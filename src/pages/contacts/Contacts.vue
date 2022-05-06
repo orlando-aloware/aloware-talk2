@@ -92,8 +92,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated', 'profile']),
-    ...mapState('contacts', ['showContactsListSidebar', 'unsavedList']),
+    ...mapGetters('auth', [
+      'authenticated',
+      'profile'
+    ]),
+    ...mapState('contacts', [
+      'showContactsListSidebar',
+      'unsavedList'
+    ]),
     ...mapState(['isMobile']),
     mainClass () {
       if (this.$route.name === 'Contact') {
@@ -168,6 +174,13 @@ export default {
         }
         this.setShowContactsHeader(true)
         this.setShowContactsListSidebar(false)
+      }
+
+      if (from.name === 'Contacts' && to.name === 'Contacts') {
+        this.updateContactsListFilter({
+          id: this.previousListId,
+          filters: this.previousListFilters
+        })
       }
 
       if (to.name === 'Contact' && this.$q.screen.lt.md) {

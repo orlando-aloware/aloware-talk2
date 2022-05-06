@@ -206,7 +206,10 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isFiltersOpen']),
+    ...mapState('contacts', [
+      'isFiltersOpen',
+      'selectedList'
+    ]),
     ...mapState(['filters']),
     ...mapGetters('contacts', [
       'currentListFilters',
@@ -505,10 +508,14 @@ export default {
       }
 
       if (!_.isEqual(updatedFilter, initialListFilters)) {
-        this.$VueEvent.fire('fetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
 
       this.setCurrentListFilters(updatedFilter)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: updatedFilter
+      })
       this.$VueEvent.fire('shouldUpdateListCount')
       this.$emit('filtersUpdated')
     },
@@ -525,10 +532,14 @@ export default {
       }
 
       if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
-        this.$VueEvent.fire('fetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
 
       this.setCurrentListFilters(updatedFilter)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: updatedFilter
+      })
       this.$emit('filtersUpdated')
     },
 
@@ -549,7 +560,13 @@ export default {
       return typeof filter.default !== 'undefined' && filter.default === 1
     },
 
-    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
+    ...mapActions('contacts', [
+      'openFilters',
+      'closeFilters',
+      'setFilters',
+      'setCurrentListFilters',
+      'updateContactsListFilter'
+    ]),
     ...mapActions(['setFilters'])
   },
 

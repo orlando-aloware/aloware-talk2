@@ -223,6 +223,8 @@ export default function () {
     pinnedListsLoaded: false,
     publicListsLoaded: false,
     myListsLoaded: false,
-    listContactsLoaded: false
+    listContactsLoaded: false,
+    previousListFilters: {},
+    previousListId: null
   }
 }

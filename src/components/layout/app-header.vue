@@ -164,13 +164,18 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['authenticated', 'profile']),
+    ...mapGetters('auth', [
+      'authenticated',
+      'profile'
+    ]),
     ...mapState('contacts', [
       'selectedList',
       'pinnedListsLoaded',
       'publicListsLoaded',
       'myListsLoaded',
-      'listContactsLoaded'
+      'listContactsLoaded',
+      'previousListFilters',
+      'previousListId'
     ]),
     ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile']),
@@ -284,11 +289,16 @@ export default {
     },
 
     refreshContacts () {
+      this.updateContactsListFilter({
+        id: this.previousListId,
+        filters: this.previousListFilters
+      })
       this.$VueEvent.fire('fetchContacts')
       this.$VueEvent.fire('fetchContactsLists')
     },
 
     ...mapActions('stats', ['setMetricGroups', 'setMetricLoader']),
+    ...mapActions('contacts', ['updateContactsListFilter']),
     ...mapActions(['setDialerFormStatus'])
   },
 

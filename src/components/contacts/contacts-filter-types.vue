@@ -118,7 +118,7 @@
 
 <script>
 import CompactBtn from 'components/compact-btn'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import _ from 'lodash'
 export default {
   name: 'contacts-filter-types',
@@ -160,7 +160,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['currentListFilters']),
+    ...mapState('contacts', [
+      'previousListId'
+    ]),
+    ...mapGetters('contacts', [
+      'currentListFilters',
+      'selectedList'
+    ]),
     hasValue () {
       switch (this.filter.type) {
         case 'string':
@@ -295,12 +301,18 @@ export default {
     applyFilter () {
       const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.setCurrentListFilters(this.allFilters)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: this.allFilters
+      })
+      this.setPreviousListFilters(this.allFilters)
+      this.setPreviousListId(this.selectedList.id)
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')
 
       if (!_.isEqual(this.initialListFilters, currentListFilters)) {
         this.setShowMyContacts(false)
-        this.$VueEvent.fire('fetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
         this.$VueEvent.fire('shouldUpdateListCount')
       }
     },
@@ -387,7 +399,12 @@ export default {
     onInput () {
       this.$refs.filterOperation[0].updateInputValue('')
     },
-    ...mapActions('contacts', [ 'setCurrentListFilters', 'setShowMyContacts' ])
+    ...mapActions('contacts', [
+      'setCurrentListFilters',
+      'setShowMyContacts',
+      'updateContactsListFilter',
+      'setPreviousListFilters'
+    ])
   },
   watch: {
     filterOperator () {
