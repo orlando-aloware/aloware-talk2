@@ -134,6 +134,9 @@ export default {
       [payload.id]: payload.contacts
     }
   },
+  SET_ALL_CONTACTS_SELECTED: (state, isSelected) => {
+    state.isAllContactsSelected = isSelected
+  },
   SET_SELECTED_LIST: (state, payload) => {
     state.selectedList = { ...state.selectedList, ...payload }
   },

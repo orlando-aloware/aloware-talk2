@@ -126,6 +126,7 @@ export default {
     if (this.isMobile) {
       this.toggleSidebar()
     }
+    this.setAllContactsSelected(false)
   },
 
   methods: {
@@ -133,7 +134,8 @@ export default {
       'setShowContactsListSidebar',
       'setShowContactsHeader',
       'setUnsavedList',
-      'setListContactOwner'
+      'setListContactOwner',
+      'setAllContactsSelected'
     ]),
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
