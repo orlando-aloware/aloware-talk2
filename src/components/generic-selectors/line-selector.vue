@@ -20,8 +20,10 @@
               style="word-break: break-all;"
               emit-value
               map-options
-              outlined
               dense
+              :outlined="outlined"
+              :borderless="borderless"
+              :clearable="clearable"
               :loading="campaignsIsLoading"
               :use-input="useInput"
               :error="hasError"
@@ -153,6 +155,22 @@ export default {
       default: false
     },
     useOnlyActives: {
+      type: Boolean,
+      default: false
+    },
+    clearable: {
+      type: Boolean,
+      default: false
+    },
+    specificClass: {
+      type: String,
+      required: false
+    },
+    outlined: {
+      type: Boolean,
+      default: true
+    },
+    borderless: {
       type: Boolean,
       default: false
     }

@@ -24,6 +24,12 @@ export default {
   name: 'contact-line-selector',
   mixins: [ LinexMixins ],
   components: { VueMultiselect },
+  props: {
+    showPaused: {
+      type: Boolean,
+      default: true
+    }
+  },
   computed: {
     formattedLineOptions () {
       const contactLines = { data: [] }
@@ -44,6 +50,11 @@ export default {
           disable: true
         })
         linesArray.data = [...contactLines.data, ...otherLines]
+      }
+
+      // filter lines if prop is false and only those who has active attribute
+      if (!this.showPaused) {
+        linesArray.data = linesArray.data.filter(line => 'active' in line ? line.active : true)
       }
 
       return linesArray.data
