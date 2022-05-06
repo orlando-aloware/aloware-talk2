@@ -113,6 +113,11 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Initial Line</p>
+        <p>{{ contact.initial_campaign.name }}</p>
+      </div>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
