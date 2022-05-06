@@ -144,12 +144,14 @@ export default {
   },
 
   watch: {
-    'contact.id': function (value) {
+    'contact.id': _.debounce(function (value) {
       this.$nextTick(() => {
         this.$refs.detailsComponentContainer.scrollTop = 0
       })
-      this.getCommunicationsSummary(value)
-    }
+      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+        this.getCommunicationsSummary(value)
+      }
+    }, 500)
   }
 }
 </script>
