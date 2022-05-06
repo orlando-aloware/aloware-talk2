@@ -20,6 +20,8 @@
               style="word-break: break-all;"
               emit-value
               map-options
+              dense
+              :outlined="outlined"
               :borderless="borderless"
               :clearable="clearable"
               :loading="campaignsIsLoading"
