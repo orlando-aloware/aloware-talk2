@@ -299,14 +299,13 @@ export default {
       this.$refs.filterOperation[0].focus()
     },
     applyFilter () {
+      this.setListContactsLoaded(false)
       const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.setCurrentListFilters(this.allFilters)
       this.updateContactsListFilter({
         id: this.selectedList.id,
         filters: this.allFilters
       })
-      this.setPreviousListFilters(this.allFilters)
-      this.setPreviousListId(this.selectedList.id)
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.$emit('filtersApplied')
 
@@ -403,7 +402,7 @@ export default {
       'setCurrentListFilters',
       'setShowMyContacts',
       'updateContactsListFilter',
-      'setPreviousListFilters'
+      'setListContactsLoaded'
     ])
   },
   watch: {

@@ -136,13 +136,25 @@
           <compact-btn borderless
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        variant="outlined-light"
-                       v-if="hasAppliedFilters"
-                       :disabled="isResetDisabled"
-                       @clicked="resetFilters">
+                       v-if="hasAppliedFilters && !isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
+                       :disabled="defaultIds.includes(id)"
+                       tooltip-text="Clear"
+                       @clicked="clearFilters">
             <close-icon width="14px"
                         height="14px"
                         icon-color="#62666E">
             </close-icon>
+          </compact-btn>
+          <compact-btn borderless
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       variant="outlined-light"
+                       v-if="isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
+                       tooltip-text="Reset"
+                       @clicked="resetFilters">
+            <refresh-icon width="14px"
+                          height="14px"
+                          icon-color="grey-90">
+            </refresh-icon>
           </compact-btn>
           <compact-btn borderless
                        variant="outlined-light"
@@ -696,6 +708,7 @@ import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import { avatarMixin, contactListCountMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
   name: 'contacts-view',
@@ -711,6 +724,7 @@ export default {
   ],
 
   components: {
+    RefreshIcon,
     BackButton,
     DeleteRedIcon,
     ExportIcon,
@@ -849,7 +863,9 @@ export default {
       'setBulkDelete',
       'setMessageComposerMode',
       'exportCsv',
-      'updateContactsList'
+      'updateContactsList',
+      'updateContactsListFilter',
+      'setListContactsLoaded'
     ]),
     onSearch (searchText) {
       this.$emit('search', searchText)
@@ -1090,15 +1106,40 @@ export default {
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
+    clearFilters () {
+      this.setCurrentListFilters({})
+      this.setListContactsLoaded(false)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: {}
+      })
+      this.$VueEvent.fire('filters-reset')
+      this.setShowMyContacts(false)
+      this.$VueEvent.fire('filteredFetchContacts', { clear: true })
+      this.$VueEvent.fire('shouldUpdateListCount')
+    },
     resetFilters (resetSearch = false) {
-      const defaultFilters = this.fixDefaultFilters()
-      this.setCurrentListFilters(defaultFilters)
+      this.setListContactsLoaded(false)
+      if (this.selectedList.id === this.previousListId) {
+        this.setCurrentListFilters(this.previousListFilters)
+        this.updateContactsListFilter({
+          id: this.selectedList.id,
+          filters: this.previousListFilters
+        })
+      } else {
+        this.setCurrentListFilters(this.fixDefaultFilters())
+        this.updateContactsListFilter({
+          id: this.selectedList.id,
+          filters: this.fixDefaultFilters()
+        })
+      }
+
       if (resetSearch) {
         this.resetSearch()
       }
       this.$VueEvent.fire('filters-reset')
 
-      this.$VueEvent.fire('fetchContacts', { clear: true })
+      this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       this.$VueEvent.fire('shouldUpdateListCount')
       this.filterHasChanges = false
     },
@@ -1377,7 +1418,9 @@ export default {
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
       'pinnedCounts',
-      'previousListFilters'
+      'previousListFilters',
+      'previousListId',
+      'listContactsLoaded'
     ]),
     ...mapGetters('contacts', [
       'lists',
@@ -1461,7 +1504,7 @@ export default {
       return this.isFilterHasChanges ? 'primary' : 'secondary'
     },
     saveFilterButtonCustomClass () {
-      return !this.isFilterHasChanges ? 'button-disabled' : ''
+      return this.isDisabledSaveFilter ? 'button-disabled' : ''
     },
     isResetDisabled () {
       return !this.isFilterHasChanges
@@ -1513,14 +1556,17 @@ export default {
           !this.isLoading) ||
         false
     },
-    isFilterHasChanges () {
+    isCurrentAndPreviousFiltersMismatch () {
       const previousListFilters = JSON.parse(JSON.stringify(this.previousListFilters))
 
       if (!this.currentListFilters.search && !previousListFilters.search) {
         previousListFilters.search = this.currentListFilters.search
       }
 
-      return this.filterHasChanges || !_.isEqual(this.currentListFilters, previousListFilters)
+      return !_.isEqual(this.currentListFilters, previousListFilters)
+    },
+    isFilterHasChanges () {
+      return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
     },
     isDisabledSaveFilter () {
       return !this.isFilterHasChanges ||

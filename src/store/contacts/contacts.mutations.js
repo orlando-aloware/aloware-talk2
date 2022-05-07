@@ -74,7 +74,9 @@ export default {
     Vue.set(state.lists, `${list.id}`, list)
   },
   UPDATE_LIST_FILTER: (state, payload) => {
-    Vue.set(state.lists[payload.id], 'filters', payload.filters)
+    if (typeof state.lists[payload.id] !== 'undefined') {
+      Vue.set(state.lists[payload.id], 'filters', payload.filters)
+    }
   },
   PINNED_LOADED: (state, pinned) => {
     state.pinned = pinned

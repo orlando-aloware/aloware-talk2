@@ -176,7 +176,9 @@ export default {
         this.setShowContactsListSidebar(false)
       }
 
-      if (from.name === 'Contacts' && to.name === 'Contacts') {
+      if (from.name === 'Contacts' &&
+        to.name === 'Contacts' &&
+        this.previousListId) {
         this.updateContactsListFilter({
           id: this.previousListId,
           filters: this.previousListFilters

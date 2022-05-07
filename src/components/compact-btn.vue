@@ -5,6 +5,13 @@
     @click.stop="onClickEvent"
   >
     <slot />
+    <q-tooltip v-if="tooltipText"
+               content-class="bg-grey-light11"
+               anchor="top middle"
+               self="center middle"
+               :offset="[20, 20]">
+      {{ tooltipText }}
+    </q-tooltip>
   </button>
 </template>
 
@@ -60,6 +67,11 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+    tooltipText: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   methods: {

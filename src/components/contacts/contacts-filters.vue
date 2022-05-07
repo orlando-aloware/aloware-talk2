@@ -491,6 +491,7 @@ export default {
     },
 
     onDeleteFilter (index, key) {
+      this.setListContactsLoaded(false)
       const updatedFilter = _.cloneDeep(JSON.parse(JSON.stringify(this.currentListFilters)))
       const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
@@ -521,6 +522,7 @@ export default {
     },
 
     onDeleteGroupFilter (index) {
+      this.setListContactsLoaded(false)
       const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
 
       if (updatedFilter.constructor.name === 'Array') {
@@ -565,7 +567,8 @@ export default {
       'closeFilters',
       'setFilters',
       'setCurrentListFilters',
-      'updateContactsListFilter'
+      'updateContactsListFilter',
+      'setListContactsLoaded'
     ]),
     ...mapActions(['setFilters'])
   },
