@@ -206,6 +206,7 @@ export default {
           }
 
           let listId = this.id === 'my-queue' || this.id === 'in-queue' ? this.myQueue?.id : this.id
+          listId = listId === null ? 'all' : listId
           const list = _.get(this.lists, listId, { id: null, name: '', type: null })
 
           this.setSelectedList({

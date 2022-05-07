@@ -15,7 +15,7 @@
       <router-link
         class="btn-header-nav-back"
         v-if="['Communication'].includes($route.name)"
-        :to="{ name: 'Contact', params: { id: $route.params.contactId }}">
+        :to="{ path: prevRoute }">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left"></i>
         </button>
@@ -155,12 +155,6 @@ export default {
       loading: false,
       prevRoute: null
     }
-  },
-
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.prevRoute = from
-    })
   },
 
   computed: {
@@ -337,6 +331,9 @@ export default {
         delete query.call
         this.$router.replace({ query })
       }
+    },
+    $route (to, from) {
+      this.prevRoute = from.path
     }
   }
 }
