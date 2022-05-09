@@ -32,7 +32,8 @@
         @paginated="onPaginate"
         @loadMore="onLoadMore(selectedList)"
         @onFiltersCount="getFiltersCount"
-        @on-list-update="updateList">
+        @on-list-update="updateList"
+        @on-my-queue-list="myQueueList">
       </router-view>
     </div>
 
@@ -178,6 +179,7 @@ export default {
   async mounted () {
     this.START_DIAL_TOGGLE(false)
     // // await this.initialize()
+    await this.myQueueList()
     await this.setFilterParams(this.$route.params)
 
     this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
@@ -202,8 +204,11 @@ export default {
     })
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'getMyQueueList'
+    ]),
     ...mapActions('contacts', [
-      // 'contactsLoaded',
+      'listLoaded',
       'clearList'
     ]),
     ...mapMutations('powerDialer', [
@@ -211,6 +216,14 @@ export default {
       'TOGGLE_TABLE_LOADER',
       'SET_ACTIVE_FILTER'
     ]),
+    async myQueueList () {
+      let response = await this.getMyQueueList()
+      if (response.status === 200) {
+        this.listLoaded({ ...response.data, id: 'my-queue' })
+      } else {
+        this.$generalNotification('My Queue list not found! Please contact administrator.', 'error')
+      }
+    },
     handleBulkDeletion () {
       const url = { data: null }
       switch (this.removeContactActionType) {

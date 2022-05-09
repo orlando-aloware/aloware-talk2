@@ -765,12 +765,7 @@ export default {
       console.log('PD contact to create : ', contact)
     },
     async myQueueList () {
-      let response = await this.getMyQueueList()
-      if (response.status === 200) {
-        this.listLoaded({ ...response.data, id: 'my-queue' })
-      } else {
-        this.$generalNotification('My Queue list not found! Please contact administrator.', 'error')
-      }
+      this.$emit('on-my-queue-list')
     },
     onSearch (searchText) {
       this.$emit('search', searchText)
