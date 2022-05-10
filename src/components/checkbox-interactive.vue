@@ -29,6 +29,9 @@ export default {
       return this.checkedItems.find(item => item.contact_list_item_id === this.resource.contact_list_item_id)
     }
   },
+  mounted () {
+    this.onToggleCheck()
+  },
   data () {
     return {
       isChecked: false
@@ -45,16 +48,19 @@ export default {
         items.data.push(this.resource)
       }
       this.$emit('checked', { data: items.data, checked: this.isChecked })
-    }
-  },
-  watch: {
-    checkedItems (arr) {
+    },
+    onToggleCheck () {
       const found = this.checkedItems.find(item => item.contact_list_item_id === this.resource.contact_list_item_id)
       if (found) {
         this.isChecked = true
       } else {
         this.isChecked = false
       }
+    }
+  },
+  watch: {
+    checkedItems () {
+      this.onToggleCheck()
     }
   }
 }

@@ -929,6 +929,12 @@ export default {
     getUserName (userId) {
       const user = this.users.find(item => item.id === userId)
       return user ? user.name : '-'
+    },
+    onForcedCheckAll (value) {
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
     }
   },
   watch: {
@@ -958,10 +964,7 @@ export default {
       this.onFetch()
     },
     checked: function (value) {
-      const elem = document.querySelector('.data-table-check-all')
-      if (elem) {
-        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
-      }
+      this.onForcedCheckAll(value)
     }
   }
 }

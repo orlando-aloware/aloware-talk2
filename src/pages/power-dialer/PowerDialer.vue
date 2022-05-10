@@ -30,7 +30,7 @@
         @checkboxChanged="onFetchMyContacts"
         @sort="onSortByField"
         @paginated="onPaginate"
-        @loadMore="onLoadMore(selectedList)"
+        @loadMore="beforeOnLoadMore(selectedList)"
         @onFiltersCount="getFiltersCount"
         @on-list-update="updateList"
         @on-my-queue-list="myQueueList">
@@ -84,6 +84,7 @@ import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import sessionsMixins from 'src/plugins/mixins/sessions-engine'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+// import { get } from 'lodash'
 
 export default {
   name: 'PowerDialer',
@@ -209,7 +210,8 @@ export default {
     ]),
     ...mapActions('contacts', [
       'listLoaded',
-      'clearList'
+      'clearList',
+      'setListSelectedContacts'
     ]),
     ...mapMutations('powerDialer', [
       'START_DIAL_TOGGLE',
@@ -301,6 +303,15 @@ export default {
             this.SET_ACTIVE_FILTER('in-queue')
           }
         }
+      }
+    },
+    beforeOnLoadMore (selectedList) {
+      this.onLoadMore(selectedList)
+    },
+    forcedCheckAllItems () {
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem.checked) {
+        this.setListSelectedContacts({ id: this.tempId, contacts: this.contactsData.data })
       }
     },
     async updateList (data) {

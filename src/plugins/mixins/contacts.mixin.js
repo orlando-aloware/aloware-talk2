@@ -125,6 +125,9 @@ export default {
             // Load contacts and force concatenation
             this.contactsLoaded(data, true)
             this.markCheckedAll()
+            if (this.isPowerDialer) {
+              this.forcedCheckAllItems()
+            }
           })
           .finally(() => {
             this.isLoadingMore = false
