@@ -8344,6 +8344,11 @@ span.mention {
   &-header-separator {
     margin: 0 15px;
   }
+  .sessions-main-page {
+    &.minimized {
+      width: 100vw;
+    }
+  }
 }
 
 .custom-control-input:disabled {

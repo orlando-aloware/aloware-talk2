@@ -6,9 +6,9 @@
       <SessionSidebar />
     </div>
     <div
-      :class="`${sessionSidebarExpanded ? 'col-12' : 'col-10'} bg-grey-1 px-0 pr-1 mb-0`"
-      class="px-0 mb-0 main flex-1"
-      :style="`${sessionSidebarExpanded ? 'padding-left:15px !important;' : ''}`">
+      :class="`${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 pr-1 mb-0`"
+      class="sessions-main-page px-0 mb-0 main flex-1"
+      :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
       <div class="t-flex-group">
 
         <!-- Session Header -->
