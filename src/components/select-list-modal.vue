@@ -81,7 +81,7 @@ import Search from 'src/components/search'
 export default {
   components: { Search, SelectListTreeFolder },
   computed: {
-    ...mapGetters('contacts', ['selectList', 'currentListFilters', 'selectedStaticList', 'selectedList', 'selectedContacts', 'folders']),
+    ...mapGetters('contacts', ['selectList', 'currentListFilters', 'selectedStaticList', 'selectedList', 'selectedContacts', 'folders', 'isAllContactsSelected']),
     getTitle () {
       return 'Add to Static Lists'
     }
@@ -105,7 +105,8 @@ export default {
       this.isLoading = true
       this.$axios
         .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, {
-          contacts: this.selectedContacts[this.selectedList.id].map(item => item.id)
+          contacts: this.selectedContacts[this.selectedList.id].map(item => item.id),
+          include_all_contacts: this.isAllContactsSelected
         })
         .then((response) => {
           const message = response.data.message

@@ -2,7 +2,13 @@
   <div class="bulk-action-menu">
     <div class="menu-actions d-flex flex-row">
       <div class="items">
-        <span>{{ getSelectedCount }} selected</span>
+        <span v-if="!isAllContactsSelected">{{ getSelectedCount }} selected</span>
+        <span v-else>Selected all {{ selectedList.contactCount | numFormat }} contact from this list</span>
+      </div>
+      <div class="items" v-if="!isAllContactsSelected && selectedList.contactCount > 25">
+        <a href="#" @click="onSetAllContactsSelected">
+          Select all {{ selectedList.contactCount | numFormat }} contacts from this list
+        </a>
       </div>
       <div class="items"
            v-if="false">
@@ -56,13 +62,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['selectedContacts']),
+    ...mapGetters('contacts', ['selectedContacts', 'selectedList', 'isAllContactsSelected']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
     }
   },
   methods: {
-    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'createListOpen', 'selectListOpen', 'setSelectedStaticList']),
+    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'createListOpen', 'selectListOpen', 'setSelectedStaticList', 'setAllContactsSelected']),
     onDelete (e) {
       this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
@@ -81,6 +87,11 @@ export default {
         contact_folder_id: null
       })
       this.setSelectedStaticList({ id: null, name: '', type: null })
+      e.preventDefault()
+    },
+    onSetAllContactsSelected (e) {
+      this.setAllContactsSelected(true)
+      this.$emit('onSetAllContactsSelected')
       e.preventDefault()
     }
   }
