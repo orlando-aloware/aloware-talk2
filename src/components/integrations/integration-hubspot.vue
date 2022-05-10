@@ -300,11 +300,11 @@ export default {
   },
 
   watch: {
-    'contact.id': function () {
-      if (this.contact && this.contact.id) {
+    'contact.id': _.debounce(function () {
+      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
         this.getData()
       }
-    }
+    }, 500)
   }
 }
 </script>

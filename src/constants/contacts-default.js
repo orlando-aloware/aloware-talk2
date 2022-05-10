@@ -207,5 +207,7 @@ export const DEFAULT_STATE = {
   pinnedListsLoaded: false,
   publicListsLoaded: false,
   myListsLoaded: false,
-  listContactsLoaded: false
+  listContactsLoaded: false,
+  previousListFilters: {},
+  previousListId: null
 }

@@ -83,7 +83,9 @@
           <b-form-group id="input-group-2"
                         label="Send From"
                         label-for="input-2">
-            <contact-line-selector @select="lineSelected"></contact-line-selector>
+            <contact-line-selector :showPaused="false"
+                                   @select="lineSelected">
+            </contact-line-selector>
           </b-form-group>
 
           <b-form-group id="input-group-2"

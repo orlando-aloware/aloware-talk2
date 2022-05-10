@@ -22,7 +22,9 @@
 
       </b-button>
       <br/>
-      <i class="fa fa-phone-slash fs-20 mt-5"></i>
+      <i class="fa fs-20 mt-5"
+         v-if="!isDiagnosing"
+         :class="[diagnosis && diagnosis.agent_is_eligible_to_take_call ? 'fa-phone' : 'fa-phone-slash']"></i>
     </b-col>
   </b-row>
   <b-row class="row-no-padding"

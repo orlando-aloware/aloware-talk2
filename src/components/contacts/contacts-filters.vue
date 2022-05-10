@@ -206,7 +206,10 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isFiltersOpen']),
+    ...mapState('contacts', [
+      'isFiltersOpen',
+      'selectedList'
+    ]),
     ...mapState(['filters']),
     ...mapGetters('contacts', [
       'currentListFilters',
@@ -488,6 +491,7 @@ export default {
     },
 
     onDeleteFilter (index, key) {
+      this.setListContactsLoaded(false)
       const updatedFilter = _.cloneDeep(JSON.parse(JSON.stringify(this.currentListFilters)))
       const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
@@ -505,15 +509,20 @@ export default {
       }
 
       if (!_.isEqual(updatedFilter, initialListFilters)) {
-        this.$VueEvent.fire('fetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
 
       this.setCurrentListFilters(updatedFilter)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: updatedFilter
+      })
       this.$VueEvent.fire('shouldUpdateListCount')
       this.$emit('filtersUpdated')
     },
 
     onDeleteGroupFilter (index) {
+      this.setListContactsLoaded(false)
       const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
 
       if (updatedFilter.constructor.name === 'Array') {
@@ -525,10 +534,14 @@ export default {
       }
 
       if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
-        this.$VueEvent.fire('fetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
 
       this.setCurrentListFilters(updatedFilter)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: updatedFilter
+      })
       this.$emit('filtersUpdated')
     },
 
@@ -549,7 +562,14 @@ export default {
       return typeof filter.default !== 'undefined' && filter.default === 1
     },
 
-    ...mapActions('contacts', ['openFilters', 'closeFilters', 'setFilters', 'setCurrentListFilters']),
+    ...mapActions('contacts', [
+      'openFilters',
+      'closeFilters',
+      'setFilters',
+      'setCurrentListFilters',
+      'updateContactsListFilter',
+      'setListContactsLoaded'
+    ]),
     ...mapActions(['setFilters'])
   },
 

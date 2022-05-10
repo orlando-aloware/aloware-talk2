@@ -15,7 +15,7 @@
       <router-link
         class="btn-header-nav-back"
         v-if="['Communication'].includes($route.name)"
-        :to="{ name: 'Contact', params: { id: $route.params.contactId }}">
+        :to="{ path: prevRoute }">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left"></i>
         </button>
@@ -157,20 +157,19 @@ export default {
     }
   },
 
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.prevRoute = from
-    })
-  },
-
   computed: {
-    ...mapGetters('auth', ['authenticated', 'profile']),
+    ...mapGetters('auth', [
+      'authenticated',
+      'profile'
+    ]),
     ...mapState('contacts', [
       'selectedList',
       'pinnedListsLoaded',
       'publicListsLoaded',
       'myListsLoaded',
-      'listContactsLoaded'
+      'listContactsLoaded',
+      'previousListFilters',
+      'previousListId'
     ]),
     ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile']),
@@ -236,11 +235,14 @@ export default {
 
     navigateBack (e) {
       const previousPage = _.get(this.$route.query, 'previousPage', null)
+      const previousList = _.get(this.$route.query, 'list', null)
 
       if (previousPage === 'PowerDialer') {
-        this.$router.push({
-          path: this.$router.history._startLocation
-        })
+        if (previousList) {
+          this.$router.push(`/power-dialer/list/${previousList}`)
+        } else {
+          this.$router.push(`/power-dialer`)
+        }
       }
 
       if (this.$route.name === 'Settings Tab') {
@@ -284,11 +286,16 @@ export default {
     },
 
     refreshContacts () {
+      this.updateContactsListFilter({
+        id: this.previousListId,
+        filters: this.previousListFilters
+      })
       this.$VueEvent.fire('fetchContacts')
       this.$VueEvent.fire('fetchContactsLists')
     },
 
     ...mapActions('stats', ['setMetricGroups', 'setMetricLoader']),
+    ...mapActions('contacts', ['updateContactsListFilter']),
     ...mapActions(['setDialerFormStatus'])
   },
 
@@ -324,6 +331,9 @@ export default {
         delete query.call
         this.$router.replace({ query })
       }
+    },
+    $route (to, from) {
+      this.prevRoute = from.path
     }
   }
 }

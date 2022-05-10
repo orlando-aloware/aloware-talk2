@@ -357,26 +357,35 @@ export default {
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
+
       if (this.contactId) {
-        return this.$axios.get(`/api/v2/contacts/${this.contactId}`).then(res => {
-          this.fetchContactCommunications(this.contactId, false).then(() => {
-            this.loadingContact = false
-            // if route has communication id
-            // until id is found
-            if (this.hasCommunication()) {
-              this.loadingContactCommunications = true
-              this.fetchContactCommunicationsUntilFound()
-            } else {
-              this.loadingContactCommunications = false
-            }
-            this.scrollMessages()
-          })
-          return res
+        this.source.cancel('Fetch contact info operation canceled by the user.')
+        this.source = this.cancelToken.source()
+        return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
+          if (res) {
+            this.fetchContactCommunications(this.contactId, false).then(() => {
+              this.loadingContact = false
+              // if route has communication id
+              // until id is found
+              if (this.hasCommunication()) {
+                this.loadingContactCommunications = true
+                this.fetchContactCommunicationsUntilFound()
+              } else {
+                this.loadingContactCommunications = false
+              }
+              this.scrollMessages()
+            })
+            return res
+          }
         }).catch(err => {
-          this.loadingContact = false
-          this.loadingContactCommunications = false
-          this.$handleErrors(err.response)
-          this.$router.push({ path: '/contacts' })
+          if (this.$axios.isCancel(err) && err) {
+            console.log('Request canceled', err.message)
+          } else {
+            this.loadingContact = false
+            this.loadingContactCommunications = false
+            this.$handleErrors(err.response)
+            this.$router.push({ path: '/contacts' })
+          }
         })
       }
       this.loadingContact = false
@@ -904,6 +913,9 @@ export default {
     processFetchContactInfo (callback) {
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
+        if (!res) {
+          return
+        }
         // if contact status changes then redirect to the right url
         if (this.$route.name === 'Inbox Contact Task' && this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
           this.$router.push({
@@ -1060,8 +1072,11 @@ export default {
   },
 
   watch: {
-    selectedCampaign () {
+    'selectedCampaign.id': _.debounce(function (value) {
       this.updateMessageComposer()
+    }, 1000),
+    contactId: function () {
+      this.communicationsPage = 1
     }
   },
 

@@ -54,6 +54,12 @@ export default {
   listLoaded: ({ commit }, payload) => {
     commit('LIST_LOADED', payload)
   },
+  updateContactsList: ({ commit }, payload) => {
+    commit('UPDATE_LIST', payload)
+  },
+  updateContactsListFilter: ({ commit }, payload) => {
+    commit('UPDATE_LIST_FILTER', payload)
+  },
   columnsOpen: ({ commit }, payload) => {
     commit('COLUMNS_OPEN', payload)
   },
@@ -316,5 +322,11 @@ export default {
   },
   setAllContactsSelected: ({ commit }, selected) => {
     commit('SET_ALL_CONTACTS_SELECTED', selected)
+  },
+  setPreviousListFilters: ({ commit }, payload) => {
+    commit('SET_PREVIOUS_LIST_FILTERS', payload)
+  },
+  setPreviousListId: ({ commit }, id) => {
+    commit('SET_PREVIOUS_LIST_ID', id)
   }
 }

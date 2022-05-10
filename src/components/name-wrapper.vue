@@ -5,7 +5,7 @@
     </div>
     <div class="flex-grow-1">
       <router-link
-        :to="`${linkPath}${computedResource.id}?previousPage=PowerDialer`"
+        :to="`${linkPath}${computedResource.id}${urlParams}`"
         v-slot="{ href, route, navigate }">
         <a :href="href"
           @click="navigate"
@@ -34,6 +34,10 @@ export default {
     linkPath: {
       type: String,
       default: '/'
+    },
+    list: {
+      type: Object,
+      default: () => {}
     }
   },
   components: {
@@ -53,6 +57,15 @@ export default {
         return `${computedResource.first_name}`.trim()
       }
       return ''
+    },
+    urlParams () {
+      const pathKey = this.list.name ? this.list.id : null
+      return pathKey ? `?previousPage=PowerDialer&list=${pathKey}` : `?previousPage=PowerDialer`
+    }
+  },
+  methods: {
+    onNavigate (navigate) {
+      navigate()
     }
   }
 }

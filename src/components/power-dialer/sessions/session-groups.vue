@@ -292,28 +292,44 @@ export default {
       return this.selectedList.id === this.myQueue.id
     },
     totalAll () {
-      // return this.powerDialerTaskFilters?.all?.total_items
-      let { called, failed, scheduled } = this.powerDialerTasks
-      return called.length + failed.length + this.powerDialerTasks.in_queue.length + scheduled.length
+      let { totalQueued, totalCalled, totalFailed, totalScheduled } = this
+      return totalQueued + totalCalled + totalFailed + totalScheduled
     },
     totalQueued () {
-      // return this.powerDialerTaskFilters?.in_queue?.total_queued
-      return this.powerDialerTasks.in_queue.length
+      let queued = this.powerDialerTasks.in_queue
+      let total = queued.length < this.itemsPerPage
+        ? queued.length
+        : queued.length >= this.getTotalItem('in_queue')
+          ? queued.length + this.itemsPerPage
+          : queued.length + this.getTotalItem('in_queue')
+      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
     },
     totalCalled () {
-      // return this.powerDialerTaskFilters?.called?.total_called
       let { called } = this.powerDialerTasks
-      return called.length
+      let total = called.length < this.itemsPerPage
+        ? called.length
+        : called.length >= this.getTotalItem('called')
+          ? called.length + this.itemsPerPage
+          : called.length + this.getTotalItem('called')
+      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
     },
     totalFailed () {
-      // return this.powerDialerTaskFilters?.failed?.total_failed
       let { failed } = this.powerDialerTasks
-      return failed.length
+      let total = failed.length < this.itemsPerPage
+        ? failed.length
+        : failed.length >= this.getTotalItem('failed')
+          ? failed.length + this.itemsPerPage
+          : failed.length + this.getTotalItem('failed')
+      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
     },
     totalScheduled () {
-      // return this.powerDialerTaskFilters?.scheduled?.total_scheduled
       let { scheduled } = this.powerDialerTasks
-      return scheduled.length
+      let total = scheduled.length < this.itemsPerPage
+        ? scheduled.length
+        : scheduled.length >= this.getTotalItem('scheduled')
+          ? scheduled.length + this.itemsPerPage
+          : scheduled.length + this.getTotalItem('scheduled')
+      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
     }
   },
   methods: {
@@ -435,17 +451,20 @@ export default {
       if (group.length < this.itemsPerPage) {
         return false
       }
+      return group.length < this.getTotalItem(key)
+    },
+    getTotalItem (key) {
       switch (key) {
         case 'in_queue':
-          return group.length < this.totalQueued
+          return this.powerDialerTaskFilters[key].total_queued
         case 'called':
-          return group.length < this.totalCalled
+          return this.powerDialerTaskFilters[key].total_called
         case 'failed':
-          return group.length < this.totalFailed
+          return this.powerDialerTaskFilters[key].total_failed
         case 'scheduled':
-          return group.length < this.totalScheduled
+          return this.powerDialerTaskFilters[key].total_scheduled
         default:
-          return group.length < this.totalAll
+          return this.powerDialerTaskFilters[key].total_items
       }
     },
     fetchName (item) {

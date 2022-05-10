@@ -136,13 +136,25 @@
           <compact-btn borderless
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        variant="outlined-light"
-                       v-if="hasAppliedFilters"
-                       :disabled="isResetDisabled"
-                       @clicked="resetFilters">
+                       v-if="hasAppliedFilters && !isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
+                       :disabled="defaultIds.includes(id)"
+                       tooltip-text="Clear"
+                       @clicked="clearFilters">
             <close-icon width="14px"
                         height="14px"
                         icon-color="#62666E">
             </close-icon>
+          </compact-btn>
+          <compact-btn borderless
+                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                       variant="outlined-light"
+                       v-if="isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
+                       tooltip-text="Reset"
+                       @clicked="resetFilters">
+            <refresh-icon width="14px"
+                          height="14px"
+                          icon-color="grey-90">
+            </refresh-icon>
           </compact-btn>
           <compact-btn borderless
                        variant="outlined-light"
@@ -162,7 +174,7 @@
         <compact-btn
           variant="primary"
           v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
-          :disabled="!filterHasChanges || defaultIds.includes(this.id) || isUpdatingList || list.show_in_public_folder"
+          :disabled="isDisabledSaveFilter"
           :customClass="saveFilterButtonCustomClass"
           @clicked="onUpdateContactList">
           <q-spinner-bars v-if="isUpdatingList"
@@ -698,6 +710,7 @@ import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import { avatarMixin, contactListCountMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
   name: 'contacts-view',
@@ -713,6 +726,7 @@ export default {
   ],
 
   components: {
+    RefreshIcon,
     BackButton,
     DeleteRedIcon,
     ExportIcon,
@@ -851,7 +865,10 @@ export default {
       'setBulkDelete',
       'setMessageComposerMode',
       'exportCsv',
-      'setAllContactsSelected'
+      'setAllContactsSelected',
+      'updateContactsList',
+      'updateContactsListFilter',
+      'setListContactsLoaded'
     ]),
     onSearch (searchText) {
       this.$emit('search', searchText)
@@ -998,7 +1015,8 @@ export default {
         console.log('Updating existing dynamic list...')
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
-          .then(() => {
+          .then((res) => {
+            this.updateContactsList(res.data)
             this.initialListFilters = this.currentListFilters
             this.updateFilterHasChanges()
             this.isUpdatingList = false
@@ -1101,15 +1119,40 @@ export default {
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
+    clearFilters () {
+      this.setCurrentListFilters({})
+      this.setListContactsLoaded(false)
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: {}
+      })
+      this.$VueEvent.fire('filters-reset')
+      this.setShowMyContacts(false)
+      this.$VueEvent.fire('filteredFetchContacts', { clear: true })
+      this.$VueEvent.fire('shouldUpdateListCount')
+    },
     resetFilters (resetSearch = false) {
-      const defaultFilters = this.fixDefaultFilters()
-      this.setCurrentListFilters(defaultFilters)
+      this.setListContactsLoaded(false)
+      if (this.selectedList.id === this.previousListId) {
+        this.setCurrentListFilters(this.previousListFilters)
+        this.updateContactsListFilter({
+          id: this.selectedList.id,
+          filters: this.previousListFilters
+        })
+      } else {
+        this.setCurrentListFilters(this.fixDefaultFilters())
+        this.updateContactsListFilter({
+          id: this.selectedList.id,
+          filters: this.fixDefaultFilters()
+        })
+      }
+
       if (resetSearch) {
         this.resetSearch()
       }
       this.$VueEvent.fire('filters-reset')
 
-      this.$VueEvent.fire('fetchContacts', { clear: true })
+      this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       this.$VueEvent.fire('shouldUpdateListCount')
       this.filterHasChanges = false
     },
@@ -1388,7 +1431,10 @@ export default {
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
       'pinnedCounts',
-      'isAllContactsSelected'
+      'isAllContactsSelected',
+      'previousListFilters',
+      'previousListId',
+      'listContactsLoaded'
     ]),
     ...mapGetters('contacts', [
       'lists',
@@ -1444,7 +1490,7 @@ export default {
       return {
         'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
           (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
-            !this.filterHasChanges) ||
+            !this.isFilterHasChanges) ||
           this.defaultIds.includes(this.id)
       }
     },
@@ -1466,16 +1512,16 @@ export default {
       return this.isFiltersOpen ? 'light' : 'primary'
     },
     resetButtonVariant () {
-      return this.filterHasChanges ? 'primary' : 'outlined-light'
+      return this.isFilterHasChanges ? 'primary' : 'outlined-light'
     },
     saveFilterButtonVariant () {
-      return this.filterHasChanges ? 'primary' : 'secondary'
+      return this.isFilterHasChanges ? 'primary' : 'secondary'
     },
     saveFilterButtonCustomClass () {
-      return !this.filterHasChanges ? 'button-disabled' : ''
+      return this.isDisabledSaveFilter ? 'button-disabled' : ''
     },
     isResetDisabled () {
-      return !this.filterHasChanges
+      return !this.isFilterHasChanges
     },
     isListDeletable () {
       // eslint-disable-next-line no-unused-vars
@@ -1523,6 +1569,24 @@ export default {
           !this.isLoadingMore &&
           !this.isLoading) ||
         false
+    },
+    isCurrentAndPreviousFiltersMismatch () {
+      const previousListFilters = JSON.parse(JSON.stringify(this.previousListFilters))
+
+      if (!this.currentListFilters.search && !previousListFilters.search) {
+        previousListFilters.search = this.currentListFilters.search
+      }
+
+      return !_.isEqual(this.currentListFilters, previousListFilters)
+    },
+    isFilterHasChanges () {
+      return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
+    },
+    isDisabledSaveFilter () {
+      return !this.isFilterHasChanges ||
+        this.defaultIds.includes(this.id) ||
+        this.isUpdatingList ||
+        this.list.show_in_public_folder
     }
   },
 

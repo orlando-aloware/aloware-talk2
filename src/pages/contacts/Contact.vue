@@ -119,7 +119,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['resetChangedContactProperties', 'selectedContactChanging', 'setContact', 'setContactClone']),
     ...mapActions(['setContactDetailsDrawer']),
-    fetchContact () {
+    fetchContact: _.debounce(function () {
       this.selectedContactChanging(true)
       this.processFetchContactInfo((selectedContact) => {
         this.setContact(selectedContact)
@@ -127,7 +127,7 @@ export default {
         this.resetChangedContactProperties([])
         this.selectedContactChanging(false)
       })
-    },
+    }, 1000),
     toggleDrawer () {
       this.drawer = !this.drawer
       this.setContactDetailsDrawer(this.drawer)
