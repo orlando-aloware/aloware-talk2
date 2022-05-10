@@ -29,13 +29,15 @@
     <div
       v-else
       class="row breadcrumbs d-flex py-2">
-      <div class="breadcrumbs__directory d-flex flex-column">
+      <div class="breadcrumbs__directory px-0 d-flex flex-column">
         <!-- <div class="pr-2">LOL</div> -->
-        <div class="small text-muted pt-1">
+        <div
+          v-if="breadcrumbs.crumbs"
+          class="small text-muted pt-1 pr-2">
           {{ breadcrumbs.crumbs }}
         </div>
       </div>
-      <div class="breadcrumbs__icon px-2 py-0">
+      <div class="breadcrumbs__icon pl-0 pr-2 py-0">
         <ListIcon />
       </div>
       <div class="breadcrumbs__name">

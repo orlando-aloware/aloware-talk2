@@ -5,7 +5,6 @@
         variant="light"
         size="sm"
         class="sidebar-toggle"
-        :style="`${sessionSidebarExpanded ? 'right:-25px !important' : ''}`"
         @click="toggleSidebar">
         <i class="material-icons">{{ !sessionSidebarExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>

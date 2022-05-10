@@ -125,6 +125,9 @@ export default {
             // Load contacts and force concatenation
             this.contactsLoaded(data, true)
             this.markCheckedAll()
+            if (this.isPowerDialer) {
+              this.forcedCheckAllItems()
+            }
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -375,7 +378,7 @@ export default {
     },
     markCheckedAll () {
       if (this.selectedContacts[this.id] && !_.isEmpty(this.contactsData) && document.querySelector('.data-table-check-all')) {
-        document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && this.selectedContacts[this.id].length >= this.contactsData.data.length
+        document.querySelector('.data-table-check-all').checked = (this.contactsData.data.length > 0 && this.selectedContacts[this.id].length >= this.contactsData.data.length) || this.isAllContactsSelected
       }
     },
     fixDefaultFilters () {
@@ -551,12 +554,14 @@ export default {
   },
 
   computed: {
+
     ...mapState('contacts', [
       'search',
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
       'previousListId',
-      'previousListFilters'
+      'previousListFilters',
+      'isAllContactsSelected'
     ]),
     ...mapGetters('auth', [
       'profile'
