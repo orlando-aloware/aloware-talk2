@@ -8322,8 +8322,8 @@ span.mention {
     }
 
     &.minimized {
-      min-width: 0px;
-      max-width: 0px;
+      min-width: 15px;
+      max-width: 15px;
     }
 
     .contacts-sidebar-card {
