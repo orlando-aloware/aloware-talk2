@@ -8316,6 +8316,16 @@ span.mention {
     min-width: 260px;
     max-width: 260px;
 
+    &.sidebar-1 {
+      min-width: 280px;
+      max-width: 280px;
+    }
+
+    &.minimized {
+      min-width: 0px;
+      max-width: 0px;
+    }
+
     .contacts-sidebar-card {
       overflow-y: auto !important;
 
