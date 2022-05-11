@@ -354,6 +354,10 @@ export default {
       this.resetChannelChangedFilterFields()
 
       for (const item in this.filter) {
+        if (item === 'answer_status' && this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
+          continue
+        }
+
         if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
           +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
           (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
@@ -426,7 +430,7 @@ export default {
       }
 
       this.isGettingFilters = true
-      return talk2Api.V2.inbox.filters.get({ type: this.defaultFilterModel.type }).then(response => {
+      return talk2Api.V2.inbox.filters.get({ type: this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.defaultFilterModel.type }).then(response => {
         this.personalFilters = response.data.data.user || []
         this.companyFilters = response.data.data.company || []
         this.isGettingFilters = false
@@ -437,6 +441,10 @@ export default {
       if (!params.scope) {
         const scope = [1, '1', true].includes(filter.is_on_company) ? 'company' : 'user'
         params = { ...params, scope: scope }
+      }
+
+      if (this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
+        params.type = ChannelType.CHANNEL_CALLS
       }
 
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {

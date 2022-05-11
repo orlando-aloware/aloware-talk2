@@ -81,6 +81,7 @@
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import { maxLength, required } from 'vuelidate/lib/validators'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   name: 'create-filter-dialog',
@@ -132,7 +133,8 @@ export default {
         name: '',
         scope: 'user'
       },
-      selectWidth: 0
+      selectWidth: 0,
+      ChannelType
     }
   },
 
@@ -167,7 +169,10 @@ export default {
         return
       }
       this.isCreating = true
-      this.filter = { ...this.filter, type: this.filterModel.type, filter: this.filterModel.filter }
+      this.filter = {
+        ...this.filter,
+        type: this.filterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.filterModel.type,
+        filter: this.filterModel.filter }
       return talk2Api.V2.inbox.filters.save(this.filter).then(response => {
         this.isCreating = false
         this.$VueEvent.fire('channel_filter_created', response.data.filter)

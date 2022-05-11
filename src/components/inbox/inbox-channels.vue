@@ -141,6 +141,9 @@
             </template>
           </b-overlay>
         </div>
+        <div v-if="!communications.length && !isGettingTasksList && !isLoadingMore && !isSearch"
+             class="text-center">
+          No data found based on the given filter criteria</div>
       </div>
       <filter-dialog v-model="filter"
                      :default-filter-model="channelDefaultFilterModel"
@@ -156,7 +159,7 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin } from 'src/plugins/mixins'
+import { aclMixin, communicationMixin, dateMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/inbox/channel-tasks/task-list'
 import * as Filters from 'src/constants/filters'
@@ -177,7 +180,7 @@ import UserSelector from 'components/generic-selectors/user-selector'
 export default {
   name: 'inbox-channels',
 
-  mixins: [ aclMixin, communicationMixin ],
+  mixins: [ aclMixin, communicationMixin, dateMixin ],
 
   components: {
     UserSelector,
@@ -277,7 +280,7 @@ export default {
             my_contact: Filters.DEFAULT_STATE.filter.my_contact
           }
           break
-        case ['calls'].includes(this.$route.params.channel):
+        case ['calls', 'recordings'].includes(this.$route.params.channel):
           defaultFilterModel.type = ChannelType.CHANNEL_CALLS
           defaultFilterModel.filter = {
             campaigns: Filters.DEFAULT_STATE.filter.campaigns,
@@ -300,29 +303,10 @@ export default {
             to_date: Filters.DEFAULT_STATE.filter.to_date,
             my_contact: Filters.DEFAULT_STATE.filter.my_contact
           }
-          break
-        case ['recordings'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact
+
+          if (['recordings'].includes(this.$route.params.channel)) {
+            defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
+            defaultFilterModel.filter.answer_status = 'recorded'
           }
           break
         case ['mentions'].includes(this.$route.params.channel):
@@ -482,6 +466,10 @@ export default {
 
     onApplyFilter (filter) {
       this.filter = filter
+
+      if (this.$route.params.channel === 'recordings') {
+        this.filter.answer_status = 'recorded'
+      }
 
       if (this.$route.params.channel === 'mentions') {
         if (this.mentionType === MentionType.TYPE_RECEIVED) {
