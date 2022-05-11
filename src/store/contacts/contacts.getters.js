@@ -22,6 +22,7 @@ export default {
   createDialog: (state) => state.createDialog,
   selectedContacts: (state) => state.selectedContacts,
   selectedList: (state) => state.selectedList,
+  isAllContactsSelected: (state) => state.isAllContactsSelected,
   selectedStaticList: (state) => state.selectedStaticList,
   createList: (state) => state.createList,
   selectList: (state) => state.selectList,

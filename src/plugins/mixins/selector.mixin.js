@@ -1,6 +1,13 @@
 import _ from 'lodash'
 
 export default {
+  props: {
+    forceRemoveMissingValues: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   data () {
     return {
       isFocused: false,
@@ -19,25 +26,22 @@ export default {
 
   computed: {
     selectedObject () {
-      const objectData = { id: null, found: null }
-      objectData.id = typeof this.selectedId === 'object' ? _.get(this.selectedId, this.compareProperty, '') : this.selectedId
+      const data = { id: this.getSelectedIdData(null) }
 
-      if (!_.isEmpty(this.options) && this.compareProperty && objectData.id) {
-        objectData.found = this.options.find(option => option[this.compareProperty] === objectData.id)
+      if (data.id) {
+        return data.id
       }
 
-      if (objectData.found) {
-        return objectData.found
-      }
+      data.id = this.getSelectedId(this.selectedId)
 
       if (this.compareProperty) {
         let data = {}
         data[this.textProperty] = ''
-        data[this.compareProperty] = objectData.id
+        data[this.compareProperty] = data.id
         return data
       }
 
-      return objectData.id
+      return data.id
     }
   },
 
@@ -49,6 +53,46 @@ export default {
   },
 
   methods: {
+    getSelectedId (id) {
+      const data = { id: (id ?? this.selectedId) }
+      return (typeof data.id === 'object' ? _.get(id, this.compareProperty, '') : data.id)
+    },
+
+    getSelectedIdData (id) {
+      const objectData = { found: null, id: null }
+      objectData.id = this.getSelectedId(id)
+
+      if (!_.isEmpty(this.options) && this.compareProperty && objectData.id) {
+        objectData.found = this.options.find(option => option[this.compareProperty] === objectData.id)
+      }
+
+      return objectData.found
+    },
+
+    removeMissingValues () {
+      if (!this.forceRemoveMissingValues) {
+        return
+      }
+
+      if (this.selectedId.constructor === Array) {
+        const data = { id: null, found: null }
+        for (data.id in this.selectedId) {
+          data.found = this.getSelectedIdData(this.selectedId[data.id])
+
+          if (!data.found) {
+            this.selectedId.splice(data.id, 1)
+          }
+        }
+
+        return
+      }
+
+      const found = this.getSelectedIdData(null)
+      if (!found) {
+        this.selectedId = null
+      }
+    },
+
     onShowMenu () {
       this.selectWidth = this.$refs[this.reference].$el.offsetWidth
     },
@@ -130,6 +174,10 @@ export default {
       }
     },
     toggleInputValue (toggle) {
+      if (typeof this.useChips !== 'undefined' && this.useChips) {
+        return
+      }
+
       if (this.reference && this.$refs[this.reference]) {
         // this.selectedId = null
         const element = this.$refs[this.reference].$el.querySelector('.q-field__control-container .q-field__native span')
@@ -145,6 +193,9 @@ export default {
   watch: {
     selectedObject (value) {
       this.toggleInputValue(value[this.textProperty])
+    },
+    selectedId () {
+      this.removeMissingValues()
     }
   }
 }

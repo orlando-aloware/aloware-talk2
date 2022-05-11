@@ -23,9 +23,9 @@
         <b-container fluid class="bv-example-row m-0 p-0 pb-0 border-bottom">
           <b-row
             class="pr-2 pt-4 pb-3"
-            v-if="$q.screen.name !== 'lg'">
+            v-if="$q.screen.lt.lg">
             <b-col cols="12">
-              <div class="d-flex">
+              <div class="d-flex">11111111
                 <PowerDialerFilter
                   :list-data="fixedContactsData"
                   :id="selectedListId"
@@ -47,8 +47,8 @@
             </b-col>
             <b-col
               cols="8"
-              v-if="$q.screen.name === 'lg'">
-              <div class="d-flex">
+              v-if="$q.screen.gt.md">
+              <div class="d-flex">22222222
                 <PowerDialerFilter
                   :list-data="fixedContactsData"
                   :id="selectedListId"
@@ -929,6 +929,12 @@ export default {
     getUserName (userId) {
       const user = this.users.find(item => item.id === userId)
       return user ? user.name : '-'
+    },
+    onForcedCheckAll (value) {
+      const elem = document.querySelector('.data-table-check-all')
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
     }
   },
   watch: {
@@ -958,10 +964,7 @@ export default {
       this.onFetch()
     },
     checked: function (value) {
-      const elem = document.querySelector('.data-table-check-all')
-      if (elem) {
-        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
-      }
+      this.onForcedCheckAll(value)
     }
   }
 }

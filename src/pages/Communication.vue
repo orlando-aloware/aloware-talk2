@@ -1,7 +1,8 @@
 <template>
   <div class="container-fluid mt-2 mb-2">
     <communication-details v-if="!hasError" :communication="communication"
-                           :verbose="true"></communication-details>
+                           :verbose="true">
+    </communication-details>
     <b-row v-else>
       <b-col md="4"
              sm="12"

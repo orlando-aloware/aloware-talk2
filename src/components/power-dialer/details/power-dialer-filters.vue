@@ -1,9 +1,9 @@
 <template>
   <b-card class="filter-chips border-0 text-center px-2" no-body>
-    <div class="t-grouped-buttons">
+    <div class="t-grouped-buttons pl-1">
 
       <router-link
-        class="link px-1"
+        class="link pr-1"
         v-for="(lsFilter, key) in listFilters"
         :key="key"
         :to="currentRoute(lsFilter)">
@@ -11,7 +11,7 @@
           <div class="t-badge-name">
             {{ lsFilter.name }}
           </div>
-          <div :class="`t__badge ${id === lsFilter.id ? 'active' : ''}`">
+          <div :class="`t__badge mr-0 ${id === lsFilter.id ? 'active' : ''}`">
             <!-- <span>{{ filtersCounter[lsFilter.meta] }}=</span> -->
             <span>{{ filtersCounter[lsFilter.meta] }}</span>
           </div>

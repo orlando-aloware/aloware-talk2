@@ -130,7 +130,8 @@ export default {
       'currentListFilters',
       'selectedList',
       'selectedContacts',
-      'unsavedList'
+      'unsavedList',
+      'isAllContactsSelected'
     ]),
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
@@ -179,7 +180,8 @@ export default {
           type: this.createList.type,
           headers: DEFAULT_COLUMNS,
           mode: this.createList.mode,
-          order: 0
+          order: 0,
+          include_all_contacts: this.isAllContactsSelected
         }
       }
 

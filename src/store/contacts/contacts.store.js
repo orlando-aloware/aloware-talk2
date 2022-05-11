@@ -134,6 +134,7 @@ export default function () {
       target: null
     },
     selectedContacts: {},
+    isAllContactsSelected: false,
     selectedList: {
       id: 'all',
       name: 'All Contacts',

@@ -122,7 +122,7 @@
           <div
             class="small text-muted fs-13 text-right"
             v-if="selectedList.type === ContactListTypes.DYNAMIC">
-            {{ selectedList.contactCount }} Contacts
+            {{ selectedList.contactCount | numFormat }} Contacts
           </div>
           <div
             class="small text-muted fs-13 text-right"
@@ -250,7 +250,9 @@
       </div>
     </template>
     <template slot="actions">
-      <bulk-action-menu :id="id" v-if="checked.length > 0"></bulk-action-menu>
+      <bulk-action-menu :id="id"
+                        v-if="checked.length > 0"
+                        @onSetAllContactsSelected="onCheckAllItemsFromTheList"></bulk-action-menu>
     </template>
 
     <template slot="table">
@@ -296,7 +298,7 @@
                     type="checkbox"
                     class="checker"
                     :value="contact.id"
-                    :checked="checked.find(item => item.id === contact.id)"
+                    :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
                     @change="onCheckerClicked(contact)" />
                   <span class="checkmark"></span>
                 </label>
@@ -863,6 +865,7 @@ export default {
       'setBulkDelete',
       'setMessageComposerMode',
       'exportCsv',
+      'setAllContactsSelected',
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded'
@@ -956,7 +959,17 @@ export default {
             items.data = items.data.filter(item => item.id !== Number(checkbox.value))
           }
         })
-
+      this.setAllContactsSelected(false)
+      this.setListSelectedContacts({ id: this.id, contacts: items.data })
+    },
+    onCheckAllItemsFromTheList (checked) {
+      const items = { data: [] }
+      document
+        .querySelectorAll('.checker')
+        .forEach((checkbox) => {
+          items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
+        })
+      this.setAllContactsSelected(true)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
     onCheckedRows (checked) {
@@ -1262,7 +1275,7 @@ export default {
         items.data = [...this.checked]
         items.data.push(contact)
       }
-
+      this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
     },
     isCountField (columnName) {
@@ -1418,6 +1431,7 @@ export default {
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
       'pinnedCounts',
+      'isAllContactsSelected',
       'previousListFilters',
       'previousListId',
       'listContactsLoaded'
@@ -1576,6 +1590,10 @@ export default {
     }
   },
 
+  beforeRouteLeave () {
+    this.setAllContactsSelected(false)
+  },
+
   mounted () {
     if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
       this.loadList(this.$route.params.id)
@@ -1637,6 +1655,7 @@ export default {
           this.setSelectedListContactCount(count)
         })
       }
+      this.setAllContactsSelected(false)
     },
     selectedList: function (value) {
       if (this.selectedContacts[value.id]) {

@@ -320,6 +320,9 @@ export default {
   setListContactOwner: ({ commit }, ownerId) => {
     commit('SET_LIST_CONTACT_OWNER', ownerId)
   },
+  setAllContactsSelected: ({ commit }, selected) => {
+    commit('SET_ALL_CONTACTS_SELECTED', selected)
+  },
   setPreviousListFilters: ({ commit }, payload) => {
     commit('SET_PREVIOUS_LIST_FILTERS', payload)
   },

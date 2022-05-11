@@ -8316,6 +8316,16 @@ span.mention {
     min-width: 260px;
     max-width: 260px;
 
+    &.sidebar-1 {
+      min-width: 280px;
+      max-width: 280px;
+    }
+
+    &.minimized {
+      min-width: 15px;
+      max-width: 15px;
+    }
+
     .contacts-sidebar-card {
       overflow-y: auto !important;
 
@@ -8333,6 +8343,11 @@ span.mention {
   }
   &-header-separator {
     margin: 0 15px;
+  }
+  .sessions-main-page {
+    &.minimized {
+      width: 100vw;
+    }
   }
 }
 
