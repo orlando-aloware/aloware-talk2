@@ -5,7 +5,7 @@
         <span v-if="!isAllContactsSelected">{{ getSelectedCount }} selected</span>
         <span v-else>Selected all {{ selectedList.contactCount | numFormat }} contact from this list</span>
       </div>
-      <div class="items" v-if="!isAllContactsSelected && selectedList.contactCount > 25">
+      <div class="items" v-if="!isAllContactsSelected && selectedList.contactCount > 25 && forceAllSelection">
         <a href="#" @click="onSetAllContactsSelected">
           Select all {{ selectedList.contactCount | numFormat }} contacts from this list
         </a>
@@ -65,6 +65,9 @@ export default {
     ...mapGetters('contacts', ['selectedContacts', 'selectedList', 'isAllContactsSelected']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
+    },
+    forceAllSelection () {
+      return false
     }
   },
   methods: {
