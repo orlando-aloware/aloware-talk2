@@ -50,7 +50,7 @@
 
 <script>
 
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 
 export default {
@@ -62,7 +62,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('contacts', ['selectedContacts', 'selectedList', 'isAllContactsSelected']),
+    ...mapGetters('contacts', ['selectedContacts', 'selectedList']),
+    ...mapState('contacts', ['isAllContactsSelected']),
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
     },
