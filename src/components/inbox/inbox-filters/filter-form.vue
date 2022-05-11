@@ -59,6 +59,7 @@
                 class="form-label"
               >
                 <line-selector v-model="filter.campaigns"
+                               :force-remove-missing-values="true"
                                :multiple="true"
                                :use-chips="true"
                                :generic-styling="false"
@@ -76,6 +77,7 @@
                 label="Ring Groups"
               >
                 <ring-group-selector v-model="filter.ring_groups"
+                                     :force-remove-missing-values="true"
                                      :multiple="true"
                                      :highlighted="isChanged('ring_groups')"
                                      :generic-multiselect="false"
@@ -295,6 +297,7 @@
                 </div>
                 <user-selector v-model="filter.users"
                                custom-placeholder="Select Communication Owners"
+                               :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
@@ -309,6 +312,7 @@
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector v-model="filter.workflows"
+                                   :force-remove-missing-values="true"
                                    :multiple="true"
                                    :generic-styling="false"
                                    :use-chips="true"
@@ -322,6 +326,7 @@
               <b-form-group class="form-label"
                             label="Contact Owners">
                 <user-selector v-model="filter.contact_owner"
+                               :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"

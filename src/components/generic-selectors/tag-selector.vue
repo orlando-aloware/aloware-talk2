@@ -209,6 +209,7 @@ export default {
 
       if (this.tags && this.tags.length > 0) {
         this.tagsArray = this.tags
+        this.tagsOptions = this.tags
         this.selectedTags = this.value
         return
       }
@@ -217,6 +218,7 @@ export default {
         params: { full_load: true }
       }).then(res => {
         this.tagsArray = res.data
+        this.tagsOptions = this.tags
         this.selectedTags = this.value
       }).catch(err => {
         console.log(err)
