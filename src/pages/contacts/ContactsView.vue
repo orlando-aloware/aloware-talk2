@@ -1590,10 +1590,6 @@ export default {
     }
   },
 
-  beforeRouteLeave () {
-    this.setAllContactsSelected(false)
-  },
-
   mounted () {
     if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
       this.loadList(this.$route.params.id)
