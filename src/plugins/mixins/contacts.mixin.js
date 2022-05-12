@@ -150,8 +150,6 @@ export default {
         page: this.contactsData.page
       }
       this.fetch(filters, true, true)
-
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', this.buildQueryString(filters, true).filter_groups)
     },
     onSearch (searchText) {
       this.isLoaded = false
@@ -159,8 +157,6 @@ export default {
       this.fetch({
         search: this.search
       }, true, true)
-
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', this.buildQueryString({ search: this.search }, true).filter_groups)
     },
     apiEndpoint (queued) {
       if (!this.isPowerDialer) {
@@ -194,9 +190,14 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
+      const queryString = this.buildQueryString(params, isContactModule)
+
+      // use the same query string to update the list count
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', queryString.filter_groups)
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
-          params: this.buildQueryString(params, isContactModule),
+          params: queryString,
           paramsSerializer: qs.stringify
         })
         .then((response) => response.data)
