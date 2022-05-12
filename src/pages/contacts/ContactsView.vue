@@ -62,7 +62,7 @@
           </search>
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">
-              {{ listItemsTotalContacts }} {{ listItemsTotalContacts == 1 ? 'Contact' : 'Contacts' }}
+              {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
             </div>
             <div class="small text-muted fs-13 text-right" v-else>
               {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
