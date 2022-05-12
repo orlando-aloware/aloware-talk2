@@ -14,10 +14,10 @@
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
+                            v-if="!loadingContact && !changingSelectedContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
-                            @toggleDetails="toggleDetails"
-                            v-if="!loadingContact && !changingSelectedContact">
+                            @toggleDetails="toggleDetails">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -40,7 +40,9 @@
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <contact-details @back="toggleDetails" v-if="!loadingContactCommunications && !changingSelectedContact"></contact-details>
+        <contact-details v-if="!loadingContactCommunications && !changingSelectedContact"
+                         @back="toggleDetails">
+        </contact-details>
       </div>
       <q-drawer
         overlay

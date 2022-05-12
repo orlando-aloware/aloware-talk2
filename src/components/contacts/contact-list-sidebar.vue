@@ -128,8 +128,11 @@ export default {
     },
 
     isSelected (item) {
-      if (this.contact.id !== this.contactIdOnUrl) return this.contactIdOnUrl === item.id
-      else return this.contact.id === item.id
+      if (this.contact.id !== this.contactIdOnUrl) {
+        return this.contactIdOnUrl === item.id
+      } else {
+        return this.contact.id === item.id
+      }
     }
   },
 
