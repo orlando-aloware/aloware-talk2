@@ -61,8 +61,12 @@
             :disabled="isLoadingDisabled">
           </search>
           <div class="contacts-total mobile">
-            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
-            <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">
+              {{ listItemsTotalContacts }} {{ listItemsTotalContacts == 1 ? 'Contact' : 'Contacts' }}
+            </div>
+            <div class="small text-muted fs-13 text-right" v-else>
+              {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </div>
           </div>
         </div>
         <div class="px-3 d-inline-flex"
@@ -122,12 +126,12 @@
           <div
             class="small text-muted fs-13 text-right"
             v-if="selectedList.type === ContactListTypes.DYNAMIC">
-            {{ selectedList.contactCount | numFormat }} Contacts
+            {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
           <div
             class="small text-muted fs-13 text-right"
             v-else>
-            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts
+            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
