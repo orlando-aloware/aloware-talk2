@@ -1,5 +1,5 @@
 <template>
-  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving"
+  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || loadingContactCommunications"
              :opacity="0.85"
              class="h-100 w-100"
              variant="white"
@@ -16,7 +16,8 @@
                             :campaignId="selectedCampaignId"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
-                            @toggleDetails="toggleDetails">
+                            @toggleDetails="toggleDetails"
+                            v-if="!loadingContact">
           <template v-slot:moreActivities>
             <q-btn outline
                    dense
@@ -39,7 +40,7 @@
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <contact-details @back="toggleDetails"></contact-details>
+        <contact-details @back="toggleDetails" v-if="!loadingContactCommunications"></contact-details>
       </div>
       <q-drawer
         overlay
@@ -59,7 +60,7 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer"></contact-details>
+        <contact-details v-if="drawer || !loadingContactCommunications"></contact-details>
       </q-drawer>
     </div>
     <template #overlay>
