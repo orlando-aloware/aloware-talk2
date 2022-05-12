@@ -154,6 +154,7 @@ export default {
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
+        contact_owner: this.showMyContacts ? this.profile.id : undefined,
         search: this.search
       }, true, true)
     },
