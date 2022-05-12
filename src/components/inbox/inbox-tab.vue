@@ -395,12 +395,12 @@ export default {
         console.log(err)
       })
     },
-    onItemRemoved (contact) {
+    async onItemRemoved (contact, callback) {
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
-      const settingContact = this.setContacts(filteredContacts)
-      return Promise.all([
-        settingContact
-      ])
+      await this.setContacts(filteredContacts)
+      if (typeof callback !== 'undefined') {
+        callback()
+      }
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
@@ -805,8 +805,10 @@ export default {
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
-          this.onItemRemoved(contact)
-
+          const _this = this
+          this.onItemRemoved(contact, function () {
+            _this.onItemSelected(_this.contacts[0])
+          })
           this.loadContactTasks(true, false)
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):

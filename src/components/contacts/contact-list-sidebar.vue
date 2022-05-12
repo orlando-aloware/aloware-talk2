@@ -15,7 +15,7 @@
         <b-list-group class="p-2 pr-2">
             <contact-list-sidebar-item v-for="(item, index) in fixedContactsData.data"
                                        v-model="fixedContactsData.data[index]"
-                                       :class="[contact.id === item.id ? 'router-link-exact-active router-link-active' : '']"
+                                       :class="[isSelected(item) ? 'router-link-exact-active router-link-active' : '']"
                                        :key="item.id"
                                        @itemSelected="onSidebarToggleMobile(item)"/>
         </b-list-group>
@@ -80,6 +80,10 @@ export default {
       }
 
       return this.contactsData
+    },
+
+    contactIdOnUrl () {
+      return this.$route.params.id || null
     }
   },
 
@@ -120,6 +124,14 @@ export default {
     handScroll (el) {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70)) {
         this.onBottomScroll()
+      }
+    },
+
+    isSelected (item) {
+      if (this.contact.id !== this.contactIdOnUrl) {
+        return this.contactIdOnUrl === item.id
+      } else {
+        return this.contact.id === item.id
       }
     }
   },
