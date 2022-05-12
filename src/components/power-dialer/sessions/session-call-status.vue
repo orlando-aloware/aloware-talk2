@@ -218,7 +218,7 @@
 
         <q-card-section class="q-pt-none">
           <p v-if="!hasQueuedTaskLists">No remaining tasks found...</p>
-          <p>You will be redirected to PowerDialer: <strong>{{ selectedList.name }}</strong> list. Please wait...</p>
+          <p>You will be redirected to PowerDialer <strong>{{ selectedList.name }}</strong> list. Please wait...</p>
         </q-card-section>
 
         <q-card-actions align="right"></q-card-actions>
