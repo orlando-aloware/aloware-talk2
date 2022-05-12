@@ -7,25 +7,20 @@
     </div>
     <template v-for="(info, key) in filteredMetrics">
       <div
-        v-if="defaultMetrics"
+        v-if="defaultMetrics && metricName(info)"
         :key="`metric-default-${key}`"
         class="summary-info-labels__div d-flex pl-0 pr-4 pt-1">
         <span v-if="metricName(info)">
           {{ metricName(info) }}
         </span>
-        <span
-          v-else
-          class="text-grey-80">
-          Undefined
-        </span>
         <strong class="pl-2">
-          <span :class="`${metricName(info) ? '' : 'text-grey-80'}`">
+          <span v-if="metricName(info)">
             {{ `${info.completed_contacts_count}(${info.percentage}%)` }}
           </span>
         </strong>
       </div>
       <div
-        v-else
+        v-else-if="metricName(info)"
         :key="`metric-blocked-${key}`"
         class="col col-4 p-0 px-1 pb-3">
         <q-card-section
