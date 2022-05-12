@@ -10,9 +10,18 @@
         v-if="defaultMetrics"
         :key="`metric-default-${key}`"
         class="summary-info-labels__div d-flex pl-0 pr-4 pt-1">
-        {{ metricName(info) }}
+        <span v-if="metricName(info)">
+          {{ metricName(info) }}
+        </span>
+        <span
+          v-else
+          class="text-grey-80">
+          Undefined
+        </span>
         <strong class="pl-2">
-          {{ `${info.completed_contacts_count}(${info.percentage}%)` }}
+          <span :class="`${metricName(info) ? '' : 'text-grey-80'}`">
+            {{ `${info.completed_contacts_count}(${info.percentage}%)` }}
+          </span>
         </strong>
       </div>
       <div
@@ -132,7 +141,7 @@ export default {
             return m
         }
       })
-      return metric?.label
+      return metric?.label ? metric.label : false
     }
   },
   data () {
