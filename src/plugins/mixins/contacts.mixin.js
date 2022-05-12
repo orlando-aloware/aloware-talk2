@@ -144,12 +144,11 @@ export default {
     },
     onFetchMyContacts (checked) {
       this.isLoading = true
-      const filters = {
+      this.fetch({
         contact_owner: checked ? this.profile.id : undefined,
         search: this.search,
         page: this.contactsData.page
-      }
-      this.fetch(filters, true, true)
+      }, true, true)
     },
     onSearch (searchText) {
       this.isLoaded = false
