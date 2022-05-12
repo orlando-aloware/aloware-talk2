@@ -27,7 +27,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Search name, phone, address'
+      default: 'Search name, phone, email address'
     },
 
     disabled: {

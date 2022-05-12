@@ -322,7 +322,7 @@ export default {
       this.refreshTagSelector()
       if (!this.appliedFilter) {
         this.setSelectedFilter(null)
-        this.filter = { ...this.defaultFilterModel.filter }
+        this.filter = _.pick(this.value, this.filterFields)
         this.applyFilter()
       }
     },

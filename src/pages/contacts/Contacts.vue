@@ -206,6 +206,7 @@ export default {
       }).then(confirm => {
         if (confirm) {
           this.setUnsavedList(null)
+          this.setAllContactsSelected(false)
           next()
         } else {
           next(false)
@@ -217,6 +218,7 @@ export default {
       }
 
       setTimeout(() => {
+        this.setAllContactsSelected(false)
         next()
       }, 100)
     }
