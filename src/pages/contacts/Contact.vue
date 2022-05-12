@@ -122,6 +122,13 @@ export default {
     ...mapActions(['setContactDetailsDrawer']),
     fetchContact: _.debounce(function () {
       this.selectedContactChanging(true)
+
+      // OPTION: Changes selected marker on contact list, even before fetching data,
+      // but after enabling loading overlay
+      // let contactList = _.get(this.$parent.$data, 'contactsData.data', [])
+      // let selectedContact = contactList.filter(({ id }) => id === this.contactId)
+      // if (selectedContact.length > 0) this.setContact(selectedContact[0])
+
       this.processFetchContactInfo((selectedContact) => {
         this.setContact(selectedContact)
         this.setContactClone(selectedContact)
