@@ -104,7 +104,7 @@
          class="bg-dark d-flex align-items-center justify-content-center h-100">
       <q-spinner-bars
         color="white"
-        size="5em"
+        size="2em"
       />
     </div>
     <template v-if="!loadingPhone && shouldShow">
