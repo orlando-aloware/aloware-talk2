@@ -209,6 +209,22 @@
         </q-btn>
       </div>
     </div>
+
+    <q-dialog v-model="reRouteModal">
+      <q-card class="px-4">
+        <q-card-section>
+          <div class="text-h6"></div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <p v-if="!hasQueuedTaskLists">No remaining tasks found...</p>
+          <p>You will be redirected to PowerDialer: <strong>{{ selectedList.name }}</strong> list. Please wait...</p>
+        </q-card-section>
+
+        <q-card-actions align="right"></q-card-actions>
+      </q-card>
+    </q-dialog>
+
   </q-card>
 </template>
 
@@ -449,11 +465,6 @@ export default {
     }
   },
 
-  mounted () {
-    // this.$options.auto_dialer_interval = '0'
-    // console.log('8888888888 :>> ', this.skippedTasks)
-  },
-
   created () {
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
@@ -573,6 +584,7 @@ export default {
       if (!this.flagged) {
         this.TOGGLE_SESSION_LOADER(true)
       }
+
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
         this.$emit('on-all-tasks-are-skipped')
@@ -585,9 +597,9 @@ export default {
       if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
+          this.activeTask = await this.getContact({ id: this.taskToCall.id })
         }
-        // this.activeTask = this.taskToCall
-        this.activeTask = await this.getContact({ id: this.taskToCall.id })
+
         await this.fetchContact(this.taskToCall.id)
         if (!this.wrapUp) {
           this.resetTimer()
@@ -598,7 +610,7 @@ export default {
       }
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        if (this.timerIsOver) {
+        if (this.timerIsOver && this.selectedList.id !== 'all') {
           this.reRoute()
           this.$emit('no-tasks-found')
         }
@@ -638,7 +650,10 @@ export default {
       }
     },
     reRoute () {
-      this.$emit('on-redirect', this.selectedList)
+      this.reRouteModal = true
+      setTimeout(() => {
+        this.$emit('on-redirect', this.selectedList)
+      }, this.redirectDelay)
     },
     managingSessionFlows (status = '') {
       let {
@@ -730,16 +745,20 @@ export default {
         }, 2000)
       }
     },
-    'powerDialerTasks.in_queue' (tasks) {
-      if (tasks.length === 0 && !this.togglePause) {
-        this.shouldRedirect = true
-      }
-      if (tasks.length > 0 && !this.flagged) {
-        this.shouldRedirect = false
-        if (!this.wrapUp) {
+    'powerDialerTasks.in_queue': {
+      handler (tasks) {
+        if (tasks.length === 0 && !this.togglePause) {
+          this.shouldRedirect = true
           this.initialize()
         }
-      }
+        if (tasks.length > 0 && !this.flagged) {
+          this.shouldRedirect = false
+          if (!this.wrapUp) {
+            this.initialize()
+          }
+        }
+      },
+      deep: true
     },
     currentSessionStatus (status) {
       this.managingSessionFlows(status)
@@ -779,7 +798,9 @@ export default {
       autoDialer: {
         outbound_campaign_id: null,
         ratio: 1
-      }
+      },
+      reRouteModal: false,
+      redirectDelay: 5000
     }
   }
 }

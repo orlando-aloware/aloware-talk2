@@ -126,6 +126,8 @@ export default {
             params = { id: this.selectedList.id, task_status: taskStatus }
           }
           res = await this.getSessionTaskByFilter(params)
+          // console.log('this.powerDialer :>> ', this.powerDialerTasks[stat])
+          // console.log('res.data.data :>> ', res.data.data);
           this.powerDialerTasks[stat] = res.data.data
           this.powerDialerTaskFilters[stat] = res.data
         })
