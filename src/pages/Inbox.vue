@@ -99,10 +99,6 @@ export default {
   },
 
   created () {
-    this.$VueEvent.listen('contact_task_status_updated', () => {
-      this.fetchTaskCounts()
-    })
-
     if (this.$route.query && this.$route.query.add_contact) {
       this.$VueEvent.fire('add_contact', {
         phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
@@ -113,9 +109,6 @@ export default {
   mounted () {
     if (this.authenticated) {
       this.setChannel()
-      if (this.$route.params.channel !== 'inbox') {
-        this.fetchTaskCounts()
-      }
     }
   },
 

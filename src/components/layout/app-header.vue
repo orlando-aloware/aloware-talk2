@@ -234,6 +234,7 @@ export default {
     },
 
     navigateBack (e) {
+      console.log('navigateBack', { e })
       const previousPage = _.get(this.$route.query, 'previousPage', null)
       const previousList = _.get(this.$route.query, 'list', null)
 
@@ -254,10 +255,11 @@ export default {
         this.$router.push({
           name: 'Contacts'
         })
+      } else if (this.selectedList.id) {
+        this.$router.push({
+          path: `list/${this.selectedList.id}`
+        })
       } else {
-        // this.$router.push({
-        //   path: `list/${this.selectedList.id}`
-        // })
         this.$router.back()
       }
 
