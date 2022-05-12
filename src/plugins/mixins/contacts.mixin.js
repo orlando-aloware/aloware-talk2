@@ -144,11 +144,14 @@ export default {
     },
     onFetchMyContacts (checked) {
       this.isLoading = true
-      this.fetch({
+      const filters = {
         contact_owner: checked ? this.profile.id : undefined,
         search: this.search,
         page: this.contactsData.page
-      }, true, true)
+      }
+      this.fetch(filters, true, true)
+
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', this.buildQueryString(filters, true).filter_groups)
     },
     onSearch (searchText) {
       this.isLoaded = false
