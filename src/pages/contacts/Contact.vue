@@ -174,6 +174,9 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
+      // Show loading overlay as soon as id changes
+      this.selectedContactChanging(true)
+
       this.contactListSidebarOpen = false
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
