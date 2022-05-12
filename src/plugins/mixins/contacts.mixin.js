@@ -156,6 +156,8 @@ export default {
       this.fetch({
         search: this.search
       }, true, true)
+
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', this.buildQueryString({ search: this.search }, true).filter_groups)
     },
     apiEndpoint (queued) {
       if (!this.isPowerDialer) {
