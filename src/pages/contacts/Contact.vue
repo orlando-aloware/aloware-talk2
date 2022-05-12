@@ -1,5 +1,5 @@
 <template>
-  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving"
+  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || loadingContactCommunications"
              :opacity="0.85"
              class="h-100 w-100"
              variant="white"
@@ -14,6 +14,7 @@
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
+                            v-if="!loadingContact && !changingSelectedContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
                             @toggleDetails="toggleDetails">
@@ -39,7 +40,9 @@
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <contact-details @back="toggleDetails"></contact-details>
+        <contact-details v-if="!loadingContactCommunications && !changingSelectedContact"
+                         @back="toggleDetails">
+        </contact-details>
       </div>
       <q-drawer
         overlay
@@ -59,7 +62,7 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer"></contact-details>
+        <contact-details v-if="drawer && !loadingContactCommunications && !changingSelectedContact"></contact-details>
       </q-drawer>
     </div>
     <template #overlay>
@@ -121,6 +124,13 @@ export default {
     ...mapActions(['setContactDetailsDrawer']),
     fetchContact: _.debounce(function () {
       this.selectedContactChanging(true)
+
+      // OPTION: Changes selected marker on contact list, even before fetching data,
+      // but after enabling loading overlay
+      // let contactList = _.get(this.$parent.$data, 'contactsData.data', [])
+      // let selectedContact = contactList.filter(({ id }) => id === this.contactId)
+      // if (selectedContact.length > 0) this.setContact(selectedContact[0])
+
       this.processFetchContactInfo((selectedContact) => {
         this.setContact(selectedContact)
         this.setContactClone(selectedContact)
@@ -173,6 +183,9 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
+      // Show loading overlay as soon as id changes
+      this.selectedContactChanging(true)
+
       this.contactListSidebarOpen = false
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
