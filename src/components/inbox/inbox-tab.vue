@@ -397,7 +397,10 @@ export default {
     },
     onItemRemoved (contact) {
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
-      this.setContacts(filteredContacts)
+      const settingContact = this.setContacts(filteredContacts)
+      return Promise.all([
+        settingContact
+      ])
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
@@ -802,14 +805,26 @@ export default {
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
-          this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
-          this.loadContactTasks()
+          this.onItemRemoved(contact)
+
+          this.loadContactTasks(true, false)
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         default:
-          const contacts = [...this.contacts]
-          contacts[index] = contact
-          this.setContacts(contacts)
+          if (index < 0) {
+            const contacts = [...this.contacts]
+            if (this.sorting.order === 'desc') {
+              contacts.unshift(contact)
+            } else {
+              contacts.push(contact)
+            }
+            this.setContacts(contacts)
+            this.loadContactTasks(true, false)
+          } else {
+            const contacts = [...this.contacts]
+            contacts[index] = contact
+            this.setContacts(contacts)
+          }
       }
     }
 
