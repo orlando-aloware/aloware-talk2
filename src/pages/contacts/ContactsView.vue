@@ -923,20 +923,6 @@ export default {
         }
       }
       this.setCurrentListFilters(filters)
-
-      this.setDataCount(
-        this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
-          0: {
-            filters: {
-              contact_lists: {
-                operator: 1,
-                value: [stringId]
-              }
-            },
-            is_conjunction: true
-          }
-        }
-      )
     },
     setData (id) {
       const list = this.lists[id] || {}
@@ -1133,7 +1119,6 @@ export default {
       this.$VueEvent.fire('filters-reset')
       this.setShowMyContacts(false)
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
-      this.$VueEvent.fire('shouldUpdateListCount')
     },
     resetFilters (resetSearch = false) {
       this.setListContactsLoaded(false)
@@ -1157,7 +1142,6 @@ export default {
       this.$VueEvent.fire('filters-reset')
 
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
-      this.$VueEvent.fire('shouldUpdateListCount')
       this.filterHasChanges = false
     },
     fixDefaultFilters () {

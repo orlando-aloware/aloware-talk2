@@ -517,7 +517,6 @@ export default {
         id: this.selectedList.id,
         filters: updatedFilter
       })
-      this.$VueEvent.fire('shouldUpdateListCount')
       this.$emit('filtersUpdated')
     },
 
