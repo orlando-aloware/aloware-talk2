@@ -1614,11 +1614,11 @@ export default {
       }
     })
 
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', _.debounce(function (filters) {
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', function (filters) {
       _this.getListDataCount({ filters }).then(response => {
         _this.setSelectedListContactCount(response.data.count)
       })
-    }, 1000))
+    })
   },
 
   watch: {
