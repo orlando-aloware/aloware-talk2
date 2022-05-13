@@ -206,6 +206,26 @@ export default {
       }).then(confirm => {
         if (confirm) {
           this.setUnsavedList(null)
+
+          // set the contacts list to 'All Contacts'
+          const list = { data: null, found: null }
+          for (list.data in this.lists) {
+            if (this.lists[list.data].id.toString() === 'all') {
+              list.found = this.lists[list.data]
+              break
+            }
+          }
+
+          if (to.name !== 'Contact' || !list.found) {
+            next()
+          }
+
+          this.setSelectedList({ id: list.found.id, name: list.found.name, type: list.found.type })
+          this.setCurrentListFilters(list.found.filters)
+          this.$VueEvent.fire('clearContacts')
+          this.$VueEvent.fire('fetchContacts', { clear: true, isLoading: true })
+          this.$VueEvent.fire('shouldUpdateListCount')
+
           next()
         } else {
           next(false)
