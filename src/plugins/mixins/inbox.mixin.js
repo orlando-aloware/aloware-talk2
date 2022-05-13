@@ -105,23 +105,31 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
     },
-    loadContactTasks (loadCount = true) {
-      this.gettingContactsList(true)
+    loadContactTasks (loadCount = true, showLoading = true) {
+      if (showLoading) {
+        this.gettingContactsList(true)
+        this.setContacts([])
+      }
+
       // always reset page when fresh loading contacts
       this.page = 1
-      this.setContacts([])
+
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask) && loadCount) {
-        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+        if (this.currentTask === ContactTaskStatus.STATUS_OPEN && showLoading) {
           this.setLoadingOpenTaskCount(true)
         }
 
-        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+        if (this.currentTask === ContactTaskStatus.STATUS_PENDING && showLoading) {
           this.setLoadingPendingTaskCount(true)
         }
         this.getContactsCountByTaskStatus(this.currentTask)
       }
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         if (response) {
+          // only empty contacts after the request is done since we are now showing the animation
+          if (!showLoading) {
+            this.setContacts([])
+          }
           this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
           this.gettingContactsList(false)
           this.setContactsCurrentPage(response.data.current_page)

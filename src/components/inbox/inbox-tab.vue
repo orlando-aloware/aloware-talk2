@@ -395,9 +395,12 @@ export default {
         console.log(err)
       })
     },
-    onItemRemoved (contact) {
+    async onItemRemoved (contact, callback) {
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
-      this.setContacts(filteredContacts)
+      await this.setContacts(filteredContacts)
+      if (typeof callback !== 'undefined') {
+        callback()
+      }
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
@@ -802,14 +805,28 @@ export default {
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
-          this.onItemSelected(this.contacts[index + 1] || this.contacts[0])
-          this.loadContactTasks()
+          const _this = this
+          this.onItemRemoved(contact, function () {
+            _this.onItemSelected(_this.contacts[0])
+          })
+          this.loadContactTasks(true, false)
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         default:
-          const contacts = [...this.contacts]
-          contacts[index] = contact
-          this.setContacts(contacts)
+          if (index < 0) {
+            const contacts = [...this.contacts]
+            if (this.sorting.order === 'desc') {
+              contacts.unshift(contact)
+            } else {
+              contacts.push(contact)
+            }
+            this.setContacts(contacts)
+            this.loadContactTasks(true, false)
+          } else {
+            const contacts = [...this.contacts]
+            contacts[index] = contact
+            this.setContacts(contacts)
+          }
       }
     }
 

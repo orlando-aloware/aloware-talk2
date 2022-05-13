@@ -211,7 +211,7 @@
                         @click="updateSelectedSetting"
                         unelevated
                         no-caps
-                        :disabled="disabled"
+                        :disabled="saveDisabled"
                         size="sm"
                         class="px-3 py-0"
                         color="primary">Save</q-btn>
@@ -332,6 +332,7 @@ import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import SettingIcon from 'components/icons/setting-o-icon'
+import { isEqual } from 'lodash'
 
 // const UNTITLED = 'Untitled'
 
@@ -437,7 +438,8 @@ export default {
       updateObj: null,
       selectedItem: null,
       selectedItemId: null,
-      temporarySetting: {}
+      temporarySetting: {},
+      saveDisabled: false
     }
   },
   methods: {
@@ -538,6 +540,7 @@ export default {
       this.loading = false
     },
     async updateSelectedSetting () {
+      this.saveDisabled = true
       let res = await this.updateDialerSessionSetting(
         this.removeEmptyParams(this.selectedItem)
       )
@@ -547,6 +550,14 @@ export default {
         }
         this.$generalNotification(`Dialer Session Setting has been updated!`)
       }
+      this.onUpdatedSessionMetrics()
+      this.saveDisabled = false
+    },
+    onUpdatedSessionMetrics () {
+      if (isEqual(this.filterSelectedItem, this.sessionSettings)) {
+        return
+      }
+      this.$emit('on-update-session-metrics')
     },
     onDeleteRequest (id) {
       this.newSetting = true

@@ -206,6 +206,7 @@ export default {
       }).then(confirm => {
         if (confirm) {
           this.setUnsavedList(null)
+          this.setAllContactsSelected(false)
 
           // set the contacts list to 'All Contacts'
           const list = { data: null, found: null }
@@ -237,6 +238,7 @@ export default {
       }
 
       setTimeout(() => {
+        this.setAllContactsSelected(false)
         next()
       }, 100)
     }

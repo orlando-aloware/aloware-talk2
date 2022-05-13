@@ -60,6 +60,7 @@
             :disable="disabled"
             :generic-styling="false"
             :generic-multiselect="false"
+            :force-remove-missing-values="true"
             @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
 
           <ScriptSelector

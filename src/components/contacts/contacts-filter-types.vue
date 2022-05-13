@@ -312,7 +312,6 @@ export default {
       if (!_.isEqual(this.initialListFilters, currentListFilters)) {
         this.setShowMyContacts(false)
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
-        this.$VueEvent.fire('shouldUpdateListCount')
       }
     },
     getStringValue () {

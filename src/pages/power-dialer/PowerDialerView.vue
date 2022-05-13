@@ -14,7 +14,8 @@
       <StartDialing
         :disabled-trigger="numberOfContacts === 0"
         :list="filteredList"
-        @start="beginDial" />
+        @start="beginDial"
+        @on-update-session-metrics="onSessionMetricsUpdate" />
     </template>
 
     <template slot="actions">
@@ -25,7 +26,7 @@
             class="pr-2 pt-4 pb-3"
             v-if="$q.screen.lt.lg">
             <b-col cols="12">
-              <div class="d-flex">11111111
+              <div class="d-flex">
                 <PowerDialerFilter
                   :list-data="fixedContactsData"
                   :id="selectedListId"
@@ -48,7 +49,7 @@
             <b-col
               cols="8"
               v-if="$q.screen.gt.md">
-              <div class="d-flex">22222222
+              <div class="d-flex">
                 <PowerDialerFilter
                   :list-data="fixedContactsData"
                   :id="selectedListId"
@@ -852,6 +853,14 @@ export default {
         headers: this.filteredColumns,
         name: this.list?.name
       })
+    },
+    onSessionMetricsUpdate () {
+      this.$axios
+        .get('/api/v2/power-dialer-lists/' + this.selectedListId)
+        .then((response) => response.data)
+        .then((response) => {
+          this.activeMetrics = response.session_metrics
+        })
     },
     generateParams (contact) {
       if (this.selectedList.name === 'My Queue') {

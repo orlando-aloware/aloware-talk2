@@ -55,14 +55,18 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search
-            class="width-250"
+            class="width-260"
             :search="search"
             @search="onSearch"
             :disabled="isLoadingDisabled">
           </search>
           <div class="contacts-total mobile">
-            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">{{ listItemsTotalContacts }} Contacts</div>
-            <div class="small text-muted fs-13 text-right" v-else> {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts</div>
+            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">
+              {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </div>
+            <div class="small text-muted fs-13 text-right" v-else>
+              {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </div>
           </div>
         </div>
         <div class="px-3 d-inline-flex"
@@ -122,12 +126,12 @@
           <div
             class="small text-muted fs-13 text-right"
             v-if="selectedList.type === ContactListTypes.DYNAMIC">
-            {{ selectedList.contactCount | numFormat }} Contacts
+            {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
           <div
             class="small text-muted fs-13 text-right"
             v-else>
-            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} Contacts
+            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
@@ -822,7 +826,7 @@ export default {
         dataLength: 0
       },
       datatableTarget: null,
-      hasExport: false,
+      hasExport: true,
       countFields: [
         'unread_texts_count',
         'unread_missed_calls_count',
@@ -919,20 +923,6 @@ export default {
         }
       }
       this.setCurrentListFilters(filters)
-
-      this.setDataCount(
-        this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
-          0: {
-            filters: {
-              contact_lists: {
-                operator: 1,
-                value: [stringId]
-              }
-            },
-            is_conjunction: true
-          }
-        }
-      )
     },
     setData (id) {
       const list = this.lists[id] || {}
@@ -973,6 +963,7 @@ export default {
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
     onCheckedRows (checked) {
+      this.setAllContactsSelected(false)
       this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {
@@ -1129,7 +1120,6 @@ export default {
       this.$VueEvent.fire('filters-reset')
       this.setShowMyContacts(false)
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
-      this.$VueEvent.fire('shouldUpdateListCount')
     },
     resetFilters (resetSearch = false) {
       this.setListContactsLoaded(false)
@@ -1153,7 +1143,6 @@ export default {
       this.$VueEvent.fire('filters-reset')
 
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
-      this.$VueEvent.fire('shouldUpdateListCount')
       this.filterHasChanges = false
     },
     fixDefaultFilters () {
@@ -1624,6 +1613,10 @@ export default {
           is_conjunction: true
         })
       }
+    })
+
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', function (filters) {
+      _this.setDataCount(filters)
     })
   },
 
