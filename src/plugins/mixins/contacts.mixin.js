@@ -154,6 +154,7 @@ export default {
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
+        contact_owner: this.showMyContacts ? this.profile.id : undefined,
         search: this.search
       }, true, true)
     },
@@ -189,9 +190,14 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
+      const queryString = this.buildQueryString(params, isContactModule)
+
+      // use the same query string to update the list count
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', queryString.filter_groups)
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
-          params: this.buildQueryString(params, isContactModule),
+          params: queryString,
           paramsSerializer: qs.stringify
         })
         .then((response) => response.data)
@@ -202,6 +208,10 @@ export default {
 
           this.contactsLoaded(data)
           this.setListContactsLoaded(true)
+
+          if (this.$route.name === 'Contact') {
+            this.$VueEvent.fire('contactsListSidebarDataLoaded', data.data)
+          }
 
           if (this.apiEndpoint(queued).includes('my-queue')) {
             // TODOs: Use vuex for storing filtered power dialer contact lists
@@ -233,7 +243,11 @@ export default {
           console.log(err)
         })
     }, 1000),
-    fetch (params = {}, hasOrder = true, clear = false) {
+    fetch (params = {}, hasOrder = true, clear = false, isLoading = false) {
+      if (isLoading) {
+        this.isLoadingMore = true
+      }
+
       if (!this.fromContactFilters) {
         this.setPreviousListFilters(params)
         this.setPreviousListId(this.id)
@@ -484,15 +498,16 @@ export default {
       this.$VueEvent.stop('onLoadMoreContacts')
     },
     initiateFetch (data) {
-      const fetchData = { hasOrder: null, params: null, clear: null }
+      const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
       fetchData.params = _.get(data, 'params', {})
       fetchData.hasOrder = _.get(data, 'hasOrder', true)
       fetchData.clear = _.get(data, 'clear', false)
+      fetchData.isLoading = _.get(data, 'isLoading', false)
 
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
 
-      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear)
+      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading)
     },
     startEvents () {
       this.$VueEvent.listen('filteredFetchContacts', (data) => {

@@ -83,7 +83,7 @@ export default {
     },
 
     contactIdOnUrl () {
-      return this.$route.params.id || null
+      return this.$route.params.id ? parseInt(this.$route.params.id) : null
     }
   },
 

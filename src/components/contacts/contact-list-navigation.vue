@@ -76,9 +76,8 @@ export default {
   },
 
   mounted () {
-    const _this = this
-    this.$VueEvent.listen('contactsListSidebarDataLoaded', function (data) {
-      _this.contacts = data
+    this.$VueEvent.listen('contactsListSidebarDataLoaded', (data) => {
+      this.contacts = data
     })
   }
 }
