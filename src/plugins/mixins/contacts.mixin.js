@@ -154,6 +154,7 @@ export default {
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
+        contact_owner: this.showMyContacts ? this.profile.id : undefined,
         search: this.search
       }, true, true)
     },
@@ -189,9 +190,14 @@ export default {
 
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
+      const queryString = this.buildQueryString(params, isContactModule)
+
+      // use the same query string to update the list count
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', queryString.filter_groups)
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
-          params: this.buildQueryString(params, isContactModule),
+          params: queryString,
           paramsSerializer: qs.stringify
         })
         .then((response) => response.data)
