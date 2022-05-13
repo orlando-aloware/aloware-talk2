@@ -592,6 +592,11 @@ export default {
         this.TOGGLE_SESSION_LOADER(true)
       }
 
+      if (this.toggleEnd && this.timerIsOver) {
+        this.reRoute()
+        return
+      }
+
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
         this.$emit('on-all-tasks-are-skipped')
@@ -756,6 +761,7 @@ export default {
     },
     toggleEnd (value) {
       if ((value && this.timerIsOver) && !this.statusCallConnected) {
+        debugger
         setTimeout(() => {
           this.reRoute()
         }, 2000)
