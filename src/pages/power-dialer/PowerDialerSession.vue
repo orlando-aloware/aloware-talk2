@@ -98,6 +98,8 @@ export default {
       await this.getMyQueueList()
     }
     await this.fetchTasks()
+
+    this.verifyOpenTasks()
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -116,6 +118,10 @@ export default {
         res = await this.getSessionTaskByFilter({ id: this.selectedList.id, task_status: 1 })
         this.powerDialerTasks['in_queue'] = res.data.data
         this.powerDialerTaskFilters['in_queue'] = res.data
+
+        if (this.powerDialerTasks['in_queue'].length === 0) {
+          this.$VueEvent.fire('initiate_session_no_tasks')
+        }
       } else {
         Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(async stat => {
           let params = {}

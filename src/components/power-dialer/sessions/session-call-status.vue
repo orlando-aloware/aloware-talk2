@@ -481,6 +481,9 @@ export default {
       this.hasActiveTask = false
       this.initialize()
     })
+    this.$VueEvent.listen('initiate_session_no_tasks', () => {
+      this.closePowerDialerNoTasks()
+    })
     this.flagged = false
   },
 
@@ -614,17 +617,18 @@ export default {
       }
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        if (this.timerIsOver && this.selectedList.id !== 'all') {
-          if (this.flagged) {
-            this.reRoute(false)
-            if (this.redirectNotification) {
-              this.$emit('no-tasks-found')
-            }
-          }
+        if (this.timerIsOver && this.selectedList.id !== 'all' && this.flagged) {
+          this.closePowerDialerNoTasks()
         }
       }
 
       this.TOGGLE_SESSION_LOADER(false)
+    },
+    closePowerDialerNoTasks () {
+      this.reRoute(false)
+      if (this.redirectNotification) {
+        this.$emit('no-tasks-found')
+      }
     },
     onToggleMute () {
       this.$VueEvent.fire('toggleMute')
