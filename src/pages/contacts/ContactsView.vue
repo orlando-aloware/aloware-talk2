@@ -826,7 +826,7 @@ export default {
         dataLength: 0
       },
       datatableTarget: null,
-      hasExport: false,
+      hasExport: true,
       countFields: [
         'unread_texts_count',
         'unread_missed_calls_count',

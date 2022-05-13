@@ -209,6 +209,22 @@
         </q-btn>
       </div>
     </div>
+
+    <q-dialog v-model="reRouteModal">
+      <q-card class="px-4">
+        <q-card-section>
+          <div class="text-h6"></div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <p v-if="!hasQueuedTaskLists">No remaining tasks found...</p>
+          <p>You will be redirected to PowerDialer <strong>{{ selectedList.name }}</strong> list. Please wait...</p>
+        </q-card-section>
+
+        <q-card-actions align="right"></q-card-actions>
+      </q-card>
+    </q-dialog>
+
   </q-card>
 </template>
 
@@ -330,7 +346,7 @@ export default {
     },
     fullname () {
       let { taskToCall } = this
-      if ((taskToCall.first_name === null || taskToCall.first_name === '') && (taskToCall.last_name === null || taskToCall.last_name === '')) {
+      if ((taskToCall?.first_name === null || taskToCall?.first_name === '') && (taskToCall?.last_name === null || taskToCall?.last_name === '')) {
         return `No Name`
       }
       return `${taskToCall?.first_name || ''} ${taskToCall?.last_name || ''}`
@@ -449,11 +465,6 @@ export default {
     }
   },
 
-  mounted () {
-    // this.$options.auto_dialer_interval = '0'
-    // console.log('8888888888 :>> ', this.skippedTasks)
-  },
-
   created () {
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
@@ -470,6 +481,7 @@ export default {
       this.hasActiveTask = false
       this.initialize()
     })
+    this.flagged = false
   },
 
   methods: {
@@ -555,6 +567,9 @@ export default {
     onTimerIsOver (task) {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
+        if (this.toggleEnd) {
+          this.reRoute()
+        }
         if (!this.togglePause && !this.wrapUp) {
           this.runTask(task)
         }
@@ -573,6 +588,7 @@ export default {
       if (!this.flagged) {
         this.TOGGLE_SESSION_LOADER(true)
       }
+
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
         this.$emit('on-all-tasks-are-skipped')
@@ -582,12 +598,12 @@ export default {
         return
       }
 
-      if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
+      if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
+          this.activeTask = await this.getContact({ id: this.taskToCall.id })
         }
-        // this.activeTask = this.taskToCall
-        this.activeTask = await this.getContact({ id: this.taskToCall.id })
+
         await this.fetchContact(this.taskToCall.id)
         if (!this.wrapUp) {
           this.resetTimer()
@@ -598,11 +614,16 @@ export default {
       }
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        if (this.timerIsOver) {
-          this.reRoute()
-          this.$emit('no-tasks-found')
+        if (this.timerIsOver && this.selectedList.id !== 'all') {
+          if (this.flagged) {
+            this.reRoute(false)
+            if (this.redirectNotification) {
+              this.$emit('no-tasks-found')
+            }
+          }
         }
       }
+
       this.TOGGLE_SESSION_LOADER(false)
     },
     onToggleMute () {
@@ -637,8 +658,14 @@ export default {
         this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
-    reRoute () {
-      this.$emit('on-redirect', this.selectedList)
+    reRoute (isForced = false) {
+      if (isForced) {
+        this.redirectNotification = isForced
+      }
+      this.reRouteModal = true
+      setTimeout(() => {
+        this.$emit('on-redirect', this.selectedList)
+      }, this.redirectDelay)
     },
     managingSessionFlows (status = '') {
       let {
@@ -730,16 +757,20 @@ export default {
         }, 2000)
       }
     },
-    'powerDialerTasks.in_queue' (tasks) {
-      if (tasks.length === 0 && !this.togglePause) {
-        this.shouldRedirect = true
-      }
-      if (tasks.length > 0 && !this.flagged) {
-        this.shouldRedirect = false
-        if (!this.wrapUp) {
-          this.initialize()
+    'powerDialerTasks.in_queue': {
+      handler (tasks) {
+        if (tasks.length === 0 && !this.togglePause) {
+          this.shouldRedirect = true
+          // this.initialize()
         }
-      }
+        if (tasks.length > 0 && !this.flagged) {
+          this.shouldRedirect = false
+          if (!this.wrapUp) {
+            this.initialize()
+          }
+        }
+      },
+      deep: true
     },
     currentSessionStatus (status) {
       this.managingSessionFlows(status)
@@ -779,7 +810,10 @@ export default {
       autoDialer: {
         outbound_campaign_id: null,
         ratio: 1
-      }
+      },
+      reRouteModal: false,
+      redirectDelay: 5000,
+      redirectNotification: false
     }
   }
 }
