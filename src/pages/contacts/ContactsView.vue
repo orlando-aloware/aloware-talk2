@@ -1616,9 +1616,7 @@ export default {
     })
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', function (filters) {
-      _this.getListDataCount({ filters }).then(response => {
-        _this.setSelectedListContactCount(response.data.count)
-      })
+      _this.setDataCount(filters)
     })
   },
 
