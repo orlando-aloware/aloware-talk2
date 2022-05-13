@@ -43,7 +43,11 @@ export default {
           if (this.sessionPaused) {
             return 'Up Next'
           } else {
-            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
+            if (this.countdownTimer > 0) {
+              return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer > 0 ? this.countdownTimer : 0}s</span>`
+            } else {
+              return `Dialing...`
+            }
           }
         case 'WRAP_UP':
           return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`

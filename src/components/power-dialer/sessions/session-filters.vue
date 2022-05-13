@@ -54,7 +54,6 @@ export default {
   },
   methods: {
     clicked (value, enabled = undefined) {
-      console.log('enabled :>> ', enabled)
       if (enabled) {
         this.id = value.id
         this.$emit('selected-tab', value)

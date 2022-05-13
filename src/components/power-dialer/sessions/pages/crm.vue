@@ -1,13 +1,14 @@
 <template>
   <div class="row full-height">
     <div class="col-12 p-0 px-3 pb-2">
-      <iframe
-        v-if="hubspotLink"
-        :src="hubspotLink"
-        frameborder="0"
-        style="height:100%; width:100%;"
-        id="hubspot-crm">
-      </iframe>
+      <div class="hubspot-iframe-container">
+        <iframe
+          v-if="hubspotLink"
+          :src="hubspotLink"
+          frameborder="0"
+          id="hubspot-crm">
+        </iframe>
+      </div>
       <!-- <q-card flat class="p-3">
         <q-card-section class="p-0">
           <div class="text-subtitle1 text-weight-medium">
