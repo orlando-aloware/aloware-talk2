@@ -301,6 +301,26 @@ export const fixFullDateTime = (dt) => {
 }
 
 /**
+ * Fix date time
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
+export const fixFullDate = (dt) => {
+  if (dt) {
+    if (window.timezone) {
+      if (window.timezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD') + ' MNL'
+      }
+      return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD')
+    } else {
+      return window.moment.utc(dt).local().format('YYYY-MM-DD')
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
  * Fix time
  * @param {date|string|Moment} dt
  * @param {string} format
@@ -536,6 +556,7 @@ export default ({ Vue }) => {
     fixDate,
     fixDateTime,
     fixFullDateTime,
+    fixFullDate,
     fixTime,
     fixTimeLocal,
     fixDuration,

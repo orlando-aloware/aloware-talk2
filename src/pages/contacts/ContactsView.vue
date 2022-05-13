@@ -511,7 +511,7 @@
                 class="text-left"
                 :key="`c-${colIndx}`">
                 <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
-                  {{ contact.created_at | fixDate }}
+                  {{ contact.created_at | fixFullDateTime }}
                 </div>
               </td>
 
@@ -595,9 +595,14 @@
                   - {{ contact[column.name] }}
                 </span>
                 <div
-                  v-else-if="column.name.includes('_at') || column.name.includes('date')"
-                  class="text-left ellipse">
+                  v-else-if="column.name.includes('_at')"
+                  class="text-left ellipse col-indented">
                   {{ contact[column.name] | fixFullDateTime }}
+                </div>
+                <div
+                  v-else-if="column.name.includes('date_of_birth')"
+                  class="text-left ellipse col-indented" >
+                  {{ contact[column.name] | fixFullDate }}
                 </div>
                 <div
                   v-else
