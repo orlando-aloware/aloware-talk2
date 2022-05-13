@@ -13,9 +13,6 @@ export default {
     ...mapGetters('contacts', [
       'listItems'
     ])
-    // powerLists () {
-    //   return this.listItems[this.selectedList?.id]?.data
-    // }
   },
   methods: {
     ...mapActions('powerDialer', [
@@ -30,7 +27,7 @@ export default {
       this.powerDialerTasks['in_queue'] = res.data.data
     },
     updateTaskStatus (task) {
-      console.log(` %c TASK UPDATED : ${task.task_status} `, 'background:red;color:white;', task)
+      // console.log(` %c TASK UPDATED : ${task.task_status} `, 'background:red;color:white;', task)
       switch (task.task_status) {
         case AutoDialTaskStatus.STATUS_IN_PROGRESS:
           this.onStatusInProgress(task)
@@ -49,29 +46,24 @@ export default {
           break
         default:
       }
-      // this.activeTask.task = task
       this.setShowPhone(false)
     },
     onStatusInProgress (task) {
-      // this.activeTask = this.powerLists?.find(lst => lst.contact_list_item_id === task.id)
       // Re-assign new items for IN QUEUE and exclude the curernt task
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
     onStatusCompleted (task) {
       this.powerDialerTasks.called.push(this.activeTask)
-      // this.$VueEvent.fire('endWrapUp')
       window.VueEvent.fire('initiate_session', task)
     },
     onStatusFailed (task) {
       this.powerDialerTasks.failed.push(this.activeTask)
-      // this.$VueEvent.fire('endWrapUp')
     },
     onStatusQueued (task) {
       // Status Queued
       let taskToMove = this.powerDialerTasks.in_queue.find(lst => lst.contact_list_item_id === task.id)
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
       this.powerDialerTasks.in_queue.push(taskToMove)
-      // this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.push(this.powerDialerTasks.in_queue.splice(this.powerDialerTasks.in_queue.indexOf('12'), 1)[0])
       window.VueEvent.fire('initiate_session', task)
     },
     onStatusScheduled (task) {

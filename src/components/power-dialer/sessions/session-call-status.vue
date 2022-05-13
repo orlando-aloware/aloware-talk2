@@ -567,6 +567,9 @@ export default {
     onTimerIsOver (task) {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
+        if (this.toggleEnd) {
+          this.reRoute()
+        }
         if (!this.togglePause && !this.wrapUp) {
           this.runTask(task)
         }
@@ -595,7 +598,7 @@ export default {
         return
       }
 
-      if ((!this.statusCallConnected && this.hasQueuedTaskLists) && !this.togglePause) {
+      if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
           this.activeTask = await this.getContact({ id: this.taskToCall.id })
@@ -613,8 +616,10 @@ export default {
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
         if (this.timerIsOver && this.selectedList.id !== 'all') {
           if (this.flagged) {
-            this.reRoute()
-            this.$emit('no-tasks-found')
+            this.reRoute(false)
+            if (this.redirectNotification) {
+              this.$emit('no-tasks-found')
+            }
           }
         }
       }
@@ -653,7 +658,10 @@ export default {
         this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
-    reRoute () {
+    reRoute (isForced = false) {
+      if (isForced) {
+        this.redirectNotification = isForced
+      }
       this.reRouteModal = true
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
@@ -804,7 +812,8 @@ export default {
         ratio: 1
       },
       reRouteModal: false,
-      redirectDelay: 5000
+      redirectDelay: 5000,
+      redirectNotification: false
     }
   }
 }

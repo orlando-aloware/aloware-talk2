@@ -184,29 +184,29 @@ export default {
     await this.setFilterParams(this.$route.params)
 
     this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
-      console.log(` %c PUSHER caught: metric_sessions_update `, 'background:black;color:yellow;', sessionMetrics)
+      // console.log(` %c PUSHER caught: metric_sessions_update `, 'background:black;color:yellow;', sessionMetrics)
       this.activeMetrics = sessionMetrics.session_metrics_calculations
     })
     this.$VueEvent.listen('contact_list_item_created', async (task) => {
-      console.log(` %c PUSHER caught: contact_list_item_created `, 'background:black;color:yellow;', task)
-      console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+      // console.log(` %c PUSHER caught: contact_list_item_created `, 'background:black;color:yellow;', task)
+      // console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
       if (this.hasSessions) {
         await this.fetchInQueueTasks(task)
       }
     })
     this.$VueEvent.listen('contact_list_item_updated', (task) => {
-      console.log(` %c PUSHER caught: contact_list_item_updated `, 'background:black;color:yellow;', task)
+      // console.log(` %c PUSHER caught: contact_list_item_updated `, 'background:black;color:yellow;', task)
       if (this.hasSessions) {
         this.updateTaskStatus(task)
       }
     })
     this.$VueEvent.listen('contact_list_item_deleting', (task) => {
-      console.log(` %c PUSHER caught: contact_list_item_deleting `, 'background:black;color:yellow;', task)
-      console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
+      // console.log(` %c PUSHER caught: contact_list_item_deleting `, 'background:black;color:yellow;', task)
+      // console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
     })
     this.$VueEvent.listen('contact_list_bulk_created', (task) => {
-      console.log(` %c PUSHER caught: contact_list_bulk_created `, 'background:black;color:yellow;', task)
-      console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
+      // console.log(` %c PUSHER caught: contact_list_bulk_created `, 'background:black;color:yellow;', task)
+      // console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
     })
   },
   methods: {
@@ -273,11 +273,6 @@ export default {
       }
       await this.prepareData()
     },
-    resetValues () {
-      // this.RESET_LIST()
-      this.START_DIAL_TOGGLE(false)
-      // this.SET_POWER_DIALER_LIST([])
-    },
     setFilters (id) {
       if (id) {
         if (this.$route.meta.title === 'Power Dialer' ||
@@ -327,11 +322,13 @@ export default {
       this.clearList()
     }
   },
+
   data () {
     return {
       ContactsListRemoveFromTypes
     }
   },
+
   watch: {
     '$route.params.filter': function (id) {
       this.setFilters(id)
@@ -350,6 +347,7 @@ export default {
       this.contactsData = newObj
     }
   },
+
   beforeRouteUpdate (to, from, next) {
     if (to.meta !== 'Power Dialer Sessions') {
       this.START_DIAL_TOGGLE(true)
@@ -358,6 +356,7 @@ export default {
     }
     next()
   },
+
   beforeRouteLeave (to, from, next) {
     this.stopEvents()
     setTimeout(() => {
