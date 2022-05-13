@@ -761,7 +761,6 @@ export default {
     },
     toggleEnd (value) {
       if ((value && this.timerIsOver) && !this.statusCallConnected) {
-        debugger
         setTimeout(() => {
           this.reRoute()
         }, 2000)
