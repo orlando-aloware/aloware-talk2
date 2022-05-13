@@ -330,9 +330,7 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <a href=""
-                       @click="onNavigate(contact.id, $event)"
-                       class="d-flex align-items-center item contact-name">
+                    <router-link :to="generateRoute(contact.id)" class="d-flex align-items-center item contact-name">
                       <template v-if="contact.name">
                         <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                           {{ contact.name | ucwords }}
@@ -343,7 +341,8 @@
                           No Name
                         </div>
                       </template>
-                    </a>
+                    </router-link>
+
                     <b-badge v-if="contact.is_dnc"
                                  variant="danger"
                                  class="badge-phone-info">
@@ -1616,7 +1615,9 @@ export default {
     })
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', function (filters) {
-      _this.setDataCount(filters)
+      if (filters && filters.length) {
+        _this.setDataCount(filters)
+      }
     })
   },
 

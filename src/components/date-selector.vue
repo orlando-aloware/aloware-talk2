@@ -24,7 +24,7 @@ export default {
   components: { VueCtkDateTimePicker },
   props: {
     value: {
-      required: true
+      required: false
     },
     minDate: {
       type: String,
@@ -79,7 +79,7 @@ export default {
   },
   data () {
     return {
-      date: window.moment()
+      date: this.value
     }
   },
   methods: {
