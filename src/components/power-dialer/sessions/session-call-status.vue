@@ -346,7 +346,7 @@ export default {
     },
     fullname () {
       let { taskToCall } = this
-      if ((taskToCall.first_name === null || taskToCall.first_name === '') && (taskToCall.last_name === null || taskToCall.last_name === '')) {
+      if ((taskToCall?.first_name === null || taskToCall?.first_name === '') && (taskToCall?.last_name === null || taskToCall?.last_name === '')) {
         return `No Name`
       }
       return `${taskToCall?.first_name || ''} ${taskToCall?.last_name || ''}`
@@ -481,6 +481,7 @@ export default {
       this.hasActiveTask = false
       this.initialize()
     })
+    this.flagged = false
   },
 
   methods: {
@@ -611,10 +612,13 @@ export default {
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
         if (this.timerIsOver && this.selectedList.id !== 'all') {
-          this.reRoute()
-          this.$emit('no-tasks-found')
+          if (this.flagged) {
+            this.reRoute()
+            this.$emit('no-tasks-found')
+          }
         }
       }
+
       this.TOGGLE_SESSION_LOADER(false)
     },
     onToggleMute () {
@@ -749,7 +753,7 @@ export default {
       handler (tasks) {
         if (tasks.length === 0 && !this.togglePause) {
           this.shouldRedirect = true
-          this.initialize()
+          // this.initialize()
         }
         if (tasks.length > 0 && !this.flagged) {
           this.shouldRedirect = false
