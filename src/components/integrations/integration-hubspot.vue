@@ -185,6 +185,10 @@ export default {
       return this.workflow.id
     },
 
+    companyDomain () {
+      return this.currentCompany.hubspot_company_ui_domain || 'app.hubspot.com'
+    },
+
     hubspotContactBaseLink () {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
@@ -195,7 +199,7 @@ export default {
             this.contact.integration_data.hubspot)
         ) &&
         this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://app.hubspot.com/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
+        return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
 
       return false
