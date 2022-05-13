@@ -98,8 +98,6 @@ export default {
       await this.getMyQueueList()
     }
     await this.fetchTasks()
-
-    this.verifyOpenTasks()
   },
   methods: {
     ...mapActions('powerDialer', [
