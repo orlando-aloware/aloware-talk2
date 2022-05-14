@@ -661,7 +661,7 @@ export default {
       }
     },
     resetTimer () {
-      if (this.ongoingSession.finishedPdSession) {
+      if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
         if (this.wrapUp) {
           this.countdownTimer = this.wrapUpSeconds
         } else {
