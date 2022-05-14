@@ -1,4 +1,5 @@
 import qs from 'qs'
+import moment from 'moment'
 export default {
   /**
    * Actual API Calls for
@@ -249,13 +250,21 @@ export default {
   setFinishedPowerDialerSession: ({ commit }, data = true) => {
     commit('SET_FINISHED_PD_SESSION', data)
   },
-  updateSessionTimer: ({ commit }, data = {}) => {
+  updateSessionTimer: ({ commit }, data) => {
     commit('UPDATE_SESSION_TIMER', data)
   },
   updateCountdownTimer: ({ commit }, data = -1) => {
     commit('UPDATE_COUNTDOWN_TIMER', data)
   },
-  updateOngoingSession: ({ commit }, params) => {
-    commit('UPDATE_ONGOING_SESSION', params)
+  updateOngoingSession: ({ commit }, data) => {
+    if (!data) {
+      commit('UPDATE_ONGOING_SESSION', {
+        finishedPdSession: false,
+        startTime: moment(),
+        totalSeconds: 0,
+        countdownTimer: -1
+      })
+    }
+    commit('UPDATE_ONGOING_SESSION', data)
   }
 }

@@ -1,5 +1,6 @@
 // import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { updateField } from 'vuex-map-fields'
+import _ from 'lodash'
 
 export default {
   updateField,
@@ -139,6 +140,6 @@ export default {
     state.ongoingSession.countdownTimer = data
   },
   UPDATE_ONGOING_SESSION: (state, data) => {
-    state.ongoingSession = data
+    state.ongoingSession = _.merge(state.ongoingSession, data)
   }
 }

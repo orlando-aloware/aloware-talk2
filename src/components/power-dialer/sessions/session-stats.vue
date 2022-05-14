@@ -68,11 +68,7 @@ export default {
   },
   beforeMount () {
     if (this.ongoingSession.finishedPdSession) {
-      this.updateOngoingSession({
-        finishedPdSession: false,
-        startTime: moment(),
-        totalSeconds: 0
-      })
+      this.updateOngoingSession()
     } else {
       this.updateSessionTimer(this.ongoingSession.totalSeconds + 1)
     }
