@@ -1858,6 +1858,7 @@ export default {
     },
 
     ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
     ...mapActions([
       'resetVuex',
       'setUsage',
@@ -1967,6 +1968,10 @@ export default {
         setTimeout(() => {
           this.$VueEvent.fire('inbox_route_name_change')
         }, 1000)
+      }
+
+      if (to.meta.title !== 'Power Dialer Sessions') {
+        this.setFinishedPowerDialerSession()
       }
     },
 
