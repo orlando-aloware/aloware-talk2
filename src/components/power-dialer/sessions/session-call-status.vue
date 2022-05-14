@@ -585,7 +585,6 @@ export default {
     },
 
     resetSession () {
-      console.log('88888888888888888888888888 :>> ')
       this.activeTask = {}
       this.taskToCall = {}
       this.hasActiveTask = false
@@ -605,6 +604,7 @@ export default {
     },
 
     async initialize () {
+      console.log('Initializing....')
       if (!this.isSessionRunning) {
         this.TOGGLE_SESSION_LOADER(true)
       }
@@ -625,7 +625,7 @@ export default {
 
       // TEMPORARY IMPLEMENTATION
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
-      if (!this.statusOnACall && !this.isSessionRunning) {
+      if (!this.statusOnACall && !this.statusOnACall) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
           this.activeTask = await this.getContact({ id: this.taskToCall.id })
