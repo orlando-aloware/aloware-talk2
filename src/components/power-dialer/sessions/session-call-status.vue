@@ -661,10 +661,12 @@ export default {
       }
     },
     resetTimer () {
-      if (this.wrapUp) {
-        this.countdownTimer = this.wrapUpSeconds
-      } else {
-        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      if (this.ongoingSession.finishedPdSession) {
+        if (this.wrapUp) {
+          this.countdownTimer = this.wrapUpSeconds
+        } else {
+          this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+        }
       }
     },
     reRoute (isForced = false) {
