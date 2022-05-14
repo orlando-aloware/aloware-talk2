@@ -46,6 +46,9 @@ export default {
             if (this.countdownTimer > 0) {
               return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer > 0 ? this.countdownTimer : 0}s</span>`
             } else {
+              if (this.toggleEnd || this.togglePause) {
+                return 'Ready'
+              }
               return `Dialing...`
             }
           }
