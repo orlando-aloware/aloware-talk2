@@ -252,6 +252,9 @@ export default {
   updateSessionTimer: ({ commit }, data = {}) => {
     commit('UPDATE_SESSION_TIMER', data)
   },
+  updateCountdownTimer: ({ commit }, data = -1) => {
+    commit('UPDATE_COUNTDOWN_TIMER', data)
+  },
   updateOngoingSession: ({ commit }, params) => {
     commit('UPDATE_ONGOING_SESSION', params)
   }

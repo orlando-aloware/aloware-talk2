@@ -135,6 +135,9 @@ export default {
   UPDATE_SESSION_TIMER: (state, data) => {
     state.ongoingSession.totalSeconds = data
   },
+  UPDATE_COUNTDOWN_TIMER: (state, data) => {
+    state.ongoingSession.countdownTimer = data
+  },
   UPDATE_ONGOING_SESSION: (state, data) => {
     state.ongoingSession = data
   }

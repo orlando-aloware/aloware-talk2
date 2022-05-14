@@ -801,7 +801,6 @@ export default {
   data () {
     return {
       countdownStarted: false,
-      countdownTimer: -1,
       countdownInterval: null,
       skippedTasks: [],
       prevRoute: null,
