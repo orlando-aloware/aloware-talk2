@@ -177,6 +177,12 @@ export default function () {
     hubspot: {},
     powerDialerActiveList: {
       data: []
+    },
+    ongoingSession: {
+      finishedPdSession: true,
+      totalSeconds: null,
+      startTime: null,
+      currentTime: null
     }
   }
 }

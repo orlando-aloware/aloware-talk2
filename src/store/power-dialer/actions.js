@@ -245,5 +245,14 @@ export default {
   async getLastCommunicationScript ({ commit }, id = null) {
     let res = await window.axios.get(`api/v1/communication/${id}/scripts`)
     return res
+  },
+  setFinishedPowerDialerSession: ({ commit }, data = true) => {
+    commit('SET_FINISHED_PD_SESSION', data)
+  },
+  updateSessionTimer: ({ commit }, data = {}) => {
+    commit('UPDATE_SESSION_TIMER', data)
+  },
+  updateOngoingSession: ({ commit }, params) => {
+    commit('UPDATE_ONGOING_SESSION', params)
   }
 }
