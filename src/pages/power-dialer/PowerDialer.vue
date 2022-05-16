@@ -262,7 +262,6 @@ export default {
         }).finally(() => {
           this.contactsToDelete = null
           this.isBusy = false
-          this.removeContactClose()
         })
     },
     onRemove () {

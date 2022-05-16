@@ -46,7 +46,7 @@
         <compact-btn
           class="mr-2"
           variant="primary"
-          :disabled="!checked.length"
+          :disabled="!checked.length || clicked"
           @clicked="addSelectedContacts"
         >
           Add Selected Contacts
@@ -207,7 +207,8 @@ export default {
       checked: [],
       filterHasChanges: false,
       listName: '',
-      myContacts: false
+      myContacts: false,
+      clicked: false
     }
   },
 
@@ -316,6 +317,7 @@ export default {
         })
     },
     addSelectedContacts () {
+      this.clicked = true
       this.isLoading = true
       this.closeFilters()
       return this.$axios
@@ -456,6 +458,11 @@ export default {
           return !c.is_dnc && !c.is_blocked
         })
         document.querySelector('.data-table-check-all').checked = this.contactsData.data.length > 0 && value.length === filteredContacts.length
+      }
+    },
+    clicked: function (value) {
+      if (value) {
+        setTimeout(() => { this.clicked = false }, 2000)
       }
     }
   }
