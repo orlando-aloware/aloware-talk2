@@ -467,7 +467,6 @@ export default {
       var res = null
       let newList = null
       /**
-       * TODOs
        * Identify first before exiting the component
        * IF selected item is temporary OR
        * IF selected item is personal/company
@@ -527,12 +526,13 @@ export default {
     },
     async saveAsNew () {
       this.loading = true
-      let newSettings = { ...this.selectedItem }
+      let newSettings = { ...this.filterSelectedItem }
       newSettings.name = this.newSettingName
       newSettings.is_company_scope = 0
       newSettings.id = null
       newSettings.contact_list_id = null
-      let res = await this.createDialerSessionSetting(this.removeEmptyParams(newSettings))
+      let collection = this.removeEmptyParams(newSettings)
+      let res = await this.createDialerSessionSetting(collection)
       if (res?.id) {
         await this.getDialerSessionSettings()
       }
@@ -629,7 +629,11 @@ export default {
     async dialog (val) {
       if (val) {
         this.loading = true
+
+        // Fetch personal and company session settings
         await this.getDialerSessionSettings()
+
+        // Fetch temporary session settings, if there is
         let temporarySetting = await this.getTemporarySessionSetting(this.listId)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list?.dialer_session_id
@@ -638,21 +642,17 @@ export default {
         })
         if (fetchedSettings?.id) {
           this.selectedItem = fetchedSettings
-        } else {
+        } else if (this.temporarySetting?.id) {
           this.selectedItem = this.temporarySetting
+        } else {
+          this.selectedItem = this.filterSelectedItem
         }
         this.activeList = this.list
-        // if (this.sessionSettings?.id) {
-        //   // this.resetDefaults(false)
-        // }
         this.loading = false
+      } else {
+        this.selectedItem = {}
       }
     },
-    // selectedItem (val) {
-    //   if (val === UNTITLED) {
-    //     this.clearSessionSetting()
-    //   }
-    // },
     newSetting (val) {
       if (!val) {
         this.deleteId = null
