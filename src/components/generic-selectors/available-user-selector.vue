@@ -17,12 +17,14 @@
             :placeholder="placeholder"
             :loading="loadingUsers"
             :disable="disable || loadingUsers"
+            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             :class="[ prepend ? 'with-prepend' : '' ]"
             v-model="selectedId"
             @filter="filterFn"
             @focus="onFocus"
             @blur="onBlur"
-            @input="onInput">
+            @input="onInput"
+            @popup-show="onShowMenu">
     <template v-slot:prepend
               v-if="prepend">
       <span class="text-size-xs text-grey-80">{{ prepend }}</span>
@@ -113,7 +115,8 @@ export default {
       availableUsers: [],
       unavailableUsers: [],
       userOptions: [],
-      reference: 'availableUserSelector'
+      reference: 'availableUserSelector',
+      selectWidth: 0
     }
   },
 
@@ -244,6 +247,10 @@ export default {
         case AnswerTypes.BY_NONE:
           return 'Will Not Answer'
       }
+    },
+
+    onShowMenu () {
+      this.selectWidth = this.$refs.availableUserSelector.$el.offsetWidth
     }
   },
 
