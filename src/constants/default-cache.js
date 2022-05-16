@@ -6,6 +6,9 @@ export const DEFAULT_STATE = {
     'powerDialer.sessionSettings',
     'powerDialer.selectedList',
     'powerDialer.ongoingSession',
+    'powerDialer.sessionCallStatuses',
+    'powerDialer.countdownTimer',
+    'powerDialer.isSessionRunning',
     'contacts.showMyContacts'
   ]
 }

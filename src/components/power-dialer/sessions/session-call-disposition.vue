@@ -14,7 +14,7 @@
           CALL DISPOSITION
         </div>
       </div>
-      <div class="d-flex t-menu__content over-flow px-3 pb-1">
+      <div class="d-flex t-menu__content over-flow px-3">
         <ChipsEllipsis
           @on-selected-item="onSelectedCallDisposition"
           :list-items="filteredCallDispositions"
@@ -29,7 +29,7 @@
           CONTACT DISPOSITION
         </div>
       </div>
-      <div class="d-flex t-menu__content over-flow px-3 pb-1">
+      <div class="d-flex t-menu__content over-flow px-3">
         <ChipsEllipsis
           @on-selected-item="onSelectedContactDisposition"
           :list-items="filteredContactDispositions"
