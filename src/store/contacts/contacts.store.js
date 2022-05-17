@@ -166,6 +166,7 @@ export default function () {
     contact: {},
     contactClone: {},
     changedContactProperties: [],
+    changedContactAttributes: [],
     contactPhoneNumbers: [],
     contactRingGroups: [],
     contactAttributes: [],

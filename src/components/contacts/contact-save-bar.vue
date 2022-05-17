@@ -2,7 +2,7 @@
   <div v-if="isVisible"
        class="contact-save-bar-wrapper text-right">
     <span class="label">
-      You've changed {{ changedContactProperties.length }} property
+      You've changed {{ changedContactProperties.length + changedContactAttributes.length }} property
     </span>
     <b-button size="sm"
               class="ml-2"
@@ -30,7 +30,7 @@ import _ from 'lodash'
 export default {
   name: 'contact-save-bar',
   computed: {
-    ...mapState('contacts', ['changedContactProperties', 'contact', 'contactClone', 'changingSelectedContact']),
+    ...mapState('contacts', ['changedContactProperties', 'contact', 'contactClone', 'changingSelectedContact', 'changedContactAttributes']),
     saveButtonLabel () {
       if (this.isBusy || this.isDisposing) {
         return 'Saving changes..'
@@ -39,7 +39,9 @@ export default {
       return 'Save'
     },
     isVisible () {
-      return this.contact.id === this.contactClone.id && this.changedContactProperties.length > 0 && !this.changingSelectedContact
+      return this.contact.id === this.contactClone.id &&
+        (this.changedContactProperties.length > 0 || this.changedContactAttributes.length > 0) &&
+        !this.changingSelectedContact
     }
   },
   data () {
@@ -49,15 +51,18 @@ export default {
     }
   },
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'setChangedContactProperties']),
+    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'setChangedContactProperties', 'resetChangedContactAttributes']),
     onCancel () {
       if (this.contactClone.id === this.contact.id) {
         this.setContact({ ...this.contactClone })
       }
       this.resetChangedContactProperties()
+      this.resetChangedContactAttributes()
+      this.$VueEvent.fire('cancelContactChanges')
     },
     onSave () {
       this.isBusy = true
+      this.$VueEvent.fire('saveContact')
       return Promise.all([
         this.saveChanges(),
         this.disposeContact()
@@ -81,6 +86,7 @@ export default {
 
           this.setContactClone(this.contact)
           this.resetChangedContactProperties()
+          this.resetChangedContactAttributes()
         }
 
         // contact has been updated while disposition is not

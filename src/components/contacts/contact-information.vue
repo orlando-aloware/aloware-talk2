@@ -165,6 +165,8 @@
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
         </contact-input-field>
       </div>
+      <contact-attributes v-if="contact.id"
+                          :contact="contact"></contact-attributes>
     </div>
     <b-button pill
               variant="light"
@@ -189,6 +191,7 @@ import ContactDispositionSelector from 'components/generic-selectors/contact-dis
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
+import ContactAttributes from 'components/contacts/contact-attributes'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -200,6 +203,7 @@ export default {
     }
   },
   components: {
+    ContactAttributes,
     DatePickerSelector,
     QTimezoneSelector,
     ContactDispositionSelector,
