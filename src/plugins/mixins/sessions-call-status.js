@@ -20,20 +20,13 @@ export default {
       'sessionPaused',
       'activeTask',
       'powerDialerTasks',
-      'ongoingSession'
+      'ongoingSession',
+      'countdownTimer'
     ]),
     ...mapGetters('contacts', [
       'listItems',
       'selectedList'
     ]),
-    countdownTimer: {
-      get () {
-        return this.ongoingSession.countdownTimer
-      },
-      set (newValue) {
-        this.updateCountdownTimer(newValue)
-      }
-    },
     list () {
       return this.listItems[this.selectedList?.id]?.data
     },
@@ -87,8 +80,7 @@ export default {
     ...mapActions(['setShowPhone']),
     ...mapActions('powerDialer', [
       'moveContactItems',
-      'getSessionTaskByFilter',
-      'updateCountdownTimer'
+      'getSessionTaskByFilter'
     ]),
 
     async nextContact () {
