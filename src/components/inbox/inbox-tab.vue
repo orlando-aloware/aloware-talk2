@@ -757,13 +757,13 @@ export default {
           // only add if user is currently on pending tab
           if (['pending'].includes(this.$route.params.status)) {
             // we then add to contact tasks
-            const contacts = _.cloneDeep(this.contacts)
-            if (this.sorting.order === 'asc') {
-              contacts.push(contactTaskToRemove)
-            } else {
-              contacts.unshift(contactTaskToRemove)
-            }
-            this.setContacts(contacts)
+          const contacts = _.cloneDeep(this.contacts)
+          if (this.sorting.order === 'asc') {
+            contacts.push(contactTaskToRemove)
+          } else {
+            contacts.unshift(contactTaskToRemove)
+          }
+          this.setContacts(contacts)
           }
         }
         this.setLiveContacts(
@@ -807,12 +807,20 @@ export default {
         // reload if on open tab and the contact status is set to pending or closed
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
-        case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+        case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
           const _this = this
           this.onItemRemoved(contact, function () {
             _this.onItemSelected(_this.contacts[0])
           })
           this.loadContactTasks(true, false)
+          break
+        case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+          // just remove contact from current list
+          if (index >= 0) {
+            const contacts = [...this.contacts]
+            contacts.splice(index, 1)
+            this.setContacts(contacts)
+          }
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         default:
