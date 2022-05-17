@@ -486,7 +486,7 @@ export default {
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
     }
-    if (this.campaings) {
+    if (this.campaigns) {
       this.findDefaultOutboundCampaign()
     }
     this.$VueEvent.listen('initiate_session', (session) => {
