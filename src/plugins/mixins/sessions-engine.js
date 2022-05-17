@@ -8,7 +8,11 @@ export default {
   },
   computed: {
     ...mapFields('powerDialer', [
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'activeTask',
+      'taskToCall',
+      'hasActiveTask',
+      'sessionCallStatuses'
     ]),
     ...mapGetters('contacts', [
       'listItems'
@@ -69,6 +73,19 @@ export default {
     onStatusScheduled (task) {
       // Status Scheduled
       this.powerDialerTasks.scheduled.push(this.activeTask)
+    },
+    resetSelectedTaskAndContact () {
+      this.activeTask = {}
+      this.taskToCall = {}
+      this.hasActiveTask = false
+      this.sessionCallStatuses = {
+        pause: false,
+        end: false,
+        recording: false,
+        hold: false,
+        next: false,
+        mute: false
+      }
     }
   }
 }

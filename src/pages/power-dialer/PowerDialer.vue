@@ -2,7 +2,6 @@
   <div
     v-if="authenticated"
     class="contacts mx-0 content-row d-flex overflow-hidden h-100">
-
     <div
       v-show="!hasSessions"
       class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
@@ -116,7 +115,9 @@ export default {
     ...mapState(['isMobile']),
     ...mapFields('powerDialer', [
       'activeMetrics',
-      'powerDialerActiveList'
+      'powerDialerActiveList',
+      'powerDialerTasks',
+      'reRouteModal'
     ]),
     ...mapGetters('auth', ['authenticated']),
     ...mapGetters('powerDialer', [
@@ -176,6 +177,9 @@ export default {
     },
     listId () {
       return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+    },
+    hasQueuedTaskLists () {
+      return this.powerDialerTasks.in_queue.length > 0
     }
   },
   async mounted () {
@@ -208,6 +212,9 @@ export default {
     this.$VueEvent.listen('contact_list_bulk_created', (task) => {
       // console.log(` %c PUSHER caught: contact_list_bulk_created `, 'background:black;color:yellow;', task)
       // console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
+    })
+    this.$VueEvent.listen('call_sessions_ended', () => {
+      this.resetSelectedTaskAndContact()
     })
   },
   methods: {
@@ -256,7 +263,6 @@ export default {
         }).finally(() => {
           this.contactsToDelete = null
           this.isBusy = false
-          this.removeContactClose()
         })
     },
     onRemove () {

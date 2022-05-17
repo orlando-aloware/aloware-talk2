@@ -43,7 +43,14 @@ export default {
           if (this.sessionPaused) {
             return 'Up Next'
           } else {
-            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
+            if (this.countdownTimer > 0) {
+              return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer > 0 ? this.countdownTimer : 0}s</span>`
+            } else {
+              if (this.toggleEnd || this.togglePause) {
+                return 'Ready'
+              }
+              return `Dialing...`
+            }
           }
         case 'WRAP_UP':
           return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
@@ -78,19 +85,12 @@ export default {
       this.$VueEvent.fire('hangupCall')
     },
 
-    // async fetchNextContact () {
-    //   this.taskToCall = this.powerDialerTasks.in_queue[0]
-    //   if (this.taskToCall?.id) {
-    //     await this.fetchContact(this.taskToCall?.id)
-    //   }
-    // },
-
-    async fetchContact (taskId = '') {
+    async fetchContact (taskId = null) {
       this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: taskId })
-      if (!this.flagged) {
+      if (!this.isSessionRunning) {
         // this.activeTask = res
-        this.flagged = true
+        this.isSessionRunning = true
       }
     },
 

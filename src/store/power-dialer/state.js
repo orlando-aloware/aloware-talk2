@@ -8,6 +8,16 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default function () {
   return {
+    isSessionRunning: false,
+    sessionCallStatuses: {
+      pause: false,
+      end: false,
+      recording: false,
+      hold: false,
+      next: false,
+      mute: false
+    },
+    countdownTimer: -1,
     flaggedCreateExisting: false,
     myQueue: null,
     myQueueListFilters: null,

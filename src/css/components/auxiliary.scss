@@ -420,3 +420,13 @@ iframe > html {
 .session-sidebar {
   min-width: 300px !important;
 }
+
+.hubspot-iframe-container {
+  height: calc(100% - 20px);
+  width: 100%;
+  overflow: hidden;
+  #hubspot-crm {
+    width: calc(100% + 0px);
+    height: 100%;
+  }
+}

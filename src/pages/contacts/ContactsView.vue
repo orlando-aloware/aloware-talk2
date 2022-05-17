@@ -330,9 +330,7 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <a href=""
-                       @click="onNavigate(contact.id, $event)"
-                       class="d-flex align-items-center item contact-name">
+                    <router-link :to="generateRoute(contact.id)" class="d-flex align-items-center item contact-name">
                       <template v-if="contact.name">
                         <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                           {{ contact.name | ucwords }}
@@ -343,7 +341,8 @@
                           No Name
                         </div>
                       </template>
-                    </a>
+                    </router-link>
+
                     <b-badge v-if="contact.is_dnc"
                                  variant="danger"
                                  class="badge-phone-info">
@@ -512,7 +511,7 @@
                 class="text-left"
                 :key="`c-${colIndx}`">
                 <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
-                  {{ contact.created_at | fixDate }}
+                  {{ contact.created_at | fixFullDateTime }}
                 </div>
               </td>
 
@@ -596,9 +595,14 @@
                   - {{ contact[column.name] }}
                 </span>
                 <div
-                  v-else-if="column.name.includes('_at') || column.name.includes('date')"
-                  class="text-left ellipse">
+                  v-else-if="column.name.includes('_at')"
+                  class="text-left ellipse col-indented">
                   {{ contact[column.name] | fixFullDateTime }}
+                </div>
+                <div
+                  v-else-if="column.name.includes('date_of_birth')"
+                  class="text-left ellipse col-indented" >
+                  {{ contact[column.name] | fixFullDate }}
                 </div>
                 <div
                   v-else
@@ -1616,7 +1620,9 @@ export default {
     })
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', function (filters) {
-      _this.setDataCount(filters)
+      if (filters && filters.length) {
+        _this.setDataCount(filters)
+      }
     })
   },
 
