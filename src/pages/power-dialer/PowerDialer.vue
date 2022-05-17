@@ -66,6 +66,7 @@
 
 <script>
 
+import _ from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
@@ -223,14 +224,14 @@ export default {
       'TOGGLE_TABLE_LOADER',
       'SET_ACTIVE_FILTER'
     ]),
-    async myQueueList () {
+    myQueueList: _.debounce(async function () {
       let response = await this.getMyQueueList()
       if (response.status === 200) {
         this.listLoaded({ ...response.data, id: 'my-queue' })
       } else {
         this.$generalNotification('My Queue list not found! Please contact administrator.', 'error')
       }
-    },
+    }, 100),
     handleBulkDeletion () {
       const url = { data: null }
       switch (this.removeContactActionType) {
