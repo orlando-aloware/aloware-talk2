@@ -192,8 +192,7 @@ export default function () {
       finishedPdSession: true,
       totalSeconds: null,
       startTime: null,
-      currentTime: null,
-      countdownTimer: -1
+      currentTime: null
     }
   }
 }
