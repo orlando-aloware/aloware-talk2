@@ -744,6 +744,8 @@ export default {
 
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      let contactTaskToRemove = null
+
       if (index >= 0) {
         const liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
@@ -751,12 +753,13 @@ export default {
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
           communication.type === CommunicationTypes.CALL &&
           [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
-          const contactTaskToRemove = liveContacts[index]
+          contactTaskToRemove = liveContacts[index]
           liveContacts.splice(index, 1)
 
-          // only add if user is currently on pending tab
-          if (['pending'].includes(this.$route.params.status)) {
-            // we then add to contact tasks
+          if (communication.direction === CommunicationDirections.OUTBOUND) {
+            contactTaskToRemove.task_status = ContactTaskStatus.STATUS_PENDING
+          }
+
           const contacts = _.cloneDeep(this.contacts)
           if (this.sorting.order === 'asc') {
             contacts.push(contactTaskToRemove)
@@ -764,7 +767,6 @@ export default {
             contacts.unshift(contactTaskToRemove)
           }
           this.setContacts(contacts)
-          }
         }
         this.setLiveContacts(
           [
@@ -792,6 +794,10 @@ export default {
         if (contacts[contactIndex].id === this.contact.id) {
           this.setContact(contacts[contactIndex])
         }
+      }
+
+      if (contactTaskToRemove) {
+        this.$VueEvent.fire('contact_task_status_updated', contactTaskToRemove)
       }
     }
 
