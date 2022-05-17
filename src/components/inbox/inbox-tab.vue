@@ -755,18 +755,16 @@ export default {
           liveContacts.splice(index, 1)
 
           // only add if user is currently on pending tab
-          if (!['pending'].includes(this.$route.params.status)) {
-            return
+          if (['pending'].includes(this.$route.params.status)) {
+            // we then add to contact tasks
+            const contacts = _.cloneDeep(this.contacts)
+            if (this.sorting.order === 'asc') {
+              contacts.push(contactTaskToRemove)
+            } else {
+              contacts.unshift(contactTaskToRemove)
+            }
+            this.setContacts(contacts)
           }
-
-          // we then add to contact tasks
-          const contacts = _.cloneDeep(this.contacts)
-          if (this.sorting.order === 'asc') {
-            contacts.push(contactTaskToRemove)
-          } else {
-            contacts.unshift(contactTaskToRemove)
-          }
-          this.setContacts(contacts)
         }
         this.setLiveContacts(
           [
