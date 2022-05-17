@@ -481,6 +481,7 @@ export default {
   },
 
   created () {
+    this.ongoingSession.listId = this.$route.params.id
     this.resetSession()
 
     if (!this.profile.auto_dialer_enabled) {

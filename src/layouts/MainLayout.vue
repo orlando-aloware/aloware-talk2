@@ -284,6 +284,7 @@ export default {
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
     ...mapState('inbox', ['selectedContact', 'liveContacts']),
+    ...mapState('powerDialer', ['ongoingSession']),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -318,6 +319,9 @@ export default {
         'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.md,
         'mobile-phone-visible': this.isPhoneVisible
       }
+    },
+    isSamePDListId () {
+      return this.$route.params.id === this.ongoingSession.listId
     }
   },
 
@@ -767,6 +771,8 @@ export default {
         this.$VueEvent.fire('inbox_route_name_change')
       }, 1000)
     }
+
+    this.resetPowerDialerSession(this.$route)
   },
 
   mounted () {
@@ -809,6 +815,12 @@ export default {
   },
 
   methods: {
+    resetPowerDialerSession (route) {
+      if (route.meta.title !== 'Power Dialer Sessions' || (route.meta.title === 'Power Dialer Sessions' && !this.isSamePDListId)) {
+        this.setFinishedPowerDialerSession()
+      }
+    },
+
     onDialerFormHide () {
       // if (typeof this.$refs.appFooter !== 'undefined') {
       //   this.$refs.appFooter.toggleContacts()
@@ -1970,9 +1982,7 @@ export default {
         }, 1000)
       }
 
-      if (to.meta.title !== 'Power Dialer Sessions') {
-        this.setFinishedPowerDialerSession()
-      }
+      this.resetPowerDialerSession(to)
     },
 
     authenticated (newVal, oldVal) {

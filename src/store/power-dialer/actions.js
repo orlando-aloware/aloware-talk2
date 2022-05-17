@@ -261,7 +261,8 @@ export default {
       commit('UPDATE_ONGOING_SESSION', {
         finishedPdSession: false,
         startTime: moment(),
-        totalSeconds: 0
+        totalSeconds: 0,
+        listId: null
       })
     }
     commit('UPDATE_ONGOING_SESSION', data)

@@ -192,7 +192,8 @@ export default function () {
       finishedPdSession: true,
       totalSeconds: null,
       startTime: null,
-      currentTime: null
+      currentTime: null,
+      listId: null
     }
   }
 }
