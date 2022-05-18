@@ -42,7 +42,7 @@
                 <SearchList
                   :search="search"
                   @search="onSearch"
-                  class="width-250" />
+                  class="width-260" />
 
               </div>
             </b-col>
@@ -455,8 +455,8 @@ import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu-2'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
-import powermixin from 'src/plugins/mixins/power-dialer'
-import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
+import pdMixin from 'src/plugins/mixins/power-dialer'
+import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
@@ -519,7 +519,7 @@ export default {
       default: null
     }
   },
-  mixins: [powermixin, pdMixin],
+  mixins: [pdMixin, pdInitMixin],
 
   inject: [
     'contactsData'
@@ -653,7 +653,7 @@ export default {
         default:
           total = list.total_items
       }
-      return `${currentTotal} of ${total} Contacts`
+      return `${currentTotal} of ${total || 0} Contacts`
     },
     activeList () {
       return this.listItems[this.selectedListId]?.data || []
