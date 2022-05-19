@@ -327,6 +327,9 @@ export default {
         'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.md,
         'mobile-phone-visible': this.isPhoneVisible
       }
+    },
+    isNotInInbox () {
+      return this.$route.path.indexOf('channels/inbox') === -1 && !['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)
     }
   },
 
@@ -612,7 +615,7 @@ export default {
           this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
         }
       }
-      if (this.$route.path.indexOf('channels/inbox') === -1 && !['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+      if (this.isNotInInbox) {
         if (!communication.contact_id) {
           return
         }
@@ -686,7 +689,7 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', (communication) => {
-      if (this.$route.path.indexOf('channels/inbox') === -1 && !['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+      if (this.isNotInInbox) {
         // Do not alter live contacts if it's in active mode
         const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
           [
