@@ -744,6 +744,8 @@ export default {
 
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      let contactTaskToRemove = null
+
       if (index >= 0) {
         const liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
@@ -751,10 +753,13 @@ export default {
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
           communication.type === CommunicationTypes.CALL &&
           [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
-          const contactTaskToRemove = liveContacts[index]
+          contactTaskToRemove = liveContacts[index]
           liveContacts.splice(index, 1)
 
-          // we then add to contact tasks
+          if (communication.direction === CommunicationDirections.OUTBOUND) {
+            contactTaskToRemove.task_status = ContactTaskStatus.STATUS_PENDING
+          }
+
           const contacts = _.cloneDeep(this.contacts)
           if (this.sorting.order === 'asc') {
             contacts.push(contactTaskToRemove)
@@ -790,6 +795,10 @@ export default {
           this.setContact(contacts[contactIndex])
         }
       }
+
+      if (contactTaskToRemove) {
+        this.$VueEvent.fire('contact_task_status_updated', contactTaskToRemove)
+      }
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
@@ -804,12 +813,20 @@ export default {
         // reload if on open tab and the contact status is set to pending or closed
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
-        case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+        case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
           const _this = this
           this.onItemRemoved(contact, function () {
             _this.onItemSelected(_this.contacts[0])
           })
           this.loadContactTasks(true, false)
+          break
+        case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+          // just remove contact from current list
+          if (index >= 0) {
+            const contacts = [...this.contacts]
+            contacts.splice(index, 1)
+            this.setContacts(contacts)
+          }
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         default:
