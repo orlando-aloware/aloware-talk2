@@ -746,7 +746,7 @@ export default {
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
       let contactTaskToRemove = null
 
-      if (index >= 0) {
+      if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
         const liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
         // if type is call and completed/voicemail then remove from live calls
