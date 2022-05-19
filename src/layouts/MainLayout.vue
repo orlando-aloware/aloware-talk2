@@ -196,7 +196,8 @@ import {
   htmlMixin,
   webrtcMixin,
   notificationMixin,
-  broadcastMixin
+  broadcastMixin,
+  parkCallMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -235,7 +236,8 @@ export default {
     aclMixin,
     communicationMixin,
     notificationMixin,
-    broadcastMixin
+    broadcastMixin,
+    parkCallMixin
   ],
 
   data () {
@@ -279,7 +281,14 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications', 'showPhone']),
+    ...mapState([
+      'dialer',
+      'campaigns',
+      'isMobile',
+      'ringGroups',
+      'notifications',
+      'showPhone'
+    ]),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
@@ -322,6 +331,9 @@ export default {
   },
 
   created () {
+    this.setNotificationAudio()
+    this.fetchAllParkedCalls()
+
     if (this.$route.name === 'Phone' && !this.isMobile) {
       this.$router.replace({ path: '/' })
     }
@@ -1333,17 +1345,21 @@ export default {
           scope.setTag('company_name', this.profile.company_name)
           scope.setTag('version', storage.local.getItem('version'))
         })
+
         if (this.profile.company_id) {
           this.$Sentry.configureScope((scope) => {
             scope.setTag('company_id', this.profile.company_id)
           })
         }
+
         const getCurrentCompany = this.getCurrentCompany()
         const getUsers = this.getUsers()
+        const fetchAllParkedCalls = this.fetchAllParkedCalls()
 
         await Promise.all([
           getCurrentCompany,
-          getUsers
+          getUsers,
+          fetchAllParkedCalls
         ])
       }
     },
@@ -1888,7 +1904,8 @@ export default {
       'setIsTabletOrMobile',
       'setContactDetailsDrawer',
       'setEnableAudio',
-      'setDefaultDateFilter'
+      'setDefaultDateFilter',
+      'setNotificationAudio'
     ]),
     ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
     ...mapActions('auth', {

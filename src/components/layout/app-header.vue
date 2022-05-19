@@ -224,15 +224,6 @@ export default {
       this.dialerStatus = false
     },
 
-    navigateToContactActivity () {
-      this.$router.push({
-        name: 'Communication',
-        params: {
-          contactId: this.$route.params.contactId
-        }
-      })
-    },
-
     navigateBack (e) {
       console.log('navigateBack', { e })
       const previousPage = _.get(this.$route.query, 'previousPage', null)

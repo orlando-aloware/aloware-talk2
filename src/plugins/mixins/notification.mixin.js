@@ -5,7 +5,6 @@ import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls
 export default {
   data () {
     return {
-      notificationAudio: new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3'),
       dialerCallFishingInterval: null
     }
   },
@@ -20,7 +19,8 @@ export default {
       'voicemailNotifiedDesktop',
       'contactNotifiedDesktop',
       'appointmentNotifiedDesktop',
-      'reminderNotifiedDesktop'
+      'reminderNotifiedDesktop',
+      'notificationAudio'
     ])
   },
 

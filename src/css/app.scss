@@ -1823,6 +1823,7 @@ i.option-separator {
 }
 
 .collapsed-has-notes {
+  &.no-expansion,
   .q-item {
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;

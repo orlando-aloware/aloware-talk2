@@ -17,7 +17,13 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer', 'notifications', 'ringGroups', 'callFishingQueue']),
+    ...mapState([
+      'dialer',
+      'notifications',
+      'ringGroups',
+      'callFishingQueue',
+      'parkedCalls'
+    ]),
 
     shouldShowIncomingCallMenu () {
       if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode) {
@@ -40,7 +46,9 @@ export default {
       if (!this.communication) {
         return false
       }
-      return this.dialer.parkedCall && this.dialer.parkedCall.id === this.communication.id
+
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.communication.id)
+      return !_.isEmpty(found)
     },
 
     isActiveCall () {

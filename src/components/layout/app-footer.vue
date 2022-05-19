@@ -147,7 +147,6 @@ import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
-import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 export default {
@@ -164,10 +163,13 @@ export default {
     ContactMenuItem
   },
 
-  mixins: [parkCallMixins],
-
   computed: {
-    ...mapState(['isMobile', 'dialer', 'showPhone']),
+    ...mapState([
+      'isMobile',
+      'dialer',
+      'showPhone',
+      'parkedCalls'
+    ]),
     isMoreActive () {
       return this.tab === 'more'
     },

@@ -184,7 +184,6 @@
 import { mapGetters, mapState } from 'vuex'
 import ContactPhoneNumberSearch from 'components/dialer/contact-phone-number-search'
 import LineSelector from 'components/generic-selectors/line-selector'
-import parkCallMixins from 'src/plugins/mixins/park-call.mixin'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
@@ -195,7 +194,6 @@ export default {
   name: 'dialer-form',
 
   mixins: [
-    parkCallMixins,
     contactMixin,
     timezoneCheckMixin
   ],
@@ -241,7 +239,11 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['dialer']),
+    ...mapState([
+      'dialer',
+      'parkedCalls',
+      'loadingParkedCalls'
+    ]),
     ...mapGetters('auth', ['profile']),
 
     sendTextColor () {
@@ -308,7 +310,6 @@ export default {
     hideDialer () {
       this.$emit('hide')
       this.resetForm()
-      // this.fetchAllParkedCalls()
     },
 
     resetForm () {
