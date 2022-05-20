@@ -144,7 +144,11 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setShowPhone', 'removeFromCallFishingQueue']),
+    ...mapActions([
+      'setShowPhone',
+      'removeFromCallFishingQueue',
+      'setDialerParkedCall'
+    ]),
     ...mapActions('inbox', ['setContacts', 'setLiveContacts']),
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
@@ -248,18 +252,38 @@ export default {
 
     onParkCurrentCallAndConnect () {
       this.showParkedCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(true, true)
     },
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(false, true)
     },
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(true, false)
     },
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(false, true)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {

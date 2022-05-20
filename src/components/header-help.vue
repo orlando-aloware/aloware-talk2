@@ -41,7 +41,7 @@
 
 <script>
 import talk2Api from 'src/plugins/api/api'
-import Roles from 'src/constants/roles'
+import * as Roles from 'src/constants/roles'
 import { mapGetters } from 'vuex'
 
 export default {
