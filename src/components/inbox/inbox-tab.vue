@@ -313,7 +313,9 @@ export default {
       'toggleFilterModelForm',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
-      'setLoadingPendingTaskCount'
+      'setLoadingPendingTaskCount',
+      'setOpenTaskCount',
+      'setPendingTaskCount'
     ]),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
@@ -396,6 +398,17 @@ export default {
       })
     },
     async onItemRemoved (contact, callback) {
+      if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+        this.setPendingTaskCount(this.taskCounts.pending - 1)
+      }
+
+      if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+        this.setOpenTaskCount(this.taskCounts.open - 1)
+      }
+
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
       await this.setContacts(filteredContacts)
       if (typeof callback !== 'undefined') {
@@ -810,6 +823,17 @@ export default {
         return
       }
 
+      if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+        this.setPendingTaskCount(this.taskCounts.pending - 1)
+      }
+
+      if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+        this.setOpenTaskCount(this.taskCounts.open - 1)
+      }
+
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+
       const index = this.contacts.findIndex(item => item.id === contact.id)
       switch (true) {
         // reload if on closed tab and the contact status is set to pending
@@ -851,12 +875,52 @@ export default {
       }
     }
 
+    this.listeners.contactAuditCreated = (data) => {
+      if (data.property === 'contact_task_status') {
+        // update task status on live contacts
+        const index = this.liveContacts.findIndex(item => item.id === data.contact_id)
+        if (index >= 0) {
+          const liveContacts = _.cloneDeep(this.liveContacts)
+          liveContacts[index].task_status = parseInt(data.to)
+
+          this.setLiveContacts(
+            [
+              // connected calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+              // parked calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+              // incoming calls
+              ...liveContacts.filter(item => [
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+              ].includes(item.last_communication.current_status2))
+            ]
+          )
+        }
+
+        const contactIndex = this.contacts.findIndex(item => item.id === data.contact_id)
+        if (contactIndex >= 0) {
+          const contacts = _.cloneDeep(this.contacts)
+          contacts[contactIndex].task_status = parseInt(data.to)
+          this.setContacts(contacts)
+          if (contacts[contactIndex].id === this.contact.id) {
+            this.setContact(contacts[contactIndex])
+          }
+        }
+      }
+    }
+
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
     this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
+
+    this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -875,6 +939,7 @@ export default {
     this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
     this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
+    this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
   },
 
   watch: {

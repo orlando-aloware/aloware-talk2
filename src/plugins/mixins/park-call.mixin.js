@@ -36,7 +36,6 @@ export default {
       return this.$axios
         .post('/api/v1/contact-center/parked-calls')
         .then((res) => {
-          console.log(res)
           this.setParkedCalls(res.data)
           this.setLoadingParkedCalls(false)
           return Promise.resolve()

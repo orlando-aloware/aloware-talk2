@@ -167,6 +167,18 @@ export default {
       }
     })
 
+    this.$VueEvent.listen('contact_audit_created', (data) => {
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.contact && parseInt(this.contact.id) === parseInt(data.contact_id)) {
+        if (data.property === 'contact_task_status') {
+          const contact = _.cloneDeep(this.contact)
+          contact.task_status = parseInt(data.to)
+          this.setContact(contact)
+        }
+      }
+    })
+
     this.$VueEvent.listen('contact_disposed', (disposedContact) => {
       if (disposedContact.id === this.contact.id) {
         const contact = _.cloneDeep(this.contact)
