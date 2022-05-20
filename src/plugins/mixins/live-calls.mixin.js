@@ -26,10 +26,14 @@ export default {
     ]),
 
     shouldShowIncomingCallMenu () {
-      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode) {
+      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode && this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
         return false
       }
-      return ((this.isIncomingLiveCall && this.isCallFishing && this.isCallFishingMode) || (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')) && !this.isParkedCall && !this.isConnectedCall
+      return (
+        (this.isIncomingLiveCall && this.isCallFishing && (this.isCallFishingMode || this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW)) ||
+        (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')
+      ) && !this.isParkedCall &&
+        !this.isConnectedCall
     },
     shouldShowAnsweredCallMenu () {
       return this.isActiveCall && !this.isParkedCall && !this.shouldShowIncomingCallMenu
@@ -84,6 +88,15 @@ export default {
       return false
     },
 
+    isIgnored () {
+      if (_.isEmpty(this.callFishingQueue)) {
+        return true
+      }
+
+      const found = this.callFishingQueue.find(item => item.communicationId === this.communication.id)
+      return _.isEmpty(found)
+    },
+
     isIncomingLiveCall () {
       return this.communication.type === CommunicationTypes.CALL &&
         this.communication.direction === CommunicationDirection.INBOUND &&
@@ -119,6 +132,14 @@ export default {
 
     liveCallStatuses () {
       return [...this.incomingCallStatuses, ...[CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW]]
+    },
+
+    isShowIgnoreCallIcon () {
+      return this.isIncomingLiveCall && this.isCallFishingMode && this.isCallFishing && !this.isIgnored
+    },
+
+    isShowCancelCallIcon () {
+      return this.isIncomingLiveCall && !this.isCallFishing
     }
   },
 
@@ -153,6 +174,7 @@ export default {
             shouldPark: false,
             shouldHangup: false
           }
+          this.$VueEvent.fire('endWrapUp')
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
           this.isAnsweringCall = false

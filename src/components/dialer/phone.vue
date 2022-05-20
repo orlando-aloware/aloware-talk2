@@ -172,10 +172,11 @@
             <span>{{ phoneStatus }}</span>
           </div>
           <div class="phone-cta">
-            <div class="d-flex flex-row justify-content-between"
+            <div class="d-flex flex-row"
+                 :class="[ isUnparkCallVisible || (!isDeclineCallVisible && !isIgnoreCallVisible && isAnswerCallVisible) ? 'justify-content-center' : 'justify-content-between' ]"
                  v-if="isPhoneCTAVisible">
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.call !== undefined && dialer.callFishing.communication === undefined">
+                   v-if="isDeclineCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -188,7 +189,7 @@
                 <span class="text-size-xs mt-1">Decline</span>
               </div>
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.callFishing.communication !== undefined">
+                   v-if="isIgnoreCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -201,7 +202,8 @@
                 <span class="text-size-xs mt-1">Ignore</span>
               </div>
 
-              <div class="d-flex flex-column align-items-center">
+              <div class="d-flex flex-column align-items-center"
+              v-if="isAnswerCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -212,6 +214,20 @@
                   </accept-call-icon>
                 </q-btn>
                 <span class="text-size-xs mt-1">Accept</span>
+              </div>
+
+              <div class="d-flex flex-column align-items-center"
+                   v-if="isUnparkCallVisible">
+                <q-btn class="height-52"
+                       ripple
+                       round
+                       no-caps
+                       @click="unparkCommunication">
+                  <parked-call-icon width="52"
+                                    height="52">
+                  </parked-call-icon>
+                </q-btn>
+                <span class="text-size-xs mt-1">Unpark</span>
               </div>
             </div>
 
@@ -227,7 +243,7 @@
                                   height="52">
                 </cancel-call-icon>
               </q-btn>
-              <span class="text-size-xs mt-1">Hang Up</span>
+              <span class="text-size-xs mt-1">Hangup</span>
             </div>
           </div>
         </template>
@@ -1241,9 +1257,11 @@ import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
 export default {
   name: 'phone',
   components: {
+    ParkedCallIcon,
     MobileLiveCallBar,
     IgnoreCallIcon,
     CopyIcon,
@@ -1378,7 +1396,22 @@ export default {
     }
   },
   computed: {
-    ...mapState(['dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification', 'sessionPhoneExpansion']),
+    ...mapState([
+      'dialer',
+      'campaigns',
+      'users',
+      'warnings',
+      'inputDevices',
+      'outputDevices',
+      'currentInputDevice',
+      'currentOutputDevice',
+      'shouldIntroduce',
+      'addedParty',
+      'showIncomingCallNotification',
+      'sessionPhoneExpansion',
+      'parkedCalls',
+      'callFishingQueue'
+    ]),
     ...mapState('cache', ['currentCompany']),
 
     isCallCompleted () {
@@ -1621,6 +1654,35 @@ export default {
     },
     isOnPowerDialerSessionRoute () {
       return this.$route.meta.id === 'power-dialer-session'
+    },
+    isCallFishingCommunicationInParkedCalls () {
+      if (_.isEmpty(this.parkedCalls)) {
+        return false
+      }
+
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.callFishing.communication.id)
+
+      return !_.isEmpty(found)
+    },
+    isIgnored () {
+      if (_.isEmpty(this.callFishingQueue)) {
+        return true
+      }
+
+      const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
+      return _.isEmpty(found)
+    },
+    isDeclineCallVisible () {
+      return this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined
+    },
+    isIgnoreCallVisible () {
+      return this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls && !this.isIgnored
+    },
+    isAnswerCallVisible () {
+      return (this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined) || (this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls)
+    },
+    isUnparkCallVisible () {
+      return this.dialer.callFishing.communication !== undefined && this.isCallFishingCommunicationInParkedCalls
     }
   },
   created () {
@@ -1849,6 +1911,9 @@ export default {
       setTimeout(() => {
         this.loadingPark = false
       }, 1000)
+    },
+    unparkCommunication () {
+      this.$VueEvent.fire('unparkCommunication', this.dialer.callFishing.communication)
     },
     saveAndResetExpansion ($event) {
       if ($event) {
