@@ -174,7 +174,11 @@ export default {
             shouldPark: false,
             shouldHangup: false
           }
-          this.$VueEvent.fire('endWrapUp')
+
+          if (this.dialer.call && this.dialer.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('endWrapUp')
+          }
+
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
           this.isAnsweringCall = false
@@ -231,6 +235,10 @@ export default {
         this.showParkedCallMenu = true
         e.stopImmediatePropagation()
         return
+      }
+
+      if (this.dialer.call && this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
       }
 
       this.$VueEvent.fire('unparkCommunication', this.communication)
