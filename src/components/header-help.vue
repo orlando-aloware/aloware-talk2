@@ -28,8 +28,8 @@
                  target="_blank"
                  type="a"
                  unelevated
-                 v-if="!user.profile.company.reseller_id"
-                 color="primary">
+                 color="primary"
+                 v-if="!user.profile.company.reseller_id">
             Get Help
           </q-btn>
           <q-btn class="mt-2 d-block"
@@ -37,8 +37,8 @@
                  target="_blank"
                  type="a"
                  unelevated
-                 v-if="!user.profile.company.reseller_id"
-                 color="success">
+                 color="success"
+                 v-if="!user.profile.company.reseller_id">
             Setup Guide
           </q-btn>
         </q-list>
