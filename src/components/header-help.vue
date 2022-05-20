@@ -8,10 +8,10 @@
                       :ripple="false"
                       :menu-offset="[4, 16]">
         <template v-slot:label>
-                  <i class="fa fa-question-circle text-2x text-red-10 header-help-icon-wrapper"></i>
+                  <i class="fa fa-question-circle text-2x text-danger header-help-icon-wrapper"></i>
         </template>
 
-        <q-list class="tab-dropdown-list p-3 allow-select">
+        <q-list class="tab-dropdown-list p-3 allow-select header-help-dropdown-list">
           <span class="text-md"
                 v-if="user.profile"
                 @click="noClose($event)">
@@ -22,18 +22,25 @@
                 @click="noClose($event)">
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
-          <a v-if="!user.profile.company.reseller_id"
-              class="btn btn-block bg-indigo-10 text-white mt-2"
-              href="https://support.aloware.com"
-              target="_blank">
+
+          <q-btn class="mt-2 d-block"
+                 href="https://support.aloware.com"
+                 target="_blank"
+                 type="a"
+                 unelevated
+                 v-if="!user.profile.company.reseller_id"
+                 color="primary">
             Get Help
-          </a>
-          <a v-if="!user.profile.company.reseller_id"
-            class="btn btn-block bg-green-8 text-white"
-            href="https://aloware.com/setup-guide"
-            target="_blank">
+          </q-btn>
+          <q-btn class="mt-2 d-block"
+                 href="https://aloware.com/setup-guide"
+                 target="_blank"
+                 type="a"
+                 unelevated
+                 v-if="!user.profile.company.reseller_id"
+                 color="success">
             Setup Guide
-          </a>
+          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>

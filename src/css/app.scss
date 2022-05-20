@@ -8188,6 +8188,12 @@ span.mention {
   margin-right: 20px !important;
 }
 
+.header-help-dropdown-list {
+  .q-btn:hover {
+    text-decoration: none;
+  }
+}
+
 .tab-avatar-menu {
 
   min-width: 227px !important;
