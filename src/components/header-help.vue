@@ -58,8 +58,6 @@ export default {
   },
 
   created () {
-    this.getBuildInfo()
-
     // initialize window width size
     this.window_size = window.screen.width
 
@@ -95,15 +93,6 @@ export default {
       if (event) {
         event.stopPropagation()
       }
-    },
-    getBuildInfo () {
-      talk2Api.V1.buildInfo.get().then(res => {
-        console.log('getBuildInfo', { res })
-        this.env = res.data.env
-        this.branch = res.data.branch
-      }).catch(err => {
-        console.log(err)
-      })
     }
   }
 }
