@@ -232,6 +232,10 @@ export default {
     this.leaving = false
   },
 
+  beforeDestroy () {
+    this.setContact({})
+  },
+
   beforeRouteLeave (to, from, next) {
     this.leaving = true
     next()
