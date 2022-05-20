@@ -28,18 +28,10 @@
                  target="_blank"
                  type="a"
                  unelevated
+                 no-caps
                  color="primary"
                  v-if="!user.profile.company.reseller_id">
             Get Help
-          </q-btn>
-          <q-btn class="mt-2 d-block"
-                 href="https://aloware.com/setup-guide"
-                 target="_blank"
-                 type="a"
-                 unelevated
-                 color="success"
-                 v-if="!user.profile.company.reseller_id">
-            Setup Guide
           </q-btn>
         </q-list>
       </q-btn-dropdown>
