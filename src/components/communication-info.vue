@@ -48,11 +48,12 @@
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
+                        v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
                         @click="onRejectCall">
-                <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode"
+                <ignore-call-icon v-if="isShowIgnoreCallIcon"
                                   height="24"
                                   width="24"/>
-                <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishingMode"/>
+                <cancel-call-icon v-if="isShowCancelCallIcon"/>
               </b-button>
             </div>
             <div class="pl-1 pr-0"

@@ -173,10 +173,10 @@
           </div>
           <div class="phone-cta">
             <div class="d-flex flex-row"
-                 :class="[ dialer.callFishing.communication !== undefined && isCallFishingCommunicationInParkedCalls ? 'justify-content-center' : 'justify-content-between' ]"
+                 :class="[ isUnparkCallVisible || (!isDeclineCallVisible && !isIgnoreCallVisible && isAnswerCallVisible) ? 'justify-content-center' : 'justify-content-between' ]"
                  v-if="isPhoneCTAVisible">
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.call !== undefined && dialer.callFishing.communication === undefined">
+                   v-if="isDeclineCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -189,7 +189,7 @@
                 <span class="text-size-xs mt-1">Decline</span>
               </div>
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.callFishing.communication !== undefined && !isCallFishingCommunicationInParkedCalls">
+                   v-if="isIgnoreCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -203,7 +203,7 @@
               </div>
 
               <div class="d-flex flex-column align-items-center"
-              v-if="(dialer.call !== undefined && dialer.callFishing.communication === undefined) || (dialer.callFishing.communication !== undefined && !isCallFishingCommunicationInParkedCalls)">
+              v-if="isAnswerCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -217,7 +217,7 @@
               </div>
 
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.callFishing.communication !== undefined && isCallFishingCommunicationInParkedCalls">
+                   v-if="isUnparkCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -1409,7 +1409,8 @@ export default {
       'addedParty',
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
-      'parkedCalls'
+      'parkedCalls',
+      'callFishingQueue'
     ]),
     ...mapState('cache', ['currentCompany']),
 
@@ -1662,6 +1663,26 @@ export default {
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.callFishing.communication.id)
 
       return !_.isEmpty(found)
+    },
+    isIgnored () {
+      if (_.isEmpty(this.callFishingQueue)) {
+        return true
+      }
+
+      const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
+      return _.isEmpty(found)
+    },
+    isDeclineCallVisible () {
+      return this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined
+    },
+    isIgnoreCallVisible () {
+      return this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls && !this.isIgnored
+    },
+    isAnswerCallVisible () {
+      return (this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined) || (this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls)
+    },
+    isUnparkCallVisible () {
+      return this.dialer.callFishing.communication !== undefined && this.isCallFishingCommunicationInParkedCalls
     }
   },
   created () {
