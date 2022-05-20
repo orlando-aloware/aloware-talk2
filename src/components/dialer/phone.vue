@@ -485,7 +485,8 @@
                              @click="goToContact">
                       </q-btn>
                     </p>
-                    <p class="text-sm-left contact-phone mb-1">
+                    <p class="text-sm-left contact-phone mb-1"
+                       v-if="contact">
                       <span>{{ contact.phone_number | fixPhone }}</span>
                       <b-link href="#"
                               class="copy-phone-number text-grey-100 d-inline-flex ml-1"
