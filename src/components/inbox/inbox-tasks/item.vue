@@ -40,7 +40,7 @@
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
+               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </div>
           <div class="truncated-text call-parked-label"
@@ -59,6 +59,7 @@
             {{ smsEmptyBodyAlternativeText }}
           </div>
           <div class="truncated-text"
+               :class="{ 'pt-1': [CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(contact.last_communication.type) }"
                v-if="contact.last_communication.body !== null">
             {{ contact.last_communication.body }}
           </div>
