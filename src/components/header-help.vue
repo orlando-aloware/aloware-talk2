@@ -1,27 +1,14 @@
 <template>
-  <q-item>
-    <q-item-section class="nav-item dropdown pos-stc-xs mr-2"
-                    v-if="!whitelabel && !loading_whitelabel && !isMobileSize"
-                    avatar>
+  <q-item class="header-help-wrapper">
+    <q-item-section class="nav-item dropdown"
+                    v-if="!whitelabel && !loading_whitelabel && !isMobileSize">
       <q-btn-dropdown class="tab-dropdown"
                       ref="menu"
                       flat
+                      :ripple="false"
                       :menu-offset="[4, 16]">
         <template v-slot:label>
-          <a class="nav-link"
-              data-toggle="dropdown"
-              data-tour-step="2"
-              ref="helpMenu">
-            <q-icon name="info"
-                    class="material-icons-outlined ml-2 cursor-pointer"
-                    color="#62666E"
-                    size="14px">
-              <q-tooltip anchor="top middle"
-                          self="center middle">
-                These are the contact list your admin shares with you.
-              </q-tooltip>
-            </q-icon>
-          </a>
+                  <i class="fa fa-question-circle text-2x text-red-10 header-help-icon-wrapper"></i>
         </template>
 
         <q-list class="tab-dropdown-list p-3 allow-select">
@@ -36,13 +23,13 @@
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
           <a v-if="!user.profile.company.reseller_id"
-              class="btn btn-block new-blue mt-2"
+              class="btn btn-block bg-indigo-10 text-white mt-2"
               href="https://support.aloware.com"
               target="_blank">
             Get Help
           </a>
           <a v-if="!user.profile.company.reseller_id"
-            class="btn btn-block btn-success"
+            class="btn btn-block bg-green-8 text-white"
             href="https://aloware.com/setup-guide"
             target="_blank">
             Setup Guide

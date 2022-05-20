@@ -8166,6 +8166,28 @@ span.mention {
   }
 }
 
+.header-help-wrapper {
+  .q-btn-dropdown__arrow {
+    display: none;
+  }
+
+  .q-btn__wrapper {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .col {
+    flex-basis: unset;
+  }
+
+  .header-help-icon-wrapper {
+    color: #ad002b;
+    font-size: 38px;
+  }
+
+  margin-right: 20px !important;
+}
+
 .tab-avatar-menu {
 
   min-width: 227px !important;
