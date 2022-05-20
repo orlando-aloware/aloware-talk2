@@ -34,13 +34,6 @@
             target="_blank">
             Setup Guide
           </a>
-          <q-separator v-if="env !== 'production'" class="mt-1 mb-1"></q-separator>
-          <p class="mb-0 mt-2 text-xs"
-            v-if="branch && env && env !== 'production'">
-            Environment: <span class="_600">{{ env }}</span>
-            <br>
-            Branch: <span class="_600">{{ branch }}</span>
-          </p>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
