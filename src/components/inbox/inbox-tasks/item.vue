@@ -259,6 +259,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
+    ...mapState('contacts', { contactData: 'contact' }),
     ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts', 'channelChangedFilterFields']),
     contactName () {
       if (this.contact && this.contact.name) {
@@ -377,17 +378,22 @@ export default {
       this.previousRoute = from
     },
 
-    isReopened: function () {
-      const _this = this
-
-      if (this.isSearch || (this.previousRoute && this.previousRoute.name === 'Inbox')) { return }
-
-      setTimeout(function () {
-        _this.$emit('onItemRemoved', _this.contact)
+    isReopened: function (value) {
+      if (this.isSearch || (this.previousRoute && this.previousRoute.name === 'Inbox') || !value) { return }
+      setTimeout(() => {
+        this.$emit('onItemRemoved', this.contact)
       }, 3000)
     },
     'contact.last_communication.id': function () {
       this.taskItemKey++
+    },
+    'contactData.task_status': {
+      deep: true,
+      handler: function (value) {
+        if (this.contactData.id === this.contact.id) {
+          this.contact.task_status = this.contactData.task_status
+        }
+      }
     }
   }
 }

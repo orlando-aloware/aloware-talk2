@@ -697,12 +697,16 @@ export default {
           } else {
             if (isInContacts) {
               const index = contacts.data.findIndex(item => item.id === contact.id)
-              if (contact.task_status !== this.currentTask) {
-                this.onItemRemoved(contact)
-                return
-              }
+
               contacts.data[index] = contact
               this.setContacts(contacts.data)
+
+              if (contact.task_status !== this.currentTask) {
+                setTimeout(() => {
+                  this.onItemRemoved(contact)
+                }, 3000)
+                return
+              }
             }
 
             // only modify order if new contact task === current task
