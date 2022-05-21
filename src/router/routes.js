@@ -1,10 +1,320 @@
+const MainLayout = () => import('layouts/MainLayout.vue')
+const Login = () => import('pages/Login.vue')
+const ForgotPassword = () => import('pages/ForgotPassword.vue')
+const ResetPassword = () => import('pages/ResetPassword.vue')
+const Inbox = () => import('pages/Inbox.vue')
+const Contact = () => import('src/pages/contacts/Contact.vue')
+const Contacts = () => import('src/pages/contacts/Contacts.vue')
+const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
+const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
+const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
+const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
+const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
+const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
+const Stats = () => import('pages/stats/Stats.vue')
+const Settings = () => import('pages/Settings.vue')
+const Account = () => import('pages/Account.vue')
+const Communication = () => import('pages/Communication.vue')
+const Phone = () => import('pages/Phone.vue')
+const Error404 = () => import('pages/Error404.vue')
 
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: MainLayout,
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
+      {
+        path: 'login',
+        name: 'Login',
+        meta: {
+          isGuest: true
+        },
+        component: Login
+      },
+      {
+        path: 'forgot-password',
+        name: 'Forgot Password',
+        meta: {
+          isGuest: true
+        },
+        component: ForgotPassword
+      },
+      {
+        path: 'reset/:token',
+        name: 'Reset Password',
+        meta: {
+          isGuest: true
+        },
+        component: ResetPassword
+      },
+      {
+        path: '',
+        name: 'Inbox',
+        component: Inbox,
+        meta: {
+          title: 'Communications'
+        },
+        children: [
+          {
+            path: 'channels/:channel/:status/contacts/:id',
+            name: 'Inbox Contact Task',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/:channel/:status',
+            name: 'Inbox Channel Task Status',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/:channel/contacts/:id/communications/:communicationId',
+            name: 'Inbox Contact',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
+            name: 'Inbox Contact Communication',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/:channel',
+            name: 'Inbox Channel',
+            component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
+          }
+        ]
+      },
+      {
+        path: 'contacts',
+        component: Contacts,
+        meta: {
+          title: 'Contacts'
+        },
+        children: [
+          {
+            name: 'Contacts',
+            path: '/',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts'
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: 'list/:id(my-contacts|new-leads|unanswered|unassigned|unsaved)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Default Contacts List'
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: 'list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List'
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts List Public',
+            path: 'list/public/:id(\\d+)+',
+            component: ContactsView,
+            meta: {
+              title: 'Contacts',
+              page: 'Public Contacts List'
+            }
+          },
+          {
+            name: 'Contacts',
+            path: 'list/:id(\\d+)+/add',
+            meta: { title: 'Contacts' },
+            component: ContactsAddView
+          }
+        ]
+      },
+      {
+        path: 'contacts/:id',
+        name: 'Contact',
+        component: Contacts,
+        meta: {
+          title: 'Contact'
+        }
+      },
+      {
+        path: 'power-dialer',
+        component: PowerDialer,
+        meta: {
+          title: 'Power Dialer',
+          id: 'power-dialer'
+        },
+        children: [
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer',
+              id: 'power-dialer'
+            },
+            path: '',
+            redirect: {
+              path: 'in-queue'
+            },
+            component: PowerDialerView
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer',
+              id: 'power-dialer-queue-filter'
+            },
+            path: ':id(in-queue|called|failed|scheduled|all)+',
+            component: PowerDialerView
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Sessions',
+              id: 'power-dialer-session'
+            },
+            path: 'list/:id(\\d+)+/sessions',
+            component: () => import('src/pages/power-dialer/PowerDialerSession')
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer List',
+              id: 'power-dialer-list'
+            },
+            path: 'list/:id(\\d+)+',
+            redirect: {
+              path: 'list/:id(\\d+)+/in-queue'
+            },
+            component: PowerDialerView,
+            children: [
+              {
+                name: 'Power Dialer',
+                meta: {
+                  title: 'Power Dialer',
+                  id: 'power-dialer-list-filter'
+                },
+                path: ':filter(in-queue|called|failed|scheduled|all)+',
+                component: PowerDialerView
+              }
+            ]
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Add List',
+              id: 'power-dialer-add-list'
+            },
+            path: 'list/:id(\\d+)+/add',
+            component: PowerDialerAddView
+          },
+          {
+            name: 'Power Dialer',
+            meta: {
+              title: 'Power Dialer Add List',
+              id: 'power-dialer-add-queue-list'
+            },
+            path: 'list/add',
+            component: PowerDialerAddView
+          }
+        ]
+      },
+      {
+        name: 'Power Dialer Session',
+        meta: {
+          title: 'Power Dialer Session',
+          id: 'power-dialer-session'
+        },
+        path: 'power-dialer/session',
+        component: PowerDialerSession
+      },
+      {
+        path: 'stats',
+        name: 'Stats',
+        component: Stats,
+        meta: {
+          title: 'Stats'
+        }
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: Settings,
+        meta: {
+          title: 'Settings'
+        },
+        children: [
+          {
+            path: '/settings/:tab',
+            name: 'Settings Tab',
+            component: Settings,
+            meta: {
+              title: 'Settings'
+            }
+          }
+        ]
+      },
+      {
+        path: 'account',
+        name: 'Account',
+        component: Account
+      },
+      {
+        path: 'user-activity/:userId',
+        name: 'User Activity',
+        component: Account
+      },
+      {
+        path: 'line-activity/:campaignId',
+        name: 'Line Activity',
+        component: Account
+      },
+      {
+        path: 'ring-group-activity/:ringGroupId',
+        name: 'Ring Group Activity',
+        component: Account
+      },
+      {
+        path: 'sequence-activity/:sequenceId',
+        name: 'Sequence Activity',
+        component: Account
+      },
+      {
+        path: 'broadcast-activity/:broadcastId',
+        name: 'Broadcast Activity',
+        component: Account
+      },
+      {
+        path: '/contacts/:contactId/communications/:communicationId',
+        name: 'Communication',
+        component: Communication,
+        meta: {
+          title: 'Communication'
+        }
+      },
+      {
+        path: 'phone',
+        name: 'Phone',
+        component: Phone
+      }
     ]
   },
 
@@ -12,7 +322,7 @@ const routes = [
   // but you can also remove it
   {
     path: '*',
-    component: () => import('pages/Error404.vue')
+    component: Error404
   }
 ]
 

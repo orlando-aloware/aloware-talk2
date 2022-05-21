@@ -1,0 +1,62 @@
+select {
+
+  optgroup {
+    font-weight: 400;
+    color: $grey-80;
+    padding: 10px;
+
+    option {
+      color: $grey-100;
+      padding: 10px;
+    }
+
+  }
+
+}
+
+.square-box {
+  height: 10px;
+  width: 10px;
+}
+
+.make-invisible {
+  opacity: 0;
+}
+
+.mini-select {
+  .q-field__inner {
+    .q-field__control {
+      height: auto !important;
+      min-height: auto !important;
+      padding-top: 7px!important;
+      padding-bottom: 7px!important;
+      .q-field__control-container {
+        .q-field__native {
+          min-height: auto !important;
+          font-size: 13px;
+          padding: 0;
+          padding-left: 15px !important;
+        }
+      }
+      .q-field__append {
+        padding-right: 14px !important;
+      }
+    }
+  }
+}
+
+.text-11 {
+  font-size: 11px !important;
+}
+
+.text-13 {
+  font-size: 13px !important;
+}
+
+.text-15 {
+  font-size: 15px !important;
+}
+
+.text-18 {
+  font-size: 18px !important;
+}

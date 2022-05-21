@@ -1,0 +1,459 @@
+<template>
+  <div class="pt-2 message-composer-text-wrapper">
+    <div class="file-dropper position-absolute"
+         v-cloak
+         @paste.prevent="onPaste"
+         @drop.prevent="onDrop"
+         @dragover.prevent>
+    </div>
+    <div @dragover.prevent
+         @drop.prevent="onDrop"
+         @paste="onPaste">
+      <div class="mb-2 d-inline-flex media-preview-wrapper">
+        <div v-for="(file, index) in filesOnQueue"
+             :key="index"
+             class="media-preview">
+          <div v-if="file.type.includes('audio')"
+               class="audio-thumbnail-wrapper">
+            <audio-placeholder :file="file"
+                               @remove="onRemoveFileInQueue">
+            </audio-placeholder>
+          </div>
+          <div v-if="file.type.includes('pdf')"
+               class="pdf-thumbnail-wrapper">
+              <application-placeholder :file="file"
+                                       @remove="onRemoveFileInQueue">
+              </application-placeholder>
+          </div>
+          <div v-if="file.type.includes('video')"
+               class="video-thumbnail-wrapper">
+            <video-placeholder :file="file"
+                               @remove="onRemoveFileInQueue">
+            </video-placeholder>
+          </div>
+          <div v-if="file.type.includes('image')">
+            <image-placeholder :file="file"
+                               @remove="onRemoveFileInQueue">
+            </image-placeholder>
+          </div>
+        </div>
+
+        <div v-if="messageComposer.sms.gif_url"
+               class="media-preview">
+            <img class="img-preview"
+                 :src="messageComposer.sms.gif_url"/>
+            <b-button size="sm"
+                      class="btn-remove-attachments"
+                      @click="removeMessageGif"
+                      pill>
+              <i class="fa fa-times"></i>
+            </b-button>
+          </div>
+
+        <div v-for="attachment of messageComposer.sms.attachments"
+               :key="attachment.id"
+               class="media-preview">
+            <div v-if="attachment.mimetype.includes('audio')"
+                 class="audio-thumbnail-wrapper">
+              <div class="text-center media-icon-wrapper mt-2">
+                <i class="fa fa-microphone media-icon"></i>
+              </div>
+              <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
+              <b-button size="sm"
+                        class="btn-remove-attachments"
+                        @click="removeAttachment(attachment)"
+                        pill>
+                <i class="fa fa-times"></i>
+              </b-button>
+            </div>
+            <div v-if="attachment.mimetype.includes('pdf')"
+                 class="pdf-thumbnail-wrapper">
+              <div class="text-center media-icon-wrapper mt-2">
+                <i class="far fa-file-pdf media-icon"></i>
+              </div>
+              <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
+              <b-button size="sm"
+                        class="btn-remove-attachments"
+                        @click="removeAttachment(attachment)"
+                        pill>
+                <i class="fa fa-times"></i>
+              </b-button>
+            </div>
+            <div v-if="attachment.mimetype.includes('video')"
+                 class="video-thumbnail-wrapper">
+              <b-embed type="video"
+                       aspect="1by1">
+                <source :src="getPreviewLink(attachment.uuid)"
+                        :type="attachment.mimetype">
+              </b-embed>
+              <b-button size="sm"
+                        variant="light"
+                        class="btn-play"
+                        pill>
+                <i class="fa fa-play"></i>
+              </b-button>
+              <b-button size="sm"
+                        class="btn-remove-attachments"
+                        @click="removeAttachment(attachment)"
+                        pill>
+                <i class="fa fa-times"></i>
+              </b-button>
+            </div>
+            <div v-if="attachment.mimetype.includes('image')">
+              <img  class="img-preview"
+                    :src="getPreviewLink(attachment.uuid)"/>
+              <b-button size="sm"
+                        class="btn-remove-attachments"
+                        @click="removeAttachment(attachment)"
+                        pill>
+                <i class="fa fa-times"></i>
+              </b-button>
+            </div>
+          </div>
+
+      </div>
+      <q-input class="q-input-composer"
+               borderless
+               autogrow
+               ref="smsMessageBody"
+               input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
+               type="textarea"
+               placeholder="Type your message"
+               v-model="messageComposer.sms.body"
+               @keydown="onKeyDown">
+      </q-input>
+    </div>
+    <div class="d-flex justify-content-between"
+         @dragover.prevent>
+      <message-composer-options @gifSelected="gifSelected"
+                                @attachmentUploaded="attachmentUploaded"
+                                @templateSelected="templateSelected"
+                                @variableSelected="variableSelected"/>
+      <div>
+        <q-btn-dropdown
+          split
+          class="message-composer-send-dropdown-button"
+          color="primary"
+          size="sm"
+          padding="0px 12px"
+          :ripple="false"
+          :disable="!validSms"
+          :disable-dropdown="!validSms"
+          :menu-offset="[0, 6]"
+          @click="onSend"
+        >
+          <template slot="label">
+            <q-spinner-bars v-if="isSending"
+                            class="mr-1"
+                            color="white" />
+            {{ isSending ? ' Sending Text...' : 'Send Text' }}
+          </template>
+          <q-list class="message-composer-send-dropdown-button-list">
+            <q-item clickable v-close-popup @click="showScheduleMessage">
+              <q-item-section>
+                <q-item-label>Schedule Send</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </div>
+    </div>
+    <scheduled-message></scheduled-message>
+    <sms-template-modal></sms-template-modal>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+import { mapActions, mapGetters } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
+import ScheduledMessage from 'components/message-composer/scheduled-message'
+import SmsTemplateModal from 'components/sms-template-modal'
+import ImagePlaceholder from 'components/message-composer/file-placeholders/image-placeholder'
+import VideoPlaceholder from 'components/message-composer/file-placeholders/video-placeholder'
+import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
+import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
+import MessageComposerOptions from 'components/message-composer/message-composer-options'
+
+export default {
+  name: 'message-composer-sms',
+
+  components: {
+    MessageComposerOptions,
+    AudioPlaceholder,
+    ApplicationPlaceholder,
+    VideoPlaceholder,
+    ImagePlaceholder,
+    SmsTemplateModal,
+    ScheduledMessage
+  },
+
+  computed: {
+    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    validSms: function () {
+      return ((this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0) &&
+        this.selectedLine &&
+        this.messageComposer.sms.phone_number &&
+        this.messageComposer.sms.phone_number.length > 0
+    },
+    messageBody () {
+      return this.messageComposer.sms.body
+    },
+    messageAttachments () {
+      return this.messageComposer.sms.attachments
+    }
+  },
+
+  data () {
+    return {
+      isSending: false,
+      filesOnQueue: [],
+      fileOnQueueIcon: ['fa', 'fa-times'],
+      filesOnQueueToken: [],
+      focusInterval: null,
+      fileTypes: [
+        'audio/basic',
+        'audio/L24',
+        'audio/mp4',
+        'audio/mpeg',
+        'audio/ogg',
+        'audio/vnd.rn-realaudio',
+        'audio/vnd.wave',
+        'audio/3gpp',
+        'audio/3gpp2',
+        'audio/ac3',
+        'audio/vnd.wave',
+        'audio/webm',
+        'audio/amr-nb',
+        'audio/amr',
+        'video/mpeg',
+        'video/mp4',
+        'video/quicktime',
+        'video/webm',
+        'video/3gpp',
+        'video/3gpp2',
+        'video/3gpp-tt',
+        'video/H261',
+        'video/H263',
+        'video/H263-1998',
+        'video/H263-2000',
+        'video/H264',
+        'image/bmp',
+        'image/tiff',
+        'image/jpeg',
+        'image/jpg',
+        'image/gif',
+        'image/png',
+        'text/vcard',
+        'text/x-vcard',
+        'text/csv',
+        'text/rtf',
+        'text/richtext',
+        'text/calendar',
+        'text/directory',
+        'application/pdf',
+        'application/vcard']
+    }
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setMessageComposerSmsGif',
+      'removeMessageComposerSmsAttachment',
+      'setMessageComposerSmsBody',
+      'resetMessageComposerSms',
+      'appendMessageComposerSmsAttachments',
+      'scheduleMessageOpen'
+    ]),
+    processFilesToQueue (file) {
+      if (!file) {
+        return
+      }
+
+      if (!this.fileTypes.includes(file.type)) {
+        this.$generalNotification('Unsupported file type detected.', 'error')
+        return
+      }
+
+      // Images should not exceed 5MB
+      if (['image/jpeg', 'image/png', 'image/tiff', 'image/jpg', 'image/gif'].includes(file.type) && (file.size / (1024 * 1024) > 5)) {
+        this.$generalNotification('Exceed max file size of 5MB for images detected.', 'error')
+        return
+      }
+
+      // Other file types should not exceed 600KB
+      if (!['image/jpeg', 'image/png', 'image/tiff', 'image/jpg', 'image/gif'].includes(file.type) && (file.size / (1024 * 1024) > 0.6)) {
+        this.$generalNotification('Exceed max file size of 600KB for other file types detected.', 'error')
+        return
+      }
+
+      this.filesOnQueue.push(file)
+      this.onUpload(file)
+    },
+    onDrop (e) {
+      const files = e.dataTransfer.files
+      const index = { i: 0 }
+      for (index.i = 0; index.i < files.length; index.i++) {
+        this.processFilesToQueue(files[index.i])
+      }
+    },
+    onPaste (e) {
+      const index = { i: 0, item: null, file: null, found: false }
+
+      if (e.clipboardData.items.length) {
+        for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
+          index.item = e.clipboardData.items[index.i]
+          index.file = index.item.type && index.item.type.length > 0 ? index.item.getAsFile() : null
+          if (index.file) {
+            index.found = true
+            this.processFilesToQueue(index.file)
+          }
+        }
+
+        if (index.found) {
+          e.preventDefault()
+        }
+      }
+    },
+    onKeyDown (evt) {
+      if (evt.keyCode === 13 && !evt.shiftKey) {
+        if (this.validSms) {
+          this.onSend()
+        }
+        evt.preventDefault()
+      }
+    },
+    formatMessage () {
+      return {
+        body: this.messageComposer.sms.body,
+        contact_id: this.contact.id,
+        campaign_id: this.selectedLine.id,
+        phone_number: this.messageComposer.sms.phone_number,
+        attachments: this.messageComposer.sms.attachments.map(attachment => attachment.uuid),
+        gif: this.messageComposer.sms.gif_url
+      }
+    },
+    onSend () {
+      this.isSending = true
+      return talk2Api.V1.message.send(this.formatMessage())
+        .then(response => {
+          this.resetMessageComposerSms()
+          this.$generalNotification('Message sent.')
+        }).catch(error => {
+          console.log(error)
+          this.$generalNotification('Error while sending message.', 'error')
+        }).finally(() => {
+          this.isSending = false
+        })
+    },
+    gifSelected (gif) {
+      this.setMessageComposerSmsGif(gif)
+    },
+    removeMessageGif () {
+      this.setMessageComposerSmsGif('')
+    },
+    removeAttachment (attachment) {
+      this.removeMessageComposerSmsAttachment(attachment)
+    },
+    getPreviewLink (uuid) {
+      return process.env.API_URL + '/static/uploaded_file/' + uuid
+    },
+    templateSelected (template) {
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
+    },
+    variableSelected (variable) {
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
+    },
+    attachmentUploaded (files) {
+      files.forEach((file) => {
+        this.appendMessageComposerSmsAttachments(file)
+      })
+    },
+    showScheduleMessage () {
+      this.scheduleMessageOpen(true)
+    },
+    focusInput () {
+      const count = { data: 0 }
+      this.focusInterval = setInterval(() => {
+        if (typeof this.$refs.smsMessageBody !== 'undefined') {
+          this.$refs.smsMessageBody.focus()
+          clearInterval(this.focusInterval)
+        }
+        count.data++
+        if (count.data > 180) {
+          clearInterval(this.focusInterval)
+        }
+      }, 250)
+    },
+    onUpload (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const cancelToken = axios.CancelToken
+      this.filesOnQueueToken[file.name] = cancelToken.source()
+
+      talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, { cancelToken: this.filesOnQueueToken[file.name].token }).then(response => {
+        this.appendMessageComposerSmsAttachments(response.data.uploaded_file)
+        this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
+      }).catch(error => {
+        if (window.axios.isCancel(error)) {
+          console.log('Request canceled', error.message)
+        }
+
+        console.log(error)
+        const message = this.filesOnQueue.length > 1 ? 'Error while uploading one of the files.' : 'Error while uploading file.'
+        this.$generalNotification(message, 'error')
+        this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
+      })
+    },
+    onRemoveFileInQueue (file) {
+      this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
+      this.filesOnQueueToken[file.name].cancel()
+    },
+    base64ToBlob (b64Data, contentType, sliceSize) {
+      contentType = contentType || ''
+      sliceSize = sliceSize || 512
+
+      const byteCharacters = window.atob(b64Data)
+      const byteArrays = []
+      const offset = { data: null }
+      const slice = { data: null }
+      const byteNumbers = { data: null }
+      const byteArray = { data: null }
+      const index = { i: 0 }
+
+      for (offset.data = 0; offset.data < byteCharacters.length; offset.data += sliceSize) {
+        slice.data = byteCharacters.slice(offset.data, offset.data + sliceSize)
+
+        byteNumbers.data = new Array(slice.data.length)
+        for (index.i = 0; index.i < slice.data.length; index.i++) {
+          byteNumbers.data[index.i] = slice.data.charCodeAt(index.i)
+        }
+
+        byteArray.data = new Uint8Array(byteNumbers.data)
+
+        byteArrays.push(byteArray.data)
+      }
+
+      return new Blob(byteArrays, { type: contentType })
+    }
+  },
+
+  mounted () {
+    this.resetMessageComposerSms()
+    if (this.messageComposer.mode === 'sms') {
+      this.focusInput()
+    }
+  },
+
+  watch: {
+    'messageComposer.sms.body': function (value) {
+      this.setMessageComposerSmsBody(value)
+    }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.focusInterval)
+  }
+}
+</script>

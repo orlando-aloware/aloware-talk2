@@ -1,0 +1,26 @@
+<template>
+  <svg :width="width" :height="height" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.3037 5.55078H12.2521C12.7764 5.55078 13.2014 5.95485 13.2014 6.45329V12.5452C13.2014 13.0437 12.7764 13.4478 12.2521 13.4478H11.3037C10.7794 13.4478 10.3543 13.0437 10.3543 12.5452V6.45329C10.3543 5.95485 10.7794 5.55078 11.3037 5.55078ZM7.69584 5.55167H6.74741C6.22312 5.55167 5.7981 5.95574 5.7981 6.45418V12.5461C5.7981 13.0446 6.22312 13.4486 6.74741 13.4486H7.69584C8.22013 13.4486 8.64516 13.0446 8.64516 12.5461V6.45418C8.64516 5.95574 8.22013 5.55167 7.69584 5.55167Z" :fill="color"/>
+    <circle cx="9.50003" cy="9.49985" r="8.13462" :stroke="color" stroke-width="1.5"/>
+  </svg>
+</template>
+
+<script>
+export default {
+  name: 'unhold-icon',
+  props: {
+    width: {
+      type: [Number, String],
+      default: 16
+    },
+    height: {
+      type: [Number, String],
+      default: 16
+    },
+    color: {
+      type: String,
+      default: '#F2994A'
+    }
+  }
+}
+</script>

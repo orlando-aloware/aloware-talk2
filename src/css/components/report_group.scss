@@ -1,0 +1,134 @@
+.box-container {
+  position: relative;
+
+  .box-container-badge {
+    padding: 0;
+    margin: 0;
+    z-index:10;
+    border:1px grey solid;
+    position:absolute;
+    top:-5px;
+
+    &.floating-right {
+      right: 0;
+    }
+    &.floating-left {
+      left: 0;
+    }
+  }
+}
+
+.metric-box {
+  background-color: $white !important;
+  position: relative;
+  width: 199px !important;
+  border: 1px solid $grey-60;
+  border-radius: 10px;
+  min-height: 130px;
+  padding: 25px 20px 13px 20px;
+
+  &-item {
+    width: 215px;
+    height: 146px;
+  }
+
+  &.dashed-box {
+    border: dashed 1px $grey-70 !important;
+    background-color: $grey-40 !important;
+  }
+
+  .q-card__actions {
+    padding: 0 0;
+    margin: 0 0;
+  }
+
+  .metric-box-label {
+    font-size: $f-box-title;
+    font-weight: 600;
+    letter-spacing: -0.25px !important;
+    line-height: 34px;
+    white-space: nowrap;
+  }
+
+  .metric-box-desc {
+    font-size: 15px;
+    color: $grey-90;
+    letter-spacing: -0.6px;
+    width: 100%;
+    padding: 16px 0 0 0;
+    .metric-label {
+      line-height: 20px;
+    }
+    .category-label {
+      line-height: 20px;
+      letter-spacing: -0.0025em;
+      font-weight: normal;
+    }
+    &.metric-box-header {
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+    .add-metrics-wrapper {
+      margin-top: 20px;
+      font-size: 14px;
+      color: $grey-90;
+      font-weight: 600;
+    }
+  }
+
+  .metric-floating-btn {
+    right: 5px;
+    top: 5px;
+    position: absolute;
+  }
+
+}
+
+.metric-group {
+  position: relative;
+  .group-delete {
+    z-index:10;
+    border:1px grey solid;
+    right:-5px;
+    top:-5px;
+    position:absolute;
+    i {
+      font-size: 11px;
+      padding:3px;
+    }
+  }
+  .group-wrapper {
+    border-radius: 12px;
+    .add-metrics,
+    .metric-loader {
+      vertical-align: top;
+    }
+    .add-metrics {
+      .metric-box,
+      .metric-box-desc {
+        padding: 0 0;
+      }
+    }
+    .metric-group-drawer {
+      position: absolute;
+      right: 0px;
+      top: 0;
+      height: 100%;
+      width: 35px;
+      padding: 10px;
+      margin: 0;
+
+      .drawer-icon {
+        position: absolute;
+        bottom: 10px;
+        i {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+}
+
+.report-group-header {
+  margin-bottom: 3px;
+}

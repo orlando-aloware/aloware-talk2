@@ -1,0 +1,142 @@
+import Vue from 'vue'
+import _ from 'lodash'
+import * as InboxDefault from 'src/constants/inbox-default'
+
+export default {
+  SET_CONTACT_ID: (state, id) => {
+    state.selectedContactId = id
+  },
+  SET_SELECTED_COMMUNICATION: (state, communication) => {
+    state.selectedCommunication = communication
+  },
+  SET_COMMUNICATIONS: (state, communications) => {
+    state.communications = communications
+  },
+  SET_COMMUNICATIONS_CURRENT_PAGE: (state, page) => {
+    state.communicationsCurrentPage = page
+  },
+  GETTING_TASKS_LIST: (state, isGetting) => {
+    state.isGettingTasksList = isGetting
+  },
+  GETTING_CONTACTS_LIST: (state, isGetting) => {
+    state.isFetchingContacts = isGetting
+  },
+  SET_ACTIVE_CHANNEL: (state, channel) => {
+    state.activeChannel = channel
+  },
+  SET_TASK_COUNT: (state, payload) => {
+    state.taskCounts = { ...state.taskCounts, ...payload }
+  },
+  SET_OPEN_TASK_COUNT: (state, count) => {
+    state.taskCounts = { ...state.taskCounts, open: count }
+  },
+  SET_PENDING_TASK_COUNT: (state, count) => {
+    state.taskCounts = { ...state.taskCounts, pending: count }
+  },
+  SET_NEW_TASK_COUNT: (state, count) => {
+    state.taskCounts = { ...state.taskCounts, new: count }
+  },
+  SET_CLOSED_TASK_COUNT: (state, count) => {
+    state.taskCounts = { ...state.taskCounts, closed: count }
+  },
+  SET_CONTACT: (state, payload) => {
+    const contact = state.contacts.find(contact => contact.id === payload.contact_id)
+    const lastCommunication = _.get(contact, 'last_communication', null)
+
+    if (!lastCommunication || (lastCommunication && lastCommunication.id !== payload.id)) {
+      return
+    }
+
+    const index = contact ? state.contacts.indexOf(contact) : null
+    if (index !== -1 && index !== null) {
+      state.contacts[index].last_communication = payload
+      Vue.set(state.contacts[index], 'last_communication', payload)
+    }
+  },
+  SET_CONTACTS: (state, contacts) => {
+    state.contacts = contacts
+  },
+  SET_LIVE_CONTACTS: (state, contacts) => {
+    state.liveContacts = contacts
+  },
+  SET_CONTACTS_CURRENT_PAGE: (state, page) => {
+    state.contactsCurrentPage = page
+  },
+  SET_SELECTED_CONTACT: (state, contact) => {
+    state.selectedContact = contact
+  },
+  UPDATE_CONTACT: (state, contact) => {
+    state.selectedContact = contact
+  },
+  SET_CHANNEL_CLONED_FILTER: (state, filter) => {
+    state.channelClonedFilter = _.cloneDeep(filter)
+  },
+
+  UPDATE_CHANNEL_CHANGED_FILTER_FIELDS: (state, { name, value }) => {
+    // compensate comparing of array/object values
+    const comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
+    const comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
+
+    if (comparatorA === comparatorB) {
+      state.channelChangedFilterFields = [...state.channelChangedFilterFields].filter(item => item.property !== name)
+      return
+    }
+
+    const found = { data: null }
+    found.data = state.channelChangedFilterFields.find(item => item.property === name)
+    found.data = found.data ? state.channelChangedFilterFields.indexOf(found.data) : null
+
+    if (found.data !== -1 && found.data !== null) {
+      Vue.set(state.channelChangedFilterFields[found.data], 'value', value)
+      return
+    }
+
+    state.channelChangedFilterFields.push({ property: name, value: value })
+  },
+  RESET_CHANNEL_CHANGED_FILTER_FIELDS: (state) => {
+    state.channelChangedFilterFields = []
+  },
+  TOGGLE_FILTER_MODEL_FORM: (state, isShown = false) => {
+    state.isFilterModelFormShown = isShown
+  },
+  TOGGLE_FILTER_DIALOG: (state, isShown = false) => {
+    state.isFilterDialogShown = isShown
+  },
+  SET_SELECTED_FILTER: (state, filter) => {
+    state.selectedFilter = filter
+  },
+  SET_APPLIED_FILTER: (state, filter) => {
+    state.appliedFilter = filter
+  },
+  SET_HAS_MORE_CONTACTS: (state, hasMore) => {
+    state.hasMoreContacts = hasMore
+  },
+  SET_HAS_MORE_COMMUNICATIONS: (state, hasMore) => {
+    state.hasMoreCommunications = hasMore
+  },
+  SET_SEARCHER_OPEN: (state, isOpen) => {
+    state.isSearcherOpen = isOpen
+  },
+
+  RESET_VUEX (state, value) {
+    if (!_.isArray(value) || _.isEmpty(value)) {
+      return
+    }
+
+    state.activeChannel = null
+    state.selectedContactId = null
+    state.selectedCommunication = null
+
+    if (!value.includes('all')) {
+      return
+    }
+
+    state = Object.assign({}, InboxDefault.DEFAULT_STATE)
+  },
+  SET_LOADING_OPEN_TASK_COUNT (state, loading) {
+    state.isLoadingOpenTaskCount = loading
+  },
+  SET_LOADING_PENDING_TASK_COUNT (state, loading) {
+    state.isLoadingPendingTaskCount = loading
+  }
+}

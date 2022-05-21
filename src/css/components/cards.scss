@@ -1,0 +1,53 @@
+.t-cards {
+
+  .q-list {
+
+    .q-item {
+
+      border-radius: 8px;
+
+      &.active {
+        background-color: $light-blue4;
+      }
+
+      &:hover {
+        background-color: $grey-50 !important;
+        cursor: pointer;
+      }
+
+      .q-item__section {
+        .q-item__label {
+          font-size: 14px;
+          font-weight: 500 !important;
+        }
+      }
+
+      .q-avatar {
+        // background-color: $grey-80 !important;
+        color: $white;
+        .q-avatar__content {
+          font-size: 13px;
+        }
+      }
+
+    }
+
+  }
+
+}
+
+.t-expansion-panels {
+  .q-expansion-item__container {
+    .q-item {
+      .q-item__section {
+        &.t-item-icon {
+          padding-right: 0;
+        }
+      }
+      
+      .q-item__section--side {
+        padding-right: 16px;
+      }
+    }
+  }
+}

@@ -8,15 +8,28 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>">
-
-    <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="icon" type="image/ico" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="128x128" href="<% if (process.env.APP_ENV != 'production') { %>favicon-dev-128x128.png<% } else { %>favicon-128x128.png<% } %>">
+    <link rel="icon" type="image/png" sizes="96x96" href="<% if (process.env.APP_ENV != 'production') { %>favicon-dev-96x96.png<% } else { %>favicon-96x96.png<% } %>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<% if (process.env.APP_ENV != 'production') { %>favicon-dev-32x32.png<% } else { %>favicon-32x32.png<% } %>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<% if (process.env.APP_ENV != 'production') { %>favicon-dev-16x16.png<% } else { %>favicon-16x16.png<% } %>">
+    <link rel="icon" type="image/ico" href="<% if (process.env.APP_ENV != 'production') { %>favicon-dev.ico<% } else { %>favicon.ico<% } %>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   </head>
   <body>
     <!-- DO NOT touch the following DIV -->
     <div id="q-app"></div>
+
+
+    <script>
+
+      if ('<%= process.env.APP_ENV %>' === 'production') {
+        var APP_ID = '<%= process.env.INTERCOM_APP_ID %>';
+
+        (function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/' + APP_ID;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s, x);};if(document.readyState==='complete'){l();}else if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+      }
+    </script>
   </body>
 </html>

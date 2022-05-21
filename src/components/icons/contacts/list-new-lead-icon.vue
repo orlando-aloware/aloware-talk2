@@ -1,0 +1,36 @@
+<template>
+  <svg :width="width" :height="height" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>list-new lead</title>
+    <defs>
+      <rect id="path-1" x="0" y="0" width="24" height="24"></rect>
+    </defs>
+    <g id="list-new-lead" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g id="ring-grouop">
+        <mask id="mask-2" fill="white">
+          <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="user-/-user_plus-(Background/Mask)"></g>
+        <path d="M8,12 C5.79086113,12 4,10.2091389 4,8 C4,5.79086113 5.79086113,4 8,4 C10.2091389,4 12,5.79086113 12,8 C12,10.2091389 10.2091389,12 8,12 Z M8,10 C6.89543056,10 6,9.10456944 6,8 C6,6.89543056 6.89543056,6 8,6 C9.10456944,6 10,6.89543056 10,8 C10,9.10456944 9.10456944,10 8,10 Z M19,8 L19,11 L22,11 L22,13 L19,13 L19,16 L17,16 L17,13 L14,13 L14,11 L17,11 L17,8 L19,8 Z M14,19 C14,15.6862915 11.3137083,13 8,13 C4.68629146,13 2,15.6862915 2,19 L4,19 C4,16.7908609 5.79086089,15 8,15 C10.2091389,15 12,16.7908609 12,19 L14,19 Z" id="user-/-user_plus" :class="`svg-fill-${iconColor}`" mask="url(#mask-2)"></path>
+      </g>
+    </g>
+  </svg>
+</template>
+
+<script>
+export default {
+  props: {
+    width: {
+      type: [Number, String],
+      default: 24
+    },
+    height: {
+      type: [Number, String],
+      default: 24
+    },
+    iconColor: {
+      type: String,
+      default: 'grey-mid'
+    }
+  }
+}
+</script>

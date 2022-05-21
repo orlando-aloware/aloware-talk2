@@ -18,15 +18,10 @@ module.exports = function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: [
-
-      'axios'
-    ],
+    boot: ['bootstrap', 'axios', 'VueEvent', 'Push', 'filters', 'directives', 'components'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: [
-      'app.scss'
-    ],
+    css: ['app.scss'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -38,13 +33,15 @@ module.exports = function (/* ctx */) {
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-      'roboto-font', // optional, you are not bound to it
-      'material-icons' // optional, you are not bound to it
+      'roboto-font',
+      'material-icons',
+      'material-icons-outlined',
+      'fontawesome-v5'
     ],
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history',
 
       // transpile: false,
 
@@ -75,8 +72,16 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
-      https: false,
-      port: 8080,
+      before (app) {
+        const cors = require('cors')
+        if (process.env.USE_CORS) {
+          app.use(cors())
+        }
+      },
+
+      https: true,
+      host: 'talk2.test',
+      disableHostCheck: true,
       open: true // opens browser window automatically
     },
 
@@ -99,12 +104,12 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: ['Notify', 'Dialog']
     },
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: [],
+    animations: ['slideInLeft', 'slideOutLeft'],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
@@ -165,25 +170,51 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
     electron: {
-      bundler: 'packager', // 'packager' or 'builder'
+      bundler: 'builder', // 'packager' or 'builder'
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-
         // OS X / Mac App Store
         // appBundleId: '',
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
-
         // Windows only
         // win32metadata: { ... }
       },
 
       builder: {
         // https://www.electron.build/configuration/configuration
-
-        appId: 'aloware-talk2'
+        appId: 'com.aloware.talk2',
+        mac: {
+          target: ['dmg', 'zip'],
+          type: 'distribution',
+          category: 'public.app-category.business',
+          entitlements: './src-electron/build/entitlements.mac.plist',
+          entitlementsInherit: './src-electron/build/entitlements.mac.plist',
+          hardenedRuntime: true,
+          darkModeSupport: false,
+          extendInfo: {
+            NSMicrophoneUsageDescription:
+              'Please give us access to your microphone'
+          }
+        },
+        win: {
+          target: 'nsis'
+        },
+        linux: {
+          target: 'AppImage'
+        },
+        publish: {
+          provider: 'github',
+          token: process.env.GH_TOKEN,
+          publishAutoUpdate: true
+        },
+        protocols: {
+          name: 'Aloware Talk',
+          schemes: ['alowaretalk', 'tel', 'callto']
+        },
+        afterSign: './src-electron/build/afterSignHook.js'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration

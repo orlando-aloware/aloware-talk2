@@ -1,0 +1,157 @@
+<template>
+  <div>
+    <q-select ref="wrapUpSelector"
+              options-selected-class="text-primary"
+              class="q-basic-selector"
+              color="primary"
+              option-value="value"
+              option-label="label"
+              input-debounce="0"
+              style="word-break: break-all;"
+              emit-value
+              map-options
+              dense
+              outlined
+              v-model="selectedId"
+              use-input
+              :options="options"
+              :multiple="multiple"
+              :placeholder="placeholder"
+              :disable="disable"
+              :class="[ highlighted ? highlightedClass : '', customClass]"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              @popup-show="onShowMenu"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
+              @filter="filterFn">
+
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="no-results text-grey">
+            No results
+          </q-item-section>
+        </q-item>
+      </template>
+
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-section>
+            <q-item-label v-html="scope.opt"/>
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
+  </div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+import { selectorMixin } from 'src/plugins/mixins'
+
+export default {
+  name: 'extension-selector',
+
+  mixins: [
+    selectorMixin
+  ],
+
+  props: {
+    value: {
+      type: [String, Number],
+      default: 0
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    disable: {
+      type: Boolean,
+      default: false
+    },
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    },
+    customClass: {
+      type: String,
+      default: ''
+    }
+  },
+
+  computed: {
+    ...mapState(['users']),
+
+    placeholder () {
+      switch (true) {
+        case this.multiple && (this.selectedId !== null && this.selectedId !== undefined) && this.selectedId.length < 1:
+          return 'Select extensions'
+        case !this.multiple && (this.selectedId === null || this.selectedId === undefined):
+          return 'Select extension'
+        case this.multiple && (this.selectedId !== null && this.selectedId !== undefined) && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
+        default:
+          return ''
+      }
+    },
+
+    availableExtensions () {
+      const availableExtensions = []
+      const item = { i: 100 }
+      // fill the extensions array
+      for (item.i = 100; item.i < 1000; item.i++) {
+        availableExtensions.push(item.i.toString())
+      }
+
+      // find used extensions
+      const usedExtensions = this.users ? this.users.map(user => (user.extension) ? user.extension : null).filter(o => o !== null) : []
+
+      // remove used extensions from available extensions
+      return availableExtensions.filter((extension) => !usedExtensions.includes(extension))
+    }
+  },
+
+  data () {
+    return {
+      selectedId: this.value,
+      options: [],
+      reference: 'wrapUpSelector',
+      compareProperty: null
+    }
+  },
+
+  methods: {
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.availableExtensions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.availableExtensions.filter(item => item.toLowerCase().indexOf(needle) > -1)
+      })
+    }
+  },
+  mounted () {
+    this.options = this.availableExtensions
+  },
+  watch: {
+    value () {
+      this.selectedId = this.value
+    },
+
+    selectedId (val) {
+      this.$emit('select', this.selectedId ? this.selectedId : null)
+      this.showInputPlaceholder()
+    }
+  }
+}
+</script>

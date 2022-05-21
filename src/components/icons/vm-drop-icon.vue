@@ -1,0 +1,28 @@
+<template>
+  <svg :width="width" :height="height" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.00948 1C2.34739 1 1 2.34238 1 4.00335V11.9966C1 13.6554 2.33663 15 4.00948 15H13.9905C15.6526 15 17 13.6576 17 11.9966V4.00335C17 2.34465 15.6634 1 13.9905 1H4.00948Z" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6 10C7.10457 10 8 9.10457 8 8C8 6.89543 7.10457 6 6 6C4.89543 6 4 6.89543 4 8C4 9.10457 4.89543 10 6 10Z" :stroke="color" stroke-width="1.2"/>
+    <path d="M12 10C13.1046 10 14 9.10457 14 8C14 6.89543 13.1046 6 12 6C10.8954 6 10 6.89543 10 8C10 9.10457 10.8954 10 12 10Z" :stroke="color" stroke-width="1.2"/>
+    <path d="M6 10H12" :stroke="color" stroke-width="1.2"/>
+  </svg>
+</template>
+
+<script>
+export default {
+  name: 'vm-drop-icon',
+  props: {
+    width: {
+      type: [Number, String],
+      default: 18
+    },
+    height: {
+      type: [Number, String],
+      default: 18
+    },
+    color: {
+      type: String,
+      default: '#62666E'
+    }
+  }
+}
+</script>

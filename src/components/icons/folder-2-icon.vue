@@ -1,0 +1,44 @@
+<template>
+  <svg
+    :width="width"
+    :height="height"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M13.75 13.5005H2.25C1.91848 13.5005 1.60054 13.3688 1.36612 13.1344C1.1317 12.9 1 12.582 1 12.2505V3.75049C1 3.41897 1.1317 3.10103 1.36612 2.8666C1.60054 2.63218 1.91848 2.50049 2.25 2.50049H4.62156C4.86837 2.50049 5.10965 2.57356 5.315 2.71049L6.185 3.29049C6.39034 3.42741 6.63163 3.50048 6.87844 3.50049H13.75C14.0815 3.50049 14.3995 3.63218 14.6339 3.8666C14.8683 4.10103 15 4.41897 15 4.75049V12.2505C15 12.582 14.8683 12.9 14.6339 13.1344C14.3995 13.3688 14.0815 13.5005 13.75 13.5005Z"
+      :stroke="color"
+      stroke-width="1.1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M1 5.99902H15"
+      :stroke="color"
+      stroke-width="1.1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</template>
+
+<script>
+export default {
+  name: 'folder-arrow-open-icon',
+  props: {
+    width: {
+      type: [Number, String],
+      default: 16
+    },
+    height: {
+      type: [Number, String],
+      default: 16
+    },
+    color: {
+      type: String,
+      default: '#333333'
+    }
+  }
+}
+</script>

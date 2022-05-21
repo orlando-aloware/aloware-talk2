@@ -1,0 +1,16 @@
+import * as CacheDefault from 'src/constants/cache-default'
+
+export default {
+  DELETE_CURRENT_COMPANY (state) {
+    state.currentCompany = null
+  },
+
+  SET_CURRENT_COMPANY (state, currentCompany) {
+    state.currentCompany = currentCompany
+  },
+
+  RESET_VUEX (state) {
+    // perform state reset
+    state = Object.assign({}, CacheDefault.DEFAULT_STATE)
+  }
+}

@@ -1,0 +1,204 @@
+<template>
+  <div class="w-100 tags-wrapper"
+       v-if="hasPermissionTo('tag communication')">
+    <generic-multi-select :values="communication.tag_ids"
+                          :options="combinedTags"
+                          :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                          :optionsIsGrouped="true"
+                          @valuesUpdated="saveTags">
+      <template v-slot:button>
+        <add-icon-circle height="14" width="14" color="#256EFF"/>
+        <span class="ml-1">
+          {{ buttonText }}
+        </span>
+      </template>
+    </generic-multi-select>
+  </div>
+</template>
+
+<script>
+import { aclMixin } from 'src/plugins/mixins'
+import { mapActions, mapState } from 'vuex'
+import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
+import * as TagCategory from 'src/constants/tag-categories'
+import _ from 'lodash'
+import * as TagTypes from 'src/constants/tag-types'
+import AddIconCircle from 'components/icons/add-icon-circle'
+export default {
+  name: 'communication-tags',
+
+  mixins: [aclMixin],
+
+  components: {
+    AddIconCircle,
+    GenericMultiSelect
+  },
+
+  props: {
+    communication: {
+      required: true
+    },
+    buttonText: {
+      required: false,
+      type: String,
+      default: 'Add Tags'
+    },
+    exclude: {
+      required: false,
+      default: null
+    }
+  },
+
+  data () {
+    return {
+      loadingTag: false,
+      loadingTags: false,
+      options: [],
+      category: TagCategory.CAT_COMMUNICATIONS
+    }
+  },
+
+  computed: {
+    ...mapState(['tagsFullyLoaded', 'tags']),
+    availableTags () {
+      if (this.options) {
+        return this.options.filter((tag) => {
+          return tag.id !== this.exclude
+        })
+      }
+
+      return []
+    },
+
+    tagsAlphabeticalOrder () {
+      if (this.availableTags) {
+        const tags = this.category ? _.clone(this.availableTags).filter(tag => tag.category === this.category) : _.clone(this.availableTags)
+        return tags.sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+        })
+      }
+
+      return []
+    },
+
+    companyTagsAlphabeticalOrder () {
+      if (this.tagsAlphabeticalOrder.length) {
+        return this.tagsAlphabeticalOrder.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
+      }
+
+      return []
+    },
+
+    importTagsAlphabeticalOrder () {
+      if (this.category && this.category !== TagCategory.CAT_CONTACTS) {
+        return []
+      }
+
+      if (this.tagsAlphabeticalOrder.length) {
+        return this.tagsAlphabeticalOrder.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
+      }
+
+      return []
+    },
+
+    combinedTags () {
+      const companyTags = this.companyTagsAlphabeticalOrder
+      const importTags = this.importTagsAlphabeticalOrder
+
+      const tags = []
+
+      if (companyTags && companyTags.length) {
+        tags.push({
+          title: 'Account Tags',
+          children: companyTags
+        })
+      }
+
+      if (importTags && importTags.length) {
+        tags.push({
+          title: 'Import Tags',
+          children: importTags
+        })
+      }
+      return tags
+    }
+  },
+
+  created () {
+    if (this.communication && !this.communication.tag_ids) {
+      if (this.communication.tags) {
+        this.communication.tag_ids = this.communication.tags.map((o) => o.id)
+      }
+    }
+  },
+
+  mounted () {
+    if (this.tags) {
+      this.options = this.tags
+    }
+
+    if (!this.tags) {
+      this.getTags()
+    }
+  },
+
+  methods: {
+    getTags () {
+      if (!this.hasPermissionTo('list tag')) {
+        return
+      }
+
+      if (this.tagsFullyLoaded) {
+        this.options = this.tags
+        return
+      }
+
+      this.loadingTags = true
+      const params = {
+        full_load: true
+      }
+      return this.$axios.get('/api/v1/tag', { params }).then(res => {
+        this.options = res.data
+        this.loadingTags = false
+        this.setTagsFullyLoaded(true)
+      }).catch(err => {
+        console.log(err)
+        this.loadingTags = false
+      })
+    },
+
+    saveTags (tags) {
+      if (!this.hasPermissionTo('tag communication')) {
+        return
+      }
+
+      this.loadingTag = true
+      this.$axios.post('/api/v1/communication/' + this.communication.id + '/tag', {
+        tags: tags
+      }).then(res => {
+        this.communication.tags = res.data
+        this.communication.tag_ids = this.communication.tags.map((o) => o.id)
+        this.loadingTag = false
+        this.$generalNotification('Tags successfully updated')
+      }).catch(err => {
+        this.$handleErrors(err.response)
+        this.loadingTag = false
+        if (this.communication.tags) {
+          this.communication.tag_ids = this.communication.tags.map((o) => o.id)
+        }
+      })
+    },
+    ...mapActions(['setTagsFullyLoaded'])
+  },
+  watch: {
+    tags: {
+      deep: true,
+      handler: function () {
+        this.options = this.tags
+      }
+    }
+  }
+}
+</script>

@@ -1,0 +1,4 @@
+export const COMPANY_ADMIN = 'Company Admin'
+export const BILLING_ADMIN = 'Billing Admin'
+export const COMPANY_AGENT = 'Company Agent'
+export const COMPANY_REPORTER_ACCESS = 'Company Reporter Access'
