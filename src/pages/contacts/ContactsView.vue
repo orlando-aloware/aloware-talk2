@@ -55,7 +55,7 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search
-            class="width-330"
+            class="width-260"
             :search="search"
             @search="onSearch"
             :disabled="isLoadingDisabled">
