@@ -95,7 +95,7 @@
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Timezone</p>
         <q-timezone-selector v-model="contact.timezone"
-                             :disabled="!hasPermissionTo('update contact')"
+                             :disabled="!isAdmin"
                              @select="(eventPayload) => onUpdateFields(eventPayload, 'timezone')">
         </q-timezone-selector>
       </div>
