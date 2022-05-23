@@ -784,16 +784,18 @@ export default {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.backToDial()
 
-            switch (true) {
-              case shouldUnpark:
-                this.unparkCommunication(data)
-                break
-              case shouldAnswer:
-                this.makeCall('call:' + data.id, data.campaignId)
-                break
-            }
-            this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
-            clearInterval(this.$options.hangupInterval)
+            setTimeout(() => {
+              switch (true) {
+                case shouldUnpark:
+                  this.unparkCommunication(data)
+                  break
+                case shouldAnswer:
+                  this.makeCall('call:' + data.id, data.campaignId)
+                  break
+              }
+              this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
+              clearInterval(this.$options.hangupInterval)
+            }, 1000)
           }
 
           counter.data++

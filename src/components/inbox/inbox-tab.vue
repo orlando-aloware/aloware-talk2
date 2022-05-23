@@ -962,6 +962,12 @@ export default {
         }
 
         this.lineOrRingGroupFilter = null
+
+        // avoid contacts refresh if status is not expected
+        if (!['open', 'pending', 'closed'].includes(this.$route.params.status)) {
+          return
+        }
+
         // prevent reset of filters if coming from the root
         if (!this.$route.params.id) {
           this.resetList()

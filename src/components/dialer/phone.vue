@@ -485,7 +485,8 @@
                              @click="goToContact">
                       </q-btn>
                     </p>
-                    <p class="text-sm-left contact-phone mb-1">
+                    <p class="text-sm-left contact-phone mb-1"
+                       v-if="contact">
                       <span>{{ contact.phone_number | fixPhone }}</span>
                       <b-link href="#"
                               class="copy-phone-number text-grey-100 d-inline-flex ml-1"
@@ -501,7 +502,8 @@
               </b-list-group-item>
             </b-list-group>
 
-            <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2">
+            <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2"
+                            v-if="dialer.communication">
               <div class="pr-2">
                 <component :is="stateToIcon(dialer.communication.disposition_status2, dialer.communication.type, dialer.communication.direction)"
                            v-if="dialer.communication.disposition_status2">
@@ -516,7 +518,8 @@
               </div>
             </q-item-section>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">
                 Call Disposition
               </label>
@@ -561,7 +564,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <div class="d-flex flex-row align-items-center w-100 mb-2">
                 <label class="form-control-label mb-0 text-grey-90">Started at:</label>
                 <span class="ml-2">{{ dialer.communication.created_at | fixCommunicationDateTime }}</span>
@@ -572,7 +576,8 @@
               </div>
             </div>
 
-            <div class="d-flex align-items-center pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex align-items-center pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label mb-0 text-grey-90">Line:</label>
               <span class="ml-2"
                     v-if="getCampaign(dialer.communication.campaign_id)">
@@ -580,7 +585,8 @@
               </span>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90"
                      v-if="dialer.communication.has_recording">
                 Call Recording
@@ -598,7 +604,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90"
                      v-if="dialer.communication.has_voicemail">
                 Voicemail
@@ -616,14 +623,16 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">Tags</label>
               <div class="d-flex align-items-center w-100">
                 <communication-tags :communication="dialer.communication"/>
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">Notes</label>
               <div class="d-flex align-items-center w-100">
                 <communication-note ref="communicationNotes"
@@ -685,7 +694,8 @@
                                 v-if="contact">
                     <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
                   </q-item-label>
-                  <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start">
+                  <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
+                                v-if="dialer.communication">
                     <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
