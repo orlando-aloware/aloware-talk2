@@ -23,27 +23,37 @@
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
               <span class="contact-primary-phone">{{ contact.phone_number | fixPhone }}</span>
-              <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
-                       :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
-                       class="badge-phone-info ml-1">
-                {{ phone.lrn_type | fixLrnType }}
-              </b-badge>
-
-               <b-badge v-if="contact.is_dnc"
-                        variant="danger"
-                        class="badge-phone-info ml-1">
-                DNC
-              </b-badge>
 
               <b-link href="#"
                       class="copy-phone-number ml-1"
                       @click.prevent="copyPhoneNumber">
                 <q-tooltip anchor="top middle"
-                            self="center middle">
+                           self="center middle">
                   Copy
                 </q-tooltip>
                 <i class="material-icons">content_copy</i>
               </b-link>
+
+              <br/>
+
+              <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
+                       :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
+                       class="badge-phone-info mr-1">
+                {{ phone.lrn_type | fixLrnType }}
+              </b-badge>
+
+               <b-badge v-if="phone.is_invalid"
+                        variant="danger"
+                        class="badge-phone-info mr-1">
+                Invalid Number
+              </b-badge>
+
+               <b-badge v-if="contact.is_dnc"
+                        variant="danger"
+                        class="badge-phone-info mr-1">
+                DNC
+              </b-badge>
+
               <input :value="contact.phone_number"
                      type="hidden"
                      id="phone-number-clone"/>

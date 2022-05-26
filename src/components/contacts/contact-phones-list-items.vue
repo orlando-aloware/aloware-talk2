@@ -14,15 +14,21 @@
         <b-badge
           v-if="(phone.lrn_type || phone.lrn_type === 0) && $options.filters.validLrnType(phone.lrn_type)"
           :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
-          class="badge-phone-info">
+          class="badge-phone-info mr-1">
           {{ phone.lrn_type | fixLrnType }}
         </b-badge>
 
         <b-badge
           v-if="phone.phone_number === contact.phone_number"
           variant="grey-80"
-          class="badge-phone-info ml-1">
+          class="badge-phone-info mr-1">
           Primary
+        </b-badge>
+
+        <b-badge v-if="phone.is_invalid"
+          variant="danger"
+          class="badge-phone-info">
+          Invalid Number
         </b-badge>
       </div>
 
