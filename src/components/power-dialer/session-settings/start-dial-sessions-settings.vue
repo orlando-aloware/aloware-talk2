@@ -232,7 +232,7 @@
                   color="primary"
                   size="2em"
                 />
-                <p id="cancel-label">Preparing session settings..</p>
+                <p id="cancel-label">{{ loadingText }}</p>
               </div>
             </template>
           </b-overlay>
@@ -438,7 +438,9 @@ export default {
       selectedItemId: null,
       temporarySetting: {},
       saveDisabled: false,
-      isBusy: false
+      isBusy: false,
+      isDialing: false,
+      loadingText: 'Preparing session settings..'
     }
   },
   methods: {
@@ -471,6 +473,8 @@ export default {
        * IF selected item is personal/company
        */
       this.loading = true
+      this.isDialing = true
+      this.loadingText = 'Starting session..'
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.filterSelectedItem }
         res = await this.createDialerSessionSetting({
@@ -513,8 +517,10 @@ export default {
       this.loading = true
       let res = null
       if (data?.id) {
+        this.loadingText = 'Fetching session settings data..'
         res = await this.getSessionSetting(data.id)
       } else {
+        this.loadingText = 'Fetching temporary session settings data..'
         res = await this.getTemporarySessionSetting(this.listId)
         // this.resetDefaults(false)
       }
