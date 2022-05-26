@@ -42,7 +42,7 @@
                 {{ phone.lrn_type | fixLrnType }}
               </b-badge>
 
-               <b-badge v-if="phone.is_invalid"
+               <b-badge v-if="phone && phone.is_invalid"
                         variant="danger"
                         class="badge-phone-info mr-1">
                 Invalid Number
