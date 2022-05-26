@@ -1,27 +1,5 @@
 <template>
   <div class="t-session-settings">
-    <!-- <b-dropdown
-      text="..."
-      no-caret
-      right size="sm"
-      variant="white"
-      class="mr-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
-      <template #button-content>
-        <i class="fa fa-ellipsis-h"></i>
-      </template>
-      <b-dropdown-item
-        @click="{}"
-        href="#">
-        <i class="fa fa-bars mr-1"></i>
-        Option 1
-      </b-dropdown-item>
-      <b-dropdown-item
-        @click="{}"
-        href="#">
-        <i class="fa fa-bars mr-1"></i>
-        Option 2
-      </b-dropdown-item>
-    </b-dropdown> -->
     <q-btn
       v-if="defaultTrigger"
       class="start-dial-button p-0"
@@ -53,204 +31,212 @@
         class="mx-1" />
     </q-btn>
     <q-dialog
-      v-model="dialog"
-      transition-show="jump-down">
-      <q-card
-        flat
-        style="width: 800px; max-width: 90vw; min-height: 500px;"
-        class="my-card py-2 px-2">
-        <q-card-section
-          class="p-0"
-          horizontal>
-          <q-card-section
-            style="width: 26% !important"
-            class="p-0 pt-2 pr-2 border-right">
+      transition-show="jump-down"
+      v-model="dialog">
+        <q-card
+          flat
+          style="width: 800px; max-width: 90vw; min-height: 500px;"
+          class="my-card py-2 px-2">
+          <b-overlay :show="loading">
+            <q-card-section
+              class="p-0"
+              horizontal>
+              <q-card-section
+                style="width: 26% !important"
+                class="p-0 pt-2 pr-2 border-right">
 
-            <p class="text-weight-bold px-2">Session Settings</p>
+                <p class="text-weight-bold px-2">Session Settings</p>
 
-            <q-list
-              dense
-              bordered
-              padding
-              style="display:contents;"
-              class="mt-3">
-              <q-item
-                :class="`px-2 border-radius-1 ${hasSelectedTemporarySetting ? 'bg-grey-70' : ''}`"
-                :disable="loading"
-                clickable>
-                <q-item-section
-                  @click="loadSettings('Untitled')">
-                  <div class="text-bold">New <span class="text-weight-regular text-grey-80">(Untitled)</span></div>
-                </q-item-section>
-                <q-item-section side>
-                  <CheckIcon v-if="selectedItemName === 'Untitled'" />
-                </q-item-section>
-              </q-item>
-            </q-list>
-
-            <q-list
-              dense
-              bordered
-              padding
-              style="display:contents;"
-              class="mt-3">
-              <template
-                v-for="t in groupedSettings">
-                <q-item
-                  :key="t.value">
-                  <q-item-section class="p-0">
-                    <div class="text-grey px-2 pt-3 text-uppercase text-caption">
-                      {{ t.label }}
-                    </div>
-                  </q-item-section>
-                </q-item>
-                <template
-                  v-if="fetchedGroupSettings(t.name).length > 0">
+                <q-list
+                  dense
+                  bordered
+                  padding
+                  style="display:contents;"
+                  class="mt-3">
                   <q-item
-                    v-for="(f, fk) in fetchedGroupSettings(t.name)"
-                    :key="`${t.name}-${fk}`"
-                    @click.native.prevent="loadSettings(f)"
-                    @mouseenter="hovered = f.id"
-                    @mouseleave="toggleSelected"
                     clickable
-                    v-ripple
-                    :class="`px-2 py-0 border-radius-1 ${isSessionValid(f) ? 'bg-grey-70' : ''}`"
+                    :class="`px-2 border-radius-1 ${hasSelectedTemporarySetting ? 'bg-grey-70' : ''}`"
                     :disable="loading">
-                    <q-item-section class="mr-2">
-                      {{ f.name }}
-                    </q-item-section>
                     <q-item-section
-                      v-if="hovered !== f.id || t.name === 'company'"
-                      side>
-                      <CheckIcon
-                        v-if="isSessionValid(f)"
-                        class="mr-2" />
+                      @click="loadSettings('Untitled')">
+                      <div class="text-bold">New <span class="text-weight-regular text-grey-80">(Untitled)</span></div>
                     </q-item-section>
-                    <q-item-section
-                      @click.native.stop="{}"
-                      v-if="hovered === f.id && t.name !== 'company'"
-                      side>
-                      <q-btn
-                        size="md"
-                        class="m-0"
-                        round flat outline dense
-                        color="grey"
-                        @click="hoveredMenu = f.id">
-                        <i class="fa fa-ellipsis-h"></i>
-                      </q-btn>
-                      <q-menu
-                        anchor="top right"
-                        self="top left">
-                        <q-list style="min-width: 100px">
-                          <q-item
-                            @click="onRename(f)"
-                            dense
-                            clickable
-                            v-close-popup>
-                            <q-item-section class="px-3">
-                              <div>
-                                <i class="fa fa-pencil-alt mr-2"></i>
-                                Rename
-                              </div>
-                            </q-item-section>
-                          </q-item>
-                          <q-item
-                            @click="onDeleteRequest(f.id)"
-                            dense
-                            clickable
-                            v-close-popup>
-                            <q-item-section class="px-3">
-                              <div class="text-red">
-                                <i class="fa fa-trash-alt mr-2"></i>
-                                Delete
-                              </div>
-                            </q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
+                    <q-item-section side>
+                      <CheckIcon v-if="selectedItemName === 'Untitled'" />
                     </q-item-section>
                   </q-item>
-                </template>
-                <div v-else :key="t.name">
-                  <span
-                    class="px-2 text-grey text-caption text-italic">
-                    No saved settings
-                  </span>
-                </div>
-              </template>
-            </q-list>
-          </q-card-section>
+                </q-list>
 
-          <!-- <q-separator vertical /> -->
+                <q-list
+                  dense
+                  bordered
+                  padding
+                  style="display:contents;"
+                  class="mt-3">
+                  <template
+                    v-for="t in groupedSettings">
+                    <q-item
+                      :key="t.value">
+                      <q-item-section class="p-0">
+                        <div class="text-grey px-2 pt-3 text-uppercase text-caption">
+                          {{ t.label }}
+                        </div>
+                      </q-item-section>
+                    </q-item>
+                    <template
+                      v-if="fetchedGroupSettings(t.name).length > 0">
+                      <q-item
+                        clickable
+                        v-ripple
+                        v-for="(f, fk) in fetchedGroupSettings(t.name)"
+                        :key="`${t.name}-${fk}`"
+                        :class="`px-2 py-0 border-radius-1 ${isSessionValid(f) ? 'bg-grey-70' : ''}`"
+                        :disable="loading"
+                        @click.native.prevent="loadSettings(f)"
+                        @mouseenter="hovered = f.id"
+                        @mouseleave="toggleSelected">
+                        <q-item-section class="mr-2">
+                          {{ f.name }}
+                        </q-item-section>
+                        <q-item-section
+                          v-if="hovered !== f.id || t.name === 'company'"
+                          side>
+                          <CheckIcon
+                            v-if="isSessionValid(f)"
+                            class="mr-2" />
+                        </q-item-section>
+                        <q-item-section
+                          side
+                          @click.native.stop="{}"
+                          v-if="hovered === f.id && t.name !== 'company'">
+                          <q-btn
+                            size="md"
+                            class="m-0"
+                            round flat outline dense
+                            color="grey"
+                            @click="hoveredMenu = f.id">
+                            <i class="fa fa-ellipsis-h"></i>
+                          </q-btn>
+                          <q-menu
+                            anchor="top right"
+                            self="top left">
+                            <q-list style="min-width: 100px">
+                              <q-item
+                                dense
+                                clickable
+                                v-close-popup
+                                @click="onRename(f)">
+                                <q-item-section class="px-3">
+                                  <div>
+                                    <i class="fa fa-pencil-alt mr-2"></i>
+                                    Rename
+                                  </div>
+                                </q-item-section>
+                              </q-item>
+                              <q-item
+                                dense
+                                clickable
+                                v-close-popup
+                                @click="onDeleteRequest(f.id)">
+                                <q-item-section class="px-3">
+                                  <div class="text-red">
+                                    <i class="fa fa-trash-alt mr-2"></i>
+                                    Delete
+                                  </div>
+                                </q-item-section>
+                              </q-item>
+                            </q-list>
+                          </q-menu>
+                        </q-item-section>
+                      </q-item>
+                    </template>
+                    <div v-else :key="t.name">
+                      <span
+                        class="px-2 text-grey text-caption text-italic">
+                        No saved settings
+                      </span>
+                    </div>
+                  </template>
+                </q-list>
+              </q-card-section>
 
-          <q-card-section
-            class="px-0 py-0"
-            style="width: 74% !important"
-            :disabled="loading">
-            <q-card flat>
-              <div class="row">
-                <div class="col-12">
-                  <q-card flat class="p-0">
-                    <q-card-actions class="px-0">
-                      <div class="session-settings-title">
-                        {{ selectedItemName }}
-                        <q-tooltip anchor="center right">
-                          {{ selectedItemName }}
-                        </q-tooltip>
-                      </div>
-                      <q-space />
-                      <q-btn
-                        @click="resetDefaults"
-                        unelevated
-                        no-caps
-                        size="sm"
-                        class="px-3 py-0"
-                        color="grey-5">Reset</q-btn>
-                      <q-btn
-                        v-if="!hasSelectedTemporarySetting"
-                        @click="updateSelectedSetting"
-                        unelevated
-                        no-caps
-                        :disabled="saveDisabled"
-                        size="sm"
-                        class="px-3 py-0"
-                        color="primary">Save</q-btn>
-                      <q-btn
-                        v-if="hasSelectedTemporarySetting"
-                        @click="newSetting = true"
-                        unelevated
-                        no-caps
-                        :disabled="disabled"
-                        size="sm"
-                        class="px-3 py-0"
-                        color="primary">Save As New</q-btn>
-                      <q-btn
-                        @click="beginDial"
-                        unelevated
-                        no-caps
-                        :disabled="disabled"
-                        size="sm"
-                        class="px-3 py-0"
-                        color="success">
-                        {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
-                      </q-btn>
-                    </q-card-actions>
-                  </q-card>
-                </div>
+              <q-card-section
+                class="px-0 py-0"
+                style="width: 74% !important"
+                :disabled="loading">
+                <q-card flat>
+                  <div class="row">
+                    <div class="col-12">
+                      <q-card flat class="p-0">
+                        <q-card-actions class="px-0">
+                          <div class="session-settings-title">
+                            {{ selectedItemName }}
+                            <q-tooltip anchor="center right">
+                              {{ selectedItemName }}
+                            </q-tooltip>
+                          </div>
+                          <q-space />
+                          <q-btn
+                            unelevated
+                            no-caps
+                            size="sm"
+                            class="px-3 py-0"
+                            color="grey-5"
+                            @click="resetDefaults">Reset</q-btn>
+                          <q-btn
+                            v-if="!hasSelectedTemporarySetting"
+                            unelevated
+                            no-caps
+                            size="sm"
+                            class="px-3 py-0"
+                            color="primary"
+                            :disabled="saveDisabled"
+                            @click="updateSelectedSetting">Save</q-btn>
+                          <q-btn
+                            v-if="hasSelectedTemporarySetting"
+                            unelevated
+                            no-caps
+                            size="sm"
+                            class="px-3 py-0"
+                            color="primary"
+                            :disabled="disabled"
+                            @click="newSetting = true">Save As New</q-btn>
+                          <q-btn
+                            unelevated
+                            no-caps
+                            size="sm"
+                            class="px-3 py-0"
+                            color="success"
+                            :disabled="disabled"
+                            @click="beginDial">
+                            {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                          </q-btn>
+                        </q-card-actions>
+                      </q-card>
+                    </div>
+                  </div>
+
+                  <SessionsForm
+                    v-model="filterSelectedItem"
+                    :disabled="isCompanyScope"
+                    :flagged="dialog"
+                    @valid-form="disabled = false"
+                    @invalid-form="disabled = true"/>
+
+                </q-card>
+              </q-card-section>
+            </q-card-section>
+            <template #overlay>
+              <div class="text-center">
+                <q-spinner-bars
+                  color="primary"
+                  size="2em"
+                />
+                <p id="cancel-label">Preparing session settings..</p>
               </div>
-
-              <SessionsForm
-                v-model="filterSelectedItem"
-                @valid-form="disabled = false"
-                @invalid-form="disabled = true"
-                :disabled="isCompanyScope"
-                :flagged="dialog" />
-
-            </q-card>
-          </q-card-section>
-        </q-card-section>
-
-      </q-card>
+            </template>
+          </b-overlay>
+        </q-card>
     </q-dialog>
 
     <!-- DIALOG used for confirmation -->
@@ -292,6 +278,7 @@
             color="grey-80"
             size="sm"
             v-close-popup
+            :disabled="isBusy || isBusy"
             @click="newSetting = false">
             Cancel
           </b-button>
@@ -299,23 +286,34 @@
             v-if="deleteId"
             variant="danger"
             size="sm"
+            :disabled="isBusy"
             @click="onDeleteSetting">
-            Remove
+            <q-spinner-bars v-if="isBusy"
+                            class="mr-1"
+                            color="white" />
+            {{ isBusy ? ' Removing...' : 'Remove' }}
           </b-button>
           <b-button
             v-else-if="updateObj"
-            :disabled="updateObj.name === newSettingName || newSettingName.length === 0"
             variant="success"
             size="sm"
+            :disabled="updateObj.name === newSettingName || newSettingName.length === 0 || isBusy"
             @click="renameSetting">
-            Save
+            <q-spinner-bars v-if="isBusy"
+                            class="mr-1"
+                            color="white" />
+            {{ isBusy ? ' Saving...' : 'Save' }}
           </b-button>
           <b-button
             v-else
             variant="success"
             size="sm"
+            :disabled="isBusy"
             @click="saveAsNew">
-            Save
+            <q-spinner-bars v-if="isBusy"
+                            class="mr-1"
+                            color="white" />
+            {{ isBusy ? ' Saving...' : 'Save' }}
           </b-button>
         </q-card-actions>
       </q-card>
@@ -439,7 +437,8 @@ export default {
       selectedItem: null,
       selectedItemId: null,
       temporarySetting: {},
-      saveDisabled: false
+      saveDisabled: false,
+      isBusy: false
     }
   },
   methods: {
@@ -531,13 +530,16 @@ export default {
       newSettings.is_company_scope = 0
       newSettings.id = null
       newSettings.contact_list_id = null
+      this.isBusy = true
       let collection = this.removeEmptyParams(newSettings)
       let res = await this.createDialerSessionSetting(collection)
       if (res?.id) {
         await this.getDialerSessionSettings()
+        this.$generalNotification('Dialer session setting has been saved.')
       }
       this.newSetting = false
       this.loading = false
+      this.isBusy = false
     },
     async updateSelectedSetting () {
       this.saveDisabled = true
@@ -548,7 +550,7 @@ export default {
         if (this.sessionSettings.id === res.data.id) {
           await this.getPowerDialerList(this.listId)
         }
-        this.$generalNotification(`Dialer Session Setting has been updated!`)
+        this.$generalNotification(`Dialer session setting has been updated!`)
       }
       this.onUpdatedSessionMetrics()
       this.saveDisabled = false
@@ -569,6 +571,7 @@ export default {
     },
     async renameSetting () {
       this.updateObj.name = this.newSettingName
+      this.isBusy = true
       let res = await this.updateDialerSessionSetting({
         id: this.updateObj.id,
         name: this.updateObj.name
@@ -576,16 +579,19 @@ export default {
       if (res.data) {
         this.newSetting = false
         this.updateObj = ''
-        this.$generalNotification(`Dialer Session Setting has been renamed to ${res.data.name}.`)
+        this.$generalNotification(`Dialer session setting has been renamed to ${res.data.name}.`)
+        this.isBusy = false
       }
     },
     async onDeleteSetting () {
+      this.isBusy = true
       let res = await this.deleteDialerSessionSetting(this.deleteId)
       if (res.data) {
         await this.getDialerSessionSettings()
         this.newSetting = false
         this.deleteId = null
-        this.$generalNotification('Dialer Session Setting has been removed!')
+        this.$generalNotification('Dialer session setting has been removed.')
+        this.isBusy = false
       }
     },
     fetchedGroupSettings (type) {
