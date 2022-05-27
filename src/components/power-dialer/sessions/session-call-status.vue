@@ -683,11 +683,7 @@ export default {
     },
     resetTimer () {
       if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
-        if (this.wrapUp) {
-          this.countdownTimer = this.wrapUpSeconds
-        } else {
-          this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
-        }
+        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
       }
     },
     reRoute (isForced = false) {
