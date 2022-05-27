@@ -330,7 +330,7 @@ export default {
             this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           }
           this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added')
+          this.$generalNotification('Selected contacts were successfully added.')
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)

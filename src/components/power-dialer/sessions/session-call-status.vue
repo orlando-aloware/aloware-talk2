@@ -13,6 +13,27 @@
         </div>
 
         <q-btn
+          class="sessions-button free-width mx-1"
+          no-wrap no-caps size="sm"
+          unelevated
+          outline
+          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
+          :disabled="!statusCallConnected"
+          @click="onToggleMute">
+          <mute-icon v-show="!toggleMute"
+                     class="mr-2"
+                     :width="12"
+                     :height="12"></mute-icon>
+          <unmute-icon v-show="toggleMute"
+                       class="mr-2"
+                       :width="12"
+                       :height="12"></unmute-icon>
+          <div class="text-body2 text-black">
+            {{ toggleMute ? 'Unmute' : 'Mute' }}
+          </div>
+        </q-btn>
+
+        <q-btn
           @click="onToggleHold"
           no-wrap no-caps size="sm"
           unelevated
@@ -249,10 +270,14 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import sessionsMixins from 'src/plugins/mixins/sessions-call-status'
 import { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
+import MuteIcon from 'components/icons/mute-icon'
+import UnmuteIcon from 'components/icons/unmute-icon'
 
 export default {
   name: 'SessionCallStatus',
   components: {
+    MuteIcon,
+    UnmuteIcon,
     CalendarIcon,
     TransferIcon,
     DialPadIcon,
