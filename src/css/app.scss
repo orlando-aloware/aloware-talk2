@@ -11209,3 +11209,13 @@ h1.contact-list-name-label {
     }
   }
 }
+
+
+.session-contact-info-scroller {
+  height: calc(100vh - 380px) !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.session-integration-title {
+  color: #303133
+}

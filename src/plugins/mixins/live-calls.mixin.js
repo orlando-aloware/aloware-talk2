@@ -25,6 +25,8 @@ export default {
       'parkedCalls'
     ]),
 
+    ...mapState('inbox', ['liveContacts']),
+
     shouldShowIncomingCallMenu () {
       if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode && this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
         return false
@@ -68,7 +70,10 @@ export default {
       if (!this.communication) {
         return false
       }
-      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2)
+
+      // make sure that comms has the correct status and is already included in live contacts
+      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2) &&
+        this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
 
     isCallFishing () {

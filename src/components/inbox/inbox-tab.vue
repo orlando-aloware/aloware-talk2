@@ -82,6 +82,11 @@
                          class="live-call-badge d-flex justify-center align-items-center position-absolute"
                          pill></b-badge>
               </div>
+              <q-tooltip anchor="bottom start"
+                         self="center start"
+                         :offset="[7, 18]">
+                See most recent communication with contacts you have visibility over
+              </q-tooltip>
             </div>
           </template>
 

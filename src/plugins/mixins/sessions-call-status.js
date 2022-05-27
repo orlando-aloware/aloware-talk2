@@ -19,7 +19,9 @@ export default {
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'ongoingSession',
+      'countdownTimer'
     ]),
     ...mapGetters('contacts', [
       'listItems',
