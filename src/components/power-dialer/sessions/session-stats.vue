@@ -54,6 +54,7 @@
 
 <script>
 
+import { mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import StartDialing from '../session-settings/start-dial-sessions-settings'
 import SummaryInfoLabels from '../details/summary-info-labels'
@@ -65,15 +66,19 @@ export default {
     StartDialing,
     SummaryInfoLabels
   },
-  mounted () {
-    this.startTime = moment()
-    this.totalSeconds = 0
+  beforeMount () {
+    if (this.ongoingSession.finishedPdSession) {
+      this.updateOngoingSession()
+    } else {
+      this.updateSessionTimer(this.ongoingSession.totalSeconds + 1)
+    }
   },
   computed: {
     ...mapFields('powerDialer', [
       'activeList',
       'powerDialerTasks',
-      'powerDialerTaskFilters'
+      'powerDialerTaskFilters',
+      'ongoingSession'
     ]),
     completedTasks () {
       return this.powerDialerTaskFilters?.all?.total_called || 0 + this.powerDialerTaskFilters?.all?.total_failed || 0
@@ -82,7 +87,7 @@ export default {
       return this.powerDialerTaskFilters?.all?.total_queued || 0
     },
     timer () {
-      return this.totalSeconds
+      return this.ongoingSession.totalSeconds
     },
     defaultStats () {
       return [
@@ -101,7 +106,7 @@ export default {
       ]
     },
     hasReachedHour () {
-      return this.totalSeconds === 3600
+      return this.ongoingSession.totalSeconds === 3600
     }
   },
   filters: {
@@ -121,21 +126,19 @@ export default {
       return 0
     }
   },
-  data () {
-    return {
-      totalSeconds: null,
-      startTime: Date.now(),
-      currentTime: 0
-    }
-  },
   watch: {
-    totalSeconds (val) {
+    'ongoingSession.totalSeconds': function (val) {
       setTimeout(() => {
-        this.totalSeconds++
+        this.updateSessionTimer(this.ongoingSession.totalSeconds + 1)
       }, 1000)
     }
   },
   methods: {
+    ...mapActions('powerDialer', [
+      'setFinishedPowerDialerSession',
+      'updateSessionTimer',
+      'updateOngoingSession'
+    ]),
     updateSettings (obj) {
       this.activeList = obj.data
       this.$generalNotification('Session settings has been updated.', 'success')

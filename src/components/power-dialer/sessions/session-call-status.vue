@@ -481,12 +481,13 @@ export default {
   },
 
   created () {
+    this.ongoingSession.listId = this.$route.params.id
     this.resetSession()
 
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
     }
-    if (this.campaings) {
+    if (this.campaigns) {
       this.findDefaultOutboundCampaign()
     }
     this.$VueEvent.listen('initiate_session', (session) => {
@@ -681,10 +682,8 @@ export default {
       }
     },
     resetTimer () {
-      if (this.wrapUp) {
-        this.countdownTimer = this.wrapUpSeconds
-      } else {
-        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
+        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
       }
     },
     reRoute (isForced = false) {
