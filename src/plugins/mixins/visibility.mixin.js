@@ -430,6 +430,56 @@ export default {
       }
 
       return true
+    },
+
+    checkMentionMatchesUserAccessibility (mention) {
+      // checks if communication matches user communication visibility
+      if (this.profile.communications_visibility === CommunicationAccessTypes.COMMUNICATIONS_OWNED_ONLY &&
+        mention.mentioner_user_id &&
+        mention.mentioner_user_id !== this.profile.id) {
+        return false
+      }
+
+      // ring group only access
+      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
+        // if contact does not exist
+        if (!mention.contact) {
+          return false
+        }
+
+        // if user does not have unassigned access
+        if (mention.contact &&
+          !mention.contact.user_id &&
+          !this.profile.can_view_unassigned_contacts) {
+          return false
+        }
+
+        // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
+      }
+
+      // owned only access
+      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
+        // if contact does not exist
+        if (!mention.contact) {
+          return false
+        }
+
+        // if user does not have unassigned access
+        if (mention.contact &&
+          !mention.contact.user_id &&
+          !this.profile.can_view_unassigned_contacts) {
+          return false
+        }
+
+        // checks if communication's contact is owned by the user
+        if (mention.contact &&
+          mention.contact.user_id &&
+          mention.contact.user_id !== this.profile.id) {
+          return false
+        }
+      }
+
+      return true
     }
   }
 }
