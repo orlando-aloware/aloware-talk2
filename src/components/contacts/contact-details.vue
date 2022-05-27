@@ -59,12 +59,20 @@ import ContactSaveBar from 'components/contacts/contact-save-bar'
 import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
-import { aclMixin, contact } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  contact,
+  visibilityMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'contact-details',
 
-  mixins: [contact, aclMixin],
+  mixins: [
+    contact,
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: {
     ContactSequence,
