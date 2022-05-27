@@ -6,7 +6,13 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, agentMixin, userMixin, notificationMixin } from '../../boot/mixins'
+import {
+  aclMixin,
+  agentMixin,
+  userMixin,
+  notificationMixin,
+  visibilityMixin
+} from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
@@ -15,7 +21,13 @@ import * as CommunicationCurrentStatus from '../../constants/communication-curre
 export default {
   name: 'dialer',
 
-  mixins: [aclMixin, agentMixin, userMixin, notificationMixin],
+  mixins: [
+    aclMixin,
+    agentMixin,
+    userMixin,
+    notificationMixin,
+    visibilityMixin
+  ],
 
   data () {
     return {
@@ -45,6 +57,10 @@ export default {
 
   created () {
     this.$VueEvent.listen('update_communication', (data) => {
+      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+        return
+      }
+
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)

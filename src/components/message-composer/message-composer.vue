@@ -63,7 +63,11 @@
 <script>
 import MessageComposerSms from 'components/message-composer/message-composer-sms'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import contactMixin from 'src/plugins/mixins/contact.mixin'
+import {
+  contact,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
 import talk2Api from 'src/plugins/api/api'
@@ -74,7 +78,11 @@ import MessageComposerNote from 'components/message-composer/message-composer-no
 export default {
   name: 'message-composer',
 
-  mixins: [contactMixin],
+  mixins: [
+    contact,
+    aclMixin,
+    visibilityMixin
+  ],
 
   props: {
     campaignId: {

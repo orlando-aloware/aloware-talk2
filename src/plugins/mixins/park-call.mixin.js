@@ -12,6 +12,10 @@ export default {
 
   created () {
     this.$VueEvent.listen('update_communication', (data) => {
+      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+        return
+      }
+
       if (data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
         this.removeParkedCall(data.id)
         return

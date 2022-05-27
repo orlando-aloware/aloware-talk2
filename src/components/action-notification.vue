@@ -161,7 +161,12 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { mentionsMixin, notificationMixin } from 'src/plugins/mixins'
+import {
+  mentionsMixin,
+  notificationMixin,
+  visibilityMixin,
+  aclMixin
+} from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -174,7 +179,9 @@ export default {
 
   mixins: [
     notificationMixin,
-    mentionsMixin
+    mentionsMixin,
+    visibilityMixin,
+    aclMixin
   ],
 
   components: {
@@ -332,6 +339,10 @@ export default {
   },
   created () {
     this.$VueEvent.listen('update_communication', (data) => {
+      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+        return
+      }
+
       if (![
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,

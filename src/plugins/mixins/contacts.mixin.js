@@ -530,6 +530,10 @@ export default {
           return
         }
 
+        if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+          return
+        }
+
         const index = this.contactsData.data.findIndex(item => item.id === communication.contact_id)
         if (index >= 0) {
           talk2Api.V2.contacts.get(communication.contact_id).then(response => {

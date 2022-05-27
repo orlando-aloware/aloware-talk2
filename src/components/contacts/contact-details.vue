@@ -121,6 +121,10 @@ export default {
           return
         }
 
+        if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+          return
+        }
+
         this.communicationsSummary.summaries.total_count++
         const type = communication.type
         const direction = communication.direction

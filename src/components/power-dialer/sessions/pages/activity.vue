@@ -52,8 +52,12 @@
 <script>
 
 import { mapState, mapGetters, mapActions } from 'vuex'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
+import {
+  contact,
+  contacts,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import ContactActivities from 'src/components/contacts/contact-activities'
 
 export default {
@@ -62,8 +66,10 @@ export default {
     ContactActivities
   },
   mixins: [
-    contactsMixins,
-    contactMixins
+    contacts,
+    contact,
+    aclMixin,
+    visibilityMixin
   ],
   mounted () {
     this.flagged = false

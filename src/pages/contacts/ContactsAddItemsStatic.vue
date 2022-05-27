@@ -167,13 +167,20 @@ import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/components/table-row.vue'
 import TextPopover from 'components/popover/text-popover'
-
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import {
+  contacts,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
 
 export default {
-  mixins: [contactsMixins],
+  mixins: [
+    contacts,
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: {
     ContactsFilters,

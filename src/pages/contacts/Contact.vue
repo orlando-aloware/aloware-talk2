@@ -80,7 +80,11 @@
 <script>
 import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
+import {
+  contact,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
@@ -90,7 +94,11 @@ import _ from 'lodash'
 export default {
   name: 'contact',
 
-  mixins: [contactMixins],
+  mixins: [
+    contact,
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: {
     CloseIcon,
