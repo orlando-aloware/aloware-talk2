@@ -1,43 +1,44 @@
-import _ from 'lodash'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import { mapActions, mapState } from 'vuex'
 
 export default {
-  data () {
-    return {
-      parkedCalls: [],
-      loadingParkedCalls: false
-    }
+  computed: {
+    ...mapState([
+      'loadingParkedCalls',
+      'parkedCalls'
+    ])
   },
 
   created () {
     this.$VueEvent.listen('update_communication', (data) => {
-      const found = this.parkedCalls.find(parkedCall => parkedCall.id === data.id)
-
-      if (data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && found) {
-        this.parkedCalls.splice(this.parkedCalls.indexOf(found), 1)
+      if (data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
+        this.removeParkedCall(data.id)
         return
       }
 
-      if (data.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && !found) {
-        this.parkedCalls.push(data)
+      if (data.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
+        this.addParkedCall(data)
       }
     })
   },
 
-  mounted () {
-    // this.fetchAllParkedCalls()
-  },
-
   methods: {
-    fetchAllParkedCalls: _.debounce(function () {
-      this.loadingParkedCalls = true
-      this.$axios
+    ...mapActions([
+      'setParkedCalls',
+      'setLoadingParkedCalls',
+      'addParkedCall',
+      'removeParkedCall'
+    ]),
+
+    fetchAllParkedCalls () {
+      this.setLoadingParkedCalls(false)
+      return this.$axios
         .post('/api/v1/contact-center/parked-calls')
         .then((res) => {
-          console.log(res)
-          this.parkedCalls = res.data
-          this.loadingParkedCalls = false
+          this.setParkedCalls(res.data)
+          this.setLoadingParkedCalls(false)
+          return Promise.resolve()
         })
         .catch((error) => {
           const {
@@ -46,8 +47,9 @@ export default {
           } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
-          this.loadingParkedCalls = false
+          this.setLoadingParkedCalls(false)
+          return Promise.reject()
         })
-    })
+    }
   }
 }

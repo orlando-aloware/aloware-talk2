@@ -1619,11 +1619,11 @@ export default {
       }
     })
 
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', function (filters) {
-      if (filters && filters.length) {
-        _this.setDataCount(filters)
-      }
-    })
+    const setDataCount = _.debounce((filters) => {
+      this.setDataCount(filters)
+    }, 100)
+
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', setDataCount)
   },
 
   watch: {
@@ -1701,6 +1701,10 @@ export default {
         this.myContacts = value
       }
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('shouldUpdateListCount')
+    this.$VueEvent.stop('shouldUpdateListCountOnSearch')
   }
 }
 </script>

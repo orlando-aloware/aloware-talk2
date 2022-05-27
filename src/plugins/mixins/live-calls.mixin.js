@@ -17,13 +17,25 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer', 'notifications', 'ringGroups', 'callFishingQueue']),
+    ...mapState([
+      'dialer',
+      'notifications',
+      'ringGroups',
+      'callFishingQueue',
+      'parkedCalls'
+    ]),
+
+    ...mapState('inbox', ['liveContacts']),
 
     shouldShowIncomingCallMenu () {
-      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode) {
+      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode && this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
         return false
       }
-      return ((this.isIncomingLiveCall && this.isCallFishing && this.isCallFishingMode) || (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')) && !this.isParkedCall && !this.isConnectedCall
+      return (
+        (this.isIncomingLiveCall && this.isCallFishing && (this.isCallFishingMode || this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW)) ||
+        (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')
+      ) && !this.isParkedCall &&
+        !this.isConnectedCall
     },
     shouldShowAnsweredCallMenu () {
       return this.isActiveCall && !this.isParkedCall && !this.shouldShowIncomingCallMenu
@@ -40,7 +52,9 @@ export default {
       if (!this.communication) {
         return false
       }
-      return this.dialer.parkedCall && this.dialer.parkedCall.id === this.communication.id
+
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.communication.id)
+      return !_.isEmpty(found)
     },
 
     isActiveCall () {
@@ -56,7 +70,10 @@ export default {
       if (!this.communication) {
         return false
       }
-      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2)
+
+      // make sure that comms has the correct status and is already included in live contacts
+      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2) &&
+        this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
 
     isCallFishing () {
@@ -74,6 +91,15 @@ export default {
       }
 
       return false
+    },
+
+    isIgnored () {
+      if (_.isEmpty(this.callFishingQueue)) {
+        return true
+      }
+
+      const found = this.callFishingQueue.find(item => item.communicationId === this.communication.id)
+      return _.isEmpty(found)
     },
 
     isIncomingLiveCall () {
@@ -111,11 +137,23 @@ export default {
 
     liveCallStatuses () {
       return [...this.incomingCallStatuses, ...[CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW]]
+    },
+
+    isShowIgnoreCallIcon () {
+      return this.isIncomingLiveCall && this.isCallFishingMode && this.isCallFishing && !this.isIgnored
+    },
+
+    isShowCancelCallIcon () {
+      return this.isIncomingLiveCall && !this.isCallFishing
     }
   },
 
   methods: {
-    ...mapActions(['setShowPhone', 'removeFromCallFishingQueue']),
+    ...mapActions([
+      'setShowPhone',
+      'removeFromCallFishingQueue',
+      'setDialerParkedCall'
+    ]),
     ...mapActions('inbox', ['setContacts', 'setLiveContacts']),
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
@@ -145,6 +183,11 @@ export default {
             shouldPark: false,
             shouldHangup: false
           }
+
+          if (this.dialer.call && this.dialer.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('endWrapUp')
+          }
+
           this.$VueEvent.fire('answerCallFishing', data)
           this.setShowPhone(true)
           this.isAnsweringCall = false
@@ -163,16 +206,16 @@ export default {
       this.isRejecting = true
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
-        const liveContacts = _.cloneDeep(this.liveContacts)
-        if (this.liveContacts.find(item => item.id === this.contact.id)) {
-          liveContacts.splice(this.liveContacts.findIndex(item => item.id === this.contact.id), 1)
-          this.setLiveContacts(liveContacts)
-        }
-        const contacts = _.cloneDeep(this.contacts)
-        if (!this.contacts.find(item => item.id === this.contact.id)) {
-          contacts.unshift(this.contact)
-          this.setContacts(contacts)
-        }
+        // const liveContacts = _.cloneDeep(this.liveContacts)
+        // if (this.liveContacts.find(item => item.id === this.contact.id)) {
+        //   liveContacts.splice(this.liveContacts.findIndex(item => item.id === this.contact.id), 1)
+        //   this.setLiveContacts(liveContacts)
+        // }
+        // const contacts = _.cloneDeep(this.contacts)
+        // if (!this.contacts.find(item => item.id === this.contact.id)) {
+        //   contacts.unshift(this.contact)
+        //   this.setContacts(contacts)
+        // }
 
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
@@ -203,25 +246,49 @@ export default {
         return
       }
 
-      this.$VueEvent.fire('unparkCall')
+      if (this.dialer.call && this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      this.$VueEvent.fire('unparkCommunication', this.communication)
       this.$VueEvent.fire('togglePhone')
       e.stopImmediatePropagation()
     },
 
     onParkCurrentCallAndConnect () {
       this.showParkedCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(true, true)
     },
     onHangupCurrentCallAndConnect () {
       this.showParkedCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(false, true)
     },
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(true, false)
     },
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
+
+      if (_.isEmpty(this.dialer.parkedCall)) {
+        this.setDialerParkedCall(this.communication)
+      }
+
       this.answerCommunication(false, true)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {

@@ -125,7 +125,8 @@ export default {
     },
 
     onBlur () {
-      if (typeof this.useChips !== 'undefined' && this.useChips) {
+      if ((typeof this.useChips !== 'undefined' && this.useChips) ||
+        (typeof this.multiple !== 'undefined' && this.multiple)) {
         return
       }
 
@@ -174,7 +175,8 @@ export default {
       }
     },
     toggleInputValue (toggle) {
-      if (typeof this.useChips !== 'undefined' && this.useChips) {
+      if ((typeof this.useChips !== 'undefined' && this.useChips) ||
+        (typeof this.multiple !== 'undefined' && this.multiple)) {
         return
       }
 

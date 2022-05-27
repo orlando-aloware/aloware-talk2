@@ -172,10 +172,11 @@
             <span>{{ phoneStatus }}</span>
           </div>
           <div class="phone-cta">
-            <div class="d-flex flex-row justify-content-between"
+            <div class="d-flex flex-row"
+                 :class="[ isUnparkCallVisible || (!isDeclineCallVisible && !isIgnoreCallVisible && isAnswerCallVisible) ? 'justify-content-center' : 'justify-content-between' ]"
                  v-if="isPhoneCTAVisible">
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.call !== undefined && dialer.callFishing.communication === undefined">
+                   v-if="isDeclineCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -188,7 +189,7 @@
                 <span class="text-size-xs mt-1">Decline</span>
               </div>
               <div class="d-flex flex-column align-items-center"
-                   v-if="dialer.callFishing.communication !== undefined">
+                   v-if="isIgnoreCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -201,7 +202,8 @@
                 <span class="text-size-xs mt-1">Ignore</span>
               </div>
 
-              <div class="d-flex flex-column align-items-center">
+              <div class="d-flex flex-column align-items-center"
+              v-if="isAnswerCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -212,6 +214,20 @@
                   </accept-call-icon>
                 </q-btn>
                 <span class="text-size-xs mt-1">Accept</span>
+              </div>
+
+              <div class="d-flex flex-column align-items-center"
+                   v-if="isUnparkCallVisible">
+                <q-btn class="height-52"
+                       ripple
+                       round
+                       no-caps
+                       @click="unparkCommunication">
+                  <parked-call-icon width="52"
+                                    height="52">
+                  </parked-call-icon>
+                </q-btn>
+                <span class="text-size-xs mt-1">Unpark</span>
               </div>
             </div>
 
@@ -227,7 +243,7 @@
                                   height="52">
                 </cancel-call-icon>
               </q-btn>
-              <span class="text-size-xs mt-1">Hang Up</span>
+              <span class="text-size-xs mt-1">Hangup</span>
             </div>
           </div>
         </template>
@@ -469,7 +485,8 @@
                              @click="goToContact">
                       </q-btn>
                     </p>
-                    <p class="text-sm-left contact-phone mb-1">
+                    <p class="text-sm-left contact-phone mb-1"
+                       v-if="contact">
                       <span>{{ contact.phone_number | fixPhone }}</span>
                       <b-link href="#"
                               class="copy-phone-number text-grey-100 d-inline-flex ml-1"
@@ -485,7 +502,8 @@
               </b-list-group-item>
             </b-list-group>
 
-            <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2">
+            <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2"
+                            v-if="dialer.communication">
               <div class="pr-2">
                 <component :is="stateToIcon(dialer.communication.disposition_status2, dialer.communication.type, dialer.communication.direction)"
                            v-if="dialer.communication.disposition_status2">
@@ -500,7 +518,8 @@
               </div>
             </q-item-section>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">
                 Call Disposition
               </label>
@@ -545,7 +564,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <div class="d-flex flex-row align-items-center w-100 mb-2">
                 <label class="form-control-label mb-0 text-grey-90">Started at:</label>
                 <span class="ml-2">{{ dialer.communication.created_at | fixCommunicationDateTime }}</span>
@@ -556,7 +576,8 @@
               </div>
             </div>
 
-            <div class="d-flex align-items-center pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex align-items-center pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label mb-0 text-grey-90">Line:</label>
               <span class="ml-2"
                     v-if="getCampaign(dialer.communication.campaign_id)">
@@ -564,7 +585,8 @@
               </span>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90"
                      v-if="dialer.communication.has_recording">
                 Call Recording
@@ -582,7 +604,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90"
                      v-if="dialer.communication.has_voicemail">
                 Voicemail
@@ -600,14 +623,16 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">Tags</label>
               <div class="d-flex align-items-center w-100">
                 <communication-tags :communication="dialer.communication"/>
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">Notes</label>
               <div class="d-flex align-items-center w-100">
                 <communication-note ref="communicationNotes"
@@ -669,7 +694,8 @@
                                 v-if="contact">
                     <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
                   </q-item-label>
-                  <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start">
+                  <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
+                                v-if="dialer.communication">
                     <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
@@ -1241,9 +1267,11 @@ import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
 export default {
   name: 'phone',
   components: {
+    ParkedCallIcon,
     MobileLiveCallBar,
     IgnoreCallIcon,
     CopyIcon,
@@ -1378,7 +1406,22 @@ export default {
     }
   },
   computed: {
-    ...mapState(['dialer', 'campaigns', 'users', 'warnings', 'inputDevices', 'outputDevices', 'currentInputDevice', 'currentOutputDevice', 'shouldIntroduce', 'addedParty', 'showIncomingCallNotification', 'sessionPhoneExpansion']),
+    ...mapState([
+      'dialer',
+      'campaigns',
+      'users',
+      'warnings',
+      'inputDevices',
+      'outputDevices',
+      'currentInputDevice',
+      'currentOutputDevice',
+      'shouldIntroduce',
+      'addedParty',
+      'showIncomingCallNotification',
+      'sessionPhoneExpansion',
+      'parkedCalls',
+      'callFishingQueue'
+    ]),
     ...mapState('cache', ['currentCompany']),
 
     isCallCompleted () {
@@ -1621,6 +1664,35 @@ export default {
     },
     isOnPowerDialerSessionRoute () {
       return this.$route.meta.id === 'power-dialer-session'
+    },
+    isCallFishingCommunicationInParkedCalls () {
+      if (_.isEmpty(this.parkedCalls)) {
+        return false
+      }
+
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.callFishing.communication.id)
+
+      return !_.isEmpty(found)
+    },
+    isIgnored () {
+      if (_.isEmpty(this.callFishingQueue)) {
+        return true
+      }
+
+      const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
+      return _.isEmpty(found)
+    },
+    isDeclineCallVisible () {
+      return this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined
+    },
+    isIgnoreCallVisible () {
+      return this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls && !this.isIgnored
+    },
+    isAnswerCallVisible () {
+      return (this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined) || (this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls)
+    },
+    isUnparkCallVisible () {
+      return this.dialer.callFishing.communication !== undefined && this.isCallFishingCommunicationInParkedCalls
     }
   },
   created () {
@@ -1849,6 +1921,9 @@ export default {
       setTimeout(() => {
         this.loadingPark = false
       }, 1000)
+    },
+    unparkCommunication () {
+      this.$VueEvent.fire('unparkCommunication', this.dialer.callFishing.communication)
     },
     saveAndResetExpansion ($event) {
       if ($event) {

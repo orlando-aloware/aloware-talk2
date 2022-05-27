@@ -90,16 +90,17 @@
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
+                      v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
                       @click="onRejectCall">
               <!-- show remove icon for call fishing mode -->
-              <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode && isCallFishing"
+              <ignore-call-icon v-if="isShowIgnoreCallIcon"
                                 height="24"
                                 width="24" />
               <!-- only show reject button if -->
-              <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishing"/>
+              <cancel-call-icon v-if="isShowCancelCallIcon"/>
             </b-button>
           </div>
-          <div v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)"
+          <div v-if="(isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) || (!isCallFishingMode && isIncomingLiveCall)"
                class="pl-1 pr-0" >
             <b-button variant="light"
                       size="sm"

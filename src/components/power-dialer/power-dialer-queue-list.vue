@@ -5,6 +5,9 @@
         QUEUE
       </div>
     </div>
+    <contacts-sidebar-loader v-if="!hasListData"
+                             :items="1">
+    </contacts-sidebar-loader>
      <div
       class="d-flex pinned__content flex-column"
       v-if="hasListData">
@@ -20,6 +23,7 @@
 
 import QueueListItem from './power-dialer-queue-list-item'
 import { mapGetters } from 'vuex'
+import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 
 export default {
   name: 'PowerDialerQueueList',
@@ -30,6 +34,7 @@ export default {
     }
   },
   components: {
+    ContactsSidebarLoader,
     QueueListItem
   },
   computed: {

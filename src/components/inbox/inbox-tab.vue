@@ -82,6 +82,11 @@
                          class="live-call-badge d-flex justify-center align-items-center position-absolute"
                          pill></b-badge>
               </div>
+              <q-tooltip anchor="bottom start"
+                         self="center start"
+                         :offset="[7, 18]">
+                See most recent communication with contacts you have visibility over
+              </q-tooltip>
             </div>
           </template>
 
@@ -313,7 +318,9 @@ export default {
       'toggleFilterModelForm',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
-      'setLoadingPendingTaskCount'
+      'setLoadingPendingTaskCount',
+      'setOpenTaskCount',
+      'setPendingTaskCount'
     ]),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
@@ -396,6 +403,17 @@ export default {
       })
     },
     async onItemRemoved (contact, callback) {
+      if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+        this.setPendingTaskCount(this.taskCounts.pending - 1)
+      }
+
+      if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+        this.setOpenTaskCount(this.taskCounts.open - 1)
+      }
+
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
       await this.setContacts(filteredContacts)
       if (typeof callback !== 'undefined') {
@@ -697,12 +715,16 @@ export default {
           } else {
             if (isInContacts) {
               const index = contacts.data.findIndex(item => item.id === contact.id)
-              if (contact.task_status !== this.currentTask) {
-                this.onItemRemoved(contact)
-                return
-              }
+
               contacts.data[index] = contact
               this.setContacts(contacts.data)
+
+              if (contact.task_status !== this.currentTask) {
+                setTimeout(() => {
+                  this.onItemRemoved(contact)
+                }, 3000)
+                return
+              }
             }
 
             // only modify order if new contact task === current task
@@ -744,17 +766,22 @@ export default {
 
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
-      if (index >= 0) {
+      let contactTaskToRemove = null
+
+      if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
         const liveContacts = _.cloneDeep(this.liveContacts)
         liveContacts[index].last_communication = communication
         // if type is call and completed/voicemail then remove from live calls
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
           communication.type === CommunicationTypes.CALL &&
           [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
-          const contactTaskToRemove = liveContacts[index]
+          contactTaskToRemove = liveContacts[index]
           liveContacts.splice(index, 1)
 
-          // we then add to contact tasks
+          if (communication.direction === CommunicationDirections.OUTBOUND) {
+            contactTaskToRemove.task_status = ContactTaskStatus.STATUS_PENDING
+          }
+
           const contacts = _.cloneDeep(this.contacts)
           if (this.sorting.order === 'asc') {
             contacts.push(contactTaskToRemove)
@@ -790,12 +817,27 @@ export default {
           this.setContact(contacts[contactIndex])
         }
       }
+
+      if (contactTaskToRemove) {
+        this.$VueEvent.fire('contact_task_status_updated', contactTaskToRemove)
+      }
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch) {
         return
       }
+
+      if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+        this.setPendingTaskCount(this.taskCounts.pending - 1)
+      }
+
+      if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+        this.setOpenTaskCount(this.taskCounts.open - 1)
+      }
+
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
 
       const index = this.contacts.findIndex(item => item.id === contact.id)
       switch (true) {
@@ -804,12 +846,20 @@ export default {
         // reload if on open tab and the contact status is set to pending or closed
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
-        case [ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+        case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
           const _this = this
           this.onItemRemoved(contact, function () {
             _this.onItemSelected(_this.contacts[0])
           })
           this.loadContactTasks(true, false)
+          break
+        case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
+          // just remove contact from current list
+          if (index >= 0) {
+            const contacts = [...this.contacts]
+            contacts.splice(index, 1)
+            this.setContacts(contacts)
+          }
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         default:
@@ -830,12 +880,52 @@ export default {
       }
     }
 
+    this.listeners.contactAuditCreated = (data) => {
+      if (data.property === 'contact_task_status') {
+        // update task status on live contacts
+        const index = this.liveContacts.findIndex(item => item.id === data.contact_id)
+        if (index >= 0) {
+          const liveContacts = _.cloneDeep(this.liveContacts)
+          liveContacts[index].task_status = parseInt(data.to)
+
+          this.setLiveContacts(
+            [
+              // connected calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+              // parked calls
+              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+              // incoming calls
+              ...liveContacts.filter(item => [
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+              ].includes(item.last_communication.current_status2))
+            ]
+          )
+        }
+
+        const contactIndex = this.contacts.findIndex(item => item.id === data.contact_id)
+        if (contactIndex >= 0) {
+          const contacts = _.cloneDeep(this.contacts)
+          contacts[contactIndex].task_status = parseInt(data.to)
+          this.setContacts(contacts)
+          if (contacts[contactIndex].id === this.contact.id) {
+            this.setContact(contacts[contactIndex])
+          }
+        }
+      }
+    }
+
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
     this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
+
+    this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -854,6 +944,7 @@ export default {
     this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
     this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
+    this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
   },
 
   watch: {
@@ -876,6 +967,12 @@ export default {
         }
 
         this.lineOrRingGroupFilter = null
+
+        // avoid contacts refresh if status is not expected
+        if (!['open', 'pending', 'closed'].includes(this.$route.params.status)) {
+          return
+        }
+
         // prevent reset of filters if coming from the root
         if (!this.$route.params.id) {
           this.resetList()

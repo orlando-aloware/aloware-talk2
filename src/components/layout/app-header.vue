@@ -49,6 +49,8 @@
 
         <shared-login-menu v-if="!isElectron"></shared-login-menu>
 
+        <header-help></header-help>
+
         <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'"></profile>
 
         <phone v-if="!titleOnly"></phone>
@@ -111,6 +113,7 @@ import InboxChannelNavigation from 'components/inbox/inbox-channel-navigation'
 import RefreshIcon from 'components/icons/refresh-icon'
 import SharedLoginMenu from 'components/shared-login-menu'
 import BackButton from 'components/back-button'
+import HeaderHelp from 'components/header-help'
 
 export default {
   name: 'app-header',
@@ -130,7 +133,8 @@ export default {
     DialerForm,
     Profile,
     CompactBtn,
-    RefreshIcon
+    RefreshIcon,
+    HeaderHelp
   },
 
   props: {
@@ -222,15 +226,6 @@ export default {
     hideDialer () {
       this.dialerIcon = 'img:app-icons/header/dialer_gray.svg'
       this.dialerStatus = false
-    },
-
-    navigateToContactActivity () {
-      this.$router.push({
-        name: 'Communication',
-        params: {
-          contactId: this.$route.params.contactId
-        }
-      })
     },
 
     navigateBack (e) {

@@ -48,7 +48,7 @@ export default {
     ]),
     totalInQueued () {
       if (!this.myQueueListFilters) {
-        return this.myQueue.items.length
+        return 0 // this.myQueue.items.length
       }
       return this.myQueueListFilters?.total_queued || 0
     }
@@ -58,6 +58,9 @@ export default {
       isActive: true
     }
   },
+  created () {
+    this.initActive()
+  },
   methods: {
     gotoBase () {
       if (this.$route.meta.id !== 'power-dialer-queue-filter') {
@@ -66,12 +69,15 @@ export default {
     },
     addQueueItem () {
       this.$router.push('/power-dialer/list/add')
+    },
+    initActive () {
+      this.isActive = this.$route.meta.id === 'power-dialer-queue-filter' || this.$route.meta.id === 'power-dialer-add-queue-list'
     }
   },
   watch: {
     '$route': {
-      handler (val) {
-        this.isActive = val.meta.id === 'power-dialer-queue-filter' || val.meta.id === 'power-dialer-add-queue-list'
+      handler () {
+        this.initActive()
       },
       deep: true
     }

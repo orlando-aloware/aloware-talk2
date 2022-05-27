@@ -40,7 +40,7 @@
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
+               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </div>
           <div class="truncated-text call-parked-label"
@@ -59,6 +59,7 @@
             {{ smsEmptyBodyAlternativeText }}
           </div>
           <div class="truncated-text"
+               :class="{ 'pt-1': [CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(contact.last_communication.type) }"
                v-if="contact.last_communication.body !== null">
             {{ contact.last_communication.body }}
           </div>
@@ -92,16 +93,17 @@
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
+                      v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
                       @click="onRejectCall">
               <!-- show remove icon for call fishing mode -->
-              <ignore-call-icon v-if="isIncomingLiveCall && isCallFishingMode && isCallFishing"
+              <ignore-call-icon v-if="isShowIgnoreCallIcon"
                                 height="24"
                                 width="24" />
               <!-- only show reject button if -->
-              <cancel-call-icon v-if="isIncomingLiveCall && !isCallFishing"/>
+              <cancel-call-icon v-if="isShowCancelCallIcon"/>
             </b-button>
           </div>
-          <div v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)"
+          <div v-if="(isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) || (!isCallFishingMode && isIncomingLiveCall)"
                class="pl-1 pr-0" >
             <b-button variant="light"
                       size="sm"
@@ -259,6 +261,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
+    ...mapState('contacts', { contactData: 'contact' }),
     ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts', 'channelChangedFilterFields']),
     contactName () {
       if (this.contact && this.contact.name) {
@@ -377,17 +380,22 @@ export default {
       this.previousRoute = from
     },
 
-    isReopened: function () {
-      const _this = this
-
-      if (this.isSearch || (this.previousRoute && this.previousRoute.name === 'Inbox')) { return }
-
-      setTimeout(function () {
-        _this.$emit('onItemRemoved', _this.contact)
+    isReopened: function (value) {
+      if (this.isSearch || (this.previousRoute && this.previousRoute.name === 'Inbox') || !value) { return }
+      setTimeout(() => {
+        this.$emit('onItemRemoved', this.contact)
       }, 3000)
     },
     'contact.last_communication.id': function () {
       this.taskItemKey++
+    },
+    'contactData.task_status': {
+      deep: true,
+      handler: function (value) {
+        if (this.contactData.id === this.contact.id) {
+          this.contact.task_status = this.contactData.task_status
+        }
+      }
     }
   }
 }

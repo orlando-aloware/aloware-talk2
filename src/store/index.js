@@ -240,7 +240,10 @@ export default function (/* { ssrContext } */) {
       appointmentNotifiedDesktop: [],
       reminderNotifiedDesktop: [],
       defaultDateFilter: null,
-      sessionPhoneExpansion: ''
+      sessionPhoneExpansion: '',
+      notificationAudio: null,
+      loadingParkedCalls: false,
+      parkedCalls: []
     },
 
     getters: {
@@ -687,6 +690,21 @@ export default function (/* { ssrContext } */) {
       },
       setDefaultDateFilter ({ commit }, value) {
         commit('SET_DEFAULT_DATE_FILTER', value)
+      },
+      setNotificationAudio ({ commit }) {
+        commit('SET_NOTIFICATION_AUDIO')
+      },
+      setLoadingParkedCalls ({ commit }, value) {
+        commit('SET_LOADING_PARKED_CALLS', value)
+      },
+      setParkedCalls ({ commit }, communications) {
+        commit('SET_PARKED_CALLS', communications)
+      },
+      addParkedCall ({ commit }, communication) {
+        commit('ADD_PARKED_CALL', communication)
+      },
+      removeParkedCall ({ commit }, communicationId) {
+        commit('REMOVE_PARKED_CALL', communicationId)
       }
     },
 
@@ -1310,6 +1328,38 @@ export default function (/* { ssrContext } */) {
 
       SET_DEFAULT_DATE_FILTER (state, value) {
         state.defaultDateFilter = value
+      },
+
+      SET_NOTIFICATION_AUDIO (state) {
+        state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
+      },
+
+      SET_LOADING_PARKED_CALLS (state, value) {
+        state.loadingParkedCalls = value
+      },
+
+      SET_PARKED_CALLS (state, communications) {
+        state.parkedCalls = communications
+      },
+
+      ADD_PARKED_CALL (state, communication) {
+        const found = state.parkedCalls.find(parkedCall => parkedCall.id === communication.id)
+
+        if (found) {
+          return
+        }
+
+        state.parkedCalls.push(communication)
+      },
+
+      REMOVE_PARKED_CALL (state, communicationId) {
+        const found = state.parkedCalls.find(parkedCall => parkedCall.id === communicationId)
+
+        if (!found) {
+          return
+        }
+
+        state.parkedCalls.splice(state.parkedCalls.indexOf(found), 1)
       },
 
       updateField

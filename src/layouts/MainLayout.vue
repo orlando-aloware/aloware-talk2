@@ -196,7 +196,8 @@ import {
   htmlMixin,
   webrtcMixin,
   notificationMixin,
-  broadcastMixin
+  broadcastMixin,
+  parkCallMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -235,7 +236,8 @@ export default {
     aclMixin,
     communicationMixin,
     notificationMixin,
-    broadcastMixin
+    broadcastMixin,
+    parkCallMixin
   ],
 
   data () {
@@ -279,7 +281,14 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['dialer', 'campaigns', 'isMobile', 'ringGroups', 'notifications', 'showPhone']),
+    ...mapState([
+      'dialer',
+      'campaigns',
+      'isMobile',
+      'ringGroups',
+      'notifications',
+      'showPhone'
+    ]),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
     ...mapState('contacts', ['showContactsHeader']),
@@ -322,10 +331,16 @@ export default {
     },
     isSamePDListId () {
       return this.$route.params.id === this.ongoingSession.listId
+    },
+    isNotInInbox () {
+      return this.$route.path.indexOf('channels/inbox') === -1 && !['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)
     }
   },
 
   created () {
+    this.setNotificationAudio()
+    this.fetchAllParkedCalls()
+
     if (this.$route.name === 'Phone' && !this.isMobile) {
       this.$router.replace({ path: '/' })
     }
@@ -604,9 +619,23 @@ export default {
           this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
         }
       }
-
-      if (this.$route.path.indexOf('channels/inbox') === -1) {
+      if (this.isNotInInbox) {
         if (!communication.contact_id) {
+          return
+        }
+
+        const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+          [
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+          ].includes(item.last_communication.current_status2))
+
+        if (isActiveInLiveContactsIndex >= 0) {
           return
         }
 
@@ -664,7 +693,7 @@ export default {
     })
 
     this.$VueEvent.listen('new_communication', (communication) => {
-      if (this.$route.path.indexOf('channels/inbox') === -1) {
+      if (this.isNotInInbox) {
         // Do not alter live contacts if it's in active mode
         const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
           [
@@ -1345,17 +1374,21 @@ export default {
           scope.setTag('company_name', this.profile.company_name)
           scope.setTag('version', storage.local.getItem('version'))
         })
+
         if (this.profile.company_id) {
           this.$Sentry.configureScope((scope) => {
             scope.setTag('company_id', this.profile.company_id)
           })
         }
+
         const getCurrentCompany = this.getCurrentCompany()
         const getUsers = this.getUsers()
+        const fetchAllParkedCalls = this.fetchAllParkedCalls()
 
         await Promise.all([
           getCurrentCompany,
-          getUsers
+          getUsers,
+          fetchAllParkedCalls
         ])
       }
     },
@@ -1901,7 +1934,8 @@ export default {
       'setIsTabletOrMobile',
       'setContactDetailsDrawer',
       'setEnableAudio',
-      'setDefaultDateFilter'
+      'setDefaultDateFilter',
+      'setNotificationAudio'
     ]),
     ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
     ...mapActions('auth', {

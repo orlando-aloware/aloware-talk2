@@ -21,8 +21,6 @@
 
           <q-select
             v-if="cform.name === 'metric_options'"
-            v-model="resources[cform.name]"
-            :options="metrics"
             option-value="value"
             option-label="label"
             multiple
@@ -30,10 +28,14 @@
             use-input
             emit-value
             map-options
-            :disable="disabled"
             class="generic-selector-2"
-            :max-values="4"
-            outlined dense>
+            outlined
+            dense
+            placeholder="Select session metrics"
+            v-model="resources[cform.name]"
+            :options="metrics"
+            :disable="disabled"
+            :max-values="4">
             <template v-slot:option="scope">
               <q-item
                 v-bind="scope.itemProps"
@@ -81,16 +83,16 @@
 
           <ContactDispositionSelector
             v-else-if="cform.name === 'contact_disposition_ids'"
+            custom-class="padded-container-1 generic-selector-1"
+            class="pb-3"
             v-model="resources[cform.name]"
             :generic-styling="false"
             :multiple="true"
             :use-chips="true"
             :outlined="true"
             :disable="disabled"
-            :show-placeholder="false"
-            custom-class="padded-container-1 generic-selector-1"
-            @change="{}"
-            class="pb-3">
+            :show-placeholder="true"
+            @change="{}">
           </ContactDispositionSelector>
 
           <VmDropSelector
@@ -141,7 +143,6 @@ import ContactDispositionSelector from 'components/generic-selectors/contact-dis
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
-// import { isEmpty } from 'lodash'
 
 export default {
   name: 'StartDialSessionsForm',

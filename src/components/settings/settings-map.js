@@ -153,13 +153,6 @@ const SettingsMap = {
   },
 
   // PERSONALIZATION SETTINGS
-  'focus_mode': {
-    title: 'Focus Mode',
-    description: 'Only show contacts assigned to this user.',
-    route: '/settings/personalization',
-    hash_keyword: 'focus-mode',
-    visible: true
-  },
   'go_to_available_after_login': {
     title: 'Available by Default, But Allow Manual Changes',
     description: 'Put user on available status after login and disable idle mode detection (auto offline).',

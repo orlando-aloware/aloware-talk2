@@ -10,27 +10,6 @@
           </div>
         </b-col>
       </b-form-row>
-      <b-form-row class="mt-4"
-                  v-if="isAdmin"
-                  :id="`${SettingsMap.focus_mode.hash_keyword}-container`">
-        <b-col sm="12"
-               md="12">
-          <div>
-            <h5 class="form-label">Focus Mode</h5>
-            <p class="form-helper-text">Only show me contacts that are assigned to me.</p>
-          </div>
-
-          <b-form-group
-            label=""
-          >
-            <b-form-checkbox switch
-                             v-model="user.focus_mode"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'focus_mode')">
-              Enable focus mode
-            </b-form-checkbox>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.go_to_available_after_login.hash_keyword}-container`">

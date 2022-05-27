@@ -1,5 +1,5 @@
 <template>
-  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || loadingContactCommunications"
+  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || loadingContactCommunications || isEmptyContact"
              :opacity="0.85"
              class="h-100 w-100"
              variant="white"
@@ -14,7 +14,7 @@
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
-                            v-if="!loadingContact && !changingSelectedContact"
+                            v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
                             @toggleDetails="toggleDetails">
@@ -40,7 +40,7 @@
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <contact-details v-if="!loadingContactCommunications && !changingSelectedContact"
+        <contact-details v-if="!loadingContactCommunications && !changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
       </div>
@@ -62,7 +62,7 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer && !loadingContactCommunications && !changingSelectedContact"></contact-details>
+        <contact-details v-if="drawer && !loadingContactCommunications && !changingSelectedContact && !isEmptyContact"></contact-details>
       </q-drawer>
     </div>
     <template #overlay>
@@ -105,6 +105,9 @@ export default {
     ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'tagsFullyLoaded', 'campaigns', 'users', 'tags']),
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication'].includes(this.$route.name)
+    },
+    isEmptyContact () {
+      return Object.keys(this.contact).length === 0
     }
   },
 
@@ -164,6 +167,18 @@ export default {
       }
     })
 
+    this.$VueEvent.listen('contact_audit_created', (data) => {
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.contact && parseInt(this.contact.id) === parseInt(data.contact_id)) {
+        if (data.property === 'contact_task_status') {
+          const contact = _.cloneDeep(this.contact)
+          contact.task_status = parseInt(data.to)
+          this.setContact(contact)
+        }
+      }
+    })
+
     this.$VueEvent.listen('contact_disposed', (disposedContact) => {
       if (disposedContact.id === this.contact.id) {
         const contact = _.cloneDeep(this.contact)
@@ -215,6 +230,10 @@ export default {
 
   beforeRouteUpdate () {
     this.leaving = false
+  },
+
+  beforeDestroy () {
+    this.setContact({})
   },
 
   beforeRouteLeave (to, from, next) {

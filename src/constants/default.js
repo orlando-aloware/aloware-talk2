@@ -200,5 +200,9 @@ export const DEFAULT_STATE = {
   contactNotifiedDesktop: [],
   appointmentNotifiedDesktop: [],
   reminderNotifiedDesktop: [],
-  defaultDateFilter: null
+  defaultDateFilter: null,
+  sessionPhoneExpansion: '',
+  notificationAudio: null,
+  loadingParkedCalls: false,
+  parkedCalls: []
 }
