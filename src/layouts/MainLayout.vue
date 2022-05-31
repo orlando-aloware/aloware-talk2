@@ -600,7 +600,9 @@ export default {
 
     // user mention notification
     this.$VueEvent.listen('mention', (data) => {
-      this.processActionNotification(data, 'mention')
+      if (this.checkMentionMatchesUserAccessibility(data)) {
+        this.processActionNotification(data, 'mention')
+      }
     })
 
     this.$VueEvent.listen('update_communication', (communication) => {
