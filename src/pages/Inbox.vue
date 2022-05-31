@@ -20,7 +20,7 @@ import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import {
-  contact,
+  contactMixin,
   inboxMixin,
   aclMixin,
   visibilityMixin
@@ -32,7 +32,7 @@ export default {
   name: 'inbox',
 
   mixins: [
-    contact,
+    contactMixin,
     inboxMixin,
     aclMixin,
     visibilityMixin

@@ -80,7 +80,7 @@ import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import ColumnHeaders from 'components/column-headers'
 import {
   powerDialerMixin,
-  contacts,
+  contactsMixins,
   powerDialerInitMixin,
   sessionsEngineMixin,
   aclMixin,
@@ -106,7 +106,7 @@ export default {
   },
   mixins: [
     powerDialerMixin,
-    contacts,
+    contactsMixins,
     powerDialerInitMixin,
     sessionsEngineMixin,
     aclMixin,

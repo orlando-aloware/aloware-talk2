@@ -18,11 +18,11 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
-import LinexMixins from 'src/plugins/mixins/lines.mixin'
+import LinesMixins from 'src/plugins/mixins/lines.mixin'
 
 export default {
   name: 'contact-line-selector',
-  mixins: [ LinexMixins ],
+  mixins: [ LinesMixins ],
   components: { VueMultiselect },
   props: {
     showPaused: {

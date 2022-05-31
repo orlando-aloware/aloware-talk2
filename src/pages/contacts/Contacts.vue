@@ -60,7 +60,7 @@ import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
 import {
-  contacts,
+  contactsMixins,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -77,7 +77,7 @@ export default {
   },
 
   mixins: [
-    contacts,
+    contactsMixins,
     aclMixin,
     visibilityMixin
   ],

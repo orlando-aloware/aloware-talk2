@@ -229,7 +229,6 @@ export default {
     },
 
     navigateBack (e) {
-      console.log('navigateBack', { e })
       const previousPage = _.get(this.$route.query, 'previousPage', null)
       const previousList = _.get(this.$route.query, 'list', null)
 
@@ -239,6 +238,7 @@ export default {
         } else {
           this.$router.push(`/power-dialer`)
         }
+        return
       }
 
       if (this.$route.name === 'Settings Tab') {

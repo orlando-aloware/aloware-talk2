@@ -46,7 +46,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import {
-  contact,
+  contactMixin,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -56,7 +56,7 @@ export default {
   name: 'line-selector',
 
   mixins: [
-    contact,
+    contactMixin,
     aclMixin,
     visibilityMixin
   ],

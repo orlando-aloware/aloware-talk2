@@ -66,7 +66,7 @@ import ContactInfo from 'components/contacts/contact-information'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 
 export default {
-  name: 'DetailsForm',
+  name: 'DetailsContactInformation',
   props: {
     resources: {
       type: Object,

@@ -61,7 +61,7 @@ import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import {
   aclMixin,
-  contact,
+  contactMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
 
@@ -69,7 +69,7 @@ export default {
   name: 'contact-details',
 
   mixins: [
-    contact,
+    contactMixin,
     aclMixin,
     visibilityMixin
   ],

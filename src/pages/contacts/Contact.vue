@@ -81,7 +81,7 @@
 import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import {
-  contact,
+  contactMixin,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -95,7 +95,7 @@ export default {
   name: 'contact',
 
   mixins: [
-    contact,
+    contactMixin,
     aclMixin,
     visibilityMixin
   ],

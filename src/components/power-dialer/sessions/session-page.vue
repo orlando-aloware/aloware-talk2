@@ -1,7 +1,7 @@
 <template>
   <div class="t-flex-group__no-bg flex-column border-top">
 
-    <SessionTabsHeaders
+    <SessionFilters
       @selected-tab="selectTab" />
 
     <div class="t-panel-container">
@@ -10,16 +10,15 @@
         class="bg-transparent">
 
         <q-tab-panel class="p-0" name="Details">
-          <!-- <div class="text-h6">Mails</div> -->
-          <ContactDetails />
+          <SessionPageDetails />
         </q-tab-panel>
 
         <q-tab-panel class="p-0" name="Activity">
-          <ContactActivity />
+          <SessionPageActivity />
         </q-tab-panel>
 
         <q-tab-panel class="p-0" name="CRM View">
-          <ContactCrm />
+          <SessionPageCrm />
         </q-tab-panel>
 
       </q-tab-panels>
@@ -29,18 +28,18 @@
 
 <script>
 
-import SessionTabsHeaders from 'src/components/power-dialer/sessions/session-filters'
-import ContactDetails from './pages/details'
-import ContactActivity from './pages/activity'
-import ContactCrm from './pages/crm'
+import SessionFilters from 'src/components/power-dialer/sessions/session-filters'
+import SessionPageDetails from './pages/session-page-details'
+import SessionPageActivity from './pages/session-page-activity'
+import SessionPageCrm from './pages/session-page-crm'
 
 export default {
   name: 'SessionPage',
   components: {
-    SessionTabsHeaders,
-    ContactDetails,
-    ContactActivity,
-    ContactCrm
+    SessionFilters,
+    SessionPageDetails,
+    SessionPageActivity,
+    SessionPageCrm
   },
   methods: {
     selectTab (val) {

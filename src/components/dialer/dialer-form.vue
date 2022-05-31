@@ -188,7 +188,7 @@ import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
 import {
-  contact,
+  contactMixin,
   timezoneCheckMixin,
   visibilityMixin,
   aclMixin
@@ -198,7 +198,7 @@ export default {
   name: 'dialer-form',
 
   mixins: [
-    contact,
+    contactMixin,
     timezoneCheckMixin,
     visibilityMixin,
     aclMixin

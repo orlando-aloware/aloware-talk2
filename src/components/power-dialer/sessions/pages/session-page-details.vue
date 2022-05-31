@@ -24,9 +24,7 @@
           </q-card-section>
         </q-card>
 
-        <DetailsLeads
-          :resources="scripts" />
-
+        <DetailsScripts :resources="scripts" />
       </div>
 
       <div
@@ -45,7 +43,7 @@
           </q-card-section>
         </q-card>
 
-        <DetailsContactInfo
+        <DetailsContactInfomation
           v-if="contact"
           :resources="contact" />
 
@@ -66,8 +64,8 @@
 <script>
 
 import { mapGetters, mapState } from 'vuex'
-import DetailsLeads from './details-scripts'
-import DetailsContactInfo from './details-contact-information'
+import DetailsScripts from './details-scripts'
+import DetailsContactInfomation from './details-contact-information'
 import DetailsTools from './details-tools'
 import HubSpotIcon from 'components/icons/hubspot-icon'
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
@@ -78,8 +76,8 @@ export default {
   mixins: [hubspotIntegrationMixin],
 
   components: {
-    DetailsLeads,
-    DetailsContactInfo,
+    DetailsScripts,
+    DetailsContactInfomation,
     DetailsTools,
     HubSpotIcon
   },

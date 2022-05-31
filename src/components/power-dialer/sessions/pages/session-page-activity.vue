@@ -53,8 +53,8 @@
 
 import { mapState, mapGetters, mapActions } from 'vuex'
 import {
-  contact,
-  contacts,
+  contactMixin,
+  contactsMixins,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -66,8 +66,8 @@ export default {
     ContactActivities
   },
   mixins: [
-    contacts,
-    contact,
+    contactsMixins,
+    contactMixin,
     aclMixin,
     visibilityMixin
   ],

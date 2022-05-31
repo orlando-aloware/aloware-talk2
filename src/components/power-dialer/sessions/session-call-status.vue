@@ -251,7 +251,7 @@
 
 <script>
 
-import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
 import TransferIcon from 'components/icons/transfer-icon-2'
@@ -453,8 +453,7 @@ export default {
     },
     getTimeZone () {
       let timezone = this.taskToCall?.timezone
-      const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('HH:mm')
-      return contactLocalTime
+      return moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('hh:mm A')
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
@@ -596,7 +595,7 @@ export default {
           return
         }
         if (!this.togglePause && !this.wrapUp) {
-          this.runTask(task)
+          // this.runTask(task)
         }
         if (this.wrapUp) {
           this.initialize()

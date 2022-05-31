@@ -64,7 +64,7 @@
 import MessageComposerSms from 'components/message-composer/message-composer-sms'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
-  contact,
+  contactMixin,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -79,7 +79,7 @@ export default {
   name: 'message-composer',
 
   mixins: [
-    contact,
+    contactMixin,
     aclMixin,
     visibilityMixin
   ],

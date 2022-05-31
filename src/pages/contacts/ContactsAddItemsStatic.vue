@@ -80,7 +80,7 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
-          <span class="small text-muted selected-contacts mr-2">{{ totalCount }} Contacts</span>
+          <span class="small text-muted selected-contacts mr-2">{{ contactCount | numFormat }} Contacts</span>
 
           <div class="v-divider">
           </div>
@@ -169,17 +169,19 @@ import TableRow from 'src/components/table-row.vue'
 import TextPopover from 'components/popover/text-popover'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import {
-  contacts,
+  contactsMixins,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  contactListCountMixin
 } from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
 
 export default {
   mixins: [
-    contacts,
+    contactsMixins,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    contactListCountMixin
   ],
 
   components: {
@@ -215,7 +217,8 @@ export default {
       filterHasChanges: false,
       listName: '',
       myContacts: false,
-      clicked: false
+      clicked: false,
+      contactCount: 0
     }
   },
 
@@ -227,12 +230,6 @@ export default {
         return this.listItems[this.id].data
       }
       return []
-    },
-    totalCount () {
-      if (this.listItems[this.id]) {
-        return this.listItems[this.id].total
-      }
-      return 0
     },
     currentPage () {
       if (this.listItems[this.id]) {
@@ -441,11 +438,21 @@ export default {
     onPagination (params) {
       this.checked = []
       this.onPaginate(params)
+    },
+    setDataCount (data, updatePinned = false) {
+      if (!data) {
+        return
+      }
+      this.getListDataCount({ filters: data }).then(response => {
+        this.contactCount = response.data.count
+      })
     }
   },
   mounted () {
     this.listName = ''
     this.fetch()
+
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.setDataCount)
   },
   watch: {
     '$route.params.id': function () {
