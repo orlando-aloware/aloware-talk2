@@ -451,18 +451,12 @@ export default {
   mounted () {
     this.listName = ''
     this.fetch()
-
+    this.setDataCount([])
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.setDataCount)
   },
   watch: {
     '$route.params.id': function () {
       this.fetch()
-    },
-    currentListFilters: {
-      deep: true,
-      handler: function () {
-        this.fetch(this.currentListFilters)
-      }
     },
     checkedItemIds: function (value) {
       if (this.isContactModule) {

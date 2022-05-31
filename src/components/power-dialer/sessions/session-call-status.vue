@@ -214,18 +214,20 @@
         </q-btn>
 
         <q-btn
-          @click="onToggleEnd"
+
           no-wrap outline no-caps
           size="sm"
+          :disable="toggleEnd"
           :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
-          :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
+          :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
+          @click="onToggleEnd">
 
           <EndCallIcon
             class="mr-2"
             color="#62666E" />
 
           <div class="text-body2 text-black">
-            {{ toggleEnd ? 'Ending Session' : 'End Session'}}
+            {{ toggleEnd ? 'Ending Session...' : 'End Session'}}
           </div>
         </q-btn>
       </div>
@@ -595,7 +597,7 @@ export default {
           return
         }
         if (!this.togglePause && !this.wrapUp) {
-          // this.runTask(task)
+          this.runTask(task)
         }
         if (this.wrapUp) {
           this.initialize()
