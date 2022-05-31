@@ -316,8 +316,7 @@
           v-else-if="`${contact[column.name] && contact[column.name] instanceof Object}`"
           class="text-left">
           <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-            <!-- {{ contact[column.name].name }} -->
-            {{ contact[column.name] }}
+             {{ contact[column.name].name }}
           </div>
         </div>
         <div
