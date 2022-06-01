@@ -80,7 +80,7 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
-          <span class="small text-muted selected-contacts mr-2">{{ totalCount }} Contacts</span>
+          <span class="small text-muted selected-contacts mr-2">{{ contactCount | numFormat }} Contacts</span>
 
           <div class="v-divider">
           </div>
@@ -167,13 +167,22 @@ import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TableRow from 'src/components/table-row.vue'
 import TextPopover from 'components/popover/text-popover'
-
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import {
+  contactsMixins,
+  aclMixin,
+  visibilityMixin,
+  contactListCountMixin
+} from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
 
 export default {
-  mixins: [contactsMixins],
+  mixins: [
+    contactsMixins,
+    aclMixin,
+    visibilityMixin,
+    contactListCountMixin
+  ],
 
   components: {
     ContactsFilters,
@@ -208,7 +217,8 @@ export default {
       filterHasChanges: false,
       listName: '',
       myContacts: false,
-      clicked: false
+      clicked: false,
+      contactCount: 0
     }
   },
 
@@ -220,12 +230,6 @@ export default {
         return this.listItems[this.id].data
       }
       return []
-    },
-    totalCount () {
-      if (this.listItems[this.id]) {
-        return this.listItems[this.id].total
-      }
-      return 0
     },
     currentPage () {
       if (this.listItems[this.id]) {
@@ -330,7 +334,7 @@ export default {
             this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           }
           this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added')
+          this.$generalNotification('Selected contacts were successfully added.')
         })
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)
@@ -434,21 +438,25 @@ export default {
     onPagination (params) {
       this.checked = []
       this.onPaginate(params)
+    },
+    setDataCount (data, updatePinned = false) {
+      if (!data) {
+        return
+      }
+      this.getListDataCount({ filters: data }).then(response => {
+        this.contactCount = response.data.count
+      })
     }
   },
   mounted () {
     this.listName = ''
     this.fetch()
+    this.setDataCount([])
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.setDataCount)
   },
   watch: {
     '$route.params.id': function () {
       this.fetch()
-    },
-    currentListFilters: {
-      deep: true,
-      handler: function () {
-        this.fetch(this.currentListFilters)
-      }
     },
     checkedItemIds: function (value) {
       if (this.isContactModule) {

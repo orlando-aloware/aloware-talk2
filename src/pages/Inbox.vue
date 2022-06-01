@@ -19,15 +19,24 @@
 import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
+import {
+  contactMixin,
+  inboxMixin,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
-import { inboxMixin } from 'src/plugins/mixins'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox',
 
-  mixins: [contactMixins, inboxMixin],
+  mixins: [
+    contactMixin,
+    inboxMixin,
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: { Contact, InboxSide },
 

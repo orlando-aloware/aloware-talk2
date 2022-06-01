@@ -13,6 +13,27 @@
         </div>
 
         <q-btn
+          class="sessions-button free-width mx-1"
+          no-wrap no-caps size="sm"
+          unelevated
+          outline
+          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
+          :disabled="!statusCallConnected"
+          @click="onToggleMute">
+          <mute-icon v-show="!toggleMute"
+                     class="mr-2"
+                     :width="12"
+                     :height="12"></mute-icon>
+          <unmute-icon v-show="toggleMute"
+                       class="mr-2"
+                       :width="12"
+                       :height="12"></unmute-icon>
+          <div class="text-body2 text-black">
+            {{ toggleMute ? 'Unmute' : 'Mute' }}
+          </div>
+        </q-btn>
+
+        <q-btn
           @click="onToggleHold"
           no-wrap no-caps size="sm"
           unelevated
@@ -193,18 +214,20 @@
         </q-btn>
 
         <q-btn
-          @click="onToggleEnd"
+
           no-wrap outline no-caps
           size="sm"
+          :disable="toggleEnd"
           :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
-          :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`">
+          :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
+          @click="onToggleEnd">
 
           <EndCallIcon
             class="mr-2"
             color="#62666E" />
 
           <div class="text-body2 text-black">
-            {{ toggleEnd ? 'Ending Session' : 'End Session'}}
+            {{ toggleEnd ? 'Ending Session...' : 'End Session'}}
           </div>
         </q-btn>
       </div>
@@ -230,7 +253,7 @@
 
 <script>
 
-import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
 import TransferIcon from 'components/icons/transfer-icon-2'
@@ -249,10 +272,14 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import sessionsMixins from 'src/plugins/mixins/sessions-call-status'
 import { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
+import MuteIcon from 'components/icons/mute-icon'
+import UnmuteIcon from 'components/icons/unmute-icon'
 
 export default {
   name: 'SessionCallStatus',
   components: {
+    MuteIcon,
+    UnmuteIcon,
     CalendarIcon,
     TransferIcon,
     DialPadIcon,
@@ -428,8 +455,7 @@ export default {
     },
     getTimeZone () {
       let timezone = this.taskToCall?.timezone
-      const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('HH:mm')
-      return contactLocalTime
+      return moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('hh:mm A')
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
@@ -481,12 +507,13 @@ export default {
   },
 
   created () {
+    this.ongoingSession.listId = this.$route.params.id
     this.resetSession()
 
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
     }
-    if (this.campaings) {
+    if (this.campaigns) {
       this.findDefaultOutboundCampaign()
     }
     this.$VueEvent.listen('initiate_session', (session) => {
@@ -681,10 +708,8 @@ export default {
       }
     },
     resetTimer () {
-      if (this.wrapUp) {
-        this.countdownTimer = this.wrapUpSeconds
-      } else {
-        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
+      if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
+        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
       }
     },
     reRoute (isForced = false) {

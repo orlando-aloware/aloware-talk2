@@ -1620,9 +1620,7 @@ export default {
     })
 
     const setDataCount = _.debounce((filters) => {
-      if (filters && filters.length) {
-        this.setDataCount(filters)
-      }
+      this.setDataCount(filters)
     }, 100)
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', setDataCount)

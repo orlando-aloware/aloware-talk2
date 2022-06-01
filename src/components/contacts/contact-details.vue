@@ -59,12 +59,20 @@ import ContactSaveBar from 'components/contacts/contact-save-bar'
 import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
-import { aclMixin, contact } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  contactMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'contact-details',
 
-  mixins: [contact, aclMixin],
+  mixins: [
+    contactMixin,
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: {
     ContactSequence,
@@ -118,6 +126,10 @@ export default {
       this.$VueEvent.listen('new_communication', communication => {
         // checks if the new comm is not from the current contact, then return
         if (communication.contact_id !== this.contactId) {
+          return
+        }
+
+        if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
           return
         }
 

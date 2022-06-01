@@ -45,13 +45,21 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import contactMixin from 'src/plugins/mixins/contact.mixin'
+import {
+  contactMixin,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'line-selector',
 
-  mixins: [contactMixin],
+  mixins: [
+    contactMixin,
+    aclMixin,
+    visibilityMixin
+  ],
 
   props: {
     campaignId: {

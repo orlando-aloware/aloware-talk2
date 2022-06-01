@@ -545,6 +545,22 @@ export const formatTime = (time, formatTo24Hr) => {
   return window.moment(time, 'HHmm').format(formatTo24Hr ? 'HH:mm' : 'hh:mm A')
 }
 
+export const utcToLocalizedMoment = (dt) => {
+  if (dt) {
+    if (window.timezone) {
+      return window.moment.utc(dt).tz(window.timezone)
+    } else {
+      return window.moment.utc(dt).local()
+    }
+  } else {
+    if (window.timezone) {
+      return window.moment.utc().tz(window.timezone)
+    } else {
+      return window.moment.utc().local()
+    }
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     dateTimePassed,
@@ -568,7 +584,8 @@ export default ({ Vue }) => {
     fixFullDateLocal,
     fixFullDateUTCRelative,
     fixCommunicationDateTime,
-    formatTime
+    formatTime,
+    utcToLocalizedMoment
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

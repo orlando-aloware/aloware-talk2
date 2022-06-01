@@ -1218,7 +1218,10 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { communicationInfoMixin, notificationMixin } from 'src/plugins/mixins'
+import {
+  communicationInfoMixin,
+  notificationMixin
+} from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import PersonIcon from 'components/icons/person-icon'

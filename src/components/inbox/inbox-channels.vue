@@ -159,13 +159,15 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, communicationMixin, dateMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  dateMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/inbox/channel-tasks/task-list'
 import * as Filters from 'src/constants/filters'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as CommunicationDirections from 'src/constants/communication-direction'
 import CompactBtn from 'components/compact-btn'
 import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import * as MentionType from 'src/constants/mention-type'
@@ -180,7 +182,11 @@ import UserSelector from 'components/generic-selectors/user-selector'
 export default {
   name: 'inbox-channels',
 
-  mixins: [ aclMixin, communicationMixin, dateMixin ],
+  mixins: [
+    aclMixin,
+    dateMixin,
+    visibilityMixin
+  ],
 
   components: {
     UserSelector,
@@ -356,7 +362,6 @@ export default {
       filter: null,
       clonedFilter: null,
       previousRoute: null,
-      searchFields: ['contact.name', 'contact.phone_number'],
       currentPage: 0,
       isLoadingMore: false,
       isLoaded: false,
@@ -504,189 +509,6 @@ export default {
         default:
           return true
       }
-    },
-
-    checkCommunicationMatchesFilters (communication) {
-      // if answer status filter is other than all
-      if (this.filter.answer_status !== 'all') {
-        // handle live & hold as a special case
-        if (['live', 'hold', 'queued'].includes(this.filter.answer_status) &&
-            communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          return false
-        }
-        // check the communication disposition status matches the answer status filter
-        if (this.filter.answer_status === 'answered' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          return false
-        }
-        if (this.filter.answer_status === 'unanswered' &&
-            ![CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW,
-              CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(communication.disposition_status2)) {
-          return false
-        }
-        if (this.filter.answer_status === 'missed' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
-          return false
-        }
-        if (this.filter.answer_status === 'abandoned' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
-          return false
-        }
-        if (this.filter.answer_status === 'in-progress' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
-          return false
-        }
-        if (this.filter.answer_status === 'failed' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
-          return false
-        }
-        if (this.filter.answer_status === 'deadend' && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
-          return false
-        }
-      }
-      // if campaign filter is selected
-      if (this.filter.campaigns.length > 0) {
-        // check the communication campaign matches the campaign filter
-        if (this.filter.campaigns.indexOf(communication.campaign_id) < 0) {
-          return false
-        }
-      }
-      // if workflow filter is selected
-      if (this.filter.workflows.length > 0) {
-        // check the communication campaign matches the campaign filter
-        if (this.filter.workflows.indexOf(communication.workflow_id) < 0) {
-          return false
-        }
-      }
-      // if user filter is selected
-      if (this.filter.users.length > 0) {
-        // check the communication user matches the user filter
-        if (this.filter.users.indexOf(communication.user_id) < 0) {
-          return false
-        }
-      }
-      // if user filter is selected
-      if (this.filter.users.length > 0) {
-        // check the communication user matches the user filter
-        if (this.filter.users.indexOf(communication.owner_id) < 0) {
-          return false
-        }
-      }
-      // if number filter is selected
-      if (this.filter.incoming_numbers.length > 0) {
-        // check the communication number matches the number filter
-        if (this.filter.incoming_numbers.indexOf(communication.incoming_number_id) < 0) {
-          return false
-        }
-      }
-      // if ring groups filter is selected
-      if (this.filter.ring_groups.length > 0) {
-        // check the communication ring group matches the ring group filter
-        if (this.filter.ring_groups.indexOf(communication.ring_group_id) < 0) {
-          return false
-        }
-      }
-      // if direction filter is selected
-      if (this.filter.direction !== 'all') {
-        // check the communication direction matches the direction filter
-        if (this.filter.direction === 'inbound' && communication.direction !== CommunicationDirections.INBOUND) {
-          return false
-        } else if (this.filter.direction === 'outbound' && communication.direction !== CommunicationDirections.OUTBOUND) {
-          return false
-        }
-      }
-      // checks first time conversations filter is selected and matches the communication
-      if (this.filter.first_time_only && !communication.first_time_caller) {
-        return false
-      }
-      // checks date range filter matches communication start time
-      if (this.filter.from_date && this.filter.to_date && !this.utcToLocalizedMoment(communication.created_at).isBetween(this.filter.from_date, this.filter.to_date)) {
-        return false
-      }
-      // checks min talk time filter matches communication talk time
-      if (this.filter.min_talk_time > communication.talk_time) {
-        return false
-      }
-      // if type of communication filter is selected
-      if (this.filter.type !== 'all') {
-        // check type of communication matches the type of communication filter
-        if (this.filter.type === 'call' && communication.type !== CommunicationTypes.CALL) {
-          return false
-        } else if (this.filter.type === 'sms' && communication.type !== CommunicationTypes.SMS) {
-          return false
-        }
-      }
-      // checks tags filter matches communication tags
-      if (this.filter.tags.length > 0 && communication.tags.length <= 0) {
-        return false
-      }
-      // checks untagged only filter matches communication tags
-      if (this.filter.untagged_only && communication.tags.length > 0) {
-        return false
-      }
-
-      return true
-    },
-
-    checkCommunicationMatchesRingGroup (communication) {
-      // checks if communication belongs to this ring group
-      if (this.ringGroupId) {
-        if (communication.ring_group_id !== this.ringGroupId) {
-          return false
-        }
-      }
-
-      return true
-    },
-
-    checkCommunicationMatchesCampaign (communication) {
-      // checks if communication belongs to this campaign
-      if (this.campaignId) {
-        if (communication.campaign_id !== this.campaignId) {
-          return false
-        }
-      }
-
-      return true
-    },
-
-    checkCommunicationMatchesUser (communication) {
-      // checks if communication belongs to this user
-      if (this.userId) {
-        if (communication.user_id && communication.user_id !== this.userId) {
-          return false
-        }
-        // check if we have tried to call this user
-        if (!communication.user_id && communication.target_users && !communication.target_users.find(userId => userId === this.userId)) {
-          return false
-        }
-      }
-
-      return true
-    },
-
-    checkCommunicationMatchesWorkflow (communication) {
-      // checks if communication belongs to this workflow
-      if (this.workflowId) {
-        if (communication.workflow_id !== this.workflowId) {
-          return false
-        }
-      }
-
-      return true
-    },
-
-    checkCommunicationMatchesSearch (communication) {
-      // checks if communication matches search
-      if (this.searchText && this.searchText.trim().length > 0) {
-        const searchField = { data: null }
-        for (searchField.data of this.searchFields) {
-          if (communication[searchField.data]) {
-            if (communication[searchField.data].toString().indexOf(this.searchText) > -1) {
-              return true
-            }
-          }
-        }
-
-        return false
-      }
-
-      return true
     },
 
     getCommunications (params) {
@@ -1050,13 +872,13 @@ export default {
         }
 
         if (this.checkCommunicationChannels(data) &&
-          this.checkCommunicationMatchesSearch(data) &&
-          this.checkCommunicationMatchesFilters(data) &&
+          this.checkCommunicationMatchesSearch(this.searchText, data) &&
+          this.checkCommunicationMatchesFilters(this.filter, data) &&
           this.checkCommunicationMatchesUserAccessibility(data) &&
-          this.checkCommunicationMatchesCampaign(data) &&
-          this.checkCommunicationMatchesWorkflow(data) &&
-          this.checkCommunicationMatchesUser(data) &&
-          this.checkCommunicationMatchesRingGroup(data)) {
+          this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+          this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+          this.checkCommunicationMatchesUser(this.userId, data) &&
+          this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
           this.pagination.total += 1
           // push new data to top of array
           this.communications.unshift(data)
@@ -1081,13 +903,13 @@ export default {
           // update communication
           data = _.extend({}, found[0], data)
           if (this.checkCommunicationChannels(data) &&
-            this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesSearch(this.searchText, data) &&
+            this.checkCommunicationMatchesFilters(this.filter, data) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
-            this.checkCommunicationMatchesRingGroup(data)) {
+            this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+            this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+            this.checkCommunicationMatchesUser(this.userId, data) &&
+            this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
             this.$set(this.communications, this.communications.indexOf(found[0]), data)
           } else {
             this.communications = this.communications.filter(communication => {
@@ -1098,12 +920,12 @@ export default {
         } else {
           // add the communication if it's not already there and if it matches the criteria
           if (this.checkCommunicationChannels(data) &&
-            this.checkCommunicationMatchesSearch(data) &&
-            this.checkCommunicationMatchesFilters(data) &&
+            this.checkCommunicationMatchesSearch(this.searchText, data) &&
+            this.checkCommunicationMatchesFilters(this.filter, data) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(data) &&
-            this.checkCommunicationMatchesWorkflow(data) &&
-            this.checkCommunicationMatchesUser(data) &&
+            this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+            this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+            this.checkCommunicationMatchesUser(this.userId, data) &&
             this.pagination.prev === null &&
             this.communications.length > 0 &&
             data.id > this.communications[0].id) {

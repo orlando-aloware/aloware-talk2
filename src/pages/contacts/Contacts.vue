@@ -59,7 +59,11 @@ import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
 import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import contactsMixins from 'src/plugins/mixins/contacts.mixin'
+import {
+  contactsMixins,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Contact from 'pages/contacts/Contact'
 
@@ -73,7 +77,9 @@ export default {
   },
 
   mixins: [
-    contactsMixins
+    contactsMixins,
+    aclMixin,
+    visibilityMixin
   ],
 
   components: {

@@ -237,6 +237,10 @@ export default {
     }
 
     this.$VueEvent.listen('new_communication', (data) => {
+      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+        return
+      }
+
       this.addNewCommunication(data)
       if (data.contact_id === this.contact.id) {
         talk2Api.V2.contacts.get(this.contact.id).then(response => {
@@ -246,6 +250,10 @@ export default {
     })
 
     this.$VueEvent.listen('update_communication', (data) => {
+      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
+        return
+      }
+
       this.updateCommunication(data)
     })
 
@@ -527,6 +535,9 @@ export default {
             this.scrollMessages()
             this.loadingContactCommunications = false
           }
+        }).catch(error => {
+          this.$handleErrors(error.response)
+          this.loadingContactCommunications = false
         })
       } else { // we found the activity, scroll to it
         this.scrollIntoActivity()

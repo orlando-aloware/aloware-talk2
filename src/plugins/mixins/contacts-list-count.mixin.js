@@ -4,11 +4,11 @@ export default {
   methods: {
     getListDataCount (data) {
       return this.$axios.get(`api/v2/contacts/count`, {
-        params: this.buildQueryString(typeof data.filters === 'object' ? data.filters : JSON.parse(data.filters)),
+        params: this.getQueryString(typeof data.filters === 'object' ? data.filters : JSON.parse(data.filters)),
         paramsSerializer: qs.stringify
       })
     },
-    buildQueryString (filters) {
+    getQueryString (filters) {
       const query = {}
 
       const keys = Object.keys(filters)

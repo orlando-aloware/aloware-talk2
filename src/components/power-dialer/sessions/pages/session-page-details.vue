@@ -18,30 +18,32 @@
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div
-              class="text-18 text-weight-medium">
+              class="text-subtitle1 text-weight-medium">
               Scripts
             </div>
           </q-card-section>
         </q-card>
 
-        <DetailsLeads
-          :resources="scripts" />
-
+        <DetailsScripts :resources="scripts" />
       </div>
 
       <div
         class="col-4 p-1 px-2"
         style="height:70vh;">
-        <q-card flat class="p-3">
+        <q-card v-if="isHubspotEnabled && hubspotLink"
+                flat
+                class="p-3">
           <q-card-section class="p-0">
-            <div class="text-18 text-weight-medium">
+            <b-link class="text-weight-medium text-decoration-none"
+                    target="_blank"
+                    :href="hubspotLink">
               <HubSpotIcon />
-              Open in HubSpot
-            </div>
+              <span class="session-integration-title ml-1">Open in HubSpot</span>
+            </b-link>
           </q-card-section>
         </q-card>
 
-        <DetailsContactInfo
+        <DetailsContactInfomation
           v-if="contact"
           :resources="contact" />
 
@@ -61,27 +63,36 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
-import DetailsLeads from './details-scripts'
-import DetailsContactInfo from './details-contact-information'
+import { mapGetters, mapState } from 'vuex'
+import DetailsScripts from './details-scripts'
+import DetailsContactInfomation from './details-contact-information'
 import DetailsTools from './details-tools'
 import HubSpotIcon from 'components/icons/hubspot-icon'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'SessionPageDetails',
+
+  mixins: [hubspotIntegrationMixin],
+
   components: {
-    DetailsLeads,
-    DetailsContactInfo,
+    DetailsScripts,
+    DetailsContactInfomation,
     DetailsTools,
     HubSpotIcon
   },
+
   computed: {
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('contacts', [
       'contact'
     ]),
     ...mapGetters('powerDialer', [
       'sessionLoader'
-    ])
+    ]),
+    hubspotLink () {
+      return this.getHubspotLink(this.contact)
+    }
   },
   data () {
     return {

@@ -223,6 +223,15 @@
       </td>
 
       <td
+        v-else-if="['task_status', 'task_status_name'].includes(column.name)"
+        class="text-left"
+        :key="column.name">
+        <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
+          {{ contact.task_status_name }}
+        </div>
+      </td>
+
+      <td
         v-else-if="column.name === 'actions'"
         class="text-left datatable-row__actions"
         :key="column.name">
@@ -307,8 +316,7 @@
           v-else-if="`${contact[column.name] && contact[column.name] instanceof Object}`"
           class="text-left">
           <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-            <!-- {{ contact[column.name].name }} -->
-            {{ contact[column.name] }}
+             {{ contact[column.name].name }}
           </div>
         </div>
         <div

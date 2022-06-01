@@ -187,15 +187,21 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import contactMixin from 'src/plugins/mixins/contact.mixin'
-import timezoneCheckMixin from 'src/plugins/mixins/timezone-check.mixin'
+import {
+  contactMixin,
+  timezoneCheckMixin,
+  visibilityMixin,
+  aclMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
 
   mixins: [
     contactMixin,
-    timezoneCheckMixin
+    timezoneCheckMixin,
+    visibilityMixin,
+    aclMixin
   ],
 
   components: {

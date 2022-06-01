@@ -36,9 +36,18 @@
 import Avatar from 'components/avatar'
 import { mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import {
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'contact-list-sidebar-item',
+
+  mixins: [
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: { Avatar },
 
@@ -74,6 +83,10 @@ export default {
   created () {
     this.$VueEvent.listen('new_communication', (data) => {
       if (this.$route.name !== 'Contact') {
+        return
+      }
+
+      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
 

@@ -571,7 +571,7 @@ export default {
     this.$VueEvent.listen('export_event_update', (task) => {
       console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
       this.$generalNotification(
-        `Your export is now available. You can now download the file <b><a href="https://app.alodev.org/download/${task.export.uuid}" download>here</a></b>.`,
+        `Your export is now available. Click <b><a href="${process.env.API_URL}/download/${task.export.uuid}" download>here</a></b> to download the file.`,
         'success',
         0,
         true
@@ -883,7 +883,7 @@ export default {
       talk2Api.V2.powerDialerListItem.add(params).then(res => {
         this.setShouldUpdateSelectedListContactCount(true)
         this.onFetch()
-        this.$generalNotification('Selected contacts were successfully added')
+        this.$generalNotification('Selected contacts were successfully added.')
       })
     },
     onDeleteContact (data) {

@@ -82,6 +82,11 @@
                          class="live-call-badge d-flex justify-center align-items-center position-absolute"
                          pill></b-badge>
               </div>
+              <q-tooltip anchor="bottom start"
+                         self="center start"
+                         :offset="[7, 18]">
+                See most recent communication with contacts you have visibility over
+              </q-tooltip>
             </div>
           </template>
 
@@ -173,7 +178,11 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
-import { inboxMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  inboxMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
@@ -186,7 +195,11 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 export default {
   name: 'inbox-tab',
 
-  mixins: [inboxMixin],
+  mixins: [
+    aclMixin,
+    inboxMixin,
+    visibilityMixin
+  ],
 
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
@@ -662,6 +675,11 @@ export default {
         return
       }
 
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+        !this.checkCommunicationMatchesUserAccessibility(communication)) {
+        return
+      }
+
       setTimeout(() => {
         talk2Api.V2.contacts.get(communication.contact_id).then(response => {
           const contact = response.data
@@ -756,6 +774,11 @@ export default {
 
       // do not alter when contact is in live call and live comm is different from the one in the dialer
       if (this.dialer.contact && this.dialer.communication && communication.contact_id === this.dialer.contact.id && this.dialer.communication.id !== communication.id) {
+        return
+      }
+
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+        !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
 

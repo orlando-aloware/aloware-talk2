@@ -111,7 +111,8 @@
                       right size="xs"
                       variant="white"
                       ref="dropdown"
-                      class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top">
+                      class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top"
+                      :disabled="isMoving || isDeleting">
 
                       <template #button-content>
                         <i class="fa fa-ellipsis-h"></i>
@@ -163,7 +164,10 @@
                       ref="returnToQueue">
                       <q-btn
                         @click="moveTask(itm, moveDirection.top)"
-                        size="xs" flat round>
+                        size="xs"
+                        flat
+                        round
+                        :disabled="isMoving || isDeleting">
                         <q-avatar size="15px">
                           <!-- <img src="icons/refresh-call.png"> -->
                           <ContactInQueue />
@@ -358,6 +362,7 @@ export default {
         })
     },
     async moveTask (item = {}, direction = this.moveDirection.top) {
+      this.isMoving = true
       const res = await this.moveContactItems({
         id: this.selectedList.id,
         params: {
@@ -373,11 +378,14 @@ export default {
         })
         this.powerDialerTasks['in_queue'] = res.data.data
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
+        this.isMoving = false
       } else {
         this.$generalNotification(`Unable to move item to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'error')
+        this.isMoving = false
       }
     },
     async onDeleteTask (data) {
+      this.isDeleting = true
       return this.$axios
         .delete(
           `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${data.contact_list_item_id}`
@@ -389,9 +397,11 @@ export default {
           })
           this.powerDialerTasks['in_queue'] = response.data.data
           this.$generalNotification(res.data.message)
+          this.isDeleting = false
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
+          this.isDeleting = false
         })
     },
     async loadMore (key) {
@@ -491,7 +501,9 @@ export default {
         scheduled: false,
         all: false
       },
-      itemsPerPage: 20
+      itemsPerPage: 20,
+      isMoving: false,
+      isDeleting: false
     }
   }
 }

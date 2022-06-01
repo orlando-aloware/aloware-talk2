@@ -78,10 +78,14 @@ import RemoveListConfirmation from 'components/remove-list-confirmation'
 import RemoveContact from 'components/remove-contact'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import ColumnHeaders from 'components/column-headers'
-import powermixin from 'src/plugins/mixins/power-dialer'
-import ContactsMixins from 'src/plugins/mixins/contacts.mixin'
-import pdMixin from 'src/plugins/mixins/power-dialer-init.mixin'
-import sessionsMixins from 'src/plugins/mixins/sessions-engine'
+import {
+  powerDialerMixin,
+  contactsMixins,
+  powerDialerInitMixin,
+  sessionsEngineMixin,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 // import { get } from 'lodash'
@@ -101,10 +105,12 @@ export default {
     CreateListModal
   },
   mixins: [
-    powermixin,
-    ContactsMixins,
-    pdMixin,
-    sessionsMixins
+    powerDialerMixin,
+    contactsMixins,
+    powerDialerInitMixin,
+    sessionsEngineMixin,
+    aclMixin,
+    visibilityMixin
   ],
   provide () {
     return {

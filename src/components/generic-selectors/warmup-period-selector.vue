@@ -2,16 +2,17 @@
   <q-select
     class="padded-container"
     options-selected-class="text-primary"
-    ref="warmupPeriod"
-    :options="warmups"
     option-label="text"
     option-value="value"
+    dense
+    outlined
+    ref="warmupPeriod"
+    :options="warmups"
     :disable="disable"
     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-    v-model="localValue"
     :emit-value="true"
     :display-value="`${localValue === '0' || localValue === 0 ? 'No Warm Up' : localValue + ' seconds'}`"
-    outlined
+    v-model="localValue"
     @popup-show="onShowWarmUpMenu">
   </q-select>
 </template>

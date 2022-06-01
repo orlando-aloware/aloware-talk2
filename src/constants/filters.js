@@ -41,6 +41,7 @@ export const DEFAULT_STATE = {
     mentioner_user_id: [],
     mentioned_user_id: [],
     owner_id: [],
+    owners: [],
     my_contact: 0,
     contact_owner: [],
     creator_type: null

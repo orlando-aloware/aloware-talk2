@@ -7,7 +7,9 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-card>
-    <q-card flat :disabled="sessionLoader" class="t-scroll-y1 mt-1 p-0 py-0">
+    <q-card flat
+            class="mt-1 p-0 py-0 session-contact-info-scroller"
+            :disabled="sessionLoader">
       <q-card-section class="p-0">
         <ContactInfo
           :has-expanded="false" />
@@ -64,7 +66,7 @@ import ContactInfo from 'components/contacts/contact-information'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 
 export default {
-  name: 'DetailsForm',
+  name: 'DetailsContactInformation',
   props: {
     resources: {
       type: Object,

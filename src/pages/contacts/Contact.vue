@@ -80,7 +80,11 @@
 <script>
 import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
-import contactMixins from 'src/plugins/mixins/contact.mixin'
+import {
+  contactMixin,
+  aclMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
@@ -90,7 +94,11 @@ import _ from 'lodash'
 export default {
   name: 'contact',
 
-  mixins: [contactMixins],
+  mixins: [
+    contactMixin,
+    aclMixin,
+    visibilityMixin
+  ],
 
   components: {
     CloseIcon,
@@ -158,7 +166,8 @@ export default {
     this.$VueEvent.listen('contact_updated', (data) => {
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
+      const contactId = parseInt(data.id)
+      if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
         talk2Api.V2.contacts.get(data.id).then(response => {
           const contact = response.data
           // check data loaded
@@ -230,6 +239,10 @@ export default {
 
   beforeRouteUpdate () {
     this.leaving = false
+  },
+
+  beforeDestroy () {
+    this.setContact({})
   },
 
   beforeRouteLeave (to, from, next) {
