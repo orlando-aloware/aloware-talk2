@@ -166,7 +166,8 @@ export default {
     this.$VueEvent.listen('contact_updated', (data) => {
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
+      const contactId = parseInt(data.id)
+      if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
         talk2Api.V2.contacts.get(data.id).then(response => {
           const contact = response.data
           // check data loaded
