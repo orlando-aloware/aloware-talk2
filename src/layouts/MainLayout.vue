@@ -1155,7 +1155,7 @@ export default {
         this.loadingUsers = true
         this.setUsersIsLoading(true)
         return this.$axios
-          .get('/api/v1/user', {
+          .get('/api/v2/users', {
             mode: 'no-cors'
           })
           .then((res) => {
