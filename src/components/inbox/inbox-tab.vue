@@ -651,6 +651,8 @@ export default {
           this.setSelectedContact(contact)
           // this.setContact(contact)
           this.updateContacts(contact)
+        }).catch(err => {
+          console.log(err)
         })
       }
     }
@@ -763,6 +765,8 @@ export default {
               }
             }
           }
+        }).catch(err => {
+          console.log(err)
         })
       }, 1000)
     }

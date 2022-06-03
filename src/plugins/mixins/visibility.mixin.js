@@ -480,6 +480,16 @@ export default {
       }
 
       return true
+    },
+
+    checkContactMatchesUserAccessibility (contact) {
+      // check auth exists to prevent js errors
+      if (!this.profile) {
+        return false
+      }
+
+      // checks if contact matches user visibility
+      return contact.user_id === this.profile.id
     }
   }
 }

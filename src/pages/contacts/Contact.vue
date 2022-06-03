@@ -172,6 +172,8 @@ export default {
           const contact = response.data
           // check data loaded
           this.setContact(contact)
+        }).catch(err => {
+          console.log(err)
         })
       }
     })
