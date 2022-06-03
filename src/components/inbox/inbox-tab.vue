@@ -570,7 +570,6 @@ export default {
       }
     },
     onRouteNameChange () {
-      console.log(this.$route.name)
       this.currentTask = ContactTaskStatus.STATUS_OPEN
       this.resetList()
     }
