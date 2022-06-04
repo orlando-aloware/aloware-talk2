@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 export default {
@@ -95,8 +96,15 @@ export default {
       this.$emit('close')
     },
     getContact () {
-      talk2Api.V1.contact.get(this.contact.id).then(response => {
-        if (response.data.id === this.contact.id) {
+      const contactId = _.get(this.contact, 'id', null)
+
+      if (!contactId) {
+        console.log('Failed to fetch contact: Missing contact id!')
+        return
+      }
+
+      talk2Api.V1.contact.get(contactId).then(response => {
+        if (response.data.id === contactId) {
           this.setContact(response.data)
         }
       })

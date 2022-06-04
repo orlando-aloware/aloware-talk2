@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
@@ -137,9 +138,17 @@ export default {
             this.contactToRemove.id
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
-          url.data = `/api/v2/contacts/${this.contactToRemove.id}`
+          const contactId = _.get(this.contactToRemove, 'id', null)
+
+          if (!contactId) {
+            console.log('Failed to remove contact: Missing contact id!')
+            return
+          }
+
+          url.data = `/api/v2/contacts/${contactId}`
           break
       }
+
       this.isBusy = true
       return this.$axios
         .delete(

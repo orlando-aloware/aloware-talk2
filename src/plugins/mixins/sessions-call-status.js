@@ -88,6 +88,11 @@ export default {
     },
 
     async fetchContact (taskId = null) {
+      if (!taskId) {
+        this.isSessionRunning = false
+        return
+      }
+
       this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: taskId })
       if (!this.isSessionRunning) {
@@ -139,6 +144,10 @@ export default {
     },
 
     skipSingleTask (autoDialTask, message, skipTask = false) {
+      if (!autoDialTask.contact_list_item_id) {
+        return
+      }
+
       this.loading_skip = true
       return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
         .then(res => {

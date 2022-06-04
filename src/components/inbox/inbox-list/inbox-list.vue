@@ -63,7 +63,6 @@ export default {
           contacts.push(contact.data)
         }
         this.contacts = _.union(this.contacts, contacts)
-        console.log(this.contacts)
         this.pagination = _.clone(res.data)
         delete this.pagination.data
         this.paginationLoading = false
