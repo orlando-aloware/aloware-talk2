@@ -1,5 +1,6 @@
 import qs from 'qs'
 import moment from 'moment'
+import _ from 'lodash'
 export default {
   /**
    * Actual API Calls for
@@ -47,7 +48,14 @@ export default {
     commit('SET_MY_QUEUE_LIST_FILTERS', data)
   },
   getContact: async ({ commit }, params = {}) => {
-    let res = await window.axios.get(`api/v2/contacts/${params.id}`)
+    const contactId = _.get(params, 'id', null)
+
+    if (!contactId) {
+      console.log('Failed to get contact: Missing contact id!')
+      return
+    }
+
+    let res = await window.axios.get(`api/v2/contacts/${contactId}`)
     if (res.status === 200) {
       commit('contacts/SET_CONTACT', res.data, { root: true })
       return res.data
@@ -213,7 +221,7 @@ export default {
     // let res = await window.axios.get(`api/v2/power-dialer-lists/${params.id}/itemspage=1&per_page=25&sort_order=desc&task_status=${params.taks_status}`)
     // let endpoint = params?.task_status ? `api/v2/power-dialer-lists/${params.id}/items?task_status=${params.task_status}` : `api/v2/power-dialer-lists/${params.id}/items`
     let res = await window.axios.get(
-      `api/v2/power-dialer-lists/${params.id}/items`,
+      `api/v2/power-dialer-lists/${params.id === 'all' ? 'my-queue' : params.id}/items`,
       {
         params,
         paramsSerializer: qs.stringify

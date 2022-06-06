@@ -721,6 +721,8 @@ export default {
             const contact = response.data
             // check data loaded
             this.setSelectedContact(contact)
+          }).catch(err => {
+            console.log(err)
           })
         }
       }
@@ -782,6 +784,8 @@ export default {
                 ]
               )
             }
+          }).catch(err => {
+            console.log(err)
           })
         }, 1000)
       }
@@ -1155,7 +1159,7 @@ export default {
         this.loadingUsers = true
         this.setUsersIsLoading(true)
         return this.$axios
-          .get('/api/v1/user', {
+          .get('/api/v2/users', {
             mode: 'no-cors'
           })
           .then((res) => {

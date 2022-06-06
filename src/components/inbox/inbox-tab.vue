@@ -572,7 +572,6 @@ export default {
       }
     },
     onRouteNameChange () {
-      console.log(this.$route.name)
       this.currentTask = ContactTaskStatus.STATUS_OPEN
       this.resetList()
     }
@@ -653,6 +652,8 @@ export default {
           this.setSelectedContact(contact)
           // this.setContact(contact)
           this.updateContacts(contact)
+        }).catch(err => {
+          console.log(err)
         })
       }
     }
@@ -765,6 +766,8 @@ export default {
               }
             }
           }
+        }).catch(err => {
+          console.log(err)
         })
       }, 1000)
     }

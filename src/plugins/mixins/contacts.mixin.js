@@ -542,6 +542,8 @@ export default {
             if (this.contact.id === communication.contact_id) {
               this.setContact(response.data)
             }
+          }).catch(err => {
+            console.log(err)
           })
         }
       })

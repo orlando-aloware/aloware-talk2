@@ -270,6 +270,10 @@ export default {
   V2: {
     contacts: {
       get (id) {
+        if (!id) {
+          return Promise.reject(new Error('Failed to process contact fetch: Missing contact id!'))
+        }
+
         return window.axios.get(`/api/v2/contacts/${id}`)
       },
 

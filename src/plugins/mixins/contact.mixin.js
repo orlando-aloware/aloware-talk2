@@ -245,6 +245,9 @@ export default {
       if (data.contact_id === this.contact.id) {
         talk2Api.V2.contacts.get(this.contact.id).then(response => {
           this.setContact(response.data)
+          this.setContactClone(response.data)
+        }).catch(err => {
+          console.log(err)
         })
       }
     })
@@ -392,7 +395,14 @@ export default {
             this.loadingContact = false
             this.loadingContactCommunications = false
             this.$handleErrors(err.response)
-            this.$router.push({ path: '/contacts' })
+
+            if (this.$route.name.includes('Inbox')) {
+              this.$router.push({ name: 'Inbox' })
+            }
+
+            if (!this.$route.name.includes('Inbox')) {
+              this.$router.push({ path: '/contacts' })
+            }
           }
         })
       }

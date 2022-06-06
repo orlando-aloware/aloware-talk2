@@ -98,7 +98,7 @@ export default {
     }
   },
   mounted () {
-    console.log(this.selection, this.optionValue)
+    // console.log(this.selection, this.optionValue)
   }
 }
 </script>

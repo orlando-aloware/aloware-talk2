@@ -100,7 +100,7 @@ export default {
   methods: {
     ...mapActions('contacts', ['openFilters']),
     onSortByField (nextSorts) {
-      console.log(nextSorts)
+      // console.log(nextSorts)
     },
     onColumnsReordered (nextColumns) {
       this.columns = nextColumns
