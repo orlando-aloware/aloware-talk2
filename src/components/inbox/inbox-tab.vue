@@ -135,13 +135,23 @@
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
-        <inbox-task-list :contacts="contactTasks"
+        <inbox-task-list v-if="!taskListHasError"
+                         :contacts="contactTasks"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
                          @onItemRemoved="onItemRemoved"
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
+        <div v-if="taskListHasError"
+             class="text-center mt-5">
+          Unable to fetch contact tasks.
+          <br/>
+          <b-btn variant="primary"
+                 class="mt-3"
+                 size="sm"
+                 @click="loadContactTasks(false)">Retry</b-btn>
+        </div>
         <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
           <b-overlay :show="isLoadingMore || isFetchingContacts"
                      rounded="sm"

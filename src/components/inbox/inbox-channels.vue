@@ -141,9 +141,19 @@
             </template>
           </b-overlay>
         </div>
-        <div v-if="!communications.length && !isGettingTasksList && !isLoadingMore && !isSearch"
-             class="text-center">
-          No data found based on the given filter criteria</div>
+        <div v-if="!communications.length && !isGettingTasksList && !isLoadingMore && !isSearch && !communicationsListHasError"
+             class="text-center mt-3">
+          No data found based on the given filter criteria
+        </div>
+        <div v-if="communicationsListHasError"
+             class="text-center mt-3">
+          Unable to fetch {{ $route.params.channel !== 'mentions' ? 'communications' : 'mentions' }}.
+          <br/>
+          <b-btn variant="primary"
+                 class="mt-3"
+                 size="sm"
+                 @click="getCommunications(filter)">Retry</b-btn>
+        </div>
       </div>
       <filter-dialog v-model="filter"
                      :default-filter-model="channelDefaultFilterModel"
@@ -366,6 +376,7 @@ export default {
       isLoadingMore: false,
       isLoaded: false,
       isScrolled: false,
+      communicationsListHasError: false,
       pagination: {
         type: Object,
         required: true
@@ -440,7 +451,7 @@ export default {
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
-        this.filter.cursor = 1
+        this.filter.cursor = null
       }
 
       if (this.campaignId) {
@@ -511,8 +522,9 @@ export default {
       }
     },
 
-    getCommunications (params) {
+    getCommunications (params, callback) {
       this.gettingTasksList(true)
+      this.communicationsListHasError = false
 
       const api = { data: talk2Api.V1.reports.communications }
 
@@ -550,8 +562,17 @@ export default {
             this.isLoaded = true
             this.pagination = _.clone(response.data)
             delete this.pagination.data
+
+            if (typeof callback !== 'undefined') {
+              callback()
+            }
+          } else {
+            this.gettingTasksList(false)
+            this.communicationsListHasError = true
+            this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
           }
         }).catch(thrown => {
+          this.gettingTasksList(false)
           if (window.axios.isCancel(thrown) && thrown) {
             console.log('Request canceled', thrown.message)
           }
@@ -750,7 +771,7 @@ export default {
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
-        this.filter.cursor = 1
+        this.filter.cursor = null
       }
       this.filter.search_text = this.searchText
       this.isSearch = false
@@ -812,7 +833,7 @@ export default {
           if (this.$route.params.channel === 'mentions') {
             this.filter.page = 1
           } else {
-            this.filter.cursor = 1
+            this.filter.cursor = null
           }
           this.getCommunications(this.filter)
         }
@@ -1018,7 +1039,7 @@ export default {
       const communications = [...this.communications]
       if (['calls', 'messages', 'mentions', 'voicemails', 'recordings'].includes(this.$route.params.channel)) {
         if (this.$route.params.channel === 'mentions') {
-          communications.filter(item => item.mention_subject.contact.id === data.id).forEach((value) => {
+          communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
             value.mention_subject.contact = data
           })
         } else {
@@ -1031,24 +1052,24 @@ export default {
       }
     })
 
-    if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-      if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
-        const communication = { data: null }
-
-        if (this.$route.name === 'Inbox Contact Communication') {
-          communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
-        } else {
-          communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
-        }
-
-        if (communication.data) {
-          this.setSelectedCommunication(communication.data)
-        }
-      }
-    }
-
     if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
-      this.getCommunications(this.filter)
+      this.getCommunications(this.filter, () => {
+        if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
+          if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
+            const communication = { data: null }
+
+            if (this.$route.name === 'Inbox Contact Communication') {
+              communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
+            } else {
+              communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
+            }
+
+            if (communication.data) {
+              this.setSelectedCommunication(communication.data)
+            }
+          }
+        }
+      })
     }
   }
 }

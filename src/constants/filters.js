@@ -15,7 +15,7 @@ export const DEFAULT_STATE = {
     user_id: null,
     workflow_id: null,
     page: 1,
-    cursor: 1,
+    cursor: null,
     per_page: 20,
     checked_table_fields: null,
     first_time_only: 0,
