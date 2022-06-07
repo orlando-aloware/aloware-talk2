@@ -49,6 +49,7 @@ export default {
       },
       isLoadingMore: false,
       isLoaded: false,
+      taskListHasError: false,
       page: 1,
       perPage: 20,
       lineOrRingGroupFilter: null,
@@ -106,6 +107,7 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
     },
     loadContactTasks (loadCount = true, showLoading = true) {
+      this.taskListHasError = false
       if (showLoading) {
         this.gettingContactsList(true)
         this.setContacts([])
@@ -136,6 +138,12 @@ export default {
           this.setHasMoreContacts(response.data.next_page_url)
           this.isLoadingMore = false
           this.isLoaded = true
+        } else {
+          this.taskListHasError = true
+          if (showLoading) {
+            this.gettingContactsList(false)
+          }
+          this.$generalNotification(`An exception was encountered while fetching contact tasks.`, 'error')
         }
       })
     },

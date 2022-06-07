@@ -8,24 +8,41 @@
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
-    <div class="contact-activities">
-      <div class="inner-1">
-        <div class="inner-2 scrollbar-white"
-             ref="activitiesWrap">
-          <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center pt-2">
-            <slot name="moreActivities">
-            </slot>
+
+      <div class="contact-activities">
+        <b-overlay class="h-100 w-100"
+                   variant="white"
+                   rounded="sm"
+                   :show="loadingCommunications"
+                   :opacity="0.85">
+          <div class="inner-1">
+          <div class="inner-2 scrollbar-white"
+               ref="activitiesWrap">
+            <div class="d-flex flex-row w-100 pb-3 justify-content-center align-items-center pt-2">
+              <slot name="moreActivities">
+              </slot>
+            </div>
+            <contact-activity v-for="(communication, index) in communications"
+                              :key="communication.id + '-comm-' + index"
+                              :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
+                              :communication="communication"
+                              :contact="contact"
+                              :campaignId="campaignId">
+            </contact-activity>
           </div>
-          <contact-activity v-for="(communication, index) in communications"
-                            :key="communication.id + '-comm-' + index"
-                            :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
-                            :communication="communication"
-                            :contact="contact"
-                            :campaignId="campaignId">
-          </contact-activity>
         </div>
+          <template #overlay>
+            <div class="text-center">
+              <q-spinner-bars
+                color="primary"
+                size="2em"
+              />
+              <p id="cancel-label">Loading communications...</p>
+            </div>
+          </template>
+        </b-overlay>
       </div>
-    </div>
+
     <div class="composer-container-wrapper">
       <message-composer :campaignId="campaignId"></message-composer>
     </div>
@@ -53,6 +70,10 @@ export default {
     },
     campaignId: {
       required: false
+    },
+    loadingCommunications: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

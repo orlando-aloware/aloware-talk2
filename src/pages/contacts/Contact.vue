@@ -1,25 +1,28 @@
 <template>
-  <b-overlay :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || loadingContactCommunications || isEmptyContact"
-             :opacity="0.85"
+  <b-overlay v-if="authenticated"
              class="h-100 w-100"
              variant="white"
              rounded="sm"
-             v-if="authenticated">
+             :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || isEmptyContact"
+             :opacity="0.85"
+             >
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && tagsFullyLoaded && campaigns && users && tags">
-        <contact-activities ref="contactActivities"
+        <contact-activities v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
+                            ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
-                            v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
+                            :loadingCommunications="loadingContactCommunications"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
                             @toggleDetails="toggleDetails">
           <template v-slot:moreActivities>
-            <q-btn outline
+            <q-btn v-if="hasMoreCommunications"
+                   outline
                    dense
                    rounded
                    no-caps
@@ -28,7 +31,6 @@
                    size="md"
                    :loading="isLoadingPreviousActivities"
                    :disable="isLoadingPreviousActivities"
-                   v-if="hasMoreCommunications"
                    @click="loadMorePreviousActivities">
               <div class="px-2">
                 Previous Activities
@@ -40,7 +42,7 @@
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <contact-details v-if="!loadingContactCommunications && !changingSelectedContact && !isEmptyContact"
+        <contact-details v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
       </div>
@@ -62,7 +64,7 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer && !loadingContactCommunications && !changingSelectedContact && !isEmptyContact"></contact-details>
+        <contact-details v-if="drawer && !changingSelectedContact && !isEmptyContact"></contact-details>
       </q-drawer>
     </div>
     <template #overlay>
