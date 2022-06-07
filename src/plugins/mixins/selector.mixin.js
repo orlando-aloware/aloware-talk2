@@ -35,9 +35,9 @@ export default {
       data.id = this.getSelectedId(this.selectedId)
 
       if (this.compareProperty) {
-        let data = {}
-        data[this.textProperty] = ''
-        data[this.compareProperty] = data.id
+        this.textProperty !== 'id' && (data[this.textProperty] = '')
+        typeof this.selectedId === 'object' && (data[this.textProperty] = _.get(this.selectedId, this.textProperty, ''))
+        this.compareProperty !== 'id' && (data[this.compareProperty] = data.id)
         return data
       }
 
