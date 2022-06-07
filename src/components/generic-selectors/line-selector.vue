@@ -182,7 +182,8 @@ export default {
       selectedId: null,
       options: [],
       reference: 'lineSelect',
-      emitChange: true
+      emitChange: true,
+      fullOptionsProperty: 'activeCampaignsAlphabeticalOrder'
     }
   },
 

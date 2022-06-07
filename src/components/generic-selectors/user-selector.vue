@@ -183,7 +183,8 @@ export default {
       isFocused: false,
       selectedId: this.value,
       userOptions: [],
-      reference: 'userSelect'
+      reference: 'userSelect',
+      fullOptionsProperty: 'formattedOptions'
     }
   },
 

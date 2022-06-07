@@ -142,7 +142,8 @@ export default {
     return {
       selectedId: this.value,
       options: [],
-      reference: 'contactDispositionSelect'
+      reference: 'contactDispositionSelect',
+      fullOptionsProperty: 'contactDispositionsAlphabeticalOrder'
     }
   },
 

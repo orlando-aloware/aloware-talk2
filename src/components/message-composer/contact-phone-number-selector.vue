@@ -50,6 +50,9 @@ export default {
     },
     placeholder () {
       return ''
+    },
+    contactPhoneNumberOptions () {
+      return this.contact.phone_numbers
     }
   },
   data () {
@@ -63,7 +66,8 @@ export default {
       textProperty: 'phone_number',
       emitChange: true,
       emitChangeProperty: 'phone_number',
-      emitEvent: 'setSelectedPhone'
+      emitEvent: 'setSelectedPhone',
+      fullOptionsProperty: 'contactPhoneNumberOptions'
     }
   },
   methods: {
@@ -80,13 +84,13 @@ export default {
     filterFn (val, update) {
       if (val === '') {
         update(() => {
-          this.options = this.contact.phone_numbers
+          this.options = this.contactPhoneNumberOptions
         })
         return
       }
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.contact.phone_numbers.filter(v => v.phone_number && (v.phone_number.toLowerCase().indexOf(needle) > -1 || v.title.toLowerCase().indexOf(needle) > -1))
+        this.options = this.contactPhoneNumberOptions.filter(v => v.phone_number && (v.phone_number.toLowerCase().indexOf(needle) > -1 || v.title.toLowerCase().indexOf(needle) > -1))
       })
     },
 
@@ -130,7 +134,7 @@ export default {
   },
   mounted () {
     this.setPhone(this.contact.phone_number)
-    this.options = this.contact.phone_numbers
+    this.options = this.contactPhoneNumberOptions
     this.showInputPlaceholder()
   },
   watch: {
@@ -141,7 +145,7 @@ export default {
       }
     },
     'contact.id': function () {
-      this.options = this.contact.phone_numbers
+      this.options = this.contactPhoneNumberOptions
       this.selectedId = {}
       this.setPhone(this.contact.phone_number)
       this.showInputPlaceholder()

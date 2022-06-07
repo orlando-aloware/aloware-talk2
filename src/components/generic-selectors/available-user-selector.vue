@@ -116,7 +116,8 @@ export default {
       unavailableUsers: [],
       userOptions: [],
       reference: 'availableUserSelector',
-      selectWidth: 0
+      selectWidth: 0,
+      fullOptionsProperty: 'formattedOptions'
     }
   },
 

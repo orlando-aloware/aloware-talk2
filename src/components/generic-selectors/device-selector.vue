@@ -39,7 +39,8 @@ export default {
     return {
       selectedId: this.value,
       emitChange: true,
-      reference: 'device-selector'
+      reference: 'device-selector',
+      fullOptionsProperty: 'options'
     }
   },
   watch: {

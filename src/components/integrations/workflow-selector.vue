@@ -49,7 +49,8 @@ export default {
       workflows: [],
       options: this.workflowOptions,
       placeholder: 'Select workflow',
-      reference: 'workflowSelector'
+      reference: 'workflowSelector',
+      fullOptionsProperty: 'workflowOptions'
     }
   },
   methods: {

@@ -20,7 +20,9 @@ export default {
       emitEvent: 'change',
       alterFunction: null,
       isCheckEmit: false,
-      element: null
+      element: null,
+      referenceElement: null,
+      fullOptionsProperty: null
     }
   },
 
@@ -47,6 +49,11 @@ export default {
 
   mounted () {
     this.element = this.$el ? this.$el : document
+
+    if (this.referenceElement) {
+      this.element = this.$refs[this.referenceElement].$el
+    }
+
     if (!this.selectedObject) {
       this.clearInputValue()
     }
@@ -59,11 +66,16 @@ export default {
     },
 
     getSelectedIdData (id) {
-      const objectData = { found: null, id: null }
+      const objectData = { found: null, id: null, options: [] }
+
+      if (this.fullOptionsProperty) {
+        objectData.options = this[this.fullOptionsProperty]
+      }
+
       objectData.id = this.getSelectedId(id)
 
-      if (!_.isEmpty(this.options) && this.compareProperty && objectData.id) {
-        objectData.found = this.options.find(option => option[this.compareProperty] === objectData.id)
+      if (!_.isEmpty(objectData.options) && this.compareProperty && objectData.id) {
+        objectData.found = objectData.options.find(option => option[this.compareProperty] === objectData.id)
       }
 
       return objectData.found
