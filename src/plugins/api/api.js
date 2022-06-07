@@ -204,11 +204,7 @@ export default {
     reports: {
       communications: {
         get (params) {
-          return window.axios.get(`${suffixV1}reports/communications`, params).catch(function (thrown) {
-            if (window.axios.isCancel(thrown) && thrown) {
-              console.log(thrown.message)
-            }
-          })
+          return window.axios.get(`${suffixV1}reports/communications`, params)
         }
       }
     },
@@ -285,11 +281,6 @@ export default {
         ])
 
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
-          .catch(thrown => {
-            if (window.axios.isCancel(thrown) && thrown) {
-              console.log('Request canceled', thrown.message)
-            }
-          })
       },
       counts (params, cancelTokenSource) {
         return window.axios.get(`/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })

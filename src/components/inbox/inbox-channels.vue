@@ -566,15 +566,14 @@ export default {
             if (typeof callback !== 'undefined') {
               callback()
             }
+          }
+        }).catch(thrown => {
+          if (window.axios.isCancel(thrown) && thrown) {
+            console.log('Request canceled', thrown.message)
           } else {
             this.gettingTasksList(false)
             this.communicationsListHasError = true
             this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
-          }
-        }).catch(thrown => {
-          this.gettingTasksList(false)
-          if (window.axios.isCancel(thrown) && thrown) {
-            console.log('Request canceled', thrown.message)
           }
         })
     },

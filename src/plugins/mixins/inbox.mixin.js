@@ -127,6 +127,7 @@ export default {
         this.getContactsCountByTaskStatus(this.currentTask)
       }
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
+        this.taskListHasError = false
         if (response) {
           // only empty contacts after the request is done since we are now showing the animation
           if (!showLoading) {
@@ -138,6 +139,10 @@ export default {
           this.setHasMoreContacts(response.data.next_page_url)
           this.isLoadingMore = false
           this.isLoaded = true
+        }
+      }).catch((thrown) => {
+        if (window.axios.isCancel(thrown) && thrown) {
+          console.log(thrown.message)
         } else {
           this.taskListHasError = true
           if (showLoading) {
