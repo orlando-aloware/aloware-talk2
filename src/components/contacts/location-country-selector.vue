@@ -53,7 +53,8 @@ export default {
       compareProperty: 'code',
       reference: 'countrySelect',
       emitEvent: 'select',
-      emitChange: true
+      emitChange: true,
+      fullOptionsProperty: 'countries'
     }
   },
   computed: {

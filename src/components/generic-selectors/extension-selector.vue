@@ -121,7 +121,8 @@ export default {
       selectedId: this.value,
       options: [],
       reference: 'wrapUpSelector',
-      compareProperty: null
+      compareProperty: null,
+      fullOptionsProperty: 'availableExtensions'
     }
   },
 

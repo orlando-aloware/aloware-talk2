@@ -84,7 +84,8 @@ export default {
       options: [],
       loadingScripts: false,
       textProperty: 'title',
-      reference: 'scriptSelector'
+      reference: 'scriptSelector',
+      fullOptionsProperty: 'scriptsAlphabeticalOrder'
     }
   },
 

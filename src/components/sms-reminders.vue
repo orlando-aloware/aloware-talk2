@@ -87,7 +87,8 @@ export default {
       selectedId: this.campaignId,
       recentShowSendSmsReminderButton: false,
       options: [],
-      reference: 'smsReminders'
+      reference: 'smsReminders',
+      fullOptionsProperty: 'campaigns'
     }
   },
 
