@@ -75,7 +75,7 @@
 <script>
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import EnrollSequenceModal from 'components/enroll-sequence-modal'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 
@@ -86,6 +86,7 @@ export default {
 
   data () {
     return {
+      workflow: null,
       sequence: null,
       required: null,
       isBusy: false
@@ -97,6 +98,13 @@ export default {
       type: Object,
       required: true
     }
+  },
+
+  computed: {
+    ...mapState('contacts', [
+      'sequenceInfo',
+      'sequenceInfoLoading'
+    ])
   },
 
   methods: {
@@ -113,10 +121,13 @@ export default {
         this.sequence = response.data.sequence
         this.workflow = response.data.workflow
         this.isBusy = false
-        this.$emit('sequenceLoaded', { sequence: this.sequence, workflow: this.workflow })
+        this.emitSequenceInfo()
       }).catch(() => {
         this.isBusy = false
       })
+    },
+    emitSequenceInfo () {
+      this.$emit('sequenceLoaded', { sequence: this.sequence, workflow: this.workflow })
     },
     disenrollContact () {
       this.$bvModal.msgBoxConfirm('Do you wish to disenroll this contact from all sequences?', {
@@ -144,17 +155,21 @@ export default {
   },
 
   mounted () {
-    const _this = this
-    this.getSequenceInfo()
+    this.sequence = this.sequenceInfo.sequence
+    this.workflow = this.sequenceInfo.workflow
 
-    this.$VueEvent.listen('contactSequenceEnrolled', function (contactId) {
-      if (_this.contact.id !== contactId) {
+    if (!_.isEmpty(this.sequence) && !_.isEmpty(this.workflow)) {
+      this.emitSequenceInfo()
+    }
+
+    this.$VueEvent.listen('contactSequenceEnrolled', (contactId) => {
+      if (this.contact.id !== contactId) {
         return
       }
 
-      _this.isBusy = true
+      this.isBusy = true
       setTimeout(() => {
-        _this.getSequenceInfo()
+        this.getSequenceInfo()
       }, 3000)
     })
   },
@@ -164,7 +179,20 @@ export default {
       if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
         this.getSequenceInfo()
       }
-    }, 500)
+    }, 500),
+
+    sequenceInfoLoading (value) {
+      this.isBusy = value
+    },
+
+    sequenceInfo: {
+      deep: true,
+      handler: function (data) {
+        this.sequence = data.sequence
+        this.workflow = data.workflow
+        this.emitSequenceInfo()
+      }
+    }
   }
 }
 </script>

@@ -69,6 +69,10 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact']),
+    ...mapState('contacts', [
+      'lineIncomingNumberLoading',
+      'lineIncomingNumber'
+    ]),
     ...mapState(['campaigns']),
 
     selectedCampaign () {
@@ -119,8 +123,7 @@ export default {
   mounted () {
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
-      this.setDefaultLine(this.contact.id)
-      this.showPlaceholder()
+      this.setIncomingNumber()
     }
   },
 
@@ -197,6 +200,12 @@ export default {
       if (this.selectedLine && this.contact.id) {
         this.getIncomingNumber()
       }
+    },
+
+    setIncomingNumber () {
+      this.selectedLine = this.selectedCampaign
+      this.incomingNumber = this.lineIncomingNumber
+      this.showPlaceholder()
     }
   },
 
@@ -214,6 +223,15 @@ export default {
       if (value && this.contact && this.contact.id) {
         this.setDefaultLine()
         this.showPlaceholder()
+      }
+    },
+    lineIncomingNumberLoading (value) {
+      this.isBusy = value
+    },
+    lineIncomingNumber: {
+      deep: true,
+      handler: function (value) {
+        this.setIncomingNumber()
       }
     }
   }

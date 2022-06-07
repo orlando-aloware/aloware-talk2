@@ -120,7 +120,6 @@ export default {
 
   async mounted () {
     if (this.contact) {
-      this.getCommunicationsSummary(this.contact.id)
       // listens to newly communication added
       // used in communications count summary
       this.$VueEvent.listen('new_communication', communication => {
@@ -160,9 +159,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.detailsComponentContainer.scrollTop = 0
       })
-      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
-        this.getCommunicationsSummary(value)
-      }
     }, 500)
   }
 }
