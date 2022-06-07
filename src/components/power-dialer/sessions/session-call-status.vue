@@ -34,15 +34,19 @@
         </q-btn>
 
         <q-btn
-          @click="onToggleHold"
           no-wrap no-caps size="sm"
           unelevated
           outline
-          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
           class="sessions-button free-width mx-1"
-          :disabled="!statusCallConnected">
-          <UnholdIcon v-if="toggleHold" class="mr-2" color="#F2997A" />
-          <PauseIcon v-else class="mr-2" color="#62666E" />
+          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
+          :disabled="!statusCallConnected"
+          @click="onToggleHold">
+          <UnHoldIcon v-if="toggleHold"
+                      class="mr-2"
+                      color="#F2997A" />
+          <PauseIcon v-else
+                     class="mr-2"
+                     color="#62666E" />
           <div class="text-body2 text-black">
             {{ toggleHold ? 'Unhold' : 'Hold' }}
           </div>
@@ -107,7 +111,7 @@
       <div class="d-flex align-items-center p-0">
         <div
           v-if="timezone"
-          class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
+          class="flex-grow-1 text-14 text-subtitle1 text-capitalize pl-3 py-0">
           <DropIcon
             width="18px"
             height="18px"
@@ -129,11 +133,11 @@
         </q-btn> -->
 
         <q-btn
-          @click="onToggleRecording"
+          class="sessions-button free-width mx-1"
           no-wrap outline no-caps
           size="sm" color="grey-4"
           :disabled="!statusCallConnected"
-          class="sessions-button free-width mx-1">
+          @click="onToggleRecording">
 
           <StopIcon
             v-if="toggleRecording"
@@ -171,18 +175,21 @@
 
           <span class="text-subtitle2 text-grey"></span>
           <div class="text-10 pt-1">
-            <HeadphoneIcon width="12px" height="12px" class="mr-0 py-0" style="position:relative;top:-2px;" />
+            <HeadphoneIcon width="12px"
+                           height="12px"
+                           class="mr-0 py-0"
+                           style="position:relative;top:-2px;" />
             {{ lineName }}
           </div>
 
         </div>
         <q-btn
           v-if="toggleEnd"
-          @click="resumeSession"
           color="primary"
           unelevated
           no-wrap no-caps size="sm"
-          class="btn-btn-primary sessions-button free-width mx-1">
+          class="btn-btn-primary sessions-button free-width mx-1"
+          @click="resumeSession">
 
           <PauseIcon
             class="mr-2"
@@ -196,12 +203,12 @@
 
         <q-btn
           v-else
-          @click="onTogglePause"
-          :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           unelevated :outline="!sessionPaused"
           no-wrap no-caps size="sm"
+          :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           :disabled="toggleEnd"
-          :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`">
+          :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`"
+          @click="onTogglePause">
 
           <PauseIcon
             class="mr-2"
@@ -214,7 +221,6 @@
         </q-btn>
 
         <q-btn
-
           no-wrap outline no-caps
           size="sm"
           :disable="toggleEnd"
@@ -262,7 +268,7 @@ import CalendarIcon from 'components/icons/calendar-icon'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
-import UnholdIcon from 'components/icons/pause-icon-3'
+import UnHoldIcon from 'components/icons/pause-icon-3'
 import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
@@ -287,7 +293,7 @@ export default {
     DropIcon,
     HeadphoneIcon,
     PauseIcon,
-    UnholdIcon,
+    UnHoldIcon,
     CallDropIcon,
     StopIcon,
     EndCallIcon,
@@ -394,10 +400,7 @@ export default {
       return keyCtr
     },
     hasDefaultContact () {
-      if (this.taskToCall?.id) {
-        return false
-      }
-      return true
+      return !this.taskToCall?.id
     },
     getLine () {
       return this.campaigns.find((line) => line.id === this.activeTask?.task?.communication?.campaign_id)
@@ -631,7 +634,6 @@ export default {
     },
 
     async initialize () {
-      console.log('Initializing....')
       if (!this.isSessionRunning) {
         this.TOGGLE_SESSION_LOADER(true)
       }

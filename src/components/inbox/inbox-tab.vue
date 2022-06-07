@@ -410,17 +410,19 @@ export default {
         console.log(err)
       })
     },
-    async onItemRemoved (contact, callback) {
-      if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
-        this.setPendingTaskCount(this.taskCounts.pending - 1)
-      }
+    async onItemRemoved (contact, callback, loadCount = true) {
+      if (loadCount) {
+        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
+          this.setPendingTaskCount(this.taskCounts.pending - 1)
+        }
 
-      if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
-        this.setOpenTaskCount(this.taskCounts.open - 1)
-      }
+        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
+          this.setOpenTaskCount(this.taskCounts.open - 1)
+        }
 
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      }
 
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
       await this.setContacts(filteredContacts)
@@ -871,8 +873,8 @@ export default {
           const _this = this
           this.onItemRemoved(contact, function () {
             _this.onItemSelected(_this.contacts[0])
-          })
-          this.loadContactTasks(true, false)
+          }, false)
+          this.loadContactTasks(false, false)
           break
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
           // just remove contact from current list
@@ -892,7 +894,7 @@ export default {
               contacts.push(contact)
             }
             this.setContacts(contacts)
-            this.loadContactTasks(true, false)
+            this.loadContactTasks(false, false)
           } else {
             const contacts = [...this.contacts]
             contacts[index] = contact
