@@ -457,5 +457,18 @@ export default {
   },
   SET_PREVIOUS_LIST_ID (state, id) {
     state.previousListId = id
+  },
+  SET_SEQUENCE_INFO (state, payload) {
+    Vue.set(state.sequenceInfo, 'sequence', payload.sequence)
+    Vue.set(state.sequenceInfo, 'workflow', payload.workflow)
+  },
+  SET_SEQUENCE_INFO_LOADING (state, value) {
+    state.sequenceInfoLoading = value
+  },
+  SET_LINE_INCOMING_NUMBER (state, payload) {
+    state.lineIncomingNumber = payload
+  },
+  SET_LINE_INCOMING_NUMBER_LOADING (state, value) {
+    state.lineIncomingNumberLoading = value
   }
 }
