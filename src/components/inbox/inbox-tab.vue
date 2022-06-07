@@ -422,14 +422,6 @@ export default {
     },
     async onItemRemoved (contact, callback, loadCount = true) {
       if (loadCount) {
-        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
-          this.setPendingTaskCount(this.taskCounts.pending - 1)
-        }
-
-        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
-          this.setOpenTaskCount(this.taskCounts.open - 1)
-        }
-
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       }
@@ -773,6 +765,9 @@ export default {
                   contacts.data.unshift(contact)
                 }
                 this.setContacts(contacts.data)
+
+                this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+                this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
               }
             }
           }
