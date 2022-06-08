@@ -32,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated', 'loading'])
   },
   created () {
     // proceed to cookie validation if account is talk allowed access
@@ -60,6 +60,8 @@ export default {
       })
     }
 
+    this.setFullStory()
+
     this.$VueEvent.listen('make_new_call', (data) => {
       window.axios.post('/api/v1/contact', {
         add_phone_number: this.$options.filters.fixPhone(data.phone_number)
@@ -86,6 +88,13 @@ export default {
         this.$router.replace('/')
       })
     })
+  },
+  watch: {
+    loading (value) {
+      if (!value) {
+        this.setFullStory()
+      }
+    }
   },
   methods: {
     async validateCookieUser () {
@@ -120,6 +129,7 @@ export default {
     },
     logout () {
       this.logoutUser().then((res) => {
+        this.setFullStory()
         this.response = res.data
         this.$router.push({ name: 'Login' }).catch((err) => {
           console.log(err)
