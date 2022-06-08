@@ -151,8 +151,6 @@ export default {
           user_roles: profile.user_roles
         }
         this.$FullStory.identify(id, identityInformation)
-
-        console.log({ identityInformation })
       }
     },
     // identify or anonymize user
@@ -161,8 +159,6 @@ export default {
       if (this.loading) {
         return
       }
-
-      console.log({ m: 'setFullStory', profile: this.profile })
 
       if (this.profile && this.authenticated) {
         this.fullStoryIdentify(this.profile?.id, this.profile)
