@@ -128,6 +128,38 @@ export default {
         console.log(err)
       })
     },
+    fullStoryIdentify (id, profile) {
+      // Sanity check: verify if user is really there
+      if (profile && id) {
+        let identityInformation = {
+          displayName: profile.full_name,
+          email: profile.email,
+          timezone: profile.timezone,
+          usage: profile.usage,
+          company_name: profile.company_name,
+          user_permissions: profile.user_permissions,
+          user_roles: profile.user_roles
+        }
+        this.$FullStory.identify(id, identityInformation)
+
+        console.log({ identityInformation })
+      }
+    },
+    // identify or anonymize user
+    setFullStory () {
+      // Identify user on fullstory
+      if (this.loading) {
+        return
+      }
+
+      console.log({ m: 'setFullStory', profile: this.profile })
+
+      if (this.profile && this.authenticated) {
+        this.fullStoryIdentify(this.profile?.id, this.profile)
+        return
+      }
+      this.$FullStory.anonymize()
+    },
     ...mapActions('auth', {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
