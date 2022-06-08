@@ -138,20 +138,22 @@ export default {
         console.log(err)
       })
     },
-    fullStoryIdentify (id, profile) {
+    fullStoryIdentify (profile) {
       // Sanity check: verify if user is really there
-      if (profile && id) {
-        let identityInformation = {
-          displayName: profile.full_name,
-          email: profile.email,
-          timezone: profile.timezone,
-          usage: profile.usage,
-          company_name: profile.company_name,
-          user_permissions: profile.user_permissions,
-          user_roles: profile.user_roles
-        }
-        this.$FullStory.identify(id, identityInformation)
+      if (!profile) {
+        return
       }
+
+      let identityInformation = {
+        displayName: profile.full_name,
+        email: profile.email,
+        timezone: profile.timezone,
+        usage: profile.usage,
+        company_name: profile.company_name,
+        user_permissions: profile.user_permissions,
+        user_roles: profile.user_roles
+      }
+      this.$FullStory.identify(profile.id, identityInformation)
     },
     // identify or anonymize user
     setFullStory () {
@@ -161,7 +163,7 @@ export default {
       }
 
       if (this.profile && this.authenticated) {
-        this.fullStoryIdentify(this.profile?.id, this.profile)
+        this.fullStoryIdentify(this.profile)
         return
       }
       this.$FullStory.anonymize()
