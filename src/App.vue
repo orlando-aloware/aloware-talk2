@@ -60,7 +60,9 @@ export default {
       })
     }
 
-    this.setFullStory()
+    if (!this.authenticated) {
+      this.setFullStory()
+    }
 
     this.$VueEvent.listen('make_new_call', (data) => {
       window.axios.post('/api/v1/contact', {
