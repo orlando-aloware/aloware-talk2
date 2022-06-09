@@ -28,7 +28,8 @@ export default {
   data () {
     return {
       cookieValidated: false,
-      sharedCookie: null
+      sharedCookie: null,
+      fullStoryEnabled: process.env.FULLSTORY_ORG_ID
     }
   },
   computed: {
@@ -153,10 +154,8 @@ export default {
     },
     // identify or anonymize user
     setFullStory () {
-      let shouldSendData = process.env.FULLSTORY_ORG_ID
-
       // Identify user on fullstory
-      if (this.loading || !shouldSendData) {
+      if (this.loading || !this.fullStoryEnabled) {
         return
       }
 
