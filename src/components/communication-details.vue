@@ -230,7 +230,7 @@
                     anchor="top middle"
                     self="bottom middle"
                     max-width="150px">
-                    {{ rejectionTooltipData(communication.rejected_by_app) }}
+                    {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                   </q-tooltip>
                 </q-icon>
                 <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
