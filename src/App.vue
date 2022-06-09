@@ -60,10 +60,6 @@ export default {
       })
     }
 
-    if (!this.authenticated) {
-      this.setFullStory()
-    }
-
     this.$VueEvent.listen('make_new_call', (data) => {
       window.axios.post('/api/v1/contact', {
         add_phone_number: this.$options.filters.fixPhone(data.phone_number)
