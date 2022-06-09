@@ -53,12 +53,12 @@
         </q-btn>
 
         <q-btn
-          @click="nextContact"
+          class="sessions-button free-width mx-1"
+          size="sm"
           no-wrap unelevated no-caps
           :disabled="!statusCallConnected"
-          size="sm"
           :color="statusCallConnected ? 'red-7' : 'grey-8'"
-          class="sessions-button free-width mx-1">
+          @click="nextContact">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
@@ -119,18 +119,6 @@
             style="position:relative;top:-2px;" />
           {{ timezone }} - {{ getTimeZone }}
         </div>
-
-        <!-- <q-btn
-          @click="onToggleMute"
-          no-wrap outline no-caps
-          size="sm" color="grey-4"
-          :disabled="!statusCallConnected"
-          class="sessions-button free-width mx-1">
-          <MuteIcon height="13px" class="mr-2" color="#62666E" />
-          <div class="text-body2 text-black">
-            {{ toggleMute ? 'Unmute' : 'Mute' }}
-          </div>
-        </q-btn> -->
 
         <q-btn
           class="sessions-button free-width mx-1"
@@ -698,10 +686,9 @@ export default {
       this.togglePause = !this.togglePause
     },
     onToggleEnd () {
-      if (this.sessionPaused) {
-        this.reRoute()
-      }
+      this.onTogglePause()
       this.toggleEnd = !this.toggleEnd
+      this.reRoute()
     },
     resumeSession () {
       this.toggleEnd = false

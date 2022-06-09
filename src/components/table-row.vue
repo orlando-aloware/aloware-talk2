@@ -68,7 +68,7 @@
             <b-badge v-if="contact.is_blocked"
               variant="danger"
               class="badge-phone-info">
-              blocked
+              Blocked
             </b-badge>
 
           </div>
