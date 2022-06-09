@@ -142,13 +142,12 @@ export default {
       }
 
       let identityInformation = {
-        displayName: profile.full_name,
+        displayName: profile.name,
         email: profile.email,
-        timezone: profile.timezone,
-        usage: profile.usage,
-        company_name: profile.company_name,
-        user_permissions: profile.user_permissions,
-        user_roles: profile.user_roles
+        timezone_str: window.timezone,
+        companyId_int: profile.company_id,
+        companyName_str: profile.company_name,
+        userRoles_strs: profile.user_roles
       }
       this.$FullStory.identify(profile.id, identityInformation)
     },
