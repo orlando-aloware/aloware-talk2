@@ -29,7 +29,7 @@ export default {
     return {
       cookieValidated: false,
       sharedCookie: null,
-      fullStoryEnabled: process.env.FULLSTORY_ORG_ID
+      fullstory_org_id: process.env.FULLSTORY_ORG_ID
     }
   },
   computed: {
@@ -155,7 +155,7 @@ export default {
     // identify or anonymize user
     setFullStory () {
       // Identify user on fullstory
-      if (this.loading || !this.fullStoryEnabled) {
+      if (this.loading || !this.fullstory_org_id) {
         return
       }
 
