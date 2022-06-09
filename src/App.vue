@@ -153,8 +153,10 @@ export default {
     },
     // identify or anonymize user
     setFullStory () {
+      let shouldSendData = process.env.FULLSTORY_ORG_ID
+
       // Identify user on fullstory
-      if (this.loading) {
+      if (this.loading || !shouldSendData) {
         return
       }
 
