@@ -90,10 +90,8 @@ export default {
     })
   },
   watch: {
-    loading (value) {
-      if (!value) {
-        this.setFullStory()
-      }
+    authenticated () {
+      this.setFullStory()
     }
   },
   methods: {
