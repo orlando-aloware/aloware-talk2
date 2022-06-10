@@ -88,7 +88,7 @@ export default {
   },
   watch: {
     async activeTask (value) {
-      if (value.id) {
+      if (value && value.id) {
         await this.changeScript()
       }
     }

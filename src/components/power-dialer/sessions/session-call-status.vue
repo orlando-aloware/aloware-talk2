@@ -247,7 +247,6 @@
 </template>
 
 <script>
-
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
@@ -265,7 +264,7 @@ import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import { isEmpty } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -491,29 +490,23 @@ export default {
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
     }
+
     if (this.campaigns) {
       this.findDefaultOutboundCampaign()
     }
-    this.$VueEvent.listen('initiate_session', (session) => {
-      this.activeTask = {}
-      this.hasActiveTask = false
-      this.initialize()
-    })
-    this.$VueEvent.listen('initiate_wrapup', (session) => {
-      this.hasActiveTask = false
-      this.initialize()
-    })
-    this.$VueEvent.listen('initiate_session_no_tasks', () => {
-      this.closePowerDialerNoTasks()
-    })
-    this.$VueEvent.listen('endWrapUp', () => {
-      this.wrapUp = false
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
 
-      if (this.taskToCall) {
-        this.processSession(true)
-      }
-    })
+    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
+    this.$VueEvent.listen('initiate_session', this.onInitiateSession)
+
+    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
+    this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
+
+    this.$VueEvent.stop('endWrapUp', this.closePowerDialerNoTasks)
+    this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
+
+    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
+    this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
+
     this.isSessionRunning = false
   },
 
@@ -634,7 +627,7 @@ export default {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
-          this.activeTask = await this.getContact({ id: this.taskToCall.id })
+          this.activeTask = await this.getContact({ id: get(this.taskToCall, 'id', null) })
           // this.activeTask = this.taskToCall
           // this.setContact(this.taskToCall)
 
@@ -836,6 +829,25 @@ export default {
           this.$VueEvent.fire('endWrapUp')
         }
         this.reRoute()
+      }
+    },
+    onInitiateSession (session) {
+      this.activeTask = {}
+      this.hasActiveTask = false
+      this.initialize()
+    },
+    onInitiateWrapUp (session) {
+      this.hasActiveTask = false
+      this.initialize()
+    },
+    onEndWrapUp () {
+      this.wrapUp = false
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
+
+      if (this.taskToCall) {
+        setTimeout(() => {
+          this.processSession(true)
+        }, 200)
       }
     }
   },
