@@ -39,7 +39,7 @@
 </template>
 
 <script>
-
+import _ from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
@@ -56,11 +56,13 @@ export default {
     ]),
     ...mapState(['dialer']),
     fullName () {
-      let { activeTask } = this
-      if (!activeTask.first_name && !activeTask.last_name) {
+      const name = `${_.get(this.activeTask, 'first_name', '')} ${_.get(this.activeTask, 'last_name', '')}`
+
+      if (!name) {
         return 'No Name'
       }
-      return `${this.activeTask?.first_name} ${this.activeTask?.last_name}`
+
+      return name
     },
     firstname () {
       return this.activeTask?.first_name
