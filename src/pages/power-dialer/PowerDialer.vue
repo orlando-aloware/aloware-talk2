@@ -345,7 +345,6 @@ export default {
         .then((data) => {
           this.updateMyQueueListData(data)
         })
-      console.log('should fetch')
     }
   },
 

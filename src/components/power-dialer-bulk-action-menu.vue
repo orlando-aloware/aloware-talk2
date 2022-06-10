@@ -81,7 +81,6 @@ export default {
       const res = await this.moveContactItems({
         id: this.isMyQueue ? this.myQueue.id : this.id,
         params: {
-          // contact_ids: this.selectedContactIds,
           contact_list_item_ids: this.selectedContactIds,
           direction: direction
         }
