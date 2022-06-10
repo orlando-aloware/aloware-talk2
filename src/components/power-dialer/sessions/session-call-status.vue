@@ -1,5 +1,6 @@
 <template>
-  <q-card flat :disabled="sessionLoader">
+  <q-card flat
+          :disabled="sessionLoader">
     <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-3 pb-0">
 
@@ -56,8 +57,8 @@
           class="sessions-button free-width mx-1"
           size="sm"
           no-wrap unelevated no-caps
-          :disabled="!statusCallConnected"
-          :color="statusCallConnected ? 'red-7' : 'grey-8'"
+          :disabled="!canNextTask "
+          :color="canNextTask  ? 'red-7' : 'grey-8'"
           @click="nextContact">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
@@ -474,6 +475,12 @@ export default {
         return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
       }
       return false
+    },
+    canNextTask () {
+      return (
+        this.statusCallConnected ||
+        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+      ) && this.callInProgress
     }
   },
 
@@ -498,6 +505,14 @@ export default {
     })
     this.$VueEvent.listen('initiate_session_no_tasks', () => {
       this.closePowerDialerNoTasks()
+    })
+    this.$VueEvent.listen('endWrapUp', () => {
+      this.wrapUp = false
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
+
+      if (this.taskToCall) {
+        this.processSession(true)
+      }
     })
     this.isSessionRunning = false
   },
@@ -692,7 +707,24 @@ export default {
       if (isForced) {
         this.redirectNotification = isForced
       }
+
       this.reRouteModal = true
+
+      if (this.dialer.currentStatus !== 'READY') {
+        this.hangUpIntervalCounter = 0
+        this.hangUpInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('endWrapUp')
+          }
+
+          this.hangUpIntervalCounter++
+
+          if (this.hangUpIntervalCounter >= 120) {
+            clearInterval(this.hangUpInterval)
+          }
+        }, 500)
+      }
+
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
       }, this.redirectDelay)
@@ -755,30 +787,48 @@ export default {
       //   this.expanded = true
       // }, 50)
     },
+    processSession (noWrapUp = false) {
+      if (!noWrapUp) {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      this.activeTask = this.taskToCall
+      this.setContact(this.taskToCall)
+      this.TOGGLE_SESSION_LOADER(true)
+
+      if (!this.isSessionRunning) {
+        this.isSessionRunning = true
+      }
+
+      this.resetTimer()
+      setTimeout(() => {
+        this.startWarmUpCountDown()
+      }, 1000)
+    },
     async nextContact () {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED' && this.taskToCall) {
+        this.wrapUp = false
+        this.taskToCall = this.powerDialerTasks.in_queue[0]
+        this.processSession()
+        return
+      }
+
       this.$VueEvent.fire('hangupCall')
       this.wrapUp = false
       this.taskToCall = this.powerDialerTasks.in_queue[0]
 
       if (this.taskToCall) {
+        this.hangUpIntervalCounter = 0
         this.hangUpInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.$VueEvent.fire('endWrapUp')
-
-            this.activeTask = this.taskToCall
-            this.setContact(this.taskToCall)
-
-            this.TOGGLE_SESSION_LOADER(true)
-
-            if (!this.isSessionRunning) {
-              this.isSessionRunning = true
-            }
-
+            this.processSession()
             clearInterval(this.hangUpInterval)
-            this.resetTimer()
-            setTimeout(() => {
-              this.startWarmUpCountDown()
-            }, 1000)
+          }
+
+          this.hangUpIntervalCounter++
+
+          if (this.hangUpIntervalCounter >= 120) {
+            clearInterval(this.hangUpInterval)
           }
         }, 500)
       } else {
@@ -862,7 +912,8 @@ export default {
       reRouteModal: false,
       redirectDelay: 3000,
       redirectNotification: false,
-      hangUpInterval: null
+      hangUpInterval: null,
+      hangUpIntervalCounter: 0
     }
   }
 }
