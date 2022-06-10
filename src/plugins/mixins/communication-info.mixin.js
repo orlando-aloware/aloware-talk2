@@ -1,6 +1,7 @@
 import * as CommunicationDirections from '../../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
+import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
 
 export default {
   methods: {
@@ -146,31 +147,94 @@ export default {
 
     rejectionToIcon (rejectionReason) {
       switch (rejectionReason) {
-        case this.REJECTION_REASON_BLOCKED:
+        case CommunicationRejectionReasons.REJECTION_REASON_BLOCKED:
           return 'phone_locked'
-        case this.REJECTION_REASON_CREDITS:
+        case CommunicationRejectionReasons.REJECTION_REASON_CREDITS:
           return 'money_off'
-        case this.REJECTION_REASON_OTHER:
+        case CommunicationRejectionReasons.REJECTION_REASON_OTHER:
           return 'warning'
-        case this.REJECTION_REASON_USER_NOT_FOUND:
+        case CommunicationRejectionReasons.REJECTION_REASON_USER_NOT_FOUND:
           return 'error'
-        case this.REJECTION_REASON_FAILED:
+        case CommunicationRejectionReasons.REJECTION_REASON_FAILED:
           return 'error'
+        default:
+          return 'warning'
       }
     },
 
-    rejectionTooltipData (rejectionReason) {
+    rejectionTooltipData (rejectionReason, type) {
       switch (rejectionReason) {
-        case this.REJECTION_REASON_BLOCKED:
-          return 'Could not route: the contact is blocked, if you want to take the call please unblock the contact from either the contacts section or from blocked contacts tab in company page.'
-        case this.REJECTION_REASON_CREDITS:
-          return 'Could not route: account doesn\'t have enough credits, please recharge your account or contact support.'
-        case this.REJECTION_REASON_OTHER:
-          return 'Could not route: please contact support.'
-        case this.REJECTION_REASON_USER_NOT_FOUND:
-          return 'Could not route: no eligible users can be found, please check your line\'s routing settings. Check notes for more information.'
-        case this.REJECTION_REASON_FAILED:
-          return 'Could not route: our carrier could not route this communication, please make sure the phone number is in service'
+        case CommunicationRejectionReasons.REJECTION_REASON_BLOCKED:
+          return 'The contact was blocked.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CREDITS:
+          return 'Account didn\'t have enough credits.'
+        case CommunicationRejectionReasons.REJECTION_REASON_OTHER:
+          return 'Please contact support.'
+        case CommunicationRejectionReasons.REJECTION_REASON_USER_NOT_FOUND:
+          return 'No eligible users could be found.'
+        case CommunicationRejectionReasons.REJECTION_REASON_FAILED:
+          return 'Our carrier could not route this communication.'
+        case CommunicationRejectionReasons.REJECTION_REASON_ANONYMOUS_CONTACT:
+          let placeHolder = 'send a message'
+          switch (type) {
+            case CommunicationTypes.CALL:
+              placeHolder = 'make a call'
+              break
+            case CommunicationTypes.RVM:
+              placeHolder = 'send an RVM'
+              break
+            case CommunicationTypes.EMAIL:
+              placeHolder = 'send an email'
+              break
+            case CommunicationTypes.FAX:
+              placeHolder = 'send a fax'
+              break
+          }
+          return `Cannot ${placeHolder} to an anonymous contact.`
+        case CommunicationRejectionReasons.REJECTION_REASON_TRAFFIC_BLOCKED:
+          return 'SMS traffic was blocked by Twilio.'
+        case CommunicationRejectionReasons.REJECTION_REASON_NOT_MESSAGING_ENABLED:
+          return 'Phone number was not messaging enabled.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_DELETED:
+          return 'Line was deleted.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_PAUSED:
+          return 'Line was paused.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_DNC:
+          return 'Contact was DNC.'
+        case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DISABLED:
+          return 'Company was not enabled.'
+        case CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY:
+          return 'Message body was required.'
+        case CommunicationRejectionReasons.REJECTION_REASON_NUMBER_IS_INTERNATIONAL:
+          return 'The contact phone number was international.'
+        case CommunicationRejectionReasons.REJECTION_REASON_FAX_NUMBER_NOT_FOUND:
+          return 'We couldn\'t send a fax from a non-fax capable number.'
+        case CommunicationRejectionReasons.REJECTION_REASON_INVALID_OR_WRONG_PHONE_NUMBER:
+          return 'Phone number was wrong or invalid.'
+        case CommunicationRejectionReasons.REJECTION_REASON_TOLLFREE_NUMBER:
+          return 'Phone number was toll-free.'
+        case CommunicationRejectionReasons.REJECTION_REASON_USER_NOT_PERMITTED_TO_MAKE_CALL:
+          return 'Received a call from a user without the permission to make an outbound call.'
+        case CommunicationRejectionReasons.REJECTION_REASON_USER_NOT_ACTIVE:
+          return 'Received a call from a paused user.'
+        case CommunicationRejectionReasons.REJECTION_REASON_NO_AUTO_DIAL_TASK_REMAINING:
+          return 'There were no power dialer tasks remaining to run.'
+        case CommunicationRejectionReasons.REJECTION_REASON_AUTO_DIAL_TASK_NOT_QUEUED:
+          return 'Tried to run a power dialer task that is not queued.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_NOT_FOUND:
+          return 'Couldn\'t find an outbound line for this call.'
+        case CommunicationRejectionReasons.REJECTION_REASON_INCOMING_NUMBER_NOT_FOUND:
+          return 'Couldn\'t find an outbound incoming number for this call.'
+        case CommunicationRejectionReasons.REJECTION_REASON_INVALID_USER:
+          return 'Received a call from an undefined user.'
+        case CommunicationRejectionReasons.REJECTION_REASON_INVALID_LINK_FORMAT:
+          return '[From HubSpot] The link format was incorrect.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CONNECTED_HS_ACCOUNT_NOT_FOUND:
+          return '[From HubSpot] Could not find the connected HubSpot account.'
+        case CommunicationRejectionReasons.REJECTION_REASON_HS_CONTACT_NOT_FOUND:
+          return '[From HubSpot] Could not find the associated contact with the HubSpot deal.'
+        case CommunicationRejectionReasons.REJECTION_REASON_HS_INVALID_PHONE_NUMBER:
+          return '[From HubSpot] Could not find a phone number associated with the contact on the HubSpot deal.'
       }
     },
 

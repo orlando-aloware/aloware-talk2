@@ -28,11 +28,12 @@ export default {
   data () {
     return {
       cookieValidated: false,
-      sharedCookie: null
+      sharedCookie: null,
+      fullstoryOrgId: process.env.FULLSTORY_ORG_ID
     }
   },
   computed: {
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated', 'loading'])
   },
   created () {
     // proceed to cookie validation if account is talk allowed access
@@ -87,6 +88,11 @@ export default {
       })
     })
   },
+  watch: {
+    authenticated () {
+      this.setFullStory()
+    }
+  },
   methods: {
     async validateCookieUser () {
       if (this.sharedCookie) {
@@ -120,6 +126,7 @@ export default {
     },
     logout () {
       this.logoutUser().then((res) => {
+        this.setFullStory()
         this.response = res.data
         this.$router.push({ name: 'Login' }).catch((err) => {
           console.log(err)
@@ -127,6 +134,35 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    fullStoryIdentify (profile) {
+      // Sanity check: verify if user is really there
+      if (!profile) {
+        return
+      }
+
+      let identityInformation = {
+        displayName: profile.name,
+        email: profile.email,
+        timezone_str: window.timezone,
+        companyId_int: profile.company_id,
+        companyName_str: profile.company_name,
+        userRoles_strs: profile.user_roles
+      }
+      this.$FullStory.identify(profile.id, identityInformation)
+    },
+    // identify or anonymize user
+    setFullStory () {
+      // Identify user on fullstory
+      if (this.loading || !this.fullstoryOrgId) {
+        return
+      }
+
+      if (this.profile && this.authenticated) {
+        this.fullStoryIdentify(this.profile)
+        return
+      }
+      this.$FullStory.anonymize()
     },
     ...mapActions('auth', {
       logoutUser: 'logout',
