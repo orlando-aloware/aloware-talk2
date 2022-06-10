@@ -11,7 +11,7 @@
       <div class="text-13 pr-3 border-right right-spacing-2">
         {{ labelForNumberOfContacts }}
       </div>
-      <StartDialing
+      <start-dial-session-settings
         :disabled-trigger="numberOfContacts === 0"
         :list="filteredList"
         @start="beginDial"
@@ -444,7 +444,7 @@ import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-
 import Datatable from 'src/components/datatable'
 import TableRow from 'src/components/table-row'
 import SearchList from 'src/components/search'
-import StartDialing from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
+import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
 import StatusChip from 'src/components/status-chip'
 import TagPopover from 'src/components/tag-popover'
 import ChippedItems from 'src/components/chipped-items'
@@ -531,7 +531,7 @@ export default {
     Datatable,
     SearchList,
     SummaryInfoLabels,
-    StartDialing,
+    StartDialSessionSettings,
     TableRow,
     StatusChip,
     TagPopover,
@@ -792,7 +792,6 @@ export default {
       }
     },
     async beginDial () {
-      // this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
       this.START_DIAL_TOGGLE(true)
     },
@@ -950,7 +949,6 @@ export default {
     '$route.params': {
       handler (params) {
         if (!this.$route.name.includes('Contact')) {
-          console.log('Initializing...')
           this.init()
         }
       },

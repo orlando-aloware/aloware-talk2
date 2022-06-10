@@ -99,10 +99,6 @@ export default {
       )
     }
   },
-  async mounted () {
-    let response = await this.getContactFolders()
-    this.contactFolders = response
-  },
   methods: {
     ...mapActions('contacts', [
       'createPdListClose',

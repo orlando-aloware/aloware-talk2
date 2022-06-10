@@ -5,7 +5,7 @@
     <div
       v-show="!hasSessions"
       class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
-      <PowerDialerSidebar />
+      <PowerDialerSidebar @fetchMyQueueData="onFetchMyQueueData" />
     </div>
     <div
       class="px-0 mb-0 main flex-1"
@@ -88,6 +88,7 @@ import {
 } from 'src/plugins/mixins'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import qs from 'qs'
 // import { get } from 'lodash'
 
 export default {
@@ -333,6 +334,18 @@ export default {
     onClear () {
       this.powerDialerActiveList.data = []
       this.clearList()
+    },
+    onFetchMyQueueData () {
+      this.$axios
+        .get(this.apiEndpoint(true), {
+          params: this.buildQueryString({}, false),
+          paramsSerializer: qs.stringify
+        })
+        .then((response) => response.data)
+        .then((data) => {
+          this.updateMyQueueListData(data)
+        })
+      console.log('should fetch')
     }
   },
 

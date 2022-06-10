@@ -249,6 +249,10 @@ export default {
   },
   computed: {
     ...mapState(['dialer']),
+    ...mapState('powerDialer', [
+      'powerDialerTasks',
+      'activeTask'
+    ]),
     ...mapGetters('powerDialer', [
       // 'powerDialerListItems',
       // 'currentList',
@@ -260,7 +264,6 @@ export default {
       'listItems'
     ]),
     ...mapFields('powerDialer', [
-      'powerDialerTasks',
       'powerDialerTaskFilters',
       'activeTask',
       'taskToCall',

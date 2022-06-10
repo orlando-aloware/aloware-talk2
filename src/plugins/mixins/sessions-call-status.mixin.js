@@ -1,5 +1,5 @@
 import { mapFields } from 'vuex-map-fields'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
 
@@ -16,20 +16,16 @@ export default {
     }
   },
   computed: {
+    ...mapState('powerDialer', ['powerDialerTasks']),
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
-      'powerDialerTasks',
       'ongoingSession',
       'countdownTimer'
     ]),
     ...mapGetters('contacts', [
-      'listItems',
       'selectedList'
     ]),
-    list () {
-      return this.listItems[this.selectedList?.id]?.data
-    },
     status () {
       return AutoDialTaskStatus.STATUSES
     },
@@ -77,15 +73,12 @@ export default {
     }
   },
   methods: {
+    ...mapActions('contacts', ['setContact']),
     ...mapActions(['setShowPhone']),
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter'
     ]),
-
-    async nextContact () {
-      this.$VueEvent.fire('hangupCall')
-    },
 
     async fetchContact (taskId = null) {
       if (!taskId) {
@@ -96,7 +89,6 @@ export default {
       this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: taskId })
       if (!this.isSessionRunning) {
-        // this.activeTask = res
         this.isSessionRunning = true
       }
     },

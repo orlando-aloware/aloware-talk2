@@ -101,7 +101,7 @@
       <div class="d-flex align-items-center p-0">
         <div
           class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-          {{ fullname }}
+          {{ fullName }}
           <span class="text-15 text-subtitle1">
             {{ phoneNumber }}
           </span>
@@ -263,7 +263,7 @@ import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import sessionsMixins from 'src/plugins/mixins/sessions-call-status'
+import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
@@ -287,7 +287,7 @@ export default {
     EndCallIcon,
     RecordIcon
   },
-  mixins: [ sessionsMixins ],
+  mixins: [ sessionCallStatusMixin ],
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.prevRoute = from
@@ -295,6 +295,7 @@ export default {
   },
   beforeDestroy () {
     this.clearWarmUpCountDown()
+    clearInterval(this.hangUpInterval)
   },
   computed: {
     ...mapFields([
@@ -359,36 +360,15 @@ export default {
       }
       return address
     },
-    listObject () {
-      return this.listItems[this.selectedList?.id]
-    },
-    list () {
-      return this.listObject.data || []
-    },
     companyName () {
       return this.taskToCall?.company_name || 'Company: N/A'
     },
-    fullname () {
+    fullName () {
       let { taskToCall } = this
       if ((taskToCall?.first_name === null || taskToCall?.first_name === '') && (taskToCall?.last_name === null || taskToCall?.last_name === '')) {
         return `No Name`
       }
       return `${taskToCall?.first_name || ''} ${taskToCall?.last_name || ''}`
-    },
-    keyIndex () {
-      let keyCtr = 0
-      this.list.forEach((item, key) => {
-        if (item?.id === this.contact?.id) {
-          keyCtr = key
-        }
-      })
-      if (keyCtr + 1 < this.list.length) {
-        return ++keyCtr
-      }
-      return keyCtr
-    },
-    hasDefaultContact () {
-      return !this.taskToCall?.id
     },
     getLine () {
       return this.campaigns.find((line) => line.id === this.activeTask?.task?.communication?.campaign_id)
@@ -533,7 +513,6 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
-
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
 
@@ -566,8 +545,7 @@ export default {
         this.autoDialer.outbound_campaign_id = null
       }
     },
-
-    startWarmUpCountDown (task) {
+    startWarmUpCountDown () {
       if (this.countdownStarted) {
         return
       }
@@ -576,11 +554,10 @@ export default {
       this.resetTimer()
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
-        this.onTimerIsOver(task)
+        this.onTimerIsOver()
       }, 1000)
     },
-
-    onTimerIsOver (task) {
+    onTimerIsOver () {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
         if (this.toggleEnd || !this.hasQueuedTaskLists) {
@@ -588,7 +565,7 @@ export default {
           return
         }
         if (!this.togglePause && !this.wrapUp) {
-          this.runTask(task)
+          this.runTask()
         }
         if (this.wrapUp) {
           this.initialize()
@@ -601,7 +578,6 @@ export default {
         }
       }
     },
-
     resetSession () {
       this.activeTask = {}
       this.taskToCall = {}
@@ -615,12 +591,10 @@ export default {
         mute: false
       }
     },
-
     start () {
       this.resetSession()
       this.initialize()
     },
-
     async initialize () {
       if (!this.isSessionRunning) {
         this.TOGGLE_SESSION_LOADER(true)
@@ -642,20 +616,33 @@ export default {
 
       // TEMPORARY IMPLEMENTATION
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
-      if (!this.statusOnACall && !this.statusOnACall) {
+      if (!this.statusOnACall) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
           this.activeTask = await this.getContact({ id: this.taskToCall.id })
-        }
+          // this.activeTask = this.taskToCall
+          // this.setContact(this.taskToCall)
 
-        // Fetch current contact thru API call
-        await this.fetchContact(this.taskToCall.id)
-        if (!this.wrapUp) {
+          this.TOGGLE_SESSION_LOADER(true)
+
+          if (!this.isSessionRunning) {
+            this.isSessionRunning = true
+          }
+
           this.resetTimer()
           setTimeout(() => {
             this.startWarmUpCountDown()
           }, 1000)
         }
+
+        // Fetch current contact thru API call
+        // await this.fetchContact(this.taskToCall.id)
+        // if (!this.wrapUp) {
+        //   this.resetTimer()
+        //   setTimeout(() => {
+        //     this.startWarmUpCountDown()
+        //   }, 1000)
+        // }
       }
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
@@ -750,7 +737,6 @@ export default {
           break
       }
     },
-
     openAdd () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'add'
@@ -768,6 +754,36 @@ export default {
       // setTimeout(() => {
       //   this.expanded = true
       // }, 50)
+    },
+    async nextContact () {
+      this.$VueEvent.fire('hangupCall')
+      this.wrapUp = false
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
+
+      if (this.taskToCall) {
+        this.hangUpInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('endWrapUp')
+
+            this.activeTask = this.taskToCall
+            this.setContact(this.taskToCall)
+
+            this.TOGGLE_SESSION_LOADER(true)
+
+            if (!this.isSessionRunning) {
+              this.isSessionRunning = true
+            }
+
+            clearInterval(this.hangUpInterval)
+            this.resetTimer()
+            setTimeout(() => {
+              this.startWarmUpCountDown()
+            }, 1000)
+          }
+        }, 500)
+      } else {
+        this.reRoute()
+      }
     }
   },
   watch: {
@@ -822,6 +838,9 @@ export default {
       } else {
         this.initialize()
       }
+    },
+    'dialer.currentStatus': function (value) {
+
     }
   },
   data () {
@@ -839,7 +858,8 @@ export default {
       },
       reRouteModal: false,
       redirectDelay: 3000,
-      redirectNotification: false
+      redirectNotification: false,
+      hangUpInterval: null
     }
   }
 }

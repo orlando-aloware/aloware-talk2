@@ -16,7 +16,7 @@
       <div class="button-label">
         Start Dialing
         <q-tooltip v-if="disabledTrigger">
-          To start dialing, a minimum of 1 (one) contact item in the list is required
+          To start dialing, a minimum of one (1) contact item in the list is required.
         </q-tooltip>
       </div>
     </q-btn>
@@ -335,7 +335,7 @@ import { isEqual } from 'lodash'
 // const UNTITLED = 'Untitled'
 
 export default {
-  name: 'StartDialsSessionsSettings',
+  name: 'StartDialSessionsSettings',
   props: {
     list: {
       type: Object
@@ -465,7 +465,7 @@ export default {
       this.dialog = true
     },
     async beginDial () {
-      var res = null
+      let res = null
       let newList = null
       /**
        * Identify first before exiting the component
@@ -475,6 +475,7 @@ export default {
       this.loading = true
       this.isDialing = true
       this.loadingText = 'Starting session..'
+
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.filterSelectedItem }
         res = await this.createDialerSessionSetting({
@@ -492,7 +493,6 @@ export default {
         }
       } else {
         let { id } = this.selectedItem
-        // this.activeSessionSettingId = id
         newList = await this.updateContactsList({
           id: this.listId,
           dialer_session_id: id

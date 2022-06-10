@@ -67,9 +67,10 @@
 
           <ScriptSelector
             v-else-if="cform.name === 'script_id'"
+            class="w-100"
             v-model="resources[cform.name]"
             :disable="disabled"
-            class="w-100"></ScriptSelector>
+            :clearable="true" />
 
           <CallDispositionSelector
             v-else-if="cform.name === 'call_disposition_ids'"

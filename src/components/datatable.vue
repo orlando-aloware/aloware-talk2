@@ -30,8 +30,7 @@
               :class="{
                 checkbox: column.name === 'checkbox',
                 sticky: column.sticky,
-                hovering: hoverKey === key ? isHovering : false,
-                'th-name': column.name === 'name'
+                hovering: hoverKey === key ? isHovering : false
               }"
               :id="`cols-${column.name}`"
               :style="{

@@ -45,7 +45,7 @@ import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
 
 export default {
-  name: 'ContactInProgress',
+  name: 'SessionContactInProgress',
   components: {
     PhoneIcon
   },
@@ -91,7 +91,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

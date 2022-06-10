@@ -6,7 +6,7 @@
       <SessionSidebar />
     </div>
     <div
-      :class="`${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 pr-1 mb-0`"
+      :class="`${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 mb-0`"
       class="sessions-main-page px-0 mb-0 main flex-1"
       :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
       <div class="t-flex-group">
@@ -17,7 +17,7 @@
             <CallDisposition />
           </div>
           <div class="col-5 p-0">
-            <CallStatus
+            <session-call-status
               @on-redirect="redirectRoute"
               @no-tasks-found="onNoTasksFound"
               @on-all-tasks-are-skipped="onAllTasksAreSkipped" />
@@ -37,11 +37,11 @@ import { mapGetters, mapActions, mapMutations } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
-import CallStatus from 'src/components/power-dialer/sessions/session-call-status'
+import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionPage from 'src/components/power-dialer/sessions/session-page'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import sessionsMixins from 'src/plugins/mixins/sessions-call-status'
+import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 
 export default {
@@ -49,16 +49,15 @@ export default {
   components: {
     SessionSidebar,
     CallDisposition,
-    CallStatus,
+    SessionCallStatus,
     SessionPage
   },
   mixins: [
-    sessionsMixins,
+    sessionCallStatusMixin,
     broadcast
   ],
   computed: {
     ...mapGetters('contacts', [
-      'listItems',
       'contact',
       'selectedList'
     ]),
@@ -66,16 +65,12 @@ export default {
       'sessionSidebarExpanded'
     ]),
     ...mapFields('powerDialer', [
-      'powerDialerTasks',
       'powerDialerTaskFilters',
       'activeList',
       'activeMetrics',
       'myQueue',
       'hasActiveTask'
     ]),
-    list () {
-      return this.listItems[this.selectedList.id].data || []
-    },
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
@@ -122,13 +117,10 @@ export default {
         }
       } else {
         Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(async stat => {
-          let params = {}
           let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
-          if (stat === 'all') {
-            params = { id: this.selectedList.id }
-          } else {
-            params = { id: this.selectedList.id, task_status: taskStatus }
-          }
+
+          let params = stat === 'all' ? { id: this.selectedList.id } : { id: this.selectedList.id, task_status: taskStatus }
+
           res = await this.getSessionTaskByFilter(params)
           this.powerDialerTasks[stat] = res.data.data
           this.powerDialerTaskFilters[stat] = res.data
