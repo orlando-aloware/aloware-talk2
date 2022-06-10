@@ -560,7 +560,7 @@ export default {
     onTimerIsOver () {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
-        if (this.toggleEnd || !this.hasQueuedTaskLists) {
+        if ((this.toggleEnd || !this.hasQueuedTaskLists) && !this.hasActiveTask) {
           this.reRoute()
           return
         }
@@ -782,6 +782,9 @@ export default {
           }
         }, 500)
       } else {
+        if (this.dialer.currentStatus === 'WRAP_UP') {
+          this.$VueEvent.fire('endWrapUp')
+        }
         this.reRoute()
       }
     }

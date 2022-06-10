@@ -27,7 +27,7 @@
               </q-item-section>
             </template>
 
-            <InProgressContact />
+            <session-contact-in-progress />
 
           </q-expansion-item>
           <q-separator />
@@ -214,7 +214,7 @@
 
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-import InProgressContact from './session-contact-in-progress'
+import SessionContactInProgress from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
 import ArrowDownIcon from 'components/icons/arrow-down-icon'
@@ -233,7 +233,7 @@ const DIRECTION = {
 export default {
   name: 'SessionGroups',
   components: {
-    InProgressContact,
+    SessionContactInProgress,
     SearchList,
     ContactInQueue,
     PhoneIcon,
