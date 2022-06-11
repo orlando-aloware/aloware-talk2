@@ -1,5 +1,6 @@
 <template>
-  <div class="t-menu border-top">
+  <div class="power-dialer-list t-menu border-top"
+       data-popper-target="power-dialer-list">
     <ContactsFolders
       :is-contact-module-type="false">
     </ContactsFolders>

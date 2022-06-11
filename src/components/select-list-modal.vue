@@ -32,9 +32,9 @@
           <b-form-row>
             <b-col md="10">
               <search
-                @search="onSearch"
                 placeholder="Search static list..."
                 searchOnKeyup
+                @search="onSearch"
               />
             </b-col>
             <b-col md="2">
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import SelectListTreeFolder from 'src/components/select-list-tree-folder/select-list-tree-folder'
@@ -81,7 +81,8 @@ import Search from 'src/components/search'
 export default {
   components: { Search, SelectListTreeFolder },
   computed: {
-    ...mapGetters('contacts', ['selectList', 'currentListFilters', 'selectedStaticList', 'selectedList', 'selectedContacts', 'folders', 'isAllContactsSelected']),
+    ...mapState('contacts', ['isAllContactsSelected']),
+    ...mapGetters('contacts', ['selectList', 'currentListFilters', 'selectedStaticList', 'selectedList', 'selectedContacts', 'folders']),
     getTitle () {
       return 'Add to Static Lists'
     }
