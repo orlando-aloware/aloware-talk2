@@ -766,7 +766,7 @@ export default {
       console.log('PD contact to create : ', contact)
     },
     async myQueueList () {
-      this.$emit('on-my-queue-list')
+      // this.$emit('on-my-queue-list')
     },
     onSearch (searchText) {
       this.$emit('search', searchText)
@@ -913,11 +913,13 @@ export default {
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     },
-    init () {
+    init (loadList = true) {
       this.resetFilters(true)
       this.$VueEvent.fire('clearContacts')
       this.initialListFilters = this.currentListFilters
-      this.loadList(this.selectedListId)
+      if (loadList) {
+        this.loadList(this.selectedListId)
+      }
     },
     valueIsArray (value) {
       return Array.isArray(value)
@@ -946,10 +948,18 @@ export default {
     }
   },
   watch: {
-    '$route.params': {
-      handler (params) {
+    '$route.params.filter': {
+      handler () {
         if (!this.$route.name.includes('Contact')) {
-          this.init()
+          this.init(false)
+        }
+      },
+      deep: true
+    },
+    '$route.params.id': {
+      handler () {
+        if (!this.$route.name.includes('Contact')) {
+          this.init(true)
         }
       },
       deep: true

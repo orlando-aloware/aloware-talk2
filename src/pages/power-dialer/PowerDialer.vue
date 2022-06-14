@@ -89,7 +89,6 @@ import {
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import qs from 'qs'
-// import { get } from 'lodash'
 
 export default {
   name: 'PowerDialer',
@@ -165,10 +164,7 @@ export default {
       return filterKeys
     },
     isFilterKey () {
-      if (this.filterKeys.includes(this.id)) {
-        return false
-      }
-      return true
+      return !this.filterKeys.includes(this.id)
     },
     isActive () {
       return this.$route.name === 'Power Dialer'
@@ -192,7 +188,7 @@ export default {
   async mounted () {
     this.START_DIAL_TOGGLE(false)
     // // await this.initialize()
-    await this.myQueueList()
+    // await this.myQueueList()
     await this.setFilterParams(this.$route.params)
 
     this.$VueEvent.listen('metric_sessions_update', (sessionMetrics) => {
@@ -226,7 +222,8 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'getMyQueueList'
+      'getMyQueueList',
+      'updateMyQueueListData'
     ]),
     ...mapActions('contacts', [
       'listLoaded',
@@ -336,6 +333,7 @@ export default {
       this.clearList()
     },
     onFetchMyQueueData () {
+      this.myQueueList()
       this.$axios
         .get(this.apiEndpoint(true), {
           params: this.buildQueryString({}, false),

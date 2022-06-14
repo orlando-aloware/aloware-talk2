@@ -1,6 +1,5 @@
 <template>
-  <q-card flat
-          :disabled="sessionLoader">
+  <q-card flat>
     <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-3 pb-0">
 
@@ -264,7 +263,7 @@ import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import { get, isEmpty } from 'lodash'
+import { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -627,9 +626,9 @@ export default {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
           this.taskToCall = this.powerDialerTasks.in_queue[0]
-          this.activeTask = await this.getContact({ id: get(this.taskToCall, 'id', null) })
-          // this.activeTask = this.taskToCall
-          // this.setContact(this.taskToCall)
+          this.activeTask = this.taskToCall
+          this.hasActiveTask = true
+          this.setContact(this.taskToCall)
 
           this.TOGGLE_SESSION_LOADER(true)
 
@@ -642,15 +641,6 @@ export default {
             this.startWarmUpCountDown()
           }, 1000)
         }
-
-        // Fetch current contact thru API call
-        // await this.fetchContact(this.taskToCall.id)
-        // if (!this.wrapUp) {
-        //   this.resetTimer()
-        //   setTimeout(() => {
-        //     this.startWarmUpCountDown()
-        //   }, 1000)
-        // }
       }
 
       if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
@@ -786,8 +776,9 @@ export default {
       }
 
       this.activeTask = this.taskToCall
+      this.hasActiveTask = true
       this.setContact(this.taskToCall)
-      this.TOGGLE_SESSION_LOADER(true)
+      // this.TOGGLE_SESSION_LOADER(true)
 
       if (!this.isSessionRunning) {
         this.isSessionRunning = true
@@ -811,6 +802,8 @@ export default {
       this.taskToCall = this.powerDialerTasks.in_queue[0]
 
       if (this.taskToCall) {
+        this.activeTask = this.taskToCall
+        this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
         this.hangUpInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
@@ -905,7 +898,9 @@ export default {
       }
     },
     'dialer.currentStatus': function (value) {
-
+      if (value === 'WRAP_UP') {
+        this.nextContact()
+      }
     }
   },
   data () {

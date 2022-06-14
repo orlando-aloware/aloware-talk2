@@ -474,7 +474,7 @@ export default {
        */
       this.loading = true
       this.isDialing = true
-      this.loadingText = 'Starting session..'
+      this.loadingText = 'Redirecting you to Power Dialer session..'
 
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.filterSelectedItem }
