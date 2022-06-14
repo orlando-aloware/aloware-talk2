@@ -8,7 +8,6 @@ const DIRECTION = {
   bottom: 2
 }
 
-// import { isEmpty } from 'lodash'
 export default {
   data () {
     return {
@@ -30,6 +29,10 @@ export default {
       return AutoDialTaskStatus.STATUSES
     },
     statusDisplayButton () {
+      if (!this.dialer.isReady) {
+        return 'Offline'
+      }
+
       switch (this.dialer?.currentStatus) {
         case 'READY':
           if (this.timerIsOver) {
@@ -64,8 +67,9 @@ export default {
           return 'Hanging Up Call'
         case 'CALL_DISCONNECTED':
           return 'Call Disconnected'
+        case 'OFFLINE':
         default:
-          return 'Ready'
+          return 'Offline'
       }
     },
     moveDirection () {

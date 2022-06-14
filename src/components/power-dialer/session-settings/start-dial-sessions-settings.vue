@@ -323,7 +323,7 @@
 
 <script>
 
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
@@ -356,6 +356,7 @@ export default {
     SettingIcon
   },
   computed: {
+    ...mapState(['dialer']),
     ...mapFields('powerDialer', [
       'sessionSettings',
       'dialerSessionSettings',
@@ -474,7 +475,7 @@ export default {
        */
       this.loading = true
       this.isDialing = true
-      this.loadingText = 'Redirecting you to Power Dialer session..'
+      this.loadingText = this.defaultTrigger ? 'Redirecting you to Power Dialer session..' : 'Applying changes to session settings..'
 
       if (this.temporarySetting.id === this.selectedItem.id) {
         let newSettings = { ...this.filterSelectedItem }
@@ -501,6 +502,11 @@ export default {
       }
 
       if (this.defaultTrigger) {
+        if (!this.dialer.isReady) {
+          this.loading = false
+          this.$generalNotification('Unable to start session. Dialer is offline.', 'error')
+          return
+        }
         this.$emit('start')
       } else {
         this.$emit('update', newList)

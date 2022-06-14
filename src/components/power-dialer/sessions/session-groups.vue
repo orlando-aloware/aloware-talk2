@@ -247,7 +247,6 @@ export default {
     // console.log('this.activeTask :>> ', this.activeTask)
     // let { powerDialerTasks } = this
     // this.powerDialerTasks.in_queue.shift()
-    console.log(this.powerDialerTasks, this.activeTask)
   },
   computed: {
     ...mapState(['dialer']),
