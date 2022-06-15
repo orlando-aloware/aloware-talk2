@@ -68,6 +68,10 @@ export default {
   },
   watch: {
     'taskToCall': function (value) {
+      if (!value) {
+        return
+      }
+
       this.source.cancel('Loading of contact data operation is canceled by the user.')
       this.source = this.cancelToken.source()
 

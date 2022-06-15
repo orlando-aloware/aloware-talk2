@@ -1937,6 +1937,7 @@ export default {
       this.expanded = false
       this.resetAdd()
       this.resetTransfer()
+      this.$VueEvent.fire('phoneExpansionReset')
     },
     toggleRecordingStatus () {
       this.loadingToggleRecordingStatus = true
