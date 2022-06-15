@@ -58,7 +58,7 @@
           no-wrap unelevated no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
-          @click="nextContact">
+          @click="onNextContact">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
@@ -458,6 +458,7 @@ export default {
       return false
     },
     canNextTask () {
+      // TODO should be able to next task even if on warm up period
       return (
         this.statusCallConnected ||
         ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
@@ -785,7 +786,7 @@ export default {
         this.startWarmUpCountDown()
       }, 1000)
     },
-    async nextContact () {
+    async onNextContact () {
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' && this.powerDialerTasks.in_queue.length) {
         this.wrapUp = false
         this.taskToCall = this.powerDialerTasks.in_queue[0]
@@ -897,7 +898,7 @@ export default {
     },
     'dialer.currentStatus': function (value) {
       if (value === 'WRAP_UP') {
-        this.nextContact()
+        this.onNextContact()
       }
     }
   },
