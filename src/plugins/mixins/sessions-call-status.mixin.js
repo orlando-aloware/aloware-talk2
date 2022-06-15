@@ -167,10 +167,11 @@ export default {
     },
 
     clearWarmUpCountDown () {
-      this.countdownStarted = false
       this.countdownTimer = -1
-
       clearInterval(this.countdownInterval)
+      setTimeout(() => {
+        this.countdownStarted = false
+      }, 1000)
     },
 
     skipTask () {

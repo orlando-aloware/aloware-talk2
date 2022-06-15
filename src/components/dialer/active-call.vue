@@ -145,6 +145,7 @@ export default {
       $event.stopPropagation()
       $event.preventDefault()
       this.$VueEvent.fire('endWrapUp')
+      this.$VueEvent.fire('endWrapUpPDSession')
     },
 
     togglePhone () {

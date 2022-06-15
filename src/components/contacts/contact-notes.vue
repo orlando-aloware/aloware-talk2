@@ -1,5 +1,6 @@
 <template>
-  <b-card class="border-0 contact-notes-wrapper">
+  <b-card class="border-0 contact-notes-wrapper"
+          v-if="contact">
     <h4 v-if="!no_title">Notes</h4>
     <div v-if="!isEdit"
          class="notes mt-1" @click="onEditNotes" v-html="contact.notes">

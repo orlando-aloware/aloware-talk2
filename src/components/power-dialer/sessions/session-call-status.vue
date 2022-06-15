@@ -500,7 +500,7 @@ export default {
     this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
     this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
 
-    this.$VueEvent.stop('endWrapUp', this.closePowerDialerNoTasks)
+    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
 
     this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
@@ -790,14 +790,17 @@ export default {
       }, 1000)
     },
     async nextContact () {
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED' && this.taskToCall) {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED' && this.powerDialerTasks.in_queue.length) {
         this.wrapUp = false
         this.taskToCall = this.powerDialerTasks.in_queue[0]
         this.processSession()
         return
       }
 
-      this.$VueEvent.fire('hangupCall')
+      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.$VueEvent.fire('hangupCall')
+      }
+
       this.wrapUp = false
       this.taskToCall = this.powerDialerTasks.in_queue[0]
 
@@ -818,9 +821,8 @@ export default {
           }
         }, 500)
       } else {
-        if (this.dialer.currentStatus === 'WRAP_UP') {
-          this.$VueEvent.fire('endWrapUp')
-        }
+        this.dialer.currentStatus === 'WRAP_UP' && this.$VueEvent.fire('endWrapUp')
+        this.hasActiveTask = false
         this.reRoute()
       }
     },
