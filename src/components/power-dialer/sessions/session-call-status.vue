@@ -564,7 +564,7 @@ export default {
           return
         }
         if (!this.togglePause && !this.wrapUp) {
-          // this.runTask()
+          this.runTask()
         }
         if (this.wrapUp) {
           this.initialize()
