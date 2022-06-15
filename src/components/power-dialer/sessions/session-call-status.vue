@@ -171,26 +171,8 @@
           </div>
 
         </div>
-        <q-btn
-          v-if="toggleEnd"
-          color="primary"
-          unelevated
-          no-wrap no-caps size="sm"
-          class="btn-btn-primary sessions-button free-width mx-1"
-          @click="resumeSession">
-
-          <PauseIcon
-            class="mr-2"
-            color="white" />
-
-          <div class="text-body2 text-white">
-            Resume
-          </div>
-
-        </q-btn>
 
         <q-btn
-          v-else
           unelevated :outline="!sessionPaused"
           no-wrap no-caps size="sm"
           :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
@@ -204,7 +186,7 @@
 
           <div
             :class="`text-body2 ${sessionPaused ? 'text-white' : 'text-black'}`">
-            {{ togglePause ? sessionPaused ? 'Resume Session' : 'Unpause Session' : 'Pause Session' }}
+            {{ pauseButtonText }}
           </div>
         </q-btn>
 
@@ -479,6 +461,16 @@ export default {
         this.statusCallConnected ||
         ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
       ) && this.callInProgress
+    },
+    pauseButtonText () {
+      switch (true) {
+        case this.togglePause && !this.sessionPaused && !this.toggleEnd:
+          return 'Unpause Session'
+        case this.togglePause && this.sessionPaused && !this.toggleEnd:
+          return 'Resume Session'
+        default:
+          return 'Pause Session'
+      }
     }
   },
 
@@ -572,7 +564,7 @@ export default {
           return
         }
         if (!this.togglePause && !this.wrapUp) {
-          this.runTask()
+          // this.runTask()
         }
         if (this.wrapUp) {
           this.initialize()
