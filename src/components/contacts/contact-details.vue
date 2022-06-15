@@ -23,7 +23,8 @@
         </contact-information>
         <contact-tags :contact="contact">
         </contact-tags>
-        <contact-notes :contact="contact"
+        <contact-notes v-if="contact"
+                       :contact="contact"
                        @input="onNotesInput">
         </contact-notes>
         <contact-integrations :contact="contact"></contact-integrations>

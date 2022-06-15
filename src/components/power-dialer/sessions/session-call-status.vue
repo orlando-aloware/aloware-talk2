@@ -209,7 +209,8 @@
       </div>
     </div>
 
-    <q-dialog v-model="reRouteModal">
+    <q-dialog persistent
+              v-model="reRouteModal">
       <q-card class="px-4">
         <q-card-section>
           <div class="text-h6"></div>
@@ -464,9 +465,9 @@ export default {
     },
     pauseButtonText () {
       switch (true) {
-        case this.togglePause && !this.sessionPaused && !this.toggleEnd:
+        case this.togglePause:
           return 'Unpause Session'
-        case this.togglePause && this.sessionPaused && !this.toggleEnd:
+        case this.togglePause && this.sessionPaused:
           return 'Resume Session'
         default:
           return 'Pause Session'
@@ -661,9 +662,12 @@ export default {
     },
     onTogglePause () {
       this.togglePause = !this.togglePause
+      if (this.togglePause) {
+        this.sessionPaused = true
+      }
     },
     onToggleEnd () {
-      this.onTogglePause()
+      this.togglePause = true
       this.toggleEnd = !this.toggleEnd
       this.reRoute()
     },
