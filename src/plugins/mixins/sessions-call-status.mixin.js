@@ -2,6 +2,7 @@ import { mapFields } from 'vuex-map-fields'
 import { mapGetters, mapActions, mapState } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
+import _ from 'lodash'
 
 const DIRECTION = {
   top: 1,
@@ -140,15 +141,17 @@ export default {
     },
 
     skipSingleTask (autoDialTask, message, skipTask = false) {
-      if (autoDialTask && !autoDialTask.contact_list_item_id) {
+      const contactListItemId = _.get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
         return
       }
 
       this.loading_skip = true
-      return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
         .then(res => {
-          if (!this.skippedTasks.includes(autoDialTask.contact_list_item_id)) {
-            this.skippedTasks.push(autoDialTask.contact_list_item_id)
+          if (!this.skippedTasks.includes(contactListItemId)) {
+            this.skippedTasks.push(contactListItemId)
           }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list

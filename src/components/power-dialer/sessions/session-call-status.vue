@@ -689,6 +689,7 @@ export default {
       }
 
       this.reRouteModal = true
+      this.isSessionRunning = false
 
       if (this.dialer.currentStatus !== 'READY') {
         this.hangUpIntervalCounter = 0
@@ -836,7 +837,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = this.powerDialerTasks.in_queue[0]
 
-      if (this.taskToCall) {
+      if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
           this.processSession(true)
         }, 200)
