@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="contact">
     <b-card class="border-0">
       <h4>All Numbers</h4>
       <contact-phones-list-items :phones="primaryPhone"
