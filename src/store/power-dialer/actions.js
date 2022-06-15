@@ -274,5 +274,8 @@ export default {
       })
     }
     commit('UPDATE_ONGOING_SESSION', data)
+  },
+  setActiveTask: ({ commit }, task) => {
+    commit('SET_ACTIVE_TASK', task)
   }
 }

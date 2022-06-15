@@ -500,6 +500,9 @@ export default {
     this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
 
+    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
+    this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
+
     this.isSessionRunning = false
   },
 
@@ -761,12 +764,6 @@ export default {
     openTransfer () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'transfer'
-      // this.resetTransfer()
-      // this.expansionEnabled = true
-      // this.bottomExpansion = 'transfer'
-      // setTimeout(() => {
-      //   this.expanded = true
-      // }, 50)
     },
     processSession (noWrapUp = false) {
       if (!noWrapUp) {
@@ -842,6 +839,9 @@ export default {
           this.processSession(true)
         }, 200)
       }
+    },
+    onPhoneExpansionReset () {
+      this.sessionPhoneExpansion = ''
     }
   },
   watch: {

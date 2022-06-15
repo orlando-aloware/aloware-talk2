@@ -32,6 +32,7 @@ import SessionFilters from 'src/components/power-dialer/sessions/session-filters
 import SessionPageDetails from './pages/session-page-details'
 import SessionPageActivity from './pages/session-page-activity'
 import SessionPageCrm from './pages/session-page-crm'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'SessionPage',
@@ -41,14 +42,42 @@ export default {
     SessionPageActivity,
     SessionPageCrm
   },
+  computed: {
+    ...mapState('powerDialer', ['activeTask', 'taskToCall'])
+  },
   methods: {
+    ...mapActions('contacts', ['setContact']),
+    ...mapActions('powerDialer', ['setActiveTask']),
     selectTab (val) {
       this.panel = val.name
+    },
+    getContactData (id, source) {
+      return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })
     }
   },
   data () {
     return {
-      panel: 'Details'
+      panel: 'Details',
+      cancelToken: null,
+      source: null
+    }
+  },
+  created () {
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
+  },
+  watch: {
+    'taskToCall': function (value) {
+      if (!value) {
+        return
+      }
+
+      this.source.cancel('Loading of contact data operation is canceled by the user.')
+      this.source = this.cancelToken.source()
+
+      this.getContactData(value.id, this.source.token).then(res => {
+        this.setContact(res.data)
+      })
     }
   }
 }

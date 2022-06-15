@@ -26,18 +26,19 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 const DEFAULT_TAB = 1
 
 export default {
   name: 'SessionFilters',
   computed: {
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('contacts', [
       'contact'
     ]),
     hasHubspotEnabled () {
-      return this.contact?.company?.hubspot_integration_enabled
+      return this.currentCompany?.hubspot_integration_enabled
     },
     tabs () {
       return [
