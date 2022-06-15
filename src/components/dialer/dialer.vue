@@ -45,7 +45,8 @@ export default {
       hangupInterval: null,
       AgentStatus,
       WebrtcEvents,
-      CommunicationDispositionStatus
+      CommunicationDispositionStatus,
+      activeConnectionInterval: null
     }
   },
 
@@ -467,8 +468,27 @@ export default {
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])
 
-      this.connection = this.device.connect(params, true)
-      this.initConnectionEvents()
+      const activeConnectionCounter = { data: 0 }
+
+      // check if connection is completely closed before opening a new one
+      if (this.device.activeConnection()) {
+        this.activeConnectionInterval = setInterval(() => {
+          if (!this.device.activeConnection()) {
+            this.connection = this.device.connect(params, true)
+            this.initConnectionEvents()
+            clearInterval(this.activeConnectionInterval)
+          }
+
+          activeConnectionCounter.data++
+
+          if (activeConnectionCounter.data >= 120) {
+            clearInterval(this.activeConnectionInterval)
+          }
+        }, 500)
+      } else {
+        this.connection = this.device.connect(params, true)
+        this.initConnectionEvents()
+      }
     },
 
     initConnectionEvents () {

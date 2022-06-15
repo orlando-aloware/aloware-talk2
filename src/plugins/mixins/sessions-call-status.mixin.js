@@ -140,7 +140,7 @@ export default {
     },
 
     skipSingleTask (autoDialTask, message, skipTask = false) {
-      if (!autoDialTask.contact_list_item_id) {
+      if (autoDialTask && !autoDialTask.contact_list_item_id) {
         return
       }
 
