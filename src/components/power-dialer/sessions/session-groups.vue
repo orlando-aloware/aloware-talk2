@@ -46,7 +46,7 @@
                   {{ listFilters[key.toUpperCase()].name }}
                   <q-chip size="xs" square class="p-0">
                     <span v-if="key === 'in_queue'">
-                      {{ totalQueued >= 1 && hasActiveTask ? totalQueued - 1 : totalQueued }}
+                      {{ totalQueued }}
                     </span>
                     <span v-else-if="key === 'called'">
                       {{ totalCalled }}
@@ -478,7 +478,7 @@ export default {
     getTotalItem (key) {
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTasks[key] ? this.powerDialerTasks[key].length : 0
+          return this.powerDialerTasks.in_queue ? this.powerDialerTasks.in_queue.length : 0
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':

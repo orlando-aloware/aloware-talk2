@@ -60,7 +60,9 @@ export default {
 
   mounted () {
     this.isEdit = false
-    this.prevValue = this.contact.notes
+    if (this.contact) {
+      this.prevValue = this.contact.notes
+    }
   },
 
   methods: {

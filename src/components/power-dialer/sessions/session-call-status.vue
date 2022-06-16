@@ -58,7 +58,7 @@
           no-wrap unelevated no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
-          @click="onNextContact">
+          @click="onNextTask">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
@@ -246,7 +246,7 @@ import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import { isEmpty } from 'lodash'
+import _, { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -458,11 +458,8 @@ export default {
       return false
     },
     canNextTask () {
-      // TODO should be able to next task even if on warm up period
-      return (
-        this.statusCallConnected ||
-        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
-      ) && this.callInProgress
+      // should be able to next task even if on warm up period
+      return this.statusCallConnected || ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
     },
     pauseButtonText () {
       switch (true) {
@@ -622,7 +619,8 @@ export default {
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
-          this.taskToCall = this.powerDialerTasks.in_queue[0]
+          this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+          this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
           this.activeTask = this.taskToCall
           this.hasActiveTask = true
           this.setContact(this.taskToCall)
@@ -684,6 +682,8 @@ export default {
     resetTimer () {
       if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
         this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
+      } else {
+        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
     reRoute (isForced = false) {
@@ -773,7 +773,6 @@ export default {
       this.activeTask = this.taskToCall
       this.hasActiveTask = true
       this.setContact(this.taskToCall)
-      // this.TOGGLE_SESSION_LOADER(true)
 
       if (!this.isSessionRunning) {
         this.isSessionRunning = true
@@ -784,10 +783,20 @@ export default {
         this.startWarmUpCountDown()
       }, 1000)
     },
-    async onNextContact () {
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED' && this.powerDialerTasks.in_queue.length) {
+    async onNextTask () {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
         this.wrapUp = false
-        this.taskToCall = this.powerDialerTasks.in_queue[0]
+        this.hasActiveTask = false
+
+        this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+
+        if (!this.taskToCall) {
+          this.hasActiveTask = false
+          this.reRoute()
+          return
+        }
+
+        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
         this.processSession()
         return
       }
@@ -795,9 +804,11 @@ export default {
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
         this.$VueEvent.fire('hangupCall')
       }
-
+    },
+    async onNextTaskWhenOnWrapUp () {
       this.wrapUp = false
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
+      this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
 
       if (this.taskToCall) {
         this.activeTask = this.taskToCall
@@ -899,7 +910,7 @@ export default {
     },
     'dialer.currentStatus': function (value) {
       if (value === 'WRAP_UP') {
-        this.onNextContact()
+        this.onNextTaskWhenOnWrapUp()
       }
     }
   },
