@@ -113,6 +113,7 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
+                    :disabled="!hasExport"
                     @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
@@ -733,7 +734,8 @@ export default {
   data () {
     return {
       selectedItem: null,
-      hasFilters: false
+      hasFilters: false,
+      hasExport: false
     }
   },
   methods: {
