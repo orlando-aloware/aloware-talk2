@@ -26,7 +26,7 @@
         </div>
 
         <!-- Session Main Page -->
-        <SessionPage />
+        <SessionContactPage />
       </div>
     </div>
   </div>
@@ -47,7 +47,7 @@ import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
-import SessionPage from 'src/components/power-dialer/sessions/session-page'
+import SessionContactPage from 'src/components/power-dialer/sessions/session-contact-page'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
@@ -60,7 +60,7 @@ export default {
     SessionSidebar,
     CallDisposition,
     SessionCallStatus,
-    SessionPage
+    SessionContactPage
   },
   mixins: [
     sessionCallStatusMixin,

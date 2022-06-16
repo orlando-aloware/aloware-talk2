@@ -19,7 +19,7 @@ import { mapState } from 'vuex'
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'SessionPageCrm',
+  name: 'SessionContactPageCrm',
   mixins: [hubspotIntegrationMixin],
   computed: {
     ...mapState('contacts', ['contact']),
