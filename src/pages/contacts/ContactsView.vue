@@ -237,7 +237,7 @@
           <b-dropdown-item
             @click="exportAsCsv"
             href="#"
-            :disabled="hasExport">
+            :disabled="!hasExport">
             <export-icon></export-icon>
             Export as CSV
           </b-dropdown-item>
@@ -831,7 +831,7 @@ export default {
         dataLength: 0
       },
       datatableTarget: null,
-      hasExport: true,
+      hasExport: false,
       countFields: [
         'unread_texts_count',
         'unread_missed_calls_count',
