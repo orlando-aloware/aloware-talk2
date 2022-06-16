@@ -983,7 +983,6 @@ export default {
       this.onFetch()
     },
     checked: function (value) {
-      console.log('test')
       this.onForcedCheckAll(value)
     }
   }
