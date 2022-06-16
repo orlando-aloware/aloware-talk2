@@ -23,6 +23,7 @@
       <div class="items">
         <a
           href=""
+          :disabled="disabledDelete"
           @click="onDelete">
           <i class="fa fa-trash text-primary"></i>
           Delete
@@ -43,6 +44,10 @@ export default {
     id: {
       type: [Number, String],
       required: true
+    },
+    disabledDelete: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -67,6 +72,10 @@ export default {
       'moveContactItems'
     ]),
     onDelete (e) {
+      if (this.disabledDelete) {
+        e.preventDefault()
+        return
+      }
       this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()

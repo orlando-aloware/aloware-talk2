@@ -61,11 +61,12 @@
               <div class="d-flex float-right">
 
                 <b-dropdown text="Add Contacts"
-                  right
-                  no-caret
-                  variant="light"
-                  class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
-                  toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center">
+                            right
+                            no-caret
+                            variant="light"
+                            class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                            toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
+                            :disabled="taskAddAndClearingDisabled">
                   <template
                     #button-content class="filter-toggle-button">
                     <div
@@ -77,18 +78,27 @@
                       class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
                       style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;">
                     </i>
+                    <q-tooltip v-if="taskAddAndClearingDisabled"
+                               content-class="bg-grey-light11"
+                               anchor="top middle" self="center middle">
+                      Clearing of task is currently disabled.
+                    </q-tooltip>
                   </template>
                   <b-dropdown-item
                     href="#"
+                    :disabled="taskAddAndClearingDisabled"
                     @click="onAddContactsToList">
                     <i class="fa fa-search mr-1"></i>
-                    Select Contacts
+                    Select Contacts & Add to List
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    v-b-modal:create-contact-modal>
+                    v-b-modal:create-contact-modal
+                    :disabled="taskAddAndClearingDisabled">
                     <i class="fa fa-plus mr-1"></i>
                     Create Contact
+                    {{ taskAddAndClearingDisabled ? '' : ' & Add to List' }}
+
                   </b-dropdown-item>
                 </b-dropdown>
 
@@ -120,10 +130,16 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
+                    :disabled="taskAddAndClearingDisabled"
                     @click="onClearList"
                     v-if="isMyQueue">
                     <i class="fa fa-trash-alt mr-1 text-red"></i>
                     <span class="text-red">Clear</span>
+                    <q-tooltip v-if="taskAddAndClearingDisabled"
+                               content-class="bg-grey-light11"
+                               anchor="top middle" self="center middle">
+                      Clearing of task is currently disabled.
+                    </q-tooltip>
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
@@ -145,6 +161,7 @@
       <BulkActionMenu
         v-if="checked.length > 0"
         :id="filteredSelectedListId"
+        :disabledDelete="taskAddAndClearingDisabled"
         @moved-contacts="onFetch({}, false)" />
     </template>
 
@@ -301,9 +318,15 @@
                   v-else-if="column.name === 'actions'"
                   :key="key">
                   <button
-                    @click="onRemove(contact)"
-                    class="btn btn-sm btn-link datatable-row__actions__action--trash">
+                    class="btn btn-sm btn-link datatable-row__actions__action--trash"
+                    :disabled="taskAddAndClearingDisabled"
+                    @click="onRemove(contact)">
                     <TrashOIcon />
+                    <q-tooltip v-if="taskAddAndClearingDisabled"
+                               content-class="bg-grey-light11"
+                               anchor="top middle" self="center middle">
+                      Clearing of task is currently disabled.
+                    </q-tooltip>
                   </button>
                 </td>
                 <td
@@ -462,6 +485,7 @@ import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEqual, isEmpty, get } from 'lodash'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'PowerDialerView',
@@ -520,7 +544,7 @@ export default {
       default: null
     }
   },
-  mixins: [pdMixin, pdInitMixin],
+  mixins: [pdMixin, pdInitMixin, aclMixin],
 
   inject: [
     'contactsData'
@@ -584,6 +608,7 @@ export default {
     })
   },
   computed: {
+    ...mapState('cache', ['currentCompany']),
     ...mapFields('powerDialer', [
       'powerDialerActiveList'
     ]),
@@ -612,6 +637,9 @@ export default {
       'currentListFilters',
       'clearList'
     ]),
+    taskAddAndClearingDisabled () {
+      return !this.isAdmin && this.currentCompany.disable_power_dialer_add
+    },
     filter () {
       return this.activeFilter
     },
@@ -875,6 +903,10 @@ export default {
       }
     },
     onContactCreated (contact) {
+      if (this.taskAddAndClearingDisabled) {
+        return
+      }
+
       let params = {
         contact_ids: [contact.id]
       }
