@@ -43,7 +43,7 @@
           </q-card-section>
         </q-card>
 
-        <DetailsContactInfomation
+        <DetailsContactInformation
           v-if="contact"
           :resources="contact" />
 
@@ -65,19 +65,19 @@
 
 import { mapGetters, mapState } from 'vuex'
 import DetailsScripts from './details-scripts'
-import DetailsContactInfomation from './details-contact-information'
+import DetailsContactInformation from './details-contact-information'
 import DetailsTools from './details-tools'
 import HubSpotIcon from 'components/icons/hubspot-icon'
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'SessionPageDetails',
+  name: 'SessionContactPageDetails',
 
   mixins: [hubspotIntegrationMixin],
 
   components: {
     DetailsScripts,
-    DetailsContactInfomation,
+    DetailsContactInformation,
     DetailsTools,
     HubSpotIcon
   },

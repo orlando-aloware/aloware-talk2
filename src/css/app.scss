@@ -1001,7 +1001,7 @@ i.option-separator {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    display: inline-block;
+    display: inline-block !important;
     margin-top: -1px;
   }
 
