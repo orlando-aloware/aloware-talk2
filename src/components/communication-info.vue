@@ -394,17 +394,20 @@
               <div class="w-100 mb-0 pt-2 pb-2">
                 <label class="form-control-label w-100 mb-1">User</label>
                 <div class="d-flex align-items-center w-100">
-                  <div class="status-icon d-inline-block"
-                       :state="communication.rejected_by_app"
-                       v-if="communication.rejected_by_app !== 0"
-                       v-html="rejectionToIcon(communication.rejected_by_app)">
-                    <q-tooltip anchor="bottom middle"
-                               self="top middle">
+
+                  <q-icon class="status-icon d-inline-block text-danger"
+                          :state="communication.rejected_by_app"
+                          :name="rejectionToIcon(communication.rejected_by_app)"
+                          v-if="communication.rejected_by_app !== 0">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
                       {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                     </q-tooltip>
-                  </div>
+                  </q-icon>
 
-                  <q-tooltip class="item"
+                  <!--q-tooltip class="item"
                              content-class="bg-grey-light11"
                              anchor="top middle"
                              self="top middle"
@@ -414,7 +417,7 @@
                                v-bind:is="icon"
                                :name="rejectionToIcon(communication.rejected_by_app)">
                     </component>
-                  </q-tooltip>
+                  </q-tooltip-->
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
                     <router-link
                       :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
