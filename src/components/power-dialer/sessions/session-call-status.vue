@@ -38,8 +38,8 @@
           unelevated
           outline
           class="sessions-button free-width mx-1"
-          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
-          :disabled="!statusCallConnected"
+          :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
+          :disabled="isHoldDisabled"
           @click="onToggleHold">
           <UnHoldIcon v-if="toggleHold"
                       class="mr-2"
@@ -250,6 +250,8 @@ import _, { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
+import * as CommunicationStatus from 'src/constants/communication-status'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'SessionCallStatus',
@@ -412,6 +414,19 @@ export default {
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
+    },
+    isCallCompleted () {
+      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+    },
+    isHoldDisabled () {
+      return !this.dialer.communication ||
+        this.loadingHold ||
+        this.loadingUnhold ||
+        !this.dialer.communication.customer_leg_sid ||
+        this.isCallCompleted ||
+        (this.currentCompany && !this.currentCompany.conferencing_enabled) ||
+        (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
+        (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid)
     },
     statusReady () {
       return this.dialer.currentStatus === 'READY'
@@ -657,7 +672,30 @@ export default {
     },
     onToggleHold () {
       this.toggleHold = !this.toggleHold
+      if (this.dialer.isHeld) {
+        this.loadingUnhold = true
+      } else {
+        this.loadingHold = true
+      }
       this.$VueEvent.fire('toggleHold')
+      this.$options.holdIntervalCount = 0
+      this.$options.holdInterval = setInterval(() => {
+        if (this.loadingHold && this.dialer.isHeld) {
+          this.loadingHold = false
+          clearInterval(this.$options.holdInterval)
+        }
+
+        if (this.loadingUnhold && !this.dialer.isHeld) {
+          this.loadingUnhold = false
+          clearInterval(this.$options.holdInterval)
+        }
+
+        this.$options.holdIntervalCount++
+
+        if (this.$options.holdIntervalCount >= 120) {
+          clearInterval(this.$options.holdInterval)
+        }
+      }, 500)
     },
     onToggleRecording () {
       this.$VueEvent.fire('toggleRecordingStatus')
@@ -931,7 +969,9 @@ export default {
       redirectDelay: 3000,
       redirectNotification: false,
       hangUpInterval: null,
-      hangUpIntervalCounter: 0
+      hangUpIntervalCounter: 0,
+      loadingHold: false,
+      loadingUnhold: false
     }
   }
 }
