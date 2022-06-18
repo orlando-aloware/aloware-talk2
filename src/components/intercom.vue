@@ -37,6 +37,9 @@ export default {
       })
     },
     setup () {
+      if (!this.authenticated) {
+        return
+      }
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
@@ -66,11 +69,13 @@ export default {
   },
 
   created () {
-    this.getStatics().then(() => {
-      if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
-        this.setup()
-      }
-    })
+    if (this.authenticated) {
+      this.getStatics().then(() => {
+        if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
+          this.setup()
+        }
+      })
+    }
   },
 
   mounted () {
