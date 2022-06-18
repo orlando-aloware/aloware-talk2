@@ -69,20 +69,16 @@ export default {
   },
 
   created () {
-    if (this.authenticated) {
-      this.getStatics().then(() => {
-        if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
-          this.setup()
-        }
-      })
-    }
+    this.getStatics().then(() => {
+      if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
+        this.setup()
+      }
+    })
   },
 
   mounted () {
     this.shutDown()
-    if (this.authenticated) {
-      this.launch()
-    }
+    this.launch()
   },
 
   watch: {
