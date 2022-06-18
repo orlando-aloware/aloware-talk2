@@ -1,12 +1,13 @@
 <template>
-  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+  <b-overlay :show="sessionLoader">
+    <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
     <div
       class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar sidebar-1"
       :class="`${sessionSidebarExpanded ? 'minimized' : ''}`">
       <SessionSidebar />
     </div>
     <div
-      :class="`${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 pr-1 mb-0`"
+      :class="`${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 mb-0`"
       class="sessions-main-page px-0 mb-0 main flex-1"
       :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
       <div class="t-flex-group">
@@ -17,7 +18,7 @@
             <CallDisposition />
           </div>
           <div class="col-5 p-0">
-            <CallStatus
+            <session-call-status
               @on-redirect="redirectRoute"
               @no-tasks-found="onNoTasksFound"
               @on-all-tasks-are-skipped="onAllTasksAreSkipped" />
@@ -25,10 +26,18 @@
         </div>
 
         <!-- Session Main Page -->
-        <SessionPage />
+        <SessionContactPage />
       </div>
     </div>
   </div>
+    <template #overlay>
+      <div class="text-center">
+        <q-spinner-bars color="primary"
+                        size="2em" />
+        <div>Preparing session...</div>
+      </div>
+    </template>
+  </b-overlay>
 </template>
 
 <script>
@@ -37,45 +46,42 @@ import { mapGetters, mapActions, mapMutations } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
-import CallStatus from 'src/components/power-dialer/sessions/session-call-status'
-import SessionPage from 'src/components/power-dialer/sessions/session-page'
+import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
+import SessionContactPage from 'src/components/power-dialer/sessions/session-contact-page'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import sessionsMixins from 'src/plugins/mixins/sessions-call-status'
+import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
+import qs from 'qs'
 
 export default {
   name: 'PowerDialerSession',
   components: {
     SessionSidebar,
     CallDisposition,
-    CallStatus,
-    SessionPage
+    SessionCallStatus,
+    SessionContactPage
   },
   mixins: [
-    sessionsMixins,
+    sessionCallStatusMixin,
     broadcast
   ],
   computed: {
     ...mapGetters('contacts', [
-      'listItems',
       'contact',
       'selectedList'
     ]),
     ...mapGetters('powerDialer', [
-      'sessionSidebarExpanded'
+      'sessionSidebarExpanded',
+      'sessionLoader'
     ]),
     ...mapFields('powerDialer', [
-      'powerDialerTasks',
       'powerDialerTaskFilters',
       'activeList',
       'activeMetrics',
       'myQueue',
       'hasActiveTask'
     ]),
-    list () {
-      return this.listItems[this.selectedList.id].data || []
-    },
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
@@ -88,11 +94,11 @@ export default {
   },
   async created () {
     await this.fetchCurrentList()
+    this.TOGGLE_SESSION_LOADER(true)
     await this.fetchTasks(1)
     this.hasActiveTask = false
   },
   async mounted () {
-    this.TOGGLE_SESSION_LOADER(true)
     this.resetPowerDialerTasks()
     if (!this.myQueue) {
       await this.getMyQueueList()
@@ -102,7 +108,6 @@ export default {
   methods: {
     ...mapActions('powerDialer', [
       'resetPowerDialerTasks',
-      'getSessionTaskByFilter',
       'getPowerDialerList',
       'setSelectedPDList',
       'getMyQueueList'
@@ -110,28 +115,35 @@ export default {
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
     ]),
-    async fetchTasks (status) {
-      let res = null
-      if (status) {
-        res = await this.getSessionTaskByFilter({ id: this.selectedList.id, task_status: 1 })
-        this.powerDialerTasks['in_queue'] = res.data.data
-        this.powerDialerTaskFilters['in_queue'] = res.data
-
-        if (this.powerDialerTasks['in_queue'].length === 0) {
-          this.$VueEvent.fire('initiate_session_no_tasks')
+    getTaskByFilter (params = {}) {
+      return window.axios.get(
+        `api/v2/power-dialer-lists/${params.id === 'all' ? 'my-queue' : params.id}/items`,
+        {
+          params,
+          paramsSerializer: qs.stringify
         }
-      } else {
-        Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(async stat => {
-          let params = {}
-          let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
-          if (stat === 'all') {
-            params = { id: this.selectedList.id }
-          } else {
-            params = { id: this.selectedList.id, task_status: taskStatus }
+      )
+    },
+    fetchTasks (status) {
+      if (status) {
+        this.getTaskByFilter({ id: this.selectedList.id, task_status: 1 }).then(res => {
+          this.powerDialerTasks['in_queue'] = res.data.data
+          this.powerDialerTaskFilters['in_queue'] = res.data
+
+          if (this.powerDialerTasks['in_queue'].length === 0) {
+            this.$VueEvent.fire('initiate_session_no_tasks')
           }
-          res = await this.getSessionTaskByFilter(params)
-          this.powerDialerTasks[stat] = res.data.data
-          this.powerDialerTaskFilters[stat] = res.data
+        })
+      } else {
+        Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
+          let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+
+          let params = stat === 'all' ? { id: this.selectedList.id } : { id: this.selectedList.id, task_status: taskStatus }
+
+          this.getTaskByFilter(params).then(res => {
+            this.powerDialerTasks[stat] = res.data.data
+            this.powerDialerTaskFilters[stat] = res.data
+          })
         })
       }
     },

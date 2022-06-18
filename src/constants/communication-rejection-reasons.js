@@ -1,0 +1,56 @@
+// A call/SMS was received by our system but not shown to user because company was out of credit
+export const REJECTION_REASON_CREDITS = 1
+// A call/SMS was received by our system but was blocked because caller's phone number is blocked.
+export const REJECTION_REASON_BLOCKED = 2
+// A call/SMS was received by our system but was blocked because because of other reasons, e.g.: .
+export const REJECTION_REASON_OTHER = 3
+// A call/SMS was received by our system but it doesn't have a user
+export const REJECTION_REASON_USER_NOT_FOUND = 4
+// A call/SMS was failed
+export const REJECTION_REASON_FAILED = 5
+// A call/SMS was received by our system because of an anonymous contact
+export const REJECTION_REASON_ANONYMOUS_CONTACT = 6
+// A call/SMS was received by our system because of traffic blocking by Twilio
+export const REJECTION_REASON_TRAFFIC_BLOCKED = 7
+// A call/SMS was received by our system because phone number is not messaging enabled
+export const REJECTION_REASON_NOT_MESSAGING_ENABLED = 8
+// A call/SMS was rejected to send by our system because campaign is deleted
+export const REJECTION_REASON_CAMPAIGN_DELETED = 9
+// A call/SMS was rejected to send by our system because campaign is paused
+export const REJECTION_REASON_CAMPAIGN_PAUSED = 10
+// A call/SMS was rejected to send by our system because contact is in DNC
+export const REJECTION_REASON_CONTACT_DNC = 11
+// A call/SMS was rejected to send by our system because company is disabled
+export const REJECTION_REASON_COMPANY_DISABLED = 12
+// A call/SMS was rejected to send by our system because message is empty
+export const REJECTION_REASON_MESSAGE_EMPTY = 13
+// A call/SMS was rejected to send by our system because recipient's number is international
+export const REJECTION_REASON_NUMBER_IS_INTERNATIONAL = 14
+// A fax was rejected to send by our system because no fax number was found for the sender
+export const REJECTION_REASON_FAX_NUMBER_NOT_FOUND = 15
+// A communication is rejected due to invalid or erroneous phone number
+export const REJECTION_REASON_INVALID_OR_WRONG_PHONE_NUMBER = 16
+// A communication is rejected due the phone number is toll free
+export const REJECTION_REASON_TOLLFREE_NUMBER = 17
+// A communication is rejected due not permitted to make call
+export const REJECTION_REASON_USER_NOT_PERMITTED_TO_MAKE_CALL = 18
+// A communication is rejected due the caller is not active
+export const REJECTION_REASON_USER_NOT_ACTIVE = 19
+// A communication is rejected cause there is no auto dial task remaining
+export const REJECTION_REASON_NO_AUTO_DIAL_TASK_REMAINING = 20
+// A communication is rejected due the auto dial task is not queued
+export const REJECTION_REASON_AUTO_DIAL_TASK_NOT_QUEUED = 21
+// A communication is rejected due the absence of campaign
+export const REJECTION_REASON_CAMPAIGN_NOT_FOUND = 22
+// A communication is rejected due the absence of incoming number
+export const REJECTION_REASON_INCOMING_NUMBER_NOT_FOUND = 23
+// A communication is rejected cause the user is invalid
+export const REJECTION_REASON_INVALID_USER = 24
+// A communication is rejected due the link format is invalid
+export const REJECTION_REASON_INVALID_LINK_FORMAT = 25
+// A communication is rejected due the absence of connected HS account
+export const REJECTION_REASON_CONNECTED_HS_ACCOUNT_NOT_FOUND = 26
+// A communication is rejected due the absence of connected HS contact
+export const REJECTION_REASON_HS_CONTACT_NOT_FOUND = 27
+// A communication is rejected due the connected HS phone number is invalid
+export const REJECTION_REASON_HS_INVALID_PHONE_NUMBER = 28

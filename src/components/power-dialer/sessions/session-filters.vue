@@ -6,11 +6,18 @@
         :key="key"
         class="link px-1" style="display:contents;">
         <div
-          @click="clicked(filter, filter.enabled)"
-          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${id === filter.id ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`">
+          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${id === filter.id ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`"
+          @click="clicked(filter, filter.enabled)">
           <div class="t-badge-name">
             {{ filter.name }}
           </div>
+          <q-tooltip v-if="filter.name === 'CRM View' && !hasHubspotEnabled"
+                     content-class="bg-grey-light11"
+                     anchor="bottom start"
+                     self="center start"
+                     :offset="[0, 18]">
+            Hubspot integration is disabled.
+          </q-tooltip>
         </div>
       </div>
     </div>
@@ -19,18 +26,19 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 const DEFAULT_TAB = 1
 
 export default {
   name: 'SessionFilters',
   computed: {
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('contacts', [
       'contact'
     ]),
     hasHubspotEnabled () {
-      return this.contact?.company?.hubspot_integration_enabled
+      return this.currentCompany?.hubspot_integration_enabled
     },
     tabs () {
       return [

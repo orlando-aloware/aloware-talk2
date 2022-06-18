@@ -203,7 +203,8 @@ export default {
       auth: auth,
       isLoading: false,
       options: [],
-      reference: 'sequenceSelect'
+      reference: 'sequenceSelect',
+      fullOptionsProperty: 'formattedSequences'
     }
   },
 

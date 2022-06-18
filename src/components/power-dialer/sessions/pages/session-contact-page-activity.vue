@@ -1,6 +1,6 @@
 <template>
   <b-overlay
-    :show="changingSelectedContact || sessionLoader"
+    :show="changingSelectedContact"
     :opacity="0.85"
     class="h-100"
     variant="white"
@@ -46,6 +46,13 @@
         </div>
       </div>
     </div>
+    <template #overlay>
+      <div class="text-center">
+        <q-spinner-bars color="primary"
+                        size="2em" />
+        <div>Fetching contact activity information...</div>
+      </div>
+    </template>
   </b-overlay>
 </template>
 
@@ -61,7 +68,7 @@ import {
 import ContactActivities from 'src/components/contacts/contact-activities'
 
 export default {
-  name: 'SessionPageActivity',
+  name: 'SessionContactPageActivity',
   components: {
     ContactActivities
   },
@@ -71,6 +78,11 @@ export default {
     aclMixin,
     visibilityMixin
   ],
+  props: {
+    panel: {
+      required: true
+    }
+  },
   mounted () {
     this.flagged = false
     this.prepareActivities()
@@ -113,20 +125,9 @@ export default {
         return 'w-less-330px'
       }
       return 'w-less-500px'
-      // !this.isSidebarCollapsed ? 'w-less-630px' : 'w-less-345px'
     }
   },
   methods: {
-    // ...mapActions('inbox', [
-    //   'setContacts',
-    //   'setSelectedContact'
-    // ]),
-    // ...mapActions('powerDialer', [
-    //   // 'resetChangedContactProperties',
-    //   'selectedContactChanging',
-    //   'setContact'
-    //   // 'setContactClone'
-    // ]),
     ...mapActions('contacts', [
       'resetChangedContactProperties',
       'selectedContactChanging',
@@ -176,7 +177,8 @@ export default {
   },
   data () {
     return {
-      flagged: false
+      flagged: false,
+      isLoading: false
     }
   }
 }

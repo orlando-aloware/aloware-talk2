@@ -1,5 +1,5 @@
 <template>
-  <q-card flat :disabled="sessionLoader">
+  <q-card flat>
     <div class="t-menu-2 no-border">
       <div class="d-flex align-items-center pt-3 pb-0">
 
@@ -34,27 +34,31 @@
         </q-btn>
 
         <q-btn
-          @click="onToggleHold"
           no-wrap no-caps size="sm"
           unelevated
           outline
-          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
           class="sessions-button free-width mx-1"
-          :disabled="!statusCallConnected">
-          <UnholdIcon v-if="toggleHold" class="mr-2" color="#F2997A" />
-          <PauseIcon v-else class="mr-2" color="#62666E" />
+          :color="statusCallConnected ? 'grey-4' : 'grey-8'"
+          :disabled="!statusCallConnected"
+          @click="onToggleHold">
+          <UnHoldIcon v-if="toggleHold"
+                      class="mr-2"
+                      color="#F2997A" />
+          <PauseIcon v-else
+                     class="mr-2"
+                     color="#62666E" />
           <div class="text-body2 text-black">
             {{ toggleHold ? 'Unhold' : 'Hold' }}
           </div>
         </q-btn>
 
         <q-btn
-          @click="nextContact"
-          no-wrap unelevated no-caps
-          :disabled="!statusCallConnected"
+          class="sessions-button free-width mx-1"
           size="sm"
-          :color="statusCallConnected ? 'red-7' : 'grey-8'"
-          class="sessions-button free-width mx-1">
+          no-wrap unelevated no-caps
+          :disabled="!canNextTask "
+          :color="canNextTask  ? 'red-7' : 'grey-8'"
+          @click="onNextTask">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
@@ -97,7 +101,7 @@
       <div class="d-flex align-items-center p-0">
         <div
           class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
-          {{ fullname }}
+          {{ fullName }}
           <span class="text-15 text-subtitle1">
             {{ phoneNumber }}
           </span>
@@ -107,7 +111,7 @@
       <div class="d-flex align-items-center p-0">
         <div
           v-if="timezone"
-          class="flex-grow-1 text-14 text-subtitle1 text-capitaliz pl-3 py-0">
+          class="flex-grow-1 text-14 text-subtitle1 text-capitalize pl-3 py-0">
           <DropIcon
             width="18px"
             height="18px"
@@ -116,24 +120,12 @@
           {{ timezone }} - {{ getTimeZone }}
         </div>
 
-        <!-- <q-btn
-          @click="onToggleMute"
-          no-wrap outline no-caps
-          size="sm" color="grey-4"
-          :disabled="!statusCallConnected"
-          class="sessions-button free-width mx-1">
-          <MuteIcon height="13px" class="mr-2" color="#62666E" />
-          <div class="text-body2 text-black">
-            {{ toggleMute ? 'Unmute' : 'Mute' }}
-          </div>
-        </q-btn> -->
-
         <q-btn
-          @click="onToggleRecording"
+          class="sessions-button free-width mx-1"
           no-wrap outline no-caps
           size="sm" color="grey-4"
           :disabled="!statusCallConnected"
-          class="sessions-button free-width mx-1">
+          @click="onToggleRecording">
 
           <StopIcon
             v-if="toggleRecording"
@@ -171,37 +163,22 @@
 
           <span class="text-subtitle2 text-grey"></span>
           <div class="text-10 pt-1">
-            <HeadphoneIcon width="12px" height="12px" class="mr-0 py-0" style="position:relative;top:-2px;" />
+            <HeadphoneIcon width="12px"
+                           height="12px"
+                           class="mr-0 py-0"
+                           style="position:relative;top:-2px;" />
             {{ lineName }}
           </div>
 
         </div>
-        <q-btn
-          v-if="toggleEnd"
-          @click="resumeSession"
-          color="primary"
-          unelevated
-          no-wrap no-caps size="sm"
-          class="btn-btn-primary sessions-button free-width mx-1">
-
-          <PauseIcon
-            class="mr-2"
-            color="white" />
-
-          <div class="text-body2 text-white">
-            Resume
-          </div>
-
-        </q-btn>
 
         <q-btn
-          v-else
-          @click="onTogglePause"
-          :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           unelevated :outline="!sessionPaused"
           no-wrap no-caps size="sm"
+          :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           :disabled="toggleEnd"
-          :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`">
+          :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`"
+          @click="onTogglePause">
 
           <PauseIcon
             class="mr-2"
@@ -209,12 +186,11 @@
 
           <div
             :class="`text-body2 ${sessionPaused ? 'text-white' : 'text-black'}`">
-            {{ togglePause ? sessionPaused ? 'Resume Session' : 'Unpause Session' : 'Pause Session' }}
+            {{ pauseButtonText }}
           </div>
         </q-btn>
 
         <q-btn
-
           no-wrap outline no-caps
           size="sm"
           :disable="toggleEnd"
@@ -233,7 +209,8 @@
       </div>
     </div>
 
-    <q-dialog v-model="reRouteModal">
+    <q-dialog persistent
+              v-model="reRouteModal">
       <q-card class="px-4">
         <q-card-section>
           <div class="text-h6"></div>
@@ -252,7 +229,6 @@
 </template>
 
 <script>
-
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
@@ -262,15 +238,15 @@ import CalendarIcon from 'components/icons/calendar-icon'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
-import UnholdIcon from 'components/icons/pause-icon-3'
+import UnHoldIcon from 'components/icons/pause-icon-3'
 import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import sessionsMixins from 'src/plugins/mixins/sessions-call-status'
-import { isEmpty } from 'lodash'
+import { sessionCallStatusMixin } from 'src/plugins/mixins'
+import _, { isEmpty } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -287,13 +263,13 @@ export default {
     DropIcon,
     HeadphoneIcon,
     PauseIcon,
-    UnholdIcon,
+    UnHoldIcon,
     CallDropIcon,
     StopIcon,
     EndCallIcon,
     RecordIcon
   },
-  mixins: [ sessionsMixins ],
+  mixins: [ sessionCallStatusMixin ],
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.prevRoute = from
@@ -301,6 +277,7 @@ export default {
   },
   beforeDestroy () {
     this.clearWarmUpCountDown()
+    clearInterval(this.hangUpInterval)
   },
   computed: {
     ...mapFields([
@@ -365,39 +342,15 @@ export default {
       }
       return address
     },
-    listObject () {
-      return this.listItems[this.selectedList?.id]
-    },
-    list () {
-      return this.listObject.data || []
-    },
     companyName () {
       return this.taskToCall?.company_name || 'Company: N/A'
     },
-    fullname () {
+    fullName () {
       let { taskToCall } = this
       if ((taskToCall?.first_name === null || taskToCall?.first_name === '') && (taskToCall?.last_name === null || taskToCall?.last_name === '')) {
         return `No Name`
       }
       return `${taskToCall?.first_name || ''} ${taskToCall?.last_name || ''}`
-    },
-    keyIndex () {
-      let keyCtr = 0
-      this.list.forEach((item, key) => {
-        if (item?.id === this.contact?.id) {
-          keyCtr = key
-        }
-      })
-      if (keyCtr + 1 < this.list.length) {
-        return ++keyCtr
-      }
-      return keyCtr
-    },
-    hasDefaultContact () {
-      if (this.taskToCall?.id) {
-        return false
-      }
-      return true
     },
     getLine () {
       return this.campaigns.find((line) => line.id === this.activeTask?.task?.communication?.campaign_id)
@@ -503,6 +456,20 @@ export default {
         return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
       }
       return false
+    },
+    canNextTask () {
+      // should be able to next task even if on warm up period
+      return this.statusCallConnected || ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+    },
+    pauseButtonText () {
+      switch (true) {
+        case this.togglePause:
+          return 'Unpause Session'
+        case this.togglePause && this.sessionPaused:
+          return 'Resume Session'
+        default:
+          return 'Pause Session'
+      }
     }
   },
 
@@ -513,21 +480,26 @@ export default {
     if (!this.profile.auto_dialer_enabled) {
       this.reRoute()
     }
+
     if (this.campaigns) {
       this.findDefaultOutboundCampaign()
     }
-    this.$VueEvent.listen('initiate_session', (session) => {
-      this.activeTask = {}
-      this.hasActiveTask = false
-      this.initialize()
-    })
-    this.$VueEvent.listen('initiate_wrapup', (session) => {
-      this.hasActiveTask = false
-      this.initialize()
-    })
-    this.$VueEvent.listen('initiate_session_no_tasks', () => {
-      this.closePowerDialerNoTasks()
-    })
+
+    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
+    this.$VueEvent.listen('initiate_session', this.onInitiateSession)
+
+    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
+    this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
+
+    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
+    this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
+
+    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
+    this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
+
+    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
+    this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
+
     this.isSessionRunning = false
   },
 
@@ -542,7 +514,6 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
-
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
 
@@ -575,8 +546,7 @@ export default {
         this.autoDialer.outbound_campaign_id = null
       }
     },
-
-    startWarmUpCountDown (task) {
+    startWarmUpCountDown () {
       if (this.countdownStarted) {
         return
       }
@@ -585,19 +555,18 @@ export default {
       this.resetTimer()
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
-        this.onTimerIsOver(task)
+        this.onTimerIsOver()
       }, 1000)
     },
-
-    onTimerIsOver (task) {
+    onTimerIsOver () {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
-        if (this.toggleEnd || !this.hasQueuedTaskLists) {
+        if ((this.toggleEnd || !this.hasQueuedTaskLists) && !this.hasActiveTask) {
           this.reRoute()
           return
         }
         if (!this.togglePause && !this.wrapUp) {
-          this.runTask(task)
+          this.runTask()
         }
         if (this.wrapUp) {
           this.initialize()
@@ -610,7 +579,6 @@ export default {
         }
       }
     },
-
     resetSession () {
       this.activeTask = {}
       this.taskToCall = {}
@@ -624,14 +592,11 @@ export default {
         mute: false
       }
     },
-
     start () {
       this.resetSession()
       this.initialize()
     },
-
     async initialize () {
-      console.log('Initializing....')
       if (!this.isSessionRunning) {
         this.TOGGLE_SESSION_LOADER(true)
       }
@@ -652,15 +617,20 @@ export default {
 
       // TEMPORARY IMPLEMENTATION
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
-      if (!this.statusOnACall && !this.statusOnACall) {
+      if (!this.statusOnACall) {
         if (!this.wrapUp) {
-          this.taskToCall = this.powerDialerTasks.in_queue[0]
-          this.activeTask = await this.getContact({ id: this.taskToCall.id })
-        }
+          this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+          this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+          this.activeTask = this.taskToCall
+          this.hasActiveTask = true
+          this.setContact(this.taskToCall)
 
-        // Fetch current contact thru API call
-        await this.fetchContact(this.taskToCall.id)
-        if (!this.wrapUp) {
+          this.TOGGLE_SESSION_LOADER(true)
+
+          if (!this.isSessionRunning) {
+            this.isSessionRunning = true
+          }
+
           this.resetTimer()
           setTimeout(() => {
             this.startWarmUpCountDown()
@@ -694,12 +664,14 @@ export default {
     },
     onTogglePause () {
       this.togglePause = !this.togglePause
+      if (this.togglePause) {
+        this.sessionPaused = true
+      }
     },
     onToggleEnd () {
-      if (this.sessionPaused) {
-        this.reRoute()
-      }
+      this.togglePause = true
       this.toggleEnd = !this.toggleEnd
+      this.reRoute()
     },
     resumeSession () {
       this.toggleEnd = false
@@ -710,13 +682,33 @@ export default {
     resetTimer () {
       if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
         this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
+      } else {
+        this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
     reRoute (isForced = false) {
       if (isForced) {
         this.redirectNotification = isForced
       }
+
       this.reRouteModal = true
+      this.isSessionRunning = false
+
+      if (this.dialer.currentStatus !== 'READY') {
+        this.hangUpIntervalCounter = 0
+        this.hangUpInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('endWrapUp')
+          }
+
+          this.hangUpIntervalCounter++
+
+          if (this.hangUpIntervalCounter >= 120) {
+            clearInterval(this.hangUpInterval)
+          }
+        }, 500)
+      }
+
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
       }, this.redirectDelay)
@@ -761,7 +753,6 @@ export default {
           break
       }
     },
-
     openAdd () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'add'
@@ -773,12 +764,95 @@ export default {
     openTransfer () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'transfer'
-      // this.resetTransfer()
-      // this.expansionEnabled = true
-      // this.bottomExpansion = 'transfer'
-      // setTimeout(() => {
-      //   this.expanded = true
-      // }, 50)
+    },
+    processSession (noWrapUp = false) {
+      if (!noWrapUp) {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      this.activeTask = this.taskToCall
+      this.hasActiveTask = true
+      this.setContact(this.taskToCall)
+
+      if (!this.isSessionRunning) {
+        this.isSessionRunning = true
+      }
+
+      this.resetTimer()
+      setTimeout(() => {
+        this.startWarmUpCountDown()
+      }, 1000)
+    },
+    async onNextTask () {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
+        this.wrapUp = false
+        this.hasActiveTask = false
+
+        this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+
+        if (!this.taskToCall) {
+          this.hasActiveTask = false
+          this.reRoute()
+          return
+        }
+
+        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.processSession()
+        return
+      }
+
+      if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+        this.$VueEvent.fire('hangupCall')
+      }
+    },
+    async onNextTaskWhenOnWrapUp () {
+      this.wrapUp = false
+      this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+
+      if (this.taskToCall) {
+        this.activeTask = this.taskToCall
+        this.hasActiveTask = true
+        this.hangUpIntervalCounter = 0
+        this.hangUpInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.processSession()
+            clearInterval(this.hangUpInterval)
+          }
+
+          this.hangUpIntervalCounter++
+
+          if (this.hangUpIntervalCounter >= 120) {
+            clearInterval(this.hangUpInterval)
+          }
+        }, 500)
+      } else {
+        this.dialer.currentStatus === 'WRAP_UP' && this.$VueEvent.fire('endWrapUp')
+        this.hasActiveTask = false
+        this.reRoute()
+      }
+    },
+    onInitiateSession (session) {
+      this.activeTask = {}
+      this.hasActiveTask = false
+      this.initialize()
+    },
+    onInitiateWrapUp (session) {
+      this.hasActiveTask = false
+      this.initialize()
+    },
+    onEndWrapUp () {
+      this.wrapUp = false
+      this.taskToCall = this.powerDialerTasks.in_queue[0]
+
+      if (this.taskToCall && this.isSessionRunning) {
+        setTimeout(() => {
+          this.processSession(true)
+        }, 200)
+      }
+    },
+    onPhoneExpansionReset () {
+      this.sessionPhoneExpansion = ''
     }
   },
   watch: {
@@ -833,6 +907,11 @@ export default {
       } else {
         this.initialize()
       }
+    },
+    'dialer.currentStatus': function (value) {
+      if (value === 'WRAP_UP') {
+        this.onNextTaskWhenOnWrapUp()
+      }
     }
   },
   data () {
@@ -850,7 +929,9 @@ export default {
       },
       reRouteModal: false,
       redirectDelay: 3000,
-      redirectNotification: false
+      redirectNotification: false,
+      hangUpInterval: null,
+      hangUpIntervalCounter: 0
     }
   }
 }

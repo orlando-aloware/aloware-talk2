@@ -114,7 +114,7 @@ export default {
       return this.$axios
         .delete(`${this.listEndpoint}/${this.listToRemove.id}`, { params })
         .then(() => {
-          this.$generalNotification('Contact list was successfully removed.')
+          this.$generalNotification('List has been successfully removed.')
           this.removeListFromFolders(this.listToRemove.id, this.folders)
           this.removeListFromPinned(this.listToRemove.id)
           this.refreshFoldersList()

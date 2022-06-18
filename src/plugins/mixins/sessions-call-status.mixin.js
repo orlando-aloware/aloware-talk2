@@ -1,14 +1,14 @@
 import { mapFields } from 'vuex-map-fields'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
+import _ from 'lodash'
 
 const DIRECTION = {
   top: 1,
   bottom: 2
 }
 
-// import { isEmpty } from 'lodash'
 export default {
   data () {
     return {
@@ -16,24 +16,24 @@ export default {
     }
   },
   computed: {
+    ...mapState('powerDialer', ['powerDialerTasks']),
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
-      'powerDialerTasks',
       'ongoingSession',
       'countdownTimer'
     ]),
     ...mapGetters('contacts', [
-      'listItems',
       'selectedList'
     ]),
-    list () {
-      return this.listItems[this.selectedList?.id]?.data
-    },
     status () {
       return AutoDialTaskStatus.STATUSES
     },
     statusDisplayButton () {
+      if (!this.dialer.isReady) {
+        return 'Offline'
+      }
+
       switch (this.dialer?.currentStatus) {
         case 'READY':
           if (this.timerIsOver) {
@@ -68,8 +68,9 @@ export default {
           return 'Hanging Up Call'
         case 'CALL_DISCONNECTED':
           return 'Call Disconnected'
+        case 'OFFLINE':
         default:
-          return 'Ready'
+          return 'Offline'
       }
     },
     moveDirection () {
@@ -77,15 +78,12 @@ export default {
     }
   },
   methods: {
+    ...mapActions('contacts', ['setContact']),
     ...mapActions(['setShowPhone']),
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter'
     ]),
-
-    async nextContact () {
-      this.$VueEvent.fire('hangupCall')
-    },
 
     async fetchContact (taskId = null) {
       if (!taskId) {
@@ -96,7 +94,6 @@ export default {
       this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: taskId })
       if (!this.isSessionRunning) {
-        // this.activeTask = res
         this.isSessionRunning = true
       }
     },
@@ -144,15 +141,17 @@ export default {
     },
 
     skipSingleTask (autoDialTask, message, skipTask = false) {
-      if (!autoDialTask.contact_list_item_id) {
+      const contactListItemId = _.get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
         return
       }
 
       this.loading_skip = true
-      return this.$axios.post(`/api/v2/power-dialer-list-items/${autoDialTask.contact_list_item_id}/skip`)
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
         .then(res => {
-          if (!this.skippedTasks.includes(autoDialTask.contact_list_item_id)) {
-            this.skippedTasks.push(autoDialTask.contact_list_item_id)
+          if (!this.skippedTasks.includes(contactListItemId)) {
+            this.skippedTasks.push(contactListItemId)
           }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list
@@ -171,10 +170,11 @@ export default {
     },
 
     clearWarmUpCountDown () {
-      this.countdownStarted = false
       this.countdownTimer = -1
-
       clearInterval(this.countdownInterval)
+      setTimeout(() => {
+        this.countdownStarted = false
+      }, 1000)
     },
 
     skipTask () {

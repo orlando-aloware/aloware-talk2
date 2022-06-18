@@ -1,7 +1,8 @@
 <template>
   <div class="h-100 border-0 no-border-radius">
     <PowerDialerQueueList
-      :active-count="count" />
+      :active-count="count"
+      @fetchMyQueueData="onFetchMyQueueData" />
     <PowerDialerList />
   </div>
 </template>
@@ -38,6 +39,11 @@ export default {
   data () {
     return {
       count: 0
+    }
+  },
+  methods: {
+    onFetchMyQueueData () {
+      this.$emit('fetchMyQueueData')
     }
   }
 }

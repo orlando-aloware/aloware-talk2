@@ -43,7 +43,7 @@
         :folders="folders"
         :layer="layer + 1"
         :item-folders="listOfChildFolders"
-        :item-lists="items"
+        :item-lists="searchedPdItem && searchedPdItem.length > 0 ? items.filter(item => item.name.toLowerCase().includes(searchedPdItem.toLocaleLowerCase())) : items"
         action="create">
       </MoveFolderLists>
     </div>
@@ -91,6 +91,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('contacts', ['searchedPdItem']),
     ...mapGetters('powerDialer', [
       'createDialog',
       'searchedListItem'

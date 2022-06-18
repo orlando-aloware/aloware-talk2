@@ -372,6 +372,21 @@ export default {
       if (this.contactId) {
         this.source.cancel('Fetch contact info operation canceled by the user.')
         this.source = this.cancelToken.source()
+
+        talk2Api.V1.contact.getPhoneNumbers(this.contactId).then(response => {
+          this.setContactPhoneNumbers(response.data)
+        })
+
+        this.getCommunicationsSummary(this.contactId)
+        this.setSequenceInfoLoading(true)
+
+        talk2Api.V1.contact.getSequenceInfo(this.contactId).then(response => {
+          this.setSequenceInfo(response.data)
+          this.setSequenceInfoLoading(true)
+        }).catch(() => {
+          this.setSequenceInfoLoading(true)
+        })
+
         return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
           if (res) {
             this.fetchContactCommunications(this.contactId, false).then(() => {
@@ -931,6 +946,17 @@ export default {
       }
     },
 
+    updateLineIncomingNumber () {
+      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
+        this.setLineIncomingNumberLoading(true)
+        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id).then(response => {
+          this.setLineIncomingNumber(response.data)
+        }).finally(() => {
+          this.setLineIncomingNumberLoading(false)
+        })
+      }
+    },
+
     processFetchContactInfo (callback) {
       this.loadingContactInProgress()
       return this.fetchContactInfo().then(res => {
@@ -1088,13 +1114,24 @@ export default {
       }
     },
 
-    ...mapActions('contacts', ['setContact', 'setContactClone', 'resetChangedContactProperties', 'updateContacts']),
+    ...mapActions('contacts', [
+      'setContact',
+      'setContactClone',
+      'resetChangedContactProperties',
+      'updateContacts',
+      'setContactPhoneNumbers',
+      'setSequenceInfoLoading',
+      'setSequenceInfo',
+      'setLineIncomingNumberLoading',
+      'setLineIncomingNumber'
+    ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },
 
   watch: {
     'selectedCampaign.id': _.debounce(function (value) {
       this.updateMessageComposer()
+      this.updateLineIncomingNumber()
     }, 1000),
     contactId: function () {
       this.communicationsPage = 1

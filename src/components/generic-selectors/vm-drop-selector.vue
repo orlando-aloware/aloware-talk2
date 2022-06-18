@@ -117,7 +117,8 @@ export default {
       vmDrops: [],
       options: [],
       loadingVmDrops: false,
-      reference: 'vmDropSelect'
+      reference: 'vmDropSelect',
+      fullOptionsProperty: 'vmDropAlphabeticalOrder'
     }
   },
 

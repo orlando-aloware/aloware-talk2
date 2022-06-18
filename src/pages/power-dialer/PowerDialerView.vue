@@ -11,7 +11,7 @@
       <div class="text-13 pr-3 border-right right-spacing-2">
         {{ labelForNumberOfContacts }}
       </div>
-      <StartDialing
+      <start-dial-session-settings
         :disabled-trigger="numberOfContacts === 0"
         :list="filteredList"
         @start="beginDial"
@@ -61,11 +61,12 @@
               <div class="d-flex float-right">
 
                 <b-dropdown text="Add Contacts"
-                  right
-                  no-caret
-                  variant="light"
-                  class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
-                  toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center">
+                            right
+                            no-caret
+                            variant="light"
+                            class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                            toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
+                            :disabled="taskAddAndClearingDisabled">
                   <template
                     #button-content class="filter-toggle-button">
                     <div
@@ -77,18 +78,27 @@
                       class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
                       style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;">
                     </i>
+                    <q-tooltip v-if="taskAddAndClearingDisabled"
+                               content-class="bg-grey-light11"
+                               anchor="top middle" self="center middle">
+                      Clearing of task is currently disabled.
+                    </q-tooltip>
                   </template>
                   <b-dropdown-item
                     href="#"
+                    :disabled="taskAddAndClearingDisabled"
                     @click="onAddContactsToList">
                     <i class="fa fa-search mr-1"></i>
-                    Select Contacts
+                    Select Contacts & Add to List
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    v-b-modal:create-contact-modal>
+                    v-b-modal:create-contact-modal
+                    :disabled="taskAddAndClearingDisabled">
                     <i class="fa fa-plus mr-1"></i>
                     Create Contact
+                    {{ taskAddAndClearingDisabled ? '' : ' & Add to List' }}
+
                   </b-dropdown-item>
                 </b-dropdown>
 
@@ -113,16 +123,23 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
+                    :disabled="!hasExport"
                     @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
+                    :disabled="taskAddAndClearingDisabled"
                     @click="onClearList"
                     v-if="isMyQueue">
                     <i class="fa fa-trash-alt mr-1 text-red"></i>
                     <span class="text-red">Clear</span>
+                    <q-tooltip v-if="taskAddAndClearingDisabled"
+                               content-class="bg-grey-light11"
+                               anchor="top middle" self="center middle">
+                      Clearing of task is currently disabled.
+                    </q-tooltip>
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
@@ -144,6 +161,7 @@
       <BulkActionMenu
         v-if="checked.length > 0"
         :id="filteredSelectedListId"
+        :disabledDelete="taskAddAndClearingDisabled"
         @moved-contacts="onFetch({}, false)" />
     </template>
 
@@ -300,9 +318,15 @@
                   v-else-if="column.name === 'actions'"
                   :key="key">
                   <button
-                    @click="onRemove(contact)"
-                    class="btn btn-sm btn-link datatable-row__actions__action--trash">
+                    class="btn btn-sm btn-link datatable-row__actions__action--trash"
+                    :disabled="taskAddAndClearingDisabled"
+                    @click="onRemove(contact)">
                     <TrashOIcon />
+                    <q-tooltip v-if="taskAddAndClearingDisabled"
+                               content-class="bg-grey-light11"
+                               anchor="top middle" self="center middle">
+                      Clearing of task is currently disabled.
+                    </q-tooltip>
                   </button>
                 </td>
                 <td
@@ -444,7 +468,7 @@ import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-
 import Datatable from 'src/components/datatable'
 import TableRow from 'src/components/table-row'
 import SearchList from 'src/components/search'
-import StartDialing from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
+import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
 import StatusChip from 'src/components/status-chip'
 import TagPopover from 'src/components/tag-popover'
 import ChippedItems from 'src/components/chipped-items'
@@ -453,7 +477,7 @@ import NameWrapper from 'src/components/name-wrapper'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
-import BulkActionMenu from 'src/components/bulk-action-menu-2'
+import BulkActionMenu from 'src/components/power-dialer-bulk-action-menu'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import pdMixin from 'src/plugins/mixins/power-dialer'
 import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
@@ -461,6 +485,7 @@ import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEqual, isEmpty, get } from 'lodash'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'PowerDialerView',
@@ -519,7 +544,7 @@ export default {
       default: null
     }
   },
-  mixins: [pdMixin, pdInitMixin],
+  mixins: [pdMixin, pdInitMixin, aclMixin],
 
   inject: [
     'contactsData'
@@ -531,7 +556,7 @@ export default {
     Datatable,
     SearchList,
     SummaryInfoLabels,
-    StartDialing,
+    StartDialSessionSettings,
     TableRow,
     StatusChip,
     TagPopover,
@@ -583,6 +608,7 @@ export default {
     })
   },
   computed: {
+    ...mapState('cache', ['currentCompany']),
     ...mapFields('powerDialer', [
       'powerDialerActiveList'
     ]),
@@ -611,6 +637,9 @@ export default {
       'currentListFilters',
       'clearList'
     ]),
+    taskAddAndClearingDisabled () {
+      return !this.isAdmin && this.currentCompany.disable_power_dialer_add
+    },
     filter () {
       return this.activeFilter
     },
@@ -733,7 +762,8 @@ export default {
   data () {
     return {
       selectedItem: null,
-      hasFilters: false
+      hasFilters: false,
+      hasExport: false
     }
   },
   methods: {
@@ -766,7 +796,7 @@ export default {
       console.log('PD contact to create : ', contact)
     },
     async myQueueList () {
-      this.$emit('on-my-queue-list')
+      // this.$emit('on-my-queue-list')
     },
     onSearch (searchText) {
       this.$emit('search', searchText)
@@ -792,7 +822,6 @@ export default {
       }
     },
     async beginDial () {
-      // this.setContact(this.contact)
       this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
       this.START_DIAL_TOGGLE(true)
     },
@@ -874,6 +903,10 @@ export default {
       }
     },
     onContactCreated (contact) {
+      if (this.taskAddAndClearingDisabled) {
+        return
+      }
+
       let params = {
         contact_ids: [contact.id]
       }
@@ -914,11 +947,13 @@ export default {
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     },
-    init () {
+    init (loadList = true) {
       this.resetFilters(true)
       this.$VueEvent.fire('clearContacts')
       this.initialListFilters = this.currentListFilters
-      this.loadList(this.selectedListId)
+      if (loadList) {
+        this.loadList(this.selectedListId)
+      }
     },
     valueIsArray (value) {
       return Array.isArray(value)
@@ -947,11 +982,18 @@ export default {
     }
   },
   watch: {
-    '$route.params': {
-      handler (params) {
+    '$route.params.filter': {
+      handler () {
         if (!this.$route.name.includes('Contact')) {
-          console.log('Initializing...')
-          this.init()
+          this.init(false)
+        }
+      },
+      deep: true
+    },
+    '$route.params.id': {
+      handler () {
+        if (!this.$route.name.includes('Contact')) {
+          this.init(true)
         }
       },
       deep: true

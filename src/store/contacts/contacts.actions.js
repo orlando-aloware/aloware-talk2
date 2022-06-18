@@ -328,5 +328,17 @@ export default {
   },
   setPreviousListId: ({ commit }, id) => {
     commit('SET_PREVIOUS_LIST_ID', id)
+  },
+  setSequenceInfo: ({ commit }, payload) => {
+    commit('SET_SEQUENCE_INFO', payload)
+  },
+  setSequenceInfoLoading: ({ commit }, value) => {
+    commit('SET_SEQUENCE_INFO_LOADING', value)
+  },
+  setLineIncomingNumber: ({ commit }, payload) => {
+    commit('SET_LINE_INCOMING_NUMBER', payload)
+  },
+  setLineIncomingNumberLoading: ({ commit }, value) => {
+    commit('SET_LINE_INCOMING_NUMBER_LOADING', value)
   }
 }

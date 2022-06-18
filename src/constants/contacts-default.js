@@ -209,5 +209,12 @@ export const DEFAULT_STATE = {
   myListsLoaded: false,
   listContactsLoaded: false,
   previousListFilters: {},
-  previousListId: null
+  previousListId: null,
+  sequenceInfo: {
+    sequence: null,
+    workflow: null
+  },
+  sequenceInfoLoading: false,
+  lineIncomingNumber: null,
+  lineIncomingNumberLoading: false
 }

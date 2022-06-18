@@ -15,26 +15,21 @@
 
 <script>
 
-import { mapFields } from 'vuex-map-fields'
+import { mapState } from 'vuex'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'SessionPageCrm',
+  name: 'SessionContactPageCrm',
+  mixins: [hubspotIntegrationMixin],
   computed: {
-    ...mapFields('powerDialer', [
-      'hubspot'
-    ]),
+    ...mapState('contacts', ['contact']),
     hubspotLink () {
-      return this.hubspot.link
+      return this.getHubspotLink(this.contact)
     },
     test () {
       let iframe = document.getElementById('hubspot-crm')
       let el = iframe.contentWindow
       return el
-    }
-  },
-  data () {
-    return {
-      sample: ''
     }
   }
 }

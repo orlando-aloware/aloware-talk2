@@ -48,7 +48,7 @@ export default {
     ]),
     totalInQueued () {
       if (!this.myQueueListFilters) {
-        return 0 // this.myQueue.items.length
+        return 0
       }
       return this.myQueueListFilters?.total_queued || 0
     }

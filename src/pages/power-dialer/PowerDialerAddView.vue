@@ -1,5 +1,5 @@
 <template>
-  <ContactAddItems
+  <ContactAddItemsStatic
     v-if="isLoaded && contactListName"
     :id="id"
     :contactList="contactList"
@@ -11,14 +11,14 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
-import ContactAddItems from 'src/pages/contacts/ContactsAddItemsStatic.vue'
+import ContactAddItemsStatic from 'src/pages/contacts/ContactsAddItemsStatic.vue'
 // import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'PowerDialerAddView',
   components: {
-    ContactAddItems
+    ContactAddItemsStatic
   },
   mounted () {
     this.loadList(this.$route.params.id)

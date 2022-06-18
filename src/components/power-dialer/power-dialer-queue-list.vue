@@ -12,9 +12,7 @@
       class="d-flex pinned__content flex-column"
       v-if="hasListData">
 
-      <QueueListItem
-        :item="filteredList" />
-
+      <QueueListItem :item="filteredList" />
     </div>
   </div>
 </template>
@@ -52,6 +50,11 @@ export default {
     },
     hasListData () {
       return this.myQueue?.id
+    }
+  },
+  mounted () {
+    if (this.$route.name === 'Power Dialer' && this.$route.params.id !== 'in-queue') {
+      this.$emit('fetchMyQueueData')
     }
   }
 }

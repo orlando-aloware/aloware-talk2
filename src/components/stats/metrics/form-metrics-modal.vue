@@ -1,10 +1,12 @@
 <template>
   <q-dialog
     v-model="modal"
-    transition-show="jump-down">
+    transition-show="jump-down"
+    @show="onShowModal">
     <q-card
       flat
       style="width: 380px;"
+      ref="form-metrics-modal"
       class="my-card pb-4">
       <div class="row text-center justify-center">
         <q-card
@@ -148,6 +150,20 @@ export default {
         return false
       }
       return true
+    },
+    fixedAvailableMetrics () {
+      const newMetrics = JSON.parse(JSON.stringify(this.availableMetrics))
+      const index = { data: null }
+      for (index.data in newMetrics) {
+        if (typeof newMetrics[index.data].metric_id !== 'undefined') {
+          newMetrics[index.data].metric_id = `${newMetrics[index.data].type}_${newMetrics[index.data].metric_id}`
+        }
+      }
+
+      return newMetrics
+    },
+    modalElement () {
+      return this.$refs['form-metrics-modal'].$el
     }
   },
   data () {
@@ -166,11 +182,12 @@ export default {
       compareProperty: 'metric_id',
       textProperty: 'label',
       MetricOptionColors,
-      MetricOptionGroups
+      MetricOptionGroups,
+      fullOptionsProperty: 'fixedAvailableMetrics'
     }
   },
   mounted () {
-    this.options = this.fixedAvailableMetrics()
+    this.options = this.fixedAvailableMetrics
   },
   watch: {
     isOpen (val) {
@@ -193,7 +210,7 @@ export default {
     availableMetrics: {
       deep: true,
       handler: function () {
-        this.options = this.fixedAvailableMetrics()
+        this.options = this.fixedAvailableMetrics
       }
     },
     selectedId () {
@@ -202,7 +219,20 @@ export default {
       } else {
         this.placeholder = 'Add Metric'
       }
-      this.showInputPlaceholder()
+
+      this.$options.formMetricsModalCounter = 0
+      this.$options.formMetricsModalInterval = setInterval(() => {
+        if (this.modal) {
+          this.showInputPlaceholder()
+          clearInterval(this.$options.formMetricsModalInterval)
+        }
+
+        this.$options.formMetricsModalCounter++
+
+        if (this.$options.formMetricsModalCounter >= 300) {
+          clearInterval(this.$options.formMetricsModalInterval)
+        }
+      }, 500)
     }
   },
   methods: {
@@ -216,6 +246,7 @@ export default {
         })
         return
       }
+
       this.$emit('create', {
         categoryLabel: option ? option.categoryLabel : '',
         label: option ? option.label : '',
@@ -239,19 +270,8 @@ export default {
     onShowMetricsMenu () {
       this.selectWidth = this.$refs.statsSelectMetrics.$el.offsetWidth
     },
-    fixedAvailableMetrics () {
-      const newMetrics = JSON.parse(JSON.stringify(this.availableMetrics))
-      const index = { data: null }
-      for (index.data in newMetrics) {
-        if (typeof newMetrics[index.data].metric_id !== 'undefined') {
-          newMetrics[index.data].metric_id = `${newMetrics[index.data].type}_${newMetrics[index.data].metric_id}`
-        }
-      }
-
-      return newMetrics
-    },
     filterFn (val, update) {
-      const fixedMetrics = this.fixedAvailableMetrics()
+      const fixedMetrics = this.fixedAvailableMetrics
       if (val === '') {
         update(() => {
           this.options = fixedMetrics
@@ -268,7 +288,13 @@ export default {
         return `${label}s`
       }
       return label
+    },
+    onShowModal () {
+      this.element = this.$refs['form-metrics-modal'].$el
     }
+  },
+  beforeDestroy () {
+    clearInterval(this.$options.formMetricsModalInterval)
   }
 }
 </script>

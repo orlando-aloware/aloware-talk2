@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="contact">
     <b-card class="border-0">
       <h4>All Numbers</h4>
       <contact-phones-list-items :phones="primaryPhone"
@@ -85,19 +85,8 @@ export default {
     }
   },
 
-  mounted () {
-    if (this.contact && this.contact.id) {
-      this.getPhoneNumbers()
-    }
-  },
-
   methods: {
-    ...mapActions('contacts', ['setContactPhoneNumbers', 'setContactSelectedPhone', 'setMessageComposerMode', 'setMessageComposerSmsPhoneNumber']),
-    getPhoneNumbers () {
-      return talk2Api.V1.contact.getPhoneNumbers(this.contact.id).then(response => {
-        this.setContactPhoneNumbers(response.data)
-      })
-    },
+    ...mapActions('contacts', ['setContactSelectedPhone', 'setMessageComposerMode', 'setMessageComposerSmsPhoneNumber']),
 
     onAddPhone () {
       this.setContactSelectedPhone(null)

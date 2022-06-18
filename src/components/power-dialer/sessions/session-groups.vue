@@ -1,6 +1,6 @@
 <template>
   <div class="t-menu1 border-top">
-    <q-card flat :disabled="sessionLoader">
+    <q-card flat>
       <div
         v-if="false"
         class="t-menu__header d-flex align-items-center">
@@ -27,13 +27,14 @@
               </q-item-section>
             </template>
 
-            <InProgressContact />
+            <session-contact-in-progress />
 
           </q-expansion-item>
           <q-separator />
         </div>
 
-        <div v-for="(group, key) in filteredTasks" :key="key">
+        <div v-for="(group, key) in filteredTasks"
+             :key="key">
           <q-expansion-item
             :default-opened="key === 'in_queue'"
             class="t-expansion-panels px-0"
@@ -214,7 +215,7 @@
 
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-import InProgressContact from './session-contact-in-progress'
+import SessionContactInProgress from './session-contact-in-progress'
 import SearchList from 'src/components/search'
 import PhoneIcon from 'components/icons/call-drop-icon'
 import ArrowDownIcon from 'components/icons/arrow-down-icon'
@@ -233,7 +234,7 @@ const DIRECTION = {
 export default {
   name: 'SessionGroups',
   components: {
-    InProgressContact,
+    SessionContactInProgress,
     SearchList,
     ContactInQueue,
     PhoneIcon,
@@ -249,6 +250,11 @@ export default {
   },
   computed: {
     ...mapState(['dialer']),
+    ...mapState('powerDialer', [
+      'powerDialerTasks',
+      'activeTask',
+      'hasActiveTask'
+    ]),
     ...mapGetters('powerDialer', [
       // 'powerDialerListItems',
       // 'currentList',
@@ -260,7 +266,6 @@ export default {
       'listItems'
     ]),
     ...mapFields('powerDialer', [
-      'powerDialerTasks',
       'powerDialerTaskFilters',
       'activeTask',
       'taskToCall',
@@ -300,40 +305,47 @@ export default {
       return totalQueued + totalCalled + totalFailed + totalScheduled
     },
     totalQueued () {
-      let queued = this.powerDialerTasks.in_queue
-      let total = queued.length < this.itemsPerPage
-        ? queued.length
-        : queued.length >= this.getTotalItem('in_queue')
-          ? queued.length + this.itemsPerPage
-          : queued.length + this.getTotalItem('in_queue')
-      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+      // let queued = this.powerDialerTasks.in_queue
+      // let total = queued.length < this.itemsPerPage
+      //   ? queued.length
+      //   : queued.length >= this.getTotalItem('in_queue')
+      //     ? queued.length + this.itemsPerPage
+      //     : queued.length + this.getTotalItem('in_queue')
+      // return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+
+      return this.getTotalItem('in_queue')
     },
     totalCalled () {
-      let { called } = this.powerDialerTasks
-      let total = called.length < this.itemsPerPage
-        ? called.length
-        : called.length >= this.getTotalItem('called')
-          ? called.length + this.itemsPerPage
-          : called.length + this.getTotalItem('called')
-      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+      // let { called } = this.powerDialerTasks
+      // let total = called.length < this.itemsPerPage
+      //   ? called.length
+      //   : called.length >= this.getTotalItem('called')
+      //     ? called.length + this.itemsPerPage
+      //     : called.length + this.getTotalItem('called')
+      // return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+
+      return this.getTotalItem('called')
     },
     totalFailed () {
-      let { failed } = this.powerDialerTasks
-      let total = failed.length < this.itemsPerPage
-        ? failed.length
-        : failed.length >= this.getTotalItem('failed')
-          ? failed.length + this.itemsPerPage
-          : failed.length + this.getTotalItem('failed')
-      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+      // let { failed } = this.powerDialerTasks
+      // let total = failed.length < this.itemsPerPage
+      //   ? failed.length
+      //   : failed.length >= this.getTotalItem('failed')
+      //     ? failed.length + this.itemsPerPage
+      //     : failed.length + this.getTotalItem('failed')
+      // return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+
+      return this.getTotalItem('failed')
     },
     totalScheduled () {
-      let { scheduled } = this.powerDialerTasks
-      let total = scheduled.length < this.itemsPerPage
-        ? scheduled.length
-        : scheduled.length >= this.getTotalItem('scheduled')
-          ? scheduled.length + this.itemsPerPage
-          : scheduled.length + this.getTotalItem('scheduled')
-      return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+      // let { scheduled } = this.powerDialerTasks
+      // let total = scheduled.length < this.itemsPerPage
+      //   ? scheduled.length
+      //   : scheduled.length >= this.getTotalItem('scheduled')
+      //     ? scheduled.length + this.itemsPerPage
+      //     : scheduled.length + this.getTotalItem('scheduled')
+      // return total <= this.itemsPerPage ? total : total - this.itemsPerPage
+      return this.getTotalItem('scheduled')
     }
   },
   methods: {
@@ -466,15 +478,15 @@ export default {
     getTotalItem (key) {
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTaskFilters[key].total_queued
+          return this.powerDialerTasks.in_queue ? this.powerDialerTasks.in_queue.length : 0
         case 'called':
-          return this.powerDialerTaskFilters[key].total_called
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
-          return this.powerDialerTaskFilters[key].total_failed
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_failed : 0
         case 'scheduled':
-          return this.powerDialerTaskFilters[key].total_scheduled
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_scheduled : 0
         default:
-          return this.powerDialerTaskFilters[key].total_items
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_items : 0
       }
     },
     fetchName (item) {

@@ -2,7 +2,7 @@
   <q-card class="t-cards pt-2">
     <q-list class="px-2 pb-2">
       <q-item
-        v-if="hasActiveTask"
+        v-if="hasActiveTask && activeTask"
         class="active t-expansion-panel px-2">
         <div class="py-2">
           <q-avatar size="30px" color="grey">
@@ -11,7 +11,7 @@
         </div>
 
         <q-item-section class="pl-2">
-          <q-item-label>{{ fullname }}</q-item-label>
+          <q-item-label>{{ fullName }}</q-item-label>
           <q-item-label caption lines="2">{{ phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
           <q-item-label caption lines="2">{{ company_name }}</q-item-label>
         </q-item-section>
@@ -39,13 +39,13 @@
 </template>
 
 <script>
-
+import _ from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
 
 export default {
-  name: 'ContactInProgress',
+  name: 'SessionContactInProgress',
   components: {
     PhoneIcon
   },
@@ -55,12 +55,14 @@ export default {
       'hasActiveTask'
     ]),
     ...mapState(['dialer']),
-    fullname () {
-      let { activeTask } = this
-      if (!activeTask.first_name && !activeTask.last_name) {
+    fullName () {
+      const name = `${_.get(this.activeTask, 'first_name', '')} ${_.get(this.activeTask, 'last_name', '')}`
+
+      if (!name) {
         return 'No Name'
       }
-      return `${this.activeTask?.first_name} ${this.activeTask?.last_name}`
+
+      return name
     },
     firstname () {
       return this.activeTask?.first_name
@@ -91,7 +93,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

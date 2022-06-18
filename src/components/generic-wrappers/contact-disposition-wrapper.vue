@@ -26,7 +26,9 @@ export default {
   },
 
   mounted () {
-    this.dispositionStatusId = this.contact.disposition_status_id
+    if (this.contact) {
+      this.dispositionStatusId = this.contact.disposition_status_id
+    }
   },
 
   methods: {

@@ -157,6 +157,10 @@ export default {
         return
       }
 
+      if (this.$route.params.communicationId === mention.mention_subject_id) {
+        return
+      }
+
       this.setSelectedCommunication(mention)
       this.$router.push({
         name: 'Inbox Contact Communication',
@@ -166,8 +170,6 @@ export default {
           status: this.direction,
           channel: 'mentions'
         }
-      }).catch(err => {
-        console.log(err)
       })
     },
 

@@ -158,7 +158,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
 import Search from 'src/components/search.vue'
@@ -224,6 +224,7 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile']),
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('contacts', ['lists', 'listItems', 'isFiltersOpen']),
     items () {
       if (this.listItems[this.id]) {
@@ -449,6 +450,18 @@ export default {
     }
   },
   mounted () {
+    if (!this.isAdmin && this.currentCompany.disable_power_dialer_add && this.$route.name === 'Power Dialer') {
+      this.$generalNotification('Adding task to Power Dialer list is currently disabled. Redirecting...', 'info', 2000)
+      setTimeout(() => {
+        if (this.contactList.id === 'my-queue') {
+          this.$router.push(`/power-dialer`)
+        } else {
+          this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+        }
+      }, 3000)
+      return
+    }
+
     this.listName = ''
     this.fetch()
     this.setDataCount([])

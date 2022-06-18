@@ -74,8 +74,8 @@
                 </contact-menu-item>
 
                 <div
-                  :id="'folder-submenu-items-' + rootFolderId"
                   class="folder-submenu-items extended"
+                  :id="'folder-submenu-items-' + rootFolderId"
                   :class="{ 'd-flex': isMenuOpen }"
                   @mouseleave="{}"
                   @mouseover="createSubmenu">
@@ -87,7 +87,7 @@
                       <span
                         class="create-item"
                         style="width:100%;padding:10px;">
-                        Create from Existing Contacts List
+                        Create from existing contacts list
                       </span>
                     </template>
                   </contact-menu-item>
@@ -96,7 +96,7 @@
                     @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">
-                        Create by Manually Selecting Contacts
+                        Create new list &amp; select contacts
                       </span>
                     </template>
                   </contact-menu-item>

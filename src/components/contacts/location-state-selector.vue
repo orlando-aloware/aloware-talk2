@@ -65,7 +65,8 @@ export default {
       compareProperty: null,
       reference: 'stateSelect',
       emitEvent: 'select',
-      emitChange: true
+      emitChange: true,
+      fullOptionsProperty: 'states'
     }
   },
   methods: {

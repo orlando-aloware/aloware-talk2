@@ -237,7 +237,7 @@
           <b-dropdown-item
             @click="exportAsCsv"
             href="#"
-            :disabled="hasExport">
+            :disabled="!hasExport">
             <export-icon></export-icon>
             Export as CSV
           </b-dropdown-item>
@@ -530,7 +530,7 @@
                     <!--message-o-icon></message-o-icon-->
                     <span class="aloicons action-icons">A</span>
                   </button>
-                  <button v-if="!list.show_in_public_folder"
+                  <button v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
                           class="btn btn-sm datatable-row__actions__action--trash"
                           @click="onRemove(contact, id)">
                     <span class="aloicons action-icons">B</span>
@@ -717,7 +717,7 @@ import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
-import { avatarMixin, contactListCountMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import { avatarMixin, contactListCountMixin, timezoneCheckMixin, aclMixin } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
@@ -726,7 +726,8 @@ export default {
   mixins: [
     avatarMixin,
     contactListCountMixin,
-    timezoneCheckMixin
+    timezoneCheckMixin,
+    aclMixin
   ],
 
   inject: [
@@ -830,7 +831,7 @@ export default {
         dataLength: 0
       },
       datatableTarget: null,
-      hasExport: true,
+      hasExport: false,
       countFields: [
         'unread_texts_count',
         'unread_missed_calls_count',

@@ -1,22 +1,23 @@
 <template>
-  <q-select :options="scriptsOptions"
-            :placeholder="placeholder"
-            :loading="loadingScripts"
-            :disable="disable || loadingScripts"
-            :class="[ prepend ? 'with-prepend' : '' ]"
-            class="padded-container"
-            v-model="localValue"
-            options-selected-class="text-primary"
+  <q-select options-selected-class="text-primary"
             color="primary"
             option-label="text"
             option-value="id"
             input-debounce="0"
             use-input
-            :emit-value="true"
             map-options
             outlined
             dense
+            class="padded-container"
+            :class="[ prepend ? 'with-prepend' : '' ]"
+            :options="scriptsOptions"
+            :placeholder="placeholder"
+            :loading="loadingScripts"
+            :disable="disable || loadingScripts"
             :display-value="scriptTitle"
+            :emit-value="true"
+            :clearable="clearable"
+            v-model="localValue"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -66,6 +67,10 @@ export default {
     prepend: {
       type: String,
       required: false
+    },
+    clearable: {
+      type: Boolean,
+      default: false
     }
   },
 

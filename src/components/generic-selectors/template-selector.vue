@@ -77,7 +77,8 @@ export default {
     return {
       selectedId: this.value,
       options: [],
-      reference: 'templateSelector'
+      reference: 'templateSelector',
+      fullOptionsProperty: 'templatesAlphabeticalOrder'
     }
   },
 

@@ -1001,7 +1001,7 @@ i.option-separator {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    display: inline-block;
+    display: inline-block !important;
     margin-top: -1px;
   }
 
@@ -6214,7 +6214,6 @@ table.datatable {
     min-height: 50px;
 
     &.mdi_input_2 {
-      display: block !important;
       padding-top: 10px !important;
     }
 
@@ -11218,4 +11217,11 @@ h1.contact-list-name-label {
 }
 .session-integration-title {
   color: #303133
+}
+
+.power-dialer-list  {
+  .sublists {
+    overflow-y: auto !important;
+    height: 78vh;
+  }
 }

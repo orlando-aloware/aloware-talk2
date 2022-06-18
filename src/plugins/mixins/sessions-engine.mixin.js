@@ -53,15 +53,19 @@ export default {
       this.setShowPhone(false)
     },
     onStatusInProgress (task) {
-      // Re-assign new items for IN QUEUE and exclude the curernt task
+      // Re-assign new items for IN QUEUE and exclude the current task
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
     onStatusCompleted (task) {
-      this.powerDialerTasks.called.push(this.activeTask)
-      window.VueEvent.fire('initiate_session', task)
+      let contactTask = this.powerDialerTasks.in_queue.find(item => item.id === task.contact.id)
+      this.powerDialerTasks.called.push(contactTask)
+      // window.VueEvent.fire('initiate_session', task)
     },
     onStatusFailed (task) {
-      this.powerDialerTasks.failed.push(this.activeTask)
+      let contactTask = this.powerDialerTasks.in_queue.find(item => item.id === task.contact.id)
+      if (contactTask) {
+        this.powerDialerTasks.failed.push(contactTask)
+      }
     },
     onStatusQueued (task) {
       // Status Queued

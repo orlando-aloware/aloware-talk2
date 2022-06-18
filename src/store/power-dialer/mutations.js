@@ -11,7 +11,9 @@ export default {
     state.myQueueListFilters = data
   },
   SET_MY_QUEUE_LIST_DATA: (state, data) => {
-    state.myQueue.items = data
+    if (state.myQueue) {
+      state.myQueue.items = data
+    }
   },
   SET_CONTACT_RESOURCES: (state, data) => {
     state.contacts = data

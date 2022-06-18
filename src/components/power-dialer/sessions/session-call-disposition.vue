@@ -1,7 +1,6 @@
 <template>
   <q-card
     flat
-    :disabled="sessionLoader"
     style="height: 100%;">
     <div
       v-if="sessionPaused"

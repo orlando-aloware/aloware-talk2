@@ -11,7 +11,7 @@
         ></Search>
       </div>
     </div>
-    <div class="move-dialog-lists px-2">
+    <div class="move-dialog-lists px-2 pb-2">
       <CreateListItem
         v-for="folder in contactFolders"
         :name="folder.name"
@@ -20,9 +20,10 @@
         :order="folder.order"
         :folders="folder.child_folders"
         :layer="0"
-        :items="folder.lists" />
+        :items="searchedPdItem && searchedPdItem.length > 0 ? folder.lists.filter(item => item.name.toLowerCase().includes(searchedPdItem.toLocaleLowerCase())) : folder.lists" />
     </div>
-    <div class="move-dialog-footer" v-if="hasSelected">
+    <div v-if="hasSelected"
+         class="move-dialog-footer">
       <div class="text-muted small pr-2">
         {{ message }}
       </div>
@@ -30,10 +31,11 @@
         variant="primary"
         class="mr-2"
         v-if="hasSelected"
-        :disabled="isMoving"
+        :disabled="isCreating"
         @clicked="onConfirmCreate">
-        <q-spinner-bars v-if="isMoving" color="white" />
-        {{ isMoving ? '' : 'Create' }}
+        <q-spinner-bars v-if="isCreating"
+                        color="white" />
+        {{ isCreating ? '' : 'Create' }}
       </CompactBtn>
     </div>
   </div>
@@ -41,7 +43,7 @@
 
 <script>
 import { createPopper } from '@popperjs/core'
-import { mapActions, mapMutations, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
@@ -69,8 +71,7 @@ export default {
   data () {
     return {
       searchValue: '',
-      itemsList: [],
-      isMoving: false,
+      isCreating: false,
       contactFolders: null
     }
   },
@@ -81,27 +82,12 @@ export default {
       'lists',
       'searchedPdItem'
     ]),
-    searchedItemsList () {
-      if (this.searchValue) {
-        return this.filterByActiveId(
-          this.filterBySearchValue(this.itemsList, this.searchValue)
-        )
-      }
-      return this.filterByActiveId(this.itemsList)
-    },
-    rootItems () {
-      return this.folders.find(item => item.name === 'Root')
-    },
     hasSelected () {
       return (
         typeof this.createDialog.target === 'number' &&
         this.createDialog.target >= 0
       )
     }
-  },
-  async mounted () {
-    let response = await this.getContactFolders()
-    this.contactFolders = response
   },
   methods: {
     ...mapActions('contacts', [
@@ -118,10 +104,10 @@ export default {
       return this.createListRequest()
     },
     createFolderRequest () {
-      this.isMoving = true
+      this.isCreating = true
     },
     createListRequest () {
-      this.isMoving = true
+      this.isCreating = true
       let params = {
         type: 1,
         name: this.createDialog.name
@@ -137,24 +123,26 @@ export default {
           })
           .then(() => {
             this.reloadFolders()
-            this.isMoving = false
+            this.isCreating = false
           })
           .catch(this.handleRequestError)
           .finally(this.createPdListClose)
       } else {
         this.$axios
           .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`)
-          .then(() => {
+          .then((res) => {
+            console.log(res)
             this.reloadFolders()
-            this.isMoving = false
+            this.isCreating = false
+            this.$generalNotification('Power dialer list has been successfully created from a contacts list.', 'success')
+            this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
           })
           .catch(this.handleRequestError)
           .finally(this.createPdListClose)
       }
     },
     handleRequestError (err) {
-      const { message, html } = extractErrorMessage(err)
-      console.log(html)
+      const { message } = extractErrorMessage(err)
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {
@@ -166,74 +154,29 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
-    filterByActiveId (items) {
-      let filteredItems = items
-        .filter((i) => i.id !== this.createDialog.id)
-        .map((i) => {
-          return {
-            ...i,
-            child_folders: this.filterByActiveId(i.child_folders)
-          }
-        })
-      return filteredItems
-    },
-    filterBySearchValue (items, searchValue) {
-      return items
-        .filter((i) => i.searchText.toLowerCase().includes(searchValue.toLowerCase()))
-        .map((i) => {
-          return {
-            ...i,
-            child_folders: this.filterBySearchValue(
-              i.child_folders,
-              searchValue
-            )
-          }
-        })
-    },
     onSearch (searchValue) {
-      // this.searchValue = searchValue
+      this.searchValue = searchValue
       this.ON_SEARCH_PD_ITEM(searchValue)
     },
-    createFolders (names = '', newFolders = []) {
-      return newFolders.map((i) => {
-        const name = i.name.toLowerCase()
-        const nextNames = names + this.getFolderNames(name, i.child_folders)
-        return {
-          id: i.id,
-          name: i.name,
-          searchText: nextNames,
-          child_folders: this.createFolders(name, i.child_folders)
-        }
-      })
-    },
-    getFolderNames (names, folders) {
-      for (let i = 0; i < folders.length; i++) {
-        names += folders[i].name.toLowerCase()
-        if (
-          Array.isArray(folders[i].child_folders) &&
-          folders[i].child_folders.length
-        ) {
-          names += this.getFolderNames(
-            folders[i].name,
-            folders[i].child_folders
-          )
-        }
-      }
-      return names
-    },
-    createDialogInstance (state) {
-      this.searchValue = ''
-
-      const elId = state.type + '-' + state.id
-
+    createDialogInstance () {
+      this.ON_SEARCH_PD_ITEM(this.searchValue)
       const reference = document.querySelector(
-        '[data-popper-target="' + elId + '"]'
+        '[data-popper-target="power-dialer-list"]'
       )
 
       this.$refs.createDialog.classList.add('d-flex')
 
       popperInstance = createPopper(reference, this.$refs.createDialog, {
-        placement: 'auto'
+        placement: 'auto',
+        positionFixed: true,
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [-80, 10]
+            }
+          }
+        ]
       })
 
       document.body.addEventListener('click', this.handleClick)
@@ -255,6 +198,7 @@ export default {
         !evt.target.classList.contains('create-item')
       ) {
         this.createPdListClose()
+        this.searchValue = ''
         document.body.removeEventListener('click', this.handleClick)
       }
     }
@@ -272,21 +216,12 @@ export default {
         document.body.removeEventListener('focus', this.handleClick)
         this.destroyDialogInstance(state)
       }
-    },
-    contactFolders: function (value) {
-      let itemsList = []
-      if (value.length) {
-        value = value[0].child_folders
-        itemsList = this.createFolders('', [
-          {
-            id: 0,
-            name: 'Root Folder',
-            child_folders: value
-          }
-        ])
-      }
-      this.itemsList = itemsList
     }
+  },
+  mounted () {
+    this.getContactFolders().then(res => {
+      this.contactFolders = res
+    })
   }
 }
 </script>

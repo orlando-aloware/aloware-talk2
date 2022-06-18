@@ -7,7 +7,7 @@
     <div
       class="avatar__inner"
       :class="{ 'avatar__inner--active': active }"
-      :style="{ 'background-image': `url(${src})` }"
+      :style="{ 'background-image': (src ? `url(${src})` : 'none') }"
     >
       <sequence-icon v-if="sequenceIcon" />
       <span v-else-if="!name || !name.length">

@@ -362,7 +362,7 @@
                       anchor="top middle"
                       self="bottom middle"
                       max-width="150px">
-                      {{ rejectionTooltipData(communication.rejected_by_app) }}
+                      {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                     </q-tooltip>
                   </q-icon>
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
@@ -394,27 +394,30 @@
               <div class="w-100 mb-0 pt-2 pb-2">
                 <label class="form-control-label w-100 mb-1">User</label>
                 <div class="d-flex align-items-center w-100">
-                  <div class="status-icon d-inline-block"
-                       :state="communication.rejected_by_app"
-                       v-if="communication.rejected_by_app !== 0"
-                       v-html="rejectionToIcon(communication.rejected_by_app)">
-                    <q-tooltip anchor="bottom middle"
-                               self="top middle">
-                      {{ rejectionTooltipData(communication.rejected_by_app) }}
-                    </q-tooltip>
-                  </div>
 
-                  <q-tooltip class="item"
+                  <q-icon class="status-icon d-inline-block text-danger"
+                          :state="communication.rejected_by_app"
+                          :name="rejectionToIcon(communication.rejected_by_app)"
+                          v-if="communication.rejected_by_app !== 0">
+                    <q-tooltip
+                      anchor="top middle"
+                      self="bottom middle"
+                      max-width="150px">
+                      {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
+                    </q-tooltip>
+                  </q-icon>
+
+                  <!--q-tooltip class="item"
                              content-class="bg-grey-light11"
                              anchor="top middle"
                              self="top middle"
                              v-if="communication.rejected_by_app !== 0">
-                    {{ rejectionTooltipData(communication.rejected_by_app) }}
+                    {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                     <component class="status-icon d-inline-block"
                                v-bind:is="icon"
                                :name="rejectionToIcon(communication.rejected_by_app)">
                     </component>
-                  </q-tooltip>
+                  </q-tooltip-->
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
                     <router-link
                       :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
@@ -770,6 +773,7 @@ import * as CommunicationDispositionStatus from '../constants/communication-disp
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
@@ -863,11 +867,6 @@ export default {
   data () {
     return {
       loadingDispose: false,
-      REJECTION_REASON_CREDITS: 1, // A call/SMS was received by our system but not shown to user because company was out of credit
-      REJECTION_REASON_BLOCKED: 2, // A call/SMS was received by our system but was blocked because caller's phone number is blocked.
-      REJECTION_REASON_OTHER: 3, // A call/SMS was received by our system but was blocked because because of other reasons, e.g.: .
-      REJECTION_REASON_USER_NOT_FOUND: 4, // A call/SMS was received by our system but it doesn't have a user
-      REJECTION_REASON_FAILED: 5, // A call/SMS was failed
       activeName: false,
       loadingUpdateEngagement: false,
       showCallMenu: false,
@@ -912,7 +911,8 @@ export default {
       CommunicationCurrentStatus,
       CommunicationDispositionStatus,
       CommunicationTypes,
-      UploadedFileTypes
+      UploadedFileTypes,
+      CommunicationRejectionReasons
     }
   },
 

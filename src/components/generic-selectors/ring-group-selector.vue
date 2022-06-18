@@ -153,7 +153,8 @@ export default {
     return {
       selectedId: this.value,
       options: [],
-      reference: 'ringGroupSelect'
+      reference: 'ringGroupSelect',
+      fullOptionsProperty: 'ringGroupsAlphabeticalOrder'
     }
   },
 
