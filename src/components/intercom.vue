@@ -20,7 +20,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState('auth', ['profile']),
+    ...mapState('auth', ['profile', 'authenticated']),
     isProduction () {
       return process.env.APP_ENV === 'production'
     }
@@ -75,7 +75,9 @@ export default {
 
   mounted () {
     this.shutDown()
-    this.launch()
+    if (this.authenticated) {
+      this.launch()
+    }
   },
 
   watch: {

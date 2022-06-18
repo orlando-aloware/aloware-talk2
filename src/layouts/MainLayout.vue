@@ -339,7 +339,6 @@ export default {
 
   created () {
     this.setNotificationAudio()
-    this.fetchAllParkedCalls()
 
     if (this.$route.name === 'Phone' && !this.isMobile) {
       this.$router.replace({ path: '/' })
@@ -807,6 +806,7 @@ export default {
 
     if (this.authenticated) {
       this.initAuth()
+      this.fetchAllParkedCalls()
     } else {
       this.check().then((res) => {
         this.loading = false
