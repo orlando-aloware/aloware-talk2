@@ -332,11 +332,37 @@ export default {
       }
 
       if (!_.isEmpty(this.currentListFilters)) {
-        const filterIndex = { data: null }
-        for (filterIndex.data of Object.keys(this.currentListFilters)) {
+        const listFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+        const filterIndex = {
+          index1: null,
+          index2: null,
+          filter: null,
+          filterData: null,
+          filterType: null
+        }
+        for (filterIndex.index1 of Object.keys(listFilters)) {
           // check if filter index is a number
-          if (!isNaN(filterIndex.data / 1)) {
-            query.filter_groups = query.filter_groups.concat(this.currentListFilters[filterIndex.data])
+          if (!isNaN(filterIndex.index1 / 1)) {
+            // let's add the timezone if there are data filters
+            filterIndex.filterData = _.get(listFilters[filterIndex.index1], 'filters', null)
+
+            if (!filterIndex.filterData) {
+              continue
+            }
+
+            // loop through each filters
+            for (filterIndex.index2 of Object.keys(filterIndex.filterData)) {
+              filterIndex.filter = this.filters.find(filterItem => filterItem.key === filterIndex.index2)
+              filterIndex.filterType = _.get(filterIndex.filter, 'type', null)
+
+              if (filterIndex.filterType && filterIndex.filterType !== 'date') {
+                continue
+              }
+
+              // if filter type is 'date', add the browser's timezone
+              listFilters[filterIndex.index1].filters[filterIndex.index2].timezone = moment.tz.guess()
+            }
+            query.filter_groups = query.filter_groups.concat(listFilters[filterIndex.index1])
           }
         }
       }
@@ -575,7 +601,6 @@ export default {
   },
 
   computed: {
-
     ...mapState('contacts', [
       'search',
       'shouldUpdateSelectedListContactCount',
@@ -600,7 +625,8 @@ export default {
       'currentCompany'
     ]),
     ...mapState([
-      'defaultDateFilter'
+      'defaultDateFilter',
+      'filters'
     ]),
     ...mapGetters('powerDialer', [
       'activeFilter'
