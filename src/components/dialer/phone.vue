@@ -1449,7 +1449,6 @@ export default {
       return (!this.dialer.communication ||
         this.loadingHold ||
         this.loadingUnhold ||
-        !this.dialer.communication.customer_leg_sid ||
         this.isCallCompleted ||
         (this.currentCompany && !this.currentCompany.conferencing_enabled) ||
         (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
