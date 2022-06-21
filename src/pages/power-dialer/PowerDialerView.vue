@@ -715,7 +715,7 @@ export default {
       return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {
-      return this.selectedList.name === 'My Queue' || !this.selectedList.name
+      return this.$route.name === 'Power Dialer' && this.$route.params.id === 'in-queue'
     },
     filteredList () {
       if (this.selectedListId === 'my-queue') {
