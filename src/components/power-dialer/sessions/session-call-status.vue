@@ -821,6 +821,7 @@ export default {
       }, 1000)
     },
     async onNextTask () {
+      this.onPhoneExpansionReset()
       if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
         this.wrapUp = false
         this.hasActiveTask = false
