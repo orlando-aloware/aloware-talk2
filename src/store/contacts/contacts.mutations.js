@@ -337,11 +337,33 @@ export default {
       state.changedContactProperties = found.data.filter(item => item.property !== name)
     }
   },
+
+  UPDATE_CHANGED_CONTACT_ATTRIBUTES: (state, { name, value }) => {
+    const attr = state.contactAttributes.find(item => item.name === name)
+    // need to get in sync with contact attribute values
+    if (attr.value === null && typeof value === 'string' && value.trim().length === 0) {
+      value = null
+    }
+
+    if (attr && attr.value !== value) {
+      const index = state.changedContactAttributes.findIndex(item => item.field === name)
+      if (index >= 0) {
+        state.changedContactAttributes[index].value = value
+      } else {
+        state.changedContactAttributes.push({ field: name, value: value })
+      }
+    } else {
+      state.changedContactAttributes = state.changedContactAttributes.filter(item => item.name === name)
+    }
+  },
   SET_CHANGED_CONTACT_PROPERTIES: (state, payload) => {
     state.changedContactProperties = payload
   },
   RESET_CHANGED_CONTACT_PROPERTIES: (state) => {
     state.changedContactProperties = []
+  },
+  RESET_CHANGED_CONTACT_ATTRIBUTES: (state) => {
+    state.changedContactAttributes = []
   },
   UPDATE_CONTACTS: (state, payload) => {
     const found = { data: state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id) }
