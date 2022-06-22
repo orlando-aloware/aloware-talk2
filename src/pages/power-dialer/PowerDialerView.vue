@@ -725,23 +725,25 @@ export default {
     }
     this.init()
 
-    this.$VueEvent.listen('export_event_create', (task) => {
-      this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
-    })
+    if (this.hasExport) {
+      this.$VueEvent.listen('export_event_create', (task) => {
+        this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
+      })
 
-    this.$VueEvent.listen('export_event_update', (task) => {
-      console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
-      this.$generalNotification(
-        `Your export is now available. Click <b><a href="${process.env.API_URL}/download/${task.export.uuid}" download>here</a></b> to download the file.`,
-        'success',
-        0,
-        true
-      )
-    })
+      this.$VueEvent.listen('export_event_update', (task) => {
+        console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
+        this.$generalNotification(
+          `Your export is now available. Click <b><a href="${process.env.API_URL}/download/${task.export.uuid}" download>here</a></b> to download the file.`,
+          'success',
+          0,
+          true
+        )
+      })
 
-    this.$VueEvent.listen('export_event_delete', (task) => {
-      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
-    })
+      this.$VueEvent.listen('export_event_delete', (task) => {
+        console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
+      })
+    }
   },
   computed: {
     ...mapState('cache', ['currentCompany']),
