@@ -65,7 +65,8 @@ export default {
       this.$VueEvent.fire('saveContact')
       return Promise.all([
         this.saveChanges(),
-        this.disposeContact()
+        this.disposeContact(),
+        this.saveCustomAttributes()
       ]).then(response => {
         this.$VueEvent.fire('contactUpdated')
         if ((response[0] && response[0].status) || (response[1] && response[1].status)) {
@@ -131,6 +132,19 @@ export default {
             return { status: true, contact: response.data }
           }
 
+          return { status: true }
+        }).catch((err) => {
+          this.$handleErrors(err.response)
+          return { status: false }
+        })
+      }
+    },
+    saveCustomAttributes () {
+      if (this.changedContactAttributes.length > 0) {
+        return talk2Api.V1.contact.bulkSaveCustomAttributes(this.contact.id, { contact_attributes: this.changedContactAttributes }).then(response => {
+          this.$generalNotification('Contact custom attributes has been saved.')
+          this.$VueEvent.fire('customAttributesUpdated', this.contact)
+          this.resetChangedContactAttributes()
           return { status: true }
         }).catch((err) => {
           this.$handleErrors(err.response)

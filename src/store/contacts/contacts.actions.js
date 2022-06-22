@@ -161,7 +161,6 @@ export default {
     commit('SET_CONTACT_RING_GROUPS', ringGroups)
   },
   setContactAttributes: ({ commit }, attributes) => {
-    console.trace(attributes)
     commit('SET_CONTACT_ATTRIBUTES', attributes)
   },
   addContactPhoneNumber: ({ commit }, phoneNumber) => {

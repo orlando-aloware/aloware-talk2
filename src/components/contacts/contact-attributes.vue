@@ -67,8 +67,10 @@ export default {
       this.attributes = _.cloneDeep(this.contactAttributes)
     })
 
-    this.$VueEvent.listen('saveContact', () => {
-      this.attributes = _.cloneDeep(this.contactAttributes)
+    this.$VueEvent.listen('customAttributesUpdated', (contact) => {
+      if (this.contact.id === contact.id) {
+        this.getAttributes()
+      }
     })
   },
 

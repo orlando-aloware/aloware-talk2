@@ -340,10 +340,17 @@ export default {
 
   UPDATE_CHANGED_CONTACT_ATTRIBUTES: (state, { name, value }) => {
     const attr = state.contactAttributes.find(item => item.name === name)
-    if (attr && attr.value !== value) {
-      state.changedContactAttributes.push({ property: name, value: value })
-    } else {
+    const index = state.changedContactAttributes.findIndex(item => item.field === name)
 
+    if (index >= 0) {
+      // if is in changed attributes and the value is changed, then modify, else remove from the list
+      if (attr && attr.value !== value) {
+        state.changedContactAttributes[index].value = value
+      } else {
+        state.changedContactAttributes = state.changedContactAttributes.filter(item => item.name === name)
+      }
+    } else {
+      state.changedContactAttributes.push({ field: name, value: value })
     }
   },
   SET_CHANGED_CONTACT_PROPERTIES: (state, payload) => {
