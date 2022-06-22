@@ -61,6 +61,11 @@ export default {
       this.panel = val.name
     },
     getContactData (id, source) {
+      if (!id || id === 'undefined') {
+        console.log('Failed to get contact: Missing contact id!')
+        return
+      }
+
       return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })
     }
   },

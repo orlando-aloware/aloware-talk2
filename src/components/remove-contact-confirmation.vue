@@ -140,7 +140,7 @@ export default {
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
           const contactId = _.get(this.contactToRemove, 'id', null)
 
-          if (!contactId) {
+          if (!contactId || contactId === 'undefined') {
             console.log('Failed to remove contact: Missing contact id!')
             return
           }

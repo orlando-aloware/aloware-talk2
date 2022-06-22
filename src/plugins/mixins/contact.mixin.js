@@ -369,7 +369,7 @@ export default {
       this.loadingContact = true
       this.loadingContactCommunications = true
 
-      if (this.contactId) {
+      if (this.contactId && this.contactId !== 'undefined') {
         this.source.cancel('Fetch contact info operation canceled by the user.')
         this.source = this.cancelToken.source()
 
@@ -420,6 +420,8 @@ export default {
             }
           }
         })
+      } else {
+        console.log('Failed to fetch contact info: Missing contact id!')
       }
       this.loadingContact = false
       this.loadingContactCommunications = false

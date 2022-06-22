@@ -269,7 +269,7 @@ export default {
   V2: {
     contacts: {
       get (id) {
-        if (!id) {
+        if (!id || id === 'undefined') {
           return Promise.reject(new Error('Failed to process contact fetch: Missing contact id!'))
         }
 
