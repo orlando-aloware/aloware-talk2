@@ -285,12 +285,6 @@
               :key="`${index}`"
               class="datatable-row">
             <template
-              v-if="customRowContent">
-              <slot name="custom-content" />
-            </template>
-
-            <template
-              v-else
               v-for="(column, colIndx) in fixedColumns">
               <td
                 v-if="column.name === 'checkbox'"
@@ -379,23 +373,6 @@
                   v-if="contact.phone_number"
                   :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                   {{ contact.phone_number | fixPhone('NATIONAL', true) }}
-                </div>
-                <div
-                  v-else
-                  class="ml-1 text-grey-7 text-center "
-                  :class="`${column.draggable ? 'col-indented' : ''}`">
-                  -
-                </div>
-              </td>
-
-              <td
-                v-else-if="column.name === 'contact_owner'"
-                class="datatable-row__phone"
-                :key="`c-${colIndx}`">
-                <div
-                  v-if="contact.user_id"
-                  :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-                  {{ getOwnerName(contact.user_id) }}
                 </div>
                 <div
                   v-else
@@ -536,6 +513,20 @@
                     <span class="aloicons action-icons">B</span>
                   </button>
                 </div>
+              </td>
+
+              <td
+                v-else-if="column.name === 'task_status_name' || column.name === 'task_status'"
+                :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${colIndx}`">
+                <q-chip
+                  :outline="true"
+                  :color="getStatusColor(getStatusName(contact.task_status))"
+                  text-color="red"
+                  size="12px"
+                  class="p-0 m-0">
+                  {{ getStatusName(contact.task_status) }}
+                </q-chip>
               </td>
 
               <td
@@ -688,10 +679,9 @@
 </template>
 
 <script>
-import moment from 'moment'
+import _ from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import _ from 'lodash'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
@@ -717,7 +707,13 @@ import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
-import { avatarMixin, contactListCountMixin, timezoneCheckMixin, aclMixin } from 'src/plugins/mixins'
+import {
+  avatarMixin,
+  contactListCountMixin,
+  timezoneCheckMixin,
+  aclMixin,
+  viewMixin
+} from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
 export default {
@@ -727,7 +723,8 @@ export default {
     avatarMixin,
     contactListCountMixin,
     timezoneCheckMixin,
-    aclMixin
+    aclMixin,
+    viewMixin
   ],
 
   inject: [
@@ -806,10 +803,6 @@ export default {
     filtersCount: {
       type: Number,
       default: 0
-    },
-    customRowContent: {
-      type: Boolean,
-      default: false
     }
   },
 
@@ -821,29 +814,7 @@ export default {
       folderPath: [],
       createContactModalId: 'contacts-list-create-contact-modal',
       myContacts: false,
-      moment,
-      hoverPopover: {
-        key: 0,
-        title: '',
-        target: '',
-        show: false,
-        data: [],
-        dataLength: 0
-      },
-      datatableTarget: null,
       hasExport: false,
-      countFields: [
-        'unread_texts_count',
-        'unread_missed_calls_count',
-        'unread_voicemails_count',
-        'inbound_calls_count',
-        'inbound_texts_count',
-        'inbound_communications_count',
-        'outbound_calls_count',
-        'outbound_texts_count',
-        'outbound_communications_count',
-        'communications_count'
-      ],
       hasNextPage: false,
       ContactListTypes
     }
@@ -857,7 +828,6 @@ export default {
       'openFilters',
       'closeFilters',
       'columnsReordered',
-      'setListSelectedContacts',
       'createListOpen',
       'setCurrentListFilters',
       'removeListOpen',
@@ -874,7 +844,6 @@ export default {
       'setBulkDelete',
       'setMessageComposerMode',
       'exportCsv',
-      'setAllContactsSelected',
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded'
@@ -966,10 +935,6 @@ export default {
         })
       this.setAllContactsSelected(true)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
-    },
-    onCheckedRows (checked) {
-      this.setAllContactsSelected(false)
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
     onEditColumnsClicked () {
       this.columnsOpen({
@@ -1251,30 +1216,6 @@ export default {
         this.$router.push(`/contacts`)
       }
     },
-    getLineName (id) {
-      const found = this.campaigns.find(campaign => campaign.id === id)
-      return found ? found.name : '-'
-    },
-    getUserName (userId) {
-      const user = this.users.find(item => item.id === userId)
-
-      return user ? user.name : '-'
-    },
-    onCheckerClicked (contact) {
-      const items = { data: [] }
-      const found = this.checked.find(item => item.id === contact.id)
-      if (found) {
-        items.data = this.checked.filter(item => item.id !== contact.id)
-      } else {
-        items.data = [...this.checked]
-        items.data.push(contact)
-      }
-      this.setAllContactsSelected(false)
-      this.onCheckedRows(items.data)
-    },
-    isCountField (columnName) {
-      return this.countFields.includes(columnName)
-    },
     onRemove (contact, contactListId) {
       this.setShouldUpdateSelectedListContactCount(false)
       this.setBulkDelete(false)
@@ -1327,60 +1268,6 @@ export default {
         .catch(() => {
         })
     },
-    generateRoute (contactId) {
-      const routeData = {
-        path: `/contacts/${contactId}`
-      }
-
-      if (this.$route.name !== 'Power Dialer') {
-        routeData.query = {
-          previousPage: this.$route.name
-        }
-      }
-
-      return routeData
-    },
-    datatableOnMouseMove (e) {
-      if (e.target.closest('.popover-items') !== null) {
-        this.datatableTarget = e.target.closest('.popover-items').getAttribute('id')
-      } else {
-        this.datatableTarget = null
-      }
-
-      if (this.hoverPopover.target !== this.datatableTarget) {
-        this.hoverPopover.target = null
-        this.hoverPopover.show = false
-        return false
-      }
-    },
-    showPopover: _.debounce(function (title, id, index, colName, e) {
-      if (this.datatableTarget !== id) {
-        this.hoverPopover.target = null
-        this.hoverPopover.show = false
-        return
-      }
-
-      if (this.datatableTarget !== e.target.id) {
-        return
-      }
-
-      this.hoverPopover.key = (this.hoverPopover.key + 1)
-      this.hoverPopover.title = title
-      this.hoverPopover.target = id
-      this.hoverPopover.data = this.fixedContactsData.data[index][colName].slice(0, 10)
-      this.hoverPopover.dataLength = this.fixedContactsData.data[index][colName].length
-      this.hoverPopover.show = true
-    }, 200),
-    onMouseOverPopover (title, id, index, colName, e) {
-      this.showPopover(title, id, index, colName, e)
-    },
-    onMouseLeavePopover (e) {
-      this.hoverPopover.target = null
-      this.hoverPopover.title = ''
-      this.hoverPopover.show = false
-      this.hoverPopover.data = []
-      this.hoverPopover.dataLength = 0
-    },
     onNavigate (contactId, e) {
       e.preventDefault()
       this.$router.push(this.generateRoute(contactId))
@@ -1425,7 +1312,6 @@ export default {
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
       'pinnedCounts',
-      'isAllContactsSelected',
       'previousListFilters',
       'previousListId',
       'listContactsLoaded'
@@ -1554,9 +1440,6 @@ export default {
         }
       }
       return newItems
-    },
-    computedStyle () {
-      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     },
     hasMore () {
       return (this.hasNextPage &&
