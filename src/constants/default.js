@@ -38,6 +38,10 @@ export const DEFAULT_STATE = {
     callFishing: {
       communication: null,
       contact: null
+    },
+    error: {
+      message: '',
+      code: null
     }
   },
   warnings: [],

@@ -159,6 +159,7 @@ export default {
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
         this.$VueEvent.fire('new_in_app_call', res.data)
+        this.processActionNotification(res.data, 'call')
       }).finally(() => {
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)s
@@ -172,6 +173,7 @@ export default {
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial()
+      this.$closeActionNotification()
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
       //     console.log(err)
@@ -374,10 +376,13 @@ export default {
         if (this.dialer.communication && !force) {
           return Promise.resolve()
         }
+
         this.setDialerCommunication(res.data)
+
         if (this.dialer.communication.contact) {
           this.setDialerContact(this.dialer.communication.contact)
         }
+
         this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.communication.lead_number, 'E164'))
         this.$VueEvent.fire('communicationLoaded')
         this.loadingCommunication = false
@@ -1172,17 +1177,27 @@ export default {
 
     handleError (error) {
       this.setDialerCurrentStatus('GOT_ERROR')
-      const err = new Error(error.message + ' Code: ' + error.code)
+      this.setDialerError({
+        message: error.message,
+        code: error.code
+      })
+      const err = new Error(`${error.message} Code: ${error.code}`)
       err.code = error.code
+      // 31000 => General Twilio Client error.
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
       // there may be an issue resolving the hostname provided. If a region is being specified in Device setup, ensure it's a valid region.
       // 31009 => No transport available to send or receive messages.
       // 31201 => Generic unknown error.
+
+      // Handled errors
+      // 31003 => Connection timeout.
       // 31204 => Invalid JWT token.
       // 31205 => JWT token expired.
-      if (![31005, 31009, 31201, 31204, 31205].includes(err.code)) {
+      // 9221 => Cannot connect to insights
+      if (![31003, 31204, 31205, 9221].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
+
       console.log(error)
       this.setDialerIsReady(false)
     },
@@ -1263,8 +1278,18 @@ export default {
       'setCurrentOutputDevice',
       'setOutputDevices',
       'setShowIncomingCallNotification',
-      'setDialerFormStatus'
+      'setDialerFormStatus',
+      'setDialerError',
+      'setDialerErrorDefault'
     ])
+  },
+
+  watch: {
+    'dialer.currentStatus': function (value) {
+      if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
+        this.setDialerErrorDefault()
+      }
+    }
   },
 
   beforeDestroy () {

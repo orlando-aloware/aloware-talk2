@@ -64,18 +64,26 @@
         <active-call v-if="!isMobile"></active-call>
 
         <q-item v-if="!titleOnly">
-          <q-btn :ripple="false"
-                 :icon="dialerIcon"
-                 :disable="!isDialerReady"
+          <q-btn id="dialer-form-button"
+                 :ripple="false"
+                 :disable="!isDialerReady && !dialer.error.code"
                  size="40px"
                  padding="none"
                  align="center"
-                 flat>
+                 flat
+                 @click="onDialerErrorStatus">
+            <dialer-error-icon v-if="dialer.error.code">
+            </dialer-error-icon>
+            <dialer-icon :bg-color="dialerIconBGColor"
+                         :text-color="dialerIconTextColor"
+                         v-if="!dialer.error.code">
+            </dialer-icon>
             <q-menu :offset="[0, 10]"
                     anchor="bottom end"
                     self="top right"
-                    v-model="dialerStatus"
                     persistent
+                    v-model="dialerStatus"
+                    v-if="!dialer.error.code"
                     @before-show="showDialer"
                     @before-hide="hideDialer">
               <dialer-form v-model="dialerStatus"
@@ -84,6 +92,18 @@
               </dialer-form>
             </q-menu>
           </q-btn>
+          <b-popover target="dialer-form-button"
+                     triggers="hover"
+                     placement="bottomleft"
+                     v-if="dialer.error.code">
+            <template #title>Error code: {{ dialer.error.code }}</template>
+            {{ dialer.error.message }}
+            <br>
+            <a href="https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208" target="_blank"
+               v-if="dialer.error.code === 31208">
+              See fix
+            </a>
+          </b-popover>
         </q-item>
       </div>
     </div>
@@ -114,6 +134,8 @@ import RefreshIcon from 'components/icons/refresh-icon'
 import SharedLoginMenu from 'components/shared-login-menu'
 import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
+import DialerErrorIcon from 'components/icons/dialer-error-icon'
+import DialerIcon from 'components/icons/dialer-icon'
 
 export default {
   name: 'app-header',
@@ -121,6 +143,8 @@ export default {
   mixins: [aclMixin, avatarMixin, goBackMixin],
 
   components: {
+    DialerIcon,
+    DialerErrorIcon,
     BackButton,
     SharedLoginMenu,
     InboxChannelNavigation,
@@ -154,7 +178,6 @@ export default {
 
   data () {
     return {
-      dialerIcon: 'img:app-icons/header/dialer_gray.svg',
       dialerStatus: false,
       loading: false,
       prevRoute: null
@@ -201,6 +224,12 @@ export default {
         !this.publicListsLoaded ||
         !this.myListsLoaded ||
         !this.listContactsLoaded
+    },
+    dialerIconBGColor () {
+      return this.dialerStatus ? '#00BF4A' : '#F4F4F6'
+    },
+    dialerIconTextColor () {
+      return this.dialerStatus ? '#FFFFFF' : '#95989E'
     }
   },
 
@@ -219,12 +248,10 @@ export default {
     },
 
     showDialer () {
-      this.dialerIcon = 'img:app-icons/header/dialer_active.svg'
       this.dialerStatus = true
     },
 
     hideDialer () {
-      this.dialerIcon = 'img:app-icons/header/dialer_gray.svg'
       this.dialerStatus = false
     },
 
@@ -289,6 +316,12 @@ export default {
       })
       this.$VueEvent.fire('fetchContacts')
       this.$VueEvent.fire('fetchContactsLists')
+    },
+
+    onDialerErrorStatus () {
+      if (this.dialer.error.code === 31208) {
+        window.open('https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208')
+      }
     },
 
     ...mapActions('stats', ['setMetricGroups', 'setMetricLoader']),
