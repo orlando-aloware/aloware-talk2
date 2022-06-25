@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
 import ContactInputField from 'components/contacts/contact-input-field'
 import { mapActions, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
@@ -49,19 +48,11 @@ export default {
         name: prop,
         value: value
       })
-    },
-
-    getAttributes () {
-      return talk2Api.V1.contact.getAttributes(this.contact.id)
-        .then(response => {
-          this.attributes = response.data
-          this.setContactAttributes(_.cloneDeep(response.data))
-        })
     }
   },
 
   mounted () {
-    this.getAttributes()
+    this.attributes = _.cloneDeep(this.contactAttributes)
 
     this.$VueEvent.listen('cancelContactChanges', () => {
       this.attributes = _.cloneDeep(this.contactAttributes)
@@ -74,10 +65,12 @@ export default {
       }
     })
   },
-
   watch: {
-    'contact.id': function () {
-      this.getAttributes()
+    contactAttributes: {
+      deep: true,
+      handler: function (value) {
+        this.attributes = value
+      }
     }
   }
 }

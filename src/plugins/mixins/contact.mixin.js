@@ -387,20 +387,26 @@ export default {
           this.setSequenceInfoLoading(true)
         })
 
+        talk2Api.V1.contact.getAttributes(this.contactId)
+          .then(response => {
+            this.setContactAttributes(_.cloneDeep(response.data))
+          })
+
+        this.fetchContactCommunications(this.contactId, false).then(() => {
+          this.loadingContact = false
+          // if route has communication id
+          // until id is found
+          if (this.hasCommunication()) {
+            this.loadingContactCommunications = true
+            this.fetchContactCommunicationsUntilFound()
+          } else {
+            this.loadingContactCommunications = false
+          }
+          this.scrollMessages()
+        })
+
         return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
           if (res) {
-            this.fetchContactCommunications(this.contactId, false).then(() => {
-              this.loadingContact = false
-              // if route has communication id
-              // until id is found
-              if (this.hasCommunication()) {
-                this.loadingContactCommunications = true
-                this.fetchContactCommunicationsUntilFound()
-              } else {
-                this.loadingContactCommunications = false
-              }
-              this.scrollMessages()
-            })
             return res
           }
         }).catch(err => {
@@ -1125,7 +1131,8 @@ export default {
       'setSequenceInfoLoading',
       'setSequenceInfo',
       'setLineIncomingNumberLoading',
-      'setLineIncomingNumber'
+      'setLineIncomingNumber',
+      'setContactAttributes'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },
