@@ -48,16 +48,6 @@ export default {
       },
       selectedContactCampaigns: [],
       contactPhoneNumbers: [],
-      communicationsSummary: {
-        first_outbound_call: null,
-        summaries: {
-          inbound_calls_count: 0,
-          outbound_calls_count: 0,
-          inbound_texts_count: 0,
-          outbound_texts_count: 0,
-          total_count: 0
-        }
-      },
       communicationsPage: 1,
       communicationsPerPage: 10,
       contactIncomingNumber: null,
@@ -126,7 +116,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'auth']),
-    ...mapState('contacts', ['contact']),
+    ...mapState('contacts', ['contact', 'communicationsSummary']),
     ...mapState('inbox', { selectContact: 'selectedContact' }),
     ...mapState('cache', ['currentCompany']),
 
@@ -377,7 +367,10 @@ export default {
           this.setContactPhoneNumbers(response.data)
         })
 
-        this.getCommunicationsSummary(this.contactId)
+        talk2Api.V1.contact.getCommunicationsSummary(this.contactId).then(response => {
+          // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
+          this.setCommunicationSummary(response.data)
+        })
         this.setSequenceInfoLoading(true)
 
         talk2Api.V1.contact.getSequenceInfo(this.contactId).then(response => {
@@ -1100,22 +1093,6 @@ export default {
       })
     },
 
-    getCommunicationsSummary (contactId) {
-      if (contactId) {
-        this.$axios.get(`/api/v1/contact/${contactId}/communications-summary`)
-          .then(res => {
-            // sanitize summaries data before merging
-            // eslint-disable-next-line no-return-assign
-            Object.keys(res.data.summaries).forEach(key => res.data.summaries[key] = res.data.summaries[key] || 0)
-
-            this.communicationsSummary = { ...this.communicationsSummary, ...res.data }
-          })
-          .catch(err => {
-            console.log(err)
-          })
-      }
-    },
-
     ...mapActions('contacts', [
       'setContact',
       'setContactClone',
@@ -1125,7 +1102,8 @@ export default {
       'setSequenceInfoLoading',
       'setSequenceInfo',
       'setLineIncomingNumberLoading',
-      'setLineIncomingNumber'
+      'setLineIncomingNumber',
+      'setCommunicationSummary'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },

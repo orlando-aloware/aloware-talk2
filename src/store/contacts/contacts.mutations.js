@@ -208,6 +208,9 @@ export default {
   SET_CONTACT_ATTRIBUTES: (state, attributes) => {
     state.contactAttributes = attributes
   },
+  SET_COMMUNICATION_SUMMARY: (state, summary) => {
+    state.communicationsSummary = summary
+  },
   SET_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {
     state.contactPhoneNumbers = phoneNumbers
   },

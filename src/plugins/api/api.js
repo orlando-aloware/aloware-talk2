@@ -124,6 +124,12 @@ export default {
       },
       bulkSaveCustomAttributes (contactId, params) {
         return window.axios.patch(`${suffixV1}contact-attributes/${contactId}`, params)
+      },
+      getCommunicationsSummary (contactId) {
+        if (!contactId) {
+          return null
+        }
+        return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
       }
     },
     tags: {

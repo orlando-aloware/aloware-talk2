@@ -154,6 +154,9 @@ export default {
   setRingGroups: ({ commit }, ringGroups) => {
     commit('SET_RING_GROUPS', ringGroups)
   },
+  setCommunicationSummary: ({ commit }, summary) => {
+    commit('SET_COMMUNICATION_SUMMARY', summary)
+  },
   setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
     commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
   },
