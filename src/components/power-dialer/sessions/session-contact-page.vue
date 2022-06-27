@@ -63,7 +63,7 @@ export default {
     getContactData (id, source) {
       if (!id || id === 'undefined') {
         console.log('Failed to get contact: Missing contact id!')
-        return
+        return null
       }
 
       return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })
@@ -91,6 +91,10 @@ export default {
       this.source = this.cancelToken.source()
       this.isBusy = true
       this.getContactData(value.id, this.source.token).then(res => {
+        if (!res) {
+          return
+        }
+
         this.isBusy = false
         this.setContact(res.data)
       })

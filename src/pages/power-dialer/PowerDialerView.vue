@@ -616,6 +616,7 @@ import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
+import { TYPE_EXPORT_POWER_DIALER_LIST_ITEMS } from 'src/constants/export-types-default'
 import { isEqual, isEmpty, get } from 'lodash'
 import {
   aclMixin,
@@ -725,25 +726,35 @@ export default {
     }
     this.init()
 
-    if (this.hasExport) {
-      this.$VueEvent.listen('export_event_create', (task) => {
-        this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
-      })
+    this.$VueEvent.listen('export_event_create', (task) => {
+      if (task.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        return
+      }
 
-      this.$VueEvent.listen('export_event_update', (task) => {
-        console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
-        this.$generalNotification(
-          `Your export is now available. Click <b><a href="${process.env.API_URL}/download/${task.export.uuid}" download>here</a></b> to download the file.`,
-          'success',
-          0,
-          true
-        )
-      })
+      this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
+    })
 
-      this.$VueEvent.listen('export_event_delete', (task) => {
-        console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
-      })
-    }
+    this.$VueEvent.listen('export_event_update', (task) => {
+      if (task.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        return
+      }
+
+      console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
+      this.$generalNotification(
+        `Your export is now available. Click <b><a href="${process.env.API_URL}/download/${task.export.uuid}" download>here</a></b> to download the file.`,
+        'success',
+        0,
+        true
+      )
+    })
+
+    this.$VueEvent.listen('export_event_delete', (task) => {
+      if (task.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        return
+      }
+
+      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
+    })
   },
   computed: {
     ...mapState('cache', ['currentCompany']),
