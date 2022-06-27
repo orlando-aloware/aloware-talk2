@@ -848,6 +848,7 @@ export default {
       const communicationActivity = { data: null }
 
       // scroll to activity
+      clearInterval(this.scrollInterval)
       this.scrollInterval = setInterval(() => {
         communicationActivity.data = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
         if (communicationActivity.data) {
