@@ -589,7 +589,6 @@ export default {
         }
         if (this.togglePause) {
           this.sessionPaused = true
-          this.taskToCall = this.powerDialerTasks.in_queue[0]
         }
       }
     },
@@ -703,6 +702,15 @@ export default {
       this.togglePause = !this.togglePause
       if (this.togglePause) {
         this.sessionPaused = true
+      } else {
+        this.resetTimer()
+        this.sessionPaused = false
+
+        if (this.taskToCall && !this.statusOnACall) {
+          setTimeout(() => {
+            this.startWarmUpCountDown()
+          }, 1000)
+        }
       }
     },
     onToggleEnd () {
@@ -846,9 +854,8 @@ export default {
     async onNextTaskWhenOnWrapUp () {
       this.wrapUp = false
       this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
-      this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
-
       if (this.taskToCall) {
+        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -897,16 +904,6 @@ export default {
     currentCompany () {
       if (!this.autoDialer.outbound_campaign_id && this.togglePause) {
         this.findDefaultOutboundCampaign()
-      }
-    },
-    togglePause (value) {
-      if (!value) {
-        if (this.timerIsOver) {
-          setTimeout(() => {
-            this.initialize()
-            this.sessionPaused = false
-          }, 1000)
-        }
       }
     },
     toggleEnd (value) {

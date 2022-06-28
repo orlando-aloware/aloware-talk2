@@ -127,6 +127,23 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
+        <contact-input-field v-model="contact.csf1"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
+        </contact-input-field>
+      </div>
+      <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
+        <contact-input-field v-model="contact.csf2"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
+        </contact-input-field>
+      </div>
+      <contact-attributes v-if="contact.id"
+                          :contact="contact"></contact-attributes>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
@@ -150,23 +167,6 @@
         <p class="text-muted custom-input-label mb-0">Intake Source</p>
         <p>{{ contact.intake_source | toUpperCase }}</p>
       </div>
-
-      <div class="d-block">
-        <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
-        <contact-input-field v-model="contact.csf1"
-                             :disabled="!hasPermissionTo('update contact')"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
-        </contact-input-field>
-      </div>
-      <div class="d-block">
-        <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
-        <contact-input-field v-model="contact.csf2"
-                             :disabled="!hasPermissionTo('update contact')"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
-        </contact-input-field>
-      </div>
-      <contact-attributes v-if="contact.id"
-                          :contact="contact"></contact-attributes>
     </div>
     <b-button pill
               variant="light"
