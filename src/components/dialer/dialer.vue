@@ -173,7 +173,7 @@ export default {
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial()
-      this.$closeActionNotification()
+      this.$closeActionNotification('incomingCall')
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
       //     console.log(err)
