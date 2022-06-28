@@ -137,7 +137,7 @@
           size="sm"
           padding="0px 12px"
           :ripple="false"
-          :disable="!validSms"
+          :disable="!validSms || isTCPAApprovedTextNotAuthorized"
           :disable-dropdown="!validSms"
           :menu-offset="[0, 6]"
           @click="onSend"
@@ -165,7 +165,7 @@
 
 <script>
 import axios from 'axios'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ScheduledMessage from 'components/message-composer/scheduled-message'
 import SmsTemplateModal from 'components/sms-template-modal'
@@ -190,6 +190,7 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapState('cache', ['currentCompany']),
     validSms: function () {
       return ((this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0) &&
         this.selectedLine &&
@@ -201,6 +202,9 @@ export default {
     },
     messageAttachments () {
       return this.messageComposer.sms.attachments
+    },
+    isTCPAApprovedTextNotAuthorized () {
+      return this.currentCompany.enforce_tcpa && !this.contact.text_authorized
     }
   },
 
