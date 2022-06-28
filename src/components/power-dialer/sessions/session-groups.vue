@@ -58,7 +58,7 @@
                       {{ totalScheduled }}
                     </span>
                     <span v-else>
-                      {{ totalAll }}
+                      {{ group.length }}
                     </span>
                   </q-chip>
                 </div>
