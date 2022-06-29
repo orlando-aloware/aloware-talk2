@@ -69,7 +69,7 @@ export default {
     contactAttributes: {
       deep: true,
       handler: function (value) {
-        this.attributes = value
+        this.attributes = _.cloneDeep(value)
       }
     }
   }
