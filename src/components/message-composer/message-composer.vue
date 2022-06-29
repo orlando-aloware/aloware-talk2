@@ -4,8 +4,14 @@
          :class="[messageComposer.mode === 'note' ? 'bg-blue-70' : '']">
       <div class="tab-links d-inline-flex">
         <b-link href="#"
+                :disabled="isSmsDisabled"
                 :class="{ active : messageComposer.mode === 'sms' }"
                 @click="setMode('sms')">Text
+          <q-tooltip v-if="isSmsDisabled"
+                     anchor="top middle"
+                     self="center middle">
+            SMS/MMS feature is disabled.
+          </q-tooltip>
         </b-link>
         <b-link href="#"
                 v-if="currentCompany && currentCompany.reseller_id !== 357"
@@ -35,7 +41,8 @@
         </b-link>
       </div>
       <div>
-        <message-composer-sms v-if="messageComposer.mode === 'sms'"/>
+        <message-composer-sms :is-disabled="isSmsDisabled"
+                              v-if="messageComposer.mode === 'sms'"/>
         <message-composer-fax v-if="messageComposer.mode === 'fax'" />
         <message-composer-email v-if="messageComposer.mode === 'email' && contact.email" />
         <message-composer-note v-if="messageComposer.mode === 'note'" />
@@ -99,6 +106,9 @@ export default {
     disableFax () {
       return this.selectedLine ? !this.selectedLine.is_fax : true
     },
+    isSmsDisabled () {
+      return !this.currentCompany.sms_enabled
+    },
     isPhoneNumberInvalid () {
       if (this.selectContact && this.selectContact.phone_numbers && this.selectContact.phone_numbers.length) {
         const number = this.selectContact.phone_numbers.find(num => num.phone_number === this.selectContact.phone_number)
@@ -138,7 +148,12 @@ export default {
   },
 
   mounted () {
-    this.setMode('sms')
+    if (this.isSmsDisabled) {
+      this.setMode('email')
+    } else {
+      this.setMode('sms')
+    }
+
     this.setMessageComposerSmsPhoneNumber(this.contact.phone_number)
     if (!this.templates || this.templates.length < 1) {
       this.getSmsTemplates()

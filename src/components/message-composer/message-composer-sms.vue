@@ -1,5 +1,6 @@
 <template>
-  <div class="pt-2 message-composer-text-wrapper">
+  <div class="pt-2 message-composer-text-wrapper"
+       :disabled="isDisabled">
     <div class="file-dropper position-absolute"
          v-cloak
          @paste.prevent="onPaste"
@@ -186,6 +187,13 @@ export default {
     ImagePlaceholder,
     SmsTemplateModal,
     ScheduledMessage
+  },
+
+  props: {
+    isDisabled: {
+      type: Boolean,
+      default: false
+    }
   },
 
   computed: {
