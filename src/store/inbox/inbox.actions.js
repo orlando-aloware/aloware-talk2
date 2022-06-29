@@ -38,6 +38,12 @@ export default {
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
   },
+  updateLiveContactLastCommCurrentStatus: ({ commit }, payload) => {
+    commit('UPDATE_LIVE_CONTACT_LAST_COMM_CURRENT_STATUS', payload)
+  },
+  removeLiveContact: ({ commit }, contactId) => {
+    commit('REMOVE_LIVE_CONTACT', contactId)
+  },
   setContactsCurrentPage: ({ commit }, page) => {
     commit('SET_CONTACTS_CURRENT_PAGE', page)
   },

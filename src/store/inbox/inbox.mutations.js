@@ -59,6 +59,38 @@ export default {
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
   },
+  UPDATE_LIVE_CONTACT_LAST_COMM_CURRENT_STATUS: (state, payload) => {
+    const liveContact = { data: null, index: null }
+    liveContact.data = state.liveContacts.find(contact => contact.id === payload.id)
+
+    if (!liveContact.data) {
+      return
+    }
+
+    liveContact.index = state.liveContacts.indexOf(liveContact.data)
+
+    if (liveContact.index === -1) {
+      return
+    }
+
+    Vue.set(state.liveContacts[liveContact.index].last_communication, 'current_status2', payload.status)
+  },
+  REMOVE_LIVE_CONTACT: (state, contactId) => {
+    const liveContact = { data: null, index: null }
+    liveContact.data = state.liveContacts.find(contact => contact.id === contactId)
+
+    if (!liveContact.data) {
+      return
+    }
+
+    liveContact.index = state.liveContacts.indexOf(liveContact.data)
+
+    if (liveContact.index === -1) {
+      return
+    }
+
+    state.liveContacts.splice(liveContact.index, 1)
+  },
   SET_CONTACTS_CURRENT_PAGE: (state, page) => {
     state.contactsCurrentPage = page
   },
