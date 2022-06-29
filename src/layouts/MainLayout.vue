@@ -197,7 +197,8 @@ import {
   notificationMixin,
   broadcastMixin,
   parkCallMixin,
-  visibilityMixin
+  visibilityMixin,
+  unownedContactTaskMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -237,7 +238,8 @@ export default {
     notificationMixin,
     broadcastMixin,
     parkCallMixin,
-    visibilityMixin
+    visibilityMixin,
+    unownedContactTaskMixin
   ],
 
   data () {
@@ -606,7 +608,16 @@ export default {
     })
 
     this.$VueEvent.listen('update_communication', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+      const parkedCall = _.get(this.dialer, 'parkedCall', null)
+      const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
+
+      // remove the parked call if the caller was disconnected
+      if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW && parkedCall && parkedCall.id === communication.id) {
+        this.setDialerParkedCall()
+        this.removeParkedCall(communication.id)
+      }
+
+      if (this.checkCommunicationMatchesUserAccessibility(communication) || isCommunicationHasUnownedContact) {
         // missed call notification
         // if (communication.type === CommunicationTypes.CALL &&
         //   communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
@@ -1969,6 +1980,7 @@ export default {
       'setDialerContact',
       'setDialerCurrentNumber',
       'setDialerIsMuted',
+      'setDialerParkedCall',
       'setFilters',
       'setTagsFullyLoaded',
       'setNotifications',
@@ -1979,7 +1991,8 @@ export default {
       'setContactDetailsDrawer',
       'setEnableAudio',
       'setDefaultDateFilter',
-      'setNotificationAudio'
+      'setNotificationAudio',
+      'removeParkedCall'
     ]),
     ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
     ...mapActions('auth', {

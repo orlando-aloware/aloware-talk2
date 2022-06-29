@@ -205,7 +205,11 @@
 
 <script>
 import _ from 'lodash'
-import { avatarMixin, communicationInfoMixin, liveCallsMixin } from 'src/plugins/mixins'
+import {
+  avatarMixin,
+  communicationInfoMixin,
+  liveCallsMixin
+} from 'src/plugins/mixins'
 import Avatar from 'components/avatar'
 import { mapActions, mapState } from 'vuex'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
