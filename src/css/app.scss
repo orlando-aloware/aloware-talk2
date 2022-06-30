@@ -5314,6 +5314,38 @@ button#bs-folder-options {
   }
 }
 
+.integration-import-list-modal {
+  .modal-lg {
+    @media (min-width: 992px) {
+      max-width: 650px;
+    }
+  }
+  .modal-body {
+    padding: 0;
+  }
+  &__body {
+    padding: 40px;
+  }
+  &__title {
+    font-size: 18px;
+    font-weight: 400;
+    color: $black;
+  }
+  &__close {
+    margin-right: -15px;
+    margin-top: -30px;
+  }
+  &__list-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $black;
+  }
+  &__list-desc {
+    font-size: 13px;
+    color: $grey-light5;
+  }
+}
+
 .table-header {
   min-height: 58px;
 }

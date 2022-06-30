@@ -57,7 +57,7 @@
         v-if="isActive" />
       <RemoveFolderDialog
         :is-contact-module-type="false" />
-      <CreateListModal :is-default="false" />
+      <create-list-modal :is-default="false" />
     </template>
 
   </div>
