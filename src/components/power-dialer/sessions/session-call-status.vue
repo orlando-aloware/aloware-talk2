@@ -811,6 +811,7 @@ export default {
       this.sessionPhoneExpansion = 'transfer'
     },
     processSession (noWrapUp = false) {
+      this.onPhoneExpansionReset()
       if (!noWrapUp) {
         this.$VueEvent.fire('endWrapUp')
       }
@@ -852,6 +853,7 @@ export default {
       }
     },
     async onNextTaskWhenOnWrapUp () {
+      this.onPhoneExpansionReset()
       this.wrapUp = false
       this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {

@@ -103,6 +103,8 @@ export default {
       contactId: null,
       cancelToken: null,
       source: null,
+      communicationApiCancelToken: null,
+      communicationApiSource: null,
       contactActivitiesInterval: null,
       containerElInterval: null,
       scrollInterval: null,
@@ -221,6 +223,9 @@ export default {
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
+
+    this.communicationApiCancelToken = this.$axios.CancelToken
+    this.communicationApiSource = this.communicationApiCancelToken.source()
 
     if (this.skipComponents.includes(this.$options.name)) {
       return
@@ -405,6 +410,7 @@ export default {
         }).catch(err => {
           if (this.$axios.isCancel(err) && err) {
             console.log('Request canceled', err.message)
+            this.loadingContact = false
           } else {
             this.loadingContact = false
             this.loadingContactCommunications = false
@@ -492,8 +498,8 @@ export default {
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
-      this.source.cancel('fetchContactCommunications operation canceled by the user.')
-      this.source = this.cancelToken.source()
+      this.communicationApiSource.cancel('fetchContactCommunications operation canceled by the user.')
+      this.communicationApiSource = this.communicationApiCancelToken.source()
       const lastAuditCreatedAt = { data: null }
       const item = { index: null }
       for (item.index in this.communicationsAndAudits) {
@@ -508,7 +514,7 @@ export default {
           per_page: this.communicationsPerPage,
           last_audit_created_at: lastAuditCreatedAt.data
         },
-        cancelToken: this.source.token
+        cancelToken: this.communicationApiSource.token
       }).then(res => {
         if (res.data.data && res.data.data.length) {
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)

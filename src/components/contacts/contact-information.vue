@@ -141,7 +141,7 @@
         </contact-input-field>
       </div>
       <contact-attributes v-if="contact.id"
-                          :contact="contact"></contact-attributes>
+                          :contact="contact"/>
 
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
