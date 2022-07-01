@@ -118,33 +118,367 @@
       <datatable
         :stickyHeaders="true"
         :columns="validColumns"
-        :hasMore="hasMore"
+        :is-empty="isEmpty"
+        :is-loading-more="isLoadingMore"
         :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
-        :isEmpty="isEmpty"
-        :isLoadingMore="isLoadingMore"
         :total-rows="contactsData.total"
         :current-page="contactsData.current_page"
         :last-page="contactsData.last_page"
+        @onMouseMove="datatableOnMouseMove"
+        @onMouseLeave="datatableOnMouseMove"
         @reordered="onColumnsReordered"
         @checked="onCheckAllItems"
-        @paginated="onPagination"
         @sort="onSortByField"
-        @more="onLoadMore"
-      >
+        @paginated="onPagination"
+        @more="onLoadMore">
         <template slot="tbody">
-          <table-row
-            v-for="(contact, index) in contactsData.data"
-            :key="contact.id + index + Math.random()"
-            :contact="contact"
-            :columns="validColumns"
-            :checked="checked"
-            :contactListId="1"
-            @checked="onCheckedRows"
-          />
+          <tr v-for="(contact, index) in contactsData.data"
+              :key="`${index}`"
+              class="datatable-row">
+            <template v-for="(column, key) in validColumns">
+              <!-- change date added to date created -->
+              <!-- COLUMN: Checkboxes -->
+              <!-- <div :key="`key-${key}`">{{contact}}</div> -->
+              <td
+                v-if="column.name === 'checkbox'"
+                :key="`c-${key}`"
+                class="text-left pull-left datatable-row__checkbox">
+
+                <label class="custom-checkbox-container">
+                  <input
+                    type="checkbox"
+                    class="checker"
+                    :value="contact.id"
+                    :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
+                    @change="onCheckerClicked(contact)" />
+                  <span class="checkmark"></span>
+                </label>
+              </td>
+              <!-- COLUMN: Name  -->
+              <td
+                v-else-if="column.name === 'name'"
+                class="datatable-row__name"
+                :key="`c-${key}`">
+                <div class="d-flex align-items-center">
+                  <div class="pr-2">
+                    <div
+                      class="avatar"
+                      :style="computedStyle">
+                      <div
+                        class="avatar__inner">
+                        <span v-if="!contact.name || !contact.name.length">
+                          <i class="fa fa-user"></i>
+                        </span>
+                        <span v-else>
+                          {{ getInitials(contact.name || 'No Name') }}
+                        </span>
+                      </div>
+                      <slot></slot>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <router-link :to="generateRoute(contact.id)"
+                                 class="d-flex align-items-center item contact-name">
+                      <template v-if="contact.name">
+                        <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                          {{ contact.name | ucwords }}
+                        </div>
+                      </template>
+                      <template v-if="!contact.name">
+                        <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                          No Name
+                        </div>
+                      </template>
+                    </router-link>
+
+                    <b-badge v-if="contact.is_dnc"
+                             variant="danger"
+                             class="badge-phone-info">
+                      DNC
+                    </b-badge>
+                  </div>
+                </div>
+              </td>
+              <!-- COLUMN: Phone Number -->
+              <td
+                v-else-if="column.name === 'phone_number'"
+                class="datatable-row__phone"
+                :key="`c-${key}`">
+                <div
+                  v-if="contact.phone_number"
+                  :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+                </div>
+                <div
+                  v-else
+                  class="ml-1 text-grey-7 text-center "
+                  :class="`${column.draggable ? 'col-indented' : ''}`">
+                  --
+                </div>
+              </td>
+              <td
+                v-else-if="column.name === 'last_engagement_text'"
+                :key="`c-${key}`">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  <div>{{ contact.last_engagement_text }}</div>
+                  <div class="small text-muted">
+                    {{ moment(contact.last_engagement_at).format('LLL') }}
+                  </div>
+                </div>
+              </td>
+              <!-- COLUMN: Date Added/Created At -->
+              <td
+                v-else-if="column.name === 'created_at'"
+                class="text-left"
+                :key="`c-${key}`">
+                <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
+                  {{ contact.created_at | fixFullDateTime }}
+                </div>
+              </td>
+              <!-- COLUMN: Tags -->
+              <td
+                v-else-if="column.name === 'tags'"
+                :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${key}`"
+                @mouseleave="onMouseLeavePopover($event)">
+
+                <template
+                  v-if="!contact.tags || (contact.tags && !contact.tags.length)">
+                  --
+                </template>
+
+                <template
+                  v-if="Array.isArray(contact.tags) && contact.tags.length">
+                  <div
+                    class="d-flex align-items-center contact-tags-item popover-items"
+                    :id="`pt-${index}-${key}`"
+                    v-if="contact.id"
+                    @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${key}`, index, column.name, $event)">
+                    <span :style="`color: ${contact.tags[0].color};`">
+                      <i
+                        class="fa fa-circle"
+                        :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
+                      <span v-if="contact.tags.length > 1">
+                        {{ contact.tags[0].name | truncate(17) }}
+                      </span>
+                      <span
+                        v-else>
+                        {{ contact.tags[0].name | truncate(27) }}
+                      </span>
+                    </span>
+                    <span
+                      v-if="contact.tags.length > 1"
+                      class="ml-1 text-grey-7">
+                      +{{ (contact.tags.length - 1) }} more
+                    </span>
+                  </div>
+                </template>
+              </td>
+              <!-- COLUMN: Status -->
+              <td
+                v-else-if="column.name === 'task_status_name' || column.name === 'task_status'"
+                :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${key}`">
+                <q-chip
+                  :outline="true"
+                  :color="getStatusColor(getStatusName(contact.task_status))"
+                  text-color="red"
+                  size="12px"
+                  class="p-0 m-0">
+                  {{ getStatusName(contact.task_status) }}
+                </q-chip>
+              </td>
+              <td
+                v-else-if="column.name === 'contact_owner'"
+                class="datatable-row__name"
+                :key="`c-${key}`">
+                <div class="d-flex align-items-center">
+                  <div class="flex-grow-1">
+                    <div v-if="contact.user_id">
+                      <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                        {{ (getUserName(contact.user_id)) | ucwords }}
+                      </div>
+                    </div>
+                    <div v-else>
+                      <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                        No Name
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td
+                v-else-if="column.name === 'text_authorized_at'"
+                class="text-left"
+                :key="`c-${key}`">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ contact.text_authorized_at ? 'Yes' : 'No' }}
+                </div>
+              </td>
+              <td
+                v-else-if="column.name === 'initial_campaign_id'"
+                class="text-left"
+                :key="`c-${key}`">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                  {{ getLineName(contact.initial_campaign_id) }}
+                </div>
+              </td>
+              <td
+                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${key}`"
+                v-else-if="column.name === 'unread_missed_calls_count'">
+                <span
+                  class="badge badge-danger unread-text bg-red-80"
+                  v-if="contact.unread_missed_calls_count > 0">
+                  {{ contact.unread_missed_calls_count }}
+                </span>
+              </td>
+              <td
+                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${key}`"
+                v-else-if="column.name === 'unread_voicemails_count'">
+                <span
+                  class="badge badge-danger unread-text bg-red-80"
+                  v-if="contact.unread_voicemails_count > 0">
+                  {{ contact.unread_voicemails_count }}
+                </span>
+              </td>
+              <td
+                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                :key="`c-${key}`"
+                v-else-if="column.name === 'unread_texts_count'">
+                <span
+                  class="badge badge-danger unread-text bg-red-80"
+                  v-if="contact.unread_texts_count > 0">
+                  {{ contact.unread_texts_count }}
+                </span>
+              </td>
+              <td
+                v-else
+                :key="`c-${key}`"
+                @mouseleave="onMouseLeavePopover($event)">
+
+                <div
+                  v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)"
+                  class="text-left">
+                  <div :class="`${column.draggable ? 'col-indented' : ''}`">
+                    -
+                  </div>
+                </div>
+
+                <div
+                  v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length"
+                  class="text-left">
+                  <div
+                    v-if="contact[column.name].length > 0"
+                    :id="`ot-${index}-${key}`"
+                    class="d-flex align-items-center popover-items"
+                    @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${key}`, index, column.name, $event)">
+                    <div
+                      v-if="typeof contact[column.name][0].phone_number !== 'undefined'"
+                      :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                      {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
+                    </div>
+                    <div
+                      v-else
+                      :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                      {{ contact[column.name][0].name }}
+                    </div>
+                    <span
+                      v-if="contact[column.name].length > 1"
+                      class="ml-1 text-grey-7">
+                      +{{ (contact[column.name].length - 1) }} more
+                    </span>
+                  </div>
+                  <span
+                    v-if="contact[column.name].length === 0">
+                    -
+                  </span>
+                </div>
+                <div
+                  v-else-if="contact[column.name] && contact[column.name] instanceof Object && Object.keys(contact[column.name]).length"
+                  class="text-left">
+                  <div
+                    v-if="contact[column.name].id && typeof contact[column.name].name !== 'undefined'"
+                    :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                    {{ contact[column.name].name }}
+                  </div>
+                </div>
+                <span
+                  v-else-if="contact[column.name] && contact[column.name] instanceof Object && !Object.keys(contact[column.name]).length"
+                  class="text-left">
+                  - {{ contact[column.name] }}
+                </span>
+                <div
+                  v-else-if="column.name.includes('_at')"
+                  class="text-left ellipse col-indented">
+                  {{ contact[column.name] | fixFullDateTime }}
+                </div>
+                <div
+                  v-else-if="column.name.includes('date_of_birth')"
+                  class="text-left ellipse col-indented" >
+                  {{ contact[column.name] | fixFullDate }}
+                </div>
+                <div
+                  v-else
+                  class="ellipse"
+                  :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`">
+                  {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
+                  (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : ( contact[column.name] === null ? '-' : contact[column.name] ) ) }}
+                </div>
+              </td>
+            </template>
+          </tr>
         </template>
       </datatable>
+
+      <b-popover
+        v-if="hoverPopover.target"
+        triggers="hover"
+        placement="topright"
+        boundary="window"
+        ref="popover"
+        :key="hoverPopover.key"
+        :show.sync="hoverPopover.show"
+        :target="hoverPopover.target">
+        <template #title>
+          <div class="contact-tags-title">{{ hoverPopover.title }}</div>
+        </template>
+        <template v-if="hoverPopover.title === 'Tags'">
+          <span class="d-flex align-items-center contact-tags-item"
+                v-for="(item, index) in hoverPopover.data"
+                :key="`t-${index}`">
+            <span :style="`color: ${item.color};`">
+              <i class="fa fa-circle" :style="`color: ${item.color};font-size:50%;position: relative; top: -2px;`"></i>
+              {{ item.name }}
+            </span>
+          </span>
+        </template>
+        <template v-if="hoverPopover.title !== 'Tags'">
+          <div
+            class="ml-1 w-100"
+            v-for="(item, index) in hoverPopover.data"
+            :key="`ct-${index}`">
+            <i
+              class="fa fa-circle text-black"
+              :style="`font-size:36%;position: relative; top: -3px;`"></i>
+            <span v-if="typeof item.phone_number !== 'undefined'">
+              {{ item.phone_number | fixPhone('NATIONAL', true) }}
+            </span>
+            <span v-else>
+              {{ item.name }}
+            </span>
+          </div>
+        </template>
+        <span
+          v-if="hoverPopover.dataLength > 11"
+          class="ml-1 text-grey-7">
+          +{{ (hoverPopover.dataLength - 11) }} more
+        </span>
+      </b-popover>
+
     </template>
 
     <template slot="filters">
@@ -165,23 +499,28 @@ import Search from 'src/components/search.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
-import TableRow from 'src/components/table-row.vue'
 import TextPopover from 'components/popover/text-popover'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import {
-  contactsMixins,
   aclMixin,
   visibilityMixin,
-  contactListCountMixin
+  contactListCountMixin,
+  viewMixin,
+  avatarMixin
 } from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
+import { isEqual } from 'lodash'
 
 export default {
   mixins: [
-    contactsMixins,
     aclMixin,
     visibilityMixin,
-    contactListCountMixin
+    contactListCountMixin,
+    viewMixin,
+    avatarMixin
+  ],
+  inject: [
+    'pdContactsData'
   ],
 
   components: {
@@ -191,7 +530,6 @@ export default {
     Search,
     Datatable,
     ImportContactsModal,
-    TableRow,
     TextPopover,
     FolderStaticIcon
   },
@@ -208,12 +546,16 @@ export default {
     openEdit: {
       type: Boolean,
       default: false
+    },
+    isLoadingDisabled: {
+      type: Boolean,
+      default: false
     }
   },
 
   data () {
     return {
-      checked: [],
+      checkedItems: [],
       filterHasChanges: false,
       listName: '',
       myContacts: false,
@@ -258,7 +600,7 @@ export default {
     },
     checkedItemIds () {
       const ids = []
-      this.checked.forEach(check => {
+      this.checkedItems.forEach(check => {
         ids.push(check.id)
       })
       return ids
@@ -282,6 +624,13 @@ export default {
       return this.contactsData.data.filter(contact => {
         return contact.phone_numbers[0].is_primary === false
       })
+    },
+    fixedContactsData () {
+      if (isEqual(this.$parent.$data.contactsData, this.pdContactsData)) {
+        return this.pdContactsData
+      }
+
+      return this.$parent.$data.contactsData
     }
   },
   methods: {
@@ -292,7 +641,8 @@ export default {
       'foldersLoaded',
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount',
-      'setSearch'
+      'setSearch',
+      'setShowMyContacts'
     ]),
     updateListName (data) {
       const id = this.$attrs.id === 'my-queue' ? this.selectedList.id : this.$attrs.id
@@ -350,7 +700,7 @@ export default {
       if (this.isContactModule) {
         return {
           contact_list_id: this.contactList.id,
-          contacts: this.checked
+          contacts: this.checkedItems
         }
       } else {
         if (this.contactList.id === 'my-queue') {
@@ -372,7 +722,7 @@ export default {
     },
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>
-        this.checked.includes(i.id)
+        this.checkedItems.includes(i.id)
       )
     },
     onCancel () {
@@ -390,26 +740,26 @@ export default {
       })
     },
     onCheckAllItems (checked) {
-      this.checked = []
+      this.checkedItems = []
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           if (checked) {
             if (this.isContactModule) {
-              this.checked.push(this.contactsData.data.find(item => item.id === Number(checkbox.value)))
+              this.checkedItems.push(this.contactsData.data.find(item => item.id === Number(checkbox.value)))
             } else {
               let foundContact = this.contactsData.data.find(item => item.id === Number(checkbox.value))
               if (!(foundContact.is_blocked || foundContact.is_dnc)) {
-                this.checked.push(foundContact)
+                this.checkedItems.push(foundContact)
               }
             }
           } else {
-            this.checked = this.checked.filter(item => item.id !== Number(checkbox.value))
+            this.checkedItems = this.checkedItems.filter(item => item.id !== Number(checkbox.value))
           }
         })
     },
     onCheckedRows (checked) {
-      this.checked = checked
+      this.checkedItems = checked
     },
     onFiltersClicked () {
       if (this.isFiltersOpen) {
@@ -437,7 +787,7 @@ export default {
       this.filtersCount = count
     },
     onPagination (params) {
-      this.checked = []
+      this.checkedItems = []
       this.onPaginate(params)
     },
     setDataCount (data, updatePinned = false) {
@@ -447,6 +797,22 @@ export default {
       this.getListDataCount({ filters: data }).then(response => {
         this.contactCount = response.data.count
       })
+    },
+    onFetchMyContacts (checked) {
+      this.setShowMyContacts(checked)
+      this.$emit('checkboxChanged', checked)
+    },
+    onSearch (searchText) {
+      this.$emit('search', searchText)
+    },
+    onSortByField (sorts) {
+      this.$emit('sort', sorts)
+    },
+    onPaginate (params) {
+      this.$emit('paginated', params)
+    },
+    onLoadMore () {
+      this.$emit('loadMore')
     }
   },
   mounted () {

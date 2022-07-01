@@ -21,8 +21,9 @@ export default {
   },
   computed: {
     ...mapState('contacts', ['isAllContactsSelected']),
+    ...mapState(['users']),
     checked () {
-      return this.selectedContacts[this.id] || []
+      return _.get(this.selectedContacts, this.id, [])
     },
     computedStyle () {
       return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }

@@ -360,19 +360,25 @@ export default {
     },
     autoClose () {
       this.runDateTimeInterval()
-      if ((this.id === 'callFishing' && document.getElementById('callFishing') && !this.isCommunicationInCallFishingQueue) ||
-        (this.id === 'incomingCall' && document.getElementById('incomingCall') && _.isEmpty(this.dialer.call))) {
+      if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
+          !this.isCommunicationInCallFishingQueue) ||
+        (this.id === 'incomingCall' && document.getElementById('incomingCall') &&
+          _.isEmpty(this.dialer.call))
+      ) {
         this.processRemoveFromNotification(this.communication)
         return
       }
 
-      if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+      if (this.id === 'incomingCall' &&
+        (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
       }
 
-      if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
+      if (!this.noAutoHide &&
+        this.dateTime &&
+        this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
@@ -405,7 +411,10 @@ export default {
 
       this.clearDateTimeInterval()
 
-      if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
+      if (this.id !== 'callFishing' ||
+        (this.id === 'callFishing' &&
+          !document.getElementById('callFishing'))
+      ) {
         this.removeFromCallFishingNotificationQueue(this.notifications[this.id].communicationId)
         this.setNotifications({
           type: this.id,
@@ -477,7 +486,12 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
-      if (this.id !== 'callFishing' || (this.id === 'callFishing' && (!this.queue || (this.queue && !this.queue.length)))) {
+      if (this.id !== 'callFishing' ||
+        (this.id === 'callFishing' &&
+          (!this.queue ||
+            (this.queue && !this.queue.length))
+        )
+      ) {
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
@@ -502,14 +516,16 @@ export default {
         return className.data && typeof className.data === 'string' && (className.data.includes('call-actions') || className.data.includes('call-fishing-actions'))
       })
 
-      if (!found && this.isValidPhoneShowInfo) {
+      if (!found &&
+        this.isValidPhoneShowInfo) {
         this.showCallFishingDataInPhone({
           communication: this.communication,
           contact: this.contact
         }, this.id)
       }
 
-      if (!found && this.id === 'system') {
+      if (!found &&
+        this.id === 'system') {
         window.location.reload()
       }
     },

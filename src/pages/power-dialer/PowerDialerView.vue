@@ -169,7 +169,6 @@
       <Datatable
         :stickyHeaders="true"
         :columns="columns"
-        :has-more="hasMore"
         :is-empty="isEmpty || isStartState"
         :is-loading-more="isLoadingMore"
         :is-loading="isLoading"
@@ -177,7 +176,7 @@
         :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
-        :total-rows="totalRows"
+        :total-rows="fixedContactsData.total"
         :current-page="currentPage"
         :last-page="lastPage"
         @onMouseMove="datatableOnMouseMove"
@@ -188,7 +187,7 @@
         @paginated="onPaginate"
         @more="onLoadMore">
         <template slot="tbody">
-          <tr v-for="(contact, index) in this.fixedContactsData.data"
+          <tr v-for="(contact, index) in fixedContactsData.data"
               :key="`${index}`"
               class="datatable-row">
             <template v-for="(column, key) in filteredColumns">
@@ -848,9 +847,6 @@ export default {
       }
       return this.pdColumns
     },
-    totalRows () {
-      return this.listItems?.[this.selectedListId]?.total || 0
-    },
     currentPage () {
       return this.listItems?.[this.selectedListId]?.current_page || 1
     },
@@ -934,7 +930,8 @@ export default {
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
       'listLoaded',
-      'pinnedCountLoaded'
+      'pinnedCountLoaded',
+      'setShowMyContacts'
     ]),
     ...mapActions('powerDialer', [
       'updateContactsList',
@@ -951,6 +948,7 @@ export default {
       this.$emit('search', searchText)
     },
     onFetchMyContacts (checked) {
+      this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
     onSortByField (sorts) {
