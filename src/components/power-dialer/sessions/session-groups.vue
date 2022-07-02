@@ -283,8 +283,16 @@ export default {
        * everytime items are displayed
        */
       let { powerDialerTasks, activeTask } = this
+
+      if (!activeTask) {
+        return {
+          ...powerDialerTasks,
+          in_queue: this.powerDialerTasks.in_queue
+        }
+      }
+
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        return !activeTask || (activeTask && task.contact_list_item_id !== activeTask.contact_list_item_id)
+        return task.contact_list_item_id !== activeTask.contact_list_item_id
       })
       return {
         ...powerDialerTasks,

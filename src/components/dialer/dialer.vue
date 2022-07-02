@@ -122,7 +122,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
-      this.removeUnownedLiveContactTask(this.dialer.contact.id)
+      this.removeUnownedLiveContactTask()
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         this.setDialerIsReady(false)
@@ -131,7 +131,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
-      this.removeUnownedLiveContactTask(this.dialer.contact.id)
+      this.removeUnownedLiveContactTask()
       this.handleError(error)
       this.backToDial()
     })
