@@ -638,7 +638,7 @@ export default {
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
     isMyQueue () {
-      return this.$attrs?.id === 'my-queue'
+      return this.contactList.id === 'my-queue'
     },
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0

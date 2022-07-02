@@ -23,9 +23,9 @@
       <div
         class="height-32 d-flex align-items-center justify-content-center width-32"
         ref="editGroup"
-        @click="active = true">
+        v-if="editable"
+        @click="editable && (active = true)">
         <PencilIcon
-          v-if="editable"
           color="grey"
           :class="`${isVisible ? '' : 'make-invisible'}`" />
       </div>
