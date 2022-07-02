@@ -1,10 +1,11 @@
 <template>
   <div class="message-options">
     <b-link v-if="messageComposer.mode === 'sms'"
-            href="#">
+            href="#"
+            :disabled="isDisabled">
       <q-menu content-class="mx-height-500"
               ref="giphyMenu"
-              :offset="[0,5]" >
+              :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
           <search-giphy @selected="onGifSelected"></search-giphy>
         </div>
@@ -18,7 +19,7 @@
 
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            :disabled="!selectedLine">
+            :disabled="!selectedLine || isDisabled">
       <q-menu ref="attachmentMenu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
@@ -32,7 +33,8 @@
     </b-link>
 
     <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
-            href="#">
+            href="#"
+            :disabled="isDisabled">
       <q-menu content-class="mx-height-300"
               ref="templatesMenu"
               :offset="[0,5]">
@@ -47,7 +49,8 @@
     </b-link>
 
     <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
-            href="#">
+            href="#"
+            :disabled="isDisabled">
       <q-menu content-class="mx-height-300"
               ref="variablesMenu"
               :offset="[0,5]">
@@ -74,7 +77,7 @@ import MessageTemplates from 'components/message-composer/options/message-templa
 import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
 import VariableIcon from 'components/icons/variable-icon'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'message-composer-options',
@@ -91,7 +94,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['selectedLine', 'messageComposer'])
+    ...mapState('cache', ['currentCompany']),
+    ...mapGetters('contacts', ['selectedLine', 'messageComposer']),
+    isDisabled () {
+      return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
+    }
   },
 
   methods: {

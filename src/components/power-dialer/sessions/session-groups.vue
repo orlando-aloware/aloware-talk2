@@ -58,7 +58,7 @@
                       {{ totalScheduled }}
                     </span>
                     <span v-else>
-                      {{ totalAll }}
+                      {{ group.length }}
                     </span>
                   </q-chip>
                 </div>
@@ -284,7 +284,7 @@ export default {
        */
       let { powerDialerTasks, activeTask } = this
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        return task.contact_list_item_id !== activeTask.contact_list_item_id
+        return !activeTask || (activeTask && task.contact_list_item_id !== activeTask.contact_list_item_id)
       })
       return {
         ...powerDialerTasks,

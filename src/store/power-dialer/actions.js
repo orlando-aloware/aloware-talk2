@@ -51,7 +51,7 @@ export default {
   getContact: async ({ commit }, params = {}) => {
     const contactId = _.get(params, 'id', null)
 
-    if (!contactId) {
+    if (!contactId || contactId === 'undefined') {
       console.log('Failed to get contact: Missing contact id!')
       return
     }

@@ -79,6 +79,10 @@ export default function (/* { ssrContext } */) {
         callFishing: {
           communication: null,
           contact: null
+        },
+        error: {
+          message: '',
+          code: null
         }
       },
       warnings: [],
@@ -327,6 +331,14 @@ export default function (/* { ssrContext } */) {
 
       setDialerParkedCall ({ commit }, communication) {
         commit('SET_DIALER_PARKED_CALL', communication)
+      },
+
+      setDialerErrorDefault ({ commit }) {
+        commit('SET_DIALER_ERROR_DEFAULT')
+      },
+
+      setDialerError ({ commit }, error) {
+        commit('SET_DIALER_ERROR', error)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -806,6 +818,16 @@ export default function (/* { ssrContext } */) {
         if (communication && state.dialer.communication && communication.id === state.dialer.communication.id) {
           state.dialer.call = null
         }
+      },
+
+      SET_DIALER_ERROR_DEFAULT (state) {
+        state.dialer.error.message = ''
+        state.dialer.error.code = null
+      },
+
+      SET_DIALER_ERROR (state, error) {
+        state.dialer.error.message = error.message
+        state.dialer.error.code = error.code
       },
 
       SET_OLD_AGENT_STATUS (state, status) {

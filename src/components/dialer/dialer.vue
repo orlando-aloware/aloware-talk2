@@ -11,7 +11,8 @@ import {
   agentMixin,
   userMixin,
   notificationMixin,
-  visibilityMixin
+  visibilityMixin,
+  unownedContactTaskMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -26,7 +27,8 @@ export default {
     agentMixin,
     userMixin,
     notificationMixin,
-    visibilityMixin
+    visibilityMixin,
+    unownedContactTaskMixin
   ],
 
   data () {
@@ -120,6 +122,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
+      this.removeUnownedLiveContactTask(this.dialer.contact.id)
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         this.setDialerIsReady(false)
@@ -128,6 +131,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
+      this.removeUnownedLiveContactTask(this.dialer.contact.id)
       this.handleError(error)
       this.backToDial()
     })
@@ -159,6 +163,8 @@ export default {
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
         this.$VueEvent.fire('new_in_app_call', res.data)
+        this.processActionNotification(res.data, 'call')
+        this.addNonOwnedLiveContact(res.data)
       }).finally(() => {
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)s
@@ -169,9 +175,11 @@ export default {
     })
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
+      this.removeUnownedLiveContactTask()
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial()
+      this.$closeActionNotification('incomingCall')
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
       //     console.log(err)
@@ -181,6 +189,7 @@ export default {
 
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
       console.log('Successfully connected call', call)
+      this.updateUnownedContactLastCommunicationStatus()
       const map = call._connection.customParameters
       const customParameters = {}
       map.forEach((value, key) => {
@@ -219,6 +228,7 @@ export default {
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+      this.removeUnownedLiveContactTask()
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
       if (!this.dialer.parkedCall && !this.dialer.call) {
@@ -374,10 +384,13 @@ export default {
         if (this.dialer.communication && !force) {
           return Promise.resolve()
         }
+
         this.setDialerCommunication(res.data)
+
         if (this.dialer.communication.contact) {
           this.setDialerContact(this.dialer.communication.contact)
         }
+
         this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.communication.lead_number, 'E164'))
         this.$VueEvent.fire('communicationLoaded')
         this.loadingCommunication = false
@@ -574,6 +587,7 @@ export default {
 
       console.log('Rejecting call')
 
+      this.removeUnownedLiveContactTask()
       this.setDialerCurrentStatus('REJECTING_CALL')
 
       if (this.device.activeConnection()) {
@@ -705,6 +719,7 @@ export default {
 
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
+      this.addNonOwnedParkedTask(this.dialer.communication)
       const params = {
         communication_id: this.dialer.communication.id
       }
@@ -726,6 +741,7 @@ export default {
 
       this.loadingUnpark = true
       const parkedCall = this.dialer.parkedCall
+      this.removeParkedCall(this.dialer.parkedCall.id)
       this.setDialerParkedCall()
       this.stopParkedCallTimer()
       const data = {
@@ -1172,17 +1188,27 @@ export default {
 
     handleError (error) {
       this.setDialerCurrentStatus('GOT_ERROR')
-      const err = new Error(error.message + ' Code: ' + error.code)
+      this.setDialerError({
+        message: error.message,
+        code: error.code
+      })
+      const err = new Error(`${error.message} Code: ${error.code}`)
       err.code = error.code
+      // 31000 => General Twilio Client error.
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
       // there may be an issue resolving the hostname provided. If a region is being specified in Device setup, ensure it's a valid region.
       // 31009 => No transport available to send or receive messages.
       // 31201 => Generic unknown error.
+
+      // Handled errors
+      // 31003 => Connection timeout.
       // 31204 => Invalid JWT token.
       // 31205 => JWT token expired.
-      if (![31005, 31009, 31201, 31204, 31205].includes(err.code)) {
+      // 9221 => Cannot connect to insights
+      if (![31003, 31204, 31205, 9221].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
+
       console.log(error)
       this.setDialerIsReady(false)
     },
@@ -1263,8 +1289,19 @@ export default {
       'setCurrentOutputDevice',
       'setOutputDevices',
       'setShowIncomingCallNotification',
-      'setDialerFormStatus'
+      'setDialerFormStatus',
+      'setDialerError',
+      'setDialerErrorDefault',
+      'removeParkedCall'
     ])
+  },
+
+  watch: {
+    'dialer.currentStatus': function (value) {
+      if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
+        this.setDialerErrorDefault()
+      }
+    }
   },
 
   beforeDestroy () {
@@ -1296,6 +1333,7 @@ export default {
     clearInterval(this.$options.parkedCallDurationInterval)
     clearInterval(this.$options.webrtcTokenRegenerateInterval)
     clearInterval(this.$options.hangupInterval)
+    clearInterval(this.unownedContact.interval)
   }
 }
 </script>

@@ -42,7 +42,7 @@
 
 <script>
 
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
@@ -67,6 +67,7 @@ export default {
     broadcast
   ],
   computed: {
+    ...mapState(['dialer']),
     ...mapGetters('contacts', [
       'contact',
       'selectedList'
@@ -95,8 +96,15 @@ export default {
   async created () {
     await this.fetchCurrentList()
     this.TOGGLE_SESSION_LOADER(true)
-    await this.fetchTasks(1)
+    await this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
     this.hasActiveTask = false
+
+    this.$VueEvent.listen('endWrapUp', () => {
+      if (this.$route.name === 'Power Dialer') {
+        this.fetchTasks(AutoDialTaskStatus.STATUS_COMPLETED)
+        this.fetchTasks(AutoDialTaskStatus.STATUS_FAILED)
+      }
+    })
   },
   async mounted () {
     this.resetPowerDialerTasks()
@@ -126,11 +134,27 @@ export default {
     },
     fetchTasks (status) {
       if (status) {
-        this.getTaskByFilter({ id: this.selectedList.id, task_status: 1 }).then(res => {
-          this.powerDialerTasks['in_queue'] = res.data.data
-          this.powerDialerTaskFilters['in_queue'] = res.data
+        this.getTaskByFilter({ id: this.selectedList.id, task_status: status }).then(res => {
+          const taskType = { data: '' }
+          switch (status) {
+            case AutoDialTaskStatus.STATUS_COMPLETED:
+              taskType.data = 'called'
+              break
+            case AutoDialTaskStatus.STATUS_FAILED:
+              taskType.data = 'failed'
+              break
+            case AutoDialTaskStatus.STATUS_SCHEDULED:
+              taskType.data = 'scheduled'
+              break
+            case AutoDialTaskStatus.STATUS_QUEUED:
+            default:
+              taskType.data = 'in_queue'
+          }
 
-          if (this.powerDialerTasks['in_queue'].length === 0) {
+          this.powerDialerTasks[taskType.data] = res.data.data
+          this.powerDialerTaskFilters[taskType.data] = res.data
+
+          if (this.powerDialerTasks['in_queue'].length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
             this.$VueEvent.fire('initiate_session_no_tasks')
           }
         })

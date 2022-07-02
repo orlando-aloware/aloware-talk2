@@ -7038,8 +7038,12 @@ table.datatable {
     }
   }
 
-  a.linkified {
+  .sms-activity a.linkified {
     color: $grey-90;
+  }
+
+  .sms-activity.bg-primary a.linkified {
+    color: $white !important;
   }
 }
 

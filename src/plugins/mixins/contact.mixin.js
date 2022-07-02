@@ -48,16 +48,6 @@ export default {
       },
       selectedContactCampaigns: [],
       contactPhoneNumbers: [],
-      communicationsSummary: {
-        first_outbound_call: null,
-        summaries: {
-          inbound_calls_count: 0,
-          outbound_calls_count: 0,
-          inbound_texts_count: 0,
-          outbound_texts_count: 0,
-          total_count: 0
-        }
-      },
       communicationsPage: 1,
       communicationsPerPage: 10,
       contactIncomingNumber: null,
@@ -113,6 +103,8 @@ export default {
       contactId: null,
       cancelToken: null,
       source: null,
+      communicationApiCancelToken: null,
+      communicationApiSource: null,
       contactActivitiesInterval: null,
       containerElInterval: null,
       scrollInterval: null,
@@ -126,7 +118,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'auth']),
-    ...mapState('contacts', ['contact']),
+    ...mapState('contacts', ['contact', 'communicationsSummary']),
     ...mapState('inbox', { selectContact: 'selectedContact' }),
     ...mapState('cache', ['currentCompany']),
 
@@ -231,6 +223,9 @@ export default {
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
+
+    this.communicationApiCancelToken = this.$axios.CancelToken
+    this.communicationApiSource = this.communicationApiCancelToken.source()
 
     if (this.skipComponents.includes(this.$options.name)) {
       return
@@ -369,7 +364,7 @@ export default {
       this.loadingContact = true
       this.loadingContactCommunications = true
 
-      if (this.contactId) {
+      if (this.contactId && this.contactId !== 'undefined') {
         this.source.cancel('Fetch contact info operation canceled by the user.')
         this.source = this.cancelToken.source()
 
@@ -377,7 +372,10 @@ export default {
           this.setContactPhoneNumbers(response.data)
         })
 
-        this.getCommunicationsSummary(this.contactId)
+        talk2Api.V1.contact.getCommunicationsSummary(this.contactId).then(response => {
+          // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
+          this.setCommunicationSummary(response.data)
+        })
         this.setSequenceInfoLoading(true)
 
         talk2Api.V1.contact.getSequenceInfo(this.contactId).then(response => {
@@ -387,25 +385,32 @@ export default {
           this.setSequenceInfoLoading(true)
         })
 
+        talk2Api.V1.contact.getAttributes(this.contactId)
+          .then(response => {
+            this.setContactAttributes(_.cloneDeep(response.data))
+          })
+
+        this.fetchContactCommunications(this.contactId, false).then(() => {
+          this.loadingContact = false
+          // if route has communication id
+          // until id is found
+          if (this.hasCommunication()) {
+            this.loadingContactCommunications = true
+            this.fetchContactCommunicationsUntilFound()
+          } else {
+            this.loadingContactCommunications = false
+          }
+          this.scrollMessages()
+        })
+
         return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
           if (res) {
-            this.fetchContactCommunications(this.contactId, false).then(() => {
-              this.loadingContact = false
-              // if route has communication id
-              // until id is found
-              if (this.hasCommunication()) {
-                this.loadingContactCommunications = true
-                this.fetchContactCommunicationsUntilFound()
-              } else {
-                this.loadingContactCommunications = false
-              }
-              this.scrollMessages()
-            })
             return res
           }
         }).catch(err => {
           if (this.$axios.isCancel(err) && err) {
             console.log('Request canceled', err.message)
+            this.loadingContact = false
           } else {
             this.loadingContact = false
             this.loadingContactCommunications = false
@@ -420,6 +425,8 @@ export default {
             }
           }
         })
+      } else {
+        console.log('Failed to fetch contact info: Missing contact id!')
       }
       this.loadingContact = false
       this.loadingContactCommunications = false
@@ -491,8 +498,8 @@ export default {
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
-      this.source.cancel('fetchContactCommunications operation canceled by the user.')
-      this.source = this.cancelToken.source()
+      this.communicationApiSource.cancel('fetchContactCommunications operation canceled by the user.')
+      this.communicationApiSource = this.communicationApiCancelToken.source()
       const lastAuditCreatedAt = { data: null }
       const item = { index: null }
       for (item.index in this.communicationsAndAudits) {
@@ -507,7 +514,7 @@ export default {
           per_page: this.communicationsPerPage,
           last_audit_created_at: lastAuditCreatedAt.data
         },
-        cancelToken: this.source.token
+        cancelToken: this.communicationApiSource.token
       }).then(res => {
         if (res.data.data && res.data.data.length) {
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)
@@ -847,6 +854,7 @@ export default {
       const communicationActivity = { data: null }
 
       // scroll to activity
+      clearInterval(this.scrollInterval)
       this.scrollInterval = setInterval(() => {
         communicationActivity.data = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
         if (communicationActivity.data) {
@@ -1098,22 +1106,6 @@ export default {
       })
     },
 
-    getCommunicationsSummary (contactId) {
-      if (contactId) {
-        this.$axios.get(`/api/v1/contact/${contactId}/communications-summary`)
-          .then(res => {
-            // sanitize summaries data before merging
-            // eslint-disable-next-line no-return-assign
-            Object.keys(res.data.summaries).forEach(key => res.data.summaries[key] = res.data.summaries[key] || 0)
-
-            this.communicationsSummary = { ...this.communicationsSummary, ...res.data }
-          })
-          .catch(err => {
-            console.log(err)
-          })
-      }
-    },
-
     ...mapActions('contacts', [
       'setContact',
       'setContactClone',
@@ -1123,7 +1115,9 @@ export default {
       'setSequenceInfoLoading',
       'setSequenceInfo',
       'setLineIncomingNumberLoading',
-      'setLineIncomingNumber'
+      'setLineIncomingNumber',
+      'setCommunicationSummary',
+      'setContactAttributes'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },
