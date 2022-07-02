@@ -21,7 +21,10 @@ export default {
   },
   computed: {
     ...mapState('contacts', ['isAllContactsSelected']),
-    ...mapState(['users']),
+    ...mapState([
+      'users',
+      'campaigns'
+    ]),
     checked () {
       return _.get(this.selectedContacts, this.id, [])
     },

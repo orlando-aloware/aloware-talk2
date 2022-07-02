@@ -67,7 +67,13 @@ export default {
 
   created () {
     this.getStatics().then(() => {
-      if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
+      if ((this.statics &&
+        !this.statics.whitelabel) &&
+        this.currentCompany &&
+        !this.currentCompany.reseller_id &&
+        this.profile &&
+        this.isProduction &&
+        this.authenticated) {
         this.setup()
       }
     })

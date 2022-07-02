@@ -633,7 +633,11 @@ export default {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
           this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
-          this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+
+          if (this.taskToCall) {
+            this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+          }
+
           this.activeTask = this.taskToCall
           this.hasActiveTask = true
           this.setContact(this.taskToCall)

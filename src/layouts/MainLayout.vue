@@ -1077,7 +1077,11 @@ export default {
             setTimeout(() => {
               this.showRefreshButton = true
             }, 10000)
-            this.loading = true
+
+            // prevent showing an empty screen with a loading spinner in login page
+            if (this.$route.name !== 'Login') {
+              this.loading = true
+            }
           } else {
             this.checkAuth(authTry)
           }

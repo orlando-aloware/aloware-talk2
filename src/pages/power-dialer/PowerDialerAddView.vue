@@ -677,7 +677,7 @@ export default {
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
     isMyQueue () {
-      return this.$attrs?.id === 'my-queue'
+      return this.contactList.id === 'my-queue'
     },
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
@@ -755,7 +755,7 @@ export default {
         })
     },
     updateListName (data) {
-      const id = this.$attrs.id === 'my-queue' ? this.selectedList.id : this.$attrs.id
+      const id = this.contactList.id === 'my-queue' ? this.selectedList.id : this.contactList.id
       this.$axios
         .patch(`/api/v2/power-dialer-lists/${id}`, {
           name: data
