@@ -25,6 +25,14 @@ export default {
         store().commit('SET_USAGE', res.data.user.usage)
         store().commit('SET_USER_STATUS', res.data.user.enabled)
 
+        if ((!res.data.user.enabled || !res.data.user.company.enabled) && window.location.href.indexOf('/suspended') === -1) {
+          window.location.href = '/suspended'
+        }
+
+        if (res.data.user.enabled && res.data.user.company.enabled && window.location.href.indexOf('/suspended') !== -1) {
+          window.location.href = '/'
+        }
+
         return Promise.resolve(res)
       }).catch((err) => {
         if (!preventLogout) {
