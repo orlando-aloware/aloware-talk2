@@ -119,7 +119,7 @@
             :id="`popover-tags-${contact.id}`"
             ref="`popover-tags-${contact.id}`"
             v-if="contact.id">
-            <span :style="`color: ${contact.tags[0].color};`">
+            <span>
               <i
                 class="fa fa-circle"
                 :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>

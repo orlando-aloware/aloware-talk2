@@ -10,8 +10,7 @@
         :id="`popover-tags-${computedResource.contact_list_item_id}`"
         class="d-flex align-items-center computedResource-tags-item"
         v-if="computedResource.contact_list_item_id">
-        <span
-          :style="`color: ${computedResource.tags[0].color};`">
+        <span>
           <i
             class="fa fa-circle"
             :style="`color: ${computedResource.tags[0].color};font-size:50%;position: relative; top: -2px;`">

@@ -411,7 +411,7 @@
                     :id="`pt-${index}-${colIndx}`"
                     v-if="contact.id"
                     @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
-                    <span :style="`color: ${contact.tags[0].color};`">
+                    <span>
                       <i
                         class="fa fa-circle"
                         :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
@@ -640,7 +640,7 @@
           <span class="d-flex align-items-center contact-tags-item"
                 v-for="(item, index) in hoverPopover.data"
                 :key="`t-${index}`">
-            <span :style="`color: ${item.color};`">
+            <span>
               <i class="fa fa-circle" :style="`color: ${item.color};font-size:50%;position: relative; top: -2px;`"></i>
               {{ item.name }}
             </span>
