@@ -59,12 +59,12 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !this.accountSuspended">
+            <dialer v-if="authenticated && !accountSuspended">
             </dialer>
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
-                  v-if="authenticated && !this.accountSuspended"
+                  v-if="authenticated && !accountSuspended"
                   :breakpoint="0"
                   class="h-100 sidebar-wrapper d-block"
                   :width="64"
@@ -86,7 +86,7 @@
           side="right"
           :breakpoint="789"
           v-model="mobilePhoneDrawer"
-          v-if="authenticated && !this.accountSuspended"
+          v-if="authenticated && !accountSuspended"
           @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-show="!isPhoneVisible">
@@ -109,7 +109,7 @@
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading && isMobile && !this.accountSuspended"
+                    v-if="authenticated && !isWidget && !loading && isMobile && !accountSuspended"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -342,7 +342,7 @@ export default {
   },
 
   created () {
-    if (this.$route.name === 'Account Suspended') {
+    if (this.$route.name === 'Suspended') {
       this.setAccountSuspended(true)
     }
 
@@ -2084,11 +2084,11 @@ export default {
         }, 1000)
       }
 
-      if (to.name === 'Account Suspended') {
+      if (to.name === 'Suspended') {
         this.setAccountSuspended(true)
       }
 
-      if (this.accountSuspended && to.name !== 'Account Suspended') {
+      if (this.accountSuspended && to.name !== 'Suspended') {
         this.setAccountSuspended(false)
       }
 

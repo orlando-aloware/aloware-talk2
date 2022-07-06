@@ -133,6 +133,7 @@ export default {
     onLoginError (err) {
       this.loading = false
       if (err.response?.status !== 401) {
+        console.log(err)
         this.$handleErrors(err.response)
       } else {
         // show notification

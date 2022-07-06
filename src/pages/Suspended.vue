@@ -32,21 +32,21 @@
             contact our support at
             <span class="text-primary"
                   v-if="currentCompany && currentCompany.reseller_id != 357">
-                              support@aloware.com
-                          </span>
+              support@aloware.com
+            </span>
             <span class="text-primary"
                   v-if="currentCompany && currentCompany.reseller_id == 357">
-                              support@simpsocial.com
-                          </span>
+              support@simpsocial.com
+            </span>
             or call
             <span class="text-primary"
                   v-if="currentCompany && currentCompany.reseller_id != 357">
-                              855-256-2001
-                          </span>
+                855-256-2001
+            </span>
             <span class="text-primary"
                   v-if="currentCompany && currentCompany.reseller_id == 357">
-                              888-829-1110
-                          </span>
+                888-829-1110
+            </span>
             for assistance.
           </h2>
         </div>

@@ -318,7 +318,7 @@ const routes = [
       },
       {
         path: 'suspended',
-        name: 'Account Suspended',
+        name: 'Suspended',
         component: Suspended
       }
     ]
