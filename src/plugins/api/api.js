@@ -121,6 +121,15 @@ export default {
       },
       syncHubspot (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
+      },
+      bulkSaveCustomAttributes (contactId, params) {
+        return window.axios.patch(`${suffixV1}contact-attributes/${contactId}`, params)
+      },
+      getCommunicationsSummary (contactId) {
+        if (!contactId) {
+          return null
+        }
+        return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
       }
     },
     tags: {
@@ -266,7 +275,7 @@ export default {
   V2: {
     contacts: {
       get (id) {
-        if (!id) {
+        if (!id || id === 'undefined') {
           return Promise.reject(new Error('Failed to process contact fetch: Missing contact id!'))
         }
 

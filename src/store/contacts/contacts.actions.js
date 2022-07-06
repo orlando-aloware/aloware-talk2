@@ -154,6 +154,9 @@ export default {
   setRingGroups: ({ commit }, ringGroups) => {
     commit('SET_RING_GROUPS', ringGroups)
   },
+  setCommunicationSummary: ({ commit }, summary) => {
+    commit('SET_COMMUNICATION_SUMMARY', summary)
+  },
   setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
     commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
   },
@@ -269,11 +272,17 @@ export default {
   updateChangedContactProperties: ({ commit }, params) => {
     commit('UPDATE_CHANGED_CONTACT_PROPERTIES', params)
   },
+  updateChangedContactAttributes: ({ commit }, params) => {
+    commit('UPDATE_CHANGED_CONTACT_ATTRIBUTES', params)
+  },
   setChangedContactProperties: ({ commit }, payload) => {
     commit('SET_CHANGED_CONTACT_PROPERTIES', payload)
   },
   resetChangedContactProperties: ({ commit }) => {
     commit('RESET_CHANGED_CONTACT_PROPERTIES')
+  },
+  resetChangedContactAttributes: ({ commit }) => {
+    commit('RESET_CHANGED_CONTACT_ATTRIBUTES')
   },
   updateContacts: ({ commit }, payload) => {
     commit('UPDATE_CONTACTS', payload)

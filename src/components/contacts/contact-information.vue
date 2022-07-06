@@ -127,6 +127,23 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
+        <contact-input-field v-model="contact.csf1"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
+        </contact-input-field>
+      </div>
+      <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
+        <contact-input-field v-model="contact.csf2"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
+        </contact-input-field>
+      </div>
+      <contact-attributes v-if="contact.id"
+                          :contact="contact"/>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">TCPA Approved</p>
         <p>{{ contact.text_authorized | fixBooleanType }}</p>
       </div>
@@ -149,21 +166,6 @@
       <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Intake Source</p>
         <p>{{ contact.intake_source | toUpperCase }}</p>
-      </div>
-
-      <div class="d-block">
-        <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
-        <contact-input-field v-model="contact.csf1"
-                             :disabled="!hasPermissionTo('update contact')"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
-        </contact-input-field>
-      </div>
-      <div class="d-block">
-        <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
-        <contact-input-field v-model="contact.csf2"
-                             :disabled="!hasPermissionTo('update contact')"
-                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
-        </contact-input-field>
       </div>
     </div>
     <b-button pill
@@ -189,6 +191,7 @@ import ContactDispositionSelector from 'components/generic-selectors/contact-dis
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
+import ContactAttributes from 'components/contacts/contact-attributes'
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -200,6 +203,7 @@ export default {
     }
   },
   components: {
+    ContactAttributes,
     DatePickerSelector,
     QTimezoneSelector,
     ContactDispositionSelector,

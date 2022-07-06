@@ -53,6 +53,10 @@ export default {
       this.setShowPhone(false)
     },
     onStatusInProgress (task) {
+      if (!task) {
+        return
+      }
+
       // Re-assign new items for IN QUEUE and exclude the current task
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
@@ -68,6 +72,10 @@ export default {
       }
     },
     onStatusQueued (task) {
+      if (!task) {
+        return
+      }
+
       // Status Queued
       let taskToMove = this.powerDialerTasks.in_queue.find(lst => lst.contact_list_item_id === task.id)
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)

@@ -1,0 +1,31 @@
+export const TYPE_GENERIC = 'generic'
+export const TYPE_SUMMARY = 'summary'
+export const TYPE_COMMUNICATION = 'communication'
+export const TYPE_CONTACTS = 'contacts'
+export const TYPE_KPI = 'kpi'
+export const TYPE_BROADCASTS_ACTIVITY_REPORTING = 'broadcasts_activity_reporting'
+export const TYPE_CONTACTS_ACTIVITY_REPORTING_LINES = 'contacts_activity_reporting_lines'
+export const TYPE_CONTACTS_ACTIVITY_REPORTING_AGENTS = 'contacts_activity_reporting_agents'
+export const TYPE_CONTACTS_ACTIVITY_REPORTING_NEW_CONTACTS_VS_DNC = 'contacts_activity_reporting_new_contacts_vs_dnc'
+export const TYPE_LINES_ACTIVITY_REPORTING = 'lines_activity_reporting'
+export const TYPE_RING_GROUPS_ACTIVITY_REPORTING = 'ring_groups_activity_reporting'
+export const TYPE_SEQUENCES_ACTIVITY_REPORTING = 'sequences_activity_reporting'
+export const TYPE_USERS_ACTIVITY_REPORTING = 'users_activity_reporting'
+export const TYPE_USER_TIMELINE_REPORTING = 'user_timeline_reporting'
+export const TYPE_COMMUNICATION_CALL_DISPOSITION_PER_DAY_REPORTING = 'communication_call_disposition_per_day_reporting'
+export const TYPE_COMMUNICATION_CALL_DISPOSITION_PER_USER_REPORTING = 'communication_call_disposition_per_user_reporting'
+export const TYPE_COMMUNICATION_CONTACT_DISPOSITION_PER_DAY_REPORTING = 'communication_contact_disposition_per_day_reporting'
+export const TYPE_COMMUNICATION_CONTACT_DISPOSITION_PER_USER_REPORTING = 'communication_contact_disposition_per_user_reporting'
+export const TYPE_COMMUNICATION_COMPLIANCE_BY_DATE_REPORTING = 'communication_compliance_by_date_reporting'
+export const TYPE_COMMUNICATION_COMPLIANCE_BY_LINE_REPORTING = 'communication_compliance_by_line_reporting'
+// daily outbound SMS report
+export const TYPE_COMMUNICATION_DAILY_OUTBOUND_SMS_REPORT = 'communication_daily_outbound_sms_report'
+// daily inbound SMS report
+export const TYPE_COMMUNICATION_DAILY_INBOUND_SMS_REPORT = 'communication_daily_inbound_sms_report'
+// daily dnc report
+export const TYPE_DAILY_DNC_REPORT = 'daily_dnc_report'
+// import logs
+export const TYPE_IMPORT_LOGS_REPORTING = 'import_logs'
+// contact list items
+export const TYPE_EXPORT_CONTACT_LIST_ITEMS = 'contact_list_items'
+export const TYPE_EXPORT_POWER_DIALER_LIST_ITEMS = 'power_dialer_list_items'

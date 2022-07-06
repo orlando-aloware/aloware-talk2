@@ -222,7 +222,13 @@
 
 <script>
 import Avatar from 'components/avatar'
-import { avatarMixin, communicationInfoMixin, notificationMixin, liveCallsMixin } from 'src/plugins/mixins'
+import {
+  avatarMixin,
+  communicationInfoMixin,
+  notificationMixin,
+  liveCallsMixin,
+  unownedContactTaskMixin
+} from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -240,7 +246,13 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 export default {
   name: 'inbox-task-item',
 
-  mixins: [avatarMixin, communicationInfoMixin, notificationMixin, liveCallsMixin],
+  mixins: [
+    avatarMixin,
+    communicationInfoMixin,
+    notificationMixin,
+    liveCallsMixin,
+    unownedContactTaskMixin
+  ],
 
   components: { IgnoreCallIcon, ParkCallIcon, HangupIcon, ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
 
@@ -372,6 +384,12 @@ export default {
       if (this.selectedContact && this.selectedContact.id === contact.id && !this.isReopened) {
         return
       }
+
+      if (this.isNotOwned(contact.user_id)) {
+        this.$generalNotification(`Contact is inaccessible.`, 'error')
+        return
+      }
+
       this.$emit('onItemSelected', contact)
     }
   },

@@ -6,7 +6,7 @@
              class="p-0 mb-2"
              col>
         <p class="mb-0 data-text">{{ summary.inbound_calls_count || 0 }}</p>
-        <p class="mb-0 data-label">Inbound Call</p>
+        <p class="mb-0 data-label">Inbound Calls</p>
       </b-col>
       <b-col cols="6"
              class="p-0 mb-2"

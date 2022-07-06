@@ -79,6 +79,10 @@ export default function (/* { ssrContext } */) {
         callFishing: {
           communication: null,
           contact: null
+        },
+        error: {
+          message: '',
+          code: null
         }
       },
       warnings: [],
@@ -243,7 +247,8 @@ export default function (/* { ssrContext } */) {
       sessionPhoneExpansion: '',
       notificationAudio: null,
       loadingParkedCalls: false,
-      parkedCalls: []
+      parkedCalls: [],
+      accountSuspended: false
     },
 
     getters: {
@@ -327,6 +332,14 @@ export default function (/* { ssrContext } */) {
 
       setDialerParkedCall ({ commit }, communication) {
         commit('SET_DIALER_PARKED_CALL', communication)
+      },
+
+      setDialerErrorDefault ({ commit }) {
+        commit('SET_DIALER_ERROR_DEFAULT')
+      },
+
+      setDialerError ({ commit }, error) {
+        commit('SET_DIALER_ERROR', error)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -705,6 +718,9 @@ export default function (/* { ssrContext } */) {
       },
       removeParkedCall ({ commit }, communicationId) {
         commit('REMOVE_PARKED_CALL', communicationId)
+      },
+      setAccountSuspended ({ commit }, value) {
+        commit('SET_ACCOUNT_SUSPENDED', value)
       }
     },
 
@@ -806,6 +822,16 @@ export default function (/* { ssrContext } */) {
         if (communication && state.dialer.communication && communication.id === state.dialer.communication.id) {
           state.dialer.call = null
         }
+      },
+
+      SET_DIALER_ERROR_DEFAULT (state) {
+        state.dialer.error.message = ''
+        state.dialer.error.code = null
+      },
+
+      SET_DIALER_ERROR (state, error) {
+        state.dialer.error.message = error.message
+        state.dialer.error.code = error.code
       },
 
       SET_OLD_AGENT_STATUS (state, status) {
@@ -1360,6 +1386,10 @@ export default function (/* { ssrContext } */) {
         }
 
         state.parkedCalls.splice(state.parkedCalls.indexOf(found), 1)
+      },
+
+      SET_ACCOUNT_SUSPENDED (state, value) {
+        state.accountSuspended = value
       },
 
       updateField

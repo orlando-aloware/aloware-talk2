@@ -38,6 +38,10 @@ export const DEFAULT_STATE = {
     callFishing: {
       communication: null,
       contact: null
+    },
+    error: {
+      message: '',
+      code: null
     }
   },
   warnings: [],
@@ -204,5 +208,6 @@ export const DEFAULT_STATE = {
   sessionPhoneExpansion: '',
   notificationAudio: null,
   loadingParkedCalls: false,
-  parkedCalls: []
+  parkedCalls: [],
+  accountSuspended: false
 }
