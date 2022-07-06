@@ -14,7 +14,8 @@ export default {
   data () {
     return {
       env: null,
-      statics: null
+      statics: null,
+      app_id: process.env.INTERCOM_APP_ID
     }
   },
 
@@ -33,12 +34,13 @@ export default {
         return Promise.reject(err)
       })
     },
+
     setup () {
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
             alignment: 'right',
-            app_id: process.env.INTERCOM_APP_ID,
+            app_id: this.app_id,
             name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
@@ -50,11 +52,13 @@ export default {
         }
       })
     },
+
     launch () {
       if (this.profile && window.Intercom) {
         this.setup()
       }
     },
+
     shutDown () {
       if (!this.profile && window.Intercom) {
         window.Intercom('shutdown')
