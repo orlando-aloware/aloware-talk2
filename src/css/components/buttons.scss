@@ -35,10 +35,11 @@
     margin: 1px 0;
     height: 26px;
     border-radius: 5px;
-    
+
     .t__badge {
       background-color: $grey-70;
       font-size: 10px;
+      line-height: 16px;
       padding: 0px 5px;
       margin: 1px 5px;
       border-radius: 5px;
@@ -72,7 +73,7 @@
       color: $white;
     }
   }
-  
+
 }
 
 .start-dial-button {
@@ -110,7 +111,7 @@
   &.show {
     .dropdown-toggle {
       border: $primary solid 1px !important;
-    }    
+    }
   }
   .dropdown-toggle {
     border-radius: 6px;
@@ -139,7 +140,7 @@
     }
     .dropdown {
       &.t-btn-floater {
-        
+
         &__bottom {
           position: absolute;
           bottom: 12px;
@@ -188,7 +189,7 @@
               color: black;
             }
           }
-          
+
         }
       }
     }
