@@ -28,7 +28,8 @@ const routes = [
         path: 'login',
         name: 'Login',
         meta: {
-          isGuest: true
+          isGuest: true,
+          title: 'Login'
         },
         component: Login
       },

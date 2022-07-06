@@ -20,10 +20,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState('auth', ['profile', 'authenticated']),
-    isProduction () {
-      return process.env.APP_ENV === 'production'
-    }
+    ...mapState('auth', ['profile', 'authenticated'])
   },
 
   methods: {
@@ -54,12 +51,12 @@ export default {
       })
     },
     launch () {
-      if (this.profile && window.Intercom && this.isProduction) {
+      if (this.profile && window.Intercom) {
         this.setup()
       }
     },
     shutDown () {
-      if (!this.profile && window.Intercom && this.isProduction) {
+      if (!this.profile && window.Intercom) {
         window.Intercom('shutdown')
       }
     }
@@ -67,23 +64,15 @@ export default {
 
   created () {
     this.getStatics().then(() => {
-      if ((this.statics &&
-        !this.statics.whitelabel) &&
+      if (!this.hasReporterAccess &&
+        (this.statics && !this.statics.whitelabel) &&
         this.currentCompany &&
         !this.currentCompany.reseller_id &&
         this.profile &&
-        this.isProduction &&
-        this.authenticated) {
+        process.env.APP_ENV !== 'local') {
         this.setup()
       }
     })
-  },
-
-  mounted () {
-    this.shutDown()
-    if (this.authenticated) {
-      this.launch()
-    }
   },
 
   watch: {
