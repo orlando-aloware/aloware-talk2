@@ -1,21 +1,5 @@
 <template>
   <div class="row w-100">
-    <b-alert :show="showDiagnosis"
-             dismissible
-             variant="danger"
-             v-if="diagnosis.length > 0 && shouldShowDiagnosis">
-      <div class="d-flex justify-content-between">
-        <div>
-          <i class="material-icons">warning</i> {{ firstDiagnosis }}
-        </div>
-        <span v-if="currentCompany && currentCompany.reseller_id !== 357">
-          Contact Support: (818) 740-6004
-        </span>
-        <span v-if="currentCompany && currentCompany.reseller_id === 357">
-          Contact Support: (888) 829-1110
-        </span>
-      </div>
-    </b-alert>
     <section class="w-100 mx-0 mt-5">
       <!-- brand -->
       <div class="d-flex justify-content-center w-100 mt-5 mb-5">
@@ -86,7 +70,6 @@
 <script>
 import talk2Api from 'src/plugins/api/api'
 import { mapState } from 'vuex'
-import { ISSUE_MAX_NEGATIVE_BALANCE } from 'src/constants/company-issues-default'
 
 export default {
   name: 'Suspended',
@@ -94,11 +77,7 @@ export default {
     return {
       statics: null,
       loadingWhitelabel: false,
-      apiURL: process.env.API_URL,
-      issueCodes: [],
-      diagnosis: [],
-      link: null,
-      showDiagnosis: false
+      apiURL: process.env.API_URL
     }
   },
   computed: {
@@ -106,20 +85,10 @@ export default {
     ...mapState('auth', [
       'authenticated',
       'profile'
-    ]),
-    shouldShowDiagnosis () {
-      return !(this.currentCompany && this.currentCompany.reseller_id === 357)
-    },
-    firstDiagnosis () {
-      if (this.diagnosis.length > 0) {
-        return this.diagnosis[0]
-      }
-      return 'We are having issues with your account and calls might not route at this time. Please contact support as soon as possible.'
-    }
+    ])
   },
   created () {
     this.getStatics()
-    this.runDiagnosis()
   },
   methods: {
     getStatics () {
@@ -130,21 +99,6 @@ export default {
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingWhitelabel = false
-      })
-    },
-    runDiagnosis () {
-      talk2Api.V1.status.runDiagnosis().then(res => {
-        this.issueCodes = res.data.issue_codes
-        this.diagnosis = res.data.issues
-        this.link = res.data.link
-        this.showDiagnosis = res.data.has_issues
-        // if account has reached max negative balance and auto recharge is not set
-        if (this.issueCodes.length && this.issueCodes.includes(ISSUE_MAX_NEGATIVE_BALANCE) && !this.profile.usage.auto_recharge) {
-          this.$router.push({ name: 'Account', query: { tab: 'billing' } })
-            .catch(err => {
-              console.log(err)
-            })
-        }
       })
     }
   }
