@@ -47,8 +47,7 @@
           class="d-flex align-items-center contact-tags-item"
           v-for="tag in computedResource.tags"
           :key="tag.id">
-          <span
-            :style="`color: ${tag.color};`">
+          <span>
             <i
               class="fa fa-circle"
               :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`">

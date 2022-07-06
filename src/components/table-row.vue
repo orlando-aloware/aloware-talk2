@@ -150,7 +150,7 @@
               v-for="tag in contact.tags"
               :key="tag.id"
               class="d-flex align-items-center contact-tags-item">
-              <span :style="`color: ${tag.color};`">
+              <span>
                 <i class="fa fa-circle" :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`"></i>
                 {{ tag.name }}
               </span>
