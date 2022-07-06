@@ -80,7 +80,6 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import auth from 'src/boot/auth'
 import Variables from 'src/components/message-composer/options/variables'
 
 export default {
@@ -120,7 +119,6 @@ export default {
 
   data () {
     return {
-      auth,
       isSaving: false,
       template: {
         id: '',

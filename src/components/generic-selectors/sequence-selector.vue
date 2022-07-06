@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import auth from 'boot/auth'
 import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin } from 'src/plugins/mixins'
@@ -200,7 +199,6 @@ export default {
   data () {
     return {
       selectedId: this.value,
-      auth: auth,
       isLoading: false,
       options: [],
       reference: 'sequenceSelect',
