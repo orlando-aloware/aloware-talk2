@@ -1,10 +1,10 @@
 <template>
   <div class="h-100"
        :class="[
-          authenticated && !suspended ? `dashboard ${pageClass}` : 'guest',
+          authenticated || !suspended ? `dashboard ${pageClass}` : 'guest',
           lightMode ? 'light-mode' : 'night-mode'
         ]"
-       v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
+       v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center"
          :class="{ 'unsupported': !$q.platform.is.mobile }">
       <span>This screen size is not supported.</span>
@@ -23,7 +23,7 @@
           </q-header>
           <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
-              <template v-if="!loading">
+              <template v-if="!loading || suspended">
                 <transition :name="transitionName"
                             mode="out-in">
                   <!-- <keep-alive> -->
@@ -32,7 +32,7 @@
                 </transition>
               </template>
               <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
-                   v-else-if="loading">
+                   v-else-if="loading && !suspended">
                 <div class="container">
                   <q-spinner-bars color="primary"
                                   size="40px">
