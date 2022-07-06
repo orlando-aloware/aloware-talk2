@@ -1,6 +1,7 @@
 import * as storage from 'src/plugins/helpers/storage'
+import { debounce } from 'lodash'
 
-const check = async ({ commit }, preventLogout = false) => {
+const check = debounce(async ({ commit }, preventLogout = false) => {
   try {
     if (storage.local.getItem('api_token') === null) {
       return Promise.reject('unauthorized')
@@ -22,11 +23,17 @@ const check = async ({ commit }, preventLogout = false) => {
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
 
-    if ((!response.data.user.enabled || !response.data.user.company.enabled) && window.location.href.indexOf('/suspended') === -1) {
+    if ((!response.data.user.enabled ||
+      !response.data.user.company.enabled) &&
+      window.location.href.indexOf('/suspended') === -1) {
       window.location.href = '/suspended'
     }
 
-    if (response.data.user.enabled && response.data.user.company.enabled && window.location.href.indexOf('/suspended') !== -1) {
+    if (response.data.user.enabled &&
+      response.data.user.company.enabled &&
+      (window.location.href.indexOf('/suspended') !== -1 ||
+        (window.location.href.indexOf('/login') !== -1 &&
+          window.location.href.indexOf('suspended') !== -1))) {
       window.location.href = '/'
     }
 
@@ -40,7 +47,7 @@ const check = async ({ commit }, preventLogout = false) => {
     }
     return Promise.reject(err)
   }
-}
+}, 1000)
 
 const login = async ({ commit }, {
   email,
