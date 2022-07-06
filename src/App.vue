@@ -14,7 +14,7 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <intercom></intercom>
+    <intercom v-if="authenticated && profile && profile.enabled"></intercom>
   </div>
 </template>
 <script>

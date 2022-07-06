@@ -162,6 +162,9 @@ export default _.merge({
   },
   computed: {
     ...mapState(['auth']),
+    hasReporterAccess () {
+      return this.auth && this.auth.profile && this.auth.profile.read_only_access
+    },
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
     }

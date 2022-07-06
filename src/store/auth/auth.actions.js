@@ -22,6 +22,14 @@ const check = async ({ commit }, preventLogout = false) => {
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
 
+    if ((!response.data.user.enabled || !response.data.user.company.enabled) && window.location.href.indexOf('/suspended') === -1) {
+      window.location.href = '/suspended'
+    }
+
+    if (response.data.user.enabled && response.data.user.company.enabled && window.location.href.indexOf('/suspended') !== -1) {
+      window.location.href = '/'
+    }
+
     return response
   } catch (err) {
     commit('SET_LOADING', false)
@@ -132,6 +140,10 @@ const logout = async ({ commit }) => {
     storage.local.removeItem('shared_cookie')
 
     window.axios.defaults.headers.common['Authorization'] = null
+
+    if (window.Intercom) {
+      window.Intercom('shutdown')
+    }
 
     commit('SET_LOADING', false)
     commit('SET_AUTHENTICATED', false)
