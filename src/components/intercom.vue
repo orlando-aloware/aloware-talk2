@@ -51,6 +51,18 @@ export default {
           })
         }
       })
+    },
+
+    launch () {
+      if (this.profile && window.Intercom) {
+        this.setup()
+      }
+    },
+
+    shutDown () {
+      if (!this.profile && window.Intercom) {
+        window.Intercom('shutdown')
+      }
     }
   },
 
@@ -65,6 +77,17 @@ export default {
         this.setup()
       }
     })
+  },
+
+  watch: {
+    profile () {
+      this.shutDown()
+      this.launch()
+    }
+  },
+
+  beforeDestroy () {
+    this.shutDown()
   }
 }
 </script>
