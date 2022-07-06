@@ -270,11 +270,6 @@ export default {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
       }
-    },
-    status: {
-      runDiagnosis () {
-        return window.axios.get(`${suffixV1}status/diagnosis`)
-      }
     }
   },
   V2: {
