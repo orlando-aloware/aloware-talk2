@@ -167,16 +167,7 @@ export default {
       this.$refs.createDialog.classList.add('d-flex')
 
       popperInstance = createPopper(reference, this.$refs.createDialog, {
-        placement: 'auto',
-        positionFixed: true,
-        modifiers: [
-          {
-            name: 'offset',
-            options: {
-              offset: [-80, 10]
-            }
-          }
-        ]
+        placement: 'auto-start'
       })
 
       document.body.addEventListener('click', this.handleClick)
