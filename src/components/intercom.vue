@@ -45,9 +45,9 @@ export default {
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
             user_hash: response.data, // Current user hash
-            background_color: '#256eff',
-            action_color: '#256eff',
-            vertical_padding: 80
+            background_color: '#15163f',
+            action_color: '#15163f',
+            vertical_padding: 10
           })
         }
       })
