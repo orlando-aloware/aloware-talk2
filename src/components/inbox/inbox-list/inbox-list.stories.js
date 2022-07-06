@@ -1,15 +1,11 @@
 import InboxList from './inbox-list.vue'
-
 import { storiesOf } from '@storybook/vue'
-
-import auth from 'boot/auth'
+import { mapState } from 'vuex'
 
 const inboxList = () => ({
   components: { InboxList },
-  data () {
-    return {
-      auth: auth
-    }
+  computed: {
+    ...mapState('auth', ['profile'])
   },
   template: '<inbox-list v-if="auth.user.profile" />'
 })

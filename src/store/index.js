@@ -247,7 +247,8 @@ export default function (/* { ssrContext } */) {
       sessionPhoneExpansion: '',
       notificationAudio: null,
       loadingParkedCalls: false,
-      parkedCalls: []
+      parkedCalls: [],
+      accountSuspended: false
     },
 
     getters: {
@@ -717,6 +718,9 @@ export default function (/* { ssrContext } */) {
       },
       removeParkedCall ({ commit }, communicationId) {
         commit('REMOVE_PARKED_CALL', communicationId)
+      },
+      setAccountSuspended ({ commit }, value) {
+        commit('SET_ACCOUNT_SUSPENDED', value)
       }
     },
 
@@ -1382,6 +1386,10 @@ export default function (/* { ssrContext } */) {
         }
 
         state.parkedCalls.splice(state.parkedCalls.indexOf(found), 1)
+      },
+
+      SET_ACCOUNT_SUSPENDED (state, value) {
+        state.accountSuspended = value
       },
 
       updateField

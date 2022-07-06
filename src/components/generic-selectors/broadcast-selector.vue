@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import auth from 'boot/auth'
 import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 export default {
@@ -151,7 +150,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       isLoading: false,
       broadcast: this.value,
       broadcastsOptions: [],
