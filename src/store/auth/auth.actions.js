@@ -1,7 +1,6 @@
 import * as storage from 'src/plugins/helpers/storage'
-import { debounce } from 'lodash'
 
-const check = debounce(async ({ commit }, preventLogout = false) => {
+const check = async ({ commit }, preventLogout = false) => {
   try {
     if (storage.local.getItem('api_token') === null) {
       return Promise.reject('unauthorized')
@@ -47,7 +46,7 @@ const check = debounce(async ({ commit }, preventLogout = false) => {
     }
     return Promise.reject(err)
   }
-}, 1000)
+}
 
 const login = async ({ commit }, {
   email,

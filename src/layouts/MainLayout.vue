@@ -1,7 +1,7 @@
 <template>
   <div class="h-100"
        :class="[
-          authenticated || !suspended ? `dashboard ${pageClass}` : 'guest',
+          authenticated && !suspended ? `dashboard ${pageClass}` : 'guest',
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
@@ -276,6 +276,7 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
+      checkDebounced: null,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -342,6 +343,8 @@ export default {
   },
 
   created () {
+    this.checkDebounced = _.debounce(this.check, 1000)
+
     if (this.$route.name === 'Suspended') {
       this.setSuspended(true)
     }
@@ -833,7 +836,7 @@ export default {
       this.initAuth()
       this.fetchAllParkedCalls()
     } else {
-      this.check().then((res) => {
+      this.check().then(() => {
         this.loading = false
         this.authCheckStatus = true
         this.showRefreshButton = false
@@ -916,7 +919,7 @@ export default {
   methods: {
     checkSuspended (data) {
       if (!data.enabled &&
-        window.location.href.indexOf('/suspended') === -1) {
+        this.$route.name !== 'Suspended') {
         window.location.href = '/suspended'
         this.setSuspended(true)
         this.$generalNotification('Your account has been suspended. Please contact our support for assistance.', 'error')
@@ -924,9 +927,8 @@ export default {
       }
 
       if (data.enabled &&
-        (window.location.href.indexOf('/suspended') !== -1 ||
-          this.$route.name === 'Login')) {
-        window.location.href = '/'
+        this.$route.name === 'Suspended') {
+        this.$router.replace('/')
       }
     },
 
@@ -2053,8 +2055,7 @@ export default {
       }
     },
     $route (to, from) {
-      this.check()
-
+      this.checkDebounced()
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
