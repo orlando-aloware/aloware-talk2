@@ -782,6 +782,8 @@ export default {
         })
     },
     addSelectedContacts () {
+      this.$VueEvent.fire('open_power_dialer_modal_options', this.attachedParams())
+      /*
       this.clicked = true
       this.closeFilters()
       return this.$axios
@@ -801,6 +803,7 @@ export default {
           console.log(html)
           this.$generalNotification(message, 'error')
         })
+      */
     },
     attachedParams () {
       if (this.isContactModule) {
