@@ -163,7 +163,7 @@ export default {
           this.$generalNotification(message, 'warning')
           return Promise.resolve(res)
         }).catch(err => {
-          // this.$root.handleErrors(err.response)
+          // this.$handleErrors(err.response)
           // this.loading_skip = false
           return Promise.reject(err)
         })
