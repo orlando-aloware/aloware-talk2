@@ -967,7 +967,7 @@ export default function (/* { ssrContext } */) {
       DELETE_TEMPLATE (state, template) {
         const found = state.templates.find(item => item.id === template.id)
         if (found) {
-          state.templates.splice(state.smsTemplates.indexOf(found), 1)
+          state.templates.splice(state.templates.indexOf(found), 1)
         }
       },
 

@@ -80,7 +80,7 @@ module.exports = function (/* ctx */) {
       },
 
       https: true,
-      host: 'talk2.test',
+      host: 'localhost',
       disableHostCheck: true,
       open: true // opens browser window automatically
     },

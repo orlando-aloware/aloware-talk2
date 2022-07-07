@@ -105,7 +105,9 @@ export default _.merge({
     hasPermissionTo (permissions, source = null) {
       // this has been added to provide us with a way to check permissions in beforeRouteEnter
       if (!source) {
-        source = this.auth
+        source = this.profile
+      } else {
+        source = _.get(source, 'profile', null)
       }
 
       // if user is logged out of the system when session expires
@@ -114,27 +116,29 @@ export default _.merge({
       }
 
       // if user doesn't have permissions
-      if (!source.profile || !source.profile || !source.profile.user_permissions) {
+      if (!source.user_permissions) {
         return false
       }
 
       if (Array.isArray(permissions)) {
         const permission = { index: null }
         for (permission.index of permissions) {
-          if (!source.profile.user_permissions.includes(permission.index)) {
+          if (!source.user_permissions.includes(permission.index)) {
             return false
           }
         }
         return true
       } else {
-        return source.profile.user_permissions.includes(permissions)
+        return source.user_permissions.includes(permissions)
       }
     },
 
     hasRole (roles, source = null) {
       // this has been added to provide us with a way to check roles in beforeRouteEnter
       if (!source) {
-        source = this.auth
+        source = this.profile
+      } else {
+        source = _.get(source, 'profile', null)
       }
 
       // if user is logged out of the system when session expires
@@ -143,27 +147,27 @@ export default _.merge({
       }
 
       // if user doesn't have roles
-      if (!source.profile || !source.profile.user_roles) {
+      if (!source.user_roles) {
         return false
       }
 
       if (Array.isArray(roles)) {
         const role = { data: null }
         for (role.data of roles) {
-          if (!source.profile.user_roles.includes(role.data)) {
+          if (!source.user_roles.includes(role.data)) {
             return false
           }
         }
         return true
       } else {
-        return source.profile.user_roles.includes(roles)
+        return source.user_roles.includes(roles)
       }
     }
   },
   computed: {
-    ...mapState(['auth']),
+    ...mapState('auth', ['profile']),
     hasReporterAccess () {
-      return this.auth && this.auth.profile && this.auth.profile.read_only_access
+      return this.profile && this.profile.read_only_access
     },
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
