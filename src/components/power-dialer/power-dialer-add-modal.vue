@@ -78,8 +78,10 @@
 </template>
 
 <script>
-import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DatePicker from 'v-calendar/lib/components/date-picker.umd'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'PowerDialerAddModal',
@@ -94,23 +96,23 @@ export default {
     loading: false,
     params: {},
     conversion: [
-      'multiple',
-      'duplicated'
+      'multiple_phone_numbers',
+      'prevent_duplicates'
     ],
     where: 'queue',
     schedule: new Date(),
     options: {
       conversion: [
         {
-          value: 'multiple',
+          value: 'multiple_phone_numbers',
           text: 'Turn multiple numbers into separated tasks',
           helper: 'Any non-primary numbers of a contact will be turned into separate tasks'
         }, {
-          value: 'duplicated',
+          value: 'prevent_duplicates',
           text: 'Don\'t add duplicate phone numbers',
           helper: 'If unselected, duplicate numbers will be turned into separate tasks'
         }, {
-          value: 'international',
+          value: 'allow_international_phone_numbers',
           text: 'Don\'t add international phone numbers'
         }
       ],
@@ -151,8 +153,41 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'setShouldUpdateSelectedListContactCount',
+      'setSearch'
+    ]),
     addContacts () {
-      console.log(this.params)
+      this.loading = true
+
+      let params = {
+        ...this.params,
+        'prevent_duplicates': this.conversion.includes('prevent_duplicates'),
+        'multiple_phone_numbers': this.conversion.includes('multiple_phone_numbers'),
+        'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers')
+      }
+
+      if (this.where === 'scheduled') {
+        params.future_scheduled_time = this.schedule.toISOString().substr(0, 10)
+      }
+
+      return this.$axios
+        .post('api/v2/power-dialer-list-items', params)
+        .then(() => {
+          this.setShouldUpdateSelectedListContactCount(true)
+          this.$router.push(`/power-dialer`)
+          this.setSearch('')
+          this.$generalNotification('Selected contacts were successfully added.')
+        })
+        .catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+        })
+        .finally(() => {
+          this.loading = false
+          this.dialog = false
+        })
     }
   }
 }
