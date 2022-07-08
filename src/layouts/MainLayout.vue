@@ -811,7 +811,7 @@ export default {
     })
 
     this.$VueEvent.listen('user_updated', (user) => {
-      this.checkSuspended(user)
+      this.checkSuspended(user, true)
     })
 
     this.$VueEvent.listen('company_updated', (company) => {
@@ -917,16 +917,22 @@ export default {
   },
 
   methods: {
-    checkSuspended (data) {
+    checkSuspended (data, isUser = false) {
+      const isCurrentUser = isUser ? this.profile.id === data.id : false
+
       if (!data.enabled &&
+        (!isUser ||
+          (isUser && isCurrentUser)) &&
         this.$route.name !== 'Suspended') {
-        window.location.href = '/suspended'
+        this.$router.replace('/suspended')
         this.setSuspended(true)
         this.$generalNotification('Your account has been suspended. Please contact our support for assistance.', 'error')
         return
       }
 
       if (data.enabled &&
+        (!isUser ||
+          (isUser && isCurrentUser)) &&
         this.$route.name === 'Suspended') {
         this.$router.replace('/')
       }
