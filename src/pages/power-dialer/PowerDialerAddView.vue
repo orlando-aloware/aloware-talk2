@@ -718,7 +718,6 @@ export default {
       'closeFilters',
       'foldersLoaded',
       'columnsReordered',
-      'setShouldUpdateSelectedListContactCount',
       'setSearch',
       'listLoaded',
       'setShowMyContacts'
@@ -782,28 +781,10 @@ export default {
         })
     },
     addSelectedContacts () {
-      this.$VueEvent.fire('open_power_dialer_modal_options', this.attachedParams())
-      /*
-      this.clicked = true
-      this.closeFilters()
-      return this.$axios
-        .post(this.addItemEndpoint, this.attachedParams())
-        .then(() => {
-          this.setShouldUpdateSelectedListContactCount(true)
-          if (this.contactList.id === 'my-queue') {
-            this.$router.push(`/power-dialer`)
-          } else {
-            this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
-          }
-          this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added.')
-        })
-        .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
-      */
+      this.$VueEvent.fire('open_power_dialer_modal_options', {
+        mode: 'add',
+        params: this.attachedParams()
+      })
     },
     attachedParams () {
       if (this.isContactModule) {
