@@ -47,7 +47,6 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 let popperInstance
 
@@ -91,8 +90,7 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'createPdListClose',
-      'foldersLoaded'
+      'createPdListClose'
     ]),
     ...mapActions('powerDialer', [
       'getContactFolders'
@@ -107,52 +105,13 @@ export default {
       this.isCreating = true
     },
     createListRequest () {
-      this.isCreating = true
-      let params = {
-        type: 1,
-        name: this.createDialog.name
-      }
-      if (this.createDialog?.id) {
-        params.contact_folder_id = this.createDialog.id
-      }
-
-      if (this.createDialog.id) {
-        return this.$axios
-          .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`, {
-            contact_folder_id: this.createDialog.id
-          })
-          .then(() => {
-            this.reloadFolders()
-            this.isCreating = false
-          })
-          .catch(this.handleRequestError)
-          .finally(this.createPdListClose)
-      } else {
-        this.$axios
-          .post(`/api/v2/power-dialer-lists/${this.createDialog.target}/duplicate`)
-          .then((res) => {
-            console.log(res)
-            this.reloadFolders()
-            this.isCreating = false
-            this.$generalNotification('Power dialer list has been successfully created from a contacts list.', 'success')
-            this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
-          })
-          .catch(this.handleRequestError)
-          .finally(this.createPdListClose)
-      }
-    },
-    handleRequestError (err) {
-      const { message } = extractErrorMessage(err)
-      this.$generalNotification(message, 'error')
-    },
-    reloadFolders () {
-      return this.$axios
-        .get('/api/v2/power-dialer-folders')
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch((_err) => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
+      this.$VueEvent.fire('open_power_dialer_modal_options', {
+        mode: 'duplicate',
+        params: {
+          target: this.createDialog.target,
+          contact_folder_id: this.createDialog.id
+        }
+      })
     },
     onSearch (searchValue) {
       this.searchValue = searchValue
