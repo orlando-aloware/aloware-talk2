@@ -287,12 +287,12 @@ export default {
       if (!activeTask) {
         return {
           ...powerDialerTasks,
-          in_queue: this.powerDialerTasks.in_queue
+          in_queue: powerDialerTasks.in_queue
         }
       }
 
       let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        return task.contact_list_item_id !== activeTask.contact_list_item_id
+        return task && task.contact_list_item_id !== activeTask.contact_list_item_id
       })
       return {
         ...powerDialerTasks,

@@ -22,11 +22,17 @@ const check = async ({ commit }, preventLogout = false) => {
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
 
-    if ((!response.data.user.enabled || !response.data.user.company.enabled) && window.location.href.indexOf('/suspended') === -1) {
+    if ((!response.data.user.enabled ||
+      !response.data.user.company.enabled) &&
+      window.location.href.indexOf('/suspended') === -1) {
       window.location.href = '/suspended'
     }
 
-    if (response.data.user.enabled && response.data.user.company.enabled && window.location.href.indexOf('/suspended') !== -1) {
+    if (response.data.user.enabled &&
+      response.data.user.company.enabled &&
+      (window.location.href.indexOf('/suspended') !== -1 ||
+        (window.location.href.indexOf('/login') !== -1 &&
+          window.location.href.indexOf('suspended') !== -1))) {
       window.location.href = '/'
     }
 

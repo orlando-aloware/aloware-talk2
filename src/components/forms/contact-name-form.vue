@@ -72,7 +72,7 @@ export default {
         this.$emit('close')
         this.$VueEvent.fire('contact_updated', response.data)
       }).catch(err => {
-        this.$root.handleErrors(err.response)
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.is_busy = false
       })

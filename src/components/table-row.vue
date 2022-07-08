@@ -515,7 +515,7 @@ export default {
           // this.$generalNotification(`We are calling your phone to connect you to ${this.contact.name}`)
         })
         .catch((_err) => {
-          // this.$root.handleErrors(err.response)
+          // this.$handleErrors(err.response)
         })
     },
     generateRoute (contactId) {

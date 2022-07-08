@@ -109,6 +109,13 @@ const SettingsMap = {
     hash_keyword: 'can-broadcast',
     visible: true
   },
+  'can_delete_contact': {
+    title: 'Delete Contact',
+    description: 'If user is allowed to delete a contact.',
+    route: '/settings/profile',
+    hash_keyword: 'delete-contact',
+    visible: true
+  },
 
   // VISIBILITY SETTINGS
   'contacts_visibility': {

@@ -103,7 +103,7 @@ export default {
         this.is_busy = false
         this.onClose()
       }).catch(err => {
-        this.$root.handleErrors(err.response)
+        this.$handleErrors(err.response)
         this.is_busy = false
       })
 
