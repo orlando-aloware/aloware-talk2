@@ -69,7 +69,7 @@
         <b-button class="btn-block mt-4"
                   variant="primary"
                   size="sm"
-                  @click="addContacts">
+                  @click="save">
           Ok
         </b-button>
       </b-overlay>
@@ -133,7 +133,8 @@ export default {
     },
     popover_config: {
       placement: 'right'
-    }
+    },
+    mode: null // add, duplicate
   }),
 
   computed: {
@@ -141,25 +142,8 @@ export default {
       let count = this.params.contact_ids ? this.params.contact_ids.length : 0
 
       return count + (count === 1 ? ' contact' : ' contacts')
-    }
-  },
-
-  mounted () {
-    this.$VueEvent.listen('open_power_dialer_modal_options', (data) => {
-      console.log(data)
-      this.params = data
-      this.dialog = true
-    })
-  },
-
-  methods: {
-    ...mapActions('contacts', [
-      'setShouldUpdateSelectedListContactCount',
-      'setSearch'
-    ]),
-    addContacts () {
-      this.loading = true
-
+    },
+    requestParams () {
       let params = {
         ...this.params,
         'prevent_duplicates': this.conversion.includes('prevent_duplicates'),
@@ -171,14 +155,29 @@ export default {
         params.future_scheduled_time = this.schedule.toISOString().substr(0, 10)
       }
 
-      return this.$axios
-        .post('api/v2/power-dialer-list-items', params)
-        .then(() => {
-          this.setShouldUpdateSelectedListContactCount(true)
-          this.$router.push(`/power-dialer`)
-          this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added.')
-        })
+      return params
+    }
+  },
+
+  mounted () {
+    this.$VueEvent.listen('open_power_dialer_modal_options', (data) => {
+      console.log(data)
+      this.mode = data.mode
+      this.params = data.params
+      this.dialog = true
+    })
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setShouldUpdateSelectedListContactCount',
+      'setSearch',
+      'foldersLoaded'
+    ]),
+    save () {
+      this.loading = true
+
+      return this.getRequest()
         .catch((err) => {
           const { message, html } = extractErrorMessage(err)
           console.log(html)
@@ -188,7 +187,57 @@ export default {
           this.loading = false
           this.dialog = false
         })
+    },
+    getRequest () {
+      switch (this.mode) {
+        case 'add':
+          return this.addContacts()
+        case 'duplicate':
+          return this.duplicateList()
+      }
+    },
+    addContacts () {
+      return this.$axios
+        .post('api/v2/power-dialer-list-items', this.requestParams)
+        .then(() => {
+          this.setShouldUpdateSelectedListContactCount(true)
+          this.setSearch('')
+          this.$generalNotification('Selected contacts were successfully added.')
+
+          if (this.params.contact_list_id) {
+            this.$router.push(`/power-dialer/list/${this.params.contact_list_id}`)
+          } else {
+            this.$router.push(`/power-dialer`)
+          }
+        })
+    },
+    duplicateList () {
+      // remove target from params
+      let target = this.params.target
+      let params = this.requestParams
+      delete params.target
+
+      return this.$axios
+        .post(`/api/v2/power-dialer-lists/${target}/duplicate`, params)
+        .then((res) => {
+          this.reloadFolders()
+          this.$generalNotification('Power dialer list has been successfully created from a contacts list.', 'success')
+          this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
+        })
+    },
+    reloadFolders () {
+      return this.$axios
+        .get('/api/v2/power-dialer-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch(() => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
     }
+    // getListCount (id) {
+    //   return this.$axios
+    //     .get(`/api/v2/power-dialer-lists/${id}/count`)
+    // }
   }
 }
 </script>
