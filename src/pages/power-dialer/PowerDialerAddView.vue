@@ -488,6 +488,7 @@
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
+      <power-dialer-add-modal :params="attachedParams()" />
     </template>
   </contacts-screen>
 </template>
@@ -512,6 +513,7 @@ import {
   avatarMixin
 } from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import { isEqual } from 'lodash'
 
 export default {
@@ -589,7 +591,8 @@ export default {
     Datatable,
     ImportContactsModal,
     TextPopover,
-    FolderStaticIcon
+    FolderStaticIcon,
+    PowerDialerAddModal
   },
   mounted () {
     this.loadList(this.$route.params.id)
@@ -720,7 +723,8 @@ export default {
       'columnsReordered',
       'setSearch',
       'listLoaded',
-      'setShowMyContacts'
+      'setShowMyContacts',
+      'addPowerDialerOpen'
     ]),
     loadList (id) {
       if (!id) {
@@ -781,10 +785,7 @@ export default {
         })
     },
     addSelectedContacts () {
-      this.$VueEvent.fire('open_power_dialer_modal_options', {
-        mode: 'add',
-        params: this.attachedParams()
-      })
+      this.addPowerDialerOpen(true)
     },
     attachedParams () {
       if (this.isContactModule) {
