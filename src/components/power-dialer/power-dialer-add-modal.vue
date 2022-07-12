@@ -1,7 +1,8 @@
 <template>
   <b-modal dialog-class="modal-pd-add"
            hide-footer
-           v-model="dialog">
+           v-model="isOpen"
+           @hidden="onHidden">
     <template #modal-title>
       <h2>Power Dialer Task Options</h2>
     </template>
@@ -81,7 +82,7 @@
 import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'PowerDialerAddModal',
@@ -91,10 +92,23 @@ export default {
     DatePicker
   },
 
+  props: {
+    redirect: {
+      type: Boolean,
+      default: true
+    },
+    params: {
+      type: Object,
+      required: true
+    },
+    mode: {
+      type: String,
+      default: 'add' // add, duplicate
+    }
+  },
+
   data: () => ({
-    dialog: false,
     loading: false,
-    params: {},
     conversion: [
       'multiple_phone_numbers',
       'prevent_duplicates'
@@ -133,11 +147,19 @@ export default {
     },
     popover_config: {
       placement: 'right'
-    },
-    mode: null // add, duplicate
+    }
   }),
 
   computed: {
+    ...mapState('contacts', ['isAddPowerDialerOpen']),
+    isOpen: {
+      get () {
+        return this.isAddPowerDialerOpen
+      },
+      set (isOpen) {
+        return isOpen
+      }
+    },
     contactsDescription () {
       let count = this.params.contact_ids ? this.params.contact_ids.length : 0
 
@@ -159,21 +181,16 @@ export default {
     }
   },
 
-  mounted () {
-    this.$VueEvent.listen('open_power_dialer_modal_options', (data) => {
-      console.log(data)
-      this.mode = data.mode
-      this.params = data.params
-      this.dialog = true
-    })
-  },
-
   methods: {
     ...mapActions('contacts', [
       'setShouldUpdateSelectedListContactCount',
       'setSearch',
-      'foldersLoaded'
+      'foldersLoaded',
+      'addPowerDialerOpen'
     ]),
+    onHidden () {
+      this.addPowerDialerOpen(false)
+    },
     save () {
       this.loading = true
 
@@ -185,7 +202,7 @@ export default {
         })
         .finally(() => {
           this.loading = false
-          this.dialog = false
+          this.addPowerDialerOpen(false)
         })
     },
     getRequest () {
@@ -204,10 +221,12 @@ export default {
           this.setSearch('')
           this.$generalNotification('Selected contacts were successfully added.')
 
-          if (this.params.contact_list_id) {
-            this.$router.push(`/power-dialer/list/${this.params.contact_list_id}`)
-          } else {
-            this.$router.push(`/power-dialer`)
+          if (this.redirect) {
+            if (this.params.contact_list_id) {
+              this.$router.push(`/power-dialer/list/${this.params.contact_list_id}`)
+            } else {
+              this.$router.push(`/power-dialer`)
+            }
           }
         })
     },
@@ -222,7 +241,10 @@ export default {
         .then((res) => {
           this.reloadFolders()
           this.$generalNotification('Power dialer list has been successfully created from a contacts list.', 'success')
-          this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
+
+          if (this.redirect) {
+            this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
+          }
         })
     },
     reloadFolders () {
@@ -238,6 +260,12 @@ export default {
     //   return this.$axios
     //     .get(`/api/v2/power-dialer-lists/${id}/count`)
     // }
+  },
+
+  watch: {
+    'isAddPowerDialerOpen': function (value) {
+      this.isOpen = value
+    }
   }
 }
 </script>
