@@ -38,6 +38,9 @@
         {{ isCreating ? '' : 'Create' }}
       </CompactBtn>
     </div>
+    <power-dialer-add-modal :params="powerDialerParams"
+                            mode="duplicate"
+                            v-if="isAddPowerDialerOpen"></power-dialer-add-modal>
   </div>
 </template>
 
@@ -47,6 +50,7 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item'
 import Search from 'src/components/search.vue'
 import CompactBtn from 'src/components/compact-btn.vue'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 
 let popperInstance
 
@@ -65,13 +69,15 @@ export default {
   components: {
     CreateListItem,
     Search,
-    CompactBtn
+    CompactBtn,
+    PowerDialerAddModal
   },
   data () {
     return {
       searchValue: '',
       isCreating: false,
-      contactFolders: null
+      contactFolders: null,
+      powerDialerParams: {}
     }
   },
   computed: {
@@ -79,7 +85,8 @@ export default {
       'createDialog',
       'folders',
       'lists',
-      'searchedPdItem'
+      'searchedPdItem',
+      'isAddPowerDialerOpen'
     ]),
     hasSelected () {
       return (
@@ -90,7 +97,8 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'createPdListClose'
+      'createPdListClose',
+      'addPowerDialerOpen'
     ]),
     ...mapActions('powerDialer', [
       'getContactFolders'
@@ -105,13 +113,12 @@ export default {
       this.isCreating = true
     },
     createListRequest () {
-      this.$VueEvent.fire('open_power_dialer_modal_options', {
-        mode: 'duplicate',
-        params: {
-          target: this.createDialog.target,
-          contact_folder_id: this.createDialog.id
-        }
-      })
+      this.powerDialerParams = {
+        target: this.createDialog.target,
+        contact_folder_id: this.createDialog.id
+      }
+
+      this.addPowerDialerOpen(true)
     },
     onSearch (searchValue) {
       this.searchValue = searchValue
