@@ -58,7 +58,6 @@
       <RemoveFolderDialog
         :is-contact-module-type="false" />
       <CreateListModal :is-default="false" />
-      <PowerDialerAddModal />
     </template>
 
   </div>
@@ -70,7 +69,6 @@ import _ from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import PowerDialerSidebar from 'src/components/power-dialer/power-dialer-sidebar'
-import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import MoveDialog from 'components/move-dialog'
 import CreateDialog from 'components/power-dialer/custom/create-dialog'
 import CreateListModal from 'components/create-list-modal'
@@ -96,7 +94,6 @@ export default {
   name: 'PowerDialer',
   components: {
     PowerDialerSidebar,
-    PowerDialerAddModal,
     MoveDialog,
     CreateDialog,
     RemoveListModal,
