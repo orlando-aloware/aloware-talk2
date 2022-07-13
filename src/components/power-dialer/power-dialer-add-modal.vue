@@ -107,6 +107,11 @@ export default {
     }
   },
 
+  mounted () {
+    this.loading = true
+    this.setCount()
+  },
+
   data: () => ({
     loading: false,
     conversion: [
@@ -147,7 +152,8 @@ export default {
     },
     popover_config: {
       placement: 'right'
-    }
+    },
+    count: 0
   }),
 
   computed: {
@@ -159,11 +165,6 @@ export default {
       set (isOpen) {
         return isOpen
       }
-    },
-    contactsDescription () {
-      let count = this.params.contact_ids ? this.params.contact_ids.length : 0
-
-      return count + (count === 1 ? ' contact' : ' contacts')
     },
     requestParams () {
       let params = {
@@ -178,6 +179,9 @@ export default {
       }
 
       return params
+    },
+    contactsDescription () {
+      return this.count + (this.count === 1 ? ' contact' : ' contacts')
     }
   },
 
@@ -188,8 +192,20 @@ export default {
       'foldersLoaded',
       'addPowerDialerOpen'
     ]),
+    setCount () {
+      if (this.params.contact_ids) {
+        this.count = this.params.contact_ids.length
+        this.loading = false
+      } else if (this.params.target) {
+        this.getListCount(this.params.target).then(res => {
+          this.count = res.data.count
+          this.loading = false
+        })
+      }
+    },
     onHidden () {
       this.addPowerDialerOpen(false)
+      this.$emit('hidden')
     },
     save () {
       this.loading = true
@@ -255,16 +271,19 @@ export default {
         .catch(() => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
+    },
+    getListCount (id) {
+      return this.$axios
+        .get(`/api/v2/power-dialer-lists/${id}/count`)
     }
-    // getListCount (id) {
-    //   return this.$axios
-    //     .get(`/api/v2/power-dialer-lists/${id}/count`)
-    // }
   },
 
   watch: {
     'isAddPowerDialerOpen': function (value) {
       this.isOpen = value
+    },
+    'params.contact_ids': function (contacts) {
+      this.count = contacts.length
     }
   }
 }
