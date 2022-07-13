@@ -67,7 +67,7 @@ export default {
         parkedCallFound: null
       }
 
-      if (!liveContactData.communication) {
+      if (liveContactData.communication) {
         liveContactData.liveContactFound = this.liveContacts.find(contact => contact.id === liveContactData.communication.contact_id)
         liveContactData.parkedCallFound = this.parkedCalls.find(call => call.id === liveContactData.communication.id)
       }

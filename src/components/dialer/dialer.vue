@@ -279,8 +279,8 @@ export default {
       this.hangupCall()
     })
 
-    this.$VueEvent.listen('answerCall', () => {
-      this.answerCall()
+    this.$VueEvent.listen('answerCall', (communication = null) => {
+      this.answerCall(communication)
       this.$closeActionNotification('incomingCall')
       this.$closeActionNotification('callFishing')
     })
@@ -558,7 +558,7 @@ export default {
       }
     },
 
-    answerCall () {
+    answerCall (communication = null) {
       if (!this.dialer.call) {
         return
       }
@@ -568,6 +568,11 @@ export default {
       this.setDialerCurrentStatus('ANSWERING_CALL')
       this.setShowIncomingCallNotification(false)
       this.clearDialerCallFishing()
+
+      if (communication) {
+        this.answerCallFishing(communication)
+        return
+      }
 
       if (this.device.activeConnection()) {
         if (this.isMobile && this.$route.name !== 'Phone') {
@@ -926,6 +931,7 @@ export default {
         console.log('Transfer is in progress')
       }).catch(err => {
         console.log(err)
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.loadingTransfer = false
       })
@@ -977,6 +983,7 @@ export default {
       }).catch(err => {
         this.setAddedParty()
         console.log(err)
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.loadingAdd = false
       })

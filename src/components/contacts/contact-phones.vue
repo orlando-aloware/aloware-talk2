@@ -125,7 +125,11 @@ export default {
           talk2Api.V1.contact.deletePhone(this.contact.id, phone.id)
             .then(response => {
               this.$generalNotification('Phone number has been deleted.')
-              this.getPhoneNumbers()
+              talk2Api.V1.contact.getPhoneNumbers()
+                .catch(err => {
+                  console.log(err)
+                  this.$handleErrors(err.response)
+                })
             }).catch(error => {
               console.log(error)
               this.$handleErrors(error.response)
@@ -165,7 +169,11 @@ export default {
   watch: {
     'contact.id': _.debounce(function () {
       if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
-        this.getPhoneNumbers()
+        talk2Api.V1.contact.getPhoneNumbers()
+          .catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
       }
     }, 500)
   }
