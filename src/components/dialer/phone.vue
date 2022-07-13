@@ -1663,7 +1663,7 @@ export default {
       }
     },
     isPhoneBodyVisible () {
-      return this.screen === 'call' && ((!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'OUTGOING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication)))
+      return this.screen === 'call' && !_.isEmpty(this.dialer.call || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication)))
     },
     isPhoneCTAVisible () {
       return (!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'INCOMING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication))
@@ -1692,16 +1692,16 @@ export default {
       return _.isEmpty(found)
     },
     isDeclineCallVisible () {
-      return this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined
+      return this.dialer.call !== undefined || (this.dialer.callFishing && this.dialer.callFishing.communication === undefined)
     },
     isIgnoreCallVisible () {
-      return this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls && !this.isIgnored
+      return this.dialer.callFishing && this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls && !this.isIgnored
     },
     isAnswerCallVisible () {
-      return (this.dialer.call !== undefined && this.dialer.callFishing.communication === undefined) || (this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls)
+      return (this.dialer.call !== undefined && (!this.dialer.callFishing || (this.dialer.callFishing && this.dialer.callFishing.communication === undefined))) || (this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls)
     },
     isUnparkCallVisible () {
-      return this.dialer.callFishing.communication !== undefined && this.isCallFishingCommunicationInParkedCalls
+      return this.dialer.callFishing && this.dialer.callFishing.communication !== undefined && this.isCallFishingCommunicationInParkedCalls
     }
   },
   created () {

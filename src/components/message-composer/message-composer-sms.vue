@@ -139,7 +139,7 @@
           padding="0px 12px"
           :ripple="false"
           :disable="!validSms || isTCPAApprovedTextNotAuthorized"
-          :disable-dropdown="!validSms"
+          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized"
           :menu-offset="[0, 6]"
           @click="onSend"
         >

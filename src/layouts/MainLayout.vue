@@ -218,6 +218,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import store from 'src/store'
 
 export default {
   name: 'MyLayout',
@@ -276,7 +277,9 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
-      checkDebounced: null,
+      checkDebounce: null,
+      userSuspended: false,
+      accountSuspended: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -343,7 +346,7 @@ export default {
   },
 
   created () {
-    this.checkDebounced = _.debounce(this.check, 1000)
+    this.checkDebounce = _.debounce(this.check, 1000)
 
     if (this.$route.name === 'Suspended') {
       this.setSuspended(true)
@@ -924,15 +927,37 @@ export default {
         (!isUser ||
           (isUser && isCurrentUser)) &&
         this.$route.name !== 'Suspended') {
+        isUser && isCurrentUser && (this.userSuspended = true)
         this.$router.replace('/suspended')
         this.setSuspended(true)
         this.$generalNotification('Your account has been suspended. Please contact our support for assistance.', 'error')
         return
       }
 
+      if (!data.enabled &&
+        isUser &&
+        isCurrentUser) {
+        this.userSuspended = true
+      }
+
+      if (!data.enabled &&
+        !isUser) {
+        this.accountSuspended = true
+      }
+
       if (data.enabled &&
-        (!isUser ||
-          (isUser && isCurrentUser)) &&
+        isUser &&
+        isCurrentUser &&
+        !this.suspended &&
+        this.userSuspended) {
+        this.userSuspended = false
+      }
+
+      if (data.enabled &&
+        (
+          (!isUser && this.accountSuspended) ||
+          (isUser && isCurrentUser && this.userSuspended)
+        ) &&
         this.$route.name === 'Suspended') {
         this.$router.replace('/')
       }
@@ -2061,7 +2086,7 @@ export default {
       }
     },
     $route (to, from) {
-      this.checkDebounced()
+      this.checkDebounce()
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
@@ -2187,6 +2212,22 @@ export default {
         this.mobilePhoneDrawer = true
         this.isPhoneVisible = true
       }
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    if (to.name === 'Suspended') {
+      store().dispatch('auth/check', { preventLogout: false, preventRedirect: true }).then((response) => {
+        if (response.data.user.enabled &&
+          response.data.user.company.enabled) {
+          next({ path: '/' })
+        } else {
+          next()
+        }
+      }).catch(() => {
+        next()
+      })
+    } else {
+      next()
     }
   }
 }

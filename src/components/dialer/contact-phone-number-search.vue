@@ -106,6 +106,9 @@ export default {
       }).then((res) => {
         this.phoneNumbers = res.data.data
         this.$emit('searchResults', !!this.phoneNumbers.length)
+      }).catch(err => {
+        console.log(err)
+        this.$handleErrors(err.response)
       })
     },
 

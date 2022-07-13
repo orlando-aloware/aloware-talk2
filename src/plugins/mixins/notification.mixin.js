@@ -281,6 +281,12 @@ export default {
 
     showCallFishingDataInPhone (data, type = 'callFishing') {
       this.$VueEvent.fire('showPhone')
+
+      if (type !== 'callFishing') {
+        this.$closeActionNotification(type)
+        return
+      }
+
       const queue = _.get(this.notifications, 'callFishing.queue', [])
 
       if (!queue ||
