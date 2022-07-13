@@ -47,7 +47,7 @@
         <compact-btn
           class="mr-2"
           variant="primary"
-          :disabled="!checkedItems.length || clicked"
+          :disabled="!checkedItems.length"
           @clicked="addSelectedContacts"
         >
           Add Selected Contacts
@@ -488,7 +488,9 @@
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
-      <power-dialer-add-modal :params="attachedParams()" />
+      <power-dialer-add-modal :params="attachedParams()"
+                              v-if="openPDModal"
+                              @hidden="openPDModal = false" />
     </template>
   </contacts-screen>
 </template>
@@ -710,7 +712,7 @@ export default {
       filterHasChanges: false,
       listName: '',
       myContacts: false,
-      clicked: false,
+      openPDModal: false,
       contactCount: 0
     }
   },
@@ -785,6 +787,7 @@ export default {
         })
     },
     addSelectedContacts () {
+      this.openPDModal = true
       this.addPowerDialerOpen(true)
     },
     attachedParams () {
@@ -932,11 +935,6 @@ export default {
           return !c.is_dnc && !c.is_blocked
         })
         document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
-      }
-    },
-    clicked: function (value) {
-      if (value) {
-        setTimeout(() => { this.clicked = false }, 2000)
       }
     }
   }
