@@ -22,7 +22,8 @@ export default {
       'notifications',
       'ringGroups',
       'callFishingQueue',
-      'parkedCalls'
+      'parkedCalls',
+      'showIncomingCallNotification'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -30,11 +31,41 @@ export default {
     ...mapState('inbox', ['liveContacts']),
 
     shouldShowIncomingCallMenu () {
-      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode && this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
+      if (this.isIncomingLiveCall &&
+        this.isCallFishing &&
+        !this.isCallFishingMode &&
+        this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
+        return false
+      }
+
+      // show call buttons when the incoming call notification shows up
+      if (!this.showIncomingCallNotification) {
         return false
       }
 
       const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      // don't show call buttons if not a fishing mode call and dialer does not have communication yet
+      if (ringGroup &&
+        (
+          (ringGroup.should_queue && !ringGroup.fishing_mode) ||
+          (!ringGroup.should_queue)
+        ) &&
+        (
+          !this.dialer.communication ||
+          this.dialer.communication.id !== this.communication.id
+        )
+      ) {
+        return false
+      }
+
+      if (!ringGroup &&
+        (
+          !this.dialer.communication ||
+          this.dialer.communication.id !== this.communication.id
+        )) {
+        return false
+      }
 
       // only show the buttons (answer/reject) when there's an active call notification on a ring group w/o fishing mode
       if (ringGroup &&
@@ -42,9 +73,10 @@ export default {
           (ringGroup.should_queue && !ringGroup.fishing_mode) ||
           (!ringGroup.should_queue)
         ) &&
-        this.dialer.communication.id === this.communication.id
+        this.dialer.communication &&
+        this.dialer.communication.id !== this.communication.id
       ) {
-        return true
+        return false
       }
 
       return (
