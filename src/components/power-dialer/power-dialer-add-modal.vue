@@ -288,10 +288,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.modal-pd-add {
-  width: 420px;
-  max-width: 90vw;
-}
-</style>
