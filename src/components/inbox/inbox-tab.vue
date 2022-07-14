@@ -125,7 +125,8 @@
       </search-toggle>
       <div class="w-100 flex-grow-1"
            v-if="liveCalls.length > 0 && !isSearch">
-        <inbox-task-list :contacts="liveCalls"
+        <inbox-task-list key-prefix="live-call"
+                         :contacts="liveCalls"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
@@ -135,11 +136,12 @@
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
-        <inbox-task-list v-if="!taskListHasError"
+        <inbox-task-list key-prefix="task"
                          :contacts="contactTasks"
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
+                         v-if="!taskListHasError"
                          @onItemRemoved="onItemRemoved"
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
