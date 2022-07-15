@@ -6,7 +6,7 @@
       </q-card-section>
       <q-separator inset />
 
-      <q-card-section v-if="communication.metadata && communication.metadata.ring_group_snapshot && ringGroup"
+      <q-card-section v-if="showRingGroupSnapShot"
                       class="text-center">
         <span>This is a snapshot of the ring group at the point when this call arrived.</span>
         <ring-group-routing-table
@@ -19,7 +19,12 @@
       </q-card-section>
       <q-card-section v-else>
         <div class="text-center text-md _400">
-          <p class="mb-0">
+          <p v-if="communication.disposition_status2 === DISPOSITION_STATUS_ABANDONED_NEW"
+             class="mb-0">
+            Abandoned calls don't have a ring group snapshot.
+          </p>
+          <p v-else
+             class="mb-0">
             {{ !ringGroup ? 'This call does not have a ring group.' : 'This feature is not yet available on your account.' }}
           </p>
         </div>
@@ -33,6 +38,7 @@
 import * as RingGroupDialMode from '../constants/ring-group-dial-modes'
 import * as AgentStatusLabels from '../constants/agent-status-labels'
 import RingGroupRoutingTable from 'components/ring-group-routing-table'
+import { DISPOSITION_STATUS_ABANDONED_NEW } from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'ring-group-snapshot',
@@ -81,6 +87,24 @@ export default {
       ],
       RingGroupDialMode,
       AgentStatusLabels
+    }
+  },
+
+  computed: {
+    showRingGroupSnapShot () {
+      return this.communication.metadata &&
+        this.communication.metadata.ring_group_snapshot &&
+        this.ringGroup &&
+        (
+          // and if the call was not queued
+          !this.communication.metadata.reports ||
+          !this.communication.metadata.reports.is_queued ||
+          // or queued but not abandoned
+          (
+            this.communication.metadata.reports.is_queued &&
+            this.communication.disposition_status2 !== DISPOSITION_STATUS_ABANDONED_NEW
+          )
+        )
     }
   },
 
