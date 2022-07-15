@@ -86,7 +86,8 @@ export default {
         }
       ],
       RingGroupDialMode,
-      AgentStatusLabels
+      AgentStatusLabels,
+      DISPOSITION_STATUS_ABANDONED_NEW
     }
   },
 
