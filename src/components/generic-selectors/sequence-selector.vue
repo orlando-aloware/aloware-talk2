@@ -84,6 +84,7 @@
 import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin } from 'src/plugins/mixins'
+import _ from 'lodash'
 
 export default {
   name: 'sequence-selector',
@@ -140,6 +141,10 @@ export default {
       type: String,
       default: 'q-field--highlighted'
     }
+  },
+
+  created () {
+    this.allOptions = _.cloneDeep(this.formattedSequences)
   },
 
   computed: {
@@ -201,8 +206,9 @@ export default {
       selectedId: this.value,
       isLoading: false,
       reference: 'sequenceSelect',
-      fullOptionsProperty: 'formattedSequences',
-      filterBy: ''
+      fullOptionsProperty: 'allOptions',
+      filterBy: '',
+      allOptions: []
     }
   },
 
