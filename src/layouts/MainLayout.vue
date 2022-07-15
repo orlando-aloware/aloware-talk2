@@ -619,7 +619,6 @@ export default {
     })
 
     this.$VueEvent.listen('update_communication', (communication) => {
-      console.log('test')
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
 
