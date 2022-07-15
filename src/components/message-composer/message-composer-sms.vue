@@ -1,6 +1,6 @@
 <template>
   <div class="pt-2 message-composer-text-wrapper"
-       :disabled="isDisabled || !isTCPAApprovedTextNotAuthorized">
+       :disabled="isDisabled || isTCPAApprovedTextNotAuthorized">
     <div class="file-dropper position-absolute"
          v-cloak
          @paste.prevent="onPaste"
@@ -121,7 +121,7 @@
                type="textarea"
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
-               :disable="isDisabled || !isTCPAApprovedTextNotAuthorized"
+               :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
                @keydown="onKeyDown">
       </q-input>
     </div>
@@ -158,7 +158,7 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-tooltip v-if="!isTCPAApprovedTextNotAuthorized"
+        <q-tooltip v-if="isTCPAApprovedTextNotAuthorized"
                    anchor="top middle"
                    self="center middle"
         >
