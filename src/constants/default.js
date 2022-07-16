@@ -209,5 +209,5 @@ export const DEFAULT_STATE = {
   notificationAudio: null,
   loadingParkedCalls: false,
   parkedCalls: [],
-  accountSuspended: false
+  suspended: false
 }

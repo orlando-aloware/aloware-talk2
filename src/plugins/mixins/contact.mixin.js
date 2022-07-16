@@ -368,40 +368,55 @@ export default {
         this.source.cancel('Fetch contact info operation canceled by the user.')
         this.source = this.cancelToken.source()
 
-        talk2Api.V1.contact.getPhoneNumbers(this.contactId).then(response => {
-          this.setContactPhoneNumbers(response.data)
-        })
+        talk2Api.V1.contact.getPhoneNumbers(this.contactId)
+          .then(response => {
+            this.setContactPhoneNumbers(response.data)
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
 
-        talk2Api.V1.contact.getCommunicationsSummary(this.contactId).then(response => {
-          // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
-          this.setCommunicationSummary(response.data)
-        })
+        talk2Api.V1.contact.getCommunicationsSummary(this.contactId)
+          .then(response => {
+            // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
+            this.setCommunicationSummary(response.data)
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
         this.setSequenceInfoLoading(true)
 
-        talk2Api.V1.contact.getSequenceInfo(this.contactId).then(response => {
-          this.setSequenceInfo(response.data)
-          this.setSequenceInfoLoading(true)
-        }).catch(() => {
-          this.setSequenceInfoLoading(true)
-        })
+        talk2Api.V1.contact.getSequenceInfo(this.contactId)
+          .then(response => {
+            this.setSequenceInfo(response.data)
+            this.setSequenceInfoLoading(true)
+          }).catch((err) => {
+            this.setSequenceInfoLoading(false)
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
 
         talk2Api.V1.contact.getAttributes(this.contactId)
           .then(response => {
             this.setContactAttributes(_.cloneDeep(response.data))
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
           })
 
-        this.fetchContactCommunications(this.contactId, false).then(() => {
-          this.loadingContact = false
-          // if route has communication id
-          // until id is found
-          if (this.hasCommunication()) {
-            this.loadingContactCommunications = true
-            this.fetchContactCommunicationsUntilFound()
-          } else {
-            this.loadingContactCommunications = false
-          }
-          this.scrollMessages()
-        })
+        this.fetchContactCommunications(this.contactId, false)
+          .then(() => {
+            this.loadingContact = false
+            // if route has communication id
+            // until id is found
+            if (this.hasCommunication()) {
+              this.loadingContactCommunications = true
+              this.fetchContactCommunicationsUntilFound()
+            } else {
+              this.loadingContactCommunications = false
+            }
+            this.scrollMessages()
+          })
 
         return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
           if (res) {
@@ -567,8 +582,7 @@ export default {
             this.scrollMessages()
             this.loadingContactCommunications = false
           }
-        }).catch(error => {
-          this.$handleErrors(error.response)
+        }).catch(() => {
           this.loadingContactCommunications = false
         })
       } else { // we found the activity, scroll to it

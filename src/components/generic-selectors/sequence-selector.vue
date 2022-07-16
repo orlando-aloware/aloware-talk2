@@ -14,7 +14,7 @@
               outlined
               dense
               v-model="selectedId"
-              :options="options"
+              :options="formattedSequences"
               :placeholder="placeholder"
               :multiple="multiple"
               :disable="disable"
@@ -84,6 +84,7 @@
 import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin } from 'src/plugins/mixins'
+import _ from 'lodash'
 
 export default {
   name: 'sequence-selector',
@@ -142,6 +143,10 @@ export default {
     }
   },
 
+  created () {
+    this.allOptions = _.cloneDeep(this.formattedSequences)
+  },
+
   computed: {
     ...mapState({
       workflows: state => state.workflows
@@ -160,7 +165,7 @@ export default {
       }
     },
     formattedSequences () {
-      const activeSequences = this.availableWorkflows.filter(workflow => workflow.active)
+      const activeSequences = this.availableWorkflows.filter(workflow => workflow.active && (!this.filterBy || workflow.name.toLowerCase().indexOf(this.filterBy) > -1))
       if (activeSequences.length > 0) {
         activeSequences.unshift({
           group: 'Active',
@@ -168,7 +173,7 @@ export default {
         })
       }
 
-      const pausedSequences = this.availableWorkflows.filter(workflow => !workflow.active)
+      const pausedSequences = this.availableWorkflows.filter(workflow => !workflow.active && (!this.filterBy || workflow.name.toLowerCase().indexOf(this.filterBy) > -1))
       if (pausedSequences.length > 0) {
         pausedSequences.unshift({
           group: 'Paused',
@@ -200,30 +205,19 @@ export default {
     return {
       selectedId: this.value,
       isLoading: false,
-      options: [],
       reference: 'sequenceSelect',
-      fullOptionsProperty: 'formattedSequences'
+      fullOptionsProperty: 'allOptions',
+      filterBy: '',
+      allOptions: []
     }
   },
 
   methods: {
     filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.options = this.formattedSequences
-        })
-        return
-      }
+      this.filterBy = val.toLowerCase()
 
-      update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.formattedSequences.filter((sequence) => sequence.name && sequence.name.toLowerCase().indexOf(needle) > -1)
-      })
+      update()
     }
-  },
-
-  created () {
-    this.options = this.formattedSequences
   },
 
   watch: {

@@ -4437,7 +4437,7 @@ i.option-separator {
   position: fixed;
   width: 100%;
   background: $grey-40;
-  height: 73px;
+  height: 65px;
   padding: 17px 18px;
   bottom: 0;
   border-top: 1px solid $grey-70;
@@ -8974,7 +8974,7 @@ screen and (max-width: 956px) {
   .page-layout {
     .sidebar-active {
       .page-header + .page-container {
-        padding-top: 58px;
+        padding-top: 62px;
       }
     }
   }
@@ -9031,7 +9031,7 @@ screen and (max-width: 956px) {
     .h-2-livebar {
       .sidebar-active {
         > .page-container {
-          padding-top: 58px;
+          padding-top: 62px;
         }
       }
     }
@@ -10662,7 +10662,7 @@ screen and (max-width: 956px) {
 }
 
 .notification-body-wrapper {
-  cursor: pointer;
+  /* cursor: pointer; */
   .call-actions {
     padding-top: 2px;
     button:first-child {
@@ -10752,10 +10752,6 @@ screen and (max-width: 956px) {
   &:hover {
     color: $blue-4;
   }
-}
-
-.pt-58 {
-  padding-top: 58px !important;
 }
 
 .pt-60 {

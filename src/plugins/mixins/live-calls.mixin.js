@@ -22,15 +22,63 @@ export default {
       'notifications',
       'ringGroups',
       'callFishingQueue',
-      'parkedCalls'
+      'parkedCalls',
+      'showIncomingCallNotification'
     ]),
+
+    ...mapState('auth', ['profile']),
 
     ...mapState('inbox', ['liveContacts']),
 
     shouldShowIncomingCallMenu () {
-      if (this.isIncomingLiveCall && this.isCallFishing && !this.isCallFishingMode && this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
+      if (this.isIncomingLiveCall &&
+        this.isCallFishing &&
+        !this.isCallFishingMode &&
+        this.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) {
         return false
       }
+
+      // show call buttons when the incoming call notification shows up
+      if (!this.showIncomingCallNotification) {
+        return false
+      }
+
+      const ringGroup = this.getRingGroup(this.communication.ring_group_id)
+
+      // don't show call buttons if not a fishing mode call and dialer does not have communication yet
+      if (ringGroup &&
+        (
+          (ringGroup.should_queue && !ringGroup.fishing_mode) ||
+          (!ringGroup.should_queue)
+        ) &&
+        (
+          !this.dialer.communication ||
+          this.dialer.communication.id !== this.communication.id
+        )
+      ) {
+        return false
+      }
+
+      if (!ringGroup &&
+        (
+          !this.dialer.communication ||
+          this.dialer.communication.id !== this.communication.id
+        )) {
+        return false
+      }
+
+      // only show the buttons (answer/reject) when there's an active call notification on a ring group w/o fishing mode
+      if (ringGroup &&
+        (
+          (ringGroup.should_queue && !ringGroup.fishing_mode) ||
+          (!ringGroup.should_queue)
+        ) &&
+        this.dialer.communication &&
+        this.dialer.communication.id !== this.communication.id
+      ) {
+        return false
+      }
+
       return (
         (this.isIncomingLiveCall && this.isCallFishing && (this.isCallFishingMode || this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW)) ||
         (this.isIncomingLiveCall && this.dialer.call && this.dialer.call.state === 'pending')
@@ -152,7 +200,8 @@ export default {
     ...mapActions([
       'setShowPhone',
       'removeFromCallFishingQueue',
-      'setDialerParkedCall'
+      'setDialerParkedCall',
+      'setShowIncomingCallNotification'
     ]),
     ...mapActions('inbox', ['setContacts', 'setLiveContacts']),
     getRingGroup (id) {
@@ -166,20 +215,21 @@ export default {
       }
 
       this.isAnsweringCall = true
+      const communication = {
+        id: this.communication.id,
+        campaignId: this.communication.campaign_id,
+        contactName: this.contact.name,
+        companyName: this.contact.company_name,
+        contactId: this.contact.id,
+        phoneNumber: this.contact.phone_number
+      }
 
       if (this.communication.ring_group_id) {
         const ringGroup = this.getRingGroup(this.communication.ring_group_id)
 
         if (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) {
           const data = {
-            communication: {
-              id: this.communication.id,
-              campaignId: this.communication.campaign_id,
-              contactName: this.contact.name,
-              companyName: this.contact.company_name,
-              contactId: this.contact.id,
-              phoneNumber: this.contact.phone_number
-            },
+            communication: communication,
             shouldPark: false,
             shouldHangup: false
           }
@@ -197,7 +247,7 @@ export default {
         }
       }
 
-      this.$VueEvent.fire('answerCall')
+      this.$VueEvent.fire('answerCall', communication)
       this.isAnsweringCall = false
       this.setShowPhone(true)
       e.stopImmediatePropagation()
@@ -314,6 +364,7 @@ export default {
         return
       }
 
+      this.setShowIncomingCallNotification(false)
       this.showCallFishingDataInPhone({
         communication: this.communication,
         contact: this.contact

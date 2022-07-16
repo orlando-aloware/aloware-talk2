@@ -59,13 +59,25 @@ export default {
       }, 100)
     },
     removeUnownedLiveContactTask () {
-      const contact = this.dialer.contact
-      const call = this.dialer.call
-      const communication = this.dialer.communication
-      const liveContactfound = this.liveContacts.find(contact => contact.id === communication.contact_id)
-      const parkedCallFound = this.parkedCalls.find(call => call.id === communication.id)
-      if (contact && this.isNotOwned(contact.user_id) && call && liveContactfound && !parkedCallFound) {
-        this.removeLiveContact(contact.id)
+      const liveContactData = {
+        contact: this.dialer.contact,
+        call: this.dialer.call,
+        communication: this.dialer.communication,
+        liveContactFound: null,
+        parkedCallFound: null
+      }
+
+      if (liveContactData.communication) {
+        liveContactData.liveContactFound = this.liveContacts.find(contact => contact.id === liveContactData.communication.contact_id)
+        liveContactData.parkedCallFound = this.parkedCalls.find(call => call.id === liveContactData.communication.id)
+      }
+
+      if (liveContactData.contact &&
+        this.isNotOwned(liveContactData.contact.user_id) &&
+        liveContactData.call &&
+        liveContactData.liveContactFound &&
+        !liveContactData.parkedCallFound) {
+        this.removeLiveContact(liveContactData.contact.id)
       }
     },
     removeUnownedParkedCall (communication) {

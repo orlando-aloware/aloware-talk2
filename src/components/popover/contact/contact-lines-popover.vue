@@ -95,7 +95,7 @@ export default {
         this.$generalNotification('Phone number added')
         this.onClose()
       }).catch(err => {
-        this.$root.handleErrors(err.response)
+        this.$handleErrors(err.response)
         this.is_busy = false
       })
 

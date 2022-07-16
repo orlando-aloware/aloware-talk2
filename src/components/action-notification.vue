@@ -354,7 +354,12 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setNotifications', 'setShowPhone', 'clearCallFishingQueue', 'removeFromCallFishingQueue']),
+    ...mapActions([
+      'setNotifications',
+      'setShowPhone',
+      'clearCallFishingQueue',
+      'removeFromCallFishingQueue',
+      'setShowIncomingCallNotification']),
     onShow () {
       this.isValidNotification = false
     },
@@ -516,13 +521,15 @@ export default {
         return className.data && typeof className.data === 'string' && (className.data.includes('call-actions') || className.data.includes('call-fishing-actions'))
       })
 
-      if (!found &&
-        this.isValidPhoneShowInfo) {
-        this.showCallFishingDataInPhone({
-          communication: this.communication,
-          contact: this.contact
-        }, this.id)
-      }
+      // 07/12/2022 - Removed for now
+      // if (!found &&
+      //   this.isValidPhoneShowInfo) {
+      //   this.setShowIncomingCallNotification(false)
+      //   this.showCallFishingDataInPhone({
+      //     communication: this.communication,
+      //     contact: this.contact
+      //   }, this.id)
+      // }
 
       if (!found &&
         this.id === 'system') {

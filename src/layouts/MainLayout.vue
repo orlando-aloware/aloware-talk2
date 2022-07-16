@@ -1,16 +1,16 @@
 <template>
   <div class="h-100"
        :class="[
-          authenticated && !accountSuspended ? `dashboard ${pageClass}` : 'guest',
+          authenticated && !suspended ? `dashboard ${pageClass}` : 'guest',
           lightMode ? 'light-mode' : 'night-mode'
         ]"
-       v-if="(!this.isGuest && authenticated || this.isGuest && !authenticated)">
+       v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center"
          :class="{ 'unsupported': !$q.platform.is.mobile }">
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !accountSuspended" />
+      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended" />
       <q-layout class="page-layout"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
@@ -18,12 +18,12 @@
         <div class="h-100"
              :class="{ 'sidebar-active': sidebarVisible, 'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible) }">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading && showContactsHeader && !accountSuspended">
+                    v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
           <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
-              <template v-if="!loading">
+              <template v-if="!loading || suspended">
                 <transition :name="transitionName"
                             mode="out-in">
                   <!-- <keep-alive> -->
@@ -32,7 +32,7 @@
                 </transition>
               </template>
               <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
-                   v-else-if="loading">
+                   v-else-if="loading && !suspended">
                 <div class="container">
                   <q-spinner-bars color="primary"
                                   size="40px">
@@ -59,12 +59,12 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !accountSuspended">
+            <dialer v-if="authenticated && !suspended">
             </dialer>
           </q-page-container>
         </div>
         <q-drawer v-model="sidebarVisible"
-                  v-if="authenticated && !accountSuspended"
+                  v-if="authenticated && !suspended"
                   :breakpoint="0"
                   class="h-100 sidebar-wrapper d-block"
                   :width="64"
@@ -86,7 +86,7 @@
           side="right"
           :breakpoint="789"
           v-model="mobilePhoneDrawer"
-          v-if="authenticated && !accountSuspended"
+          v-if="authenticated && !suspended"
           @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-show="!isPhoneVisible">
@@ -109,7 +109,7 @@
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading && isMobile && !accountSuspended"
+                    v-if="authenticated && !isWidget && !loading && isMobile && !suspended"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -218,6 +218,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import store from 'src/store'
 
 export default {
   name: 'MyLayout',
@@ -276,6 +277,9 @@ export default {
       mobilePhoneDrawer: false,
       isPhoneVisible: false,
       metricsDataLoaded: false,
+      checkDebounce: null,
+      userSuspended: false,
+      accountSuspended: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -291,7 +295,7 @@ export default {
       'ringGroups',
       'notifications',
       'showPhone',
-      'accountSuspended'
+      'suspended'
     ]),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
@@ -323,8 +327,7 @@ export default {
     },
     pageContainerClasses () {
       return {
-        'page-container h-100': true,
-        'pt-58': this.showContactsHeader
+        'page-container h-100': true
       }
     },
     mobilePhoneDrawerClass () {
@@ -342,8 +345,10 @@ export default {
   },
 
   created () {
+    this.checkDebounce = _.debounce(this.check, 1000)
+
     if (this.$route.name === 'Suspended') {
-      this.setAccountSuspended(true)
+      this.setSuspended(true)
     }
 
     this.setNotificationAudio()
@@ -807,6 +812,14 @@ export default {
       }
     })
 
+    this.$VueEvent.listen('user_updated', (user) => {
+      this.checkSuspended(user, true)
+    })
+
+    this.$VueEvent.listen('company_updated', (company) => {
+      this.checkSuspended(company)
+    })
+
     if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
         position: 'top',
@@ -825,7 +838,7 @@ export default {
       this.initAuth()
       this.fetchAllParkedCalls()
     } else {
-      this.check().then((res) => {
+      this.check().then(() => {
         this.loading = false
         this.authCheckStatus = true
         this.showRefreshButton = false
@@ -850,6 +863,7 @@ export default {
         this.authCheckStatus = false
       })
     }
+
     window.addEventListener('resize', this.resizeHandler)
 
     if (!this.isMobile) {
@@ -905,6 +919,49 @@ export default {
   },
 
   methods: {
+    checkSuspended (data, isUser = false) {
+      const isCurrentUser = isUser ? this.profile.id === data.id : false
+
+      if (!data.enabled &&
+        (!isUser ||
+          (isUser && isCurrentUser)) &&
+        this.$route.name !== 'Suspended') {
+        isUser && isCurrentUser && (this.userSuspended = true)
+        this.$router.replace('/suspended')
+        this.setSuspended(true)
+        this.$generalNotification('Your account has been suspended. Please contact our support for assistance.', 'error')
+        return
+      }
+
+      if (!data.enabled &&
+        isUser &&
+        isCurrentUser) {
+        this.userSuspended = true
+      }
+
+      if (!data.enabled &&
+        !isUser) {
+        this.accountSuspended = true
+      }
+
+      if (data.enabled &&
+        isUser &&
+        isCurrentUser &&
+        !this.suspended &&
+        this.userSuspended) {
+        this.userSuspended = false
+      }
+
+      if (data.enabled &&
+        (
+          (!isUser && this.accountSuspended) ||
+          (isUser && isCurrentUser && this.userSuspended)
+        ) &&
+        this.$route.name === 'Suspended') {
+        this.$router.replace('/')
+      }
+    },
+
     resetPowerDialerSession (route) {
       if (route.meta.title !== 'Power Dialer Sessions' || (route.meta.title === 'Power Dialer Sessions' && !this.isSamePDListId)) {
         this.setFinishedPowerDialerSession()
@@ -1954,6 +2011,8 @@ export default {
       this.$VueEvent.stop('mention')
       this.$VueEvent.stop('update_communication')
       this.$VueEvent.stop('new_version')
+      this.$VueEvent.stop('user_updated')
+      this.$VueEvent.stop('company_updated')
       this.unsubscribeFromPusher()
       this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
       this.resetNotifications()
@@ -2003,7 +2062,7 @@ export default {
       'setDefaultDateFilter',
       'setNotificationAudio',
       'removeParkedCall',
-      'setAccountSuspended'
+      'setSuspended'
     ]),
     ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
     ...mapActions('auth', {
@@ -2026,6 +2085,7 @@ export default {
       }
     },
     $route (to, from) {
+      this.checkDebounce()
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
@@ -2085,11 +2145,11 @@ export default {
       }
 
       if (to.name === 'Suspended') {
-        this.setAccountSuspended(true)
+        this.setSuspended(true)
       }
 
-      if (this.accountSuspended && to.name !== 'Suspended') {
-        this.setAccountSuspended(false)
+      if (this.suspended && to.name !== 'Suspended') {
+        this.setSuspended(false)
       }
 
       this.resetPowerDialerSession(to)
@@ -2151,6 +2211,22 @@ export default {
         this.mobilePhoneDrawer = true
         this.isPhoneVisible = true
       }
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    if (to.name === 'Suspended') {
+      store().dispatch('auth/check', { preventLogout: false, preventRedirect: true }).then((response) => {
+        if (response.data.user.enabled &&
+          response.data.user.company.enabled) {
+          next({ path: '/' })
+        } else {
+          next()
+        }
+      }).catch(() => {
+        next()
+      })
+    } else {
+      next()
     }
   }
 }

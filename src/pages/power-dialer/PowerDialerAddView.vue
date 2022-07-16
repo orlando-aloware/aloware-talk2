@@ -834,7 +834,7 @@ export default {
     onCancel () {
       this.closeFilters()
       if (this.contactList.name === 'My Queue') {
-        this.$router.push(this.$router.history._startLocation)
+        this.$router.push({ path: '/power-dialer/in-queue' })
       } else {
         this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
       }
