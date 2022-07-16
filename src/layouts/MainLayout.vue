@@ -327,8 +327,7 @@ export default {
     },
     pageContainerClasses () {
       return {
-        'page-container h-100': true,
-        'pt-58': this.showContactsHeader
+        'page-container h-100': true
       }
     },
     mobilePhoneDrawerClass () {
