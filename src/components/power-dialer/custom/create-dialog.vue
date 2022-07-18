@@ -41,7 +41,8 @@
     <power-dialer-add-modal :params="powerDialerParams"
                             mode="duplicate"
                             v-if="isAddPowerDialerOpen && powerDialerParams.target"
-                            @hidden="onHiddenPowerDialerModal"/>
+                            @hidden="powerDialerParams = {}">
+    </power-dialer-add-modal>
   </div>
 </template>
 
