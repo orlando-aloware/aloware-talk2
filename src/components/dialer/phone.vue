@@ -1499,9 +1499,15 @@ export default {
       if (this.add.mode === 'user' && this.add.userId) {
         return true
       }
+
+      if (this.add.mode === 'ring-group' && this.add.ringGroupId) {
+        return true
+      }
+
       if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
         return true
       }
+
       return false
     },
     bottomExpansionLabel () {
@@ -2217,13 +2223,13 @@ export default {
       }, 1000)
     },
     introduceParticipant ($event) {
-      this.loadingAdd = true
+      this.loadingIntroduce = true
       this.add.introduce = true
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
       setTimeout(() => {
-        this.loadingAdd = false
+        this.loadingIntroduce = false
       }, 1000)
     },
     dropThirdParty () {
