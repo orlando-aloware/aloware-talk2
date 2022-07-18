@@ -145,7 +145,7 @@ const logout = async ({ commit }) => {
 
     const response = await window.axios.post('/logout')
 
-    clear()
+    clear({ commit })
 
     commit('SET_LOADING', false)
 
