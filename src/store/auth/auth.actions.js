@@ -145,26 +145,32 @@ const logout = async ({ commit }) => {
 
     const response = await window.axios.post('/logout')
 
-    storage.local.removeItem('api_token')
-    storage.local.removeItem('impersonate')
-    storage.local.removeItem('portal_session')
-    storage.local.removeItem('company_id')
-    storage.local.removeItem('shared_cookie')
-
-    window.axios.defaults.headers.common['Authorization'] = null
-
-    if (window.Intercom) {
-      window.Intercom('shutdown')
-    }
+    clear()
 
     commit('SET_LOADING', false)
-    commit('SET_AUTHENTICATED', false)
-    commit('SET_PROFILE', null)
+
     return response
   } catch (err) {
     commit('SET_LOADING', false)
     return Promise.reject(err)
   }
+}
+
+const clear = ({ commit }) => {
+  storage.local.removeItem('api_token')
+  storage.local.removeItem('impersonate')
+  storage.local.removeItem('portal_session')
+  storage.local.removeItem('company_id')
+  storage.local.removeItem('shared_cookie')
+
+  window.axios.defaults.headers.common['Authorization'] = null
+
+  if (window.Intercom) {
+    window.Intercom('shutdown')
+  }
+
+  commit('SET_AUTHENTICATED', false)
+  commit('SET_PROFILE', null)
 }
 
 const register = async ({ commit }, payload) => {
@@ -271,6 +277,7 @@ export default {
   getSharedCookie,
   getCookieUser,
   logout,
+  clear,
   register,
   forgotPass,
   resetPass,
