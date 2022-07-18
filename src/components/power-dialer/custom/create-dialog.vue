@@ -41,7 +41,7 @@
     <power-dialer-add-modal :params="powerDialerParams"
                             mode="duplicate"
                             v-if="isAddPowerDialerOpen && powerDialerParams.target"
-                            @hidden="powerDialerParams = {}"/>
+                            @hidden="onHiddenPowerDialerModal"/>
   </div>
 </template>
 
@@ -159,6 +159,9 @@ export default {
         this.searchValue = ''
         document.body.removeEventListener('click', this.handleClick)
       }
+    },
+    onHiddenPowerDialerModal () {
+      this.powerDialerParams = {}
     }
   },
   beforeDestroy () {
