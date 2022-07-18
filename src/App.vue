@@ -89,10 +89,10 @@ export default {
     })
 
     this.$VueEvent.listen('user_logout', (data) => {
-      this.clearUser()
-      this.$router.push({ name: 'Login' }).catch((err) => {
-        console.log(err)
-      })
+      if (this.authenticated) {
+        this.clearUser()
+        this.$router.push({ name: 'Login' })
+      }
     })
   },
   watch: {
