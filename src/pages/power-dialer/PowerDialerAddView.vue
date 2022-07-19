@@ -47,7 +47,7 @@
         <compact-btn
           class="mr-2"
           variant="primary"
-          :disabled="!checkedItems.length || clicked"
+          :disabled="!checkedItems.length"
           @clicked="addSelectedContacts"
         >
           Add Selected Contacts
@@ -488,6 +488,9 @@
     </template>
     <template slot="footer">
       <import-contacts-modal ref="importContacts" />
+      <power-dialer-add-modal :params="attachedParams()"
+                              v-if="openPDModal"
+                              @hidden="openPDModal = false" />
     </template>
   </contacts-screen>
 </template>
@@ -512,6 +515,7 @@ import {
   avatarMixin
 } from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import { isEqual } from 'lodash'
 
 export default {
@@ -589,7 +593,8 @@ export default {
     Datatable,
     ImportContactsModal,
     TextPopover,
-    FolderStaticIcon
+    FolderStaticIcon,
+    PowerDialerAddModal
   },
   mounted () {
     this.loadList(this.$route.params.id)
@@ -707,7 +712,7 @@ export default {
       filterHasChanges: false,
       listName: '',
       myContacts: false,
-      clicked: false,
+      openPDModal: false,
       contactCount: 0
     }
   },
@@ -718,10 +723,10 @@ export default {
       'closeFilters',
       'foldersLoaded',
       'columnsReordered',
-      'setShouldUpdateSelectedListContactCount',
       'setSearch',
       'listLoaded',
-      'setShowMyContacts'
+      'setShowMyContacts',
+      'addPowerDialerOpen'
     ]),
     loadList (id) {
       if (!id) {
@@ -782,25 +787,8 @@ export default {
         })
     },
     addSelectedContacts () {
-      this.clicked = true
-      this.closeFilters()
-      return this.$axios
-        .post(this.addItemEndpoint, this.attachedParams())
-        .then(() => {
-          this.setShouldUpdateSelectedListContactCount(true)
-          if (this.contactList.id === 'my-queue') {
-            this.$router.push(`/power-dialer`)
-          } else {
-            this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
-          }
-          this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added.')
-        })
-        .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
     },
     attachedParams () {
       if (this.isContactModule) {
@@ -947,11 +935,6 @@ export default {
           return !c.is_dnc && !c.is_blocked
         })
         document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
-      }
-    },
-    clicked: function (value) {
-      if (value) {
-        setTimeout(() => { this.clicked = false }, 2000)
       }
     }
   }

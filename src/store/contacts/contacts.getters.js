@@ -65,6 +65,7 @@ export default {
   isScheduledMessageListOpen: (state) => state.isScheduledMessageListOpen,
   isAddAppointmentOpen: (state) => state.isAddAppointmentOpen,
   isAppointmentSubmitted: (state) => state.isAppointmentSubmitted,
+  isAddPowerDialerOpen: (state) => state.isAddPowerDialerOpen,
   isEnrollSequenceOpen: (state) => state.isEnrollSequenceOpen,
   isAddReminderOpen: (state) => state.isAddReminderOpen,
   changingSelectedContact: (state) => state.changingSelectedContact,

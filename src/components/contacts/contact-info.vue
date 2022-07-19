@@ -162,7 +162,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button"
-                :disabled="true">
+                @click="openPowerDialerModal">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add to power dialer
@@ -172,6 +172,8 @@
     </div>
     <appointment-form-modal :contact="contact"></appointment-form-modal>
     <contact-add-reminder-modal></contact-add-reminder-modal>
+    <power-dialer-add-modal :params="addPowerDialerParams"
+                            :redirect="false"></power-dialer-add-modal>
   </b-card>
 </template>
 
@@ -186,6 +188,7 @@ import AddCallIcon from 'src/components/icons/add-call-icon'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
@@ -202,6 +205,7 @@ export default {
     DigitalClock,
     ContactAddReminderModal,
     AppointmentFormModal,
+    PowerDialerAddModal,
     PencilOIcon,
     AddCallIcon,
     CallIcon,
@@ -226,6 +230,12 @@ export default {
 
     phone () {
       return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
+    },
+
+    addPowerDialerParams () {
+      return {
+        contact_ids: [this.contact.id]
+      }
     }
   },
 
@@ -239,7 +249,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'addReminderOpen']),
+    ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'addReminderOpen', 'addPowerDialerOpen']),
     ...mapActions(['setShowPhone']),
 
     openAddReminderModal () {
@@ -248,6 +258,10 @@ export default {
 
     openAppointmentModal () {
       this.addAppointmentOpen(true)
+    },
+
+    openPowerDialerModal () {
+      this.addPowerDialerOpen(true)
     },
 
     onOpenEditForm () {

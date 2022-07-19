@@ -205,6 +205,7 @@ export default function () {
     isScheduledMessageListOpen: false,
     isAddAppointmentOpen: false,
     isAppointmentSubmitted: false,
+    isAddPowerDialerOpen: false,
     isEnrollSequenceOpen: false,
     isAddReminderOpen: false,
     changingSelectedContact: false,
