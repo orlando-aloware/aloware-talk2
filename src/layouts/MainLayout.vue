@@ -295,7 +295,8 @@ export default {
       'ringGroups',
       'notifications',
       'showPhone',
-      'suspended'
+      'suspended',
+      'parkedCalls'
     ]),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
@@ -620,6 +621,16 @@ export default {
     this.$VueEvent.listen('update_communication', (communication) => {
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
+      const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
+
+      // update unowned parked call contact's last communication
+      if (isCommunicationHasUnownedContact && parkedCallFound) {
+        this.updateLiveContactLastCommProperties({
+          id: communication.contact_id,
+          status: communication.current_status2,
+          user_id: communication.user_id
+        })
+      }
 
       // remove the parked call if the caller was disconnected
       if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW && parkedCall && parkedCall.id === communication.id) {
@@ -2064,13 +2075,24 @@ export default {
       'removeParkedCall',
       'setSuspended'
     ]),
-    ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
+    ...mapActions('contacts', [
+      'resetSearch',
+      'setShowContactsHeader'
+    ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
     }),
-    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups', 'setMetricLoader']),
-    ...mapActions('inbox', ['setSelectedContact', 'setLiveContacts'])
+    ...mapActions('stats', [
+      'setAvailableMetrics',
+      'setMetricGroups',
+      'setMetricLoader'
+    ]),
+    ...mapActions('inbox', [
+      'setSelectedContact',
+      'setLiveContacts',
+      'updateLiveContactLastCommProperties'
+    ])
   },
 
   watch: {

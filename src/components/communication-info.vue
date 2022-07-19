@@ -53,6 +53,10 @@
                 <ignore-call-icon v-if="isShowIgnoreCallIcon"
                                   height="24"
                                   width="24"/>
+                <q-tooltip anchor="top middle"
+                           self="center middle">
+                  {{ isShowIgnoreCallIcon ? 'Ignore' : 'Decline' }}
+                </q-tooltip>
                 <cancel-call-icon v-if="isShowCancelCallIcon"/>
               </b-button>
             </div>
@@ -62,6 +66,11 @@
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
                         @click="onAcceptCall">
+                <q-tooltip anchor="top middle"
+                           self="center middle"
+                           v-if="!showIncomingCallMenu">
+                  Answer
+                </q-tooltip>
                 <accept-call-icon/>
               </b-button>
             </div>
@@ -75,6 +84,10 @@
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
                         @click="onHangUpCall">
+                <q-tooltip anchor="top middle"
+                           self="center middle">
+                  Hang up
+                </q-tooltip>
                 <cancel-call-icon/>
               </b-button>
             </div>
@@ -87,6 +100,11 @@
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
                       @click="onUnparkCall">
+              <q-tooltip anchor="top middle"
+                         self="center middle"
+                         v-if="!showParkedCallMenu">
+                Unpark
+              </q-tooltip>
               <parked-call-icon/>
             </b-button>
           </div>

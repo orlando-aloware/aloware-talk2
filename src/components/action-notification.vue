@@ -103,6 +103,10 @@
                  round
                  no-caps
                  @click="answerCall">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Answer
+            </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
         </div>
@@ -127,6 +131,10 @@
                  no-caps
                  @click="answerCall"
                  v-if="dialer.currentStatus === 'WRAP_UP'">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Answer
+            </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
 
