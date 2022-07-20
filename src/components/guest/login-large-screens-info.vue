@@ -14,8 +14,8 @@
                 </p>
                 <div>
                     <a class="btn btn-primary btn-xl px-5"
-                    target="_blank"
-                    href="mailto:support@aloware.com?subject=Enable transcription for free">
+                       target="_blank"
+                       href="mailto:support@aloware.com?subject=Enable transcription for free">
                         Request access
                     </a>
                 </div>
