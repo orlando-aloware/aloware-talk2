@@ -15,7 +15,7 @@
                 <div>
                     <a class="btn btn-primary btn-xl px-5"
                     target="_blank"
-                    href="https://aloware.com/get-demo/">
+                    href="mailto:support@aloware.com?subject=Enable transcription for free">
                         Request access
                     </a>
                 </div>
