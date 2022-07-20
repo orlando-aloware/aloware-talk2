@@ -242,6 +242,30 @@ body,
   background-color: $dark;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,700;1,300;1,700&display=swap');
+
+.banner-font {
+  font-family: 'Poppins', sans-serif;
+}
+
+.text-banner-title {
+  font-size: 2.47rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.text-banner-subtitle {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.ai-bg {
+  background-image: url("../assets/pattern2_overlay.svg"), url("../assets/pattern2.jpg");
+  background-repeat: no-repeat;
+  background-size: 49vw, cover;
+  background-position: center;
+}
+
 @media (max-width: 992px) {
   .page-title {
     font-size: 22px !important;
