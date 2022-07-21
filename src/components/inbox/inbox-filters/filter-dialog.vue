@@ -187,6 +187,8 @@ export default {
           return 'Voice Messages'
         case ['mentions'].includes(this.$route.params.channel):
           return 'Mentions'
+        case ['all-communications'].includes(this.$route.params.channel):
+          return 'All Comms.'
         case ['calls', 'recordings'].includes(this.$route.params.channel):
         default:
           return 'Calls & Recordings'
@@ -425,7 +427,7 @@ export default {
     },
 
     getFilters () {
-      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(this.defaultFilterModel.type)) {
+      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_INBOX].includes(this.defaultFilterModel.type)) {
         return
       }
 
