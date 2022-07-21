@@ -40,7 +40,8 @@
         <div class="notification-details"
              :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
              @click="toInbox">
-          <div class="d-flex flex-grow-1 align-items-baseline w-100" v-if="getSource">
+          <div class="d-flex flex-grow-1 align-items-baseline w-100"
+               v-if="getSource">
             <span class="mr-auto text-white pr-1">
               Source: {{ getSource }}
             </span>
