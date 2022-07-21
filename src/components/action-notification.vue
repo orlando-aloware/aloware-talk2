@@ -28,7 +28,7 @@
           {{ queueCount }}
         </b-badge>
         <div class="mr-2 notification-icon"
-             :class="[['incomingCall','callFishing'].includes(id) && getSource ? 'mt-2' : '']"
+             :class="[['incomingCall', 'callFishing'].includes(id) && getSource ? 'mt-2' : '']"
              @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
@@ -89,7 +89,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
-             :class="[['incomingCall','callFishing'].includes(id) && getSource ? 'mt-2' : '']"
+             :class="[['incomingCall', 'callFishing'].includes(id) && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
