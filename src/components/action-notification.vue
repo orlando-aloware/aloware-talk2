@@ -28,7 +28,8 @@
           {{ queueCount }}
         </b-badge>
         <div class="mr-2 notification-icon"
-        @click="toInbox">
+             :class="[['incomingCall','callFishing'].includes(id) && getSource ? 'mt-2' : '']"
+             @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
           <call-icon v-if="id === 'call'"/>
@@ -39,6 +40,11 @@
         <div class="notification-details"
              :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
              @click="toInbox">
+          <div class="d-flex flex-grow-1 align-items-baseline w-100" v-if="getSource">
+            <span class="mr-auto text-white pr-1">
+              Source: {{ getSource }}
+            </span>
+          </div>
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
             <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
             <strong class="mr-auto text-white title pr-1">
@@ -83,6 +89,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
+             :class="[['incomingCall','callFishing'].includes(id) && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -181,6 +188,8 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationDirections from 'src/constants/communication-direction'
+import * as CommunicationTransferTypes from 'src/constants/communication-transfer-types'
 
 export default {
   name: 'action-notification',
@@ -343,6 +352,28 @@ export default {
     },
     isCommunicationInCallFishingQueue () {
       return !_.isEmpty(this.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === this.communicationId))
+    },
+    getSource () {
+      if (!this.communication) {
+        return ''
+      }
+
+      // Check if inbound call
+      if (this.communication.direction === CommunicationDirections.INBOUND && !this.communication.transfer_type && !this.communication.workflow_id) {
+        return 'New Inbound'
+      }
+
+      // Check if it is sequence
+      if (this.communication.workflow_id) {
+        return 'Sequence'
+      }
+
+      // Check if it is warm or cold transfer
+      if (this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_COLD || this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_WARM) {
+        return 'Transfer'
+      }
+
+      return ''
     }
   },
   created () {
