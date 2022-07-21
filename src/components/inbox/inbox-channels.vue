@@ -865,7 +865,7 @@ export default {
       }
     },
     '$route.params.channel': function (value) {
-      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings'].includes(value)) {
+      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings', 'all-communications'].includes(value)) {
         this.getCommunications(this.filter)
       }
     }
