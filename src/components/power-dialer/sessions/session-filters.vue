@@ -4,7 +4,8 @@
       <div
         v-for="(filter, key) in tabs"
         :key="key"
-        class="link px-1" style="display:contents;">
+        class="link px-1"
+        style="display:contents;">
         <div
           :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${id === filter.id ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`"
           @click="clicked(filter, filter.enabled)">

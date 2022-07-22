@@ -80,18 +80,20 @@ export default {
     }
   },
   async mounted () {
-    let metrics = await this.getSessionMetricsOptions()
-    let collection = []
+    const metrics = {
+      data: await this.getSessionMetricsOptions(),
+      collection: []
+    }
 
-    metrics.forEach(m => {
-      collection.push({
+    metrics.data.forEach(m => {
+      metrics.collection.push({
         label: m.label,
         disable: true,
         value: null
       })
-      collection = collection.concat(...m.options)
+      metrics.collection = metrics.collection.concat(...m.options)
     })
-    this.metrics = collection
+    this.metrics = metrics.collection
   },
   computed: {
     ...mapFields('powerDialer', [
@@ -118,9 +120,9 @@ export default {
       'getSessionMetricsOptions'
     ]),
     metricName (metricObj) {
-      let metric = this.metrics.find((m) => {
-        let id = m.value?.split('_&_')[1].toString()
-        let key = m.value?.split('_&_')[0].toString()
+      const metric = this.metrics.find((m) => {
+        const id = m.value?.split('_&_')[1].toString()
+        const key = m.value?.split('_&_')[0].toString()
         switch (metricObj?.type) {
           case METRIC.contact_disposition:
             if (m.value && key === 'contact_disposition' && id === metricObj.metric_id.toString()) {
