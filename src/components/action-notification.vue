@@ -118,6 +118,7 @@
           </q-btn>
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
+             :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
              v-if="id === 'callFishing' && dialer && dialer.call">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -358,22 +359,33 @@ export default {
         return ''
       }
 
-      // Check if inbound call
-      if (this.communication.direction === CommunicationDirections.INBOUND && !this.communication.transfer_type && !this.communication.workflow_id) {
+      if (this.isNewInbound) {
         return 'New Inbound'
       }
 
-      // Check if it is sequence
-      if (this.communication.workflow_id) {
-        return 'Sequence'
-      }
-
-      // Check if it is warm or cold transfer
-      if (this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_COLD || this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_WARM) {
+      if (this.isTransfer) {
         return 'Transfer'
       }
 
+      if (this.isSequence) {
+        return 'Sequence'
+      }
+
       return ''
+    },
+    isNewInbound () {
+      return this.communication.direction === CommunicationDirections.INBOUND && !this.isTransfer && !this.isSequence
+    },
+    isSequence () {
+      return this.communication.workflow_id
+    },
+    isTransfer () {
+      return this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_COLD ||
+        this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_WARM ||
+        this.hasLegcData
+    },
+    hasLegcData () {
+      return this.communication.legc_status && this.communication.legc_uuid
     }
   },
   created () {
