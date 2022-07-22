@@ -242,6 +242,28 @@ body,
   background-color: $dark;
 }
 
+.banner-font {
+  font-family: 'Poppins', sans-serif;
+}
+
+.text-banner-title {
+  font-size: 2.47rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.text-banner-subtitle {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.ai-bg {
+  background-image: url("../assets/pattern2_overlay.svg"), url("../assets/pattern2.jpg");
+  background-repeat: no-repeat;
+  background-size: 49vw, cover;
+  background-position: center;
+}
+
 @media (max-width: 992px) {
   .page-title {
     font-size: 22px !important;
@@ -11229,4 +11251,8 @@ h1.contact-list-name-label {
 .modal-pd-add {
   width: 420px;
   max-width: 90vw;
+}
+
+.hubspot-crm-iframe {
+  overflow: hidden;
 }

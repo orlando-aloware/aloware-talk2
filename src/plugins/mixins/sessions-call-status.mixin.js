@@ -1,8 +1,8 @@
 import { mapFields } from 'vuex-map-fields'
-import { mapGetters, mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
-import _ from 'lodash'
+import { get } from 'lodash'
 
 const DIRECTION = {
   top: 1,
@@ -12,19 +12,36 @@ const DIRECTION = {
 export default {
   data () {
     return {
-      callInProgress: false
+      skippedTasks: [],
+      countdownInterval: null,
+      callInProgress: false,
+      countdownStarted: false,
+      wrapUp: false
     }
   },
   computed: {
-    ...mapState('powerDialer', ['powerDialerTasks']),
+    ...mapState('powerDialer', [
+      'powerDialerTasks'
+    ]),
+    ...mapState([
+      'dialer'
+    ]),
     ...mapFields('powerDialer', [
+      'sessionCallStatuses',
       'sessionPaused',
       'activeTask',
       'ongoingSession',
-      'countdownTimer'
+      'countdownTimer',
+      'isSessionRunning',
+      'taskToCall',
+      'hasActiveTask'
     ]),
     ...mapGetters('contacts', [
       'selectedList'
+    ]),
+    ...mapGetters('powerDialer', [
+      'sessionLoader',
+      'sessionSettings'
     ]),
     status () {
       return AutoDialTaskStatus.STATUSES
@@ -39,21 +56,24 @@ export default {
           if (this.timerIsOver) {
             return 'Ready'
           }
+
           if (this.wrapUp) {
             return `Wrap up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
           }
+
           if (this.sessionPaused) {
             return 'Up Next'
-          } else {
-            if (this.countdownTimer > 0) {
-              return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer > 0 ? this.countdownTimer : 0}s</span>`
-            } else {
-              if (this.toggleEnd || this.togglePause) {
-                return 'Ready'
-              }
-              return `Dialing...`
-            }
           }
+
+          if (this.countdownTimer > 0) {
+            return `Will call in <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer > 0 ? this.countdownTimer : 0}s</span>`
+          }
+
+          if (this.toggleEnd || this.togglePause) {
+            return 'Ready'
+          }
+
+          return `Dialing...`
         case 'WRAP_UP':
           return `Wrap Up <span class="text-weight-bold text-grey-7 text-lowercase">${this.countdownTimer >= 0 ? this.countdownTimer : 0}s</span>`
         case 'MAKING_CALL':
@@ -75,6 +95,39 @@ export default {
     },
     moveDirection () {
       return DIRECTION
+    },
+    shouldSkip () {
+      return this.sessionSettings.skip_outside_daytime_hours === 1
+    },
+    togglePause: {
+      get () {
+        return this.sessionCallStatuses.pause
+      },
+      set (val) {
+        this.sessionCallStatuses.pause = val
+      }
+    },
+    toggleEnd: {
+      get () {
+        return this.sessionCallStatuses.end
+      },
+      set (val) {
+        this.sessionCallStatuses.end = val
+      }
+    },
+    timerIsOver () {
+      return this.countdownTimer === -1
+    },
+    powerDialerSettings () {
+      const settings = this.profile.company.power_dialer_settings
+      if (settings !== null && settings.open_time && settings.close_time) {
+        return settings
+      }
+
+      return {
+        open_time: '09:00:00',
+        close_time: '18:00:00'
+      }
     }
   },
   methods: {
@@ -83,6 +136,12 @@ export default {
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter'
+    ]),
+    ...mapMutations('powerDialer', [
+      'TOGGLE_SESSION_LOADER'
+    ]),
+    ...mapActions('powerDialer', [
+      'getContact'
     ]),
 
     async fetchContact (taskId = null) {
@@ -99,7 +158,12 @@ export default {
     },
 
     async runTask () {
-      let timezone = this.taskToCall?.timezone
+      const timezone = this.taskToCall?.timezone
+      // Time without timezone
+      const startDay = moment.tz(this.powerDialerSettings.open_time, 'HH:mm:ss', timezone)
+      const endDay = moment.tz(this.powerDialerSettings.close_time, 'HH:mm:ss', timezone)
+      const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone)
+
       // If there is no contact TZ then
       // Use the company TZ
       if (this.shouldSkip && !timezone) {
@@ -109,18 +173,11 @@ export default {
         return
       }
       // Check if it's outside working hours or not
-      if (this.shouldSkip && timezone) {
-        // Time without timezone
-        const startDay = moment.tz(this.powerDialerSettings.open_time, 'HH:mm:ss', timezone)
-        const endDay = moment.tz(this.powerDialerSettings.close_time, 'HH:mm:ss', timezone)
-        const contactLocalTime = moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone)
-
-        if (!contactLocalTime.isBetween(startDay, endDay)) {
-          // Implement: Should skip single task
-          this.skipSingleTask(this.taskToCall, 'Task is skipped because it\'s outside day times. Pushed the task to the bottom of the list.')
-          // this.moveTask(this.taskToCall, this.moveDirection.bottom)
-          return
-        }
+      if (this.shouldSkip && timezone && !contactLocalTime.isBetween(startDay, endDay)) {
+        // Implement: Should skip single task
+        this.skipSingleTask(this.taskToCall, 'Task is skipped because it\'s outside day times. Pushed the task to the bottom of the list.')
+        // this.moveTask(this.taskToCall, this.moveDirection.bottom)
+        return
       }
 
       if (this.taskToCall?.contact_list_item_id) {
@@ -141,13 +198,12 @@ export default {
     },
 
     skipSingleTask (autoDialTask, message, skipTask = false) {
-      const contactListItemId = _.get(autoDialTask, 'contact_list_item_id', null)
+      const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
         return
       }
 
-      this.loading_skip = true
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
         .then(res => {
           if (!this.skippedTasks.includes(contactListItemId)) {
@@ -159,12 +215,10 @@ export default {
           //   this.addTaskToList(autoDialTask)
           // }
           // this.skipped_list.push(autoDialTask.id)
-          // this.loading_skip = false
           this.$generalNotification(message, 'warning')
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)
-          // this.loading_skip = false
           return Promise.reject(err)
         })
     },

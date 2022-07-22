@@ -23,21 +23,25 @@
           <mute-icon v-show="!toggleMute"
                      class="mr-2"
                      :width="12"
-                     :height="12"></mute-icon>
+                     :height="12">
+          </mute-icon>
           <unmute-icon v-show="toggleMute"
                        class="mr-2"
                        :width="12"
-                       :height="12"></unmute-icon>
+                       :height="12">
+          </unmute-icon>
           <div class="text-body2 text-black">
             {{ toggleMute ? 'Unmute' : 'Mute' }}
           </div>
         </q-btn>
 
         <q-btn
-          no-wrap no-caps size="sm"
+          class="sessions-button free-width mx-1"
+          no-wrap
+          no-caps
+          size="sm"
           unelevated
           outline
-          class="sessions-button free-width mx-1"
           :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
           :disabled="isHoldDisabled"
           @click="onToggleHold">
@@ -55,7 +59,9 @@
         <q-btn
           class="sessions-button free-width mx-1"
           size="sm"
-          no-wrap unelevated no-caps
+          no-wrap
+          unelevated
+          no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
           @click="onNextTask">
@@ -64,12 +70,12 @@
         </q-btn>
 
         <b-dropdown
+          class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
           text="..."
           no-caret
           right size="sm"
           variant="white"
-          :disabled="!statusCallConnected"
-          class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+          :disabled="!statusCallConnected">
           <template #button-content>
             <i class="fa fa-ellipsis-h"></i>
           </template>
@@ -110,8 +116,8 @@
 
       <div class="d-flex align-items-center p-0">
         <div
-          v-if="timezone"
-          class="flex-grow-1 text-14 text-subtitle1 text-capitalize pl-3 py-0">
+          class="flex-grow-1 text-14 text-subtitle1 text-capitalize pl-3 py-0"
+          v-if="timezone">
           <DropIcon
             width="18px"
             height="18px"
@@ -122,8 +128,11 @@
 
         <q-btn
           class="sessions-button free-width mx-1"
-          no-wrap outline no-caps
-          size="sm" color="grey-4"
+          no-wrap
+          outline
+          no-caps
+          size="sm"
+          color="grey-4"
           :disabled="!statusCallConnected"
           @click="onToggleRecording">
 
@@ -173,8 +182,11 @@
         </div>
 
         <q-btn
-          unelevated :outline="!sessionPaused"
-          no-wrap no-caps size="sm"
+          unelevated
+          no-wrap
+          no-caps
+          size="sm"
+          :outline="!sessionPaused"
           :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
           :disabled="toggleEnd"
           :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`"
@@ -191,7 +203,9 @@
         </q-btn>
 
         <q-btn
-          no-wrap outline no-caps
+          no-wrap
+          outline
+          no-caps
           size="sm"
           :disable="toggleEnd"
           :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
@@ -217,11 +231,16 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <p v-if="!hasQueuedTaskLists">No remaining tasks found...</p>
-          <p>You will be redirected to PowerDialer <strong>{{ selectedList.name }}</strong> list. Please wait...</p>
+          <p v-if="!hasQueuedTaskLists">
+            No remaining tasks found...
+          </p>
+          <p>
+            You will be redirected to PowerDialer <strong>{{ selectedList.name }}</strong> list. Please wait...
+          </p>
         </q-card-section>
 
-        <q-card-actions align="right"></q-card-actions>
+        <q-card-actions align="right">
+        </q-card-actions>
       </q-card>
     </q-dialog>
 
@@ -229,7 +248,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
 import TransferIcon from 'components/icons/transfer-icon-2'
@@ -246,7 +265,7 @@ import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import _, { isEmpty } from 'lodash'
+import { isEmpty, cloneDeep } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -286,28 +305,19 @@ export default {
       'sessionPhoneExpansion'
     ]),
     ...mapFields('powerDialer', [
-      'sessionCallStatuses',
       'countdownTimer',
       'sessionPaused',
       'activeTask',
-      'hasActiveTask',
-      'taskToCall',
-      'hubspot',
-      'isSessionRunning'
+      'hubspot'
     ]),
     ...mapState([
-      'campaigns',
-      'dialer'
+      'campaigns'
     ]),
     ...mapState('cache', [
       'currentCompany'
     ]),
     ...mapState('auth', [
       'profile'
-    ]),
-    ...mapGetters('powerDialer', [
-      'sessionLoader',
-      'sessionSettings'
     ]),
     ...mapGetters('contacts', [
       'contact',
@@ -326,33 +336,34 @@ export default {
     currentSessionStatus () {
       return this.dialer?.currentStatus || ''
     },
-    shouldSkip () {
-      return this.sessionSettings.skip_outside_daytime_hours === 1
-    },
     address () {
-      let { taskToCall } = this
-      let address = ''
       if (isEmpty(this.taskToCall)) {
         return 'N/A'
       }
-      if (taskToCall?.cnam_city && !taskToCall?.cnam_state) {
-        address = `${taskToCall?.cnam_city || ''}`
-      } else if (!taskToCall?.cnam_city && taskToCall?.cnam_state) {
-        address = `${taskToCall?.cnam_state || ''}`
-      } else {
-        address = `${taskToCall?.cnam_city || ''} ${taskToCall?.cnam_state || ''}`
+
+      if (this.taskToCall?.cnam_city &&
+        !this.taskToCall?.cnam_state) {
+        return `${this.taskToCall?.cnam_city || ''}`
       }
-      return address
+
+      if (!this.taskToCall?.cnam_city &&
+        this.taskToCall?.cnam_state) {
+        return `${this.taskToCall?.cnam_state || ''}`
+      }
+
+      return `${this.taskToCall?.cnam_city || ''} ${this.taskToCall?.cnam_state || ''}`
     },
     companyName () {
       return this.taskToCall?.company_name || 'Company: N/A'
     },
     fullName () {
-      let { taskToCall } = this
-      if ((taskToCall?.first_name === null || taskToCall?.first_name === '') && (taskToCall?.last_name === null || taskToCall?.last_name === '')) {
+      if ((this.taskToCall?.first_name === null ||
+        this.taskToCall?.first_name === '') &&
+        (this.taskToCall?.last_name === null ||
+          this.taskToCall?.last_name === '')) {
         return `No Name`
       }
-      return `${taskToCall?.first_name || ''} ${taskToCall?.last_name || ''}`
+      return `${this.taskToCall?.first_name || ''} ${this.taskToCall?.last_name || ''}`
     },
     getLine () {
       return this.campaigns.find((line) => line.id === this.activeTask?.task?.communication?.campaign_id)
@@ -361,21 +372,17 @@ export default {
       return this.dialer.isMuted
     },
     toggleRecording () {
-      if (this.dialer.recordingStatus === 'in-progress' && this.dialer.communication && this.dialer.communication.should_record === true) {
+      if (this.dialer.recordingStatus === 'in-progress' &&
+        this.dialer.communication &&
+        this.dialer.communication.should_record === true) {
         return true
       }
-      if (this.dialer.recordingStatus === 'paused' && this.dialer.communication && this.dialer.communication.should_record === true) {
+      if (this.dialer.recordingStatus === 'paused' &&
+        this.dialer.communication &&
+        this.dialer.communication.should_record === true) {
         return false
       }
       return false
-    },
-    togglePause: {
-      get () {
-        return this.sessionCallStatuses.pause
-      },
-      set (val) {
-        this.sessionCallStatuses.pause = val
-      }
     },
     toggleHold: {
       get () {
@@ -383,14 +390,6 @@ export default {
       },
       set (val) {
         this.sessionCallStatuses.hold = val
-      }
-    },
-    toggleEnd: {
-      get () {
-        return this.sessionCallStatuses.end
-      },
-      set (val) {
-        this.sessionCallStatuses.end = val
       }
     },
     status () {
@@ -409,14 +408,17 @@ export default {
       return this.taskToCall?.timezone
     },
     getTimeZone () {
-      let timezone = this.taskToCall?.timezone
+      const timezone = this.taskToCall?.timezone
       return moment.tz(moment.tz(timezone).format('HH:mm:ss'), 'HH:mm:ss', timezone).format('hh:mm A')
     },
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
     },
     isCallCompleted () {
-      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+      return (
+        (this.dialer.communication &&
+          this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) ||
+        ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
     isHoldDisabled () {
       return !this.dialer.communication ||
@@ -442,25 +444,11 @@ export default {
           return false
       }
     },
-    timerIsOver () {
-      return this.countdownTimer === -1
-    },
     integrationsHubspot () {
       return this.activeTask?.integrations?.hubspot
     },
     options () {
       return this.$options.auto_dialer_interval
-    },
-    powerDialerSettings () {
-      let settings = this.profile.company.power_dialer_settings
-      if (settings !== null && settings.open_time && settings.close_time) {
-        return settings
-      }
-
-      return {
-        open_time: '09:00:00',
-        close_time: '18:00:00'
-      }
     },
     hasQueuedTaskLists () {
       return this.powerDialerTasks.in_queue.length > 0
@@ -473,7 +461,8 @@ export default {
     },
     canNextTask () {
       // should be able to next task even if on warm up period
-      return this.statusCallConnected || ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+      return this.statusCallConnected ||
+        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
     },
     pauseButtonText () {
       switch (true) {
@@ -519,12 +508,6 @@ export default {
 
   methods: {
     ...mapActions(['setShowPhone']),
-    ...mapActions('powerDialer', [
-      'getContact'
-    ]),
-    ...mapMutations('powerDialer', [
-      'TOGGLE_SESSION_LOADER'
-    ]),
     ...mapActions('contacts', [
       'setContactClone'
     ]),
@@ -532,25 +515,32 @@ export default {
       this.autoDialer.outbound_campaign_id = null
 
       // Default PowerDialer outbound line
-      if (this.currentCompany && this.currentCompany.default_power_dialer_campaign_id) {
+      if (this.currentCompany &&
+        this.currentCompany.default_power_dialer_campaign_id) {
         this.autoDialer.outbound_campaign_id = this.currentCompany.default_power_dialer_campaign_id
         return
       }
 
       // Force outbound line on all users
-      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.currentCompany.force_outbound_line) {
+      if (this.currentCompany &&
+        this.currentCompany.default_outbound_campaign_id &&
+        this.currentCompany.force_outbound_line) {
         this.autoDialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
         return
       }
 
       // Outbound line is set to use account default and account has a default
-      if (this.currentCompany && this.currentCompany.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
+      if (this.currentCompany &&
+        this.currentCompany.default_outbound_campaign_id &&
+        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+        !this.profile.default_outbound_campaign_id) {
         this.autoDialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
         return
       }
 
       // User has a default outbound line
-      if (this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+      if (this.profile.default_outbound_campaign_id &&
+        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
         this.autoDialer.outbound_campaign_id = this.profile.default_outbound_campaign_id
         return
       }
@@ -575,11 +565,15 @@ export default {
     onTimerIsOver () {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
-        if ((this.toggleEnd || !this.hasQueuedTaskLists) && !this.hasActiveTask) {
+        if (
+          (this.toggleEnd ||
+            !this.hasQueuedTaskLists) &&
+          !this.hasActiveTask) {
           this.reRoute()
           return
         }
-        if (!this.togglePause && !this.wrapUp) {
+        if (!this.togglePause &&
+          !this.wrapUp) {
           this.runTask()
         }
         if (this.wrapUp) {
@@ -614,7 +608,8 @@ export default {
         this.TOGGLE_SESSION_LOADER(true)
       }
 
-      if (this.toggleEnd && this.timerIsOver) {
+      if (this.toggleEnd &&
+        this.timerIsOver) {
         this.reRoute()
         return
       }
@@ -632,7 +627,7 @@ export default {
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
-          this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+          this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
           if (this.taskToCall) {
             this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
@@ -763,19 +758,15 @@ export default {
       }, this.redirectDelay)
     },
     managingSessionFlows (status = '') {
-      let {
-        togglePause,
-        statusCallConnected,
-        timerIsOver,
-        isSessionRunning
-      } = this
       switch (status) {
         // If Status is READY
         case 'READY':
           // if (this.toggleEnd) {
           //   this.reRoute()
           // }
-          if (!statusCallConnected && timerIsOver && isSessionRunning) {
+          if (!this.statusCallConnected &&
+            this.timerIsOver &&
+            this.isSessionRunning) {
             this.resetTimer()
           }
           break
@@ -792,7 +783,7 @@ export default {
         case 'CALL_CONNECTED':
           break
         case 'HANGING_UP_CALL':
-          if (!togglePause) {
+          if (!this.togglePause) {
             this.resetTimer()
           }
           break
@@ -839,7 +830,7 @@ export default {
         this.wrapUp = false
         this.hasActiveTask = false
 
-        this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+        this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
         if (!this.taskToCall) {
           this.hasActiveTask = false
@@ -859,7 +850,7 @@ export default {
     async onNextTaskWhenOnWrapUp () {
       this.onPhoneExpansionReset()
       this.wrapUp = false
-      this.taskToCall = _.cloneDeep(this.powerDialerTasks.in_queue[0])
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
         this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
         this.activeTask = this.taskToCall
@@ -957,12 +948,8 @@ export default {
   },
   data () {
     return {
-      countdownStarted: false,
-      countdownInterval: null,
-      skippedTasks: [],
       prevRoute: null,
       shouldRedirect: false,
-      wrapUp: false,
       loading: false,
       autoDialer: {
         outbound_campaign_id: null,

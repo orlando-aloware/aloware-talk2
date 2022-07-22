@@ -61,7 +61,6 @@
 import { mapState, mapGetters, mapActions } from 'vuex'
 import {
   contactMixin,
-  contactsMixins,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -73,7 +72,6 @@ export default {
     ContactActivities
   },
   mixins: [
-    contactsMixins,
     contactMixin,
     aclMixin,
     visibilityMixin
@@ -134,9 +132,10 @@ export default {
       'setContact',
       'setContactClone'
     ]),
+    ...mapActions(['setContactDetailsDrawer']),
     fetchContact () {
       this.selectedContactChanging(true)
-      this.processFetchContactInfo((selectedContact) => {
+      this.$VueEvent.fire('fetch_contact_info', (selectedContact) => {
         this.setContact(selectedContact)
         this.setContactClone(selectedContact)
         this.resetChangedContactProperties([])
@@ -178,7 +177,10 @@ export default {
   data () {
     return {
       flagged: false,
-      isLoading: false
+      isLoading: false,
+      drawer: false,
+      detailsOpen: false,
+      contactListSidebarOpen: false
     }
   }
 }

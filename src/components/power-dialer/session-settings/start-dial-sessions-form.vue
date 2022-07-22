@@ -74,12 +74,12 @@
 
           <CallDispositionSelector
             v-else-if="cform.name === 'call_disposition_ids'"
+            class="pb-3"
             v-model="resources[cform.name]"
             :multiple="true"
             :highlighted="isChanged('call_dispositions')"
             :disable="disabled"
-            @change="{}"
-            class="pb-3">
+            @change="{}">
           </CallDispositionSelector>
 
           <ContactDispositionSelector
@@ -98,20 +98,20 @@
 
           <VmDropSelector
             v-else-if="cform.name === 'setVmDropShortcuts'"
+            class="w-100"
             v-model="resources[cform.name]"
             :disable="disabled"
-            class="w-100"
             @change="{}">
           </VmDropSelector>
 
           <p v-else-if="cform.name === 'skip_outside_daytime_hours'">
             <q-toggle
+              size="md"
+              val="md"
               v-model="resources[cform.name]"
               :true-value="1"
               :false-value="0"
-              :disable="disabled"
-              size="md"
-              val="md" />
+              :disable="disabled" />
           </p>
 
           <WarmupPeriodSelector
@@ -121,10 +121,11 @@
 
           <q-select
             v-else
-            v-model="resources[cform.name]"
-            :options="[]"
             class="generic-selector-2"
-            outlined dense />
+            outlined
+            dense
+            :options="[]"
+            v-model="resources[cform.name]" />
 
         </div>
       </div>
@@ -208,17 +209,16 @@ export default {
         return this.resources
       },
       set (obj) {
-        let { resources } = this
-        resources.name = null
-        resources.campaign_id = null
-        resources.skip_outside_daytime_hours = true
-        resources.warmup_period_in_seconds = 0
-        resources.script_id = null
-        resources.metric_options = []
-        resources.call_disposition_ids = []
-        resources.contact_disposition_ids = []
-        resources.is_company_scope = null
-        return resources
+        this.resources.name = null
+        this.resources.campaign_id = null
+        this.resources.skip_outside_daytime_hours = true
+        this.resources.warmup_period_in_seconds = 0
+        this.resources.script_id = null
+        this.resources.metric_options = []
+        this.resources.call_disposition_ids = []
+        this.resources.contact_disposition_ids = []
+        this.resources.is_company_scope = null
+        return this.resources
       }
     },
     warmUpPeriods () {
