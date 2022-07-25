@@ -53,7 +53,7 @@
 
         <q-item class="ak-trigger">
           <q-item-section class="nav-item dropdown ak-trigger">
-            <a href="#" class="nav-link ak-trigger">
+            <a href="#" class="nav-link ak-trigger px-0">
               <span class="fa fa-bullhorn changelog-trigger pointer" style="font-size: 1.2rem"></span>
               <AnnounceKit catchClick=".ak-trigger"
                           :user="currentUser"
