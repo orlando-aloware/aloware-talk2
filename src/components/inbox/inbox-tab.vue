@@ -682,7 +682,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication, true) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -789,7 +789,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication, true) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }

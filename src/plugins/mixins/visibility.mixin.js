@@ -17,7 +17,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('inbox', [
-      'showMyContacts'
+      'inboxShowMyContacts'
     ])
   },
 
@@ -40,7 +40,7 @@ export default {
       return true
     },
 
-    checkCommunicationMatchesFilters (filter, communication) {
+    checkCommunicationMatchesFilters (filter, communication, forInbox = false) {
       // if answer status filter is other than all
       if (filter.answer_status !== undefined &&
         filter.answer_status !== 'all') {
@@ -135,7 +135,8 @@ export default {
       if (
         ((filter.my_contact !== undefined &&
           filter.my_contact) ||
-          this.showMyContacts) &&
+        (forInbox &&
+          this.inboxShowMyContacts)) &&
         communication.contact) {
         // check the communication's contact owner matches the current user
         if (communication.contact.user_id !== this.profile.id) {

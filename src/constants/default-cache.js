@@ -10,6 +10,6 @@ export const DEFAULT_STATE = {
     'powerDialer.countdownTimer',
     'powerDialer.isSessionRunning',
     'contacts.showMyContacts',
-    'inbox.showMyContacts'
+    'inbox.inboxShowMyContacts'
   ]
 }

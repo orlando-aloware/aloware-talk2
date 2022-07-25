@@ -418,7 +418,7 @@ export default {
       'channelChangedFilterFields',
       'isFilterDialogShown',
       'isFilterModelFormShown',
-      'showMyContacts'
+      'inboxShowMyContacts'
     ]),
     ...mapState('auth', [
       'profile'
@@ -514,7 +514,7 @@ export default {
     this.rangePicker = this.$refs.picker
 
     setTimeout(() => {
-      if (this.showMyContacts) {
+      if (this.inboxShowMyContacts) {
         this.filter.my_contact = 1
       }
     }, 500)

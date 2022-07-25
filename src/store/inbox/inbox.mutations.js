@@ -175,8 +175,8 @@ export default {
   SET_LOADING_PENDING_TASK_COUNT (state, loading) {
     state.isLoadingPendingTaskCount = loading
   },
-  SET_SHOW_MY_CONTACTS (state, value) {
-    state.showMyContacts = value
+  SET_INBOX_SHOW_MY_CONTACTS (state, value) {
+    state.inboxShowMyContacts = value
   },
   SET_DEFAULT_SHOW_MY_CONTACTS (state, value) {
     state.showMyContacts = InboxDefault.DEFAULT_STATE.showMyContacts

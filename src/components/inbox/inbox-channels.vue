@@ -259,7 +259,7 @@ export default {
       'channelChangedFilterFields',
       'appliedFilter',
       'hasMoreCommunications',
-      'showMyContacts'
+      'inboxShowMyContacts'
     ]),
 
     nextPage () {
@@ -596,7 +596,7 @@ export default {
       this.isLoadingMore = true
       this.isLoaded = false
 
-      if (this.showMyContacts) {
+      if (this.inboxShowMyContacts) {
         params.my_contact = 1
       }
 
@@ -831,7 +831,7 @@ export default {
 
     filterMyContacts (params, showMyContacts) {
       if (showMyContacts === undefined) {
-        showMyContacts = this.showMyContacts
+        showMyContacts = this.inboxShowMyContacts
       }
 
       const myContactsFilter = _.get(params, 'my_contact', null)
@@ -925,7 +925,7 @@ export default {
 
         if (this.checkCommunicationChannels(data) &&
           this.checkCommunicationMatchesSearch(this.searchText, data) &&
-          this.checkCommunicationMatchesFilters(this.filter, data) &&
+          this.checkCommunicationMatchesFilters(this.filter, data, true) &&
           this.checkCommunicationMatchesUserAccessibility(data) &&
           this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
           this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
@@ -956,7 +956,7 @@ export default {
           data = _.extend({}, found[0], data)
           if (this.checkCommunicationChannels(data) &&
             this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data) &&
+            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
             this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
@@ -973,7 +973,7 @@ export default {
           // add the communication if it's not already there and if it matches the criteria
           if (this.checkCommunicationChannels(data) &&
             this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data) &&
+            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
             this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
