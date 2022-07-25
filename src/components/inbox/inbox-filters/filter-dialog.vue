@@ -167,7 +167,7 @@ export default {
       'channelClonedFilter',
       'isFilterModelFormShown',
       'appliedFilter',
-      'showMyContacts'
+      'inboxShowMyContacts'
     ]),
     isOpen: {
       get () {
@@ -292,7 +292,7 @@ export default {
       'resetChannelChangedFilterFields',
       'toggleFilterDialog',
       'setChannelClonedFilter',
-      'setShowMyContacts'
+      'setInboxShowMyContacts'
     ]),
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
@@ -356,8 +356,8 @@ export default {
       this.resetChannelChangedFilterFields()
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
 
-      if (myContactsFilter !== null && myContactsFilter !== (this.showMyContacts | 0)) {
-        this.setShowMyContacts(Boolean(myContactsFilter))
+      if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
+        this.setInboxShowMyContacts(Boolean(myContactsFilter))
       }
 
       for (const item in this.filter) {

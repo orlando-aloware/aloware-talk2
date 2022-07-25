@@ -10,7 +10,7 @@ export default {
       'isFetchingContacts',
       'contactsCurrentPage',
       'liveContacts',
-      'showMyContacts'
+      'inboxShowMyContacts'
     ]),
     ...mapState('auth', ['profile']),
     nextPage () {
@@ -236,7 +236,7 @@ export default {
         query.my_contact = this.filter.my_contact
       }
 
-      if ((this.filter && this.filter.my_contact) || this.showMyContacts) {
+      if ((this.filter && this.filter.my_contact) || this.inboxShowMyContacts) {
         this.filters = { ...this.filters, 'contact_owner': { value: [this.profile.id], operator: 1 } }
       }
 

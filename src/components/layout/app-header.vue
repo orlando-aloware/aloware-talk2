@@ -36,12 +36,12 @@
           size="sm"
           switch
           :disabled="!isInboxFiltersLoaded || isGettingTasksList"
-          v-model="inboxShowMyContacts"
+          v-model="inboxShowMyContactsFilter"
         >
         </b-form-checkbox>
         <label class="text-primary mr-2 mt-2 cursor-pointer"
                :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
-               @click="inboxShowMyContacts = !inboxShowMyContacts">My Contacts</label>
+               @click="inboxShowMyContactsFilter = !inboxShowMyContactsFilter">My Contacts</label>
       </div>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
@@ -197,7 +197,7 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      inboxShowMyContacts: false
+      inboxShowMyContactsFilter: false
     }
   },
 
@@ -216,7 +216,7 @@ export default {
       'previousListId'
     ]),
     ...mapState('inbox', [
-      'showMyContacts',
+      'inboxShowMyContacts',
       'isInboxFiltersLoaded',
       'isGettingTasksList'
     ]),
@@ -263,7 +263,7 @@ export default {
   },
 
   created () {
-    this.inboxShowMyContacts = this.showMyContacts
+    this.inboxShowMyContactsFilter = this.inboxShowMyContacts
     this.$VueEvent.listen('callContact', (data) => {
       this.showDialer()
       setTimeout(() => {
@@ -355,7 +355,7 @@ export default {
     },
 
     onMyContactsChange () {
-      this.setShowMyContacts(this.inboxShowMyContacts)
+      this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
 
       if (['Inbox', 'Inbox Channel Task Status'].includes(this.$route.name)) {
         this.$VueEvent.fire('inbox_load_contacts')
@@ -363,7 +363,7 @@ export default {
       }
 
       // for inbox channels
-      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContacts)
+      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
     },
 
     ...mapActions('stats', [
@@ -373,9 +373,10 @@ export default {
     ...mapActions('contacts', [
       'updateContactsListFilter'
     ]),
-    ...mapActions([
-      'setDialerFormStatus'
-    ])
+    ...mapActions('inbox', [
+      'setInboxShowMyContacts'
+    ]),
+    ...mapActions(['setDialerFormStatus'])
   },
 
   watch: {
@@ -414,12 +415,12 @@ export default {
     $route (to, from) {
       this.prevRoute = from.path
     },
-    showMyContacts (value) {
-      if (value !== this.inboxShowMyContacts) {
-        this.inboxShowMyContacts = value
+    inboxShowMyContacts (value) {
+      if (value !== this.inboxShowMyContactsFilter) {
+        this.inboxShowMyContactsFilter = value
       }
     },
-    inboxShowMyContacts () {
+    inboxShowMyContactsFilter () {
       this.onMyContactsChange()
     }
   }

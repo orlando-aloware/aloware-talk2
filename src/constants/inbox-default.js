@@ -87,6 +87,6 @@ export const DEFAULT_STATE = {
   appliedFilter: null,
   isLoadingOpenTaskCount: false,
   isLoadingPendingTaskCount: false,
-  showMyContacts: true,
+  inboxShowMyContacts: true,
   isInboxFiltersLoaded: true
 }
