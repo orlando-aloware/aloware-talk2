@@ -847,6 +847,10 @@ export default {
   watch: {
     $route (to, from) {
       this.previousRoute = from
+
+      if (['Inbox Channel', 'Inbox', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        this.isLoaded = false
+      }
     },
     'activeChannel': function (value) {
       if (this.$route.name === 'Inbox Channel') {
