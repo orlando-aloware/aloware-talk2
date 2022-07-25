@@ -6,7 +6,12 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 export default {
 
   computed: {
-    ...mapState('inbox', ['isFetchingContacts', 'contactsCurrentPage', 'liveContacts']),
+    ...mapState('inbox', [
+      'isFetchingContacts',
+      'contactsCurrentPage',
+      'liveContacts',
+      'showMyContacts'
+    ]),
     ...mapState('auth', ['profile']),
     nextPage () {
       return this.contactsCurrentPage + 1
@@ -72,7 +77,9 @@ export default {
       'setOpenTaskCount',
       'setPendingTaskCount',
       'setLoadingOpenTaskCount',
-      'setLoadingPendingTaskCount'
+      'setLoadingPendingTaskCount',
+      'setIsInboxFiltersLoaded',
+      'gettingTasksList'
     ]),
     getNoneLiveCallContactTasks (contacts) {
       if (this.liveContacts.length >= 0) {
@@ -107,6 +114,8 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
     },
     loadContactTasks (loadCount = true, showLoading = true) {
+      this.setIsInboxFiltersLoaded(this.isLoaded)
+      this.gettingTasksList(false)
       this.taskListHasError = false
       if (showLoading) {
         this.gettingContactsList(true)
@@ -139,6 +148,7 @@ export default {
           this.setHasMoreContacts(response.data.next_page_url)
           this.isLoadingMore = false
           this.isLoaded = true
+          this.setIsInboxFiltersLoaded(this.isLoaded)
         }
       }).catch((thrown) => {
         if (window.axios.isCancel(thrown) && thrown) {
@@ -150,6 +160,8 @@ export default {
           }
           this.$generalNotification(`An exception was encountered while fetching contact tasks.`, 'error')
         }
+        this.isLoaded = true
+        this.setIsInboxFiltersLoaded(this.isLoaded)
       })
     },
     loadMoreContactTasks () {
@@ -162,6 +174,9 @@ export default {
         this.setHasMoreContacts(response.data.next_page_url)
         this.isLoadingMore = false
         this.isLoaded = true
+      }).catch(() => {
+        this.isLoaded = true
+        this.setIsInboxFiltersLoaded(this.isLoaded)
       })
     },
     getContactsByTaskStatus (taskId) {
@@ -219,6 +234,9 @@ export default {
 
       if (this.filter && this.filter.my_contact) {
         query.my_contact = this.filter.my_contact
+      }
+
+      if ((this.filter && this.filter.my_contact) || this.showMyContacts) {
         this.filters = { ...this.filters, 'contact_owner': { value: [this.profile.id], operator: 1 } }
       }
 
