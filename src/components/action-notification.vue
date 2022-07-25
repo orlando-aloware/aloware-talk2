@@ -361,30 +361,78 @@ export default {
       }
 
       if (this.isNewInbound) {
-        return 'New Inbound'
+        return 'New Inbound Call'
       }
 
-      if (this.isTransfer) {
-        return 'Transfer'
+      if (this.isWarmTransferUser && this.isWarmCallIntroduced) {
+        return 'Introduction to User'
+      }
+
+      if (this.isWarmTransferRingGroup && this.isWarmCallIntroduced) {
+        return 'Introduction to Ring Group'
+      }
+
+      if (this.isWarmTransferUser && !this.isWarmCallIntroduced) {
+        return 'Add to User'
+      }
+
+      if (this.isWarmTransferRingGroup && !this.isWarmCallIntroduced) {
+        return 'Add to Ring Group'
+      }
+
+      if (this.isColdTransferUser) {
+        return 'Transfer to User'
+      }
+
+      if (this.isColdTransferRingGroup) {
+        return 'Transfer to Ring Group'
       }
 
       if (this.isSequence) {
-        return 'Sequence'
+        return 'Call from Sequence'
       }
 
       return ''
     },
-    isNewInbound () {
-      return this.communication.direction === CommunicationDirections.INBOUND && !this.isTransfer && !this.isSequence
+    isNewInbound() {
+      return this.communication.direction === CommunicationDirections.INBOUND &&
+        !this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_WARM) &&
+        !this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_COLD) &&
+        !this.isSequence
     },
-    isSequence () {
+
+    isSequence() {
       return this.communication.workflow_id
     },
-    isTransfer () {
-      return this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_COLD ||
-        this.communication.transfer_type === CommunicationTransferTypes.TRANSFER_TYPE_WARM ||
-        this.hasLegcData
+
+    isColdTransfer() {
+      return this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_COLD)
     },
+
+    isWarmTransfer() {
+      return this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_WARM)
+    },
+
+    isWarmTransferRingGroup() {
+      return !this.communication.added_user_id && this.isWarmTransfer
+    },
+
+    isWarmTransferUser() {
+      return this.communication.added_user_id && this.isWarmTransfer
+    },
+
+    isWarmCallIntroduced() {
+      return this.communication.is_introduce
+    },
+
+    isColdTransferRingGroup() {
+      return this.communication.is_cold_transfer_to_ring_group && this.isColdTransfer
+    },
+
+    isColdTransferUser() {
+      return !this.communication.is_cold_transfer_to_ring_group && this.isColdTransfer
+    },
+
     hasLegcData () {
       return this.communication.legc_status && this.communication.legc_uuid
     }
@@ -643,7 +691,10 @@ export default {
           path: `/contacts/${this.contactId}`
         })
       }
-    }
+    },
+    isTransfer(transfer_type) {
+      return this.communication.transfer_type === transfer_type
+    },
   },
 
   beforeDestroy () {
