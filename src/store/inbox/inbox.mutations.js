@@ -174,5 +174,11 @@ export default {
   },
   SET_LOADING_PENDING_TASK_COUNT (state, loading) {
     state.isLoadingPendingTaskCount = loading
+  },
+  SET_SHOW_MY_CONTACTS (state, value) {
+    state.showMyContacts = value
+  },
+  SET_IS_INBOX_FILTERS_LOADED (state, value) {
+    state.isInboxFiltersLoaded = value
   }
 }

@@ -9,6 +9,7 @@ export const DEFAULT_STATE = {
     'powerDialer.sessionCallStatuses',
     'powerDialer.countdownTimer',
     'powerDialer.isSessionRunning',
-    'contacts.showMyContacts'
+    'contacts.showMyContacts',
+    'inbox.showMyContacts'
   ]
 }

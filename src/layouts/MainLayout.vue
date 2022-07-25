@@ -2091,7 +2091,9 @@ export default {
     ...mapActions('inbox', [
       'setSelectedContact',
       'setLiveContacts',
-      'updateLiveContactLastCommProperties'
+      'updateLiveContactLastCommProperties',
+      'setIsInboxFiltersLoaded',
+      'gettingTasksList'
     ])
   },
 
@@ -2164,6 +2166,11 @@ export default {
         setTimeout(() => {
           this.$VueEvent.fire('inbox_route_name_change')
         }, 1000)
+      }
+
+      if (to.name === 'Inbox' && !from.name.includes('Inbox')) {
+        this.setIsInboxFiltersLoaded(false)
+        this.gettingTasksList(true)
       }
 
       if (to.name === 'Suspended') {
