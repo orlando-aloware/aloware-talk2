@@ -297,6 +297,10 @@ export default {
         this.scrollMessages()
       }
     })
+
+    this.$VueEvent.listen('fetch_contact_info', (callback) => {
+      this.processFetchContactInfo(callback)
+    })
   },
 
   methods: {

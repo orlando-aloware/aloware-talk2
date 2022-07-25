@@ -3,7 +3,8 @@
     :disabled="sessionLoader"
     flat
     class="p-0">
-    <q-card-section class="px-0" style="overflow:auto;">
+    <q-card-section class="px-0"
+                    style="overflow:auto;">
 
       <ScriptSelector
         v-model="scriptId"

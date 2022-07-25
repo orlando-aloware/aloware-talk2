@@ -3,6 +3,7 @@
     <div class="col-12 p-0">
       <div class="hubspot-iframe-container">
         <iframe
+          class="hubspot-crm-iframe"
           v-if="hubspotLink"
           :src="hubspotLink"
           frameborder="0"
@@ -27,16 +28,9 @@ export default {
       return this.getHubspotLink(this.contact)
     },
     test () {
-      let iframe = document.getElementById('hubspot-crm')
-      let el = iframe.contentWindow
-      return el
+      const iframe = document.getElementById('hubspot-crm')
+      return iframe.contentWindow
     }
   }
 }
 </script>
-
-<style>
-  iframe > * {
-    overflow: hidden;
-  }
-</style>

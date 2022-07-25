@@ -45,7 +45,9 @@
                 style="width: 26% !important"
                 class="p-0 pt-2 pr-2 border-right">
 
-                <p class="text-weight-bold px-2">Session Settings</p>
+                <p class="text-weight-bold px-2">
+                  Session Settings
+                </p>
 
                 <q-list
                   dense
@@ -59,7 +61,9 @@
                     :disable="loading">
                     <q-item-section
                       @click="loadSettings('Untitled')">
-                      <div class="text-bold">New <span class="text-weight-regular text-grey-80">(Untitled)</span></div>
+                      <div class="text-bold">
+                        New <span class="text-weight-regular text-grey-80">(Untitled)</span>
+                      </div>
                     </q-item-section>
                     <q-item-section side>
                       <CheckIcon v-if="selectedItemName === 'Untitled'" />
@@ -74,47 +78,50 @@
                   style="display:contents;"
                   class="mt-3">
                   <template
-                    v-for="t in groupedSettings">
+                    v-for="settingCategory in groupedSettings">
                     <q-item
-                      :key="t.value">
+                      :key="settingCategory.value">
                       <q-item-section class="p-0">
                         <div class="text-grey px-2 pt-3 text-uppercase text-caption">
-                          {{ t.label }}
+                          {{ settingCategory.label }}
                         </div>
                       </q-item-section>
                     </q-item>
                     <template
-                      v-if="fetchedGroupSettings(t.name).length > 0">
+                      v-if="fetchedGroupSettings(settingCategory.name).length > 0">
                       <q-item
                         clickable
                         v-ripple
-                        v-for="(f, fk) in fetchedGroupSettings(t.name)"
-                        :key="`${t.name}-${fk}`"
-                        :class="`px-2 py-0 border-radius-1 ${isSessionValid(f) ? 'bg-grey-70' : ''}`"
+                        v-for="(setting, settingKey) in fetchedGroupSettings(settingCategory.name)"
+                        :key="`${settingCategory.name}-${settingKey}`"
+                        :class="`px-2 py-0 border-radius-1 ${isSessionValid(setting) ? 'bg-grey-70' : ''}`"
                         :disable="loading"
-                        @click.native.prevent="loadSettings(f)"
-                        @mouseenter="hovered = f.id"
+                        @click.native.prevent="loadSettings(setting)"
+                        @mouseenter="hovered = setting.id"
                         @mouseleave="toggleSelected">
                         <q-item-section class="mr-2">
-                          {{ f.name }}
+                          {{ setting.name }}
                         </q-item-section>
                         <q-item-section
-                          v-if="hovered !== f.id || t.name === 'company'"
+                          v-if="hovered !== setting.id || settingCategory.name === 'company'"
                           side>
                           <CheckIcon
-                            v-if="isSessionValid(f)"
+                            v-if="isSessionValid(setting)"
                             class="mr-2" />
                         </q-item-section>
                         <q-item-section
                           side
                           @click.native.stop="{}"
-                          v-if="hovered === f.id && t.name !== 'company'">
+                          v-if="hovered === setting.id && settingCategory.name !== 'company'">
                           <q-btn
                             size="md"
                             class="m-0"
-                            round flat outline dense
+                            round
+                            flat
+                            outline
+                            dense
                             color="grey"
-                            @click="hoveredMenu = f.id">
+                            @click="hoveredMenu = setting.id">
                             <i class="fa fa-ellipsis-h"></i>
                           </q-btn>
                           <q-menu
@@ -125,7 +132,7 @@
                                 dense
                                 clickable
                                 v-close-popup
-                                @click="onRename(f)">
+                                @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
                                     <i class="fa fa-pencil-alt mr-2"></i>
@@ -137,7 +144,7 @@
                                 dense
                                 clickable
                                 v-close-popup
-                                @click="onDeleteRequest(f.id)">
+                                @click="onDeleteRequest(setting.id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
                                     <i class="fa fa-trash-alt mr-2"></i>
@@ -150,7 +157,7 @@
                         </q-item-section>
                       </q-item>
                     </template>
-                    <div v-else :key="t.name">
+                    <div v-else :key="settingCategory.name">
                       <span
                         class="px-2 text-grey text-caption text-italic">
                         No saved settings
@@ -167,7 +174,8 @@
                 <q-card flat>
                   <div class="row">
                     <div class="col-12">
-                      <q-card flat class="p-0">
+                      <q-card flat
+                              class="p-0">
                         <q-card-actions class="px-0">
                           <div class="session-settings-title">
                             {{ selectedItemName }}
@@ -182,7 +190,9 @@
                             size="sm"
                             class="px-3 py-0"
                             color="grey-5"
-                            @click="resetDefaults">Reset</q-btn>
+                            @click="resetDefaults">
+                            Reset
+                          </q-btn>
                           <q-btn
                             v-if="!hasSelectedTemporarySetting"
                             unelevated
@@ -191,7 +201,9 @@
                             class="px-3 py-0"
                             color="primary"
                             :disabled="saveDisabled"
-                            @click="updateSelectedSetting">Save</q-btn>
+                            @click="updateSelectedSetting">
+                            Save
+                          </q-btn>
                           <q-btn
                             v-if="hasSelectedTemporarySetting"
                             unelevated
@@ -200,7 +212,9 @@
                             class="px-3 py-0"
                             color="primary"
                             :disabled="disabled"
-                            @click="newSetting = true">Save As New</q-btn>
+                            @click="newSetting = true">
+                            Save As New
+                          </q-btn>
                           <q-btn
                             unelevated
                             no-caps
@@ -232,7 +246,9 @@
                   color="primary"
                   size="2em"
                 />
-                <p id="cancel-label">{{ loadingText }}</p>
+                <p id="cancel-label">
+                  {{ loadingText }}
+                </p>
               </div>
             </template>
           </b-overlay>
@@ -247,9 +263,15 @@
         <q-card-section>
           <div
             class="text-subtitle1 text-bold text-grey-8">
-            <span v-if="deleteId">Delete Session Settings</span>
-            <span v-else-if="updateObj">Rename Session Settings</span>
-            <span v-else>Save New Session Settings</span>
+            <span v-if="deleteId">
+              Delete Session Settings
+            </span>
+            <span v-else-if="updateObj">
+              Rename Session Settings
+            </span>
+            <span v-else>
+              Save New Session Settings
+            </span>
           </div>
         </q-card-section>
 
@@ -331,8 +353,6 @@ import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import SettingIcon from 'components/icons/setting-o-icon'
 import { isEqual } from 'lodash'
-
-// const UNTITLED = 'Untitled'
 
 export default {
   name: 'StartDialSessionsSettings',
@@ -466,8 +486,10 @@ export default {
       this.dialog = true
     },
     async beginDial () {
-      let res = null
-      let newList = null
+      const requests = {
+        res: null,
+        newList: null
+      }
       /**
        * Identify first before exiting the component
        * IF selected item is temporary OR
@@ -478,25 +500,24 @@ export default {
       this.loadingText = this.defaultTrigger ? 'Redirecting you to Power Dialer session..' : 'Applying changes to session settings..'
 
       if (this.temporarySetting.id === this.selectedItem.id) {
-        let newSettings = { ...this.filterSelectedItem }
-        res = await this.createDialerSessionSetting({
+        const newSettings = { ...this.filterSelectedItem }
+        requests.res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
           contact_list_id: this.listId,
           name: `${this.list.name}-${new Date().valueOf()}`
         })
-        if (res?.id) {
+        if (requests.res?.id) {
           await this.getDialerSessionSettings()
-          newList = await this.updateContactsList({
+          requests.newList = await this.updateContactsList({
             id: this.listId,
             dialer_session_id: null
           })
           this.SET_SESSION_SETTINGS(this.selectedItem)
         }
       } else {
-        let { id } = this.selectedItem
-        newList = await this.updateContactsList({
+        requests.newList = await this.updateContactsList({
           id: this.listId,
-          dialer_session_id: id
+          dialer_session_id: this.selectedItem.id
         })
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
@@ -509,9 +530,9 @@ export default {
         }
         this.$emit('start')
       } else {
-        this.$emit('update', newList)
+        this.$emit('update', requests.newList)
       }
-      this.sessionSettings = res?.id ? res : this.selectedItem
+      this.sessionSettings = requests.res?.id ? requests.res : this.selectedItem
 
       if (this.sessionSettings?.id) {
         this.dialog = false
@@ -521,30 +542,32 @@ export default {
     },
     async loadSettings (data) {
       this.loading = true
-      let res = null
+      const request = {
+        res: null
+      }
       if (data?.id) {
         this.loadingText = 'Fetching session settings data..'
-        res = await this.getSessionSetting(data.id)
+        request.res = await this.getSessionSetting(data.id)
       } else {
         this.loadingText = 'Fetching temporary session settings data..'
-        res = await this.getTemporarySessionSetting(this.listId)
+        request.res = await this.getTemporarySessionSetting(this.listId)
         // this.resetDefaults(false)
       }
-      // this.sessionSettings = res
-      this.selectedItemId = res.id || ''
-      this.selectedItem = res?.id ? res : this.defaultValues
+      // this.sessionSettings = request.res
+      this.selectedItemId = request.res.id || ''
+      this.selectedItem = request.res?.id ? request.res : this.defaultValues
       this.loading = false
     },
     async saveAsNew () {
       this.loading = true
-      let newSettings = { ...this.filterSelectedItem }
+      const newSettings = { ...this.filterSelectedItem }
       newSettings.name = this.newSettingName
       newSettings.is_company_scope = 0
       newSettings.id = null
       newSettings.contact_list_id = null
       this.isBusy = true
-      let collection = this.removeEmptyParams(newSettings)
-      let res = await this.createDialerSessionSetting(collection)
+      const collection = this.removeEmptyParams(newSettings)
+      const res = await this.createDialerSessionSetting(collection)
       if (res?.id) {
         await this.getDialerSessionSettings()
         this.$generalNotification('Dialer session setting has been saved.')
@@ -555,7 +578,7 @@ export default {
     },
     async updateSelectedSetting () {
       this.saveDisabled = true
-      let res = await this.updateDialerSessionSetting(
+      const res = await this.updateDialerSessionSetting(
         this.removeEmptyParams(this.selectedItem)
       )
       if (res?.data) {
@@ -584,7 +607,7 @@ export default {
     async renameSetting () {
       this.updateObj.name = this.newSettingName
       this.isBusy = true
-      let res = await this.updateDialerSessionSetting({
+      const res = await this.updateDialerSessionSetting({
         id: this.updateObj.id,
         name: this.updateObj.name
       })
@@ -597,7 +620,7 @@ export default {
     },
     async onDeleteSetting () {
       this.isBusy = true
-      let res = await this.deleteDialerSessionSetting(this.deleteId)
+      const res = await this.deleteDialerSessionSetting(this.deleteId)
       if (res.data) {
         await this.getDialerSessionSettings()
         this.newSetting = false
@@ -617,7 +640,7 @@ export default {
       }
     },
     resetDefaults (isExistingList = true) {
-      let params = {
+      const params = {
         call_disposition_ids: [],
         campaign_id: null,
         company_id: null,
@@ -652,10 +675,10 @@ export default {
         await this.getDialerSessionSettings()
 
         // Fetch temporary session settings, if there is
-        let temporarySetting = await this.getTemporarySessionSetting(this.listId)
+        const temporarySetting = await this.getTemporarySessionSetting(this.listId)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list?.dialer_session_id
-        let fetchedSettings = this.dialerSessionSettings.find((setting) => {
+        const fetchedSettings = this.dialerSessionSettings.find((setting) => {
           return setting.id === this.selectedItemId
         })
         if (fetchedSettings?.id) {

@@ -1,6 +1,6 @@
 import qs from 'qs'
 import moment from 'moment'
-import _ from 'lodash'
+import { get } from 'lodash'
 
 export default {
   /**
@@ -8,11 +8,11 @@ export default {
    * Contact Folders (mimicking Contacts)
    */
   getContactFolders: async ({ commit }) => {
-    let res = await window.axios.get('api/v2/contact-folders')
+    const res = await window.axios.get('api/v2/contact-folders')
     return res.data
   },
   async exportCsv ({ commit }, id = '') {
-    let res = await window.axios.get(`api/v2/power-dialer-lists/${id}/export-csv?all=1`)
+    const res = await window.axios.get(`api/v2/power-dialer-lists/${id}/export-csv?all=1`)
     return res
   },
 
@@ -25,14 +25,14 @@ export default {
     commit('contacts/SET_SELECTED_LIST', data, { root: true })
   },
   getMyQueueList: async ({ commit }) => {
-    let res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
+    const res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
     if (res.status === 200) {
       commit('SET_MY_QUEUE_LIST', res.data)
     }
     return res
   },
   getPowerDialerList: async ({ commit }, id = '') => {
-    let res = await window.axios.get(`api/v2/power-dialer-lists/${id}`)
+    const res = await window.axios.get(`api/v2/power-dialer-lists/${id}`)
     if (res.status === 200) {
       commit('SET_SELECTED_PD_LIST',
         {
@@ -49,14 +49,14 @@ export default {
     commit('SET_MY_QUEUE_LIST_FILTERS', data)
   },
   getContact: async ({ commit }, params = {}) => {
-    const contactId = _.get(params, 'id', null)
+    const contactId = get(params, 'id', null)
 
     if (!contactId || contactId === 'undefined') {
       console.log('Failed to get contact: Missing contact id!')
       return
     }
 
-    let res = await window.axios.get(`api/v2/contacts/${contactId}`)
+    const res = await window.axios.get(`api/v2/contacts/${contactId}`)
     if (res.status === 200) {
       commit('contacts/SET_CONTACT', res.data, { root: true })
       return res.data
@@ -64,11 +64,11 @@ export default {
     }
   },
   getContacts: async ({ commit }) => {
-    let res = await window.axios.get(`api/v2/contacts`)
+    const res = await window.axios.get(`api/v2/contacts`)
     return res.data
   },
   getContactResources: async ({ commit }, params = {}) => {
-    let res = await window.axios.get('api/v2/contacts', {
+    const res = await window.axios.get('api/v2/contacts', {
       params: params,
       paramsSerializer: qs.stringify
     })
@@ -80,11 +80,11 @@ export default {
     commit('CONTACTS_LOADED', payload)
   },
   getList: async ({ commit }, endpoint = '') => {
-    let res = await window.axios.get(endpoint)
+    const res = await window.axios.get(endpoint)
     return res.data
   },
   async updateContactsList ({ commit }, params = {}) {
-    let res = await window.axios.patch(
+    const res = await window.axios.patch(
       `api/v2/power-dialer-lists/${params.id}`,
       params
     )
@@ -95,7 +95,7 @@ export default {
    * Disposition API calls
    */
   async updateCallDisposition ({ commit }, params = {}) {
-    let res = await window.axios.post(`api/v1/communication/${params.id}/dispose-call`, {
+    const res = await window.axios.post(`api/v1/communication/${params.id}/dispose-call`, {
       'call_disposition_id': params.params.call_disposition_id,
       paramsSerializer: qs.stringify
     })
@@ -104,7 +104,7 @@ export default {
     }
   },
   async updateContactDisposition ({ commit }, params = {}) {
-    let res = await window.axios.post(`api/v1/contact/${params.id}/dispose`, {
+    const res = await window.axios.post(`api/v1/contact/${params.id}/dispose`, {
       'disposition_status': params.params.disposition_status,
       paramsSerializer: qs.stringify
     })
@@ -252,7 +252,7 @@ export default {
     })
   },
   async getLastCommunicationScript ({ commit }, id = null) {
-    let res = await window.axios.get(`api/v1/communication/${id}/scripts`)
+    const res = await window.axios.get(`api/v1/communication/${id}/scripts`)
     return res
   },
   setFinishedPowerDialerSession: ({ commit }, data = true) => {

@@ -28,6 +28,22 @@
       <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
       <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
+      <div class="px-3 d-inline-flex"
+           v-if="$route.name === 'Inbox' || ($route.meta && $route.meta.title && $route.meta.title === 'Communications')">
+        <b-form-checkbox
+          class="mt-2 cursor-pointer"
+          :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
+          size="sm"
+          switch
+          :disabled="!isInboxFiltersLoaded || isGettingTasksList"
+          v-model="inboxShowMyContactsFilter"
+        >
+        </b-form-checkbox>
+        <label class="text-primary mr-2 mt-2 cursor-pointer"
+               :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
+               @click="inboxShowMyContactsFilter = !inboxShowMyContactsFilter">My Contacts</label>
+      </div>
+
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    v-if="$route.name === 'Stats' && !titleOnly"
                    :disabled="loading"
@@ -180,7 +196,8 @@ export default {
     return {
       dialerStatus: false,
       loading: false,
-      prevRoute: null
+      prevRoute: null,
+      inboxShowMyContactsFilter: false
     }
   },
 
@@ -198,8 +215,20 @@ export default {
       'previousListFilters',
       'previousListId'
     ]),
-    ...mapState('stats', ['metricLoader', 'groupMetricLoader']),
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile']),
+    ...mapState('inbox', [
+      'inboxShowMyContacts',
+      'isInboxFiltersLoaded',
+      'isGettingTasksList'
+    ]),
+    ...mapState('stats', [
+      'metricLoader',
+      'groupMetricLoader'
+    ]),
+    ...mapState([
+      'dialer',
+      'dialerFormStatus',
+      'isMobile'
+    ]),
 
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
@@ -234,6 +263,7 @@ export default {
   },
 
   created () {
+    this.inboxShowMyContactsFilter = this.inboxShowMyContacts
     this.$VueEvent.listen('callContact', (data) => {
       this.showDialer()
       setTimeout(() => {
@@ -324,8 +354,28 @@ export default {
       }
     },
 
-    ...mapActions('stats', ['setMetricGroups', 'setMetricLoader']),
-    ...mapActions('contacts', ['updateContactsListFilter']),
+    onMyContactsChange () {
+      this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
+
+      if (['Inbox', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        this.$VueEvent.fire('inbox_load_contacts')
+        return
+      }
+
+      // for inbox channels
+      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
+    },
+
+    ...mapActions('stats', [
+      'setMetricGroups',
+      'setMetricLoader'
+    ]),
+    ...mapActions('contacts', [
+      'updateContactsListFilter'
+    ]),
+    ...mapActions('inbox', [
+      'setInboxShowMyContacts'
+    ]),
     ...mapActions(['setDialerFormStatus'])
   },
 
@@ -364,6 +414,14 @@ export default {
     },
     $route (to, from) {
       this.prevRoute = from.path
+    },
+    inboxShowMyContacts (value) {
+      if (value !== this.inboxShowMyContactsFilter) {
+        this.inboxShowMyContactsFilter = value
+      }
+    },
+    inboxShowMyContactsFilter () {
+      this.onMyContactsChange()
     }
   }
 }

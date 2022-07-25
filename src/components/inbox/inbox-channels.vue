@@ -252,7 +252,15 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isGettingTasksList', 'activeChannel', 'communications', 'channelChangedFilterFields', 'appliedFilter', 'hasMoreCommunications']),
+    ...mapState('inbox', [
+      'isGettingTasksList',
+      'activeChannel',
+      'communications',
+      'channelChangedFilterFields',
+      'appliedFilter',
+      'hasMoreCommunications',
+      'inboxShowMyContacts'
+    ]),
 
     nextPage () {
       if (this.$route.params.channel === 'mentions') {
@@ -421,7 +429,8 @@ export default {
       },
       scrollTimeout: null,
       cancelToken: null,
-      source: null
+      source: null,
+      listeners: {}
     }
   },
 
@@ -436,7 +445,9 @@ export default {
       'setAppliedFilter',
       'setHasMoreCommunications',
       'toggleFilterModelForm',
-      'toggleFilterDialog']),
+      'toggleFilterDialog',
+      'setIsInboxFiltersLoaded'
+    ]),
 
     onResetFilters () {
       this.resetFilters()
@@ -523,6 +534,7 @@ export default {
     },
 
     getCommunications (params, callback) {
+      this.setIsInboxFiltersLoaded(true)
       this.gettingTasksList(true)
       this.communicationsListHasError = false
 
@@ -550,6 +562,8 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
+      params = this.filterMyContacts(params)
+
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
       return api.data.get({ params: params, cancelToken: this.source.token })
@@ -581,6 +595,10 @@ export default {
     loadMoreCommunications (params) {
       this.isLoadingMore = true
       this.isLoaded = false
+
+      if (this.inboxShowMyContacts) {
+        params.my_contact = 1
+      }
 
       const api = { data: talk2Api.V1.reports.communications }
 
@@ -809,6 +827,20 @@ export default {
             }
           }
         })
+    },
+
+    filterMyContacts (params, showMyContacts) {
+      if (showMyContacts === undefined) {
+        showMyContacts = this.inboxShowMyContacts
+      }
+
+      const myContactsFilter = _.get(params, 'my_contact', null)
+
+      if (myContactsFilter !== null && myContactsFilter !== (showMyContacts | 0)) {
+        params.my_contact = (showMyContacts | 0)
+      }
+
+      return params
     }
   },
 
@@ -879,7 +911,7 @@ export default {
 
     this.setMentionType()
 
-    this.$VueEvent.listen('new_communication', (data) => {
+    this.listeners.newCommunication = (data) => {
       // check new communication exists in the old list
       const found = this.communications.filter(communication => {
         return communication.id === data.id
@@ -893,7 +925,7 @@ export default {
 
         if (this.checkCommunicationChannels(data) &&
           this.checkCommunicationMatchesSearch(this.searchText, data) &&
-          this.checkCommunicationMatchesFilters(this.filter, data) &&
+          this.checkCommunicationMatchesFilters(this.filter, data, true) &&
           this.checkCommunicationMatchesUserAccessibility(data) &&
           this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
           this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
@@ -909,9 +941,9 @@ export default {
           }
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('update_communication', (data) => {
+    this.listeners.updateCommunication = (data) => {
       // disable live dashboard for end clients
       // check data loaded
       if (this.pagination.prev === null) {
@@ -924,7 +956,7 @@ export default {
           data = _.extend({}, found[0], data)
           if (this.checkCommunicationChannels(data) &&
             this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data) &&
+            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
             this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
@@ -941,7 +973,7 @@ export default {
           // add the communication if it's not already there and if it matches the criteria
           if (this.checkCommunicationChannels(data) &&
             this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data) &&
+            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
             this.checkCommunicationMatchesUserAccessibility(data) &&
             this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
             this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
@@ -960,9 +992,9 @@ export default {
           }
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('delete_communication', (data) => {
+    this.listeners.deleteCommunication = (data) => {
       // check data loaded
       if (this.pagination.prev === null) {
         // try to find the communication
@@ -973,9 +1005,9 @@ export default {
           this.pagination.total -= 1
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('mark_contact_communications_all_as_read', (data) => {
+    this.listeners.markContactCommunicationsAllAsRead = (data) => {
       const contactId = _.get(data, 'id', null)
 
       if (!contactId) {
@@ -994,7 +1026,24 @@ export default {
 
       // set updated communications
       this.setCommunications(this.communications)
-    })
+    }
+
+    this.listeners.inboxLoadCommunications = (showMyContacts) => {
+      this.filter = this.filterMyContacts(this.filter, showMyContacts)
+
+      if (this.filter.cursor !== undefined) {
+        delete this.filter.cursor
+      }
+
+      this.isLoaded = false
+      this.getCommunications(this.filter)
+    }
+
+    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.listen('delete_communication', this.listeners.deleteCommunication)
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.listeners.markContactCommunicationsAllAsRead)
+    this.$VueEvent.listen('inbox_load_communications', this.listeners.inboxLoadCommunications)
   },
 
   mounted () {
@@ -1070,6 +1119,14 @@ export default {
         }
       })
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
+    this.$VueEvent.stop('mark_contact_communications_all_as_read', this.listeners.markContactCommunicationsAllAsRead)
+    this.$VueEvent.stop('inbox_load_communications', this.listeners.inboxLoadCommunications)
   }
 }
 </script>
