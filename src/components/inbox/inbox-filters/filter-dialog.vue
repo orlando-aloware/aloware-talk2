@@ -103,7 +103,7 @@
             </compact-btn>
             <compact-btn class="btn-secondary"
                          v-if="enableSidebarAndSaveFx"
-                         :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(defaultFilterModel.type)"
+                         :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_ALL_COMMUNICATIONS].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
@@ -419,15 +419,16 @@ export default {
       if (!personalFilter) {
         this.filter = { ...this.defaultFilterModel.filter }
       } else {
+        // combine default filter values with the selected one
         const personalFilterObject = personalFilter.filter
-        this.filter = _.pick(personalFilterObject, this.filterFields)
+        this.filter = { ...this.defaultFilterModel.filter, ..._.pick(personalFilterObject, this.filterFields) }
       }
 
       this.applyFilter()
     },
 
     getFilters () {
-      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_INBOX].includes(this.defaultFilterModel.type)) {
+      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_INBOX, ChannelType.CHANNEL_ALL_COMMUNICATIONS].includes(this.defaultFilterModel.type)) {
         return
       }
 
