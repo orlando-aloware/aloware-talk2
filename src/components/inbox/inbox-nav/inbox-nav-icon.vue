@@ -9,6 +9,7 @@ import message from 'components/icons/inbox/message-icon'
 import mention from 'components/icons/inbox/mention-icon'
 import voicemail from 'components/icons/inbox/voicemail-icon'
 import record from 'components/icons/inbox/record-icon'
+import allCommunications from 'components/icons/inbox/all-communications-icon'
 
 export default {
   /* eslint-disable */
@@ -22,7 +23,8 @@ export default {
     call,
     message,
     mention,
-    record
+    record,
+    allCommunications
     /* eslint-enable */
   },
   props: {

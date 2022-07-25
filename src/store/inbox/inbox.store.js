@@ -68,7 +68,7 @@ export default function () {
       {
         label: 'All Communications',
         value: 'all-communications',
-        icon: 'record',
+        icon: 'all-communications',
         disabled: false,
         type: 'all',
         answerStatus: 'all'
