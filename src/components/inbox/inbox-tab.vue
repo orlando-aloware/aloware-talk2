@@ -980,7 +980,6 @@ export default {
     this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
-    this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)
   },
 
