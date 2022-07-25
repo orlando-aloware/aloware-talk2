@@ -86,5 +86,14 @@ export default {
   },
   setLoadingPendingTaskCount: ({ commit }, loading = false) => {
     commit('SET_LOADING_PENDING_TASK_COUNT', loading)
+  },
+  setShowMyContacts: ({ commit }, value) => {
+    commit('SET_SHOW_MY_CONTACTS', value)
+  },
+  setDefaultShowMyContacts: ({ commit }, value) => {
+    commit('SET_DEFAULT_SHOW_MY_CONTACTS', value)
+  },
+  setIsInboxFiltersLoaded: ({ commit }, value) => {
+    commit('SET_IS_INBOX_FILTERS_LOADED', value)
   }
 }

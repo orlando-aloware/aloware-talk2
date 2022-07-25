@@ -2070,7 +2070,12 @@ export default {
       check: 'check'
     }),
     ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups', 'setMetricLoader']),
-    ...mapActions('inbox', ['setSelectedContact', 'setLiveContacts'])
+    ...mapActions('inbox', [
+      'setSelectedContact',
+      'setLiveContacts',
+      'setIsInboxFiltersLoaded',
+      'gettingTasksList'
+    ])
   },
 
   watch: {
@@ -2142,6 +2147,11 @@ export default {
         setTimeout(() => {
           this.$VueEvent.fire('inbox_route_name_change')
         }, 1000)
+      }
+
+      if (to.name === 'Inbox' && !from.name.includes('Inbox')) {
+        this.setIsInboxFiltersLoaded(false)
+        this.gettingTasksList(true)
       }
 
       if (to.name === 'Suspended') {

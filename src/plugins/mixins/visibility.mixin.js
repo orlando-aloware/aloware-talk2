@@ -15,7 +15,10 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', ['profile']),
+    ...mapState('inbox', [
+      'showMyContacts'
+    ])
   },
 
   methods: {
@@ -125,6 +128,17 @@ export default {
         filter.contact_owner.length > 0 && communication.contact) {
         // check the communication's contact owner matches the contact owner filter
         if (filter.contact_owner.indexOf(communication.contact.user_id) < 0) {
+          return false
+        }
+      }
+      // if my contact or inbox's show my contacts filter is active
+      if (
+        ((filter.my_contact !== undefined &&
+            filter.my_contact) ||
+          this.showMyContacts) &&
+        communication.contact) {
+        // check the communication's contact owner matches the current user
+        if (communication.contact.user_id !== this.profile.id) {
           return false
         }
       }
