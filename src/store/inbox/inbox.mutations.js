@@ -178,6 +178,9 @@ export default {
   SET_SHOW_MY_CONTACTS (state, value) {
     state.showMyContacts = value
   },
+  SET_DEFAULT_SHOW_MY_CONTACTS (state, value) {
+    state.showMyContacts = InboxDefault.DEFAULT_STATE.showMyContacts
+  },
   SET_IS_INBOX_FILTERS_LOADED (state, value) {
     state.isInboxFiltersLoaded = value
   }

@@ -90,6 +90,9 @@ export default {
   setShowMyContacts: ({ commit }, value) => {
     commit('SET_SHOW_MY_CONTACTS', value)
   },
+  setDefaultShowMyContacts: ({ commit }) => {
+    commit('SET_DEFAULT_SHOW_MY_CONTACTS')
+  },
   setIsInboxFiltersLoaded: ({ commit }, value) => {
     commit('SET_IS_INBOX_FILTERS_LOADED', value)
   }
