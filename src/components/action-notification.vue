@@ -394,42 +394,43 @@ export default {
 
       return ''
     },
-    isNewInbound() {
+
+    isNewInbound () {
       return this.communication.direction === CommunicationDirections.INBOUND &&
         !this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_WARM) &&
         !this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_COLD) &&
         !this.isSequence
     },
 
-    isSequence() {
+    isSequence () {
       return this.communication.workflow_id
     },
 
-    isColdTransfer() {
+    isColdTransfer () {
       return this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_COLD)
     },
 
-    isWarmTransfer() {
+    isWarmTransfer () {
       return this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_WARM)
     },
 
-    isWarmTransferRingGroup() {
+    isWarmTransferRingGroup () {
       return !this.communication.added_user_id && this.isWarmTransfer
     },
 
-    isWarmTransferUser() {
+    isWarmTransferUser () {
       return this.communication.added_user_id && this.isWarmTransfer
     },
 
-    isWarmCallIntroduced() {
+    isWarmCallIntroduced () {
       return this.communication.is_introduce
     },
 
-    isColdTransferRingGroup() {
+    isColdTransferRingGroup () {
       return this.communication.is_cold_transfer_to_ring_group && this.isColdTransfer
     },
 
-    isColdTransferUser() {
+    isColdTransferUser () {
       return !this.communication.is_cold_transfer_to_ring_group && this.isColdTransfer
     },
 
@@ -692,9 +693,10 @@ export default {
         })
       }
     },
-    isTransfer(transfer_type) {
-      return this.communication.transfer_type === transfer_type
-    },
+
+    isTransfer (transferType) {
+      return this.communication.transfer_type === transferType
+    }
   },
 
   beforeDestroy () {
