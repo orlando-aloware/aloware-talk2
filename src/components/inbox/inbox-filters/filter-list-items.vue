@@ -18,6 +18,7 @@
     </b-form-input>
     <b-dropdown class="m-2 b-compact-dropdown-button text-bold position-absolute"
                 no-caret
+                :popper-opts="{ positionFixed: true }"
                 variant="light"
                 v-if="!isRenaming">
       <template #button-content>
