@@ -2,34 +2,33 @@
   <div class="filter-items cursor-pointer d-flex justify-content-between position-relative"
        v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === filter.id && !isRenaming }"
        @click="onItemSelect">
-              <span v-if="!isRenaming">
-                <q-tooltip anchor="top middle"
-                           self="center middle">
-                  {{ filter.name }}
-                </q-tooltip>
-                {{ filter.name }}
-              </span>
-    <b-form-input
-      size="sm"
-      :value="filter.name"
-      :id="'filter-input-' + filter.id"
-      v-if="isRenaming"
-      @blur="onInputBlur"
-      @keydown="onKeyDown">
-
+    <span v-if="!isRenaming">
+      <q-tooltip anchor="top middle"
+                 self="center middle">
+        {{ filter.name }}
+      </q-tooltip>
+      {{ filter.name }}
+    </span>
+    <b-form-input size="sm"
+                  :value="filter.name"
+                  :id="'filter-input-' + filter.id"
+                  v-if="isRenaming"
+                  @blur="onInputBlur"
+                  @keydown="onKeyDown">
     </b-form-input>
-    <b-dropdown text="..."
+    <b-dropdown class="m-2 b-compact-dropdown-button text-bold position-absolute"
                 no-caret
                 variant="light"
-                class="m-2 b-compact-dropdown-button text-bold position-absolute"
                 v-if="!isRenaming">
       <template #button-content>
         <i class="fa fa-ellipsis-h"></i>
       </template>
-      <b-dropdown-item href="#" @click="(e) => onEdit(e)">
+      <b-dropdown-item href="#"
+                       @click="(e) => onEdit(e)">
         <pencil-icon></pencil-icon> Rename
       </b-dropdown-item>
-      <b-dropdown-item href="#" @click="(e) => onDelete(e)">
+      <b-dropdown-item href="#"
+                       @click="(e) => onDelete(e)">
         <trash-o-icon></trash-o-icon> Delete
       </b-dropdown-item>
     </b-dropdown>
@@ -44,7 +43,11 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'filter-list-items',
-  components: { TrashOIcon, PencilIcon },
+  components: {
+    TrashOIcon,
+    PencilIcon
+  },
+
   props: {
     filter: {
       type: Object,
