@@ -147,6 +147,7 @@ export default {
       this.resetVuex(['all'])
       this.setCurrentCompany(company)
       this.setUsage(usage)
+      this.setDefaultShowMyContacts()
 
       storage.local.setItem('company_id', company.id)
 
@@ -189,9 +190,19 @@ export default {
       }
     },
 
-    ...mapActions('cache', ['setCurrentCompany']),
-    ...mapActions(['resetVuex', 'setUsage']),
-    ...mapActions('auth', ['login'])
+    ...mapActions('cache', [
+      'setCurrentCompany'
+    ]),
+    ...mapActions([
+      'resetVuex',
+      'setUsage'
+    ]),
+    ...mapActions('auth', [
+      'login'
+    ]),
+    ...mapActions('inbox', [
+      'setDefaultShowMyContacts'
+    ])
   }
 }
 </script>

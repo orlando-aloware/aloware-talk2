@@ -682,7 +682,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication, true) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -789,7 +789,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication, true) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -948,6 +948,10 @@ export default {
       }
     }
 
+    this.listeners.inboxLoadContacts = () => {
+      this.loadContactTasks()
+    }
+
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
@@ -956,6 +960,7 @@ export default {
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
 
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
+    this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -975,6 +980,7 @@ export default {
     this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+    this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)
   },
 
   watch: {

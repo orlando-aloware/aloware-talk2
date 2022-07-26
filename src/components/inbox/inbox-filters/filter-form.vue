@@ -414,16 +414,28 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['channelChangedFilterFields', 'isFilterDialogShown', 'isFilterModelFormShown']),
-    ...mapState('auth', ['profile']),
+    ...mapState('inbox', [
+      'channelChangedFilterFields',
+      'isFilterDialogShown',
+      'isFilterModelFormShown',
+      'inboxShowMyContacts'
+    ]),
+    ...mapState('auth', [
+      'profile'
+    ]),
     isInboxOrAllComms () {
-      return ['Inbox Channel Task Status', 'Inbox', 'Inbox Contact Task'].includes(this.$route.name) || ['all-communications'].includes(this.$route.params.channel)
+      return [
+        'Inbox Channel Task Status',
+        'Inbox',
+        'Inbox Contact Task'
+      ].includes(this.$route.name) || ['all-communications'].includes(this.$route.params.channel)
     },
     dateRangeLabel () {
       return this.isInboxOrAllComms ? 'Last Engagement Date' : 'Time'
     },
     dateHasChanges () {
-      return this.filter.from_date !== this.defaultFilterModel.filter.from_date || this.filter.to_date !== this.defaultFilterModel.filter.to_date
+      return this.filter.from_date !== this.defaultFilterModel.filter.from_date ||
+        this.filter.to_date !== this.defaultFilterModel.filter.to_date
     },
     isRangeSelectionOpen () {
       if (!this.rangePicker) {
@@ -464,7 +476,9 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['updateChannelChangedFilterFields']),
+    ...mapActions('inbox', [
+      'updateChannelChangedFilterFields'
+    ]),
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },
@@ -498,6 +512,12 @@ export default {
     this.dateRange.startDate = this.filter.from_date
     this.dateRange.endDate = this.filter.to_date
     this.rangePicker = this.$refs.picker
+
+    setTimeout(() => {
+      if (this.inboxShowMyContacts) {
+        this.filter.my_contact = 1
+      }
+    }, 500)
   },
 
   watch: {
