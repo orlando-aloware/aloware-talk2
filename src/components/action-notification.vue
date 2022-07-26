@@ -190,8 +190,7 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import * as CommunicationDirections from 'src/constants/communication-direction'
-import * as CommunicationTransferTypes from 'src/constants/communication-transfer-types'
+import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 
 export default {
   name: 'action-notification',
@@ -355,87 +354,73 @@ export default {
     isCommunicationInCallFishingQueue () {
       return !_.isEmpty(this.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === this.communicationId))
     },
+
     getSource () {
       if (!this.communication) {
         return ''
-      }
-
-      if (this.isNewInbound) {
-        return 'New Inbound Call'
-      }
-
-      if (this.isWarmTransferUser && this.isWarmCallIntroduced) {
-        return 'Introduction to User'
-      }
-
-      if (this.isWarmTransferRingGroup && this.isWarmCallIntroduced) {
-        return 'Introduction to Ring Group'
-      }
-
-      if (this.isWarmTransferUser && !this.isWarmCallIntroduced) {
-        return 'Add to User'
-      }
-
-      if (this.isWarmTransferRingGroup && !this.isWarmCallIntroduced) {
-        return 'Add to Ring Group'
       }
 
       if (this.isColdTransferUser) {
         return 'Transfer to User'
       }
 
-      if (this.isColdTransferRingGroup) {
+      if (this.isColdTransferRg) {
         return 'Transfer to Ring Group'
+      }
+
+      if (this.isIntroduceToUser) {
+        return 'Introduce to User'
+      }
+
+      if (this.isIntroduceToRg) {
+        return 'Introduce to Ring Group'
+      }
+
+      if (this.isAddToUser) {
+        return 'Add to User'
+      }
+
+      if (this.isAddToRg) {
+        return 'Add to Ring Group'
       }
 
       if (this.isSequence) {
         return 'Call from Sequence'
       }
 
-      return ''
-    },
-
-    isNewInbound () {
-      return this.communication.direction === CommunicationDirections.INBOUND &&
-        !this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_WARM) &&
-        !this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_COLD) &&
-        !this.isSequence
+      return 'New Inbound Call'
     },
 
     isSequence () {
       return this.communication.workflow_id
     },
 
-    isColdTransfer () {
-      return this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_COLD)
+    isIntroduceToRg () {
+      return this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
     },
 
-    isWarmTransfer () {
-      return this.isTransfer(CommunicationTransferTypes.TRANSFER_TYPE_WARM)
+    isIntroduceToUser () {
+      return this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER
     },
 
-    isWarmTransferRingGroup () {
-      return !this.communication.added_user_id && this.isWarmTransfer
+    isAddToRg () {
+      return !this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
     },
 
-    isWarmTransferUser () {
-      return this.communication.added_user_id && this.isWarmTransfer
+    isAddToUser () {
+      return !this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER
     },
 
-    isWarmCallIntroduced () {
+    callIsIntroduced () {
       return this.communication.is_introduce
     },
 
-    isColdTransferRingGroup () {
-      return this.communication.is_cold_transfer_to_ring_group && this.isColdTransfer
+    isColdTransferRg () {
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_RG
     },
 
     isColdTransferUser () {
-      return !this.communication.is_cold_transfer_to_ring_group && this.isColdTransfer
-    },
-
-    hasLegcData () {
-      return this.communication.legc_status && this.communication.legc_uuid
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
     }
   },
   created () {
@@ -692,11 +677,8 @@ export default {
           path: `/contacts/${this.contactId}`
         })
       }
-    },
-
-    isTransfer (transferType) {
-      return this.communication.transfer_type === transferType
     }
+
   },
 
   beforeDestroy () {
