@@ -43,7 +43,7 @@
           <div class="d-flex flex-grow-1 align-items-baseline w-100"
                v-if="getSource">
             <span class="mr-auto text-white pr-1">
-              Source: {{ getSource }}
+              {{ getSource }}
             </span>
           </div>
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
