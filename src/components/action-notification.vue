@@ -42,7 +42,7 @@
              @click="toInbox">
           <div class="d-flex flex-grow-1 align-items-baseline w-100"
                v-if="getSource">
-            <span class="mr-auto text-white pr-1">
+            <span class="mr-auto text-white pr-1 text-sm">
               {{ getSource }}
             </span>
           </div>
