@@ -32,12 +32,24 @@ export default {
       this.changeAgentStatus(agentStatus)
     })
 
+    // update agent status every 2 minutes
+    // disabled by Sohrab on July 26th, 2022
+    /*
+    const statusInterval = 2 * 60 * 1000
     if (!window.agentStatusIntervalId) {
       window.agentStatusIntervalId = setInterval(() => {
-        // this is a recursive agent status check with 3 retries
-        this.getAgentStatus()
-      }, 60 * 1000)
+        const now = new Date().getTime()
+        const lastRun = localStorage.getItem('agentStatusIntervalLastRun') || 0
+
+        // only runs if last run was at least the defined time ago (to avoid multiple tabs running multiple requests)
+        if (now - lastRun >= statusInterval) {
+          // this is a recursive agent status check with 3 retries
+          this.getAgentStatus()
+          localStorage.setItem('agentStatusIntervalLastRun', now)
+        }
+      }, statusInterval)
     }
+    */
   },
 
   methods: {
