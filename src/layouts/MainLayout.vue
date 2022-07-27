@@ -895,11 +895,20 @@ export default {
       this.sidebarVisible = true
     }
 
+    // check auth every 5 minutes
+    const checkInterval = 5 * 60 * 1000
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
-        // this is a recursive authentication check with 3 tries
-        this.checkAuth()
-      }, 60 * 1000)
+        const now = new Date().getTime()
+        const lastRun = localStorage.getItem('checkAuthIntervalLastRun') || 0
+
+        // only runs if last run was at least the defined time ago (to avoid multiple tabs running multiple requests)
+        if (now - lastRun >= checkInterval) {
+          // this is a recursive authentication check with 3 tries
+          this.checkAuth()
+          localStorage.setItem('checkAuthIntervalLastRun', now)
+        }
+      }, checkInterval)
     }
 
     if (this.mediaPlaybackRequiresUserGesture()) {

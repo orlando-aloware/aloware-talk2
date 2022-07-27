@@ -33,7 +33,7 @@ Vue.use(Vuelidate)
 Vue.use(BusinessHours)
 
 window.Bowser = Bowser
-window.timezone = jstz.determine().name()
+window.timezone = ('Intl' in window ? new Intl.DateTimeFormat().resolvedOptions().timeZone : jstz.determine().name()) || 'America/Los_Angeles'
 
 if (process.env.APP_DEBUG) {
   Vue.config.devtools = true
