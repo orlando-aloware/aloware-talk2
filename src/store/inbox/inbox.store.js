@@ -64,6 +64,14 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'recorded'
+      },
+      {
+        label: 'All Communications',
+        value: 'all-communications',
+        icon: 'all-communications',
+        disabled: false,
+        type: 'all',
+        answerStatus: 'all'
       }
     ],
     communications: [],

@@ -340,6 +340,32 @@ export default {
             contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
           }
           break
+        case ['all-communications'].includes(this.$route.params.channel):
+          defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+            creator_type: Filters.DEFAULT_STATE.filter.creator_type
+          }
+          break
         case ['messages'].includes(this.$route.params.channel):
         default:
           defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
@@ -902,7 +928,7 @@ export default {
       }
     },
     '$route.params.channel': function (value) {
-      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings'].includes(value)) {
+      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings', 'all-communications'].includes(value)) {
         this.getCommunications(this.filter)
       }
     }

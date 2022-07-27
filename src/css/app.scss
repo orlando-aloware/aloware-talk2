@@ -7214,6 +7214,14 @@ table.datatable {
           height: 20px !important;
           font-size: 10px;
         }
+
+        .dropdown-menu.show {
+          min-width: 5rem;
+
+          .dropdown-item {
+            padding: 0.25rem 1rem;
+          }
+        }
       }
 
       button:hover,
