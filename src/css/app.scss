@@ -667,6 +667,11 @@ body,
       box-shadow: none;
     }
   }
+
+  .q-badge--floating {
+    top: 0px;
+    right: 5px;
+  }
 }
 
 .page-footer {

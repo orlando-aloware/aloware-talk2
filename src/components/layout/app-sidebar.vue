@@ -71,13 +71,32 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn :ripple="false"
+           icon="img:app-icons/menu/power_dialer_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100 disabled"
+           v-show="!isActive('Power Dialer') && !profile.auto_dialer_enabled"
+           flat
+           @click="showProFeatureDialog">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Power Dialer</span>
+      </q-tooltip>
+    </q-btn>
     <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Power Dialer')"
+           v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
       <q-tooltip
         anchor="center right"
@@ -92,7 +111,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Power Dialer')"
+           v-show="!isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
       <q-tooltip
         anchor="center right"
@@ -177,15 +196,23 @@
              class="nav-icons w-100"
              @click="$emit('toggleMode')"/>
     </div>
+    <pro-feature-dialog :isOpen="pro_feature_dialog"
+                        @close="closeProFeatureDialog">
+    </pro-feature-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
+import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 
 export default {
   name: 'app-sidebar',
+
+  components: {
+    ProFeatureDialog
+  },
 
   props: {
     lightMode: {
@@ -195,6 +222,7 @@ export default {
   },
 
   computed: {
+    ...mapState('auth', ['profile']),
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -205,7 +233,8 @@ export default {
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/mode_gray.svg'
+      modeIcon: 'img:app-icons/menu/mode_gray.svg',
+      pro_feature_dialog: false
     }
   },
 
@@ -236,6 +265,14 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    },
+
+    showProFeatureDialog () {
+      this.pro_feature_dialog = true
+    },
+
+    closeProFeatureDialog () {
+      this.pro_feature_dialog = false
     },
 
     ...mapActions('auth', ['logout'])
