@@ -13,9 +13,17 @@ export default {
     }
   },
   computed: {
-    ...mapState('inbox', ['liveContacts']),
-    ...mapState(['dialer', 'parkedCalls']),
-    ...mapState('auth', ['profile'])
+    ...mapState('inbox', [
+      'liveContacts',
+      'inboxShowMyContacts'
+    ]),
+    ...mapState([
+      'dialer',
+      'parkedCalls'
+    ]),
+    ...mapState('auth', [
+      'profile'
+    ])
   },
   methods: {
     addNonOwnedLiveContact (communication) {
@@ -88,7 +96,14 @@ export default {
       }
     },
     isNotOwned (userId) {
-      return userId && userId !== this.profile.id && this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
+      return userId &&
+        userId !== this.profile.id &&
+        this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
+    },
+    isNotOwnedFilter (userId) {
+      return userId &&
+        userId !== this.profile.id &&
+        this.inboxShowMyContacts
     },
     ...mapActions('inbox', [
       'setLiveContacts',
