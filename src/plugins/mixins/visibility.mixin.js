@@ -139,9 +139,9 @@ export default {
       // if my contact or inbox's show my contacts filter is active
       if (
         ((filter.my_contact !== undefined &&
-          filter.my_contact) ||
-        (forInbox &&
-          this.inboxShowMyContacts)) &&
+            filter.my_contact) ||
+          (forInbox &&
+            this.inboxShowMyContacts)) &&
         communication.contact) {
         // check the communication's contact owner matches the current user
         if (communication.contact.user_id !== this.profile.id) {
