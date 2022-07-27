@@ -193,7 +193,8 @@ import Vue from 'vue'
 import {
   aclMixin,
   inboxMixin,
-  visibilityMixin
+  visibilityMixin,
+  unownedContactTaskMixin
 } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
@@ -210,7 +211,8 @@ export default {
   mixins: [
     aclMixin,
     inboxMixin,
-    visibilityMixin
+    visibilityMixin,
+    unownedContactTaskMixin
   ],
 
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
@@ -253,35 +255,87 @@ export default {
     },
     contactTasks () {
       if (this.isSearch) {
-        return [...this.contacts]
+        return [
+          ...this.contacts
+        ]
       }
-      return [...this.incomingCalls, ...this.contacts]
+      return [
+        ...this.incomingCalls,
+        ...this.contacts.filter(item => {
+          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+          if (isFilterOrUnownedContact !== null) {
+            return isFilterOrUnownedContact
+          }
+
+          return true
+        })
+      ]
     },
     hasLiveCall () {
       return this.dialer.call &&
         this.dialer.call.state === 'open'
     },
     hasIncomingLiveCall () {
-      const i = this.liveContacts.findIndex(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
-      return i >= 0
+      return this.incomingCalls.length > 0
     },
     incomingCalls () {
-      return this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
+      return this.liveContacts.filter(item => {
+        const found = [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+        ].includes(item.last_communication.current_status2)
+
+        if (!found) {
+          return false
+        }
+
+        const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+        if (isFilterOrUnownedContact !== null) {
+          return isFilterOrUnownedContact
+        }
+
+        return found
+      })
     },
     liveCalls () {
       return [
         // parked calls
-        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+        ...this.liveContacts.filter(item => {
+          const found = [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)
+
+          if (!found) {
+            return false
+          }
+
+          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+          if (isFilterOrUnownedContact !== null) {
+            return isFilterOrUnownedContact
+          }
+
+          return found
+        }),
         // connected calls
-        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2))
+        ...this.liveContacts.filter(item => {
+          const found = [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)
+
+          if (!found) {
+            return false
+          }
+
+          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+          if (isFilterOrUnownedContact !== null) {
+            return isFilterOrUnownedContact
+          }
+
+          return found
+        })
       ]
     },
     changedFilterFieldCount () {
@@ -578,6 +632,25 @@ export default {
     onRouteNameChange () {
       this.currentTask = ContactTaskStatus.STATUS_OPEN
       this.resetList()
+    },
+    checkFilterAndUnownedContact (contact) {
+      if (this.dialer.communication &&
+        contact.last_communication.id === this.dialer.communication.id &&
+        (this.isNotOwned(contact.user_id) ||
+          this.isNotOwnedFilter(contact.user_id))) {
+        return true
+      }
+
+      const filter = {
+        my_contact: 1
+      }
+
+      if (this.inboxShowMyContacts &&
+        !this.checkCommunicationMatchesFilters(filter, contact.last_communication, true)) {
+        return false
+      }
+
+      return null
     }
   },
 
@@ -682,7 +755,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication, true) ||
+      if ((!this.checkCommunicationMatchesFilters(this.filter, communication)) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -789,7 +862,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication, true) ||
+      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
