@@ -247,7 +247,11 @@ export default {
         }
       }
 
-      this.$VueEvent.fire('answerCall', communication)
+      if (this.dialer.communication && this.dialer.communication.id === communication.id) {
+        this.$VueEvent.fire('answerCall')
+      } else {
+        this.$VueEvent.fire('answerCall', communication)
+      }
       this.isAnsweringCall = false
       this.setShowPhone(true)
       e.stopImmediatePropagation()
