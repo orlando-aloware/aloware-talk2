@@ -11,7 +11,7 @@
                 :label="dateRangeLabel"
               >
                 <div class="last-engagement-tooltip-wrapper"
-                     v-if="isInbox">
+                     v-if="isInboxOrAllComms">
                   <information-circle-icon color="#2F80ED">
                   </information-circle-icon>
                   <q-tooltip  anchor="top middle"
@@ -69,7 +69,7 @@
                 </line-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['inbox', 'calls', 'recordings', 'voicemails'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group
@@ -103,7 +103,7 @@
                 </communication-direction-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'messages'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'messages', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -116,7 +116,7 @@
                 </answer-status-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -129,7 +129,7 @@
                 </talk-time-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -142,7 +142,7 @@
                 </transfer-type-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group
@@ -176,7 +176,7 @@
                 </tag-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
                    md="6"
                    sm="12">
               <b-form-group class="form-label"
@@ -272,7 +272,7 @@
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'voicemails'].includes($route.params.channel)"
+            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'voicemails', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -338,7 +338,7 @@
                 </user-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['messages'].includes($route.params.channel)"
+            <b-col v-if="['messages', 'all-communications'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -423,15 +423,15 @@ export default {
     ...mapState('auth', [
       'profile'
     ]),
-    isInbox () {
+    isInboxOrAllComms () {
       return [
         'Inbox Channel Task Status',
         'Inbox',
         'Inbox Contact Task'
-      ].includes(this.$route.name)
+      ].includes(this.$route.name) || ['all-communications'].includes(this.$route.params.channel)
     },
     dateRangeLabel () {
-      return this.isInbox ? 'Last Engagement Date' : 'Time'
+      return this.isInboxOrAllComms ? 'Last Engagement Date' : 'Time'
     },
     dateHasChanges () {
       return this.filter.from_date !== this.defaultFilterModel.filter.from_date ||
