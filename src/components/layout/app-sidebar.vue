@@ -98,6 +98,10 @@
            class="nav-icons w-100"
            v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
@@ -113,6 +117,10 @@
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
