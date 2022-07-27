@@ -264,7 +264,8 @@ export default {
         ...this.contacts.filter(item => {
           const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
 
-          if (isFilterOrUnownedContact !== null) {
+          if (this.inboxShowMyContacts &&
+            isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -295,7 +296,8 @@ export default {
 
         const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
 
-        if (isFilterOrUnownedContact !== null) {
+        if (this.inboxShowMyContacts &&
+          isFilterOrUnownedContact !== null) {
           return isFilterOrUnownedContact
         }
 
@@ -314,7 +316,8 @@ export default {
 
           const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
 
-          if (isFilterOrUnownedContact !== null) {
+          if (this.inboxShowMyContacts &&
+            isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -330,7 +333,8 @@ export default {
 
           const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
 
-          if (isFilterOrUnownedContact !== null) {
+          if (this.inboxShowMyContacts &&
+            isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -648,13 +652,11 @@ export default {
         ![
           CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
-        ].includes(contact.last_communication.current_status2) &&
-        this.inboxShowMyContacts) {
+        ].includes(contact.last_communication.current_status2)) {
         return true
       }
 
-      if (this.inboxShowMyContacts &&
-        contact.user_id !== this.profile.id) {
+      if (contact.user_id !== this.profile.id) {
         return false
       }
 
