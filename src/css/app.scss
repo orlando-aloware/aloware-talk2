@@ -684,6 +684,11 @@ body,
       height: 20px;
       margin-bottom: 7px;
       color: $grey-30;
+
+      .q-badge--floating {
+        top: 2px;
+        right: 14px;
+      }
     }
     font-family: $font-family-body;
     font-size: 10px;

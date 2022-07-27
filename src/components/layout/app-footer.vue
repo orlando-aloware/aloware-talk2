@@ -49,14 +49,35 @@
         </span>
         Phone
       </q-route-tab>
+      <q-route-tab name="power-dialer-disabled"
+                   content-class="tab-icons xs-text text-grey-5"
+                   :ripple="false"
+                   no-caps
+                   v-if="!profile.auto_dialer_enabled">
+        <span class="tab-icon"
+              @click="showProFeatureDialog">
+          <q-badge floating
+                   rounded
+                   color="orange">
+          </q-badge>
+          <power-dialer-mobile-icon
+            color="#BDBDBD"/>
+        </span>
+        Power Dialer
+      </q-route-tab>
       <q-route-tab name="power-dialer"
                    to="/power-dialer"
                    :content-class="tab === 'power-dialer' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
                    :active="tab === 'power-dialer'"
                    no-caps
-                   exact>
+                   exact
+                   v-else>
         <span class="tab-icon">
+          <q-badge floating
+                   rounded
+                   color="orange">
+          </q-badge>
           <power-dialer-mobile-icon
             :color="tab === 'power-dialer' ? '#256EFF' : '#A3A3A3'"/>
         </span>
@@ -134,6 +155,9 @@
         </contact-menu-item>
       </contact-menu>
     </b-popover>
+    <pro-feature-dialog :isOpen="pro_feature_dialog"
+                        @close="closeProFeatureDialog">
+    </pro-feature-dialog>
   </div>
 </template>
 
@@ -147,8 +171,10 @@ import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
+import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
+
 export default {
   name: 'app-footer',
   components: {
@@ -160,7 +186,8 @@ export default {
     ContactsMobileIcon,
     InboxMobileIcon,
     ContactMenu,
-    ContactMenuItem
+    ContactMenuItem,
+    ProFeatureDialog
   },
 
   computed: {
@@ -170,6 +197,7 @@ export default {
       'showPhone',
       'parkedCalls'
     ]),
+    ...mapState('auth', ['profile']),
     isMoreActive () {
       return this.tab === 'more'
     },
@@ -198,7 +226,8 @@ export default {
   data () {
     return {
       tab: 'inbox',
-      parkedCallQueue: []
+      parkedCallQueue: [],
+      pro_feature_dialog: false
     }
   },
 
@@ -261,6 +290,12 @@ export default {
     },
     toggleContacts () {
       this.tab = 'contacts'
+    },
+    showProFeatureDialog () {
+      this.pro_feature_dialog = true
+    },
+    closeProFeatureDialog () {
+      this.pro_feature_dialog = false
     }
   },
 
