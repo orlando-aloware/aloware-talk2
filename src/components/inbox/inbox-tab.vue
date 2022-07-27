@@ -398,7 +398,8 @@ export default {
       'setLoadingPendingTaskCount',
       'setLoadingPendingTaskCount',
       'setOpenTaskCount',
-      'setPendingTaskCount'
+      'setPendingTaskCount',
+      'updateChannelChangedFilterFields'
     ]),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
@@ -1031,7 +1032,15 @@ export default {
       }
     }
 
-    this.listeners.inboxLoadContacts = () => {
+    this.listeners.inboxLoadContacts = (showMyContacts) => {
+      if (showMyContacts) {
+        this.filter.contact_owner = []
+        this.updateChannelChangedFilterFields({
+          name: 'contact_owner',
+          value: []
+        })
+      }
+
       this.loadContactTasks()
     }
 

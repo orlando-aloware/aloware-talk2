@@ -365,7 +365,7 @@ export default {
           continue
         }
 
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) &&
           +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
           (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
           this.updateChannelChangedFilterFields({

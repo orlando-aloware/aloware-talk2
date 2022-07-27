@@ -7296,6 +7296,16 @@ table.datatable {
     border-color: $success;
     background-color: $success;
   }
+
+  .quick-access {
+    .vue-daterange-picker {
+      .reportrange-text {
+        height: 40px;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
 }
 
 @media (min-width: 992px) {

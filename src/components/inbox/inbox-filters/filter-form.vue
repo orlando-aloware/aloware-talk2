@@ -4,8 +4,9 @@
       <b-container>
         <div v-if="$route.name === 'Inbox' || !['mentions'].includes($route.params.channel)">
           <h5 class="section-header">Quick Access</h5>
-          <b-form-row class="mt-2">
-            <b-col sm="12" md="6">
+          <b-form-row class="mt-2 quick-access">
+            <b-col sm="12"
+                   md="6">
               <b-form-group
                 class="form-label"
                 :label="dateRangeLabel"
@@ -21,8 +22,8 @@
                 </div>
 
                 <date-range-picker
-                  v-model="dateRange"
                   ref="picker"
+                  v-model="dateRange"
                   :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
                   :opens="opens"
                   :ranges="ranges"
@@ -35,7 +36,7 @@
                 </date-range-picker>
               </b-form-group>
             </b-col>
-            <b-col sm="12"
+            <!--b-col sm="12"
                    md="6">
               <b-form-group label="My Contacts"
                             class="form-label">
@@ -51,7 +52,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row class="mt-2">
+          <b-form-row class="mt-2"-->
             <b-col sm="12"
                    md="6">
               <b-form-group
@@ -69,6 +70,8 @@
                 </line-selector>
               </b-form-group>
             </b-col>
+          </b-form-row>
+          <b-form-row class="mt-2">
             <b-col v-if="$route.name === 'Inbox' || ['inbox', 'calls', 'recordings', 'voicemails'].includes($route.params.channel)"
                    sm="12"
                    md="6">

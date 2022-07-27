@@ -446,7 +446,8 @@ export default {
       'setHasMoreCommunications',
       'toggleFilterModelForm',
       'toggleFilterDialog',
-      'setIsInboxFiltersLoaded'
+      'setIsInboxFiltersLoaded',
+      'updateChannelChangedFilterFields'
     ]),
 
     onResetFilters () {
@@ -1037,6 +1038,14 @@ export default {
 
       if (this.filter.cursor !== undefined) {
         delete this.filter.cursor
+      }
+
+      if (showMyContacts) {
+        this.filter.contact_owner = []
+        this.updateChannelChangedFilterFields({
+          name: 'contact_owner',
+          value: []
+        })
       }
 
       this.isLoaded = false
