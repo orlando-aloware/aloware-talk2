@@ -24,18 +24,22 @@
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import CompactBtn from 'components/compact-btn'
+
 export default {
   name: 'pro-feature-dialog',
+
   components: {
     ConfirmDialog,
     CompactBtn
   },
+
   props: {
     isOpen: {
       type: Boolean,
       default: false
     }
   },
+
   methods: {
     close () {
       this.$emit('close')
