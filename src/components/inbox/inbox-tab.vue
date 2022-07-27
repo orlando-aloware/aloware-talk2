@@ -641,6 +641,18 @@ export default {
         return true
       }
 
+      if (contact.last_communication.ring_group_id &&
+        this.checkCommunicationRingGroupHasCurrentUser(contact.last_communication.ring_group_id) &&
+        (contact.last_communication.user_id === null ||
+          contact.last_communication.user_id === this.profile.id) &&
+        ![
+          CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
+        ].includes(contact.last_communication.current_status2) &&
+        this.inboxShowMyContacts) {
+        return true
+      }
+
       if (this.inboxShowMyContacts &&
         contact.user_id !== this.profile.id) {
         return false

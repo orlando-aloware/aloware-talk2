@@ -15,9 +15,14 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile']),
+    ...mapState('auth', [
+      'profile'
+    ]),
     ...mapState('inbox', [
       'inboxShowMyContacts'
+    ]),
+    ...mapState([
+      'ringGroups'
     ])
   },
 
@@ -505,6 +510,27 @@ export default {
 
       // checks if contact matches user visibility
       return contact.user_id === this.profile.id
+    },
+
+    checkCommunicationRingGroupHasCurrentUser (ringGroupId) {
+      if (!ringGroupId) {
+        return false
+      }
+
+      const found = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
+
+      if (!found) {
+        return false
+      }
+
+      const keys = Object.keys(found.ordered_user_ids)
+      for (const key of keys) {
+        if (found.ordered_user_ids[key].includes(this.profile.id)) {
+          return true
+        }
+      }
+
+      return false
     }
   }
 }
