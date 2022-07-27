@@ -176,7 +176,7 @@ export default {
     },
 
     values () {
-      return this.multiple ? _.reject(this.value, _.isEmpty) : this.value
+      return this.multiple ? _.filter(this.value, (item) => { return !!item }) : this.value
     }
   },
 
