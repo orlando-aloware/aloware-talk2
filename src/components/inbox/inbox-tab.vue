@@ -641,12 +641,8 @@ export default {
         return true
       }
 
-      const filter = {
-        my_contact: 1
-      }
-
       if (this.inboxShowMyContacts &&
-        !this.checkCommunicationMatchesFilters(filter, contact.last_communication, true)) {
+        contact.user_id !== this.profile.id) {
         return false
       }
 
