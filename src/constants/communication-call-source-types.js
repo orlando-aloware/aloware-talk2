@@ -1,0 +1,4 @@
+export const SOURCE_ADD_RG = 'add-rg'
+export const SOURCE_ADD_USER = 'add-user'
+export const SOURCE_COLD_RG = 'cold-transfer-rg'
+export const SOURCE_COLD_USER = 'cold-transfer-user'
