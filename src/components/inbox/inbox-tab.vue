@@ -693,15 +693,17 @@ export default {
         this.setLoadingOpenTaskCount(true)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
 
-        this.loadContactTasks(false).finally(function () {
-          if (_this.$route.params.id) {
-            const id = _this.$route.params.id
-            const contact = _this.contactTasks.find(item => item.id.toString() === id)
-            if (contact) {
-              _this.setSelectedContact(contact)
+        if (!this.inboxShowMyContacts) {
+          this.loadContactTasks(false).finally(function () {
+            if (_this.$route.params.id) {
+              const id = _this.$route.params.id
+              const contact = _this.contactTasks.find(item => item.id.toString() === id)
+              if (contact) {
+                _this.setSelectedContact(contact)
+              }
             }
-          }
-        })
+          })
+        }
       }
     }
 
