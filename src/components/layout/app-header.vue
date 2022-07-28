@@ -357,7 +357,7 @@ export default {
     onMyContactsChange () {
       this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
 
-      if (['Inbox', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+      if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
         this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter)
         return
       }
