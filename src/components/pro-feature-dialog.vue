@@ -2,9 +2,9 @@
   <confirm-dialog title="Oops!"
                   id="pro-feature-alert"
                   hideFooter
-                  :isOpen="isOpen"
-                  @close="close"
-                  @hide="close">
+                  :isOpen="showProFeatureDialog"
+                  @close="toggleProFeatureDialog(false)"
+                  @hide="toggleProFeatureDialog(false)">
     <template #content>
       <div class="text-center">
         <p>
@@ -13,7 +13,7 @@
         <compact-btn variant="primary"
                      class="ml-3"
                      :disabled="false"
-                     @clicked="close">
+                     @clicked="toggleProFeatureDialog(false)">
           Ok
         </compact-btn>
       </div>
@@ -24,6 +24,7 @@
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import CompactBtn from 'components/compact-btn'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'pro-feature-dialog',
@@ -33,17 +34,12 @@ export default {
     CompactBtn
   },
 
-  props: {
-    isOpen: {
-      type: Boolean,
-      default: false
-    }
+  computed: {
+    ...mapState(['showProFeatureDialog'])
   },
 
   methods: {
-    close () {
-      this.$emit('close')
-    }
+    ...mapActions(['toggleProFeatureDialog'])
   }
 }
 </script>
