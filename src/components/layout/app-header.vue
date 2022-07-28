@@ -32,15 +32,15 @@
            v-if="$route.name === 'Inbox' || ($route.meta && $route.meta.title && $route.meta.title === 'Communications')">
         <b-form-checkbox
           class="mt-2 cursor-pointer"
-          :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
+          :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
           size="sm"
           switch
-          :disabled="!isInboxFiltersLoaded || isGettingTasksList"
+          :disabled="!isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts"
           v-model="inboxShowMyContactsFilter"
         >
         </b-form-checkbox>
         <label class="text-primary mr-2 mt-2 cursor-pointer"
-               :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
+               :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
                @click="inboxShowMyContactsFilter = !inboxShowMyContactsFilter">My Contacts</label>
       </div>
 
@@ -218,7 +218,8 @@ export default {
     ...mapState('inbox', [
       'inboxShowMyContacts',
       'isInboxFiltersLoaded',
-      'isGettingTasksList'
+      'isGettingTasksList',
+      'isFetchingContacts'
     ]),
     ...mapState('stats', [
       'metricLoader',

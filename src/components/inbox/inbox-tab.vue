@@ -688,22 +688,20 @@ export default {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
         // do other possible actions
       } else {
-        if (!this.inboxShowMyContacts) {
-          this.setLoadingPendingTaskCount(true)
-          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-          this.setLoadingOpenTaskCount(true)
-          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        this.setLoadingPendingTaskCount(true)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.setLoadingOpenTaskCount(true)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
 
-          this.loadContactTasks(false).finally(() => {
-            if (this.$route.params.id) {
-              const id = this.$route.params.id
-              const contact = this.contactTasks.find(item => item.id.toString() === id)
-              if (contact) {
-                this.setSelectedContact(contact)
-              }
+        this.loadContactTasks(false).finally(() => {
+          if (this.$route.params.id) {
+            const id = this.$route.params.id
+            const contact = this.contactTasks.find(item => item.id.toString() === id)
+            if (contact) {
+              this.setSelectedContact(contact)
             }
-          })
-        }
+          }
+        })
       }
     }
 
