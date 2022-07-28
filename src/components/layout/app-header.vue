@@ -70,13 +70,14 @@
         <q-item class="ak-trigger">
           <q-item-section class="nav-item dropdown ak-trigger">
             <a href="#"
-               class="nav-link ak-trigger px-0">
+               class="nav-link ak-trigger pl-0">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
-              <AnnounceKit catchClick=".ak-trigger"
-                          :user="currentUser"
-                          :widget="ak_widget_url" />
+              <AnnounceKit style="position: fixed;"
+                           catchClick=".ak-trigger"
+                           :user="currentUser"
+                           :widget="ak_widget_url" />
             </a>
           </q-item-section>
         </q-item>
