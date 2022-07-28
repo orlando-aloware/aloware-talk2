@@ -41,7 +41,7 @@
         </b-form-checkbox>
         <label class="text-primary mr-2 mt-2 cursor-pointer"
                :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
-               @click="inboxShowMyContactsFilter = !inboxShowMyContactsFilter">My Contacts</label>
+               @click="myContactsFilterChange">My Contacts</label>
       </div>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
@@ -385,6 +385,14 @@ export default {
       if (this.dialer.error.code === 31208) {
         window.open('https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208')
       }
+    },
+
+    myContactsFilterChange () {
+      if (!this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts) {
+        return
+      }
+
+      this.inboxShowMyContactsFilter = !this.inboxShowMyContactsFilter
     },
 
     onMyContactsChange () {
