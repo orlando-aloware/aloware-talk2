@@ -216,7 +216,13 @@
 
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.INBOUND">
-            {{ communication.type === CommunicationTypes.CALL ? 'Called' : 'Sent' }} from {{ communication.lead_number | fixPhone }}
+          <router-link
+            :to="{ name: 'Communication', params: { contactId: contact.id , communicationId: communication.id }}">
+            <information-circle-icon style="cursor: help;"
+                                     color="#2196f3">
+            </information-circle-icon>
+          </router-link>
+          {{ communication.type === CommunicationTypes.CALL ? 'Called' : 'Sent' }} from {{ communication.lead_number | fixPhone }}
         </span>
 
         <span class="text-muted"
@@ -331,6 +337,7 @@ import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import FileIcon from 'components/icons/contact-activity/file-icon'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 import talk2Api from 'src/plugins/api/api'
 
@@ -344,7 +351,8 @@ export default {
   components: {
     FileIcon,
     CommunicationInfo,
-    Avatar
+    Avatar,
+    InformationCircleIcon
   },
 
   props: {
