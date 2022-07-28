@@ -90,14 +90,18 @@ export default {
       this.source.cancel('Loading of contact data operation is canceled by the user.')
       this.source = this.cancelToken.source()
       this.isBusy = true
-      this.getContactData(value.id, this.source.token).then(res => {
-        if (!res) {
-          return
-        }
+      const contactsData = this.getContactData(value.id, this.source.token)
 
-        this.isBusy = false
-        this.setContact(res.data)
-      })
+      if (contactsData) {
+        contactsData.then(res => {
+          if (!res) {
+            return
+          }
+
+          this.isBusy = false
+          this.setContact(res.data)
+        })
+      }
     }
   }
 }

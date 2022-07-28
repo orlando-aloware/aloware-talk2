@@ -119,7 +119,7 @@
             :id="`popover-tags-${contact.id}`"
             ref="`popover-tags-${contact.id}`"
             v-if="contact.id">
-            <span :style="`color: ${contact.tags[0].color};`">
+            <span>
               <i
                 class="fa fa-circle"
                 :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
@@ -150,7 +150,7 @@
               v-for="tag in contact.tags"
               :key="tag.id"
               class="d-flex align-items-center contact-tags-item">
-              <span :style="`color: ${tag.color};`">
+              <span>
                 <i class="fa fa-circle" :style="`color: ${tag.color};font-size:50%;position: relative; top: -2px;`"></i>
                 {{ tag.name }}
               </span>
@@ -515,7 +515,7 @@ export default {
           // this.$generalNotification(`We are calling your phone to connect you to ${this.contact.name}`)
         })
         .catch((_err) => {
-          // this.$root.handleErrors(err.response)
+          // this.$handleErrors(err.response)
         })
     },
     generateRoute (contactId) {

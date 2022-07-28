@@ -14,7 +14,7 @@
       2) Have the contact send a communication to one of your lines or ring groups. The contact will automatically be moved to <b>Open</b>.
     </div>
     <inbox-task-item v-for="(contact, index) in contacts"
-                     :key="`contact-item-${index}`"
+                     :key="`${keyPrefix}-item-${index}`"
                      :contact="contact"
                      :loading-contact="loadingContacts"
                      :is-search="isSearch"
@@ -47,6 +47,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    keyPrefix: {
+      type: String,
+      required: false,
+      default: 'contact'
     }
   },
   methods: {

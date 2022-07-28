@@ -208,5 +208,6 @@ export const DEFAULT_STATE = {
   sessionPhoneExpansion: '',
   notificationAudio: null,
   loadingParkedCalls: false,
-  parkedCalls: []
+  parkedCalls: [],
+  suspended: false
 }

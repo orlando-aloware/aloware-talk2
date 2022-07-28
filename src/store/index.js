@@ -247,7 +247,8 @@ export default function (/* { ssrContext } */) {
       sessionPhoneExpansion: '',
       notificationAudio: null,
       loadingParkedCalls: false,
-      parkedCalls: []
+      parkedCalls: [],
+      suspended: false
     },
 
     getters: {
@@ -717,6 +718,9 @@ export default function (/* { ssrContext } */) {
       },
       removeParkedCall ({ commit }, communicationId) {
         commit('REMOVE_PARKED_CALL', communicationId)
+      },
+      setSuspended ({ commit }, value) {
+        commit('SET_SUSPENDED', value)
       }
     },
 
@@ -963,7 +967,7 @@ export default function (/* { ssrContext } */) {
       DELETE_TEMPLATE (state, template) {
         const found = state.templates.find(item => item.id === template.id)
         if (found) {
-          state.templates.splice(state.smsTemplates.indexOf(found), 1)
+          state.templates.splice(state.templates.indexOf(found), 1)
         }
       },
 
@@ -1382,6 +1386,10 @@ export default function (/* { ssrContext } */) {
         }
 
         state.parkedCalls.splice(state.parkedCalls.indexOf(found), 1)
+      },
+
+      SET_SUSPENDED (state, value) {
+        state.suspended = value
       },
 
       updateField

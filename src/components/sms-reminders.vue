@@ -50,7 +50,6 @@
   </div>
 </template>
 <script>
-import auth from 'boot/auth'
 import { mapState } from 'vuex'
 import { selectorMixin } from 'src/plugins/mixins'
 
@@ -82,7 +81,6 @@ export default {
 
   data () {
     return {
-      auth: auth,
       loading: false,
       selectedId: this.campaignId,
       recentShowSendSmsReminderButton: false,

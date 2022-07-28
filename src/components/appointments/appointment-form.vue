@@ -123,7 +123,7 @@ import ContactLineSelector from 'components/contact-line-selector'
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
-import auth from 'boot/auth'
+import { mapState } from 'vuex'
 
 export default {
   name: 'appointment-form',
@@ -147,7 +147,6 @@ export default {
   },
   data () {
     return {
-      auth,
       isSaving: false,
       appointment: {
         date: '', // window.moment().format('MM/DD/YYYY HH:mm'),
@@ -168,6 +167,9 @@ export default {
         user: null
       }
     }
+  },
+  computed: {
+    ...mapState('auth', ['profile'])
   },
   methods: {
     onSubmit () {
@@ -191,7 +193,7 @@ export default {
         body: this.appointment.body,
         type: this.appointment.type,
         contact: this.contact,
-        user: auth.user.profile
+        user: this.profile
       }
 
       if (this.appointment.smsReminder.enabled) {

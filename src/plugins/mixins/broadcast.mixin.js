@@ -394,6 +394,7 @@ export default {
         .listen('.company.updated', (event) => {
           if (this.currentCompany && this.currentCompany.id === event.company.id) {
             this.setCurrentCompany(event.company)
+            this.$VueEvent.fire('company_updated', event.company)
           }
         })
         .listen('.communication.created', (event) => {
