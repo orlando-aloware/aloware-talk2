@@ -218,7 +218,10 @@ export default {
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
   computed: {
-    ...mapState(['dialer']),
+    ...mapState([
+      'dialer',
+      'parkedCalls'
+    ]),
     ...mapState('inbox',
       [
         'taskCounts',
@@ -643,6 +646,12 @@ export default {
         contact.last_communication.id === this.dialer.communication.id &&
         (this.isNotOwned(contact.user_id) ||
             this.isNotOwnedFilter(contact.user_id))) {
+        return true
+      }
+
+      const found = this.parkedCalls.find(comm => comm.id === contact.last_communication.id)
+
+      if (found) {
         return true
       }
 
