@@ -39,7 +39,8 @@ export default {
       'removeVoicemailNotifiedDesktop',
       'removeContactNotifiedDesktop',
       'removeAppointmentNotifiedDesktop',
-      'removeReminderNotifiedDesktop'
+      'removeReminderNotifiedDesktop',
+      'setShowIncomingCallNotification'
     ]),
 
     playAudio () {
@@ -275,6 +276,7 @@ export default {
       }
 
       if (!_.isEmpty(params.data)) {
+        ['callFishing', 'incomingCall'].includes(params.data.type) && this.setShowIncomingCallNotification(true)
         this.$actionNotification(params.data)
       }
     },

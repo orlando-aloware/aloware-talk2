@@ -177,7 +177,7 @@ export const DEFAULT_STATE = {
       queue: null
     }
   },
-  showIncomingCallNotification: true,
+  showIncomingCallNotification: false,
   // cached states
   sidebarFolded: false,
   currentCompany: null,

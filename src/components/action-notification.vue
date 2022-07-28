@@ -444,8 +444,9 @@ export default {
       'setNotifications',
       'setShowPhone',
       'clearCallFishingQueue',
-      'removeFromCallFishingQueue',
-      'setShowIncomingCallNotification']),
+      'removeFromCallFishingQueue'
+      // 'setShowIncomingCallNotification'
+    ]),
     onShow () {
       this.isValidNotification = false
     },
