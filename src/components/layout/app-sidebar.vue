@@ -78,7 +78,7 @@
            class="nav-icons w-100 disabled"
            v-show="!isActive('Power Dialer') && !profile.auto_dialer_enabled"
            flat
-           @click="showProFeatureDialog">
+           @click="toggleProFeatureDialog(true)">
       <q-badge floating
                rounded
                color="orange">
@@ -204,23 +204,15 @@
              class="nav-icons w-100"
              @click="$emit('toggleMode')"/>
     </div>
-    <pro-feature-dialog :isOpen="pro_feature_dialog"
-                        @close="closeProFeatureDialog">
-    </pro-feature-dialog>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 
 export default {
   name: 'app-sidebar',
-
-  components: {
-    ProFeatureDialog
-  },
 
   props: {
     lightMode: {
@@ -241,8 +233,7 @@ export default {
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/mode_gray.svg',
-      pro_feature_dialog: false
+      modeIcon: 'img:app-icons/menu/mode_gray.svg'
     }
   },
 
@@ -275,14 +266,7 @@ export default {
       }
     },
 
-    showProFeatureDialog () {
-      this.pro_feature_dialog = true
-    },
-
-    closeProFeatureDialog () {
-      this.pro_feature_dialog = false
-    },
-
+    ...mapActions(['toggleProFeatureDialog']),
     ...mapActions('auth', ['logout'])
   },
 
