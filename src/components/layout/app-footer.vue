@@ -55,7 +55,7 @@
                    no-caps
                    v-if="!profile.auto_dialer_enabled">
         <span class="tab-icon"
-              @click="showProFeatureDialog">
+              @click="toggleProFeatureDialog(true)">
           <q-badge floating
                    rounded
                    color="orange">
@@ -155,9 +155,6 @@
         </contact-menu-item>
       </contact-menu>
     </b-popover>
-    <pro-feature-dialog :isOpen="pro_feature_dialog"
-                        @close="closeProFeatureDialog">
-    </pro-feature-dialog>
   </div>
 </template>
 
@@ -171,7 +168,6 @@ import ContactMenu from 'components/contacts/contact-menu.vue'
 import ContactMenuItem from 'components/contacts/contact-menu-item.vue'
 import MobilePhoneIcon from 'components/icons/mobile-phone-icon'
 import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
-import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 
@@ -186,8 +182,7 @@ export default {
     ContactsMobileIcon,
     InboxMobileIcon,
     ContactMenu,
-    ContactMenuItem,
-    ProFeatureDialog
+    ContactMenuItem
   },
 
   computed: {
@@ -226,8 +221,7 @@ export default {
   data () {
     return {
       tab: 'inbox',
-      parkedCallQueue: [],
-      pro_feature_dialog: false
+      parkedCallQueue: []
     }
   },
 
@@ -238,7 +232,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
-    ...mapActions(['setShowPhone']),
+    ...mapActions(['setShowPhone', 'toggleProFeatureDialog']),
     isActive (tab) {
       return this.tab === tab
     },
@@ -290,12 +284,6 @@ export default {
     },
     toggleContacts () {
       this.tab = 'contacts'
-    },
-    showProFeatureDialog () {
-      this.pro_feature_dialog = true
-    },
-    closeProFeatureDialog () {
-      this.pro_feature_dialog = false
     }
   },
 
