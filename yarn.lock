@@ -1738,6 +1738,13 @@ alphanum-sort@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/alphanum-sort/-/alphanum-sort-1.0.2.tgz"
 
+announcekit-vue@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/announcekit-vue/-/announcekit-vue-2.0.4.tgz#8ec704e5bc6d1dc878867dd03a62f607fa2518f7"
+  integrity sha512-WCYB6Yic+nAMB4B8gQ1UCDNfJvhgZipiCp5ZNRpc5G5r+XiipfuZtoIDGqemIfK5U+HOVwM8CxsU2fCvEal5NQ==
+  dependencies:
+    vue-runtime-helpers "^1.1.2"
+
 ansi-align@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ansi-align/-/ansi-align-2.0.0.tgz#c36aeccba563b89ceb556f3690f0b1d9e3547f7f"
@@ -1973,11 +1980,12 @@ asar@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/asar/-/asar-3.1.0.tgz"
   dependencies:
-    "@types/glob" "^7.1.1"
     chromium-pickle-js "^0.2.0"
     commander "^5.0.0"
     glob "^7.1.6"
     minimatch "^3.0.4"
+  optionalDependencies:
+    "@types/glob" "^7.1.1"
 
 asn1.js@^5.2.0:
   version "5.4.1"
@@ -5200,6 +5208,9 @@ fs@^0.0.2:
 fsevents@^1.2.7:
   version "1.2.13"
   resolved "https://registry.npmjs.org/fsevents/-/fsevents-1.2.13.tgz"
+  dependencies:
+    bindings "^1.5.0"
+    nan "^2.12.1"
 
 fsevents@~2.3.1, fsevents@~2.3.2:
   version "2.3.2"
@@ -6549,15 +6560,16 @@ json5@^2.2.0:
 jsonfile@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/jsonfile/-/jsonfile-4.0.0.tgz"
-  dependencies:
+  optionalDependencies:
     graceful-fs "^4.1.6"
 
 jsonfile@^6.0.1:
   version "6.1.0"
   resolved "https://registry.npmjs.org/jsonfile/-/jsonfile-6.1.0.tgz"
   dependencies:
-    graceful-fs "^4.1.6"
     universalify "^2.0.0"
+  optionalDependencies:
+    graceful-fs "^4.1.6"
 
 jsonparse@^1.2.0:
   version "1.3.1"
@@ -7798,7 +7810,6 @@ npm@^6.13.4:
     cmd-shim "^3.0.3"
     columnify "~1.5.4"
     config-chain "^1.1.12"
-    debuglog "*"
     detect-indent "~5.0.0"
     detect-newline "^2.1.0"
     dezalgo "~1.0.3"
@@ -7813,7 +7824,6 @@ npm@^6.13.4:
     has-unicode "~2.0.1"
     hosted-git-info "^2.8.9"
     iferr "^1.0.2"
-    imurmurhash "*"
     infer-owner "^1.0.4"
     inflight "~1.0.6"
     inherits "^2.0.4"
@@ -7832,14 +7842,8 @@ npm@^6.13.4:
     libnpx "^10.2.4"
     lock-verify "^2.1.0"
     lockfile "^1.0.4"
-    lodash._baseindexof "*"
     lodash._baseuniq "~4.6.0"
-    lodash._bindcallback "*"
-    lodash._cacheindexof "*"
-    lodash._createcache "*"
-    lodash._getnative "*"
     lodash.clonedeep "~4.5.0"
-    lodash.restparam "*"
     lodash.union "~4.6.0"
     lodash.uniq "~4.5.0"
     lodash.without "~4.4.0"
@@ -11150,7 +11154,6 @@ vue-bootstrap-typeahead@^0.2.6:
 
 "vue-business-hours@git+https://github.com/aloware/vue-business-hours.git":
   version "1.4.1"
-  uid fd80a637f3db1b4989cb2b7eb07a35c596b30899
   resolved "git+https://github.com/aloware/vue-business-hours.git#fd80a637f3db1b4989cb2b7eb07a35c596b30899"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"
@@ -11258,6 +11261,11 @@ vue-router@3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.5.3.tgz#041048053e336829d05dafacf6a8fb669a2e7999"
 
+vue-runtime-helpers@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vue-runtime-helpers/-/vue-runtime-helpers-1.1.2.tgz#446b7b820888ab0c5264d2c3a32468e72e4100f3"
+  integrity sha512-pZfGp+PW/IXEOyETE09xQHR1CKkR9HfHZdnMD/FVLUNI+HxYTa82evx5WrF6Kz4s82qtqHvMZ8MZpbk2zT2E1Q==
+
 vue-server-renderer@^2.7.1:
   version "2.7.6"
   resolved "https://registry.yarnpkg.com/vue-server-renderer/-/vue-server-renderer-2.7.6.tgz#cc2c0f5b2e793495886b1ac6517de26cb7bf8923"
@@ -11354,10 +11362,10 @@ watchpack@^1.7.4:
   version "1.7.5"
   resolved "https://registry.npmjs.org/watchpack/-/watchpack-1.7.5.tgz"
   dependencies:
-    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
   optionalDependencies:
+    chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
 
 wavesurfer.js@^3.2.0:
