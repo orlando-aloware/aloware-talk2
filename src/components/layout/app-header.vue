@@ -67,6 +67,20 @@
 
         <header-help></header-help>
 
+        <q-item class="ak-trigger">
+          <q-item-section class="nav-item dropdown ak-trigger">
+            <a href="#"
+               class="nav-link ak-trigger px-0">
+              <span class="fa fa-bullhorn changelog-trigger pointer"
+                    style="font-size: 1.2rem">
+              </span>
+              <AnnounceKit catchClick=".ak-trigger"
+                          :user="currentUser"
+                          :widget="ak_widget_url" />
+            </a>
+          </q-item-section>
+        </q-item>
+
         <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'"></profile>
 
         <phone v-if="!titleOnly"></phone>
@@ -133,6 +147,7 @@
 
 <script>
 import _ from 'lodash'
+import * as storage from 'src/plugins/helpers/storage'
 import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
@@ -152,6 +167,7 @@ import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
+import AnnounceKit from 'announcekit-vue'
 
 export default {
   name: 'app-header',
@@ -174,7 +190,8 @@ export default {
     Profile,
     CompactBtn,
     RefreshIcon,
-    HeaderHelp
+    HeaderHelp,
+    AnnounceKit
   },
 
   props: {
@@ -259,6 +276,20 @@ export default {
     },
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
+    },
+    ak_widget_url () {
+      return storage.local.getItem('ak_widget_url')
+    },
+    currentUser () {
+      if (!this.profile) {
+        return {}
+      }
+
+      return {
+        id: this.profile.id,
+        email: this.profile.email,
+        name: this.profile.name
+      }
     }
   },
 

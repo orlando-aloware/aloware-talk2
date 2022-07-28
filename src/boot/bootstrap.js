@@ -24,6 +24,7 @@ storage.local.setItem('api_url', process.env.API_URL)
 storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
+storage.local.setItem('ak_widget_url', process.env.AK_WIDGET_URL)
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
