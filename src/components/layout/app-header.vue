@@ -15,7 +15,7 @@
       <router-link
         class="btn-header-nav-back"
         v-if="['Communication'].includes($route.name)"
-        :to="{ path: prevRoute }">
+        :to="{ name: 'Contact', params: { id: $route.params.contactId }}">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left"></i>
         </button>
@@ -196,7 +196,6 @@ export default {
     return {
       dialerStatus: false,
       loading: false,
-      prevRoute: null,
       inboxShowMyContactsFilter: false
     }
   },
@@ -411,9 +410,6 @@ export default {
         delete query.call
         this.$router.replace({ query })
       }
-    },
-    $route (to, from) {
-      this.prevRoute = from.path
     },
     inboxShowMyContacts (value) {
       if (value !== this.inboxShowMyContactsFilter) {
