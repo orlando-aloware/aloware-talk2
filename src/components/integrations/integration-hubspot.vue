@@ -62,7 +62,7 @@
               <p class="mb-1 d-inline-flex">
                 <span class="data-icon-label">Amount: </span>
                 <span class="data-value ml-1"
-                      v-if="deal.properties">
+                      v-if="deal.properties && deal.properties.amount">
                   <q-tooltip anchor="top middle"
                              self="center middle">
                     {{ deal.properties.amount.value | toCurrency }}
