@@ -591,6 +591,7 @@ export default {
     },
     onApplyFilter (filter) {
       this.filter = filter
+      this.isLoaded = false
       this.loadContactTasks()
       this.loadTaskCounts()
     },
@@ -680,7 +681,6 @@ export default {
   },
 
   mounted () {
-    const _this = this
     this.setContacts([])
     this.setStatus()
 
@@ -688,18 +688,18 @@ export default {
       if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
         // do other possible actions
       } else {
-        this.setLoadingPendingTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-        this.setLoadingOpenTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-
         if (!this.inboxShowMyContacts) {
-          this.loadContactTasks(false).finally(function () {
-            if (_this.$route.params.id) {
-              const id = _this.$route.params.id
-              const contact = _this.contactTasks.find(item => item.id.toString() === id)
+          this.setLoadingPendingTaskCount(true)
+          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+          this.setLoadingOpenTaskCount(true)
+          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+
+          this.loadContactTasks(false).finally(() => {
+            if (this.$route.params.id) {
+              const id = this.$route.params.id
+              const contact = this.contactTasks.find(item => item.id.toString() === id)
               if (contact) {
-                _this.setSelectedContact(contact)
+                this.setSelectedContact(contact)
               }
             }
           })
@@ -972,9 +972,8 @@ export default {
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
-          const _this = this
-          this.onItemRemoved(contact, function () {
-            _this.onItemSelected(_this.contacts[0])
+          this.onItemRemoved(contact, () => {
+            this.onItemSelected(this.contacts[0])
           }, false)
           this.loadContactTasks(false, false)
           break
@@ -1043,7 +1042,11 @@ export default {
       }
     }
 
-    this.listeners.inboxLoadContacts = (showMyContacts) => {
+    this.listeners.inboxLoadContacts = _.debounce((showMyContacts) => {
+      if (!this.isLoaded) {
+        return
+      }
+
       if (showMyContacts) {
         this.filter.contact_owner = []
         this.updateChannelChangedFilterFields({
@@ -1051,8 +1054,21 @@ export default {
           value: []
         })
       }
-      this.loadContactTasks()
-    }
+
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.loadContactTasks(false).finally(() => {
+        if (this.$route.params.id) {
+          const id = this.$route.params.id
+          const contact = this.contactTasks.find(item => item.id.toString() === id)
+          if (contact) {
+            this.setSelectedContact(contact)
+          }
+        }
+      })
+    }, 100)
 
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)

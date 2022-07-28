@@ -329,11 +329,6 @@ export default {
     },
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
-
-      if (_.isEmpty(this.dialer.parkedCall)) {
-        this.setDialerParkedCall(this.communication)
-      }
-
       this.answerCommunication(true, false)
     },
     onHangUpCurrentCallAndAnswer () {
