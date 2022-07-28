@@ -185,6 +185,7 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
+      <pro-feature-dialog/>
       </div>
   </div>
 </template>
@@ -218,6 +219,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
 
 export default {
@@ -230,7 +232,8 @@ export default {
     AppFooter,
     AppSidebar,
     Dialer,
-    Phone
+    Phone,
+    ProFeatureDialog
   },
 
   mixins: [
