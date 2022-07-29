@@ -166,7 +166,8 @@ export default {
       'isFilterDialogShown',
       'channelClonedFilter',
       'isFilterModelFormShown',
-      'appliedFilter'
+      'appliedFilter',
+      'inboxShowMyContacts'
     ]),
     isOpen: {
       get () {
@@ -290,7 +291,8 @@ export default {
       'updateChannelChangedFilterFields',
       'resetChannelChangedFilterFields',
       'toggleFilterDialog',
-      'setChannelClonedFilter'
+      'setChannelClonedFilter',
+      'setInboxShowMyContacts'
     ]),
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
@@ -352,13 +354,18 @@ export default {
 
     onApply () {
       this.resetChannelChangedFilterFields()
+      const myContactsFilter = _.get(this.filter, 'my_contact', null)
+
+      if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
+        this.setInboxShowMyContacts(Boolean(myContactsFilter))
+      }
 
       for (const item in this.filter) {
         if (item === 'answer_status' && this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
           continue
         }
 
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) &&
           +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
           (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
           this.updateChannelChangedFilterFields({

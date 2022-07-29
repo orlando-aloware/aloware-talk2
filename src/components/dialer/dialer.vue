@@ -1007,7 +1007,7 @@ export default {
       this.setDialerIsHeld(false)
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
-      this.setShowIncomingCallNotification(true)
+      this.setShowIncomingCallNotification(false)
     },
 
     countCallDuration () {
@@ -1234,6 +1234,7 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      this.setShowIncomingCallNotification(false)
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'

@@ -193,7 +193,8 @@ import Vue from 'vue'
 import {
   aclMixin,
   inboxMixin,
-  visibilityMixin
+  visibilityMixin,
+  unownedContactTaskMixin
 } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
@@ -210,13 +211,17 @@ export default {
   mixins: [
     aclMixin,
     inboxMixin,
-    visibilityMixin
+    visibilityMixin,
+    unownedContactTaskMixin
   ],
 
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
 
   computed: {
-    ...mapState(['dialer']),
+    ...mapState([
+      'dialer',
+      'parkedCalls'
+    ]),
     ...mapState('inbox',
       [
         'taskCounts',
@@ -253,35 +258,91 @@ export default {
     },
     contactTasks () {
       if (this.isSearch) {
-        return [...this.contacts]
+        return [
+          ...this.contacts
+        ]
       }
-      return [...this.incomingCalls, ...this.contacts]
+      return [
+        ...this.incomingCalls,
+        ...this.contacts.filter(item => {
+          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+          if (this.inboxShowMyContacts &&
+            isFilterOrUnownedContact !== null) {
+            return isFilterOrUnownedContact
+          }
+
+          return true
+        })
+      ]
     },
     hasLiveCall () {
       return this.dialer.call &&
         this.dialer.call.state === 'open'
     },
     hasIncomingLiveCall () {
-      const i = this.liveContacts.findIndex(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
-      return i >= 0
+      return this.incomingCalls.length > 0
     },
     incomingCalls () {
-      return this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW].includes(item.last_communication.current_status2))
+      return this.liveContacts.filter(item => {
+        const found = [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+        ].includes(item.last_communication.current_status2)
+
+        if (!found) {
+          return false
+        }
+
+        const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+        if (this.inboxShowMyContacts &&
+          isFilterOrUnownedContact !== null) {
+          return isFilterOrUnownedContact
+        }
+
+        return found
+      })
     },
     liveCalls () {
       return [
         // parked calls
-        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+        ...this.liveContacts.filter(item => {
+          const found = [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)
+
+          if (!found) {
+            return false
+          }
+
+          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+          if (this.inboxShowMyContacts &&
+            isFilterOrUnownedContact !== null) {
+            return isFilterOrUnownedContact
+          }
+
+          return found
+        }),
         // connected calls
-        ...this.liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2))
+        ...this.liveContacts.filter(item => {
+          const found = [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)
+
+          if (!found) {
+            return false
+          }
+
+          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+
+          if (this.inboxShowMyContacts &&
+            isFilterOrUnownedContact !== null) {
+            return isFilterOrUnownedContact
+          }
+
+          return found
+        })
       ]
     },
     changedFilterFieldCount () {
@@ -340,7 +401,8 @@ export default {
       'setLoadingPendingTaskCount',
       'setLoadingPendingTaskCount',
       'setOpenTaskCount',
-      'setPendingTaskCount'
+      'setPendingTaskCount',
+      'updateChannelChangedFilterFields'
     ]),
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
@@ -529,6 +591,7 @@ export default {
     },
     onApplyFilter (filter) {
       this.filter = filter
+      this.isLoaded = false
       this.loadContactTasks()
       this.loadTaskCounts()
     },
@@ -578,6 +641,37 @@ export default {
     onRouteNameChange () {
       this.currentTask = ContactTaskStatus.STATUS_OPEN
       this.resetList()
+    },
+    checkFilterAndUnownedContact (contact) {
+      if (this.dialer.communication &&
+        contact.last_communication.id === this.dialer.communication.id &&
+        (this.isNotOwned(contact.user_id) ||
+            this.isNotOwnedFilter(contact.user_id))) {
+        return true
+      }
+
+      const found = this.parkedCalls.find(comm => comm.id === contact.last_communication.id)
+
+      if (found) {
+        return true
+      }
+
+      if (contact.last_communication.ring_group_id &&
+        this.checkCommunicationRingGroupHasCurrentUser(contact.last_communication.ring_group_id) &&
+        (contact.last_communication.user_id === null ||
+        contact.last_communication.user_id === this.profile.id) &&
+        ![
+          CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
+        ].includes(contact.last_communication.current_status2)) {
+        return true
+      }
+
+      if (contact.user_id !== this.profile.id) {
+        return false
+      }
+
+      return null
     }
   },
 
@@ -587,7 +681,6 @@ export default {
   },
 
   mounted () {
-    const _this = this
     this.setContacts([])
     this.setStatus()
 
@@ -600,12 +693,12 @@ export default {
         this.setLoadingOpenTaskCount(true)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
 
-        this.loadContactTasks(false).finally(function () {
-          if (_this.$route.params.id) {
-            const id = _this.$route.params.id
-            const contact = _this.contactTasks.find(item => item.id.toString() === id)
+        this.loadContactTasks(false).finally(() => {
+          if (this.$route.params.id) {
+            const id = this.$route.params.id
+            const contact = this.contactTasks.find(item => item.id.toString() === id)
             if (contact) {
-              _this.setSelectedContact(contact)
+              this.setSelectedContact(contact)
             }
           }
         })
@@ -877,9 +970,8 @@ export default {
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
-          const _this = this
-          this.onItemRemoved(contact, function () {
-            _this.onItemSelected(_this.contacts[0])
+          this.onItemRemoved(contact, () => {
+            this.onItemSelected(this.contacts[0])
           }, false)
           this.loadContactTasks(false, false)
           break
@@ -948,6 +1040,34 @@ export default {
       }
     }
 
+    this.listeners.inboxLoadContacts = _.debounce((showMyContacts) => {
+      if (!this.isLoaded) {
+        return
+      }
+
+      if (showMyContacts) {
+        this.filter.contact_owner = []
+        this.updateChannelChangedFilterFields({
+          name: 'contact_owner',
+          value: []
+        })
+      }
+
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.loadContactTasks(false).finally(() => {
+        if (this.$route.params.id) {
+          const id = this.$route.params.id
+          const contact = this.contactTasks.find(item => item.id.toString() === id)
+          if (contact) {
+            this.setSelectedContact(contact)
+          }
+        }
+      })
+    }, 100)
+
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
@@ -956,6 +1076,7 @@ export default {
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
 
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
+    this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -975,6 +1096,7 @@ export default {
     this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+    this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)
   },
 
   watch: {

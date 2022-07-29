@@ -247,7 +247,11 @@ export default {
         }
       }
 
-      this.$VueEvent.fire('answerCall', communication)
+      if (this.dialer.communication && this.dialer.communication.id === communication.id) {
+        this.$VueEvent.fire('answerCall')
+      } else {
+        this.$VueEvent.fire('answerCall', communication)
+      }
       this.isAnsweringCall = false
       this.setShowPhone(true)
       e.stopImmediatePropagation()
@@ -325,11 +329,6 @@ export default {
     },
     onParkCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
-
-      if (_.isEmpty(this.dialer.parkedCall)) {
-        this.setDialerParkedCall(this.communication)
-      }
-
       this.answerCommunication(true, false)
     },
     onHangUpCurrentCallAndAnswer () {

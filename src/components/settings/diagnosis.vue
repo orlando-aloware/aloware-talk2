@@ -98,7 +98,7 @@
           <b-list-group-item class="d-flex justify-content-between align-items-center" v-for="onGoingCall in onGoingCalls" :key="onGoingCall.id">
             <b-media tag="li">
               <template #aside>
-                <inbound-call-o-icon v-if="ongoingCall.direction === CommunicationDirection.OUTBOUND"></inbound-call-o-icon>
+                <inbound-call-o-icon v-if="onGoingCall.direction === CommunicationDirection.OUTBOUND"></inbound-call-o-icon>
                 <outbound-call-o-icon v-else class="mt-1"></outbound-call-o-icon>
               </template>
               {{ onGoingCall.direction === CommunicationDirection.OUTBOUND ? 'Outbound' : 'Inbound' }} call with

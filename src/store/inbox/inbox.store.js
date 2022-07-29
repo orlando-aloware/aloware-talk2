@@ -87,6 +87,8 @@ export default function () {
     selectedFilter: null,
     appliedFilter: null,
     isLoadingOpenTaskCount: false,
-    isLoadingPendingTaskCount: false
+    isLoadingPendingTaskCount: false,
+    inboxShowMyContacts: true,
+    isInboxFiltersLoaded: true
   }
 }

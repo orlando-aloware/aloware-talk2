@@ -218,7 +218,7 @@ export default function (/* { ssrContext } */) {
           queue: null
         }
       },
-      showIncomingCallNotification: true,
+      showIncomingCallNotification: false,
       // cached states
       sidebarFolded: false,
       tagOptions: {
