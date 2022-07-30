@@ -265,10 +265,9 @@ export default {
       return [
         ...this.incomingCalls,
         ...this.contacts.filter(item => {
-          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+          const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-          if (this.inboxShowMyContacts &&
-            isFilterOrUnownedContact !== null) {
+          if (isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -297,10 +296,9 @@ export default {
           return false
         }
 
-        const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+        const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-        if (this.inboxShowMyContacts &&
-          isFilterOrUnownedContact !== null) {
+        if (isFilterOrUnownedContact !== null) {
           return isFilterOrUnownedContact
         }
 
@@ -317,10 +315,9 @@ export default {
             return false
           }
 
-          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+          const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-          if (this.inboxShowMyContacts &&
-            isFilterOrUnownedContact !== null) {
+          if (isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -334,10 +331,9 @@ export default {
             return false
           }
 
-          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+          const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-          if (this.inboxShowMyContacts &&
-            isFilterOrUnownedContact !== null) {
+          if (isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -644,18 +640,20 @@ export default {
     },
     checkFilterAndUnownedContact (contact) {
       if (this.dialer.communication &&
+        contact.last_communication &&
         contact.last_communication.id === this.dialer.communication.id &&
         (this.isNotOwned(contact.user_id) || this.isNotOwnedFilter(contact.user_id))) {
         return true
       }
 
-      const found = this.parkedCalls.find(comm => comm.id === contact.last_communication.id)
+      const found = contact.last_communication ? this.parkedCalls.find(comm => comm.id === contact.last_communication.id) : false
 
       if (found) {
         return true
       }
 
-      if (contact.last_communication.ring_group_id &&
+      if (contact.last_communication &&
+        contact.last_communication.ring_group_id &&
         this.checkCommunicationRingGroupHasCurrentUser(contact.last_communication.ring_group_id) &&
         (contact.last_communication.user_id === null || contact.last_communication.user_id === this.profile.id) &&
         ![
