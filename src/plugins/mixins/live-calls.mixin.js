@@ -89,7 +89,7 @@ export default {
       return this.isActiveCall && !this.isParkedCall && !this.shouldShowIncomingCallMenu
     },
     shouldShowParkedCallMenu () {
-      return this.isParkedCall
+      return this.isParkedCall && this.communication.user_id === this.profile.id
     },
     isActiveCallOwner () {
       return this.dialer && this.dialer.state === 'open' &&

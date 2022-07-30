@@ -185,6 +185,7 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
+      <pro-feature-dialog/>
       </div>
   </div>
 </template>
@@ -218,6 +219,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
 
 export default {
@@ -230,7 +232,8 @@ export default {
     AppFooter,
     AppSidebar,
     Dialer,
-    Phone
+    Phone,
+    ProFeatureDialog
   },
 
   mixins: [
@@ -295,7 +298,8 @@ export default {
       'ringGroups',
       'notifications',
       'showPhone',
-      'suspended'
+      'suspended',
+      'parkedCalls'
     ]),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
@@ -620,6 +624,16 @@ export default {
     this.$VueEvent.listen('update_communication', (communication) => {
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
+      const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
+
+      // update unowned parked call contact's last communication
+      if (isCommunicationHasUnownedContact && parkedCallFound) {
+        this.updateLiveContactLastCommProperties({
+          id: communication.contact_id,
+          status: communication.current_status2,
+          user_id: communication.user_id
+        })
+      }
 
       // remove the parked call if the caller was disconnected
       if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW && parkedCall && parkedCall.id === communication.id) {
@@ -884,11 +898,20 @@ export default {
       this.sidebarVisible = true
     }
 
+    // check auth every 5 minutes
+    const checkInterval = 5 * 60 * 1000
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
-        // this is a recursive authentication check with 3 tries
-        this.checkAuth()
-      }, 60 * 1000)
+        const now = new Date().getTime()
+        const lastRun = localStorage.getItem('checkAuthIntervalLastRun') || 0
+
+        // only runs if last run was at least the defined time ago (to avoid multiple tabs running multiple requests)
+        if (now - lastRun >= checkInterval) {
+          // this is a recursive authentication check with 3 tries
+          this.checkAuth()
+          localStorage.setItem('checkAuthIntervalLastRun', now)
+        }
+      }, checkInterval)
     }
 
     if (this.mediaPlaybackRequiresUserGesture()) {
@@ -2064,15 +2087,23 @@ export default {
       'removeParkedCall',
       'setSuspended'
     ]),
-    ...mapActions('contacts', ['resetSearch', 'setShowContactsHeader']),
+    ...mapActions('contacts', [
+      'resetSearch',
+      'setShowContactsHeader'
+    ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check'
     }),
-    ...mapActions('stats', ['setAvailableMetrics', 'setMetricGroups', 'setMetricLoader']),
+    ...mapActions('stats', [
+      'setAvailableMetrics',
+      'setMetricGroups',
+      'setMetricLoader'
+    ]),
     ...mapActions('inbox', [
       'setSelectedContact',
       'setLiveContacts',
+      'updateLiveContactLastCommProperties',
       'setIsInboxFiltersLoaded',
       'gettingTasksList'
     ])

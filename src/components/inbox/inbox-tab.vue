@@ -645,8 +645,7 @@ export default {
     checkFilterAndUnownedContact (contact) {
       if (this.dialer.communication &&
         contact.last_communication.id === this.dialer.communication.id &&
-        (this.isNotOwned(contact.user_id) ||
-            this.isNotOwnedFilter(contact.user_id))) {
+        (this.isNotOwned(contact.user_id) || this.isNotOwnedFilter(contact.user_id))) {
         return true
       }
 
@@ -658,8 +657,7 @@ export default {
 
       if (contact.last_communication.ring_group_id &&
         this.checkCommunicationRingGroupHasCurrentUser(contact.last_communication.ring_group_id) &&
-        (contact.last_communication.user_id === null ||
-        contact.last_communication.user_id === this.profile.id) &&
+        (contact.last_communication.user_id === null || contact.last_communication.user_id === this.profile.id) &&
         ![
           CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
@@ -775,7 +773,7 @@ export default {
         return
       }
 
-      if (!this.checkCommunicationMatchesFilters(this.filter, communication) ||
+      if ((!this.checkCommunicationMatchesFilters(this.filter, communication)) ||
         !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }

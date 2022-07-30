@@ -43,18 +43,20 @@ export default {
     addNonOwnedParkedTask (communication) {
       if (this.isNotOwned(communication.contact.user_id)) {
         this.addParkedCall(communication)
-        this.updateLiveContactLastCommCurrentStatus({
+        this.updateLiveContactLastCommProperties({
           id: communication.contact.id,
-          status: CURRENT_STATUS_HOLD_NEW
+          status: CURRENT_STATUS_HOLD_NEW,
+          user_id: communication.user_id
         })
       }
     },
     updateUnownedContactLastCommunicationStatus () {
       this.unownedContact.interval = setInterval(() => {
         if (this.dialer.contact) {
-          this.updateLiveContactLastCommCurrentStatus({
+          this.updateLiveContactLastCommProperties({
             id: this.dialer.contact.id,
-            status: CURRENT_STATUS_INPROGRESS_NEW
+            status: CURRENT_STATUS_INPROGRESS_NEW,
+            user_id: this.dialer.communication.user_id
           })
           clearInterval(this.unownedContact.interval)
         }
@@ -94,7 +96,9 @@ export default {
       }
     },
     isNotOwned (userId) {
-      return userId && userId !== this.profile.id && this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
+      return userId &&
+        userId !== this.profile.id &&
+        this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
     },
     isNotOwnedFilter (userId) {
       return userId &&
@@ -103,7 +107,7 @@ export default {
     },
     ...mapActions('inbox', [
       'setLiveContacts',
-      'updateLiveContactLastCommCurrentStatus',
+      'updateLiveContactLastCommProperties',
       'removeLiveContact'
     ]),
     ...mapActions([

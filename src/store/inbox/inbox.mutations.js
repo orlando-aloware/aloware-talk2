@@ -59,7 +59,7 @@ export default {
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
   },
-  UPDATE_LIVE_CONTACT_LAST_COMM_CURRENT_STATUS: (state, payload) => {
+  UPDATE_LIVE_CONTACT_LAST_COMM_PROPERTIES: (state, payload) => {
     const liveContact = { data: null, index: null }
     liveContact.data = state.liveContacts.find(contact => contact.id === payload.id)
 
@@ -73,7 +73,11 @@ export default {
       return
     }
 
-    Vue.set(state.liveContacts[liveContact.index].last_communication, 'current_status2', payload.status)
+    Object.keys(payload).forEach(key => {
+      if (key !== 'id') {
+        Vue.set(state.liveContacts[liveContact.index].last_communication, key, payload[key])
+      }
+    })
   },
   REMOVE_LIVE_CONTACT: (state, contactId) => {
     const liveContact = { data: null, index: null }
@@ -174,7 +178,7 @@ export default {
   SET_INBOX_SHOW_MY_CONTACTS (state, value) {
     state.inboxShowMyContacts = value
   },
-  SET_DEFAULT_SHOW_MY_CONTACTS (state) {
+  SET_DEFAULT_SHOW_MY_CONTACTS (state, value) {
     state.showMyContacts = InboxDefault.DEFAULT_STATE.showMyContacts
   },
   SET_IS_INBOX_FILTERS_LOADED (state, value) {

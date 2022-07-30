@@ -218,12 +218,34 @@ export default {
             this.updateMyQueueListData(data)
           }
 
-          let listId = this.id === 'my-queue' || this.id === 'in-queue' ? this.myQueue?.id : this.id
-          listId = listId === null ? 'all' : listId
-          const list = _.get(this.lists, listId, { id: null, name: '', type: null })
+          const listData = {
+            id: this.id,
+            isMyQueuePaths: [
+              'power-dialer/in-queue',
+              'power-dialer/called',
+              'power-dialer/failed',
+              'power-dialer/scheduled',
+              'power-dialer/all'
+            ],
+            isInMyQueuePaths: false
+          }
+
+          listData.isInMyQueuePaths = listData.isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
+
+          if (this.$route.name.includes('Power Dialer') &&
+            (listData.isInMyQueuePaths ||
+              this.id === 'my-queue')) {
+            listData.id = this.myQueue?.id
+          }
+
+          if (listData.id === null) {
+            listData.id = 'all'
+          }
+
+          const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
 
           this.setSelectedList({
-            id: listId,
+            id: listData.id,
             name: list.name,
             type: list.type
           })

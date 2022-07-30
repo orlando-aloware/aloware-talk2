@@ -1,5 +1,5 @@
 import { mapState } from 'vuex'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 export default {
   computed: {
@@ -41,10 +41,10 @@ export default {
     getContactId (contact) {
       const contactId = { data: null }
       switch (true) {
-        case contact.integration_data && !_.isEmpty(contact.integration_data):
+        case contact.integration_data && !isEmpty(contact.integration_data):
           contactId.data = contact.integration_data.hubspot.contact_id
           break
-        case contact.integrations && !_.isEmpty(contact.integrations):
+        case contact.integrations && !isEmpty(contact.integrations):
           contactId.data = contact.integrations.hubspot.contact_id
           break
         default:

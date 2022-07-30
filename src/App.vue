@@ -95,6 +95,13 @@ export default {
         this.$router.replace('/')
       })
     })
+
+    this.$VueEvent.listen('user_logout', (data) => {
+      if (this.authenticated) {
+        this.clearUser()
+        this.$router.push({ name: 'Login' })
+      }
+    })
   },
   watch: {
     authenticated () {
@@ -172,7 +179,8 @@ export default {
     ...mapActions('auth', {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
-      getSharedCookie: 'getSharedCookie'
+      getSharedCookie: 'getSharedCookie',
+      clearUser: 'clear'
     }),
     ...mapActions('cache', [
       'setCurrentCompany'

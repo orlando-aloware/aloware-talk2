@@ -68,6 +68,12 @@ export default {
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
+
+        const user = this.getUser(this.dialer.communication.added_user_id)
+        if (user.name) {
+          this.setAddedParty(user)
+        }
+
         if (this.dialer.communication.contact) {
           this.setDialerContact(this.dialer.communication.contact)
         }

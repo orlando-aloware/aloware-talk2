@@ -304,7 +304,9 @@ export default {
   APPOINTMENT_SUBMITTED: (state, isSubmitted) => {
     state.isAppointmentSubmitted = isSubmitted
   },
-
+  ADD_POWER_DIALER_OPEN: (state, isOpen) => {
+    state.isAddPowerDialerOpen = isOpen
+  },
   ENROLL_SEQUENCE_OPEN: (state, isOpen) => {
     state.isEnrollSequenceOpen = isOpen
   },

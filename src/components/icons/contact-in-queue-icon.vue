@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'call-icon',
+  name: 'contact-in-queue-icon',
   props: {
     width: {
       type: [Number, String],
@@ -24,7 +24,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

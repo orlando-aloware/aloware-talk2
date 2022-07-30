@@ -667,6 +667,11 @@ body,
       box-shadow: none;
     }
   }
+
+  .q-badge--floating {
+    top: 8px;
+    right: 15px;
+  }
 }
 
 .page-footer {
@@ -679,6 +684,11 @@ body,
       height: 20px;
       margin-bottom: 7px;
       color: $grey-30;
+
+      .q-badge--floating {
+        top: 2px;
+        right: 14px;
+      }
     }
     font-family: $font-family-body;
     font-size: 10px;
@@ -7214,6 +7224,14 @@ table.datatable {
           height: 20px !important;
           font-size: 10px;
         }
+
+        .dropdown-menu.show {
+          min-width: 5rem;
+
+          .dropdown-item {
+            padding: 0.25rem 1rem;
+          }
+        }
       }
 
       button:hover,
@@ -11255,5 +11273,20 @@ h1.contact-list-name-label {
   .sublists {
     overflow-y: auto !important;
     height: 78vh;
+  }
+}
+
+.modal-pd-add {
+  width: 420px;
+  max-width: 90vw;
+}
+
+.hubspot-crm-iframe {
+  overflow: hidden;
+}
+
+#pro-feature-alert {
+  .modal-header {
+    border: none;
   }
 }

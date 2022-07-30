@@ -5,15 +5,22 @@
         v-if="hasActiveTask && activeTask"
         class="active t-expansion-panel px-2">
         <div class="py-2">
-          <q-avatar size="30px" color="grey">
+          <q-avatar size="30px"
+                    color="grey">
             {{ avatarName(firstname, lastname) }}
           </q-avatar>
         </div>
 
         <q-item-section class="pl-2">
-          <q-item-label>{{ fullName }}</q-item-label>
-          <q-item-label caption lines="2">{{ phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
-          <q-item-label caption lines="2">{{ company_name }}</q-item-label>
+          <q-item-label>
+            {{ fullName }}
+          </q-item-label>
+          <q-item-label caption lines="2">
+            {{ phone_number | fixPhone('NATIONAL', true) }}
+          </q-item-label>
+          <q-item-label caption lines="2">
+            {{ company_name }}
+          </q-item-label>
         </q-item-section>
 
         <q-item-section
@@ -29,9 +36,13 @@
         </q-item-section>
 
       </q-item>
-      <div v-else class="px-0 pb-1 text-grey">
-        <q-card flat class="bg-grey-50 p-2 mx-2">
-          <span class="px-2">No call in progress</span>
+      <div class="px-0 pb-1 text-grey"
+           v-else>
+        <q-card flat
+                class="bg-grey-50 p-2 mx-2">
+          <span class="px-2">
+            No call in progress
+          </span>
         </q-card>
       </div>
     </q-list>
@@ -39,7 +50,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import { get } from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
@@ -56,7 +67,7 @@ export default {
     ]),
     ...mapState(['dialer']),
     fullName () {
-      const name = `${_.get(this.activeTask, 'first_name', '')} ${_.get(this.activeTask, 'last_name', '')}`
+      const name = `${get(this.activeTask, 'first_name', '')} ${get(this.activeTask, 'last_name', '')}`
 
       if (!name) {
         return 'No Name'
