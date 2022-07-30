@@ -352,17 +352,7 @@ export default {
         return columns
       }
 
-      const newColumns = JSON.parse(JSON.stringify(headers))
-      const index = { data: null }
-      const found = { data: null }
-      for (index.data in columns) {
-        found.data = newColumns.find(item => item.name === columns[index.data].name)
-        if (found.data === undefined) {
-          newColumns.splice((parseInt(index.data) + 1), 0, columns[index.data])
-        }
-      }
-
-      return newColumns
+      return headers
     },
     onModalShow () {
       this.searchText = ''
