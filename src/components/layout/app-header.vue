@@ -67,8 +67,8 @@
 
         <header-help></header-help>
 
-        <q-item class="ak-trigger">
-          <q-item-section class="nav-item dropdown ak-trigger">
+        <q-item>
+          <q-item-section class="nav-item dropdown">
             <a href="#"
                class="nav-link ak-trigger pl-0">
               <span class="fa fa-bullhorn changelog-trigger pointer"
