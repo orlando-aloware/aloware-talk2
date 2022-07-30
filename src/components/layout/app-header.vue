@@ -69,8 +69,7 @@
 
         <q-item class="ak-trigger">
           <q-item-section class="nav-item dropdown ak-trigger">
-            <a href="#"
-               class="nav-link ak-trigger pl-0">
+            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
@@ -78,7 +77,7 @@
                            catchClick=".ak-trigger"
                            :user="currentUser"
                            :widget="ak_widget_url" />
-            </a>
+            </div>
           </q-item-section>
         </q-item>
 
