@@ -595,7 +595,15 @@ export default {
       }
 
       if (data.from && data.to && data.property !== 'workflow_id') {
-        return generalMessage.data + ' has been changed from "' + fromValue.data + '" to "' + toValue.data + '"'
+        const hsContactAuditProperties = ['user_id', 'disposition_status_id']
+        generalMessage.data += ' has been changed from "' + fromValue.data + '" to "' + toValue.data + '"'
+
+        // Add reason for hubspot property change
+        if (data.notes && data.notes !== '' && hsContactAuditProperties.includes(data.property)) {
+          generalMessage.data += '. Reason: ' + data.notes
+        }
+
+        return generalMessage.data
       }
 
       if (data.from && !data.to) {
