@@ -702,21 +702,21 @@ export default {
         }
         this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
           this.setDialerIsHeld(true)
-          console.log('Call held')
+          console.log('Call parked')
         }).catch(err => {
           console.log(err)
         }).finally(_ => {
           this.loadingHold = false
         })
       } else {
-        console.log('Unholding call')
+        console.log('Unparking call')
         this.loadingUnhold = true
         const params = {
           communication_id: this.dialer.communication.id
         }
         this.$axios.post('/api/v1/dialer/new-unhold', params).then(() => {
           this.setDialerIsHeld(false)
-          console.log('Call unheld')
+          console.log('Call unparked')
         }).catch(err => {
           console.log(err)
         }).finally(_ => {
@@ -758,7 +758,7 @@ export default {
       this.setDialerParkedCall()
       this.stopParkedCallTimer()
       const data = {
-        currentNumber: 'unhold:' + parkedCall.id,
+        currentNumber: 'unpark:' + parkedCall.id,
         outboundCampaignId: parkedCall.campaign_id,
         contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
         companyName: (parkedCall.contact) ? parkedCall.contact.company_name : '',
@@ -767,7 +767,7 @@ export default {
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
       this.setDialerRecordingStatus('paused')
-      console.log('Unhold is in progress.')
+      console.log('Unpark is in progress.')
 
       if (this.isMobile) {
         this.$VueEvent.fire('doneUnparkCall')
@@ -783,7 +783,7 @@ export default {
       }
 
       const data = {
-        currentNumber: 'unhold:' + parkedCallData.id,
+        currentNumber: 'unpark:' + parkedCallData.id,
         outboundCampaignId: parkedCallData.campaign_id,
         contactName: (parkedCallData.contact) ? parkedCallData.contact.name : '',
         companyName: (parkedCallData.contact) ? parkedCallData.contact.company_name : '',
@@ -792,7 +792,7 @@ export default {
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
       this.setDialerRecordingStatus('paused')
-      console.log('Unhold is in progress.')
+      console.log('Unpark is in progress.')
 
       if (this.isMobile) {
         this.$VueEvent.fire('doneUnparkCall')
