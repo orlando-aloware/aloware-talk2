@@ -262,6 +262,7 @@ export default {
       loadingBroadcasts: false,
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
+      loadingLeadSources: false,
       isWidget: false,
       transitionName: null,
       prevHeight: 0,
@@ -299,7 +300,8 @@ export default {
       'notifications',
       'showPhone',
       'suspended',
-      'parkedCalls'
+      'parkedCalls',
+      'leadSources'
     ]),
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('stats', ['availableMetrics']),
@@ -1145,6 +1147,7 @@ export default {
 
         this.getDispositionStatuses()
         this.getCallDispositions()
+        this.getLeadSources()
       })
     },
 
@@ -1507,6 +1510,27 @@ export default {
           console.error(err)
           this.loadingMetricGroups = false
           this.setMetricLoader(false)
+          return Promise.reject()
+        })
+    },
+
+    getLeadSources () {
+      if (this.isWidget) {
+        return
+      }
+
+      this.loadingLeadSources = true
+      return this.$axios
+        .get('/api/v1/lead-sources', {
+          mode: 'no-cors'
+        })
+        .then(res => {
+          this.setLeadSources(res.data)
+          this.loadingLeadSources = false
+          return Promise.resolve()
+        }).catch(err => {
+          this.loadingLeadSources = false
+          console.log(err)
           return Promise.reject()
         })
     },
@@ -2085,7 +2109,8 @@ export default {
       'setDefaultDateFilter',
       'setNotificationAudio',
       'removeParkedCall',
-      'setSuspended'
+      'setSuspended',
+      'setLeadSources'
     ]),
     ...mapActions('contacts', [
       'resetSearch',
