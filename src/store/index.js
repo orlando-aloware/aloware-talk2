@@ -249,7 +249,8 @@ export default function (/* { ssrContext } */) {
       loadingParkedCalls: false,
       parkedCalls: [],
       suspended: false,
-      showProFeatureDialog: false
+      showProFeatureDialog: false,
+      leadSources: []
     },
 
     getters: {
@@ -725,6 +726,9 @@ export default function (/* { ssrContext } */) {
       },
       toggleProFeatureDialog ({ commit }, value) {
         commit('TOGGLE_PRO_FEATURE_DIALOG', value)
+      },
+      setLeadSources ({ commit }, leadSources) {
+        commit('SET_LEAD_SOURCES', leadSources)
       }
     },
 
@@ -1398,6 +1402,10 @@ export default function (/* { ssrContext } */) {
 
       TOGGLE_PRO_FEATURE_DIALOG (state, value) {
         state.showProFeatureDialog = value
+      },
+
+      SET_LEAD_SOURCES (state, leadSources) {
+        state.leadSources = leadSources
       },
 
       updateField
