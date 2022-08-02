@@ -766,6 +766,7 @@ export default {
       }
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
+      this.setDialerRecordingStatus('paused')
       console.log('Unhold is in progress.')
 
       if (this.isMobile) {
@@ -790,6 +791,7 @@ export default {
       }
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
+      this.setDialerRecordingStatus('paused')
       console.log('Unhold is in progress.')
 
       if (this.isMobile) {
