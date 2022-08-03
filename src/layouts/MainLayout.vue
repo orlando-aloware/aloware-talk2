@@ -661,6 +661,11 @@ export default {
             return
           }
 
+          const loopData = {
+            keys: Object.keys(communication),
+            key: null
+          }
+
           const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
             [
               CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
@@ -674,7 +679,10 @@ export default {
 
           if (isActiveInLiveContactsIndex >= 0 && this.liveContacts[isActiveInLiveContactsIndex].last_communication.id === communication.id) {
             const liveContacts = _.cloneDeep(this.liveContacts)
-            liveContacts[isActiveInLiveContactsIndex].last_communication = communication
+
+            for (loopData.key of loopData.keys) {
+              liveContacts[isActiveInLiveContactsIndex].last_communication[loopData.key] = communication[loopData.key]
+            }
 
             // if type is call and completed/voicemail then remove from live calls
             if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
@@ -710,7 +718,11 @@ export default {
           const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
           if (index >= 0) {
             const liveContacts = _.cloneDeep(this.liveContacts)
-            liveContacts[index].last_communication = communication
+
+            for (loopData.key of loopData.keys) {
+              liveContacts[index].last_communication[loopData.key] = communication[loopData.key]
+            }
+
             this.setLiveContacts(
               [
                 // connected calls

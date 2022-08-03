@@ -140,7 +140,7 @@
 
             <div class="text-white text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
-                            v-if="contact || dialer.callFishing.contact">
+                            v-if="contact || hasCallFishingContact">
                 <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
                 <q-btn color="white"
                        icon="o_info"
@@ -659,7 +659,7 @@
         </b-button>
       </div>
       <div class="phone-expansion d-flex overlay"
-           v-if="(devMode || !isCallCompleted) && (contact || dialer.callFishing.communication) && expansionEnabled">
+           v-if="(devMode || !isCallCompleted) && (contact || hasCallFishingCommunication) && expansionEnabled">
         <q-expansion-item v-model="expanded"
                           class="shadow-1 overflow-hidden w-100"
                           header-class="text-sm bg-white text-center"
@@ -1668,20 +1668,36 @@ export default {
         }
       }
     },
+    hasCallFishingCommunication () {
+      return _.get(this.dialer, 'callFishing.communication', null) !== null
+    },
+    hasCallFishingContact () {
+      return _.get(this.dialer, 'callFishing.contact', null) !== null
+    },
     isPhoneBodyVisible () {
-      return this.screen === 'call' && !_.isEmpty(this.dialer.call || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication)))
+      return this.screen === 'call' &&
+        (!_.isEmpty(this.dialer.call) ||
+          !this.hasCallFishingCommunication)
     },
     isPhoneCTAVisible () {
-      return (!_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'INCOMING') || (!_.isEmpty(this.dialer.callFishing) && !_.isEmpty(this.dialer.callFishing.communication))
+      return (!_.isEmpty(this.dialer.call) &&
+        this.dialer.call.direction === 'INCOMING') ||
+        this.hasCallFishingCommunication
     },
     isHangupCallVisible () {
-      return !_.isEmpty(this.dialer.call) && this.dialer.call.direction === 'OUTGOING' && (!_.isEmpty(this.dialer.callFishing) && _.isEmpty(this.dialer.callFishing.communication))
+      return !_.isEmpty(this.dialer.call) &&
+        this.dialer.call.direction === 'OUTGOING' &&
+        !this.hasCallFishingCommunication
     },
     isOnPowerDialerSessionRoute () {
       return this.$route.meta.id === 'power-dialer-session'
     },
     isCallFishingCommunicationInParkedCalls () {
       if (_.isEmpty(this.parkedCalls)) {
+        return false
+      }
+
+      if (_.isEmpty(this.dialer.callFishing)) {
         return false
       }
 
@@ -1694,20 +1710,31 @@ export default {
         return true
       }
 
+      if (_.isEmpty(this.dialer.callFishing)) {
+        return false
+      }
+
       const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
       return _.isEmpty(found)
     },
     isDeclineCallVisible () {
-      return this.dialer.call !== undefined || (this.dialer.callFishing && this.dialer.callFishing.communication === undefined)
+      return this.dialer.call !== undefined ||
+        !this.hasCallFishingCommunication
     },
     isIgnoreCallVisible () {
-      return this.dialer.callFishing && this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls && !this.isIgnored
+      return this.hasCallFishingCommunication &&
+        !this.isCallFishingCommunicationInParkedCalls &&
+        !this.isIgnored
     },
     isAnswerCallVisible () {
-      return (this.dialer.call !== undefined && (!this.dialer.callFishing || (this.dialer.callFishing && this.dialer.callFishing.communication === undefined))) || (this.dialer.callFishing.communication !== undefined && !this.isCallFishingCommunicationInParkedCalls)
+      return (this.dialer.call !== undefined &&
+          !this.hasCallFishingCommunication) ||
+        (this.hasCallFishingCommunication &&
+          !this.isCallFishingCommunicationInParkedCalls)
     },
     isUnparkCallVisible () {
-      return this.dialer.callFishing && this.dialer.callFishing.communication !== undefined && this.isCallFishingCommunicationInParkedCalls
+      return this.hasCallFishingCommunication &&
+        this.isCallFishingCommunicationInParkedCalls
     }
   },
   created () {
@@ -1806,7 +1833,8 @@ export default {
     },
     answerCall () {
       this.$VueEvent.fire('answerCall')
-      if (this.dialer.callFishing.communication) {
+
+      if (this.hasCallFishingCommunication) {
         this.$VueEvent.fire('makeCall', {
           currentNumber: 'call:' + _.get(this.dialer, 'callFishing.communication.id', null),
           outboundCampaignId: _.get(this.dialer, 'callFishing.communication.campaign_id', null),
@@ -1816,6 +1844,7 @@ export default {
         })
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
+
       this.changeScreen('menu')
     },
     rejectCall () {
@@ -1938,7 +1967,11 @@ export default {
       }, 1000)
     },
     unparkCommunication () {
-      this.$VueEvent.fire('unparkCommunication', this.dialer.callFishing.communication)
+      if (!this.hasCallFishingCommunication) {
+        return
+      }
+
+      this.$VueEvent.fire('unparkCall', this.dialer.callFishing.communication)
     },
     saveAndResetExpansion ($event) {
       if ($event) {

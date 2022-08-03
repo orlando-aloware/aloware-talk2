@@ -868,13 +868,16 @@ export default {
       }, 1000)
     }
 
-    this.listeners.updateCommunication = (communication) => {
+    this.listeners.updateInboxCommunication = (communication) => {
       if (!communication.contact_id || this.isSearch) {
         return
       }
 
       // do not alter when contact is in live call and live comm is different from the one in the dialer
-      if (this.dialer.contact && this.dialer.communication && communication.contact_id === this.dialer.contact.id && this.dialer.communication.id !== communication.id) {
+      if (this.dialer.contact &&
+        this.dialer.communication &&
+        communication.contact_id === this.dialer.contact.id &&
+        this.dialer.communication.id !== communication.id) {
         return
       }
 
@@ -885,11 +888,19 @@ export default {
 
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      const loopData = {
+        keys: Object.keys(communication),
+        key: null
+      }
       let contactTaskToRemove = null
 
       if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
         const liveContacts = _.cloneDeep(this.liveContacts)
-        liveContacts[index].last_communication = communication
+
+        for (loopData.key of loopData.keys) {
+          liveContacts[index].last_communication[loopData.key] = communication[loopData.key]
+        }
+
         // if type is call and completed/voicemail then remove from live calls
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
           communication.type === CommunicationTypes.CALL &&
@@ -930,7 +941,11 @@ export default {
       const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
         const contacts = _.cloneDeep(this.contacts)
-        contacts[contactIndex].last_communication = communication
+
+        for (loopData.key of loopData.keys) {
+          contacts[contactIndex].last_communication[loopData.key] = communication[loopData.key]
+        }
+
         this.setContacts(contacts)
         if (contacts[contactIndex].id === this.contact.id) {
           this.setContact(contacts[contactIndex])
@@ -1068,7 +1083,7 @@ export default {
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.listen('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
 
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
@@ -1089,7 +1104,7 @@ export default {
     this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
     this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.stop('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)

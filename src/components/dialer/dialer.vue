@@ -335,12 +335,8 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('unparkCall', () => {
-      this.unparkCall()
-    })
-
-    this.$VueEvent.listen('unparkCommunication', (data) => {
-      this.unparkCommunication(data)
+    this.$VueEvent.listen('unparkCall', (data = null, preventClear = false) => {
+      this.unparkCall(data, preventClear)
     })
 
     this.$VueEvent.listen('mergeCalls', () => {
@@ -747,48 +743,29 @@ export default {
       })
     },
 
-    unparkCall () {
-      if (!this.dialer.parkedCall) {
+    unparkCall (parkedCallData = null, preventClear = false) {
+      if (!parkedCallData && !this.dialer.parkedCall) {
         return
       }
 
       this.loadingUnpark = true
-      const parkedCall = this.dialer.parkedCall
-      this.removeParkedCall(this.dialer.parkedCall.id)
-      this.setDialerParkedCall()
-      this.stopParkedCallTimer()
-      const data = {
-        currentNumber: 'unpark:' + parkedCall.id,
-        outboundCampaignId: parkedCall.campaign_id,
-        contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
-        companyName: (parkedCall.contact) ? parkedCall.contact.company_name : '',
-        contactId: parkedCall.contact_id
-      }
-      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
-      this.loadingUnpark = false
-      this.setDialerRecordingStatus('paused')
-      console.log('Unpark is in progress.')
+      const parkedCall = parkedCallData || this.dialer.parkedCall
 
-      if (this.isMobile) {
-        this.$VueEvent.fire('doneUnparkCall')
-      }
-    },
-
-    unparkCommunication (parkedCallData, preventClear = false) {
-      this.loadingUnpark = true
-
-      if (!preventClear) {
+      if ((parkedCallData && !preventClear) || !parkedCallData) {
         this.setDialerParkedCall()
         this.stopParkedCallTimer()
       }
 
       const data = {
-        currentNumber: 'unpark:' + parkedCallData.id,
-        outboundCampaignId: parkedCallData.campaign_id,
-        contactName: (parkedCallData.contact) ? parkedCallData.contact.name : '',
-        companyName: (parkedCallData.contact) ? parkedCallData.contact.company_name : '',
-        contactId: parkedCallData.contact_id
+        currentNumber: 'unhold:' + parkedCall.id,
+        outboundCampaignId: parkedCall.campaign_id,
+        contactName: (parkedCall.contact) ? parkedCall.contact.name : '',
+        companyName: (parkedCall.contact) ? parkedCall.contact.company_name : '',
+        contactId: parkedCall.contact_id,
+        id: parkedCall.id
       }
+
+      this.removeParkedCall(data.id)
       this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
       this.loadingUnpark = false
       this.setDialerRecordingStatus('paused')
@@ -816,7 +793,7 @@ export default {
         }
 
         if (shouldUnpark) {
-          this.unparkCommunication(data, true)
+          this.unparkCall(data, true)
         }
 
         this.setDialerIsMuted(false)
@@ -854,7 +831,7 @@ export default {
             setTimeout(() => {
               switch (true) {
                 case shouldUnpark:
-                  this.unparkCommunication(data)
+                  this.unparkCall(data)
                   break
                 case shouldAnswer:
                   this.makeCall('call:' + data.id, data.campaignId)
@@ -1338,7 +1315,6 @@ export default {
     this.$VueEvent.stop('forceRefreshCommunication')
     this.$VueEvent.stop('parkCall')
     this.$VueEvent.stop('unparkCall')
-    this.$VueEvent.stop('unparkCommunication')
     this.$VueEvent.stop('answerCallFishing')
     this.$VueEvent.stop('mergeCalls')
     this.$VueEvent.stop('dropThirdParty')

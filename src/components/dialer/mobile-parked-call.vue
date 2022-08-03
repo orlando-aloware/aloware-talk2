@@ -73,7 +73,7 @@ export default {
       }
 
       this.loadingUnpark = true
-      this.$VueEvent.fire('unparkCommunication', {
+      this.$VueEvent.fire('unparkCall', {
         id: this.communication.id,
         campaign_id: this.communication.campaign_id,
         contact: this.communication.contact,
