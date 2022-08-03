@@ -396,6 +396,7 @@ export default {
       general_audit_properties: [
         'disposition_status_id',
         'user_id',
+        'lead_source_id',
         'workflow_id',
         'phone_number',
         'email',
@@ -443,7 +444,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses']),
+    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'leadSources']),
     ...mapState('cache', ['currentCompany']),
 
     getCommunicationClass () {
@@ -581,20 +582,17 @@ export default {
       const toValue = { data: '' }
 
       if (data.from) {
-        fromValue.data = data.property === 'disposition_status_id' ? this.getContactDisposition(data.from).name : ''
-        fromValue.data = data.property === 'user_id' ? this.getUser(data.from).name : fromValue.data
-        fromValue.data = !['disposition_status_id', 'user_id'].includes(data.property) ? data.from : fromValue.data
+        fromValue.data = this.getValue(data.property, data.from)
       }
 
       if (data.to) {
-        toValue.data = data.property === 'disposition_status_id' ? this.getContactDisposition(data.to).name : ''
-        toValue.data = data.property === 'user_id' ? this.getUser(data.to).name : toValue.data
-        toValue.data = !['disposition_status_id', 'user_id'].includes(data.property) ? data.to : toValue.data
+        toValue.data = this.getValue(data.property, data.to)
       }
 
       if (!data.from && data.to) {
         switch (data.property) {
           case 'disposition_status_id':
+          case 'lead_source_id':
           case 'user_id':
             return generalMessage.data + ' has been set to "' + toValue.data + '"'
           case 'workflow_id':
@@ -603,12 +601,21 @@ export default {
       }
 
       if (data.from && data.to && data.property !== 'workflow_id') {
-        return generalMessage.data + ' has been changed from "' + fromValue.data + '" to "' + toValue.data + '"'
+        const hsContactAuditProperties = ['user_id', 'disposition_status_id']
+        generalMessage.data += ' has been changed from "' + fromValue.data + '" to "' + toValue.data + '"'
+
+        // Add reason for hubspot property change
+        if (data.notes && data.notes !== '' && hsContactAuditProperties.includes(data.property)) {
+          generalMessage.data += '. Reason: ' + data.notes
+        }
+
+        return generalMessage.data
       }
 
       if (data.from && !data.to) {
         switch (data.property) {
           case 'disposition_status_id':
+          case 'lead_source_id':
           case 'user_id':
             return generalMessage.data + ' has been removed from "' + fromValue.data + '"'
           case 'workflow_id':
@@ -617,6 +624,25 @@ export default {
       }
 
       return ''
+    },
+
+    getValue (property, data) {
+      let value = ''
+      switch (property) {
+        case 'disposition_status_id':
+          value = this.getContactDisposition(data).name
+          break
+        case 'lead_source_id':
+          value = this.getLeadSource(data).name
+          break
+        case 'user_id':
+          value = this.getUser(data).name
+          break
+        default:
+          value = data
+          break
+      }
+      return value
     },
 
     generateCustomAuditMessage (communication) {
@@ -798,9 +824,25 @@ export default {
         this.isRetryingSendSms = false
       })
     },
+
     getNotesBottomLabel () {
       const name = this.getUser(this.communication.user_id).name
       return name + (name.charAt(name.length - 1) === 's' ? `'` : `'s`) + ' note'
+    },
+
+    getLeadSource (leadSourceId) {
+      if (!leadSourceId) {
+        return { name: '' }
+      }
+
+      leadSourceId = parseInt(leadSourceId)
+      let found = this.leadSources.find(leadSource => leadSource.id === leadSourceId)
+
+      if (found) {
+        return found
+      }
+
+      return { name: '' }
     }
   }
 }

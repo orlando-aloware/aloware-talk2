@@ -71,14 +71,37 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn :ripple="false"
+           icon="img:app-icons/menu/power_dialer_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100 disabled"
+           v-show="!isActive('Power Dialer') && !profile.auto_dialer_enabled"
+           flat
+           @click="toggleProFeatureDialog(true)">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
+      <q-tooltip
+        anchor="center right"
+        self="center left"
+        :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Power Dialer</span>
+      </q-tooltip>
+    </q-btn>
     <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Power Dialer')"
+           v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
@@ -92,8 +115,12 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Power Dialer')"
+           v-show="!isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
@@ -181,7 +208,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -195,6 +222,7 @@ export default {
   },
 
   computed: {
+    ...mapState('auth', ['profile']),
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -238,6 +266,7 @@ export default {
       }
     },
 
+    ...mapActions(['toggleProFeatureDialog']),
     ...mapActions('auth', ['logout'])
   },
 

@@ -667,6 +667,11 @@ body,
       box-shadow: none;
     }
   }
+
+  .q-badge--floating {
+    top: 8px;
+    right: 15px;
+  }
 }
 
 .page-footer {
@@ -679,6 +684,11 @@ body,
       height: 20px;
       margin-bottom: 7px;
       color: $grey-30;
+
+      .q-badge--floating {
+        top: 2px;
+        right: 14px;
+      }
     }
     font-family: $font-family-body;
     font-size: 10px;
@@ -11273,4 +11283,14 @@ h1.contact-list-name-label {
 
 .hubspot-crm-iframe {
   overflow: hidden;
+}
+
+#pro-feature-alert {
+  .modal-header {
+    border: none;
+  }
+}
+
+.hyperlink-color {
+  color: $blue-5;
 }

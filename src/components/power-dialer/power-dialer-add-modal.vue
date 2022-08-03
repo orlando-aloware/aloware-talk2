@@ -115,7 +115,6 @@ export default {
   data: () => ({
     loading: false,
     conversion: [
-      'multiple_phone_numbers',
       'prevent_duplicates'
     ],
     where: 'queue',
@@ -128,11 +127,11 @@ export default {
           helper: 'Any non-primary numbers of a contact will be turned into separate tasks'
         }, {
           value: 'prevent_duplicates',
-          text: 'Don\'t add duplicate phone numbers',
-          helper: 'If unselected, duplicate numbers will be turned into separate tasks'
+          text: 'Prevent duplicate phone numbers',
+          helper: 'If selected, duplicate numbers will not be included again'
         }, {
           value: 'allow_international_phone_numbers',
-          text: 'Don\'t add international phone numbers'
+          text: 'Add international phone numbers'
         }
       ],
       where: [

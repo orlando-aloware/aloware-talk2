@@ -32,16 +32,16 @@
            v-if="$route.name === 'Inbox' || ($route.meta && $route.meta.title && $route.meta.title === 'Communications')">
         <b-form-checkbox
           class="mt-2 cursor-pointer"
-          :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
+          :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
           size="sm"
           switch
-          :disabled="!isInboxFiltersLoaded || isGettingTasksList"
+          :disabled="!isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts"
           v-model="inboxShowMyContactsFilter"
         >
         </b-form-checkbox>
         <label class="text-primary mr-2 mt-2 cursor-pointer"
-               :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList }"
-               @click="inboxShowMyContactsFilter = !inboxShowMyContactsFilter">My Contacts</label>
+               :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
+               @click="myContactsFilterChange">My Contacts</label>
       </div>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
@@ -66,6 +66,20 @@
         <shared-login-menu v-if="!isElectron"></shared-login-menu>
 
         <header-help></header-help>
+
+        <q-item>
+          <q-item-section class="nav-item dropdown">
+            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
+              <span class="fa fa-bullhorn changelog-trigger pointer"
+                    style="font-size: 1.2rem">
+              </span>
+              <AnnounceKit style="position: fixed;"
+                           catchClick=".ak-trigger"
+                           :user="currentUser"
+                           :widget="ak_widget_url" />
+            </div>
+          </q-item-section>
+        </q-item>
 
         <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'"></profile>
 
@@ -133,6 +147,7 @@
 
 <script>
 import _ from 'lodash'
+import * as storage from 'src/plugins/helpers/storage'
 import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
@@ -152,6 +167,7 @@ import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
+import AnnounceKit from 'announcekit-vue'
 
 export default {
   name: 'app-header',
@@ -174,7 +190,8 @@ export default {
     Profile,
     CompactBtn,
     RefreshIcon,
-    HeaderHelp
+    HeaderHelp,
+    AnnounceKit
   },
 
   props: {
@@ -218,7 +235,8 @@ export default {
     ...mapState('inbox', [
       'inboxShowMyContacts',
       'isInboxFiltersLoaded',
-      'isGettingTasksList'
+      'isGettingTasksList',
+      'isFetchingContacts'
     ]),
     ...mapState('stats', [
       'metricLoader',
@@ -259,6 +277,20 @@ export default {
     },
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
+    },
+    ak_widget_url () {
+      return storage.local.getItem('ak_widget_url')
+    },
+    currentUser () {
+      if (!this.profile) {
+        return {}
+      }
+
+      return {
+        id: this.profile.id,
+        email: this.profile.email,
+        name: this.profile.name
+      }
     },
     backRoute () {
       if (this.$route.name === 'Communication') {
@@ -368,10 +400,18 @@ export default {
       }
     },
 
+    myContactsFilterChange () {
+      if (!this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts) {
+        return
+      }
+
+      this.inboxShowMyContactsFilter = !this.inboxShowMyContactsFilter
+    },
+
     onMyContactsChange () {
       this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
 
-      if (['Inbox', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+      if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
         this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter)
         return
       }

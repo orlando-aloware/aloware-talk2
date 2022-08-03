@@ -265,10 +265,9 @@ export default {
       return [
         ...this.incomingCalls,
         ...this.contacts.filter(item => {
-          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+          const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-          if (this.inboxShowMyContacts &&
-            isFilterOrUnownedContact !== null) {
+          if (isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -297,10 +296,9 @@ export default {
           return false
         }
 
-        const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+        const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-        if (this.inboxShowMyContacts &&
-          isFilterOrUnownedContact !== null) {
+        if (isFilterOrUnownedContact !== null) {
           return isFilterOrUnownedContact
         }
 
@@ -317,10 +315,9 @@ export default {
             return false
           }
 
-          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+          const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-          if (this.inboxShowMyContacts &&
-            isFilterOrUnownedContact !== null) {
+          if (isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -334,10 +331,9 @@ export default {
             return false
           }
 
-          const isFilterOrUnownedContact = this.checkFilterAndUnownedContact(item)
+          const isFilterOrUnownedContact = this.inboxShowMyContacts ? this.checkFilterAndUnownedContact(item) : null
 
-          if (this.inboxShowMyContacts &&
-            isFilterOrUnownedContact !== null) {
+          if (isFilterOrUnownedContact !== null) {
             return isFilterOrUnownedContact
           }
 
@@ -591,6 +587,7 @@ export default {
     },
     onApplyFilter (filter) {
       this.filter = filter
+      this.isLoaded = false
       this.loadContactTasks()
       this.loadTaskCounts()
     },
@@ -643,22 +640,22 @@ export default {
     },
     checkFilterAndUnownedContact (contact) {
       if (this.dialer.communication &&
+        contact.last_communication &&
         contact.last_communication.id === this.dialer.communication.id &&
-        (this.isNotOwned(contact.user_id) ||
-          this.isNotOwnedFilter(contact.user_id))) {
+        (this.isNotOwned(contact.user_id) || this.isNotOwnedFilter(contact.user_id))) {
         return true
       }
 
-      const found = this.parkedCalls.find(comm => comm.id === contact.last_communication.id)
+      const found = contact.last_communication ? this.parkedCalls.find(comm => comm.id === contact.last_communication.id) : false
 
       if (found) {
         return true
       }
 
-      if (contact.last_communication.ring_group_id &&
+      if (contact.last_communication &&
+        contact.last_communication.ring_group_id &&
         this.checkCommunicationRingGroupHasCurrentUser(contact.last_communication.ring_group_id) &&
-        (contact.last_communication.user_id === null ||
-          contact.last_communication.user_id === this.profile.id) &&
+        (contact.last_communication.user_id === null || contact.last_communication.user_id === this.profile.id) &&
         ![
           CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
@@ -680,7 +677,6 @@ export default {
   },
 
   mounted () {
-    const _this = this
     this.setContacts([])
     this.setStatus()
 
@@ -693,12 +689,12 @@ export default {
         this.setLoadingOpenTaskCount(true)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
 
-        this.loadContactTasks(false).finally(function () {
-          if (_this.$route.params.id) {
-            const id = _this.$route.params.id
-            const contact = _this.contactTasks.find(item => item.id.toString() === id)
+        this.loadContactTasks(false).finally(() => {
+          if (this.$route.params.id) {
+            const id = this.$route.params.id
+            const contact = this.contactTasks.find(item => item.id.toString() === id)
             if (contact) {
-              _this.setSelectedContact(contact)
+              this.setSelectedContact(contact)
             }
           }
         })
@@ -970,9 +966,8 @@ export default {
         case [ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && ['closed'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['pending'].includes(this.$route.params.status):
         case [ContactTaskStatus.STATUS_CLOSED].includes(contact.task_status) && ['open'].includes(this.$route.params.status):
-          const _this = this
-          this.onItemRemoved(contact, function () {
-            _this.onItemSelected(_this.contacts[0])
+          this.onItemRemoved(contact, () => {
+            this.onItemSelected(this.contacts[0])
           }, false)
           this.loadContactTasks(false, false)
           break
@@ -1041,7 +1036,11 @@ export default {
       }
     }
 
-    this.listeners.inboxLoadContacts = (showMyContacts) => {
+    this.listeners.inboxLoadContacts = _.debounce((showMyContacts) => {
+      if (!this.isLoaded) {
+        return
+      }
+
       if (showMyContacts) {
         this.filter.contact_owner = []
         this.updateChannelChangedFilterFields({
@@ -1050,8 +1049,20 @@ export default {
         })
       }
 
-      this.loadContactTasks()
-    }
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.loadContactTasks(false).finally(() => {
+        if (this.$route.params.id) {
+          const id = this.$route.params.id
+          const contact = this.contactTasks.find(item => item.id.toString() === id)
+          if (contact) {
+            this.setSelectedContact(contact)
+          }
+        }
+      })
+    }, 100)
 
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)

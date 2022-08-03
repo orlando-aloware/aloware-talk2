@@ -218,7 +218,7 @@ export default function (/* { ssrContext } */) {
           queue: null
         }
       },
-      showIncomingCallNotification: true,
+      showIncomingCallNotification: false,
       // cached states
       sidebarFolded: false,
       tagOptions: {
@@ -248,7 +248,9 @@ export default function (/* { ssrContext } */) {
       notificationAudio: null,
       loadingParkedCalls: false,
       parkedCalls: [],
-      suspended: false
+      suspended: false,
+      showProFeatureDialog: false,
+      leadSources: []
     },
 
     getters: {
@@ -721,6 +723,12 @@ export default function (/* { ssrContext } */) {
       },
       setSuspended ({ commit }, value) {
         commit('SET_SUSPENDED', value)
+      },
+      toggleProFeatureDialog ({ commit }, value) {
+        commit('TOGGLE_PRO_FEATURE_DIALOG', value)
+      },
+      setLeadSources ({ commit }, leadSources) {
+        commit('SET_LEAD_SOURCES', leadSources)
       }
     },
 
@@ -1390,6 +1398,14 @@ export default function (/* { ssrContext } */) {
 
       SET_SUSPENDED (state, value) {
         state.suspended = value
+      },
+
+      TOGGLE_PRO_FEATURE_DIALOG (state, value) {
+        state.showProFeatureDialog = value
+      },
+
+      SET_LEAD_SOURCES (state, leadSources) {
+        state.leadSources = leadSources
       },
 
       updateField
