@@ -15,7 +15,7 @@
       <router-link
         class="btn-header-nav-back"
         v-if="['Communication'].includes($route.name)"
-        :to="{ name: 'Contact', params: { id: $route.params.contactId }}">
+        :to="backRoute">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left"></i>
         </button>
@@ -196,6 +196,7 @@ export default {
     return {
       dialerStatus: false,
       loading: false,
+      prevRoute: null,
       inboxShowMyContactsFilter: false
     }
   },
@@ -258,6 +259,20 @@ export default {
     },
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
+    },
+    backRoute () {
+      if (this.$route.name === 'Communication') {
+        return {
+          name: 'Contact',
+          params: {
+            id: this.$route.params.contactId
+          }
+        }
+      }
+
+      return {
+        path: this.prevRoute
+      }
     }
   },
 
@@ -410,6 +425,9 @@ export default {
         delete query.call
         this.$router.replace({ query })
       }
+    },
+    $route (to, from) {
+      this.prevRoute = from.path
     },
     inboxShowMyContacts (value) {
       if (value !== this.inboxShowMyContactsFilter) {
