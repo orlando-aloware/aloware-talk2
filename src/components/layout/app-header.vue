@@ -15,7 +15,7 @@
       <router-link
         class="btn-header-nav-back"
         v-if="['Communication'].includes($route.name)"
-        :to="{ path: prevRoute }">
+        :to="backRoute">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left"></i>
         </button>
@@ -290,6 +290,20 @@ export default {
         id: this.profile.id,
         email: this.profile.email,
         name: this.profile.name
+      }
+    },
+    backRoute () {
+      if (this.$route.name === 'Communication') {
+        return {
+          name: 'Contact',
+          params: {
+            id: this.$route.params.contactId
+          }
+        }
+      }
+
+      return {
+        path: this.prevRoute
       }
     }
   },
