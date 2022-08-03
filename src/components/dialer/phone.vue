@@ -1697,10 +1697,6 @@ export default {
         return false
       }
 
-      if (_.isEmpty(this.dialer.callFishing)) {
-        return false
-      }
-
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.callFishing.communication.id)
 
       return !_.isEmpty(found)
@@ -1708,10 +1704,6 @@ export default {
     isIgnored () {
       if (_.isEmpty(this.callFishingQueue)) {
         return true
-      }
-
-      if (_.isEmpty(this.dialer.callFishing)) {
-        return false
       }
 
       const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
