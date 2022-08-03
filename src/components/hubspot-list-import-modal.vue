@@ -52,23 +52,34 @@
           <button
             class="btn btn-block btn-primary mt-0"
             @click="onSubmit"
-            :disabled="!listId || isLoading"
+            :disabled="!list || isLoading"
           >
-            Import
+            Next
           </button>
         </div>
       </div>
+      <power-dialer-add-modal :params="powerDialerParams"
+                              mode="hubspot"
+                              v-if="isAddPowerDialerOpen"
+                              @hidden="onHiddenPowerDialerModal">
+      </power-dialer-add-modal>
     </b-overlay>
   </b-modal>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import HubspotListSelector from 'components/generic-selectors/hubspot-list-selector'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 
 export default {
   name: 'hubspot-list-import-modal',
-  components: { HubspotListSelector },
+
+  components: {
+    HubspotListSelector,
+    PowerDialerAddModal
+  },
+
   props: {
     isContactModule: {
       type: Boolean,
@@ -79,7 +90,19 @@ export default {
       default: false
     }
   },
+
+  data () {
+    return {
+      isLoading: false,
+      errorMsg: '',
+      list: null
+    }
+  },
+
   computed: {
+    ...mapState('contacts', [
+      'isAddPowerDialerOpen'
+    ]),
     getTitle () {
       return 'Import From Hubspot List'
     },
@@ -89,29 +112,50 @@ export default {
     foldersEndpoint () {
       return '/api/v2/power-dialer-folders'
     },
-    redirectPath () {
-      return `/power-dialer/list`
+    powerDialerParams () {
+      return {
+        target: this.list.listId,
+        size: this.list.metaData.size
+      }
     }
+    // redirectPath () {
+    //   return `/power-dialer/list`
+    // }
   },
+
   methods: {
-    ...mapActions('contacts',
-      [
-        'foldersLoaded'
-      ]
-    ),
+    ...mapActions('contacts', [
+      'foldersLoaded',
+      'addPowerDialerOpen'
+    ]),
     onClose () {
       if (!this.isLoading) {
         this.$emit('close')
       }
     },
-    onListSelectorChange (id) {
-      this.listId = id
+    onListSelectorChange (list) {
+      this.list = list
     },
     onSubmit () {
-      this.isLoading = true
-      // TODO send request to api endpoint
-    },
+      this.addPowerDialerOpen(true)
+      // this.isLoading = true
 
+      // // TODO send request to api endpoint
+      // this.$axios
+      //   .post(this.listsEndpoint + '/import-hubspot-list/' + this.listId)
+      //   .then(response => response.data)
+      //   .then(data => {
+      //     if (data.message) {
+      //       this.$generalNotification(data.message)
+      //     }
+
+      //     this.isLoading = false
+      //     this.onClose()
+      //   })
+      //   .catch(_err => {
+      //     this.$generalNotification('Unable to load contacts from folder, please try again.', 'error')
+      //   })
+    },
     loadFolders () {
       this.$axios
         .get(this.foldersEndpoint)
@@ -120,13 +164,9 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
-    }
-  },
-  data () {
-    return {
-      isLoading: false,
-      errorMsg: '',
-      listId: null
+    },
+    onHiddenPowerDialerModal () {
+      this.addPowerDialerOpen(false)
     }
   }
 }

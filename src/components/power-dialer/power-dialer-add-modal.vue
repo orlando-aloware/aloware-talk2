@@ -103,7 +103,7 @@ export default {
     },
     mode: {
       type: String,
-      default: 'add' // add, duplicate
+      default: 'add' // add, duplicate, hubspot
     }
   },
 
@@ -197,10 +197,15 @@ export default {
         this.count = this.params.contact_ids.length
         this.loading = false
       } else if (this.params.target) {
-        this.getListCount(this.params.target).then(res => {
-          this.count = res.data.count
+        if (this.mode === 'hubspot') {
+          this.count = this.params.size
           this.loading = false
-        })
+        } else {
+          this.getListCount(this.params.target).then(res => {
+            this.count = res.data.count
+            this.loading = false
+          })
+        }
       }
     },
     onHidden () {
@@ -227,6 +232,8 @@ export default {
           return this.addContacts()
         case 'duplicate':
           return this.duplicateList()
+        case 'hubspot':
+          return this.importFromHubspot()
       }
     },
     addContacts () {
@@ -261,6 +268,20 @@ export default {
           if (this.redirect) {
             this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
           }
+        })
+    },
+    importFromHubspot () {
+      return this.$axios
+        .post('/api/v2/power-dialer-lists/import-hubspot-list/' + this.params.target)
+        .then(response => response.data)
+        .then(data => {
+          this.reloadFolders()
+          this.$generalNotification(data.message)
+
+          // response nao vem id =/
+        })
+        .catch(_err => {
+          this.$generalNotification('Unable to load contacts from folder, please try again.', 'error')
         })
     },
     reloadFolders () {
