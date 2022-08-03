@@ -726,7 +726,10 @@ export default {
     resetTimer () {
       if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
         this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
-      } else {
+        return
+      }
+
+      if (!this.wrapUp) {
         this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
@@ -938,11 +941,6 @@ export default {
         this.startWarmUpCountDown()
       } else {
         this.initialize()
-      }
-    },
-    'dialer.currentStatus': function (value) {
-      if (value === 'WRAP_UP') {
-        this.onNextTaskWhenOnWrapUp()
       }
     }
   },
