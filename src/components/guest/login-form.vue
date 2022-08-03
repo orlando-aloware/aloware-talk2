@@ -134,6 +134,7 @@ export default {
       this.loading = false
       if (err.response?.status !== 401) {
         console.log(err)
+        this.$handleErrors(err.response)
       } else {
         // show notification
         this.$generalNotification(err.response?.data?.error, 'error')
@@ -146,6 +147,7 @@ export default {
       this.resetVuex(['all'])
       this.setCurrentCompany(company)
       this.setUsage(usage)
+      this.setDefaultShowMyContacts()
 
       storage.local.setItem('company_id', company.id)
 
@@ -153,7 +155,7 @@ export default {
       if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && !this.isAdmin) {
         location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
-        const redirectPath = this.$route.query.redirect || '/'
+        const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
 
         await this.$router.push(String(redirectPath))
         await this.redirectTimeout()
@@ -188,9 +190,19 @@ export default {
       }
     },
 
-    ...mapActions('cache', ['setCurrentCompany']),
-    ...mapActions(['resetVuex', 'setUsage']),
-    ...mapActions('auth', ['login'])
+    ...mapActions('cache', [
+      'setCurrentCompany'
+    ]),
+    ...mapActions([
+      'resetVuex',
+      'setUsage'
+    ]),
+    ...mapActions('auth', [
+      'login'
+    ]),
+    ...mapActions('inbox', [
+      'setDefaultShowMyContacts'
+    ])
   }
 }
 </script>

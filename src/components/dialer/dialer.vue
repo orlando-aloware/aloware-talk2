@@ -68,6 +68,12 @@ export default {
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
+
+        const user = this.getUser(this.dialer.communication.added_user_id)
+        if (user.name) {
+          this.setAddedParty(user)
+        }
+
         if (this.dialer.communication.contact) {
           this.setDialerContact(this.dialer.communication.contact)
         }
@@ -122,7 +128,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.OFFLINE, (device) => {
-      this.removeUnownedLiveContactTask(this.dialer.contact.id)
+      this.removeUnownedLiveContactTask()
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         this.setDialerIsReady(false)
@@ -131,7 +137,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
-      this.removeUnownedLiveContactTask(this.dialer.contact.id)
+      this.removeUnownedLiveContactTask()
       this.handleError(error)
       this.backToDial()
     })
@@ -162,9 +168,11 @@ export default {
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
-        this.$VueEvent.fire('new_in_app_call', res.data)
-        this.processActionNotification(res.data, 'call')
-        this.addNonOwnedLiveContact(res.data)
+        if (res) {
+          this.$VueEvent.fire('new_in_app_call', res.data)
+          this.processActionNotification(res.data, 'call')
+          this.addNonOwnedLiveContact(res.data)
+        }
       }).finally(() => {
         // this.$router.push({ name: 'Incoming Call' }).catch(err => {
         //   console.log(err)s
@@ -279,8 +287,8 @@ export default {
       this.hangupCall()
     })
 
-    this.$VueEvent.listen('answerCall', () => {
-      this.answerCall()
+    this.$VueEvent.listen('answerCall', (communication = null) => {
+      this.answerCall(communication)
       this.$closeActionNotification('incomingCall')
       this.$closeActionNotification('callFishing')
     })
@@ -558,7 +566,7 @@ export default {
       }
     },
 
-    answerCall () {
+    answerCall (communication = null) {
       if (!this.dialer.call) {
         return
       }
@@ -568,6 +576,11 @@ export default {
       this.setDialerCurrentStatus('ANSWERING_CALL')
       this.setShowIncomingCallNotification(false)
       this.clearDialerCallFishing()
+
+      if (communication) {
+        this.answerCallFishing(communication)
+        return
+      }
 
       if (this.device.activeConnection()) {
         if (this.isMobile && this.$route.name !== 'Phone') {
@@ -926,6 +939,7 @@ export default {
         console.log('Transfer is in progress')
       }).catch(err => {
         console.log(err)
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.loadingTransfer = false
       })
@@ -977,6 +991,7 @@ export default {
       }).catch(err => {
         this.setAddedParty()
         console.log(err)
+        this.$handleErrors(err.response)
       }).finally(() => {
         this.loadingAdd = false
       })
@@ -998,7 +1013,7 @@ export default {
       this.setDialerIsHeld(false)
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
-      this.setShowIncomingCallNotification(true)
+      this.setShowIncomingCallNotification(false)
     },
 
     countCallDuration () {
@@ -1225,6 +1240,7 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      this.setShowIncomingCallNotification(false)
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'

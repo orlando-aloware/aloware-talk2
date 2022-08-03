@@ -177,7 +177,7 @@ export const DEFAULT_STATE = {
       queue: null
     }
   },
-  showIncomingCallNotification: true,
+  showIncomingCallNotification: false,
   // cached states
   sidebarFolded: false,
   currentCompany: null,
@@ -208,5 +208,6 @@ export const DEFAULT_STATE = {
   sessionPhoneExpansion: '',
   notificationAudio: null,
   loadingParkedCalls: false,
-  parkedCalls: []
+  parkedCalls: [],
+  suspended: false
 }

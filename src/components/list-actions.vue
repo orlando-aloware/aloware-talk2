@@ -10,7 +10,7 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="type === ContactListTypes.DYNAMIC && listId"
+      v-if="type === ContactListTypes.DYNAMIC && listId && false"
       @click="$emit('clonestatic')"
     >
       <template slot="icon">

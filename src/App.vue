@@ -14,7 +14,7 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <intercom></intercom>
+    <intercom v-if="authenticated && profile && profile.enabled"></intercom>
   </div>
 </template>
 <script>
@@ -33,7 +33,11 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['profile', 'authenticated', 'loading'])
+    ...mapState('auth', ['profile', 'authenticated', 'loading']),
+    isFromClassic () {
+      const urlParams = new URLSearchParams(window.location.search)
+      return Number(urlParams.get('from_classic'))
+    }
   },
   created () {
     // proceed to cookie validation if account is talk allowed access
@@ -45,6 +49,10 @@ export default {
         this.validateCookieUser()
       }
     })
+
+    if (this.isFromClassic) {
+      this.setDefaultShowMyContacts()
+    }
   },
   mounted () {
     // if account is not allowed to access talk, we need to logout
@@ -87,6 +95,13 @@ export default {
         this.$router.replace('/')
       })
     })
+
+    this.$VueEvent.listen('user_logout', (data) => {
+      if (this.authenticated) {
+        this.clearUser()
+        this.$router.push({ name: 'Login' })
+      }
+    })
   },
   watch: {
     authenticated () {
@@ -116,11 +131,8 @@ export default {
       storage.local.setItem('shared_cookie', this.sharedCookie)
       storage.local.setItem('company_id', company.id)
 
-      const urlParams = new URLSearchParams(window.location.search)
-      const fromClassic = Number(urlParams.get('from_classic'))
-
       // we need to redirect and reload if coming from classic instead of simply router push
-      if (fromClassic) {
+      if (this.isFromClassic) {
         location.href = '/'
       }
     },
@@ -167,12 +179,18 @@ export default {
     ...mapActions('auth', {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
-      getSharedCookie: 'getSharedCookie'
+      getSharedCookie: 'getSharedCookie',
+      clearUser: 'clear'
     }),
-    ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions('cache', [
+      'setCurrentCompany'
+    ]),
     ...mapActions([
       'resetVuex',
       'setUsage'
+    ]),
+    ...mapActions('inbox', [
+      'setDefaultShowMyContacts'
     ])
   }
 }

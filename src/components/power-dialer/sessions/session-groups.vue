@@ -2,8 +2,8 @@
   <div class="t-menu1 border-top">
     <q-card flat>
       <div
-        v-if="false"
-        class="t-menu__header d-flex align-items-center">
+        class="t-menu__header d-flex align-items-center"
+        v-if="false">
         <div class="header__header__title font-weight-bold p-3 flex-grow-1">
 
           <SearchList
@@ -36,15 +36,17 @@
         <div v-for="(group, key) in filteredTasks"
              :key="key">
           <q-expansion-item
-            :default-opened="key === 'in_queue'"
             class="t-expansion-panels px-0"
+            :default-opened="key === 'in_queue'"
             header-class="text-black">
             <template v-slot:header>
               <q-item-section
                 class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
                 <div class="text-13">
                   {{ listFilters[key.toUpperCase()].name }}
-                  <q-chip size="xs" square class="p-0">
+                  <q-chip size="xs"
+                          square
+                          class="p-0">
                     <span v-if="key === 'in_queue'">
                       {{ totalQueued }}
                     </span>
@@ -66,92 +68,105 @@
             </template>
 
             <q-card
-              :disabled="filterDisabled[key]"
-              class="t-cards">
+              class="t-cards"
+              :disabled="filterDisabled[key]">
               <q-list
-                v-if="group.length > 0"
                 class="px-2 pb-2"
+                v-if="group.length > 0"
                 @mouseleave="onLeave">
                 <template v-for="(itm, i) in group">
                   <q-item
+                    class="t-expansion-panel px-2"
                     :key="`acc-item-${i}`"
                     v-if="itm"
-                    :class="{ active: itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }"
-                    class="t-expansion-panel px-2">
+                    :class="{ active: itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }">
                     <div class="py-2">
                       <q-avatar
-                        v-if="avatarName(itm.first_name, itm.last_name)"
                         size="30px"
-                        color="grey">
+                        color="grey"
+                        v-if="avatarName(itm.first_name, itm.last_name)">
                         {{ avatarName(itm.first_name, itm.last_name) }}
                       </q-avatar>
                       <q-avatar
-                        v-else
                         size="30px"
-                        color="grey">
-                        <i class="fa fa-user" aria-hidden="true"></i>
+                        color="grey"
+                        v-else>
+                        <i class="fa fa-user"
+                           aria-hidden="true">
+                        </i>
                       </q-avatar>
                     </div>
                     <q-item-section class="pl-2">
-                      <q-item-label>{{ fetchName(itm) }}</q-item-label>
-                      <q-item-label caption lines="2">{{ itm.phone_number | fixPhone('NATIONAL', true) }}</q-item-label>
-                      <q-item-label caption lines="2">{{ itm.company_name }}</q-item-label>
+                      <q-item-label>
+                        {{ fetchName(itm) }}
+                      </q-item-label>
+                      <q-item-label caption
+                                    lines="2">
+                        {{ itm.phone_number | fixPhone('NATIONAL', true) }}
+                      </q-item-label>
+                      <q-item-label caption
+                                    lines="2">
+                        {{ itm.company_name }}
+                      </q-item-label>
                     </q-item-section>
                     <q-item-section
-                      v-if="!itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'"
                       class="t-item-icon"
+                      v-if="!itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'"
                       side top>
-                      <q-avatar color="red" size="md">
+                      <q-avatar color="red"
+                                size="md">
                         <PhoneIcon color="white" />
                       </q-avatar>
                     </q-item-section>
                     <b-dropdown
-                      @mouseover="onOver"
-                      @mouseleave="onLeave"
+                      class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top"
                       no-caret
                       right size="xs"
                       variant="white"
                       ref="dropdown"
-                      class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top"
-                      :disabled="isMoving || isDeleting">
+                      :disabled="isMoving || isDeleting"
+                      @mouseover="onOver"
+                      @mouseleave="onLeave">
 
                       <template #button-content>
-                        <i class="fa fa-ellipsis-h"></i>
+                        <i class="fa fa-ellipsis-h">
+                        </i>
                       </template>
 
                       <template>
                         <b-dropdown-item
+                          href="#"
                           v-if="key === 'in_queue'"
-                          @click="moveTask(itm, moveDirection.top)"
-                          href="#">
-                          <ArrowUpIcon height="16px" width="16px" />
+                          @click="moveTask(itm, moveDirection.top)">
+                          <ArrowUpIcon height="16px"
+                                       width="16px" />
                           Move to Top
                         </b-dropdown-item>
                         <b-dropdown-item
+                          href="#"
                           v-if="key === 'in_queue'"
-                          @click="moveTask(itm, moveDirection.bottom)"
-                          href="#">
+                          @click="moveTask(itm, moveDirection.bottom)">
                           <ArrowDownIcon height="15px" width="15px" />
                           Move to Bottom
                         </b-dropdown-item>
                         <b-dropdown-item
+                          href="#"
                           v-if="key !== 'in_queue'"
-                          @click="addTask(itm, moveDirection.top)"
-                          href="#">
+                          @click="addTask(itm, moveDirection.top)">
                           <ArrowUpIcon height="16px" width="16px" />
                           Add to Top of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item
+                          href="#"
                           v-if="key !== 'in_queue'"
-                          @click="addTask(itm, moveDirection.bottom)"
-                          href="#">
+                          @click="addTask(itm, moveDirection.bottom)">
                           <ArrowDownIcon height="15px" width="15px" />
                           Add to Bottom of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item
+                          href="#"
                           v-if="key === 'in_queue'"
-                          @click="onDeleteTask(itm)"
-                          href="#">
+                          @click="onDeleteTask(itm)">
                           <TrashIcon />
                           Remove from List
                         </b-dropdown-item>
@@ -160,18 +175,17 @@
                     </b-dropdown>
 
                     <div
-                      v-if="key === 'in_queue'"
                       class="dropdown t-btn-floater t-btn-floater__bottom"
+                      v-if="key === 'in_queue'"
                       ref="returnToQueue">
                       <q-btn
-                        @click="moveTask(itm, moveDirection.top)"
                         size="xs"
                         flat
                         round
-                        :disabled="isMoving || isDeleting">
+                        :disabled="isMoving || isDeleting"
+                        @click="moveTask(itm, moveDirection.top)">
                         <q-avatar size="15px">
-                          <!-- <img src="icons/refresh-call.png"> -->
-                          <ContactInQueue />
+                          <ContactInQueueIcon />
                         </q-avatar>
                       </q-btn>
                     </div>
@@ -179,14 +193,19 @@
                 </template>
               </q-list>
 
-              <div v-else class="px-0 pb-1 text-grey">
-                <q-card flat class="bg-grey-50 p-2 mx-3 my-2">
-                  <span class="px-2">No task listed</span>
+              <div class="px-0 pb-1 text-grey"
+                   v-else>
+                <q-card flat
+                        class="bg-grey-50 p-2 mx-3 my-2">
+                  <span class="px-2">
+                    No task listed
+                  </span>
                 </q-card>
               </div>
 
               <div v-if="hasMoreItems(group, key)">
-                <q-card flat class="px-1 m-0 p-0">
+                <q-card flat
+                        class="px-1 m-0 p-0">
                   <q-card-actions
                     vertical
                     align="center"
@@ -221,7 +240,7 @@ import PhoneIcon from 'components/icons/call-drop-icon'
 import ArrowDownIcon from 'components/icons/arrow-down-icon'
 import ArrowUpIcon from 'components/icons/arrow-up-icon'
 import TrashIcon from 'components/icons/trash-o-icon'
-import ContactInQueue from 'components/icons/contact-in-queue'
+import ContactInQueueIcon from 'components/icons/contact-in-queue-icon'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -236,7 +255,7 @@ export default {
   components: {
     SessionContactInProgress,
     SearchList,
-    ContactInQueue,
+    ContactInQueueIcon,
     PhoneIcon,
     ArrowDownIcon,
     ArrowUpIcon,
@@ -282,12 +301,19 @@ export default {
        * Filter and exclude the in-progress task
        * everytime items are displayed
        */
-      let { powerDialerTasks, activeTask } = this
-      let inQueue = this.powerDialerTasks.in_queue.filter(task => {
-        return !activeTask || (activeTask && task.contact_list_item_id !== activeTask.contact_list_item_id)
+
+      if (!this.activeTask) {
+        return {
+          ...this.powerDialerTasks,
+          in_queue: this.powerDialerTasks.in_queue
+        }
+      }
+
+      const inQueue = this.powerDialerTasks.in_queue.filter(task => {
+        return task && task.contact_list_item_id !== this.activeTask.contact_list_item_id
       })
       return {
-        ...powerDialerTasks,
+        ...this.powerDialerTasks,
         in_queue: inQueue
       }
     },
@@ -301,8 +327,7 @@ export default {
       return this.selectedList.id === this.myQueue.id
     },
     totalAll () {
-      let { totalQueued, totalCalled, totalFailed, totalScheduled } = this
-      return totalQueued + totalCalled + totalFailed + totalScheduled
+      return this.totalQueued + this.totalCalled + this.totalFailed + this.totalScheduled
     },
     totalQueued () {
       // let queued = this.powerDialerTasks.in_queue
@@ -355,7 +380,7 @@ export default {
       'getSessionTaskByFilter'
     ]),
     addTask (item = {}, direction = this.moveDirection.top) {
-      let params = {
+      const params = {
         contact_ids: [item?.id],
         direction: direction
       }
@@ -384,7 +409,7 @@ export default {
         }
       })
       if (res.status === 200) {
-        let res = await this.getSessionTaskByFilter({
+        const res = await this.getSessionTaskByFilter({
           id: this.selectedList.id,
           task_status: 1
         })
@@ -419,7 +444,7 @@ export default {
     async loadMore (key) {
       this.filterDisabled[key] = true
       this.groupPageFilters[key]++
-      let res = await this.getSessionTaskByFilter({
+      const res = await this.getSessionTaskByFilter({
         id: this.selectedList.id,
         task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
         per_page: this.itemsPerPage,
@@ -454,19 +479,21 @@ export default {
       // contact_ids:
     },
     totalCount (key = '') {
-      if (!key) return ''
-      let detail = this.listItems[this.selectedList.id]
+      if (!key) {
+        return ''
+      }
+
       switch (key.toUpperCase()) {
         case AutoDialTaskStatus.STATUSES.called:
-          return detail.total_called
+          return this.listItems[this.selectedList.id].total_called
         case AutoDialTaskStatus.STATUSES.failed:
-          return detail.total_failed
+          return this.listItems[this.selectedList.id].total_failed
         case AutoDialTaskStatus.STATUSES.in_queue:
-          return detail.total_queued
+          return this.listItems[this.selectedList.id].total_queued
         case AutoDialTaskStatus.STATUSES.scheduled:
-          return detail.total_scheduled
+          return this.listItems[this.selectedList.id].total_scheduled
         default:
-          return detail.total
+          return this.listItems[this.selectedList.id].total
       }
     },
     hasMoreItems (group = [], key) {
@@ -493,6 +520,7 @@ export default {
       if ((item.first_name === null || item.first_name === '') && (item.last_name === null || item.last_name === '')) {
         return `No Name`
       }
+
       return `${item?.first_name || ''} ${item?.last_name || ''}`
     }
   },

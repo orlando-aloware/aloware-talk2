@@ -270,8 +270,9 @@
         </b-form-row>
       </div>
 
-      <b-form-row v-if="isAdmin"
-                  class="mt-4" :id="`${SettingsMap.text_message_handling.hash_keyword}-container`">
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.text_message_handling.hash_keyword}-container`"
+                  v-if="canBeEdited && isNotOwnSettings && user.role_name === 'Company Agent'">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Text Message Handling (Beta)</h5>
@@ -291,98 +292,79 @@
         </b-col>
       </b-form-row>
 
-      <div :id="`${SettingsMap.can_change_contact_ownership.hash_keyword}-container`"
-           v-if="isNotOwnSettings">
-        <b-form-row class="mt-4">
+      <template v-if="!isAdmin && !user.is_destination">
+        <div :id="`${SettingsMap.can_change_contact_ownership.hash_keyword}-container`"
+             v-if="isNotOwnSettings && user.role_name === 'Company Agent'">
+          <b-form-row class="mt-4">
+            <b-col sm="12" md="12">
+              <div>
+                <h5 class="form-label">Change Contact Ownership</h5>
+                <p class="form-helper-text">If you don't want to allow this user to change contact ownership, please uncheck the checkbox below.</p>
+              </div>
+
+              <b-form-group label="" >
+                <b-form-checkbox
+                  v-model="user.can_change_contact_ownership"
+                  :value="true"
+                  :unchecked-value="false"
+                  @change="(eventPayload) => onUpdateFields(eventPayload, 'can_change_contact_ownership')"
+                >
+                  Can change contact ownership
+                </b-form-checkbox>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+        </div>
+
+        <b-form-row class="mt-4"
+                    :id="`${SettingsMap.can_modify_contact_ring_groups.hash_keyword}-container`"
+                    v-if="isNotOwnSettings && user.role_name === 'Company Agent'">
           <b-col sm="12" md="12">
             <div>
-              <h5 class="form-label">Change Contact Ownership</h5>
-              <p class="form-helper-text">If you don't want to allow this user to change contact ownership, please uncheck the checkbox below.</p>
+              <h5 class="form-label">Allow Contact Ring Groups Modification</h5>
+              <p class="form-helper-text">If you don't want to allow this user to modify the contact ring groups, please uncheck the checkbox below.</p>
             </div>
 
             <b-form-group label="" >
               <b-form-checkbox
-                v-model="user.can_change_contact_ownership"
+                v-model="user.can_modify_contact_ring_groups"
                 :value="true"
                 :unchecked-value="false"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'can_change_contact_ownership')"
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'can_modify_contact_ring_groups')"
               >
-                Can change contact ownership
+                Can modify contact ring groups
               </b-form-checkbox>
             </b-form-group>
           </b-col>
         </b-form-row>
 
-      </div>
+        <b-form-row class="mt-4"
+                    :id="`${SettingsMap.can_barge_and_whisper_on_call.hash_keyword}-container`"
+                    v-if="isNotOwnSettings && user.role_name === 'Company Agent'">
+          <b-col sm="12"
+                 md="12">
+            <div>
+              <h5 class="form-label">Allow Call Barge and Whisper</h5>
+              <p class="form-helper-text">If you don't want to allow this user to barge and/or whisper on a call, please uncheck "Can barge and whisper on a call".</p>
+            </div>
 
-      <b-form-row class="mt-4"
-                  :id="`${SettingsMap.can_modify_contact_ring_groups.hash_keyword}-container`"
-                  v-if="isNotOwnSettings">
-        <b-col sm="12" md="12">
-          <div>
-            <h5 class="form-label">Allow Contact Ring Groups Modification</h5>
-            <p class="form-helper-text">If you don't want to allow this user to modify the contact ring groups, please uncheck the checkbox below.</p>
-          </div>
-
-          <b-form-group label="" >
-            <b-form-checkbox
-              v-model="user.can_modify_contact_ring_groups"
-              :value="true"
-              :unchecked-value="false"
-              @change="(eventPayload) => onUpdateFields(eventPayload, 'can_modify_contact_ring_groups')"
-            >
-              Can modify contact ring groups
-            </b-form-checkbox>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
-
-      <b-form-row class="mt-4"
-                  :id="`${SettingsMap.can_barge_and_whisper_on_call.hash_keyword}-container`"
-                  v-if="isNotOwnSettings">
-        <b-col sm="12"
-               md="12">
-          <div>
-            <h5 class="form-label">Allow Call Barge and Whisper</h5>
-            <p class="form-helper-text">If you don't want to allow this user to barge and/or whisper on a call, please uncheck "Can barge and whisper on a call".</p>
-          </div>
-
-          <b-form-group label="" >
-            <b-form-checkbox
-              v-model="user.can_barge_and_whisper_on_call"
-              :value="true"
-              :unchecked-value="false"
-              @change="(eventPayload) => onUpdateFields(eventPayload, 'can_barge_and_whisper_on_call')"
-            >
-              Can barge and whisper on a call
-            </b-form-checkbox>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
-
-      <b-form-row v-if="isAdmin"
-                  class="mt-4"
-                  :id="`${SettingsMap.campaign_id.hash_keyword}-container`">
-        <b-col sm="12"
-               md="6">
-          <div>
-            <h5 class="form-label">User's Personal Line</h5>
-          </div>
-
-          <b-form-group label=""
-                        class="mt-2">
-            <user-campaign-selector v-model="user.campaign_id"
-                                    :user="user"
-                                    :disable="!isAdmin"
-                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'campaign_id')">
-            </user-campaign-selector>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
+            <b-form-group label="" >
+              <b-form-checkbox
+                v-model="user.can_barge_and_whisper_on_call"
+                :value="true"
+                :unchecked-value="false"
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'can_barge_and_whisper_on_call')"
+              >
+                Can barge and whisper on a call
+              </b-form-checkbox>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
+      </template>
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.has_broadcast_access.hash_keyword}-container`"
-                  v-if="isNotOwnSettings">
+                  v-if="isNotOwnSettings && user.role_name === 'Company Agent' && !user.is_destination">
         <b-col sm="12"
                md="12">
           <div>
@@ -399,6 +381,49 @@
               @change="(eventPayload) => onUpdateFields(eventPayload, 'has_broadcast_access')">
               Can create and update broadcast
             </b-form-checkbox>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.can_delete_contact.hash_keyword}-container`"
+                  v-if="isNotOwnSettings && user.role_name === 'Company Agent' && !user.is_destination">
+        <b-col sm="12"
+               md="12">
+          <div>
+            <h5 class="
+            form-label">Delete Contact</h5>
+            <p class="form-helper-text">Grant user the ability to delete a contact.</p>
+          </div>
+
+          <b-form-group label="" >
+            <b-form-checkbox
+              v-model="user.can_delete_contact"
+              :value="true"
+              :unchecked-value="false"
+              @change="(eventPayload) => onUpdateFields(eventPayload, 'can_delete_contact')">
+              Can delete a contact
+            </b-form-checkbox>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row v-if="isAdmin && connectedCampaigns.length"
+                  class="mt-4"
+                  :id="`${SettingsMap.campaign_id.hash_keyword}-container`">
+        <b-col sm="12"
+               md="6">
+          <div>
+            <h5 class="form-label">User's Personal Line</h5>
+          </div>
+
+          <b-form-group label=""
+                        class="mt-2">
+            <user-campaign-selector v-model="user.campaign_id"
+                                    :user="user"
+                                    :disable="!isAdmin"
+                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'campaign_id')">
+            </user-campaign-selector>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -424,6 +449,7 @@ export default {
   components: { UserCampaignSelector, AnswerTypeSelector },
 
   computed: {
+    ...mapState(['campaigns']),
     ...mapState('settings', ['userClone']),
     ...mapState('auth', ['profile']),
     userDestinationEditable () {
@@ -431,11 +457,11 @@ export default {
     },
 
     isNotOwnSettings () {
-      if (this.auth && (!this.auth.hasOwnProperty('user') || !this.auth.user.hasOwnProperty('profile'))) {
+      if (!this.profile) {
         return false
       }
 
-      return this.hasRole(Roles.COMPANY_ADMIN) && +this.user.id !== +this.auth.user.profile.id
+      return this.hasRole(Roles.COMPANY_ADMIN) && +this.user.id !== +this.profile.id
     },
 
     canBeEdited () {
@@ -443,6 +469,11 @@ export default {
     },
     requirePassword () {
       return this.showPasswordFields
+    },
+    connectedCampaigns () {
+      return this.campaigns.filter((campaign) => {
+        return campaign.user_id === this.user.id
+      })
     }
   },
 

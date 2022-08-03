@@ -19,6 +19,7 @@
           </span>
           <br>
           <span class="text-md"
+                v-if="user.profile"
                 @click="noClose($event)">
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
@@ -82,7 +83,7 @@ export default {
       }).catch(err => {
         console.log(err)
         this.loading_whitelabel = false
-        this.$root.handleErrors(err.response)
+        this.$handleErrors(err.response)
       })
     },
     windowResize () {

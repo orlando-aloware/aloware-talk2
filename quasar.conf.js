@@ -213,8 +213,8 @@ module.exports = function (/* ctx */) {
         protocols: {
           name: 'Aloware Talk',
           schemes: ['alowaretalk', 'tel', 'callto']
-        },
-        afterSign: './src-electron/build/afterSignHook.js'
+        }
+        // afterSign: './src-electron/build/afterSignHook.js'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration

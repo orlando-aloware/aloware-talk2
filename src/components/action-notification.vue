@@ -28,7 +28,8 @@
           {{ queueCount }}
         </b-badge>
         <div class="mr-2 notification-icon"
-        @click="toInbox">
+             :class="[['incomingCall', 'callFishing'].includes(id) && getSource ? 'mt-2' : '']"
+             @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
           <call-icon v-if="id === 'call'"/>
@@ -39,6 +40,12 @@
         <div class="notification-details"
              :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
              @click="toInbox">
+          <div class="d-flex flex-grow-1 align-items-baseline w-100"
+               v-if="getSource">
+            <span class="mr-auto text-white pr-1 text-sm">
+              {{ getSource }}
+            </span>
+          </div>
           <div class="d-flex flex-grow-1 align-items-baseline w-100">
             <!--b-img blank blank-color="#ff5555" class="mr-2" width="12" height="12"></b-img-->
             <strong class="mr-auto text-white title pr-1">
@@ -83,6 +90,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
+             :class="[['incomingCall', 'callFishing'].includes(id) && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -103,10 +111,15 @@
                  round
                  no-caps
                  @click="answerCall">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Answer
+            </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
+             :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
              v-if="id === 'callFishing' && dialer && dialer.call">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -127,6 +140,10 @@
                  no-caps
                  @click="answerCall"
                  v-if="dialer.currentStatus === 'WRAP_UP'">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Answer
+            </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
 
@@ -173,6 +190,7 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 
 export default {
   name: 'action-notification',
@@ -335,6 +353,74 @@ export default {
     },
     isCommunicationInCallFishingQueue () {
       return !_.isEmpty(this.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === this.communicationId))
+    },
+
+    getSource () {
+      if (!this.communication) {
+        return ''
+      }
+
+      if (this.isColdTransferUser) {
+        return 'Transfer to User'
+      }
+
+      if (this.isColdTransferRg) {
+        return 'Transfer to Ring Group'
+      }
+
+      if (this.isIntroduceToUser) {
+        return 'Introduce to User'
+      }
+
+      if (this.isIntroduceToRg) {
+        return 'Introduce to Ring Group'
+      }
+
+      if (this.isAddToUser) {
+        return 'Add to User'
+      }
+
+      if (this.isAddToRg) {
+        return 'Add to Ring Group'
+      }
+
+      if (this.isSequence) {
+        return 'Call from Sequence'
+      }
+
+      return 'New Inbound Call'
+    },
+
+    isSequence () {
+      return this.communication.workflow_id
+    },
+
+    isIntroduceToRg () {
+      return this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
+    },
+
+    isIntroduceToUser () {
+      return this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER
+    },
+
+    isAddToRg () {
+      return !this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
+    },
+
+    isAddToUser () {
+      return !this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER
+    },
+
+    callIsIntroduced () {
+      return this.communication.is_introduce
+    },
+
+    isColdTransferRg () {
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_RG
+    },
+
+    isColdTransferUser () {
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
     }
   },
   created () {
@@ -354,25 +440,37 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setNotifications', 'setShowPhone', 'clearCallFishingQueue', 'removeFromCallFishingQueue']),
+    ...mapActions([
+      'setNotifications',
+      'setShowPhone',
+      'clearCallFishingQueue',
+      'removeFromCallFishingQueue'
+      // 'setShowIncomingCallNotification'
+    ]),
     onShow () {
       this.isValidNotification = false
     },
     autoClose () {
       this.runDateTimeInterval()
-      if ((this.id === 'callFishing' && document.getElementById('callFishing') && !this.isCommunicationInCallFishingQueue) ||
-        (this.id === 'incomingCall' && document.getElementById('incomingCall') && _.isEmpty(this.dialer.call))) {
+      if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
+          !this.isCommunicationInCallFishingQueue) ||
+        (this.id === 'incomingCall' && document.getElementById('incomingCall') &&
+          _.isEmpty(this.dialer.call))
+      ) {
         this.processRemoveFromNotification(this.communication)
         return
       }
 
-      if (this.id === 'incomingCall' && (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
+      if (this.id === 'incomingCall' &&
+        (['CALL_CONNECTED', 'INVITE_CANCELLED', 'READY'].includes(this.dialer.currentStatus))) {
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
       }
 
-      if (!this.noAutoHide && this.dateTime && this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
+      if (!this.noAutoHide &&
+        this.dateTime &&
+        this.dateTime.diff(this.$moment(), 'seconds') <= -30) {
         this.onHidden()
         this.$closeActionNotification(this.id)
         return
@@ -405,7 +503,10 @@ export default {
 
       this.clearDateTimeInterval()
 
-      if (this.id !== 'callFishing' || (this.id === 'callFishing' && !document.getElementById('callFishing'))) {
+      if (this.id !== 'callFishing' ||
+        (this.id === 'callFishing' &&
+          !document.getElementById('callFishing'))
+      ) {
         this.removeFromCallFishingNotificationQueue(this.notifications[this.id].communicationId)
         this.setNotifications({
           type: this.id,
@@ -477,7 +578,12 @@ export default {
       this.setShowPhone(true)
     },
     rejectCall () {
-      if (this.id !== 'callFishing' || (this.id === 'callFishing' && (!this.queue || (this.queue && !this.queue.length)))) {
+      if (this.id !== 'callFishing' ||
+        (this.id === 'callFishing' &&
+          (!this.queue ||
+            (this.queue && !this.queue.length))
+        )
+      ) {
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
@@ -502,14 +608,18 @@ export default {
         return className.data && typeof className.data === 'string' && (className.data.includes('call-actions') || className.data.includes('call-fishing-actions'))
       })
 
-      if (!found && this.isValidPhoneShowInfo) {
-        this.showCallFishingDataInPhone({
-          communication: this.communication,
-          contact: this.contact
-        }, this.id)
-      }
+      // 07/12/2022 - Removed for now
+      // if (!found &&
+      //   this.isValidPhoneShowInfo) {
+      //   this.setShowIncomingCallNotification(false)
+      //   this.showCallFishingDataInPhone({
+      //     communication: this.communication,
+      //     contact: this.contact
+      //   }, this.id)
+      // }
 
-      if (!found && this.id === 'system') {
+      if (!found &&
+        this.id === 'system') {
         window.location.reload()
       }
     },
@@ -569,6 +679,7 @@ export default {
         })
       }
     }
+
   },
 
   beforeDestroy () {

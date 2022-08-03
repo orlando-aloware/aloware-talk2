@@ -218,7 +218,7 @@ export default function (/* { ssrContext } */) {
           queue: null
         }
       },
-      showIncomingCallNotification: true,
+      showIncomingCallNotification: false,
       // cached states
       sidebarFolded: false,
       tagOptions: {
@@ -247,7 +247,10 @@ export default function (/* { ssrContext } */) {
       sessionPhoneExpansion: '',
       notificationAudio: null,
       loadingParkedCalls: false,
-      parkedCalls: []
+      parkedCalls: [],
+      suspended: false,
+      showProFeatureDialog: false,
+      leadSources: []
     },
 
     getters: {
@@ -717,6 +720,15 @@ export default function (/* { ssrContext } */) {
       },
       removeParkedCall ({ commit }, communicationId) {
         commit('REMOVE_PARKED_CALL', communicationId)
+      },
+      setSuspended ({ commit }, value) {
+        commit('SET_SUSPENDED', value)
+      },
+      toggleProFeatureDialog ({ commit }, value) {
+        commit('TOGGLE_PRO_FEATURE_DIALOG', value)
+      },
+      setLeadSources ({ commit }, leadSources) {
+        commit('SET_LEAD_SOURCES', leadSources)
       }
     },
 
@@ -963,7 +975,7 @@ export default function (/* { ssrContext } */) {
       DELETE_TEMPLATE (state, template) {
         const found = state.templates.find(item => item.id === template.id)
         if (found) {
-          state.templates.splice(state.smsTemplates.indexOf(found), 1)
+          state.templates.splice(state.templates.indexOf(found), 1)
         }
       },
 
@@ -1382,6 +1394,18 @@ export default function (/* { ssrContext } */) {
         }
 
         state.parkedCalls.splice(state.parkedCalls.indexOf(found), 1)
+      },
+
+      SET_SUSPENDED (state, value) {
+        state.suspended = value
+      },
+
+      TOGGLE_PRO_FEATURE_DIALOG (state, value) {
+        state.showProFeatureDialog = value
+      },
+
+      SET_LEAD_SOURCES (state, leadSources) {
+        state.leadSources = leadSources
       },
 
       updateField

@@ -22,7 +22,7 @@ export const ALL_COLUMNS = [
     draggable: false,
     resizable: true,
     default: true,
-    minWidth: 225
+    minWidth: 200
   },
   {
     name: 'first_name',
@@ -444,8 +444,8 @@ export const ALL_COLUMNS = [
     draggable: false,
     resizable: false,
     default: true,
-    maxWidth: 150,
-    minWidth: 150
+    maxWidth: 130,
+    minWidth: 130
   }
 ]
 

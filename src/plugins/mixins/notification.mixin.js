@@ -39,7 +39,8 @@ export default {
       'removeVoicemailNotifiedDesktop',
       'removeContactNotifiedDesktop',
       'removeAppointmentNotifiedDesktop',
-      'removeReminderNotifiedDesktop'
+      'removeReminderNotifiedDesktop',
+      'setShowIncomingCallNotification'
     ]),
 
     playAudio () {
@@ -67,13 +68,17 @@ export default {
     },
 
     closeCallNotifications (type = 'incomingCall', communicationId = null, forceClose = false) {
-      if (!communicationId || !['incomingCall', 'callFishing'].includes(type)) {
+      if (!communicationId ||
+        !['incomingCall', 'callFishing'].includes(type)) {
         return
       }
 
       // for incoming call
       const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
-      if (type === 'incomingCall' && notificationCommId.data === communicationId && this.dialer.currentStatus !== 'RECEIVED_CALL_INVITE') {
+
+      if (type === 'incomingCall' &&
+        notificationCommId.data === communicationId &&
+        this.dialer.currentStatus !== 'RECEIVED_CALL_INVITE') {
         this.$closeActionNotification(type)
         this.closeDesktopNotification(communicationId, 'communication')
         return
@@ -83,26 +88,35 @@ export default {
       notificationCommId.data = _.get(this.notifications, 'callFishing.communicationId', null)
       const dialerCallFishingCommId = _.get(this.dialer, 'callFishing.communication.id', null)
 
-      if (communicationId && dialerCallFishingCommId && communicationId === dialerCallFishingCommId) {
+      if (communicationId &&
+        dialerCallFishingCommId &&
+        communicationId === dialerCallFishingCommId) {
         this.clearDialerCallFishing()
       }
 
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
 
-      if ((notificationCommId.data === communicationId && type === 'callFishing' && !callFishingQueue.data) || forceClose) {
+      if (
+        (notificationCommId.data === communicationId &&
+          type === 'callFishing' &&
+          !callFishingQueue.data) ||
+        forceClose) {
         this.$closeActionNotification(type)
         this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
-      if (notificationCommId.data === communicationId && type === 'callFishing' && document.getElementById('callFishing')) {
+      if (notificationCommId.data === communicationId &&
+        type === 'callFishing' &&
+        document.getElementById('callFishing')) {
         this.switchCallFishingFromQueue()
         this.closeDesktopNotification(communicationId, 'communication')
         return
       }
 
-      if (type === 'callFishing' && communicationId) {
+      if (type === 'callFishing' &&
+        communicationId) {
         this.removeFromCallFishingNotificationQueue(communicationId)
         this.removeFromCallFishingQueue(communicationId)
         this.closeDesktopNotification(communicationId, 'communication')
@@ -111,6 +125,7 @@ export default {
 
     closeDesktopNotification (communicationId, type) {
       const notification = this.communicationNotifiedDesktop.find(notification => notification.id === communicationId)
+
       if (notification) {
         notification.close()
         this[`remove${this.$options.filters.capitalize(type)}NotifiedDesktop`](communicationId)
@@ -120,6 +135,7 @@ export default {
     clearDialerCallFishing () {
       // clear dialer's call fishing details
       const dialerCallFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+
       if (dialerCallFishingCommunication) {
         this.setDialerCallFishing({
           communication: null,
@@ -130,7 +146,9 @@ export default {
 
     getNotificationType (ringGroupId) {
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
-      return ringGroup && ringGroup.should_queue && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
+      return ringGroup &&
+      ringGroup.should_queue &&
+      ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
     },
 
     switchCallFishingFromQueue () {
@@ -226,7 +244,13 @@ export default {
           break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
-          if (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode && ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT && this.user && this.user.profile && this.user.profile.id !== communication.contact.user_id) {
+          if (ringGroup &&
+            ringGroup.should_queue &&
+            ringGroup.fishing_mode &&
+            ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT &&
+            this.user &&
+            this.user.profile &&
+            this.user.profile.id !== communication.contact.user_id) {
             break
           }
 
@@ -252,15 +276,23 @@ export default {
       }
 
       if (!_.isEmpty(params.data)) {
+        ['callFishing', 'incomingCall'].includes(params.data.type) && this.setShowIncomingCallNotification(true)
         this.$actionNotification(params.data)
       }
     },
 
     showCallFishingDataInPhone (data, type = 'callFishing') {
       this.$VueEvent.fire('showPhone')
+
+      if (type !== 'callFishing') {
+        this.$closeActionNotification(type)
+        return
+      }
+
       const queue = _.get(this.notifications, 'callFishing.queue', [])
 
-      if (!queue || (queue && queue.length === 0)) {
+      if (!queue ||
+        (queue && queue.length === 0)) {
         this.$closeActionNotification(type)
       }
 
@@ -271,12 +303,15 @@ export default {
       }
 
       const counter = { data: 0 }
-      if (!queue || (queue && queue.length === 0)) {
+
+      if (!queue ||
+        (queue && queue.length === 0)) {
         this.dialerCallFishingInterval = setInterval(() => {
           if (!document.getElementById(type)) {
             this.setDialerCallFishing(data)
             clearInterval(this.dialerCallFishingInterval)
           }
+
           counter.data++
 
           if (counter.data > 120) {

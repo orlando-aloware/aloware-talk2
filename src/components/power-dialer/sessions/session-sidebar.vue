@@ -6,7 +6,9 @@
         size="sm"
         class="sidebar-toggle"
         @click="toggleSidebar">
-        <i class="material-icons">{{ !sessionSidebarExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
+        <i class="material-icons">
+          {{ !sessionSidebarExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}
+        </i>
       </b-button>
       <SessionStats />
       <SessionGroups />

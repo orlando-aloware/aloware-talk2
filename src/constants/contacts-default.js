@@ -188,6 +188,7 @@ export const DEFAULT_STATE = {
   isScheduledMessageListOpen: false,
   isAddAppointmentOpen: false,
   isAppointmentSubmitted: false,
+  isAddPowerDialerOpen: false,
   isEnrollSequenceOpen: false,
   isAddReminderOpen: false,
   changingSelectedContact: false,

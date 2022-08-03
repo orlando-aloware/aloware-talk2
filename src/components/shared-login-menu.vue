@@ -1,5 +1,5 @@
 <template>
-  <div v-if="profile.company.talk_enabled"
+  <div v-if="profile && profile.company.talk_enabled"
        class="bridge-menu-wrapper">
     <q-btn v-if="isAdmin"
            outline

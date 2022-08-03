@@ -242,6 +242,28 @@ body,
   background-color: $dark;
 }
 
+.banner-font {
+  font-family: 'Poppins', sans-serif;
+}
+
+.text-banner-title {
+  font-size: 2.47rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.text-banner-subtitle {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.ai-bg {
+  background-image: url("../assets/pattern2_overlay.svg"), url("../assets/pattern2.jpg");
+  background-repeat: no-repeat;
+  background-size: 49vw, cover;
+  background-position: center;
+}
+
 @media (max-width: 992px) {
   .page-title {
     font-size: 22px !important;
@@ -645,6 +667,11 @@ body,
       box-shadow: none;
     }
   }
+
+  .q-badge--floating {
+    top: 8px;
+    right: 15px;
+  }
 }
 
 .page-footer {
@@ -657,6 +684,11 @@ body,
       height: 20px;
       margin-bottom: 7px;
       color: $grey-30;
+
+      .q-badge--floating {
+        top: 2px;
+        right: 14px;
+      }
     }
     font-family: $font-family-body;
     font-size: 10px;
@@ -4437,7 +4469,7 @@ i.option-separator {
   position: fixed;
   width: 100%;
   background: $grey-40;
-  height: 73px;
+  height: 65px;
   padding: 17px 18px;
   bottom: 0;
   border-top: 1px solid $grey-70;
@@ -5563,7 +5595,7 @@ table.datatable {
         &:not(.checkbox):hover {
           background-color: $grey-60;
           &.hovering {
-            background-color: rgba(37, 110, 255, 0.1);
+            background-color: #e9f0ff;
           }
         }
 
@@ -7224,6 +7256,14 @@ table.datatable {
           height: 20px !important;
           font-size: 10px;
         }
+
+        .dropdown-menu.show {
+          min-width: 5rem;
+
+          .dropdown-item {
+            padding: 0.25rem 1rem;
+          }
+        }
       }
 
       button:hover,
@@ -7305,6 +7345,16 @@ table.datatable {
     color: $white;
     border-color: $success;
     background-color: $success;
+  }
+
+  .quick-access {
+    .vue-daterange-picker {
+      .reportrange-text {
+        height: 40px;
+        display: flex;
+        align-items: center;
+      }
+    }
   }
 }
 
@@ -9006,7 +9056,7 @@ screen and (max-width: 956px) {
   .page-layout {
     .sidebar-active {
       .page-header + .page-container {
-        padding-top: 58px;
+        padding-top: 62px;
       }
     }
   }
@@ -9063,7 +9113,7 @@ screen and (max-width: 956px) {
     .h-2-livebar {
       .sidebar-active {
         > .page-container {
-          padding-top: 58px;
+          padding-top: 62px;
         }
       }
     }
@@ -10694,7 +10744,7 @@ screen and (max-width: 956px) {
 }
 
 .notification-body-wrapper {
-  cursor: pointer;
+  /* cursor: pointer; */
   .call-actions {
     padding-top: 2px;
     button:first-child {
@@ -10784,10 +10834,6 @@ screen and (max-width: 956px) {
   &:hover {
     color: $blue-4;
   }
-}
-
-.pt-58 {
-  padding-top: 58px !important;
 }
 
 .pt-60 {
@@ -11260,4 +11306,23 @@ h1.contact-list-name-label {
     overflow-y: auto !important;
     height: 78vh;
   }
+}
+
+.modal-pd-add {
+  width: 420px;
+  max-width: 90vw;
+}
+
+.hubspot-crm-iframe {
+  overflow: hidden;
+}
+
+#pro-feature-alert {
+  .modal-header {
+    border: none;
+  }
+}
+
+.hyperlink-color {
+  color: $blue-5;
 }

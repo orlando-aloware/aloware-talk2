@@ -10,15 +10,18 @@
           v-model="panel"
           class="bg-transparent">
 
-          <q-tab-panel class="p-0" name="Details">
+          <q-tab-panel class="p-0"
+                       name="Details">
             <SessionContactPageDetails />
           </q-tab-panel>
 
-          <q-tab-panel class="p-0" name="Activity">
+          <q-tab-panel class="p-0"
+                       name="Activity">
             <SessionContactPageActivity :panel="panel" />
           </q-tab-panel>
 
-          <q-tab-panel class="p-0" name="CRM View">
+          <q-tab-panel class="p-0"
+                       name="CRM View">
             <SessionContactPageCrm />
           </q-tab-panel>
 
@@ -29,7 +32,9 @@
       <div class="text-center">
         <q-spinner-bars color="primary"
                         size="2em" />
-        <div>Fetching contact information...</div>
+        <div>
+          Fetching contact information...
+        </div>
       </div>
     </template>
   </b-overlay>
@@ -90,14 +95,18 @@ export default {
       this.source.cancel('Loading of contact data operation is canceled by the user.')
       this.source = this.cancelToken.source()
       this.isBusy = true
-      this.getContactData(value.id, this.source.token).then(res => {
-        if (!res) {
-          return
-        }
+      const contactsData = this.getContactData(value.id, this.source.token)
 
-        this.isBusy = false
-        this.setContact(res.data)
-      })
+      if (contactsData) {
+        contactsData.then(res => {
+          if (!res) {
+            return
+          }
+
+          this.isBusy = false
+          this.setContact(res.data)
+        })
+      }
     }
   }
 }

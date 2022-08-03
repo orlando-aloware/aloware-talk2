@@ -13,9 +13,17 @@ export default {
     }
   },
   computed: {
-    ...mapState('inbox', ['liveContacts']),
-    ...mapState(['dialer', 'parkedCalls']),
-    ...mapState('auth', ['profile'])
+    ...mapState('inbox', [
+      'liveContacts',
+      'inboxShowMyContacts'
+    ]),
+    ...mapState([
+      'dialer',
+      'parkedCalls'
+    ]),
+    ...mapState('auth', [
+      'profile'
+    ])
   },
   methods: {
     addNonOwnedLiveContact (communication) {
@@ -35,18 +43,20 @@ export default {
     addNonOwnedParkedTask (communication) {
       if (this.isNotOwned(communication.contact.user_id)) {
         this.addParkedCall(communication)
-        this.updateLiveContactLastCommCurrentStatus({
+        this.updateLiveContactLastCommProperties({
           id: communication.contact.id,
-          status: CURRENT_STATUS_HOLD_NEW
+          status: CURRENT_STATUS_HOLD_NEW,
+          user_id: communication.user_id
         })
       }
     },
     updateUnownedContactLastCommunicationStatus () {
       this.unownedContact.interval = setInterval(() => {
         if (this.dialer.contact) {
-          this.updateLiveContactLastCommCurrentStatus({
+          this.updateLiveContactLastCommProperties({
             id: this.dialer.contact.id,
-            status: CURRENT_STATUS_INPROGRESS_NEW
+            status: CURRENT_STATUS_INPROGRESS_NEW,
+            user_id: this.dialer.communication.user_id
           })
           clearInterval(this.unownedContact.interval)
         }
@@ -59,13 +69,25 @@ export default {
       }, 100)
     },
     removeUnownedLiveContactTask () {
-      const contact = this.dialer.contact
-      const call = this.dialer.call
-      const communication = this.dialer.communication
-      const liveContactfound = this.liveContacts.find(contact => contact.id === communication.contact_id)
-      const parkedCallFound = this.parkedCalls.find(call => call.id === communication.id)
-      if (contact && this.isNotOwned(contact.user_id) && call && liveContactfound && !parkedCallFound) {
-        this.removeLiveContact(contact.id)
+      const liveContactData = {
+        contact: this.dialer.contact,
+        call: this.dialer.call,
+        communication: this.dialer.communication,
+        liveContactFound: null,
+        parkedCallFound: null
+      }
+
+      if (liveContactData.communication) {
+        liveContactData.liveContactFound = this.liveContacts.find(contact => contact.id === liveContactData.communication.contact_id)
+        liveContactData.parkedCallFound = this.parkedCalls.find(call => call.id === liveContactData.communication.id)
+      }
+
+      if (liveContactData.contact &&
+        this.isNotOwned(liveContactData.contact.user_id) &&
+        liveContactData.call &&
+        liveContactData.liveContactFound &&
+        !liveContactData.parkedCallFound) {
+        this.removeLiveContact(liveContactData.contact.id)
       }
     },
     removeUnownedParkedCall (communication) {
@@ -74,11 +96,18 @@ export default {
       }
     },
     isNotOwned (userId) {
-      return userId && userId !== this.profile.id && this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
+      return userId &&
+        userId !== this.profile.id &&
+        this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
+    },
+    isNotOwnedFilter (userId) {
+      return userId &&
+        userId !== this.profile.id &&
+        this.inboxShowMyContacts
     },
     ...mapActions('inbox', [
       'setLiveContacts',
-      'updateLiveContactLastCommCurrentStatus',
+      'updateLiveContactLastCommProperties',
       'removeLiveContact'
     ]),
     ...mapActions([

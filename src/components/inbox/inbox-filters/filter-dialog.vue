@@ -103,7 +103,7 @@
             </compact-btn>
             <compact-btn class="btn-secondary"
                          v-if="enableSidebarAndSaveFx"
-                         :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(defaultFilterModel.type)"
+                         :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_ALL_COMMUNICATIONS].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
@@ -166,7 +166,8 @@ export default {
       'isFilterDialogShown',
       'channelClonedFilter',
       'isFilterModelFormShown',
-      'appliedFilter'
+      'appliedFilter',
+      'inboxShowMyContacts'
     ]),
     isOpen: {
       get () {
@@ -187,6 +188,8 @@ export default {
           return 'Voice Messages'
         case ['mentions'].includes(this.$route.params.channel):
           return 'Mentions'
+        case ['all-communications'].includes(this.$route.params.channel):
+          return 'All Comms.'
         case ['calls', 'recordings'].includes(this.$route.params.channel):
         default:
           return 'Calls & Recordings'
@@ -290,7 +293,8 @@ export default {
       'updateChannelChangedFilterFields',
       'resetChannelChangedFilterFields',
       'toggleFilterDialog',
-      'setChannelClonedFilter'
+      'setChannelClonedFilter',
+      'setInboxShowMyContacts'
     ]),
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
@@ -352,13 +356,18 @@ export default {
 
     onApply () {
       this.resetChannelChangedFilterFields()
+      const myContactsFilter = _.get(this.filter, 'my_contact', null)
+
+      if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
+        this.setInboxShowMyContacts(Boolean(myContactsFilter))
+      }
 
       for (const item in this.filter) {
         if (item === 'answer_status' && this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
           continue
         }
 
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
+        if (['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) &&
           +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
           (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
           this.updateChannelChangedFilterFields({
@@ -417,15 +426,16 @@ export default {
       if (!personalFilter) {
         this.filter = { ...this.defaultFilterModel.filter }
       } else {
+        // combine default filter values with the selected one
         const personalFilterObject = personalFilter.filter
-        this.filter = _.pick(personalFilterObject, this.filterFields)
+        this.filter = { ...this.defaultFilterModel.filter, ..._.pick(personalFilterObject, this.filterFields) }
       }
 
       this.applyFilter()
     },
 
     getFilters () {
-      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS].includes(this.defaultFilterModel.type)) {
+      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_INBOX, ChannelType.CHANNEL_ALL_COMMUNICATIONS].includes(this.defaultFilterModel.type)) {
         return
       }
 

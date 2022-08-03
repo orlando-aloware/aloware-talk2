@@ -1,9 +1,12 @@
 <template>
   <div>
-    <q-card flat class="mt-0 p-0">
+    <q-card flat
+            class="mt-0 p-0">
       <q-toolbar class="mt-2 shadow-2">
         <q-toolbar-title>
-          <div class="text-subtitle1 text-weight-medium px-2">About</div>
+          <div class="text-subtitle1 text-weight-medium px-2">
+            About
+          </div>
         </q-toolbar-title>
       </q-toolbar>
     </q-card>
@@ -90,8 +93,7 @@ export default {
       'contactClone'
     ]),
     localResource () {
-      let res = { ...this.resources }
-      return res
+      return { ...this.resources }
     },
     isValidResource () {
       return this.contact.id === this.contactClone.id

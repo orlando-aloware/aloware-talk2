@@ -15,7 +15,15 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', [
+      'profile'
+    ]),
+    ...mapState('inbox', [
+      'inboxShowMyContacts'
+    ]),
+    ...mapState([
+      'ringGroups'
+    ])
   },
 
   methods: {
@@ -37,7 +45,7 @@ export default {
       return true
     },
 
-    checkCommunicationMatchesFilters (filter, communication) {
+    checkCommunicationMatchesFilters (filter, communication, forInbox = false) {
       // if answer status filter is other than all
       if (filter.answer_status !== undefined &&
         filter.answer_status !== 'all') {
@@ -125,6 +133,18 @@ export default {
         filter.contact_owner.length > 0 && communication.contact) {
         // check the communication's contact owner matches the contact owner filter
         if (filter.contact_owner.indexOf(communication.contact.user_id) < 0) {
+          return false
+        }
+      }
+      // if my contact or inbox's show my contacts filter is active
+      if (
+        ((filter.my_contact !== undefined &&
+            filter.my_contact) ||
+          (forInbox &&
+            this.inboxShowMyContacts)) &&
+        communication.contact) {
+        // check the communication's contact owner matches the current user
+        if (communication.contact.user_id !== this.profile.id) {
           return false
         }
       }
@@ -490,6 +510,27 @@ export default {
 
       // checks if contact matches user visibility
       return contact.user_id === this.profile.id
+    },
+
+    checkCommunicationRingGroupHasCurrentUser (ringGroupId) {
+      if (!ringGroupId) {
+        return false
+      }
+
+      const found = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
+
+      if (!found) {
+        return false
+      }
+
+      const keys = Object.keys(found.ordered_user_ids)
+      for (const key of keys) {
+        if (found.ordered_user_ids[key].includes(this.profile.id)) {
+          return true
+        }
+      }
+
+      return false
     }
   }
 }

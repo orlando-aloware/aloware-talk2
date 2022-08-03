@@ -192,7 +192,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
-                    v-if="((list.type === ContactListTypes.STATIC && isEditable) || this.id === 'all') &&  !list.show_in_public_folder">
+                    v-if="((list.type === ContactListTypes.STATIC && isEditable) || id === 'all') &&  !list.show_in_public_folder">
           <template #button-content class="filter-toggle-button">
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
@@ -269,9 +269,9 @@
         :contact-list-id="id"
         :paginated="false"
         :show-pagination="!isStartState"
-        :total-rows="this.fixedContactsData.total"
-        :current-page="this.fixedContactsData.current_page"
-        :last-page="this.fixedContactsData.last_page"
+        :total-rows="fixedContactsData.total"
+        :current-page="fixedContactsData.current_page"
+        :last-page="fixedContactsData.last_page"
         v-if="listItemsHasData"
         @onMouseMove="datatableOnMouseMove"
         @onMouseLeave="datatableOnMouseMove"
@@ -281,7 +281,7 @@
         @paginated="onPaginate"
         @more="onLoadMore">
         <template slot="tbody">
-          <tr v-for="(contact, index) in this.fixedContactsData.data"
+          <tr v-for="(contact, index) in fixedContactsData.data"
               :key="`${index}`"
               class="datatable-row">
             <template
@@ -411,7 +411,7 @@
                     :id="`pt-${index}-${colIndx}`"
                     v-if="contact.id"
                     @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
-                    <span :style="`color: ${contact.tags[0].color};`">
+                    <span>
                       <i
                         class="fa fa-circle"
                         :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
@@ -640,7 +640,7 @@
           <span class="d-flex align-items-center contact-tags-item"
                 v-for="(item, index) in hoverPopover.data"
                 :key="`t-${index}`">
-            <span :style="`color: ${item.color};`">
+            <span>
               <i class="fa fa-circle" :style="`color: ${item.color};font-size:50%;position: relative; top: -2px;`"></i>
               {{ item.name }}
             </span>

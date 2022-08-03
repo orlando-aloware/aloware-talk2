@@ -140,6 +140,7 @@ export default {
       'removeContactActionType'
     ]),
     ...mapState(['currentRoute']),
+    ...mapState('auth', ['profile']),
     mainClass () {
       if (this.$route.name === 'Contact') {
         return 'w-100'
@@ -183,6 +184,12 @@ export default {
     },
     hasQueuedTaskLists () {
       return this.powerDialerTasks.in_queue.length > 0
+    }
+  },
+  created () {
+    // check if user has access and redirect to inbox in case it doesnt
+    if (!this.profile.auto_dialer_enabled) {
+      this.$router.push({ name: 'Inbox' })
     }
   },
   async mounted () {

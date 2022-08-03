@@ -14,16 +14,14 @@ export default {
   data () {
     return {
       env: null,
-      statics: null
+      statics: null,
+      app_id: process.env.INTERCOM_APP_ID
     }
   },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState('auth', ['profile']),
-    isProduction () {
-      return process.env.APP_ENV === 'production'
-    }
+    ...mapState('auth', ['profile', 'authenticated'])
   },
 
   methods: {
@@ -36,57 +34,37 @@ export default {
         return Promise.reject(err)
       })
     },
+
     setup () {
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
             alignment: 'right',
-            app_id: process.env.INTERCOM_APP_ID,
+            app_id: this.app_id,
             name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
             user_hash: response.data, // Current user hash
-            background_color: '#256eff',
-            action_color: '#256eff',
+            background_color: '#15163f',
+            action_color: '#15163f',
             vertical_padding: 80
           })
         }
       })
-    },
-    launch () {
-      if (this.profile && window.Intercom && this.isProduction) {
-        this.setup()
-      }
-    },
-    shutDown () {
-      if (!this.profile && window.Intercom && this.isProduction) {
-        window.Intercom('shutdown')
-      }
     }
   },
 
   created () {
     this.getStatics().then(() => {
-      if ((this.statics && !this.statics.whitelabel) && this.currentCompany && !this.currentCompany.reseller_id && this.profile && this.isProduction) {
+      if (!this.hasReporterAccess &&
+        (this.statics && !this.statics.whitelabel) &&
+        this.currentCompany &&
+        !this.currentCompany.reseller_id &&
+        this.profile &&
+        process.env.APP_ENV !== 'local') {
         this.setup()
       }
     })
-  },
-
-  mounted () {
-    this.shutDown()
-    this.launch()
-  },
-
-  watch: {
-    profile: function () {
-      this.shutDown()
-      this.launch()
-    }
-  },
-
-  beforeDestroy () {
-    this.shutDown()
   }
 }
 </script>

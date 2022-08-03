@@ -38,8 +38,8 @@ export default {
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
   },
-  updateLiveContactLastCommCurrentStatus: ({ commit }, payload) => {
-    commit('UPDATE_LIVE_CONTACT_LAST_COMM_CURRENT_STATUS', payload)
+  updateLiveContactLastCommProperties: ({ commit }, payload) => {
+    commit('UPDATE_LIVE_CONTACT_LAST_COMM_PROPERTIES', payload)
   },
   removeLiveContact: ({ commit }, contactId) => {
     commit('REMOVE_LIVE_CONTACT', contactId)
@@ -86,5 +86,14 @@ export default {
   },
   setLoadingPendingTaskCount: ({ commit }, loading = false) => {
     commit('SET_LOADING_PENDING_TASK_COUNT', loading)
+  },
+  setInboxShowMyContacts: ({ commit }, value) => {
+    commit('SET_INBOX_SHOW_MY_CONTACTS', value)
+  },
+  setDefaultShowMyContacts: ({ commit }, value) => {
+    commit('SET_DEFAULT_SHOW_MY_CONTACTS', value)
+  },
+  setIsInboxFiltersLoaded: ({ commit }, value) => {
+    commit('SET_IS_INBOX_FILTERS_LOADED', value)
   }
 }

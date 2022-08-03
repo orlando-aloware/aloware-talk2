@@ -251,6 +251,10 @@ export default {
     commit('ADD_APPOINTMENT_OPEN', isOpen)
   },
 
+  addPowerDialerOpen: ({ commit }, isOpen) => {
+    commit('ADD_POWER_DIALER_OPEN', isOpen)
+  },
+
   enrollSequenceOpen: ({ commit }, isOpen) => {
     commit('ENROLL_SEQUENCE_OPEN', isOpen)
   },

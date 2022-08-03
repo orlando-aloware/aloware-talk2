@@ -1,51 +1,26 @@
 <template>
   <div class="d-none d-lg-block">
-    <div class="default-bg h-100 d-flex justify-content-center align-items-center text-center">
+    <div class="ai-bg h-100 d-flex justify-content-center align-items-center text-center">
       <div>
-        <img src="app-icons/misc/logo_white.svg"
-             class="pb-5" />
-        <q-carousel
-          v-model="slide"
-          swipeable
-          animated
-          infinite
-          control-color="green"
-          navigation
-          padding
-          height="480px"
-          class="text-white col-12 transparent login-carousel px-0"
-          :autoplay="true">
-          <q-carousel-slide name="1"
-                            class="column no-wrap flex-center">
-            <div class="q-mt-md text-center">
-              <q-img src="images/login-agent-img1.png"
-                     style="max-width: 300px; max-height: 300px;" />
-              <strong class="login-slide-heading d-inline-block w-100 pb-2">
-                Enterprise call center software,<br>
-                built for smart business.
-              </strong>
-              <span class="w-100 description">
-                Supports calls & texts. CRM Integration.<br>
-                5 min setup.
-              </span>
+        <div class="row"
+             style="max-width:550px">
+            <div class="col-12">
+                <h1 class="mb-4 text-white text-h4 text-weight-bold banner-font text-banner-title">
+                    Our AI-powered <br> call transcription feature <br> is now available
+                </h1>
+                <p class="mb-4 text-white banner-font text-banner-subtitle">
+                    <br>
+                    Get up to 5000 minutes for free
+                </p>
+                <div>
+                    <a class="btn btn-primary btn-xl px-5"
+                       target="_blank"
+                       href="mailto:support@aloware.com?subject=Enable transcription for free">
+                        Request access
+                    </a>
+                </div>
             </div>
-          </q-carousel-slide>
-          <q-carousel-slide name="2"
-                            class="column no-wrap flex-center">
-            <div class="q-mt-md text-center">
-              <q-img src="images/login-agent-img2.png"
-                     style="max-width: 300px; max-height: 300px;" />
-              <strong class="login-slide-heading d-inline-block w-100">
-                #1 Phone + SMS/MMS<br>
-                Integration For HubSpot
-              </strong>
-              <span class="w-100">
-                Instantly call and text your CRM leads with Aloware's<br>
-                outbound sales solution working inside HubSpot
-              </span>
-            </div>
-          </q-carousel-slide>
-        </q-carousel>
+        </div>
       </div>
     </div>
   </div>

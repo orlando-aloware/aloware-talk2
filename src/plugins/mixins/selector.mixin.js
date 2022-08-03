@@ -54,8 +54,8 @@ export default {
       this.element = this.$refs[this.referenceElement].$el
     }
 
-    if (!this.selectedObject) {
-      this.clearInputValue()
+    if (_.isEmpty(_.omitBy(_.omitBy(this.selectedObject, _.isNil), _.isEmpty))) {
+      this.toggleInputValue()
     }
   },
 
