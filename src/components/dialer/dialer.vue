@@ -606,7 +606,7 @@ export default {
 
       // set agent status to busy if it's an answer by browser/apps user
       // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
-      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id)) {
+      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) && !this.currentCompany.force_users_always_available) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
       }
 
