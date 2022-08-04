@@ -85,6 +85,7 @@ export default {
       } else if (intercomIframeHeight === 0) {
         document.getElementsByTagName('header')[0].style.top = 0
         document.getElementsByTagName('aside')[0].style.top = 0
+        document.getElementsByTagName('body')[0].style.marginTop = 0
 
         document.getElementsByClassName('main-content')[0].setAttribute('style', '')
         document.getElementsByClassName('datatable-wrapper')[0].getElementsByTagName('div')[0].setAttribute('style', '')
