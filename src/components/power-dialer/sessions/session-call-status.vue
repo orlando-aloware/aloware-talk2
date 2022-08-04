@@ -299,6 +299,12 @@ export default {
   beforeDestroy () {
     this.clearWarmUpCountDown()
     clearInterval(this.hangUpInterval)
+
+    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
+    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
+    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
+    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
+    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
   },
   computed: {
     ...mapFields([
@@ -488,19 +494,10 @@ export default {
       this.findDefaultOutboundCampaign()
     }
 
-    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
     this.$VueEvent.listen('initiate_session', this.onInitiateSession)
-
-    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
     this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
-
-    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
-
-    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
-
-    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
     this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
 
     this.isSessionRunning = false

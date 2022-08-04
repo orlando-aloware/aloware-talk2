@@ -115,7 +115,6 @@ export default {
   data: () => ({
     loading: false,
     conversion: [
-      'multiple_phone_numbers',
       'prevent_duplicates'
     ],
     where: 'queue',
