@@ -74,6 +74,10 @@ export default {
         document.getElementsByTagName('header')[0].style.top = intercomIframeHeight + 'px'
         document.getElementsByTagName('aside')[0].style.top = intercomIframeHeight + 'px'
 
+        document.getElementsByClassName('main-content')[0].setAttribute(
+          'style',
+          'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+        )
         document.getElementsByClassName('datatable-wrapper')[0].getElementsByTagName('div')[0].setAttribute(
           'style',
           'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
@@ -82,7 +86,8 @@ export default {
         document.getElementsByTagName('header')[0].style.top = 0
         document.getElementsByTagName('aside')[0].style.top = 0
 
-        document.getElementsByClassName('datatable-wrapper')[0].getElementsByTagName('div')[0].setAttribute('style', null)
+        document.getElementsByClassName('main-content')[0].setAttribute('style', '')
+        document.getElementsByClassName('datatable-wrapper')[0].getElementsByTagName('div')[0].setAttribute('style', '')
       }
     },
     getIntercomIframeHeight (intercomIframe) {
