@@ -639,7 +639,6 @@ export default {
           this.activeTask = this.taskToCall
           this.hasActiveTask = true
           this.setContact(this.taskToCall)
-
           this.TOGGLE_SESSION_LOADER(true)
           this.resetTimer()
 
