@@ -6,12 +6,12 @@
       @openHubspotListImportDialog="onHubspotImportDialogOpen">
     </contacts-folders>
     <hubspot-list-import-modal :is-open="isHubspotImportDialogOpen"
+                               v-if="isHubspotImportDialogOpen"
                                @close="onHubspotImportDialogClose"/>
   </div>
 </template>
 
 <script>
-
 import ContactsFolders from '../contacts/contacts-folders'
 import HubspotListImportModal from 'components/hubspot-list-import-modal'
 
