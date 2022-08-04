@@ -547,13 +547,17 @@ export default {
         this.autoDialer.outbound_campaign_id = null
       }
     },
-    startWarmUpCountDown () {
+    startWarmUpCountDown (resetCountdownTimer = false) {
       if (this.countdownStarted) {
         return
       }
 
       this.countdownStarted = true
-      this.resetTimer()
+
+      if (resetCountdownTimer) {
+        this.resetTimer()
+      }
+
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
         this.onTimerIsOver()
@@ -635,12 +639,12 @@ export default {
           this.setContact(this.taskToCall)
 
           this.TOGGLE_SESSION_LOADER(true)
+          this.resetTimer()
 
           if (!this.isSessionRunning) {
             this.isSessionRunning = true
           }
 
-          this.resetTimer()
           setTimeout(() => {
             this.startWarmUpCountDown()
           }, 1000)
@@ -721,9 +725,13 @@ export default {
       }
     },
     resetTimer () {
-      if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
+      if (this.ongoingSession.finishedPdSession ||
+        this.countdownTimer <= -1) {
         this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
-      } else {
+        return
+      }
+
+      if (!this.wrapUp) {
         this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
@@ -766,10 +774,15 @@ export default {
             this.isSessionRunning) {
             this.resetTimer()
           }
+
+          if (this.isSessionRunning &&
+            this.wrapUpSeconds === -1) {
+            this.onNextTask()
+          }
           break
         case 'WRAP_UP':
           this.wrapUp = true
-          this.resetTimer()
+          this.countdownTimer = this.wrapUpSeconds
           break
         case 'MAKING_CALL':
           break
@@ -935,11 +948,6 @@ export default {
         this.startWarmUpCountDown()
       } else {
         this.initialize()
-      }
-    },
-    'dialer.currentStatus': function (value) {
-      if (value === 'WRAP_UP') {
-        this.onNextTaskWhenOnWrapUp()
       }
     }
   },
