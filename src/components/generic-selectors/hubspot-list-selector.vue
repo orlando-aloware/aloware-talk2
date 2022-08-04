@@ -82,7 +82,6 @@
 </template>
 
 <script>
-// import auth from 'boot/auth'
 import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin } from 'src/plugins/mixins'
@@ -90,10 +89,15 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'hubspot-list-selector',
+
   mixins: [
     selectorMixin
   ],
-  components: { RemoveTagIcon },
+
+  components: {
+    RemoveTagIcon
+  },
+
   props: {
     value: {
       required: false
@@ -146,7 +150,9 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
     placeholder () {
       switch (true) {
         case this.multiple && this.selectedId && this.selectedId.length < 1:
@@ -176,7 +182,6 @@ export default {
   data () {
     return {
       selectedId: this.value,
-      // auth: auth,
       isLoading: false,
       options: [],
       reference: 'hubspotListSelector',
