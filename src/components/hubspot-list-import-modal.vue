@@ -37,10 +37,6 @@
                                  @change="onListSelectorChange"/>
         </div>
 
-        <div class="text-red">
-          {{ errorMsg }}
-        </div>
-
         <div class="d-flex align-items-center pt-3">
           <button
             class="btn btn-block btn-light mt-0 mr-2"
@@ -61,7 +57,8 @@
       <power-dialer-add-modal :params="powerDialerParams"
                               mode="hubspot"
                               v-if="isAddPowerDialerOpen"
-                              @hidden="onHiddenPowerDialerModal">
+                              @hidden="onHiddenPowerDialerModal"
+                              @submit="onClose">
       </power-dialer-add-modal>
     </b-overlay>
   </b-modal>
@@ -94,7 +91,6 @@ export default {
   data () {
     return {
       isLoading: false,
-      errorMsg: '',
       list: null
     }
   },
@@ -106,26 +102,16 @@ export default {
     getTitle () {
       return 'Import From Hubspot List'
     },
-    listsEndpoint () {
-      return '/api/v2/power-dialer-lists'
-    },
-    foldersEndpoint () {
-      return '/api/v2/power-dialer-folders'
-    },
     powerDialerParams () {
       return {
         target: this.list.listId,
         size: this.list.metaData.size
       }
     }
-    // redirectPath () {
-    //   return `/power-dialer/list`
-    // }
   },
 
   methods: {
     ...mapActions('contacts', [
-      'foldersLoaded',
       'addPowerDialerOpen'
     ]),
     onClose () {
@@ -138,32 +124,6 @@ export default {
     },
     onSubmit () {
       this.addPowerDialerOpen(true)
-      // this.isLoading = true
-
-      // // TODO send request to api endpoint
-      // this.$axios
-      //   .post(this.listsEndpoint + '/import-hubspot-list/' + this.listId)
-      //   .then(response => response.data)
-      //   .then(data => {
-      //     if (data.message) {
-      //       this.$generalNotification(data.message)
-      //     }
-
-      //     this.isLoading = false
-      //     this.onClose()
-      //   })
-      //   .catch(_err => {
-      //     this.$generalNotification('Unable to load contacts from folder, please try again.', 'error')
-      //   })
-    },
-    loadFolders () {
-      this.$axios
-        .get(this.foldersEndpoint)
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch((_err) => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
     },
     onHiddenPowerDialerModal () {
       this.addPowerDialerOpen(false)
