@@ -1,30 +1,24 @@
 <template>
-  <b-modal
-    v-model="isOpen"
-    title="Create A List"
-    size="lg"
-    modal-class="integration-import-list-modal"
-    scrollable
-    centered
-    hide-footer
-    hide-header
-    no-close-on-esc
-    no-close-on-backdrop
-  >
-    <b-overlay
-      spinner-variant="primary"
-      spinner-type="grow"
-      spinner-small
-      rounded="sm"
-      :show="isLoading"
-    >
+  <b-modal title="Create A List"
+           size="lg"
+           modal-class="integration-import-list-modal"
+           scrollable
+           centered
+           hide-footer
+           hide-header
+           no-close-on-esc
+           no-close-on-backdrop
+           v-model="isOpen">
+    <b-overlay spinner-variant="primary"
+               spinner-type="grow"
+               spinner-small
+               rounded="sm"
+               :show="isLoading">
       <div class="d-flex flex-column integration-import-list-modal__body position-relative">
         <div class="d-flex align-items-center">
           <div class="flex-grow-1 integration-import-list-modal__title">{{ getTitle }}</div>
-          <button
-            class="btn btn-link small text-muted integration-import-list-modal__close"
-            @click="onClose"
-          >
+          <button class="btn btn-link small text-muted integration-import-list-modal__close"
+                  @click="onClose">
             <i class="fa fa-times"></i>
           </button>
         </div>
@@ -38,18 +32,14 @@
         </div>
 
         <div class="d-flex align-items-center pt-3">
-          <button
-            class="btn btn-block btn-light mt-0 mr-2"
-            @click="onClose"
-            :disabled="isLoading"
-          >
+          <button class="btn btn-block btn-light mt-0 mr-2"
+                  :disabled="isLoading"
+                  @click="onClose">
             Cancel
           </button>
-          <button
-            class="btn btn-block btn-primary mt-0"
-            @click="onSubmit"
-            :disabled="!list || isLoading"
-          >
+          <button class="btn btn-block btn-primary mt-0"
+                  :disabled="!list || isLoading"
+                  @click="onSubmit">
             Next
           </button>
         </div>
