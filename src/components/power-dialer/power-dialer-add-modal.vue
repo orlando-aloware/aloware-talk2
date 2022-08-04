@@ -226,6 +226,7 @@ export default {
         })
     },
     getRequest () {
+      // In case of new types of requests, you just need to setup a new mode and its own import method, like above
       switch (this.mode) {
         case 'add':
           return this.addContacts()
@@ -242,6 +243,7 @@ export default {
           this.setShouldUpdateSelectedListContactCount(true)
           this.setSearch('')
           this.$generalNotification('Selected contacts were successfully added.')
+          this.$emit('submit')
 
           if (this.redirect) {
             if (this.params.contact_list_id) {
@@ -263,6 +265,7 @@ export default {
         .then((res) => {
           this.reloadFolders()
           this.$generalNotification('Power dialer list has been successfully created from a contacts list.', 'success')
+          this.$emit('submit')
 
           if (this.redirect) {
             this.$router.push({ path: `/power-dialer/list/${res.data.data.id}/in-queue` })
@@ -270,17 +273,22 @@ export default {
         })
     },
     importFromHubspot () {
+      // remove target and size from params
+      let target = this.params.target
+      let params = this.requestParams
+      delete params.target
+      delete params.size
+
       return this.$axios
-        .post('/api/v2/power-dialer-lists/import-hubspot-list/' + this.params.target)
+        .post('/api/v2/power-dialer-lists/import-hubspot-list/' + target, params)
         .then(response => response.data)
         .then(data => {
           this.reloadFolders()
           this.$generalNotification(data.message)
-
-          // response nao vem id =/
+          this.$emit('submit')
         })
         .catch(_err => {
-          this.$generalNotification('Unable to load contacts from folder, please try again.', 'error')
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
         })
     },
     reloadFolders () {
