@@ -16,7 +16,8 @@ export default {
       countdownInterval: null,
       callInProgress: false,
       countdownStarted: false,
-      wrapUp: false
+      wrapUp: false,
+      reRouteModal: false
     }
   },
   computed: {
@@ -53,7 +54,7 @@ export default {
 
       switch (this.dialer?.currentStatus) {
         case 'READY':
-          if (this.timerIsOver) {
+          if (this.timerIsOver || !this.isSessionRunning || this.reRouteModal) {
             return 'Ready'
           }
 
