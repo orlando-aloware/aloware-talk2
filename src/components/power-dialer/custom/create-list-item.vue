@@ -105,13 +105,13 @@ export default {
       if (this.layer === 0) {
         return []
       }
-      return this.items.child_folders || []
+      return this.items?.child_folders || []
     },
     itemLists () {
-      return this.items.lists || []
+      return this.items?.lists || []
     },
     listOfChildFolders () {
-      return this.items.child_folders || []
+      return this.items?.child_folders || []
     },
     isTargetable () {
       if (this.createDialog.type === 'list') {

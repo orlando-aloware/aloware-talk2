@@ -13,6 +13,13 @@
     </div>
     <div class="move-dialog-lists px-2 pb-2">
       <CreateListItem
+        name="Public Lists"
+        :key="0"
+        :id="0"
+        :order="0"
+        :layer="0"
+        :items="searchedPdItem && searchedPdItem.length > 0 ? publicContactLists.filter(item => item.name.toLowerCase().includes(searchedPdItem.toLocaleLowerCase())) : publicContactLists" />
+      <CreateListItem
         v-for="folder in contactFolders"
         :name="folder.name"
         :key="folder.id"
@@ -78,6 +85,7 @@ export default {
     return {
       searchValue: '',
       isCreating: false,
+      publicContactLists: null,
       contactFolders: null,
       powerDialerParams: {}
     }
@@ -103,7 +111,8 @@ export default {
       'addPowerDialerOpen'
     ]),
     ...mapActions('powerDialer', [
-      'getContactFolders'
+      'getContactFolders',
+      'getPublicContactLists'
     ]),
     ...mapMutations('contacts', [
       'ON_SEARCH_PD_ITEM'
@@ -181,6 +190,9 @@ export default {
     }
   },
   mounted () {
+    this.getPublicContactLists().then(res => {
+      this.publicContactLists = res
+    })
     this.getContactFolders().then(res => {
       this.contactFolders = res
     })
