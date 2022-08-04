@@ -299,6 +299,8 @@ export default {
   beforeDestroy () {
     this.clearWarmUpCountDown()
     clearInterval(this.hangUpInterval)
+    clearInterval(this.countdownInterval)
+    clearInterval(this.$options.holdInterval)
 
     this.$VueEvent.stop('initiate_session', this.onInitiateSession)
     this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
@@ -548,7 +550,7 @@ export default {
       }
     },
     startWarmUpCountDown (resetCountdownTimer = false) {
-      if (this.countdownStarted) {
+      if (this.countdownStarted || !this.isSessionRunning || this.reRouteModal) {
         return
       }
 
@@ -758,6 +760,7 @@ export default {
         }, 500)
       }
 
+      clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
       }, this.redirectDelay)
@@ -901,7 +904,11 @@ export default {
         setTimeout(() => {
           this.processSession(true)
         }, 200)
+        return
       }
+
+      this.hasActiveTask = false
+      this.reRoute()
     },
     onPhoneExpansionReset () {
       this.sessionPhoneExpansion = ''
@@ -960,7 +967,6 @@ export default {
         outbound_campaign_id: null,
         ratio: 1
       },
-      reRouteModal: false,
       redirectDelay: 3000,
       redirectNotification: false,
       hangUpInterval: null,
