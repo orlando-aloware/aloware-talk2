@@ -85,7 +85,7 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapState } from 'vuex'
 
 export default {
-  name: 'PowerDialerAddModal',
+  name: 'power-dialer-add-modal',
 
   components: {
     InformationCircleIcon,

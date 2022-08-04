@@ -16,11 +16,13 @@ import ContactsFolders from '../contacts/contacts-folders'
 import HubspotListImportModal from 'components/hubspot-list-import-modal'
 
 export default {
-  name: 'PowerDialerList',
+  name: 'power-dialer-list',
+
   components: {
     HubspotListImportModal,
     ContactsFolders
   },
+
   data () {
     return {
       isCreatingFolder: false,
@@ -29,6 +31,7 @@ export default {
       isHubspotImportDialogOpen: false
     }
   },
+
   methods: {
     onHubspotImportDialogClose () {
       this.isHubspotImportDialogOpen = false
@@ -37,6 +40,7 @@ export default {
       this.isHubspotImportDialogOpen = true
     }
   },
+
   watch: {
     '$route': {
       handler (routeObj) {
