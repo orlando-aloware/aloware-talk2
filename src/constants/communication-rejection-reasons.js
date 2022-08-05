@@ -62,3 +62,9 @@ export const REJECTION_REASON_DAILY_LIMIT_EXCEEDED = 30
 export const REJECTION_REASON_CONTACT_IS_NOT_TCPA_APPROVED = 31
 // A SMS/MMS was rejected to send by our system because contact is opted out
 export const REJECTION_REASON_PHONE_NUMBER_OPTED_OUT = 32
+// A fax/call was rejected to send by our system because line is proxy
+export const REJECTION_REASON_CAMPAIGN_PROXY = 33
+// A call/SMS was rejected to send by our system because company is deleted
+export const REJECTION_REASON_COMPANY_DELETED = 34
+// A call/SMS was rejected to send by our system because company is suspended
+export const REJECTION_REASON_COMPANY_SUSPENDED = 35
