@@ -897,9 +897,10 @@ export default {
     },
     onEndWrapUp () {
       this.wrapUp = false
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall && this.isSessionRunning) {
+        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
         setTimeout(() => {
           this.processSession(true)
         }, 200)
