@@ -199,6 +199,8 @@ export default {
           return 'Line was deleted.'
         case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_PAUSED:
           return 'Line was paused.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_PROXY:
+          return 'Line was proxied.'
         case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_DNC:
           return 'Contact was DNC.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DISABLED:
@@ -235,6 +237,10 @@ export default {
           return '[From HubSpot] Could not find the associated contact with the HubSpot deal.'
         case CommunicationRejectionReasons.REJECTION_REASON_HS_INVALID_PHONE_NUMBER:
           return '[From HubSpot] Could not find a phone number associated with the contact on the HubSpot deal.'
+        case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DELETED:
+          return 'Company was deleted.'
+        case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
+          return 'Company was suspended.'
       }
     },
 
