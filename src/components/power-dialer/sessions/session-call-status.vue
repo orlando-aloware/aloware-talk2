@@ -581,8 +581,9 @@ export default {
         }
         if (this.wrapUp) {
           this.initialize()
-          this.wrapUp = false
-          this.wrapUpSeconds !== 0 && (this.isSessionRunning = false)
+          this.wrapUpSeconds !== 0 &&
+          (this.wrapUp = false) &&
+          (this.isSessionRunning = false)
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -900,7 +901,6 @@ export default {
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall && this.isSessionRunning) {
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
         setTimeout(() => {
           this.processSession(true)
         }, 200)
