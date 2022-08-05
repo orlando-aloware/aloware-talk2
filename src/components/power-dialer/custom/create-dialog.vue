@@ -185,12 +185,14 @@ export default {
     }
   },
   mounted () {
-    this.getPublicContactLists().then(res => {
-      this.publicContactLists = res
-    })
-    this.getContactFolders().then(res => {
-      this.contactFolders = res
-    })
+    this.getPublicContactLists()
+      .then(res => {
+        this.publicContactLists = res
+      })
+    this.getContactFolders()
+      .then(res => {
+        this.contactFolders = res
+      })
   }
 }
 </script>
