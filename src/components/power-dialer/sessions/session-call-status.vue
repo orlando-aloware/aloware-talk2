@@ -582,7 +582,7 @@ export default {
         if (this.wrapUp) {
           this.initialize()
           this.wrapUp = false
-          this.isSessionRunning = false
+          this.wrapUpSeconds !== 0 && (this.isSessionRunning = false)
         }
         if (this.togglePause) {
           this.sessionPaused = true
