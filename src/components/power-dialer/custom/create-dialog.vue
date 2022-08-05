@@ -15,7 +15,7 @@
                       :id="0"
                       :order="0"
                       :layer="0"
-                      :items="searchedPdItem && searchedPdItem.length > 0 ? publicContactLists.filter(item => item.name.toLowerCase().includes(searchedPdItem.toLocaleLowerCase())) : publicContactLists" />
+                      :items="searchList(publicContactLists)" />
       <CreateListItem v-for="folder in contactFolders"
                       :name="folder.name"
                       :key="folder.id"
@@ -23,7 +23,7 @@
                       :order="folder.order"
                       :folders="folder.child_folders"
                       :layer="0"
-                      :items="searchedPdItem && searchedPdItem.length > 0 ? folder.lists.filter(item => item.name.toLowerCase().includes(searchedPdItem.toLocaleLowerCase())) : folder.lists" />
+                      :items="searchList(folder.lists)" />
     </div>
     <div v-if="hasSelected"
          class="move-dialog-footer">
@@ -167,6 +167,11 @@ export default {
     },
     onHiddenPowerDialerModal () {
       this.powerDialerParams = {}
+    },
+    searchList (lists) {
+      return this.searchedPdItem && this.searchedPdItem.length > 0
+        ? lists.filter(item => item.name.toLowerCase().includes(this.searchedPdItem.toLocaleLowerCase()))
+        : lists
     }
   },
   beforeDestroy () {
