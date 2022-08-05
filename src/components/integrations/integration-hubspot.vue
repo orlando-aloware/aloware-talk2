@@ -230,9 +230,13 @@ export default {
     }
   },
 
-  mounted () {
+  async mounted () {
     if (this.contact && this.contact.id) {
-      this.getData()
+      await this.getData()
+
+      if (this.hubspotLink) {
+        this.syncHubspot(false)
+      }
     }
   },
 
@@ -294,12 +298,15 @@ export default {
       this.showWorkflowSelectorForm = true
     },
 
-    syncHubspot () {
+    syncHubspot (showAlert = true) {
       this.isSyncing = true
       talk2Api.V1.contact.syncHubspot(this.contact.id).then(response => {
         this.isSyncing = false
         this.getData()
-        this.$generalNotification('Contact has been successfully synced.')
+
+        if (showAlert) {
+          this.$generalNotification('Contact has been successfully synced.')
+        }
       })
     }
   },

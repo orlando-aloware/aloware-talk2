@@ -1,6 +1,7 @@
 import qs from 'qs'
 import moment from 'moment'
 import { get } from 'lodash'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   /**
@@ -10,6 +11,10 @@ export default {
   getContactFolders: async ({ commit }) => {
     const res = await window.axios.get('api/v2/contact-folders')
     return res.data
+  },
+  getPublicContactLists: async ({ commit }) => {
+    const res = await talk2Api.V2.contactList.public()
+    return res.data.data
   },
   async exportCsv ({ commit }, id = '') {
     const res = await window.axios.get(`api/v2/power-dialer-lists/${id}/export-csv?all=1`)
