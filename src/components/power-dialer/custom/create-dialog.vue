@@ -1,38 +1,40 @@
 <template>
-  <div
-    class="move-dialog move-dialog__create shadow-sm"
-    ref="createDialog">
+  <div class="move-dialog move-dialog__create shadow-sm"
+       ref="createDialog">
     <div class="move-dialog-input mdi_input_2">
       <div>
-        <Search
-          ref="folder-search"
-          :placeholder="placeholder"
-          @search="onSearch"
+        <Search ref="folder-search"
+                :placeholder="placeholder"
+                @search="onSearch"
         ></Search>
       </div>
     </div>
     <div class="move-dialog-lists px-2 pb-2">
-      <CreateListItem
-        v-for="folder in contactFolders"
-        :name="folder.name"
-        :key="folder.id"
-        :id="folder.id"
-        :order="folder.order"
-        :folders="folder.child_folders"
-        :layer="0"
-        :items="searchedPdItem && searchedPdItem.length > 0 ? folder.lists.filter(item => item.name.toLowerCase().includes(searchedPdItem.toLocaleLowerCase())) : folder.lists" />
+      <CreateListItem name="Public Lists"
+                      :key="0"
+                      :id="0"
+                      :order="0"
+                      :layer="0"
+                      :items="searchList(publicContactLists)" />
+      <CreateListItem v-for="folder in contactFolders"
+                      :name="folder.name"
+                      :key="folder.id"
+                      :id="folder.id"
+                      :order="folder.order"
+                      :folders="folder.child_folders"
+                      :layer="0"
+                      :items="searchList(folder.lists)" />
     </div>
     <div v-if="hasSelected"
          class="move-dialog-footer">
       <div class="text-muted small pr-2">
         {{ message }}
       </div>
-      <CompactBtn
-        variant="primary"
-        class="mr-2"
-        v-if="hasSelected"
-        :disabled="isCreating"
-        @clicked="onConfirmCreate">
+      <CompactBtn variant="primary"
+                  class="mr-2"
+                  v-if="hasSelected"
+                  :disabled="isCreating"
+                  @clicked="onConfirmCreate">
         <q-spinner-bars v-if="isCreating"
                         color="white" />
         {{ isCreating ? '' : 'Create' }}
@@ -78,6 +80,7 @@ export default {
     return {
       searchValue: '',
       isCreating: false,
+      publicContactLists: null,
       contactFolders: null,
       powerDialerParams: {}
     }
@@ -103,7 +106,8 @@ export default {
       'addPowerDialerOpen'
     ]),
     ...mapActions('powerDialer', [
-      'getContactFolders'
+      'getContactFolders',
+      'getPublicContactLists'
     ]),
     ...mapMutations('contacts', [
       'ON_SEARCH_PD_ITEM'
@@ -163,6 +167,11 @@ export default {
     },
     onHiddenPowerDialerModal () {
       this.powerDialerParams = {}
+    },
+    searchList (lists) {
+      return this.searchedPdItem && this.searchedPdItem.length > 0
+        ? lists.filter(item => item.name.toLowerCase().includes(this.searchedPdItem.toLocaleLowerCase()))
+        : lists
     }
   },
   beforeDestroy () {
@@ -181,9 +190,14 @@ export default {
     }
   },
   mounted () {
-    this.getContactFolders().then(res => {
-      this.contactFolders = res
-    })
+    this.getPublicContactLists()
+      .then(res => {
+        this.publicContactLists = res
+      })
+    this.getContactFolders()
+      .then(res => {
+        this.contactFolders = res
+      })
   }
 }
 </script>
