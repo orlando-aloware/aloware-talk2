@@ -230,9 +230,13 @@ export default {
     }
   },
 
-  mounted () {
+  async mounted () {
     if (this.contact && this.contact.id) {
-      this.syncHubspot(false)
+      await this.getData()
+
+      if (this.hubspotLink) {
+        this.syncHubspot(false)
+      }
     }
   },
 
