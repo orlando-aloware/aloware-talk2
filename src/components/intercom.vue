@@ -37,7 +37,6 @@ export default {
     },
 
     setup (newRoute = false) {
-      let self = this
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
@@ -52,15 +51,15 @@ export default {
             vertical_padding: 80
           })
 
-          setInterval(function () {
+          setInterval(() => {
             let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
-            let intercomIframeHeight = self.getIntercomIframeHeight(intercomIframe)
+            let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
 
-            if (intercomIframeHeight !== self.intercomBannerHeight || newRoute) {
-              self.fixTopMenu(intercomIframeHeight)
+            if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
+              this.fixTopMenu(intercomIframeHeight)
             }
 
-            self.intercomBannerHeight = intercomIframeHeight
+            this.intercomBannerHeight = intercomIframeHeight
           }, 1 * 1000)
         }
       })
@@ -99,9 +98,8 @@ export default {
   },
 
   created () {
-    let self = this
     this.$router.beforeEach((to, from, next) => {
-      self.setup(true)
+      this.setup(true)
       next()
     })
 
