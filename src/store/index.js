@@ -564,6 +564,10 @@ export default function (/* { ssrContext } */) {
         commit('UPDATE_USER', user)
       },
 
+      updateUserStatus ({ commit }, event) {
+        commit('UPDATE_USER_STATUS', event)
+      },
+
       deleteUser ({ commit }, user) {
         commit('DELETE_USER', user)
       },
@@ -1138,6 +1142,16 @@ export default function (/* { ssrContext } */) {
         const found = state.users.find((u) => u.id === user.id)
         if (found) {
           Vue.set(state.users, state.users.indexOf(found), user)
+        }
+      },
+
+      UPDATE_USER_STATUS (state, event) {
+        const found = state.users.find(u => u.id === event.user_id)
+        if (found) {
+          const index = state.users.indexOf(found)
+          Vue.set(state.users[index], 'agent_status', event.agent_status)
+          Vue.set(state.users[index], 'last_agent_status_change', event.last_agent_status_change)
+          Vue.set(state.users[index], 'updated_at', event.last_agent_status_change)
         }
       },
 
