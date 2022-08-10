@@ -5271,6 +5271,8 @@ button#bs-folder-options {
   }
   &__content {
     overflow: auto;
+    height: 78vh;
+
     &:not(.no-folder) {
       max-height: calc(100% - 163px);
     }
@@ -11304,7 +11306,6 @@ h1.contact-list-name-label {
 .power-dialer-list  {
   .sublists {
     overflow-y: auto !important;
-    height: 78vh;
   }
 }
 
