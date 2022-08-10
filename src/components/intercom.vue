@@ -17,6 +17,7 @@ export default {
       env: null,
       statics: null,
       app_id: process.env.INTERCOM_APP_ID
+      timeInterval: null
     }
   },
 
@@ -51,7 +52,7 @@ export default {
             vertical_padding: 80
           })
 
-          setInterval(() => {
+          this.timeInterval = setInterval(() => {
             let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
             let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
 
@@ -113,6 +114,10 @@ export default {
         this.setup()
       }
     })
+  },
+
+  beforeDestroy () {
+    clearInterval(this.timeInterval)
   }
 }
 </script>
