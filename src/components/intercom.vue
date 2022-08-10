@@ -51,6 +51,50 @@ export default {
           })
         }
       })
+    },
+    fixTopMenu () {
+      let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
+      let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
+      let isTopNotification = intercomIframe ? intercomIframe.getBoundingClientRect().top === 0 : true
+
+      let mainContent = document.getElementsByClassName('main-content')[0]
+      let datatableWrapper = document.getElementsByClassName('datatable-wrapper')[0]
+
+      if (intercomIframeHeight > 0 && intercomIframe && intercomIframe.offsetWidth === window.innerWidth && isTopNotification) {
+        document.getElementsByTagName('header')[0].style.top = intercomIframeHeight + 'px'
+        document.getElementsByTagName('aside')[0].style.top = intercomIframeHeight + 'px'
+
+        if (mainContent) {
+          mainContent.setAttribute(
+            'style',
+            'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+          )
+        }
+
+        if (datatableWrapper) {
+          datatableWrapper.getElementsByTagName('div')[0].setAttribute(
+            'style',
+            'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+          )
+        }
+
+      } else if (intercomIframeHeight === 0) {
+        document.getElementsByTagName('header')[0].style.top = 0
+        document.getElementsByTagName('aside')[0].style.top = 0
+        document.getElementsByTagName('body')[0].style.marginTop = 0
+
+        if (mainContent) {
+          mainContent.setAttribute('style', '')
+        }
+        if (datatableWrapper) {
+          datatableWrapper.getElementsByTagName('div')[0].setAttribute('style', '')
+        }
+      }
+    },
+    getIntercomIframeHeight (intercomIframe) {
+      let intercomIframeInnerDoc = intercomIframe ? (intercomIframe.contentDocument || intercomIframe.contentWindow.document) : null
+      let intercomIframeDomBody = intercomIframeInnerDoc ? intercomIframeInnerDoc.getElementById('intercom-container-body') : null
+      return intercomIframeDomBody ? intercomIframeDomBody.clientHeight : 0
     }
   },
 
