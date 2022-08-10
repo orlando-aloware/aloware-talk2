@@ -18,40 +18,6 @@ export default {
     }
   },
 
-  created () {
-    this.$VueEvent.listen('user_updated', (user) => {
-      // if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
-      if (this.profile && user.id === this.profile.id) {
-        // this.setAgentStatus(user.agent_status)
-        this.setProfile(user)
-        console.log('Changed agent status [event]: ', user.agent_status)
-      }
-    })
-
-    this.$VueEvent.listen('change_agent_status', (agentStatus) => {
-      this.changeAgentStatus(agentStatus)
-    })
-
-    // update agent status every 2 minutes
-    // disabled by Sohrab on July 26th, 2022
-    /*
-    const statusInterval = 2 * 60 * 1000
-    if (!window.agentStatusIntervalId) {
-      window.agentStatusIntervalId = setInterval(() => {
-        const now = new Date().getTime()
-        const lastRun = localStorage.getItem('agentStatusIntervalLastRun') || 0
-
-        // only runs if last run was at least the defined time ago (to avoid multiple tabs running multiple requests)
-        if (now - lastRun >= statusInterval) {
-          // this is a recursive agent status check with 3 retries
-          this.getAgentStatus()
-          localStorage.setItem('agentStatusIntervalLastRun', now)
-        }
-      }, statusInterval)
-    }
-    */
-  },
-
   methods: {
     color (agentStatus) {
       switch (agentStatus) {
@@ -141,12 +107,12 @@ export default {
         this.loadingAgentStatus = true
         this.$axios.post('/api/v1/user/' + this.profile.id + '/agent-status', {
           agent_status: val
-        }).then(res => {
+        }).then(({ data }) => {
           this.loadingAgentStatus = false
-          this.setAgentStatus(res.data.agent_status)
-          this.$VueEvent.fire('user_updated', res.data)
-          console.log('Changed agent status [api]: ', res.data.agent_status)
-          if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.setAgentStatus(data.agent_status)
+          this.$VueEvent.fire('user_updated', data)
+          console.log('Changed agent status [api]: ', data.agent_status)
+          if (data.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
             this.$VueEvent.fire('endWrapUp')
           }
         }).catch(err => {
@@ -176,7 +142,6 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('change_agent_status')
     clearInterval(window.agentStatusIntervalId)
   }
 }

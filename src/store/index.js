@@ -249,7 +249,8 @@ export default function (/* { ssrContext } */) {
       loadingParkedCalls: false,
       parkedCalls: [],
       suspended: false,
-      showProFeatureDialog: false
+      showProFeatureDialog: false,
+      leadSources: []
     },
 
     getters: {
@@ -563,6 +564,10 @@ export default function (/* { ssrContext } */) {
         commit('UPDATE_USER', user)
       },
 
+      updateUserStatus ({ commit }, event) {
+        commit('UPDATE_USER_STATUS', event)
+      },
+
       deleteUser ({ commit }, user) {
         commit('DELETE_USER', user)
       },
@@ -725,6 +730,9 @@ export default function (/* { ssrContext } */) {
       },
       toggleProFeatureDialog ({ commit }, value) {
         commit('TOGGLE_PRO_FEATURE_DIALOG', value)
+      },
+      setLeadSources ({ commit }, leadSources) {
+        commit('SET_LEAD_SOURCES', leadSources)
       }
     },
 
@@ -1137,6 +1145,16 @@ export default function (/* { ssrContext } */) {
         }
       },
 
+      UPDATE_USER_STATUS (state, event) {
+        const found = state.users.find(u => u.id === event.user_id)
+        if (found) {
+          const index = state.users.indexOf(found)
+          Vue.set(state.users[index], 'agent_status', event.agent_status)
+          Vue.set(state.users[index], 'last_agent_status_change', event.last_agent_status_change)
+          Vue.set(state.users[index], 'updated_at', event.last_agent_status_change)
+        }
+      },
+
       DELETE_USER (state, user) {
         const found = state.users.find((wf) => wf.id === user.id)
         if (found) {
@@ -1398,6 +1416,10 @@ export default function (/* { ssrContext } */) {
 
       TOGGLE_PRO_FEATURE_DIALOG (state, value) {
         state.showProFeatureDialog = value
+      },
+
+      SET_LEAD_SOURCES (state, leadSources) {
+        state.leadSources = leadSources
       },
 
       updateField

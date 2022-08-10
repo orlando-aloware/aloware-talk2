@@ -35,3 +35,4 @@ yarn-error.log*
 /.env.dev
 /.env.pre-prod
 /.env.prod
+.vscode/*

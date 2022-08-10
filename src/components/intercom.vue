@@ -13,9 +13,11 @@ export default {
 
   data () {
     return {
+      intercomBannerHeight: 0,
       env: null,
       statics: null,
-      app_id: process.env.INTERCOM_APP_ID
+      app_id: process.env.INTERCOM_APP_ID,
+      timeInterval: null
     }
   },
 
@@ -35,7 +37,7 @@ export default {
       })
     },
 
-    setup () {
+    setup (newRoute = false) {
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
@@ -49,12 +51,72 @@ export default {
             action_color: '#15163f',
             vertical_padding: 80
           })
+
+          this.timeInterval = setInterval(() => {
+            let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
+            let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
+
+            if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
+              this.fixTopMenu(intercomIframeHeight)
+            }
+
+            this.intercomBannerHeight = intercomIframeHeight
+          }, 1 * 1000)
         }
       })
+    },
+    fixTopMenu () {
+      let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
+      let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
+      let isTopNotification = intercomIframe ? intercomIframe.getBoundingClientRect().top === 0 : true
+
+      let mainContent = document.getElementsByClassName('main-content')[0]
+      let datatableWrapper = document.getElementsByClassName('datatable-wrapper')[0]
+      let dataTableWrapperDiv = datatableWrapper ? datatableWrapper.getElementsByTagName('div')[0] : null
+
+      if (intercomIframeHeight > 0 && intercomIframe && intercomIframe.offsetWidth === window.innerWidth && isTopNotification) {
+        document.getElementsByTagName('header')[0].style.top = intercomIframeHeight + 'px'
+        document.getElementsByTagName('aside')[0].style.top = intercomIframeHeight + 'px'
+
+        if (mainContent) {
+          mainContent.setAttribute(
+            'style',
+            'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+          )
+        }
+
+        if (dataTableWrapperDiv) {
+          dataTableWrapperDiv.setAttribute(
+            'style',
+            'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+          )
+        }
+      } else if (intercomIframeHeight === 0) {
+        document.getElementsByTagName('header')[0].style.top = 0
+        document.getElementsByTagName('aside')[0].style.top = 0
+        document.getElementsByTagName('body')[0].style.marginTop = 0
+
+        if (mainContent) {
+          mainContent.setAttribute('style', '')
+        }
+        if (dataTableWrapperDiv) {
+          dataTableWrapperDiv.setAttribute('style', '')
+        }
+      }
+    },
+    getIntercomIframeHeight (intercomIframe) {
+      let intercomIframeInnerDoc = intercomIframe ? (intercomIframe.contentDocument || intercomIframe.contentWindow.document) : null
+      let intercomIframeDomBody = intercomIframeInnerDoc ? intercomIframeInnerDoc.getElementById('intercom-container-body') : null
+      return intercomIframeDomBody ? intercomIframeDomBody.clientHeight : 0
     }
   },
 
   created () {
+    this.$router.beforeEach((to, from, next) => {
+      this.setup(true)
+      next()
+    })
+
     this.getStatics().then(() => {
       if (!this.hasReporterAccess &&
         (this.statics && !this.statics.whitelabel) &&
@@ -65,6 +127,10 @@ export default {
         this.setup()
       }
     })
+  },
+
+  beforeDestroy () {
+    clearInterval(this.timeInterval)
   }
 }
 </script>

@@ -192,6 +192,9 @@ export default {
         },
         enrollToWorkflow (params) {
           return window.axios.post(`${suffixV1}integration/hubspot/enroll-contact`, params)
+        },
+        getList (params) {
+          return window.axios.get(`${suffixV1}integration/hubspot/lists`, params)
         }
       }
     },

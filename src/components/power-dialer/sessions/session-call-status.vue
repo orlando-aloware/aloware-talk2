@@ -299,6 +299,14 @@ export default {
   beforeDestroy () {
     this.clearWarmUpCountDown()
     clearInterval(this.hangUpInterval)
+    clearInterval(this.countdownInterval)
+    clearInterval(this.$options.holdInterval)
+
+    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
+    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
+    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
+    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
+    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
   },
   computed: {
     ...mapFields([
@@ -488,19 +496,10 @@ export default {
       this.findDefaultOutboundCampaign()
     }
 
-    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
     this.$VueEvent.listen('initiate_session', this.onInitiateSession)
-
-    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
     this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
-
-    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
-
-    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
-
-    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
     this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
 
     this.isSessionRunning = false
@@ -550,13 +549,17 @@ export default {
         this.autoDialer.outbound_campaign_id = null
       }
     },
-    startWarmUpCountDown () {
-      if (this.countdownStarted) {
+    startWarmUpCountDown (resetCountdownTimer = false) {
+      if (this.countdownStarted || !this.isSessionRunning || this.reRouteModal) {
         return
       }
 
       this.countdownStarted = true
-      this.resetTimer()
+
+      if (resetCountdownTimer) {
+        this.resetTimer()
+      }
+
       this.countdownInterval = setInterval(() => {
         this.countdownTimer--
         this.onTimerIsOver()
@@ -578,8 +581,9 @@ export default {
         }
         if (this.wrapUp) {
           this.initialize()
-          this.wrapUp = false
-          this.isSessionRunning = false
+          this.wrapUpSeconds !== 0 &&
+          (this.wrapUp = false) &&
+          (this.isSessionRunning = false)
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -636,14 +640,13 @@ export default {
           this.activeTask = this.taskToCall
           this.hasActiveTask = true
           this.setContact(this.taskToCall)
-
           this.TOGGLE_SESSION_LOADER(true)
+          this.resetTimer()
 
           if (!this.isSessionRunning) {
             this.isSessionRunning = true
           }
 
-          this.resetTimer()
           setTimeout(() => {
             this.startWarmUpCountDown()
           }, 1000)
@@ -724,9 +727,13 @@ export default {
       }
     },
     resetTimer () {
-      if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
+      if (this.ongoingSession.finishedPdSession ||
+        this.countdownTimer <= -1) {
         this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
-      } else {
+        return
+      }
+
+      if (!this.wrapUp) {
         this.countdownTimer = this.sessionSettings.warmup_period_in_seconds
       }
     },
@@ -753,6 +760,7 @@ export default {
         }, 500)
       }
 
+      clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
       }, this.redirectDelay)
@@ -769,10 +777,15 @@ export default {
             this.isSessionRunning) {
             this.resetTimer()
           }
+
+          if (this.isSessionRunning &&
+            this.wrapUpSeconds === -1) {
+            this.onNextTask()
+          }
           break
         case 'WRAP_UP':
           this.wrapUp = true
-          this.resetTimer()
+          this.countdownTimer = this.wrapUpSeconds
           break
         case 'MAKING_CALL':
           break
@@ -885,13 +898,17 @@ export default {
     },
     onEndWrapUp () {
       this.wrapUp = false
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
           this.processSession(true)
         }, 200)
+        return
       }
+
+      this.hasActiveTask = false
+      this.reRoute()
     },
     onPhoneExpansionReset () {
       this.sessionPhoneExpansion = ''
@@ -939,11 +956,6 @@ export default {
       } else {
         this.initialize()
       }
-    },
-    'dialer.currentStatus': function (value) {
-      if (value === 'WRAP_UP') {
-        this.onNextTaskWhenOnWrapUp()
-      }
     }
   },
   data () {
@@ -955,7 +967,6 @@ export default {
         outbound_campaign_id: null,
         ratio: 1
       },
-      reRouteModal: false,
       redirectDelay: 3000,
       redirectNotification: false,
       hangUpInterval: null,

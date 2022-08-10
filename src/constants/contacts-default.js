@@ -217,5 +217,16 @@ export const DEFAULT_STATE = {
   },
   sequenceInfoLoading: false,
   lineIncomingNumber: null,
-  lineIncomingNumberLoading: false
+  lineIncomingNumberLoading: false,
+  communicationsSummary: {
+    first_outbound_call: null,
+    summaries: {
+      inbound_calls_count: 0,
+      outbound_calls_count: 0,
+      inbound_texts_count: 0,
+      outbound_texts_count: 0,
+      total_count: 0
+    }
+  },
+  isContactMixinUsed: false
 }

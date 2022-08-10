@@ -497,5 +497,8 @@ export default {
   },
   SET_LINE_INCOMING_NUMBER_LOADING (state, value) {
     state.lineIncomingNumberLoading = value
+  },
+  SET_IS_CONTACT_MIXIN_USED (state, value) {
+    state.isContactMixinUsed = value
   }
 }

@@ -232,6 +232,7 @@
 
 <script>
 
+import { get } from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionContactInProgress from './session-contact-in-progress'
@@ -505,7 +506,8 @@ export default {
     getTotalItem (key) {
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTasks.in_queue ? this.powerDialerTasks.in_queue.length : 0
+          const inQueue = get(this.powerDialerTasks, 'in_queue', null)
+          return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':

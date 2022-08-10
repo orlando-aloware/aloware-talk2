@@ -280,7 +280,9 @@ export default {
     onApplyChanges () {
       const typeQuery = _.get(this.$route, 'query.type', null)
 
-      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) || (typeQuery && typeQuery === 'public')) {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) ||
+        (typeQuery && typeQuery === 'public') ||
+        this.resourceId === 'unsaved') {
         this.closeAndMutate()
         return
       }
@@ -309,7 +311,8 @@ export default {
         })
     },
     onResetAllColumns () {
-      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) ||
+        this.resourceId === 'unsaved') {
         this.closeAndReset()
         return
       }
@@ -352,17 +355,7 @@ export default {
         return columns
       }
 
-      const newColumns = JSON.parse(JSON.stringify(headers))
-      const index = { data: null }
-      const found = { data: null }
-      for (index.data in columns) {
-        found.data = newColumns.find(item => item.name === columns[index.data].name)
-        if (found.data === undefined) {
-          newColumns.splice((parseInt(index.data) + 1), 0, columns[index.data])
-        }
-      }
-
-      return newColumns
+      return headers
     },
     onModalShow () {
       this.searchText = ''
