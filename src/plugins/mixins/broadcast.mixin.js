@@ -393,6 +393,7 @@ export default {
             }
           }
         })
+
       window.Echo.private('company-' + this.profile.company_id)
         .listen('.company.updated', (event) => {
           if (this.currentCompany && this.currentCompany.id === event.company.id) {
@@ -602,10 +603,19 @@ export default {
         .listen('.export.deleted', (event) => {
           window.VueEvent.fire('export_event_delete', event)
         })
+
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event
         .listen('.app.newversion', (event) => {
           this.$VueEvent.fire('new_version', event.data.message)
+        })
+
+      window.Echo.private('cache-agent-status-' + this.profile.company_id)
+        .listen('.agent_status.updated', (event) => {
+          if (!this.profile || !event.user_id) {
+            return
+          }
+          this.$VueEvent.fire('agent_status_updated', event)
         })
     },
     broadcastLeave () {

@@ -112,7 +112,8 @@ export default {
         'line-selector',
         'contact-details',
         'message-composer'
-      ]
+      ],
+      listeners: {}
     }
   },
 
@@ -231,7 +232,7 @@ export default {
       return
     }
 
-    this.$VueEvent.listen('new_communication', (data) => {
+    this.listeners.newCommunication = _.debounce((data) => {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
@@ -241,25 +242,26 @@ export default {
         talk2Api.V2.contacts.get(this.contact.id).then(response => {
           this.setContact(response.data)
           this.setContactClone(response.data)
+          this.$VueEvent.fire('inbox_contact_updated')
         }).catch(err => {
           console.log(err)
         })
       }
-    })
+    }, 500)
 
-    this.$VueEvent.listen('update_communication', (data) => {
+    this.listeners.updateCommunication = (data) => {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
 
       this.updateCommunication(data)
-    })
+    }
 
-    this.$VueEvent.listen('delete_communication', (data) => {
+    this.listeners.deleteCommunication = (data) => {
       this.deleteCommunication(data)
-    })
+    }
 
-    this.$VueEvent.listen('contact_updated', (data) => {
+    this.listeners.contactUpdated = (data) => {
       // check data loaded
       if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
         const updatedContact = _.get(this, 'contact', {})
@@ -288,22 +290,31 @@ export default {
         }
         this.updateContacts(updatedContact)
       }
-    })
+    }
 
-    this.$VueEvent.listen('contact_audit_created', (data) => {
+    this.listeners.contactAuditCreated = (data) => {
       // check data loaded
       if (parseInt(data.contact_id) === parseInt(this.contactId)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
       }
-    })
+    }
 
-    this.$VueEvent.listen('fetch_contact_info', (callback) => {
+    this.listeners.fetchContactInfo = (callback) => {
       this.processFetchContactInfo(callback)
-    })
+    }
+
+    this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
   },
 
   methods: {
+    initListeners () {
+      this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+      this.$VueEvent.listen('delete_communication', this.listeners.deleteCommunication)
+      this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
+      this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
+    },
     addNewCommunication: _.debounce(function (data) {
       if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
         return false
@@ -608,7 +619,7 @@ export default {
           if (!found) {
             this.selectedContactCampaigns.push(o.campaign_id)
           }
-          o.tag_ids = o.tags.map((a) => a.id)
+          o.tag_ids = !_.isEmpty(o.tags) ? o.tags.map((a) => a.id) : []
         }
       })
     },
@@ -1135,7 +1146,8 @@ export default {
       'setLineIncomingNumberLoading',
       'setLineIncomingNumber',
       'setCommunicationSummary',
-      'setContactAttributes'
+      'setContactAttributes',
+      'setIsContactMixinUsed'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },
@@ -1151,6 +1163,13 @@ export default {
   },
 
   beforeDestroy () {
+    this.setIsContactMixinUsed(false)
+    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
+    this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+    this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
     clearInterval(this.contactActivitiesInterval)
     clearInterval(this.containerElInterval)
     clearInterval(this.scrollInterval)

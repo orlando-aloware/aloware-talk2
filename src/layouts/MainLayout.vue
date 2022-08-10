@@ -200,7 +200,8 @@ import {
   broadcastMixin,
   parkCallMixin,
   visibilityMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  agentMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -244,7 +245,8 @@ export default {
     broadcastMixin,
     parkCallMixin,
     visibilityMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    agentMixin
   ],
 
   data () {
@@ -291,7 +293,9 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
     ...mapState([
       'dialer',
       'campaigns',
@@ -303,11 +307,23 @@ export default {
       'parkedCalls',
       'leadSources'
     ]),
-    ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState('stats', ['availableMetrics']),
-    ...mapState('contacts', ['showContactsHeader']),
-    ...mapState('inbox', ['selectedContact', 'liveContacts']),
-    ...mapState('powerDialer', ['ongoingSession']),
+    ...mapState('auth', [
+      'profile',
+      'authenticated'
+    ]),
+    ...mapState('stats', [
+      'availableMetrics'
+    ]),
+    ...mapState('contacts', [
+      'showContactsHeader'
+    ]),
+    ...mapState('inbox', [
+      'selectedContact',
+      'liveContacts'
+    ]),
+    ...mapState('powerDialer', [
+      'ongoingSession'
+    ]),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -830,11 +846,55 @@ export default {
 
     this.$VueEvent.listen('user_updated', (user) => {
       this.checkSuspended(user, true)
+
+      // if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
+      if (this.profile && user.id === this.profile.id) {
+        // this.setAgentStatus(user.agent_status)
+        this.setProfile(user)
+        console.log('Changed agent status [event]: ', user.agent_status)
+      }
     })
 
     this.$VueEvent.listen('company_updated', (company) => {
       this.checkSuspended(company)
     })
+
+    this.$VueEvent.listen('agent_status_updated', (event) => {
+      // store.commit('UPDATE_AGENT_STATUS', event)
+      this.updateUserStatus(event)
+      if (this.currentCompany &&
+        event.company_id &&
+        event.company_id === this.currentCompany.id &&
+        this.profile &&
+        event.user_id === this.profile.id &&
+        this.profile.agent_status !== event.agent_status) {
+        this.setAgentStatus(event.agent_status)
+        console.log('Changed agent status [event]: ', event.agent_status)
+      }
+    })
+
+    this.$VueEvent.listen('change_agent_status', (agentStatus) => {
+      this.changeAgentStatus(agentStatus)
+    })
+
+    // update agent status every 2 minutes
+    // disabled by Sohrab on July 26th, 2022
+    /*
+    const statusInterval = 2 * 60 * 1000
+    if (!window.agentStatusIntervalId) {
+      window.agentStatusIntervalId = setInterval(() => {
+        const now = new Date().getTime()
+        const lastRun = localStorage.getItem('agentStatusIntervalLastRun') || 0
+
+        // only runs if last run was at least the defined time ago (to avoid multiple tabs running multiple requests)
+        if (now - lastRun >= statusInterval) {
+          // this is a recursive agent status check with 3 retries
+          this.getAgentStatus()
+          localStorage.setItem('agentStatusIntervalLastRun', now)
+        }
+      }, statusInterval)
+    }
+    */
 
     if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
@@ -1115,18 +1175,12 @@ export default {
         this.loading = false
         if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
           if (!this.profile.go_to_available_after_login) {
-            this.$VueEvent.fire(
-              'change_agent_status',
-              AgentStatus.AGENT_STATUS_OFFLINE
-            )
+            this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE)
           }
         }
 
         if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
-          this.$VueEvent.fire(
-            'change_agent_status',
-            AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
-          )
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
         }
 
         this.broadcastInit()
@@ -2060,6 +2114,8 @@ export default {
       this.$VueEvent.stop('new_version')
       this.$VueEvent.stop('user_updated')
       this.$VueEvent.stop('company_updated')
+      this.$VueEvent.stop('agent_status_updated')
+      this.$VueEvent.stop('change_agent_status')
       this.unsubscribeFromPusher()
       this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
       this.resetNotifications()
@@ -2110,7 +2166,8 @@ export default {
       'setNotificationAudio',
       'removeParkedCall',
       'setSuspended',
-      'setLeadSources'
+      'setLeadSources',
+      'updateUserStatus'
     ]),
     ...mapActions('contacts', [
       'resetSearch',

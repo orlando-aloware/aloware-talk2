@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import 'highlight.js/styles/github.css'
 import googlePhone from 'google-libphonenumber'
-import jstz from 'jstimezonedetect'
 import moment from 'moment'
 import 'moment-timezone'
 import momentDurationFormatSetup from 'moment-duration-format'
@@ -34,7 +33,7 @@ Vue.use(Vuelidate)
 Vue.use(BusinessHours)
 
 window.Bowser = Bowser
-window.timezone = ('Intl' in window ? new Intl.DateTimeFormat().resolvedOptions().timeZone : jstz.determine().name()) || 'America/Los_Angeles'
+window.timezone = 'Intl' in window ? new Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/Los_Angeles'
 
 if (process.env.APP_DEBUG) {
   Vue.config.devtools = true
