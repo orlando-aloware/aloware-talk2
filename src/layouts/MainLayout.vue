@@ -293,7 +293,9 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
     ...mapState([
       'dialer',
       'campaigns',
@@ -305,11 +307,23 @@ export default {
       'parkedCalls',
       'leadSources'
     ]),
-    ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState('stats', ['availableMetrics']),
-    ...mapState('contacts', ['showContactsHeader']),
-    ...mapState('inbox', ['selectedContact', 'liveContacts']),
-    ...mapState('powerDialer', ['ongoingSession']),
+    ...mapState('auth', [
+      'profile',
+      'authenticated'
+    ]),
+    ...mapState('stats', [
+      'availableMetrics'
+    ]),
+    ...mapState('contacts', [
+      'showContactsHeader'
+    ]),
+    ...mapState('inbox', [
+      'selectedContact',
+      'liveContacts'
+    ]),
+    ...mapState('powerDialer', [
+      'ongoingSession'
+    ]),
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },

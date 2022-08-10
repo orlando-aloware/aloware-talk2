@@ -353,5 +353,8 @@ export default {
   },
   setLineIncomingNumberLoading: ({ commit }, value) => {
     commit('SET_LINE_INCOMING_NUMBER_LOADING', value)
+  },
+  setIsContactMixinUsed: ({ commit }, value) => {
+    commit('SET_IS_CONTACT_MIXIN_USED', value)
   }
 }

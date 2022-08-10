@@ -202,6 +202,8 @@ export default {
   },
 
   created () {
+    this.setIsContactMixinUsed(true)
+    this.initListeners()
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
