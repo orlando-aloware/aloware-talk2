@@ -11304,7 +11304,12 @@ h1.contact-list-name-label {
 .power-dialer-list  {
   .sublists {
     overflow-y: auto !important;
-    height: 78vh;
+  }
+
+  .folders {
+    &__content {
+      height: 78vh;
+    }
   }
 }
 
