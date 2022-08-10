@@ -119,6 +119,10 @@ export default {
         .finally(this.closeMoveDialog)
     },
     moveListRequest () {
+      if (this.moveDialog.id === 'unsaved') {
+        return
+      }
+
       this.isMoving = true
       return this.$axios
         .patch(`${this.fetchFoldersListEndpoint}/${this.moveDialog.id}`, {

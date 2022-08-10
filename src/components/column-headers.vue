@@ -280,7 +280,9 @@ export default {
     onApplyChanges () {
       const typeQuery = _.get(this.$route, 'query.type', null)
 
-      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) || (typeQuery && typeQuery === 'public')) {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) ||
+        (typeQuery && typeQuery === 'public') ||
+        this.resourceId === 'unsaved') {
         this.closeAndMutate()
         return
       }
@@ -309,7 +311,8 @@ export default {
         })
     },
     onResetAllColumns () {
-      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id)) {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) ||
+        this.resourceId === 'unsaved') {
         this.closeAndReset()
         return
       }
