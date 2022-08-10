@@ -315,6 +315,13 @@ export default {
       this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
       this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
     },
+    removeListeners () {
+      this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
+      this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
+      this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
+      this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+    },
     addNewCommunication: _.debounce(function (data) {
       if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
         return false
@@ -1163,12 +1170,6 @@ export default {
   },
 
   beforeDestroy () {
-    this.setIsContactMixinUsed(false)
-    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
-    this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
-    this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
-    this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
     clearInterval(this.contactActivitiesInterval)
     clearInterval(this.containerElInterval)

@@ -248,6 +248,8 @@ export default {
   },
 
   beforeDestroy () {
+    this.setIsContactMixinUsed(false)
+    this.removeListeners()
     this.setContact({})
   },
 
