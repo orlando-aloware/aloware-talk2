@@ -29,7 +29,7 @@
                         :target="folderId">
               <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
-                <contact-menu-item @click="onCreateFolderToggle">
+                <contact-menu-item @click="onCreateFolderToggle($event)">
                   <template slot="icon">
                     <folder-icon color="#62666E"></folder-icon>
                   </template>
@@ -39,7 +39,7 @@
                 </contact-menu-item>
 
                 <contact-menu-item v-if="isContactModuleType"
-                                    @click="onCreateList">
+                                    @click="onCreateList($event)">
                   <template slot="icon">
                     <people-icon></people-icon>
                   </template>
@@ -112,7 +112,7 @@
                             :parent_id="null"
                             :endpoint="foldersEndpoint"
                             v-if="isCreatingFolder"
-                            @blur="onCreateFolderToggle"
+                            @blur="onCreateFolderToggle($event)"
                             @cancel="onCreateFolderCancel"/>
         <template v-if="foldersLength && !isLoading">
           <template v-for="folder in folders[0].child_folders">
@@ -140,7 +140,7 @@
                         :layer="0"
                         :parent_id="null"
                         v-if="folders[0].id !== removedFolder"
-                        @blur="onCreateFolderToggle"
+                        @blur="onCreateFolderToggle($event)"
                         @cancel="onCreateFolderCancel"/>
         </template>
         <div class="item-empty"
@@ -194,7 +194,8 @@ export default {
       'folders',
       'removedFolder',
       'activeFolder',
-      'createDialog'
+      'createDialog',
+      'unsavedList'
     ]),
     ...mapState('cache', ['currentCompany']),
     ...mapGetters('powerDialer', [
@@ -256,7 +257,8 @@ export default {
       isCreatingFolder: false,
       isLoading: false,
       isMenuOpen: false,
-      popperInstance: null
+      popperInstance: null,
+      isUnsavedListModalShown: false
     }
   },
   methods: {
@@ -265,18 +267,53 @@ export default {
       'createListOpen',
       'createPdListOpen',
       'setActiveFolder',
-      'setMyListsLoaded'
+      'setMyListsLoaded',
+      'setUnsavedList'
     ]),
     initResources () {
       this.loadFolders()
       this.setActiveFolder(this.folderId)
     },
-    onCreateFolderToggle () {
-      this.isCreatingFolder = !this.isCreatingFolder
+    showUnsavedListDialog (callback) {
+      if (this.unsavedList && !this.isUnsavedListModalShown) {
+        this.isUnsavedListModalShown = true
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.setUnsavedList(null)
+            callback()
+          }
+
+          this.isUnsavedListModalShown = false
+        })
+      }
+
+      if (!this.unsavedList) {
+        callback()
+      }
     },
-    onCreateList () {
-      this.createListOpen({
-        contact_folder_id: null
+    onCreateFolderToggle (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.isCreatingFolder = !this.isCreatingFolder
+      })
+    },
+    onCreateList (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.createListOpen({
+          contact_folder_id: null
+        })
       })
     },
     onCreateFromExistingList (data) {

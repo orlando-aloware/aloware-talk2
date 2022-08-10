@@ -392,6 +392,10 @@ export default {
         })
     },
     updateListRequest (id, params) {
+      if (id === 'unsaved') {
+        return
+      }
+
       return this.$axios
         .patch(this.listPath + id, params)
         .catch((error) => {

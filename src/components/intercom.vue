@@ -13,9 +13,11 @@ export default {
 
   data () {
     return {
+      intercomBannerHeight: 0,
       env: null,
       statics: null,
-      app_id: process.env.INTERCOM_APP_ID
+      app_id: process.env.INTERCOM_APP_ID,
+      timeInterval: null
     }
   },
 
@@ -35,7 +37,7 @@ export default {
       })
     },
 
-    setup () {
+    setup (newRoute = false) {
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
@@ -49,6 +51,17 @@ export default {
             action_color: '#15163f',
             vertical_padding: 80
           })
+
+          this.timeInterval = setInterval(() => {
+            let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
+            let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
+
+            if (intercomIframeHeight !== this.intercomBannerHeight || newRoute) {
+              this.fixTopMenu(intercomIframeHeight)
+            }
+
+            this.intercomBannerHeight = intercomIframeHeight
+          }, 1 * 1000)
         }
       })
     },
@@ -99,6 +112,11 @@ export default {
   },
 
   created () {
+    this.$router.beforeEach((to, from, next) => {
+      this.setup(true)
+      next()
+    })
+
     this.getStatics().then(() => {
       if (!this.hasReporterAccess &&
         (this.statics && !this.statics.whitelabel) &&
@@ -109,6 +127,10 @@ export default {
         this.setup()
       }
     })
+  },
+
+  beforeDestroy () {
+    clearInterval(this.timeInterval)
   }
 }
 </script>
