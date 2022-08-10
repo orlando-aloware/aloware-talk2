@@ -16,7 +16,7 @@ export default {
       intercomBannerHeight: 0,
       env: null,
       statics: null,
-      app_id: process.env.INTERCOM_APP_ID
+      app_id: process.env.INTERCOM_APP_ID,
       timeInterval: null
     }
   },
