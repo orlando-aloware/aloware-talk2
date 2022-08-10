@@ -619,7 +619,7 @@ export default {
           if (!found) {
             this.selectedContactCampaigns.push(o.campaign_id)
           }
-          o.tag_ids = o.tags.map((a) => a.id)
+          o.tag_ids = !_.isEmpty(o.tags) ? o.tags.map((a) => a.id) : []
         }
       })
     },
