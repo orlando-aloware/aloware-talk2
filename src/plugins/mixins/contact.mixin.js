@@ -237,7 +237,6 @@ export default {
         return
       }
 
-      console.trace(`test 1, ${Math.floor(Date.now() / 1000)}`)
       this.addNewCommunication(data)
       if (data.contact_id === this.contact.id) {
         talk2Api.V2.contacts.get(this.contact.id).then(response => {
