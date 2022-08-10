@@ -70,25 +70,38 @@ export default {
       let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
       let isTopNotification = intercomIframe ? intercomIframe.getBoundingClientRect().top === 0 : true
 
+      let mainContent = document.getElementsByClassName('main-content')[0]
+      let datatableWrapper = document.getElementsByClassName('datatable-wrapper')[0]
+      let dataTableWrapperDiv = datatableWrapper ? datatableWrapper.getElementsByTagName('div')[0] : null
+
       if (intercomIframeHeight > 0 && intercomIframe && intercomIframe.offsetWidth === window.innerWidth && isTopNotification) {
         document.getElementsByTagName('header')[0].style.top = intercomIframeHeight + 'px'
         document.getElementsByTagName('aside')[0].style.top = intercomIframeHeight + 'px'
 
-        document.getElementsByClassName('main-content')[0].setAttribute(
-          'style',
-          'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
-        )
-        document.getElementsByClassName('datatable-wrapper')[0].getElementsByTagName('div')[0].setAttribute(
-          'style',
-          'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
-        )
+        if (mainContent) {
+          mainContent.setAttribute(
+            'style',
+            'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+          )
+        }
+
+        if (dataTableWrapperDiv) {
+          dataTableWrapperDiv.setAttribute(
+            'style',
+            'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
+          )
+        }
       } else if (intercomIframeHeight === 0) {
         document.getElementsByTagName('header')[0].style.top = 0
         document.getElementsByTagName('aside')[0].style.top = 0
         document.getElementsByTagName('body')[0].style.marginTop = 0
 
-        document.getElementsByClassName('main-content')[0].setAttribute('style', '')
-        document.getElementsByClassName('datatable-wrapper')[0].getElementsByTagName('div')[0].setAttribute('style', '')
+        if (mainContent) {
+          mainContent.setAttribute('style', '')
+        }
+        if (dataTableWrapperDiv) {
+          dataTableWrapperDiv.setAttribute('style', '')
+        }
       }
     },
     getIntercomIframeHeight (intercomIframe) {
