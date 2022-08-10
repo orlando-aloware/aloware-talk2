@@ -72,6 +72,7 @@ export default {
 
       let mainContent = document.getElementsByClassName('main-content')[0]
       let datatableWrapper = document.getElementsByClassName('datatable-wrapper')[0]
+      let dataTableWrapperDiv = datatableWrapper ? datatableWrapper.getElementsByTagName('div')[0] : null
 
       if (intercomIframeHeight > 0 && intercomIframe && intercomIframe.offsetWidth === window.innerWidth && isTopNotification) {
         document.getElementsByTagName('header')[0].style.top = intercomIframeHeight + 'px'
@@ -84,13 +85,12 @@ export default {
           )
         }
 
-        if (datatableWrapper) {
-          datatableWrapper.getElementsByTagName('div')[0].setAttribute(
+        if (dataTableWrapperDiv) {
+          dataTableWrapperDiv.setAttribute(
             'style',
             'height: calc(100% - ' + intercomIframeHeight + 'px) !important;'
           )
         }
-
       } else if (intercomIframeHeight === 0) {
         document.getElementsByTagName('header')[0].style.top = 0
         document.getElementsByTagName('aside')[0].style.top = 0
@@ -99,8 +99,8 @@ export default {
         if (mainContent) {
           mainContent.setAttribute('style', '')
         }
-        if (datatableWrapper) {
-          datatableWrapper.getElementsByTagName('div')[0].setAttribute('style', '')
+        if (dataTableWrapperDiv) {
+          dataTableWrapperDiv.setAttribute('style', '')
         }
       }
     },
