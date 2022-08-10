@@ -5271,7 +5271,6 @@ button#bs-folder-options {
   }
   &__content {
     overflow: auto;
-
     &:not(.no-folder) {
       max-height: calc(100% - 163px);
     }
