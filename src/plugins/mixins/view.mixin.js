@@ -2,6 +2,7 @@ import { mapActions, mapState } from 'vuex'
 import moment from 'moment'
 import _ from 'lodash'
 import { COUNT_FIELDS } from 'src/constants/count-fields-default'
+import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
   data () {
@@ -107,9 +108,20 @@ export default {
       this.hoverPopover.data = []
       this.hoverPopover.dataLength = 0
     },
-    getStatusColor (taskStatusName) {
+    getStatusColor (taskStatusName, module = null) {
       if (!taskStatusName) {
         return taskStatusName
+      }
+
+      if (module === 'contacts') {
+        switch (taskStatusName) {
+          case 'Pending':
+            return 'grey-90'
+          case 'Closed':
+            return 'success'
+          default:
+            return 'primary'
+        }
       }
 
       switch (taskStatusName) {
@@ -123,11 +135,23 @@ export default {
           return 'primary'
       }
     },
-    getStatusName (taskStatus) {
+    getStatusName (taskStatus, module = null) {
       const integerTaskStatus = taskStatus ? parseInt(taskStatus) : taskStatus
 
       if (!integerTaskStatus) {
         return ''
+      }
+
+      if (module === 'contacts') {
+        switch (integerTaskStatus) {
+          case ContactTaskStatus.STATUS_PENDING:
+            return 'Pending'
+          case ContactTaskStatus.STATUS_CLOSED:
+            return 'Closed'
+          case ContactTaskStatus.STATUS_OPEN:
+          default:
+            return 'Open'
+        }
       }
 
       switch (integerTaskStatus) {
