@@ -68,3 +68,5 @@ export const REJECTION_REASON_CAMPAIGN_PROXY = 33
 export const REJECTION_REASON_COMPANY_DELETED = 34
 // A call/SMS was rejected to send by our system because company is suspended
 export const REJECTION_REASON_COMPANY_SUSPENDED = 35
+// A communication is rejected because no phone number was found
+export const REJECTION_REASON_PHONE_NUMBER_NOT_FOUND = 36

@@ -241,6 +241,8 @@ export default {
           return 'Company was deleted.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
           return 'Company was suspended.'
+        case CommunicationRejectionReasons.REJECTION_REASON_PHONE_NUMBER_NOT_FOUND:
+          return 'Phone number was not found.'
       }
     },
 

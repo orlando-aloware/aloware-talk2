@@ -65,10 +65,10 @@
           <span v-if="customAuditsConditions(communication)">
             {{ generateCustomAuditMessage(communication) + (communication.notes ? ' (Reason: ' + communication.notes + ')' : '') }}
           </span>
-          <span v-if="communication.user_id && getUser(communication.user_id).name.length">
+          <span v-if="communication.user_id && getUser(communication.user_id).name.length && showAuthor(communication)">
             by {{ getUser(communication.user_id).name }}
           </span>
-          <span v-else>
+          <span v-else-if="showAuthor(communication)">
             by System
           </span>
           <q-badge class="is-dot mx-1 grey-light"
@@ -843,6 +843,10 @@ export default {
       }
 
       return { name: '' }
+    },
+
+    showAuthor (audit) {
+      return audit.property != 'text_authorized' && audit.property != 'is_opted_out'
     }
   }
 }
