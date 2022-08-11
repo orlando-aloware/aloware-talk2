@@ -11302,14 +11302,10 @@ h1.contact-list-name-label {
 }
 
 .power-dialer-list  {
+  height: calc(100% - 100px);
+  overflow-y: auto;
   .sublists {
     overflow-y: auto !important;
-  }
-
-  .folders {
-    &__content {
-      height: 78vh;
-    }
   }
 }
 
