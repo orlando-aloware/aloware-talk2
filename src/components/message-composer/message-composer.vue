@@ -81,6 +81,7 @@ import talk2Api from 'src/plugins/api/api'
 import MessageComposerFax from 'components/message-composer/message-composer-fax'
 import MessageComposerEmail from 'components/message-composer/message-composer-email'
 import MessageComposerNote from 'components/message-composer/message-composer-note'
+import * as Roles from 'src/constants/roles'
 
 export default {
   name: 'message-composer',
@@ -103,11 +104,12 @@ export default {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
     ...mapState(['templates']),
     ...mapState('cache', ['currentCompany']),
+    ...mapState('auth', ['profile']),
     disableFax () {
       return this.selectedLine ? !this.selectedLine.is_fax : true
     },
     isSmsDisabled () {
-      return !this.currentCompany.sms_enabled
+      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
     },
     isPhoneNumberInvalid () {
       if (this.selectContact && this.selectContact.phone_numbers && this.selectContact.phone_numbers.length) {
