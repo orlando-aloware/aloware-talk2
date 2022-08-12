@@ -248,9 +248,10 @@ export default {
   },
   mounted () {
     this.initResources()
-    this.$VueEvent.listen('fetchContactsLists', () => {
+    this.listeners.fetchContactsLists = () => {
       this.initResources()
-    })
+    }
+    this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
   },
   data () {
     return {
@@ -258,7 +259,8 @@ export default {
       isLoading: false,
       isMenuOpen: false,
       popperInstance: null,
-      isUnsavedListModalShown: false
+      isUnsavedListModalShown: false,
+      listeners: {}
     }
   },
   methods: {
@@ -382,6 +384,9 @@ export default {
         this.initResources()
       }
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('fetchContactsLists', this.listeners.fetchContactsLists)
   }
 }
 </script>

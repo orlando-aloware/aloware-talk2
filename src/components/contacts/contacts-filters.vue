@@ -420,7 +420,7 @@ export default {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.data.label,
-              operator: operator.data.label,
+              operator: operator.data ? _.get(operator.data, 'label', null) : null,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
               default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0

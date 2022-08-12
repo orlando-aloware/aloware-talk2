@@ -40,6 +40,7 @@ export default {
     return {
       loadingDefaultCounts: false,
       loadingPinned: false,
+      listeners: {},
       ContactListTypes
     }
   },
@@ -54,11 +55,10 @@ export default {
 
   mounted () {
     this.init()
-    this.$VueEvent.listen('fetchContactsLists', () => {
+    this.listeners.fetchContactsLists = () => {
       this.init()
-    })
-
-    this.$VueEvent.listen('getListCount', (list) => {
+    }
+    this.listeners.getListCount = (list) => {
       if (list.type === this.ContactListTypes.DYNAMIC && list.id !== 'my-contacts') {
         this.loadDynamicListPinnedCount(list)
       }
@@ -70,9 +70,8 @@ export default {
       if (list.type === this.ContactListTypes.STATIC) {
         this.loadPinnedCount(list.id)
       }
-    })
-
-    this.$VueEvent.listen('listCountUpdated', (data) => {
+    }
+    this.listeners.listCountUpdated = (data) => {
       const isPinned = this.pinnedLists.find(item => item.id.toString() === data.list.id.toString())
       if (!isPinned) {
         return
@@ -82,7 +81,11 @@ export default {
         id: data.list.id,
         count: data.count
       })
-    })
+    }
+
+    this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
+    this.$VueEvent.listen('getListCount', this.listeners.getListCount)
+    this.$VueEvent.listen('listCountUpdated', this.listeners.listCountUpdated)
   },
 
   methods: {
@@ -254,6 +257,11 @@ export default {
     loading (value) {
       this.setPinnedListsLoaded(!value)
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('fetchContactsLists', this.listeners.fetchContactsLists)
+    this.$VueEvent.stop('getListCount', this.listeners.getListCount)
+    this.$VueEvent.stop('listCountUpdated', this.listeners.listCountUpdated)
   }
 }
 </script>

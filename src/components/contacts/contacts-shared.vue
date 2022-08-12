@@ -33,7 +33,8 @@ export default {
       isCreatingFolder: false,
       isLoading: false,
       lists: [],
-      layer: 1
+      layer: 1,
+      listeners: {}
     }
   },
   methods: {
@@ -77,9 +78,10 @@ export default {
   },
   mounted () {
     this.loadFolders()
-    this.$VueEvent.listen('fetchContactsLists', () => {
+    this.listeners.fetchContactsLists = () => {
       this.loadFolders()
-    })
+    }
+    this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
   },
   watch: {
     $route (to) {
@@ -87,6 +89,9 @@ export default {
         this.loadFolders()
       }
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('fetchContactsLists', this.listeners.fetchContactsLists)
   }
 }
 </script>

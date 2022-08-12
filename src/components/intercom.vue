@@ -73,10 +73,13 @@ export default {
       let mainContent = document.getElementsByClassName('main-content')[0]
       let datatableWrapper = document.getElementsByClassName('datatable-wrapper')[0]
       let dataTableWrapperDiv = datatableWrapper ? datatableWrapper.getElementsByTagName('div')[0] : null
+      let headerElement = document.getElementsByTagName('header')[0]
+      let asideElement = document.getElementsByTagName('aside')[0]
+      let bodyElement = document.getElementsByTagName('body')[0]
 
       if (intercomIframeHeight > 0 && intercomIframe && intercomIframe.offsetWidth === window.innerWidth && isTopNotification) {
-        document.getElementsByTagName('header')[0].style.top = intercomIframeHeight + 'px'
-        document.getElementsByTagName('aside')[0].style.top = intercomIframeHeight + 'px'
+        headerElement && (headerElement.style.top = intercomIframeHeight + 'px')
+        asideElement && (asideElement.style.top = intercomIframeHeight + 'px')
 
         if (mainContent) {
           mainContent.setAttribute(
@@ -92,9 +95,9 @@ export default {
           )
         }
       } else if (intercomIframeHeight === 0) {
-        document.getElementsByTagName('header')[0].style.top = 0
-        document.getElementsByTagName('aside')[0].style.top = 0
-        document.getElementsByTagName('body')[0].style.marginTop = 0
+        headerElement && (headerElement.style.top = 0)
+        asideElement && (asideElement.style.top = 0)
+        bodyElement && (bodyElement.style.marginTop = 0)
 
         if (mainContent) {
           mainContent.setAttribute('style', '')
