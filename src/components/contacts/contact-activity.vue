@@ -846,7 +846,7 @@ export default {
     },
 
     showAuthor (audit) {
-      return audit.property != 'text_authorized' && audit.property != 'is_opted_out'
+      return audit.property !== 'text_authorized' && audit.property !== 'is_opted_out'
     }
   }
 }
