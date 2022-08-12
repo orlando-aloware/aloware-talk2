@@ -96,7 +96,7 @@
         <q-item v-if="!titleOnly">
           <q-btn id="dialer-form-button"
                  :ripple="false"
-                 :disable="!isDialerReady && !dialer.error.code"
+                 :disable="isDialerDisabled"
                  size="40px"
                  padding="none"
                  align="center"
@@ -168,6 +168,7 @@ import HeaderHelp from 'components/header-help'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import AnnounceKit from 'announcekit-vue'
+import * as Roles from 'src/constants/roles'
 
 export default {
   name: 'app-header',
@@ -291,6 +292,9 @@ export default {
         email: this.profile.email,
         name: this.profile.name
       }
+    },
+    isDialerDisabled () {
+      return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
     }
   },
 
@@ -310,7 +314,9 @@ export default {
     },
 
     showDialer () {
-      this.dialerStatus = true
+      if (!this.isDialerDisabled) {
+        this.dialerStatus = true
+      }
     },
 
     hideDialer () {
