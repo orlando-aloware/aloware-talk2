@@ -252,11 +252,11 @@ export default {
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
     },
-    
+
     isElectron () {
       return Platform.is.electron
     },
-    
+
     isMainTitle () {
       if (['Settings Tab'].includes(this.$route.name) && !this.$q.screen.lt.md) {
         return true
@@ -275,19 +275,19 @@ export default {
         !this.myListsLoaded ||
         !this.listContactsLoaded
     },
-    
+
     dialerIconBGColor () {
       return this.dialerStatus ? '#00BF4A' : '#F4F4F6'
     },
-    
+
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
     },
-    
+
     ak_widget_url () {
       return storage.local.getItem('ak_widget_url')
     },
-    
+
     currentUser () {
       if (!this.profile) {
         return {}
@@ -299,7 +299,7 @@ export default {
         name: this.profile.name
       }
     },
-    
+
     backRoute () {
       if (this.$route.name === 'Communication') {
         return {
@@ -314,7 +314,7 @@ export default {
         path: this.prevRoute
       }
     },
-    
+
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
     }
