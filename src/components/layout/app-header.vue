@@ -15,7 +15,7 @@
       <router-link
         class="btn-header-nav-back"
         v-if="['Communication'].includes($route.name)"
-        :to="{ path: prevRoute }">
+        :to="backRoute">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left"></i>
         </button>
@@ -252,9 +252,11 @@ export default {
     isDialerReady () {
       return !this.dialer.call && this.dialer.isReady
     },
+    
     isElectron () {
       return Platform.is.electron
     },
+    
     isMainTitle () {
       if (['Settings Tab'].includes(this.$route.name) && !this.$q.screen.lt.md) {
         return true
@@ -273,15 +275,19 @@ export default {
         !this.myListsLoaded ||
         !this.listContactsLoaded
     },
+    
     dialerIconBGColor () {
       return this.dialerStatus ? '#00BF4A' : '#F4F4F6'
     },
+    
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
     },
+    
     ak_widget_url () {
       return storage.local.getItem('ak_widget_url')
     },
+    
     currentUser () {
       if (!this.profile) {
         return {}
@@ -293,6 +299,22 @@ export default {
         name: this.profile.name
       }
     },
+    
+    backRoute () {
+      if (this.$route.name === 'Communication') {
+        return {
+          name: 'Contact',
+          params: {
+            id: this.$route.params.contactId
+          }
+        }
+      }
+
+      return {
+        path: this.prevRoute
+      }
+    },
+    
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
     }

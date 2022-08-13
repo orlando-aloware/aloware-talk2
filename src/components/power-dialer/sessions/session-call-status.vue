@@ -301,6 +301,12 @@ export default {
     clearInterval(this.hangUpInterval)
     clearInterval(this.countdownInterval)
     clearInterval(this.$options.holdInterval)
+
+    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
+    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
+    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
+    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
+    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
   },
   computed: {
     ...mapFields([
@@ -490,19 +496,10 @@ export default {
       this.findDefaultOutboundCampaign()
     }
 
-    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
     this.$VueEvent.listen('initiate_session', this.onInitiateSession)
-
-    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
     this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
-
-    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
-
-    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
-
-    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
     this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
 
     this.isSessionRunning = false
@@ -584,8 +581,9 @@ export default {
         }
         if (this.wrapUp) {
           this.initialize()
-          this.wrapUp = false
-          this.isSessionRunning = false
+          this.wrapUpSeconds !== 0 &&
+          (this.wrapUp = false) &&
+          (this.isSessionRunning = false)
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -648,6 +646,7 @@ export default {
           if (!this.isSessionRunning) {
             this.isSessionRunning = true
           }
+
           setTimeout(() => {
             this.startWarmUpCountDown()
           }, 1000)
@@ -899,7 +898,7 @@ export default {
     },
     onEndWrapUp () {
       this.wrapUp = false
-      this.taskToCall = this.powerDialerTasks.in_queue[0]
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {

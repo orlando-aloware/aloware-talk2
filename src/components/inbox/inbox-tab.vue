@@ -220,7 +220,8 @@ export default {
   computed: {
     ...mapState([
       'dialer',
-      'parkedCalls'
+      'parkedCalls',
+      'isMobile'
     ]),
     ...mapState('inbox',
       [
@@ -235,7 +236,10 @@ export default {
         'isLoadingPendingTaskCount'
       ]
     ),
-    ...mapState('contacts', ['contact']),
+    ...mapState('contacts', [
+      'contact',
+      'isContactMixinUsed'
+    ]),
     statusText () {
       switch (this.currentTask) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -668,6 +672,92 @@ export default {
       }
 
       return null
+    },
+    processNewCommunicationEvent (data, communication) {
+      const contact = data
+      const contacts = { data: _.cloneDeep(this.contacts) }
+      const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+      const isInContacts = this.contacts.find(item => item.id === contact.id)
+      this.updateContact(contact)
+
+      // check if communication is a live call
+      if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
+        [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+        const liveContacts = _.cloneDeep(this.liveContacts)
+
+        if (!isInLiveContacts) {
+          liveContacts.push(contact)
+        }
+
+        if (isInContacts) {
+          const index = contacts.data.findIndex(item => item.id === contact.id)
+          contacts.data.splice(index, 1)
+          this.setContacts(contacts.data)
+        }
+
+        this.setLiveContacts(
+          [
+            // connected calls
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+            // parked calls
+            ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+            // incoming calls
+            ...liveContacts.filter(item => [
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+              CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+            ].includes(item.last_communication.current_status2))
+          ]
+        )
+      } else {
+        if (isInContacts) {
+          const index = contacts.data.findIndex(item => item.id === contact.id)
+
+          contacts.data[index] = contact
+          this.setContacts(contacts.data)
+
+          if (contact.task_status !== this.currentTask) {
+            setTimeout(() => {
+              this.onItemRemoved(contact)
+            }, 3000)
+            return
+          }
+        }
+
+        // only modify order if new contact task === current task
+        // only push new non-live comms if no filter is applied
+        if (this.currentTask === contact.task_status && this.channelChangedFilterFields.length < 1) {
+          if (!isInLiveContacts) {
+            // if contact is not in the list, then automatically add it to the top
+            if (!isInContacts) {
+              if (this.contacts.length > this.perPage) {
+                contacts.data.pop()
+              }
+            } else {
+              // get all contacts except the current one
+              contacts.data = _.clone(contacts.data.filter(item => item.id !== contact.id))
+            }
+
+            if (this.sorting.order === 'asc') {
+              contacts.data.push(contact)
+            } else {
+              contacts.data.unshift(contact)
+            }
+            this.setContacts(contacts.data)
+
+            this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+            this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+          }
+        }
+      }
     }
   },
 
@@ -738,7 +828,8 @@ export default {
     this.listeners.contactUpdated = (data) => {
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
+      if (this.selectedContact &&
+        parseInt(this.selectedContact.id) === parseInt(data.id)) {
         talk2Api.V2.contacts.get(data.id).then(response => {
           const contact = response.data
           // check data loaded
@@ -776,105 +867,29 @@ export default {
         return
       }
 
-      setTimeout(() => {
-        talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-          const contact = response.data
-          const contacts = { data: _.cloneDeep(this.contacts) }
-          const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-          const isInContacts = this.contacts.find(item => item.id === contact.id)
-          this.updateContact(contact)
-
-          // check if communication is a live call
-          if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-            [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
-            const liveContacts = _.cloneDeep(this.liveContacts)
-
-            if (!isInLiveContacts) {
-              liveContacts.push(contact)
-            }
-
-            if (isInContacts) {
-              const index = contacts.data.findIndex(item => item.id === contact.id)
-              contacts.data.splice(index, 1)
-              this.setContacts(contacts.data)
-            }
-
-            this.setLiveContacts(
-              [
-                // connected calls
-                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
-                // parked calls
-                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
-                // incoming calls
-                ...liveContacts.filter(item => [
-                  CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-                ].includes(item.last_communication.current_status2))
-              ]
-            )
-          } else {
-            if (isInContacts) {
-              const index = contacts.data.findIndex(item => item.id === contact.id)
-
-              contacts.data[index] = contact
-              this.setContacts(contacts.data)
-
-              if (contact.task_status !== this.currentTask) {
-                setTimeout(() => {
-                  this.onItemRemoved(contact)
-                }, 3000)
-                return
-              }
-            }
-
-            // only modify order if new contact task === current task
-            // only push new non-live comms if no filter is applied
-            if (this.currentTask === contact.task_status && this.channelChangedFilterFields.length < 1) {
-              if (!isInLiveContacts) {
-                // if contact is not in the list, then automatically add it to the top
-                if (!isInContacts) {
-                  if (this.contacts.length > this.perPage) {
-                    contacts.data.pop()
-                  }
-                } else {
-                  // get all contacts except the current one
-                  contacts.data = _.clone(contacts.data.filter(item => item.id !== contact.id))
-                }
-
-                if (this.sorting.order === 'asc') {
-                  contacts.data.push(contact)
-                } else {
-                  contacts.data.unshift(contact)
-                }
-                this.setContacts(contacts.data)
-
-                this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-                this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-              }
-            }
-          }
-        }).catch(err => {
-          console.log(err)
-        })
-      }, 1000)
+      if (!this.isContactMixinUsed) {
+        setTimeout(() => {
+          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
+            this.processNewCommunicationEvent(response.data, communication)
+          }).catch(err => {
+            console.log(err)
+          })
+        }, 1000)
+      } else {
+        this.processNewCommunicationEvent(this.contact, communication)
+      }
     }
 
-    this.listeners.updateCommunication = (communication) => {
+    this.listeners.updateInboxCommunication = (communication) => {
       if (!communication.contact_id || this.isSearch) {
         return
       }
 
       // do not alter when contact is in live call and live comm is different from the one in the dialer
-      if (this.dialer.contact && this.dialer.communication && communication.contact_id === this.dialer.contact.id && this.dialer.communication.id !== communication.id) {
+      if (this.dialer.contact &&
+        this.dialer.communication &&
+        communication.contact_id === this.dialer.contact.id &&
+        this.dialer.communication.id !== communication.id) {
         return
       }
 
@@ -885,11 +900,19 @@ export default {
 
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
+      const loopData = {
+        keys: Object.keys(communication),
+        key: null
+      }
       let contactTaskToRemove = null
 
       if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
         const liveContacts = _.cloneDeep(this.liveContacts)
-        liveContacts[index].last_communication = communication
+
+        for (loopData.key of loopData.keys) {
+          liveContacts[index].last_communication[loopData.key] = communication[loopData.key]
+        }
+
         // if type is call and completed/voicemail then remove from live calls
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
           communication.type === CommunicationTypes.CALL &&
@@ -930,7 +953,11 @@ export default {
       const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
         const contacts = _.cloneDeep(this.contacts)
-        contacts[contactIndex].last_communication = communication
+
+        for (loopData.key of loopData.keys) {
+          contacts[contactIndex].last_communication[loopData.key] = communication[loopData.key]
+        }
+
         this.setContacts(contacts)
         if (contacts[contactIndex].id === this.contact.id) {
           this.setContact(contacts[contactIndex])
@@ -1068,7 +1095,8 @@ export default {
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.listen('inbox_new_communication', this.listeners.newCommunication)
+    this.$VueEvent.listen('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
 
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
@@ -1089,7 +1117,8 @@ export default {
     this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
     this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.stop('inbox_new_communication', this.listeners.newCommunication)
+    this.$VueEvent.stop('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)

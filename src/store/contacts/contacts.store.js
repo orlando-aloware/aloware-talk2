@@ -245,6 +245,7 @@ export default function () {
         outbound_texts_count: 0,
         total_count: 0
       }
-    }
+    },
+    isContactMixinUsed: false
   }
 }

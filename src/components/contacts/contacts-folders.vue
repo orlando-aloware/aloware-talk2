@@ -1,40 +1,35 @@
 <template>
-  <q-expansion-item
-    default-opened
-    expand-icon-toggle
-    label="My Lists"
-    icon="perm_identity"
-    :class="`contact-sidebar-list-wrapper my-lists ${isContactModuleType ? '' : 'hide-toggle'}`"
-  >
+  <q-expansion-item default-opened
+                    expand-icon-toggle
+                    label="My Lists"
+                    icon="perm_identity"
+                    :class="`contact-sidebar-list-wrapper my-lists ${isContactModuleType ? '' : 'hide-toggle'}`">
     <template v-slot:header>
       <q-item-section>
         <div class="folders__header d-flex align-items-center list--header pb-0">
           <div class="header__header__title font-weight-bold flex-grow-1">
             <span v-if="isContactModuleType">My Lists</span>
             <span v-else class="px-3">Power Dialer Lists</span>
-            <button
-              class="btn btn-link btn-sm tooltip-target mr-1"
-              :id="folderId"
-              :ref="folderId"
-              @click="destroySubmenu">
-              <plus-icon
-                color="#256EFF"
-                width="14"
-                height="14"
-                firstD="M7 1.5V12.5"
-                secondD="M12.5 7H1.5"
-                strokeWidth="1.5" />
+            <button class="btn btn-link btn-sm tooltip-target mr-1"
+                    :id="folderId"
+                    :ref="folderId"
+                    @click="destroySubmenu">
+              <plus-icon color="#256EFF"
+                          width="14"
+                          height="14"
+                          firstD="M7 1.5V12.5"
+                          secondD="M12.5 7H1.5"
+                          strokeWidth="1.5" />
             </button>
 
-            <b-popover
-              triggers="click blur"
-              placement="bottomright"
-              boundary="window"
-              custom-class="contact-popover"
-              :target="folderId">
+            <b-popover triggers="click blur"
+                        placement="bottomright"
+                        boundary="window"
+                        custom-class="contact-popover"
+                        :target="folderId">
               <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
-                <contact-menu-item @click="onCreateFolderToggle">
+                <contact-menu-item @click="onCreateFolderToggle($event)">
                   <template slot="icon">
                     <folder-icon color="#62666E"></folder-icon>
                   </template>
@@ -43,9 +38,8 @@
                   </template>
                 </contact-menu-item>
 
-                <contact-menu-item
-                  v-if="isContactModuleType"
-                  @click="onCreateList">
+                <contact-menu-item v-if="isContactModuleType"
+                                    @click="onCreateList($event)">
                   <template slot="icon">
                     <people-icon></people-icon>
                   </template>
@@ -53,10 +47,9 @@
                     <span>List</span>
                   </template>
                 </contact-menu-item>
-                <contact-menu-item
-                  v-else
-                  @mouseover="createSubmenu"
-                  @mouseleave="destroySubmenu">
+                <contact-menu-item v-else
+                                    @mouseover="createSubmenu"
+                                    @mouseleave="destroySubmenu">
                   <template slot="icon">
                     <people-icon></people-icon>
                   </template>
@@ -64,39 +57,42 @@
                     <span>List</span>
                   </template>
                   <template slot="suffix">
-                    <span
-                      :id="'folder-submenu-' + rootFolderId"
-                      class="submenu-icon"
-                      @click="createSubmenu">
+                    <span :id="'folder-submenu-' + rootFolderId"
+                          class="submenu-icon"
+                          @click="createSubmenu">
                       <FolderArrowCloseIcon color="#62666E" />
                     </span>
                   </template>
                 </contact-menu-item>
 
-                <div
-                  class="folder-submenu-items extended"
-                  :id="'folder-submenu-items-' + rootFolderId"
-                  :class="{ 'd-flex': isMenuOpen }"
-                  @mouseleave="{}"
-                  @mouseover="createSubmenu">
+                <div class="folder-submenu-items extended"
+                      :id="'folder-submenu-items-' + rootFolderId"
+                      :class="{ 'd-flex': isMenuOpen }"
+                      @mouseleave="{}"
+                      @mouseover="createSubmenu">
 
-                  <contact-menu-item
-                    style="padding:0 !important"
-                    @click="onCreateFromExistingList">
+                  <contact-menu-item style="padding:0 !important"
+                                      @click="onCreateFromExistingList">
                     <template slot="title">
-                      <span
-                        class="create-item"
-                        style="width:100%;padding:10px;">
+                      <span class="create-item"
+                            style="width:100%;padding:10px;">
                         Create from existing contacts list
                       </span>
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item
-                    @click="onCreateByManualSelection">
+                  <contact-menu-item @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">
                         Create new list &amp; select contacts
+                      </span>
+                    </template>
+                  </contact-menu-item>
+                  <contact-menu-item v-if="isHubspotEnabled"
+                                     @click="onCreateFromHubspot">
+                    <template slot="title">
+                      <span class="create-item">
+                        Import from Hubspot
                       </span>
                     </template>
                   </contact-menu-item>
@@ -112,56 +108,48 @@
     <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
       <div class="folders__content">
         <!-- <p @click="isLoading = !isLoading">-- {{ isLoading }}</p> -->
-        <tree-folder-create
-          v-if="isCreatingFolder"
-          :layer="0"
-          :parent_id="null"
-          :endpoint="foldersEndpoint"
-          @blur="onCreateFolderToggle"
-          @cancel="onCreateFolderCancel"
-        />
+        <tree-folder-create :layer="0"
+                            :parent_id="null"
+                            :endpoint="foldersEndpoint"
+                            v-if="isCreatingFolder"
+                            @blur="onCreateFolderToggle($event)"
+                            @cancel="onCreateFolderCancel"/>
         <template v-if="foldersLength && !isLoading">
           <template v-for="folder in folders[0].child_folders">
-            <tree-folder
-              v-if="folder.id !== removedFolder"
-              :name="folder.name"
-              :key="folder.id"
-              :id="folder.id"
-              :order="folder.order"
-              :endpoint="foldersEndpoint"
-              :hasEdit="folders[0].has_edit"
-              :hasDelete="folders[0].has_delete"
-              :folders="folder.child_folders"
-              :lists="folder.lists"
-              :layer="0"
-            />
+            <tree-folder :name="folder.name"
+                          :key="folder.id"
+                          :id="folder.id"
+                          :order="folder.order"
+                          :endpoint="foldersEndpoint"
+                          :hasEdit="folders[0].has_edit"
+                          :hasDelete="folders[0].has_delete"
+                          :folders="folder.child_folders"
+                          :lists="folder.lists"
+                          :layer="0"
+                          v-if="folder.id !== removedFolder"/>
           </template>
-          <tree-folder
-            v-if="folders[0].id !== removedFolder"
-            :name="folders[0].name"
-            :id="folders[0].id"
-            :order="folders[0].order"
-            :hasEdit="folders[0].has_edit"
-            :endpoint="foldersEndpoint"
-            :hasDelete="folders[0].has_delete"
-            :isRootList="true"
-            :folders="[]"
-            :lists="folders[0].lists"
-            :layer="0"
-            :parent_id="null"
-            @blur="onCreateFolderToggle"
-            @cancel="onCreateFolderCancel"
-          />
+          <tree-folder :name="folders[0].name"
+                        :id="folders[0].id"
+                        :order="folders[0].order"
+                        :hasEdit="folders[0].has_edit"
+                        :endpoint="foldersEndpoint"
+                        :hasDelete="folders[0].has_delete"
+                        :isRootList="true"
+                        :folders="[]"
+                        :lists="folders[0].lists"
+                        :layer="0"
+                        :parent_id="null"
+                        v-if="folders[0].id !== removedFolder"
+                        @blur="onCreateFolderToggle($event)"
+                        @cancel="onCreateFolderCancel"/>
         </template>
-        <div v-if="isFolderEmpty && !isLoading"
-            class="item-empty">
+        <div class="item-empty"
+              v-if="isFolderEmpty && !isLoading">
           <span class="fs-12 text-muted">
             You don't have any contact list
           </span>
         </div>
-        <contacts-sidebar-loader
-          v-if="isLoading">
-        </contacts-sidebar-loader>
+        <contacts-sidebar-loader v-if="isLoading"/>
       </div>
     </div>
   </q-expansion-item>
@@ -206,8 +194,10 @@ export default {
       'folders',
       'removedFolder',
       'activeFolder',
-      'createDialog'
+      'createDialog',
+      'unsavedList'
     ]),
+    ...mapState('cache', ['currentCompany']),
     ...mapGetters('powerDialer', [
       'datatableLoader'
     ]),
@@ -216,12 +206,6 @@ export default {
     },
     rootFolder () {
       return this.folders?.find(folder => folder.name === 'Root')
-    },
-    rootFolderIsContactModuleType () {
-      if (this.rootFolder.module_type === 0) {
-        return true
-      }
-      return false
     },
     foldersEndpoint () {
       return this.isContacts ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
@@ -257,20 +241,26 @@ export default {
     },
     isContact () {
       return this.routeName === 'Contacts' && this.isContactModuleType
+    },
+    isHubspotEnabled () {
+      return this.currentCompany && this.currentCompany.hubspot_integration_enabled
     }
   },
   mounted () {
     this.initResources()
-    this.$VueEvent.listen('fetchContactsLists', () => {
+    this.listeners.fetchContactsLists = () => {
       this.initResources()
-    })
+    }
+    this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
   },
   data () {
     return {
       isCreatingFolder: false,
       isLoading: false,
       isMenuOpen: false,
-      popperInstance: null
+      popperInstance: null,
+      isUnsavedListModalShown: false,
+      listeners: {}
     }
   },
   methods: {
@@ -279,18 +269,53 @@ export default {
       'createListOpen',
       'createPdListOpen',
       'setActiveFolder',
-      'setMyListsLoaded'
+      'setMyListsLoaded',
+      'setUnsavedList'
     ]),
     initResources () {
       this.loadFolders()
       this.setActiveFolder(this.folderId)
     },
-    onCreateFolderToggle () {
-      this.isCreatingFolder = !this.isCreatingFolder
+    showUnsavedListDialog (callback) {
+      if (this.unsavedList && !this.isUnsavedListModalShown) {
+        this.isUnsavedListModalShown = true
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.setUnsavedList(null)
+            callback()
+          }
+
+          this.isUnsavedListModalShown = false
+        })
+      }
+
+      if (!this.unsavedList) {
+        callback()
+      }
     },
-    onCreateList () {
-      this.createListOpen({
-        contact_folder_id: null
+    onCreateFolderToggle (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.isCreatingFolder = !this.isCreatingFolder
+      })
+    },
+    onCreateList (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.createListOpen({
+          contact_folder_id: null
+        })
       })
     },
     onCreateFromExistingList (data) {
@@ -307,6 +332,10 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
+    },
+    onCreateFromHubspot () {
+      this.destroySubmenu()
+      this.$emit('openHubspotListImportDialog')
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false
@@ -355,6 +384,9 @@ export default {
         this.initResources()
       }
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('fetchContactsLists', this.listeners.fetchContactsLists)
   }
 }
 </script>

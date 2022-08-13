@@ -304,7 +304,7 @@ export default {
         this.$VueEvent.fire('endWrapUp')
       }
 
-      this.$VueEvent.fire('unparkCommunication', this.communication)
+      this.$VueEvent.fire('unparkCall', this.communication)
       this.$VueEvent.fire('togglePhone')
       e.stopImmediatePropagation()
     },

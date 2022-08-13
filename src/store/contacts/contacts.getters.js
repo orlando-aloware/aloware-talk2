@@ -74,5 +74,6 @@ export default {
   unsavedList: (state) => state.unsavedList,
   activeFolder: (state) => state.activeFolder,
   removedFolder: (state) => state.removedFolder,
-  clearList: (state) => state.clearList
+  clearList: (state) => state.clearList,
+  isAllContactsSelected: (state) => state.isAllContactsSelected
 }

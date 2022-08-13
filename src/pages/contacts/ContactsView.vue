@@ -521,11 +521,11 @@
                 :key="`c-${colIndx}`">
                 <q-chip
                   :outline="true"
-                  :color="getStatusColor(getStatusName(contact.task_status))"
+                  :color="getStatusColor(getStatusName(contact.task_status, 'contacts'), 'contacts')"
                   text-color="red"
                   size="12px"
                   class="p-0 m-0">
-                  {{ getStatusName(contact.task_status) }}
+                  {{ getStatusName(contact.task_status, 'contacts') }}
                 </q-chip>
               </td>
 
