@@ -1443,7 +1443,7 @@ export default {
       return !this.devMode && this.isCallCompleted
     },
     isVmDropDisabled () {
-      return !this.devMode && (this.isCallCompleted || this.dialer.communication.customer_leg_status !== CommunicationStatus.STATUS_INPROGRESS_NEW)
+      return !this.devMode && this.isCallCompleted
     },
     isHoldDisabled () {
       return (!this.dialer.communication ||
