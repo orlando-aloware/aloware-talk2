@@ -415,7 +415,7 @@ export default {
             option.data = options.data ? options.data.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
             trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : trueValue.data
+            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : [trueValue.data]
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,

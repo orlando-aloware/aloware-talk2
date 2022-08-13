@@ -404,7 +404,7 @@ export default {
         id: this.previousListId,
         filters: this.previousListFilters
       })
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { fromRefresh: true })
       this.$VueEvent.fire('fetchContactsLists')
     },
 
