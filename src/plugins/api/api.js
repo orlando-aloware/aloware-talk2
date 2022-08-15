@@ -273,6 +273,11 @@ export default {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
       }
+    },
+    urlShortener: {
+      generate (text) {
+        return window.axios.post('/api/v1/url-shortener/urls/parse', { text })
+      }
     }
   },
   V2: {
