@@ -38,6 +38,10 @@ export default {
     },
 
     setup (newRoute = false) {
+      if (!this.authenticated || !this.profile?.enabled) {
+        return
+      }
+
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
