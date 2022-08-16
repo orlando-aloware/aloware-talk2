@@ -87,7 +87,8 @@
         <q-btn type="submit"
                class="px-2 py-1"
                flat
-               color="primary">Send and go classic</q-btn>
+               color="primary"
+               @click="onSubmit">Send and go classic</q-btn>
       </q-card-actions>
     </q-card>
   </q-dialog>
