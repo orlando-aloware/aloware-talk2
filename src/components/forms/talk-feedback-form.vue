@@ -133,6 +133,8 @@ export default {
       })
     },
     closeDialog () {
+      this.reason = 1
+      this.explanations = ['', '']
       this.$emit('toggle')
     }
   }
