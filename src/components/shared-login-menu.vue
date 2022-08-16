@@ -81,7 +81,7 @@ export default {
       }
 
       // Uncomment when force_talk is enabled
-      // return !this.profile.force_talk
+      // return !this.profile.company.force_talk
       return true
     }
   },
