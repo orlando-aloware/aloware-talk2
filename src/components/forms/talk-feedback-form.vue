@@ -114,9 +114,9 @@ export default {
   computed: {
     feedback_params () {
       let explanation = ''
-      if (this.reason === 6) {
+      if (this.reason === 5) {
         explanation = this.explanations[0]
-      } else {
+      } else if (this.reason === 9) {
         explanation = this.explanations[1]
       }
 
