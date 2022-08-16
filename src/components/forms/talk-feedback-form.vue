@@ -86,7 +86,7 @@
                  class="px-2 py-1 mr-auto"
                  flat
                  color="secondary"
-                 @click="this.closeDialog">Stay in Talk 🥳</q-btn>
+                 @click="closeDialog">Stay in Talk 🥳</q-btn>
           <q-btn type="submit"
                  class="px-2 py-1"
                  flat
