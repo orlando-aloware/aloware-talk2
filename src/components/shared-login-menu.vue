@@ -4,7 +4,7 @@
     <q-btn v-if="isAdmin"
            outline
            class="q-btn-standard"
-           @click="onGoToClassic">
+           @click="toggleFeedbackDialog">
 
         <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
     </q-btn>
@@ -14,7 +14,7 @@
       class="q-shared-login-menu-dropdown "
       color="primary"
       padding="0px 10px"
-      @click="onGoToClassic"
+      @click="toggleFeedbackDialog"
     >
 
       <template slot="label">
@@ -52,7 +52,8 @@
       </q-list>
     </q-btn-dropdown>
     <talk-feedback-form :isOpen="isFeedbackModalOpen"
-                        @toggle="toggleFeedbackDialog"/>
+                        @toggle="toggleFeedbackDialog"
+                        @submit="onGoToClassic"/>
   </div>
 </template>
 
