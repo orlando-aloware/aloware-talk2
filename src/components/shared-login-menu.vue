@@ -1,5 +1,5 @@
 <template>
-  <div v-if="profile && profile.company.talk_enabled"
+  <div v-if="profile && profile.company.talk_enabled && canSwitchApps"
        class="bridge-menu-wrapper">
     <q-btn v-if="isAdmin"
            outline
@@ -53,7 +53,7 @@
     </q-btn-dropdown>
     <talk-feedback-form :isOpen="isFeedbackModalOpen"
                         @toggle="toggleFeedbackDialog"
-                        @submit="onGoToClassic"/>
+                        @submit.prevent="onGoToClassic"/>
   </div>
 </template>
 
@@ -74,7 +74,16 @@ export default {
   components: { TalkFeedbackForm },
 
   computed: {
-    ...mapGetters('auth', ['profile'])
+    ...mapGetters('auth', ['profile']),
+    canSwitchApps () {
+      if (this.isAdmin) {
+        return true
+      }
+
+      // Uncomment when force_talk is enabled
+      // return !this.profile.force_talk
+      return true
+    }
   },
 
   data () {
