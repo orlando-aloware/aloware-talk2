@@ -224,6 +224,9 @@ export default {
       'authenticated',
       'profile'
     ]),
+    ...mapGetters('contacts', [
+      'pinnedLists'
+    ]),
     ...mapState('contacts', [
       'selectedList',
       'pinnedListsLoaded',
@@ -400,11 +403,15 @@ export default {
     },
 
     refreshContacts () {
-      this.updateContactsListFilter({
-        id: this.previousListId,
-        filters: this.previousListFilters
-      })
-      this.$VueEvent.fire('fetchContacts')
+      const selectedListId = _.get(this.selectedList, 'id', null)
+      if (selectedListId &&
+        !this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))) {
+        this.updateContactsListFilter({
+          id: this.previousListId,
+          filters: this.previousListFilters
+        })
+      }
+      this.$VueEvent.fire('fetchContacts', { fromRefresh: true })
       this.$VueEvent.fire('fetchContactsLists')
     },
 

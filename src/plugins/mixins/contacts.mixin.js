@@ -265,12 +265,12 @@ export default {
           console.log(err)
         })
     }, 1000),
-    fetch (params = {}, hasOrder = true, clear = false, isLoading = false) {
+    fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
       if (isLoading) {
         this.isLoadingMore = true
       }
 
-      if (!this.fromContactFilters) {
+      if (!this.fromContactFilters && !fromRefresh) {
         this.setPreviousListFilters(params)
         this.setPreviousListId(this.id)
       }
@@ -545,7 +545,7 @@ export default {
       this.$VueEvent.stop('clearContacts')
       this.$VueEvent.stop('onLoadMoreContacts')
     },
-    initiateFetch (data) {
+    initiateFetch (data, fromRefresh = false) {
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
       fetchData.params = _.get(data, 'params', {})
       fetchData.hasOrder = _.get(data, 'hasOrder', true)
@@ -555,7 +555,7 @@ export default {
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
 
-      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading)
+      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },
     startEvents () {
       this.$VueEvent.listen('filteredFetchContacts', (data) => {
@@ -563,8 +563,10 @@ export default {
         this.initiateFetch(data)
       })
       this.$VueEvent.listen('fetchContacts', (data) => {
+        const fromRefresh = _.get(data, 'fromRefresh', false)
         this.fromContactFilters = false
-        this.initiateFetch(data)
+        data = fromRefresh ? {} : data
+        this.initiateFetch(data, fromRefresh)
       })
       this.$VueEvent.listen('clearContacts', () => {
         this.clearContacts()
@@ -641,7 +643,8 @@ export default {
       'currentListFilters',
       'changingSelectedContact',
       'selectedList',
-      'contact'
+      'contact',
+      'pinnedLists'
     ]),
     ...mapState('cache', [
       'currentCompany'
@@ -859,7 +862,11 @@ export default {
       }
     },
     id: function (newValue, oldValue) {
-      if (oldValue !== null && this.$route.name === 'Contacts') {
+      const selectedListId = _.get(this.selectedList, 'id', null)
+      if (oldValue !== null &&
+        this.$route.name === 'Contacts' &&
+        selectedListId &&
+        !this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))) {
         this.updateContactsListFilter({
           id: this.previousListId,
           filters: this.previousListFilters

@@ -1323,7 +1323,8 @@ export default {
       'isFiltersOpen',
       'selectedList',
       'currentListFilters',
-      'unsavedList'
+      'unsavedList',
+      'pinnedLists'
     ]),
     ...mapState([
       'isTabletOrMobile',
@@ -1521,7 +1522,10 @@ export default {
         this.setData(this.id)
       }
 
-      if (this.$route.name === 'Contacts') {
+      const selectedListId = _.get(this.selectedList, 'id', null)
+      if (this.$route.name === 'Contacts' &&
+        selectedListId &&
+        !this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))) {
         this.resetFilters()
         this.initialListFilters = this.currentListFilters
         this.myContacts = this.showMyContacts
