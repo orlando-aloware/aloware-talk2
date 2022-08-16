@@ -712,7 +712,8 @@ import {
   contactListCountMixin,
   timezoneCheckMixin,
   aclMixin,
-  viewMixin
+  viewMixin,
+  contactsListFiltersMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
@@ -724,7 +725,8 @@ export default {
     contactListCountMixin,
     timezoneCheckMixin,
     aclMixin,
-    viewMixin
+    viewMixin,
+    contactsListFiltersMixin
   ],
 
   inject: [
@@ -1522,15 +1524,7 @@ export default {
         this.setData(this.id)
       }
 
-      const selectedListId = _.get(this.selectedList, 'id', null)
-      if (this.$route.name === 'Contacts' &&
-        selectedListId &&
-        !this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))) {
-        this.resetFilters()
-        this.initialListFilters = this.currentListFilters
-        this.myContacts = this.showMyContacts
-        this.setShouldUpdateSelectedListContactCount(true)
-      }
+      this.initiateUpdateContactsListFilter()
 
       if (this.$route.params.id === 'unsaved') {
         this.getListDataCount({ filters: JSON.stringify(this.list.filters) }).then(response => {
