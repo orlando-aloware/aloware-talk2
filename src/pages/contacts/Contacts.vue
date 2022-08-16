@@ -106,8 +106,7 @@ export default {
     ]),
     ...mapState('contacts', [
       'showContactsListSidebar',
-      'unsavedList',
-      'selectedList'
+      'unsavedList'
     ]),
     ...mapState(['isMobile']),
     mainClass () {

@@ -1325,8 +1325,7 @@ export default {
       'isFiltersOpen',
       'selectedList',
       'currentListFilters',
-      'unsavedList',
-      'pinnedLists'
+      'unsavedList'
     ]),
     ...mapState([
       'isTabletOrMobile',

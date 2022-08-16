@@ -643,8 +643,7 @@ export default {
       'currentListFilters',
       'changingSelectedContact',
       'selectedList',
-      'contact',
-      'pinnedLists'
+      'contact'
     ]),
     ...mapState('cache', [
       'currentCompany'

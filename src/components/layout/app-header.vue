@@ -234,9 +234,6 @@ export default {
       'authenticated',
       'profile'
     ]),
-    ...mapGetters('contacts', [
-      'pinnedLists'
-    ]),
     ...mapState('contacts', [
       'selectedList',
       'pinnedListsLoaded',

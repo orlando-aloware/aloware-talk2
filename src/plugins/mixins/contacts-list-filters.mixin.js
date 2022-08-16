@@ -16,46 +16,48 @@ export default {
     ...mapActions('contacts', [
       'updateContactsListFilter'
     ]),
-    initiateUpdateContactsListFilter (data = {}) {
-      const forPreviousList = get(data, 'forPreviousList', false)
-      const routeFromName = get(data, 'routeFromName', null)
-      const routeToName = get(data, 'routeToName', null)
-      const oldIdValue = get(data, 'oldIdValue', null)
-      const selectedListId = get(this.selectedList, 'id', null)
-      const pinnedListFound = this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))
-
-      if (
-        ((!forPreviousList &&
-          !routeFromName &&
-          !routeToName) ||
-        (forPreviousList &&
-          routeFromName &&
-          routeToName &&
-          routeFromName === 'Contacts' &&
-          routeToName === 'Contacts' &&
-          this.previousListId) ||
-        (oldIdValue !== null &&
-          this.$route.name === 'Contacts')) &&
-        selectedListId &&
-        !pinnedListFound) {
-        this.processUpdateContactsListFilter()
-        return
+    initiateUpdateContactsListFilter (params = {}) {
+      const data = {
+        forPreviousList: get(params, 'forPreviousList', false),
+        routeFromName: get(params, 'routeFromName', null),
+        routeToName: get(params, 'routeToName', null),
+        oldIdValue: get(params, 'oldIdValue', null),
+        selectedListId: get(this.selectedList, 'id', null),
+        pinnedListFound: null,
+        currentListFilters: this.currentListFilters !== undefined ? this.currentListFilters : undefined,
+        showMyContacts: this.showMyContacts !== undefined ? this.showMyContacts : undefined
       }
-
-      const currentListFilters = this.currentListFilters !== undefined ? this.currentListFilters : undefined
-      const showMyContacts = this.showMyContacts !== undefined ? this.showMyContacts : undefined
+      data.pinnedListFound = this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(data.selectedListId))
 
       if (this.$route.name === 'Contacts' &&
-        selectedListId &&
-        !pinnedListFound &&
+        data.selectedListId &&
+        !data.pinnedListFound &&
         typeof this.resetFilters === 'function' &&
         this.initialListFilters !== undefined &&
         this.myContacts !== undefined &&
         typeof this.setShouldUpdateSelectedListContactCount === 'function') {
         this.resetFilters()
-        this.initialListFilters = currentListFilters
-        this.myContacts = showMyContacts
+        this.initialListFilters = data.currentListFilters
+        this.myContacts = data.showMyContacts
         this.setShouldUpdateSelectedListContactCount(true)
+        return
+      }
+
+      if (
+        ((!data.forPreviousList &&
+            !data.routeFromName &&
+            !data.routeToName) ||
+          (data.forPreviousList &&
+            data.routeFromName &&
+            data.routeToName &&
+            data.routeFromName === 'Contacts' &&
+            data.routeToName === 'Contacts' &&
+            this.previousListId) ||
+          (data.oldIdValue !== null &&
+            this.$route.name === 'Contacts')) &&
+        data.selectedListId &&
+        !data.pinnedListFound) {
+        this.processUpdateContactsListFilter()
       }
     },
     processUpdateContactsListFilter () {
