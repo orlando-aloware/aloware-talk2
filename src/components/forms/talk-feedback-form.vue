@@ -110,9 +110,26 @@ export default {
       ]
     }
   },
+  computed: {
+    feedback_params () {
+      let explanation = ''
+      if (this.reason === 6) {
+        explanation = this.explanations[0]
+      } else {
+        explanation = this.explanations[1]
+      }
+
+      return {
+        reason: this.reason,
+        explanation
+      }
+    }
+  },
   methods: {
     onSubmit () {
-      this.$emit('submit')
+      this.$axios.post('/api/v2/feedback', this.feedback_params).then(() => {
+        this.$emit('submit')
+      })
     },
     closeDialog () {
       this.$emit('toggle')
