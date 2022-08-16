@@ -643,8 +643,7 @@ export default {
       'currentListFilters',
       'changingSelectedContact',
       'selectedList',
-      'contact',
-      'pinnedLists'
+      'contact'
     ]),
     ...mapState('cache', [
       'currentCompany'
@@ -862,14 +861,9 @@ export default {
       }
     },
     id: function (newValue, oldValue) {
-      const selectedListId = _.get(this.selectedList, 'id', null)
-      if (oldValue !== null &&
-        this.$route.name === 'Contacts' &&
-        selectedListId &&
-        !this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))) {
-        this.updateContactsListFilter({
-          id: this.previousListId,
-          filters: this.previousListFilters
+      if (this.initiateUpdateContactsListFilter !== undefined) {
+        this.initiateUpdateContactsListFilter({
+          oldIdValue: oldValue
         })
       }
     }
