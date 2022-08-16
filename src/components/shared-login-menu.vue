@@ -51,10 +51,13 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
+    <talk-feedback-form :isOpen="isFeedbackModalOpen"
+                        @toggle="toggleFeedbackDialog"/>
   </div>
 </template>
 
 <script>
+import TalkFeedbackForm from './forms/talk-feedback-form.vue'
 import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
@@ -67,6 +70,8 @@ export default {
 
   mixins: [aclMixin],
 
+  components: { TalkFeedbackForm },
+
   computed: {
     ...mapGetters('auth', ['profile'])
   },
@@ -74,7 +79,8 @@ export default {
   data () {
     return {
       user: null,
-      AppDefaultLogin
+      AppDefaultLogin,
+      isFeedbackModalOpen: false
     }
   },
 
@@ -96,6 +102,9 @@ export default {
     },
     onInput () {
       this.updateDefaultLogin()
+    },
+    toggleFeedbackDialog () {
+      this.isFeedbackModalOpen = !this.isFeedbackModalOpen
     }
   },
 
