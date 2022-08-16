@@ -66,6 +66,7 @@ import {
 } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Contact from 'pages/contacts/Contact'
+import { get } from 'lodash'
 
 export default {
   name: 'Contacts',
@@ -104,7 +105,8 @@ export default {
     ]),
     ...mapState('contacts', [
       'showContactsListSidebar',
-      'unsavedList'
+      'unsavedList',
+      'selectedList'
     ]),
     ...mapState(['isMobile']),
     mainClass () {
@@ -184,9 +186,13 @@ export default {
         this.setShowContactsListSidebar(false)
       }
 
+      const selectedListId = get(this.selectedList, 'id', null)
       if (from.name === 'Contacts' &&
         to.name === 'Contacts' &&
-        this.previousListId) {
+        this.previousListId &&
+        selectedListId &&
+        !this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(selectedListId))
+      ) {
         this.updateContactsListFilter({
           id: this.previousListId,
           filters: this.previousListFilters
