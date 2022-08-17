@@ -174,7 +174,11 @@ export default {
   },
   methods: {
     async onSubmit () {
-      await this.$axios.post('/api/v2/feedback', this.feedback_params).catch(() => {})
+      try {
+        await this.$axios.post('/api/v2/feedback', this.feedback_params).catch(() => {})
+      } catch (exception) {
+        console.log('It wasn\'t possible to send feedback.', { exception })
+      }
       this.$emit('submit')
     },
     closeDialog () {
