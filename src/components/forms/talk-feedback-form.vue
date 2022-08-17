@@ -154,10 +154,6 @@ export default {
     feedback_params () {
       let explanation = ''
 
-      if (this.reason >= 2 && this.reason <= 5) {
-        explanation += 'I don\'t understand how to use Talk2: '
-      }
-
       if (this.reason === 5) {
         explanation += this.explanations[0]
       } else if (this.reason === 9) {
@@ -182,7 +178,12 @@ export default {
       this.$emit('toggle')
     },
     getReasonLabel (id) {
-      return this.reasons.filter((reason) => reason.id === id)[0].label
+      let label = this.reasons.filter((reason) => reason.id === id)[0].label
+
+      if (this.reason >= 2 && this.reason <= 5) {
+        label = 'I don\'t understand how to use Talk2: ' + label
+      }
+      return label
     }
   }
 }
