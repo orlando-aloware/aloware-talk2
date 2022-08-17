@@ -177,7 +177,6 @@ export default {
       }
     },
     getParams () {
-      console.log('debug')
       let headers = DEFAULT_COLUMNS
 
       if (this.$route.name.includes('Power Dialer')) {
