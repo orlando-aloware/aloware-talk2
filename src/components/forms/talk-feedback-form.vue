@@ -163,7 +163,7 @@ export default {
       let reasonLabel = this.getReasonLabel(this.reason)
 
       if (this.reason >= 2 && this.reason <= 5) {
-        reasonLabel = 'I don\'t understand how to use Talk2: ' + reasonLabel
+        reasonLabel = 'I don\'t understand how to use Talk - ' + reasonLabel
       }
 
       return {
