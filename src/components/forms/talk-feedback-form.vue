@@ -173,10 +173,9 @@ export default {
     }
   },
   methods: {
-    onSubmit () {
-      this.$axios.post('/api/v2/feedback', this.feedback_params).then(() => {
-        this.$emit('submit')
-      })
+    async onSubmit () {
+      await this.$axios.post('/api/v2/feedback', this.feedback_params)
+      this.$emit('submit')
     },
     closeDialog () {
       this.reason = 1
