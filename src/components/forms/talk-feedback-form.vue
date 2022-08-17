@@ -153,10 +153,15 @@ export default {
   computed: {
     feedback_params () {
       let explanation = ''
+
+      if (this.reason >= 2 && this.reason <= 5) {
+        explanation += 'I don\'t understand how to use Talk2: '
+      }
+
       if (this.reason === 5) {
-        explanation = this.explanations[0]
+        explanation += this.explanations[0]
       } else if (this.reason === 9) {
-        explanation = this.explanations[1]
+        explanation += this.explanations[1]
       }
 
       return {
