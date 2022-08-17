@@ -1,5 +1,6 @@
 <template>
-  <q-dialog v-model="isOpen">
+  <q-dialog id="talk-feedback-form"
+            v-model="isOpen">
     <q-card>
       <q-card-section class="bg-blue-80">
         <h2 class="text-grey-1">Sad to see you go! 😢</h2>
@@ -78,17 +79,15 @@
           </div>
         </div>
       </q-card-section>
-      <q-card-actions align="right" class="bg-white">
-        <div class="q-pa-md q-gutter-sm">
-          <q-btn class="mx-2 my-1 mr-auto"
-                 color="secondary"
-                 label="Stay in Talk 🥳"
-                 @click="closeDialog" />
-          <q-btn class="mx-2 my-1"
-                 color="primary"
-                 label="Go to classic"
-                 @click="onSubmit" />
-        </div>
+      <q-card-actions align="right">
+        <q-btn class="my-1 mr-auto"
+               color="secondary"
+               label="Stay in Talk 🥳"
+               @click="closeDialog" />
+        <q-btn class="my-1"
+               color="primary"
+               label="Go to classic"
+               @click="onSubmit" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -195,5 +194,8 @@ export default {
 </script>
 
 <style>
-
+#talk-feedback-form .q-btn__content .block {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
 </style>
