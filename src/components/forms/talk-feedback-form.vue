@@ -7,7 +7,7 @@
       <q-card-section>
         <div>
           <h2>
-            Please select a reason as to why you are choosing to switch back to Aloware Classic (Talk1):
+            Please select a reason as to why you are choosing to switch back to Aloware Classic:
           </h2>
         </div>
         <div class="q-gutter-sm">
@@ -18,7 +18,7 @@
           </q-item>
           <div class="my-2 py-0 text-weight-bold">
             <span class="ml-3 mr-2">-</span>
-            <span>I don't understand how to use Talk2</span>
+            <span>I don't understand how to use Talk</span>
           </div>
           <div class="pl-2 pt-0 mt-0">
             <q-item class="my-0 py-0 text-weight-medium">
@@ -79,16 +79,16 @@
         </div>
       </q-card-section>
       <q-card-actions align="right" class="bg-white">
-        <q-btn type="submit"
-               class="px-2 py-1 mr-auto"
-               flat
-               color="secondary"
-               @click="closeDialog">Stay in Talk 🥳</q-btn>
-        <q-btn type="submit"
-               class="px-2 py-1"
-               flat
-               color="primary"
-               @click="onSubmit">Send and go classic</q-btn>
+        <div class="q-pa-md q-gutter-sm">
+          <q-btn class="mx-2 my-1 mr-auto"
+                 color="secondary"
+                 label="Stay in Talk 🥳"
+                 @click="closeDialog" />
+          <q-btn class="mx-2 my-1"
+                 color="primary"
+                 label="Go to classic"
+                 @click="onSubmit" />
+        </div>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -118,7 +118,7 @@ const reasons = [
   },
   {
     id: 6,
-    label: 'I am experiencing glitches/bugs in Talk2 💻'
+    label: 'I am experiencing glitches/bugs in Talk 💻'
   },
   {
     id: 7,
@@ -126,7 +126,7 @@ const reasons = [
   },
   {
     id: 8,
-    label: 'I don\'t like Talk2 💔'
+    label: 'I don\'t like Talk 💔'
   },
   {
     id: 9,
