@@ -160,8 +160,14 @@ export default {
         explanation += this.explanations[1]
       }
 
+      let reasonLabel = this.getReasonLabel(this.reason)
+
+      if (this.reason >= 2 && this.reason <= 5) {
+        reasonLabel = 'I don\'t understand how to use Talk2: ' + reasonLabel
+      }
+
       return {
-        reason: this.getReasonLabel(this.reason),
+        reason: reasonLabel,
         explanation
       }
     }
@@ -179,10 +185,6 @@ export default {
     },
     getReasonLabel (id) {
       let label = this.reasons.filter((reason) => reason.id === id)[0].label
-
-      if (this.reason >= 2 && this.reason <= 5) {
-        label = 'I don\'t understand how to use Talk2: ' + label
-      }
       return label
     }
   }
