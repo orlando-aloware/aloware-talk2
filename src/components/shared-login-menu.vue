@@ -53,7 +53,7 @@
     </q-btn-dropdown>
     <talk-feedback-form :isOpen="isFeedbackModalOpen"
                         @toggle="toggleFeedbackDialog"
-                        @submit.prevent="onGoToClassic"/>
+                        @submit="onGoToClassic"/>
   </div>
 </template>
 
