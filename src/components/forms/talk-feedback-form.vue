@@ -14,7 +14,7 @@
           <q-item class="py-0 mb-0 text-weight-bold">
             <q-radio v-model="reason"
                      :val="1"
-                     label="I am just playing around 🕹️" />
+                     :label="getReasonLabel(1)" />
           </q-item>
           <div class="my-2 py-0 text-weight-bold">
             <span class="ml-3 mr-2">-</span>
@@ -24,22 +24,22 @@
             <q-item class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
                        :val="2"
-                       label="How to communicate with my contacts 💬" />
+                       :label="getReasonLabel(2)" />
             </q-item>
             <q-item class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
                        :val="3"
-                       label="How to use the Power Dialer 📱" />
+                       :label="getReasonLabel(3)" />
             </q-item>
             <q-item class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
                        :val="4"
-                       label="How to find my contacts 👤" />
+                       :label="getReasonLabel(4)" />
             </q-item>
             <q-item class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
                        :val="5"
-                       label="Other ..." />
+                       :label="getReasonLabel(5)" />
             </q-item>
             <div class="ml-4"
                  v-if="reason == 5">
@@ -52,22 +52,22 @@
           <q-item class="py-0 my-0 text-weight-bold">
             <q-radio v-model="reason"
                      :val="6"
-                     label="I am experiencing glitches/bugs in Talk2 💻" />
+                     :label="getReasonLabel(6)" />
           </q-item>
           <q-item class="py-0 my-0 text-weight-bold">
             <q-radio v-model="reason"
                      :val="7"
-                     label="Talk2 is slower than Aloware Classic 🐢" />
+                     :label="getReasonLabel(7)" />
           </q-item>
           <q-item class="py-0 my-0 text-weight-bold">
             <q-radio v-model="reason"
                      :val="8"
-                     label="I don't like Talk2 💔" />
+                     :label="getReasonLabel(8)" />
           </q-item>
           <q-item class="pb-0 my-0 text-weight-bold">
             <q-radio v-model="reason"
                      :val="9"
-                     label="Other ..." />
+                     :label="getReasonLabel(9)" />
           </q-item>
           <div class="ml-4"
                v-if="reason == 9">
@@ -95,6 +95,44 @@
 </template>
 
 <script>
+const reasons = [
+  {
+    id: 1,
+    label: 'I am just playing around 🕹️'
+  },
+  {
+    id: 2,
+    label: 'How to communicate with my contacts 💬'
+  },
+  {
+    id: 3,
+    label: 'How to use the Power Dialer 📱'
+  },
+  {
+    id: 4,
+    label: 'How to find my contacts 👤'
+  },
+  {
+    id: 5,
+    label: 'Other ...'
+  },
+  {
+    id: 6,
+    label: 'I am experiencing glitches/bugs in Talk2 💻'
+  },
+  {
+    id: 7,
+    label: 'Talk2 is slower than Aloware Classic 🐢'
+  },
+  {
+    id: 8,
+    label: 'I don\'t like Talk2 💔'
+  },
+  {
+    id: 9,
+    label: 'Other ...'
+  }
+]
 export default {
   props: {
     isOpen: {
@@ -104,6 +142,7 @@ export default {
   },
   data () {
     return {
+      reasons,
       reason: 1,
       explanations: [
         '',
@@ -121,7 +160,7 @@ export default {
       }
 
       return {
-        reason: this.reason,
+        reason: this.getReasonLabel(this.reason),
         explanation
       }
     }
@@ -136,6 +175,9 @@ export default {
       this.reason = 1
       this.explanations = ['', '']
       this.$emit('toggle')
+    },
+    getReasonLabel (id) {
+      return this.reasons.filter((reason) => reason.id === id)[0].label
     }
   }
 }
