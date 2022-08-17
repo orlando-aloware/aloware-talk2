@@ -11,7 +11,7 @@
     </template>
     <q-card class="my-card"
             flat>
-      <b-overlay :show="loading">
+      <b-overlay :show="loading > 0">
         <div>
           You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
         </div>
@@ -131,17 +131,18 @@ export default {
   },
 
   mounted () {
-    this.loading = true
-    this.setCount()
+    this.loading++
 
     if (this.mode === 'hubspot') {
       // check if Hubspot list already exists
       this.checkHubspotList()
     }
+
+    this.setCount()
   },
 
   data: () => ({
-    loading: false,
+    loading: 0,
     confirm: false,
     confirm_message: '',
     conversion: [
@@ -224,15 +225,15 @@ export default {
     setCount () {
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
-        this.loading = false
+        this.loading--
       } else if (this.params.target) {
         if (this.mode === 'hubspot') {
           this.count = this.params.size
-          this.loading = false
+          this.loading--
         } else {
           this.getListCount(this.params.target).then(res => {
             this.count = res.data.count
-            this.loading = false
+            this.loading--
           })
         }
       }
@@ -242,7 +243,7 @@ export default {
       this.$emit('hidden')
     },
     save () {
-      this.loading = true
+      this.loading++
 
       return this.getRequest()
         .catch((err) => {
@@ -251,7 +252,7 @@ export default {
           this.$generalNotification(message, 'error')
         })
         .finally(() => {
-          this.loading = false
+          this.loading--
           this.addPowerDialerOpen(false)
         })
     },
@@ -335,6 +336,8 @@ export default {
         .get(`/api/v2/power-dialer-lists/${id}/count`)
     },
     async checkHubspotList () {
+      this.loading++
+
       const res = await this.$axios
         .get('/api/v2/power-dialer-lists/hubspot-list-exists/' + this.params.target)
 
@@ -345,6 +348,7 @@ export default {
     },
     closeConfirmDialog () {
       this.confirm = false
+      this.loading--
     }
   },
 
