@@ -22,25 +22,10 @@
             <span>I don't understand how to use Talk</span>
           </div>
           <div class="pl-2 pt-0 mt-0">
-            <q-item class="my-0 py-0 text-weight-medium">
+            <q-item v-for="option in reasons.slice(1, 4)" v-bind:key="option.id" class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
-                       :val="2"
-                       :label="getReasonLabel(2)" />
-            </q-item>
-            <q-item class="my-0 py-0 text-weight-medium">
-              <q-radio v-model="reason"
-                       :val="3"
-                       :label="getReasonLabel(3)" />
-            </q-item>
-            <q-item class="my-0 py-0 text-weight-medium">
-              <q-radio v-model="reason"
-                       :val="4"
-                       :label="getReasonLabel(4)" />
-            </q-item>
-            <q-item class="my-0 py-0 text-weight-medium">
-              <q-radio v-model="reason"
-                       :val="5"
-                       :label="getReasonLabel(5)" />
+                       :val="option.id"
+                       :label="getReasonLabel(option.id)" />
             </q-item>
             <div class="ml-4"
                  v-if="reason === 5">
@@ -50,25 +35,10 @@
                        v-model="explanations[0]" />
             </div>
           </div>
-          <q-item class="py-0 my-0 text-weight-bold">
+          <q-item v-for="option in reasons.slice(5)" v-bind:key="option.id" class="py-0 my-0 text-weight-bold">
             <q-radio v-model="reason"
-                     :val="6"
-                     :label="getReasonLabel(6)" />
-          </q-item>
-          <q-item class="py-0 my-0 text-weight-bold">
-            <q-radio v-model="reason"
-                     :val="7"
-                     :label="getReasonLabel(7)" />
-          </q-item>
-          <q-item class="py-0 my-0 text-weight-bold">
-            <q-radio v-model="reason"
-                     :val="8"
-                     :label="getReasonLabel(8)" />
-          </q-item>
-          <q-item class="pb-0 my-0 text-weight-bold">
-            <q-radio v-model="reason"
-                     :val="9"
-                     :label="getReasonLabel(9)" />
+                     :val="option.id"
+                     :label="getReasonLabel(option.id)" />
           </q-item>
           <div class="ml-4"
                v-if="reason === 9">
