@@ -43,7 +43,7 @@
                        :label="getReasonLabel(5)" />
             </q-item>
             <div class="ml-4"
-                 v-if="reason == 5">
+                 v-if="reason === 5">
               <p>Please specify:</p>
               <q-input type="textarea"
                        outlined
@@ -71,7 +71,7 @@
                      :label="getReasonLabel(9)" />
           </q-item>
           <div class="ml-4"
-               v-if="reason == 9">
+               v-if="reason === 9">
             <p>Please specify:</p>
             <q-input type="textarea"
                      outlined
