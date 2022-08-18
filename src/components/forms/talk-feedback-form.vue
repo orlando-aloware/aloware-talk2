@@ -173,6 +173,11 @@ export default {
   },
   methods: {
     async onSubmit () {
+      if (this.reason === 1) {
+        this.$emit('submit')
+        return
+      }
+
       try {
         await this.$axios.post('/api/v2/feedback', this.feedback_params).catch(() => {})
       } catch (exception) {
