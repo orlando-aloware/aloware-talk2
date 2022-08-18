@@ -191,8 +191,7 @@ export default {
       this.$emit('toggle')
     },
     getReasonLabel (id) {
-      let label = this.reasons.filter((reason) => reason.id === id)[0].label
-      return label
+      return this.reasons.filter((reason) => reason.id === id)[0].label
     }
   }
 }
