@@ -22,7 +22,7 @@
             <span>I don't understand how to use Talk</span>
           </div>
           <div class="pl-2 pt-0 mt-0">
-            <q-item v-for="option in reasons.slice(1, 4)" v-bind:key="option.id" class="my-0 py-0 text-weight-medium">
+            <q-item v-for="option in reasons.slice(1, 5)" v-bind:key="option.id" class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
                        :val="option.id"
                        :label="getReasonLabel(option.id)" />
