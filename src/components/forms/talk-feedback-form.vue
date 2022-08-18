@@ -196,10 +196,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#talk-feedback-form .q-btn__content .block {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-</style>
