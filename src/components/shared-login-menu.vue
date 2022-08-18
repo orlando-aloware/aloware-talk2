@@ -80,9 +80,7 @@ export default {
         return true
       }
 
-      // Uncomment when force_talk is enabled
-      // return !this.profile.company.force_talk
-      return true
+      return !this.profile.company.force_talk
     }
   },
 
