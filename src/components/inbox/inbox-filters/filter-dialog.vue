@@ -326,7 +326,7 @@ export default {
     },
 
     refreshTagSelector () {
-      if (this.$refs.inboxChannelFilterForm.$refs.tagSelector) {
+      if (this.$refs.inboxChannelFilterForm?.$refs.tagSelector) {
         this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
         setTimeout(() => {
           this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
