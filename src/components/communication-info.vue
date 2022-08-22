@@ -799,6 +799,7 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'communication-info',
@@ -1068,11 +1069,12 @@ export default {
 
     changeEngagementStatus (event) {
       const params = {
-        status: this.communication.disposition_status2
+        status: this.communication.disposition_status2,
+        entity_type: 'communication'
       }
 
       this.loadingUpdateEngagement = true
-      this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/${this.communication.id}/update-engagement`, params).then(res => {
+      API.V1.contact.updateEngagement(this.communication.contact_id, this.communication.id, params).then(res => {
         this.loadingUpdateEngagement = false
         this.$generalNotification('Engagement updated.')
         this.$emit('update', res.data)
