@@ -17,7 +17,7 @@
             </inbox-searcher>
             <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
             <div class="filter-wrapper"
-                 :class="[hasChannelFilterChanges || selectedFilter ? '--highlighted' : '']">
+                 :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
               <compact-btn v-if="hasChannelFilterChanges"
                            borderless
                            customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
@@ -28,16 +28,16 @@
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            @clicked="toggleFilterDialog(true)">
-                <q-tooltip v-if="selectedFilter"
+                <q-tooltip v-if="appliedFilter"
                            anchor="top middle"
                            self="center middle">
-                  {{ selectedFilter.name }}
+                  {{ appliedFilter.name }}
                 </q-tooltip>
-                <filter-icon v-if="!selectedFilter && channelChangedFilterFields.length < 1"
+                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
                              color="#62666E"
                              class="filter-icon">
-                </filter-icon> {{ !selectedFilter ? '' : selectedFilter.name }}
-                {{ !selectedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
+                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
+                {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
               </compact-btn>
               <b-badge v-if="hasChannelFilterChanges"
                        class="ml-1 fs-12"
@@ -231,7 +231,7 @@ export default {
         'hasMoreContacts',
         'isFetchingContacts',
         'channelChangedFilterFields',
-        'selectedFilter',
+        'appliedFilter',
         'isLoadingOpenTaskCount',
         'isLoadingPendingTaskCount'
       ]
@@ -355,6 +355,30 @@ export default {
   },
 
   data () {
+    const defaultFilterModel = {
+      campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+      ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+      direction: Filters.DEFAULT_STATE.filter.direction,
+      answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+      min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+      transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+      callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+      tags: Filters.DEFAULT_STATE.filter.tags,
+      call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+      first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+      untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+      exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+      incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+      users: Filters.DEFAULT_STATE.filter.users,
+      workflows: Filters.DEFAULT_STATE.filter.workflows,
+      broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+      contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+      from_date: Filters.DEFAULT_STATE.filter.from_date,
+      to_date: Filters.DEFAULT_STATE.filter.to_date,
+      my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+      creator_type: Filters.DEFAULT_STATE.filter.creator_type
+    }
+
     return {
       searchText: '',
       isSearch: false,
@@ -368,24 +392,10 @@ export default {
       defaultFilterModel: {
         name: '',
         type: 6,
-        filter: {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact
-        },
+        filter: defaultFilterModel,
         scope: 'user'
       },
-      filter: {
-        campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-        ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-        from_date: Filters.DEFAULT_STATE.filter.from_date,
-        to_date: Filters.DEFAULT_STATE.filter.to_date,
-        contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-        my_contact: Filters.DEFAULT_STATE.filter.my_contact
-      },
+      filter: defaultFilterModel,
       scrollTimeout: null,
       CommunicationCurrentStatus,
       listeners: {}
@@ -397,6 +407,7 @@ export default {
       'toggleFilterDialog',
       'resetChannelChangedFilterFields',
       'toggleFilterModelForm',
+      'setAppliedFilter',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
       'setLoadingPendingTaskCount',
@@ -572,6 +583,7 @@ export default {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
+      this.setAppliedFilter(null)
     },
     loadTaskCounts () {
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {

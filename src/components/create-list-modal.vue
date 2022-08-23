@@ -107,15 +107,19 @@
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import {
-  DEFAULT_COLUMNS
+  DEFAULT_COLUMNS,
+  POWER_DIALER_DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
 import {
   DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST,
   DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
 } from 'src/constants/default-lists'
-
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
+import {
+  FROM_FILTERS,
+  FROM_FOLDERS,
+  FROM_BULK_MENU
+} from 'src/constants/contacts-list-create-mode'
 
 export default {
   props: {
@@ -173,12 +177,18 @@ export default {
       }
     },
     getParams () {
+      let headers = DEFAULT_COLUMNS
+
+      if (this.$route.name.includes('Power Dialer')) {
+        headers = POWER_DIALER_DEFAULT_COLUMNS
+      }
+
       const params = {
         data: {
           contact_folder_id: this.createList.contact_folder_id,
           name: this.createList.name,
           type: this.createList.type,
-          headers: DEFAULT_COLUMNS,
+          headers: headers,
           mode: this.createList.mode,
           order: 0,
           include_all_contacts: this.isAllContactsSelected

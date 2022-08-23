@@ -91,10 +91,10 @@ export default {
         if (!id) {
           return null
         }
-        return window.axios.post(`${suffixV1}contact/${id}/add-engagement`, params)
+        return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
       },
       updateEngagement (contactId, eventId, params) {
-        return window.axios.post(`${suffixV1}contact/${contactId}/${eventId}/update-engagement`, params)
+        return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
       getLineIncomingNumber (contactId, lineId) {
         if (!contactId || !lineId) {
@@ -272,6 +272,11 @@ export default {
     profile: {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
+      }
+    },
+    urlShortener: {
+      generate (text) {
+        return window.axios.post('/api/v1/url-shortener/urls/parse', { text })
       }
     }
   },
