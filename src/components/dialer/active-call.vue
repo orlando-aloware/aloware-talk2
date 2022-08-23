@@ -101,7 +101,7 @@ export default {
     dialerCurrentNumber () {
       const number = this.dialer.currentNumber.includes('power_dialer') ? this.activeTask.phone_number : this.dialer.currentNumber
 
-      if (/unhold:|call:|hs:/.test(number)) {
+      if (/unhold:|barge:|whisper:|call:|hs:/.test(number)) {
         return ''
       }
 
