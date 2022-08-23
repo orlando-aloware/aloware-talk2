@@ -411,8 +411,10 @@ const fixPhone = (
   includeSuffix = false
 ) => {
   if (phoneNumber) {
-    phoneNumber = phoneNumber.replace('#', '')
+    phoneNumber = phoneNumber.toString()
     phoneNumber = phoneNumber.replace(/\s+/g, '')
+    phoneNumber = phoneNumber.replace('#', '')
+    phoneNumber = phoneNumber.replace('.', '')
 
     if (phoneNumber.toLowerCase() === 'restricted') {
       return phoneNumber
@@ -447,6 +449,14 @@ const fixPhone = (
     }
 
     if (phoneNumber.includes('call:')) {
+      return phoneNumber
+    }
+
+    if (phoneNumber.includes('barge:')) {
+      return phoneNumber
+    }
+
+    if (phoneNumber.includes('whisper:')) {
       return phoneNumber
     }
 
