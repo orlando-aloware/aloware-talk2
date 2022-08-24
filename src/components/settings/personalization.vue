@@ -55,6 +55,28 @@
           </b-form-group>
         </b-col>
       </b-form-row>
+
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.url_shortener_enabled.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
+          <div>
+            <h5 class="form-label">URL Shortener</h5>
+            <p class="form-helper-text">Here you can enable or disable auto Short URL generation feature for SMS/MMS forms.</p>
+          </div>
+
+          <b-form-group
+            label=""
+          >
+            <b-form-checkbox switch
+                             v-model="user.url_shortener_enabled"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'url_shortener_enabled')">
+              Enable URL Shortener
+            </b-form-checkbox>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
     </b-form>
   </b-container>
 </template>
