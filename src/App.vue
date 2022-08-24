@@ -77,7 +77,7 @@ export default {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
 
       if (/unhold:|barge:|whisper:|call:|hs:/.test(fixedPhoneNumber)) {
-        window.get('/api/v1/communication/info', {
+        window.axios.get('/api/v1/communication/info', {
           params: {
             phone_number: fixedPhoneNumber
           }
