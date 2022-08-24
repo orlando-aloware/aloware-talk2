@@ -79,6 +79,7 @@ export default {
       if (/unhold:|barge:|whisper:|call:|hs:/.test(fixedPhoneNumber)) {
         window.axios.get('/api/v1/communication/info', {
           params: {
+            sid: '',
             phone_number: fixedPhoneNumber
           }
         }).then(res => {
