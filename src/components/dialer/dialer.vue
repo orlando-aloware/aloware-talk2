@@ -228,6 +228,11 @@ export default {
           console.log(err)
         })
 
+      // mute the phone
+      if (this.dialer.isMuted) {
+        this.forceMute()
+      }
+
       // close the dialer form when it's open and incoming call is answered
       if (this.dialerFormStatus) {
         this.setDialerFormStatus(false)
@@ -506,6 +511,13 @@ export default {
         this.connection = this.device.connect(params, true)
         this.initConnectionEvents()
       }
+
+      // Make sure that phone number is string in this part before proceeding
+      currentNumber = currentNumber.toString()
+      // force mute
+      if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
+        this.forceMute()
+      }
     },
 
     initConnectionEvents () {
@@ -631,6 +643,11 @@ export default {
         }
         this.setDialerIsMuted(false)
       }
+    },
+
+    forceMute () {
+      this.setDialerIsMuted(true)
+      this.device.activeConnection().mute(true)
     },
 
     toggleRecordingStatus () {
