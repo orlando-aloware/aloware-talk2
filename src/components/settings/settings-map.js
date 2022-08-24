@@ -174,6 +174,13 @@ const SettingsMap = {
     hash_keyword: 'wrap-up-duration',
     visible: true
   },
+  'url_shortener_enabled': {
+    title: 'Enable URL Shortener',
+    description: 'Enable URL Shortener for user',
+    route: '/settings/profile',
+    hash_keyword: 'enable-url-shortener',
+    visible: true
+  },
 
   // INBOUND CALL SETTINGS
   'extension': {
