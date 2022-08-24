@@ -90,7 +90,13 @@ export default {
   mixins: [aclMixin],
   name: 'login-form',
   computed: {
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    shouldRedirectToClassic () {
+      return this.profile &&
+        this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC &&
+        !this.isAdmin &&
+        !this.profile?.company?.force_talk
+    }
   },
   data () {
     return {
@@ -152,11 +158,10 @@ export default {
       storage.local.setItem('company_id', company.id)
 
       // redirect to Alo classic for agents
-      if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && !this.isAdmin) {
+      if (this.shouldRedirectToClassic) {
         location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
         const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
-
         await this.$router.push(String(redirectPath))
         await this.redirectTimeout()
 
