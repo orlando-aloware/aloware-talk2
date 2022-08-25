@@ -1,4 +1,4 @@
-name: Quasar Electron Build and Release
+name: Quasar Electron Build and Release macOS
 
 on:
   push:
