@@ -1,0 +1,77 @@
+name: Build/release
+
+on: push
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Prepare for app notarization (macOS)
+        if: startsWith(matrix.os, 'macos')
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # macOS code signing certificate
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
+
+          # Build script name
+          build_script_name: ${{ secrets.build_script_name }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          APP_NAME: ${{ secrets.app_name }}
+          APP_ENV: ${{ secrets.app_env }}
+          APP_DEBUG: ${{ secrets.app_debug }}
+          API_URL: ${{ secrets.api_url }}
+
+          # Pusher Configuration
+          PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
+          PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
+
+          # Sentry error logging
+          MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
+
+          # GIPHY API KEYS
+          GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
+
+          # Intercom
+          INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
+          INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
+
+          # Github Personal Access Token
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+          # Apple sign
+          APPLE_ID: ${{ secrets.apple_id }}
+
+          # AnnounceKit
+          AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
+
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
