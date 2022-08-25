@@ -66,9 +66,6 @@ jobs:
           # Github Personal Access Token
           GITHUB_TOKEN: ${{ secrets.github_token }}
 
-          # Apple sign
-          APPLE_ID: ${{ secrets.apple_id }}
-
           # AnnounceKit
           AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
 
