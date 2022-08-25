@@ -1,14 +1,23 @@
-name: Build/release
+name: Quasar Electron Build and Release
 
-on: push
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+  build-capacitor:
+    runs-on: ${{ matrix.os-versions }}
+
+    defaults:
+      run:
+        shell: bash
 
     strategy:
       matrix:
-        os: [macos-latest]
+        os-versions: [ macos-latest ]
+        node-versions: [ 14.x ]
 
     steps:
       - name: Check out Git repository
@@ -17,7 +26,7 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: ${{ matrix.node-version }}
 
       - name: Prepare for app notarization (macOS)
         if: startsWith(matrix.os, 'macos')
@@ -26,23 +35,11 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.github_token }}
+      - name: Install dependencies & Quasar
+        run: npm install && npm install -g @quasar/cli
 
-          # macOS code signing certificate
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
-
-          # Build script name
-          build_script_name: ${{ secrets.build_script_name }}
-
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Build/release Electron mac app
+        run: npm run build-mac
         env:
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
@@ -63,8 +60,13 @@ jobs:
           INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
           INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
 
-          # Github Personal Access Token
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
           GITHUB_TOKEN: ${{ secrets.github_token }}
+
+          # macOS code signing certificate
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
           # AnnounceKit
           AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
@@ -72,3 +74,29 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+
+      - name: Compressing the build
+        run: zip -r ./electron-${{ github.run_number }}.zip ./dist/electron/Packaged/*
+
+      - name: Create a Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          body: Automated Electron Deployment
+          draft: false
+          prerelease: false
+
+      - name: Upload a Release Asset
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./electron-${{ github.run_number }}.zip
+          asset_name: electron-${{ github.run_number }}.zip
+          asset_content_type: application/zip
