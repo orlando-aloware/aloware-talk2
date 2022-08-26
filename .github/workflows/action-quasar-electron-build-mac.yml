@@ -10,8 +10,8 @@ jobs:
 
     strategy:
       matrix:
-        os-versions: [ macos-latest ]
-        node-versions: [ 14.x ]
+        os: [ macos-latest ]
+        node-version: [ 14.x ]
 
     steps:
       - name: Check out Git repository
@@ -20,10 +20,10 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
-          cache: npm
+          node-version: ${{ matrix.node-version }}
 
       - name: Prepare for app notarization (macOS)
+        if: startsWith(matrix.os, 'macos')
         # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
@@ -70,7 +70,7 @@ jobs:
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
 
       - name: Compressing the build
-        run: zip -r ./electron-${{ github.run_number }}.zip ./dist/electron/Packaged/*
+        run: zip -r ./electron-${{ github.ref }}.zip ./dist/electron/Packaged/*
 
       - name: Create a Release
         id: create_release
@@ -78,8 +78,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           body: Automated Electron Deployment
           draft: false
           prerelease: false
@@ -91,6 +91,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./electron-${{ github.run_number }}.zip
-          asset_name: electron-${{ github.run_number }}.zip
+          asset_path: ./electron-${{ github.ref }}.zip
+          asset_name: electron-${{ github.ref }}.zip
           asset_content_type: application/zip
