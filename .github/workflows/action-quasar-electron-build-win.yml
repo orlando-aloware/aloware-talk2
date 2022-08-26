@@ -1,8 +1,4 @@
-name: Quasar Electron Build and Release Windows
-
-on:
-  push:
-    branches: [ master, develop ]
+name: Deploy Windows
 
 jobs:
   build:
