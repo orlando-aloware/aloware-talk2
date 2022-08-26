@@ -32,6 +32,8 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.5
+
+      - name: Build details
         run: |
           echo "Version: ${{ github.event.inputs.version }}"
           echo "Environment: ${{ github.event.inputs.environment }}"
