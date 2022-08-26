@@ -205,16 +205,16 @@ module.exports = function (/* ctx */) {
         linux: {
           target: 'AppImage'
         },
-        // publish: {
-        //   provider: 'github',
-        //   token: process.env.GH_TOKEN,
-        //   publishAutoUpdate: true
-        // },
+        publish: {
+          provider: 'github',
+          token: process.env.GITHUB_TOKEN,
+          publishAutoUpdate: process.env.AUTO_UPDATE
+        },
         protocols: {
           name: 'Aloware Talk',
           schemes: ['alowaretalk', 'tel', 'callto']
-        }
-        // afterSign: './src-electron/build/afterSignHook.js'
+        },
+        afterSign: 'electron-builder-notarize'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
