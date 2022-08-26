@@ -41,22 +41,21 @@ jobs:
             ${{ runner.os }}-
 
       - name: Make dotenv file
-        uses: SpicyPizza/create-envfile@v1.3
+        uses: ozaytsev86/create-env-file@v1
         with:
-          envkey_APP_NAME: ${{ secrets.app_name }}
-          envkey_APP_ENV: ${{ secrets.app_env }}
-          envkey_APP_DEBUG: ${{ secrets.app_debug }}
-          envkey_API_URL: ${{ secrets.api_url }}
-          envkey_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
-          envkey_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
-          envkey_MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
-          envkey_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
-          envkey_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          envkey_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
-          envkey_GITHUB_TOKEN: ${{ secrets.github_token }}
-          envkey_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
-          file_name: .env.prod
-          fail_on_empty: false
+          ENV_APP_NAME: ${{ secrets.app_name }}
+          ENV_APP_ENV: ${{ secrets.app_env }}
+          ENV_APP_DEBUG: ${{ secrets.app_debug }}
+          ENV_API_URL: ${{ secrets.api_url }}
+          ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
+          ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
+          ENV_MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
+          ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
+          ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
+          ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
+          ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
+          ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
+          file-name: .env.prod
 
       - name: Build/release Electron win app
         run: npm run deploy-win
