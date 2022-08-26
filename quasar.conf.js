@@ -208,7 +208,7 @@ module.exports = function (/* ctx */) {
         publish: {
           provider: 'github',
           token: process.env.GITHUB_TOKEN,
-          publishAutoUpdate: true
+          publishAutoUpdate: process.env.AUTO_UPDATE
         },
         protocols: {
           name: 'Aloware Talk',

@@ -3,14 +3,19 @@ name: Deploy Windows
 on:
   workflow_dispatch:
     inputs:
+      environment:
+        description: Dev or Prod
+        default: Dev
+        required: true
       version:
         description: Bump Version
-        default: v1.0.0
+        default: 1.0.0
         required: true
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    environment: ${{ github.event.inputs.environment }}
 
     strategy:
       matrix:
@@ -18,8 +23,19 @@ jobs:
         node-version: [ '14.x' ]
 
     steps:
+      - name: Validate build
+        run: if [[ ${{ github.event.inputs.environment }} != "Prod" ]] && [[ ${{ github.event.inputs.environment }} != "Dev" ]]; then exit 0; fi
+
       - name: Check out Git repository
         uses: actions/checkout@v3
+
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.5
+        run: |
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3
