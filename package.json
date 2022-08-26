@@ -1,10 +1,14 @@
 {
   "name": "aloware-talk2",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "Aloware Agent Interface",
   "productName": "Aloware Talk",
   "author": "Aloware <support@aloware.com>",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aloware/aloware-talk2.git"
+  },
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
