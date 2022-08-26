@@ -344,6 +344,8 @@ export default {
       if (res.data.exists) {
         this.confirm_message = 'The HubSpot list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
         this.confirm = true
+      } else {
+        this.loading--
       }
     },
     closeConfirmDialog () {
