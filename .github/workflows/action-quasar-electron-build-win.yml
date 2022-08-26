@@ -23,9 +23,6 @@ jobs:
         node-version: [ '14.x' ]
 
     steps:
-      - name: Validate build
-        run: if [[ "${{ github.event.inputs.environment }}" != "Prod" && "${{ github.event.inputs.environment }}" != "Dev" ]]; then exit 0; fi
-
       - name: Check out Git repository
         uses: actions/checkout@v3
 
