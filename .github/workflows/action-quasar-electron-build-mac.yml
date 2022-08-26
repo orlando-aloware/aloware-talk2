@@ -3,8 +3,6 @@ name: Quasar Electron Build and Release macOS
 on:
   push:
     branches: [ master, develop ]
-  pull_request:
-    branches: [ master, develop ]
 
 jobs:
   build:
@@ -26,7 +24,6 @@ jobs:
           cache: npm
 
       - name: Prepare for app notarization (macOS)
-        if: startsWith(matrix.os, 'macos')
         # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
