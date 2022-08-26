@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'macos-latest' ]
+        os: [ 'windows-latest' ]
         node-version: [ '14.x' ]
 
     steps:
@@ -22,12 +22,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
-
-      - name: Prepare for app notarization (macOS)
-        # Import Apple API key for app notarization on macOS
-        run: |
-          mkdir -p ~/private_keys/
-          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
@@ -46,8 +40,8 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Build/release Electron mac app
-        run: npm run deploy-mac
+      - name: Build/release Electron win app
+        run: npm run deploy-win
         env:
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
@@ -71,10 +65,6 @@ jobs:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
           GITHUB_TOKEN: ${{ secrets.github_token }}
-
-          # macOS code signing certificate
-          CSC_LINK: ${{ secrets.mac_certs }}
-          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
 
           # AnnounceKit
           AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
