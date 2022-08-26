@@ -51,11 +51,11 @@
       </q-card-section>
       <q-card-actions align="right">
         <q-btn class="my-1 mr-auto"
-               color="secondary"
+               style="background-color: #3778FF; color: white;"
                label="Stay in Talk 🥳"
                @click="closeDialog" />
         <q-btn class="my-1"
-               color="primary"
+               style="background-color: #01BE50; color: white;"
                label="Go to classic"
                @click="onSubmit" />
       </q-card-actions>
