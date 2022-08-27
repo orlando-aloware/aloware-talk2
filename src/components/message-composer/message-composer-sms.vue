@@ -526,7 +526,7 @@ export default {
         this.$q.notify({
           color: 'error',
           timeout: 3000,
-          message: 'Something went wrong when generating short URL'
+          message: 'Something went wrong while generating the short URL'
         })
         this.urlShortenerDialog = false
       }
