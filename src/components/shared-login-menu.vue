@@ -1,10 +1,10 @@
 <template>
-  <div v-if="profile && profile.company.talk_enabled"
+  <div v-if="profile && profile.company.talk_enabled && canSwitchApps"
        class="bridge-menu-wrapper">
     <q-btn v-if="isAdmin"
            outline
            class="q-btn-standard"
-           @click="onGoToClassic">
+           @click="toggleFeedbackDialog">
 
         <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
     </q-btn>
@@ -14,7 +14,7 @@
       class="q-shared-login-menu-dropdown "
       color="primary"
       padding="0px 10px"
-      @click="onGoToClassic"
+      @click="toggleFeedbackDialog"
     >
 
       <template slot="label">
@@ -51,10 +51,14 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
+    <talk-feedback-form :isOpen="isFeedbackModalOpen"
+                        @toggle="toggleFeedbackDialog"
+                        @submit="onGoToClassic"/>
   </div>
 </template>
 
 <script>
+import TalkFeedbackForm from './forms/talk-feedback-form.vue'
 import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
@@ -67,14 +71,24 @@ export default {
 
   mixins: [aclMixin],
 
+  components: { TalkFeedbackForm },
+
   computed: {
-    ...mapGetters('auth', ['profile'])
+    ...mapGetters('auth', ['profile']),
+    canSwitchApps () {
+      if (this.isAdmin) {
+        return true
+      }
+
+      return !this.profile.company.force_talk
+    }
   },
 
   data () {
     return {
       user: null,
-      AppDefaultLogin
+      AppDefaultLogin,
+      isFeedbackModalOpen: false
     }
   },
 
@@ -96,6 +110,9 @@ export default {
     },
     onInput () {
       this.updateDefaultLogin()
+    },
+    toggleFeedbackDialog () {
+      this.isFeedbackModalOpen = !this.isFeedbackModalOpen
     }
   },
 

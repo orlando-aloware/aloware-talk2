@@ -89,12 +89,6 @@
                      :filter="filter">
         </filter-form>
         <div class="container d-flex justify-content-end mt-3 action-option-container">
-          <div v-if="enableSidebarAndSaveFx">
-            <b-badge v-if="[ChannelType.CHANNEL_INBOX].includes(defaultFilterModel.type)"
-                     variant="warning">
-              Saving of filters for inbox is not available as of the moment.
-            </b-badge>
-          </div>
           <div>
             <compact-btn class="mr-3 btn-tertiary"
                          :disabled="!filterHasChanges"
@@ -103,7 +97,7 @@
             </compact-btn>
             <compact-btn class="btn-secondary"
                          v-if="enableSidebarAndSaveFx"
-                         :disabled="!(filterHasChanges) || ![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_ALL_COMMUNICATIONS].includes(defaultFilterModel.type)"
+                         :disabled="!(filterHasChanges) || [ChannelType.CHANNEL_MENTIONS].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
@@ -332,7 +326,7 @@ export default {
     },
 
     refreshTagSelector () {
-      if (this.$refs.inboxChannelFilterForm.$refs.tagSelector) {
+      if (this.$refs.inboxChannelFilterForm?.$refs.tagSelector) {
         this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
         setTimeout(() => {
           this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
@@ -435,7 +429,7 @@ export default {
     },
 
     getFilters () {
-      if (![ChannelType.CHANNEL_CALLS, ChannelType.CHANNEL_MESSAGES, ChannelType.CHANNEL_VOICEMAILS, ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_INBOX, ChannelType.CHANNEL_ALL_COMMUNICATIONS].includes(this.defaultFilterModel.type)) {
+      if ([ChannelType.CHANNEL_MENTIONS].includes(this.defaultFilterModel.type)) {
         return
       }
 

@@ -122,8 +122,28 @@
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
                :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
-               @keydown="onKeyDown">
+               @keydown="onKeyDown"
+               @blur="onBlur">
       </q-input>
+      <q-dialog v-model="urlShortenerDialog" persistent transition-show="scale" transition-hide="scale">
+        <q-card
+          flat
+          style="width: 450px; max-width: 90vw;"
+          class="py-2 px-2">
+          <q-card-section>
+            <div class="text-h6">Long URL detected</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
+          </q-card-section>
+          <q-checkbox v-model="urlShortenerDontAsk" class="pl-1" label="Don't ask me again" />
+          <q-card-actions align="right" class="bg-white text-teal">
+            <q-btn flat warning color="deep-orange" label="No" @click="onSend" v-close-popup />
+            <q-btn flat label="Yes" @click="generateShortUrl" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
     <div class="d-flex justify-content-between"
          @dragover.prevent>
@@ -207,6 +227,7 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapGetters('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     validSms: function () {
       return ((this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0) &&
@@ -232,6 +253,9 @@ export default {
       fileOnQueueIcon: ['fa', 'fa-times'],
       filesOnQueueToken: [],
       focusInterval: null,
+      urlShortenerDialog: false,
+      urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN,
+      urlShortenerDontAsk: false,
       fileTypes: [
         'audio/basic',
         'audio/L24',
@@ -273,7 +297,8 @@ export default {
         'text/calendar',
         'text/directory',
         'application/pdf',
-        'application/vcard']
+        'application/vcard'
+      ]
     }
   },
 
@@ -344,6 +369,12 @@ export default {
         evt.preventDefault()
       }
     },
+    onBlur () {
+      const detected = this.detectLongUrl(this.messageComposer.sms.body)
+      if (detected) {
+        this.urlShortenerDialog = true
+      }
+    },
     formatMessage () {
       return {
         body: this.messageComposer.sms.body,
@@ -355,6 +386,11 @@ export default {
       }
     },
     onSend () {
+      const detected = this.detectLongUrl(true)
+      if (detected) {
+        this.urlShortenerDialog = true
+        return
+      }
       this.isSending = true
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
@@ -457,6 +493,43 @@ export default {
       }
 
       return new Blob(byteArrays, { type: contentType })
+    },
+    detectLongUrl () {
+      const text = this.messageComposer.sms.body
+      if (this.currentCompany && !this.currentCompany.is_whitelabel && this.currentCompany.url_shortener_enabled && this.profile.url_shortener_enabled) {
+        const matches = text ? text.match(/\bhttps?:\/\/\S+/gi) : []
+        return matches ? matches.filter((url) => !url.includes(this.urlShortenerDomain)).length > 0 : false
+      }
+      return false
+    },
+    async generateShortUrl (send = false) {
+      if (this.urlShortenerDontAsk) {
+        talk2Api.V1.user.update(
+          this.profile.id,
+          Object.assign(this.profile, { url_shortener_enabled: false })
+        )
+      }
+      try {
+        let { data } = await talk2Api.V1.urlShortener.generate(this.messageComposer.sms.body)
+        this.$q.notify({
+          color: 'info',
+          timeout: 3000,
+          message: 'Short URLs generated successfully'
+        })
+        this.messageComposer.sms.body = data.text
+        this.urlShortenerDialog = false
+        if (send) {
+          this.onSend()
+        }
+      } catch (e) {
+        console.log(e)
+        this.$q.notify({
+          color: 'error',
+          timeout: 3000,
+          message: 'Something went wrong while generating the short URL'
+        })
+        this.urlShortenerDialog = false
+      }
     }
   },
 

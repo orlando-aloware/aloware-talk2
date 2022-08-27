@@ -91,7 +91,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="$route.params.channel && !['mentions', 'inbox'].includes($route.params.channel)">
+        <div v-if="!['mentions'].includes($route.params.channel)">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
@@ -106,7 +106,7 @@
                 </communication-direction-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'messages', 'all-communications'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['calls', 'messages', 'all-communications', 'inbox'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -119,7 +119,7 @@
                 </answer-status-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -132,7 +132,7 @@
                 </talk-time-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -145,7 +145,7 @@
                 </transfer-type-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group
@@ -164,7 +164,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="$route.params.channel && !['mentions', 'inbox'].includes($route.params.channel)">
+        <div v-if="!['mentions'].includes($route.params.channel)">
           <h5 class="mt-4 section-header">Properties</h5>
           <b-form-row class="mt-2">
             <b-col md="6"
@@ -179,7 +179,7 @@
                 </tag-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'all-communications'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
                    md="6"
                    sm="12">
               <b-form-group class="form-label"
@@ -264,7 +264,7 @@
           <b-form-row class="mt-2">
             <b-col sm="12"
                    md="6"
-                   v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
+                   v-if="!['mentions'].includes($route.params.channel)">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
                 <incoming-number-selector v-model="filter.incoming_numbers"
@@ -275,8 +275,7 @@
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['calls', 'recordings', 'messages', 'mentions', 'voicemails', 'all-communications'].includes($route.params.channel)"
-                   sm="12"
+            <b-col sm="12"
                    md="6">
               <b-form-group class="form-label"
                             label="Communication Owners">
@@ -311,7 +310,7 @@
             </b-col>
             <b-col  sm="12"
                     md="6"
-                    v-if="!['mentions', 'inbox'].includes($route.params.channel) && $route.name !== 'Inbox'">
+                    v-if="!['mentions'].includes($route.params.channel)">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector v-model="filter.workflows"
