@@ -26,9 +26,15 @@
         </b-badge>
 
         <b-badge v-if="phone.is_invalid"
-          variant="danger"
-          class="badge-phone-info">
+                 variant="danger"
+                 class="badge-phone-info">
           Invalid Number
+        </b-badge>
+
+        <b-badge v-if="phone.is_opted_out"
+                 variant="danger"
+                 class="badge-phone-info">
+          Opted Out
         </b-badge>
       </div>
 
