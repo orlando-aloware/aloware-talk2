@@ -34,7 +34,7 @@
         <b-badge v-if="phone.is_opted_out"
                  variant="danger"
                  class="badge-phone-info">
-          Opted Out
+          Opt-Out
         </b-badge>
       </div>
 
