@@ -29,6 +29,7 @@ import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { isNaN } from 'lodash'
 
 export default {
   name: 'contacts-pinned-item',
@@ -57,11 +58,30 @@ export default {
       'selectedList'
     ]),
     listCount () {
-      if (this.selectedList.id === this.item.id) {
-        return this.item.count !== this.selectedList.contactCount ? this.selectedList.contactCount : this.item.count
+      let listCount = 0
+
+      if (this.id === this.item.id) {
+        listCount = this.item.count !== this.selectedList.contactCount ? this.selectedList.contactCount : this.item.count
+      } else {
+        listCount = this.item.count
       }
 
-      return this.item.count
+      return !isNaN(listCount) ? listCount : 0
+    },
+    id () {
+      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        return this.$route.params.id
+      } else if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
+        return this.$route.params.id
+      } else if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
+        return this.$route.params.id
+      }
+
+      if (this.$route.name !== 'Contacts' && this.$route.name !== 'Power Dialer') {
+        return null
+      }
+
+      return 'all'
     }
   },
 
