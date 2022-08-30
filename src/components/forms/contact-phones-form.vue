@@ -38,7 +38,13 @@
         :unchecked-value="false"
         :disabled="this.contactSelectedPhone.is_opted_out">
         <span class="make-primary-label">SMS Opt-Out</span>
-        <b-icon class="ml-2" icon="exclamation-circle-fill" variant="dark" v-b-tooltip.hover title="Once the phone number is opted out, you can't uncheck it."></b-icon>
+        <b-icon
+          class="ml-2"
+          icon="exclamation-circle-fill"
+          variant="dark"
+          v-b-tooltip.hover
+          title="Once the phone number is opted out, you can't uncheck it."
+        />
       </b-form-checkbox>
     </b-form-group>
 
