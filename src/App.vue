@@ -186,7 +186,10 @@ export default {
         timezone_str: window.timezone,
         companyId_int: profile.company_id,
         companyName_str: profile.company_name,
-        userRoles_strs: profile.user_roles
+        userRoles_strs: profile.user_roles,
+        hubspotCSMOwner: profile.company.hubspot_csm_owner,
+        hubspotLeadOwner: profile.company.hubspot_latest_deal_owner,
+        hubspotLatestDealAmount: profile.company.hubspot_latest_deal_amount
       }
       this.$FullStory.identify(profile.id, identityInformation)
     },
