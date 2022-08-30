@@ -1,0 +1,110 @@
+name: Deploy Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Dev or Prod
+        default: Dev
+        required: true
+      version:
+        description: Bump Version
+        default: 1.0.0
+        required: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    environment: ${{ github.event.inputs.environment }}
+
+    strategy:
+      matrix:
+        os: [ 'windows-latest' ]
+        node-version: [ '14.x' ]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.5
+
+      - name: Build details
+        run: |
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies & Quasar
+        run: npm install && npm install -g @quasar/cli
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Make dotenv file
+        uses: ozaytsev86/create-env-file@v1
+        with:
+          ENV_APP_NAME: ${{ secrets.app_name }}
+          ENV_APP_ENV: ${{ secrets.app_env }}
+          ENV_APP_DEBUG: ${{ secrets.app_debug }}
+          ENV_API_URL: ${{ secrets.api_url }}
+          ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
+          ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
+          ENV_MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
+          ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
+          ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
+          ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
+          ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
+          ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
+          file-name: .env.prod
+
+      - name: Build/release Electron win app
+        run: npm run deploy-win
+        env:
+          APP_NAME: ${{ secrets.app_name }}
+          APP_ENV: ${{ secrets.app_env }}
+          APP_DEBUG: ${{ secrets.app_debug }}
+          API_URL: ${{ secrets.api_url }}
+
+          # Pusher Configuration
+          PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
+          PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
+
+          # Sentry error logging
+          MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
+
+          # GIPHY API KEYS
+          GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
+
+          # Intercom
+          INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
+          INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
+
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+
+          # AnnounceKit
+          AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
+
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}

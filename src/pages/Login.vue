@@ -21,7 +21,17 @@ export default {
   components: { LoginForm, LoginLargeScreensInfo },
 
   computed: {
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', ['profile']),
+    shouldRedirectToClassic () {
+      const urlParams = new URLSearchParams(window.location.search)
+      const fromClassic = Number(urlParams.get('from_classic'))
+
+      return this.profile &&
+        this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC &&
+        fromClassic !== 1 &&
+        !this.isAdmin &&
+        !this.profile?.company?.force_talk
+    }
   },
 
   methods: {
@@ -54,10 +64,7 @@ export default {
 
       storage.local.setItem('company_id', company.id)
 
-      const urlParams = new URLSearchParams(window.location.search)
-      const fromClassic = Number(urlParams.get('from_classic'))
-
-      if (this.profile && this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC && fromClassic !== 1 && !this.isAdmin) {
+      if (this.shouldRedirectToClassic) {
         location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
         window.location.reload()

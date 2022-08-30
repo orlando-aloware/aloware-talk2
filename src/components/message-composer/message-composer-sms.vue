@@ -254,7 +254,7 @@ export default {
       filesOnQueueToken: [],
       focusInterval: null,
       urlShortenerDialog: false,
-      urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN || 'alwr.io',
+      urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN,
       urlShortenerDontAsk: false,
       fileTypes: [
         'audio/basic',
@@ -526,7 +526,7 @@ export default {
         this.$q.notify({
           color: 'error',
           timeout: 3000,
-          message: 'Something went wrong when generating short URL'
+          message: 'Something went wrong while generating the short URL'
         })
         this.urlShortenerDialog = false
       }
