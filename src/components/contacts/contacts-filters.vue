@@ -446,6 +446,7 @@ export default {
 
       const filterFound = this.filters.find(filter => filter.key === key)
       const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
+      const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
       const labels = { data: null }
       const item = { index: null }
@@ -471,6 +472,8 @@ export default {
             optionFound.data = filterFound.options.find(option => String(option.value) === String(item.index))
             labels.data.push(optionFound.data ? optionFound.data.label : '')
           }
+        } else if (isBoolean) {
+          labels.data = [filter.trueValue[0] === 1]
         } else {
           labels.data = filter.trueValue
         }
