@@ -63,7 +63,8 @@ import {
   contactsMixins,
   aclMixin,
   visibilityMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  contactListCountMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Contact from 'pages/contacts/Contact'
@@ -81,7 +82,8 @@ export default {
     contactsMixins,
     aclMixin,
     visibilityMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    contactListCountMixin
   ],
 
   components: {

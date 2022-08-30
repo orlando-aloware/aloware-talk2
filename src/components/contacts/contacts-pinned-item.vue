@@ -29,6 +29,7 @@ import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { isNaN } from 'lodash'
 
 export default {
   name: 'contacts-pinned-item',
@@ -57,11 +58,18 @@ export default {
       'selectedList'
     ]),
     listCount () {
-      if (this.selectedList.id === this.item.id) {
-        return this.item.count !== this.selectedList.contactCount ? this.selectedList.contactCount : this.item.count
+      let listCount = 0
+
+      if (this.id === this.item.id) {
+        listCount = this.item.count !== this.selectedList.contactCount ? this.selectedList.contactCount : this.item.count
+      } else {
+        listCount = this.item.count
       }
 
-      return this.item.count
+      return !isNaN(listCount) && listCount !== undefined ? listCount : 0
+    },
+    id () {
+      return this.$route.params.id
     }
   },
 

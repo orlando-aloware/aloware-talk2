@@ -468,7 +468,7 @@ export default {
 
         if (filterFound && isRelationType) {
           for (item.index of values.data) {
-            optionFound.data = filterFound.options.find(option => option.value === item.index)
+            optionFound.data = filterFound.options.find(option => String(option.value) === String(item.index))
             labels.data.push(optionFound.data ? optionFound.data.label : '')
           }
         } else {

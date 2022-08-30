@@ -84,7 +84,8 @@ import {
   powerDialerInitMixin,
   sessionsEngineMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  contactListCountMixin
 } from 'src/plugins/mixins'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -110,7 +111,8 @@ export default {
     powerDialerInitMixin,
     sessionsEngineMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    contactListCountMixin
   ],
   provide () {
     return {
