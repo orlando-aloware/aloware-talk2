@@ -124,7 +124,8 @@
       </div>
 
       <b-form-row class="mt-4"
-                  :id="`${SettingsMap.operating_states_limit.hash_keyword}-container`">
+                  :id="`${SettingsMap.operating_states_limit.hash_keyword}-container`"
+                  v-if="isAdmin">
         <b-col sm="12"
                md="12">
           <div>
