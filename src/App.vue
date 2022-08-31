@@ -188,7 +188,7 @@ export default {
         companyName_str: profile.company_name,
         userRoles_strs: profile.user_roles,
         hubspotCSMOwner: profile.company.hubspot_csm_owner,
-        hubspotLeadOwner: profile.company.hubspot_latest_deal_owner,
+        hubspotAccountOwner: profile.company.hubspot_account_owner,
         hubspotLatestDealAmount: profile.company.hubspot_latest_deal_amount
       }
       this.$FullStory.identify(profile.id, identityInformation)
