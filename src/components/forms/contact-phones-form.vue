@@ -31,7 +31,9 @@
       </b-form-checkbox>
     </b-form-group>
 
-    <b-form-group v-if="this.contactSelectedPhone" id="input-group-2" class="checkbox-wrapper">
+    <b-form-group v-if="this.contactSelectedPhone"
+                  id="input-group-2"
+                  class="checkbox-wrapper">
       <b-form-checkbox
         v-model="phone.isOptedOut"
         :value="true"
@@ -39,12 +41,12 @@
         :disabled="this.contactSelectedPhone.is_opted_out">
         <span class="make-primary-label">SMS Opt-Out</span>
         <b-icon
-          class="ml-2"
+          class="ml-2 info-icon"
           icon="exclamation-circle-fill"
-          variant="dark"
-          v-b-tooltip.hover
-          title="Once the phone number is opted out, you can't uncheck it."
-        />
+          variant="dark" />
+        <q-tooltip target=".info-icon" anchor="top middle" self="top middle">
+          Once the phone number is opted out, you can't uncheck it.
+        </q-tooltip>
       </b-form-checkbox>
     </b-form-group>
 

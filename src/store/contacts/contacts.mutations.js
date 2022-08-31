@@ -236,7 +236,15 @@ export default {
     state.contactSelectedPhone = phone
   },
   UPDATE_CONTACT_SELECTED_PHONE: (state, phone) => {
-    state.contactPhoneNumbers = state.contactPhoneNumbers.map(item => item.id === phone.id ? { ...item, ...{ phone_number: phone.phone_number, title: phone.title, is_opted_out: phone.is_opted_out } } : item)
+    state.contactPhoneNumbers = state.contactPhoneNumbers.map(item => item.id === phone.id
+      ? {
+        ...item,
+        ...{
+          phone_number: phone.phone_number,
+          title: phone.title,
+          is_opted_out: phone.is_opted_out
+        }
+      } : item)
   },
   SET_SELECTED_LINE: (state, line) => {
     state.selectedLine = line
