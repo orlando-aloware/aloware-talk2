@@ -31,6 +31,25 @@
       </b-form-checkbox>
     </b-form-group>
 
+    <b-form-group v-if="this.contactSelectedPhone"
+                  id="input-group-2"
+                  class="checkbox-wrapper">
+      <b-form-checkbox
+        v-model="phone.isOptedOut"
+        :value="true"
+        :unchecked-value="false"
+        :disabled="this.contactSelectedPhone.is_opted_out">
+        <span class="make-primary-label">SMS Opt-Out</span>
+        <b-icon
+          class="ml-2 info-icon"
+          icon="exclamation-circle-fill"
+          variant="dark" />
+        <q-tooltip target=".info-icon" anchor="top middle" self="top middle">
+          Once the phone number is opted out, you can't uncheck it.
+        </q-tooltip>
+      </b-form-checkbox>
+    </b-form-group>
+
     <div class="d-flex justify-content-between">
       <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
       <b-button type="button"
@@ -116,7 +135,8 @@ export default {
       return talk2Api.V1.contact.updatePhone(this.contact.id, this.phone.id, {
         title: this.phone.title,
         phone_number: this.phone.number,
-        is_primary: this.phone.isPrimary
+        is_primary: this.phone.isPrimary,
+        is_opted_out: this.phone.isOptedOut
       }).then(response => {
         this.getContact()
         this.updateContactSelectedPhone(response.data)
