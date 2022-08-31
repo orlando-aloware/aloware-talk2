@@ -256,7 +256,7 @@ export default {
       filesOnQueueToken: [],
       focusInterval: null,
       urlShortenerDialog: false,
-      urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN || 'alwr.io',
+      urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN,
       urlShortenerDontAsk: false,
       urlShortenerDontAskUntilSend: false,
       generatingShortUrl: false,

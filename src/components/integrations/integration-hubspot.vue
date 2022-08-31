@@ -233,10 +233,6 @@ export default {
   async mounted () {
     if (this.contact && this.contact.id) {
       await this.getData()
-
-      if (this.hubspotLink) {
-        this.syncHubspot(false)
-      }
     }
   },
 

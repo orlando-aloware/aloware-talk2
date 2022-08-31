@@ -1,6 +1,6 @@
 <template>
   <div id="q-app">
-    <router-view v-if="cookieValidated" />
+    <router-view v-if="cookieValidated"/>
     <portal-target name="app"
                    multiple>
     </portal-target>
@@ -22,9 +22,13 @@ import * as storage from 'src/plugins/helpers/storage'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
+
 export default {
   name: 'App',
-  components: { Intercom, ActionNotification },
+  components: {
+    Intercom,
+    ActionNotification
+  },
   data () {
     return {
       cookieValidated: false,
@@ -70,20 +74,40 @@ export default {
     }
 
     this.$VueEvent.listen('make_new_call', (data) => {
-      window.axios.post('/api/v1/contact', {
-        add_phone_number: this.$options.filters.fixPhone(data.phone_number)
-      }).then(res => {
-        const contact = res.data
-        const callData = {
-          currentNumber: this.$options.filters.fixPhone(data.phone_number),
-          contactName: contact.name,
-          companyName: contact.company_name,
-          contactId: contact.id,
-          contactTimezone: contact.timezone
-        }
+      let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
 
-        this.$VueEvent.fire('callContact', callData)
-      })
+      if (/unhold:|barge:|whisper:|call:|hs:/.test(fixedPhoneNumber)) {
+        window.axios.get('/api/v1/communication/info', {
+          params: {
+            sid: '',
+            phone_number: fixedPhoneNumber
+          }
+        }).then(res => {
+          this.$VueEvent.fire('makeCall', {
+            currentNumber: fixedPhoneNumber,
+            outboundCampaignId: res.data.campaign_id,
+            contactName: res.data?.contact?.name,
+            companyName: res.data?.contact?.company_name,
+            contactId: res.data?.contact?.id,
+            contactTimezone: res.data?.contact?.timezone
+          })
+        })
+      } else {
+        window.axios.post('/api/v1/contact', {
+          add_phone_number: fixedPhoneNumber
+        }).then(res => {
+          const contact = res.data
+          const callData = {
+            currentNumber: fixedPhoneNumber,
+            contactName: contact.name,
+            companyName: contact.company_name,
+            contactId: contact.id,
+            contactTimezone: contact.timezone
+          }
+
+          this.$VueEvent.fire('callContact', callData)
+        })
+      }
     })
 
     this.$VueEvent.listen('add_contact', (data) => {
@@ -122,7 +146,10 @@ export default {
       }
     },
     async cookieUserValidated ({ data: { data } }) {
-      const { usage, company } = data
+      const {
+        usage,
+        company
+      } = data
       this.resetVuex(['non-cache'])
       this.setCurrentCompany(company)
       this.setUsage(usage)

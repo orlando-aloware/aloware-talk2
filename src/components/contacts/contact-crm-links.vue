@@ -60,6 +60,12 @@ export default {
           label: 'Guesty',
           link: this.guestyLink,
           logo: 'guesty-icon.png'
+        },
+        {
+          name: 'custom_link_builder',
+          label: 'Custom Link',
+          link: this.contact?.custom_link,
+          logo: 'link-solid.svg'
         }
       ]
     }

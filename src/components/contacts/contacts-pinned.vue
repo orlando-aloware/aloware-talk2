@@ -25,12 +25,8 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import ContactsPinnedItem from 'components/contacts/contacts-pinned-item'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
-import { contactListCountMixin } from 'src/plugins/mixins'
 
 export default {
-
-  mixins: [contactListCountMixin],
-
   components: {
     ContactsSidebarLoader,
     ContactsPinnedItem
@@ -60,7 +56,7 @@ export default {
     }
     this.listeners.getListCount = (list) => {
       if (list.type === this.ContactListTypes.DYNAMIC && list.id !== 'my-contacts') {
-        this.loadDynamicListPinnedCount(list)
+        this.loadDynamicListPinnedCount(list, true)
       }
 
       if (list.type === this.ContactListTypes.DYNAMIC && list.id === 'my-contacts') {
@@ -73,6 +69,7 @@ export default {
     }
     this.listeners.listCountUpdated = (data) => {
       const isPinned = this.pinnedLists.find(item => item.id.toString() === data.list.id.toString())
+
       if (!isPinned) {
         return
       }
@@ -83,9 +80,14 @@ export default {
       })
     }
 
+    this.listeners.updateLoadingPinned = (value) => {
+      this.loadingPinned = value
+    }
+
     this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
     this.$VueEvent.listen('getListCount', this.listeners.getListCount)
     this.$VueEvent.listen('listCountUpdated', this.listeners.listCountUpdated)
+    this.$VueEvent.listen('update-loading-pinned', this.listeners.updateLoadingPinned)
   },
 
   methods: {
@@ -196,17 +198,22 @@ export default {
         })
     },
 
-    async loadDynamicListPinnedCount (data) {
-      await this.getListDataCount(data).then((response) => {
-        this.pinnedCountLoaded({
-          id: data.contact_list_id || data.id,
-          count: response.data.count
-        })
-      }).catch((err) => {
-        console.error(err)
-        this.$generalNotification('Unable to load pinned count, please try again.', 'error')
-        this.setPinnedListsLoaded(true)
-        this.loadingPinned = false
+    async loadDynamicListPinnedCount (data, skipCancelToken = false) {
+      this.$VueEvent.fire('get-list-count', {
+        data: data,
+        skipCancelToken: skipCancelToken,
+        thenFunctions: {
+          'pinnedCountLoaded': {
+            id: data.contact_list_id || data.id,
+            count: 'response.data.count'
+          }
+        },
+        catchFunctions: {
+          'setPinnedListsLoaded': true
+        },
+        catchEventFires: {
+          'update-loading-pinned': true
+        }
       })
     },
 
@@ -234,7 +241,7 @@ export default {
             }
 
             if (data[item.i].type === this.ContactListTypes.DYNAMIC) {
-              await this.loadDynamicListPinnedCount(data[item.i])
+              await this.loadDynamicListPinnedCount(data[item.i], true)
             }
           }
 
@@ -242,7 +249,7 @@ export default {
           this.loadingPinned = false
         }).catch((err) => {
           console.error(err)
-          this.$generalNotification('Unable to load pinned count, please try again.', 'error')
+          this.$generalNotification('Unable to load pinned contacts list, please try again.', 'error')
           this.setPinnedListsLoaded(true)
           this.loadingPinned = false
         })
@@ -262,6 +269,7 @@ export default {
     this.$VueEvent.stop('fetchContactsLists', this.listeners.fetchContactsLists)
     this.$VueEvent.stop('getListCount', this.listeners.getListCount)
     this.$VueEvent.stop('listCountUpdated', this.listeners.listCountUpdated)
+    this.$VueEvent.stop('update-loading-pinned', this.listeners.updateLoadingPinned)
   }
 }
 </script>

@@ -1,6 +1,9 @@
 <template>
   <b-modal dialog-class="modal-pd-add"
+           centered
            hide-footer
+           no-close-on-backdrop
+           no-close-on-esc
            v-model="isOpen"
            @hidden="onHidden">
     <template #modal-title>
@@ -8,7 +11,7 @@
     </template>
     <q-card class="my-card"
             flat>
-      <b-overlay :show="loading">
+      <b-overlay :show="loading > 0">
         <div>
           You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
         </div>
@@ -75,6 +78,26 @@
         </b-button>
       </b-overlay>
     </q-card>
+    <b-modal modal-class="confirm-dialog"
+             title="Continue"
+             centered
+             v-model="confirm"
+             @close="onHidden">
+      <div class="text-left">
+        <div class="text-dark">
+          {{ confirm_message }}
+        </div>
+      </div>
+      <template slot="modal-footer">
+        <div class="d-flex w-100">
+          <div class="flex-grow-1"></div>
+          <button class="btn btn-sm btn-primary mr-2"
+                  @click="closeConfirmDialog">
+            Continue
+          </button>
+        </div>
+      </template>
+    </b-modal>
   </b-modal>
 </template>
 
@@ -88,8 +111,8 @@ export default {
   name: 'power-dialer-add-modal',
 
   components: {
-    InformationCircleIcon,
-    DatePicker
+    DatePicker,
+    InformationCircleIcon
   },
 
   props: {
@@ -108,12 +131,20 @@ export default {
   },
 
   mounted () {
-    this.loading = true
+    this.loading++
+
+    if (this.mode === 'hubspot') {
+      // check if Hubspot list already exists
+      this.checkHubspotList()
+    }
+
     this.setCount()
   },
 
   data: () => ({
-    loading: false,
+    loading: 0,
+    confirm: false,
+    confirm_message: '',
     conversion: [
       'prevent_duplicates'
     ],
@@ -194,15 +225,15 @@ export default {
     setCount () {
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
-        this.loading = false
+        this.loading--
       } else if (this.params.target) {
         if (this.mode === 'hubspot') {
           this.count = this.params.size
-          this.loading = false
+          this.loading--
         } else {
           this.getListCount(this.params.target).then(res => {
             this.count = res.data.count
-            this.loading = false
+            this.loading--
           })
         }
       }
@@ -212,7 +243,7 @@ export default {
       this.$emit('hidden')
     },
     save () {
-      this.loading = true
+      this.loading++
 
       return this.getRequest()
         .catch((err) => {
@@ -221,7 +252,7 @@ export default {
           this.$generalNotification(message, 'error')
         })
         .finally(() => {
-          this.loading = false
+          this.loading--
           this.addPowerDialerOpen(false)
         })
     },
@@ -303,6 +334,23 @@ export default {
     getListCount (id) {
       return this.$axios
         .get(`/api/v2/power-dialer-lists/${id}/count`)
+    },
+    async checkHubspotList () {
+      this.loading++
+
+      const res = await this.$axios
+        .get('/api/v2/power-dialer-lists/hubspot-list-exists/' + this.params.target)
+
+      if (res.data.exists) {
+        this.confirm_message = 'The HubSpot list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.confirm = true
+      } else {
+        this.loading--
+      }
+    },
+    closeConfirmDialog () {
+      this.confirm = false
+      this.loading--
     }
   },
 

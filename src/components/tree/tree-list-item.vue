@@ -106,11 +106,8 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import contactsListCountMixin from 'src/plugins/mixins/contacts-list-count.mixin'
 
 export default {
-  mixins: [contactsListCountMixin],
-
   components: {
     FolderArrowCloseIcon,
     FolderOption,
@@ -237,7 +234,6 @@ export default {
       'listLoaded',
       'listPinToggled',
       'openMoveDialog',
-      'pinnedCountLoaded',
       'setUnsavedList',
       'setUnsavedListName',
       'setShowContactsListSidebar'
@@ -330,11 +326,14 @@ export default {
       })
     },
     setDataCount (data) {
-      this.getListDataCount(data).then(response => {
-        this.pinnedCountLoaded({
-          id: this.id,
-          count: response.data.count
-        })
+      this.$VueEvent.fire('get-list-count', {
+        data: data,
+        thenFunctions: {
+          'pinnedCountLoaded': {
+            id: this.id,
+            count: 'response.data.count'
+          }
+        }
       })
     },
     pinRequest (id, isPinned) {

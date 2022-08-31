@@ -62,7 +62,9 @@ import RemoveListConfirmation from 'components/remove-list-confirmation'
 import {
   contactsMixins,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  contactsListFiltersMixin,
+  contactListCountMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Contact from 'pages/contacts/Contact'
@@ -79,7 +81,9 @@ export default {
   mixins: [
     contactsMixins,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    contactsListFiltersMixin,
+    contactListCountMixin
   ],
 
   components: {
@@ -184,14 +188,11 @@ export default {
         this.setShowContactsListSidebar(false)
       }
 
-      if (from.name === 'Contacts' &&
-        to.name === 'Contacts' &&
-        this.previousListId) {
-        this.updateContactsListFilter({
-          id: this.previousListId,
-          filters: this.previousListFilters
-        })
-      }
+      this.initiateUpdateContactsListFilter({
+        forPreviousList: true,
+        fromName: from.name,
+        toName: to.name
+      })
 
       if (to.name === 'Contact' && this.$q.screen.lt.md) {
         this.setShowContactsHeader(false)

@@ -18,7 +18,7 @@
         <span>{{ item.name }}</span>
       </div>
       <div class="counts d-flex align-items-center">
-        <b-badge pill variant="light text-muted">{{ item.count | fixCount }}</b-badge>
+        <b-badge pill variant="light text-muted">{{ listCount | fixCount }}</b-badge>
       </div>
     </a>
   </router-link>
@@ -28,7 +28,8 @@
 import FolderStaticIcon from 'components/icons/folder-static-icon'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { isNaN } from 'lodash'
 
 export default {
   name: 'contacts-pinned-item',
@@ -50,7 +51,26 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['unsavedList'])
+    ...mapState('contacts', [
+      'unsavedList'
+    ]),
+    ...mapGetters('contacts', [
+      'selectedList'
+    ]),
+    listCount () {
+      let listCount = 0
+
+      if (this.id === this.item.id) {
+        listCount = this.item.count !== this.selectedList.contactCount ? this.selectedList.contactCount : this.item.count
+      } else {
+        listCount = this.item.count
+      }
+
+      return !isNaN(listCount) && listCount !== undefined ? listCount : 0
+    },
+    id () {
+      return this.$route.params.id
+    }
   },
 
   methods: {

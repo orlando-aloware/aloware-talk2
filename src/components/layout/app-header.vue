@@ -150,7 +150,12 @@ import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, avatarMixin, goBackMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  avatarMixin,
+  goBackMixin,
+  contactsListFiltersMixin
+} from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
 import Profile from 'components/profile'
@@ -173,7 +178,12 @@ import * as Roles from 'src/constants/roles'
 export default {
   name: 'app-header',
 
-  mixins: [aclMixin, avatarMixin, goBackMixin],
+  mixins: [
+    aclMixin,
+    avatarMixin,
+    goBackMixin,
+    contactsListFiltersMixin
+  ],
 
   components: {
     DialerIcon,
@@ -400,10 +410,7 @@ export default {
     },
 
     refreshContacts () {
-      this.updateContactsListFilter({
-        id: this.previousListId,
-        filters: this.previousListFilters
-      })
+      this.initiateUpdateContactsListFilter()
       this.$VueEvent.fire('fetchContacts', { fromRefresh: true })
       this.$VueEvent.fire('fetchContactsLists')
     },
