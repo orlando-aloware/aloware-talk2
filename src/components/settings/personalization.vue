@@ -57,7 +57,8 @@
       </b-form-row>
 
       <b-form-row class="mt-4"
-                  :id="`${SettingsMap.url_shortener_enabled.hash_keyword}-container`">
+                  :id="`${SettingsMap.url_shortener_enabled.hash_keyword}-container`"
+                  v-if="currentCompany.url_shortener_enabled">
         <b-col sm="12"
                md="12">
           <div>

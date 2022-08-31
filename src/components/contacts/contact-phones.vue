@@ -80,7 +80,8 @@ export default {
         id: null,
         title: '',
         number: '',
-        isPrimary: false
+        isPrimary: false,
+        isOptedOut: false
       }
     }
   },
@@ -105,7 +106,8 @@ export default {
         id: phone.id,
         title: phone.title,
         number: phone.phone_number,
-        isPrimary: phone.phone_number === this.contact.phone_number || false
+        isPrimary: phone.phone_number === this.contact.phone_number || false,
+        isOptedOut: phone.is_opted_out
       }
       this.showPhonesForm = true
     },
