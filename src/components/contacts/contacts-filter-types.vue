@@ -4,6 +4,13 @@
          v-for="operator in filter.operators"
          :key="(filter.key + '-' + operator.value)"
     >
+      <q-radio class="my-2"
+               dense
+               :val="operator.value"
+               :label="operator.label"
+               v-model="filterOperator"
+      >
+      </q-radio>
       <template v-if="filter.type === 'string'">
         <q-select
           ref="filterOperation"
@@ -87,15 +94,12 @@
         />
       </template>
       <template v-if="filter.type === 'boolean'">
-        <div>
-          <q-radio v-model="filterOperator" :val="operator.value" :label="operator.label" />
-          <q-btn-toggle class="w-100"
-                        toggle-color="primary"
-                        :options="options"
-                        v-show="operator.value === filterOperator"
-                        v-model="filterOperatorValue">
-          </q-btn-toggle>
-        </div>
+        <q-btn-toggle class="w-100"
+                      toggle-color="primary"
+                      :options="options"
+                      v-show="operator.value === filterOperator"
+                      v-model="filterOperatorValue">
+        </q-btn-toggle>
       </template>
     </div>
     <compact-btn
