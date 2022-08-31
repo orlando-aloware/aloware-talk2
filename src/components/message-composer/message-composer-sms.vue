@@ -128,8 +128,8 @@
       <q-dialog v-model="urlShortenerDialog" persistent transition-show="scale" transition-hide="scale">
         <q-card
           flat
-          style="width: 450px; max-width: 90vw;"
-          class="py-2 px-2">
+          style="width: 420px; max-width: 90vw;"
+          class="pb-2 px-2">
           <q-card-section>
             <div class="text-h6">Long URL detected</div>
           </q-card-section>
@@ -137,10 +137,12 @@
           <q-card-section class="q-pt-none">
             Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
           </q-card-section>
+
           <q-checkbox v-model="urlShortenerDontAsk" class="pl-1" label="Don't ask me again" />
-          <q-card-actions align="right" class="bg-white text-teal">
-            <q-btn flat warning color="deep-orange" label="No" @click="onSend" v-close-popup />
-            <q-btn flat label="Yes" @click="generateShortUrl" />
+
+          <q-card-actions class="bg-white text-teal mt-2">
+            <q-btn label="No" @click="closeUrlShortener" v-close-popup />
+            <q-btn color="blue" class="ml-auto" label="Yes" @click="generateShortUrl" :loading="generatingShortUrl" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -256,6 +258,8 @@ export default {
       urlShortenerDialog: false,
       urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN,
       urlShortenerDontAsk: false,
+      urlShortenerDontAskUntilSend: false,
+      generatingShortUrl: false,
       fileTypes: [
         'audio/basic',
         'audio/L24',
@@ -386,7 +390,7 @@ export default {
       }
     },
     onSend () {
-      const detected = this.detectLongUrl(true)
+      const detected = this.detectLongUrl()
       if (detected) {
         this.urlShortenerDialog = true
         return
@@ -401,6 +405,7 @@ export default {
           this.$generalNotification('Error while sending message.', 'error')
         }).finally(() => {
           this.isSending = false
+          this.urlShortenerDontAskUntilSend = false
         })
     },
     gifSelected (gif) {
@@ -495,41 +500,46 @@ export default {
       return new Blob(byteArrays, { type: contentType })
     },
     detectLongUrl () {
-      const text = this.messageComposer.sms.body
-      if (this.currentCompany && !this.currentCompany.is_whitelabel && this.currentCompany.url_shortener_enabled && this.profile.url_shortener_enabled) {
+      if (!this.urlShortenerDontAsk && !this.urlShortenerDontAskUntilSend && this.currentCompany && !this.currentCompany.is_whitelabel && this.currentCompany.url_shortener_enabled && this.profile.url_shortener_enabled) {
+        const text = this.messageComposer.sms.body
         const matches = text ? text.match(/\bhttps?:\/\/\S+/gi) : []
         return matches ? matches.filter((url) => !url.includes(this.urlShortenerDomain)).length > 0 : false
       }
       return false
     },
-    async generateShortUrl (send = false) {
+    closeUrlShortener () {
+      this.urlShortenerDontAskUntilSend = true
       if (this.urlShortenerDontAsk) {
-        talk2Api.V1.user.update(
-          this.profile.id,
-          Object.assign(this.profile, { url_shortener_enabled: false })
-        )
+        this.disableUrlShortener()
+      }
+    },
+    async generateShortUrl (send = false) {
+      this.generatingShortUrl = true
+      if (this.urlShortenerDontAsk) {
+        this.disableUrlShortener()
       }
       try {
         let { data } = await talk2Api.V1.urlShortener.generate(this.messageComposer.sms.body)
-        this.$q.notify({
-          color: 'info',
-          timeout: 3000,
-          message: 'Short URLs generated successfully'
-        })
+        this.$generalNotification('Short URLs generated successfully.', 'success')
         this.messageComposer.sms.body = data.text
+        this.generatingShortUrl = false
         this.urlShortenerDialog = false
         if (send) {
           this.onSend()
         }
       } catch (e) {
-        console.log(e)
-        this.$q.notify({
-          color: 'error',
-          timeout: 3000,
-          message: 'Something went wrong while generating the short URL'
-        })
+        this.$generalNotification('Something went wrong when generating short URL.', 'error')
+        this.generatingShortUrl = false
         this.urlShortenerDialog = false
       }
+    },
+    disableUrlShortener () {
+      this.urlShortenerDontAsk = false
+      talk2Api.V1.user.update(
+        this.profile.id,
+        Object.assign(this.profile, { url_shortener_enabled: false })
+      )
+      this.$generalNotification('URL Shortener disabled. To enable it again visit Settings > Personalization', 'success')
     }
   },
 
