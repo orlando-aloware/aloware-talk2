@@ -186,8 +186,15 @@ export default {
           timezone: window.timezone
         })
       }).catch(() => {
-        console.log('Error while retrieving fullstory meta')
-        this.$FullStory.identify(profile.id)
+        console.log('Error while retrieving fullstory metadata from server. Using local variables.')
+        this.$FullStory.identify(profile.id, {
+          displayName: profile.name,
+          email: profile.email,
+          timezone_str: window.timezone,
+          companyId_int: profile.company_id,
+          companyName_str: profile.company_name,
+          userRoles_strs: profile.user_roles
+        })
       })
     },
     // identify or anonymize user
