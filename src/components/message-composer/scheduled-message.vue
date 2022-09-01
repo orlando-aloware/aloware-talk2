@@ -166,7 +166,7 @@ export default {
       if (typeof date === 'string') {
         this.scheduleDate
           .set('year', date.slice(0, 4))
-          .set('month', date.slice(5, 7))
+          .set('month', (parseInt(date.slice(5, 7)) - 1))
           .set('date', date.slice(8, 10))
       }
       this.validateScheduleDate()
@@ -176,6 +176,11 @@ export default {
         .set('hour', time.slice(0, 2))
         .set('minute', time.slice(3, 5))
       this.validateScheduleDate()
+    },
+    isOpen: function (value) {
+      if (!value) {
+        this.setNow()
+      }
     }
   }
 }
