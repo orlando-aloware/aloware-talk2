@@ -179,7 +179,7 @@ export default {
     },
     isOpen: function (value) {
       if (!value) {
-        this.date = new Date()
+        this.setNow()
       }
     }
   }
