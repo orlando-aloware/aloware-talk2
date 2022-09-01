@@ -167,7 +167,14 @@ export default {
       return
     }
 
-    state = Object.assign({}, InboxDefault.DEFAULT_STATE)
+    // exclude cached state for non-cache
+    const inboxDefaultState = Object.assign({}, InboxDefault.DEFAULT_STATE)
+
+    if (value.includes('non-cache')) {
+      delete inboxDefaultState.inboxShowMyContacts
+    }
+
+    state = Object.assign(state, inboxDefaultState)
   },
   SET_LOADING_OPEN_TASK_COUNT (state, loading) {
     state.isLoadingOpenTaskCount = loading

@@ -257,12 +257,11 @@ export default {
     logoutAction () {
       try {
         this.hideMenu()
-        const response = this.logout()
-        response.then(() => {
-          this.response = response?.data
-          this.resetVuex(['all'])
-          this.$router.push({ name: 'Login' })
-        })
+        this.logout()
+          .then(() => {
+            this.resetVuex(['all'])
+            this.$router.push({ name: 'Login' })
+          })
       } catch (err) {
         console.error(err)
       }
