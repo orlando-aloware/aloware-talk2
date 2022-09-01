@@ -180,18 +180,11 @@ export default {
         return
       }
 
-      let identityInformation = {
-        displayName: profile.name,
-        email: profile.email,
-        timezone_str: window.timezone,
-        companyId_int: profile.company_id,
-        companyName_str: profile.company_name,
-        userRoles_strs: profile.user_roles,
-        hubspotCSMOwner: profile.company.hubspot_csm_owner,
-        hubspotAccountOwner: profile.company.hubspot_account_owner,
-        hubspotLatestDealAmount: profile.company.hubspot_latest_deal_amount
-      }
-      this.$FullStory.identify(profile.id, identityInformation)
+      window.axios.get('/fullstory-meta').then(({ data }) => {
+        data.timezone = window.timezone
+
+        this.$FullStory.identify(profile.id, data)
+      })
     },
     // identify or anonymize user
     setFullStory () {
