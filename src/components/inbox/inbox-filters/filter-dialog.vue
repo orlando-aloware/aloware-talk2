@@ -13,8 +13,7 @@
     @shown="onShown">
 
     <div class="modal-body-wrapper d-flex">
-      <div class="left-column-wrapper"
-           v-if="enableSidebarAndSaveFx">
+      <div class="left-column-wrapper">
         <span class="filter-type-description">{{ channelFilterName }} Filters</span>
 
         <div class="mt-3">
@@ -72,12 +71,8 @@
       </div>
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <div class="w-100 text-left"
-               v-if="enableSidebarAndSaveFx">
+          <div class="w-100 text-left">
             <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
-          </div>
-          <div class="w-100" v-if="!enableSidebarAndSaveFx">
-            <span class="filter-type-description">{{ channelFilterName }} Filters</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
                        @clicked="onHide">
@@ -96,7 +91,6 @@
               Reset
             </compact-btn>
             <compact-btn class="btn-secondary"
-                         v-if="enableSidebarAndSaveFx"
                          :disabled="!(filterHasChanges) || [ChannelType.CHANNEL_MENTIONS].includes(defaultFilterModel.type)"
                          @clicked="onSaveNewFilter">
               Save as New
@@ -233,10 +227,6 @@ export default {
       }
 
       return 'Apply'
-    },
-
-    enableSidebarAndSaveFx () {
-      return process.env.APP_ENV !== 'production'
     }
   },
 
