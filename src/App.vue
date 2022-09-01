@@ -183,7 +183,7 @@ export default {
       window.axios.get('/fullstory-meta').then(({ data }) => {
         this.$FullStory.identify(profile.id, {
           ...data,
-          timezone: window.timezone
+          timezone_str: window.timezone
         })
       }).catch(() => {
         console.log('Error while retrieving fullstory metadata from server. Using local variables.')
