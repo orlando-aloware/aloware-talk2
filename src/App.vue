@@ -181,9 +181,13 @@ export default {
       }
 
       window.axios.get('/fullstory-meta').then(({ data }) => {
-        data.timezone = window.timezone
-
-        this.$FullStory.identify(profile.id, data)
+        this.$FullStory.identify(profile.id, {
+          ...data,
+          timezone: window.timezone
+        })
+      }).catch(() => {
+        console.log('Error while retrieving fullstory meta')
+        this.$FullStory.identify(profile.id)
       })
     },
     // identify or anonymize user
