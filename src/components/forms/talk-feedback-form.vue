@@ -64,6 +64,9 @@
 </template>
 
 <script>
+import { aclMixin } from 'src/plugins/mixins'
+import { mapGetters } from 'vuex'
+
 const reasons = [
   {
     id: 1,
@@ -102,9 +105,14 @@ const reasons = [
     label: 'Other ...'
   }
 ]
+const skipCompanies = []
+
 export default {
+
+  mixins: [aclMixin],
+
   props: {
-    isOpen: {
+    shouldOpen: {
       type: Boolean,
       default: false
     }
@@ -116,10 +124,12 @@ export default {
       explanations: [
         '',
         ''
-      ]
+      ],
+      skipCompanies: skipCompanies
     }
   },
   computed: {
+    ...mapGetters('auth', ['profile']),
     feedback_params () {
       let explanation = ''
 
@@ -139,6 +149,15 @@ export default {
         reason: reasonLabel,
         explanation
       }
+    },
+    isOpen () {
+      // Admins should not see the feedback form
+      // Certain companies will not see the form
+      if (this.isAdmin || this.skipCompanies.includes(this.profile.company_id)) {
+        return false
+      }
+
+      return this.shouldOpen
     }
   },
   methods: {
