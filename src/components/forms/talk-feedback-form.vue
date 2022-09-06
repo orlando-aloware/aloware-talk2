@@ -57,6 +57,7 @@
         <q-btn class="my-1"
                style="background-color: #01BE50; color: white;"
                label="Go to classic"
+               :disable="reason === null"
                @click="onSubmit" />
       </q-card-actions>
     </q-card>
@@ -126,7 +127,7 @@ export default {
   data () {
     return {
       reasons,
-      reason: 1,
+      reason: null,
       explanations: [
         '',
         ''
