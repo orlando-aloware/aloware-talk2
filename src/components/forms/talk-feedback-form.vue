@@ -158,18 +158,17 @@ export default {
       }
     },
     isOpen () {
+      return this.shouldOpen && !this.shouldSkipForm
+    },
+    shouldSkipForm () {
       // Admins should not see the feedback form
       // Certain companies will not see the form
-      if (this.isAdmin || this.skipCompanies.includes(this.profile.company_id) || this.skipUsers.includes(this.profile.id)) {
-        return false
-      }
-
-      return this.shouldOpen
+      return this.isAdmin || this.skipCompanies.includes(this.profile.company_id) || this.skipUsers.includes(this.profile.id)
     }
   },
   watch: {
     shouldOpen (value) {
-      if (value && !this.isOpen) {
+      if (value && this.shouldSkipForm) {
         this.$emit('submit')
       }
     }
