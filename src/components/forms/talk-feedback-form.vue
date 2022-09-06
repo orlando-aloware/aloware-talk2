@@ -167,6 +167,13 @@ export default {
       return this.shouldOpen
     }
   },
+  watch: {
+    shouldOpen (value) {
+      if (value && !this.isOpen) {
+        this.$emit('submit')
+      }
+    }
+  },
   methods: {
     async onSubmit () {
       if (this.reason === 1) {
