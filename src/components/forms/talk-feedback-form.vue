@@ -106,6 +106,7 @@ const reasons = [
   }
 ]
 const skipCompanies = []
+const skipUsers = []
 
 export default {
 
@@ -125,7 +126,8 @@ export default {
         '',
         ''
       ],
-      skipCompanies: skipCompanies
+      skipCompanies: skipCompanies,
+      skipUsers: skipUsers
     }
   },
   computed: {
@@ -153,7 +155,7 @@ export default {
     isOpen () {
       // Admins should not see the feedback form
       // Certain companies will not see the form
-      if (this.isAdmin || this.skipCompanies.includes(this.profile.company_id)) {
+      if (this.isAdmin || this.skipCompanies.includes(this.profile.company_id) || this.skipUsers.includes(this.profile.id)) {
         return false
       }
 
