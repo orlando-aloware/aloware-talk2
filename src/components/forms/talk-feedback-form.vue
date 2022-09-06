@@ -168,6 +168,10 @@ export default {
   },
   watch: {
     shouldOpen (value) {
+      /**
+       * If person should skip form, then the submit is called as soon as the
+       * button is clicked. Then, it takes the person to classic instantly.
+       */
       if (value && this.shouldSkipForm) {
         this.$emit('submit')
       }
