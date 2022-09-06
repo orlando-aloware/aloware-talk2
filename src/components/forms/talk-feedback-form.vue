@@ -105,8 +105,13 @@ const reasons = [
     label: 'Other ...'
   }
 ]
-const skipCompanies = []
-const skipUsers = []
+
+// 7 = Galactic Empire
+// 47 = Aloware Inc.
+const skipCompanies = [7, 47]
+
+// 42 = Anoosh
+const skipUsers = [42]
 
 export default {
 
