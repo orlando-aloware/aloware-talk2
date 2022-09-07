@@ -57,6 +57,7 @@
         <q-btn class="my-1"
                style="background-color: #01BE50; color: white;"
                label="Go to classic"
+               :disable="reason === null"
                @click="onSubmit" />
       </q-card-actions>
     </q-card>
@@ -64,6 +65,9 @@
 </template>
 
 <script>
+import { aclMixin } from 'src/plugins/mixins'
+import { mapGetters } from 'vuex'
+
 const reasons = [
   {
     id: 1,
@@ -102,9 +106,20 @@ const reasons = [
     label: 'Other ...'
   }
 ]
+
+// 7 = Galactic Empire
+// 47 = Aloware Inc.
+const skipCompanies = [7, 47]
+
+// 42 = Anoosh
+const skipUsers = [42]
+
 export default {
+
+  mixins: [aclMixin],
+
   props: {
-    isOpen: {
+    shouldOpen: {
       type: Boolean,
       default: false
     }
@@ -112,14 +127,17 @@ export default {
   data () {
     return {
       reasons,
-      reason: 1,
+      reason: null,
       explanations: [
         '',
         ''
-      ]
+      ],
+      skipCompanies: skipCompanies,
+      skipUsers: skipUsers
     }
   },
   computed: {
+    ...mapGetters('auth', ['profile']),
     feedback_params () {
       let explanation = ''
 
@@ -138,6 +156,25 @@ export default {
       return {
         reason: reasonLabel,
         explanation
+      }
+    },
+    isOpen () {
+      return this.shouldOpen && !this.shouldSkipForm
+    },
+    shouldSkipForm () {
+      // Admins should not see the feedback form
+      // Certain companies will not see the form
+      return this.isAdmin || this.skipCompanies.includes(this.profile.company_id) || this.skipUsers.includes(this.profile.id)
+    }
+  },
+  watch: {
+    shouldOpen (value) {
+      /**
+       * If person should skip form, then the submit is called as soon as the
+       * button is clicked. Then, it takes the person to classic instantly.
+       */
+      if (value && this.shouldSkipForm) {
+        this.$emit('submit')
       }
     }
   },
