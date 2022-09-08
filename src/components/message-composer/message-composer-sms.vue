@@ -401,6 +401,10 @@ export default {
         this.urlShortenerDialog = true
       }
 
+      // generate the shortened URL if "Yes" selection is remembered
+      // in the URL shortener prompt ("Don't ask me again" checkbox is active
+      // and yes button is clicked) and there's no shortened URL generation
+      // that is in-progress.
       if (detected &&
         this.urlShortenerDontAsk &&
         this.profile.url_shortener_enabled &&
@@ -539,6 +543,11 @@ export default {
       return new Blob(byteArrays, { type: contentType })
     },
     detectLongUrl () {
+      // check only the long URL if:
+      // - company is not white label
+      // - URL shortener is forced enabled in the company level and user level
+      // - dont ask flag is false (used for skipping the URL shortener prompt
+      //   to be able to send the message)
       if (!this.urlShortenerDontAskUntilSend &&
         this.currentCompany &&
         !this.currentCompany.is_whitelabel &&
