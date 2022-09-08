@@ -277,6 +277,9 @@ export default {
     urlShortener: {
       generate (text) {
         return window.axios.post('/api/v1/url-shortener/urls/parse', { text })
+      },
+      domains () {
+        return window.axios.get(`${suffixV1}url-shortener/domains`)
       }
     }
   },
