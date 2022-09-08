@@ -129,10 +129,9 @@
                 persistent
                 transition-show="scale"
                 transition-hide="scale">
-        <q-card
-          flat
-          style="width: 420px; max-width: 90vw;"
-          class="pb-2 px-2">
+        <q-card flat
+                style="width: 420px; max-width: 90vw;"
+                class="pb-2 px-2">
           <q-card-section>
             <div class="text-h6">Long URL detected</div>
           </q-card-section>
@@ -147,8 +146,8 @@
 
           <q-card-actions class="bg-white text-teal mt-2">
             <q-btn label="No"
-                   @click="closeUrlShortener"
-                   v-close-popup />
+                   v-close-popup
+                   @click="closeUrlShortener" />
             <q-btn color="blue"
                    class="ml-auto"
                    label="Yes"
@@ -569,7 +568,8 @@ export default {
           if (send) {
             this.onSend()
           }
-        }).catch(e => {
+        })
+        .catch(e => {
           console.log(e)
           this.$generalNotification('Something went wrong when generating short URL.', 'error')
           this.generatingShortUrl = false
