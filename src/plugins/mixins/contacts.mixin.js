@@ -88,6 +88,7 @@ export default {
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
       } else {
+        console.log('init')
         this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
         this.initialListFilters = defaultFilters
         this.filtersCount = this.getFiltersCount(defaultFilters)
@@ -150,6 +151,7 @@ export default {
       }
     },
     onPaginate (params) {
+      console.log('paginate')
       this.fetch(params)
     },
     onFetchMyContacts (checked) {
@@ -208,7 +210,7 @@ export default {
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
-
+      console.log(queryString)
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: queryString,
@@ -475,7 +477,7 @@ export default {
         return []
       }
 
-      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+      let defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
 
       if (typeof defaultFilters === 'string') {
         return JSON.parse(defaultFilters)
@@ -517,6 +519,8 @@ export default {
       if (['new-leads'].includes(this.$route.params.id)) {
         defaultFilters[0].filters.contact_task_status.default = 1
       }
+
+      defaultFilters = this.loadUrlFilters(defaultFilters)
 
       if (_.isEmpty(defaultFilters[0].filters)) {
         delete defaultFilters[0]
@@ -607,7 +611,7 @@ export default {
 
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
-
+      console.log('initiateFetch')
       this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },
     startEvents () {
@@ -686,6 +690,26 @@ export default {
 
         this.init()
       }
+    },
+    loadUrlFilters (filters) {
+      const url = new URL(window.location.href)
+
+      // if there are any filter in URL, build them individually
+      if (url.search) {
+        const params = url.searchParams
+
+        // filter by tag
+        if (params.has('tag_id')) {
+          filters[0].filters.tags = {
+            operator: 1,
+            value: [ params.get('tag_id') ]
+          }
+        }
+
+        filters[0].is_conjunction = true
+      }
+
+      return filters
     }
   },
 
