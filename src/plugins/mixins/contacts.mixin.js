@@ -88,7 +88,6 @@ export default {
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
       } else {
-        console.log('init')
         this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
         this.initialListFilters = defaultFilters
         this.filtersCount = this.getFiltersCount(defaultFilters)
@@ -151,7 +150,6 @@ export default {
       }
     },
     onPaginate (params) {
-      console.log('paginate')
       this.fetch(params)
     },
     onFetchMyContacts (checked) {
@@ -210,7 +208,7 @@ export default {
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
-      console.log(queryString)
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: queryString,
@@ -520,6 +518,7 @@ export default {
         defaultFilters[0].filters.contact_task_status.default = 1
       }
 
+      // load filters from URL
       defaultFilters = this.loadUrlFilters(defaultFilters)
 
       if (_.isEmpty(defaultFilters[0].filters)) {
@@ -611,7 +610,7 @@ export default {
 
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
-      console.log('initiateFetch')
+
       this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },
     startEvents () {
