@@ -698,10 +698,11 @@ export default {
         const params = url.searchParams
 
         // filter by tag
-        if (params.has('tag_id')) {
+        const tag = params.has('tag_id') ? _.parseInt(params.get('tag_id')) : false
+        if (tag) {
           filters[0].filters.tags = {
             operator: 1,
-            value: [ params.get('tag_id') ]
+            value: [ tag ]
           }
         }
 
