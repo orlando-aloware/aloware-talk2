@@ -250,9 +250,6 @@ export default {
         }
         contact.task_status = status
         this.activityContact = contact
-        this.$VueEvent.fire('contact_task_status_updated', contact)
-        this.isUpdatingStatus = false
-        this.nextStat = null
       })
     },
     back () {
@@ -271,6 +268,13 @@ export default {
       }
 
       this.$router.push(path.join('/'))
+    }
+  },
+  watch: {
+    'contact.task_status': function () {
+      this.$VueEvent.fire('contact_task_status_updated', this.contact)
+      this.isUpdatingStatus = false
+      this.nextStat = null
     }
   }
 }
