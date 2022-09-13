@@ -475,7 +475,7 @@ export default {
         return []
       }
 
-      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+      let defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
 
       if (typeof defaultFilters === 'string') {
         return JSON.parse(defaultFilters)
@@ -517,6 +517,9 @@ export default {
       if (['new-leads'].includes(this.$route.params.id)) {
         defaultFilters[0].filters.contact_task_status.default = 1
       }
+
+      // load filters from URL
+      defaultFilters = this.loadUrlFilters(defaultFilters)
 
       if (_.isEmpty(defaultFilters[0].filters)) {
         delete defaultFilters[0]
@@ -686,6 +689,27 @@ export default {
 
         this.init()
       }
+    },
+    loadUrlFilters (filters) {
+      const url = new URL(window.location.href)
+
+      // if there are any filter in URL, build them individually
+      if (url.search) {
+        const params = url.searchParams
+
+        // filter by tag
+        const tag = params.has('tag_id') ? _.parseInt(params.get('tag_id')) : false
+        if (tag) {
+          filters[0].filters.tags = {
+            operator: 1,
+            value: [ tag ]
+          }
+        }
+
+        filters[0].is_conjunction = true
+      }
+
+      return filters
     }
   },
 
