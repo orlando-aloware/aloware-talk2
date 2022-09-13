@@ -266,6 +266,20 @@ export default {
       this.contacts = contacts
     }
   },
+  fetchTaskCounts () {
+    this.setLoadingPendingTaskCount(true)
+    this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+    this.setLoadingOpenTaskCount(true)
+    this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+    return talk2Api.V2.contacts.inboxCounts().then(res => {
+      this.setTaskCount({
+        new: res.data.open,
+        open: res.data.open,
+        pending: res.data.pending,
+        closed: res.data.closed
+      })
+    })
+  },
 
   created () {
     this.cancelToken = window.axios.CancelToken
