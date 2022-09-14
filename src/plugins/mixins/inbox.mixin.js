@@ -79,7 +79,8 @@ export default {
       'setLoadingOpenTaskCount',
       'setLoadingPendingTaskCount',
       'setIsInboxFiltersLoaded',
-      'gettingTasksList'
+      'gettingTasksList',
+      'setTaskCount'
     ]),
     getNoneLiveCallContactTasks (contacts) {
       if (this.liveContacts.length >= 0) {
