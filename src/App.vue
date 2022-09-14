@@ -180,15 +180,22 @@ export default {
         return
       }
 
-      let identityInformation = {
-        displayName: profile.name,
-        email: profile.email,
-        timezone_str: window.timezone,
-        companyId_int: profile.company_id,
-        companyName_str: profile.company_name,
-        userRoles_strs: profile.user_roles
-      }
-      this.$FullStory.identify(profile.id, identityInformation)
+      window.axios.get('/fullstory-meta').then(({ data }) => {
+        this.$FullStory.identify(profile.id, {
+          ...data,
+          timezone_str: window.timezone
+        })
+      }).catch(() => {
+        console.log('Error while retrieving fullstory metadata from server. Using local variables.')
+        this.$FullStory.identify(profile.id, {
+          displayName: profile.name,
+          email: profile.email,
+          timezone_str: window.timezone,
+          companyId_int: profile.company_id,
+          companyName_str: profile.company_name,
+          userRoles_strs: profile.user_roles
+        })
+      })
     },
     // identify or anonymize user
     setFullStory () {
