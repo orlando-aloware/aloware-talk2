@@ -59,7 +59,7 @@ export default {
         path: `/contacts/${contactId}`
       }
 
-      if (this.$route.name !== 'Power Dialer') {
+      if (this.$route.name === 'Power Dialer') {
         routeData.query = {
           previousPage: this.$route.name
         }
