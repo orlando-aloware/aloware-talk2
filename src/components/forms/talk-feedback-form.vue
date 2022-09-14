@@ -193,7 +193,7 @@ export default {
       this.$emit('submit')
     },
     closeDialog () {
-      this.reason = 1
+      this.reason = null
       this.explanations = ['', '']
       this.$emit('toggle')
     },
