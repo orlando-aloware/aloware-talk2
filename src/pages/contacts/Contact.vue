@@ -82,10 +82,12 @@
 <script>
 import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
+import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import {
   contactMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  inboxMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -99,7 +101,8 @@ export default {
   mixins: [
     contactMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    inboxMixin
   ],
 
   components: {
@@ -208,6 +211,11 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
+
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
     })
   },
 
