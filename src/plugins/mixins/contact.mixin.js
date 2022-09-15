@@ -348,13 +348,13 @@ export default {
         if (!found) {
           // push new data to top of array
           this.communicationsAndAudits.push(data)
-          this.removeDuplicatecommunicationsAndAudits()
+          this.removeDuplicateCommunicationsAndAudits()
           this.scrollMessages()
         }
       }
     },
 
-    removeDuplicatecommunicationsAndAudits: _.debounce(function () {
+    removeDuplicateCommunicationsAndAudits: _.debounce(function () {
       this.communicationsAndAudits = _.uniqBy(this.communicationsAndAudits, 'id')
     }, 500),
 
