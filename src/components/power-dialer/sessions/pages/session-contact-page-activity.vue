@@ -17,6 +17,7 @@
             ref="contactActivities"
             :communications="filteredCommunications"
             :campaign-id="selectedCampaignId"
+            v-if="contact"
             @mark-all-as-read="markAllAsRead"
             @toggleDrawer="toggleDrawer"
             @toggleDetails="toggleDetails">
@@ -168,6 +169,10 @@ export default {
   },
   watch: {
     contact (newVal, oldVal) {
+      if (newVal === undefined) {
+        return
+      }
+
       if (newVal?.id !== oldVal?.id) {
         if (this.flagged) {
           this.flagged = false
