@@ -359,7 +359,8 @@ export default {
       const previousPage = _.get(this.$route.query, 'previousPage', null)
       const previousList = _.get(this.$route.query, 'list', null)
 
-      if (previousPage === 'PowerDialer') {
+      if (previousPage &&
+        previousPage.replace(' ', '') === 'PowerDialer') {
         if (previousList) {
           this.$router.push(`/power-dialer/list/${previousList}`)
         } else {
