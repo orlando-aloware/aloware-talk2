@@ -85,6 +85,7 @@ import talk2Api from 'src/plugins/api/api'
 import MessageComposerFax from 'components/message-composer/message-composer-fax'
 import MessageComposerEmail from 'components/message-composer/message-composer-email'
 import MessageComposerNote from 'components/message-composer/message-composer-note'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as Roles from 'src/constants/roles'
 
 export default {
@@ -156,7 +157,11 @@ export default {
 
       let sendingMessage = {
         ...message,
-        user_id: this.profile.id
+        direction: CommunicationDirection.OUTBOUND,
+        user_id: this.profile.id,
+        workflow_id: null,
+        lead_number: this.contact.phone_number,
+        created_at: window.moment()
       }
       this.$emit('message-sent', sendingMessage)
     }
