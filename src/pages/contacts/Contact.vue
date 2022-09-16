@@ -213,9 +213,9 @@ export default {
 
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.setLoadingPendingTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.getContactsCountByTaskStatus(this.ContactTaskStatusPending)
         this.setLoadingOpenTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        this.getContactsCountByTaskStatus(this.ContactTaskStatusOpen)
       }
     })
   },
