@@ -80,7 +80,11 @@ export default {
     },
     onSend () {
       this.isSending = true
-      talk2Api.V1.contact.sendEmail(this.contact.id, this.formatMessage()).then(response => {
+
+      let message = this.formatMessage()
+      this.$emit('message-sent', message)
+
+      talk2Api.V1.contact.sendEmail(this.contact.id, message).then(response => {
         this.resetMessageComposerEmail()
         this.$generalNotification('Email has been sent.')
       }).catch(error => {

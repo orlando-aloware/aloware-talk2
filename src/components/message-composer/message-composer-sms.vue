@@ -218,6 +218,7 @@ import VideoPlaceholder from 'components/message-composer/file-placeholders/vide
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'message-composer-sms',
@@ -438,8 +439,15 @@ export default {
         return
       }
 
+      let message = this.formatMessage()
+      this.$emit('message-sent', {
+        ...message,
+        type: CommunicationTypes.SMS,
+        user_id: this.profile.id
+      })
+
       this.isSending = true
-      return talk2Api.V1.message.send(this.formatMessage())
+      return talk2Api.V1.message.send(message)
         .then(response => {
           this.resetMessageComposerSms()
           this.$generalNotification('Message sent.')

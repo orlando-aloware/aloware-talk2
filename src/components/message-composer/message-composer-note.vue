@@ -102,7 +102,11 @@ export default {
     },
     onAdd () {
       this.isAdding = true
-      talk2Api.V1.contact.addEngagement(this.contact.id, this.formatMessage())
+
+      let message = this.formatMessage()
+      this.$emit('message-sent', message)
+
+      talk2Api.V1.contact.addEngagement(this.contact.id, message)
         .then(response => {
           this.resetMessageComposerNote()
           this.$generalNotification('Note has been added.')

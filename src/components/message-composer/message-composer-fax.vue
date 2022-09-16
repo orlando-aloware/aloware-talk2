@@ -140,7 +140,11 @@ export default {
     },
     send () {
       this.isSending = true
-      return talk2Api.V1.lines.sendFax(this.selectedLine.id, this.contact.id, this.formatMessage())
+
+      let message = this.formatMessage()
+      this.$emit('message-sent', message)
+
+      return talk2Api.V1.lines.sendFax(this.selectedLine.id, this.contact.id, message)
         .then(response => {
           if (response.status === 201) {
             this.sendCallback()
