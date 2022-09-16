@@ -82,7 +82,6 @@
 <script>
 import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import {
   contactMixin,
   aclMixin,
