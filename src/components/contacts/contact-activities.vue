@@ -124,6 +124,9 @@ export default {
     },
     setSendingCommunication (message) {
       this.sendingCommunication = message
+      setTimeout(() => {
+        this.scrollMessages()
+      }, 500)
     }
   }
 }
