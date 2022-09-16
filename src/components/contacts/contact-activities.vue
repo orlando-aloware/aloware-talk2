@@ -29,6 +29,13 @@
                               :contact="contact"
                               :campaignId="campaignId">
             </contact-activity>
+            <contact-activity key="sending-comm-0"
+                              ref="communication-0"
+                              v-if="sendingCommunication"
+                              :communication="sendingCommunication"
+                              :contact="contact"
+                              :campaignId="sendingCommunication.campaignId">
+            </contact-activity>
           </div>
         </div>
           <template #overlay>
@@ -44,7 +51,8 @@
       </div>
 
     <div class="composer-container-wrapper">
-      <message-composer :campaignId="campaignId"></message-composer>
+      <message-composer :campaignId="campaignId"
+                        @message-sent="setSendingCommunication"></message-composer>
     </div>
   </div>
 </template>
@@ -78,7 +86,8 @@ export default {
   },
   data () {
     return {
-      isLoadingPreviousActivities: false
+      isLoadingPreviousActivities: false,
+      sendingCommunication: null
     }
   },
   computed: {
@@ -112,6 +121,9 @@ export default {
     },
     markAllAsRead () {
       this.$emit('markAllAsRead')
+    },
+    setSendingCommunication (message) {
+      this.sendingCommunication = message
     }
   }
 }
