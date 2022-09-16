@@ -442,8 +442,7 @@ export default {
       let message = this.formatMessage()
       this.$emit('message-sent', {
         ...message,
-        type: CommunicationTypes.SMS,
-        user_id: this.profile.id
+        type: CommunicationTypes.SMS
       })
 
       this.isSending = true
