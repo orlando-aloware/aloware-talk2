@@ -29,12 +29,12 @@
                               :contact="contact"
                               :campaignId="campaignId">
             </contact-activity>
-            <contact-activity key="sending-comm-0"
+            <contact-activity v-for="(communication, index) in sendingCommunications"
+                              v-bind:key="'sending-comm-' + index"
                               ref="communication-0"
-                              v-if="sendingCommunication"
-                              :communication="sendingCommunication"
+                              :communication="communication"
                               :contact="contact"
-                              :campaignId="sendingCommunication.campaignId">
+                              :campaignId="communication.campaignId">
             </contact-activity>
           </div>
         </div>
@@ -87,7 +87,18 @@ export default {
   data () {
     return {
       isLoadingPreviousActivities: false,
-      sendingCommunication: null
+      sendingCommunications: []
+    }
+  },
+  watch: {
+    communications: function (communications) {
+      let lastComm = communications[communications.length - 1]
+      for (const [index, value] of this.sendingCommunications.entries()) {
+        if (value.type === lastComm.type && value.body === lastComm.body) {
+          this.sendingCommunications.splice(index, 1)
+          break
+        }
+      }
     }
   },
   computed: {
@@ -123,7 +134,8 @@ export default {
       this.$emit('markAllAsRead')
     },
     setSendingCommunication (message) {
-      this.sendingCommunication = message
+      this.sendingCommunications.push(message)
+
       setTimeout(() => {
         this.scrollMessages()
       }, 500)
