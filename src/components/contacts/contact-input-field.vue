@@ -37,7 +37,10 @@ export default {
       required: false
     },
     value: {
-      type: String
+      type: [
+        String,
+        Number
+      ]
     },
     disabled: {
       type: Boolean,

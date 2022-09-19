@@ -105,6 +105,8 @@ export default {
       source: null,
       communicationApiCancelToken: null,
       communicationApiSource: null,
+      newCommunicationCancelToken: null,
+      newCommunicationSource: null,
       contactActivitiesInterval: null,
       containerElInterval: null,
       scrollInterval: null,
@@ -231,27 +233,34 @@ export default {
 
     this.communicationApiCancelToken = this.$axios.CancelToken
     this.communicationApiSource = this.communicationApiCancelToken.source()
+    this.newCommunicationCancelToken = window.axios.CancelToken
+    this.newCommunicationSource = this.newCommunicationCancelToken.source()
 
     if (this.skipComponents.includes(this.$options.name)) {
       return
     }
 
-    this.listeners.newCommunication = _.debounce((data) => {
+    this.listeners.newCommunication = (data) => {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
 
       this.addNewCommunication(data)
+
       if (data.contact_id === this.contact.id) {
-        talk2Api.V2.contacts.get(this.contact.id).then(response => {
-          this.setContact(response.data)
-          this.setContactClone(response.data)
-          this.$VueEvent.fire('inbox_contact_updated')
+        this.newCommunicationSource.cancel(`Fetching of communication's contact information is canceled by the user.`)
+        this.newCommunicationSource = this.newCommunicationCancelToken.source()
+        talk2Api.V2.contacts.get(this.contact.id, this.newCommunicationSource.token).then(response => {
+          if (data.contact_id === this.contact.id) {
+            this.setContact(response.data)
+            this.setContactClone(response.data)
+            this.$VueEvent.fire('inbox_contact_updated')
+          }
         }).catch(err => {
           console.log(err)
         })
       }
-    }, 500)
+    }
 
     this.listeners.updateCommunication = (data) => {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
@@ -326,7 +335,7 @@ export default {
       this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
       this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
     },
-    addNewCommunication: _.debounce(function (data) {
+    addNewCommunication: function (data) {
       if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
         return false
       }
@@ -343,9 +352,14 @@ export default {
         if (!found) {
           // push new data to top of array
           this.communicationsAndAudits.push(data)
+          this.removeDuplicateCommunicationsAndAudits()
           this.scrollMessages()
         }
       }
+    },
+
+    removeDuplicateCommunicationsAndAudits: _.debounce(function () {
+      this.communicationsAndAudits = _.uniqBy(this.communicationsAndAudits, 'id')
     }, 500),
 
     updateCommunication (data) {

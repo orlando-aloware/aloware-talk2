@@ -285,9 +285,15 @@ export default {
   },
   V2: {
     contacts: {
-      get (id) {
+      get (id, sourceToken = null) {
         if (!id || id === 'undefined') {
           return Promise.reject(new Error('Failed to process contact fetch: Missing contact id!'))
+        }
+
+        if (sourceToken) {
+          return window.axios.get(`/api/v2/contacts/${id}`, {
+            cancelToken: sourceToken
+          })
         }
 
         return window.axios.get(`/api/v2/contacts/${id}`)

@@ -17,6 +17,7 @@
             ref="contactActivities"
             :communications="filteredCommunications"
             :campaign-id="selectedCampaignId"
+            v-if="contact"
             @mark-all-as-read="markAllAsRead"
             @toggleDrawer="toggleDrawer"
             @toggleDetails="toggleDetails">
@@ -88,11 +89,14 @@ export default {
   },
   created () {
     window.addEventListener('resize', this.resizeHandler)
-    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+    this.setIsContactMixinUsed(true)
+    this.initListeners()
+    this.contactActivityListeners.contactTaskStatusUpdated = (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(this.contact)
       }
-    })
+    }
+    this.$VueEvent.listen('contact_task_status_updated', this.contactActivityListeners.contactTaskStatusUpdated)
   },
   computed: {
     ...mapGetters('auth', [
@@ -165,6 +169,10 @@ export default {
   },
   watch: {
     contact (newVal, oldVal) {
+      if (newVal === undefined) {
+        return
+      }
+
       if (newVal?.id !== oldVal?.id) {
         if (this.flagged) {
           this.flagged = false
@@ -180,8 +188,14 @@ export default {
       isLoading: false,
       drawer: false,
       detailsOpen: false,
-      contactListSidebarOpen: false
+      contactListSidebarOpen: false,
+      contactActivityListeners: {}
     }
+  },
+  beforeDestroy () {
+    this.setIsContactMixinUsed(false)
+    this.removeListeners()
+    this.$VueEvent.stop('contact_task_status_updated', this.contactActivityListeners.contactTaskStatusUpdated)
   }
 }
 </script>
