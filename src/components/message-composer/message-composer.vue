@@ -153,8 +153,6 @@ export default {
       this.setSelectedLine(line)
     },
     onMessageSent (message) {
-      console.log({ message })
-
       let sendingMessage = {
         ...message,
         direction: CommunicationDirection.OUTBOUND,
