@@ -293,6 +293,11 @@
               v-if="[CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(communication.disposition_status2)"
             >
               <i class="material-icons help text-danger"
+                 v-if="communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW"
+                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
+              >cancel</i>
+              <i class="material-icons help text-danger"
+                 v-else
                  :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
               >cancel</i>
             </template>
