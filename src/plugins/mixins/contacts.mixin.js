@@ -78,7 +78,7 @@ export default {
       'setSelectedPDList'
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
-    init: _.debounce(function () {
+    init: _.debounce(function (clear = false) {
       if (this.$route.name === 'Contact') {
         this.isLoadingMore = true
       }
@@ -88,7 +88,7 @@ export default {
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
       } else {
-        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
+        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
         this.initialListFilters = defaultFilters
         this.filtersCount = this.getFiltersCount(defaultFilters)
       }
@@ -674,10 +674,10 @@ export default {
           this.setPreviousListId(this.id)
         })
     },
-    loadData (skipCancelToken = true) {
+    loadData (skipCancelToken = true, clear = false) {
       if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
-          this.init()
+          this.init(clear)
         }).catch(err => {
           console.log(err)
         })
@@ -687,7 +687,7 @@ export default {
           this.listDataSource = this.listDataCancelToken.source()
         }
 
-        this.init()
+        this.init(clear)
       }
     },
     loadUrlFilters (filters) {
@@ -946,7 +946,9 @@ export default {
 
       // this.loadData()
       if (!this.isPowerDialer) {
-        this.loadData(false)
+        const isFromAddContacts = _.get(from, 'params.id', false) !== false &&
+          from.path.includes('/add')
+        this.loadData(false, isFromAddContacts)
       }
     },
     id: function (newValue, oldValue) {
