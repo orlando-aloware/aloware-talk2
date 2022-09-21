@@ -51,7 +51,7 @@ jobs:
         run: npm --version
 
       - name: Setup Windows Build Tools
-        run: npm install --global windows-build-tools
+        run: npm install --global --production windows-build-tools@4.0.0
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
