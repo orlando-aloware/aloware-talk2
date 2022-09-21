@@ -51,7 +51,7 @@ jobs:
         run: npm --version
 
       - name: Setup Python2
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: '2.*'
           architecture: 'x64'
