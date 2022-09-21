@@ -51,7 +51,7 @@ jobs:
         run: npm --version
 
       - name: Setup Python2
-        run: choco install -y python2
+        run: choco install -y python2 && refreshenv && python2 --version
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
