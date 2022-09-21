@@ -51,10 +51,9 @@ jobs:
         run: npm --version
 
       - name: Setup Python2
-        uses: actions/setup-python@v4
-        with:
-          python-version: '2.*'
-          architecture: 'x64'
+        run: |
+          apt update
+          apt install python2
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
