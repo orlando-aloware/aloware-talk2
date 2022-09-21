@@ -50,10 +50,8 @@ jobs:
       - name: NPM version
         run: npm --version
 
-      - name: Setup Python2
-        run: |
-          choco install -y python2
-          refreshenv
+      - name: Setup Windows Build Tools
+        run: npm install --global windows-build-tools
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
