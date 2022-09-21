@@ -41,6 +41,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Node version
+        run: node --version
+
+      - name: NPM version
+        run: npm --version
+
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
 
