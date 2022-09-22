@@ -38,6 +38,7 @@ export default {
       listDataSource: null,
       listContactsCancelToken: null,
       listContactsSource: null,
+      previousSearch: null,
       ALL_COLUMNS
     }
   },
@@ -161,6 +162,21 @@ export default {
       }, true, true)
     },
     onSearch (searchText) {
+      // ignore search if previous and current search
+      // is the same or empty
+      if (this.previousSearch === searchText ||
+        (_.isEmpty(this.previousSearch) &&
+            _.isEmpty(searchText))) {
+        return
+      }
+
+      // requires at least 3 characters to allow the request or
+      // empty so that the result will reset back to the original
+      if (searchText && searchText.length < 3 && searchText.length >= 1) {
+        return
+      }
+
+      this.previousSearch = searchText
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
@@ -899,6 +915,7 @@ export default {
       }
     },
     $route (to, from) {
+      this.previousSearch = null
       this.isNavigated = false
 
       if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) ||
