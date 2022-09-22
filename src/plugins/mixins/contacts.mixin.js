@@ -826,6 +826,7 @@ export default {
       }
     },
     $route (to, from) {
+      this.previousSearch = null
       this.isNavigated = false
 
       if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) ||
