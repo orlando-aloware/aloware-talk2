@@ -385,7 +385,7 @@ export default {
 
       this.setAppliedFilter(this.selectedFilter || null)
 
-      // add the missing communication type and answer_status
+      // add the communication type and answer_status filters
       const communicationType = _.get(this.value, 'type', null)
       const communicationAnswerStatus = _.get(this.value, 'answer_status', null)
       const finalFilters = {
