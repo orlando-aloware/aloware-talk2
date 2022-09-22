@@ -151,6 +151,12 @@ export default {
       }, true, true)
     },
     onSearch (searchText) {
+      // requires at least 3 characters to allow the request or
+      // empty so that the result will reset back to the original
+      if (searchText.length < 3 && searchText.length >= 1) {
+        return
+      }
+
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
