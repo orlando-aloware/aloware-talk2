@@ -9,6 +9,7 @@
              clearable
              @blur="onBlur"
              @focus="onFocus"
+             @clear="onInput"
              @input="onInput">
       <template v-slot:prepend>
         <search-icon/>
