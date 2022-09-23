@@ -241,6 +241,8 @@ export default {
           return 'Company was deleted.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
           return 'Company was suspended.'
+        case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
+          return 'Line was sending the same message to the same contact.'
       }
     },
 
