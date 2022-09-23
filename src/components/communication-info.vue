@@ -234,7 +234,7 @@
               </template>
 
               <div v-if="communication.body">
-                <div class="text-muted mb-2"
+                <div class="fs-13 text-muted mb-2 line-height-15"
                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
                      v-html="$options.filters.nl2br(parseBody)"
                      v-linkify:options="{ target: '_blank' }">
