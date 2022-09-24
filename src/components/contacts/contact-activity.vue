@@ -104,11 +104,21 @@
               :src="attachment.url"
               width="320px"
               fit="fill"
+              native-context-menu
             >
               <template v-slot:error>
                 <div class="absolute-full flex flex-center bg-negative text-white">
                   Error!
                 </div>
+              </template>
+              <template v-slot:default>
+                <q-btn class="absolute all-pointer-events"
+                       style="top: 8px; left: 8px"
+                       icon="file_download"
+                       color="primary"
+                       size="16px"
+                       dense
+                       @click="downloadWithAxios(attachment.url, attachment.name)" />
               </template>
             </q-img>
 
@@ -327,7 +337,8 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin
+  userMixin,
+  downloadMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -347,7 +358,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin
+    userMixin,
+    downloadMixin
   ],
 
   components: {
