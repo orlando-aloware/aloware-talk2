@@ -703,7 +703,7 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
         const liveContacts = _.cloneDeep(this.liveContacts)
 
-        if (!isInLiveContacts) {
+        if (!isInLiveContacts || isInLiveContacts === undefined) {
           liveContacts.push(contact)
         }
 
