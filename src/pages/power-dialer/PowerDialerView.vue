@@ -40,9 +40,10 @@
               <div class="d-flex">
 
                 <SearchList
+                  class="width-260"
+                  limitSearchCharacters
                   :search="search"
-                  @search="onSearch"
-                  class="width-260" />
+                  @search="onSearch" />
 
               </div>
             </b-col>

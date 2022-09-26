@@ -9,8 +9,9 @@
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <search
-          @search="onSearch"
+          limitSearchCharacters
           :disabled="isLoadingDisabled"
+          @search="onSearch"
         ></search>
         <div class="px-3">
           <b-form-checkbox
