@@ -496,7 +496,10 @@ export default {
       })
     },
     async onItemRemoved (contact, callback, loadCount = true) {
-      if (loadCount) {
+      // avoid request in duplicity when task is moved to open
+      const isOpen = [ContactTaskStatus.STATUS_OPEN].includes(contact.task_status)
+
+      if (loadCount && !isOpen) {
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       }
