@@ -14,7 +14,8 @@
       <template v-slot:prepend>
         <search-icon/>
       </template>
-      <template v-slot:default>
+      <template v-slot:default
+                v-if="limitSearchCharacters">
         <q-tooltip anchor="bottom middle"
                    self="center middle"
                    v-if="!searchValue || (searchValue && searchValue.length < 3)">
@@ -51,6 +52,11 @@ export default {
     search: {
       type: String,
       default: ''
+    },
+
+    limitSearchCharacters: {
+      type: Boolean,
+      default: false
     }
   },
 
