@@ -99,12 +99,6 @@
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <a style="opacity: 0; height: 0; width: 0;"
-               target="_blank"
-               role="button"
-               download
-               :ref="`${communication.id}${index}anchor`"
-               :href="attachment.url" />
             <q-img
               class="border-rounded img-fluid d-block r-2x mb-1"
               :src="attachment.url"
@@ -124,7 +118,7 @@
                        color="primary"
                        size="16px"
                        dense
-                       @click="downloadFileFromReference(`${communication.id}${index}anchor`)" />
+                       @click="downloadWithAxios(attachment.url, attachment.name)" />
               </template>
             </q-img>
 
