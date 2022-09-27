@@ -145,6 +145,11 @@ export default {
         return subject === comm1.subject && message === comm1.message
       }
 
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.FAX)) {
+        console.log({ momment2: window.moment.utc(comm2.created_at), momment1: comm1.created_at, diff: window.moment.utc(comm2.created_at).diff(comm1.created_at) })
+        return window.moment.utc(comm2.created_at).diff(comm1.created_at) < 15 * 1000
+      }
+
       return comm1.body === comm2.body
     },
     scrollMessages () {
