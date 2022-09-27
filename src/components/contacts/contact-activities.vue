@@ -63,6 +63,7 @@ import { mapGetters } from 'vuex'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
+import * as CommunicationTypes from 'src/constants/communication-types'
 export default {
   name: 'contact-activities',
   components: {
@@ -94,7 +95,7 @@ export default {
     communications: function (communications) {
       let lastComm = communications[communications.length - 1]
       for (const [index, value] of this.sendingCommunications.entries()) {
-        if (value.type === lastComm.type && value.body === lastComm.body) {
+        if (this.isSameCommunication(value, lastComm)) {
           this.sendingCommunications.splice(index, 1)
           break
         }
@@ -124,6 +125,19 @@ export default {
     }
   },
   methods: {
+    isSameCommunication (comm1, comm2) {
+      if (comm1.type !== comm2.type) {
+        return false
+      }
+
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.NOTE)) {
+        let body1 = comm1.body.replace(/(\r\n|\n|\r)/gm, '').trim()
+        let body2 = comm2.body.replace(/(\r\n|\n|\r)/gm, '').trim()
+        return body1 === body2
+      }
+
+      return comm1.body === comm2.body
+    },
     scrollMessages () {
       const activitiesWrap = this.$refs.activitiesWrap
       if (activitiesWrap && activitiesWrap.scrollHeight) {
