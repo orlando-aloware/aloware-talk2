@@ -97,6 +97,7 @@ export default function () {
     isLoadingOpenTaskCount: false,
     isLoadingPendingTaskCount: false,
     inboxShowMyContacts: true,
-    isInboxFiltersLoaded: true
+    isInboxFiltersLoaded: true,
+    taskCountUpdateCache: {}
   }
 }
