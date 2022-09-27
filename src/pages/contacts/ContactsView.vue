@@ -56,9 +56,10 @@
         <div class="d-flex justify-content-between align-items-center">
           <search
             class="width-260"
+            limitSearchCharacters
             :search="search"
-            @search="onSearch"
-            :disabled="isLoadingDisabled">
+            :disabled="isLoadingDisabled"
+            @search="onSearch">
           </search>
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">

@@ -17,7 +17,7 @@
             <q-tooltip  anchor="bottom left"
                         self="bottom left"
             v-if="!searchText || (searchText && searchText.length < 3)">
-              requires 3 characters
+              Search requires at least 3 characters
             </q-tooltip>
           </q-input>
         </q-item-section>

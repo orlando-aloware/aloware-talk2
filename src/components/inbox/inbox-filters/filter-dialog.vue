@@ -385,7 +385,23 @@ export default {
 
       this.setAppliedFilter(this.selectedFilter || null)
 
-      this.$emit('applyFilter', { ...this.filter })
+      // add the communication type and answer_status filters
+      const communicationType = _.get(this.value, 'type', null)
+      const communicationAnswerStatus = _.get(this.value, 'answer_status', null)
+      const finalFilters = {
+        ...this.filter
+      }
+
+      if (communicationType) {
+        finalFilters.type = communicationType
+      }
+
+      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.defaultFilterModel.type) &&
+        communicationAnswerStatus) {
+        finalFilters.answer_status = communicationAnswerStatus
+      }
+
+      this.$emit('applyFilter', finalFilters)
       this.hideModal()
     },
 

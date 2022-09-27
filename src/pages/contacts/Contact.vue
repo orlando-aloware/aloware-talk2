@@ -85,7 +85,8 @@ import ContactDetails from 'src/components/contacts/contact-details'
 import {
   contactMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  inboxMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -99,7 +100,8 @@ export default {
   mixins: [
     contactMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    inboxMixin
   ],
 
   components: {
@@ -207,6 +209,13 @@ export default {
     this.$VueEvent.listen('contact_task_status_updated', (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
+      }
+
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
+        this.setLoadingPendingTaskCount(true)
+        this.getContactsCountByTaskStatus(this.ContactTaskStatusPending)
+        this.setLoadingOpenTaskCount(true)
+        this.getContactsCountByTaskStatus(this.ContactTaskStatusOpen)
       }
     })
   },

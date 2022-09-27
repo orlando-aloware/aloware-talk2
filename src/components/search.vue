@@ -9,9 +9,18 @@
              clearable
              @blur="onBlur"
              @focus="onFocus"
+             @clear="onInput"
              @input="onInput">
       <template v-slot:prepend>
         <search-icon/>
+      </template>
+      <template v-slot:default
+                v-if="limitSearchCharacters">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle"
+                   v-if="!searchValue || (searchValue && searchValue.length < 3)">
+          Search requires at least 3 characters
+        </q-tooltip>
       </template>
     </q-input>
   </div>
@@ -43,6 +52,11 @@ export default {
     search: {
       type: String,
       default: ''
+    },
+
+    limitSearchCharacters: {
+      type: Boolean,
+      default: false
     }
   },
 

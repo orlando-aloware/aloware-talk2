@@ -38,6 +38,7 @@ export default {
       listDataSource: null,
       listContactsCancelToken: null,
       listContactsSource: null,
+      previousSearch: null,
       ALL_COLUMNS
     }
   },
@@ -78,7 +79,7 @@ export default {
       'setSelectedPDList'
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
-    init: _.debounce(function () {
+    init: _.debounce(function (clear = false) {
       if (this.$route.name === 'Contact') {
         this.isLoadingMore = true
       }
@@ -88,7 +89,7 @@ export default {
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
       } else {
-        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
+        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
         this.initialListFilters = defaultFilters
         this.filtersCount = this.getFiltersCount(defaultFilters)
       }
@@ -161,6 +162,21 @@ export default {
       }, true, true)
     },
     onSearch (searchText) {
+      // ignore search if previous and current search
+      // is the same or empty
+      if (this.previousSearch === searchText ||
+        (_.isEmpty(this.previousSearch) &&
+            _.isEmpty(searchText))) {
+        return
+      }
+
+      // requires at least 3 characters to allow the request or
+      // empty so that the result will reset back to the original
+      if (searchText && searchText.length < 3 && searchText.length >= 1) {
+        return
+      }
+
+      this.previousSearch = searchText
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
@@ -674,10 +690,10 @@ export default {
           this.setPreviousListId(this.id)
         })
     },
-    loadData (skipCancelToken = true) {
+    loadData (skipCancelToken = true, clear = false) {
       if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
-          this.init()
+          this.init(clear)
         }).catch(err => {
           console.log(err)
         })
@@ -687,7 +703,7 @@ export default {
           this.listDataSource = this.listDataCancelToken.source()
         }
 
-        this.init()
+        this.init(clear)
       }
     },
     loadUrlFilters (filters) {
@@ -899,6 +915,7 @@ export default {
       }
     },
     $route (to, from) {
+      this.previousSearch = null
       this.isNavigated = false
 
       if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) ||
@@ -946,7 +963,9 @@ export default {
 
       // this.loadData()
       if (!this.isPowerDialer) {
-        this.loadData(false)
+        const isFromAddContacts = _.get(from, 'params.id', false) !== false &&
+          from.path.includes('/add')
+        this.loadData(false, isFromAddContacts)
       }
     },
     id: function (newValue, oldValue) {
