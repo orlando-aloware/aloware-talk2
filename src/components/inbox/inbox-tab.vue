@@ -1140,6 +1140,12 @@ export default {
   },
 
   watch: {
+    contactTasks (contactTasks, _contactTasks) {
+      if (contactTasks.length !== _contactTasks.length) {
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      }
+    },
     $route (to, from) {
       this.previousRoute = from
     },
