@@ -136,6 +136,15 @@ export default {
         return body1 === body2
       }
 
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.EMAIL)) {
+        let body = comm2.body.split(/\r?\n/)
+
+        let subject = body[0].split(':')[1].trim()
+        let message = body[3].trim()
+
+        return subject === comm1.subject && message === comm1.message
+      }
+
       return comm1.body === comm2.body
     },
     scrollMessages () {
