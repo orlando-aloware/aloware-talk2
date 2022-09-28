@@ -72,10 +72,11 @@ export default {
     ]),
     ...mapState(['dialer']),
     isNoName () {
-      return (this.activeTask?.first_name === null ||
-          this.activeTask?.first_name === '') &&
-        (this.activeTask?.last_name === null ||
-          this.activeTask?.last_name === '')
+      const firstName = this.activeTask?.first_name
+      const lastName = this.activeTask?.last_name
+
+      return isEmpty(firstName) &&
+        isEmpty(lastName)
     },
     fullName () {
       return this.isNoName
