@@ -135,6 +135,12 @@ export default {
 
       return ''
     },
+    hasCustomParametersContactName () {
+      return this.dialer.call &&
+        this.dialer.call.customParameters &&
+        this.dialer.call.customParameters.ContactName &&
+        this.dialer.call.customParameters.ContactName !== 'null null'
+    },
     hasCustomParametersNullContactName () {
       return this.dialer.call &&
         this.dialer.call.customParameters &&
