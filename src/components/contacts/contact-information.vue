@@ -43,6 +43,14 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Address</p>
+        <contact-input-field v-model="contact.address"
+                             :disabled="!hasPermissionTo('update contact')"
+                             @updateField="(eventPayload) => onUpdateFields(eventPayload, 'address')">
+        </contact-input-field>
+      </div>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Company</p>
         <contact-input-field v-model="contact.company_name"
                              :disabled="!hasPermissionTo('update contact')"
