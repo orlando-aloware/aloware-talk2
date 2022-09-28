@@ -2,14 +2,17 @@
   <div class="hubspot-integration-wrapper">
     <q-card class="hubspot-card"
             flat>
-      <q-item class="p-0"
-              v-if="hubspotLink">
-        <q-item-section>
+      <q-item class="p-0">
+        <q-item-section v-if="hubspotLink">
           <b-link target="_blank"
                   :href="hubspotLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
           </b-link>
+        </q-item-section>
+        <q-item-section v-else>
+          <i class="fab fa-hubspot hubspot-icon"></i>
+          <span class="integration-title">Hubspot</span>
         </q-item-section>
       </q-item>
 
@@ -45,7 +48,7 @@
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0"
-                      v-if="integration_data.properties">
+                      v-if="integration_data && integration_data.properties">
         <q-card class="deals mb-1"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
@@ -59,7 +62,7 @@
                   {{ deal.properties.dealname.value }}
                 </b-link>
               </h6>
-              <p class="mb-1 d-inline-flex">
+              <p class="mb-1 d-flex">
                 <span class="data-icon-label">Amount: </span>
                 <span class="data-value ml-1"
                       v-if="deal.properties && deal.properties.amount">
@@ -70,7 +73,7 @@
                   {{ deal.properties.amount.value | toCurrency }}
                 </span>
               </p>
-              <p class="mb-1 d-inline-flex">
+              <p class="mb-1 d-flex">
                 <span class="data-icon-label">Pipeline: </span>
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
@@ -80,7 +83,7 @@
                   {{ deal.properties.pipeline.label }}
                 </span>
               </p>
-              <p class="mb-1 d-inline-flex">
+              <p class="mb-1 d-flex">
                 <span class="data-icon-label">Stage: </span>
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
