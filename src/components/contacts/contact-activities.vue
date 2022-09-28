@@ -95,6 +95,7 @@ export default {
     communications: function (communications) {
       let lastComm = communications[communications.length - 1]
       for (const [index, value] of this.sendingCommunications.entries()) {
+        // Remove pending communication that was created if it's already processed by the API
         if (this.isSameCommunication(value, lastComm)) {
           this.sendingCommunications.splice(index, 1)
           break
