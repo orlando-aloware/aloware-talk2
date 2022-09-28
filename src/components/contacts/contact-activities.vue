@@ -130,12 +130,15 @@ export default {
         return false
       }
 
+      // If it's a note, the verification should remove new line special chars,
+      // that are automatically added at the end of the note
       if ([comm1.type, comm2.type].includes(CommunicationTypes.NOTE)) {
         let body1 = comm1.body.replace(/(\r\n|\n|\r)/gm, '').trim()
         let body2 = comm2.body.replace(/(\r\n|\n|\r)/gm, '').trim()
         return body1 === body2
       }
 
+      // If it's an email, the message and subject need to be checked
       if ([comm1.type, comm2.type].includes(CommunicationTypes.EMAIL)) {
         let body = comm2.body.split(/\r?\n/)
 
@@ -145,6 +148,8 @@ export default {
         return subject === comm1.subject && message === comm1.message
       }
 
+      // If it's a fax, it won't have any text to compare.
+      // Then, we can check if the created_at time is reasonably similar
       if ([comm1.type, comm2.type].includes(CommunicationTypes.FAX)) {
         return window.moment.utc(comm2.created_at).diff(comm1.created_at) < 15 * 1000
       }
