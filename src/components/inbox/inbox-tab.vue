@@ -707,15 +707,6 @@ export default {
           liveContacts.push(contact)
         }
 
-        /**
-         * Removed so that task does not just go away
-         */
-        // if (isInContacts) {
-        //   const index = contacts.data.findIndex(item => item.id === contact.id)
-        //   contacts.data.splice(index, 1)
-        //   this.setContacts(contacts.data)
-        // }
-
         this.setLiveContacts(
           [
             // connected calls
