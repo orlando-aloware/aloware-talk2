@@ -153,7 +153,7 @@ export default {
       this.setSelectedLine(line)
     },
     onMessageSent (message) {
-      let sendingMessage = {
+      const sendingMessage = {
         ...message,
         direction: CommunicationDirection.OUTBOUND,
         user_id: this.profile.id,

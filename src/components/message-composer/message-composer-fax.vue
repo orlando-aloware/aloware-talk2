@@ -142,7 +142,7 @@ export default {
     send () {
       this.isSending = true
 
-      let message = this.formatMessage()
+      const message = this.formatMessage()
       this.$emit('message-sent', {
         ...message,
         type: CommunicationTypes.FAX

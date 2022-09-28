@@ -439,7 +439,7 @@ export default {
         return
       }
 
-      let message = this.formatMessage()
+      const message = this.formatMessage()
       this.$emit('message-sent', {
         ...message,
         type: CommunicationTypes.SMS
