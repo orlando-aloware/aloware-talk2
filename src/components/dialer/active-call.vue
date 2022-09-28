@@ -8,9 +8,15 @@
           @click="togglePhone">
     <q-item-section>
       <q-item-label class="_600">
-        <span v-if="dialer.contact">{{ dialer.contact.name | truncate(15) }}</span>
-        <span v-else-if="dialer.call && dialer.call.customParameters && dialer.call.customParameters.ContactName">{{ dialer.call.customParameters.ContactName | truncate(15) }}</span>
-        <span v-else-if="dialer.parkedCall && dialer.parkedCall.contact">{{ dialer.parkedCall.contact.name | truncate(15) }}</span>
+        <span v-if="dialer.contact">
+          {{ dialer.contact.name | truncate(15) }}
+        </span>
+        <span v-else-if="hasCustomParametersContactName">
+          {{ dialer.call.customParameters.ContactName | truncate(15) }}
+        </span>
+        <span v-else-if="hasParkedCallContact">
+          {{ dialer.parkedCall.contact.name | truncate(15) }}
+        </span>
         <q-skeleton type="text"
                     v-else>
         </q-skeleton>
@@ -125,6 +131,16 @@ export default {
       }
 
       return ''
+    },
+    hasCustomParametersContactName () {
+      return this.dialer.call &&
+        this.dialer.call.customParameters &&
+        this.dialer.call.customParameters.ContactName &&
+        this.dialer.call.customParameters.ContactName !== 'null null'
+    },
+    hasParkedCallContact () {
+      return this.dialer.parkedCall &&
+        this.dialer.parkedCall.contact
     }
   },
 
