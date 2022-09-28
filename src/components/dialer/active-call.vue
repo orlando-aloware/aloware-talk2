@@ -9,13 +9,16 @@
     <q-item-section>
       <q-item-label class="_600">
         <span v-if="dialer.contact">
-          {{ dialer.contact.name | truncate(15) }}
+          {{ getContactName(dialer.contact.name) }}
         </span>
         <span v-else-if="hasCustomParametersContactName">
-          {{ dialer.call.customParameters.ContactName | truncate(15) }}
+          {{ getContactName(dialer.call.customParameters.ContactName) }}
+        </span>
+        <span v-else-if="hasCustomParametersNullContactName">
+          No Name
         </span>
         <span v-else-if="hasParkedCallContact">
-          {{ dialer.parkedCall.contact.name | truncate(15) }}
+          {{ getContactName(dialer.parkedCall.contact.name) }}
         </span>
         <q-skeleton type="text"
                     v-else>
@@ -65,7 +68,7 @@
 </template>
 
 <script>
-
+import { isEmpty } from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -138,6 +141,12 @@ export default {
         this.dialer.call.customParameters.ContactName &&
         this.dialer.call.customParameters.ContactName !== 'null null'
     },
+    hasCustomParametersNullContactName () {
+      return this.dialer.call &&
+        this.dialer.call.customParameters &&
+        this.dialer.call.customParameters.ContactName &&
+        this.dialer.call.customParameters.ContactName === 'null null'
+    },
     hasParkedCallContact () {
       return this.dialer.parkedCall &&
         this.dialer.parkedCall.contact
@@ -169,6 +178,14 @@ export default {
         this.$VueEvent.fire('togglePhone')
       }
       // this.$VueEvent.fire('togglePhone')
+    },
+
+    getContactName (contactName) {
+      if (!isEmpty(contactName.trim())) {
+        return this.$options.filters.truncate(contactName, 15)
+      }
+
+      return 'No Name'
     }
   },
   watch: {
