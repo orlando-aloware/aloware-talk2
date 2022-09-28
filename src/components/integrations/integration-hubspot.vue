@@ -1,9 +1,9 @@
 <template>
-  <div v-if="integration_data && hubspotLink"
-       class="hubspot-integration-wrapper">
+  <div class="hubspot-integration-wrapper">
     <q-card class="hubspot-card"
             flat>
-      <q-item class="p-0">
+      <q-item class="p-0"
+              v-if="hubspotLink">
         <q-item-section>
           <b-link target="_blank"
                   :href="hubspotLink">
@@ -15,7 +15,7 @@
 
       <q-separator/>
 
-      <q-card-section v-if="integration_data.properties">
+      <q-card-section v-if="integration_data && integration_data.properties">
         <p class="mb-0"
            v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
@@ -94,6 +94,7 @@
           </q-card-section>
         </q-card>
       </q-card-section>
+
       <q-card-section>
         <b-row>
           <b-button class="text-white"
@@ -120,7 +121,7 @@
       </q-card-section>
 
       <q-card-section
-        v-if="integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
+        v-if="integration_data && integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
@@ -133,6 +134,7 @@
         </b-row>
       </q-card-section>
     </q-card>
+
     <q-menu content-class="mx-height-300"
             ref="templatesMenu"
             no-parent-event
