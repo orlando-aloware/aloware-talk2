@@ -56,6 +56,7 @@ export default {
 
     if (this.isFromClassic) {
       this.setDefaultShowMyContacts()
+      this.setDefaultIsShortenedUrlRemembered()
     }
   },
   mounted () {
@@ -225,6 +226,9 @@ export default {
     ]),
     ...mapActions('inbox', [
       'setDefaultShowMyContacts'
+    ]),
+    ...mapActions('contacts', [
+      'setDefaultIsShortenedUrlRemembered'
     ])
   }
 }

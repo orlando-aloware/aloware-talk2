@@ -445,6 +445,7 @@ export default {
     if (value.includes('non-cache')) {
       delete contactsDefaultState.lists
       delete contactsDefaultState.showMyContacts
+      delete contactsDefaultState.isShortenedUrlRemembered
     }
 
     state = Object.assign(state, contactsDefaultState)
@@ -508,5 +509,11 @@ export default {
   },
   SET_IS_CONTACT_MIXIN_USED (state, value) {
     state.isContactMixinUsed = value
+  },
+  SET_IS_SHORTENED_URL_REMEMBERED (state, value) {
+    state.isShortenedUrlRemembered = value
+  },
+  SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED (state) {
+    state.isShortenedUrlRemembered = false
   }
 }

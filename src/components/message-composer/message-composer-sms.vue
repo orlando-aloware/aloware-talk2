@@ -240,7 +240,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapGetters('contacts', [
+      'contact',
+      'messageComposer',
+      'selectedLine'
+    ]),
+    ...mapState('contacts', [
+      'isShortenedUrlRemembered'
+    ]),
     ...mapGetters('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     validSms: function () {
@@ -335,7 +342,8 @@ export default {
       'setMessageComposerSmsBody',
       'resetMessageComposerSms',
       'appendMessageComposerSmsAttachments',
-      'scheduleMessageOpen'
+      'scheduleMessageOpen',
+      'setIsShortenedUrlRemembered'
     ]),
     processFilesToQueue (file) {
       if (!file) {
@@ -397,7 +405,7 @@ export default {
     },
     processDetectLongUrl (detected) {
       if (detected &&
-        !this.urlShortenerDontAsk) {
+        !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
         this.urlShortenerDialog = true
       }
 
@@ -406,7 +414,8 @@ export default {
       // and yes button is clicked) and there's no shortened URL generation
       // that is in-progress.
       if (detected &&
-        this.urlShortenerDontAsk &&
+        (this.urlShortenerDontAsk ||
+          this.isShortenedUrlRemembered) &&
         this.profile.url_shortener_enabled &&
         this.currentCompany.url_shortener_enabled &&
         !this.generatingShortUrl) {
@@ -568,6 +577,11 @@ export default {
     },
     async generateShortUrl (send = false) {
       this.generatingShortUrl = true
+
+      if (this.urlShortenerDontAsk) {
+        this.setIsShortenedUrlRemembered(true)
+      }
+
       talk2Api.V1.urlShortener.generate(this.messageComposer.sms.body)
         .then(({ data }) => {
           this.$generalNotification('Short URLs generated successfully.', 'success')

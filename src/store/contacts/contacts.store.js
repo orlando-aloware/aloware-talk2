@@ -246,6 +246,7 @@ export default function () {
         total_count: 0
       }
     },
-    isContactMixinUsed: false
+    isContactMixinUsed: false,
+    isShortenedUrlRemembered: false
   }
 }

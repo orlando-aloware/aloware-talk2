@@ -154,6 +154,7 @@ export default {
       this.setCurrentCompany(company)
       this.setUsage(usage)
       this.setDefaultShowMyContacts()
+      this.setDefaultIsShortenedUrlRemembered()
 
       storage.local.setItem('company_id', company.id)
 
@@ -207,6 +208,9 @@ export default {
     ]),
     ...mapActions('inbox', [
       'setDefaultShowMyContacts'
+    ]),
+    ...mapActions('contacts', [
+      'setDefaultIsShortenedUrlRemembered'
     ])
   }
 }
