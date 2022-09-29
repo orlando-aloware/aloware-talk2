@@ -196,7 +196,7 @@ export default {
     this.options = this.filter.options
   },
   mounted () {
-    this.debounceDelay = this.filter.type === 'string' ? 10 : 500
+    this.debounceDelay = ['string', 'boolean'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
