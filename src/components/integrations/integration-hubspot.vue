@@ -11,8 +11,11 @@
           </b-link>
         </q-item-section>
         <q-item-section v-else>
-          <i class="fab fa-hubspot hubspot-icon"></i>
-          <span class="integration-title">Hubspot</span>
+          <a href="#"
+             onclick="return false;">
+            <i class="fab fa-hubspot hubspot-icon"></i>
+            <span class="integration-title">Hubspot</span>
+          </a>
         </q-item-section>
       </q-item>
 
