@@ -94,15 +94,12 @@
         />
       </template>
       <template v-if="filter.type === 'boolean'">
-        <div>
-          <q-radio v-model="filterOperatorValue" :val="operator.value" :label="operator.label" />
-          <q-btn-group v-show="operator.value === filterOperatorValue"
-                       v-model="filterOperator"
-                       outline>
-            <q-btn outline label="True" />
-            <q-btn outline label="False" />
-          </q-btn-group>
-        </div>
+        <q-btn-toggle class="w-100"
+                      toggle-color="primary"
+                      :options="options"
+                      v-show="operator.value === filterOperator"
+                      v-model="filterOperatorValue">
+        </q-btn-toggle>
       </template>
     </div>
     <compact-btn
@@ -172,6 +169,7 @@ export default {
         case 'string':
         case 'relation':
         case 'multi_relation':
+        case 'boolean':
           return [1, 2].includes(this.filterOperator)
         case 'number':
           return [1, 2, 3, 4, 5, 6, 7].includes(this.filterOperator)
@@ -198,10 +196,13 @@ export default {
     this.options = this.filter.options
   },
   mounted () {
-    this.debounceDelay = this.filter.type === 'string' ? 10 : 500
+    this.debounceDelay = ['string', 'boolean'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
-    this.filterOperatorValue = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
+    // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
+    setTimeout(() => {
+      this.filterOperatorValue = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
+    }, 10)
     this.$VueEvent.listen('filters-reset', () => {
       this.resetForm()
     })
@@ -358,7 +359,7 @@ export default {
             ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
           break
         case 'boolean':
-          this.isValidated = true
+          this.isValidated = this.filterOperator && this.filterOperatorValue !== null
           break
         default:
           this.isValidated = false

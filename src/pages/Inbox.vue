@@ -18,7 +18,6 @@
 <script>
 import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
 import {
   contactMixin,
   inboxMixin,
@@ -26,7 +25,6 @@ import {
   visibilityMixin
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox',
@@ -86,20 +84,6 @@ export default {
       if (routeChanged && this.$refs['inbox-side']) {
         this.$refs['inbox-side'].navigateToInbox()
       }
-    },
-    fetchTaskCounts () {
-      this.setLoadingPendingTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      this.setLoadingOpenTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      return talk2Api.V2.contacts.inboxCounts().then(res => {
-        this.setTaskCount({
-          new: res.data.open,
-          open: res.data.open,
-          pending: res.data.pending,
-          closed: res.data.closed
-        })
-      })
     },
     onItemSelected (routeData) {
       this.contactId = routeData.params.id

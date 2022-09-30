@@ -236,7 +236,15 @@ export default {
     state.contactSelectedPhone = phone
   },
   UPDATE_CONTACT_SELECTED_PHONE: (state, phone) => {
-    state.contactPhoneNumbers = state.contactPhoneNumbers.map(item => item.id === phone.id ? { ...item, ...{ phone_number: phone.phone_number, title: phone.title } } : item)
+    state.contactPhoneNumbers = state.contactPhoneNumbers.map(item => item.id === phone.id
+      ? {
+        ...item,
+        ...{
+          phone_number: phone.phone_number,
+          title: phone.title,
+          is_opted_out: phone.is_opted_out
+        }
+      } : item)
   },
   SET_SELECTED_LINE: (state, line) => {
     state.selectedLine = line
@@ -437,6 +445,7 @@ export default {
     if (value.includes('non-cache')) {
       delete contactsDefaultState.lists
       delete contactsDefaultState.showMyContacts
+      delete contactsDefaultState.isShortenedUrlRemembered
     }
 
     state = Object.assign(state, contactsDefaultState)
@@ -500,5 +509,11 @@ export default {
   },
   SET_IS_CONTACT_MIXIN_USED (state, value) {
     state.isContactMixinUsed = value
+  },
+  SET_IS_SHORTENED_URL_REMEMBERED (state, value) {
+    state.isShortenedUrlRemembered = value
+  },
+  SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED (state) {
+    state.isShortenedUrlRemembered = false
   }
 }

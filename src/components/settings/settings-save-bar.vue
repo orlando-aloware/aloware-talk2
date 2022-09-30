@@ -60,7 +60,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
+    ...mapActions('settings', [
+      'resetChangedUserProperties',
+      'setUserClone',
+      'setUser',
+      'setFormValidity'
+    ]),
+    ...mapActions('contacts', [
+      'setDefaultIsShortenedUrlRemembered'
+    ]),
     async resetSetting () {
       this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
@@ -118,6 +126,12 @@ export default {
 
           this.setUserClone(_.cloneDeep(this.localUser))
           this.setUser(_.cloneDeep(this.userClone))
+
+          const propFound = this.changedUserProperties.find(userProp => userProp.property === 'url_shortener_enabled')
+
+          if (propFound && !propFound.value) {
+            this.setDefaultIsShortenedUrlRemembered()
+          }
 
           this.resetChangedUserProperties()
           this.setFormValidity(true)

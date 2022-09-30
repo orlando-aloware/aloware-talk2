@@ -196,6 +196,11 @@ export default {
       visibleListFilters: '',
       filterGroupIndex: 0,
       filterConjunction: true,
+      relationTypes: [
+        'relation',
+        'multi_relation',
+        'boolean'
+      ],
       filterGroups: {
         GROUP_PRIMARY_INFO,
         GROUP_CONTACT_LOCATION,
@@ -359,6 +364,7 @@ export default {
     onCloseFilter () {
       this.show = false
       this.closeFilters()
+      this.step = 1
     },
 
     backToStep () {
@@ -445,7 +451,8 @@ export default {
       }
 
       const filterFound = this.filters.find(filter => filter.key === key)
-      const isRelationType = filterFound && ['relation', 'multi_relation'].includes(filterFound.type)
+      const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
+      const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
       const labels = { data: null }
       const item = { index: null }
@@ -468,9 +475,11 @@ export default {
 
         if (filterFound && isRelationType) {
           for (item.index of values.data) {
-            optionFound.data = filterFound.options.find(option => option.value === item.index)
+            optionFound.data = filterFound.options.find(option => String(option.value) === String(item.index))
             labels.data.push(optionFound.data ? optionFound.data.label : '')
           }
+        } else if (isBoolean) {
+          labels.data = [filter.trueValue[0] === 1]
         } else {
           labels.data = filter.trueValue
         }
@@ -575,9 +584,19 @@ export default {
   watch: {
     isFiltersOpen (isFiltersOpen) {
       this.show = isFiltersOpen
+
+      if (!isFiltersOpen) {
+        this.step = 1
+      }
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+    },
+    $route: {
+      deep: true,
+      handler: function () {
+        this.step = 1
+      }
     }
   }
 }

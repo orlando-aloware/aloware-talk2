@@ -507,9 +507,9 @@ import ContactsFilters from 'components/contacts/contacts-filters'
 import {
   aclMixin,
   visibilityMixin,
-  contactListCountMixin,
   viewMixin,
-  avatarMixin
+  avatarMixin,
+  addViewMixin
 } from 'src/plugins/mixins'
 import { isEqual } from 'lodash'
 
@@ -574,9 +574,9 @@ export default {
   mixins: [
     aclMixin,
     visibilityMixin,
-    contactListCountMixin,
     viewMixin,
-    avatarMixin
+    avatarMixin,
+    addViewMixin
   ],
   inject: [
     'contactsData'
@@ -639,7 +639,7 @@ export default {
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
     isMyQueue () {
-      return this.contactList.id === 'my-queue'
+      return this.contactList && this.contactList.id === 'my-queue'
     },
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
@@ -845,14 +845,6 @@ export default {
       this.checkedItems = []
       this.onPaginate(params)
     },
-    setDataCount (data, updatePinned = false) {
-      if (!data) {
-        return
-      }
-      this.getListDataCount({ filters: data }).then(response => {
-        this.contactCount = response.data.count
-      })
-    },
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
@@ -888,9 +880,6 @@ export default {
     if (this.contactList && this.contactList.type === this.ContactListTypes.DYNAMIC) {
       this.openFilters()
     }
-
-    this.setDataCount([])
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.setDataCount)
   },
   watch: {
     '$route.params.id': function (id) {

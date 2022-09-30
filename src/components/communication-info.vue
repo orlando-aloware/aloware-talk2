@@ -234,7 +234,7 @@
               </template>
 
               <div v-if="communication.body">
-                <div class="text-muted mb-2"
+                <div class="fs-13 text-muted mb-2 line-height-15"
                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
                      v-html="$options.filters.nl2br(parseBody)"
                      v-linkify:options="{ target: '_blank' }">
@@ -290,57 +290,49 @@
               </div>
             </div>
 
-            <div class="w-100 pt-2 d-flex flex-row pb-2 mb-2 border-bottom"
+            <div class="w-100 pt-2 d-flex flex-column pb-2 mb-2 border-bottom"
                  v-if="(verbose || activityMode) && ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <div class="w-50">
-                <div class="form-group row mb-0">
-                  <div class="w-100">
-                    <label class="form-control-label w-100">From</label>
-                    <div class="d-flex align-items-center"
-                         v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
-                      {{ communication.lead_number | fixPhone }}
-                    </div>
-                    <div class="d-flex align-items-center"
-                         v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
-                      {{ communication.lead_number }}
-                    </div>
-                    <div class="d-flex align-items-center"
-                         v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
-                      {{ communication.incoming_number }}
-                    </div>
-                    <div class="d-flex align-items-center"
-                         v-else>
-                      {{ getCommunicationCampaignName() }}
-                      <br v-if="getCommunicationCampaignName()">
-                      {{ communication.incoming_number | fixPhone }}
-                    </div>
-                  </div>
+              <div class="form-group row">
+                <label class="form-control-label w-100">From</label>
+                <div class="d-flex align-items-center"
+                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
+                  {{ communication.lead_number | fixPhone }}
+                </div>
+                <div class="d-flex align-items-center"
+                      v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
+                  {{ communication.lead_number }}
+                </div>
+                <div class="d-flex align-items-center"
+                      v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
+                  {{ communication.incoming_number }}
+                </div>
+                <div class="d-flex align-items-center"
+                      v-else>
+                  {{ getCommunicationCampaignName() }}
+                  <br v-if="getCommunicationCampaignName()">
+                  {{ communication.incoming_number | fixPhone }}
                 </div>
               </div>
 
-              <div class="w-50">
-                <div class="w-100">
-                  <div class="form-group row mb-0">
-                    <label class="form-control-label w-100">To</label>
-                    <div class="d-flex align-items-center"
-                         v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
-                      {{ getCommunicationCampaignName() }}
-                      <br v-if="getCommunicationCampaignName()">
-                      {{ communication.incoming_number | fixPhone }}
-                    </div>
-                    <div class="d-flex align-items-center"
-                         v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
-                      {{ communication.incoming_number }}
-                    </div>
-                    <div class="d-flex align-items-center"
-                         v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
-                      {{ communication.lead_number }}
-                    </div>
-                    <div class="d-flex align-items-center"
-                         v-else>
-                      {{ communication.lead_number | fixPhone }}
-                    </div>
-                  </div>
+              <div class="form-group row mb-0">
+                <label class="form-control-label w-100">To</label>
+                <div class="d-flex align-items-center"
+                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
+                  {{ getCommunicationCampaignName() }}
+                  <br v-if="getCommunicationCampaignName()">
+                  {{ communication.incoming_number | fixPhone }}
+                </div>
+                <div class="d-flex align-items-center"
+                      v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
+                  {{ communication.incoming_number }}
+                </div>
+                <div class="d-flex align-items-center"
+                      v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
+                  {{ communication.lead_number }}
+                </div>
+                <div class="d-flex align-items-center"
+                      v-else>
+                  {{ communication.lead_number | fixPhone }}
                 </div>
               </div>
             </div>

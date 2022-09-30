@@ -511,9 +511,9 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import {
   aclMixin,
   visibilityMixin,
-  contactListCountMixin,
   viewMixin,
-  avatarMixin
+  avatarMixin,
+  addViewMixin
 } from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
@@ -579,9 +579,9 @@ export default {
   mixins: [
     aclMixin,
     visibilityMixin,
-    contactListCountMixin,
     viewMixin,
-    avatarMixin
+    avatarMixin,
+    addViewMixin
   ],
   inject: [
     'contactsData'
@@ -613,8 +613,6 @@ export default {
     }
 
     this.listName = ''
-    this.setDataCount([])
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.setDataCount)
   },
   computed: {
     // ...mapGetters('powerDialer', ['powerDialerListItems']),
@@ -884,14 +882,6 @@ export default {
     onPagination (params) {
       this.checkedItems = []
       this.onPaginate(params)
-    },
-    setDataCount (data, updatePinned = false) {
-      if (!data) {
-        return
-      }
-      this.getListDataCount({ filters: data }).then(response => {
-        this.contactCount = response.data.count
-      })
     },
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)

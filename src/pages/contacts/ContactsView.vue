@@ -710,7 +710,6 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import {
   avatarMixin,
-  contactListCountMixin,
   timezoneCheckMixin,
   aclMixin,
   viewMixin,
@@ -723,7 +722,6 @@ export default {
 
   mixins: [
     avatarMixin,
-    contactListCountMixin,
     timezoneCheckMixin,
     aclMixin,
     viewMixin,
@@ -819,6 +817,7 @@ export default {
       myContacts: false,
       hasExport: false,
       hasNextPage: false,
+      viewListeners: {},
       ContactListTypes
     }
   },
@@ -1282,13 +1281,24 @@ export default {
       })
     },
     setDataCount (data, updatePinned = false) {
-      this.getListDataCount({ filters: data }).then(response => {
-        const count = response.data.count
-        this.setSelectedListContactCount(count)
-        if (updatePinned) {
-          this.$VueEvent.fire('listCountUpdated', { list: this.list, count: count })
+      const fireData = {
+        data: { filters: data },
+        id: this.id,
+        thenFunctions: {
+          setSelectedListContactCount: 'response.data.count'
         }
-      })
+      }
+
+      if (updatePinned) {
+        fireData.thenEventFires = {
+          listCountUpdated: {
+            list: this.list,
+            count: 'response.data.count'
+          }
+        }
+      }
+
+      this.$VueEvent.fire('get-list-count', fireData)
     },
     getOwnerName (userId) {
       if (!userId) {
@@ -1486,19 +1496,18 @@ export default {
     // force close filter
     this.closeFilters()
     this.folderPath = this.generateFolderPath(this.folders)
-    const _this = this
 
     this.myContacts = this.showMyContacts
 
-    this.$VueEvent.listen('shouldUpdateListCount', function () {
-      if (_this.list.type === _this.ContactListTypes.DYNAMIC) {
-        _this.setDataCount(!_.isEmpty(_this.currentListFilters) ? _this.currentListFilters : _this.list.filters)
+    this.$VueEvent.listen('shouldUpdateListCount', () => {
+      if (this.list.type === this.ContactListTypes.DYNAMIC) {
+        this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
       } else {
-        _this.setDataCount({
+        this.setDataCount({
           filters: {
             contact_lists: {
               operator: 1,
-              value: [_this.list.id]
+              value: [this.list.id]
             }
           },
           is_conjunction: true
@@ -1506,17 +1515,17 @@ export default {
       }
     })
 
-    const setDataCount = _.debounce((filters) => {
+    this.viewListeners.setDataCount = _.debounce((filters) => {
       this.setDataCount(filters)
     }, 100)
 
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', setDataCount)
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
   },
 
   watch: {
     '$route.params.id': function () {
       if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
-        this.loadList(this.id)
+        // this.loadList(this.id)
         this.setCurrentListFilters({})
       }
 
@@ -1527,9 +1536,13 @@ export default {
       this.initiateUpdateContactsListFilter()
 
       if (this.$route.params.id === 'unsaved') {
-        this.getListDataCount({ filters: JSON.stringify(this.list.filters) }).then(response => {
-          const count = response.data.count
-          this.setSelectedListContactCount(count)
+        this.$VueEvent.fire('get-list-count', {
+          data: { filters: JSON.stringify(this.list.filters) },
+          thenFunctions: {
+            'setSelectedListContactCount': {
+              count: 'response.data.count'
+            }
+          }
         })
       }
       this.setAllContactsSelected(false)
@@ -1586,7 +1599,7 @@ export default {
   },
   beforeDestroy () {
     this.$VueEvent.stop('shouldUpdateListCount')
-    this.$VueEvent.stop('shouldUpdateListCountOnSearch')
+    this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
   }
 }
 </script>

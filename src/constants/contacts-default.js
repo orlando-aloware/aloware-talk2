@@ -228,5 +228,6 @@ export const DEFAULT_STATE = {
       total_count: 0
     }
   },
-  isContactMixinUsed: false
+  isContactMixinUsed: false,
+  isShortenedUrlRemembered: false
 }

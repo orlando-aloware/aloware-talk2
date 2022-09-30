@@ -65,10 +65,10 @@
           <span v-if="customAuditsConditions(communication)">
             {{ generateCustomAuditMessage(communication) + (communication.notes ? ' (Reason: ' + communication.notes + ')' : '') }}
           </span>
-          <span v-if="communication.user_id && getUser(communication.user_id).name.length">
+          <span v-if="communication.user_id && getUser(communication.user_id).name.length && showAuthor(communication)">
             by {{ getUser(communication.user_id).name }}
           </span>
-          <span v-else>
+          <span v-else-if="showAuthor(communication)">
             by System
           </span>
           <q-badge class="is-dot mx-1 grey-light"
@@ -99,16 +99,32 @@
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
+            <a style="opacity: 0; height: 0; width: 0;"
+               target="_blank"
+               role="button"
+               download
+               :ref="`${communication.id}${index}anchor`"
+               :href="attachment.url" />
             <q-img
               class="border-rounded img-fluid d-block r-2x mb-1"
               :src="attachment.url"
               width="320px"
               fit="fill"
+              native-context-menu
             >
               <template v-slot:error>
                 <div class="absolute-full flex flex-center bg-negative text-white">
                   Error!
                 </div>
+              </template>
+              <template v-slot:default>
+                <q-btn class="absolute all-pointer-events"
+                       style="top: 8px; left: 8px"
+                       icon="file_download"
+                       color="primary"
+                       size="16px"
+                       dense
+                       @click="downloadFileFromReference(`${communication.id}${index}anchor`)" />
               </template>
             </q-img>
 
@@ -332,7 +348,8 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin
+  userMixin,
+  downloadMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -352,7 +369,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin
+    userMixin,
+    downloadMixin
   ],
 
   components: {
@@ -850,6 +868,10 @@ export default {
       }
 
       return { name: '' }
+    },
+
+    showAuthor (audit) {
+      return !['text_authorized', 'is_opted_out'].includes(audit.property)
     }
   }
 }

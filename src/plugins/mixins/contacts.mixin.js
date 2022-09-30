@@ -10,6 +10,7 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
 import talk2Api from 'src/plugins/api/api'
+import { DEFAULT_STATE } from 'src/constants/contacts-default'
 
 export default {
   data () {
@@ -33,12 +34,21 @@ export default {
       previousRelations: [],
       hasContactsListChanges: false,
       fromContactFilters: false,
+      listDataCancelToken: null,
+      listDataSource: null,
+      listContactsCancelToken: null,
+      listContactsSource: null,
       previousSearch: null,
       ALL_COLUMNS
     }
   },
 
   created () {
+    this.processFetch = _.debounce(this.debouncedFetch, 1000)
+    this.listDataCancelToken = window.axios.CancelToken
+    this.listDataSource = this.listDataCancelToken.source()
+    this.listContactsCancelToken = window.axios.CancelToken
+    this.listContactsSource = this.listContactsCancelToken.source()
     this.startEvents()
   },
 
@@ -69,7 +79,7 @@ export default {
       'setSelectedPDList'
     ]),
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
-    init: _.debounce(function () {
+    init: _.debounce(function (clear = false) {
       if (this.$route.name === 'Contact') {
         this.isLoadingMore = true
       }
@@ -79,7 +89,7 @@ export default {
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
       } else {
-        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters)
+        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
         this.initialListFilters = defaultFilters
         this.filtersCount = this.getFiltersCount(defaultFilters)
       }
@@ -171,7 +181,8 @@ export default {
       this.setSearch(searchText)
       this.fetch({
         contact_owner: this.showMyContacts ? this.profile.id : undefined,
-        search: this.search
+        search: this.search,
+        isSearch: true
       }, true, true)
     },
     apiEndpoint (queued) {
@@ -191,7 +202,7 @@ export default {
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
-    processFetch: _.debounce(function (params = {}, isContactModule = true, queued = false, clear = false) {
+    debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
 
@@ -205,16 +216,20 @@ export default {
       }
 
       // clear out selections every contact fetch request
-      this.setListSelectedContacts({ id: this.selectedList ? this.selectedList.id : 'all', contacts: [] })
+      this.setListSelectedContacts({ id: this.id, contacts: [] })
       const queryString = this.buildQueryString(params, isContactModule)
 
       // use the same query string to update the list count
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', queryString.filter_groups)
 
+      this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
+      this.listContactsSource = this.listContactsCancelToken.source()
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: queryString,
-          paramsSerializer: qs.stringify
+          paramsSerializer: qs.stringify,
+          cancelToken: this.listContactsSource.token
         })
         .then((response) => response.data)
         .then((data) => {
@@ -280,8 +295,14 @@ export default {
           this.setListContactsLoaded(true)
           console.log(err)
         })
-    }, 1000),
+    },
     fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+      const isSearch = _.get(params, 'isSearch', false)
+
+      if (isSearch) {
+        delete params.isSearch
+      }
+
       if (isLoading) {
         this.isLoadingMore = true
       }
@@ -291,32 +312,38 @@ export default {
         this.setPreviousListId(this.id)
       }
 
-      const defaultSort = { data: _.get(params, 'sort', this.defaultContactDateFilter) }
+      const defaultSort = {
+        data: _.get(params, 'sort', this.defaultContactDateFilter)
+      }
+
       if (defaultSort.data.constructor !== 'Function') {
         defaultSort.data = this.defaultContactDateFilter
       }
+
       // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
       const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
+
       if (hasOrder) {
         params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
         params.order = order
       }
 
       this.isLoading = true
+
       if (typeof this.isPowerDialer !== 'undefined') {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
-            this.processFetch(params, false, true, clear)
+            this.processFetch(params, false, true, clear, isSearch)
             break
           case 'power-dialer-list-filter':
-            this.processFetch(params, false, false, clear)
+            this.processFetch(params, false, false, clear, isSearch)
             break
           default:
-            this.processFetch(params, false, false, clear)
+            this.processFetch(params, false, false, clear, isSearch)
         }
       } else {
-        this.processFetch(params, true, false, clear)
+        this.processFetch(params, true, false, clear, isSearch)
       }
     },
     buildQueryString (params, isContactModule = true) {
@@ -463,14 +490,36 @@ export default {
       if (_.isEmpty(this.list)) {
         return []
       }
-      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
-      if (this.$route.params.id === 'my-contacts') {
+
+      let defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+
+      if (typeof defaultFilters === 'string') {
+        return JSON.parse(defaultFilters)
+      }
+
+      if (this.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
+
         if (filter && profileId) {
           defaultFilters[0].filters.contact_owner.value = [profileId]
           defaultFilters[0].filters.contact_owner.default = 1
         }
+      }
+
+      if (typeof defaultFilters[0] === 'undefined') {
+        defaultFilters[0] = {
+          filters: {}
+        }
+      }
+
+      if (_.isEmpty(defaultFilters[0].filters) &&
+        [
+          'unassigned',
+          'unanswered',
+          'new-leads'
+        ].includes(this.$route.params.id)) {
+        defaultFilters[0].filters = DEFAULT_STATE.lists[this.$route.params.id].filters
       }
 
       if (['unassigned'].includes(this.$route.params.id)) {
@@ -485,7 +534,14 @@ export default {
         defaultFilters[0].filters.contact_task_status.default = 1
       }
 
-      return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
+      // load filters from URL
+      defaultFilters = this.loadUrlFilters(defaultFilters)
+
+      if (_.isEmpty(defaultFilters[0].filters)) {
+        delete defaultFilters[0]
+      }
+
+      return defaultFilters
     },
     contactsLoaded (listData, isConcatenated = false) {
       const dataLength = listData.data.length
@@ -619,8 +675,13 @@ export default {
       })
     },
     getListData () {
+      this.listDataSource.cancel('Loading of contacts list operation is canceled by the user')
+      this.listDataSource = this.listDataCancelToken.source()
+
       return this.$axios
-        .get('/api/v2/contacts-list/' + this.id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
+        .get('/api/v2/contacts-list/' + this.id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''), {
+          cancelToken: this.listDataSource.token
+        })
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: this.id })
@@ -629,14 +690,42 @@ export default {
           this.setPreviousListId(this.id)
         })
     },
-    loadData () {
+    loadData (skipCancelToken = true, clear = false) {
       if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
-          this.init()
+          this.init(clear)
+        }).catch(err => {
+          console.log(err)
         })
       } else {
-        this.init()
+        if (!skipCancelToken) {
+          this.listDataSource.cancel('Loading of contacts list operation is canceled by the user')
+          this.listDataSource = this.listDataCancelToken.source()
+        }
+
+        this.init(clear)
       }
+    },
+    loadUrlFilters (filters) {
+      const url = new URL(window.location.href)
+
+      // if there are any filter in URL, build them individually
+      if (url.search) {
+        const params = url.searchParams
+
+        // filter by tag
+        const tag = params.has('tag_id') ? _.parseInt(params.get('tag_id')) : false
+        if (tag) {
+          filters[0].filters.tags = {
+            operator: 1,
+            value: [ tag ]
+          }
+        }
+
+        filters[0].is_conjunction = true
+      }
+
+      return filters
     }
   },
 
@@ -874,7 +963,9 @@ export default {
 
       // this.loadData()
       if (!this.isPowerDialer) {
-        this.loadData()
+        const isFromAddContacts = _.get(from, 'params.id', false) !== false &&
+          from.path.includes('/add')
+        this.loadData(false, isFromAddContacts)
       }
     },
     id: function (newValue, oldValue) {

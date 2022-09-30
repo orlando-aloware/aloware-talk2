@@ -51,7 +51,7 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
-    <talk-feedback-form :isOpen="isFeedbackModalOpen"
+    <talk-feedback-form :shouldOpen="isFeedbackModalOpen"
                         @toggle="toggleFeedbackDialog"
                         @submit="onGoToClassic"/>
   </div>

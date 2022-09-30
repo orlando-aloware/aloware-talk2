@@ -356,5 +356,11 @@ export default {
   },
   setIsContactMixinUsed: ({ commit }, value) => {
     commit('SET_IS_CONTACT_MIXIN_USED', value)
+  },
+  setIsShortenedUrlRemembered: ({ commit }, value) => {
+    commit('SET_IS_SHORTENED_URL_REMEMBERED', value)
+  },
+  setDefaultIsShortenedUrlRemembered: ({ commit }) => {
+    commit('SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED')
   }
 }

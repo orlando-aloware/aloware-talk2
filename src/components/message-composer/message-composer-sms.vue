@@ -125,11 +125,13 @@
                @keydown="onKeyDown"
                @blur="onBlur">
       </q-input>
-      <q-dialog v-model="urlShortenerDialog" persistent transition-show="scale" transition-hide="scale">
-        <q-card
-          flat
-          style="width: 450px; max-width: 90vw;"
-          class="py-2 px-2">
+      <q-dialog v-model="urlShortenerDialog"
+                persistent
+                transition-show="scale"
+                transition-hide="scale">
+        <q-card flat
+                style="width: 420px; max-width: 90vw;"
+                class="pb-2 px-2">
           <q-card-section>
             <div class="text-h6">Long URL detected</div>
           </q-card-section>
@@ -137,10 +139,20 @@
           <q-card-section class="q-pt-none">
             Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
           </q-card-section>
-          <q-checkbox v-model="urlShortenerDontAsk" class="pl-1" label="Don't ask me again" />
-          <q-card-actions align="right" class="bg-white text-teal">
-            <q-btn flat warning color="deep-orange" label="No" @click="onSend" v-close-popup />
-            <q-btn flat label="Yes" @click="generateShortUrl" />
+
+          <q-checkbox v-model="urlShortenerDontAsk"
+                      class="pl-1"
+                      label="Don't ask me again" />
+
+          <q-card-actions class="bg-white text-teal mt-2">
+            <q-btn label="No"
+                   v-close-popup
+                   @click="closeUrlShortener" />
+            <q-btn color="blue"
+                   class="ml-auto"
+                   label="Yes"
+                   :loading="generatingShortUrl"
+                   @click="generateShortUrl(false)" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -159,19 +171,21 @@
           size="sm"
           padding="0px 12px"
           :ripple="false"
-          :disable="!validSms || isTCPAApprovedTextNotAuthorized"
-          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized"
+          :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl"
+          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl"
           :menu-offset="[0, 6]"
           @click="onSend"
         >
           <template slot="label">
-            <q-spinner-bars v-if="isSending"
+            <q-spinner-bars v-if="isSending || generatingShortUrl"
                             class="mr-1"
                             color="white" />
-            {{ isSending ? ' Sending Text...' : 'Send Text' }}
+            {{ sendButtonText }}
           </template>
           <q-list class="message-composer-send-dropdown-button-list">
-            <q-item clickable v-close-popup @click="showScheduleMessage">
+            <q-item clickable
+                    v-close-popup
+                    @click="showScheduleMessage">
               <q-item-section>
                 <q-item-label>Schedule Send</q-item-label>
               </q-item-section>
@@ -226,7 +240,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapGetters('contacts', [
+      'contact',
+      'messageComposer',
+      'selectedLine'
+    ]),
+    ...mapState('contacts', [
+      'isShortenedUrlRemembered'
+    ]),
     ...mapGetters('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     validSms: function () {
@@ -243,6 +264,16 @@ export default {
     },
     isTCPAApprovedTextNotAuthorized () {
       return this.currentCompany.enforce_tcpa && !this.contact.text_authorized
+    },
+    sendButtonText () {
+      switch (true) {
+        case this.generatingShortUrl:
+          return ' Generating Short URL...'
+        case this.isSending:
+          return ' Sending Text...'
+        default:
+          return 'Send Text'
+      }
     }
   },
 
@@ -254,8 +285,10 @@ export default {
       filesOnQueueToken: [],
       focusInterval: null,
       urlShortenerDialog: false,
-      urlShortenerDomain: process.env.URL_SHORTENER_DOMAIN,
+      urlShortenerDomain: null,
       urlShortenerDontAsk: false,
+      urlShortenerDontAskUntilSend: false,
+      generatingShortUrl: false,
       fileTypes: [
         'audio/basic',
         'audio/L24',
@@ -309,7 +342,8 @@ export default {
       'setMessageComposerSmsBody',
       'resetMessageComposerSms',
       'appendMessageComposerSmsAttachments',
-      'scheduleMessageOpen'
+      'scheduleMessageOpen',
+      'setIsShortenedUrlRemembered'
     ]),
     processFilesToQueue (file) {
       if (!file) {
@@ -369,11 +403,31 @@ export default {
         evt.preventDefault()
       }
     },
-    onBlur () {
-      const detected = this.detectLongUrl(this.messageComposer.sms.body)
-      if (detected) {
+    processDetectLongUrl (detected) {
+      if (detected &&
+        !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
         this.urlShortenerDialog = true
       }
+
+      // generate the shortened URL if "Yes" selection is remembered
+      // in the URL shortener prompt ("Don't ask me again" checkbox is active
+      // and yes button is clicked) and there's no shortened URL generation
+      // that is in-progress.
+      if (detected &&
+        (this.urlShortenerDontAsk ||
+          this.isShortenedUrlRemembered) &&
+        this.profile.url_shortener_enabled &&
+        this.currentCompany.url_shortener_enabled &&
+        !this.generatingShortUrl) {
+        this.generateShortUrl()
+      }
+    },
+    onBlur () {
+      if (this.urlShortenerDialog) {
+        return
+      }
+
+      this.processDetectLongUrl(this.detectLongUrl(this.messageComposer.sms.body))
     },
     formatMessage () {
       return {
@@ -386,11 +440,13 @@ export default {
       }
     },
     onSend () {
-      const detected = this.detectLongUrl(true)
+      const detected = this.detectLongUrl()
+      this.processDetectLongUrl(detected)
+
       if (detected) {
-        this.urlShortenerDialog = true
         return
       }
+
       this.isSending = true
       return talk2Api.V1.message.send(this.formatMessage())
         .then(response => {
@@ -401,6 +457,7 @@ export default {
           this.$generalNotification('Error while sending message.', 'error')
         }).finally(() => {
           this.isSending = false
+          this.urlShortenerDontAskUntilSend = false
         })
     },
     gifSelected (gif) {
@@ -495,45 +552,75 @@ export default {
       return new Blob(byteArrays, { type: contentType })
     },
     detectLongUrl () {
-      const text = this.messageComposer.sms.body
-      if (this.currentCompany && !this.currentCompany.is_whitelabel && this.currentCompany.url_shortener_enabled && this.profile.url_shortener_enabled) {
+      // check only the long URL if:
+      // - company is not white label
+      // - URL shortener is forced enabled in the company level and user level
+      // - dont ask flag is false (used for skipping the URL shortener prompt
+      //   to be able to send the message)
+      if (!this.urlShortenerDontAskUntilSend &&
+        this.currentCompany &&
+        !this.currentCompany.is_whitelabel &&
+        this.currentCompany.url_shortener_enabled &&
+        this.profile.url_shortener_enabled) {
+        const text = this.messageComposer.sms.body
         const matches = text ? text.match(/\bhttps?:\/\/\S+/gi) : []
         return matches ? matches.filter((url) => !url.includes(this.urlShortenerDomain)).length > 0 : false
       }
       return false
     },
+    closeUrlShortener () {
+      this.urlShortenerDontAskUntilSend = true
+      if (this.urlShortenerDontAsk &&
+        this.profile.url_shortener_enabled) {
+        this.disableUrlShortener()
+      }
+    },
     async generateShortUrl (send = false) {
+      this.generatingShortUrl = true
+
       if (this.urlShortenerDontAsk) {
-        talk2Api.V1.user.update(
-          this.profile.id,
-          Object.assign(this.profile, { url_shortener_enabled: false })
-        )
+        this.setIsShortenedUrlRemembered(true)
       }
-      try {
-        let { data } = await talk2Api.V1.urlShortener.generate(this.messageComposer.sms.body)
-        this.$q.notify({
-          color: 'info',
-          timeout: 3000,
-          message: 'Short URLs generated successfully'
+
+      talk2Api.V1.urlShortener.generate(this.messageComposer.sms.body)
+        .then(({ data }) => {
+          this.$generalNotification('Short URLs generated successfully.', 'success')
+          this.messageComposer.sms.body = data.text
+          this.generatingShortUrl = false
+          this.urlShortenerDialog = false
+          if (send) {
+            this.onSend()
+          }
         })
-        this.messageComposer.sms.body = data.text
-        this.urlShortenerDialog = false
-        if (send) {
-          this.onSend()
-        }
-      } catch (e) {
-        console.log(e)
-        this.$q.notify({
-          color: 'error',
-          timeout: 3000,
-          message: 'Something went wrong while generating the short URL'
+        .catch(e => {
+          console.log(e)
+          this.$generalNotification('Something went wrong when generating short URL.', 'error')
+          this.generatingShortUrl = false
+          this.urlShortenerDialog = false
         })
-        this.urlShortenerDialog = false
-      }
+    },
+    disableUrlShortener () {
+      this.urlShortenerDontAsk = false
+      talk2Api.V1.user.update(
+        this.profile.id,
+        Object.assign(this.profile, { url_shortener_enabled: false })
+      )
+      this.$generalNotification('URL Shortener disabled. To enable it again visit Settings > Personalization', 'success')
+    },
+    getDomains () {
+      talk2Api.V1.urlShortener.domains()
+        .then(({ data }) => {
+          this.urlShortenerDomain = data.domains
+          if (this.urlShortenerDomain.length > 0) {
+            this.urlShortenerDomain = this.urlShortenerDomain[0]
+          }
+        })
+      this.urlShortenerDialog = false
     }
   },
 
   mounted () {
+    this.getDomains()
     this.resetMessageComposerSms()
     if (this.messageComposer.mode === 'sms') {
       this.focusInput()

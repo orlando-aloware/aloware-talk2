@@ -505,9 +505,9 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import {
   aclMixin,
   visibilityMixin,
-  contactListCountMixin,
   viewMixin,
-  avatarMixin
+  avatarMixin,
+  addViewMixin
 } from 'src/plugins/mixins'
 import ContactsFilters from 'components/contacts/contacts-filters'
 import { isEqual } from 'lodash'
@@ -516,9 +516,9 @@ export default {
   mixins: [
     aclMixin,
     visibilityMixin,
-    contactListCountMixin,
     viewMixin,
-    avatarMixin
+    avatarMixin,
+    addViewMixin
   ],
   inject: [
     'pdContactsData'
@@ -791,14 +791,6 @@ export default {
       this.checkedItems = []
       this.onPaginate(params)
     },
-    setDataCount (data, updatePinned = false) {
-      if (!data) {
-        return
-      }
-      this.getListDataCount({ filters: data }).then(response => {
-        this.contactCount = response.data.count
-      })
-    },
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
@@ -831,8 +823,6 @@ export default {
 
     this.listName = ''
     this.fetch()
-    this.setDataCount([])
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.setDataCount)
   },
   watch: {
     '$route.params.id': function () {
