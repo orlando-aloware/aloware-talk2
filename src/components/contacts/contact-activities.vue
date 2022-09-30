@@ -52,7 +52,8 @@
 
     <div class="composer-container-wrapper">
       <message-composer :campaignId="campaignId"
-                        @message-sent="setSendingCommunication"></message-composer>
+                        @message-sent="setSendingCommunication">
+      </message-composer>
     </div>
   </div>
 </template>
@@ -64,6 +65,7 @@ import ContactActivitiesHeader from 'src/components/contacts/contact-activities-
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
 import * as CommunicationTypes from 'src/constants/communication-types'
+
 export default {
   name: 'contact-activities',
   components: {
