@@ -46,6 +46,8 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import SmsTemplateModal from 'components/sms-template-modal'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
+import * as CommunicationTypes from 'src/constants/communication-types'
+
 export default {
   name: 'message-composer-email',
   components: { MessageComposerOptions, SmsTemplateModal },
@@ -80,7 +82,14 @@ export default {
     },
     onSend () {
       this.isSending = true
-      talk2Api.V1.contact.sendEmail(this.contact.id, this.formatMessage()).then(response => {
+
+      const message = this.formatMessage()
+      this.$emit('message-sent', {
+        ...message,
+        type: CommunicationTypes.EMAIL
+      })
+
+      talk2Api.V1.contact.sendEmail(this.contact.id, message).then(response => {
         this.resetMessageComposerEmail()
         this.$generalNotification('Email has been sent.')
       }).catch(error => {
