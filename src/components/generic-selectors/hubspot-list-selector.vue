@@ -205,9 +205,13 @@ export default {
         this.options = this.sorted.filter((item) => item.name && item.name.toLowerCase().indexOf(needle) > -1)
       })
     },
-    getLists (offset) {
+    getLists (offset = 0) {
       this.isLoading = true
-      talk2Api.V1.integrations.hubspot.getList({ offset: offset }).then(response => {
+      talk2Api.V1.integrations.hubspot.getList({
+        params: {
+          offset: offset
+        }
+      }).then(response => {
         const result = response.data
         this.lists.push(...result.lists)
         if (result.has_more) {
@@ -215,6 +219,10 @@ export default {
         } else {
           this.isLoading = false
         }
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
       })
     }
   },
