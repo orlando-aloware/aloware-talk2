@@ -47,6 +47,7 @@ import talk2Api from 'src/plugins/api/api'
 import SmsTemplateModal from 'components/sms-template-modal'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
+
 export default {
   name: 'message-composer-email',
   components: { MessageComposerOptions, SmsTemplateModal },
