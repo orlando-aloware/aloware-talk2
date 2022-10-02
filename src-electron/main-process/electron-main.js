@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray } from 'ele
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
+import checkForUpdates from 'check-for-updates.js'
 
 // register for tel: links in windows
 if (process.platform === 'win32') {
