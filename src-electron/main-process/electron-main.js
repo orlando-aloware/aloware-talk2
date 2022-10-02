@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray, dialog } f
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
-import { clone } from 'ramda'
+import _ from 'lodash'
 
 // Application menu
 const menuTemplate = [
@@ -513,7 +513,7 @@ function checkForUpdates ({ silent }) {
 }
 
 const changeUpdaterMenu = ({ label, enabled }) => {
-  const newTemplate = clone(menuTemplate)
+  const newTemplate = _.clone(menuTemplate)
   newTemplate[0].submenu[2].label = label
   newTemplate[0].submenu[2].enabled = enabled
   const menu = Menu.buildFromTemplate(newTemplate)
