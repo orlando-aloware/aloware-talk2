@@ -4,19 +4,6 @@ import path from 'path'
 import { Registry } from 'rage-edit'
 import _ from 'lodash'
 
-// Application menu
-const menuTemplate = [
-  {
-    label: 'Updates',
-    submenu: [
-      { label: 'Check for updates', enabled: false, click: () => checkForUpdates({ silent: false }) }
-    ]
-  }
-]
-
-const menu = Menu.buildFromTemplate(menuTemplate)
-Menu.setApplicationMenu(menu)
-
 // register for tel: links in windows
 if (process.platform === 'win32') {
   (async () => {
