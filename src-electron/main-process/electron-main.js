@@ -25,6 +25,19 @@ if (process.platform === 'win32') {
   })()
 }
 
+// Application menu
+const applicationMenu = [
+  {
+    label: 'Updates',
+    submenu: [
+      { label: 'Check for updates', enabled: false, click: () => checkForUpdates({ silent: false }) }
+    ]
+  }
+]
+
+const menu = Menu.buildFromTemplate(applicationMenu)
+Menu.setApplicationMenu(menu)
+
 const log = require('electron-log')
 log.transports.file.level = 'info'
 log.transports.file.maxSize = 5 * 1024 * 1024
