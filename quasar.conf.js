@@ -206,9 +206,9 @@ module.exports = function (/* ctx */) {
           target: 'AppImage'
         },
         publish: {
-          provider: 'github',
-          token: process.env.GITHUB_TOKEN,
-          publishAutoUpdate: process.env.AUTO_UPDATE
+          provider: 's3',
+          bucket: 'aloware-public-dev',
+          region: 'us-west-2'
         },
         protocols: {
           name: 'Aloware Talk',
