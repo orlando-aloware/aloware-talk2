@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray, dialog } f
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
-import _ from 'lodash'
 
 // register for tel: links in windows
 if (process.platform === 'win32') {
@@ -413,7 +412,6 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('error', (error) => {
   sendStatusToWindow(`Error in autoUpdater. ${error}`)
-  changeUpdaterMenu({ label: 'Check for updates', enabled: true })
   if (isSilent) return
   dialog.showErrorBox('Error during the update', `Application couldn't be updated. Please try again or contact the support team.`)
 })
@@ -441,15 +439,12 @@ autoUpdater.on('update-available', () => {
   }, (buttonIndex) => {
     if (buttonIndex === 0) {
       autoUpdater.downloadUpdate()
-    } else {
-      changeUpdaterMenu({ label: 'Check for updates', enabled: true })
     }
   })
 })
 
 autoUpdater.on('update-not-available', () => {
   sendStatusToWindow('Update not available.')
-  changeUpdaterMenu({ label: 'Check for updates', enabled: true })
   if (isSilent) return
   dialog.showMessageBox({
     title: 'No Updates',
@@ -460,7 +455,6 @@ autoUpdater.on('update-not-available', () => {
 autoUpdater.on('update-downloaded', () => {
   sendStatusToWindow('Update downloaded.')
   updateDownloaded = true
-  changeUpdaterMenu({ label: 'Updates available', enabled: true })
   if (isSilent) return
   dialog.showMessageBox({
     title: 'Install Updates',
@@ -471,15 +465,12 @@ autoUpdater.on('update-downloaded', () => {
   }, (buttonIndex) => {
     if (buttonIndex === 0) {
       setImmediate(() => autoUpdater.quitAndInstall())
-    } else {
-      changeUpdaterMenu({ label: 'Updates available', enabled: true })
     }
   })
 })
 
 function checkForUpdates ({ silent }) {
   isSilent = silent
-  changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
   if (updateDownloaded) {
     dialog.showMessageBox({
       title: 'Available Updates',
@@ -490,21 +481,11 @@ function checkForUpdates ({ silent }) {
     }, (buttonIndex) => {
       if (buttonIndex === 0) {
         setImmediate(() => autoUpdater.quitAndInstall())
-      } else {
-        changeUpdaterMenu({ label: 'Updates available', enabled: true })
       }
     })
   } else {
     autoUpdater.checkForUpdates()
   }
-}
-
-const changeUpdaterMenu = ({ label, enabled }) => {
-  const newTemplate = _.clone(menuTemplate)
-  newTemplate[0].submenu[2].label = label
-  newTemplate[0].submenu[2].enabled = enabled
-  const menu = Menu.buildFromTemplate(newTemplate)
-  Menu.setApplicationMenu(menu)
 }
 
 process.on('uncaughtException', (err) => {
