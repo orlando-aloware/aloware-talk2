@@ -336,23 +336,6 @@ app.on('browser-window-focus', () => {
   clearBadge()
 })
 
-autoUpdater.on('update-available', (info) => {
-  try {
-    app.dock.setBadge('⮃')
-  } catch (e) {
-    log.info('setBadge() does not work on windows. ' + e.message)
-  }
-  sendStatusToWindow('update_available', 'A new update is available. Downloading now...')
-})
-
-autoUpdater.on('error', (err) => {
-  log.info('Error in auto-update: ' + err)
-  sendStatusToWindow('update_error', 'Error in auto-update. Please restart the application.')
-})
-autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
-})
-
 ipcMain.on('restart_app', () => {
   isQuiting = true
   autoUpdater.quitAndInstall()
@@ -450,6 +433,13 @@ autoUpdater.on('error', (error) => {
 
 autoUpdater.on('update-available', () => {
   sendStatusToWindow('Update available.')
+
+  try {
+    app.dock.setBadge('⮃')
+  } catch (e) {
+    log.info('setBadge() does not work on windows. ' + e.message)
+  }
+
   if (isSilent) {
     autoUpdater.downloadUpdate()
     return
