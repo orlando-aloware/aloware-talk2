@@ -207,8 +207,8 @@ module.exports = function (/* ctx */) {
         },
         publish: {
           provider: 's3',
-          bucket: 'aloware-public-dev',
-          region: 'us-west-2'
+          bucket: process.env.AWS_BUCKET,
+          region: process.env.AWS_BUCKET_REGION
         },
         protocols: {
           name: 'Aloware Talk',
