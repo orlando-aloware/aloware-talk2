@@ -35,7 +35,7 @@
           <div>
             <h5 class="form-label">Working Hours</h5>
             <p class="form-helper-text">
-              This setting sets the working hours for this user. If a call comes in outside of these hours it won't ring this user. Note that the times are local to <b>your company</b> timezone, currently set to <b>America/Los_Angeles</b>
+              This setting sets the working hours for this user. If a call comes in outside of these hours it won't ring this user. Note that the times are local to <b>your company</b> timezone, currently set to <b>{{ companyTimezone }}</b>
             </p>
           </div>
           <business-hours v-if="!isLoadingOperatingHours && operatingHours"
@@ -442,6 +442,9 @@ export default {
       }
 
       return rulesObject.data
+    },
+    companyTimezone () {
+      return this.profile?.company?.timezone || 'America/Los_Angeles'
     }
   },
 
