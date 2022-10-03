@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
@@ -171,7 +171,7 @@ if (gotTheLock) {
 
       if (process.env.NODE_ENV === 'production') {
         log.info('Setup check for updates and notify')
-        checkForUpdates({ silent: true })
+        autoUpdater.checkForUpdatesAndNotify()
       }
     } else {
       mainWindow.show()
@@ -181,7 +181,7 @@ if (gotTheLock) {
 
       if (process.env.NODE_ENV === 'production') {
         log.info('Setup check for updates and notify')
-        checkForUpdates({ silent: true })
+        autoUpdater.checkForUpdatesAndNotify()
       }
     }
   })
@@ -194,7 +194,7 @@ if (gotTheLock) {
 
     if (process.env.NODE_ENV === 'production') {
       log.info('Setup check for updates and notify')
-      checkForUpdates({ silent: true })
+      autoUpdater.checkForUpdatesAndNotify()
     }
   })
 } else {
@@ -322,6 +322,23 @@ app.on('browser-window-focus', () => {
   clearBadge()
 })
 
+autoUpdater.on('update-available', (info) => {
+  try {
+    app.dock.setBadge('⮃')
+  } catch (e) {
+    log.info('setBadge() does not work on windows. ' + e.message)
+  }
+  sendStatusToWindow('update_available', 'A new update is available. Downloading now...')
+})
+
+autoUpdater.on('error', (err) => {
+  log.info('Error in auto-update: ' + err)
+  sendStatusToWindow('update_error', 'Error in auto-update. Please restart the application.')
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
+})
+
 ipcMain.on('restart_app', () => {
   isQuiting = true
   autoUpdater.quitAndInstall()
@@ -400,92 +417,6 @@ try {
     require('fs').unlinkSync(require('path').join(app.getPath('userData'), 'DevTools Extensions'))
   }
 } catch (_) {
-}
-
-autoUpdater.autoDownload = false
-let isSilent
-let updateDownloaded = false
-
-autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow('Checking for update...')
-})
-
-autoUpdater.on('error', (error) => {
-  sendStatusToWindow(`Error in autoUpdater. ${error}`)
-  if (isSilent) return
-  dialog.showErrorBox('Error during the update', `Application couldn't be updated. Please try again or contact the support team.`)
-})
-
-autoUpdater.on('update-available', () => {
-  sendStatusToWindow('Update available.')
-
-  try {
-    app.dock.setBadge('⮃')
-  } catch (e) {
-    log.info('setBadge() does not work on windows. ' + e.message)
-  }
-
-  if (isSilent) {
-    autoUpdater.downloadUpdate()
-    return
-  }
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Found Updates',
-    message: 'New updates are available, do you want update now?',
-    defaultId: 0,
-    cancelId: 1,
-    buttons: ['Yes', 'No']
-  }, (buttonIndex) => {
-    if (buttonIndex === 0) {
-      autoUpdater.downloadUpdate()
-    }
-  })
-})
-
-autoUpdater.on('update-not-available', () => {
-  sendStatusToWindow('Update not available.')
-  if (isSilent) return
-  dialog.showMessageBox({
-    title: 'No Updates',
-    message: 'Current version is up-to-date.'
-  })
-})
-
-autoUpdater.on('update-downloaded', () => {
-  sendStatusToWindow('Update downloaded.')
-  updateDownloaded = true
-  if (isSilent) return
-  dialog.showMessageBox({
-    title: 'Install Updates',
-    message: 'Updates are ready to be installed.',
-    defaultId: 0,
-    cancelId: 1,
-    buttons: ['Install and restart', 'Close']
-  }, (buttonIndex) => {
-    if (buttonIndex === 0) {
-      setImmediate(() => autoUpdater.quitAndInstall())
-    }
-  })
-})
-
-function checkForUpdates ({ silent }) {
-  isSilent = silent
-  if (updateDownloaded) {
-    dialog.showMessageBox({
-      title: 'Available Updates',
-      message: 'New updates are available and ready to be installed.',
-      defaultId: 0,
-      cancelId: 1,
-      buttons: ['Install and restart', 'Close']
-    }, (buttonIndex) => {
-      if (buttonIndex === 0) {
-        setImmediate(() => autoUpdater.quitAndInstall())
-      }
-    })
-  } else {
-    autoUpdater.checkForUpdates()
-  }
 }
 
 process.on('uncaughtException', (err) => {
