@@ -18,8 +18,6 @@ module.exports = function (/* ctx */) {
     process.env = { ...process.env, ...parsedEnv }
   }
 
-  console.log({ env: process.env })
-
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
