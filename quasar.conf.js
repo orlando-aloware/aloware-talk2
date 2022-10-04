@@ -10,6 +10,8 @@
 module.exports = function (/* ctx */) {
   const DotEnv = require('dotenv')
   const parsedEnv = DotEnv.config().parsed
+
+  console.log({ parsedEnv, env: process.env })
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
