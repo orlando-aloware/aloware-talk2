@@ -8,6 +8,16 @@
 /* eslint-env node */
 
 module.exports = function (/* ctx */) {
+  const DotEnv = require('dotenv')
+  const parsedEnv = DotEnv.config().parsed
+
+  if (typeof parsedEnv === 'object' &&
+      !Array.isArray(parsedEnv) &&
+      parsedEnv !== undefined &&
+      parsedEnv !== null) {
+    process.env = { ...process.env, ...parsedEnv }
+  }
+
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
@@ -206,9 +216,9 @@ module.exports = function (/* ctx */) {
           target: 'AppImage'
         },
         publish: {
-          provider: 'github',
-          token: process.env.GITHUB_TOKEN,
-          publishAutoUpdate: process.env.AUTO_UPDATE
+          provider: 's3',
+          bucket: process.env.AWS_BUCKET,
+          region: process.env.AWS_BUCKET_REGION
         },
         protocols: {
           name: 'Aloware Talk',
