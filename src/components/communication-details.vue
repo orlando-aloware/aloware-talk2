@@ -831,10 +831,23 @@ export default {
     },
 
     usedRingGroup () {
-      if (!this.communication.ring_group_id) {
+      if (this.communication.ring_group_id) {
+        return this.getRingGroup(this.communication.ring_group_id)
+      }
+
+      if (this.communication.metadata && this.communication.metadata.added_ring_group_id) {
+        return this.getRingGroup(this.communication.metadata.added_ring_group_id)
+      }
+
+      return null
+    },
+
+    getRingGroup (id) {
+      if (!id) {
         return null
       }
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.communication.ring_group_id)
+
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === id)
       if (ringGroup) {
         return ringGroup
       }
