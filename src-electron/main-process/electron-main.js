@@ -68,6 +68,7 @@ function createWindow () {
     fullscreen: false,
     center: true,
     useContentSize: true,
+    icon: '../../electron-app-icon.png',
     webPreferences: {
       // Change from /quasar.conf.js > electron > nodeIntegration;
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
