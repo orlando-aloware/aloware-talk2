@@ -842,19 +842,6 @@ export default {
       return null
     },
 
-    getRingGroup (id) {
-      if (!id) {
-        return null
-      }
-
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === id)
-      if (ringGroup) {
-        return ringGroup
-      }
-
-      return null
-    },
-
     useSequence () {
       if (!this.communication.workflow_id) {
         return null
@@ -915,6 +902,19 @@ export default {
       const campaign = this.campaigns.find(campaign => campaign.id === id)
       if (campaign) {
         return campaign
+      }
+
+      return null
+    },
+
+    getRingGroup (id) {
+      if (!id) {
+        return null
+      }
+
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === id)
+      if (ringGroup) {
+        return ringGroup
       }
 
       return null
