@@ -166,7 +166,7 @@
                 transition-show="scale"
                 transition-hide="scale"
                 persistent>
-        <q-card class="bg-greenish text-white"
+        <q-card class="bg-green-10 text-white"
                 style="width: 300px">
           <q-card-section>
             <div class="text-h6">Update Downloaded</div>
