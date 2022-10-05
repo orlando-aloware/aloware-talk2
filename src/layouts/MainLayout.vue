@@ -166,7 +166,7 @@
                 transition-show="scale"
                 transition-hide="scale"
                 persistent>
-        <q-card class="bg-green-10 text-white"
+        <q-card class="bg-green-7 text-white"
                 style="width: 300px">
           <q-card-section>
             <div class="text-h6">Update Downloaded</div>
@@ -177,7 +177,7 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-greenish">
+                          class="bg-white text-green-7">
             <q-btn label="Restart"
                    @click="restartApp"
                    flat>
