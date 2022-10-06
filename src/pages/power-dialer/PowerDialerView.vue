@@ -616,7 +616,6 @@ import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { TYPE_EXPORT_POWER_DIALER_LIST_ITEMS } from 'src/constants/export-types-default'
 import { isEqual, isEmpty, get } from 'lodash'
 import {
   aclMixin,
@@ -713,48 +712,12 @@ export default {
     }
   },
 
-  beforeDestroy () {
-    this.$VueEvent.stop('export_event_create')
-    this.$VueEvent.stop('export_event_update')
-    this.$VueEvent.stop('export_event_delete')
-  },
-
   async mounted () {
     this.removeListClose()
     if (!this.isMyQueue) {
       await this.myQueueList()
     }
     this.init()
-
-    this.$VueEvent.listen('export_event_create', (task) => {
-      if (task.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
-        return
-      }
-
-      this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
-    })
-
-    this.$VueEvent.listen('export_event_update', (task) => {
-      if (task.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
-        return
-      }
-
-      console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
-      this.$generalNotification(
-        `Your export is now available. Click <b><a href="${process.env.API_URL}/download/${task.export.uuid}" download>here</a></b> to download the file.`,
-        'success',
-        0,
-        true
-      )
-    })
-
-    this.$VueEvent.listen('export_event_delete', (task) => {
-      if (task.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
-        return
-      }
-
-      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
-    })
   },
   computed: {
     ...mapState('cache', ['currentCompany']),
@@ -909,7 +872,7 @@ export default {
     return {
       selectedItem: null,
       hasFilters: false,
-      hasExport: false
+      hasExport: true
     }
   },
   methods: {
@@ -962,10 +925,8 @@ export default {
       this.$emit('loadMore')
     },
     async exportAsCsv () {
-      let response = await this.exportCsv(this.selectedList.id)
-      if (response.status === 200) {
-        this.$generalNotification('CSV export request has been sent!', 'success')
-      } else {
+      const response = await this.exportCsv(this.selectedList.id)
+      if (response.status !== 200) {
         this.$generalNotification('Unable to process export request! Please try again later.', 'error')
       }
     },

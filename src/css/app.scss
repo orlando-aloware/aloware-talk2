@@ -7512,10 +7512,12 @@ button.grey-90 {
   .close-button {
     .q-btn__wrapper {
       min-height: auto !important;
+      padding: 0;
     }
     .q-btn__content {
       display: flex;
       align-items: center;
+      padding-top: 1px;
     }
   }
   .close-button {
