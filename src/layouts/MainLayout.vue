@@ -926,7 +926,7 @@ export default {
 
       console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
       this.$generalNotification(
-        `Your export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download></a>`,
+        `Your export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
         'export',
         0,
         true,
