@@ -207,13 +207,16 @@ module.exports = function (/* ctx */) {
           extendInfo: {
             NSMicrophoneUsageDescription:
               'Please give us access to your microphone'
-          }
+          },
+          icon: 'icons/icon.icns'
         },
         win: {
-          target: 'nsis'
+          target: 'nsis',
+          icon: 'icons/icon.ico'
         },
         linux: {
-          target: 'AppImage'
+          target: 'AppImage',
+          icon: 'icons/icon.png'
         },
         publish: {
           provider: 's3',
