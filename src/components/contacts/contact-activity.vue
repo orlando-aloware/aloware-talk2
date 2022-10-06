@@ -124,7 +124,7 @@
                        color="primary"
                        size="16px"
                        dense
-                       @click="downloadFileFromReference(`${communication.id}${index}anchor`)" />
+                       @click="downloadWithAxios(attachment.url, attachment.name)" />
               </template>
             </q-img>
 
