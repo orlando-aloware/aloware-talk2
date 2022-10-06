@@ -712,12 +712,6 @@ export default {
     }
   },
 
-  beforeDestroy () {
-    this.$VueEvent.stop('export_event_create')
-    this.$VueEvent.stop('export_event_update')
-    this.$VueEvent.stop('export_event_delete')
-  },
-
   async mounted () {
     this.removeListClose()
     if (!this.isMyQueue) {
