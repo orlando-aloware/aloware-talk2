@@ -222,6 +222,7 @@ import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
+import { TYPE_EXPORT_POWER_DIALER_LIST_ITEMS } from 'src/constants/export-types-default'
 
 export default {
   name: 'MyLayout',
@@ -907,6 +908,40 @@ export default {
       }, statusInterval)
     }
     */
+
+    this.$VueEvent.listen('export_event_create', (task) => {
+      if (task.export.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
+    })
+
+    this.$VueEvent.listen('export_event_update', (task) => {
+      if (task.export.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
+      this.$generalNotification(
+        `Your export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download></a>`,
+        'export',
+        0,
+        true,
+        task.export.uuid
+      )
+    })
+
+    this.$VueEvent.listen('export_event_delete', (task) => {
+      if (task.export.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
+    })
 
     if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
@@ -2128,6 +2163,9 @@ export default {
       this.$VueEvent.stop('company_updated')
       this.$VueEvent.stop('agent_status_updated')
       this.$VueEvent.stop('change_agent_status')
+      this.$VueEvent.stop('export_event_create')
+      this.$VueEvent.stop('export_event_update')
+      this.$VueEvent.stop('export_event_delete')
       this.unsubscribeFromPusher()
       this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
       this.resetNotifications()
