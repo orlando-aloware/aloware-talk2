@@ -10,7 +10,7 @@
 module.exports = function (/* ctx */) {
   const DotEnv = require('dotenv')
   const parsedEnv = DotEnv.config().parsed
-  
+
   if (typeof parsedEnv === 'object' &&
       !Array.isArray(parsedEnv) &&
       parsedEnv !== undefined &&
