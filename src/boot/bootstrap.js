@@ -232,8 +232,22 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err.data)
 }
 
-Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false) {
+Vue.prototype.downloadFileFromElementId = (elementId) => {
+  const anchorElement = document.querySelector(`[id*="${elementId}"]`)
+
+  if (anchorElement) {
+    anchorElement.click()
+  }
+}
+
+Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, elementId = null) {
   const colorClass = { data: '' }
+  let actions = [{
+    icon: 'close',
+    color: 'black',
+    class: 'close-button px-1 pb-1'
+  }]
+
   switch (type) {
     case 'updated':
       colorClass.data = 'bg-blue-10'
@@ -242,19 +256,34 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     case 'error':
       colorClass.data = 'bg-red-10'
       break
+    case 'export':
+      actions = [{
+        label: 'Download',
+        color: 'primary',
+        class: 'px-2',
+        handler: () => {
+          if (elementId) {
+            this.downloadFileFromElementId(elementId)
+          }
+        }
+      }]
+      colorClass.data = 'bg-green-10'
+      break
     default:
       colorClass.data = 'bg-green-10'
   }
 
-  this.$q.notify({
+  const options = {
     group: false,
     classes: `general-notification text-black ${colorClass.data} ml-7`,
     timeout: timeout,
     message: message,
     position: 'bottom-left',
     html: html,
-    actions: [{ icon: 'close', color: 'black', class: 'close-button' }]
-  })
+    actions: actions
+  }
+
+  this.$q.notify(options)
 }
 
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {

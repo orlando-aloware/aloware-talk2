@@ -17,8 +17,11 @@ export default {
     return res.data.data
   },
   async exportCsv ({ commit }, id = '') {
-    const res = await window.axios.get(`api/v2/power-dialer-lists/${id}/export-csv?all=1`)
-    return res
+    return window.axios.get(`api/v2/power-dialer-lists/export-csv`, {
+      params: {
+        contact_list_id: id
+      }
+    })
   },
 
   /**
