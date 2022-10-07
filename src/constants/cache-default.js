@@ -1,3 +1,4 @@
 export const DEFAULT_STATE = {
-  currentCompany: null
+  currentCompany: null,
+  timezones: []
 }

@@ -10,7 +10,7 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended" />
+      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
@@ -27,7 +27,7 @@
                 <transition :name="transitionName"
                             mode="out-in">
                   <!-- <keep-alive> -->
-                    <router-view></router-view>
+                  <router-view></router-view>
                   <!-- </keep-alive> -->
                 </transition>
               </template>
@@ -186,7 +186,7 @@
         </q-card>
       </q-dialog>
       <pro-feature-dialog/>
-      </div>
+    </div>
   </div>
 </template>
 
@@ -295,7 +295,8 @@ export default {
 
   computed: {
     ...mapState('cache', [
-      'currentCompany'
+      'currentCompany',
+      'timezones'
     ]),
     ...mapState([
       'dialer',
@@ -822,13 +823,13 @@ export default {
             const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
             // check if communication is a live call
             if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-              [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(communication.current_status2)) {
               const liveContacts = _.cloneDeep(this.liveContacts)
               if (!isInLiveContacts) {
                 liveContacts.push(contact)
@@ -1217,6 +1218,8 @@ export default {
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
       }
+
+      this.getTimezones()
 
       this.initAccount().then(() => {
         this.loading = false
@@ -2139,6 +2142,13 @@ export default {
       }
     },
 
+    getTimezones () {
+      return this.$axios.get('/api/v1/timezones')
+        .then(res => {
+          this.setTimezones(res.data)
+        })
+    },
+
     beforeUnload () {
       this.$VueEvent.stop('bounce_dock')
       this.$VueEvent.stop('set_badge')
@@ -2179,7 +2189,7 @@ export default {
       clearInterval(this.$options.appFooterInterval)
     },
 
-    ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
     ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
     ...mapActions([
       'resetVuex',

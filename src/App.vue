@@ -74,8 +74,6 @@ export default {
       })
     }
 
-    this.getTimezones()
-
     this.$VueEvent.listen('make_new_call', (data) => {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
 
@@ -213,12 +211,6 @@ export default {
       }
       this.$FullStory.anonymize()
     },
-    getTimezones () {
-      return window.axios.get('/api/v1/timezones')
-        .then(res => {
-          this.setTimezones(res.data)
-        })
-    },
     ...mapActions('auth', {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
@@ -226,8 +218,7 @@ export default {
       clearUser: 'clear'
     }),
     ...mapActions('cache', [
-      'setCurrentCompany',
-      'setTimezones'
+      'setCurrentCompany'
     ]),
     ...mapActions([
       'resetVuex',
