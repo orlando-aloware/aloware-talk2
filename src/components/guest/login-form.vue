@@ -85,7 +85,6 @@ import { mapActions, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { aclMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
-import { useQuasar } from 'quasar'
 
 export default {
   mixins: [aclMixin],
@@ -109,12 +108,8 @@ export default {
       loading: false,
       sb: null,
       deviceInfo: null,
-      isPwd: true,
-      $q: null
+      isPwd: true
     }
-  },
-  created () {
-    this.$q = useQuasar()
   },
   methods: {
     getLoginParams () {
