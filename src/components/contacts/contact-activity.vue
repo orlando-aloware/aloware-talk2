@@ -99,12 +99,6 @@
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <a style="opacity: 0; height: 0; width: 0;"
-               target="_blank"
-               role="button"
-               download
-               :ref="`${communication.id}${index}anchor`"
-               :href="attachment.url" />
             <q-img
               class="border-rounded img-fluid d-block r-2x mb-1"
               :src="attachment.url"
@@ -124,7 +118,7 @@
                        color="primary"
                        size="16px"
                        dense
-                       @click="downloadWithAxios(attachment.url, attachment.name)" />
+                       @click="$downloadFileWithUuid(getUuidFromURL(attachment.url), attachment.name)" />
               </template>
             </q-img>
 
@@ -352,8 +346,7 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin,
-  downloadMixin
+  userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -373,8 +366,7 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin,
-    downloadMixin
+    userMixin
   ],
 
   components: {
@@ -876,6 +868,15 @@ export default {
 
     showAuthor (audit) {
       return !['text_authorized', 'is_opted_out'].includes(audit.property)
+    },
+
+    getUuidFromURL (url) {
+      if (!url) {
+        return null
+      }
+
+      const lastPart = url.split('/').pop()
+      return _.head(lastPart.split('.'))
     }
   }
 }

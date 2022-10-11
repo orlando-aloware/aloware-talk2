@@ -232,15 +232,37 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err.data)
 }
 
-Vue.prototype.downloadFileFromElementId = (elementId) => {
-  const anchorElement = document.querySelector(`[id*="${elementId}"]`)
-
-  if (anchorElement) {
-    anchorElement.click()
+Vue.prototype.$downloadFileWithUuid = (uuid, filename, type = 'common') => {
+  if (!uuid) {
+    this.$generalNotification('Failed to download file, missing UUID', 'error')
   }
+
+  const url = (type !== 'csv'
+    ? '/static/uploaded_file/'
+    : '/download/') + uuid
+
+  window.axios.get(url, {
+    params: {
+      force_download: 1
+    },
+    responseType: 'arraybuffer'
+  })
+    .then((response) => {
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+    })
+    .catch(() => {
+      this.$generalNotification('Failed to download file.', 'error')
+    })
 }
 
-Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, elementId = null) {
+Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
+  const uuid = window._.get(actionOptions, 'uuid', null)
+  const filename = window._.get(actionOptions, 'filename', null)
   const colorClass = { data: '' }
   let actions = [{
     icon: 'close',
@@ -256,14 +278,14 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     case 'error':
       colorClass.data = 'bg-red-10'
       break
-    case 'export':
+    case 'export-csv':
       actions = [{
         label: 'Download',
         color: 'primary',
         class: 'px-2',
         handler: () => {
-          if (elementId) {
-            this.downloadFileFromElementId(elementId)
+          if (uuid) {
+            this.$downloadFileWithUuid(uuid, filename, 'csv')
           }
         }
       }]
