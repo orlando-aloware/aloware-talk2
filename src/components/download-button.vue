@@ -114,9 +114,17 @@ export default {
     onDownload () {
       this.isLoading = true
 
-      // if image is giphy's
-      const domain = new URL(this.attachmentUrl)
+      let domain = null
 
+      try {
+        domain = new URL(this.attachmentUrl)
+      } catch (e) {
+        domain = {
+          hostname: ''
+        }
+      }
+
+      // if domain is giphy's
       if (domain.hostname.includes('giphy.com')) {
         this.$downloadFileWithUrl(this.attachmentUrl, this.newFilename)
           .then(() => {
