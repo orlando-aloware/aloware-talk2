@@ -5,8 +5,7 @@
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
-    <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center"
-         :class="{ 'unsupported': !$q.platform.is.mobile }">
+    <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
