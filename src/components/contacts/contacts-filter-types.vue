@@ -336,6 +336,7 @@ export default {
       switch (true) {
         case this.filterOperator === 8:
           return 0
+        // in between operator
         case this.filterOperator === 7:
           return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
         default:
@@ -344,6 +345,7 @@ export default {
     },
     setNumberValue (value) {
       switch (this.filterOperator) {
+        // in between operator
         case 7:
           this.filterOperatorValue = value[0]
           this.secondaryFilterOperatorValue = value[1]
@@ -354,6 +356,7 @@ export default {
     },
     getDateValue () {
       switch (true) {
+        // in between operator
         case this.filterOperator === 5:
           return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
         default:
@@ -362,6 +365,7 @@ export default {
     },
     setDateValue (value) {
       switch (this.filterOperator) {
+        // in between operator
         case 5:
           this.filterOperatorValue = value[0]
           this.secondaryFilterOperatorValue = value[1]
