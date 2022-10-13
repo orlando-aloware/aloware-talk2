@@ -656,15 +656,14 @@
                       Files:
                     </label>
                     <div class="d-flex align-items-center w-100">
-                      <span v-for="(attachment, index) in communication.attachments"
+                      <div v-for="(attachment, index) in communication.attachments"
                             :key="index"
-                            class="text-dark-greenish">
-                        <a class="text-dark-greenish"
-                           target="_blank"
-                           :href="attachment.url">
-                          Click Here To Download
-                        </a>
-                      </span>
+                            class="text-dark-greenish w-100">
+                        <download-button is-simple
+                                         show-file-name
+                                         :filename="attachment.name"
+                                         :attachment-url="attachment.url"/>
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -791,6 +790,7 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
+import DownloadButton from 'components/download-button'
 import API from 'src/plugins/api/api'
 
 export default {
@@ -822,7 +822,8 @@ export default {
     CommunicationNote,
     CommunicationTags,
     SmsReminders,
-    TargetUsersTree
+    TargetUsersTree,
+    DownloadButton
   },
 
   props: {

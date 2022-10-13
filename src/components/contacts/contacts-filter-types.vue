@@ -4,7 +4,7 @@
          v-for="operator in filter.operators"
          :key="(filter.key + '-' + operator.value)"
     >
-      <q-radio class="my-2"
+      <q-radio class="my-2 flex-nowrap"
                dense
                :val="operator.value"
                :label="operator.label"

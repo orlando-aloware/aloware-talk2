@@ -232,7 +232,7 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err.data)
 }
 
-Vue.prototype.$downloadFileWithUuid = (uuid, filename, type = 'common') => {
+Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') => {
   if (!uuid) {
     this.$generalNotification('Failed to download file, missing UUID', 'error')
   }
@@ -241,7 +241,7 @@ Vue.prototype.$downloadFileWithUuid = (uuid, filename, type = 'common') => {
     ? '/static/uploaded_file/'
     : '/download/') + uuid
 
-  window.axios.get(url, {
+  return window.axios.get(url, {
     params: {
       force_download: 1
     },

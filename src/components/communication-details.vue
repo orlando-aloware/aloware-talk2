@@ -50,6 +50,7 @@
                 <q-img
                   class="img-fluid d-block r-2x br-8"
                   height="300px"
+                  native-context-menu
                   v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type"
                   :class="index > 0 ? 'mb-1' : ''"
                   :key="index"
@@ -58,6 +59,11 @@
                     <div class="absolute-full flex flex-center bg-negative text-white">
                       Error!
                     </div>
+                  </template>
+                  <template v-slot:default>
+                    <download-button buttonStyle="top: 8px; left: 8px"
+                                     :attachment-name="attachment.name"
+                                     :attachment-url="attachment.url"/>
                   </template>
                 </q-img>
 
@@ -754,7 +760,11 @@
 <script>
 import _ from 'lodash'
 import { mapState } from 'vuex'
-import { aclMixin, userMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  userMixin,
+  communicationInfoMixin
+} from 'src/plugins/mixins'
 
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
@@ -773,11 +783,23 @@ import CommunicationReportIssue from 'components/communication-report-issue'
 import RingGroupSnapshot from 'components/ring-group-snapshot'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import DownloadButton from 'components/download-button'
 
 export default {
   name: 'communication-details',
 
-  components: { PencilOIcon, PredefinedTimeDurationSelector, RingGroupSnapshot, CommunicationReportIssue, CallDispositionSelector, CommunicationTags, CommunicationNote, CommunicationAudio, TargetUsersTree },
+  components: {
+    PencilOIcon,
+    PredefinedTimeDurationSelector,
+    RingGroupSnapshot,
+    CommunicationReportIssue,
+    CallDispositionSelector,
+    CommunicationTags,
+    CommunicationNote,
+    CommunicationAudio,
+    TargetUsersTree,
+    DownloadButton
+  },
 
   mixins: [communicationInfoMixin, userMixin, aclMixin],
 

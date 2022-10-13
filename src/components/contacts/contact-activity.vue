@@ -112,13 +112,9 @@
                 </div>
               </template>
               <template v-slot:default>
-                <q-btn class="absolute all-pointer-events"
-                       style="top: 8px; left: 8px"
-                       icon="file_download"
-                       color="primary"
-                       size="16px"
-                       dense
-                       @click="$downloadFileWithUuid(getUuidFromURL(attachment.url), attachment.name)" />
+                <download-button buttonStyle="top: 8px; left: 8px"
+                                 :filename="attachment.name"
+                                 :attachment-url="attachment.url"/>
               </template>
             </q-img>
 
@@ -359,6 +355,7 @@ import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import FileIcon from 'components/icons/contact-activity/file-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import DownloadButton from 'components/download-button'
 
 import talk2Api from 'src/plugins/api/api'
 
@@ -373,7 +370,8 @@ export default {
     FileIcon,
     CommunicationInfo,
     Avatar,
-    InformationCircleIcon
+    InformationCircleIcon,
+    DownloadButton
   },
 
   props: {
@@ -868,15 +866,6 @@ export default {
 
     showAuthor (audit) {
       return !['text_authorized', 'is_opted_out'].includes(audit.property)
-    },
-
-    getUuidFromURL (url) {
-      if (!url) {
-        return null
-      }
-
-      const lastPart = url.split('/').pop()
-      return _.head(lastPart.split('.'))
     }
   }
 }
