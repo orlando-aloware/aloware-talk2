@@ -184,7 +184,11 @@ export default {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     isValid () {
-      return this.appointment.date && this.appointment.time && this.appointment.timezone && this.contact
+      return this.appointment.date &&
+        this.appointment.date !== 'Invalid date' &&
+        this.appointment.time &&
+        this.appointment.timezone &&
+        this.contact
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
