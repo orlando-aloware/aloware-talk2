@@ -113,6 +113,20 @@ export default {
   methods: {
     onDownload () {
       this.isLoading = true
+
+      // if image is giphy's
+      const domain = new URL(this.attachmentUrl)
+
+      if (domain.hostname.includes('giphy.com')) {
+        this.$downloadFileWithUrl(this.attachmentUrl, this.newFilename)
+          .then(() => {
+            this.isLoading = false
+          }).catch(() => {
+            this.isLoading = false
+          })
+        return
+      }
+
       const fileUuid = !this.fileUuid ? this.getUuidFromURL(this.attachmentUrl) : this.fileUuid
       this.$downloadFileWithUuid(fileUuid, this.newFilename)
         .then(() => {

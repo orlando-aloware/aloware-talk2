@@ -252,7 +252,25 @@ Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') =>
       const link = document.createElement('a')
       link.href = url
       link.setAttribute('download', filename)
-      document.body.appendChild(link)
+      link.click()
+    })
+    .catch(() => {
+      this.$generalNotification('Failed to download file.', 'error')
+    })
+}
+
+Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
+  if (!url) {
+    this.$generalNotification('Failed to download file, missing URL', 'error')
+  }
+
+  return fetch(url)
+    .then(async (response) => {
+      const link = document.createElement('a')
+      const file = await response.blob()
+      link.href = window.URL.createObjectURL(file)
+      link.setAttribute('download', filename)
+      link.dataset.downloadurl = ['application/octet-stream', link.download, link.href].join(':')
       link.click()
     })
     .catch(() => {
