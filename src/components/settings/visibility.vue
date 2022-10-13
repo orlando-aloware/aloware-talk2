@@ -127,7 +127,8 @@
       </b-form-row>
 
       <b-form-row class="mt-4"
-                  :id="`${SettingsMap.read_only_access.hash_keyword}-container`">
+                  :id="`${SettingsMap.read_only_access.hash_keyword}-container`"
+                  v-if="!hasRole('Company Admin')">
         <b-col sm="12"
                md="12">
           <div>
