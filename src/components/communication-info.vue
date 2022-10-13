@@ -655,7 +655,7 @@
                     <label class="form-control-label w-100 mb-1">
                       Files:
                     </label>
-                    <div class="d-flex align-items-center w-100">
+                    <div class="d-flex align-items-center flex-column w-100">
                       <div v-for="(attachment, index) in communication.attachments"
                             :key="index"
                             class="text-dark-greenish w-100">
