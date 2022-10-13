@@ -287,40 +287,48 @@
 
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
           <router-link class="activity-status text-decoration-none"
-                       :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.id }}"
-                       :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
+                       :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.id }}">
             <template
               v-if="[CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(communication.disposition_status2)"
             >
-              <i class="material-icons help text-danger"
-                 v-if="communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW"
-                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
-              >cancel</i>
-              <i class="material-icons help text-danger"
-                 v-else
-                 :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
-              >cancel</i>
+              <span :class="statusClass">
+                <i class="material-icons help text-danger"
+                   v-if="communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                >cancel</i>
+                <i class="material-icons help text-danger"
+                   v-else
+                   :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
+                >cancel</i>
+              </span>
             </template>
             <template v-else>
-              <template
-                v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_DELIVERED_NEW].includes(communication.current_status2)">
+              <template v-if="![CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT, CommunicationTypes.NOTE].includes(communication.type)">
+                <template
+                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_DELIVERED_NEW].includes(communication.current_status2)">
+                  <i class="material-icons help text-bluish"
+                     :class="statusClass"
+                     :title="communication.current_status2 | translateCurrentStatusText | fixName">done_all</i>
+                </template>
+
                 <i class="material-icons help text-bluish"
-                   :title="communication.current_status2 | translateCurrentStatusText | fixName">done_all</i>
+                   :class="statusClass"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                   v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENT_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_ACCEPTED_NEW].includes(communication.current_status2)">done</i>
+
+                <i class="material-icons help text-blue"
+                   :class="statusClass"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                   v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
+
+                <i class="material-icons help text-light-blue-4"
+                   :class="statusClass"
+                   :title="'sending'"
+                   v-if="communication.current_status2 === undefined">done</i>
               </template>
 
-              <i class="material-icons help text-bluish"
-                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
-                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENT_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_ACCEPTED_NEW].includes(communication.current_status2)">done</i>
-
-              <i class="material-icons help text-blue"
-                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
-                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
-
-              <i class="material-icons help text-light-blue-4"
-                 :title="'sending'"
-                 v-if="communication.current_status2 === undefined">done</i>
-
               <i class="material-icons help text-danger"
+                 :class="statusClass"
                  :title="communication.current_status2 | translateCurrentStatusText | fixName"
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
             </template>
@@ -505,6 +513,10 @@ export default {
       id.data = _.isEmpty(id.data) ? this.communication.contact_id : id.data
 
       return _.isEmpty(id.data) ? _.get(this.contact, 'id', null) : id.data
+    },
+
+    statusClass () {
+      return [this.communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']
     }
   },
 
