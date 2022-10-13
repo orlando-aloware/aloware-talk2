@@ -137,17 +137,11 @@
               </video>
             </div>
 
-            <a :href="attachment.url"
-               target="_blank">
-              <div class="py-2 text-right"
-                   v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
-                <file-icon width="100" height="100" />
-                <p class="mb-0 mt-2"
-                   style="font-size:.7rem;word-break: break-all;">
-                  {{ attachment.name }}
-                </p>
-              </div>
-            </a>
+            <download-button is-simple-attachment
+                             :filename="attachment.name"
+                             :attachment-url="attachment.url"
+                             v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
+            </download-button>
           </div>
         </div>
 
@@ -353,7 +347,6 @@ import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-t
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
-import FileIcon from 'components/icons/contact-activity/file-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
 
@@ -367,7 +360,6 @@ export default {
   ],
 
   components: {
-    FileIcon,
     CommunicationInfo,
     Avatar,
     InformationCircleIcon,

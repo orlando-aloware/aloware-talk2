@@ -62,7 +62,7 @@
                   </template>
                   <template v-slot:default>
                     <download-button buttonStyle="top: 8px; left: 8px"
-                                     :attachment-name="attachment.name"
+                                     :filename="attachment.name"
                                      :attachment-url="attachment.url"/>
                   </template>
                 </q-img>
@@ -86,18 +86,11 @@
                   </video>
                 </div>
 
-                <a :href="attachment.url"
-                   target="_blank"
-                   v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
-                  <div class="p-2 text-center">
-                    <figure>
-                      <img height="100"
-                           width="100"
-                           src="src/assets/icons/app/file.svg">
-                      <figcaption>{{ attachment.name ? attachment.name : 'Click Here To Download' }}</figcaption>
-                    </figure>
-                  </div>
-                </a>
+                <download-button is-simple-attachment
+                                 :filename="attachment.name"
+                                 :attachment-url="attachment.url"
+                                 v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
+                </download-button>
               </div>
             </div>
 
@@ -673,13 +666,14 @@
               </b-col>
 
               <b-col>
-                <b-link target="_blank"
-                        class="text-dark-greenish"
-                        v-for="(attachment, index) in communication.attachments"
-                        :key="index"
-                        :href="attachment.url">
-                  Click Here To Download
-                </b-link>
+                <div v-for="(attachment, index) in communication.attachments"
+                     :key="index"
+                     class="text-dark-greenish w-100">
+                  <download-button is-simple
+                                   show-file-name
+                                   :filename="attachment.name"
+                                   :attachment-url="attachment.url"/>
+                </div>
               </b-col>
             </b-form-row>
           </q-card-section>

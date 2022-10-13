@@ -9,10 +9,10 @@
            :style="buttonStyle"
            :loading="isLoading"
            :disabled="isLoading"
-           v-if="!isSimple"
+           v-if="!isSimple && !isSimpleAttachment"
            @click="onDownload" />
     <div class="d-flex align-items-center"
-         v-if="isSimple">
+         v-if="isSimple && !isSimpleAttachment">
       <div class="filename-ellipsis"
            v-if="showFileName">
         {{ filenameText }}
@@ -32,18 +32,31 @@
         </download-icon>
       </q-btn>
     </div>
+    <a role="button"
+       v-if="isSimpleAttachment && !isSimple"
+       @click.prevent="onDownload">
+      <div class="py-2 text-right">
+        <file-icon width="100" height="100" />
+        <p class="mb-0 mt-2"
+           style="font-size:.7rem;word-break: break-all;">
+          {{ newFilename }}
+        </p>
+      </div>
+    </a>
   </div>
 </template>
 
 <script>
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
+import FileIcon from 'components/icons/contact-activity/file-icon'
 import { isEmpty } from 'lodash'
 export default {
   name: 'download-button',
   mixins: [communicationInfoMixin],
   components: {
-    DownloadIcon
+    DownloadIcon,
+    FileIcon
   },
   props: {
     attachmentUrl: {
@@ -61,6 +74,11 @@ export default {
       required: false
     },
     isSimple: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    isSimpleAttachment: {
       type: Boolean,
       default: false,
       required: false
