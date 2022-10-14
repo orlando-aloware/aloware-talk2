@@ -29,6 +29,13 @@
                               :contact="contact"
                               :campaignId="campaignId">
             </contact-activity>
+            <contact-activity v-for="(communication, index) in sendingCommunications"
+                              v-bind:key="'sending-comm-' + index"
+                              ref="communication-0"
+                              :communication="communication"
+                              :contact="contact"
+                              :campaignId="communication.campaignId">
+            </contact-activity>
           </div>
         </div>
           <template #overlay>
@@ -44,7 +51,9 @@
       </div>
 
     <div class="composer-container-wrapper">
-      <message-composer :campaignId="campaignId"></message-composer>
+      <message-composer :campaignId="campaignId"
+                        @message-sent="setSendingCommunication">
+      </message-composer>
     </div>
   </div>
 </template>
@@ -55,6 +64,8 @@ import { mapGetters } from 'vuex'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
+import * as CommunicationTypes from 'src/constants/communication-types'
+
 export default {
   name: 'contact-activities',
   components: {
@@ -78,7 +89,20 @@ export default {
   },
   data () {
     return {
-      isLoadingPreviousActivities: false
+      isLoadingPreviousActivities: false,
+      sendingCommunications: []
+    }
+  },
+  watch: {
+    communications: function (communications) {
+      let lastComm = communications[communications.length - 1]
+      for (const [index, value] of this.sendingCommunications.entries()) {
+        // Remove pending communication that was created if it's already processed by the API
+        if (this.isSameCommunication(value, lastComm)) {
+          this.sendingCommunications.splice(index, 1)
+          break
+        }
+      }
     }
   },
   computed: {
@@ -104,6 +128,37 @@ export default {
     }
   },
   methods: {
+    isSameCommunication (comm1, comm2) {
+      if (comm1.type !== comm2.type) {
+        return false
+      }
+
+      // If it's a note, the verification should remove new line special chars,
+      // that are automatically added at the end of the note
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.NOTE)) {
+        let body1 = comm1.body.replace(/(\r\n|\n|\r)/gm, '').trim()
+        let body2 = comm2.body.replace(/(\r\n|\n|\r)/gm, '').trim()
+        return body1 === body2
+      }
+
+      // If it's an email, the message and subject need to be checked
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.EMAIL)) {
+        let body = comm2.body.split(/\r?\n/)
+
+        let subject = body[0].split(':')[1].trim()
+        let message = body[3].trim()
+
+        return subject === comm1.subject && message === comm1.message
+      }
+
+      // If it's a fax, it won't have any text to compare.
+      // Then, we can check if the created_at time is reasonably similar
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.FAX)) {
+        return window.moment.utc(comm2.created_at).diff(comm1.created_at) < 15 * 1000
+      }
+
+      return comm1.body === comm2.body
+    },
     scrollMessages () {
       const activitiesWrap = this.$refs.activitiesWrap
       if (activitiesWrap && activitiesWrap.scrollHeight) {
@@ -112,6 +167,13 @@ export default {
     },
     markAllAsRead () {
       this.$emit('markAllAsRead')
+    },
+    setSendingCommunication (message) {
+      this.sendingCommunications.push(message)
+
+      setTimeout(() => {
+        this.scrollMessages()
+      }, 500)
     }
   }
 }

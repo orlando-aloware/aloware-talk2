@@ -5,12 +5,11 @@
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
-    <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center"
-         :class="{ 'unsupported': !$q.platform.is.mobile }">
+    <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended" />
+      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
@@ -27,7 +26,7 @@
                 <transition :name="transitionName"
                             mode="out-in">
                   <!-- <keep-alive> -->
-                    <router-view></router-view>
+                  <router-view></router-view>
                   <!-- </keep-alive> -->
                 </transition>
               </template>
@@ -166,7 +165,7 @@
                 transition-show="scale"
                 transition-hide="scale"
                 persistent>
-        <q-card class="bg-greenish text-white"
+        <q-card class="bg-green-7 text-white"
                 style="width: 300px">
           <q-card-section>
             <div class="text-h6">Update Downloaded</div>
@@ -177,7 +176,7 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-greenish">
+                          class="bg-white text-green-7">
             <q-btn label="Restart"
                    @click="restartApp"
                    flat>
@@ -186,7 +185,7 @@
         </q-card>
       </q-dialog>
       <pro-feature-dialog/>
-      </div>
+    </div>
   </div>
 </template>
 
@@ -295,7 +294,8 @@ export default {
 
   computed: {
     ...mapState('cache', [
-      'currentCompany'
+      'currentCompany',
+      'timezones'
     ]),
     ...mapState([
       'dialer',
@@ -822,13 +822,13 @@ export default {
             const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
             // check if communication is a live call
             if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-              [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(communication.current_status2)) {
               const liveContacts = _.cloneDeep(this.liveContacts)
               if (!isInLiveContacts) {
                 liveContacts.push(contact)
@@ -927,10 +927,13 @@ export default {
       console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
       this.$generalNotification(
         `Your export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
-        'export',
+        'export-csv',
         0,
         true,
-        task.export.uuid
+        {
+          uuid: task.export.uuid,
+          filename: `${task.export.uuid}.csv`
+        }
       )
     })
 
@@ -1217,6 +1220,8 @@ export default {
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
       }
+
+      this.getTimezones()
 
       this.initAccount().then(() => {
         this.loading = false
@@ -2139,6 +2144,13 @@ export default {
       }
     },
 
+    getTimezones () {
+      return this.$axios.get('/api/v1/timezones')
+        .then(res => {
+          this.setTimezones(res.data)
+        })
+    },
+
     beforeUnload () {
       this.$VueEvent.stop('bounce_dock')
       this.$VueEvent.stop('set_badge')
@@ -2179,7 +2191,7 @@ export default {
       clearInterval(this.$options.appFooterInterval)
     },
 
-    ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
     ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
     ...mapActions([
       'resetVuex',

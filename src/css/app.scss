@@ -1358,6 +1358,7 @@ i.option-separator {
 .audio-player {
   background: $grey-50;
   border-radius: 8px;
+  min-height: 42px;
 }
 
 @-webkit-keyframes rotating {
@@ -7080,10 +7081,6 @@ table.datatable {
   }
 }
 
-.activity-status {
-  width: 10px;
-}
-
 .shine {
   background-color: #fff7df;
 }
@@ -11337,4 +11334,8 @@ h1.contact-list-name-label {
 
 .line-height-15 {
   line-height: 1.5 !important;
+}
+
+.no-bg {
+  background: none !important;
 }

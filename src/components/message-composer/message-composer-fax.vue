@@ -73,6 +73,7 @@
 import UploadIcon from 'components/icons/upload-icon'
 import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters } from 'vuex'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'message-composer-fax',
@@ -140,7 +141,14 @@ export default {
     },
     send () {
       this.isSending = true
-      return talk2Api.V1.lines.sendFax(this.selectedLine.id, this.contact.id, this.formatMessage())
+
+      const message = this.formatMessage()
+      this.$emit('message-sent', {
+        ...message,
+        type: CommunicationTypes.FAX
+      })
+
+      return talk2Api.V1.lines.sendFax(this.selectedLine.id, this.contact.id, message)
         .then(response => {
           if (response.status === 201) {
             this.sendCallback()

@@ -4,7 +4,7 @@
          v-for="operator in filter.operators"
          :key="(filter.key + '-' + operator.value)"
     >
-      <q-radio class="my-2"
+      <q-radio class="my-2 flex-nowrap"
                dense
                :val="operator.value"
                :label="operator.label"
@@ -201,13 +201,27 @@ export default {
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
-      this.filterOperatorValue = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
+      this.setValue()
     }, 10)
     this.$VueEvent.listen('filters-reset', () => {
       this.resetForm()
     })
   },
   methods: {
+    setValue () {
+      const value = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
+
+      switch (this.filter.type) {
+        case 'number':
+          this.setNumberValue(value)
+          break
+        case 'date':
+          this.setDateValue(value)
+          break
+        default:
+          this.filterOperatorValue = value
+      }
+    },
     addValue () {
       if (this.filterOperatorValue &&
         typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object' &&
@@ -322,18 +336,42 @@ export default {
       switch (true) {
         case this.filterOperator === 8:
           return 0
+        // in between operator
         case this.filterOperator === 7:
           return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
         default:
           return this.filterOperatorValue
       }
     },
+    setNumberValue (value) {
+      switch (this.filterOperator) {
+        // in between operator
+        case 7:
+          this.filterOperatorValue = value[0]
+          this.secondaryFilterOperatorValue = value[1]
+          break
+        default:
+          this.filterOperator = value
+      }
+    },
     getDateValue () {
       switch (true) {
+        // in between operator
         case this.filterOperator === 5:
           return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
         default:
           return this.filterOperatorValue
+      }
+    },
+    setDateValue (value) {
+      switch (this.filterOperator) {
+        // in between operator
+        case 5:
+          this.filterOperatorValue = value[0]
+          this.secondaryFilterOperatorValue = value[1]
+          break
+        default:
+          this.filterOperator = value
       }
     },
     getRelationTypesValue () {

@@ -99,12 +99,6 @@
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <a style="opacity: 0; height: 0; width: 0;"
-               target="_blank"
-               role="button"
-               download
-               :ref="`${communication.id}${index}anchor`"
-               :href="attachment.url" />
             <q-img
               class="border-rounded img-fluid d-block r-2x mb-1"
               :src="attachment.url"
@@ -118,13 +112,9 @@
                 </div>
               </template>
               <template v-slot:default>
-                <q-btn class="absolute all-pointer-events"
-                       style="top: 8px; left: 8px"
-                       icon="file_download"
-                       color="primary"
-                       size="16px"
-                       dense
-                       @click="downloadFileFromReference(`${communication.id}${index}anchor`)" />
+                <download-button buttonStyle="top: 8px; left: 8px"
+                                 :filename="attachment.name"
+                                 :attachment-url="attachment.url"/>
               </template>
             </q-img>
 
@@ -147,17 +137,11 @@
               </video>
             </div>
 
-            <a :href="attachment.url"
-               target="_blank">
-              <div class="py-2 text-right"
-                   v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
-                <file-icon width="100" height="100" />
-                <p class="mb-0 mt-2"
-                   style="font-size:.7rem;word-break: break-all;">
-                  {{ attachment.name }}
-                </p>
-              </div>
-            </a>
+            <download-button is-simple-attachment
+                             :filename="attachment.name"
+                             :attachment-url="attachment.url"
+                             v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
+            </download-button>
           </div>
         </div>
 
@@ -303,36 +287,48 @@
 
         <template v-if="communication.direction === CommunicationDirection.OUTBOUND">
           <router-link class="activity-status text-decoration-none"
-                       :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.id }}"
-                       :class="[communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']">
+                       :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.id }}">
             <template
               v-if="[CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(communication.disposition_status2)"
             >
-              <i class="material-icons help text-danger"
-                 v-if="communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW"
-                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
-              >cancel</i>
-              <i class="material-icons help text-danger"
-                 v-else
-                 :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
-              >cancel</i>
+              <span :class="statusClass">
+                <i class="material-icons help text-danger"
+                   v-if="communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                >cancel</i>
+                <i class="material-icons help text-danger"
+                   v-else
+                   :title="communication.disposition_status2 | translateDispositionStatusText | fixName"
+                >cancel</i>
+              </span>
             </template>
             <template v-else>
-              <template
-                v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_DELIVERED_NEW].includes(communication.current_status2)">
+              <template v-if="![CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT, CommunicationTypes.NOTE].includes(communication.type)">
+                <template
+                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_DELIVERED_NEW].includes(communication.current_status2)">
+                  <i class="material-icons help text-bluish"
+                     :class="statusClass"
+                     :title="communication.current_status2 | translateCurrentStatusText | fixName">done_all</i>
+                </template>
+
                 <i class="material-icons help text-bluish"
-                   :title="communication.current_status2 | translateCurrentStatusText | fixName">done_all</i>
+                   :class="statusClass"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                   v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENT_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_ACCEPTED_NEW].includes(communication.current_status2)">done</i>
+
+                <i class="material-icons help text-blue"
+                   :class="statusClass"
+                   :title="communication.current_status2 | translateCurrentStatusText | fixName"
+                   v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
+
+                <i class="material-icons help text-light-blue-4"
+                   :class="statusClass"
+                   :title="'sending'"
+                   v-if="communication.current_status2 === undefined">done</i>
               </template>
 
-              <i class="material-icons help text-bluish"
-                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
-                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENT_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_ACCEPTED_NEW].includes(communication.current_status2)">done</i>
-
-              <i class="material-icons help text-blue"
-                 :title="communication.current_status2 | translateCurrentStatusText | fixName"
-                 v-if="[CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_SENDING_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_RECEIVING_NEW].includes(communication.current_status2)">done</i>
-
               <i class="material-icons help text-danger"
+                 :class="statusClass"
                  :title="communication.current_status2 | translateCurrentStatusText | fixName"
                  v-if="[CommunicationCurrentStatus.CURRENT_STATUS_SMS_UNDELIVERED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_SMS_FAILED_NEW].includes(communication.current_status2)">error</i>
             </template>
@@ -348,8 +344,7 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin,
-  downloadMixin
+  userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -360,8 +355,8 @@ import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-t
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
-import FileIcon from 'components/icons/contact-activity/file-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import DownloadButton from 'components/download-button'
 
 import talk2Api from 'src/plugins/api/api'
 
@@ -369,15 +364,14 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin,
-    downloadMixin
+    userMixin
   ],
 
   components: {
-    FileIcon,
     CommunicationInfo,
     Avatar,
-    InformationCircleIcon
+    InformationCircleIcon,
+    DownloadButton
   },
 
   props: {
@@ -519,6 +513,10 @@ export default {
       id.data = _.isEmpty(id.data) ? this.communication.contact_id : id.data
 
       return _.isEmpty(id.data) ? _.get(this.contact, 'id', null) : id.data
+    },
+
+    statusClass () {
+      return [this.communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']
     }
   },
 

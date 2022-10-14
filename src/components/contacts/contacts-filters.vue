@@ -485,7 +485,7 @@ export default {
         }
 
         joinedValues.data = labels.data.join(', ')
-        if (labels.data > 1) {
+        if (labels.data.length > 1) {
           return joinedValues.data.substring(0, joinedValues.data.lastIndexOf(',')) + ' or' + joinedValues.data.substring(joinedValues.data.lastIndexOf(',') + 1, joinedValues.data.length)
         }
 

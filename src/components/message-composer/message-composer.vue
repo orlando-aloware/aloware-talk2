@@ -42,10 +42,14 @@
       </div>
       <div>
         <message-composer-sms :is-disabled="isSmsDisabled"
-                              v-if="messageComposer.mode === 'sms'"/>
-        <message-composer-fax v-if="messageComposer.mode === 'fax'" />
-        <message-composer-email v-if="messageComposer.mode === 'email' && contact.email" />
-        <message-composer-note v-if="messageComposer.mode === 'note'" />
+                              v-if="messageComposer.mode === 'sms'"
+                              @message-sent="onMessageSent"/>
+        <message-composer-fax v-if="messageComposer.mode === 'fax'"
+                              @message-sent="onMessageSent"/>
+        <message-composer-email v-if="messageComposer.mode === 'email' && contact.email"
+                                @message-sent="onMessageSent"/>
+        <message-composer-note v-if="messageComposer.mode === 'note'"
+                               @message-sent="onMessageSent"/>
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1">
@@ -81,6 +85,7 @@ import talk2Api from 'src/plugins/api/api'
 import MessageComposerFax from 'components/message-composer/message-composer-fax'
 import MessageComposerEmail from 'components/message-composer/message-composer-email'
 import MessageComposerNote from 'components/message-composer/message-composer-note'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as Roles from 'src/constants/roles'
 
 export default {
@@ -146,6 +151,17 @@ export default {
     },
     onLineChange (line) {
       this.setSelectedLine(line)
+    },
+    onMessageSent (message) {
+      const sendingMessage = {
+        ...message,
+        direction: CommunicationDirection.OUTBOUND,
+        user_id: this.profile.id,
+        workflow_id: null,
+        lead_number: this.contact.phone_number,
+        created_at: window.moment()
+      }
+      this.$emit('message-sent', sendingMessage)
     }
   },
 

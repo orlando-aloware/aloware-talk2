@@ -219,6 +219,10 @@ export default {
 
     isPushContactToCrmEnabled () {
       return this.currentCompany ? this.resellerIdToPushContactToCrm.includes(this.currentCompany.reseller_id) : false
+    },
+
+    addTemporaryCommunication (communication) {
+      this.communicationsAndAudits = [...this.communicationsAndAudits, communication]
     }
   },
 

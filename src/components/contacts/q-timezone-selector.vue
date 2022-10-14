@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'q-timezone-selector',
 
@@ -39,6 +41,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['timezones']),
+
     placeholder () {
       if (!this.showPlaceholder) {
         return ''
@@ -60,7 +64,6 @@ export default {
   data () {
     return {
       timezone: this.value,
-      timezones: window.moment.tz.names(),
       options: [],
       selectWidth: 0
     }
