@@ -845,7 +845,6 @@ export default {
       'removeContactOpen',
       'setBulkDelete',
       'setMessageComposerMode',
-      'exportCsv',
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded'
@@ -1309,7 +1308,7 @@ export default {
       return owner ? owner.name : ''
     },
     async exportAsCsv () {
-      this.exportCsv(this.list.id)
+      talk2Api.V2.contacts.listExport(this.list.id)
         .catch(() => {
           this.$generalNotification('Unable to process export request! Please try again later.', 'error')
         })

@@ -1,25 +1,4 @@
-import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
-
 export default {
-  async exportCsv ({ commit }, id = '') {
-    let defaultList = null
-    const params = {}
-    Object.entries(DEFAULT_PINNED_LIST).forEach(([key, value]) => {
-      if (value.id === id) {
-        defaultList = DEFAULT_PINNED_LIST[key]
-      }
-    })
-
-    if (!defaultList) {
-      params.contact_list_id = id
-    } else {
-      params.default_list_type = defaultList.type
-    }
-
-    return window.axios.get(`api/v2/contacts-list/export-csv`, {
-      params: params
-    })
-  },
   toggleFolder: ({ commit }, id) => {
     commit('TOGGLE_FOLDER', id)
   },

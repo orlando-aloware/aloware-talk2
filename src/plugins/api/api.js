@@ -2,6 +2,7 @@ const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
 import qs from 'qs'
 import _ from 'lodash'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 export default {
   V1: {
@@ -316,6 +317,25 @@ export default {
       },
       taskStatusUpdate (id, params) {
         return window.axios.put(`/api/v2/contacts/${id}/task-status`, params)
+      },
+      async listExport (id) {
+        let defaultList = null
+        const params = {}
+        Object.entries(DEFAULT_PINNED_LIST).forEach(([key, value]) => {
+          if (value.id === id) {
+            defaultList = DEFAULT_PINNED_LIST[key]
+          }
+        })
+
+        if (!defaultList) {
+          params.contact_list_id = id
+        } else {
+          params.default_list_type = defaultList.type
+        }
+
+        return window.axios.get(`api/v2/contacts-list/export-csv`, {
+          params: params
+        })
       }
     },
     contactFolders: {
@@ -337,6 +357,15 @@ export default {
     powerDialerListItem: {
       add (params = {}) {
         return window.axios.post(`${suffixV2}power-dialer-list-items`, params)
+      }
+    },
+    powerDialer: {
+      async listExport (id) {
+        return window.axios.get(`api/v2/power-dialer-lists/export-csv`, {
+          params: {
+            contact_list_id: id
+          }
+        })
       }
     },
     contactListItem: {
