@@ -815,7 +815,7 @@ export default {
       folderPath: [],
       createContactModalId: 'contacts-list-create-contact-modal',
       myContacts: false,
-      hasExport: false,
+      hasExport: true,
       hasNextPage: false,
       viewListeners: {},
       ContactListTypes
@@ -1309,12 +1309,10 @@ export default {
       return owner ? owner.name : ''
     },
     async exportAsCsv () {
-      let res = await this.exportCsv(this.list.id)
-      if (res.status === 200) {
-        this.$generalNotification(res.data.message, 'success')
-      } else {
-        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
-      }
+      this.exportCsv(this.list.id)
+        .catch(() => {
+          this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+        })
     }
   },
 
