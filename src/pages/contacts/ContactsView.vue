@@ -609,11 +609,10 @@
         </template>
 
         <template slot="empty"
-                  v-if="showEmptySlot">
-          <div class="start-state" @click="onNavigateToAdd($event)">
-            <div
-              class="p-4 bg-light w-100 text-center border-bottom text-primary"
-            >
+                  v-if="showEmptySlot && (!list.show_in_public_folder || (list.show_in_public_folder && listItemsDataCount > 0))">
+          <div class="start-state"
+               @click="onNavigateToAdd($event)">
+            <div class="p-4 bg-light w-100 text-center border-bottom text-primary">
               <template v-if="list.type == ContactListTypes.STATIC">
                 Add contacts <i class="fa fa-plus"></i>
               </template>
