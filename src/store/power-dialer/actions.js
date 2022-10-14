@@ -16,13 +16,6 @@ export default {
     const res = await talk2Api.V2.contactList.public()
     return res.data.data
   },
-  async exportCsv ({ commit }, id = '') {
-    return window.axios.get(`api/v2/power-dialer-lists/export-csv`, {
-      params: {
-        contact_list_id: id
-      }
-    })
-  },
 
   /**
    * Actual API Calls for

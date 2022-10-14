@@ -221,7 +221,10 @@ import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
-import { TYPE_EXPORT_POWER_DIALER_LIST_ITEMS } from 'src/constants/export-types-default'
+import {
+  TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+  TYPE_EXPORT_CONTACT_LIST_ITEMS
+} from 'src/constants/export-types-default'
 
 export default {
   name: 'MyLayout',
@@ -286,6 +289,10 @@ export default {
       checkDebounce: null,
       userSuspended: false,
       accountSuspended: false,
+      allowedExports: [
+        TYPE_EXPORT_CONTACT_LIST_ITEMS,
+        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
+      ],
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -910,23 +917,24 @@ export default {
     */
 
     this.$VueEvent.listen('export_event_create', (task) => {
-      if (task.export.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ||
+      if (!this.allowedExports.includes(task.export.type) ||
         task.export.user_id !== this.profile.id) {
         return
       }
 
-      this.$generalNotification('Power Dialer list is being exported. Please wait for a while.', 'success')
+      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
+      this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
     })
 
     this.$VueEvent.listen('export_event_update', (task) => {
-      if (task.export.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ||
+      if (!this.allowedExports.includes(task.export.type) ||
         task.export.user_id !== this.profile.id) {
         return
       }
 
-      console.log(' %c EXPORT EVENT UPDATE : ', 'background: blue; color: #fff;', task)
+      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
       this.$generalNotification(
-        `Your export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+        `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
         'export-csv',
         0,
         true,
@@ -938,7 +946,7 @@ export default {
     })
 
     this.$VueEvent.listen('export_event_delete', (task) => {
-      if (task.export.type !== TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ||
+      if (!this.allowedExports.includes(task.export.type) ||
         task.export.user_id !== this.profile.id) {
         return
       }

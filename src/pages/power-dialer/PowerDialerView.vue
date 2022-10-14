@@ -899,8 +899,7 @@ export default {
     ]),
     ...mapActions('powerDialer', [
       'updateContactsList',
-      'getMyQueueList',
-      'exportCsv'
+      'getMyQueueList'
     ]),
     createNewPowerDialerContact (contact) {
       console.log('PD contact to create : ', contact)
@@ -925,10 +924,10 @@ export default {
       this.$emit('loadMore')
     },
     async exportAsCsv () {
-      const response = await this.exportCsv(this.selectedList.id)
-      if (response.status !== 200) {
-        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
-      }
+      talk2Api.V2.powerDialer.listExport(this.selectedList.id)
+        .catch(() => {
+          this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+        })
     },
     async beginDial () {
       this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)
