@@ -242,7 +242,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
           return 'Company was suspended.'
         case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
-          return 'SPAM Detected: Sending the same message multiple times has been stopped.'
+          return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
       }
     },
 
