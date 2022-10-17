@@ -92,6 +92,10 @@ export default {
       }
     },
 
+    fireEndWrapUp: _.debounce(function () {
+      this.$VueEvent.fire('endWrapUp')
+    }, 100),
+
     changeAgentStatus: _.debounce(function (val, changeAgentStatusTry = 1) {
       if (!this.authenticated) {
         return
@@ -113,7 +117,7 @@ export default {
           this.$VueEvent.fire('user_updated', data)
           console.log('Changed agent status [api]: ', data.agent_status)
           if (data.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-            this.$VueEvent.fire('endWrapUp')
+            this.fireEndWrapUp()
           }
         }).catch(err => {
           changeAgentStatusTry++
@@ -136,7 +140,7 @@ export default {
   watch: {
     agentStatus (toVal, fromVal) {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-        this.$VueEvent.fire('endWrapUp')
+        this.fireEndWrapUp()
       }
     }
   },

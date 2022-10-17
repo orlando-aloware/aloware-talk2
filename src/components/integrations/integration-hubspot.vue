@@ -245,7 +245,7 @@ export default {
   },
 
   methods: {
-    getData () {
+    getData: _.debounce(function () {
       return talk2Api.V1.contact.getIntegrationData(this.contact.id, {
         params: {
           integration_name: this.integration_name,
@@ -254,7 +254,7 @@ export default {
       }).then(response => {
         this.integration_data = response.data
       })
-    },
+    }, 100),
 
     getContactId () {
       const contactId = { data: null }
