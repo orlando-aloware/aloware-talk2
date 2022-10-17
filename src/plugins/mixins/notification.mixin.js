@@ -1,7 +1,6 @@
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
-import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 
 export default {
   data () {
@@ -255,7 +254,7 @@ export default {
             break
           }
 
-          const callType = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode && communication.last_call_source !== CommunicationSourceCallTypes.SOURCE_COLD_RG ? 'callFishing' : 'incomingCall'
+          const callType = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
