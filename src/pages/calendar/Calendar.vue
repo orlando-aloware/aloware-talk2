@@ -1,6 +1,5 @@
 <template>
-  <div class="position-relative"
-       id="calendar">
+  <div class="calendar position-relative">
     <b-overlay
       class="h-100 w-100 position-absolute"
       :show="loading"
@@ -12,6 +11,55 @@
     </b-overlay>
 
     <!-- header -->
+    <div class="calendar__header position-fixed">
+      <div class="calendar__header__action-left">
+        <b-button size="sm"
+                  variant="light"
+                  class="btn-white btn-calendar-prev-next btn-contact-prev-next"
+                  @click.prevent="changeDirection('subtract')">
+          <i class="material-icons">keyboard_arrow_left</i>
+          <q-tooltip>
+            Previous {{ view }}
+          </q-tooltip>
+        </b-button>
+        <date-selector date-only
+                       noValueToCustomElem
+                       @dateSelected="onDateSelected">
+          <b-button size="sm"
+                    variant="light"
+                    class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
+            <calendar-icon class="mr-2"/>
+            {{ currentDate }}
+            <q-tooltip>
+              Select date
+            </q-tooltip>
+          </b-button>
+        </date-selector>
+        <b-button size="sm"
+                  variant="light"
+                  class="btn-white btn-calendar-prev-next btn-contact-prev-next"
+                  @click.prevent="changeDirection('add')">
+          <i class="material-icons">keyboard_arrow_right</i>
+          <q-tooltip>
+            Next {{ view }}
+          </q-tooltip>
+        </b-button>
+      </div>
+      <div class="calendar__header__action-right">
+        <q-select options-selected-class="text-primary"
+                  color="primary"
+                  option-value="id"
+                  option-label="name"
+                  input-debounce="0"
+                  emit-value
+                  map-options
+                  dense
+                  outlined
+                  v-model="view"
+                  :options="views">
+        </q-select>
+      </div>
+    </div>
 
     <!-- scheduler -->
     <div id="container-sched">
@@ -47,7 +95,6 @@
                    @add-schedule="addSchedule"
                    @filter-click="toggleFilters"
                    @render-events="renderFromEvent"
-                   @toggle-goto-date="toggleGotoDate"
                    @update-current-date="updateCurrentDate">
         </scheduler>
       </div>
@@ -57,12 +104,17 @@
 
 <script>
 // import { mapActions, mapState } from 'vuex'
+import CalendarIcon from '../../components/icons/calendar-icon.vue'
+import DateSelector from '../../components/date-selector.vue'
 import Scheduler from '../../components/calendar/scheduler.vue'
+import moment from 'moment'
 
 export default {
   name: 'Calendar',
 
   components: {
+    CalendarIcon,
+    DateSelector,
     Scheduler
   },
 
@@ -84,14 +136,19 @@ export default {
       // original_filters: {},
       loading: true,
       // gotoDateVisible: false,
-      // gotoDate: new Date(),
+      gotoDate: new Date(),
       // statusNames: {},
       view: 'month',
-      // stepMap: {
-      //   'day': 'd',
-      //   'week': 'w',
-      //   'month': 'M'
-      // },
+      stepMap: {
+        'day': 'd',
+        'week': 'w',
+        'month': 'M'
+      },
+      views: [
+        { 'id': 'day', name: 'Day' },
+        { 'id': 'month', name: 'Month' },
+        { 'id': 'week', name: 'Week' }
+      ],
       // dpOptions: {
       //   firstDayOfWeek: 1
       // },
@@ -118,21 +175,74 @@ export default {
   computed: {
     // ...mapState('stats', ['metricGroups', 'metricLoader']),
     // ...mapState('auth', ['profile'])
+    currentDate () {
+      let d = ''
+      const m = moment(this.gotoDate)
+
+      if (this.view === 'day') {
+        d = m.format('D MMM YYYY')
+      } else if (this.view === 'week') {
+        const start = moment(this.gotoDate).startOf('isoWeek')
+        const end = moment(this.gotoDate).endOf('isoWeek')
+
+        d = start.format('D MMM') + ' - ' + end.format('D MMM YYYY')
+        if (start.format('MMM') === end.format('MMM')) {
+          d = start.format('D') + ' - ' + end.format('D MMM YYYY')
+        }
+      } else if (this.view === 'month') {
+        d = m.format('MMMM YYYY')
+      }
+
+      return d
+    },
+    formattedWeekDays () {
+      const start = moment(this.gotoDate).startOf('isoWeek')
+
+      let cd = start
+      let dates = []
+
+      for (let i = 0; i < 7; i++) {
+        dates.push({
+          date: cd,
+          dayOfWeek: cd.format('ddd'),
+          day: cd.format('D'),
+          today: cd.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')
+        })
+
+        cd.add(1, 'd')
+      }
+
+      return dates
+    }
   },
 
   methods: {
+    onDateSelected (date) {
+      this.gotoDate = date
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+    },
+
+    changeDirection (direction) {
+      let date = moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
+
+      if (this.view === 'day') {
+        this.gotoDate = date
+      }
+
+      this.$refs.scheduler.setCurrentView(date, this.view)
+    },
+
     editSchedule (event) {
-      this.$refs.manager.editSchedule(event)
+      // this.$refs.manager.editSchedule(event)
     },
 
     addSchedule (date) {
-      this.$refs.manager.addSchedule(date)
+      // this.$refs.manager.addSchedule(date)
     },
 
     toggleFilters () {
-      console.log('filters toggled')
-      // this.original_filters = _.clone(this.filters)
-      // this.dialogVisible = true
+    //   this.original_filters = _.clone(this.filters)
+    //   this.dialogVisible = true
     },
 
     loadCalendarData (state) {
@@ -181,9 +291,9 @@ export default {
       this.loadCalendarData(state)
     },
 
-    toggleGotoDate () {
-      this.gotoDateVisible = true
-    },
+    // toggleGotoDate () {
+    //   this.gotoDateVisible = true
+    // },
 
     updateCurrentDate (date) {
       this.gotoDate = date
@@ -197,6 +307,12 @@ export default {
       if (this.source) {
         this.source.cancel('Calendar: Request Cancelled.')
       }
+    }
+  },
+
+  watch: {
+    view () {
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
     }
   }
 }

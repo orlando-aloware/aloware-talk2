@@ -11342,43 +11342,92 @@ h1.contact-list-name-label {
 }
 
 // Calendar
-#calendar {
-  #container-search-result {
-    min-height: calc(100vh - 115px);
-    border: 1px solid #e0e0e0;
-    border-top: 0;
+.calendar {
+  // #container-search-result {
+  //   min-height: calc(100vh - 115px);
+  //   border: 1px solid #e0e0e0;
+  //   border-top: 0;
 
-    table {
-      .day-of-month {
-        width: 30px;
-        padding-right: 0;
-        font-size: 18px;
-        font-weight: 400;
-        text-align: center;
-        padding-left: 1rem
+  //   table {
+  //     .day-of-month {
+  //       width: 30px;
+  //       padding-right: 0;
+  //       font-size: 18px;
+  //       font-weight: 400;
+  //       text-align: center;
+  //       padding-left: 1rem
+  //     }
+
+  //     .date {
+  //       width: 150px;
+  //       text-transform: uppercase;
+  //     }
+
+  //     .time {
+  //       width: 200px;
+  //     }
+
+  //     .contact {
+  //       min-width: 200px;
+  //     }
+
+  //     td {
+  //       vertical-align: middle;
+
+  //       .fa-circle {
+  //         font-size: 12px;
+  //       }
+  //     }
+  //   }
+  // }
+
+  &__header {
+    width: calc(100% - 64px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 60px;
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 1000;
+
+    &__action-left,
+    &__action-right {
+      height: 60px;
+      flex-grow: 1;
+      display: flex;
+      justify-content: space-evenly;
+      padding: 0px 20px;
+      align-items: center;
+    }
+
+    .q-field {
+      margin-bottom: 0px !important;
+    }
+
+    .q-field__control,
+    .q-field__native {
+      min-height: 32px !important;
+      
+    }
+
+    @include screen('lg') {
+      top: 60px;
+      flex-direction: row;
+
+      &__action-left {
+        justify-content: left;
+        width: 50%;
       }
 
-      .date {
-        width: 150px;
-        text-transform: uppercase;
-      }
-
-      .time {
-        width: 200px;
-      }
-
-      .contact {
-        min-width: 200px;
-      }
-
-      td {
-        vertical-align: middle;
-
-        .fa-circle {
-          font-size: 12px;
-        }
+      &__action-right {
+        justify-content: right;
+        width: 50%;
       }
     }
+  }
+
+  .b-overlay-wrap {
+    z-index: 1005;
   }
 
   .el-badge {
@@ -11430,12 +11479,13 @@ h1.contact-list-name-label {
   }
 
   #container-sched {
-    margin-top: 60px;
+    margin-top: 120px;
     background-color: #fff;
 
     #sched-header {
       z-index: 910;
       position: relative;
+      background-color: #fff;
       border-left: 1px solid #e0e0e0;
       border-right: 1px solid #e0e0e0;
       border-bottom: 1px solid #e0e0e0;
@@ -11504,6 +11554,10 @@ h1.contact-list-name-label {
       .actual-scheduler {
         height: calc(100vh - 90px);
       }
+    }
+
+    @include screen('lg') {
+      margin-top: 60px;
     }
   }
 
@@ -11738,4 +11792,9 @@ h1.contact-list-name-label {
     background-color: #8A3350;
     text-decoration: line-through;
   }
+}
+
+.btn-calendar-prev-next {
+  height: 32px;
+  width: 32px;
 }
