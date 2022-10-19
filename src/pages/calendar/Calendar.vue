@@ -58,6 +58,7 @@
                   v-model="view"
                   :options="views">
         </q-select>
+        <helper class="mx-2"/>
       </div>
     </div>
 
@@ -106,7 +107,8 @@
 // import { mapActions, mapState } from 'vuex'
 import CalendarIcon from '../../components/icons/calendar-icon.vue'
 import DateSelector from '../../components/date-selector.vue'
-import Scheduler from '../../components/calendar/scheduler.vue'
+import Helper from '../../components/calendar/calendar-helper.vue'
+import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import moment from 'moment'
 
 export default {
@@ -115,6 +117,7 @@ export default {
   components: {
     CalendarIcon,
     DateSelector,
+    Helper,
     Scheduler
   },
 

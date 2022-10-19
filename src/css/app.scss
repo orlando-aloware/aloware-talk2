@@ -11406,8 +11406,11 @@ h1.contact-list-name-label {
 
     .q-field__control,
     .q-field__native {
-      min-height: 32px !important;
+      min-height: 31px !important;
       
+      &::before {
+        border: solid 1px #d8d8d8;
+      }
     }
 
     @include screen('lg') {
@@ -11422,6 +11425,16 @@ h1.contact-list-name-label {
       &__action-right {
         justify-content: right;
         width: 50%;
+      }
+    }
+  }
+
+  &__helper {
+    &__popover {
+      .popover-header {
+        background-color: #fff;
+        border-bottom: none;
+        font-weight: 500;
       }
     }
   }
