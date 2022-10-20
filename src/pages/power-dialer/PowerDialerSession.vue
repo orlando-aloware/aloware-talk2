@@ -53,7 +53,6 @@ import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-lis
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
-import { debounce } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -96,7 +95,9 @@ export default {
   },
   data () {
     return {
-      listeners: {}
+      listeners: {},
+      cancelToken: null,
+      source: null
     }
   },
   async created () {
@@ -105,12 +106,13 @@ export default {
     await this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
     this.hasActiveTask = false
 
-    this.listeners.endWrapUp = debounce(() => {
+    this.listeners.endWrapUp = () => {
       if (this.$route.name === 'Power Dialer') {
+        console.trace('listeners.endWrapUp TEST!!')
         this.fetchTasks(AutoDialTaskStatus.STATUS_COMPLETED)
         this.fetchTasks(AutoDialTaskStatus.STATUS_FAILED)
       }
-    }, 100)
+    }
     this.$VueEvent.listen('endWrapUp', this.listeners.endWrapUp)
   },
   async mounted () {
