@@ -55,8 +55,6 @@ export default {
           return
         }
 
-        this.$generalNotification('Unable to load contacts list count, please try again.', 'error')
-
         if (data.catchFunctions) {
           const funcs = Object.keys(data.catchFunctions)
           for (let func in funcs) {

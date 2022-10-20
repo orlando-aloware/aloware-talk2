@@ -6,13 +6,19 @@
       </div>
     </div>
     <div class="d-flex pinned__content flex-column">
-      <div v-if="!loading">
-        <contacts-pinned-item v-for="item in pinnedLists"
+      <contacts-pinned-item v-for="item in defaultLists"
+                            :item="item"
+                            :key="item.id"
+                            :countsLoading="loading">
+      </contacts-pinned-item>
+      <template v-if="!loadingPinned">
+        <contacts-pinned-item v-for="item in nonDefaultLists"
                               :item="item"
-                              :key="item.id">
+                              :key="item.id"
+                              :countsLoading="loading">
         </contacts-pinned-item>
-      </div>
-      <contacts-sidebar-loader v-if="loading"></contacts-sidebar-loader>
+      </template>
+      <contacts-sidebar-loader v-if="loadingPinned"></contacts-sidebar-loader>
     </div>
   </div>
 </template>
@@ -46,6 +52,15 @@ export default {
     ...mapGetters('contacts', ['pinnedLists', 'pinned', 'pinnedCounts']),
     loading () {
       return this.loadingDefaultCounts || this.loadingPinned
+    },
+    defaultIds () {
+      return Object.keys(DEFAULT_PINNED_LIST).map(key => DEFAULT_PINNED_LIST[key].id)
+    },
+    defaultLists () {
+      return this.pinnedLists.filter(list => this.defaultIds.includes(list.id))
+    },
+    nonDefaultLists () {
+      return this.pinnedLists.filter(list => !this.defaultIds.includes(list.id))
     }
   },
 
@@ -59,9 +74,9 @@ export default {
         this.loadDynamicListPinnedCount(list, true)
       }
 
-      if (list.type === this.ContactListTypes.DYNAMIC && list.id === 'my-contacts') {
-        this.loadMyContactsCount()
-      }
+      // if (list.type === this.ContactListTypes.DYNAMIC && list.id === 'my-contacts') {
+      //   this.loadMyContactsCount()
+      // }
 
       if (list.type === this.ContactListTypes.STATIC) {
         this.loadPinnedCount(list.id)
@@ -100,7 +115,6 @@ export default {
 
     init () {
       if (this.authenticated) {
-        this.loadDefaultCounts()
         this.loadPinned()
       }
     },
@@ -246,6 +260,7 @@ export default {
           }
 
           this.pinnedLoaded(pinnedIds)
+          this.loadDefaultCounts()
           this.loadingPinned = false
         }).catch((err) => {
           console.error(err)
