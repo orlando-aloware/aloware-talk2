@@ -8,30 +8,30 @@ export const DEFAULT_PINNED_LIST = {
     id: 'all',
     name: 'All Contacts',
     link: '/contacts',
-    type: DEFAULT_LIST_ALL_CONTACTS
+    listType: DEFAULT_LIST_ALL_CONTACTS
   },
   MY_CONTACTS: {
     id: 'my-contacts',
     name: 'My Contacts',
     link: '/contacts/my-contacts',
-    type: DEFAULT_LIST_MY_CONTACTS
+    listType: DEFAULT_LIST_MY_CONTACTS
   },
   UNASSIGNED: {
     id: 'unassigned',
     name: 'Unassigned Contacts',
     link: '/contacts/unassigned',
-    type: DEFAULT_LIST_UNASSIGNED_CONTACTS
+    listType: DEFAULT_LIST_UNASSIGNED_CONTACTS
   },
   UNANSWERED: {
     id: 'unanswered',
     name: 'Unanswered Contacts',
     link: '/contacts/unanswered',
-    type: DEFAULT_LIST_UNANSWERED_CONTACTS
+    listType: DEFAULT_LIST_UNANSWERED_CONTACTS
   },
   NEWLEADS: {
     id: 'new-leads',
     name: 'New Leads',
     link: '/contacts/new-leads',
-    type: DEFAULT_LIST_NEW_LEADS
+    listType: DEFAULT_LIST_NEW_LEADS
   }
 }

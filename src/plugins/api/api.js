@@ -330,7 +330,7 @@ export default {
         if (!defaultList) {
           params.contact_list_id = id
         } else {
-          params.default_list_type = defaultList.type
+          params.default_list_type = defaultList.listType
         }
 
         return window.axios.get(`api/v2/contacts-list/export-csv`, {
