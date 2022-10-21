@@ -156,7 +156,7 @@ export default {
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
-        contact_owner: checked ? this.profile.id : undefined,
+        my_contacts: checked,
         search: this.search,
         page: this.contactsData.page
       }, true, true)
@@ -439,14 +439,8 @@ export default {
         powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
-      if (params.contact_owner) {
-        query.filter_groups.push({ filters: {
-          contact_owner: {
-            value: [params.contact_owner],
-            operator: 1
-          }
-        },
-        is_conjunction: true })
+      if (params?.my_contacts) {
+        query.my_contacts = params.my_contacts
       }
 
       if (params.task_status) {
