@@ -45,13 +45,12 @@ export default {
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
         if (window.Intercom) {
           window.Intercom('boot', {
-            alignment: 'right',
+            alignment: 'left',
             app_id: this.app_id,
             name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
-            user_hash: response.data, // Current user hash
-            vertical_padding: 80
+            user_hash: response.data // Current user hash
           })
 
           this.timeInterval = setInterval(() => {
