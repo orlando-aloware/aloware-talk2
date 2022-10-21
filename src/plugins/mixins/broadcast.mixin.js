@@ -603,6 +603,9 @@ export default {
         .listen('.export.deleted', (event) => {
           window.VueEvent.fire('export_event_delete', event)
         })
+        .listen('.contact-list.import-hubspot', (event) => {
+          window.VueEvent.fire('contact_list_import_hubspot', event)
+        })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event
