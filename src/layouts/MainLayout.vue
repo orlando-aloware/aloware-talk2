@@ -2404,6 +2404,11 @@ export default {
         this.mobilePhoneDrawer = true
         this.isPhoneVisible = true
       }
+    },
+    agentStatus (toVal, fromVal) {
+      if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        this.$VueEvent.fire('endWrapUp')
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
