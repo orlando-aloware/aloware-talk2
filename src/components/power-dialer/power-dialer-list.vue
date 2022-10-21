@@ -14,6 +14,7 @@
 <script>
 import ContactsFolders from '../contacts/contacts-folders'
 import HubspotListImportModal from 'components/hubspot-list-import-modal'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'power-dialer-list',
@@ -28,16 +29,45 @@ export default {
       isCreatingFolder: false,
       active: '',
       toggleFolders: true,
-      isHubspotImportDialogOpen: false
+      isHubspotImportDialogOpen: false,
+      notification: null
     }
   },
 
+  mounted () {
+    this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.listen('contact_list_import_hubspot', event => {
+      if (this.notification) {
+        this.notification()
+      }
+
+      this.reloadFolders()
+      this.$generalNotification('Success! HubSpot list imported to Power Dialer.', 'redirect', 0, false, {
+        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
+      })
+    })
+  },
+
   methods: {
-    onHubspotImportDialogClose () {
+    ...mapActions('contacts', ['foldersLoaded']),
+    onHubspotImportDialogClose (data = {}) {
       this.isHubspotImportDialogOpen = false
+
+      if (data.notification) {
+        this.notification = data.notification
+      }
     },
     onHubspotImportDialogOpen () {
       this.isHubspotImportDialogOpen = true
+    },
+    reloadFolders () {
+      return this.$axios
+        .get('/api/v2/power-dialer-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch(() => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
     }
   },
 
