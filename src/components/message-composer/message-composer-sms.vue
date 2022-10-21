@@ -218,6 +218,7 @@ import VideoPlaceholder from 'components/message-composer/file-placeholders/vide
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'message-composer-sms',
@@ -240,7 +241,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+    ...mapGetters('contacts', [
+      'contact',
+      'messageComposer',
+      'selectedLine'
+    ]),
+    ...mapState('contacts', [
+      'isShortenedUrlRemembered'
+    ]),
     ...mapGetters('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     validSms: function () {
@@ -335,7 +343,8 @@ export default {
       'setMessageComposerSmsBody',
       'resetMessageComposerSms',
       'appendMessageComposerSmsAttachments',
-      'scheduleMessageOpen'
+      'scheduleMessageOpen',
+      'setIsShortenedUrlRemembered'
     ]),
     processFilesToQueue (file) {
       if (!file) {
@@ -397,7 +406,7 @@ export default {
     },
     processDetectLongUrl (detected) {
       if (detected &&
-        !this.urlShortenerDontAsk) {
+        !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
         this.urlShortenerDialog = true
       }
 
@@ -406,7 +415,8 @@ export default {
       // and yes button is clicked) and there's no shortened URL generation
       // that is in-progress.
       if (detected &&
-        this.urlShortenerDontAsk &&
+        (this.urlShortenerDontAsk ||
+          this.isShortenedUrlRemembered) &&
         this.profile.url_shortener_enabled &&
         this.currentCompany.url_shortener_enabled &&
         !this.generatingShortUrl) {
@@ -430,6 +440,12 @@ export default {
         gif: this.messageComposer.sms.gif_url
       }
     },
+    messageSentFormatMessage () {
+      return {
+        ...this.formatMessage(),
+        attachments: this.messageComposer.sms.attachments
+      }
+    },
     onSend () {
       const detected = this.detectLongUrl()
       this.processDetectLongUrl(detected)
@@ -438,8 +454,14 @@ export default {
         return
       }
 
+      const message = this.formatMessage()
+      this.$emit('message-sent', {
+        ...this.messageSentFormatMessage(),
+        type: CommunicationTypes.SMS
+      })
+
       this.isSending = true
-      return talk2Api.V1.message.send(this.formatMessage())
+      return talk2Api.V1.message.send(message)
         .then(response => {
           this.resetMessageComposerSms()
           this.$generalNotification('Message sent.')
@@ -568,6 +590,11 @@ export default {
     },
     async generateShortUrl (send = false) {
       this.generatingShortUrl = true
+
+      if (this.urlShortenerDontAsk) {
+        this.setIsShortenedUrlRemembered(true)
+      }
+
       talk2Api.V1.urlShortener.generate(this.messageComposer.sms.body)
         .then(({ data }) => {
           this.$generalNotification('Short URLs generated successfully.', 'success')

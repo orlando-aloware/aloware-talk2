@@ -12,16 +12,18 @@
           </h2>
         </div>
         <div class="q-gutter-sm">
-          <q-item class="py-0 mb-0 text-weight-bold">
+          <q-item class="py-0 mt-4 mb-0 text-weight-bold">
             <q-radio v-model="reason"
                      :val="1"
                      :label="getReasonLabel(1)" />
           </q-item>
-          <div class="my-2 py-0 text-weight-bold">
-            <span class="ml-3 mr-2">-</span>
-            <span>I don't understand how to use Talk</span>
-          </div>
-          <div class="pl-2 pt-0 mt-0">
+          <q-item class="py-0 my-0 text-weight-bold">
+            <q-radio v-model="dontUnderstand"
+                     :val="1"
+                     label="I don't understand how to use Talk" />
+          </q-item>
+          <div class="pl-2 pt-0 mt-0"
+               v-if="dontUnderstand !== null">
             <q-item v-for="option in reasons.slice(1, 5)" v-bind:key="option.id" class="my-0 py-0 text-weight-medium">
               <q-radio v-model="reason"
                        :val="option.id"
@@ -133,7 +135,8 @@ export default {
         ''
       ],
       skipCompanies: skipCompanies,
-      skipUsers: skipUsers
+      skipUsers: skipUsers,
+      dontUnderstand: null
     }
   },
   computed: {
@@ -149,7 +152,7 @@ export default {
 
       let reasonLabel = this.getReasonLabel(this.reason)
 
-      if (this.reason >= 2 && this.reason <= 5) {
+      if (this.isDontUnderstand(this.reason)) {
         reasonLabel = 'I don\'t understand how to use Talk - ' + reasonLabel
       }
 
@@ -176,6 +179,16 @@ export default {
       if (value && this.shouldSkipForm) {
         this.$emit('submit')
       }
+    },
+    reason (reason) {
+      if (reason != null && !this.isDontUnderstand(reason)) {
+        this.dontUnderstand = null
+      }
+    },
+    dontUnderstand (dontUnderstand) {
+      if (dontUnderstand !== null) {
+        this.reason = null
+      }
     }
   },
   methods: {
@@ -195,10 +208,14 @@ export default {
     closeDialog () {
       this.reason = null
       this.explanations = ['', '']
+      this.dontUnderstand = null
       this.$emit('toggle')
     },
     getReasonLabel (id) {
       return this.reasons.filter((reason) => reason.id === id)[0].label
+    },
+    isDontUnderstand (reason) {
+      return reason >= 2 && reason <= 5 && reason !== null
     }
   }
 }

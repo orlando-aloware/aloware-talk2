@@ -50,6 +50,7 @@
                 <q-img
                   class="img-fluid d-block r-2x br-8"
                   height="300px"
+                  native-context-menu
                   v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type"
                   :class="index > 0 ? 'mb-1' : ''"
                   :key="index"
@@ -58,6 +59,11 @@
                     <div class="absolute-full flex flex-center bg-negative text-white">
                       Error!
                     </div>
+                  </template>
+                  <template v-slot:default>
+                    <download-button buttonStyle="top: 8px; left: 8px"
+                                     :filename="attachment.name"
+                                     :attachment-url="attachment.url"/>
                   </template>
                 </q-img>
 
@@ -80,18 +86,11 @@
                   </video>
                 </div>
 
-                <a :href="attachment.url"
-                   target="_blank"
-                   v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
-                  <div class="p-2 text-center">
-                    <figure>
-                      <img height="100"
-                           width="100"
-                           src="src/assets/icons/app/file.svg">
-                      <figcaption>{{ attachment.name ? attachment.name : 'Click Here To Download' }}</figcaption>
-                    </figure>
-                  </div>
-                </a>
+                <download-button is-simple-attachment
+                                 :filename="attachment.name"
+                                 :attachment-url="attachment.url"
+                                 v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
+                </download-button>
               </div>
             </div>
 
@@ -667,13 +666,14 @@
               </b-col>
 
               <b-col>
-                <b-link target="_blank"
-                        class="text-dark-greenish"
-                        v-for="(attachment, index) in communication.attachments"
-                        :key="index"
-                        :href="attachment.url">
-                  Click Here To Download
-                </b-link>
+                <div v-for="(attachment, index) in communication.attachments"
+                     :key="index"
+                     class="text-dark-greenish w-100">
+                  <download-button is-simple
+                                   show-file-name
+                                   :filename="attachment.name"
+                                   :attachment-url="attachment.url"/>
+                </div>
               </b-col>
             </b-form-row>
           </q-card-section>
@@ -754,7 +754,11 @@
 <script>
 import _ from 'lodash'
 import { mapState } from 'vuex'
-import { aclMixin, userMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  userMixin,
+  communicationInfoMixin
+} from 'src/plugins/mixins'
 
 import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
@@ -773,11 +777,23 @@ import CommunicationReportIssue from 'components/communication-report-issue'
 import RingGroupSnapshot from 'components/ring-group-snapshot'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import DownloadButton from 'components/download-button'
 
 export default {
   name: 'communication-details',
 
-  components: { PencilOIcon, PredefinedTimeDurationSelector, RingGroupSnapshot, CommunicationReportIssue, CallDispositionSelector, CommunicationTags, CommunicationNote, CommunicationAudio, TargetUsersTree },
+  components: {
+    PencilOIcon,
+    PredefinedTimeDurationSelector,
+    RingGroupSnapshot,
+    CommunicationReportIssue,
+    CallDispositionSelector,
+    CommunicationTags,
+    CommunicationNote,
+    CommunicationAudio,
+    TargetUsersTree,
+    DownloadButton
+  },
 
   mixins: [communicationInfoMixin, userMixin, aclMixin],
 
@@ -831,12 +847,12 @@ export default {
     },
 
     usedRingGroup () {
-      if (!this.communication.ring_group_id) {
-        return null
+      if (this.communication.ring_group_id) {
+        return this.getRingGroup(this.communication.ring_group_id)
       }
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === this.communication.ring_group_id)
-      if (ringGroup) {
-        return ringGroup
+
+      if (this.communication.metadata && this.communication.metadata.added_ring_group_id) {
+        return this.getRingGroup(this.communication.metadata.added_ring_group_id)
       }
 
       return null
@@ -902,6 +918,19 @@ export default {
       const campaign = this.campaigns.find(campaign => campaign.id === id)
       if (campaign) {
         return campaign
+      }
+
+      return null
+    },
+
+    getRingGroup (id) {
+      if (!id) {
+        return null
+      }
+
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === id)
+      if (ringGroup) {
+        return ringGroup
       }
 
       return null

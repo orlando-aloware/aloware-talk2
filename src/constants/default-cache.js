@@ -3,13 +3,14 @@ export const DEFAULT_STATE = {
     'cache',
     'auth.profile',
     'contacts.lists',
+    'contacts.showMyContacts',
+    'contacts.isShortenedUrlRemembered',
     'powerDialer.sessionSettings',
     'powerDialer.selectedList',
     'powerDialer.ongoingSession',
     'powerDialer.sessionCallStatuses',
     'powerDialer.countdownTimer',
     'powerDialer.isSessionRunning',
-    'contacts.showMyContacts',
     'inbox.inboxShowMyContacts'
   ]
 }

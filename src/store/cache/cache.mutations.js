@@ -9,6 +9,10 @@ export default {
     state.currentCompany = currentCompany
   },
 
+  SET_TIMEZONES (state, list) {
+    state.timezones = list
+  },
+
   RESET_VUEX (state) {
     // perform state reset
     state = Object.assign({}, CacheDefault.DEFAULT_STATE)

@@ -2,6 +2,7 @@ import * as CommunicationDirections from '../../constants/communication-directio
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
+import { head } from 'lodash'
 
 export default {
   methods: {
@@ -242,7 +243,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
           return 'Company was suspended.'
         case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
-          return 'Line was sending the same message to the same contact.'
+          return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
       }
     },
 
@@ -268,6 +269,24 @@ export default {
         return 'RVM'
       }
       return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateDispositionStatusText(dispositionStatus))) + ' ' + this.$options.filters.fixCommDirection(direction) + ' ' + this.$options.filters.fixCommType(type)
+    },
+
+    getUuidFromURL (url) {
+      if (!url) {
+        return null
+      }
+
+      const lastPart = this.getFilenameFromURL(url, true)
+
+      return head(lastPart.split('.'))
+    },
+
+    getFilenameFromURL (url, skipCheck = false) {
+      if (!skipCheck && !url) {
+        return null
+      }
+
+      return head(url.split('?')).split('/').pop()
     }
   }
 }

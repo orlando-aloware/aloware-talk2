@@ -1,8 +1,4 @@
 export default {
-  async exportCsv ({ commit }, id = '') {
-    let response = await window.axios.get(`api/v2/contacts-list/${id}/export-csv`)
-    return response
-  },
   toggleFolder: ({ commit }, id) => {
     commit('TOGGLE_FOLDER', id)
   },
@@ -356,5 +352,11 @@ export default {
   },
   setIsContactMixinUsed: ({ commit }, value) => {
     commit('SET_IS_CONTACT_MIXIN_USED', value)
+  },
+  setIsShortenedUrlRemembered: ({ commit }, value) => {
+    commit('SET_IS_SHORTENED_URL_REMEMBERED', value)
+  },
+  setDefaultIsShortenedUrlRemembered: ({ commit }) => {
+    commit('SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED')
   }
 }

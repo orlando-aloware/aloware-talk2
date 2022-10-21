@@ -154,11 +154,12 @@ export default {
       this.setCurrentCompany(company)
       this.setUsage(usage)
       this.setDefaultShowMyContacts()
+      this.setDefaultIsShortenedUrlRemembered()
 
       storage.local.setItem('company_id', company.id)
 
       // redirect to Alo classic for agents
-      if (this.shouldRedirectToClassic) {
+      if (this.shouldRedirectToClassic && !this.$q.platform.is.electron) {
         location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
       } else {
         const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
@@ -207,6 +208,9 @@ export default {
     ]),
     ...mapActions('inbox', [
       'setDefaultShowMyContacts'
+    ]),
+    ...mapActions('contacts', [
+      'setDefaultIsShortenedUrlRemembered'
     ])
   }
 }

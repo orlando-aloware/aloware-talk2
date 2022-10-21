@@ -161,6 +161,10 @@ export default {
   computed: {
     ...mapState(['ringGroups']),
 
+    filteredRingGroups () {
+      return this.ringGroups.filter(ringGroup => !ringGroup.call_waiting)
+    },
+
     placeholder () {
       switch (true) {
         case this.multiple && this.selectedId.length < 1:
@@ -175,8 +179,8 @@ export default {
     },
 
     ringGroupsAlphabeticalOrder () {
-      if (this.ringGroups) {
-        return _.clone(this.ringGroups).sort((a, b) => {
+      if (this.filteredRingGroups) {
+        return _.clone(this.filteredRingGroups).sort((a, b) => {
           const textA = a.name.toUpperCase()
           const textB = b.name.toUpperCase()
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0

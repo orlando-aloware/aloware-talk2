@@ -80,6 +80,10 @@ jobs:
           ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
           ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
+          ENV_AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+          ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
+          ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
+          ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
           file-name: .env.prod
 
       - name: Build/release Electron mac app
@@ -118,3 +122,8 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+
+          AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
+          AWS_BUCKET: ${{ secrets.aws_bucket }}
+          AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}

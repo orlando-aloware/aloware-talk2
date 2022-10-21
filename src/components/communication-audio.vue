@@ -12,17 +12,10 @@
                     :uniqueId="uniqueId"
                     @ready="loading = false">
           </waveform>
-          <a class="btn btn-inline p-0"
-             title="Download"
-             target="_blank"
-             role="button"
-             :href="downloadUrl"
-             download
-             @click="blur">
-            <download-icon height="16"
-                           width="16">
-            </download-icon>
-          </a>
+          <download-button v-if="fileUuid"
+                           is-simple
+                           :filename="filename"
+                           :file-uuid="fileUuid"/>
         </div>
       </div>
     </div>
@@ -30,16 +23,22 @@
 </template>
 
 <script>
-import { aclMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  communicationInfoMixin
+} from 'src/plugins/mixins'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import Waveform from 'components/waveform'
-import DownloadIcon from 'components/icons/contact-activity/download-icon'
+import DownloadButton from 'components/download-button'
 export default {
   name: 'communication-audio',
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    communicationInfoMixin
+  ],
 
-  components: { DownloadIcon, Waveform },
+  components: { DownloadButton, Waveform },
 
   props: {
     communication: {
@@ -59,6 +58,8 @@ export default {
     return {
       remoteUrl: null,
       downloadUrl: null,
+      fileUuid: null,
+      filename: '',
       loading: false,
       UploadedFileTypes
     }
@@ -95,6 +96,8 @@ export default {
         }
         this.$axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
           .then((response) => {
+            this.fileUuid = this.getUuidFromURL(response.data.download_url)
+            this.filename = this.getFilenameFromURL(response.data.download_url)
             this.remoteUrl = response.data.url
             this.downloadUrl = response.data.download_url
           }).catch(err => {
@@ -105,15 +108,9 @@ export default {
       }
     },
 
-    blur ($event) {
-      $event.target.blur()
+    onDownload () {
+      this.$downloadFileWithUuid(this.fileUuid, this.filename)
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .audio-player {
-    min-height: 42px;
-  }
-</style>

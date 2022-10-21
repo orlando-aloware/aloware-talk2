@@ -5,12 +5,11 @@
           lightMode ? 'light-mode' : 'night-mode'
         ]"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
-    <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center"
-         :class="{ 'unsupported': !$q.platform.is.mobile }">
+    <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended" />
+      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
@@ -27,7 +26,7 @@
                 <transition :name="transitionName"
                             mode="out-in">
                   <!-- <keep-alive> -->
-                    <router-view></router-view>
+                  <router-view></router-view>
                   <!-- </keep-alive> -->
                 </transition>
               </template>
@@ -166,7 +165,7 @@
                 transition-show="scale"
                 transition-hide="scale"
                 persistent>
-        <q-card class="bg-greenish text-white"
+        <q-card class="bg-green-7 text-white"
                 style="width: 300px">
           <q-card-section>
             <div class="text-h6">Update Downloaded</div>
@@ -177,7 +176,7 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-greenish">
+                          class="bg-white text-green-7">
             <q-btn label="Restart"
                    @click="restartApp"
                    flat>
@@ -186,7 +185,7 @@
         </q-card>
       </q-dialog>
       <pro-feature-dialog/>
-      </div>
+    </div>
   </div>
 </template>
 
@@ -222,6 +221,10 @@ import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
+import {
+  TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+  TYPE_EXPORT_CONTACT_LIST_ITEMS
+} from 'src/constants/export-types-default'
 
 export default {
   name: 'MyLayout',
@@ -286,6 +289,10 @@ export default {
       checkDebounce: null,
       userSuspended: false,
       accountSuspended: false,
+      allowedExports: [
+        TYPE_EXPORT_CONTACT_LIST_ITEMS,
+        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
+      ],
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -294,7 +301,8 @@ export default {
 
   computed: {
     ...mapState('cache', [
-      'currentCompany'
+      'currentCompany',
+      'timezones'
     ]),
     ...mapState([
       'dialer',
@@ -821,13 +829,13 @@ export default {
             const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
             // check if communication is a live call
             if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-              [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+              [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
                 CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
+                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(communication.current_status2)) {
               const liveContacts = _.cloneDeep(this.liveContacts)
               if (!isInLiveContacts) {
                 liveContacts.push(contact)
@@ -907,6 +915,44 @@ export default {
       }, statusInterval)
     }
     */
+
+    this.$VueEvent.listen('export_event_create', (task) => {
+      if (!this.allowedExports.includes(task.export.type) ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
+      this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
+    })
+
+    this.$VueEvent.listen('export_event_update', (task) => {
+      if (!this.allowedExports.includes(task.export.type) ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
+      this.$generalNotification(
+        `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+        'export-csv',
+        0,
+        true,
+        {
+          uuid: task.export.uuid,
+          filename: `${task.export.uuid}.csv`
+        }
+      )
+    })
+
+    this.$VueEvent.listen('export_event_delete', (task) => {
+      if (!this.allowedExports.includes(task.export.type) ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
+    })
 
     if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
@@ -1182,6 +1228,8 @@ export default {
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
       }
+
+      this.getTimezones()
 
       this.initAccount().then(() => {
         this.loading = false
@@ -2104,6 +2152,13 @@ export default {
       }
     },
 
+    getTimezones () {
+      return this.$axios.get('/api/v1/timezones')
+        .then(res => {
+          this.setTimezones(res.data)
+        })
+    },
+
     beforeUnload () {
       this.$VueEvent.stop('bounce_dock')
       this.$VueEvent.stop('set_badge')
@@ -2128,6 +2183,9 @@ export default {
       this.$VueEvent.stop('company_updated')
       this.$VueEvent.stop('agent_status_updated')
       this.$VueEvent.stop('change_agent_status')
+      this.$VueEvent.stop('export_event_create')
+      this.$VueEvent.stop('export_event_update')
+      this.$VueEvent.stop('export_event_delete')
       this.unsubscribeFromPusher()
       this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
       this.resetNotifications()
@@ -2141,7 +2199,7 @@ export default {
       clearInterval(this.$options.appFooterInterval)
     },
 
-    ...mapActions('cache', ['setCurrentCompany']),
+    ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
     ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
     ...mapActions([
       'resetVuex',
@@ -2345,6 +2403,11 @@ export default {
         ['WRAP_UP', 'CALL_CONNECTED'].includes(value)) {
         this.mobilePhoneDrawer = true
         this.isPhoneVisible = true
+      }
+    },
+    agentStatus (toVal, fromVal) {
+      if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        this.$VueEvent.fire('endWrapUp')
       }
     }
   },

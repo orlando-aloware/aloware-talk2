@@ -8,9 +8,18 @@
           @click="togglePhone">
     <q-item-section>
       <q-item-label class="_600">
-        <span v-if="dialer.contact">{{ dialer.contact.name | truncate(15) }}</span>
-        <span v-else-if="dialer.call && dialer.call.customParameters && dialer.call.customParameters.ContactName">{{ dialer.call.customParameters.ContactName | truncate(15) }}</span>
-        <span v-else-if="dialer.parkedCall && dialer.parkedCall.contact">{{ dialer.parkedCall.contact.name | truncate(15) }}</span>
+        <span v-if="dialer.contact">
+          {{ getContactName(dialer.contact.name) }}
+        </span>
+        <span v-else-if="hasCustomParametersContactName">
+          {{ getContactName(dialer.call.customParameters.ContactName) }}
+        </span>
+        <span v-else-if="hasCustomParametersNullContactName">
+          No Name
+        </span>
+        <span v-else-if="hasParkedCallContact">
+          {{ getContactName(dialer.parkedCall.contact.name) }}
+        </span>
         <q-skeleton type="text"
                     v-else>
         </q-skeleton>
@@ -59,7 +68,7 @@
 </template>
 
 <script>
-
+import { isEmpty } from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -125,6 +134,22 @@ export default {
       }
 
       return ''
+    },
+    hasCustomParametersContactName () {
+      return this.dialer.call &&
+        this.dialer.call.customParameters &&
+        this.dialer.call.customParameters.ContactName &&
+        this.dialer.call.customParameters.ContactName !== 'null null'
+    },
+    hasCustomParametersNullContactName () {
+      return this.dialer.call &&
+        this.dialer.call.customParameters &&
+        this.dialer.call.customParameters.ContactName &&
+        this.dialer.call.customParameters.ContactName === 'null null'
+    },
+    hasParkedCallContact () {
+      return this.dialer.parkedCall &&
+        this.dialer.parkedCall.contact
     }
   },
 
@@ -153,6 +178,14 @@ export default {
         this.$VueEvent.fire('togglePhone')
       }
       // this.$VueEvent.fire('togglePhone')
+    },
+
+    getContactName (contactName) {
+      if (!isEmpty(contactName.trim())) {
+        return this.$options.filters.truncate(contactName, 15)
+      }
+
+      return 'No Name'
     }
   },
   watch: {

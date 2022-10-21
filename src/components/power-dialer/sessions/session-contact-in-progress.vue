@@ -7,7 +7,12 @@
         <div class="py-2">
           <q-avatar size="30px"
                     color="grey">
-            {{ avatarName(firstname, lastname) }}
+            <span v-if="isNoName">
+              <i class="fa fa-user"></i>
+            </span>
+            <span v-else>
+              {{ avatarName(firstname, lastname) }}
+            </span>
           </q-avatar>
         </div>
 
@@ -50,7 +55,7 @@
 </template>
 
 <script>
-import { get } from 'lodash'
+import { isEmpty } from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
@@ -66,14 +71,17 @@ export default {
       'hasActiveTask'
     ]),
     ...mapState(['dialer']),
+    isNoName () {
+      const firstName = this.activeTask?.first_name
+      const lastName = this.activeTask?.last_name
+
+      return isEmpty(firstName) &&
+        isEmpty(lastName)
+    },
     fullName () {
-      const name = `${get(this.activeTask, 'first_name', '')} ${get(this.activeTask, 'last_name', '')}`
-
-      if (!name) {
-        return 'No Name'
-      }
-
-      return name
+      return this.isNoName
+        ? `No Name`
+        : `${this.activeTask?.first_name || ''} ${this.activeTask?.last_name || ''}`
     },
     firstname () {
       return this.activeTask?.first_name
@@ -99,7 +107,9 @@ export default {
       this.$VueEvent.fire('hangupCall')
     },
     avatarName (fname, lname) {
-      return `${fname?.[0]}${lname?.[0]}`
+      fname = isEmpty(fname) ? 'N' : fname?.[0]
+      lname = isEmpty(lname) ? 'N' : lname?.[0]
+      return `${fname}${lname}`
     }
   }
 }

@@ -3,14 +3,14 @@
            size="md"
            v-model="isOpen"
            @hidden="onHidden"
-           @shown="onShown">
+           @show="onShow">
     <b-form @submit.prevent="onSubmit">
       <b-form-group
         id="input-group-1"
         label="Date"
-        label-for="input-1"
-      >
-        <date-selector :min-date="minDate"
+        label-for="input-1">
+        <date-selector v-model="reminder.date"
+                       :min-date="minDate"
                        @dateSelected="dateSelected">
         </date-selector>
       </b-form-group>
@@ -78,7 +78,10 @@ export default {
     ...mapState('contacts', ['isAddReminderOpen']),
     ...mapState('auth', ['profile']),
     isValid () {
-      return this.reminder.date && this.reminder.time && this.reminder.timezone
+      return this.reminder.date &&
+        this.reminder.date !== 'Invalid date' &&
+        this.reminder.time &&
+        this.reminder.timezone
     },
     minDate () {
       return window.moment().format('YYYY-MM-DD')
@@ -138,7 +141,7 @@ export default {
       this.resetForm()
       this.addReminderOpen(false)
     },
-    onShown () {
+    onShow () {
       this.reminder.date = window.moment().format('MM/DD/YYYY')
     },
     dateSelected (value) {

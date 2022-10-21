@@ -232,8 +232,62 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err.data)
 }
 
-Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false) {
+Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') => {
+  if (!uuid) {
+    this.$generalNotification('Failed to download file, missing UUID', 'error')
+  }
+
+  const url = (type !== 'csv'
+    ? '/static/uploaded_file/'
+    : '/download/') + uuid
+
+  return window.axios.get(url, {
+    params: {
+      force_download: 1
+    },
+    responseType: 'arraybuffer'
+  })
+    .then((response) => {
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename)
+      link.click()
+    })
+    .catch(() => {
+      this.$generalNotification('Failed to download file.', 'error')
+    })
+}
+
+Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
+  if (!url) {
+    this.$generalNotification('Failed to download file, missing URL', 'error')
+  }
+
+  return fetch(url)
+    .then(async (response) => {
+      const link = document.createElement('a')
+      const file = await response.blob()
+      link.href = window.URL.createObjectURL(file)
+      link.setAttribute('download', filename)
+      link.dataset.downloadurl = ['application/octet-stream', link.download, link.href].join(':')
+      link.click()
+    })
+    .catch(() => {
+      this.$generalNotification('Failed to download file.', 'error')
+    })
+}
+
+Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
+  const uuid = window._.get(actionOptions, 'uuid', null)
+  const filename = window._.get(actionOptions, 'filename', null)
   const colorClass = { data: '' }
+  let actions = [{
+    icon: 'close',
+    color: 'black',
+    class: 'close-button px-1 pb-1'
+  }]
+
   switch (type) {
     case 'updated':
       colorClass.data = 'bg-blue-10'
@@ -242,19 +296,34 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     case 'error':
       colorClass.data = 'bg-red-10'
       break
+    case 'export-csv':
+      actions = [{
+        label: 'Download',
+        color: 'primary',
+        class: 'px-2',
+        handler: () => {
+          if (uuid) {
+            this.$downloadFileWithUuid(uuid, filename, 'csv')
+          }
+        }
+      }]
+      colorClass.data = 'bg-green-10'
+      break
     default:
       colorClass.data = 'bg-green-10'
   }
 
-  this.$q.notify({
+  const options = {
     group: false,
     classes: `general-notification text-black ${colorClass.data} ml-7`,
     timeout: timeout,
     message: message,
     position: 'bottom-left',
     html: html,
-    actions: [{ icon: 'close', color: 'black', class: 'close-button' }]
-  })
+    actions: actions
+  }
+
+  this.$q.notify(options)
 }
 
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {

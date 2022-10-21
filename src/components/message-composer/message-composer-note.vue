@@ -66,6 +66,7 @@ import talk2Api from 'src/plugins/api/api'
 import At from 'vue-at'
 import Avatar from 'components/avatar'
 import { mentionsMixin } from 'src/plugins/mixins'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'message-composer-note',
@@ -102,7 +103,14 @@ export default {
     },
     onAdd () {
       this.isAdding = true
-      talk2Api.V1.contact.addEngagement(this.contact.id, this.formatMessage())
+
+      const message = this.formatMessage()
+      this.$emit('message-sent', {
+        ...message,
+        type: CommunicationTypes.NOTE
+      })
+
+      talk2Api.V1.contact.addEngagement(this.contact.id, message)
         .then(response => {
           this.resetMessageComposerNote()
           this.$generalNotification('Note has been added.')

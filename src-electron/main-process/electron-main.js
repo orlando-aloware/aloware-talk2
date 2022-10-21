@@ -1,7 +1,12 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell, Tray, dialog } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import { Registry } from 'rage-edit'
+import { template } from './menu'
+import { clone } from 'lodash'
+
+let isSilent
+let updateDownloaded = false
 
 // register for tel: links in windows
 if (process.platform === 'win32') {
@@ -330,13 +335,25 @@ autoUpdater.on('update-available', (info) => {
   }
   sendStatusToWindow('update_available', 'A new update is available. Downloading now...')
 })
-
 autoUpdater.on('error', (err) => {
   log.info('Error in auto-update: ' + err)
   sendStatusToWindow('update_error', 'Error in auto-update. Please restart the application.')
+  updateDownloaded = false
+  changeUpdaterMenu({ label: 'Check for updates', enabled: true })
+})
+autoUpdater.on('update-not-available', () => {
+  sendStatusToWindow('Update not available.')
+  changeUpdaterMenu({ label: 'Check for updates', enabled: true })
+  if (isSilent) return
+  dialog.showMessageBox({
+    title: 'No Updates',
+    message: 'Current version is up-to-date.'
+  })
 })
 autoUpdater.on('update-downloaded', (info) => {
   sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
+  updateDownloaded = true
+  changeUpdaterMenu({ label: 'Updates available', enabled: true })
 })
 
 ipcMain.on('restart_app', () => {
@@ -423,3 +440,22 @@ process.on('uncaughtException', (err) => {
   console.log(err)
   sendStatusToWindow('reload_app')
 })
+
+export function checkForUpdates ({ silent }) {
+  isSilent = silent
+  changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
+  if (updateDownloaded) {
+    sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
+    changeUpdaterMenu({ label: 'Updates available', enabled: true })
+  } else {
+    autoUpdater.checkForUpdates()
+  }
+}
+
+const changeUpdaterMenu = ({ label, enabled }) => {
+  const newTemplate = clone(template)
+  newTemplate[0].submenu[2].label = label
+  newTemplate[0].submenu[2].enabled = enabled
+  const menu = Menu.buildFromTemplate(newTemplate)
+  Menu.setApplicationMenu(menu)
+}

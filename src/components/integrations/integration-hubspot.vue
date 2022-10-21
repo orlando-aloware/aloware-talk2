@@ -1,21 +1,27 @@
 <template>
-  <div v-if="integration_data && hubspotLink"
-       class="hubspot-integration-wrapper">
+  <div class="hubspot-integration-wrapper">
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section>
+        <q-item-section v-if="hubspotLink">
           <b-link target="_blank"
                   :href="hubspotLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
           </b-link>
         </q-item-section>
+        <q-item-section v-else>
+          <a href="#"
+             onclick="return false;">
+            <i class="fab fa-hubspot hubspot-icon"></i>
+            <span class="integration-title">Hubspot</span>
+          </a>
+        </q-item-section>
       </q-item>
 
       <q-separator/>
 
-      <q-card-section v-if="integration_data.properties">
+      <q-card-section v-if="integration_data && integration_data.properties">
         <p class="mb-0"
            v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
@@ -45,7 +51,7 @@
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0"
-                      v-if="integration_data.properties">
+                      v-if="integration_data && integration_data.properties">
         <q-card class="deals mb-1"
                 v-for="(deal, index) in integration_data.properties.deals"
                 :key="index"
@@ -59,7 +65,7 @@
                   {{ deal.properties.dealname.value }}
                 </b-link>
               </h6>
-              <p class="mb-1 d-inline-flex">
+              <p class="mb-1 d-flex">
                 <span class="data-icon-label">Amount: </span>
                 <span class="data-value ml-1"
                       v-if="deal.properties && deal.properties.amount">
@@ -70,7 +76,7 @@
                   {{ deal.properties.amount.value | toCurrency }}
                 </span>
               </p>
-              <p class="mb-1 d-inline-flex">
+              <p class="mb-1 d-flex">
                 <span class="data-icon-label">Pipeline: </span>
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
@@ -80,7 +86,7 @@
                   {{ deal.properties.pipeline.label }}
                 </span>
               </p>
-              <p class="mb-1 d-inline-flex">
+              <p class="mb-1 d-flex">
                 <span class="data-icon-label">Stage: </span>
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
@@ -94,6 +100,7 @@
           </q-card-section>
         </q-card>
       </q-card-section>
+
       <q-card-section>
         <b-row>
           <b-button class="text-white"
@@ -120,7 +127,7 @@
       </q-card-section>
 
       <q-card-section
-        v-if="integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
+        v-if="integration_data && integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
@@ -133,6 +140,7 @@
         </b-row>
       </q-card-section>
     </q-card>
+
     <q-menu content-class="mx-height-300"
             ref="templatesMenu"
             no-parent-event

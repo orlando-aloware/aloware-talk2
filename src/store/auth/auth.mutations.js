@@ -14,11 +14,19 @@ export default {
 
     const index = { data: null }
     for (index.data in profile) {
-      Vue.set(state.profile, index.data, profile[index.data])
+      // only update the properties if the new value
+      // is not the same
+      if (state.profile[index.data] !== profile[index.data]) {
+        Vue.set(state.profile, index.data, profile[index.data])
+      }
     }
   },
   SET_AGENT_STATUS (state, agentStatus) {
-    state.profile.agent_status = agentStatus
+    // only update agent_status if the new value
+    // is not the same
+    if (state.profile.agent_status !== agentStatus) {
+      state.profile.agent_status = agentStatus
+    }
   },
   SET_AUTHENTICATED (state, authenticated) {
     state.authenticated = authenticated
