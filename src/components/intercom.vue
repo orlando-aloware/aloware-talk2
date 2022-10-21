@@ -50,9 +50,7 @@ export default {
             name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
-            user_hash: response.data, // Current user hash
-            horizontal_padding: 8,
-            vertical_padding: 8
+            user_hash: response.data // Current user hash
           })
 
           this.timeInterval = setInterval(() => {
