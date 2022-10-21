@@ -260,7 +260,7 @@ export default {
           }
 
           this.pinnedLoaded(pinnedIds)
-          this.loadDefaultCounts()
+          // this.loadDefaultCounts()
           this.loadingPinned = false
         }).catch((err) => {
           console.error(err)
