@@ -1,12 +1,11 @@
 <template>
-  <div id="scheduler"
-       ref="scheduler">
+  <div ref="scheduler">
   </div>
 </template>
 
 <script>
 import Scheduler from 'dhtmlx-scheduler'
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 import moment from 'moment'
 
 export default {
@@ -23,11 +22,11 @@ export default {
     }
   },
 
-  computed: {
-    ...mapState({
-      sidebar_folded: state => state.cache.sidebar_folded
-    })
-  },
+  // computed: {
+  //   ...mapState({
+  //     sidebar_folded: state => state.cache.sidebar_folded
+  //   })
+  // },
 
   mounted: function () {
     Scheduler.skin = 'material'
@@ -172,12 +171,12 @@ export default {
     //     $("#scheduler table").append('<thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>');
     //   });
     // },
-  },
-
-  watch: {
-    sidebar_folded () {
-      this.updateScheduler()
-    }
   }
+
+  // watch: {
+  //   sidebar_folded () {
+  //     this.updateScheduler()
+  //   }
+  // }
 }
 </script>

@@ -1,17 +1,16 @@
 <template>
   <div class="calendar position-relative">
-    <b-overlay
-      class="h-100 w-100 position-absolute"
-      :show="loading"
-      rounded="sm"
-    >
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
       <template #overlay>
         <q-spinner-bars color="primary" size="40px" />
       </template>
     </b-overlay>
 
     <!-- header -->
-    <div class="calendar__header position-fixed">
+    <div class="calendar__header">
       <div class="calendar__header__action-left">
         <b-button size="sm"
                   variant="light"
@@ -46,7 +45,9 @@
         </b-button>
       </div>
       <div class="calendar__header__action-right">
-        <q-select options-selected-class="text-primary"
+        <filters @input="onFiltersUpdated"/>
+        <q-select class="mx-2"
+                  options-selected-class="text-primary"
                   color="primary"
                   option-value="id"
                   option-label="name"
@@ -58,15 +59,15 @@
                   v-model="view"
                   :options="views">
         </q-select>
-        <helper class="mx-2"/>
+        <helper/>
       </div>
     </div>
 
     <!-- scheduler -->
-    <div id="container-sched">
-      <div id="sched-header"
+    <div class="scheduler">
+      <div class="scheduler__header"
            v-show="!showSearchResult">
-        <table id="sched-header-table">
+        <table class="scheduler__header__table">
           <tr v-if="view === 'week'">
             <td id="td-scale"></td>
             <td :class="d.today ? 'today': ''"
@@ -86,8 +87,7 @@
           </tr>
         </table>
       </div>
-      <div id="sched-body"
-           :class="view">
+      <div :class="['scheduler__body', view]">
         <scheduler ref="scheduler"
                    class="actual-scheduler"
                    :class="view + '-view'"
@@ -108,6 +108,7 @@
 import CalendarIcon from '../../components/icons/calendar-icon.vue'
 import DateSelector from '../../components/date-selector.vue'
 import Helper from '../../components/calendar/calendar-helper.vue'
+import Filters from '../../components/calendar/calendar-filters.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import moment from 'moment'
 
@@ -118,6 +119,7 @@ export default {
     CalendarIcon,
     DateSelector,
     Helper,
+    Filters,
     Scheduler
   },
 
@@ -310,6 +312,10 @@ export default {
       if (this.source) {
         this.source.cancel('Calendar: Request Cancelled.')
       }
+    },
+
+    onFiltersUpdated (data) {
+      console.log(data)
     }
   },
 

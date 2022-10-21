@@ -53,7 +53,3 @@
     </b-popover>
   </div>
 </template>
-
-<script>
-
-</script>
