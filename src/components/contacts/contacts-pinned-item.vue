@@ -17,9 +17,19 @@
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <span>{{ item.name }}</span>
       </div>
-      <div class="counts d-flex align-items-center">
-        <b-badge pill variant="light text-muted">{{ listCount | fixCount }}</b-badge>
-      </div>
+      <!--div class="counts d-flex align-items-center">
+        <b-badge pill
+                 variant="light text-muted">
+          <span v-if="countsLoading"
+                class="ml-1">
+            <q-spinner-tail size="12px"
+                            color="blue" />
+          </span>
+          <span v-else>
+            {{ listCount | fixCount }}
+          </span>
+        </b-badge>
+      </div-->
     </a>
   </router-link>
 </template>
@@ -47,6 +57,11 @@ export default {
   props: {
     item: {
       type: Object
+    },
+    countsLoading: {
+      default: true,
+      type: Boolean,
+      required: false
     }
   },
 
