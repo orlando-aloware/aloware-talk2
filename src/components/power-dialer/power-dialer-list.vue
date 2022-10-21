@@ -37,8 +37,10 @@ export default {
   mounted () {
     this.$VueEvent.stop('contact_list_import_hubspot')
     this.$VueEvent.listen('contact_list_import_hubspot', event => {
+      // dismiss the previous notification
       if (this.notification) {
         this.notification()
+        this.notification = null
       }
 
       this.reloadFolders()
