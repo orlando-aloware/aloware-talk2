@@ -309,6 +309,21 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
       }]
       colorClass.data = 'bg-green-10'
       break
+    case 'redirect':
+      actions = [{
+        label: 'Go to page',
+        color: 'primary',
+        class: 'px-2',
+        handler: () => {
+          if (actionOptions.path) {
+            this.$router.push({
+              path: actionOptions.path
+            })
+          }
+        }
+      }]
+      colorClass.data = 'bg-green-10'
+      break
     default:
       colorClass.data = 'bg-green-10'
   }
@@ -323,7 +338,7 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     actions: actions
   }
 
-  this.$q.notify(options)
+  return this.$q.notify(options)
 }
 
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {

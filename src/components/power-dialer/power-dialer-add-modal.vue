@@ -314,9 +314,10 @@ export default {
         .post('/api/v2/power-dialer-lists/import-hubspot-list/' + target, params)
         .then(response => response.data)
         .then(data => {
-          this.reloadFolders()
-          this.$generalNotification(data.message)
-          this.$emit('submit')
+          const notification = this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
+          })
         })
         .catch(_err => {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
