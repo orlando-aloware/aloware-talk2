@@ -5,6 +5,12 @@
               variant="light"
               v-b-modal.calendar-filters-modal>
       Filters
+      <b-badge v-if="filterCount > 0"
+                class="d-flex align-items-center contact-filter-count ml-1"
+                pill
+                variant="primary">
+        {{ filterCount }}
+      </b-badge>
     </b-button>
     <b-modal id="calendar-filters-modal"
              ref="modal"
@@ -31,19 +37,35 @@
         </b-form-group>
 
         <!-- Statuses -->
-        <generic-multi-select buttonText="'All'"
-                              :values="search.statuses"
-                              :options="statuses">
-        </generic-multi-select>
+        <b-form-group class="form-label"
+                      label="Status">
+          <communication-disposition-status-selector v-model="search.status"
+                                                     :options="statuses"
+                                                     :generic-styling="false"
+                                                     :multiple="true"
+                                                     :use-chips="true">
+          </communication-disposition-status-selector>
+        </b-form-group>
+
+        <hr>
 
         <!-- Users -->
+        <b-form-group class="form-label"
+                      label="Users">
+          <user-selector v-model="search.users"
+                        :generic-styling="false"
+                        :multiple="true"
+                        :use-chips="true"
+                        @change="onUserChange">
+          </user-selector>
+        </b-form-group>
       </q-card>
 
       <template #modal-footer="{ cancel, ok }">
         <div class="d-flex w-100">
           <div class="flex-grow-1"></div>
           <button class="btn btn-sm btn-default mr-2"
-                  @click="cancel()">
+                  @click="hide(cancel)">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary mr-2"
@@ -57,25 +79,62 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
-import GenericMultiSelect from '../../components/generic-selectors/generic-multi-select'
+import CommunicationDispositionStatusSelector from '../../components/generic-selectors/communication-disposition-status-selector.vue'
+import UserSelector from '../../components/generic-selectors/user-selector.vue'
 
 export default {
   components: {
-    GenericMultiSelect
+    CommunicationDispositionStatusSelector,
+    UserSelector
   },
 
-  data: () => ({
-    search: {
-      appointments: true,
-      reminders: true,
-      statuses: [],
-      users: []
+  props: {
+    filters: {
+      appointments: {
+        type: Boolean,
+        required: true
+      },
+      reminders: {
+        type: Boolean,
+        required: true
+      },
+      users: {
+        type: Array,
+        required: true
+      },
+      status: {
+        type: Array,
+        required: true
+      }
     }
-  }),
+  },
+
+  data () {
+    return {
+      search: {
+        appointments: this.filters.appointments,
+        reminders: this.filters.reminders,
+        users: this.filters.users,
+        status: this.filters.status
+      },
+      originalFilters: {}
+    }
+  },
 
   computed: {
     statuses () {
+      const names = {
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW]: 'Completed Reminder',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW]: 'Cancelled Reminder',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW]: 'Pending Reminder',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED]: 'Cancelled Appointment',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET]: 'Appointment Set',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED]: 'Appointment Completed',
+        0: 'All'
+      }
+
       let data = []
 
       if (this.search.appointments) {
@@ -90,18 +149,47 @@ export default {
         data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW)
       }
 
-      return data
+      return data.map(status => ({
+        id: status,
+        name: names[status]
+      }))
+    },
+
+    filterCount () {
+      let count = 0
+
+      count += this.originalFilters.appointments ? 0 : 1
+      count += this.originalFilters.reminders ? 0 : 1
+      count += this.originalFilters.users.length
+      count += this.originalFilters.status.length
+
+      return count
     }
   },
 
+  created () {
+    this.originalFilters = _.clone(this.filters)
+  },
+
   methods: {
+    onUserChange (user) {
+      this.search.users = user
+    },
+
     save (close) {
-      this.$emit('input', this.search)
+      this.originalFilters = _.clone(this.search)
+      this.$emit('save', this.search)
 
       // close modal when done
       close()
+    },
+
+    hide (close) {
+      this.search = _.clone(this.originalFilters)
+      this.$emit('cancel')
+
+      close()
     }
-    // getFiltersCount
   }
 }
 </script>

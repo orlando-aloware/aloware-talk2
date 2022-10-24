@@ -45,7 +45,8 @@
         </b-button>
       </div>
       <div class="calendar__header__action-right">
-        <filters @input="onFiltersUpdated"/>
+        <filters :filters="convertedFilters"
+                 @save="onSaveFilters"/>
         <q-select class="mx-2"
                   options-selected-class="text-primary"
                   color="primary"
@@ -138,11 +139,9 @@ export default {
         limit: 25,
         page: 1
       },
-      // original_filters: {},
       loading: true,
       // gotoDateVisible: false,
       gotoDate: new Date(),
-      // statusNames: {},
       view: 'month',
       stepMap: {
         'day': 'd',
@@ -159,13 +158,6 @@ export default {
       // },
       // legend: false,
       // searchMode: false,
-      // search: {
-      //     calendar_search: '',
-      //     appointments: true,
-      //     reminders: true,
-      //     calendar_users: [],
-      //     calendar_status: []
-      // },
       // originalSearch: null,
       // showFilterSearch: false,
       showSearchResult: false,
@@ -200,6 +192,7 @@ export default {
 
       return d
     },
+
     formattedWeekDays () {
       const start = moment(this.gotoDate).startOf('isoWeek')
 
@@ -218,6 +211,15 @@ export default {
       }
 
       return dates
+    },
+
+    convertedFilters () {
+      return {
+        appointments: this.filters.appointments,
+        reminders: this.filters.reminders,
+        users: this.filters.calendar_users,
+        status: this.filters.calendar_status
+      }
     }
   },
 
@@ -314,8 +316,11 @@ export default {
       }
     },
 
-    onFiltersUpdated (data) {
-      console.log(data)
+    onSaveFilters (data) {
+      this.filters.appointments = data.appointments
+      this.filters.reminders = data.reminders
+      this.filters.calendar_users = data.users || []
+      this.filters.calendar_status = data.status || []
     }
   },
 
