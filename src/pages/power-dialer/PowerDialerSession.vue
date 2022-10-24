@@ -108,7 +108,6 @@ export default {
 
     this.listeners.endWrapUp = () => {
       if (this.$route.name === 'Power Dialer') {
-        console.trace('listeners.endWrapUp TEST!!')
         this.fetchTasks(AutoDialTaskStatus.STATUS_COMPLETED)
         this.fetchTasks(AutoDialTaskStatus.STATUS_FAILED)
       }
