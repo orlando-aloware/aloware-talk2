@@ -157,6 +157,19 @@ export default {
         return window.moment.utc(comm2.created_at).diff(comm1.created_at) < 15 * 1000
       }
 
+      // If it's an sms, test to see if there are variables in the body
+      if ([comm1.type, comm2.type].includes(CommunicationTypes.SMS)) {
+        let bodyArray = comm1.body.split(' ')
+
+        for (let word of bodyArray) {
+          if (!word.includes('[') && !word.includes(']') && !comm2.body.includes(word)) {
+            return false
+          }
+        }
+
+        return true
+      }
+
       return comm1.body === comm2.body
     },
     scrollMessages () {
