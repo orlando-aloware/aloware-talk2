@@ -50,8 +50,7 @@ export default {
             name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
-            user_hash: response.data, // Current user hash
-            custom_launcher_selector: '.intercom-launcher'
+            user_hash: response.data // Current user hash
           })
 
           this.timeInterval = setInterval(() => {
