@@ -44,13 +44,13 @@ export default {
       'date',
       'day',
       'week',
-      'month',
-      {
-        html: 'Filters',
-        click: () => {
-          this.showFilter()
-        }
-      }
+      'month'
+      // {
+      //   html: 'Filters',
+      //   click: () => {
+      //     this.showFilter()
+      //   }
+      // }
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
@@ -127,9 +127,9 @@ export default {
       Scheduler.updateView()
     },
 
-    showFilter () {
-      this.$emit('filter-click')
-    },
+    // showFilter () {
+    //   this.$emit('filter-click')
+    // },
 
     renderEvents (state) {
       this.$emit('render-events', state)

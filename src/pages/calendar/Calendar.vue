@@ -95,7 +95,6 @@
                    :events="events"
                    @edit-schedule="editSchedule"
                    @add-schedule="addSchedule"
-                   @filter-click="toggleFilters"
                    @render-events="renderFromEvent"
                    @update-current-date="updateCurrentDate">
         </scheduler>
@@ -247,10 +246,10 @@ export default {
       // this.$refs.manager.addSchedule(date)
     },
 
-    toggleFilters () {
+    // toggleFilters () {
     //   this.original_filters = _.clone(this.filters)
     //   this.dialogVisible = true
-    },
+    // },
 
     loadCalendarData (state) {
       this.loading = true
@@ -283,12 +282,12 @@ export default {
           this.loading = false
         }
 
-        this.dialogVisible = false
+        // this.dialogVisible = false
       }).catch(err => {
         console.log(err)
 
         this.loading = false
-        this.dialogVisible = false
+        // this.dialogVisible = false
       })
     },
 
@@ -321,6 +320,9 @@ export default {
       this.filters.reminders = data.reminders
       this.filters.calendar_users = data.users || []
       this.filters.calendar_status = data.status || []
+
+      // reload calendar with new filters
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
     }
   },
 
