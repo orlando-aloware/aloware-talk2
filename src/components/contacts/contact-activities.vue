@@ -142,7 +142,7 @@ export default {
       }
 
       // If it's an email, the message and subject need to be checked
-      if ([comm1.type, comm2.type].includes(CommunicationTypes.EMAIL)) {
+      if (comm1.type === CommunicationTypes.EMAIL && comm2.type === CommunicationTypes.EMAIL) {
         let body = comm2.body.split(/\r?\n/)
 
         let subject = body[0].split(':')[1].trim()
@@ -158,7 +158,7 @@ export default {
       }
 
       // If it's an sms, test to see if there are variables in the body
-      if ([comm1.type, comm2.type].includes(CommunicationTypes.SMS)) {
+      if (comm1.type === CommunicationTypes.SMS && comm2.type === CommunicationTypes.SMS) {
         return this.compareMessages(comm1.body, comm2.body)
       }
 
