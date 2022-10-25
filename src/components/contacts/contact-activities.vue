@@ -148,7 +148,7 @@ export default {
         let subject = body[0].split(':')[1].trim()
         let message = body[3].trim()
 
-        return subject === comm1.subject && message === comm1.message
+        return subject === comm1.subject && this.compareMessages(comm1.message, message)
       }
 
       // If it's a fax, it won't have any text to compare.
@@ -159,18 +159,21 @@ export default {
 
       // If it's an sms, test to see if there are variables in the body
       if ([comm1.type, comm2.type].includes(CommunicationTypes.SMS)) {
-        let bodyArray = comm1.body.split(' ')
-
-        for (let word of bodyArray) {
-          if (!word.includes('[') && !word.includes(']') && !comm2.body.includes(word)) {
-            return false
-          }
-        }
-
-        return true
+        return this.compareMessages(comm1.body, comm2.body)
       }
 
       return comm1.body === comm2.body
+    },
+    compareMessages (string1, string2) {
+      let bodyArray = string1.split(' ')
+
+      for (let word of bodyArray) {
+        if (!word.includes('[') && !word.includes(']') && !string2.includes(word)) {
+          return false
+        }
+      }
+
+      return true
     },
     scrollMessages () {
       const activitiesWrap = this.$refs.activitiesWrap
