@@ -168,6 +168,8 @@ export default {
       let bodyArray = string1.split(' ')
 
       for (let word of bodyArray) {
+        // if contains bracket at beginning or at the end, it's probably a variable
+        // Variables don't need to be checked, because they are not
         if (!word.includes('[') && !word.includes(']') && !string2.includes(word)) {
           return false
         }
