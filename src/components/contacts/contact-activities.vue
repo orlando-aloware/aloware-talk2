@@ -146,9 +146,11 @@ export default {
         let body = comm2.body.split(/\r?\n/)
 
         let subject = body[0].split(':')[1].trim()
-        let message = body[3].trim()
+        let message = body.slice(3, body.length).reduce((cumulative, current) => cumulative + current).trim()
 
-        return subject === comm1.subject && this.compareMessages(comm1.message, message)
+        let comparison = this.compareMessages(comm1.message, message)
+
+        return subject === comm1.subject && comparison
       }
 
       // If it's a fax, it won't have any text to compare.
@@ -165,12 +167,13 @@ export default {
       return comm1.body === comm2.body
     },
     compareMessages (string1, string2) {
-      let bodyArray = string1.split(' ')
+      let bodyArray = string1.replace(/\n/g, ' ').split(' ')
 
       for (let word of bodyArray) {
         // if contains bracket at beginning or at the end, it's probably a variable
         // Variables don't need to be checked, because they are not
         if (!word.includes('[') && !word.includes(']') && !string2.includes(word)) {
+          console.log({ word })
           return false
         }
       }
