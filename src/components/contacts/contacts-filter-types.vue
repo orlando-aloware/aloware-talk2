@@ -223,6 +223,7 @@ export default {
       }
     },
     addValue () {
+      console.log('IN!!')
       if (this.filterOperatorValue &&
         typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object' &&
         !['relation', 'multi_relation'].includes(this.filter.type)) {
@@ -267,9 +268,8 @@ export default {
       }
 
       const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      const toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
 
-      if (!value.data && currentFilter && !this.isValidated && toDelete) {
+      if (!value.data && currentFilter && !this.isValidated) {
         delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
       } else {
         this.allFilters[this.filterGroupIndex].filters[this.filter.key] = {
@@ -314,6 +314,7 @@ export default {
       this.$refs.filterOperation[0].focus()
     },
     applyFilter () {
+      console.log('this.allFilters: ', this.allFilters)
       this.setListContactsLoaded(false)
       const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.setCurrentListFilters(this.allFilters)

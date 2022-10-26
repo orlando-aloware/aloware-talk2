@@ -550,6 +550,11 @@ export default {
         id: this.selectedList.id,
         filters: updatedFilter
       })
+
+      if (this.filterGroupIndex > 0) {
+        this.filterGroupIndex -= 1
+      }
+
       this.$emit('filtersUpdated')
     },
 
@@ -591,6 +596,12 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+      let keys = Object.keys(this.currentListFilters)
+      keys = keys.filter(item => !isNaN(parseInt(item)))
+
+      if (keys.length) {
+        this.filterGroupIndex = keys.length
+      }
     },
     $route: {
       deep: true,

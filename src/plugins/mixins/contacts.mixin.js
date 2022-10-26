@@ -308,6 +308,7 @@ export default {
       }
 
       if (!this.fromContactFilters && !fromRefresh) {
+        console.log('fetch setPreviousListFilters params: ', params)
         this.setPreviousListFilters(params)
         this.setPreviousListId(this.id)
       }
