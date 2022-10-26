@@ -124,7 +124,7 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    :disabled="!hasExport"
+                    v-if="isAdmin"
                     @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
@@ -861,8 +861,7 @@ export default {
   data () {
     return {
       selectedItem: null,
-      hasFilters: false,
-      hasExport: true
+      hasFilters: false
     }
   },
   methods: {
