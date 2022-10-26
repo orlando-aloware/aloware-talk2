@@ -1306,14 +1306,6 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
-    },
-    async exportAsCsv () {
-      talk2Api.V2.contacts.listExport(this.list.id, {
-        headers: this.list.headers
-      })
-        .catch(() => {
-          this.$generalNotification('Unable to process export request! Please try again later.', 'error')
-        })
     }
   },
 
