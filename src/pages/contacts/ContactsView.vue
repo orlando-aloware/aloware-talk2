@@ -238,7 +238,7 @@
           <b-dropdown-item
             @click="exportAsCsv"
             href="#"
-            :disabled="!hasExport">
+            v-if="isAdmin">
             <export-icon></export-icon>
             Export as CSV
           </b-dropdown-item>
@@ -815,7 +815,6 @@ export default {
       folderPath: [],
       createContactModalId: 'contacts-list-create-contact-modal',
       myContacts: false,
-      hasExport: true,
       hasNextPage: false,
       viewListeners: {},
       ContactListTypes
