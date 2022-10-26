@@ -104,9 +104,9 @@ export default {
     ...mapActions('contacts', [
       'addPowerDialerOpen'
     ]),
-    onClose () {
+    onClose (data = null) {
       if (!this.isLoading) {
-        this.$emit('close')
+        this.$emit('close', data)
       }
     },
     onListSelectorChange (list) {
