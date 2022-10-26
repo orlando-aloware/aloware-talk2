@@ -188,14 +188,6 @@ export default {
         default:
           return ''
       }
-    },
-
-    userObject () {
-      if (!this.selectedId) {
-        return null
-      }
-
-      return this.formattedOptions.find(item => item.id === this.selectedId)
     }
   },
 
