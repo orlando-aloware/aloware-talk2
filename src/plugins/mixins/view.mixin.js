@@ -1,8 +1,10 @@
 import { mapActions, mapState } from 'vuex'
 import moment from 'moment'
-import _ from 'lodash'
+import _, { isEmpty } from 'lodash'
 import { COUNT_FIELDS } from 'src/constants/count-fields-default'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   data () {
@@ -31,6 +33,18 @@ export default {
     },
     computedStyle () {
       return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
+    },
+    pdColumns () {
+      return POWER_DIALER_DEFAULT_COLUMNS
+    },
+    filteredColumns () {
+      if (!isEmpty(this.columns)) {
+        return this.columns
+      }
+
+      if (this.$route.name === 'Power Dialer') {
+        return this.pdColumns
+      }
     }
   },
   methods: {
@@ -177,6 +191,40 @@ export default {
     },
     isCountField (columnName) {
       return this.countFields.includes(columnName)
+    },
+    exportAsCsv () {
+      let id = null
+      let module = null
+
+      if (this.$route.name === 'Contacts') {
+        id = this.list.id
+        module = 'contacts'
+      }
+
+      if (this.$route.name === 'Power Dialer') {
+        id = this.selectedList.id
+        module = 'powerDialer'
+      }
+
+      if (id === null) {
+        this.$generalNotification('Failed to export. Missing id.', 'error')
+        return
+      }
+
+      const headers = this.filteredColumns.map((item) => {
+        return {
+          name: item.name,
+          label: item.label
+        }
+      })
+        .filter(item => !['checkbox', 'actions'].includes(item.name))
+
+      talk2Api.V2[module].listExport(id, {
+        headers: JSON.stringify(headers)
+      })
+        .catch(() => {
+          this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+        })
     }
   }
 }
