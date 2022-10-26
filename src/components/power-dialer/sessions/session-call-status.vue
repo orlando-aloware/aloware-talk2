@@ -62,6 +62,19 @@
           no-wrap
           unelevated
           no-caps
+          :disabled="!canRedial "
+          :color="canRedial  ? 'blue-7' : 'grey-8'"
+          @click="onRedial">
+          <RefreshIcon class="mr-2" color="white" />
+          <div class="text-body2">Redial</div>
+        </q-btn>
+
+        <q-btn
+          class="sessions-button free-width mx-1"
+          size="sm"
+          no-wrap
+          unelevated
+          no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
           @click="onNextTask">
@@ -259,6 +272,7 @@ import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
 import CallDropIcon from 'components/icons/call-drop-icon'
+import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
@@ -288,7 +302,8 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon
+    RecordIcon,
+    RefreshIcon
   },
   mixins: [ sessionCallStatusMixin ],
   beforeRouteEnter (to, from, next) {
@@ -471,6 +486,9 @@ export default {
       // should be able to next task even if on warm up period
       return this.statusCallConnected ||
         ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+    },
+    canRedial () {
+      return this.canNextTask && !this.redialedContacts.includes(this.powerDialerTasks.in_queue[0])
     },
     pauseButtonText () {
       switch (true) {
@@ -912,6 +930,27 @@ export default {
     },
     onPhoneExpansionReset () {
       this.sessionPhoneExpansion = ''
+    },
+    async onRedial () {
+      this.onNextTask()
+      console.log(this.powerDialerTasks.in_queue)
+      // this.onPhoneExpansionReset()
+      // const contact = this.powerDialerTasks.in_queue[0]
+      //
+      // if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
+      //   this.wrapUp = false
+      //
+      //   this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+      //
+      //   this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+      //   this.processSession()
+      //   return
+      // }
+      //
+      // if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+      //   this.$VueEvent.fire('hangupCall')
+      //   this.redialedContacts.push(contact)
+      // }
     }
   },
   watch: {
@@ -972,7 +1011,8 @@ export default {
       hangUpInterval: null,
       hangUpIntervalCounter: 0,
       loadingHold: false,
-      loadingUnhold: false
+      loadingUnhold: false,
+      redialedContacts: []
     }
   }
 }
