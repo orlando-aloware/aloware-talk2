@@ -112,9 +112,6 @@ export default {
           this.setAgentStatus(data.agent_status)
           this.$VueEvent.fire('user_updated', data)
           console.log('Changed agent status [api]: ', data.agent_status)
-          if (data.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-            this.$VueEvent.fire('endWrapUp')
-          }
         }).catch(err => {
           changeAgentStatusTry++
           // error
@@ -131,14 +128,6 @@ export default {
 
     ...mapActions(['setOldAgentStatus']),
     ...mapActions('auth', ['setAgentStatus', 'setProfile'])
-  },
-
-  watch: {
-    agentStatus (toVal, fromVal) {
-      if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-        this.$VueEvent.fire('endWrapUp')
-      }
-    }
   },
 
   beforeDestroy () {
