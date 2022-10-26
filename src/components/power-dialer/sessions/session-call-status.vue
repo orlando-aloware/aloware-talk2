@@ -932,25 +932,16 @@ export default {
       this.sessionPhoneExpansion = ''
     },
     async onRedial () {
-      this.onNextTask()
-      console.log(this.powerDialerTasks.in_queue)
-      // this.onPhoneExpansionReset()
-      // const contact = this.powerDialerTasks.in_queue[0]
-      //
-      // if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
-      //   this.wrapUp = false
-      //
-      //   this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
-      //
-      //   this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
-      //   this.processSession()
-      //   return
-      // }
-      //
-      // if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-      //   this.$VueEvent.fire('hangupCall')
-      //   this.redialedContacts.push(contact)
-      // }
+      this.onPhoneExpansionReset()
+      this.skipSingleTask(this.activeTask, 'This contact will go to the bottom of the current session list.', true).then(() => {
+        if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+          this.$VueEvent.fire('hangupCall')
+        }
+
+        console.log(this.powerDialerTasks.in_queue)
+        this.redialedContacts.push(this.activeTask)
+        this.powerDialerTasks.in_queue.push(this.activeTask)
+      })
     }
   },
   watch: {
