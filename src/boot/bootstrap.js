@@ -279,6 +279,10 @@ Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
+  if (window._.isEmpty(message.trim())) {
+    return
+  }
+
   const uuid = window._.get(actionOptions, 'uuid', null)
   const filename = window._.get(actionOptions, 'filename', null)
   const colorClass = { data: '' }
