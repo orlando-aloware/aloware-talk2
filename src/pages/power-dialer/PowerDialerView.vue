@@ -924,7 +924,11 @@ export default {
       this.$emit('loadMore')
     },
     async exportAsCsv () {
-      talk2Api.V2.powerDialer.listExport(this.selectedList.id)
+      talk2Api.V2.powerDialer.listExport(this.selectedList.id, {
+        params: {
+          headers: this.filteredColumns.headers
+        }
+      })
         .catch(() => {
           this.$generalNotification('Unable to process export request! Please try again later.', 'error')
         })

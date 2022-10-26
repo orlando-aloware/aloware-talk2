@@ -318,9 +318,8 @@ export default {
       taskStatusUpdate (id, params) {
         return window.axios.put(`/api/v2/contacts/${id}/task-status`, params)
       },
-      async listExport (id) {
+      async listExport (id, params = {}) {
         let defaultList = null
-        const params = {}
         Object.entries(DEFAULT_PINNED_LIST).forEach(([key, value]) => {
           if (value.id === id) {
             defaultList = DEFAULT_PINNED_LIST[key]
