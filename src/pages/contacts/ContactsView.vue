@@ -238,7 +238,7 @@
           <b-dropdown-item
             @click="exportAsCsv"
             href="#"
-            :disabled="!hasExport">
+            v-if="isAdmin">
             <export-icon></export-icon>
             Export as CSV
           </b-dropdown-item>
@@ -815,7 +815,6 @@ export default {
       folderPath: [],
       createContactModalId: 'contacts-list-create-contact-modal',
       myContacts: false,
-      hasExport: false,
       hasNextPage: false,
       viewListeners: {},
       ContactListTypes
@@ -845,7 +844,6 @@ export default {
       'removeContactOpen',
       'setBulkDelete',
       'setMessageComposerMode',
-      'exportCsv',
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded'
@@ -1307,14 +1305,6 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
-    },
-    async exportAsCsv () {
-      let res = await this.exportCsv(this.list.id)
-      if (res.status === 200) {
-        this.$generalNotification(res.data.message, 'success')
-      } else {
-        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
-      }
     }
   },
 
