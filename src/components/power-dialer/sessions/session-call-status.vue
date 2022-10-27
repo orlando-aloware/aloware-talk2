@@ -488,7 +488,9 @@ export default {
         ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
     },
     canRedial () {
-      return this.canNextTask && !this.redialedContacts.includes(this.powerDialerTasks.in_queue[0])
+      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        !this.redialedContacts.includes(this.activeTask.id) &&
+        this.powerDialerTasks.in_queue.length >= 1
     },
     pauseButtonText () {
       switch (true) {
@@ -933,14 +935,23 @@ export default {
     },
     async onRedial () {
       this.onPhoneExpansionReset()
-      this.skipSingleTask(this.activeTask, 'This contact will go to the bottom of the current session list.', true).then(() => {
+      this.redialTask(this.activeTask).then(() => {
+        this.wrapUp = false
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
 
-        console.log(this.powerDialerTasks.in_queue)
-        this.redialedContacts.push(this.activeTask)
+        this.redialedContacts.push(this.activeTask.id)
         this.powerDialerTasks.in_queue.push(this.activeTask)
+
+        this.hangUpInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.$VueEvent.fire('endWrapUp')
+            this.hasActiveTask = true
+            this.processSession(true)
+            clearInterval(this.hangUpInterval)
+          }
+        }, 500)
       })
     }
   },

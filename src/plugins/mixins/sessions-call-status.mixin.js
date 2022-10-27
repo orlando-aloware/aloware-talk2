@@ -224,6 +224,21 @@ export default {
         })
     },
 
+    redialTask (autoDialTask) {
+      const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
+        return
+      }
+
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
+        .then(res => {
+          return Promise.resolve(res)
+        }).catch(err => {
+          return Promise.reject(err)
+        })
+    },
+
     clearWarmUpCountDown () {
       this.countdownTimer = -1
       clearInterval(this.countdownInterval)
