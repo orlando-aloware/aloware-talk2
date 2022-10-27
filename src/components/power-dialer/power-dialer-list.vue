@@ -7,14 +7,15 @@
     </contacts-folders>
     <hubspot-list-import-modal :is-open="isHubspotImportDialogOpen"
                                v-if="isHubspotImportDialogOpen"
-                               @close="onHubspotImportDialogClose"/>
+                               @close="onHubspotImportDialogClose">
+    </hubspot-list-import-modal>
   </div>
 </template>
 
 <script>
 import ContactsFolders from '../contacts/contacts-folders'
 import HubspotListImportModal from 'components/hubspot-list-import-modal'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'power-dialer-list',
@@ -34,9 +35,18 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters('auth', ['profile'])
+  },
+
   mounted () {
     this.$VueEvent.stop('contact_list_import_hubspot')
     this.$VueEvent.listen('contact_list_import_hubspot', event => {
+      // return if event is for another user
+      if (event.user_id !== this.profile.id) {
+        return
+      }
+
       // dismiss the previous notification
       if (this.notification) {
         this.notification()

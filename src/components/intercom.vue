@@ -66,6 +66,7 @@ export default {
         }
       })
     },
+
     fixTopMenu () {
       let intercomIframe = document.querySelector('[name=intercom-banner-frame]')
       let intercomIframeHeight = this.getIntercomIframeHeight(intercomIframe)
@@ -108,6 +109,7 @@ export default {
         }
       }
     },
+
     getIntercomIframeHeight (intercomIframe) {
       let intercomIframeInnerDoc = intercomIframe ? (intercomIframe.contentDocument || intercomIframe.contentWindow.document) : null
       let intercomIframeDomBody = intercomIframeInnerDoc ? intercomIframeInnerDoc.getElementById('intercom-container-body') : null
