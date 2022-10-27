@@ -163,6 +163,10 @@ export default {
       type: String,
       default: ''
     },
+    showNumber: {
+      type: Boolean,
+      default: true
+    },
     threshold: {
       type: Number,
       default: 3
@@ -218,10 +222,7 @@ export default {
     if (this.disable && this.value) {
       const response = await this.$axios.get('/api/v2/contacts/' + this.value)
       const contact = response.data
-      this.options.push({
-        id: contact.id,
-        name: contact.first_name + ' ' + contact.last_name
-      })
+      this.options.push(this.formatContact(contact))
 
       this.$emit('loaded')
     }
@@ -237,10 +238,7 @@ export default {
           .then(({ data }) => {
             update(() => {
               data.data.forEach(contact => {
-                this.options.push({
-                  id: contact.id,
-                  name: contact.first_name + ' ' + contact.last_name
-                })
+                this.options.push(this.formatContact(contact))
               })
             })
 
@@ -251,7 +249,14 @@ export default {
           this.options = []
         })
       }
-    }, 500)
+    }, 500),
+
+    formatContact (contact) {
+      return {
+        id: contact.id,
+        name: `${contact.first_name} ${contact.last_name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
+      }
+    }
   },
 
   watch: {
