@@ -100,15 +100,20 @@
         </scheduler>
       </div>
     </div>
+    <manager ref="manager"
+             @render-schedule="renderSchedule">
+    </manager>
   </div>
 </template>
 
 <script>
 // import { mapActions, mapState } from 'vuex'
+import _ from 'lodash'
 import CalendarIcon from '../../components/icons/calendar-icon.vue'
 import DateSelector from '../../components/date-selector.vue'
-import Helper from '../../components/calendar/calendar-helper.vue'
 import Filters from '../../components/calendar/calendar-filters.vue'
+import Helper from '../../components/calendar/calendar-helper.vue'
+import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import moment from 'moment'
 
@@ -118,8 +123,9 @@ export default {
   components: {
     CalendarIcon,
     DateSelector,
-    Helper,
     Filters,
+    Helper,
+    Manager,
     Scheduler
   },
 
@@ -239,11 +245,11 @@ export default {
     },
 
     editSchedule (event) {
-      // this.$refs.manager.editSchedule(event)
+      this.$refs.manager.editSchedule(event)
     },
 
     addSchedule (date) {
-      // this.$refs.manager.addSchedule(date)
+      this.$refs.manager.addSchedule(date)
     },
 
     // toggleFilters () {
@@ -323,6 +329,36 @@ export default {
 
       // reload calendar with new filters
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+    },
+
+    renderSchedule (engagement) {
+      let data = _.cloneDeep(engagement.data)
+      let action = engagement.action
+
+      if (action === 'add') {
+        this.events.push(data)
+      }
+
+      if (action === 'update') {
+        let index = this.events.findIndex(ev => ev.id === data.id)
+
+        if (index > -1) {
+          this.events.splice(index, 1, data)
+        }
+      }
+
+      if (action === 'delete') {
+        let index = this.events.findIndex(ev => ev.id === data.id)
+
+        if (index > -1) {
+          this.events.splice(index, 1)
+
+          // remove the event directly from the scheduler
+          this.$refs.scheduler.deleteEvent(data.id)
+        }
+      }
+
+      this.$refs.scheduler.customParse(this.events)
     }
   },
 
