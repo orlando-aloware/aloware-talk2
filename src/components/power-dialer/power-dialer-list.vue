@@ -35,14 +35,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['user'])
+    ...mapGetters('auth', ['profile'])
   },
 
   mounted () {
     this.$VueEvent.stop('contact_list_import_hubspot')
     this.$VueEvent.listen('contact_list_import_hubspot', event => {
       // return if event is for another user
-      if (event.user_id !== this.user.profile.id) {
+      if (event.user_id !== this.profile.id) {
         return
       }
 
