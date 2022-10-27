@@ -297,6 +297,14 @@ export default {
       })
     },
 
+    reloadFromCurrentFilter () {
+      this.loadCalendarData({
+        mode: this.filters.calendar_mode,
+        min_date: this.filters.calendar_min_date,
+        max_date: this.filters.calendar_max_date
+      })
+    },
+
     renderFromEvent (state) {
       this.cancelRequestToken()
       this.resetPage()

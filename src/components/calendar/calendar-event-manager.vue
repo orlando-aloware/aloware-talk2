@@ -142,7 +142,7 @@
             </b-form-input>
           </b-form-group>
         </b-col>
-        <b-col v-if="schedule.type == CommunicationTypes.APPOINTMENT">
+        <b-col v-if="isAppointment">
           <b-form-group class="form-label"
                         label="Duration (minutes)">
             <predefined-time-duration-selector v-model="schedule.duration"
@@ -182,23 +182,26 @@
         </b-col>
       </b-row>
 
-      <b-row v-if="!schedule.is_past && schedule.type === CommunicationTypes.APPOINTMENT">
+      <b-row v-if="!schedule.is_past && isAppointment">
         <b-col>
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
         <b-col cols="12">
           <b-form-group label=""
                         class="checkbox-wrapper">
-            <b-form-checkbox v-model="sms_reminder_fields.enabled"
-                             :value="true"
-                             :unchecked-value="false">
+            <b-form-checkbox :value="true"
+                             :unchecked-value="false"
+                             v-model="sms_reminder_fields.enabled">
               <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
           </b-form-group>
         </b-col>
         <b-col v-show="sms_reminder_fields.enabled" cols="12">
-          <b-form-group label="Send From">
+          <b-form-group label="Send From"
+                        invalid-feedback="Please select a line for the SMS reminder"
+                        :state="validateState('campaign_id', 'sms_reminder_fields')">
             <contact-line-selector :showPaused="false"
+                                   v-model="$v.sms_reminder_fields.campaign_id.$model"
                                    @select="lineSelected">
             </contact-line-selector>
           </b-form-group>
@@ -211,21 +214,23 @@
             <number-of-days-selector @select="smsReminderFrequencySelected"></number-of-days-selector>
           </b-form-group>
 
-          <b-form-group label="Template Variables">
+          <b-form-group label="Template Variables"
+                        invalid-feedback="Please write a text for the SMS reminder"
+                        :state="validateState('body', 'sms_reminder_fields')">
             <div class="mb-1">
               <span class="text-danger sms-reminder-template-variables"
-                    v-for="item in sms_reminder_fields.template_variables"
                     :key="item"
+                    v-for="item in sms_reminder_fields.template_variables"
                     @click="appendSmsReminderTemplateVariable(item)">
                 {{ item }}
-            </span>
+              </span>
             </div>
             <b-form-textarea class="textarea-no-auto-shrink"
-                             placeholder=""
+                             placeholder="Write a text"
                              rows="3"
                              max-rows="8"
                              no-auto-shrink
-                             v-model="sms_reminder_fields.body">
+                             v-model="$v.sms_reminder_fields.body.$model">
             </b-form-textarea>
           </b-form-group>
         </b-col>
@@ -246,7 +251,7 @@
                 :options="appointmentOptions"
                 :disabled="!isEditable"
                 v-model="schedule.status"
-                v-if="schedule.type == CommunicationTypes.APPOINTMENT"/>
+                v-if="isAppointment"/>
               <q-btn-toggle
                 class="border w-100"
                 no-caps
@@ -289,8 +294,8 @@
 
 <script>
 import _ from 'lodash'
-import { required } from 'vuelidate/lib/validators'
-import { aclMixin, dateMixin, formValidationMixin } from 'src/plugins/mixins'
+import { required, requiredIf } from 'vuelidate/lib/validators'
+import { aclMixin, dateMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
@@ -310,8 +315,7 @@ export default {
 
   mixins: [
     aclMixin,
-    dateMixin,
-    formValidationMixin
+    dateMixin
   ],
 
   components: {
@@ -360,6 +364,18 @@ export default {
       timezone: {
         required
       }
+    },
+    sms_reminder_fields: {
+      campaign_id: {
+        required: requiredIf(function (model) {
+          return model.enabled && this.isAppointment
+        })
+      },
+      body: {
+        required: requiredIf(function (model) {
+          return model.enabled && this.isAppointment
+        })
+      }
     }
   },
 
@@ -381,7 +397,7 @@ export default {
         time: '06:00',
         type: null
       },
-      original_schedule: {},
+      originalSchedule: {},
       sms_reminder_fields: {
         enabled: true,
         template_variables: [
@@ -489,6 +505,10 @@ export default {
 
     minDate () {
       return moment().format('YYYY-MM-DD')
+    },
+
+    isAppointment () {
+      return this.schedule.type === CommunicationTypes.APPOINTMENT
     }
   },
 
@@ -503,16 +523,17 @@ export default {
   },
 
   methods: {
-    validateState (input) {
-      const { $dirty, $error } = this.$v.schedule[input]
+    validateState (input, prop = 'schedule') {
+      const { $dirty, $error } = this.$v[prop][input]
       return $dirty ? !$error : null
     },
 
     editSchedule (sched) {
+      console.log(sched)
       this.loading = true
       let date = moment(sched.start_date)
 
-      this.original_schedule = {
+      this.originalSchedule = {
         id: sched.id,
         type: sched.type,
         date: date.format('MM/DD/YYYY'),
@@ -528,7 +549,7 @@ export default {
         text: sched.text,
         timezone: sched.contact_timezone || null
       }
-      this.schedule = _.clone(this.original_schedule)
+      this.schedule = _.clone(this.originalSchedule)
 
       if (sched.is_past) {
         this.resetSmsReminder()
@@ -537,9 +558,6 @@ export default {
       this.showManager = true
       this.title = sched.status_name + ' - Edit Event'
       this.mode = 'edit'
-      // this.show_contact_selector = false
-      // this.validated = true
-      // console.log(this.schedule)
     },
 
     addSchedule (date) {
@@ -566,7 +584,7 @@ export default {
         timezone = this.schedule.contact.timezone
       }
 
-      this.original_schedule = {
+      this.originalSchedule = {
         id: null,
         type: type,
         date: d.format('MM/DD/YYYY'),
@@ -580,17 +598,14 @@ export default {
         timezone: timezone
       }
 
-      this.schedule = _.clone(this.original_schedule)
+      this.schedule = _.clone(this.originalSchedule)
 
       this.mode = 'add'
       this.title = 'Add Event'
       this.showManager = true
-      // this.validated = false
 
       if (this.calledFrom === 'contact') {
         this.title = 'Add Appointment'
-
-        // this.customPreValidateForm()
       }
     },
 
@@ -638,7 +653,7 @@ export default {
 
           // If event type is APPOINTMENT and sms reminder option is enabled
           // - include sms reminder option
-          if (this.schedule.type === CommunicationTypes.APPOINTMENT && this.sms_reminder_fields.enabled) {
+          if (this.isAppointment && this.sms_reminder_fields.enabled) {
             this.schedule.sms_reminder = this.sms_reminder_fields
           }
 
@@ -698,7 +713,9 @@ export default {
       }
     },
 
-    customResetForm () {
+    resetForm () {
+      this.$v.$reset()
+
       if (this.calledFrom === 'contact') {
         this.schedule.user = this.user.profile
         this.schedule.calendar_response = 1
@@ -720,31 +737,12 @@ export default {
         }
       }
 
-      // if (this.$refs.scheduleForm) {
-      //   this.$refs.scheduleForm.clearValidate()
-      // }
+      this.resetSmsReminder()
     },
 
-    // setContact (contact) {
-    //   this.schedule.contact = {}
-    //   this.schedule.timezone = this.user.profile.timezone
-
-    //   if (contact) {
-    //     this.schedule.contact = contact
-    //     this.schedule.timezone = contact.timezone
-
-    //     // Hide contact selector if this component is called from contact page
-    //     // if (this.calledFrom === 'contact') {
-    //     //   this.show_contact_selector = false
-    //     // }
-    //   }
-
-    //   // this.customPreValidateForm()
-    // },
-
     closeFiltersMenu (bvModalEvent) {
-      if (_.isEqual(this.schedule, this.original_schedule)) {
-        this.customResetForm()
+      if (_.isEqual(this.schedule, this.originalSchedule)) {
+        this.resetForm()
         this.showManager = false
       } else {
         // prevent closing
@@ -758,7 +756,7 @@ export default {
         })
           .then(value => {
             if (value) {
-              this.customResetForm()
+              this.resetForm()
 
               this.$nextTick(() => {
                 this.showManager = false
@@ -768,17 +766,6 @@ export default {
           })
       }
     },
-
-    // customPreValidateForm: _.debounce(function (reset = false) {
-    //   this.preValidateForm('scheduleForm')
-
-    //   // If campaigns is not empty
-    //   // AND sms reminder campaign id is not yet set
-    //   // - Set sms reminder campaign_id to the first of campaigns list.
-    //   if (this.campaigns.length > 0 && !this.sms_reminder_fields.campaign_id) {
-    //     this.sms_reminder_fields.campaign_id = this.campaigns[0].id
-    //   }
-    // }, 100),
 
     updateSmsReminderVariables () {
       if (this.schedule.time) {
@@ -836,6 +823,7 @@ export default {
 
     lineSelected (line) {
       this.sms_reminder_fields.campaign_id = line.id
+      this.$v.sms_reminder_fields.campaign_id.$touch()
     },
 
     smsReminderTimeSelected (time) {
