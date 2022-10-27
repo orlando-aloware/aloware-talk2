@@ -1,6 +1,7 @@
 <template>
   <b-modal id="manager-modal"
            size="lg"
+           body-class="p-0"
            no-close-on-esc
            no-close-on-backdrop
            :scrollable="!loading"
@@ -25,7 +26,8 @@
         {{ title }}
       </h6>
     </template>
-    <b-form ref="scheduleForm"
+    <b-form class="p-3"
+            ref="scheduleForm"
             @submit.prevent="saveSchedule()">
       <b-row v-if="calledFrom !== 'contact'">
         <b-col>
