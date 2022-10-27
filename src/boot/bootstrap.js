@@ -207,6 +207,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
       case 500:
         message.data = 'Oops! We are having some problems right now, please try again later.'
     }
+
+    if (window._.isEmpty(message.data.trim())) {
+      return
+    }
+
     this.$generalNotification(message.data, 'error', 5000, true)
   }
 }
