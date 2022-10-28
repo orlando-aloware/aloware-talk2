@@ -66,7 +66,15 @@
           :color="canRedial  ? 'blue-7' : 'grey-8'"
           @click="onRedial">
           <RefreshIcon class="mr-2" color="white" />
-          <div class="text-body2">Redial</div>
+
+            <div class="text-body2">
+              <q-tooltip content-class="bg-grey-light11"
+                         anchor="bottom middle" self="center middle">
+                This contact will go to the bottom of the current session list
+              </q-tooltip>
+              Redial
+            </div>
+
         </q-btn>
 
         <q-btn
