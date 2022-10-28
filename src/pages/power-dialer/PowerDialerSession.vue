@@ -93,18 +93,26 @@ export default {
       return this.selectedList.name.length > 0
     }
   },
+  data () {
+    return {
+      listeners: {},
+      cancelToken: null,
+      source: null
+    }
+  },
   async created () {
     await this.fetchCurrentList()
     this.TOGGLE_SESSION_LOADER(true)
     await this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
     this.hasActiveTask = false
 
-    this.$VueEvent.listen('endWrapUp', () => {
+    this.listeners.endWrapUp = () => {
       if (this.$route.name === 'Power Dialer') {
         this.fetchTasks(AutoDialTaskStatus.STATUS_COMPLETED)
         this.fetchTasks(AutoDialTaskStatus.STATUS_FAILED)
       }
-    })
+    }
+    this.$VueEvent.listen('endWrapUp', this.listeners.endWrapUp)
   },
   async mounted () {
     this.resetPowerDialerTasks()
@@ -204,6 +212,9 @@ export default {
     onAllTasksAreSkipped () {
       this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
     }
+  },
+  beforeDestroy () {
+    this.$VueEvent.stop('endWrapUp', this.listeners.endWrapUp)
   }
 }
 </script>

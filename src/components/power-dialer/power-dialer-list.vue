@@ -7,7 +7,8 @@
     </contacts-folders>
     <hubspot-list-import-modal :is-open="isHubspotImportDialogOpen"
                                v-if="isHubspotImportDialogOpen"
-                               @close="onHubspotImportDialogClose"/>
+                               @close="onHubspotImportDialogClose">
+    </hubspot-list-import-modal>
   </div>
 </template>
 

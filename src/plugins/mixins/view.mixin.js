@@ -1,6 +1,6 @@
 import { mapActions, mapState } from 'vuex'
 import moment from 'moment'
-import _, { isEmpty } from 'lodash'
+import { get, debounce, isEmpty } from 'lodash'
 import { COUNT_FIELDS } from 'src/constants/count-fields-default'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
@@ -29,7 +29,7 @@ export default {
       'campaigns'
     ]),
     checked () {
-      return _.get(this.selectedContacts, this.id, [])
+      return get(this.selectedContacts, this.id, [])
     },
     computedStyle () {
       return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
@@ -94,7 +94,7 @@ export default {
         return false
       }
     },
-    showPopover: _.debounce(function (title, id, index, colName, e) {
+    showPopover: debounce(function (title, id, index, colName, e) {
       if (this.datatableTarget !== id) {
         this.hoverPopover.target = null
         this.hoverPopover.show = false
