@@ -23,11 +23,9 @@
             :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            @popup-show="onShowMenu"
-            @focus="onFocus"
-            @blur="onBlur"
-            @input="onInput"
-            @filter="filterFn">
+            :loading="forceLoading"
+            @filter="filterFn"
+            @virtual-scroll="onVirtualScroll">
     <template v-slot:prepend
               v-if="prepend">
       {{prepend}}
@@ -170,6 +168,10 @@ export default {
     threshold: {
       type: Number,
       default: 3
+    },
+    searchOnScroll: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -188,7 +190,9 @@ export default {
         'filter_groups[0][is_conjunction]': true,
         'sort': 'last_engagement_at',
         'order': 'desc'
-      }
+      },
+      forceLoading: false,
+      searchedAllContacts: false
     }
   },
 
@@ -219,43 +223,74 @@ export default {
 
   async mounted () {
     // if component is disabled and the value is set, search for that specific contact only to fill as the option
-    if (this.disable && this.value) {
-      const response = await this.$axios.get('/api/v2/contacts/' + this.value)
-      const contact = response.data
-      this.options.push(this.formatContact(contact))
-
-      this.$emit('loaded')
+    if (this.value) {
+      this.loadContacts(this.value)
     }
   },
 
   methods: {
     filterFn: _.debounce(function (val, update) {
+      this.search = val
+      this.options = []
+
       if (val.length >= this.threshold) {
         this.$emit('loading')
 
         this.params['filter_groups[0][filters][search][value]'] = val
-        this.$axios.get(`/api/v2/contacts`, { params: this.params })
-          .then(({ data }) => {
-            update(() => {
-              data.data.forEach(contact => {
-                this.options.push(this.formatContact(contact))
-              })
-            })
-
-            this.$emit('loaded')
+        this.loadContacts()
+          .then(() => {
+            update()
           })
       } else {
         update(() => {
-          this.options = []
+          this.params.page = 1
+          this.$emit('input', null)
         })
       }
     }, 500),
+
+    onVirtualScroll (details) {
+      if (this.searchOnScroll && (details.index + 1) === this.options.length) {
+        this.params.page++
+
+        this.loadContacts()
+      }
+    },
 
     formatContact (contact) {
       return {
         id: contact.id,
         name: `${contact.first_name} ${contact.last_name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
       }
+    },
+
+    async loadContacts (id = null) {
+      if (this.searchedAllContacts) {
+        return
+      }
+
+      this.forceLoading = true
+      this.$emit('loading')
+
+      const url = '/api/v2/contacts' + (id ? '/' + id : '')
+      const response = await this.$axios.get(url, { params: this.params })
+
+      if (id) {
+        this.options.push(this.formatContact(response.data))
+      } else {
+        const contacts = response.data.data
+
+        contacts.forEach(contact => {
+          this.options.push(this.formatContact(contact))
+        })
+
+        if (contacts.length < this.params.per_page) {
+          this.searchedAllContacts = true
+        }
+      }
+
+      this.forceLoading = false
+      this.$emit('loaded')
     }
   },
 
