@@ -943,23 +943,21 @@ export default {
     },
     async onRedial () {
       this.onPhoneExpansionReset()
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       this.redialTask(this.activeTask).then(() => {
-        this.wrapUp = false
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
 
         this.redialedContacts.push(this.activeTask.id)
         this.powerDialerTasks.in_queue.push(this.activeTask)
+        this.activeTask = this.taskToCall
 
-        this.hangUpInterval = setInterval(() => {
-          if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.$VueEvent.fire('endWrapUp')
-            this.hasActiveTask = true
-            this.processSession(true)
-            clearInterval(this.hangUpInterval)
-          }
-        }, 500)
+        setTimeout(() => {
+          this.wrapUp = false
+          this.hasActiveTask = false
+          this.processSession()
+        }, 1000)
       })
     }
   },
