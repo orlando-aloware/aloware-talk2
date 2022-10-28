@@ -5,7 +5,6 @@
 
 <script>
 import Scheduler from 'dhtmlx-scheduler'
-// import { mapState } from 'vuex'
 import moment from 'moment'
 
 export default {
@@ -21,12 +20,6 @@ export default {
       }
     }
   },
-
-  // computed: {
-  //   ...mapState({
-  //     sidebar_folded: state => state.cache.sidebar_folded
-  //   })
-  // },
 
   mounted: function () {
     Scheduler.skin = 'material'
@@ -45,12 +38,6 @@ export default {
       'day',
       'week',
       'month'
-      // {
-      //   html: 'Filters',
-      //   click: () => {
-      //     this.showFilter()
-      //   }
-      // }
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
@@ -127,10 +114,6 @@ export default {
       Scheduler.updateView()
     },
 
-    // showFilter () {
-    //   this.$emit('filter-click')
-    // },
-
     renderEvents (state) {
       this.$emit('render-events', state)
     },
@@ -165,18 +148,6 @@ export default {
     updateCurrentDate (date) {
       this.$emit('update-current-date', date)
     }
-
-    // insertWeekDays() {
-    //   $(function () {
-    //     $("#scheduler table").append('<thead><tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>');
-    //   });
-    // },
   }
-
-  // watch: {
-  //   sidebar_folded () {
-  //     this.updateScheduler()
-  //   }
-  // }
 }
 </script>

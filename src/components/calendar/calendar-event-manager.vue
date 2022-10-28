@@ -121,8 +121,8 @@
                            v-if="mode !== 'edit'"
                            @dateSelected="dateSelected">
             </date-selector>
-            <b-form-input v-model="schedule.date"
-                          disabled
+            <b-form-input disabled
+                          v-model="$v.schedule.date.$model"
                           v-else>
             </b-form-input>
           </b-form-group>
@@ -236,34 +236,33 @@
         </b-col>
       </b-row>
 
-      <b-row>
-        <b-col cols="12" lg="4">
+      <b-row v-if="mode === 'edit'">
+        <b-col cols="12"
+               lg="4">
           <b-form-group label="Status">
             <div class="text-center pb-1 b-b">
-              <q-btn-toggle
-                class="border w-100"
-                no-caps
-                dense
-                unelevated
-                toggle-color="primary"
-                color="white"
-                text-color="primary"
-                :options="appointmentOptions"
-                :disabled="!isEditable"
-                v-model="schedule.status"
-                v-if="isAppointment"/>
-              <q-btn-toggle
-                class="border w-100"
-                no-caps
-                dense
-                unelevated
-                toggle-color="primary"
-                color="white"
-                text-color="primary"
-                :options="reminderOptions"
-                :disabled="!isEditable"
-                v-model="schedule.status"
-                v-else/>
+              <q-btn-toggle class="border w-100"
+                            no-caps
+                            dense
+                            unelevated
+                            toggle-color="primary"
+                            color="white"
+                            text-color="primary"
+                            :options="appointmentOptions"
+                            :disabled="!isEditable"
+                            v-model="schedule.status"
+                            v-if="isAppointment"/>
+              <q-btn-toggle class="border w-100"
+                            no-caps
+                            dense
+                            unelevated
+                            toggle-color="primary"
+                            color="white"
+                            text-color="primary"
+                            :options="reminderOptions"
+                            :disabled="!isEditable"
+                            v-model="schedule.status"
+                            v-else/>
             </div>
           </b-form-group>
         </b-col>
@@ -358,7 +357,12 @@ export default {
         required,
         minValue (val) {
           // date regex and higher than today
-          return /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(val) && val >= moment().format('MM/DD/YYYY')
+          const regex = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(val)
+
+          // if in edit mode, skip higher than today check
+          return this.mode === 'edit'
+            ? regex
+            : regex && val >= moment().format('MM/DD/YYYY')
         }
       },
       timezone: {
@@ -368,12 +372,12 @@ export default {
     sms_reminder_fields: {
       campaign_id: {
         required: requiredIf(function (model) {
-          return model.enabled && this.isAppointment
+          return model.enabled && this.isAppointment && !this.schedule.is_past
         })
       },
       body: {
         required: requiredIf(function (model) {
-          return model.enabled && this.isAppointment
+          return model.enabled && this.isAppointment && !this.schedule.is_past
         })
       }
     }
@@ -385,6 +389,7 @@ export default {
       loading: false,
       mode: 'add',
       date: new Date(),
+      // not defined as camelCase because its used directly in API
       schedule: {
         contact: {},
         user: this.user,
@@ -398,6 +403,7 @@ export default {
         type: null
       },
       originalSchedule: {},
+      // not defined as camelCase because its used directly in API
       sms_reminder_fields: {
         enabled: true,
         template_variables: [
