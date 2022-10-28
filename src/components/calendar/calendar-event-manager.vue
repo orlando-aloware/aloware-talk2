@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="manager-modal"
+  <b-modal id="calendar-manager-modal"
            size="lg"
            body-class="p-0"
            no-close-on-esc
@@ -760,7 +760,7 @@ export default {
 
               this.$nextTick(() => {
                 this.showManager = false
-                this.$bvModal.hide('manager-modal')
+                this.$bvModal.hide('calendar-manager-modal')
               })
             }
           })

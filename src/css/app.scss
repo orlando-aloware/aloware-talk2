@@ -11343,44 +11343,6 @@ h1.contact-list-name-label {
 
 // Calendar
 .calendar {
-  // #container-search-result {
-  //   min-height: calc(100vh - 115px);
-  //   border: 1px solid #e0e0e0;
-  //   border-top: 0;
-
-  //   table {
-  //     .day-of-month {
-  //       width: 30px;
-  //       padding-right: 0;
-  //       font-size: 18px;
-  //       font-weight: 400;
-  //       text-align: center;
-  //       padding-left: 1rem
-  //     }
-
-  //     .date {
-  //       width: 150px;
-  //       text-transform: uppercase;
-  //     }
-
-  //     .time {
-  //       width: 200px;
-  //     }
-
-  //     .contact {
-  //       min-width: 200px;
-  //     }
-
-  //     td {
-  //       vertical-align: middle;
-
-  //       .fa-circle {
-  //         font-size: 12px;
-  //       }
-  //     }
-  //   }
-  // }
-
   &__header {
     width: 100%;
     position: fixed;
@@ -11442,47 +11404,6 @@ h1.contact-list-name-label {
     }
   }
 
-  &__filters {
-    
-  }
-
-  // .el-badge {
-  //   vertical-align: baseline !important;
-  // }
-
-  // .dhx_cal_event_clear,
-  // .dhx_cal_event_line,
-  // .left-container {
-  //   font-family: 'Circe', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  // }
-
-  // .loading-backdrop {
-  //   position: fixed;
-  //   width: calc(100% - 15rem);
-  //   height: 100%;
-  //   z-index: 1150;
-  //   background-color: rgba(254, 254, 254, 0.6);
-  // }
-
-  
-
-  // #gotoDatePicker {
-  //   .el-date-editor {
-  //     opacity: 0;
-  //     position: absolute;
-  //     left: 0;
-  //     top: 0;
-  //     cursor: pointer;
-  //     width: 55px;
-  //     z-index: -10;
-  //   }
-
-  //   input {
-  //     cursor: pointer;
-  //     width: 55px;
-  //   }
-  // }
-
   .scheduler {
     margin-top: 120px;
     background-color: #fff;
@@ -11533,10 +11454,6 @@ h1.contact-list-name-label {
               color: #2D96F3;
             }
           }
-        }
-
-        #td-scale {
-          width: 50px;
         }
       }
     }
@@ -11674,11 +11591,6 @@ h1.contact-list-name-label {
           -moz-box-sizing: border-box;
           box-sizing: border-box;
         }
-
-        // .btn-goto-date {
-        //   // display: none;
-        //   margin-right: 1rem !important;
-        // }
       }
 
       .day {
@@ -11703,35 +11615,23 @@ h1.contact-list-name-label {
   .b-overlay-wrap {
     z-index: 1005;
   }
-
-  #h5-calendar-date {
-    line-height: 40.8px;
-    vertical-align: middle;
-    color: #232323;
-    margin: 0;
-    margin-left: 1rem;
-    align-self: center;
-  }
-
-  // .btn-direction {
-  //   width: 40px;
-  //   height: 40px;
-  //   margin: 0;
-  //   border-radius: 50%;
-
-  //   .fa, .far {
-  //     color: #323232;
-  //   }
-  // }
-
-  // .btn-direction:hover {
-  //   background-color: #dedede !important;
-  // }
 }
 
-// #scheduler {
-  
-// }
+#calendar-manager-modal {
+  .form-control {
+    &:disabled {
+      background-color: inherit;
+    }
+  }
+
+  .q-field {
+    &--disabled {
+      input:disabled {
+        display: none;
+      }
+    }
+  }
+}
 
 /* Event Colors */
 .event-color-type-12 {
