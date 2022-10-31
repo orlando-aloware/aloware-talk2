@@ -396,6 +396,7 @@ export default {
           this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
             ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
           break
+        case 'selection':
         case 'boolean':
           this.isValidated = this.filterOperator && this.filterOperatorValue !== null
           break
