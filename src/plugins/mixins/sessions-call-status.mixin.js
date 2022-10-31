@@ -233,6 +233,7 @@ export default {
 
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
         .then(res => {
+          this.$generalNotification('Success: contact is at the bottom of the current list')
           return Promise.resolve(res)
         }).catch(err => {
           return Promise.reject(err)

@@ -70,7 +70,7 @@
             <div class="text-body2">
               <q-tooltip content-class="bg-grey-light11"
                          anchor="bottom middle" self="center middle">
-                This contact will go to the bottom of the current session list
+                {{ redialTooltip }}
               </q-tooltip>
               Redial
             </div>
@@ -499,6 +499,9 @@ export default {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
         !this.redialedContacts.includes(this.activeTask.id) &&
         this.powerDialerTasks.in_queue.length >= 1
+    },
+    redialTooltip () {
+      return this.canRedial ? 'This contact will go to the bottom of the current session list' : 'This contact has already been redialed once'
     },
     pauseButtonText () {
       switch (true) {
