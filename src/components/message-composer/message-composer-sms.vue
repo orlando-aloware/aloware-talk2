@@ -467,7 +467,7 @@ export default {
           this.$generalNotification('Message sent.')
         }).catch(error => {
           console.log(error)
-          this.$generalNotification('Error while sending message.', 'error')
+          this.$handleErrors(error.response)
         }).finally(() => {
           this.isSending = false
           this.urlShortenerDontAskUntilSend = false

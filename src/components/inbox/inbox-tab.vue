@@ -615,7 +615,9 @@ export default {
       this.toggleFilterModelForm(true)
     },
     updateContact (contact) {
-      if (_.isEmpty(this.contact) || _.isEmpty(contact)) {
+      if (_.isEmpty(this.contact) ||
+        _.isEmpty(contact) ||
+        contact.id !== this.contact.id) {
         return
       }
 
@@ -631,9 +633,7 @@ export default {
         }
       }
 
-      if (currentContact.id === this.contact.id) {
-        this.setContact(currentContact)
-      }
+      this.setContact(currentContact)
     },
     onRouteChange () {
       this.setStatus()
@@ -733,9 +733,8 @@ export default {
           ]
         )
       } else {
-        if (isInContacts) {
-          const index = contacts.data.findIndex(item => item.id === contact.id)
-
+        const index = contacts.data.findIndex(item => item.id === contact.id)
+        if (isInContacts && index !== -1) {
           contacts.data[index] = contact
           this.setContacts(contacts.data)
 
@@ -882,6 +881,8 @@ export default {
         return
       }
 
+      // there's already a listener in contact mixin that handles the fetching
+      // of contact's information so we have to prevent calling another request.
       if (!this.isContactMixinUsed) {
         setTimeout(() => {
           talk2Api.V2.contacts.get(communication.contact_id).then(response => {
@@ -890,8 +891,6 @@ export default {
             console.log(err)
           })
         }, 1000)
-      } else {
-        this.processNewCommunicationEvent(this.contact, communication)
       }
     }
 
@@ -1106,6 +1105,11 @@ export default {
       })
     }, 100)
 
+    // process the event from contact.mixin
+    this.listeners.inboxContactUpdated = (data) => {
+      this.processNewCommunicationEvent(data.contact, data.communication)
+    }
+
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
@@ -1116,6 +1120,7 @@ export default {
 
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
+    this.$VueEvent.listen('inbox_contact_updated', this.listeners.inboxContactUpdated)
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -1137,6 +1142,7 @@ export default {
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)
+    this.$VueEvent.stop('inbox_contact_updated', this.listeners.inboxContactUpdated)
   },
 
   watch: {
