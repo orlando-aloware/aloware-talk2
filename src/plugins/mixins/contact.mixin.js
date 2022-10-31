@@ -105,8 +105,6 @@ export default {
       source: null,
       communicationApiCancelToken: null,
       communicationApiSource: null,
-      newCommunicationCancelToken: null,
-      newCommunicationSource: null,
       contactActivitiesInterval: null,
       containerElInterval: null,
       scrollInterval: null,
@@ -121,7 +119,11 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'auth']),
-    ...mapState('contacts', ['contact', 'communicationsSummary']),
+    ...mapState('contacts', [
+      'contact',
+      'communicationsSummary',
+      'newCommunicationInprogressContactFetch'
+    ]),
     ...mapState('inbox', { selectContact: 'selectedContact' }),
     ...mapState('cache', ['currentCompany']),
 
@@ -228,13 +230,11 @@ export default {
 
   created () {
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
-    this.cancelToken = this.$axios.CancelToken
+    this.cancelToken = window.axios.CancelToken
     this.source = this.cancelToken.source()
 
-    this.communicationApiCancelToken = this.$axios.CancelToken
+    this.communicationApiCancelToken = window.axios.CancelToken
     this.communicationApiSource = this.communicationApiCancelToken.source()
-    this.newCommunicationCancelToken = window.axios.CancelToken
-    this.newCommunicationSource = this.newCommunicationCancelToken.source()
 
     if (this.skipComponents.includes(this.$options.name)) {
       return
@@ -247,18 +247,25 @@ export default {
 
       this.addNewCommunication(data)
 
-      if (data.contact_id === this.contact.id) {
-        this.newCommunicationSource.cancel(`Fetching of communication's contact information is canceled by the user.`)
-        this.newCommunicationSource = this.newCommunicationCancelToken.source()
-        talk2Api.V2.contacts.get(this.contact.id, this.newCommunicationSource.token).then(response => {
-          if (data.contact_id === this.contact.id) {
-            this.setContact(response.data)
-            this.setContactClone(response.data)
-            this.$VueEvent.fire('inbox_contact_updated')
-          }
-        }).catch(err => {
-          console.log(err)
-        })
+      // check if there's no on-going fetch for a certain contact
+      if (!this.newCommunicationInprogressContactFetch.includes(data.contact.id)) {
+        this.addNewCommunicationInprogressContactFetch(data.contact.id)
+        talk2Api.V2.contacts.get(data.contact.id)
+          .then(response => {
+            if (data.contact_id === this.contact.id) {
+              this.setContact(response.data)
+              this.setContactClone(response.data)
+            }
+
+            this.removeNewCommunicationInprogressContactFetch(data.contact.id)
+            this.$VueEvent.fire('inbox_contact_updated', {
+              contact: response.data,
+              communication: data
+            })
+          }).catch(err => {
+            this.removeNewCommunicationInprogressContactFetch(data.contact.id)
+            console.log(err)
+          })
       }
     }
 
@@ -1172,7 +1179,9 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed'
+      'setIsContactMixinUsed',
+      'addNewCommunicationInprogressContactFetch',
+      'removeNewCommunicationInprogressContactFetch'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },
