@@ -254,8 +254,8 @@ export default {
           if (data.contact_id === this.contact.id) {
             this.setContact(response.data)
             this.setContactClone(response.data)
-            this.$VueEvent.fire('inbox_contact_updated')
           }
+          this.$VueEvent.fire('inbox_contact_updated', response.data, data)
         }).catch(err => {
           console.log(err)
         })
