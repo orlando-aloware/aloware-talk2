@@ -733,8 +733,8 @@ export default {
           ]
         )
       } else {
-        if (isInContacts) {
-          const index = contacts.data.findIndex(item => item.id === contact.id)
+        const index = contacts.data.findIndex(item => item.id === contact.id)
+        if (isInContacts && index !== -1) {
           contacts.data[index] = contact
           this.setContacts(contacts.data)
 
@@ -1106,8 +1106,8 @@ export default {
     }, 100)
 
     // process the event from contact.mixin
-    this.listeners.inboxContactUpdated = (contact, communication) => {
-      this.processNewCommunicationEvent(contact, communication)
+    this.listeners.inboxContactUpdated = (data) => {
+      this.processNewCommunicationEvent(data.contact, data.communication)
     }
 
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
