@@ -101,6 +101,25 @@
                       v-model="filterOperatorValue">
         </q-btn-toggle>
       </template>
+      <template v-if="filter.type === 'selection'">
+        <q-select
+          ref="filterOperation"
+          class="filter-operation border"
+          borderless
+          dense
+          use-chips
+          map-options
+          emit-value
+          use-input
+          input-debounce="0"
+          v-if="operator.value === filterOperator && hasValue"
+          v-model="filterOperatorValue"
+          :options="options"
+          option-disable="disabled"
+          @input="onInput"
+          @filter="filterFn"
+        />
+      </template>
     </div>
     <compact-btn
       class="mr-2 mt-3 p-3"
