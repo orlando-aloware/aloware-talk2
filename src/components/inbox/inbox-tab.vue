@@ -734,10 +734,11 @@ export default {
         )
       } else {
         if (isInContacts) {
-          const index = contacts.data.findIndex(item => item.id === contact.id)
-
-          contacts.data[index] = contact
-          this.setContacts(contacts.data)
+          if (contact.id === this.contact.id) {
+            const index = contacts.data.findIndex(item => item.id === contact.id)
+            contacts.data[index] = contact
+            this.setContacts(contacts.data)
+          }
 
           if (contact.task_status !== this.currentTask) {
             setTimeout(() => {
@@ -882,7 +883,8 @@ export default {
         return
       }
 
-      if (!this.isContactMixinUsed) {
+      if (!this.isContactMixinUsed ||
+        this.contact.id !== communication.contact.id) {
         setTimeout(() => {
           talk2Api.V2.contacts.get(communication.contact_id).then(response => {
             this.processNewCommunicationEvent(response.data, communication)
