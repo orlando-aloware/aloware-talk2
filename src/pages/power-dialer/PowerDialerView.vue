@@ -124,7 +124,7 @@
                   </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
-                    :disabled="!hasExport"
+                    v-if="isAdmin"
                     @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"></i>
                     Export as CSV
@@ -614,9 +614,8 @@ import ContactCreateModal from 'components/contacts/contact-create-modal'
 import pdMixin from 'src/plugins/mixins/power-dialer'
 import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
-import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { isEqual, isEmpty, get } from 'lodash'
+import { isEqual, get } from 'lodash'
 import {
   aclMixin,
   viewMixin,
@@ -802,15 +801,6 @@ export default {
     hasContacts () {
       return this.activeList.length > 0
     },
-    pdColumns () {
-      return POWER_DIALER_DEFAULT_COLUMNS
-    },
-    filteredColumns () {
-      if (!isEmpty(this.columns)) {
-        return this.columns
-      }
-      return this.pdColumns
-    },
     currentPage () {
       return this.listItems?.[this.selectedListId]?.current_page || 1
     },
@@ -871,8 +861,7 @@ export default {
   data () {
     return {
       selectedItem: null,
-      hasFilters: false,
-      hasExport: true
+      hasFilters: false
     }
   },
   methods: {
@@ -922,12 +911,6 @@ export default {
     },
     onLoadMore () {
       this.$emit('loadMore')
-    },
-    async exportAsCsv () {
-      talk2Api.V2.powerDialer.listExport(this.selectedList.id)
-        .catch(() => {
-          this.$generalNotification('Unable to process export request! Please try again later.', 'error')
-        })
     },
     async beginDial () {
       this.$router.push(`/power-dialer/list/${this.filteredListId}/sessions`)

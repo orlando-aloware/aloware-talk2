@@ -10,7 +10,8 @@ export default {
       'isFetchingContacts',
       'contactsCurrentPage',
       'liveContacts',
-      'inboxShowMyContacts'
+      'inboxShowMyContacts',
+      'taskCountUpdateCache'
     ]),
     ...mapState('auth', ['profile']),
     nextPage () {
@@ -186,7 +187,14 @@ export default {
       return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
     getContactsCountByTaskStatus (taskId) {
-      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true)).then(response => {
+      if (this.taskCountUpdateCache.hasOwnProperty(taskId) && this.taskCountUpdateCache[taskId] !== null) {
+        return
+      }
+
+      let promise = talk2Api.V2.contacts.counts(this.getParameters(taskId, true))
+      this.taskCountUpdateCache[taskId] = promise
+
+      return this.taskCountUpdateCache[taskId].then(response => {
         if (response) {
           if (taskId === ContactTaskStatus.STATUS_OPEN) {
             this.setOpenTaskCount(response.data.count)
@@ -206,6 +214,8 @@ export default {
             this.setLoadingPendingTaskCount(false)
           }
         }
+
+        this.taskCountUpdateCache[taskId] = null
       })
     },
     getParameters (taskId, count = false) {
