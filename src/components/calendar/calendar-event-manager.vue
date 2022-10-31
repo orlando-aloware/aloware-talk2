@@ -27,31 +27,16 @@
       </h6>
     </template>
     <b-form class="p-3"
-            ref="scheduleForm"
-            @submit.prevent="saveSchedule()">
+            ref="scheduleForm">
       <b-row v-if="calledFrom !== 'contact'">
         <b-col>
           <b-form-group class="form-label"
                         label="Event Type"
                         invalid-feedback="Please select a type for this event"
                         :state="validateState('type')">
-            <q-select class="q-basic-selector"
-                      options-selected-class="text-primary"
-                      color="primary"
-                      option-value="value"
-                      option-label="label"
-                      input-debounce="0"
-                      style="word-break: break-all;"
-                      emit-value
-                      map-options
-                      dense
-                      outlined
-                      use-input
-                      :placeholder="!schedule.type ? 'Select type' : ''"
-                      :options="eventTypes"
-                      :disable="mode === 'edit'"
-                      v-model="$v.schedule.type.$model">
-            </q-select>
+            <communication-type-selector :from="calledFrom"
+                                         v-model="$v.schedule.type.$model">
+            </communication-type-selector>
           </b-form-group>
         </b-col>
       </b-row>
@@ -298,6 +283,7 @@ import { aclMixin, dateMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
+import CommunicationTypeSelector from '../generic-selectors/communication-type-selector'
 import ContactLineSelector from 'components/contact-line-selector'
 import ContactSelector from 'components/generic-selectors/contact-selector'
 import DateSelector from 'components/date-selector'
@@ -318,6 +304,7 @@ export default {
   ],
 
   components: {
+    CommunicationTypeSelector,
     ContactLineSelector,
     ContactSelector,
     DateSelector,
@@ -437,19 +424,6 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile', 'user']),
-
-    eventTypes () {
-      return [
-        {
-          label: 'Reminder',
-          value: CommunicationTypes.REMINDER
-        },
-        {
-          label: 'Appointment',
-          value: CommunicationTypes.APPOINTMENT
-        }
-      ]
-    },
 
     appointmentOptions () {
       return [

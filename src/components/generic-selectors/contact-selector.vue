@@ -104,12 +104,6 @@ export default {
       required: false
     },
 
-    hideExtensions: {
-      required: false,
-      default: false,
-      type: Boolean
-    },
-
     disable: {
       type: Boolean,
       default: false,
