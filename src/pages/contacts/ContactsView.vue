@@ -193,7 +193,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
-                    v-if="((list.type === ContactListTypes.STATIC && isEditable) || id === 'all') &&  !list.show_in_public_folder">
+                    v-if="canAddContacts">
           <template #button-content class="filter-toggle-button">
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
@@ -273,6 +273,7 @@
         :total-rows="fixedContactsData.total"
         :current-page="fixedContactsData.current_page"
         :last-page="fixedContactsData.last_page"
+        :useEmptySlot="canAddContacts"
         v-if="listItemsHasData"
         @onMouseMove="datatableOnMouseMove"
         @onMouseLeave="datatableOnMouseMove"
@@ -608,8 +609,7 @@
           </tr>
         </template>
 
-        <template slot="empty"
-                  v-if="showEmptySlot && (!list.show_in_public_folder || (list.show_in_public_folder && listItemsDataCount > 0))">
+        <template slot="empty">
           <div class="start-state"
                @click="onNavigateToAdd($event)">
             <div class="p-4 bg-light w-100 text-center border-bottom text-primary">
@@ -1431,8 +1431,8 @@ export default {
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
-    showEmptySlot () {
-      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListTypes.STATIC)
+    canAddContacts () {
+      return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
     },
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
