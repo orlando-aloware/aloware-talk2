@@ -520,6 +520,7 @@ export default {
     state.newCommunicationInprogressContactFetch.push(id)
   },
   REMOVE_NEW_COMMUNICATION_INPROGRESS_CONTACT_FETCH (state, id) {
-    state.newCommunicationInprogressContactFetch = state.newCommunicationInprogressContactFetch.filter(item => item !== id)
+    const index = state.newCommunicationInprogressContactFetch.findIndex(item => item === id)
+    state.newCommunicationInprogressContactFetch.splice(index, 1)
   }
 }

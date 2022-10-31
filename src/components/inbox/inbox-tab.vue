@@ -882,7 +882,7 @@ export default {
       }
 
       // there's already a listener in contact mixin that handles the fetching
-      // of contact's information so we we have to prevent calling another request.
+      // of contact's information so we have to prevent calling another request.
       if (!this.isContactMixinUsed) {
         setTimeout(() => {
           talk2Api.V2.contacts.get(communication.contact_id).then(response => {
