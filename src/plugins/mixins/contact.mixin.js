@@ -230,7 +230,7 @@ export default {
 
   created () {
     this.contactId = _.get(this.$route, 'params.id', this.selectContact.id)
-    this.cancelToken = this.$axios.CancelToken
+    this.cancelToken = window.axios.CancelToken
     this.source = this.cancelToken.source()
 
     this.communicationApiCancelToken = window.axios.CancelToken
