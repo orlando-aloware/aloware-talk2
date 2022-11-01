@@ -35,7 +35,7 @@
                         invalid-feedback="Please select a type for this event"
                         :state="validateState('type')">
             <communication-type-selector :from="calledFrom"
-                                         :generic-styling="false"
+                                         :disabled="mode === 'edit'"
                                          v-model="$v.schedule.type.$model">
             </communication-type-selector>
           </b-form-group>

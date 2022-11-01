@@ -1,40 +1,30 @@
 <template>
-  <q-select ref="select"
-            class="q-basic-selector"
-            options-selected-class="text-primary"
-            color="primary"
-            option-value="id"
-            option-label="name"
-            input-debounce="0"
-            style="word-break: break-all;"
-            use-input
-            emit-value
-            map-options
-            dense
-            v-model="selectedId"
-            :hide-dropdown-icon="hideDropdownIcon"
-            :clearable="clearable"
-            :outlined="outlined"
-            :borderless="borderless"
-            :options="options"
-            :placeholder="placeholder"
-            :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
-            :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            @input="onInput">
-  </q-select>
+  <vue-multiselect track-by="value"
+                   label="name"
+                   class="mr-1 chip__clear-blue shrink-options"
+                   style="width: 100%"
+                   placeholder="Select type"
+                   :searchable="true"
+                   :showNoResults="false"
+                   :close-on-select="true"
+                   :options="options"
+                   :show-labels="false"
+                   :allow-empty="false"
+                   :disabled="disabled"
+                   v-model="type"
+                   @select="onSelect" />
 </template>
 
 <script>
+import VueMultiselect from 'vue-multiselect'
 import * as CommunicationTypes from '../../constants/communication-types'
-import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'communication-type-selector',
 
-  mixins: [
-    selectorMixin
-  ],
+  components: {
+    VueMultiselect
+  },
 
   props: {
     value: {
@@ -42,107 +32,31 @@ export default {
       required: false
     },
 
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+
     from: {
       type: String,
       required: false,
       default: 'calendar'
-    },
-
-    disable: {
-      type: Boolean,
-      default: false,
-      required: false
-    },
-
-    prepend: {
-      type: String,
-      required: false
-    },
-
-    genericStyling: {
-      type: Boolean,
-      default: true
-    },
-
-    highlighted: {
-      type: Boolean,
-      default: false
-    },
-
-    highlightedClass: {
-      type: String,
-      default: 'q-field--highlighted'
-    },
-
-    customClass: {
-      type: String,
-      default: ''
-    },
-
-    outlined: {
-      type: Boolean,
-      default: true
-    },
-
-    borderless: {
-      type: Boolean,
-      default: false
-    },
-
-    showPlaceholder: {
-      type: Boolean,
-      default: true
-    },
-
-    clearable: {
-      type: Boolean,
-      default: false
-    },
-
-    hideDropdownIcon: {
-      type: Boolean,
-      default: false
-    },
-
-    customPlaceholder: {
-      type: String,
-      default: ''
-    },
-
-    showNumber: {
-      type: Boolean,
-      default: true
-    },
-
-    threshold: {
-      type: Number,
-      default: 3
-    },
-
-    searchOnScroll: {
-      type: Boolean,
-      default: true
     }
   },
 
   data () {
     return {
-      isFocused: false,
-      selectedId: this.value,
-      reference: 'select',
-      fullOptionsProperty: 'options',
+      type: null,
       options: []
-    }
-  },
-
-  computed: {
-    placeholder () {
-      return this.value ? '' : 'Select type'
     }
   },
 
   mounted () {
     this.loadTypes()
+
+    if (this.value) {
+      this.type = this.options.find(option => option.value === this.value)
+    }
   },
 
   methods: {
@@ -158,17 +72,17 @@ export default {
       return [
         {
           name: 'Appointment',
-          id: CommunicationTypes.APPOINTMENT
+          value: CommunicationTypes.APPOINTMENT
         },
         {
           name: 'Reminder',
-          id: CommunicationTypes.REMINDER
+          value: CommunicationTypes.REMINDER
         }
       ]
     },
 
-    onInput () {
-      this.$emit('input', this.selectedId)
+    onSelect (type) {
+      this.$emit('input', type.value)
     }
   }
 }
