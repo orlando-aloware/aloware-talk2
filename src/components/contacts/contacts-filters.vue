@@ -446,7 +446,6 @@ export default {
     },
 
     getFormattedFilterSummary (filter, key) {
-      console.log({ filter, key })
       if (!filter.trueValue) {
         return ''
       }
