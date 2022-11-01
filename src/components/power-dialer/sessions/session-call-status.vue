@@ -67,9 +67,10 @@
           @click="onRedial">
           <RefreshIcon class="mr-2" color="white" />
           <div class="text-body2">
-            <q-tooltip
-              content-class="bg-grey-light11"
-              anchor="bottom middle" self="center middle">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
                 {{ redialTooltip }}
             </q-tooltip>
             Redial
