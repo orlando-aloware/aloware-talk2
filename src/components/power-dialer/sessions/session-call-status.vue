@@ -497,7 +497,7 @@ export default {
     },
     canRedial () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.redialedContacts.includes(this.activeTask.id) &&
+        !this.powerDialerTasks.redialed.includes(this.activeTask.id) &&
         this.powerDialerTasks.in_queue.length >= 1
     },
     redialTooltip () {
@@ -952,7 +952,6 @@ export default {
           this.$VueEvent.fire('hangupCall')
         }
 
-        this.redialedContacts.push(this.activeTask.id)
         this.powerDialerTasks.in_queue.push(this.activeTask)
         this.activeTask = this.taskToCall
 
@@ -1022,8 +1021,7 @@ export default {
       hangUpInterval: null,
       hangUpIntervalCounter: 0,
       loadingHold: false,
-      loadingUnhold: false,
-      redialedContacts: []
+      loadingUnhold: false
     }
   }
 }

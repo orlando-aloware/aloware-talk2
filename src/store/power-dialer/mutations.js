@@ -110,7 +110,8 @@ export default {
       called: [],
       failed: [],
       scheduled: [],
-      all: []
+      all: [],
+      redialed: []
     }
   },
   SET_SESSION_SETTINGS: (state, data) => {
