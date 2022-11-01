@@ -72,7 +72,7 @@
                         :state="validateState('contact')"
                         v-if="mode === 'edit' && schedule.contact">
             <contact-selector customClass="q-basic-selector"
-                              :disable="true"
+                              :disabled="true"
                               :generic-styling="false"
                               :hideExtensions="true"
                               :outlined="true"
@@ -512,7 +512,6 @@ export default {
     },
 
     editSchedule (sched) {
-      console.log(sched)
       this.loading = true
       let date = moment(sched.start_date)
 
