@@ -35,6 +35,7 @@
                         invalid-feedback="Please select a type for this event"
                         :state="validateState('type')">
             <communication-type-selector :from="calledFrom"
+                                         :generic-styling="false"
                                          v-model="$v.schedule.type.$model">
             </communication-type-selector>
           </b-form-group>
@@ -47,8 +48,8 @@
                         label="Contact"
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')">
-            <contact-selector v-model="$v.schedule.contact.$model.id"
-                              :generic-styling="false">
+            <contact-selector :generic-styling="false"
+                              v-model="$v.schedule.contact.$model.id">
             </contact-selector>
           </b-form-group>
         </b-col>
@@ -121,8 +122,8 @@
                                       v-if="mode !== 'edit'"
                                       @select="timeSelected">
             </predefined-time-selector>
-            <b-form-input v-model="schedule.time"
-                          disabled
+            <b-form-input disabled
+                          v-model="schedule.time"
                           v-else>
             </b-form-input>
           </b-form-group>
@@ -134,8 +135,8 @@
                                                v-if="mode !== 'edit'"
                                                @select="durationSelected">
             </predefined-time-duration-selector>
-            <b-form-input v-model="schedule.duration"
-                          disabled
+            <b-form-input disabled
+                          v-model="schedule.duration"
                           v-else>
             </b-form-input>
           </b-form-group>
@@ -172,8 +173,7 @@
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
         <b-col cols="12">
-          <b-form-group label=""
-                        class="checkbox-wrapper">
+          <b-form-group class="checkbox-wrapper">
             <b-form-checkbox :value="true"
                              :unchecked-value="false"
                              v-model="sms_reminder_fields.enabled">
@@ -181,7 +181,8 @@
             </b-form-checkbox>
           </b-form-group>
         </b-col>
-        <b-col v-show="sms_reminder_fields.enabled" cols="12">
+        <b-col cols="12"
+               v-show="sms_reminder_fields.enabled">
           <b-form-group label="Send From"
                         invalid-feedback="Please select a line for the SMS reminder"
                         :state="validateState('campaign_id', 'sms_reminder_fields')">
@@ -192,11 +193,13 @@
           </b-form-group>
 
           <b-form-group label="Time">
-            <predefined-time-selector @select="smsReminderTimeSelected"></predefined-time-selector>
+            <predefined-time-selector @select="smsReminderTimeSelected">
+            </predefined-time-selector>
           </b-form-group>
 
           <b-form-group label="Send (n) days before">
-            <number-of-days-selector @select="smsReminderFrequencySelected"></number-of-days-selector>
+            <number-of-days-selector @select="smsReminderFrequencySelected">
+            </number-of-days-selector>
           </b-form-group>
 
           <b-form-group label="Template Variables"
