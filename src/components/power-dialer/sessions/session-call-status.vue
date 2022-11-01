@@ -66,16 +66,14 @@
           :color="canRedial  ? 'blue-7' : 'grey-8'"
           @click="onRedial">
           <RefreshIcon class="mr-2" color="white" />
-
-            <div class="text-body2">
-              <q-tooltip
-                content-class="bg-grey-light11"
-                anchor="bottom middle" self="center middle">
-                  {{ redialTooltip }}
-              </q-tooltip>
-              Redial
-            </div>
-
+          <div class="text-body2">
+            <q-tooltip
+              content-class="bg-grey-light11"
+              anchor="bottom middle" self="center middle">
+                {{ redialTooltip }}
+            </q-tooltip>
+            Redial
+          </div>
         </q-btn>
 
         <q-btn
