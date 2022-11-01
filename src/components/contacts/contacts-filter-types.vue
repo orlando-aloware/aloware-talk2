@@ -105,17 +105,16 @@
         <q-select
           ref="filterOperation"
           class="filter-operation border"
+          :options="options"
+          option-disable="disabled"
+          input-debounce="0"
           borderless
           dense
-          use-chips
           map-options
           emit-value
           use-input
-          input-debounce="0"
-          v-if="operator.value === filterOperator && hasValue"
           v-model="filterOperatorValue"
-          :options="options"
-          option-disable="disabled"
+          v-if="operator.value === filterOperator && hasValue"
           @input="onInput"
           @filter="filterFn"
         />
