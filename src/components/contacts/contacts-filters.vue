@@ -446,6 +446,7 @@ export default {
     },
 
     getFormattedFilterSummary (filter, key) {
+      console.log({ filter, key })
       if (!filter.trueValue) {
         return ''
       }
@@ -483,6 +484,8 @@ export default {
         } else {
           labels.data = filter.trueValue
         }
+
+        console.log({ values, filter, optionFound, labels })
 
         joinedValues.data = labels.data.join(', ')
         if (labels.data.length > 1) {
