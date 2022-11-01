@@ -446,7 +446,6 @@ export default {
     },
 
     getFormattedFilterSummary (filter, key) {
-      console.log({ filter, key })
       if (!filter.trueValue) {
         return ''
       }
@@ -455,6 +454,7 @@ export default {
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
+      const isSelectionType = filterFound && filterFound.type === 'selection' // DNC or opt out filter
       const labels = { data: null }
       const item = { index: null }
       const optionFound = { data: null }
@@ -474,7 +474,7 @@ export default {
 
         labels.data = []
 
-        if (filterFound && isRelationType) {
+        if (filterFound && (isRelationType || isSelectionType)) {
           for (item.index of values.data) {
             optionFound.data = filterFound.options.find(option => String(option.value) === String(item.index))
             labels.data.push(optionFound.data ? optionFound.data.label : '')
@@ -484,8 +484,6 @@ export default {
         } else {
           labels.data = filter.trueValue
         }
-
-        console.log({ values, filter, optionFound, labels })
 
         joinedValues.data = labels.data.join(', ')
         if (labels.data.length > 1) {
