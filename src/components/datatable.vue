@@ -213,6 +213,10 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
+    },
+    useEmptySlot: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -233,7 +237,7 @@ export default {
       }
     },
     hasEmptySlot () {
-      return !!this.$slots.empty
+      return this.useEmptySlot
     },
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
