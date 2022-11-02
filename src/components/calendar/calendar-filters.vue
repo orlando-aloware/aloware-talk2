@@ -6,9 +6,9 @@
               v-b-modal.calendar-filters-modal>
       Filters
       <b-badge v-if="filterCount > 0"
-                class="d-flex align-items-center contact-filter-count ml-1"
-                pill
-                variant="primary">
+               class="d-flex align-items-center contact-filter-count ml-1"
+               pill
+               variant="primary">
         {{ filterCount }}
       </b-badge>
     </b-button>
@@ -19,7 +19,7 @@
         <h2>Filters</h2>
       </template>
       <q-card class="my-card"
-            flat>
+              flat>
         <!-- Appointments switch -->
         <b-form-group>
           <b-form-checkbox switch
@@ -39,11 +39,11 @@
         <!-- Statuses -->
         <b-form-group class="form-label"
                       label="Status">
-          <communication-disposition-status-selector v-model="search.status"
-                                                     :options="statuses"
+          <communication-disposition-status-selector :options="statuses"
                                                      :generic-styling="false"
                                                      :multiple="true"
-                                                     :use-chips="true">
+                                                     :use-chips="true"
+                                                     v-model="search.status">
           </communication-disposition-status-selector>
         </b-form-group>
 
@@ -52,11 +52,11 @@
         <!-- Users -->
         <b-form-group class="form-label"
                       label="Users">
-          <user-selector v-model="search.users"
-                        :generic-styling="false"
-                        :multiple="true"
-                        :use-chips="true"
-                        @change="onUserChange">
+          <user-selector :generic-styling="false"
+                         :multiple="true"
+                         :use-chips="true"
+                         v-model="search.users"
+                         @change="onUserChange">
           </user-selector>
         </b-form-group>
       </q-card>
@@ -96,14 +96,17 @@ export default {
         type: Boolean,
         required: true
       },
+
       reminders: {
         type: Boolean,
         required: true
       },
+
       users: {
         type: Array,
         required: true
       },
+
       status: {
         type: Array,
         required: true
@@ -138,15 +141,19 @@ export default {
       let data = []
 
       if (this.search.appointments) {
-        data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED)
-        data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET)
-        data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED)
+        data.push(
+          CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED,
+          CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET,
+          CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED
+        )
       }
 
       if (this.search.reminders) {
-        data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW)
-        data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW)
-        data.push(CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW)
+        data.push(
+          CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW,
+          CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW,
+          CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW
+        )
       }
 
       return data.map(status => ({
