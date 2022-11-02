@@ -23,10 +23,6 @@
             :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            @popup-show="onShowMenu"
-            @focus="onFocus"
-            @blur="onBlur"
-            @input="onInput"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -78,10 +74,15 @@ import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'communication-disposition-status-selector',
+
   mixins: [
     selectorMixin
   ],
-  components: { RemoveTagIcon },
+
+  components: {
+    RemoveTagIcon
+  },
+
   props: {
     value: {
       required: false
@@ -99,12 +100,6 @@ export default {
       required: false
     },
 
-    hideExtensions: {
-      required: false,
-      default: false,
-      type: Boolean
-    },
-
     disable: {
       type: Boolean,
       default: false,
@@ -120,42 +115,52 @@ export default {
       type: Boolean,
       default: true
     },
+  
     highlighted: {
       type: Boolean,
       default: false
     },
+  
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+  
     customClass: {
       type: String,
       default: ''
     },
+  
     outlined: {
       type: Boolean,
       default: true
     },
+  
     borderless: {
       type: Boolean,
       default: false
     },
+  
     showPlaceholder: {
       type: Boolean,
       default: true
     },
+  
     clearable: {
       type: Boolean,
       default: false
     },
+  
     hideDropdownIcon: {
       type: Boolean,
       default: false
     },
+  
     customPlaceholder: {
       type: String,
       default: ''
     },
+  
     options: {
       type: Array,
       required: true
