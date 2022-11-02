@@ -13,7 +13,7 @@
                title="Event Legends"
                width="280"
                triggers="click blur">
-      <table id="table-calendar-legend" class="w-100">
+      <table class="w-100">
         <tr>
           <td class="pr-2"><i class="fas fa-square event-color-type-12 status-8"></i></td>
           <td>Upcoming Appointment</td>
