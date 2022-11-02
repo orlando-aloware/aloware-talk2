@@ -193,7 +193,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
-                    v-if="canAddContacts">
+                    v-if="canSeeAddContacts">
           <template #button-content class="filter-toggle-button">
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
@@ -202,7 +202,7 @@
                style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
-                           :disabled="!(list.type === ContactListTypes.STATIC && isEditable)"
+                           :disabled="!canAddContacts"
                            v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onAddContactsToList">
             <search-icon color="#62666E">
@@ -273,7 +273,7 @@
         :total-rows="fixedContactsData.total"
         :current-page="fixedContactsData.current_page"
         :last-page="fixedContactsData.last_page"
-        :useEmptySlot="canAddContacts"
+        :useEmptySlot="canSeeAddContacts && canAddContacts && list.isEmpty"
         v-if="listItemsHasData"
         @onMouseMove="datatableOnMouseMove"
         @onMouseLeave="datatableOnMouseMove"
@@ -1421,8 +1421,11 @@ export default {
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
-    canAddContacts () {
+    canSeeAddContacts () {
       return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
+    },
+    canAddContacts () {
+      return this.list.type === ContactListTypes.STATIC && this.isEditable
     },
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
