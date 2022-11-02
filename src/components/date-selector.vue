@@ -10,10 +10,8 @@
                               :auto-close="autoClose"
                               :minute-interval="minuteInterval"
                               :disabled-hours="disabledHours"
-                              :no-value-to-custom-elem="noValueToCustomElem"
                               v-model="date"
                               @input="onInput">
-      <slot></slot>
     </vue-ctk-date-time-picker>
   </div>
 </template>
@@ -77,11 +75,6 @@ export default {
       type: String,
       required: false,
       default: 'l'
-    },
-    noValueToCustomElem: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   data () {
