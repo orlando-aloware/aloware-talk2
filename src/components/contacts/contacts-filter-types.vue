@@ -112,11 +112,9 @@
           dense
           map-options
           emit-value
-          use-input
           v-model="filterOperatorValue"
           v-if="operator.value === filterOperator && hasValue"
           @input="onInput"
-          @filter="filterFn"
         />
       </template>
     </div>
