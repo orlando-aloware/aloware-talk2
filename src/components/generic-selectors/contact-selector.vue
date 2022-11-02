@@ -51,7 +51,7 @@ export default {
       default: 3
     },
 
-    searchOnScroll: {
+    showNumber: {
       type: Boolean,
       default: true
     }
@@ -70,8 +70,7 @@ export default {
         'sort': 'last_engagement_at',
         'order': 'desc'
       },
-      forceLoading: false,
-      searchedAllContacts: false
+      forceLoading: false
     }
   },
 
@@ -116,10 +115,6 @@ export default {
     },
 
     async loadContacts (id = null) {
-      if (this.searchedAllContacts) {
-        return
-      }
-
       this.forceLoading = true
       this.$emit('loading')
 
@@ -134,10 +129,6 @@ export default {
         contacts.forEach(contact => {
           this.options.push(this.formatContact(contact))
         })
-
-        if (contacts.length < this.params.per_page) {
-          this.searchedAllContacts = true
-        }
       }
 
       this.forceLoading = false
