@@ -14,7 +14,8 @@
                :show="true"
                v-show="loading">
       <template #overlay>
-        <q-spinner-bars color="primary" size="40px" />
+        <q-spinner-bars color="primary"
+                        size="40px" />
       </template>
     </b-overlay>
     <template #modal-title>
@@ -48,8 +49,7 @@
                         label="Contact"
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')">
-            <contact-selector :generic-styling="false"
-                              v-model="$v.schedule.contact.$model.id">
+            <contact-selector v-model="$v.schedule.contact.$model.id">
             </contact-selector>
           </b-form-group>
         </b-col>
@@ -71,11 +71,7 @@
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')"
                         v-if="mode === 'edit' && schedule.contact">
-            <contact-selector customClass="q-basic-selector"
-                              :disabled="true"
-                              :generic-styling="false"
-                              :hideExtensions="true"
-                              :outlined="true"
+            <contact-selector :disabled="true"
                               v-model="$v.schedule.contact.$model.id"
                               @loaded="onContactsLoaded">
             </contact-selector>
@@ -529,15 +525,6 @@ export default {
     addSchedule (date) {
       let d = moment(date)
 
-      let noTome = { hour: 0, minute: 0, second: 0, millisecond: 0 }
-      let justDate = d.clone().set(noTome)
-      let nowDate = moment().set(noTome)
-
-      // not allowed to add date in the past
-      if (justDate.isBefore(nowDate)) {
-        return
-      }
-
       // Presets
       this.startDate = d
       let contact = {}
@@ -679,9 +666,7 @@ export default {
       if (this.calledFrom === 'contact') {
         this.schedule.user = this.user.profile
         this.schedule.calendar_response = 1
-      }
-
-      if (this.calledFrom === 'calendar') {
+      } else if (this.calledFrom === 'calendar') {
         this.schedule = {
           contact: {},
           user: this.user.profile,
@@ -779,7 +764,6 @@ export default {
 
     lineSelected (line) {
       this.sms_reminder_fields.campaign_id = line.id
-      this.$v.sms_reminder_fields.campaign_id.$touch()
     },
 
     smsReminderTimeSelected (time) {
