@@ -11,7 +11,6 @@
             emit-value
             map-options
             dense
-            v-model="selectedId"
             :hide-dropdown-icon="hideDropdownIcon"
             :clearable="clearable"
             :outlined="outlined"
@@ -23,6 +22,7 @@
             :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            v-model="selectedId"
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
@@ -85,6 +85,7 @@ export default {
 
   props: {
     value: {
+      type: [Array, Number],
       required: false
     },
 
@@ -115,52 +116,52 @@ export default {
       type: Boolean,
       default: true
     },
-  
+
     highlighted: {
       type: Boolean,
       default: false
     },
-  
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
-  
+
     customClass: {
       type: String,
       default: ''
     },
-  
+
     outlined: {
       type: Boolean,
       default: true
     },
-  
+
     borderless: {
       type: Boolean,
       default: false
     },
-  
+
     showPlaceholder: {
       type: Boolean,
       default: true
     },
-  
+
     clearable: {
       type: Boolean,
       default: false
     },
-  
+
     hideDropdownIcon: {
       type: Boolean,
       default: false
     },
-  
+
     customPlaceholder: {
       type: String,
       default: ''
     },
-  
+
     options: {
       type: Array,
       required: true
@@ -169,30 +170,17 @@ export default {
 
   data () {
     return {
-      isFocused: false,
       selectedId: this.value,
       filteredOptions: [],
-      reference: 'select',
       fullOptionsProperty: 'options'
     }
   },
 
   computed: {
     placeholder () {
-      if (!this.showPlaceholder) {
-        return ''
-      }
-
-      switch (true) {
-        case this.multiple && this.selectedId && this.selectedId.length < 1:
-          return this.customPlaceholder || 'Select Status'
-        case !this.multiple && !this.selectedId:
-          return this.customPlaceholder || 'Select Status'
-        case this.multiple && this.selectedId && this.selectedId.length > 0:
-        case !this.multiple && this.selectedId:
-        default:
-          return ''
-      }
+      return !this.showPlaceholder || (this.multiple && this.selectedId.length > 0) || (!this.multiple && this.selectedId)
+        ? ''
+        : 'Select Status'
     }
   },
 
