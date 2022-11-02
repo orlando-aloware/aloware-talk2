@@ -5,7 +5,8 @@
                :show="true"
                v-show="loading">
       <template #overlay>
-        <q-spinner-bars color="primary" size="40px" />
+        <q-spinner-bars color="primary"
+                        size="40px" />
       </template>
     </b-overlay>
 
@@ -57,8 +58,8 @@
                   map-options
                   dense
                   outlined
-                  v-model="view"
-                  :options="views">
+                  :options="views"
+                  v-model="view">
         </q-select>
         <helper/>
       </div>
@@ -66,8 +67,7 @@
 
     <!-- scheduler -->
     <div class="scheduler">
-      <div class="scheduler__header"
-           v-show="!showSearchResult">
+      <div class="scheduler__header">
         <table class="scheduler__header__table">
           <tr v-if="view === 'week'">
             <td id="td-scale"></td>
@@ -90,8 +90,7 @@
       </div>
       <div :class="['scheduler__body', view]">
         <scheduler ref="scheduler"
-                   class="actual-scheduler"
-                   :class="view + '-view'"
+                   :class="['actual-scheduler', view + '-view']"
                    :events="events"
                    @edit-schedule="editSchedule"
                    @add-schedule="addSchedule"
@@ -107,7 +106,6 @@
 </template>
 
 <script>
-// import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 import CalendarIcon from '../../components/icons/calendar-icon.vue'
 import DateSelector from '../../components/date-selector.vue'
@@ -132,7 +130,6 @@ export default {
   data () {
     return {
       events: [],
-      // dialogVisible: false,
       filters: {
         appointments: true,
         reminders: true,
@@ -145,7 +142,6 @@ export default {
         page: 1
       },
       loading: true,
-      // gotoDateVisible: false,
       gotoDate: new Date(),
       view: 'month',
       stepMap: {
@@ -158,25 +154,12 @@ export default {
         { 'id': 'month', name: 'Month' },
         { 'id': 'week', name: 'Week' }
       ],
-      // dpOptions: {
-      //   firstDayOfWeek: 1
-      // },
-      // legend: false,
-      // searchMode: false,
-      // originalSearch: null,
-      // showFilterSearch: false,
-      showSearchResult: false,
-      // search_loading: false,
-      // searchFocused: false,
-      // searchPopover: false,
       cancel_token: this.$axios.CancelToken,
       source: null
     }
   },
 
   computed: {
-    // ...mapState('stats', ['metricGroups', 'metricLoader']),
-    // ...mapState('auth', ['profile'])
     currentDate () {
       let d = ''
       const m = moment(this.gotoDate)
@@ -188,6 +171,7 @@ export default {
         const end = moment(this.gotoDate).endOf('isoWeek')
 
         d = start.format('D MMM') + ' - ' + end.format('D MMM YYYY')
+
         if (start.format('MMM') === end.format('MMM')) {
           d = start.format('D') + ' - ' + end.format('D MMM YYYY')
         }
@@ -252,11 +236,6 @@ export default {
       this.$refs.manager.addSchedule(date)
     },
 
-    // toggleFilters () {
-    //   this.original_filters = _.clone(this.filters)
-    //   this.dialogVisible = true
-    // },
-
     loadCalendarData (state) {
       this.loading = true
       this.source = this.cancel_token.source()
@@ -287,13 +266,10 @@ export default {
         } else {
           this.loading = false
         }
-
-        // this.dialogVisible = false
       }).catch(err => {
         console.log(err)
 
         this.loading = false
-        // this.dialogVisible = false
       })
     },
 
@@ -310,10 +286,6 @@ export default {
       this.resetPage()
       this.loadCalendarData(state)
     },
-
-    // toggleGotoDate () {
-    //   this.gotoDateVisible = true
-    // },
 
     updateCurrentDate (date) {
       this.gotoDate = date
