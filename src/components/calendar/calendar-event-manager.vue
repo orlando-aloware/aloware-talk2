@@ -168,7 +168,7 @@
         </b-col>
       </b-row>
 
-      <b-row v-if="!schedule.is_past && isAppointment">
+      <b-row v-if="isAppointment && mode === 'add'">
         <b-col>
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
@@ -320,15 +320,9 @@ export default {
 
   props: {
     calledFrom: {
+      type: String,
       required: false,
       default: 'calendar' // calendar, contact
-    },
-    contact: {
-      required: false,
-      default: null
-    },
-    campaign: {
-      required: false
     }
   },
 
@@ -362,12 +356,12 @@ export default {
     sms_reminder_fields: {
       campaign_id: {
         required: requiredIf(function (model) {
-          return model.enabled && this.isAppointment && !this.schedule.is_past
+          return model.enabled && this.isAppointment && this.mode === 'add'
         })
       },
       body: {
         required: requiredIf(function (model) {
-          return model.enabled && this.isAppointment && !this.schedule.is_past
+          return model.enabled && this.isAppointment && this.mode === 'add'
         })
       }
     }
@@ -404,12 +398,7 @@ export default {
         frequencies: ['1'],
         time: '10:00'
       },
-      selectedLine: null,
       title: 'Add Event',
-      errors: {
-        type: false,
-        contact: false
-      },
       confirmDialogParams: {
         okTitle: 'Ok',
         cancelTitle: 'Cancel',
@@ -496,11 +485,6 @@ export default {
   },
 
   mounted () {
-    // If there is campaign ID passed, use it as default for selected line
-    // if (this.campaign_id) {
-    //   this.selectedLine = this.campaign_id
-    // }
-
     // Preset sms reminder text
     this.setSmsReminderBody()
   },
@@ -659,12 +643,6 @@ export default {
             this.loading = false
             this.$handleErrors(err.response)
           })
-        } else {
-          this.errors.contact = true
-
-          if (this.schedule.type == null) {
-            this.errors.type = true
-          }
         }
       } else {
         if (cid != null && eid != null) {
@@ -708,10 +686,6 @@ export default {
           contact: {},
           user: this.user.profile,
           calendar_response: 1
-        }
-        this.errors = {
-          type: false,
-          contact: false
         }
 
         if (this.$refs.contactSelector) {
