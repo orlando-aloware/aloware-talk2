@@ -1,6 +1,7 @@
 // import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { updateField } from 'vuex-map-fields'
 import _ from 'lodash'
+import * as PowerDialerDefault from 'src/constants/power-dialer-default'
 
 export default {
   updateField,
@@ -144,5 +145,17 @@ export default {
   },
   UPDATE_ONGOING_SESSION: (state, data) => {
     state.ongoingSession = _.merge(state.ongoingSession, data)
+  },
+  RESET_VUEX: (state, value) => {
+    if (!_.isArray(value) || _.isEmpty(value)) {
+      return
+    }
+
+    if (!value.includes('all')) {
+      return
+    }
+
+    // else, perform state reset
+    state = Object.assign({}, PowerDialerDefault.DEFAULT_STATE)
   }
 }

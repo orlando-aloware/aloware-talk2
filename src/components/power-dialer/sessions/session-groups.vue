@@ -43,7 +43,9 @@
               <q-item-section
                 class="px-3 inline gt-sm text-uppercase text-grey-90 text-weight-medium">
                 <div class="text-13">
-                  {{ listFilters[key.toUpperCase()].name }}
+                  <span v-if="listFilters[key.toUpperCase()]">
+                    {{ listFilters[key.toUpperCase()].name }}
+                  </span>
                   <q-chip size="xs"
                           square
                           class="p-0">
@@ -79,7 +81,7 @@
                     class="t-expansion-panel px-2"
                     :key="`acc-item-${i}`"
                     v-if="itm"
-                    :class="{ active: itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress' }">
+                    :class="{ active: itm.id === activeTaskId && listFilters[key.toUpperCase()] && listFilters[key.toUpperCase()].name === 'In Progress' }">
                     <div class="py-2">
                       <q-avatar
                         size="30px"
