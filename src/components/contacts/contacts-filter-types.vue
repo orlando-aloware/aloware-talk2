@@ -334,8 +334,6 @@ export default {
     },
     getNumberValue () {
       switch (true) {
-        case this.filterOperator === 8:
-          return 0
         // in between operator
         case this.filterOperator === 7:
           return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
