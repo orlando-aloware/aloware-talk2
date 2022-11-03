@@ -20,8 +20,7 @@
     </b-overlay>
     <template #modal-title>
       <h6>
-        <i class="fa fa-circle mr-2"
-           :class="'event-color-type-' + schedule.type + ' status-' + schedule.status + ' ' + (schedule.is_past ? 'is_past' : '')"
+        <i :class="['fa fa-circle mr-2', headerCircleClass]"
            v-if="mode === 'edit'">
         </i>
         {{ title }}
@@ -477,6 +476,10 @@ export default {
 
     isAppointment () {
       return this.schedule.type === CommunicationTypes.APPOINTMENT
+    },
+
+    headerCircleClass () {
+      return 'event-color-type-' + this.schedule.type + ' status-' + this.schedule.status + ' ' + (this.schedule.is_past ? 'is_past' : '')
     }
   },
 
