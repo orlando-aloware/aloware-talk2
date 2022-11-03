@@ -273,7 +273,7 @@
         :total-rows="fixedContactsData.total"
         :current-page="fixedContactsData.current_page"
         :last-page="fixedContactsData.last_page"
-        :useEmptySlot="canSeeAddContacts && canAddContacts && list.isEmpty"
+        :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
         v-if="listItemsHasData"
         @onMouseMove="datatableOnMouseMove"
         @onMouseLeave="datatableOnMouseMove"
