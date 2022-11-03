@@ -597,11 +597,11 @@ export default {
         return
       }
 
-      const cid = this.schedule.contact.id
-      const eid = this.schedule.id
+      const contactId = this.schedule.contact.id
+      const eventId = this.schedule.id
 
       if (this.mode === 'add') {
-        if (cid !== null && this.schedule.type !== null) {
+        if (contactId !== null && this.schedule.type !== null) {
           this.loading = true
 
           // If event type is APPOINTMENT and sms reminder option is enabled
@@ -614,7 +614,7 @@ export default {
           postData.called_from = this.calledFrom
           postData.user_timezone = window.timezone
 
-          this.$axios.post(`/api/v1/calendar/events/contact/${cid}/create`, postData).then(res => {
+          this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/create`, postData).then(res => {
             this.loading = false
 
             this.$emit('render-schedule', {
@@ -632,7 +632,7 @@ export default {
           })
         }
       } else {
-        if (cid != null && eid != null) {
+        if (contactId != null && eventId != null) {
           this.loading = true
 
           let postData = _.cloneDeep(this.schedule)
@@ -640,7 +640,7 @@ export default {
           postData.user_timezone = window.timezone
           postData.entity_type = 'event' // it means entity id for events table
 
-          this.$axios.post(`/api/v1/calendar/events/contact/${cid}/update/${eid}`, postData).then(res => {
+          this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/update/${eventId}`, postData).then(res => {
             this.loading = false
 
             this.$emit('render-schedule', {
