@@ -164,19 +164,22 @@ export default {
       let d = ''
       const m = moment(this.gotoDate)
 
-      if (this.view === 'day') {
-        d = m.format('D MMM YYYY')
-      } else if (this.view === 'week') {
-        const start = moment(this.gotoDate).startOf('isoWeek')
-        const end = moment(this.gotoDate).endOf('isoWeek')
+      switch (this.view) {
+        case 'day':
+          d = m.format('D MMM YYYY')
+          break
+        case 'week':
+          const start = moment(this.gotoDate).startOf('isoWeek') // first day of current week
+          const end = moment(this.gotoDate).endOf('isoWeek') // last day of current week
 
-        d = start.format('D MMM') + ' - ' + end.format('D MMM YYYY')
-
-        if (start.format('MMM') === end.format('MMM')) {
-          d = start.format('D') + ' - ' + end.format('D MMM YYYY')
-        }
-      } else if (this.view === 'month') {
-        d = m.format('MMMM YYYY')
+          // if both dates are inside same month, omits month from first date
+          d = start.format('MMM') === end.format('MMM')
+            ? start.format('D') + ' - ' + end.format('D MMM YYYY')
+            : start.format('D MMM') + ' - ' + end.format('D MMM YYYY')
+          break
+        case 'month':
+          d = m.format('MMMM YYYY')
+          break
       }
 
       return d
