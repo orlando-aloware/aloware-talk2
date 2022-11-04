@@ -26,7 +26,7 @@
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
-      {{prepend}}
+      {{ prepend }}
     </template>
     <template v-slot:no-option>
       <q-item>
@@ -58,8 +58,9 @@
         <i class="fa fa-circle position-absolute"
            :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
         <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
-        <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
-              @click="scope.removeAtIndex(scope.index)">
+        <div role="button"
+             class="custom__remove d-flex align-items-center position-absolute r-0"
+             @click="scope.removeAtIndex(scope.index)">
           <remove-tag-icon class="ml-1 remove-tag-icon">
           </remove-tag-icon>
         </div>
