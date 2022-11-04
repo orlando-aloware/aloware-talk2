@@ -11,7 +11,7 @@ export const DEFAULT_STATE = {
     'powerDialer.sessionCallStatuses',
     'powerDialer.countdownTimer',
     'powerDialer.isSessionRunning',
-    'powerDialer.powerDialerTasks.redialed',
+    'powerDialer.redialed',
     'inbox.inboxShowMyContacts'
   ]
 }

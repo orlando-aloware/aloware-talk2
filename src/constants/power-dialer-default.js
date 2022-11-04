@@ -150,8 +150,7 @@ export const DEFAULT_STATE = {
     called: [],
     failed: [],
     scheduled: [],
-    all: [],
-    redialed: []
+    all: []
   },
   powerDialerTaskFilters: {
     in_queue: null,
@@ -179,5 +178,6 @@ export const DEFAULT_STATE = {
     startTime: null,
     currentTime: null,
     listId: null
-  }
+  },
+  redialed: []
 }

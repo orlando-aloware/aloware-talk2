@@ -497,7 +497,7 @@ export default {
     },
     canRedial () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.powerDialerTasks.redialed.includes(this.activeTask.id) &&
+        !this.redialed.includes(this.activeTask.id) &&
         this.powerDialerTasks.in_queue.length >= 1
     },
     redialTooltip () {
@@ -791,6 +791,7 @@ export default {
         }, 500)
       }
 
+      this.clearRedialedTask()
       clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)

@@ -146,10 +146,33 @@ export default {
   UPDATE_ONGOING_SESSION: (state, data) => {
     state.ongoingSession = _.merge(state.ongoingSession, data)
   },
-  RESET_VUEX: (state, value) => {
+  ADD_REDIALED_TASK: (state, taskId) => {
+    if (!state.redialed.includes(taskId)) {
+      state.redialed.push(taskId)
+    }
+  },
+  CLEAR_REDIALED_TASKS: (state) => {
+    state.redialed = []
+  },
+  RESET_VUEX (state, value) {
     if (!_.isArray(value) || _.isEmpty(value)) {
       return
     }
+
+    const powerDialerDefaultState = Object.assign({}, PowerDialerDefault.DEFAULT_STATE)
+
+    // exclude cached state properties(s) for non-cache reset
+    // by removing them from our default state
+    if (value.includes('non-cache')) {
+      delete powerDialerDefaultState.sessionSettings
+      delete powerDialerDefaultState.ongoingSession
+      delete powerDialerDefaultState.sessionCallStatuses
+      delete powerDialerDefaultState.countdownTimer
+      delete powerDialerDefaultState.isSessionRunning
+      delete powerDialerDefaultState.redialed
+    }
+
+    state = Object.assign(state, PowerDialerDefault.DEFAULT_STATE)
 
     if (!value.includes('all')) {
       return

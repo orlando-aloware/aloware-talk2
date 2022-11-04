@@ -166,8 +166,7 @@ export default function () {
       called: [],
       failed: [],
       scheduled: [],
-      all: [],
-      redialed: []
+      all: []
     },
     powerDialerTaskFilters: {
       in_queue: null,
@@ -195,6 +194,7 @@ export default function () {
       startTime: null,
       currentTime: null,
       listId: null
-    }
+    },
+    redialed: []
   }
 }
