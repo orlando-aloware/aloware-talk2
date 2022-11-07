@@ -36,6 +36,18 @@
           </q-tooltip>
         </b-form-checkbox>
 
+        <label class="label mt-2 mb-1 text-weight-bold">
+          Direction
+        </label>
+        <b-form-radio-group buttons
+                            class="w-100"
+                            button-variant="outline-primary"
+                            name="radio-btn-outline"
+                            size="sm"
+                            :options="options.direction"
+                            v-model="direction">
+        </b-form-radio-group>
+
         <hr>
 
         <label class="label mb-1 text-weight-bold">
@@ -150,6 +162,7 @@ export default {
     ],
     where: 'queue',
     schedule: new Date(),
+    direction: 2,
     options: {
       conversion: [
         {
@@ -160,6 +173,10 @@ export default {
           value: 'prevent_duplicates',
           text: 'Prevent duplicate phone numbers',
           helper: 'If selected, duplicate numbers will not be included again'
+        }, {
+          value: 'own_contacts_only',
+          text: 'Add own contacts only',
+          helper: 'If selected, it will add only the contacts owned by you'
         }, {
           value: 'allow_international_phone_numbers',
           text: 'Add international phone numbers'
@@ -174,6 +191,15 @@ export default {
           value: 'scheduled',
           text: 'Scheduled',
           description: 'If you want to call these contacts at a later time'
+        }
+      ],
+      direction: [
+        {
+          value: 2,
+          text: 'Bottom'
+        }, {
+          value: 1,
+          text: 'Top'
         }
       ]
     },
@@ -201,7 +227,9 @@ export default {
         ...this.params,
         'prevent_duplicates': this.conversion.includes('prevent_duplicates'),
         'multiple_phone_numbers': this.conversion.includes('multiple_phone_numbers'),
-        'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers')
+        'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers'),
+        'own_contacts_only': this.conversion.includes('own_contacts_only'),
+        'direction': this.direction
       }
 
       if (this.where === 'scheduled') {
