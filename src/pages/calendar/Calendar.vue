@@ -236,6 +236,11 @@ export default {
     },
 
     addSchedule (date) {
+      // dont allow add past events
+      if (moment(date).format('MM/DD/YYYY') < moment().format('MM/DD/YYYY')) {
+        return
+      }
+
       this.$refs.manager.addSchedule(date)
     },
 
