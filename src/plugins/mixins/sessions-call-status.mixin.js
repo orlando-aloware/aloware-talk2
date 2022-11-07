@@ -22,7 +22,8 @@ export default {
   },
   computed: {
     ...mapState('powerDialer', [
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'redialed'
     ]),
     ...mapState([
       'dialer'
@@ -136,7 +137,9 @@ export default {
     ...mapActions(['setShowPhone']),
     ...mapActions('powerDialer', [
       'moveContactItems',
-      'getSessionTaskByFilter'
+      'getSessionTaskByFilter',
+      'addRedialedTask',
+      'clearRedialedTask'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
@@ -220,6 +223,24 @@ export default {
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)
+          return Promise.reject(err)
+        })
+    },
+
+    redialTask (autoDialTask) {
+      const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
+        return
+      }
+
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
+        .then(res => {
+          this.addRedialedTask(autoDialTask.id)
+
+          this.$generalNotification('Success: contact is at the bottom of the current list')
+          return Promise.resolve(res)
+        }).catch(err => {
           return Promise.reject(err)
         })
     },

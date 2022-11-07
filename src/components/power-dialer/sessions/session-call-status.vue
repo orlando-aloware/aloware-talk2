@@ -62,6 +62,27 @@
           no-wrap
           unelevated
           no-caps
+          :disabled="!canRedial "
+          :color="canRedial  ? 'blue-7' : 'grey-8'"
+          @click="onRedial">
+          <RefreshIcon class="mr-2" color="white" />
+          <div class="text-body2">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
+                {{ redialTooltip }}
+            </q-tooltip>
+            Redial
+          </div>
+        </q-btn>
+
+        <q-btn
+          class="sessions-button free-width mx-1"
+          size="sm"
+          no-wrap
+          unelevated
+          no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
           @click="onNextTask">
@@ -259,6 +280,7 @@ import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
 import CallDropIcon from 'components/icons/call-drop-icon'
+import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
@@ -288,7 +310,8 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon
+    RecordIcon,
+    RefreshIcon
   },
   mixins: [ sessionCallStatusMixin ],
   beforeRouteEnter (to, from, next) {
@@ -471,6 +494,14 @@ export default {
       // should be able to next task even if on warm up period
       return this.statusCallConnected ||
         ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+    },
+    canRedial () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        !this.redialed.includes(this.activeTask.id) &&
+        this.powerDialerTasks.in_queue.length >= 1
+    },
+    redialTooltip () {
+      return this.canRedial ? 'This contact will go to the bottom of the current session list' : 'This contact has already been redialed once'
     },
     pauseButtonText () {
       switch (true) {
@@ -760,6 +791,7 @@ export default {
         }, 500)
       }
 
+      this.clearRedialedTask()
       clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
@@ -912,6 +944,24 @@ export default {
     },
     onPhoneExpansionReset () {
       this.sessionPhoneExpansion = ''
+    },
+    async onRedial () {
+      this.onPhoneExpansionReset()
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+      this.redialTask(this.activeTask).then(() => {
+        if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+          this.$VueEvent.fire('hangupCall')
+        }
+
+        this.powerDialerTasks.in_queue.push(this.activeTask)
+        this.activeTask = this.taskToCall
+
+        setTimeout(() => {
+          this.wrapUp = false
+          this.hasActiveTask = false
+          this.processSession()
+        }, 1000)
+      })
     }
   },
   watch: {
