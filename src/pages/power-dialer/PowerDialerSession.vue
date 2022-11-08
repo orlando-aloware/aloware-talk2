@@ -241,7 +241,11 @@ export default {
       this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
     },
     fetchQueuedTasks () {
-      if (this.totalQueued > this.totalTasksInQueue &&
+      // fetch tasks only if total queued tasks is more than
+      // current total tasks in queue + the active call
+      // and if current total tasks in queue is less than
+      // the number of tasks per page
+      if (this.totalQueued > (this.totalTasksInQueue + 1) &&
         this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
       }
