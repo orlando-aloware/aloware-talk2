@@ -581,9 +581,14 @@ export default {
         }
         if (this.wrapUp) {
           this.initialize()
-          this.wrapUpSeconds !== 0 &&
-          (this.wrapUp = false) &&
-          (this.isSessionRunning = false)
+        }
+
+        // end wrap-up if wrap-up seconds
+        // is not indefinite
+        if (this.wrapUp &&
+          this.wrapUpSeconds !== 0) {
+          this.wrapUp = false
+          this.isSessionRunning = false
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -653,15 +658,26 @@ export default {
         }
       }
 
-      if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        if (this.timerIsOver && this.selectedList.id !== 'all' && this.isSessionRunning) {
-          this.closePowerDialerNoTasks()
-        }
+      // end power dialer session if:
+      // power dialer has no tasks left in queue,
+      // countdown timer is 0,
+      // and session is still running
+      if (!this.hasQueuedTaskLists &&
+        !this.statusCallConnected &&
+        this.timerIsOver &&
+        this.isSessionRunning) {
+        this.closePowerDialerNoTasks()
       }
 
       this.TOGGLE_SESSION_LOADER(false)
     },
     closePowerDialerNoTasks () {
+      // continue the session if there is still
+      // an active task
+      if (this.hasActiveTask) {
+        return
+      }
+
       this.reRoute(false)
       if (this.redirectNotification) {
         this.$emit('no-tasks-found')
@@ -786,6 +802,14 @@ export default {
         case 'WRAP_UP':
           this.wrapUp = true
           this.countdownTimer = this.wrapUpSeconds
+
+          // if status is wrap-up and wrap-up seconds
+          // is "no wrap-up", then skip wrap-up countdown timer
+          // and proceed immediately to the next task
+          if (this.isSessionRunning &&
+            this.wrapUpSeconds === -1) {
+            this.onNextTask(true)
+          }
           break
         case 'MAKING_CALL':
           break
@@ -837,9 +861,10 @@ export default {
         this.startWarmUpCountDown()
       }, 1000)
     },
-    async onNextTask () {
+    async onNextTask (forceSkip = false) {
       this.onPhoneExpansionReset()
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
+        forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
 
@@ -929,9 +954,19 @@ export default {
     },
     'powerDialerTasks.in_queue': {
       handler (tasks) {
+        // end the session if:
+        // there's no tasks in queue
+        // and there's no active task
+        if (tasks.length === 0 &&
+          !this.hasActiveTask) {
+          this.shouldRedirect = true
+          return
+        }
+
         if (tasks.length === 0 && !this.togglePause) {
           this.shouldRedirect = true
         }
+
         if (tasks.length > 0 && !this.isSessionRunning) {
           this.shouldRedirect = false
           if (!this.wrapUp) {
