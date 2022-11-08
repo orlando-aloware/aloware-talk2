@@ -101,8 +101,7 @@ export default {
       listeners: {},
       cancelToken: null,
       source: null,
-      totalQueued: 0,
-      perPage: 20
+      totalQueued: 0
     }
   },
   async created () {
@@ -175,10 +174,8 @@ export default {
 
         if (isNextPage) {
           params.page = this.powerDialerTaskFilters[taskType.data].current_page + 1
-          params.per_page = this.powerDialerTaskFilters[taskType.data].per_page
         } else {
           params.page = 1
-          params.per_page = this.perPage
         }
 
         this.getTaskByFilter(params)
