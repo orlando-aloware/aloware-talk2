@@ -118,6 +118,7 @@ import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapState } from 'vuex'
+import * as ImportConstants from 'src/constants/power-dialer-import'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -162,7 +163,7 @@ export default {
     ],
     where: 'queue',
     schedule: new Date(),
-    direction: 2,
+    direction: ImportConstants.BOTTOM,
     options: {
       conversion: [
         {
@@ -195,10 +196,10 @@ export default {
       ],
       direction: [
         {
-          value: 2,
+          value: ImportConstants.BOTTOM,
           text: 'Bottom'
         }, {
-          value: 1,
+          value: ImportConstants.TOP,
           text: 'Top'
         }
       ]
