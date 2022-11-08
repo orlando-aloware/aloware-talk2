@@ -39,11 +39,11 @@
         <label class="label mt-2 mb-1 text-weight-bold">
           Direction
         </label>
-        <b-form-radio-group buttons
-                            class="w-100"
+        <b-form-radio-group class="w-100"
                             button-variant="outline-primary"
                             name="radio-btn-outline"
                             size="sm"
+                            buttons
                             :options="options.direction"
                             v-model="direction">
         </b-form-radio-group>
