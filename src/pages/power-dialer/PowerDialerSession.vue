@@ -100,8 +100,7 @@ export default {
     return {
       listeners: {},
       cancelToken: null,
-      source: null,
-      totalQueued: 0
+      source: null
     }
   },
   async created () {
@@ -181,7 +180,6 @@ export default {
         this.getTaskByFilter(params)
           .then(res => {
             if (status === AutoDialTaskStatus.STATUS_QUEUED) {
-              this.totalQueued = res.data.total_queued
               this.powerDialerTasks[taskType.data] = this.powerDialerTasks[taskType.data].concat(res.data.data)
             } else {
               this.powerDialerTasks[taskType.data] = res.data.data
@@ -241,11 +239,13 @@ export default {
       this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
     },
     fetchQueuedTasks () {
-      // fetch tasks only if total queued tasks is more than
+      // fetch tasks only if total queued tasks for the next task is more than
       // current total tasks in queue + the active call
       // and if current total tasks in queue is less than
       // the number of tasks per page
-      if (this.totalQueued > (this.totalTasksInQueue + 1) &&
+      const nextTaskTotalQueuedTasks = (this.powerDialerTaskFilters.in_queue.total_queued - 1)
+      const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
+      if (nextTaskTotalQueuedTasks > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
       }
