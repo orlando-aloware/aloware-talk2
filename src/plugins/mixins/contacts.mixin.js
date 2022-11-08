@@ -39,6 +39,10 @@ export default {
       listContactsCancelToken: null,
       listContactsSource: null,
       previousSearch: null,
+      addListMetaIds: [
+        'power-dialer-add-queue-list',
+        'power-dialer-add-list'
+      ],
       ALL_COLUMNS
     }
   },
@@ -111,13 +115,13 @@ export default {
         this.setListContactsLoaded(false)
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
-
-        const sort = this.$route.name === 'Power Dialer'
+        const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
+        const sort = !isAddList
           ? 'order'
           : ((this.sorts)
             ? this.sorts.orderBy
             : this.defaultContactDateFilter)
-        const order = this.$route.name === 'Power Dialer'
+        const order = !isAddList
           ? 'asc'
           : ((this.sorts)
             ? this.sorts.order
@@ -202,6 +206,7 @@ export default {
       }
       switch (this.$route.meta.id) {
         case 'power-dialer-add-list':
+        case 'power-dialer-add-queue-list':
           return `api/v2/contacts`
         case 'power-dialer':
         case 'power-dialer-queue-filter':
