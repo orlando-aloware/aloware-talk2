@@ -25,7 +25,7 @@
                          :value="option.value"
                          :key="option.value"
                          v-model="conversion"
-                         v-for="option in options.conversion">
+                         v-for="option in conversionOptions">
           {{ option.text }}
           <information-circle-icon color="#2F80ED"
                                    v-if="option.helper"/>
@@ -44,7 +44,7 @@
                             name="radio-btn-outline"
                             size="sm"
                             buttons
-                            :options="options.direction"
+                            :options="directionOptions"
                             v-model="direction">
         </b-form-radio-group>
 
@@ -57,7 +57,7 @@
                       :value="option.value"
                       :key="option.value"
                       v-model="where"
-                      v-for="option in options.where">
+                      v-for="option in whereOptions">
           {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
         </b-form-radio>
         <date-picker mode="dateTime"
@@ -119,6 +119,7 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
+import * as CompanyTiers from 'src/constants/company-international-tier'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -143,17 +144,6 @@ export default {
     }
   },
 
-  mounted () {
-    this.loading++
-
-    if (this.mode === 'hubspot') {
-      // check if Hubspot list already exists
-      this.checkHubspotList()
-    }
-
-    this.setCount()
-  },
-
   data: () => ({
     loading: 0,
     confirm: false,
@@ -164,46 +154,6 @@ export default {
     where: 'queue',
     schedule: new Date(),
     direction: ImportConstants.BOTTOM,
-    options: {
-      conversion: [
-        {
-          value: 'multiple_phone_numbers',
-          text: 'Turn multiple numbers into separated tasks',
-          helper: 'Any non-primary numbers of a contact will be turned into separate tasks'
-        }, {
-          value: 'prevent_duplicates',
-          text: 'Prevent duplicate phone numbers',
-          helper: 'If selected, duplicate numbers will not be included again'
-        }, {
-          value: 'own_contacts_only',
-          text: 'Add own contacts only',
-          helper: 'If selected, it will add only the contacts owned by you'
-        }, {
-          value: 'allow_international_phone_numbers',
-          text: 'Add international phone numbers'
-        }
-      ],
-      where: [
-        {
-          value: 'queue',
-          text: 'In queue',
-          description: 'Default'
-        }, {
-          value: 'scheduled',
-          text: 'Scheduled',
-          description: 'If you want to call these contacts at a later time'
-        }
-      ],
-      direction: [
-        {
-          value: ImportConstants.BOTTOM,
-          text: 'Bottom'
-        }, {
-          value: ImportConstants.TOP,
-          text: 'Top'
-        }
-      ]
-    },
     masks: {
       input: 'MM/DD/YYYY HH:mm'
     },
@@ -215,6 +165,7 @@ export default {
 
   computed: {
     ...mapState('contacts', ['isAddPowerDialerOpen']),
+    ...mapState('cache', ['currentCompany']),
     isOpen: {
       get () {
         return this.isAddPowerDialerOpen
@@ -241,7 +192,72 @@ export default {
     },
     contactsDescription () {
       return this.count + (this.count === 1 ? ' contact' : ' contacts')
+    },
+    isAllowedInternationalNumbers () {
+      return this.currentCompany.international_enabled && this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
+    },
+    conversionOptions () {
+      const options = [
+        {
+          value: 'multiple_phone_numbers',
+          text: 'Turn multiple numbers into separated tasks',
+          helper: 'Any non-primary numbers of a contact will be turned into separate tasks'
+        }, {
+          value: 'prevent_duplicates',
+          text: 'Prevent duplicate phone numbers',
+          helper: 'If selected, duplicate numbers will not be included again'
+        }, {
+          value: 'own_contacts_only',
+          text: 'Add own contacts only',
+          helper: 'If selected, it will add only the contacts owned by you'
+        }
+      ]
+
+      // add option only if company has international enabled and tier higher than 1
+      if (this.isAllowedInternationalNumbers) {
+        options.push({
+          value: 'allow_international_phone_numbers',
+          text: 'Add international phone numbers'
+        })
+      }
+
+      return options
+    },
+    whereOptions () {
+      return [
+        {
+          value: 'queue',
+          text: 'In queue',
+          description: 'Default'
+        }, {
+          value: 'scheduled',
+          text: 'Scheduled',
+          description: 'If you want to call these contacts at a later time'
+        }
+      ]
+    },
+    directionOptions () {
+      return [
+        {
+          value: ImportConstants.BOTTOM,
+          text: 'Bottom'
+        }, {
+          value: ImportConstants.TOP,
+          text: 'Top'
+        }
+      ]
     }
+  },
+
+  mounted () {
+    this.loading++
+
+    if (this.mode === 'hubspot') {
+      // check if Hubspot list already exists
+      this.checkHubspotList()
+    }
+
+    this.setCount()
   },
 
   methods: {
