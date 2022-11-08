@@ -192,7 +192,8 @@ export default {
 
             this.powerDialerTaskFilters[taskType.data] = res.data
 
-            if (this.powerDialerTasks.in_queue.length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
+            if (this.powerDialerTasks.in_queue.length === 0 &&
+              status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.$VueEvent.fire('initiate_session_no_tasks')
             }
           })

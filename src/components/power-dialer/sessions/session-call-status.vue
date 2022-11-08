@@ -634,7 +634,7 @@ export default {
           this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
           if (this.taskToCall) {
-            this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+            this.powerDialerTasks.in_queue.shift()
           }
 
           this.activeTask = this.taskToCall
@@ -851,7 +851,7 @@ export default {
           return
         }
 
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.powerDialerTasks.in_queue.shift()
         this.processSession()
         return
       }
@@ -865,7 +865,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.powerDialerTasks.in_queue.shift()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
