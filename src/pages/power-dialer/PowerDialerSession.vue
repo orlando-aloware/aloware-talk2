@@ -91,13 +91,18 @@ export default {
         return false
       }
       return this.selectedList.name.length > 0
+    },
+    totalTasksInQueue () {
+      return this.powerDialerTasks.in_queue.length
     }
   },
   data () {
     return {
       listeners: {},
       cancelToken: null,
-      source: null
+      source: null,
+      totalQueued: 0,
+      perPage: 20
     }
   },
   async created () {
@@ -132,40 +137,65 @@ export default {
       'TOGGLE_SESSION_LOADER'
     ]),
     getTaskByFilter (params = {}) {
+      const listId = params.id === 'all'
+        ? 'my-queue'
+        : params.id
+      delete params.name
+      delete params.id
       return window.axios.get(
-        `api/v2/power-dialer-lists/${params.id === 'all' ? 'my-queue' : params.id}/items`,
+        `api/v2/power-dialer-lists/${listId}/items`,
         {
           params,
           paramsSerializer: qs.stringify
         }
       )
     },
-    fetchTasks (status) {
+    fetchTasks (status, isNextPage = false) {
       if (status) {
-        this.getTaskByFilter({ id: this.selectedList.id, task_status: status }).then(res => {
-          const taskType = { data: '' }
-          switch (status) {
-            case AutoDialTaskStatus.STATUS_COMPLETED:
-              taskType.data = 'called'
-              break
-            case AutoDialTaskStatus.STATUS_FAILED:
-              taskType.data = 'failed'
-              break
-            case AutoDialTaskStatus.STATUS_SCHEDULED:
-              taskType.data = 'scheduled'
-              break
-            case AutoDialTaskStatus.STATUS_QUEUED:
-            default:
-              taskType.data = 'in_queue'
-          }
+        const taskType = { data: '' }
+        switch (status) {
+          case AutoDialTaskStatus.STATUS_COMPLETED:
+            taskType.data = 'called'
+            break
+          case AutoDialTaskStatus.STATUS_FAILED:
+            taskType.data = 'failed'
+            break
+          case AutoDialTaskStatus.STATUS_SCHEDULED:
+            taskType.data = 'scheduled'
+            break
+          case AutoDialTaskStatus.STATUS_QUEUED:
+          default:
+            taskType.data = 'in_queue'
+        }
 
-          this.powerDialerTasks[taskType.data] = res.data.data
-          this.powerDialerTaskFilters[taskType.data] = res.data
+        let params = {
+          id: this.selectedList.id,
+          task_status: status
+        }
 
-          if (this.powerDialerTasks['in_queue'].length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
-            this.$VueEvent.fire('initiate_session_no_tasks')
-          }
-        })
+        if (isNextPage) {
+          params.page = this.powerDialerTaskFilters[taskType.data].current_page + 1
+          params.per_page = this.powerDialerTaskFilters[taskType.data].per_page
+        } else {
+          params.page = 1
+          params.per_page = this.perPage
+        }
+
+        this.getTaskByFilter(params)
+          .then(res => {
+            if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+              this.totalQueued = res.data.total_queued
+              this.powerDialerTasks[taskType.data] = this.powerDialerTasks[taskType.data].concat(res.data.data)
+            } else {
+              this.powerDialerTasks[taskType.data] = res.data.data
+            }
+
+            this.powerDialerTaskFilters[taskType.data] = res.data
+
+            if (this.powerDialerTasks.in_queue.length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
+              this.$VueEvent.fire('initiate_session_no_tasks')
+            }
+          })
       } else {
         Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
           let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
@@ -211,6 +241,17 @@ export default {
     },
     onAllTasksAreSkipped () {
       this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
+    },
+    fetchQueuedTasks () {
+      if (this.totalQueued > this.totalTasksInQueue &&
+        this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
+        this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
+      }
+    }
+  },
+  watch: {
+    totalTasksInQueue () {
+      this.fetchQueuedTasks()
     }
   },
   beforeDestroy () {

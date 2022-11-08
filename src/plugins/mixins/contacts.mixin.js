@@ -112,8 +112,16 @@ export default {
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
 
-        const sort = (this.sorts) ? this.sorts.orderBy : this.defaultContactDateFilter
-        const order = (this.sorts) ? this.sorts.order : 'desc'
+        const sort = this.$route.name === 'Power Dialer'
+          ? 'order'
+          : ((this.sorts)
+            ? this.sorts.orderBy
+            : this.defaultContactDateFilter)
+        const order = this.$route.name === 'Power Dialer'
+          ? 'asc'
+          : ((this.sorts)
+            ? this.sorts.order
+            : 'desc')
 
         if (list) {
           path = this.apiEndpoint(this.myQueueId !== null)
@@ -321,7 +329,9 @@ export default {
       }
 
       // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
-      const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
+      const order = (this.sorts)
+        ? this.sorts.order
+        : _.get(params, 'order', 'desc')
 
       if (hasOrder) {
         params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
