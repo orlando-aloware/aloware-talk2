@@ -182,6 +182,7 @@ export default {
           .then(res => {
             this.powerDialerTaskFilters[taskType.data] = JSON.parse(JSON.stringify(res.data))
             delete this.powerDialerTaskFilters[taskType.data].data
+
             if (status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.powerDialerTasks[taskType.data].push(...res.data.data)
             } else {
@@ -246,6 +247,7 @@ export default {
       // and if current total tasks in queue is less than
       // the number of tasks per page
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
+
       if (this.powerDialerTaskFilters.in_queue.total_queued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
