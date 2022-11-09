@@ -101,22 +101,6 @@
                       v-model="filterOperatorValue">
         </q-btn-toggle>
       </template>
-      <template v-if="filter.type === 'selection'">
-        <q-select
-          ref="filterOperation"
-          class="filter-operation border"
-          :options="options"
-          option-disable="disabled"
-          input-debounce="0"
-          borderless
-          dense
-          map-options
-          emit-value
-          v-model="filterOperatorValue"
-          v-if="operator.value === filterOperator && hasValue"
-          @input="onInput"
-        />
-      </template>
     </div>
     <compact-btn
       class="mr-2 mt-3 p-3"
@@ -264,6 +248,7 @@ export default {
       }
 
       const value = { data: null }
+      
       switch (this.filter.type) {
         case 'string':
           value.data = this.getStringValue()
@@ -410,7 +395,6 @@ export default {
           this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
             ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
           break
-        case 'selection':
         case 'boolean':
           this.isValidated = this.filterOperator && this.filterOperatorValue !== null
           break
