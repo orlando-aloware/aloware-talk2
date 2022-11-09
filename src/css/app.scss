@@ -11465,7 +11465,11 @@ h1.contact-list-name-label {
       background-color: #fff;
 
       .actual-scheduler {
-        height: calc(100vh - 150px);
+        height: calc(100vh - 263px);
+
+        @include screen('lg') {
+          height: calc(100vh - 157px);
+        }
 
         .dhx_before .dhx_month_head,
         .dhx_after .dhx_month_head {
