@@ -92,7 +92,8 @@
       </b-row>
 
       <b-row v-if="schedule.type > 0 && schedule.contact && schedule.contact.id">
-        <b-col>
+        <b-col md="12"
+               :lg="isAppointment ? 4 : 6">
           <b-form-group class="form-label"
                         label="Date"
                         invalid-feedback="Please select a date for this event"
@@ -108,7 +109,8 @@
             </b-form-input>
           </b-form-group>
         </b-col>
-        <b-col>
+        <b-col md="12"
+               :lg="isAppointment ? 4 : 6">
           <b-form-group class="form-label"
                         label="Start Time"
                         invalid-feedback="Please select a time for this event"
@@ -123,7 +125,9 @@
             </b-form-input>
           </b-form-group>
         </b-col>
-        <b-col v-if="isAppointment">
+        <b-col md="12"
+               :lg="isAppointment ? 4 : 6"
+               v-if="isAppointment">
           <b-form-group class="form-label"
                         label="Duration (minutes)">
             <predefined-time-duration-selector v-model="schedule.duration"
