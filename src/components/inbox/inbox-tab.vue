@@ -496,7 +496,10 @@ export default {
       })
     },
     async onItemRemoved (contact, callback, loadCount = true) {
-      if (loadCount) {
+      // avoid request in duplicity when task is moved to open
+      const isOpen = [ContactTaskStatus.STATUS_OPEN].includes(contact.task_status)
+
+      if (loadCount && !isOpen) {
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       }
@@ -703,8 +706,14 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
         const liveContacts = _.cloneDeep(this.liveContacts)
 
-        if (!isInLiveContacts || isInLiveContacts === undefined) {
+        if (!isInLiveContacts) {
           liveContacts.push(contact)
+        }
+
+        if (isInContacts) {
+          const index = contacts.data.findIndex(item => item.id === contact.id)
+          contacts.data.splice(index, 1)
+          this.setContacts(contacts.data)
         }
 
         this.setLiveContacts(
@@ -1137,12 +1146,6 @@ export default {
   },
 
   watch: {
-    contactTasks (contactTasks, _contactTasks) {
-      if (contactTasks.length !== _contactTasks.length) {
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      }
-    },
     $route (to, from) {
       this.previousRoute = from
     },
