@@ -571,7 +571,8 @@ export default {
         if (
           (this.toggleEnd ||
             !this.hasQueuedTaskLists) &&
-          !this.hasActiveTask) {
+          (!this.hasActiveTask ||
+              !this.activeTask)) {
           this.reRoute()
           return
         }
