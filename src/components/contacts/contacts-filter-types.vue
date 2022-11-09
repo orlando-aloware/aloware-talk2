@@ -210,6 +210,7 @@ export default {
   methods: {
     setValue () {
       const value = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
+      
       switch (this.filter.type) {
         case 'number':
           this.setNumberValue(value)
