@@ -194,6 +194,7 @@ export default function () {
       startTime: null,
       currentTime: null,
       listId: null
-    }
+    },
+    redialed: []
   }
 }

@@ -2187,7 +2187,14 @@ export default {
       this.$VueEvent.stop('export_event_update')
       this.$VueEvent.stop('export_event_delete')
       this.unsubscribeFromPusher()
-      this.resetVuex(['contacts', 'inbox', 'stats', 'settings', 'non-cache'])
+      this.resetVuex([
+        'contacts',
+        'inbox',
+        'stats',
+        'settings',
+        'power-dialer',
+        'non-cache'
+      ])
       this.resetNotifications()
       window.removeEventListener('resize', this.resizeHandler)
       window.removeEventListener('keydown', this.removeBehaviorsRestrictions)

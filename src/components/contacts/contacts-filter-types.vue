@@ -212,7 +212,7 @@ export default {
     this.options = this.filter.options
   },
   mounted () {
-    this.debounceDelay = ['string', 'boolean'].includes(this.filter.type) ? 10 : 500
+    this.debounceDelay = ['string', 'boolean', 'number'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
@@ -350,8 +350,6 @@ export default {
     },
     getNumberValue () {
       switch (true) {
-        case this.filterOperator === 8:
-          return 0
         // in between operator
         case this.filterOperator === 7:
           return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
@@ -367,7 +365,7 @@ export default {
           this.secondaryFilterOperatorValue = value[1]
           break
         default:
-          this.filterOperator = value
+          this.filterOperatorValue = value
       }
     },
     getDateValue () {
