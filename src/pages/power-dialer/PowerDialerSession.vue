@@ -173,7 +173,7 @@ export default {
         }
 
         if (isNextPage) {
-          params.page = this.powerDialerTaskFilters[taskType.data].current_page + 1
+          params.page = 2
         } else {
           params.page = 1
         }
@@ -246,11 +246,13 @@ export default {
       // current total tasks in queue + the active task,
       // and if current total tasks in queue is less than
       // the number of tasks per page
-      this.powerDialerTaskFilters.in_queue.total_queued -= 1
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
       if (this.powerDialerTaskFilters.in_queue.total_queued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
+        this.powerDialerTaskFilters.in_queue.total_queued -= (this.powerDialerTaskFilters.current_page >= 2 ? 1 : 0)
+      } else {
+        this.powerDialerTaskFilters.in_queue.total_queued -= 1
       }
     }
   },
