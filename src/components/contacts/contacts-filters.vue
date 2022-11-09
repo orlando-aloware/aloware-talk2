@@ -454,6 +454,7 @@ export default {
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
+      const isSelectionType = filterFound && filterFound.type === 'selection' // DNC or opt out filter
       let values = []
       let labels = []
 
@@ -468,7 +469,7 @@ export default {
             return filter.trueValue.join(' and ')
         }
 
-        if (filterFound && isRelationType) {
+        if (filterFound && (isRelationType || isSelectionType)) {
           for (let index of values) {
             filterFound
               .options
