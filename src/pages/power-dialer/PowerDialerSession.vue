@@ -100,7 +100,8 @@ export default {
     return {
       listeners: {},
       cancelToken: null,
-      source: null
+      source: null,
+      tasksProcessed: 0
     }
   },
   async created () {
@@ -179,13 +180,13 @@ export default {
 
         this.getTaskByFilter(params)
           .then(res => {
+            this.powerDialerTaskFilters[taskType.data] = JSON.parse(JSON.stringify(res.data))
+            delete this.powerDialerTaskFilters[taskType.data].data
             if (status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.powerDialerTasks[taskType.data] = this.powerDialerTasks[taskType.data].concat(res.data.data)
             } else {
               this.powerDialerTasks[taskType.data] = res.data.data
             }
-
-            this.powerDialerTaskFilters[taskType.data] = res.data
 
             if (this.powerDialerTasks.in_queue.length === 0 &&
               status === AutoDialTaskStatus.STATUS_QUEUED) {
@@ -239,13 +240,15 @@ export default {
       this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
     },
     fetchQueuedTasks () {
-      // fetch tasks only if total queued tasks for the next task is more than
-      // current total tasks in queue + the active call
+      // fetch tasks only if:
+      // previous fetch has tasks
+      // total queued tasks for the next task is more than
+      // current total tasks in queue + the active task,
       // and if current total tasks in queue is less than
       // the number of tasks per page
-      const nextTaskTotalQueuedTasks = (this.powerDialerTaskFilters.in_queue.total_queued - 1)
+      this.powerDialerTaskFilters.in_queue.total_queued -= 1
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
-      if (nextTaskTotalQueuedTasks > totalTasksInQueueWithActiveCall &&
+      if (this.powerDialerTaskFilters.in_queue.total_queued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
       }
