@@ -247,6 +247,7 @@ export default {
       }
 
       const value = { data: null }
+      
       switch (this.filter.type) {
         case 'string':
           value.data = this.getStringValue()
