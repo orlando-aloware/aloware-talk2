@@ -193,7 +193,7 @@
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
-                    v-if="((list.type === ContactListTypes.STATIC && isEditable) || id === 'all') &&  !list.show_in_public_folder">
+                    v-if="canSeeAddContacts">
           <template #button-content class="filter-toggle-button">
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
@@ -202,7 +202,7 @@
                style="margin-top: 2px;"></i>
           </template>
           <b-dropdown-item href="#"
-                           :disabled="!(list.type === ContactListTypes.STATIC && isEditable)"
+                           :disabled="!canAddContacts"
                            v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onAddContactsToList">
             <search-icon color="#62666E">
@@ -273,6 +273,7 @@
         :total-rows="fixedContactsData.total"
         :current-page="fixedContactsData.current_page"
         :last-page="fixedContactsData.last_page"
+        :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
         v-if="listItemsHasData"
         @onMouseMove="datatableOnMouseMove"
         @onMouseLeave="datatableOnMouseMove"
@@ -608,12 +609,10 @@
           </tr>
         </template>
 
-        <template slot="empty"
-                  v-if="showEmptySlot">
-          <div class="start-state" @click="onNavigateToAdd($event)">
-            <div
-              class="p-4 bg-light w-100 text-center border-bottom text-primary"
-            >
+        <template slot="empty">
+          <div class="start-state"
+               @click="onNavigateToAdd($event)">
+            <div class="p-4 bg-light w-100 text-center border-bottom text-primary">
               <template v-if="list.type == ContactListTypes.STATIC">
                 Add contacts <i class="fa fa-plus"></i>
               </template>
@@ -1422,8 +1421,11 @@ export default {
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
-    showEmptySlot () {
-      return this.isStartState || (!this.isStartState && this.isEmpty && this.list.type === this.ContactListTypes.STATIC)
+    canSeeAddContacts () {
+      return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
+    },
+    canAddContacts () {
+      return this.list.type === ContactListTypes.STATIC && this.isEditable
     },
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
