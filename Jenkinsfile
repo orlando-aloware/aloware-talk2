@@ -11,6 +11,7 @@ pipeline {
     environment {
         DEV_DOMAIN = 'alodev.org'
         PROD_DOMAIN = 'aloware.com'
+        NODE_MODULES_PATH = '/cached_modules/npm/talk2/node_modules'
     }
 
     stages {
@@ -26,9 +27,15 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies'){
+        stage('Load Cached Modules') {
           steps {
-            sh 'npm install'
+            sh "cp -r ${env.NODE_MODULES_PATH} ."
+          }
+        }
+
+        stage('Install Dependencies') {
+          steps {
+            sh 'npm install --no-audit'
           }
         }
 
@@ -39,9 +46,9 @@ pipeline {
         }
 
         stage('Deploy to Dev Environment') {
-            when { branch 'develop' }
+//             when { branch 'develop' }
             steps {
-                sh "aws --region us-west-2 --profile talk2-deployer s3 sync ./dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
+                sh "aws --region us-west-2 --profile talk2-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
             }
         }
     }
