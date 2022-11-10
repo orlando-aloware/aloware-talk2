@@ -15,7 +15,8 @@ pipeline {
     }
 
     stages {
-        stage('Setup Env for Testing') {
+        stage('Setup Dev Env File') {
+            when { branch 'develop' }
             steps {
                 script {
                     notificationSender.sendSlackInfo()
@@ -27,16 +28,25 @@ pipeline {
             }
         }
 
+        stage('Setup Prod Env File') {
+            when { branch 'master' }
+            steps {
+                withCredentials([file(credentialsId: 'talk2-prod-env', variable: 'prod_env')]) {
+                   sh "cp ${prod_env} .env"
+                }
+            }
+        }
+
         stage('Load Cached Modules') {
-          steps {
-            sh "cp -r ${env.NODE_MODULES_PATH} ."
-          }
+            steps {
+                sh "cp -r ${env.NODE_MODULES_PATH} ."
+            }
         }
 
         stage('Install Dependencies') {
-          steps {
-            sh 'npm install --no-audit'
-          }
+            steps {
+                sh 'npm install --no-audit'
+            }
         }
 
         stage('Build Talk2 Assets') {
@@ -46,11 +56,19 @@ pipeline {
         }
 
         stage('Deploy to Dev Environment') {
-//             when { branch 'develop' }
+            when { branch 'develop' }
             steps {
-                sh "aws --region us-west-2 --profile talk2-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
+                sh "aws --region us-west-2 --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
             }
         }
+
+        stage('Deploy to Prod Environment') {
+            when { branch 'master' }
+            steps {
+                sh "aws --region us-west-2 --profile talk2-prod-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.PROD_DOMAIN} --delete"
+            }
+        }
+
     }
     post {
         success {
