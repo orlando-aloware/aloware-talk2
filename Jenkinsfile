@@ -20,8 +20,8 @@ pipeline {
                     notificationSender.sendSlackInfo()
                 }
 
-                withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev-env')]) {
-                   sh "cp ${dev-env} .env"
+                withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
+                   sh "cp ${dev_env} .env"
                 }
             }
         }
