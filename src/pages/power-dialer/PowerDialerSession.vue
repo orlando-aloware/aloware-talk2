@@ -251,7 +251,11 @@ export default {
       if (this.powerDialerTaskFilters.in_queue.total_queued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
-        this.powerDialerTaskFilters.in_queue.total_queued -= 1 // (this.powerDialerTaskFilters.in_queue.current_page >= 2 ? 1 : 0)
+        // decrement the total number of queued tasks only on the
+        // 3rd page
+        if (this.powerDialerTaskFilters.in_queue.current_page >= 3) {
+          this.powerDialerTaskFilters.in_queue.total_queued -= 1 // (this.powerDialerTaskFilters.in_queue.current_page >= 2 ? 1 : 0)
+        }
       } else {
         this.powerDialerTaskFilters.in_queue.total_queued -= 1
       }
