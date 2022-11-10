@@ -16,14 +16,14 @@ pipeline {
 
     stages {
         stage('Setup Dev Env File') {
-            when { branch 'develop' }
+//             when { branch 'develop' }
             steps {
                 script {
                     notificationSender.sendSlackInfo()
                 }
 
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                   sh "cp ${dev_env} .env"
+                   sh "cat ${dev_env} >> .env"
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
             when { branch 'master' }
             steps {
                 withCredentials([file(credentialsId: 'talk2-prod-env', variable: 'prod_env')]) {
-                   sh "cp ${prod_env} .env"
+                   sh "cat ${prod_env} >> .env"
                 }
             }
         }
@@ -56,7 +56,7 @@ pipeline {
         }
 
         stage('Deploy to Dev Environment') {
-            when { branch 'develop' }
+//             when { branch 'develop' }
             steps {
                 sh "aws --region us-west-2 --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
             }
