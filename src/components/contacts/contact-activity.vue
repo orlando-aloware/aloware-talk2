@@ -617,7 +617,7 @@ export default {
           case 'disposition_status_id':
           case 'lead_source_id':
           case 'user_id':
-            return generalMessage.data + ' has been set to "' + toValue.data + '"'
+            return generalMessage.data + ' has been set to "' + toValue.data + '"' + `. Reason: ${data.notes}`
           case 'workflow_id':
             return workflowMessage[0]
         }
@@ -640,7 +640,7 @@ export default {
           case 'disposition_status_id':
           case 'lead_source_id':
           case 'user_id':
-            return generalMessage.data + ' has been removed from "' + fromValue.data + '"'
+            return generalMessage.data + ' has been removed from "' + fromValue.data + '"' + `. Reason: ${data.notes}`
           case 'workflow_id':
             return workflowMessage[1]
         }
