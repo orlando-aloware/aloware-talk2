@@ -26,6 +26,12 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies'){
+          steps {
+            sh 'npm install'
+          }
+        }
+
         stage('Build Talk2 Assets') {
             steps {
                 sh 'quasar build'
