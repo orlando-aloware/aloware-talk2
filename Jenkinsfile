@@ -23,7 +23,7 @@ pipeline {
                 }
 
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                   sh "cat ${dev_env} >> .env"
+                   sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.dev"
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
             when { branch 'master' }
             steps {
                 withCredentials([file(credentialsId: 'talk2-prod-env', variable: 'prod_env')]) {
-                   sh "cat ${prod_env} >> .env"
+                   sh "cat ${prod_env} >> .env && cat ${prod_env} >> .env.prod"
                 }
             }
         }
