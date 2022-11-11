@@ -16,7 +16,7 @@ pipeline {
 
     stages {
         stage('Setup Dev Env File') {
-//             when { branch 'develop' }
+            when { branch 'develop' }
             steps {
                 script {
                     notificationSender.sendSlackInfo()
@@ -28,14 +28,14 @@ pipeline {
             }
         }
 
-        stage('Setup Prod Env File') {
-            when { branch 'master' }
-            steps {
-                withCredentials([file(credentialsId: 'talk2-prod-env', variable: 'prod_env')]) {
-                   sh "cat ${prod_env} >> .env && cat ${prod_env} >> .env.prod"
-                }
-            }
-        }
+//         stage('Setup Prod Env File') {
+//             when { branch 'master' }
+//             steps {
+//                 withCredentials([file(credentialsId: 'talk2-prod-env', variable: 'prod_env')]) {
+//                    sh "cat ${prod_env} >> .env && cat ${prod_env} >> .env.prod"
+//                 }
+//             }
+//         }
 
         stage('Load Cached Modules') {
             steps {
@@ -56,18 +56,18 @@ pipeline {
         }
 
         stage('Deploy to Dev Environment') {
-//             when { branch 'develop' }
+            when { branch 'develop' }
             steps {
                 sh "aws --region us-west-2 --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
             }
         }
 
-        stage('Deploy to Prod Environment') {
-            when { branch 'master' }
-            steps {
-                sh "aws --region us-west-2 --profile talk2-prod-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.PROD_DOMAIN} --delete"
-            }
-        }
+//         stage('Deploy to Prod Environment') {
+//             when { branch 'master' }
+//             steps {
+//                 sh "aws --region us-west-2 --profile talk2-prod-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.PROD_DOMAIN} --delete"
+//             }
+//         }
 
     }
     post {
