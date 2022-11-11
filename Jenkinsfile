@@ -23,7 +23,7 @@ pipeline {
                 }
 
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                   sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.dev"
+                   sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
             }
         }
