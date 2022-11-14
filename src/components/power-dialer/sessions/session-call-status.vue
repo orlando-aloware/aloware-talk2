@@ -287,7 +287,7 @@ import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep } from 'lodash'
+import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -602,7 +602,8 @@ export default {
         if (
           (this.toggleEnd ||
             !this.hasQueuedTaskLists) &&
-          !this.hasActiveTask) {
+          (!this.hasActiveTask ||
+              !this.activeTask)) {
           this.reRoute()
           return
         }
@@ -612,9 +613,14 @@ export default {
         }
         if (this.wrapUp) {
           this.initialize()
-          this.wrapUpSeconds !== 0 &&
-          (this.wrapUp = false) &&
-          (this.isSessionRunning = false)
+        }
+
+        // end wrap-up if wrap-up seconds
+        // is not indefinite
+        if (this.wrapUp &&
+          this.wrapUpSeconds !== 0) {
+          this.wrapUp = false
+          this.isSessionRunning = false
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -658,14 +664,34 @@ export default {
         return
       }
 
+      const task = get(this.powerDialerTasks.in_queue, '0', null)
+      // skip assigning the next task if
+      // there is still an active task and
+      // wrap up seconds is indefinite
+      if (!isEmpty(this.activeTask) &&
+        this.wrapUpSeconds === 0) {
+        return
+      }
+
+      // end session if no more active call,
+      // no tasks in queue, no active task,
+      // and wrap up seconds is not indefinite
+      if (!this.statusCallConnected &&
+        !this.hasQueuedTaskLists &&
+        !task &&
+        this.wrapUpSeconds !== 0) {
+        this.reRoute()
+        return
+      }
+
       // TEMPORARY IMPLEMENTATION
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
-          this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+          this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
-            this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+            this.powerDialerTasks.in_queue.shift()
           }
 
           this.activeTask = this.taskToCall
@@ -684,15 +710,26 @@ export default {
         }
       }
 
-      if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        if (this.timerIsOver && this.selectedList.id !== 'all' && this.isSessionRunning) {
-          this.closePowerDialerNoTasks()
-        }
+      // end power dialer session if:
+      // power dialer has no tasks left in queue,
+      // countdown timer is 0,
+      // and session is still running
+      if (!this.hasQueuedTaskLists &&
+        !this.statusCallConnected &&
+        this.timerIsOver &&
+        this.isSessionRunning) {
+        this.closePowerDialerNoTasks()
       }
 
       this.TOGGLE_SESSION_LOADER(false)
     },
     closePowerDialerNoTasks () {
+      // continue the session if there is still
+      // an active task
+      if (this.hasActiveTask) {
+        return
+      }
+
       this.reRoute(false)
       if (this.redirectNotification) {
         this.$emit('no-tasks-found')
@@ -804,6 +841,7 @@ export default {
           // if (this.toggleEnd) {
           //   this.reRoute()
           // }
+
           if (!this.statusCallConnected &&
             this.timerIsOver &&
             this.isSessionRunning) {
@@ -818,6 +856,14 @@ export default {
         case 'WRAP_UP':
           this.wrapUp = true
           this.countdownTimer = this.wrapUpSeconds
+
+          // if status is wrap-up and wrap-up seconds
+          // is "no wrap-up", then skip wrap-up countdown timer
+          // and proceed immediately to the next task
+          if (this.isSessionRunning &&
+            this.wrapUpSeconds === -1) {
+            this.onNextTask(true)
+          }
           break
         case 'MAKING_CALL':
           break
@@ -869,21 +915,23 @@ export default {
         this.startWarmUpCountDown()
       }, 1000)
     },
-    async onNextTask () {
+    async onNextTask (forceSkip = false) {
       this.onPhoneExpansionReset()
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
+        forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
+        const task = get(this.powerDialerTasks.in_queue, '0', null)
 
-        this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+        this.taskToCall = cloneDeep(task)
 
-        if (!this.taskToCall) {
+        if (isEmpty(task)) {
           this.hasActiveTask = false
           this.reRoute()
           return
         }
 
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.powerDialerTasks.in_queue.shift()
         this.processSession()
         return
       }
@@ -897,7 +945,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.powerDialerTasks.in_queue.shift()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -979,9 +1027,19 @@ export default {
     },
     'powerDialerTasks.in_queue': {
       handler (tasks) {
+        // end the session if:
+        // there's no tasks in queue
+        // and there's no active task
+        if (tasks.length === 0 &&
+          !this.hasActiveTask) {
+          this.shouldRedirect = true
+          return
+        }
+
         if (tasks.length === 0 && !this.togglePause) {
           this.shouldRedirect = true
         }
+
         if (tasks.length > 0 && !this.isSessionRunning) {
           this.shouldRedirect = false
           if (!this.wrapUp) {
