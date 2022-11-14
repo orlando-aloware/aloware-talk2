@@ -265,7 +265,7 @@ import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep } from 'lodash'
+import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -633,11 +633,31 @@ export default {
         return
       }
 
+      const task = get(this.powerDialerTasks.in_queue, '0', null)
+      // skip assigning the next task if
+      // there is still an active task and
+      // wrap up seconds is indefinite
+      if (!isEmpty(this.activeTask) &&
+        this.wrapUpSeconds === 0) {
+        return
+      }
+
+      // end session if no more active call,
+      // no tasks in queue, no active task,
+      // and wrap up seconds is not indefinite
+      if (!this.statusCallConnected &&
+        !this.hasQueuedTaskLists &&
+        !task &&
+        this.wrapUpSeconds !== 0) {
+        this.reRoute()
+        return
+      }
+
       // TEMPORARY IMPLEMENTATION
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
-          this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+          this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
             this.powerDialerTasks.in_queue.shift()
@@ -789,6 +809,7 @@ export default {
           // if (this.toggleEnd) {
           //   this.reRoute()
           // }
+
           if (!this.statusCallConnected &&
             this.timerIsOver &&
             this.isSessionRunning) {
@@ -868,10 +889,11 @@ export default {
         forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
+        const task = get(this.powerDialerTasks.in_queue, '0', null)
 
-        this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+        this.taskToCall = cloneDeep(task)
 
-        if (!this.taskToCall) {
+        if (isEmpty(task)) {
           this.hasActiveTask = false
           this.reRoute()
           return
