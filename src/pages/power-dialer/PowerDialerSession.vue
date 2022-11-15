@@ -53,6 +53,7 @@ import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-lis
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
+import { get } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -101,7 +102,8 @@ export default {
       listeners: {},
       cancelToken: null,
       source: null,
-      tasksProcessed: 0
+      tasksProcessed: 0,
+      inProgressFetchTasks: {}
     }
   },
   async created () {
@@ -178,12 +180,22 @@ export default {
           params.page = 1
         }
 
+        const isInProgress = get(this.inProgressFetchTasks, taskType.data, false)
+
+        if (!isInProgress) {
+          this.inProgressFetchTasks[taskType.data] = true
+        } else { // skip if there's an in-progress tasks fetch
+          return
+        }
+
         this.getTaskByFilter(params)
           .then(res => {
             this.powerDialerTaskFilters[taskType.data] = JSON.parse(JSON.stringify(res.data))
             delete this.powerDialerTaskFilters[taskType.data].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+              // const inQueueTaskIds = this.powerDialerTasks[taskType.data].map(task => task.contact_list_item_id)
+              // const uniqueData = res.data.data.filter(task => !inQueueTaskIds.includes(task.id))
               this.powerDialerTasks[taskType.data].push(...res.data.data)
             } else {
               this.powerDialerTasks[taskType.data] = res.data.data
@@ -193,6 +205,7 @@ export default {
               status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.$VueEvent.fire('initiate_session_no_tasks')
             }
+            this.inProgressFetchTasks[taskType.data] = false
           })
       } else {
         Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
