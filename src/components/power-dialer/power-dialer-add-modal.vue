@@ -194,7 +194,7 @@ export default {
       return this.count + (this.count === 1 ? ' contact' : ' contacts')
     },
     isAllowedInternationalNumbers () {
-      return this.currentCompany.international_enabled && this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
+      return this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
     },
     conversionOptions () {
       const options = [
