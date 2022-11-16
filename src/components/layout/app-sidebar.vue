@@ -129,6 +129,61 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn :ripple="false"
+           icon="img:app-icons/menu/calendar_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100 disabled"
+           v-show="!isActive('Calendar') && !profile.calendar_enabled"
+           flat
+           @click="toggleProFeatureDialog(true)">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Calendar</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ path: '/calendar' }"
+           :ripple="false"
+           icon="img:app-icons/menu/calendar_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Calendar') && profile.calendar_enabled"
+           flat>
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Calendar</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ path: '/calendar' }"
+           :ripple="false"
+           icon="img:app-icons/menu/calendar_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Calendar') && profile.calendar_enabled"
+           flat>
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Calendar</span>
+      </q-tooltip>
+    </q-btn>
+
     <q-btn :to="{ name: 'Stats' }"
            :ripple="false"
            icon="img:app-icons/menu/stats_active.svg"

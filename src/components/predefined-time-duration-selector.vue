@@ -18,10 +18,20 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
+
 export default {
   name: 'predefined-time-duration-selector',
-  components: { VueMultiselect },
+
+  components: {
+    VueMultiselect
+  },
+
   props: {
+    value: {
+      type: Number,
+      required: false,
+      default: null
+    },
     durations: {
       type: Array,
       required: false,
@@ -51,11 +61,20 @@ export default {
       }
     }
   },
+
   data () {
     return {
       duration: null
     }
   },
+
+  mounted () {
+    // if component value is set, search for that specific time only to fill as the option
+    if (this.value) {
+      this.duration = this.durations.find(duration => duration.value === this.value)
+    }
+  },
+
   methods: {
     onSelect (selected) {
       this.$emit('select', selected)

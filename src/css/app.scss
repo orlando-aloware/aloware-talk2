@@ -5,6 +5,7 @@
 @import 'variables.scss';
 @import 'svg.scss';
 @import 'components/styles.scss';
+@import "dhtmlxscheduler_material.css"; // from ~dhtmlx-scheduler/codebase/dhtmlxscheduler_material.css
 
 
 html {
@@ -11338,4 +11339,390 @@ h1.contact-list-name-label {
 
 .no-bg {
   background: none !important;
+}
+
+// Calendar
+.calendar {
+  &__header {
+    width: 100%;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 60px;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 1000;
+
+    &__action-left,
+    &__action-right {
+      height: 60px;
+      flex-grow: 1;
+      display: flex;
+      justify-content: space-evenly;
+      padding: 0px 20px;
+      align-items: center;
+    }
+
+    .q-field {
+      margin-bottom: 0px !important;
+    }
+
+    .q-field__control,
+    .q-field__native {
+      min-height: 31px !important;
+      
+      &::before {
+        border: solid 1px #d8d8d8;
+      }
+    }
+
+    @include screen('lg') {
+      width: calc(100% - 64px);
+      top: 60px;
+      flex-direction: row;
+
+      &__action-left {
+        justify-content: left;
+        width: 50%;
+      }
+
+      &__action-right {
+        justify-content: right;
+        width: 50%;
+      }
+    }
+  }
+
+  &__helper {
+    &__popover {
+      .popover-header {
+        background-color: #fff;
+        border-bottom: none;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .scheduler {
+    margin-top: 120px;
+    background-color: #fff;
+
+    &__header {
+      z-index: 910;
+      position: relative;
+      background-color: #fff;
+      border-left: 1px solid #e0e0e0;
+      border-right: 1px solid #e0e0e0;
+      border-bottom: 1px solid #e0e0e0;
+
+      &__table {
+        table-layout: fixed;
+        text-align: center;
+        width: 100%;
+        z-index: 910;
+        background: transparent 0 0;
+        display: table;
+
+        td {
+          border: 0;
+          font-weight: bold;
+          font-size: 13px;
+          line-height: 1.25;
+          padding-top: 0.8rem;
+          height: 57px;
+
+          .day-of-week {
+            text-transform: uppercase;
+            display: block;
+            color: rgba(0, 0, 0, .8);
+          }
+
+          .day {
+            display: block;
+            font-size: 24px;
+            font-weight: 300;
+            color: rgba(0, 0, 0, .54);
+          }
+
+          &.today {
+            .day-of-week {
+              color: #2D96F3;
+            }
+
+            .day {
+              color: #2D96F3;
+            }
+          }
+        }
+      }
+    }
+
+    &__body {
+      z-index: 901;
+      margin-top: -22px;
+      position: relative;
+      background-color: #fff;
+
+      .actual-scheduler {
+        height: calc(100vh - 263px);
+
+        @include screen('lg') {
+          height: calc(100vh - 157px);
+        }
+
+        .dhx_before .dhx_month_head,
+        .dhx_after .dhx_month_head {
+          font-weight: 300 !important;
+        }
+
+        .dhx_cal_tab.active {
+          color: #fff;
+          background-color: #2196f3;
+        }
+
+        .dhx_cal_date {
+          text-align: left !important;
+          margin-left: 1rem;
+        }
+
+        .dhx_cal_navline.dhx_cal_navline_flex .dhx_cal_tab {
+          box-shadow: none !important;
+          border: 1px solid #dcdfe6;
+          color: #606266;
+          vertical-align: middle;
+          line-height: 30px;
+          text-transform: none !important;
+        }
+
+        .dhx_cal_navline.dhx_cal_navline_flex .dhx_cal_tab.dhx_cal_tab_first {
+          border-right: 0;
+          border-radius: 4px 0 0 4px;
+        }
+
+        .dhx_cal_navline.dhx_cal_navline_flex .dhx_cal_tab.dhx_cal_tab_last {
+          border-left: 0;
+          border-radius: 0 4px 4px 0;
+        }
+
+        .dhx_cal_navline.dhx_cal_navline_flex .dhx_cal_tab.active {
+          color: #fff;
+        }
+
+        .dhx_cal_nav_button {
+          color: #606266;
+          border-radius: 4px;
+          text-transform: none !important;
+        }
+
+        .dhx_cal_today_button.dhx_cal_nav_button {
+          border: 1px solid #dcdfe6;
+          color: #606266;
+          vertical-align: middle;
+          line-height: 32px;
+          margin-right: 1rem !important;
+          border-radius: 4px;
+        }
+
+        .dhx_cal_prev_button::after,
+        .dhx_cal_next_button::after {
+          color: #232323 !important;
+        }
+
+        .dhx_cal_event {
+          .dhx_header, .dhx_body, .dhx_footer, .dhx_title {
+            background-color: transparent !important;
+          }
+        }
+
+        .dhx_cal_scale_placeholder,
+        .dhx_cal_header {
+          display: none !important;
+          visibility: hidden;
+        }
+
+        .dhx_month_head {
+          text-align: center;
+          font-size: 14px;
+          font-weight: bold;
+        }
+
+        .dhx_now > .dhx_month_head {
+          color: #2196f3;
+        }
+
+        .dhx_cal_data td:hover {
+          .dhx_month_head, .dhx_month_body {
+            background: rgba(#00BF50, 0.05);
+          }
+        }
+
+        .dhx_event_move.dhx_title {
+          padding: 0;
+        }
+
+        .dhx_cal_event .dhx_body, .dhx_cal_event.dhx_cal_select_menu .dhx_body {
+          padding: 0;
+          line-height: 19px !important;
+          height: 19px !important;
+        }
+
+        .dhx_event_resize.dhx_footer {
+          display: none;
+        }
+
+        .dhx_cal_data table tr {
+          border-left: 0;
+          border-right: 0;
+
+          td:last-child {
+            .dhx_month_body, .dhx_month_head {
+              border-right: 0;
+            }
+          }
+
+          td:first-child {
+            .dhx_month_body, .dhx_month_head {
+              border-left: 0;
+            }
+          }
+        }
+
+        .dhx_cal_data {
+          border-left: 1px solid #dcdfe6;
+          border-right: 1px solid #dcdfe6;
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+        }
+      }
+
+      .day {
+        margin-top: -24px;
+        z-index: 901;
+  
+        .actual-scheduler {
+          height: calc(100vh - 90px);
+        }
+      }
+    }
+
+    @include screen('lg') {
+      margin-top: 60px;
+    }
+  }
+
+  #dd-views {
+    color: red
+  }
+
+  .b-overlay-wrap {
+    z-index: 1005;
+  }
+}
+
+#calendar-manager-modal {
+  .form-control {
+    &:disabled {
+      background-color: inherit;
+    }
+  }
+
+  .q-field {
+    &--disabled {
+      input:disabled {
+        display: none;
+      }
+    }
+  }
+}
+
+/* Event Colors */
+.event-color-type-12 {
+  color: #C6DAFC;
+
+  &.status-11 {
+    color: #2D96F3;
+
+    &.is_past {
+      color: #C6DAFC;
+    }
+  }
+
+  &.status-9 {
+    color: #498A7B;
+  }
+
+  &.status-10 {
+    color: #B93E1D;
+  }
+}
+
+.event-color-type-13 {
+  color: #FBD763;
+
+  &.status-8 {
+    color: #EABA20;
+
+    &.is_past {
+      color: #f7de94;
+    }
+  }
+
+  &.status-4 {
+    color: #ff9800;
+  }
+
+  &.status-5 {
+    color: #8A3350;
+  }
+}
+
+.event-bg-color-type-12 {
+  background-color: #C6DAFC;
+  color: #ffffff !important;
+
+  &.status-11 {
+    background-color: #2D96F3;
+
+    &.is_past {
+      background-color: #C6DAFC;
+    }
+  }
+
+  &.status-9 {
+    background-color: #498A7B;
+  }
+
+  &.status-10 {
+    background-color: #B93E1D;
+    text-decoration: line-through;
+  }
+}
+
+.event-bg-color-type-13 {
+  color: #ffffff !important;
+  background-color: #FBD763;
+
+  &.status-8 {
+    background-color: #EABA20;
+
+    &.is_past {
+      background-color: #f7de94;
+    }
+  }
+
+  &.status-4 {
+    background-color: #ff9800;
+  }
+
+  &.status-5 {
+    background-color: #8A3350;
+    text-decoration: line-through;
+  }
+}
+
+.btn-calendar-prev-next {
+  height: 32px;
+  width: 32px;
 }
