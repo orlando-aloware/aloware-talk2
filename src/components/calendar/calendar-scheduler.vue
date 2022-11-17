@@ -41,6 +41,7 @@ export default {
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
+    Scheduler.config.hour_date = '%g %A'
     Scheduler.config.dblclick_create = false
     Scheduler.config.details_on_dblclick = false
     Scheduler.config.drag_event_body = false
