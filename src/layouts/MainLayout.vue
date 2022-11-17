@@ -184,6 +184,38 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
+
+      <Modal
+        id="missed-call-modal"
+        size="xs"
+      >
+        <template #title>
+          <h2>Missed Call</h2>
+        </template>
+        <p>You missed a call, so we marked your current status as busy.</p>
+        <p>Do you want your status to be available?</p>
+        <template #footer>
+          <div class="w-100">
+            <b-button
+              size="sm"
+              class="float-left"
+              variant="outline-dark"
+              @click="stayBusy"
+            >
+              Stay Busy
+            </b-button>
+            <b-button
+              size="sm"
+              class="float-right"
+              variant="primary"
+              @click="goAvailable"
+            >
+              Go Available
+            </b-button>
+          </div>
+        </template>
+      </Modal>
+
       <pro-feature-dialog/>
     </div>
   </div>
@@ -225,6 +257,7 @@ import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
   TYPE_EXPORT_CONTACT_LIST_ITEMS
 } from 'src/constants/export-types-default'
+import Modal from 'components/modal.vue'
 
 export default {
   name: 'MyLayout',
@@ -237,7 +270,8 @@ export default {
     AppSidebar,
     Dialer,
     Phone,
-    ProFeatureDialog
+    ProFeatureDialog,
+    Modal
   },
 
   mixins: [
@@ -669,11 +703,11 @@ export default {
 
       if (this.checkCommunicationMatchesUserAccessibility(communication) || isCommunicationHasUnownedContact) {
         // missed call notification
-        // if (communication.type === CommunicationTypes.CALL &&
-        //   communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
-        //   !this.profile.sleep_mode) {
-        //   this.processActionNotification(communication, 'missed call')
-        // }
+        if (communication.type === CommunicationTypes.CALL &&
+          communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
+          !this.profile.sleep_mode) {
+          this.$bvModal.show('missed-call-modal')
+        }
 
         // if disposition status is not in-progress
         // or current status is not queued / ring all, close call notification
@@ -2157,6 +2191,16 @@ export default {
         .then(res => {
           this.setTimezones(res.data)
         })
+    },
+
+    goAvailable () {
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+      this.$bvModal.hide('missed-call-modal')
+    },
+
+    stayBusy () {
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_BREAK)
+      this.$bvModal.hide('missed-call-modal')
     },
 
     beforeUnload () {

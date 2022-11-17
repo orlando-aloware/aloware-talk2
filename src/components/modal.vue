@@ -5,11 +5,12 @@
     :centered="centered"
     :no-close-on-backdrop="noCloseOnBackdrop"
     :no-close-on-esc="noCloseOnEsc"
+    :size="size"
   >
     <template #modal-title>
       <slot name="title" />
     </template>
-    <slot name="body" />
+    <slot/>
     <template #modal-footer>
       <slot name="footer" />
     </template>
@@ -35,6 +36,10 @@ export default {
     noCloseOnEsc: {
       type: Boolean,
       default: true
+    },
+    size: {
+      type: String,
+      default: 'md'
     }
   }
 }
