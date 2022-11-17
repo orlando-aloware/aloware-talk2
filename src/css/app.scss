@@ -11530,7 +11530,10 @@ h1.contact-list-name-label {
         }
 
         .dhx_cal_event {
-          .dhx_header, .dhx_body, .dhx_footer, .dhx_title {
+          .dhx_header,
+          .dhx_body,
+          .dhx_footer,
+          .dhx_title {
             background-color: transparent !important;
           }
         }
@@ -11552,7 +11555,8 @@ h1.contact-list-name-label {
         }
 
         .dhx_cal_data td:hover {
-          .dhx_month_head, .dhx_month_body {
+          .dhx_month_head,
+          .dhx_month_body {
             background: rgba(#00BF50, 0.05);
           }
         }
@@ -11561,7 +11565,8 @@ h1.contact-list-name-label {
           padding: 0;
         }
 
-        .dhx_cal_event .dhx_body, .dhx_cal_event.dhx_cal_select_menu .dhx_body {
+        .dhx_cal_event .dhx_body,
+        .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
           line-height: 19px !important;
           height: 19px !important;
@@ -11601,6 +11606,13 @@ h1.contact-list-name-label {
           color: #62666E;
           font-size: 11px;
           margin-top: 5px;
+        }
+
+        .dhx_cal_event,
+        .dhx_cal_event_clear {
+          margin-left: 1px;
+          font-size: 13px;
+          border-radius: 6px;
         }
       }
 

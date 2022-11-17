@@ -92,6 +92,10 @@ export default {
       return `<a>${count} more</a>`
     }
 
+    Scheduler.templates.event_date = function (date) {
+      return moment(date).format('HH:mm')
+    }
+
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       this.addSchedule(date)
     })
