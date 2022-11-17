@@ -68,9 +68,8 @@
     <!-- scheduler -->
     <div class="scheduler">
       <div class="scheduler__header">
-        <table class="scheduler__header__table">
+        <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
           <tr v-if="view === 'week'">
-            <td id="td-scale"></td>
             <td :class="d.today ? 'today': ''"
                 v-for="d in formattedWeekDays"
                 :key="d.dayOfWeek">

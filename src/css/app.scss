@@ -11384,7 +11384,7 @@ h1.contact-list-name-label {
     }
 
     @include screen('lg') {
-      width: calc(100% - 64px);
+      width: calc(100% - 65px);
       top: 60px;
       flex-direction: row;
 
@@ -11425,14 +11425,18 @@ h1.contact-list-name-label {
       &__table {
         table-layout: fixed;
         text-align: center;
-        width: 100%;
+        width: calc(100% - 10px);
         z-index: 910;
         background: transparent 0 0;
         display: table;
 
+        &--week {
+          width: calc(100% - 50px);
+          margin-left: auto;
+        }
+
         td {
           border: 0;
-          font-weight: bold;
           font-size: 13px;
           line-height: 1.25;
           padding-top: 0.8rem;
@@ -11446,7 +11450,7 @@ h1.contact-list-name-label {
 
           .day {
             display: block;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 300;
             color: rgba(0, 0, 0, .54);
           }
