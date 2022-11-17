@@ -11377,6 +11377,12 @@ h1.contact-list-name-label {
       }
     }
 
+    .date-time-picker {
+      .arrow-month {
+        padding-top: 5px;
+      }
+    }
+
     @include screen('lg') {
       width: calc(100% - 64px);
       top: 60px;
