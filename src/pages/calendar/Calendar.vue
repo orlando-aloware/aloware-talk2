@@ -95,7 +95,8 @@
                    @edit-schedule="editSchedule"
                    @add-schedule="addSchedule"
                    @render-events="renderFromEvent"
-                   @update-current-date="updateCurrentDate">
+                   @update-current-date="updateCurrentDate"
+                   @view-change="viewChange">
         </scheduler>
       </div>
     </div>
@@ -347,6 +348,10 @@ export default {
       }
 
       this.$refs.scheduler.customParse(this.events)
+    },
+
+    viewChange (mode) {
+      this.view = mode
     }
   },
 

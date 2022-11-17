@@ -49,6 +49,7 @@ export default {
     Scheduler.config.drag_highlight = false
     Scheduler.config.drag_move = false
     Scheduler.config.drag_resize = false
+    Scheduler.config.max_month_events = 4
     Scheduler.xy.nav_height = 0
 
     Scheduler.templates.week_date = function (start, end) {
@@ -87,6 +88,10 @@ export default {
       return moment(date).format('D')
     }
 
+    Scheduler.templates.month_events_link = function (date, count) {
+      return `<a>${count} more</a>`
+    }
+
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       this.addSchedule(date)
     })
@@ -99,6 +104,7 @@ export default {
       let state = Scheduler.getState()
       this.renderEvents(state)
       this.updateCurrentDate(newDate)
+      this.$emit('view-change', newMode)
     })
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
