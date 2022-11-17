@@ -103,7 +103,8 @@ export default {
       cancelToken: null,
       source: null,
       tasksProcessed: 0,
-      inProgressFetchTasks: {}
+      inProgressFetchTasks: {},
+      pagesFetched: 0
     }
   },
   async created () {
@@ -194,6 +195,8 @@ export default {
             delete this.powerDialerTaskFilters[taskType.data].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+              this.pagesFetched += 1
+              this.powerDialerTaskFilters[taskType.data].current_page = this.pagesFetched
               // const inQueueTaskIds = this.powerDialerTasks[taskType.data].map(task => task.contact_list_item_id)
               // const uniqueData = res.data.data.filter(task => !inQueueTaskIds.includes(task.id))
               this.powerDialerTasks[taskType.data].push(...res.data.data)
@@ -260,13 +263,16 @@ export default {
       // and if current total tasks in queue is less than
       // the number of tasks per page
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
+      const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
+      const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
 
-      if (this.powerDialerTaskFilters.in_queue.total_queued > totalTasksInQueueWithActiveCall &&
-        this.totalTasksInQueue < this.powerDialerTaskFilters.in_queue.per_page) {
+      if (powerDialerTaskInQueueTotalQueued &&
+        powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
+        this.totalTasksInQueue < powerDialerTaskInQueuePerPage) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
         // decrement the total number of queued tasks only on the
         // 3rd page and up
-        if (this.powerDialerTaskFilters.in_queue.current_page >= 3) {
+        if (this.pagesFetched >= 3) {
           this.powerDialerTaskFilters.in_queue.total_queued -= 1
         }
       } else {
@@ -280,6 +286,7 @@ export default {
     }
   },
   beforeDestroy () {
+    this.powerDialerTaskFilters.in_queue = []
     this.$VueEvent.stop('endWrapUp', this.listeners.endWrapUp)
   }
 }
