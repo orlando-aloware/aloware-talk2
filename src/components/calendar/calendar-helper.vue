@@ -15,19 +15,19 @@
                triggers="click blur">
       <table class="w-100">
         <tr>
-          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-8"></i></td>
+          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-11"></i></td>
           <td>Upcoming Appointment</td>
         </tr>
         <tr>
-          <td class="pr-2"><i class="fas fa-square event-color-type-12"></i></td>
+          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-8 is_past"></i></td>
           <td>Past Appointment</td>
         </tr>
         <tr>
-          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-4"></i></td>
+          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-9"></i></td>
           <td>Completed Appointment</td>
         </tr>
         <tr>
-          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-5"></i></td>
+          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-10"></i></td>
           <td>Canceled Appointment</td>
         </tr>
         <tr>
