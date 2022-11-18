@@ -790,11 +790,13 @@ export default {
         // only fetch the latest contact data when updated contact is also the selected contact
         // this is to avoid swarm of api request when numbers of contacts get updated
         if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
-          // just update the contact attributes
+          // just update the contact attributes instead of fetching
           let updatedContact = JSON.parse(JSON.stringify(this.selectedContact))
           const keys = Object.keys(data)
 
           for (let key in keys) {
+            // add the attribute if it doesn't exist or
+            // update the attribute
             if (!(key in updatedContact) ||
               (key in updatedContact && updatedContact[key] !== data[key])) {
               updatedContact[key] = data[key]

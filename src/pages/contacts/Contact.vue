@@ -172,11 +172,13 @@ export default {
       // this is to avoid swarm of api request when numbers of contacts get updated
       const contactId = parseInt(data.id)
       if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
-        // just update the contact attributes
+        // just update the contact attributes instead of fetching
         let updatedContact = JSON.parse(JSON.stringify(this.contact))
         const keys = Object.keys(data)
 
         for (let key in keys) {
+          // add the attribute if it doesn't exist or
+          // update the attribute
           if (!(key in updatedContact) ||
             (key in updatedContact && updatedContact[key] !== data[key])) {
             updatedContact[key] = data[key]
