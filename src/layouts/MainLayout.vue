@@ -790,13 +790,26 @@ export default {
         // only fetch the latest contact data when updated contact is also the selected contact
         // this is to avoid swarm of api request when numbers of contacts get updated
         if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
-          talk2Api.V2.contacts.get(data.id).then(response => {
-            const contact = response.data
-            // check data loaded
-            this.setSelectedContact(contact)
-          }).catch(err => {
-            console.log(err)
-          })
+          // just update the contact attributes
+          let updatedContact = JSON.parse(JSON.stringify(this.selectedContact))
+          const keys = Object.keys(data)
+
+          for (let key in keys) {
+            if (!(key in updatedContact) ||
+              (key in updatedContact && updatedContact[key] !== data[key])) {
+              updatedContact[key] = data[key]
+            }
+          }
+
+          this.setSelectedContact(updatedContact)
+
+          // talk2Api.V2.contacts.get(data.id).then(response => {
+          //   const contact = response.data
+          //   // check data loaded
+          //   this.setSelectedContact(contact)
+          // }).catch(err => {
+          //   console.log(err)
+          // })
         }
       }
     })
