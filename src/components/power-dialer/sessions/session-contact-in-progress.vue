@@ -11,7 +11,7 @@
               <i class="fa fa-user"></i>
             </span>
             <span v-else>
-              {{ avatarName(firstname, lastname) }}
+              {{ getInitials(this.activeTask.name) }}
             </span>
           </q-avatar>
         </div>
@@ -59,9 +59,13 @@ import { isEmpty } from 'lodash'
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import PhoneIcon from 'components/icons/call-drop-icon'
+import { avatarMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'SessionContactInProgress',
+  mixins: [
+    avatarMixin
+  ],
   components: {
     PhoneIcon
   },
@@ -105,13 +109,6 @@ export default {
   methods: {
     endCurrentCall () {
       this.$VueEvent.fire('hangupCall')
-    },
-    avatarName (fname, lname) {
-      let fixedFname = fname.trim()
-      let fixedLname = lname.trim()
-      fixedFname = isEmpty(fixedFname) ? 'N' : fixedFname?.[0]
-      fixedLname = isEmpty(fixedLname) ? 'N' : fixedLname?.[0]
-      return `${fixedFname}${fixedLname}`
     }
   }
 }
