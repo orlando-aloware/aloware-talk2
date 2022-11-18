@@ -44,6 +44,15 @@
             Next {{ view }}
           </q-tooltip>
         </b-button>
+        <b-button size="sm"
+                  variant="light"
+                  class="btn-white btn-rounded px-3 mx-2 btn-calendar-today"
+                  @click.prevent="changeDirection('today')">
+          Today
+          <q-tooltip>
+            Go to today
+          </q-tooltip>
+        </b-button>
       </div>
       <div class="calendar__header__action-right">
         <filters :filters="convertedFilters"
@@ -222,7 +231,9 @@ export default {
     },
 
     changeDirection (direction) {
-      let date = moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
+      let date = direction === 'today'
+        ? new Date()
+        : moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
 
       if (this.view === 'day') {
         this.gotoDate = date
