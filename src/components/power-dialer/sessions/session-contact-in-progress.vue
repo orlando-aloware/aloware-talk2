@@ -107,9 +107,11 @@ export default {
       this.$VueEvent.fire('hangupCall')
     },
     avatarName (fname, lname) {
-      fname = isEmpty(fname) ? 'N' : fname?.[0]
-      lname = isEmpty(lname) ? 'N' : lname?.[0]
-      return `${fname}${lname}`
+      let fixedFname = fname.trim()
+      let fixedLname = lname.trim()
+      fixedFname = isEmpty(fixedFname) ? 'N' : fixedFname?.[0]
+      fixedLname = isEmpty(fixedLname) ? 'N' : fixedLname?.[0]
+      return `${fixedFname}${fixedLname}`
     }
   }
 }

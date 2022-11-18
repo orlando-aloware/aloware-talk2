@@ -61,8 +61,8 @@
                     <span v-else-if="key === 'scheduled'">
                       {{ totalScheduled }}
                     </span>
-                    <span v-else>
-                      {{ group.length }}
+                    <span v-else-if="key === 'all'">
+                      {{ getTotalItems('all') }}
                     </span>
                   </q-chip>
                 </div>
@@ -234,7 +234,7 @@
 
 <script>
 
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionContactInProgress from './session-contact-in-progress'
@@ -470,10 +470,11 @@ export default {
       return data.length || 0
     },
     avatarName (fname, lname) {
-      if (!fname && !lname) {
-        return false
-      }
-      return `${fname?.[0]}${lname?.[0]}`
+      let fixedFname = fname.trim()
+      let fixedLname = lname.trim()
+      fixedFname = isEmpty(fixedFname) ? 'N' : fixedFname?.[0]
+      fixedLname = isEmpty(fixedLname) ? 'N' : fixedLname?.[0]
+      return `${fixedFname}${fixedLname}`
     },
     onOver () {
       this.$refs.dropdown.visible = true
@@ -533,6 +534,9 @@ export default {
       }
 
       return `${item?.first_name || ''} ${item?.last_name || ''}`
+    },
+    getTotalItems (group) {
+      return get(this.powerDialerTaskFilters[group], 'total_items', 0)
     }
   },
   data () {
