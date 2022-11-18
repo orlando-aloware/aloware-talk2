@@ -11647,7 +11647,7 @@ h1.contact-list-name-label {
   }
 
   #dd-views {
-    color: red
+    color: $danger;
   }
 
   .b-overlay-wrap {
@@ -11673,86 +11673,82 @@ h1.contact-list-name-label {
 
 /* Event Colors */
 .event-color-type-12 {
-  color: #C6DAFC;
+  // color: #C6DAFC;
 
   &.status-11 {
-    color: #2D96F3;
-
-    &.is_past {
-      color: #C6DAFC;
-    }
+    color: $upcoming-appointment;
   }
 
   &.status-9 {
-    color: #498A7B;
+    color: $completed-event;
   }
 
   &.status-10 {
-    color: #B93E1D;
+    color: $canceled-appointment;
+  }
+
+  &.is_past {
+    color: $past-appointment;
   }
 }
 
 .event-color-type-13 {
-  color: #FBD763;
-
   &.status-8 {
-    color: #EABA20;
-
-    &.is_past {
-      color: #f7de94;
-    }
+    color: $upcoming-reminder;
   }
 
   &.status-4 {
-    color: #ff9800;
+    color: $completed-event;
   }
 
   &.status-5 {
-    color: #8A3350;
+    color: $canceled-reminder;
+  }
+
+  &.is_past {
+    color: $past-reminder;
   }
 }
 
 .event-bg-color-type-12 {
-  background-color: #C6DAFC;
   color: #ffffff !important;
 
   &.status-11 {
-    background-color: #2D96F3;
-
-    &.is_past {
-      background-color: #C6DAFC;
-    }
+    background-color: $upcoming-appointment;
   }
 
   &.status-9 {
-    background-color: #498A7B;
+    background-color: $completed-event;
   }
 
   &.status-10 {
-    background-color: #B93E1D;
+    background-color: $canceled-appointment;
     text-decoration: line-through;
+  }
+
+  &.is_past {
+    background-color: $past-appointment;
   }
 }
 
 .event-bg-color-type-13 {
   color: #ffffff !important;
-  background-color: #FBD763;
 
   &.status-8 {
-    background-color: #EABA20;
-
-    &.is_past {
-      background-color: #f7de94;
-    }
+    background-color: $upcoming-reminder;
   }
 
   &.status-4 {
-    background-color: #ff9800;
+    background-color: $completed-event
   }
 
   &.status-5 {
-    background-color: #8A3350;
+    background-color: $canceled-reminder;
     text-decoration: line-through;
+  }
+
+  &.is_past {
+    background-color: $past-reminder;
   }
 }
 

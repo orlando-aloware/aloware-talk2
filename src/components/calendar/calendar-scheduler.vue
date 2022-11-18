@@ -73,7 +73,7 @@ export default {
     })
 
     Scheduler.templates.event_class = function (start, end, event) {
-      return 'event-bg-color-type-' + event.type + ' status-' + event.status
+      return 'event-bg-color-type-' + event.type + ' status-' + event.status + (start < new Date() ? ' is_past' : '')
     }
 
     Scheduler.templates.day_scale_date = function (date) {
