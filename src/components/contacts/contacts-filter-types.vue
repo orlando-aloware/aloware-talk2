@@ -102,8 +102,8 @@
         </q-btn-toggle>
       </template>
       <template v-if="filter.type === 'selection'">
-        <q-select ref="filterOperation"
-                  class="filter-operation border"
+        <q-select class="filter-operation border"
+                  ref="filterOperation"
                   :options="options"
                   option-disable="disabled"
                   input-debounce="0"
