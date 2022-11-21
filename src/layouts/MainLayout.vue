@@ -706,7 +706,7 @@ export default {
         if (communication.type === CommunicationTypes.CALL &&
           communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW &&
           !this.profile.sleep_mode) {
-          this.$bvModal.show('missed-call-modal')
+          if (this.currentCompany && this.currentCompany.show_call_missed_modal) this.$bvModal.show('missed-call-modal')
         }
 
         // if disposition status is not in-progress
@@ -2199,7 +2199,7 @@ export default {
     },
 
     stayBusy () {
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_BREAK)
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
       this.$bvModal.hide('missed-call-modal')
     },
 
