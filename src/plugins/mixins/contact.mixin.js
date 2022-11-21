@@ -247,26 +247,26 @@ export default {
 
       this.addNewCommunication(data)
 
-      // check if there's no on-going fetch for a certain contact
-      if (!this.newCommunicationInprogressContactFetch.includes(data.contact.id)) {
-        this.addNewCommunicationInprogressContactFetch(data.contact.id)
-        talk2Api.V2.contacts.get(data.contact.id)
-          .then(response => {
-            if (data.contact_id === this.contact.id) {
-              this.setContact(response.data)
-              this.setContactClone(response.data)
-            }
+      // check if communication's contact is the same as the current contact
+      if (parseInt(data.contact_id) === parseInt(this.contact.id)) {
+        let updatedContact = JSON.parse(JSON.stringify(this.contact))
+        const keys = Object.keys(data.contact)
 
-            this.removeNewCommunicationInprogressContactFetch(data.contact.id)
-            this.$VueEvent.fire('inbox_contact_updated', {
-              contact: response.data,
-              communication: data
-            })
-          }).catch(err => {
-            this.removeNewCommunicationInprogressContactFetch(data.contact.id)
-            console.log(err)
-          })
+        for (let key in keys) {
+          // add the attribute if it doesn't exist or
+          // update the attribute
+          if (!(key in updatedContact) ||
+            (key in updatedContact && updatedContact[key] !== data[key])) {
+            updatedContact[key] = data[key]
+          }
+        }
+        this.setContact(updatedContact)
+        this.setContactClone(updatedContact)
       }
+      this.$VueEvent.fire('inbox_contact_updated', {
+        contact: data.contact,
+        communication: data
+      })
     }
 
     this.listeners.updateCommunication = (data) => {
@@ -348,7 +348,9 @@ export default {
       }
 
       // checks if contact is the same in communication
-      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
+      if (!this.contact ||
+        !data.contact_id ||
+        this.contact.id !== data.contact_id) {
         return false
       }
 
@@ -1179,9 +1181,7 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed',
-      'addNewCommunicationInprogressContactFetch',
-      'removeNewCommunicationInprogressContactFetch'
+      'setIsContactMixinUsed'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },

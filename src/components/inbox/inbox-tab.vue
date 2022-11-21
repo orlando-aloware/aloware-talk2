@@ -690,6 +690,15 @@ export default {
     },
     processNewCommunicationEvent (data, communication) {
       const contact = data
+
+      // add the last_communication in contact if it
+      // does not exist and remove the contact in the communication
+      if (!('last_communication' in contact)) {
+        const newCommunication = JSON.parse(JSON.stringify(communication))
+        'contact' in newCommunication && delete newCommunication.contact
+        contact.last_communication = newCommunication
+      }
+
       const contacts = { data: _.cloneDeep(this.contacts) }
       const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
       const isInContacts = this.contacts.find(item => item.id === contact.id)
@@ -884,13 +893,7 @@ export default {
       // there's already a listener in contact mixin that handles the fetching
       // of contact's information so we have to prevent calling another request.
       if (!this.isContactMixinUsed) {
-        setTimeout(() => {
-          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-            this.processNewCommunicationEvent(response.data, communication)
-          }).catch(err => {
-            console.log(err)
-          })
-        }, 1000)
+        this.processNewCommunicationEvent(communication.contact, communication)
       }
     }
 
