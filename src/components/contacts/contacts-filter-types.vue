@@ -102,21 +102,20 @@
         </q-btn-toggle>
       </template>
       <template v-if="filter.type === 'selection'">
-        <q-select
-          ref="filterOperation"
-          class="filter-operation border"
-          :options="options"
-          option-disable="disabled"
-          input-debounce="0"
-          borderless
-          dense
-          map-options
-          emit-value
-          use-input
-          v-model="filterOperatorValue"
-          v-if="operator.value === filterOperator && hasValue"
-          @input="onInput"
-          @filter="filterFn"
+        <q-select ref="filterOperation"
+                  class="filter-operation border"
+                  :options="options"
+                  option-disable="disabled"
+                  input-debounce="0"
+                  borderless
+                  dense
+                  map-options
+                  emit-value
+                  use-input
+                  v-model="filterOperatorValue"
+                  v-if="operator.value === filterOperator && hasValue"
+                  @input="onInput"
+                  @filter="filterFn"
         />
       </template>
     </div>
