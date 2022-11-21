@@ -249,17 +249,9 @@ export default {
 
       // check if communication's contact is the same as the current contact
       if (parseInt(data.contact_id) === parseInt(this.contact.id)) {
-        let updatedContact = JSON.parse(JSON.stringify(this.contact))
-        const keys = Object.keys(data.contact)
-
-        for (let key in keys) {
-          // add the attribute if it doesn't exist or
-          // update the attribute
-          if (!(key in updatedContact) ||
-            (key in updatedContact && updatedContact[key] !== data[key])) {
-            updatedContact[key] = data[key]
-          }
-        }
+        // just update the contact attributes
+        const updatedContact = JSON.parse(JSON.stringify(this.contact))
+        Object.assign(updatedContact, data)
         this.setContact(updatedContact)
         this.setContactClone(updatedContact)
       }
