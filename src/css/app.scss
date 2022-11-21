@@ -11377,8 +11377,14 @@ h1.contact-list-name-label {
       }
     }
 
+    .date-time-picker {
+      .arrow-month {
+        padding-top: 5px;
+      }
+    }
+
     @include screen('lg') {
-      width: calc(100% - 64px);
+      width: calc(100% - 65px);
       top: 60px;
       flex-direction: row;
 
@@ -11419,14 +11425,18 @@ h1.contact-list-name-label {
       &__table {
         table-layout: fixed;
         text-align: center;
-        width: 100%;
+        width: calc(100% - 10px);
         z-index: 910;
         background: transparent 0 0;
         display: table;
 
+        &--week {
+          width: calc(100% - 50px);
+          margin-left: auto;
+        }
+
         td {
           border: 0;
-          font-weight: bold;
           font-size: 13px;
           line-height: 1.25;
           padding-top: 0.8rem;
@@ -11440,7 +11450,7 @@ h1.contact-list-name-label {
 
           .day {
             display: block;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 300;
             color: rgba(0, 0, 0, .54);
           }
@@ -11530,7 +11540,10 @@ h1.contact-list-name-label {
         }
 
         .dhx_cal_event {
-          .dhx_header, .dhx_body, .dhx_footer, .dhx_title {
+          .dhx_header,
+          .dhx_body,
+          .dhx_footer,
+          .dhx_title {
             background-color: transparent !important;
           }
         }
@@ -11552,7 +11565,8 @@ h1.contact-list-name-label {
         }
 
         .dhx_cal_data td:hover {
-          .dhx_month_head, .dhx_month_body {
+          .dhx_month_head,
+          .dhx_month_body {
             background: rgba(#00BF50, 0.05);
           }
         }
@@ -11561,7 +11575,8 @@ h1.contact-list-name-label {
           padding: 0;
         }
 
-        .dhx_cal_event .dhx_body, .dhx_cal_event.dhx_cal_select_menu .dhx_body {
+        .dhx_cal_event .dhx_body,
+        .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
           line-height: 19px !important;
           height: 19px !important;
@@ -11595,6 +11610,25 @@ h1.contact-list-name-label {
           -moz-box-sizing: border-box;
           box-sizing: border-box;
         }
+
+        .dhx_month_link {
+          text-align: center;
+          color: #62666E;
+          font-size: 11px;
+          margin-top: 5px;
+        }
+
+        .dhx_cal_event,
+        .dhx_cal_event_clear {
+          margin-left: 1px;
+          font-size: 13px;
+          border-radius: 6px;
+        }
+
+        .dhx_month_head {
+          text-align: right;
+          font-weight: normal;
+        }
       }
 
       .day {
@@ -11613,7 +11647,7 @@ h1.contact-list-name-label {
   }
 
   #dd-views {
-    color: red
+    color: $danger;
   }
 
   .b-overlay-wrap {
@@ -11639,90 +11673,90 @@ h1.contact-list-name-label {
 
 /* Event Colors */
 .event-color-type-12 {
-  color: #C6DAFC;
+  // color: #C6DAFC;
 
   &.status-11 {
-    color: #2D96F3;
-
-    &.is_past {
-      color: #C6DAFC;
-    }
+    color: $upcoming-appointment;
   }
 
   &.status-9 {
-    color: #498A7B;
+    color: $completed-event;
   }
 
   &.status-10 {
-    color: #B93E1D;
+    color: $canceled-appointment;
+  }
+
+  &.is_past {
+    color: $past-appointment;
   }
 }
 
 .event-color-type-13 {
-  color: #FBD763;
-
   &.status-8 {
-    color: #EABA20;
-
-    &.is_past {
-      color: #f7de94;
-    }
+    color: $upcoming-reminder;
   }
 
   &.status-4 {
-    color: #ff9800;
+    color: $completed-event;
   }
 
   &.status-5 {
-    color: #8A3350;
+    color: $canceled-reminder;
+  }
+
+  &.is_past {
+    color: $past-reminder;
   }
 }
 
 .event-bg-color-type-12 {
-  background-color: #C6DAFC;
   color: #ffffff !important;
 
   &.status-11 {
-    background-color: #2D96F3;
-
-    &.is_past {
-      background-color: #C6DAFC;
-    }
+    background-color: $upcoming-appointment;
   }
 
   &.status-9 {
-    background-color: #498A7B;
+    background-color: $completed-event;
   }
 
   &.status-10 {
-    background-color: #B93E1D;
+    background-color: $canceled-appointment;
     text-decoration: line-through;
+  }
+
+  &.is_past {
+    background-color: $past-appointment;
   }
 }
 
 .event-bg-color-type-13 {
   color: #ffffff !important;
-  background-color: #FBD763;
 
   &.status-8 {
-    background-color: #EABA20;
-
-    &.is_past {
-      background-color: #f7de94;
-    }
+    background-color: $upcoming-reminder;
   }
 
   &.status-4 {
-    background-color: #ff9800;
+    background-color: $completed-event
   }
 
   &.status-5 {
-    background-color: #8A3350;
+    background-color: $canceled-reminder;
     text-decoration: line-through;
+  }
+
+  &.is_past {
+    background-color: $past-reminder;
   }
 }
 
 .btn-calendar-prev-next {
   height: 32px;
   width: 32px;
+}
+
+.btn-calendar-today {
+  height: 32px;
 }

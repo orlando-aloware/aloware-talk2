@@ -64,11 +64,11 @@
       <template #modal-footer="{ cancel, ok }">
         <div class="d-flex w-100">
           <div class="flex-grow-1"></div>
-          <button class="btn btn-sm btn-default mr-2"
+          <button class="btn btn-sm btn-outline-dark mr-2"
                   @click="hide(cancel)">
             Cancel
           </button>
-          <button class="btn btn-sm btn-primary mr-2"
+          <button class="btn btn-sm bg-primary text-white mr-2"
                   @click="save(ok)">
             Apply Filters
           </button>

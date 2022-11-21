@@ -41,6 +41,7 @@ export default {
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
+    Scheduler.config.hour_date = '%g %A'
     Scheduler.config.dblclick_create = false
     Scheduler.config.details_on_dblclick = false
     Scheduler.config.drag_event_body = false
@@ -48,6 +49,7 @@ export default {
     Scheduler.config.drag_highlight = false
     Scheduler.config.drag_move = false
     Scheduler.config.drag_resize = false
+    Scheduler.config.max_month_events = 4
     Scheduler.xy.nav_height = 0
 
     Scheduler.templates.week_date = function (start, end) {
@@ -71,7 +73,7 @@ export default {
     })
 
     Scheduler.templates.event_class = function (start, end, event) {
-      return 'event-bg-color-type-' + event.type + ' status-' + event.status
+      return 'event-bg-color-type-' + event.type + ' status-' + event.status + (start < new Date() ? ' is_past' : '')
     }
 
     Scheduler.templates.day_scale_date = function (date) {
@@ -86,6 +88,14 @@ export default {
       return moment(date).format('D')
     }
 
+    Scheduler.templates.month_events_link = function (date, count) {
+      return `<a>${count} more</a>`
+    }
+
+    Scheduler.templates.event_date = function (date) {
+      return moment(date).format('HH:mm')
+    }
+
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       this.addSchedule(date)
     })
@@ -98,6 +108,7 @@ export default {
       let state = Scheduler.getState()
       this.renderEvents(state)
       this.updateCurrentDate(newDate)
+      this.$emit('view-change', newMode)
     })
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
