@@ -116,7 +116,7 @@ export default {
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
         const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
-        const sort = !isAddList
+        const sort = !isAddList && this.isPowerDialer
           ? 'order'
           : ((this.sorts)
             ? this.sorts.orderBy
