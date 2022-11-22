@@ -220,6 +220,7 @@ export default {
           // }
           // this.skipped_list.push(autoDialTask.id)
           this.$generalNotification(message, 'warning')
+          this.onNextTask()
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)

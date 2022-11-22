@@ -44,6 +44,15 @@
             Next {{ view }}
           </q-tooltip>
         </b-button>
+        <b-button size="sm"
+                  variant="light"
+                  class="btn-white btn-rounded px-3 mx-2 btn-calendar-today"
+                  @click.prevent="changeDirection('today')">
+          Today
+          <q-tooltip>
+            Go to today
+          </q-tooltip>
+        </b-button>
       </div>
       <div class="calendar__header__action-right">
         <filters :filters="convertedFilters"
@@ -68,9 +77,8 @@
     <!-- scheduler -->
     <div class="scheduler">
       <div class="scheduler__header">
-        <table class="scheduler__header__table">
+        <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
           <tr v-if="view === 'week'">
-            <td id="td-scale"></td>
             <td :class="d.today ? 'today': ''"
                 v-for="d in formattedWeekDays"
                 :key="d.dayOfWeek">
@@ -95,7 +103,8 @@
                    @edit-schedule="editSchedule"
                    @add-schedule="addSchedule"
                    @render-events="renderFromEvent"
-                   @update-current-date="updateCurrentDate">
+                   @update-current-date="updateCurrentDate"
+                   @view-change="viewChange">
         </scheduler>
       </div>
     </div>
@@ -222,7 +231,9 @@ export default {
     },
 
     changeDirection (direction) {
-      let date = moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
+      let date = direction === 'today'
+        ? new Date()
+        : moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
 
       if (this.view === 'day') {
         this.gotoDate = date
@@ -347,6 +358,10 @@ export default {
       }
 
       this.$refs.scheduler.customParse(this.events)
+    },
+
+    viewChange (mode) {
+      this.view = mode
     }
   },
 

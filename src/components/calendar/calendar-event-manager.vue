@@ -258,17 +258,17 @@
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
-        <button class="btn btn-sm btn-danger"
+        <button class="btn btn-sm bg-danger text-white"
                 v-if="isDeletable"
                 @click="deleteSchedule(schedule.id)">
           Remove
         </button>
         <div class="ml-auto">
-            <button class="btn btn-sm btn-light mr-2"
+            <button class="btn btn-sm btn-outline-dark mr-2"
                     @click.prevent="closeFiltersMenu">
               Cancel
             </button>
-            <button class="btn btn-sm btn-success"
+            <button class="btn btn-sm bg-primary text-white"
                     @click.prevent="saveSchedule">
               Save Event
             </button>
