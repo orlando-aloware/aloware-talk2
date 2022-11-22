@@ -251,6 +251,22 @@ export default {
       if (parseInt(data.contact_id) === parseInt(this.contact.id)) {
         // just update the contact attributes
         const updatedContact = JSON.parse(JSON.stringify(this.contact))
+        // add the last_communication in contact
+        // and remove the contact in the communication
+        const newCommunication = JSON.parse(JSON.stringify(data))
+
+        // remove the contact from communication
+        if ('contact' in newCommunication) {
+          delete newCommunication.contact
+        }
+
+        updatedContact.last_communication = newCommunication
+        // assign value for contact's last engagement from
+        // communication if it doesn't exist
+        if (!('last_engagement_at' in updatedContact)) {
+          const engagementDate = _.get(newCommunication, 'updated_at', newCommunication.created_at)
+          updatedContact.last_engagement_at = engagementDate
+        }
         Object.assign(updatedContact, data)
         this.setContact(updatedContact)
         this.setContactClone(updatedContact)
@@ -277,29 +293,18 @@ export default {
       // check data loaded
       if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
         const updatedContact = _.get(this, 'contact', {})
-        const item = { index: null }
-        for (item.index in data) {
-          if (item.index === 'communications_and_audits') {
-            continue
-          }
+        const contact = JSON.parse(JSON.stringify(data))
+        delete contact.communications_and_audits
+        Object.assign(updatedContact, contact)
 
-          if (item.index === 'unread_texts_count' && typeof data[item.index] === 'undefined') {
-            updatedContact[item.index] = 0
-            continue
-          }
-
-          updatedContact[item.index] = data[item.index]
-        }
-
-        if (typeof updatedContact['unread_texts_count'] !== 'undefined' &&
-          typeof data['unread_texts_count'] === 'undefined') {
-          updatedContact['unread_texts_count'] = 0
+        // assign zero value for unread_texts_count
+        // if it doesn't exist incontact
+        if (!('unread_texts_count' in updatedContact)) {
+          updatedContact.unread_texts_count = 0
         }
 
         this.updateSelectedContact(updatedContact)
-        if (this.contact.id === updatedContact.id) {
-          this.setContact(updatedContact)
-        }
+        this.setContact(updatedContact)
         this.updateContacts(updatedContact)
       }
     }
@@ -342,7 +347,9 @@ export default {
       // checks if contact is the same in communication
       if (!this.contact ||
         !data.contact_id ||
-        this.contact.id !== data.contact_id) {
+        (this.contact &&
+          data.contact_id &&
+          parseInt(this.contact.id) !== parseInt(data.contact_id))) {
         return false
       }
 
@@ -365,7 +372,11 @@ export default {
 
     updateCommunication (data) {
       // checks if contact is the same in communication
-      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
+      if (!this.contact ||
+        !data.contact_id ||
+        (this.contact &&
+          data.contact_id &&
+          parseInt(this.contact.id) !== parseInt(data.contact_id))) {
         return false
       }
 
@@ -383,7 +394,11 @@ export default {
 
     deleteCommunication (data) {
       // checks if contact is the same in communication
-      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
+      if (!this.contact ||
+        !data.contact_id ||
+        (this.contact &&
+          data.contact_id &&
+          parseInt(this.contact.id) !== parseInt(data.contact_id))) {
         return false
       }
 
