@@ -261,7 +261,7 @@ export default {
         case 'cnam_state':
           State.getAllStates().forEach(st => {
             this.filterOptions.push({
-              label: `${st.countryCode} | ${st.name}`,
+              label: `${st.name}`,
               originalLabel: st.isoCode
             })
           })
