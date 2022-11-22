@@ -492,8 +492,10 @@ export default {
     },
     canNextTask () {
       // should be able to next task even if on warm up period
-      return this.statusCallConnected ||
-        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+      // and no manual skip (clicked next task) is in-progress
+      return !this.loadingNext &&
+        (this.statusCallConnected ||
+        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus))
     },
     canRedial () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
@@ -592,6 +594,11 @@ export default {
       }
 
       this.countdownInterval = setInterval(() => {
+        // reset next task loading flag
+        if (this.loadingNext) {
+          this.loadingNext = false
+        }
+
         this.countdownTimer--
         this.onTimerIsOver()
       }, 1000)
@@ -688,6 +695,7 @@ export default {
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
+          this.loadingNext = true
           this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
@@ -848,8 +856,11 @@ export default {
             this.resetTimer()
           }
 
+          // automate next task only if no wrap-up and
+          // no manual skip (clicked next task) is in-progress
           if (this.isSessionRunning &&
-            this.wrapUpSeconds === -1) {
+            this.wrapUpSeconds === -1 &&
+            !this.loadingNext) {
             this.onNextTask()
           }
           break
@@ -916,7 +927,13 @@ export default {
       }, 1000)
     },
     async onNextTask (forceSkip = false) {
+      this.loadingNext = true
       this.onPhoneExpansionReset()
+      // hangup in-progress call
+      if (this.callInProgress) {
+        this.$VueEvent.fire('hangupCall')
+      }
+
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
         forceSkip) {
         this.wrapUp = false
