@@ -21,26 +21,32 @@
 export default {
   props: {
     id: String,
+
     className: {
       type: String,
       default: 'modal-pd-add'
     },
+
     centered: {
       type: Boolean,
       default: true
     },
+
     noCloseOnBackdrop: {
       type: Boolean,
       default: true
     },
+
     noCloseOnEsc: {
       type: Boolean,
       default: true
     },
+
     size: {
       type: String,
       default: 'md'
     }
+    
   }
 }
 </script>
