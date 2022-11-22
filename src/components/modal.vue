@@ -46,7 +46,6 @@ export default {
       type: String,
       default: 'md'
     }
-    
   }
 }
 </script>
