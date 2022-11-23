@@ -64,6 +64,9 @@
                     <span v-else-if="key === 'all'">
                       {{ getTotalItems('all') }}
                     </span>
+                    <span v-else>
+                      {{ group.length }}
+                    </span>
                   </q-chip>
                 </div>
               </q-item-section>
@@ -309,9 +312,16 @@ export default {
        * everytime items are displayed
        */
 
+      const pdTasks = JSON.parse(JSON.stringify(this.powerDialerTasks))
+
+      // remove redialed if it exists
+      if ('redialed' in pdTasks) {
+        delete pdTasks.redialed
+      }
+
       if (!this.activeTask) {
         return {
-          ...this.powerDialerTasks,
+          ...pdTasks,
           in_queue: this.powerDialerTasks.in_queue
         }
       }
@@ -320,7 +330,7 @@ export default {
         return task && task.contact_list_item_id !== this.activeTask.contact_list_item_id
       })
       return {
-        ...this.powerDialerTasks,
+        ...pdTasks,
         in_queue: inQueue
       }
     },

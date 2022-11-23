@@ -2013,6 +2013,10 @@ i.option-separator {
     font-weight: 600;
   }
 
+  .t-menu {
+    max-height: 208px;
+    height: 100%;
+  }
 }
 
 .contact-list-sidebar-container.width-0 {
@@ -11371,7 +11375,7 @@ h1.contact-list-name-label {
     .q-field__control,
     .q-field__native {
       min-height: 31px !important;
-      
+
       &::before {
         border: solid 1px #d8d8d8;
       }
@@ -11634,7 +11638,7 @@ h1.contact-list-name-label {
       .day {
         margin-top: -24px;
         z-index: 901;
-  
+
         .actual-scheduler {
           height: calc(100vh - 90px);
         }
