@@ -91,7 +91,6 @@ import {
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
-// import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 
 export default {

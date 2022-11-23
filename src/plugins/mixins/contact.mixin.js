@@ -298,9 +298,15 @@ export default {
         Object.assign(updatedContact, contact)
 
         // assign zero value for unread_texts_count
-        // if it doesn't exist incontact
+        // if it doesn't exist in contact
         if (!('unread_texts_count' in updatedContact)) {
           updatedContact.unread_texts_count = 0
+        }
+
+        // assign zero value for unread_count
+        // if it doesn't exist in contact
+        if (!('unread_count' in updatedContact)) {
+          updatedContact.unread_count = 0
         }
 
         this.updateSelectedContact(updatedContact)
