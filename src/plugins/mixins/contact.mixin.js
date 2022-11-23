@@ -297,16 +297,22 @@ export default {
         delete contact.communications_and_audits
         Object.assign(updatedContact, contact)
 
-        // assign zero value for unread_texts_count
+        const unreadCount = _.get(updatedContact, 'unread_count', 0)
+        const unreadMissedCallCount = _.get(updatedContact, 'unread_missed_call_count', 0)
+        const unreadVoicemailCount = _.get(updatedContact, 'unread_voicemail_count', 0)
+
+        // assign zero value for the unreads
         // if it doesn't exist in contact
         if (!('unread_texts_count' in updatedContact)) {
-          updatedContact.unread_texts_count = 0
+          updatedContact.unread_texts_count = unreadCount
         }
 
-        // assign zero value for unread_count
-        // if it doesn't exist in contact
-        if (!('unread_count' in updatedContact)) {
-          updatedContact.unread_count = 0
+        if (!('unread_missed_calls_count' in updatedContact)) {
+          updatedContact.unread_missed_calls_count = unreadMissedCallCount
+        }
+
+        if (!('unread_voicemails_count' in updatedContact)) {
+          updatedContact.unread_voicemails_count = unreadVoicemailCount
         }
 
         this.updateSelectedContact(updatedContact)
