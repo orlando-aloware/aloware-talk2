@@ -91,7 +91,6 @@ import {
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
-import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 
 export default {
@@ -172,13 +171,10 @@ export default {
       // this is to avoid swarm of api request when numbers of contacts get updated
       const contactId = parseInt(data.id)
       if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
-        talk2Api.V2.contacts.get(data.id).then(response => {
-          const contact = response.data
-          // check data loaded
-          this.setContact(contact)
-        }).catch(err => {
-          console.log(err)
-        })
+        // just update the contact attributes
+        const updatedContact = JSON.parse(JSON.stringify(this.contact))
+        Object.assign(updatedContact, data)
+        this.setContact(updatedContact)
       }
     })
 

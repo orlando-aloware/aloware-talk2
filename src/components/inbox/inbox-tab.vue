@@ -187,7 +187,6 @@ import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import Vue from 'vue'
 import {
@@ -690,6 +689,25 @@ export default {
     },
     processNewCommunicationEvent (data, communication) {
       const contact = data
+
+      // add the last_communication in contact
+      // and remove the contact in the communication
+      const newCommunication = JSON.parse(JSON.stringify(communication))
+
+      // remove the contact from communication
+      if ('contact' in newCommunication) {
+        delete newCommunication.contact
+      }
+
+      contact.last_communication = newCommunication
+
+      // assign value for contact's last engagement from
+      // communication if it doesn't exist
+      if (!('last_engagement_at' in contact)) {
+        const engagementDate = _.get(newCommunication, 'updated_at', newCommunication.created_at)
+        contact.last_engagement_at = engagementDate
+      }
+
       const contacts = { data: _.cloneDeep(this.contacts) }
       const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
       const isInContacts = this.contacts.find(item => item.id === contact.id)
@@ -840,19 +858,14 @@ export default {
     }
 
     this.listeners.contactUpdated = (data) => {
-      // only fetch the latest contact data when updated contact is also the selected contact
-      // this is to avoid swarm of api request when numbers of contacts get updated
       if (this.selectedContact &&
         parseInt(this.selectedContact.id) === parseInt(data.id)) {
-        talk2Api.V2.contacts.get(data.id).then(response => {
-          const contact = response.data
-          // check data loaded
-          this.setSelectedContact(contact)
-          // this.setContact(contact)
-          this.updateContacts(contact)
-        }).catch(err => {
-          console.log(err)
-        })
+        const updatedContact = JSON.parse(JSON.stringify(this.selectedContact))
+        Object.assign(updatedContact, data)
+        // check data loaded
+        this.setSelectedContact(updatedContact)
+        // this.setContact(contact)
+        this.updateContacts(updatedContact)
       }
     }
 
@@ -884,13 +897,7 @@ export default {
       // there's already a listener in contact mixin that handles the fetching
       // of contact's information so we have to prevent calling another request.
       if (!this.isContactMixinUsed) {
-        setTimeout(() => {
-          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-            this.processNewCommunicationEvent(response.data, communication)
-          }).catch(err => {
-            console.log(err)
-          })
-        }, 1000)
+        this.processNewCommunicationEvent(communication.contact, communication)
       }
     }
 
@@ -914,18 +921,11 @@ export default {
 
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
-      const loopData = {
-        keys: Object.keys(communication),
-        key: null
-      }
       let contactTaskToRemove = null
 
       if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
         const liveContacts = _.cloneDeep(this.liveContacts)
-
-        for (loopData.key of loopData.keys) {
-          liveContacts[index].last_communication[loopData.key] = communication[loopData.key]
-        }
+        Object.assign(liveContacts[index].last_communication, communication)
 
         // if type is call and completed/voicemail then remove from live calls
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
@@ -967,9 +967,13 @@ export default {
       const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
         const contacts = _.cloneDeep(this.contacts)
+        Object.assign(contacts[contactIndex].last_communication, communication)
 
-        for (loopData.key of loopData.keys) {
-          contacts[contactIndex].last_communication[loopData.key] = communication[loopData.key]
+        // assign value for contact's last engagement from
+        // communication if it doesn't exist
+        if (!('last_engagement_at' in contacts[contactIndex])) {
+          const engagementDate = _.get(communication, 'updated_at', communication.created_at)
+          contacts[contactIndex].last_engagement_at = engagementDate
         }
 
         this.setContacts(contacts)
