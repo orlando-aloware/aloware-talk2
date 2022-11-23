@@ -240,7 +240,7 @@ export const ALL_COLUMNS = [
     label: 'Timezone',
     category: 1,
     order: 21,
-    sortable: false,
+    sortable: true,
     draggable: true,
     resizable: true,
     default: false
