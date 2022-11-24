@@ -3,7 +3,7 @@
                    label="name"
                    class="mr-1 chip__clear-blue shrink-options"
                    style="width: 100%"
-                   placeholder="Select type"
+                   placeholder="Select contact"
                    :searchable="true"
                    :showNoResults="false"
                    :close-on-select="true"
