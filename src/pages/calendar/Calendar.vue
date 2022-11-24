@@ -24,6 +24,7 @@
         </b-button>
         <date-selector date-only
                        noValueToCustomElem
+                       :value="gotoDate"
                        @dateSelected="onDateSelected">
           <b-button size="sm"
                     variant="light"
