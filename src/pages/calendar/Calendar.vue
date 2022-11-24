@@ -225,6 +225,14 @@ export default {
     }
   },
 
+  mounted () {
+    if ('communication_id' in this.$route.query) {
+      this.$axios.get('/api/v1/calendar/events/show/' + this.$route.query.communication_id + '/communication').then(res => {
+        this.editSchedule(res.data)
+      })
+    }
+  },
+
   methods: {
     onDateSelected (date) {
       this.gotoDate = date
