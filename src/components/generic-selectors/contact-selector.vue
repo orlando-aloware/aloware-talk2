@@ -6,6 +6,7 @@
                    placeholder="Select contact"
                    :searchable="true"
                    :showNoResults="false"
+                   :showNoOptions="false"
                    :close-on-select="true"
                    :options="options"
                    :show-labels="false"
@@ -15,12 +16,6 @@
                    v-model="contact"
                    @select="onSelect"
                    @search-change="onSearch">
-    <template #noResult>
-      {{ noResultsLabel }}
-    </template>
-    <template #noOptions>
-      {{ noResultsLabel }}
-    </template>
   </vue-multiselect>
 </template>
 
@@ -71,14 +66,6 @@ export default {
         'order': 'desc'
       },
       forceLoading: false
-    }
-  },
-
-  computed: {
-    noResultsLabel () {
-      return this.search.length < this.threshold
-        ? `Type at least ${this.threshold} characters to search in contacts`
-        : 'No Results found'
     }
   },
 

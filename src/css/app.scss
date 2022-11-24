@@ -11673,6 +11673,12 @@ h1.contact-list-name-label {
       }
     }
   }
+
+  .multiselect {
+    &__content-wrapper {
+      border: none !important;
+    }
+  }
 }
 
 /* Event Colors */

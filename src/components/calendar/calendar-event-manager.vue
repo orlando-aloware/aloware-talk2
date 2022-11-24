@@ -48,6 +48,9 @@
                         label="Contact"
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')">
+            <q-tooltip anchor="top middle">
+              Type at least 3 characters to search in contacts
+            </q-tooltip>
             <contact-selector v-model="$v.schedule.contact.$model.id">
             </contact-selector>
           </b-form-group>
@@ -678,10 +681,6 @@ export default {
           contact: {},
           user: this.user.profile,
           calendar_response: 1
-        }
-
-        if (this.$refs.contactSelector) {
-          this.$refs.contactSelector.reset()
         }
       }
 
