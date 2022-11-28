@@ -36,7 +36,6 @@
     "core-js": "^3.6.5",
     "countries-and-timezones": "^2.4.0",
     "dotenv": "^16.0.3",
-    "electron-json-storage": "^4.6.0",
     "electron-notarize": "^0.3.0",
     "giphy-js-sdk-core": "^1.0.6",
     "google-libphonenumber": "^3.2.26",
