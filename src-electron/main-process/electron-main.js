@@ -4,6 +4,7 @@ import path from 'path'
 import { Registry } from 'rage-edit'
 import { template } from './menu'
 import { clone } from 'lodash'
+import * as storage from 'electron-json-storage'
 
 let isSilent
 let updateDownloaded = false
@@ -43,6 +44,14 @@ let deepLinkingUrl
 
 // keep a copy of badge count
 let badgeCount
+
+// Flag to now show "app is updated" message more than once
+var updateData = storage.getSync('update')
+if (!updateData.updateStatusNotified) {
+  storage.set('update', {
+    updateStatusNotified: false
+  })
+}
 
 /**
  * Set `__statics` path to static files in production;
@@ -344,7 +353,9 @@ autoUpdater.on('error', (err) => {
 autoUpdater.on('update-not-available', () => {
   sendStatusToWindow('Update not available.')
   changeUpdaterMenu({ label: 'Check for updates', enabled: true })
-  if (isSilent) return
+  if (isSilent || updateData.updateStatusNotified) return
+  updateData.updateStatusNotified = true
+  storage.set('update', updateData)
   dialog.showMessageBox({
     title: 'No Updates',
     message: 'Current version is up-to-date.'
@@ -353,6 +364,8 @@ autoUpdater.on('update-not-available', () => {
 autoUpdater.on('update-downloaded', (info) => {
   sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
   updateDownloaded = true
+  updateData.updateStatusNotified = false
+  storage.set('update', updateData)
   changeUpdaterMenu({ label: 'Updates available', enabled: true })
 })
 
@@ -444,6 +457,8 @@ process.on('uncaughtException', (err) => {
 export function checkForUpdates ({ silent }) {
   isSilent = silent
   changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
+  updateData.updateStatusNotified = false
+  storage.set('update', updateData)
   if (updateDownloaded) {
     sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
     changeUpdaterMenu({ label: 'Updates available', enabled: true })
