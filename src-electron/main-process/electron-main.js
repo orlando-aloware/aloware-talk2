@@ -5,7 +5,7 @@ import { Registry } from 'rage-edit'
 import { template } from './menu'
 import { clone } from 'lodash'
 
-let isSilent
+var isSilent = true
 let updateDownloaded = false
 
 // register for tel: links in windows
@@ -344,6 +344,7 @@ autoUpdater.on('error', (err) => {
 autoUpdater.on('update-not-available', () => {
   sendStatusToWindow('Update not available.')
   changeUpdaterMenu({ label: 'Check for updates', enabled: true })
+  console.log({ isSilent })
   if (isSilent) return
   dialog.showMessageBox({
     title: 'No Updates',
@@ -446,6 +447,8 @@ export function checkForUpdates ({ silent }) {
   if (silent !== undefined){
     isSilent = silent
   }
+
+  console.log({ silent, isSilent })
   changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
   if (updateDownloaded) {
     sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
