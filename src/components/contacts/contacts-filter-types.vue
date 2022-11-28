@@ -260,9 +260,11 @@ export default {
 
         case 'cnam_state':
           State.getAllStates().forEach(st => {
+            const code = isNaN(+st.isoCode) ? st.isoCode : `${st.countryCode}-${st.isoCode}`
+
             this.filterOptions.push({
               label: st.name,
-              originalLabel: st.isoCode
+              originalLabel: code
             })
           })
           break
