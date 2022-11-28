@@ -344,7 +344,6 @@ autoUpdater.on('error', (err) => {
 autoUpdater.on('update-not-available', () => {
   sendStatusToWindow('Update not available.')
   changeUpdaterMenu({ label: 'Check for updates', enabled: true })
-  console.log({ isSilent })
   if (isSilent) return
   dialog.showMessageBox({
     title: 'No Updates',
@@ -448,7 +447,6 @@ export function checkForUpdates ({ silent }) {
     isSilent = silent
   }
 
-  console.log({ silent, isSilent })
   changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
   if (updateDownloaded) {
     sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
