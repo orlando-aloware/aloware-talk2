@@ -2,7 +2,7 @@ import * as Carriers from '../../constants/carriers'
 import * as Events from '../../constants/webrtc-events'
 import DeviceError from './twilio/error'
 import TwilioConnection from './twilio/connection'
-const TwilioClientDevice = require('twilio-client').Device
+const TwilioClientDevice = require('@twilio/voice-sdk').Device
 
 export default class Device {
   constructor (carrier) {
