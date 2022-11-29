@@ -738,7 +738,8 @@ export default {
 
           const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
           if (index >= 0) {
-            const liveContacts = _.cloneDeep(this.liveContacts)// add the v2 contact attributes that we need
+            const liveContacts = _.cloneDeep(this.liveContacts)
+            // add the v2 contact attributes that we need
             Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
 
             this.setLiveContacts(
