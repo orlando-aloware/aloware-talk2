@@ -37,7 +37,6 @@ import Avatar from 'components/avatar'
 import { mapGetters } from 'vuex'
 import {
   aclMixin,
-  contactV2AttributesMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
 
@@ -46,7 +45,6 @@ export default {
 
   mixins: [
     aclMixin,
-    contactV2AttributesMixin,
     visibilityMixin
   ],
 
