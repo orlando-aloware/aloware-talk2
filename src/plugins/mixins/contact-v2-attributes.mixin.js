@@ -3,7 +3,6 @@ import { get, isEmpty } from 'lodash'
 export default {
   methods: {
     addV2ContactAttributes (contact, communication = null, contactToUpdate = null) {
-      console.log('contact.unread_count 1: ', contact.unread_count)
       // initialize the v2 contact attributes
       const unreadCount = get(contact, 'unread_count', 0)
       const unreadMissedCallCount = get(contact, 'unread_missed_call_count', 0)
@@ -36,11 +35,9 @@ export default {
       contact.unread_texts_count = unreadCount
       contact.unread_missed_calls_count = unreadMissedCallCount
       contact.unread_voicemails_count = unreadVoicemailCount
-      console.log('contact.unread_texts_count 1: ', contact.unread_texts_count)
 
       if (!isEmpty(contactToUpdate)) {
         Object.assign(contactToUpdate, contact)
-        console.log('contact.unread_texts_count 2: ', contact.unread_texts_count)
         return contactToUpdate
       }
 

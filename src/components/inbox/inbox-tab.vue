@@ -845,17 +845,20 @@ export default {
     }
 
     this.listeners.contactUpdated = (data) => {
+      const updatedContact = this.$options.filters.jsonClone(this.selectedContact)
+      const contact = this.$options.filters.jsonClone(data)
+      // add the v2 contact attributes that we need
+      Object.assign(updatedContact, this.addV2ContactAttributes(contact))
+
       if (this.selectedContact &&
         parseInt(this.selectedContact.id) === parseInt(data.id) &&
         !this.isContactMixinUsed) {
-        const updatedContact = this.$options.filters.jsonClone(this.selectedContact)
-        const contact = this.$options.filters.jsonClone(data)
-        // add the v2 contact attributes that we need
-        Object.assign(updatedContact, this.addV2ContactAttributes(contact))
         // check data loaded
         this.setSelectedContact(updatedContact)
         this.updateContacts(updatedContact)
       }
+
+      this.setContact(updatedContact)
     }
 
     this.listeners.contactUpdatedFromContactMixin = (data) => {
