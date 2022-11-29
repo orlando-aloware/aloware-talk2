@@ -181,7 +181,13 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import {
+  cloneDeep,
+  isEmpty,
+  debounce,
+  get,
+  clone
+} from 'lodash'
 import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -513,7 +519,7 @@ export default {
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
-      const contactId = _.get(contact, 'id', null)
+      const contactId = get(contact, 'id', null)
       if (contactId) {
         if (this.currentTask !== contact.task_status) {
           this.currentTask = contact.task_status
@@ -616,8 +622,8 @@ export default {
       this.toggleFilterModelForm(true)
     },
     updateContact (contact) {
-      if (_.isEmpty(this.contact) ||
-        _.isEmpty(contact) ||
+      if (isEmpty(this.contact) ||
+        isEmpty(contact) ||
         parseInt(contact.id) !== parseInt(this.contact.id)) {
         return
       }
@@ -695,7 +701,7 @@ export default {
       // add the v2 contact attributes that we need
       Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
 
-      const contacts = { data: _.cloneDeep(this.contacts) }
+      const contacts = { data: cloneDeep(this.contacts) }
       const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
       const isInContacts = contacts.data.find(item => item.id === contact.id)
       this.updateContact(contact)
@@ -709,7 +715,7 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
-        const liveContacts = _.cloneDeep(this.liveContacts)
+        const liveContacts = cloneDeep(this.liveContacts)
 
         if (!isInLiveContacts) {
           liveContacts.push(contact)
@@ -762,7 +768,7 @@ export default {
               }
             } else {
               // get all contacts except the current one
-              contacts.data = _.clone(contacts.data.filter(item => item.id !== contact.id))
+              contacts.data = clone(contacts.data.filter(item => item.id !== contact.id))
             }
 
             if (this.sorting.order === 'asc') {
@@ -790,7 +796,7 @@ export default {
     this.setStatus()
 
     if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
-      if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
+      if (!isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
         // do other possible actions
       } else {
         this.setLoadingPendingTaskCount(true)
@@ -927,7 +933,7 @@ export default {
       let contactTaskToRemove = null
 
       if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
-        const liveContacts = _.cloneDeep(this.liveContacts)
+        const liveContacts = cloneDeep(this.liveContacts)
         // add the v2 contact attributes that we need
         Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
 
@@ -942,7 +948,7 @@ export default {
             contactTaskToRemove.task_status = ContactTaskStatus.STATUS_PENDING
           }
 
-          const contacts = _.cloneDeep(this.contacts)
+          const contacts = cloneDeep(this.contacts)
           if (this.sorting.order === 'asc') {
             contacts.push(contactTaskToRemove)
           } else {
@@ -970,13 +976,14 @@ export default {
 
       const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
-        const contacts = _.cloneDeep(this.contacts)
+        const contacts = cloneDeep(this.contacts)
         // add the v2 contact attributes that we need
         Object.assign(contacts[contactIndex], this.addV2ContactAttributes(communication.contact, newCommunication, contacts[contactIndex]))
         this.setContacts(contacts)
 
-        if (parseInt(contacts[contactIndex].id) === parseInt(this.contact.id)) {
-          this.setContact(contacts[contactIndex])
+        if (!isEmpty(this.contact) &&
+          parseInt(contacts[contactIndex].id) === parseInt(this.contact.id)) {
+          this.setSelectedContact(contacts[contactIndex])
         }
       }
 
@@ -1046,7 +1053,7 @@ export default {
         // update task status on live contacts
         const index = this.liveContacts.findIndex(item => item.id === data.contact_id)
         if (index >= 0) {
-          const liveContacts = _.cloneDeep(this.liveContacts)
+          const liveContacts = cloneDeep(this.liveContacts)
           liveContacts[index].task_status = parseInt(data.to)
 
           this.setLiveContacts(
@@ -1069,17 +1076,19 @@ export default {
 
         const contactIndex = this.contacts.findIndex(item => item.id === data.contact_id)
         if (contactIndex >= 0) {
-          const contacts = _.cloneDeep(this.contacts)
+          const contacts = cloneDeep(this.contacts)
           contacts[contactIndex].task_status = parseInt(data.to)
           this.setContacts(contacts)
-          if (contacts[contactIndex].id === this.contact.id) {
-            this.setContact(contacts[contactIndex])
+
+          if (!isEmpty(this.contact) &&
+            contacts[contactIndex].id === this.contact.id) {
+            this.setSelectedContact(contacts[contactIndex])
           }
         }
       }
     }
 
-    this.listeners.inboxLoadContacts = _.debounce((showMyContacts) => {
+    this.listeners.inboxLoadContacts = debounce((showMyContacts) => {
       if (!this.isLoaded) {
         return
       }
