@@ -397,7 +397,7 @@ export default {
       }
 
       if (!_.isEmpty(this.currentListFilters)) {
-        const listFilters = this.$options.filters.jsonClone(this.currentListFilters)
+        const listFilters = this.$options.helpers.jsonClone(this.currentListFilters)
         const filterIndex = {
           index1: null,
           index2: null,
@@ -491,7 +491,7 @@ export default {
         return []
       }
 
-      let defaultFilters = !_.isEmpty(this.list.filters) ? this.$options.filters.jsonClone(this.list.filters) : {}
+      let defaultFilters = !_.isEmpty(this.list.filters) ? this.$options.helpers.jsonClone(this.list.filters) : {}
 
       if (typeof defaultFilters === 'string') {
         return JSON.parse(defaultFilters)
@@ -675,7 +675,7 @@ export default {
         const index = this.contactsData.data.findIndex(item => item.id === communication.contact_id)
 
         if (index >= 0) {
-          const contact = this.$options.filters.jsonClone(communication.contact)
+          const contact = this.$options.helpers.jsonClone(communication.contact)
           // add the v2 contact attributes that we need
           Object.assign(contact, this.addV2ContactAttributes(contact))
           // update the contact attributes
