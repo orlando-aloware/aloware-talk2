@@ -147,6 +147,7 @@
 
         <div class="sms-activity border-rounded"
              :class="getCommunicationClass"
+             :style="(communication.current_status2 === undefined) ? 'background-color: #E5EEFF !important; color: black;' : ''"
              v-if="communication.body">
           <span class="arrow pull-top"
                 :class="[ communication.direction === CommunicationDirection.INBOUND ? 'left' : 'right' ]">
@@ -324,7 +325,7 @@
                 <i class="material-icons help text-light-blue-4"
                    :class="statusClass"
                    :title="'sending'"
-                   v-if="communication.current_status2 === undefined">done</i>
+                   v-if="communication.current_status2 === undefined">access_time</i>
               </template>
 
               <i class="material-icons help text-danger"
