@@ -334,12 +334,12 @@ export default {
     },
 
     processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
-      const updatedContact = this.$options.helpers.jsonClone(this.contact)
-      const contactEvent = this.$options.helpers.jsonClone(contact)
+      const updatedContact = this.$jsonClone(this.contact)
+      const contactEvent = this.$jsonClone(contact)
       let newCommunication = null
 
       if (communciation) {
-        newCommunication = this.$options.helpers.jsonClone(communciation)
+        newCommunication = this.$jsonClone(communciation)
       }
 
       // add the v2 contact attributes that we need

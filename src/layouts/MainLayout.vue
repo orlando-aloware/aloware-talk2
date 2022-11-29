@@ -687,7 +687,7 @@ export default {
           if (!communication.contact_id) {
             return
           }
-          const newCommunication = this.$options.helpers.jsonClone(communication)
+          const newCommunication = this.$jsonClone(communication)
 
           const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
             [
@@ -779,7 +779,7 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      const contact = this.$options.helpers.jsonClone(data)
+      const contact = this.$jsonClone(data)
       // add the v2 contact attributes that we need
       Object.assign(contact, this.addV2ContactAttributes(contact))
       if (this.$route.path.indexOf('channels/inbox') === -1) {
@@ -787,7 +787,7 @@ export default {
         // this is to avoid swarm of api request when numbers of contacts get updated
         if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
           // just update the contact attributes
-          const updatedContact = this.$options.helpers.jsonClone(this.selectedContact)
+          const updatedContact = this.$jsonClone(this.selectedContact)
           Object.assign(updatedContact, contact)
           this.setSelectedContact(updatedContact)
         }
@@ -819,8 +819,8 @@ export default {
           return
         }
 
-        const contact = this.$options.helpers.jsonClone(communication.contact)
-        const newCommunication = this.$options.helpers.jsonClone(communication)
+        const contact = this.$jsonClone(communication.contact)
+        const newCommunication = this.$jsonClone(communication)
         // add the v2 contact attributes that we need
         Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
 

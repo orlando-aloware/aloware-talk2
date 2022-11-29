@@ -628,8 +628,8 @@ export default {
         return
       }
 
-      const currentContact = this.$options.helpers.jsonClone(this.contact)
-      const contactNoCommAndAudits = this.$options.helpers.jsonClone(contact)
+      const currentContact = this.$jsonClone(this.contact)
+      const contactNoCommAndAudits = this.$jsonClone(contact)
 
       // remove communications and audits
       if ('communications_and_audits' in contactNoCommAndAudits) {
@@ -693,11 +693,11 @@ export default {
       return null
     },
     processNewCommunicationEvent (data, communication) {
-      const contact = this.$options.helpers.jsonClone(data)
+      const contact = this.$jsonClone(data)
 
       // add the last_communication in contact
       // and remove the contact in the communication
-      const newCommunication = this.$options.helpers.jsonClone(communication)
+      const newCommunication = this.$jsonClone(communication)
       // add the v2 contact attributes that we need
       Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
 
@@ -851,8 +851,8 @@ export default {
     }
 
     this.listeners.contactUpdated = (data) => {
-      const updatedContact = this.$options.helpers.jsonClone(this.selectedContact)
-      const contact = this.$options.helpers.jsonClone(data)
+      const updatedContact = this.$jsonClone(this.selectedContact)
+      const contact = this.$jsonClone(data)
       // add the v2 contact attributes that we need
       Object.assign(updatedContact, this.addV2ContactAttributes(contact))
 
@@ -927,7 +927,7 @@ export default {
         return
       }
 
-      const newCommunication = this.$options.helpers.jsonClone(communication)
+      const newCommunication = this.$jsonClone(communication)
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
       let contactTaskToRemove = null
