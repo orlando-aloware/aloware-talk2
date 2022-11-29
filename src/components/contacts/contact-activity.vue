@@ -147,7 +147,6 @@
 
         <div class="sms-activity border-rounded"
              :class="getCommunicationClass"
-             :style="(communication.current_status2 === undefined) ? 'background-color: #E5EEFF !important; color: black;' : ''"
              v-if="communication.body">
           <span class="arrow pull-top"
                 :class="[ communication.direction === CommunicationDirection.INBOUND ? 'left' : 'right' ]">
@@ -468,6 +467,10 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     getCommunicationClass () {
+      if (this.communication.current_status2 === undefined) {
+        return 'sending text-black'
+      }
+
       if (this.communication.direction === CommunicationDirection.INBOUND) {
         return 'inbound bg-grey-50'
       }
