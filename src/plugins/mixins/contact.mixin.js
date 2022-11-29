@@ -353,10 +353,11 @@ export default {
         this.setContactClone(updatedContact)
         this.updateSelectedContact(updatedContact)
 
-        // update the contact in Inbox
+        // update the contact/task in Inbox
         this.$VueEvent.fire('contact_updated_from_contact_mixin', updatedContact)
       }
 
+      // update contact in inbox's group of contacts/tasks
       if (!_.isEmpty(newCommunication)) {
         this.$VueEvent.fire('inbox_contact_updated', {
           contact: updatedContact,
