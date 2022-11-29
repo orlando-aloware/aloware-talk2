@@ -246,35 +246,7 @@ export default {
       }
 
       this.addNewCommunication(data)
-
-      // check if communication's contact is the same as the current contact
-      if (parseInt(data.contact_id) === parseInt(this.contact.id)) {
-        // just update the contact attributes
-        const updatedContact = JSON.parse(JSON.stringify(this.contact))
-        // add the last_communication in contact
-        // and remove the contact in the communication
-        const newCommunication = JSON.parse(JSON.stringify(data))
-
-        // remove the contact from communication
-        if ('contact' in newCommunication) {
-          delete newCommunication.contact
-        }
-
-        updatedContact.last_communication = newCommunication
-        // assign value for contact's last engagement from
-        // communication if it doesn't exist
-        if (!('last_engagement_at' in updatedContact)) {
-          const engagementDate = _.get(newCommunication, 'updated_at', newCommunication.created_at)
-          updatedContact.last_engagement_at = engagementDate
-        }
-        Object.assign(updatedContact, data)
-        this.setContact(updatedContact)
-        this.setContactClone(updatedContact)
-      }
-      this.$VueEvent.fire('inbox_contact_updated', {
-        contact: data.contact,
-        communication: data
-      })
+      this.processContactUpdate(data.contact, data)
     }
 
     this.listeners.updateCommunication = (data) => {
@@ -290,35 +262,8 @@ export default {
     }
 
     this.listeners.contactUpdated = (data) => {
-      // check data loaded
-      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
-        const updatedContact = _.get(this, 'contact', {})
-        const contact = JSON.parse(JSON.stringify(data))
-        delete contact.communications_and_audits
-        Object.assign(updatedContact, contact)
-
-        const unreadCount = _.get(updatedContact, 'unread_count', 0)
-        const unreadMissedCallCount = _.get(updatedContact, 'unread_missed_call_count', 0)
-        const unreadVoicemailCount = _.get(updatedContact, 'unread_voicemail_count', 0)
-
-        // assign zero value for the unreads
-        // if it doesn't exist in contact
-        if (!('unread_texts_count' in updatedContact)) {
-          updatedContact.unread_texts_count = unreadCount
-        }
-
-        if (!('unread_missed_calls_count' in updatedContact)) {
-          updatedContact.unread_missed_calls_count = unreadMissedCallCount
-        }
-
-        if (!('unread_voicemails_count' in updatedContact)) {
-          updatedContact.unread_voicemails_count = unreadVoicemailCount
-        }
-
-        this.updateSelectedContact(updatedContact)
-        this.setContact(updatedContact)
-        this.updateContacts(updatedContact)
-      }
+      // update the current contact
+      this.processContactUpdate(data, null, true)
     }
 
     this.listeners.contactAuditCreated = (data) => {
@@ -333,7 +278,13 @@ export default {
       this.processFetchContactInfo(callback)
     }
 
-    this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
+    this.listeners.updateContactInGroup = (contact) => {
+      // update contact in the group of contacts
+      // only in Contact page
+      if (this.$route.name === 'Contact') {
+        this.updateContacts(contact)
+      }
+    }
   },
 
   methods: {
@@ -343,6 +294,8 @@ export default {
       this.$VueEvent.listen('delete_communication', this.listeners.deleteCommunication)
       this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
       this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
+      this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
+      this.$VueEvent.listen('update-contact-in-group', this.listeners.updateContactInGroup)
     },
     removeListeners () {
       this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
@@ -350,8 +303,10 @@ export default {
       this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
       this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
       this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+      this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
+      this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
     },
-    addNewCommunication: function (data) {
+    addNewCommunication (data) {
       if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
         return false
       }
@@ -375,6 +330,38 @@ export default {
           this.removeDuplicateCommunicationsAndAudits()
           this.scrollMessages()
         }
+      }
+    },
+
+    processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
+      const updatedContact = this.$options.filters.jsonClone(this.contact)
+      const contactEvent = this.$options.filters.jsonClone(contact)
+      let newCommunication = null
+
+      if (communciation) {
+        newCommunication = this.$options.filters.jsonClone(communciation)
+      }
+
+      // add the v2 contact attributes that we need
+      Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
+
+      // check if communication's contact is the same as the current contact
+      if (parseInt(contact.id) === parseInt(this.contact.id)) {
+        deleteCommsAndAudits && delete contact.communications_and_audits
+        Object.assign(updatedContact, contact)
+        this.setContact(updatedContact)
+        this.setContactClone(updatedContact)
+        this.updateSelectedContact(updatedContact)
+
+        // update the contact in Inbox
+        this.$VueEvent.fire('contact_updated_from_contact_mixin', updatedContact)
+      }
+
+      if (!_.isEmpty(newCommunication)) {
+        this.$VueEvent.fire('inbox_contact_updated', {
+          contact: updatedContact,
+          communication: newCommunication
+        })
       }
     },
 

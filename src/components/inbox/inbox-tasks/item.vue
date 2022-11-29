@@ -292,7 +292,12 @@ export default {
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
     ...mapState('contacts', { contactData: 'contact' }),
-    ...mapState('inbox', ['selectedContact', 'liveContacts', 'contacts', 'channelChangedFilterFields']),
+    ...mapState('inbox',
+      [
+        'selectedContact',
+        'liveContacts',
+        'channelChangedFilterFields'
+      ]),
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
@@ -422,7 +427,7 @@ export default {
         this.$emit('onItemRemoved', this.contact)
       }, 3000)
     },
-    'contact.last_communication.id': function () {
+    'contact.last_engagement_at': function () {
       this.taskItemKey++
     },
     'contactData.task_status': {

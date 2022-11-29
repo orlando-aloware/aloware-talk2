@@ -615,7 +615,7 @@ import pdMixin from 'src/plugins/mixins/power-dialer'
 import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
-import { isEqual, get } from 'lodash'
+import { isEqual, get, isEmpty } from 'lodash'
 import {
   aclMixin,
   viewMixin,
@@ -808,9 +808,18 @@ export default {
       return this.listItems?.[this.selectedListId]?.last_page || 0
     },
     fullname () {
+      if (!this.selectedItem) {
+        return ''
+      }
+
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
+      if (isEmpty(this.selectedItem) ||
+        isEmpty(this.filteredListId)) {
+        return ''
+      }
+
       return `/api/v2/power-dialer-lists/${this.filteredListId}/items/${this.selectedItem.contact_list_item_id}`
     },
     isMyQueue () {

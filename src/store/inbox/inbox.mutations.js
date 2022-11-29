@@ -40,10 +40,12 @@ export default {
     state.taskCounts = { ...state.taskCounts, closed: count }
   },
   SET_CONTACT: (state, payload) => {
-    const contact = state.contacts.find(contact => contact.id === payload.contact_id)
+    const contact = state.contacts.find(contact => parseInt(contact.id) === parseInt(payload.id))
     const lastCommunication = _.get(contact, 'last_communication', null)
 
-    if (!lastCommunication || (lastCommunication && lastCommunication.id !== payload.id)) {
+    if (!lastCommunication ||
+      (lastCommunication &&
+        parseInt(lastCommunication.contact_id) !== parseInt(payload.id))) {
       return
     }
 

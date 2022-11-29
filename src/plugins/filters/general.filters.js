@@ -252,6 +252,19 @@ const pretty = (value) => {
 }
 
 /**
+ * Clone object by JSON Stringify then Parse
+ * @param {*} value
+ * @returns {string}
+ */
+const jsonClone = (value) => {
+  if (value) {
+    return JSON.parse(JSON.stringify(value))
+  }
+
+  return value
+}
+
+/**
  * Formats full name
  * @param {string} fullName
  * @returns {string|*}
@@ -560,6 +573,7 @@ export default ({ Vue }) => {
     'numFormat': numberFormat,
     fixOrder,
     pretty,
+    jsonClone,
     firstName,
     lastName,
     replaceDash,

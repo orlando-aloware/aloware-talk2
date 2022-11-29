@@ -63,6 +63,7 @@ import ContactSequence from 'components/contacts/contact-sequence'
 import {
   aclMixin,
   contactMixin,
+  contactV2AttributesMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
 
@@ -71,6 +72,7 @@ export default {
 
   mixins: [
     contactMixin,
+    contactV2AttributesMixin,
     aclMixin,
     visibilityMixin
   ],

@@ -84,6 +84,7 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import {
   contactMixin,
+  contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
   inboxMixin
@@ -98,6 +99,7 @@ export default {
 
   mixins: [
     contactMixin,
+    contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
     inboxMixin
@@ -173,7 +175,10 @@ export default {
       if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
         // just update the contact attributes
         const updatedContact = JSON.parse(JSON.stringify(this.contact))
-        Object.assign(updatedContact, data)
+        const contact = JSON.parse(JSON.stringify(data))
+        // add the v2 contact attributes that we need
+        Object.assign(contact, this.addV2ContactAttributes(contact))
+        Object.assign(updatedContact, contact)
         this.setContact(updatedContact)
       }
     })

@@ -20,6 +20,7 @@ import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   contactMixin,
+  contactV2AttributesMixin,
   inboxMixin,
   aclMixin,
   visibilityMixin
@@ -31,6 +32,7 @@ export default {
 
   mixins: [
     contactMixin,
+    contactV2AttributesMixin,
     inboxMixin,
     aclMixin,
     visibilityMixin

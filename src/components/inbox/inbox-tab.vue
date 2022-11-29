@@ -193,7 +193,8 @@ import {
   aclMixin,
   inboxMixin,
   visibilityMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  contactV2AttributesMixin
 } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
@@ -211,7 +212,8 @@ export default {
     aclMixin,
     inboxMixin,
     visibilityMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    contactV2AttributesMixin
   ],
 
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
@@ -616,23 +618,20 @@ export default {
     updateContact (contact) {
       if (_.isEmpty(this.contact) ||
         _.isEmpty(contact) ||
-        contact.id !== this.contact.id) {
+        parseInt(contact.id) !== parseInt(this.contact.id)) {
         return
       }
 
-      const currentContact = JSON.parse(JSON.stringify(this.contact))
-      const key = { data: null }
-      for (key.data in contact) {
-        if (key.data === 'communications_and_audits') {
-          continue
-        }
+      const currentContact = this.$options.filters.jsonClone(this.contact)
+      const contactNoCommAndAudits = this.$options.filters.jsonClone(contact)
 
-        if (typeof currentContact[key.data] !== 'undefined') {
-          currentContact[key.data] = contact[key.data]
-        }
+      // remove communications and audits
+      if ('communications_and_audits' in contactNoCommAndAudits) {
+        delete contactNoCommAndAudits.communications_and_audits
       }
 
-      this.setContact(currentContact)
+      Object.assign(currentContact, contactNoCommAndAudits)
+      this.setSelectedContact(currentContact)
     },
     onRouteChange () {
       this.setStatus()
@@ -688,29 +687,17 @@ export default {
       return null
     },
     processNewCommunicationEvent (data, communication) {
-      const contact = data
+      const contact = this.$options.filters.jsonClone(data)
 
       // add the last_communication in contact
       // and remove the contact in the communication
-      const newCommunication = JSON.parse(JSON.stringify(communication))
-
-      // remove the contact from communication
-      if ('contact' in newCommunication) {
-        delete newCommunication.contact
-      }
-
-      contact.last_communication = newCommunication
-
-      // assign value for contact's last engagement from
-      // communication if it doesn't exist
-      if (!('last_engagement_at' in contact)) {
-        const engagementDate = _.get(newCommunication, 'updated_at', newCommunication.created_at)
-        contact.last_engagement_at = engagementDate
-      }
+      const newCommunication = this.$options.filters.jsonClone(communication)
+      // add the v2 contact attributes that we need
+      Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
 
       const contacts = { data: _.cloneDeep(this.contacts) }
       const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-      const isInContacts = this.contacts.find(item => item.id === contact.id)
+      const isInContacts = contacts.data.find(item => item.id === contact.id)
       this.updateContact(contact)
 
       // check if communication is a live call
@@ -753,7 +740,7 @@ export default {
       } else {
         const index = contacts.data.findIndex(item => item.id === contact.id)
         if (isInContacts && index !== -1) {
-          contacts.data[index] = contact
+          Object.assign(contacts.data[index], contact)
           this.setContacts(contacts.data)
 
           if (contact.task_status !== this.currentTask) {
@@ -859,14 +846,26 @@ export default {
 
     this.listeners.contactUpdated = (data) => {
       if (this.selectedContact &&
-        parseInt(this.selectedContact.id) === parseInt(data.id)) {
-        const updatedContact = JSON.parse(JSON.stringify(this.selectedContact))
-        Object.assign(updatedContact, data)
+        parseInt(this.selectedContact.id) === parseInt(data.id) &&
+        !this.isContactMixinUsed) {
+        const updatedContact = this.$options.filters.jsonClone(this.selectedContact)
+        const contact = this.$options.filters.jsonClone(data)
+        // add the v2 contact attributes that we need
+        Object.assign(updatedContact, this.addV2ContactAttributes(contact))
         // check data loaded
         this.setSelectedContact(updatedContact)
-        // this.setContact(contact)
         this.updateContacts(updatedContact)
       }
+    }
+
+    this.listeners.contactUpdatedFromContactMixin = (data) => {
+      if (!this.isContactMixinUsed) {
+        return
+      }
+
+      // check data loaded
+      this.setSelectedContact(data)
+      this.updateContacts(data)
     }
 
     this.listeners.newCommunication = (communication) => {
@@ -919,13 +918,15 @@ export default {
         return
       }
 
+      const newCommunication = this.$options.filters.jsonClone(communication)
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
       let contactTaskToRemove = null
 
       if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
         const liveContacts = _.cloneDeep(this.liveContacts)
-        Object.assign(liveContacts[index].last_communication, communication)
+        // add the v2 contact attributes that we need
+        Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
 
         // if type is call and completed/voicemail then remove from live calls
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
@@ -967,17 +968,11 @@ export default {
       const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
         const contacts = _.cloneDeep(this.contacts)
-        Object.assign(contacts[contactIndex].last_communication, communication)
-
-        // assign value for contact's last engagement from
-        // communication if it doesn't exist
-        if (!('last_engagement_at' in contacts[contactIndex])) {
-          const engagementDate = _.get(communication, 'updated_at', communication.created_at)
-          contacts[contactIndex].last_engagement_at = engagementDate
-        }
-
+        // add the v2 contact attributes that we need
+        Object.assign(contacts[contactIndex], this.addV2ContactAttributes(communication.contact, newCommunication, contacts[contactIndex]))
         this.setContacts(contacts)
-        if (contacts[contactIndex].id === this.contact.id) {
+
+        if (parseInt(contacts[contactIndex].id) === parseInt(this.contact.id)) {
           this.setContact(contacts[contactIndex])
         }
       }
@@ -1117,11 +1112,11 @@ export default {
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.listen('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
     this.$VueEvent.listen('inbox_new_communication', this.listeners.newCommunication)
     this.$VueEvent.listen('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
-
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
     this.$VueEvent.listen('inbox_contact_updated', this.listeners.inboxContactUpdated)
@@ -1140,6 +1135,7 @@ export default {
     this.$VueEvent.stop('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.stop('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
     this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
     this.$VueEvent.stop('inbox_new_communication', this.listeners.newCommunication)
     this.$VueEvent.stop('update_communication', this.listeners.updateInboxCommunication)
