@@ -268,7 +268,10 @@ export default {
 
     this.listeners.contactAuditCreated = (data) => {
       // check data loaded
-      if (parseInt(data.contact_id) === parseInt(this.contactId)) {
+      if (!_.isEmpty(this.contact) &&
+        data.contact_id !== null &&
+        data.contact_id !== undefined &&
+        parseInt(data.contact_id) === parseInt(this.contact.id)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
       }
@@ -306,6 +309,21 @@ export default {
       this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
     },
+    isCommOrAuditExists (communication, data) {
+      // if communication and data is a communication (has type attribute),
+      // check if ids match
+      if ('type' in communication &&
+        'type' in data &&
+        communication.id === data.id) {
+        return true
+      }
+
+      // if communication and data is a contact audit (no type attribute),
+      // check if ids match. Else, false
+      return !('type' in communication) &&
+        !('type' in data) &&
+        communication.id === data.id
+    },
     addNewCommunication (data) {
       if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
         return false
@@ -313,24 +331,23 @@ export default {
 
       // checks if contact is the same in communication
       if (_.isEmpty(this.contact) ||
-        _.isEmpty(data.contact_id) ||
+        data.contact_id === null ||
+        data.contact_id === undefined ||
         (this.contact &&
           data.contact_id &&
           parseInt(this.contact.id) !== parseInt(data.contact_id))) {
         return false
       }
 
-      // check data loaded
-      if (!_.isEmpty(this.communicationsAndAudits)) {
-        // check new communication exists in the old list
-        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
+      // check new communication exists in the old list
+      const found = this.communicationsAndAudits
+        .find(communication => this.isCommOrAuditExists(communication, data))
 
-        if (!found) {
-          // push new data to top of array
-          this.communicationsAndAudits.push(data)
-          this.removeDuplicateCommunicationsAndAudits()
-          this.scrollMessages()
-        }
+      if (!found) {
+        // push new data to top of array
+        this.communicationsAndAudits.push(data)
+        this.removeDuplicateCommunicationsAndAudits()
+        this.scrollMessages()
       }
     },
 
@@ -355,7 +372,7 @@ export default {
         this.updateSelectedContact(updatedContact)
 
         // update the contact/task in Inbox
-        this.$VueEvent.fire('contact_updated_from_contact_mixin', updatedContact)
+        this.$VueEvent.fire('contact_updated_from_contact_mixin', contact)
       }
 
       // update contact in inbox's group of contacts/tasks
@@ -374,7 +391,8 @@ export default {
     updateCommunication (data) {
       // checks if contact is the same in communication
       if (_.isEmpty(this.contact) ||
-        _.isEmpty(data.contact_id) ||
+        data.contact_id === null ||
+        data.contact_id === undefined ||
         (this.contact &&
           data.contact_id &&
           parseInt(this.contact.id) !== parseInt(data.contact_id))) {
@@ -384,7 +402,8 @@ export default {
       // check data loaded
       if (!_.isEmpty(this.communicationsAndAudits)) {
         // check new communication exists in the old list
-        const index = this.communicationsAndAudits.findIndex(communication => communication.id === data.id)
+        const index = this.communicationsAndAudits
+          .findIndex(communication => this.isCommOrAuditExists(communication, data))
 
         if (index > -1) {
           // update communication
@@ -406,7 +425,8 @@ export default {
       // check data loaded
       if (!_.isEmpty(this.communicationsAndAudits)) {
         // try to find the communication
-        const index = this.communicationsAndAudits.findIndex(communication => communication.id === data.id)
+        const index = this.communicationsAndAudits
+          .findIndex(communication => this.isCommOrAuditExists(communication, data))
 
         if (index > -1) {
           // remove it from the list
@@ -579,7 +599,12 @@ export default {
         return
       }
 
-      this.communicationsAndAudits.push(audit)
+      const found = this.communicationsAndAudits
+        .find(communication => this.isCommOrAuditExists(communication, audit))
+
+      if (!found) {
+        this.communicationsAndAudits.push(audit)
+      }
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
@@ -602,6 +627,7 @@ export default {
         cancelToken: this.communicationApiSource.token
       }).then(res => {
         if (res.data.data && res.data.data.length) {
+          this.communicationsAndAudits = this.communicationsAndAudits.filter(item => 'id' in item)
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)
         }
 
@@ -895,7 +921,9 @@ export default {
     },
 
     isCommunicationFound () {
-      return this.$route.params.communicationId && !!this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      return this.$route.params.communicationId &&
+        !!this.communicationsAndAudits.find(communication => 'type' in communication &&
+          communication.id.toString() === this.$route.params.communicationId.toString())
     },
 
     isHashActivityType () {
@@ -928,7 +956,11 @@ export default {
       const hash = (this.$route.hash.replace('#', '')).split('-')
       const id = hash[1].trim()
 
-      return !!(hash[0] === 'communication' ? this.communicationsAndAudits.find(communication => communication.type !== undefined && communication.id.toString() === id) : this.communicationsAndAudits.find(communication => communication.property !== undefined && communication.id.toString() === id))
+      return !!(hash[0] === 'communication'
+        ? this.communicationsAndAudits.find(communication => 'type' in communication &&
+          communication.id.toString() === id)
+        : this.communicationsAndAudits.find(communication => !('type' in communication) &&
+          communication.id.toString() === id))
     },
 
     scrollIntoActivity () {

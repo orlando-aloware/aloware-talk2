@@ -194,7 +194,6 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
-import Vue from 'vue'
 import {
   aclMixin,
   inboxMixin,
@@ -443,8 +442,9 @@ export default {
     },
     updateContacts (updatedContact) {
       const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
+
       if (index >= 0) {
-        Vue.set(this.contacts, index, updatedContact)
+        Object.assign(this.contacts[index], updatedContact)
       }
     },
     resetList () {
@@ -872,9 +872,11 @@ export default {
         return
       }
 
-      // check data loaded
-      this.setSelectedContact(data)
       this.updateContacts(data)
+
+      if (parseInt(data.id) === parseInt(this.contact.id)) {
+        this.setSelectedContact(data)
+      }
     }
 
     this.listeners.newCommunication = (communication) => {
