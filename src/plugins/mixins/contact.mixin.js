@@ -511,21 +511,24 @@ export default {
             }
           }).catch(err => {
             this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+
             if (this.$axios.isCancel(err) && err) {
               console.log('Request canceled', err.message)
               this.loadingContact = false
-            } else {
-              this.loadingContact = false
-              this.loadingContactCommunications = false
-              this.$handleErrors(err.response)
+              return
+            }
 
-              if (this.$route.name.includes('Inbox')) {
-                this.$router.push({ name: 'Inbox' })
-              }
+            this.loadingContact = false
+            this.loadingContactCommunications = false
+            this.$handleErrors(err.response)
 
-              if (!this.$route.name.includes('Inbox')) {
-                this.$router.push({ path: '/contacts' })
-              }
+            if (this.$route.name.includes('Inbox')) {
+              this.$router.push({ name: 'Inbox' })
+              return
+            }
+
+            if (!this.$route.name.includes('Inbox')) {
+              this.$router.push({ path: '/contacts' })
             }
           })
       } else {
