@@ -1116,7 +1116,8 @@ export default {
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contactId)
-      if (!_.isEmpty(callback)) {
+
+      if (![null, undefined].includes(callback)) {
         callback(selectedContact)
       }
     },
