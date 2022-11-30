@@ -64,7 +64,7 @@
             </user-selector>
           </b-form-group>
         </b-col>
-        <b-col>
+        <b-col v-if="schedule.is_classic_one_on_one_event">
           <b-form-group class="form-label"
                         label="Contact"
                         invalid-feedback="A contact is required"
@@ -90,8 +90,26 @@
           </b-form-group>
         </b-col>
       </b-row>
+      <b-row v-if="!schedule.is_classic_one_on_one_event && mode === 'edit'">
+        <b-col>
+          <label class="form-control-label mb-1">Attendees</label>
+          <b-table hover
+                   responsive
+                   show-empty
+                   :items="schedule.attendees"
+                   :fields="fields">
+            <template #cell(action)="data">
+              <b-button size="sm"
+                        variant="outline-danger"
+                        @click="handleDeleteAttendee(data.item)">
+                Delete
+              </b-button>
+            </template>
+          </b-table>
+        </b-col>
+      </b-row>
 
-      <b-row v-if="schedule.type > 0 && schedule.contact && schedule.contact.id">
+      <b-row v-if="schedule.type > 0">
         <b-col md="12"
                :lg="isAppointment ? 4 : 6">
           <b-form-group class="form-label"
@@ -334,7 +352,9 @@ export default {
         required
       },
       contact: {
-        required
+        required: requiredIf(function (model) {
+          return !model.is_classic_one_on_one_event
+        })
       },
       date: {
         required,
@@ -408,6 +428,24 @@ export default {
         footerClass: 'p-2 border-top-0',
         centered: true
       },
+      fields: [
+        {
+          key: 'name',
+          label: 'Name'
+        },
+        {
+          key: 'email',
+          label: 'Email'
+        },
+        {
+          key: 'phone_number',
+          label: 'Phone number'
+        },
+        {
+          key: 'action',
+          label: ''
+        }
+      ],
       CommunicationDispositionStatus,
       CommunicationTypes
     }
@@ -499,7 +537,7 @@ export default {
     },
 
     editSchedule (sched) {
-      this.loading = true
+      this.loading = false
       let date = moment(sched.start_date)
 
       this.originalSchedule = {
@@ -508,8 +546,10 @@ export default {
         date: date.format('MM/DD/YYYY'),
         time: date.format('HH:mm'),
         duration: sched.duration,
+        user: sched.creator_user,
         contact: sched.contact,
-        user: sched.user,
+        attendees: sched.attendees,
+        is_classic_one_on_one_event: sched.is_classic_one_on_one_event,
         body: sched.body,
         status: sched.status,
         date_time: 1,
@@ -517,6 +557,20 @@ export default {
         status_name: sched.status_name,
         text: sched.text,
         timezone: sched.contact_timezone || null
+      }
+
+      if (sched.is_classic_one_on_one_event) {
+        this.loading = true
+        sched.attendees.every((attendee, key) => {
+          if (attendee.entity_type === 1) { // there is contract for Contact and User entity type in backend
+            this.originalSchedule.contact = {
+              id: attendee.entity_id,
+              name: attendee.name
+            }
+            return false
+          }
+          return true
+        })
       }
       this.schedule = _.clone(this.originalSchedule)
 
@@ -527,6 +581,35 @@ export default {
       this.showManager = true
       this.title = sched.status_name + ' - Edit Event'
       this.mode = 'edit'
+    },
+
+    handleDeleteAttendee (attendeeId) {
+      this.$bvModal.msgBoxConfirm('Are you sure you want to delete this attendee?', {
+        ...this.confirmDialogParams,
+        title: 'Confirmation',
+        okTitle: 'Yes, Remove',
+        cancelTitle: 'No, Keep'
+      })
+        .then(value => {
+          if (value) {
+            this.loading = true
+
+            this.$axios.delete(`/api/v1/calendar/events/attendees/${attendeeId}/}`).then(r => {
+              this.$emit('render-schedule', {
+                data: r.data.data,
+                action: 'update'
+              })
+              this.loading = false
+              this.showManager = false
+
+              this.$generalNotification('Attendee removed.')
+            }).catch(err => {
+              this.loading = false
+              this.showManager = false
+              console.log(err)
+            })
+          }
+        })
     },
 
     addSchedule (date) {
@@ -580,7 +663,7 @@ export default {
           if (value) {
             this.loading = true
 
-            this.$axios.delete(`/api/v1/calendar/events/contact/${this.schedule.contact.id}/${scheduleId}`).then(r => {
+            this.$axios.delete(`/api/v1/calendar/events/${scheduleId}`).then(r => {
               this.$emit('render-schedule', {
                 data: r.data.data,
                 action: 'delete'
@@ -604,10 +687,11 @@ export default {
         return
       }
 
-      const contactId = this.schedule.contact.id
       const eventId = this.schedule.id
 
       if (this.mode === 'add') {
+        const contactId = this.schedule.contact.id
+
         if (contactId !== null && this.schedule.type !== null) {
           this.loading = true
 
@@ -639,7 +723,7 @@ export default {
           })
         }
       } else {
-        if (contactId != null && eventId != null) {
+        if (eventId != null) {
           this.loading = true
 
           let postData = _.cloneDeep(this.schedule)
@@ -647,7 +731,7 @@ export default {
           postData.user_timezone = window.timezone
           postData.entity_type = 'event' // it means entity id for events table
 
-          this.$axios.post(`/api/v1/calendar/events/contact/${contactId}/update/${eventId}`, postData).then(res => {
+          this.$axios.post(`/api/v1/calendar/events/${eventId}/update`, postData).then(res => {
             this.loading = false
 
             this.$emit('render-schedule', {
