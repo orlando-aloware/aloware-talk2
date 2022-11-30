@@ -25,7 +25,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device) {
       return null
     }
-    return this._createConnection(this._device.activeConnection())
+    return this._createConnection(this._device)
   }
 
   availableInputDevices () {

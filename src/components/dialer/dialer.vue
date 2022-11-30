@@ -41,7 +41,8 @@ export default {
       loadingUnhold: false,
       loadingPark: false,
       loadingUnpark: false,
-      device: new TwilioDevice(),
+      device: new TwilioDevice(null),
+      call: null,
       connection: null,
       warnings: [],
       hangupInterval: null,
@@ -96,10 +97,9 @@ export default {
       }
     })
 
-    // initialize twilio client
-    this.device.initialize()
+    this.getDesktopToken()
 
-    this.device.on(WebrtcEvents.READY, (device) => {
+    this.device.on(WebrtcEvents.REGISTERED, (device) => {
       // Subscribe to the event for when the list of devices changes
       device.audio.on('deviceChange', () => this.getInputDevices())
 
@@ -127,7 +127,7 @@ export default {
       this.setDialerCurrentStatus('READY')
     })
 
-    this.device.on(WebrtcEvents.OFFLINE, (device) => {
+    this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
@@ -143,6 +143,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      this.call = call
       console.log('Received call invite', call)
       const map = call._connection.customParameters
       const customParameters = {}
@@ -254,8 +255,6 @@ export default {
         this.backToDial()
       }
     })
-
-    this.getDesktopToken()
 
     // ping getDesktopToken every 24 hours
     this.$options.webrtcTokenRegenerateInterval = setInterval(() => {
@@ -441,11 +440,12 @@ export default {
          * however we recommend testing and using Opus as it can provide better quality for lower bandwidth,
          * particularly noticeable in poor network conditions.
          */
-        this.device.setup(this.dialer.token, {
+        // initialize twilio client
+        this.device.initialize(this.dialer.token, {
           edge: ['ashburn', 'roaming'],
-          codecPreferences: ['opus', 'pcmu'],
-          enableIceRestart: true
+          codecPreferences: ['opus', 'pcmu']
         })
+        this.device.register()
 
         return Promise.resolve(res)
       }).catch(err => {
@@ -458,7 +458,7 @@ export default {
     makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
-      if (!this.dialer.isReady) {
+      if (this.dialer.isBusy) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
       }
@@ -590,14 +590,14 @@ export default {
         return
       }
 
-      if (this.device.activeConnection()) {
+      if (this.call) {
         if (this.isMobile && this.$route.name !== 'Phone') {
           this.$router.push({
             name: 'Phone'
           })
         }
         // accept the incoming connection and start two-way audio
-        this.device.activeConnection().accept()
+        this.call.accept()
       }
     },
 
