@@ -825,33 +825,51 @@ export default {
         Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
 
         const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+        const inProgressStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+        ]
+        const onHoldStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+        ]
+        const callingStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+        ]
+        const liveCallStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+        ]
+        const commDirections = [
+          CommunicationDirections.INBOUND,
+          CommunicationDirections.OUTBOUND
+        ]
+
         // check if communication is a live call
-        if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-          [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(communication.current_status2)) {
+        if (communication.type === CommunicationTypes.CALL &&
+          commDirections.includes(communication.direction) &&
+          liveCallStatuses.includes(communication.current_status2)) {
           const liveContacts = _.cloneDeep(this.liveContacts)
+
           if (!isInLiveContacts) {
             liveContacts.push(contact)
           }
+
           this.setLiveContacts(
             [
               // connected calls
-              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
+              ...liveContacts.filter(item => inProgressStatuses.includes(item.last_communication.current_status2)),
               // parked calls
-              ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
+              ...liveContacts.filter(item => onHoldStatuses.includes(item.last_communication.current_status2)),
               // incoming calls
-              ...liveContacts.filter(item => [
-                CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-              ].includes(item.last_communication.current_status2))
+              ...liveContacts.filter(item => callingStatuses.includes(item.last_communication.current_status2))
             ]
           )
         }

@@ -70,20 +70,24 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 
 export default {
   name: 'SessionContactPageActivity',
+
   components: {
     ContactActivities
   },
+
   mixins: [
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin
   ],
+
   props: {
     panel: {
       required: true
     }
   },
+
   created () {
     window.addEventListener('resize', this.resizeHandler)
     this.setIsContactMixinUsed(true)
@@ -122,6 +126,7 @@ export default {
     this.$VueEvent.listen('contact_task_status_updated', this.contactActivityListeners.contactTaskStatusUpdated)
     this.$VueEvent.listen('contact_activity_clear_change_from_fetch', this.contactActivityListeners.clearContactChangeFromFetch)
   },
+
   mounted () {
     this.contactId = this.contact.id
     this.setSelectedContact(this.contact)
@@ -129,18 +134,22 @@ export default {
     // initial fetch after mounting
     this.processFetchContactInfo()
   },
+
   computed: {
     ...mapGetters('auth', [
       'authenticated'
     ]),
+
     ...mapGetters('powerDialer', [
       'sessionLoader'
     ]),
+
     ...mapGetters('contacts', [
       'contact',
       'isSidebarCollapsed',
       'changingSelectedContact'
     ]),
+
     ...mapState([
       'contactDetailsDrawer',
       'campaignsIsLoading',
@@ -150,9 +159,11 @@ export default {
       'users',
       'tags'
     ]),
+
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     },
+
     widthClass () {
       if (this.isInbox) {
         return 'w-less-330px'
@@ -160,6 +171,7 @@ export default {
       return 'w-less-500px'
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'resetChangedContactProperties',
@@ -167,24 +179,30 @@ export default {
       'setContact',
       'setContactClone'
     ]),
+
     ...mapActions(['setContactDetailsDrawer']),
+
     toggleDrawer () {
       this.drawer = !this.drawer
       this.setContactDetailsDrawer(this.drawer)
     },
+
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
     },
+
     toggleContactListSidebar (isOpen) {
       this.contactListSidebarOpen = isOpen
       if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
         this.$refs.contactListSidebar.onSidebarToggle()
       }
     },
+
     prepareActivities () {
       this.contactId = this.contact.id
       this.setSelectedContact(this.contact)
     },
+
     sessionContactActivityContactUpdate (data) {
       this.contactId = data.id
       this.setSelectedContact(data)
@@ -193,6 +211,7 @@ export default {
       this.resetChangedContactProperties([])
     }
   },
+
   data () {
     return {
       flagged: false,
@@ -203,11 +222,13 @@ export default {
       contactActivityListeners: {}
     }
   },
+
   watch: {
     'contact.id': function () {
       this.selectedContactChanging(true)
     }
   },
+
   beforeDestroy () {
     this.setIsContactMixinUsed(false)
     this.removeListeners()

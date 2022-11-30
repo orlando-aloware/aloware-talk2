@@ -292,12 +292,11 @@ export default {
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
     ...mapState('contacts', { contactData: 'contact' }),
-    ...mapState('inbox',
-      [
-        'selectedContact',
-        'liveContacts',
-        'channelChangedFilterFields'
-      ]),
+    ...mapState('inbox', [
+      'selectedContact',
+      'liveContacts',
+      'channelChangedFilterFields'
+    ]),
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
@@ -429,14 +428,6 @@ export default {
     },
     'contact.last_engagement_at': function () {
       this.taskItemKey++
-    },
-    'contactData.task_status': {
-      deep: true,
-      handler: function (value) {
-        if (this.contactData.id === this.contact.id) {
-          this.contact.task_status = this.contactData.task_status
-        }
-      }
     }
   }
 }

@@ -174,8 +174,8 @@ export default {
       const contactId = parseInt(data.id)
       if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
         // just update the contact attributes
-        const updatedContact = JSON.parse(JSON.stringify(this.contact))
-        const contact = JSON.parse(JSON.stringify(data))
+        const updatedContact = this.$jsonClone(this.contact)
+        const contact = this.$jsonClone(data)
         // add the v2 contact attributes that we need
         Object.assign(contact, this.addV2ContactAttributes(contact))
         Object.assign(updatedContact, contact)

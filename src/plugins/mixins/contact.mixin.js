@@ -324,18 +324,25 @@ export default {
         !('type' in data) &&
         communication.id === data.id
     },
+    isNotSameContact (contactId) {
+      const isContactIdEmpty = [null, undefined].includes(contactId)
+      const isContactEmpty = _.isEmpty(this.contact)
+      const isNotSameContact = !isContactEmpty &&
+        !isContactIdEmpty &&
+        parseInt(this.contact.id) !== parseInt(contactId)
+
+      return isContactEmpty ||
+        isContactIdEmpty ||
+        isNotSameContact
+    },
     addNewCommunication (data) {
-      if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
+      if (this.smsOnly &&
+        data.type !== CommunicationTypes.SMS) {
         return false
       }
 
       // checks if contact is the same in communication
-      if (_.isEmpty(this.contact) ||
-        data.contact_id === null ||
-        data.contact_id === undefined ||
-        (this.contact &&
-          data.contact_id &&
-          parseInt(this.contact.id) !== parseInt(data.contact_id))) {
+      if (this.isNotSameContact(data.contact_id)) {
         return false
       }
 
@@ -390,12 +397,7 @@ export default {
 
     updateCommunication (data) {
       // checks if contact is the same in communication
-      if (_.isEmpty(this.contact) ||
-        data.contact_id === null ||
-        data.contact_id === undefined ||
-        (this.contact &&
-          data.contact_id &&
-          parseInt(this.contact.id) !== parseInt(data.contact_id))) {
+      if (this.isNotSameContact(data.contact_id)) {
         return false
       }
 
@@ -414,11 +416,7 @@ export default {
 
     deleteCommunication (data) {
       // checks if contact is the same in communication
-      if (!this.contact ||
-        !data.contact_id ||
-        (this.contact &&
-          data.contact_id &&
-          parseInt(this.contact.id) !== parseInt(data.contact_id))) {
+      if (this.isNotSameContact(data.contact_id)) {
         return false
       }
 
@@ -1149,7 +1147,7 @@ export default {
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contactId)
 
-      if (![null, undefined].includes(callback)) {
+      if (typeof callback === 'function') {
         callback(selectedContact)
       }
     },

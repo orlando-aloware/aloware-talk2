@@ -132,11 +132,13 @@ export default {
   },
   methods: {
     isSameCommunication (comm1, comm2) {
-      if (_.isEmpty(comm1) ||
-        _.isEmpty(comm2) ||
-        (!_.isEmpty(comm1) &&
-          !_.isEmpty(comm2) &&
-          comm1.type !== comm2.type)) {
+      // check if comms are not empty
+      const isEmptyComms = _.isEmpty(comm1) || _.isEmpty(comm2)
+      // check if both comms' type are not the same
+      const notSameCommType = !isEmptyComms && comm1.type !== comm2.type
+
+      if (isEmptyComms ||
+        notSameCommType) {
         return false
       }
 
