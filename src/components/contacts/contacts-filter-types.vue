@@ -93,6 +93,28 @@
           @input="onInput"
           @filter="filterFn"
         />
+        <label v-if="operator.value === filterOperator && hasSecondaryOperator">
+          Content:
+        </label>
+        <q-select
+          ref="filterOperation"
+          class="filter-operation border"
+          borderless
+          dense
+          use-input
+          use-chips
+          multiple
+          :emit-value="isSpecialStringTypeFilterKey"
+          input-debounce="0"
+          v-if="operator.value === filterOperator && hasSecondaryOperator"
+          v-model="secondaryFilterOperatorValue"
+          :options="filterOptions"
+          option-value="originalLabel"
+          option-label="label"
+          option-disable="disabled"
+          v-on="specialStringTypeEvents"
+        >
+        </q-select>
       </template>
       <template v-if="filter.type === 'boolean'">
         <q-btn-toggle class="w-100"
@@ -219,13 +241,16 @@ export default {
     },
 
     hasSecondaryOperator () {
-      switch (this.filter.type) {
-        case 'number':
+      switch (true) {
+        case this.filter.type === 'number':
           return [7].includes(this.filterOperator)
-        case 'date':
+        case this.filter.type === 'date':
           return [5].includes(this.filterOperator)
+        default:
+          return false
+        case this.filter.key === 'custom_attribute':
+          return true
       }
-      return false
     },
 
     isSpecialStringTypeFilterKey () {
@@ -309,6 +334,9 @@ export default {
           break
         case 'date':
           this.setDateValue(value)
+          break
+        case 'relation':
+          this.setRelationValue(value)
           break
         default:
           this.filterOperatorValue = value
@@ -497,6 +525,10 @@ export default {
       } else {
         return JSON.parse(JSON.stringify(this.filterOperatorValue))
       }
+    },
+
+    setRelationValue (value) {
+      this.filterOperatorValue = value
     },
 
     validateValue () {
