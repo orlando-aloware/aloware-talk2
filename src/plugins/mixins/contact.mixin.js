@@ -312,8 +312,8 @@ export default {
       }
 
       // checks if contact is the same in communication
-      if (!this.contact ||
-        !data.contact_id ||
+      if (_.isEmpty(this.contact) ||
+        _.isEmpty(data.contact_id) ||
         (this.contact &&
           data.contact_id &&
           parseInt(this.contact.id) !== parseInt(data.contact_id))) {
@@ -321,9 +321,10 @@ export default {
       }
 
       // check data loaded
-      if (this.communicationsAndAudits) {
+      if (!_.isEmpty(this.communicationsAndAudits)) {
         // check new communication exists in the old list
         const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
+
         if (!found) {
           // push new data to top of array
           this.communicationsAndAudits.push(data)
@@ -372,8 +373,8 @@ export default {
 
     updateCommunication (data) {
       // checks if contact is the same in communication
-      if (!this.contact ||
-        !data.contact_id ||
+      if (_.isEmpty(this.contact) ||
+        _.isEmpty(data.contact_id) ||
         (this.contact &&
           data.contact_id &&
           parseInt(this.contact.id) !== parseInt(data.contact_id))) {
@@ -381,13 +382,13 @@ export default {
       }
 
       // check data loaded
-      if (this.communicationsAndAudits) {
+      if (!_.isEmpty(this.communicationsAndAudits)) {
         // check new communication exists in the old list
-        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
-        if (found) {
+        const index = this.communicationsAndAudits.findIndex(communication => communication.id === data.id)
+
+        if (index > -1) {
           // update communication
-          data = _.merge(found[0], data)
-          this.$set(this.communicationsAndAudits, this.communicationsAndAudits.indexOf(found), data)
+          Object.assign(this.communicationsAndAudits[index], data)
         }
       }
     },
@@ -403,17 +404,18 @@ export default {
       }
 
       // check data loaded
-      if (this.communicationsAndAudits) {
+      if (!_.isEmpty(this.communicationsAndAudits)) {
         // try to find the communication
-        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
-        if (found) {
+        const index = this.communicationsAndAudits.findIndex(communication => communication.id === data.id)
+
+        if (index > -1) {
           // remove it from the list
-          this.communicationsAndAudits.splice(this.communicationsAndAudits.indexOf(found), 1)
+          this.communicationsAndAudits.splice(index, 1)
         }
       }
     },
 
-    async fetchContactInfo () {
+    async fetchContactInfo (isFetchContact = true) {
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
@@ -474,28 +476,40 @@ export default {
             this.scrollMessages()
           })
 
-        return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
-          if (res) {
-            return res
-          }
-        }).catch(err => {
-          if (this.$axios.isCancel(err) && err) {
-            console.log('Request canceled', err.message)
-            this.loadingContact = false
-          } else {
-            this.loadingContact = false
-            this.loadingContactCommunications = false
-            this.$handleErrors(err.response)
+        if (!isFetchContact) {
+          this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+          return
+        }
 
-            if (this.$route.name.includes('Inbox')) {
-              this.$router.push({ name: 'Inbox' })
+        return this.$axios.get(`/api/v2/contacts/${this.contactId}`,
+          {
+            cancelToken: this.source.token
+          })
+          .then(res => {
+            this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+            if (res) {
+              this.$VueEvent.fire('contact_activity_update_contact_from_fetch', res.data)
+              return res
             }
+          }).catch(err => {
+            this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+            if (this.$axios.isCancel(err) && err) {
+              console.log('Request canceled', err.message)
+              this.loadingContact = false
+            } else {
+              this.loadingContact = false
+              this.loadingContactCommunications = false
+              this.$handleErrors(err.response)
 
-            if (!this.$route.name.includes('Inbox')) {
-              this.$router.push({ path: '/contacts' })
+              if (this.$route.name.includes('Inbox')) {
+                this.$router.push({ name: 'Inbox' })
+              }
+
+              if (!this.$route.name.includes('Inbox')) {
+                this.$router.push({ path: '/contacts' })
+              }
             }
-          }
-        })
+          })
       } else {
         console.log('Failed to fetch contact info: Missing contact id!')
       }
@@ -1035,9 +1049,9 @@ export default {
       }
     },
 
-    processFetchContactInfo (callback) {
+    processFetchContactInfo (callback, isFetchContact = true) {
       this.loadingContactInProgress()
-      return this.fetchContactInfo().then(res => {
+      return this.fetchContactInfo(isFetchContact).then(res => {
         if (!res) {
           return
         }
@@ -1102,7 +1116,7 @@ export default {
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contactId)
-      if (typeof callback !== 'undefined') {
+      if (!_.isEmpty(callback)) {
         callback(selectedContact)
       }
     },

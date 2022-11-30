@@ -103,6 +103,9 @@ export default {
           break
         }
       }
+    },
+    'contact.id': function () {
+      this.sendingCommunications = []
     }
   },
   computed: {
@@ -129,7 +132,11 @@ export default {
   },
   methods: {
     isSameCommunication (comm1, comm2) {
-      if (comm1.type !== comm2.type) {
+      if (_.isEmpty(comm1) ||
+        _.isEmpty(comm2) ||
+        (!_.isEmpty(comm1) &&
+          !_.isEmpty(comm2) &&
+          comm1.type !== comm2.type)) {
         return false
       }
 
