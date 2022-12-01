@@ -170,10 +170,13 @@ export default {
     }
 
     this.contactComponentListeners.contactUpdated = (data) => {
-      // only fetch the latest contact data when updated contact is also the selected contact
-      // this is to avoid swarm of api request when numbers of contacts get updated
       const contactId = parseInt(data.id)
-      if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
+
+      // check if we're in the correct contact route and
+      // contact object
+      if (this.contact &&
+        parseInt(this.contact.id) === contactId &&
+        parseInt(this.$route.params.id) === contactId) {
         // just update the contact attributes
         const updatedContact = this.$jsonClone(this.contact)
         const contact = this.$jsonClone(data)
@@ -185,8 +188,7 @@ export default {
     }
 
     this.contactComponentListeners.contactAuditCreated = (data) => {
-      // only fetch the latest contact data when updated contact is also the selected contact
-      // this is to avoid swarm of api request when numbers of contacts get updated
+      // check if current contact is the same as audit's contact id
       if (this.contact &&
         parseInt(this.contact.id) === parseInt(data.contact_id) &&
         data.property === 'contact_task_status') {
