@@ -421,6 +421,39 @@ export default {
       'setPendingTaskCount',
       'updateChannelChangedFilterFields'
     ]),
+    initInboxTaskRoute () {
+      const inboxRoutes = [
+        'Inbox',
+        'Inbox Channel Task Status',
+        'Inbox Contact Task',
+        'Inbox Contact Communication'
+      ]
+
+      // if currently in inbox routes which works with contact's
+      // task status, compare if current task is in the correct
+      // inbox route
+      if (!inboxRoutes.includes(this.$route.name) ||
+        (inboxRoutes.includes(this.$route.name) &&
+          !isEmpty(this.$route.params) &&
+          this.$route.params.status !== this.statusText)) {
+        return
+      }
+
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+
+      this.loadContactTasks(false).finally(() => {
+        if (this.$route.params.id) {
+          const id = this.$route.params.id
+          const contact = this.contactTasks.find(item => item.id.toString() === id)
+          if (contact) {
+            this.setSelectedContact(contact)
+          }
+        }
+      })
+    },
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -795,37 +828,7 @@ export default {
   mounted () {
     this.setContacts([])
     this.setStatus()
-
-    const inboxRoutes = [
-      'Inbox',
-      'Inbox Channel Task Status',
-      'Inbox Contact Task',
-      'Inbox Contact Communication'
-    ]
-
-    // if currently in inbox routes which works with contact's
-    // task status, compare if current task is in the correct
-    // inbox route
-    if (inboxRoutes.includes(this.$route.name)) {
-      if (!isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
-        return
-      }
-
-      this.setLoadingPendingTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      this.setLoadingOpenTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-
-      this.loadContactTasks(false).finally(() => {
-        if (this.$route.params.id) {
-          const id = this.$route.params.id
-          const contact = this.contactTasks.find(item => item.id.toString() === id)
-          if (contact) {
-            this.setSelectedContact(contact)
-          }
-        }
-      })
-    }
+    this.initInboxTaskRoute()
 
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
       this.setSelectedContact({})
