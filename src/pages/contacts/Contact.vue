@@ -131,7 +131,8 @@ export default {
       drawer: false,
       detailsOpen: false,
       contactListSidebarOpen: false,
-      leaving: false
+      leaving: false,
+      contactComponentListeners: {}
     }
   },
 
@@ -168,7 +169,7 @@ export default {
       this.fetchContact()
     }
 
-    this.$VueEvent.listen('contact_updated', (data) => {
+    this.contactComponentListeners.contactUpdated = (data) => {
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
       const contactId = parseInt(data.id)
@@ -181,27 +182,31 @@ export default {
         Object.assign(updatedContact, contact)
         this.setContact(updatedContact)
       }
-    })
+    }
 
-    this.$VueEvent.listen('contact_audit_created', (data) => {
+    this.contactComponentListeners.contactAuditCreated = (data) => {
       // only fetch the latest contact data when updated contact is also the selected contact
       // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.contact && parseInt(this.contact.id) === parseInt(data.contact_id)) {
-        if (data.property === 'contact_task_status') {
-          const contact = _.cloneDeep(this.contact)
-          contact.task_status = parseInt(data.to)
-          this.setContact(contact)
-        }
+      if (this.contact &&
+        parseInt(this.contact.id) === parseInt(data.contact_id) &&
+        data.property === 'contact_task_status') {
+        const contact = _.cloneDeep(this.contact)
+        contact.task_status = parseInt(data.to)
+        this.setContact(contact)
       }
-    })
+    }
 
-    this.$VueEvent.listen('contact_disposed', (disposedContact) => {
+    this.contactComponentListeners.contactDisposed = (disposedContact) => {
       if (disposedContact.id === this.contact.id) {
         const contact = _.cloneDeep(this.contact)
         contact.disposition_status_id = disposedContact.disposition_status_id
         this.setContact(contact)
       }
-    })
+    }
+
+    this.$VueEvent.listen('contact_updated', this.contactComponentListeners.contactUpdated)
+    this.$VueEvent.listen('contact_audit_created', this.contactComponentListeners.contactAuditCreated)
+    this.$VueEvent.listen('contact_disposed', this.contactComponentListeners.contactDisposed)
   },
 
   created () {
@@ -261,6 +266,9 @@ export default {
     this.setIsContactMixinUsed(false)
     this.removeListeners()
     this.setContact({})
+    this.$VueEvent.stop('contact_updated', this.contactComponentListeners.contactUpdated)
+    this.$VueEvent.stop('contact_audit_created', this.contactComponentListeners.contactAuditCreated)
+    this.$VueEvent.stop('contact_disposed', this.contactComponentListeners.contactDisposed)
   },
 
   beforeRouteLeave (to, from, next) {

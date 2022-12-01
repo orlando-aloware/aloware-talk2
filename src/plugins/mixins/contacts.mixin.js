@@ -613,12 +613,12 @@ export default {
       }
     },
     stopEvents () {
-      this.$VueEvent.listen('filteredFetchContacts', this.listeners.filteredFetchContacts)
-      this.$VueEvent.listen('fetchContacts', this.listeners.fetchContacts)
-      this.$VueEvent.listen('clearContacts', this.listeners.clearContacts)
-      this.$VueEvent.listen('onLoadMoreContacts', this.listeners.onLoadMoreContacts)
-      this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-      this.$VueEvent.listen('contactUpdated', this.listeners.contactUpdated)
+      this.$VueEvent.stop('filteredFetchContacts', this.listeners.filteredFetchContacts)
+      this.$VueEvent.stop('fetchContacts', this.listeners.fetchContacts)
+      this.$VueEvent.stop('clearContacts', this.listeners.clearContacts)
+      this.$VueEvent.stop('onLoadMoreContacts', this.listeners.onLoadMoreContacts)
+      this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.stop('contactUpdated', this.listeners.contactUpdated)
     },
     initiateFetch (data, fromRefresh = false) {
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
