@@ -358,11 +358,5 @@ export default {
   },
   setDefaultIsShortenedUrlRemembered: ({ commit }) => {
     commit('SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED')
-  },
-  addNewCommunicationInprogressContactFetch ({ commit }, id) {
-    commit('ADD_NEW_COMMUNICATION_INPROGRESS_CONTACT_FETCH', id)
-  },
-  removeNewCommunicationInprogressContactFetch ({ commit }, id) {
-    commit('REMOVE_NEW_COMMUNICATION_INPROGRESS_CONTACT_FETCH', id)
   }
 }
