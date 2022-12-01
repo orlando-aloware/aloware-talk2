@@ -806,8 +806,11 @@ export default {
     // if currently in inbox routes which works with contact's
     // task status, compare if current task is in the correct
     // inbox route
-    if (inboxRoutes.includes(this.$route.name) &&
-      !isEmpty(this.$route.params) && this.$route.params.status === this.statusText) {
+    if (inboxRoutes.includes(this.$route.name)) {
+      if (!isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
+        return
+      }
+
       this.setLoadingPendingTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       this.setLoadingOpenTaskCount(true)
