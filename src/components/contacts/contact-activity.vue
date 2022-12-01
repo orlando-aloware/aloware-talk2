@@ -324,7 +324,7 @@
                 <i class="material-icons help text-light-blue-4"
                    :class="statusClass"
                    :title="'sending'"
-                   v-if="communication.current_status2 === undefined">done</i>
+                   v-if="communication.current_status2 === undefined">access_time</i>
               </template>
 
               <i class="material-icons help text-danger"
@@ -467,6 +467,10 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     getCommunicationClass () {
+      if (this.communication.current_status2 === undefined) {
+        return 'sending text-black'
+      }
+
       if (this.communication.direction === CommunicationDirection.INBOUND) {
         return 'inbound bg-grey-50'
       }
