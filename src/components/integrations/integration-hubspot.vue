@@ -165,21 +165,27 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'integration-hubspot',
 
   components: { WorkflowSelector },
 
+  mixins: [
+    hubspotIntegrationMixin
+  ],
+
   props: {
     contact: {
       type: Object,
       required: true
     },
+
     dialer_mode: {
       type: Boolean,
       required: false,
@@ -199,28 +205,19 @@ export default {
     },
 
     hubspotContactBaseLink () {
-      if (this.currentCompany &&
-        this.currentCompany.hubspot_integration_enabled &&
-        this.contact &&
-        ((this.contact.integrations &&
-            this.contact.integrations.hubspot) ||
-          (this.contact.integration_data &&
-            this.contact.integration_data.hubspot)
-        ) &&
-        this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
+      if (!this.contactIntegrationDataLoaded) {
+        return
       }
 
-      return false
+      return this.getHubspotContactBaseLink(this.contact)
     },
 
     hubspotLink () {
-      if (this.hubspotContactBaseLink) {
-        const contactId = this.getContactId()
-        return contactId ? `${this.hubspotContactBaseLink}contact/${contactId}` : false
+      if (!this.contactIntegrationDataLoaded) {
+        return
       }
 
-      return false
+      return this.getHubspotLink(this.contact)
     }
   },
 
@@ -234,8 +231,13 @@ export default {
         email: null,
         id: null
       },
-      integration_data: null
+      integration_data: null,
+      contactIntegrationDataLoaded: false
     }
+  },
+
+  async created () {
+    await this.getContactIntegrationData()
   },
 
   async mounted () {
@@ -245,6 +247,23 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', ['setContact', 'setContactClone']),
+
+    getContactIntegrationData () {
+      return window.axios.get(`api/v2/contacts/${this.contact.id}/integration-data`)
+        .then(res => {
+          if (res?.data) {
+            this.contact.integration_data = res.data
+
+            // update contact related states
+            this.setContact(this.contact)
+            this.setContactClone(this.contact)
+
+            this.contactIntegrationDataLoaded = true
+          }
+        })
+    },
+
     getData () {
       return talk2Api.V1.contact.getIntegrationData(this.contact.id, {
         params: {
@@ -254,22 +273,6 @@ export default {
       }).then(response => {
         this.integration_data = response.data
       })
-    },
-
-    getContactId () {
-      const contactId = { data: null }
-      switch (true) {
-        case this.contact.integration_data && !_.isEmpty(this.contact.integration_data):
-          contactId.data = this.contact.integration_data.hubspot.contact_id
-          break
-        case this.contact.integrations && !_.isEmpty(this.contact.integrations):
-          contactId.data = this.contact.integrations.hubspot.contact_id
-          break
-        default:
-          contactId.data = null
-      }
-
-      return contactId.data
     },
 
     onWorkflowSelected (workflowId) {
@@ -318,6 +321,8 @@ export default {
   watch: {
     'contact.id': _.debounce(function () {
       if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+        this.contactIntegrationDataLoaded = false
+        this.getContactIntegrationData()
         this.getData()
       }
     }, 500)
