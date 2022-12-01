@@ -585,6 +585,7 @@ export default {
     // new in-app voicemail notification
     this.$VueEvent.listen('new_in_app_voicemail', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+        if (this.currentCompany && this.currentCompany.show_call_missed_modal) this.$bvModal.show('missed-call-modal')
         this.processActionNotification(communication, 'missed voicemail')
       }
     })
