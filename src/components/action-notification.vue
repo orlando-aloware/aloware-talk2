@@ -176,7 +176,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import { get, isEmpty } from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import {
   mentionsMixin,
@@ -270,19 +270,19 @@ export default {
     },
 
     queue () {
-      return _.get(this.notifications, `${this.id}.queue`, null)
+      return get(this.notifications, `${this.id}.queue`, null)
     },
 
     message () {
-      const message = _.get(this.notifications[this.id], 'message', '')
+      const message = get(this.notifications[this.id], 'message', '')
 
       return this.parseMentionToView(message)
     },
     messageIcon () {
-      return _.get(this.notifications[this.id], 'messageIcon', null)
+      return get(this.notifications[this.id], 'messageIcon', null)
     },
     title () {
-      const title = _.get(this.notifications[this.id], 'title', '')
+      const title = get(this.notifications[this.id], 'title', '')
 
       const fixedTitle = this.$options.filters.fixPhone(title)
 
@@ -293,13 +293,13 @@ export default {
       return fixedTitle
     },
     dateTime () {
-      return _.get(this.notifications[this.id], 'dateTime', '')
+      return get(this.notifications[this.id], 'dateTime', '')
     },
     contactId () {
-      return _.get(this.notifications[this.id], 'contactId', '')
+      return get(this.notifications[this.id], 'contactId', '')
     },
     communicationId () {
-      return _.get(this.notifications[this.id], 'communicationId', '')
+      return get(this.notifications[this.id], 'communicationId', '')
     },
     link () {
       if (['system', 'incomingCall', 'callFishing'].includes(this.id)) {
@@ -310,49 +310,49 @@ export default {
       }
     },
     attachment () {
-      return _.get(this.notifications[this.id], 'attachment', '')
+      return get(this.notifications[this.id], 'attachment', '')
     },
     noAutoHide () {
       return ['system', 'incomingCall', 'callFishing'].includes(this.id)
     },
     campaignId () {
-      return _.get(this.notifications[this.id], 'campaignId', null)
+      return get(this.notifications[this.id], 'campaignId', null)
     },
     campaignName () {
-      return _.get(this.notifications[this.id], 'campaignName', null)
+      return get(this.notifications[this.id], 'campaignName', null)
     },
     ringGroupId () {
-      return _.get(this.notifications[this.id], 'ringGroupId', null)
+      return get(this.notifications[this.id], 'ringGroupId', null)
     },
     ringGroupName () {
-      return _.get(this.notifications[this.id], 'ringGroupName', null)
+      return get(this.notifications[this.id], 'ringGroupName', null)
     },
     phoneNumber () {
-      return _.get(this.notifications[this.id], 'phoneNumber', null)
+      return get(this.notifications[this.id], 'phoneNumber', null)
     },
     communication () {
-      return _.get(this.notifications[this.id], 'communication', null)
+      return get(this.notifications[this.id], 'communication', null)
     },
     contact () {
-      return _.get(this.notifications[this.id], 'contact', null)
+      return get(this.notifications[this.id], 'contact', null)
     },
     isValidPhoneShowInfo () {
-      const dialerCommunicationId = _.get(this.dialer, 'communication.id', null)
-      const callFishingCommunicationId = _.get(this.dialer, 'callFishing.communication', null)
+      const dialerCommunicationId = get(this.dialer, 'communication.id', null)
+      const callFishingCommunicationId = get(this.dialer, 'callFishing.communication', null)
       return (
         (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
           (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
         !this.dialer.parkedCall
     },
     queueCount () {
-      if (_.isEmpty(this.queue)) {
+      if (isEmpty(this.queue)) {
         return 1
       }
 
       return this.queue.length + 1
     },
     isCommunicationInCallFishingQueue () {
-      return !_.isEmpty(this.callFishingQueue.find(queue => _.get(queue, 'communicationId', null) === this.communicationId))
+      return !isEmpty(this.callFishingQueue.find(queue => get(queue, 'communicationId', null) === this.communicationId))
     },
 
     getSource () {
@@ -392,34 +392,66 @@ export default {
     },
 
     isSequence () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.communication.workflow_id
     },
 
     isIntroduceToRg () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
     },
 
     isIntroduceToUser () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER
     },
 
     isAddToRg () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return !this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_RG
     },
 
     isAddToUser () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return !this.callIsIntroduced && this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_ADD_USER
     },
 
     callIsIntroduced () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.communication.is_introduce
     },
 
     isColdTransferRg () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_RG
     },
 
     isColdTransferUser () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
     }
   },
@@ -455,7 +487,7 @@ export default {
       if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
           !this.isCommunicationInCallFishingQueue) ||
         (this.id === 'incomingCall' && document.getElementById('incomingCall') &&
-          _.isEmpty(this.dialer.call))
+          isEmpty(this.dialer.call))
       ) {
         this.processRemoveFromNotification(this.communication)
         return
@@ -604,7 +636,7 @@ export default {
     onNotificationClick (event) {
       const className = { data: null }
       const found = event.path.find((item) => {
-        className.data = _.get(item, 'className', null)
+        className.data = get(item, 'className', null)
         return className.data && typeof className.data === 'string' && (className.data.includes('call-actions') || className.data.includes('call-fishing-actions'))
       })
 
@@ -640,7 +672,7 @@ export default {
 
       const className = { data: null }
       const found = event.path.find((item) => {
-        className.data = _.get(item, 'className', null)
+        className.data = get(item, 'className', null)
         return className.data && typeof className.data === 'string' && (className.data.includes('notification-icon'))
       })
 
@@ -665,7 +697,7 @@ export default {
 
       const className = { data: null }
       const found = event.path.find((item) => {
-        className.data = _.get(item, 'className', null)
+        className.data = get(item, 'className', null)
         return className.data && typeof className.data === 'string' && (className.data.includes('notification-details'))
       })
 
