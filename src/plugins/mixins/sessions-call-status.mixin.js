@@ -138,7 +138,7 @@ export default {
   },
   methods: {
     ...mapActions('contacts', ['setContact']),
-    ...mapActions(['setShowPhone']),
+    ...mapActions(['setShowPhone', 'setDialerContact']),
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
@@ -198,6 +198,14 @@ export default {
           companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
           contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
         })
+
+        const dialerContactId = get(this.dialer.contact, 'id', null)
+
+        if (dialerContactId &&
+          parseInt(this.taskToCall.id) !== parseInt(dialerContactId)) {
+          this.setDialerContact(this.taskToCall)
+        }
+
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')

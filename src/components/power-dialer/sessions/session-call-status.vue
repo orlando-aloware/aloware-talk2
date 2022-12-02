@@ -543,6 +543,13 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
+    processHangup () {
+      this.$VueEvent.fire('hangupCall')
+
+      if (this.wrapUpSeconds === -1) {
+        this.$VueEvent.fire('resetCall')
+      }
+    },
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
 
@@ -951,7 +958,7 @@ export default {
       // hangup in-progress call
       if (this.callInProgress &&
         this.dialer.currentStatus !== 'WRAP_UP') {
-        this.$VueEvent.fire('hangupCall')
+        this.processHangup()
       }
 
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
@@ -974,7 +981,7 @@ export default {
       }
 
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.$VueEvent.fire('hangupCall')
+        this.processHangup()
       }
     },
     async onNextTaskWhenOnWrapUp () {
@@ -1035,7 +1042,7 @@ export default {
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       this.redialTask(this.activeTask).then(() => {
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-          this.$VueEvent.fire('hangupCall')
+          this.processHangup()
         }
 
         this.powerDialerTasks.in_queue.push(this.activeTask)

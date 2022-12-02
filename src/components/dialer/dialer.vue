@@ -55,7 +55,8 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('powerDialer', ['activeTask'])
   },
 
   created () {
@@ -396,7 +397,17 @@ export default {
 
         this.setDialerCommunication(res.data)
 
-        if (this.dialer.communication.contact) {
+        const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // if in power dialer session, we must match the active task (contact)'s id
+        // with the communication's contact id
+        // else, set the contact.
+        if ((routeTitle &&
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+          (routeTitle !== 'Power Dialer Sessions' &&
+            this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
 
