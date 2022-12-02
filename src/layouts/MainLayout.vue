@@ -703,12 +703,6 @@ export default {
       }
 
       if (this.checkCommunicationMatchesUserAccessibility(communication) || isCommunicationHasUnownedContact) {
-        // missed call notification
-        if (communication.type === CommunicationTypes.CALL &&
-          [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(communication.disposition_status2) &&
-          !this.profile.sleep_mode) {
-          if (this.currentCompany && this.currentCompany.show_call_missed_modal) this.$bvModal.show('missed-call-modal')
-        }
 
         // if disposition status is not in-progress
         // or current status is not queued / ring all, close call notification
