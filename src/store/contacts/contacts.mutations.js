@@ -515,12 +515,5 @@ export default {
   },
   SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED (state) {
     state.isShortenedUrlRemembered = false
-  },
-  ADD_NEW_COMMUNICATION_INPROGRESS_CONTACT_FETCH (state, id) {
-    state.newCommunicationInprogressContactFetch.push(id)
-  },
-  REMOVE_NEW_COMMUNICATION_INPROGRESS_CONTACT_FETCH (state, id) {
-    const index = state.newCommunicationInprogressContactFetch.findIndex(item => item === id)
-    state.newCommunicationInprogressContactFetch.splice(index, 1)
   }
 }

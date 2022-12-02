@@ -10,8 +10,10 @@
                               :auto-close="autoClose"
                               :minute-interval="minuteInterval"
                               :disabled-hours="disabledHours"
+                              :no-value-to-custom-elem="true"
                               v-model="date"
                               @input="onInput">
+      <slot></slot>
     </vue-ctk-date-time-picker>
   </div>
 </template>
@@ -19,9 +21,14 @@
 <script>
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
+
 export default {
   name: 'date-selector',
-  components: { VueCtkDateTimePicker },
+
+  components: {
+    VueCtkDateTimePicker
+  },
+
   props: {
     value: {
       required: false
@@ -75,18 +82,25 @@ export default {
       type: String,
       required: false,
       default: 'l'
+    },
+    noValueToCustomElem: {
+      type: Boolean,
+      default: false
     }
   },
+
   data () {
     return {
       date: this.value
     }
   },
+
   methods: {
     onInput (value) {
       this.$emit('dateSelected', value)
     }
   },
+
   created () {
     if (this.value) {
       this.date = window.moment(this.value)

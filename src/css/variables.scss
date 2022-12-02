@@ -428,3 +428,12 @@ $purple-2: #BB6BD9;
 $f-size-12: 12px;
 $f-size-13: 13px;
 $f-size-14: 14px;
+
+// Calendar events colors
+$upcoming-appointment: #256EFF;
+$past-appointment: rgba($upcoming-appointment, 0.6);
+$canceled-appointment: $upcoming-appointment;
+$upcoming-reminder: #8956F8;
+$past-reminder: rgba($upcoming-reminder, 0.6);
+$canceled-reminder: $upcoming-reminder;
+$completed-event: #00BF4A;

@@ -17,7 +17,8 @@ export default {
       callInProgress: false,
       countdownStarted: false,
       wrapUp: false,
-      reRouteModal: false
+      reRouteModal: false,
+      loadingNext: false
     }
   },
   computed: {
@@ -55,6 +56,9 @@ export default {
 
       switch (this.dialer?.currentStatus) {
         case 'READY':
+          // reset call in-progress flag
+          this.callInProgress = false
+
           if (this.timerIsOver || !this.isSessionRunning || this.reRouteModal) {
             return 'Ready'
           }
@@ -134,7 +138,7 @@ export default {
   },
   methods: {
     ...mapActions('contacts', ['setContact']),
-    ...mapActions(['setShowPhone']),
+    ...mapActions(['setShowPhone', 'setDialerContact']),
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
@@ -194,6 +198,15 @@ export default {
           companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
           contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
         })
+
+        const dialerContactId = get(this.dialer.contact, 'id', null)
+
+        if (!dialerContactId ||
+          (dialerContactId &&
+            parseInt(this.activeTask.id) !== parseInt(dialerContactId))) {
+          this.setDialerContact(this.activeTask)
+        }
+
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -220,6 +233,7 @@ export default {
           // }
           // this.skipped_list.push(autoDialTask.id)
           this.$generalNotification(message, 'warning')
+          this.onNextTask()
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)
