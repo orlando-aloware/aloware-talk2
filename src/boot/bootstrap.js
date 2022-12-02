@@ -500,6 +500,14 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
   })
 }, 500)
 
+Vue.prototype.$jsonClone = (value) => {
+  if (value) {
+    return JSON.parse(JSON.stringify(value))
+  }
+
+  return value
+}
+
 // eslint-disable-next-line no-extend-native
 String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1)

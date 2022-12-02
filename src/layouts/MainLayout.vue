@@ -232,7 +232,8 @@ import {
   parkCallMixin,
   visibilityMixin,
   unownedContactTaskMixin,
-  agentMixin
+  agentMixin,
+  contactV2AttributesMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -249,7 +250,6 @@ import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
-import talk2Api from 'src/plugins/api/api'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
@@ -283,7 +283,8 @@ export default {
     parkCallMixin,
     visibilityMixin,
     unownedContactTaskMixin,
-    agentMixin
+    agentMixin,
+    contactV2AttributesMixin
   ],
 
   data () {
@@ -720,11 +721,7 @@ export default {
           if (!communication.contact_id) {
             return
           }
-
-          const loopData = {
-            keys: Object.keys(communication),
-            key: null
-          }
+          const newCommunication = this.$jsonClone(communication)
 
           const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
             [
@@ -739,10 +736,8 @@ export default {
 
           if (isActiveInLiveContactsIndex >= 0 && this.liveContacts[isActiveInLiveContactsIndex].last_communication.id === communication.id) {
             const liveContacts = _.cloneDeep(this.liveContacts)
-
-            for (loopData.key of loopData.keys) {
-              liveContacts[isActiveInLiveContactsIndex].last_communication[loopData.key] = communication[loopData.key]
-            }
+            // add the v2 contact attributes that we need
+            Object.assign(liveContacts[isActiveInLiveContactsIndex], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[isActiveInLiveContactsIndex]))
 
             // if type is call and completed/voicemail then remove from live calls
             if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
@@ -778,10 +773,8 @@ export default {
           const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
           if (index >= 0) {
             const liveContacts = _.cloneDeep(this.liveContacts)
-
-            for (loopData.key of loopData.keys) {
-              liveContacts[index].last_communication[loopData.key] = communication[loopData.key]
-            }
+            // add the v2 contact attributes that we need
+            Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
 
             this.setLiveContacts(
               [
@@ -820,19 +813,22 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
+      const contact = this.$jsonClone(data)
+      // add the v2 contact attributes that we need
+      Object.assign(contact, this.addV2ContactAttributes(contact))
       if (this.$route.path.indexOf('channels/inbox') === -1) {
         // only fetch the latest contact data when updated contact is also the selected contact
         // this is to avoid swarm of api request when numbers of contacts get updated
         if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
-          talk2Api.V2.contacts.get(data.id).then(response => {
-            const contact = response.data
-            // check data loaded
-            this.setSelectedContact(contact)
-          }).catch(err => {
-            console.log(err)
-          })
+          // just update the contact attributes
+          const updatedContact = this.$jsonClone(this.selectedContact)
+          Object.assign(updatedContact, contact)
+          this.setSelectedContact(updatedContact)
         }
       }
+
+      // update contact in group
+      this.$VueEvent.fire('update-contact-in-group', contact)
     })
 
     this.$VueEvent.listen('new_communication', (communication) => {
@@ -857,44 +853,60 @@ export default {
           return
         }
 
-        setTimeout(() => {
-          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-            const contact = response.data
-            const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-            // check if communication is a live call
-            if (communication.type === CommunicationTypes.CALL && [CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-              [CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-                CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(communication.current_status2)) {
-              const liveContacts = _.cloneDeep(this.liveContacts)
-              if (!isInLiveContacts) {
-                liveContacts.push(contact)
-              }
-              this.setLiveContacts(
-                [
-                  // connected calls
-                  ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
-                  // parked calls
-                  ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
-                  // incoming calls
-                  ...liveContacts.filter(item => [
-                    CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                    CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                    CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                    CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                    CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-                  ].includes(item.last_communication.current_status2))
-                ]
-              )
-            }
-          }).catch(err => {
-            console.log(err)
-          })
-        }, 1000)
+        const contact = this.$jsonClone(communication.contact)
+        const newCommunication = this.$jsonClone(communication)
+        // add the v2 contact attributes that we need
+        Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
+
+        const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
+        const inProgressStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+        ]
+        const onHoldStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+        ]
+        const callingStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+        ]
+        const liveCallStatuses = [
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+        ]
+        const commDirections = [
+          CommunicationDirections.INBOUND,
+          CommunicationDirections.OUTBOUND
+        ]
+
+        // check if communication is a live call
+        if (communication.type === CommunicationTypes.CALL &&
+          commDirections.includes(communication.direction) &&
+          liveCallStatuses.includes(communication.current_status2)) {
+          const liveContacts = _.cloneDeep(this.liveContacts)
+
+          if (!isInLiveContacts) {
+            liveContacts.push(contact)
+          }
+
+          this.setLiveContacts(
+            [
+              // connected calls
+              ...liveContacts.filter(item => inProgressStatuses.includes(item.last_communication.current_status2)),
+              // parked calls
+              ...liveContacts.filter(item => onHoldStatuses.includes(item.last_communication.current_status2)),
+              // incoming calls
+              ...liveContacts.filter(item => callingStatuses.includes(item.last_communication.current_status2))
+            ]
+          )
+        }
       }
     })
 

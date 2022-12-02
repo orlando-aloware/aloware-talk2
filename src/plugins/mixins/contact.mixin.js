@@ -246,27 +246,7 @@ export default {
       }
 
       this.addNewCommunication(data)
-
-      // check if there's no on-going fetch for a certain contact
-      if (!this.newCommunicationInprogressContactFetch.includes(data.contact.id)) {
-        this.addNewCommunicationInprogressContactFetch(data.contact.id)
-        talk2Api.V2.contacts.get(data.contact.id)
-          .then(response => {
-            if (data.contact_id === this.contact.id) {
-              this.setContact(response.data)
-              this.setContactClone(response.data)
-            }
-
-            this.removeNewCommunicationInprogressContactFetch(data.contact.id)
-            this.$VueEvent.fire('inbox_contact_updated', {
-              contact: response.data,
-              communication: data
-            })
-          }).catch(err => {
-            this.removeNewCommunicationInprogressContactFetch(data.contact.id)
-            console.log(err)
-          })
-      }
+      this.processContactUpdate(data.contact, data)
     }
 
     this.listeners.updateCommunication = (data) => {
@@ -282,39 +262,16 @@ export default {
     }
 
     this.listeners.contactUpdated = (data) => {
-      // check data loaded
-      if (this.contact && parseInt(this.contact.id) === parseInt(data.id)) {
-        const updatedContact = _.get(this, 'contact', {})
-        const item = { index: null }
-        for (item.index in data) {
-          if (item.index === 'communications_and_audits') {
-            continue
-          }
-
-          if (item.index === 'unread_texts_count' && typeof data[item.index] === 'undefined') {
-            updatedContact[item.index] = 0
-            continue
-          }
-
-          updatedContact[item.index] = data[item.index]
-        }
-
-        if (typeof updatedContact['unread_texts_count'] !== 'undefined' &&
-          typeof data['unread_texts_count'] === 'undefined') {
-          updatedContact['unread_texts_count'] = 0
-        }
-
-        this.updateSelectedContact(updatedContact)
-        if (this.contact.id === updatedContact.id) {
-          this.setContact(updatedContact)
-        }
-        this.updateContacts(updatedContact)
-      }
+      // update the current contact
+      this.processContactUpdate(data, null, true)
     }
 
     this.listeners.contactAuditCreated = (data) => {
       // check data loaded
-      if (parseInt(data.contact_id) === parseInt(this.contactId)) {
+      if (!_.isEmpty(this.contact) &&
+        data.contact_id !== null &&
+        data.contact_id !== undefined &&
+        parseInt(data.contact_id) === parseInt(this.contact.id)) {
         this.updateSelectedContactAudit(data)
         this.scrollMessages()
       }
@@ -324,7 +281,13 @@ export default {
       this.processFetchContactInfo(callback)
     }
 
-    this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
+    this.listeners.updateContactInGroup = (contact) => {
+      // update contact in the group of contacts
+      // only in Contact page
+      if (this.$route.name === 'Contact') {
+        this.updateContacts(contact)
+      }
+    }
   },
 
   methods: {
@@ -334,6 +297,8 @@ export default {
       this.$VueEvent.listen('delete_communication', this.listeners.deleteCommunication)
       this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
       this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
+      this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
+      this.$VueEvent.listen('update-contact-in-group', this.listeners.updateContactInGroup)
     },
     removeListeners () {
       this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
@@ -341,27 +306,88 @@ export default {
       this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
       this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
       this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+      this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
+      this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
     },
-    addNewCommunication: function (data) {
-      if (this.smsOnly && data.type !== CommunicationTypes.SMS) {
+    isCommOrAuditExists (communication, data) {
+      // if communication and data is a communication (has type attribute),
+      // check if ids match
+      if ('type' in communication &&
+        'type' in data &&
+        communication.id === data.id) {
+        return true
+      }
+
+      // if communication and data is a contact audit (no type attribute),
+      // check if ids match. Else, false
+      return !('type' in communication) &&
+        !('type' in data) &&
+        communication.id === data.id
+    },
+    isNotSameContact (contactId) {
+      const isContactIdEmpty = [null, undefined].includes(contactId)
+      const isContactEmpty = _.isEmpty(this.contact)
+      const isNotSameContact = !isContactEmpty &&
+        !isContactIdEmpty &&
+        parseInt(this.contact.id) !== parseInt(contactId)
+
+      return isContactEmpty ||
+        isContactIdEmpty ||
+        isNotSameContact
+    },
+    addNewCommunication (data) {
+      if (this.smsOnly &&
+        data.type !== CommunicationTypes.SMS) {
         return false
       }
 
       // checks if contact is the same in communication
-      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
+      if (this.isNotSameContact(data.contact_id)) {
         return false
       }
 
-      // check data loaded
-      if (this.communicationsAndAudits) {
-        // check new communication exists in the old list
-        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
-        if (!found) {
-          // push new data to top of array
-          this.communicationsAndAudits.push(data)
-          this.removeDuplicateCommunicationsAndAudits()
-          this.scrollMessages()
-        }
+      // check new communication exists in the old list
+      const found = this.communicationsAndAudits
+        .find(communication => this.isCommOrAuditExists(communication, data))
+
+      if (!found) {
+        // push new data to top of array
+        this.communicationsAndAudits.push(data)
+        this.removeDuplicateCommunicationsAndAudits()
+        this.scrollMessages()
+      }
+    },
+
+    processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
+      const updatedContact = this.$jsonClone(this.contact)
+      const contactEvent = this.$jsonClone(contact)
+      let newCommunication = null
+
+      if (communciation) {
+        newCommunication = this.$jsonClone(communciation)
+      }
+
+      // add the v2 contact attributes that we need
+      Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
+
+      // check if communication's contact is the same as the current contact
+      if (parseInt(contact.id) === parseInt(this.contact.id)) {
+        deleteCommsAndAudits && delete contact.communications_and_audits
+        Object.assign(updatedContact, contact)
+        this.setContact(updatedContact)
+        this.setContactClone(updatedContact)
+        this.updateSelectedContact(updatedContact)
+
+        // update the contact/task in Inbox
+        this.$VueEvent.fire('contact_updated_from_contact_mixin', contact)
+      }
+
+      // update contact in inbox's group of contacts/tasks
+      if (!_.isEmpty(newCommunication)) {
+        this.$VueEvent.fire('inbox_contact_updated', {
+          contact: updatedContact,
+          communication: newCommunication
+        })
       }
     },
 
@@ -371,40 +397,43 @@ export default {
 
     updateCommunication (data) {
       // checks if contact is the same in communication
-      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
+      if (this.isNotSameContact(data.contact_id)) {
         return false
       }
 
       // check data loaded
-      if (this.communicationsAndAudits) {
+      if (!_.isEmpty(this.communicationsAndAudits)) {
         // check new communication exists in the old list
-        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
-        if (found) {
+        const index = this.communicationsAndAudits
+          .findIndex(communication => this.isCommOrAuditExists(communication, data))
+
+        if (index > -1) {
           // update communication
-          data = _.merge(found[0], data)
-          this.$set(this.communicationsAndAudits, this.communicationsAndAudits.indexOf(found), data)
+          Object.assign(this.communicationsAndAudits[index], data)
         }
       }
     },
 
     deleteCommunication (data) {
       // checks if contact is the same in communication
-      if (this.contact && data.contact && this.contact.id !== data.contact.id) {
+      if (this.isNotSameContact(data.contact_id)) {
         return false
       }
 
       // check data loaded
-      if (this.communicationsAndAudits) {
+      if (!_.isEmpty(this.communicationsAndAudits)) {
         // try to find the communication
-        const found = this.communicationsAndAudits.find(communication => communication.id === data.id)
-        if (found) {
+        const index = this.communicationsAndAudits
+          .findIndex(communication => this.isCommOrAuditExists(communication, data))
+
+        if (index > -1) {
           // remove it from the list
-          this.communicationsAndAudits.splice(this.communicationsAndAudits.indexOf(found), 1)
+          this.communicationsAndAudits.splice(index, 1)
         }
       }
     },
 
-    async fetchContactInfo () {
+    async fetchContactInfo (isFetchContact = true) {
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
@@ -465,28 +494,43 @@ export default {
             this.scrollMessages()
           })
 
-        return this.$axios.get(`/api/v2/contacts/${this.contactId}`, { cancelToken: this.source.token }).then(res => {
-          if (res) {
-            return res
-          }
-        }).catch(err => {
-          if (this.$axios.isCancel(err) && err) {
-            console.log('Request canceled', err.message)
-            this.loadingContact = false
-          } else {
+        if (!isFetchContact) {
+          this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+          return
+        }
+
+        return this.$axios.get(`/api/v2/contacts/${this.contactId}`,
+          {
+            cancelToken: this.source.token
+          })
+          .then(res => {
+            this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+            if (res) {
+              this.$VueEvent.fire('contact_activity_update_contact_from_fetch', res.data)
+              return res
+            }
+          }).catch(err => {
+            this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+
+            if (this.$axios.isCancel(err) && err) {
+              console.log('Request canceled', err.message)
+              this.loadingContact = false
+              return
+            }
+
             this.loadingContact = false
             this.loadingContactCommunications = false
             this.$handleErrors(err.response)
 
             if (this.$route.name.includes('Inbox')) {
               this.$router.push({ name: 'Inbox' })
+              return
             }
 
             if (!this.$route.name.includes('Inbox')) {
               this.$router.push({ path: '/contacts' })
             }
-          }
-        })
+          })
       } else {
         console.log('Failed to fetch contact info: Missing contact id!')
       }
@@ -556,7 +600,12 @@ export default {
         return
       }
 
-      this.communicationsAndAudits.push(audit)
+      const found = this.communicationsAndAudits
+        .find(communication => this.isCommOrAuditExists(communication, audit))
+
+      if (!found) {
+        this.communicationsAndAudits.push(audit)
+      }
     },
 
     async fetchContactCommunications (contactId, skipContactInfo = true) {
@@ -579,6 +628,7 @@ export default {
         cancelToken: this.communicationApiSource.token
       }).then(res => {
         if (res.data.data && res.data.data.length) {
+          this.communicationsAndAudits = this.communicationsAndAudits.filter(item => 'id' in item)
           this.communicationsAndAudits = res.data.data.concat(this.communicationsAndAudits)
         }
 
@@ -872,7 +922,9 @@ export default {
     },
 
     isCommunicationFound () {
-      return this.$route.params.communicationId && !!this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      return this.$route.params.communicationId &&
+        !!this.communicationsAndAudits.find(communication => 'type' in communication &&
+          communication.id.toString() === this.$route.params.communicationId.toString())
     },
 
     isHashActivityType () {
@@ -905,7 +957,11 @@ export default {
       const hash = (this.$route.hash.replace('#', '')).split('-')
       const id = hash[1].trim()
 
-      return !!(hash[0] === 'communication' ? this.communicationsAndAudits.find(communication => communication.type !== undefined && communication.id.toString() === id) : this.communicationsAndAudits.find(communication => communication.property !== undefined && communication.id.toString() === id))
+      return !!(hash[0] === 'communication'
+        ? this.communicationsAndAudits.find(communication => 'type' in communication &&
+          communication.id.toString() === id)
+        : this.communicationsAndAudits.find(communication => !('type' in communication) &&
+          communication.id.toString() === id))
     },
 
     scrollIntoActivity () {
@@ -1026,9 +1082,9 @@ export default {
       }
     },
 
-    processFetchContactInfo (callback) {
+    processFetchContactInfo (callback, isFetchContact = true) {
       this.loadingContactInProgress()
-      return this.fetchContactInfo().then(res => {
+      return this.fetchContactInfo(isFetchContact).then(res => {
         if (!res) {
           return
         }
@@ -1093,7 +1149,8 @@ export default {
       // this.updateBreadcrumbContactName(this.contact)
       this.contact_phone_numbers = []
       this.$VueEvent.fire('contact_selected', this.contactId)
-      if (typeof callback !== 'undefined') {
+
+      if (typeof callback === 'function') {
         callback(selectedContact)
       }
     },
@@ -1179,9 +1236,7 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed',
-      'addNewCommunicationInprogressContactFetch',
-      'removeNewCommunicationInprogressContactFetch'
+      'setIsContactMixinUsed'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },

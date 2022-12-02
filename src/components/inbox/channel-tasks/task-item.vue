@@ -277,7 +277,11 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer']),
-    ...mapState('inbox', ['selectedCommunication', 'activeChannel', 'liveContacts', 'contacts']),
+    ...mapState('inbox', [
+      'selectedCommunication',
+      'activeChannel',
+      'liveContacts'
+    ]),
 
     contactName () {
       if (this.communication.contact && this.communication.contact.name) {
