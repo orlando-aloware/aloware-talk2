@@ -703,7 +703,6 @@ export default {
       }
 
       if (this.checkCommunicationMatchesUserAccessibility(communication) || isCommunicationHasUnownedContact) {
-
         // if disposition status is not in-progress
         // or current status is not queued / ring all, close call notification
         if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
