@@ -1243,6 +1243,10 @@ export default {
       // 9221 => Cannot connect to insights
       if (![31003, 31204, 31205, 9221].includes(err.code)) {
         this.$Sentry.captureException(err)
+      }
+
+      // Request new token if error
+      if ([31204, 31205].includes(err.code)) {
         this.getDesktopToken(true)
       }
 
