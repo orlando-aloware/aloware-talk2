@@ -201,9 +201,10 @@ export default {
 
         const dialerContactId = get(this.dialer.contact, 'id', null)
 
-        if (dialerContactId &&
-          parseInt(this.taskToCall.id) !== parseInt(dialerContactId)) {
-          this.setDialerContact(this.taskToCall)
+        if (!dialerContactId ||
+          (dialerContactId &&
+            parseInt(this.activeTask.id) !== parseInt(dialerContactId))) {
+          this.setDialerContact(this.activeTask)
         }
 
         this.callInProgress = true
