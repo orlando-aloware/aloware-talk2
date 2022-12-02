@@ -75,7 +75,17 @@ export default {
           this.setAddedParty(user)
         }
 
-        if (this.dialer.communication.contact) {
+        const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // if in power dialer session, we must match the active task (contact)'s id
+        // with the communication's contact id
+        // else, set the contact.
+        if ((routeTitle &&
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(this.dialer.communication.contact.id)) ||
+          (routeTitle !== 'Power Dialer Sessions' &&
+            this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
       }
