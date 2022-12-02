@@ -11,6 +11,7 @@ const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
 const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
+const Calendar = () => import('src/pages/calendar/Calendar.vue')
 const Stats = () => import('pages/stats/Stats.vue')
 const Settings = () => import('pages/Settings.vue')
 const Account = () => import('pages/Account.vue')
@@ -247,6 +248,14 @@ const routes = [
         },
         path: 'power-dialer/session',
         component: PowerDialerSession
+      },
+      {
+        path: 'calendar',
+        name: 'Calendar',
+        component: Calendar,
+        meta: {
+          title: 'Calendar'
+        }
       },
       {
         path: 'stats',

@@ -39,6 +39,10 @@ export default {
       listContactsSource: null,
       previousSearch: null,
       listeners: {},
+      addListMetaIds: [
+        'power-dialer-add-queue-list',
+        'power-dialer-add-list'
+      ],
       ALL_COLUMNS
     }
   },
@@ -111,9 +115,17 @@ export default {
         this.setListContactsLoaded(false)
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
-
-        const sort = (this.sorts) ? this.sorts.orderBy : this.defaultContactDateFilter
-        const order = (this.sorts) ? this.sorts.order : 'desc'
+        const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
+        const sort = !isAddList && this.isPowerDialer
+          ? 'order'
+          : ((this.sorts)
+            ? this.sorts.orderBy
+            : this.defaultContactDateFilter)
+        const order = !isAddList
+          ? 'asc'
+          : ((this.sorts)
+            ? this.sorts.order
+            : 'desc')
 
         if (list) {
           path = this.apiEndpoint(this.myQueueId !== null)
@@ -194,6 +206,7 @@ export default {
       }
       switch (this.$route.meta.id) {
         case 'power-dialer-add-list':
+        case 'power-dialer-add-queue-list':
           return `api/v2/contacts`
         case 'power-dialer':
         case 'power-dialer-queue-filter':
@@ -321,7 +334,9 @@ export default {
       }
 
       // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
-      const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
+      const order = (this.sorts)
+        ? this.sorts.order
+        : _.get(params, 'order', 'desc')
 
       if (hasOrder) {
         params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort

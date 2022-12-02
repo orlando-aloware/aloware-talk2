@@ -20,14 +20,15 @@
           use-input
           use-chips
           multiple
+          :emit-value="isSpecialStringTypeFilterKey"
           input-debounce="0"
           v-if="operator.value === filterOperator && hasValue"
           v-model="filterOperatorValue"
           :options="filterOptions"
+          option-value="originalLabel"
+          option-label="label"
           option-disable="disabled"
-          @new-value="createValue"
-          @input="addValue"
-          @input-value="showFilterOperationOptions"
+          v-on="specialStringTypeEvents"
         >
         </q-select>
       </template>
@@ -134,25 +135,33 @@
 import CompactBtn from 'components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import _ from 'lodash'
+import * as Countries from 'src/constants/countries'
+import { State } from 'country-state-city'
+
 export default {
   name: 'contacts-filter-types',
+
   components: { CompactBtn },
+
   props: {
     filter: {
       required: true,
       type: Object
     },
+
     filterGroupIndex: {
       required: false,
       type: Number,
       default: 0
     },
+
     filterConjunction: {
       required: false,
       type: Boolean,
       default: true
     }
   },
+
   data () {
     return {
       filterOperator: 1,
@@ -165,6 +174,7 @@ export default {
           disabled: true
         }
       ],
+      filterOptionsCopy: [],
       initialListFilters: [],
       isValidated: false,
       debounceDelay: 0,
@@ -173,14 +183,21 @@ export default {
       options: []
     }
   },
+
   computed: {
     ...mapState('contacts', [
       'previousListId'
     ]),
+
+    ...mapState('cache', [
+      'timezones'
+    ]),
+
     ...mapGetters('contacts', [
       'currentListFilters',
       'selectedList'
     ]),
+
     hasValue () {
       switch (this.filter.type) {
         case 'string':
@@ -196,9 +213,11 @@ export default {
           return true
       }
     },
+
     expectsDatepicker () {
       return [2, 3, 4, 5].includes(this.filterOperator)
     },
+
     hasSecondaryOperator () {
       switch (this.filter.type) {
         case 'number':
@@ -207,23 +226,79 @@ export default {
           return [5].includes(this.filterOperator)
       }
       return false
+    },
+
+    isSpecialStringTypeFilterKey () {
+      const filterKeys = ['cnam_country', 'cnam_state', 'timezone']
+      return filterKeys.includes(this.filter.key)
+    },
+
+    specialStringTypeEvents () {
+      return this.isSpecialStringTypeFilterKey ? {
+        'filter': this.filterOptionsFn
+      } : {
+        'new-value': this.createValue,
+        'input': this.addValue,
+        'input-value': this.showFilterOperationOptions
+      }
     }
   },
+
   created () {
     this.options = this.filter.options
+
+    if (this.isSpecialStringTypeFilterKey) {
+      switch (this.filter.key) {
+        case 'cnam_country':
+          Countries.COUNTRIES.forEach(country => {
+            this.filterOptions.push({
+              label: country.name,
+              originalLabel: country.code
+            })
+          })
+          break
+
+        case 'cnam_state':
+          State.getAllStates().forEach(st => {
+            const code = isNaN(+st.isoCode) && ['US', 'CA'].includes(st.countryCode) ? st.isoCode : `${st.countryCode}-${st.isoCode}`
+
+            this.filterOptions.push({
+              label: st.name,
+              originalLabel: code
+            })
+          })
+          break
+
+        case 'timezone':
+          this.timezones.forEach(tz => {
+            this.filterOptions.push({
+              label: tz,
+              originalLabel: tz
+            })
+          })
+          break
+      }
+
+      // copy original filter options for filter search suggestion
+      this.filterOptions.splice(0, 1)
+      this.filterOptionsCopy = this.filterOptions
+    }
   },
+
   mounted () {
-    this.debounceDelay = ['string', 'boolean', 'number'].includes(this.filter.type) ? 10 : 500
+    this.debounceDelay = ['string', 'boolean', 'number', 'date'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
       this.setValue()
     }, 10)
+
     this.$VueEvent.listen('filters-reset', () => {
       this.resetForm()
     })
   },
+
   methods: {
     setValue () {
       const value = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, null)
@@ -239,6 +314,7 @@ export default {
           this.filterOperatorValue = value
       }
     },
+
     addValue () {
       if (this.filterOperatorValue &&
         typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object' &&
@@ -301,6 +377,7 @@ export default {
         this.setCurrentListFilters(this.initialListFilters)
       })
     },
+
     createValue (value, done) {
       if (value && (!this.filterOperatorValue ||
         (this.filterOperatorValue && !this.filterOperatorValue.includes(value)))) {
@@ -311,6 +388,7 @@ export default {
         this.$refs.filterOperation[0].showPopup()
       })
     },
+
     showFilterOperationOptions (event) {
       if (!event ||
         (event &&
@@ -331,6 +409,23 @@ export default {
       this.$refs.filterOperation[0].showPopup()
       this.$refs.filterOperation[0].focus()
     },
+
+    filterOptionsFn (val, update) {
+      update(() => {
+        if (val === '') {
+          this.filterOptions = this.filterOptionsCopy
+          return
+        }
+
+        const needle = val.toLowerCase()
+        this.filterOptions = this.filterOptionsCopy
+          .filter(option => (
+            option.label.toLowerCase().indexOf(needle) > -1 ||
+            option.originalLabel.toLowerCase().indexOf(needle) > -1)
+          )
+      })
+    },
+
     applyFilter () {
       this.setListContactsLoaded(false)
       const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
@@ -347,9 +442,11 @@ export default {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
     },
+
     getStringValue () {
       return JSON.parse(JSON.stringify(this.filterOperatorValue))
     },
+
     getNumberValue () {
       switch (true) {
         // in between operator
@@ -359,6 +456,7 @@ export default {
           return this.filterOperatorValue
       }
     },
+
     setNumberValue (value) {
       switch (this.filterOperator) {
         // in between operator
@@ -370,6 +468,7 @@ export default {
           this.filterOperatorValue = value
       }
     },
+
     getDateValue () {
       switch (true) {
         // in between operator
@@ -379,6 +478,7 @@ export default {
           return this.filterOperatorValue
       }
     },
+
     setDateValue (value) {
       switch (this.filterOperator) {
         // in between operator
@@ -387,9 +487,10 @@ export default {
           this.secondaryFilterOperatorValue = value[1]
           break
         default:
-          this.filterOperator = value
+          this.filterOperatorValue = value
       }
     },
+
     getRelationTypesValue () {
       if (this.filterOperatorValue instanceof Array) {
         return this.filterOperatorValue
@@ -397,6 +498,7 @@ export default {
         return JSON.parse(JSON.stringify(this.filterOperatorValue))
       }
     },
+
     validateValue () {
       switch (this.filter.type) {
         case 'string':
@@ -420,16 +522,19 @@ export default {
           this.isValidated = false
       }
     },
+
     resetForm () {
       this.filterOperator = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
       this.$nextTick(() => {
         this.filterOperatorValue = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, [])
       })
     },
+
     updateIsValidated (value) {
       this.isValidated = value
       this.filterOperatorValue = 1
     },
+
     filterFn (val, update) {
       if (this.filterOperatorValue && val === this.filterOperatorValue) {
         update(() => {
@@ -450,9 +555,11 @@ export default {
         this.options = this.filter.options.filter(option => option.label.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     onInput () {
       this.$refs.filterOperation[0].updateInputValue('')
     },
+
     ...mapActions('contacts', [
       'setCurrentListFilters',
       'setShowMyContacts',
@@ -460,6 +567,7 @@ export default {
       'setListContactsLoaded'
     ])
   },
+
   watch: {
     filterOperator () {
       this.filterOperatorValue = null
@@ -474,6 +582,7 @@ export default {
 
       this.validateValue()
     },
+
     filterOperatorValue () {
       const debounce = _.debounce(() => {
         this.addValue()
@@ -481,6 +590,7 @@ export default {
       debounce()
       this.validateValue()
     },
+
     secondaryFilterOperatorValue () {
       const debounce = _.debounce(() => {
         this.addValue()
@@ -488,10 +598,12 @@ export default {
       debounce()
       this.validateValue()
     },
+
     'filter.options': function (value) {
       this.options = this.filter.options
     }
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('filters-reset')
     this.$VueEvent.stop('filters-back')

@@ -17,7 +17,8 @@ export default {
       callInProgress: false,
       countdownStarted: false,
       wrapUp: false,
-      reRouteModal: false
+      reRouteModal: false,
+      loadingNext: false
     }
   },
   computed: {
@@ -55,6 +56,9 @@ export default {
 
       switch (this.dialer?.currentStatus) {
         case 'READY':
+          // reset call in-progress flag
+          this.callInProgress = false
+
           if (this.timerIsOver || !this.isSessionRunning || this.reRouteModal) {
             return 'Ready'
           }
@@ -220,6 +224,7 @@ export default {
           // }
           // this.skipped_list.push(autoDialTask.id)
           this.$generalNotification(message, 'warning')
+          this.onNextTask()
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)

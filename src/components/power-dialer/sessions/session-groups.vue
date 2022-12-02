@@ -61,6 +61,9 @@
                     <span v-else-if="key === 'scheduled'">
                       {{ totalScheduled }}
                     </span>
+                    <span v-else-if="key === 'all'">
+                      {{ getTotalItems('all') }}
+                    </span>
                     <span v-else>
                       {{ group.length }}
                     </span>
@@ -86,8 +89,8 @@
                       <q-avatar
                         size="30px"
                         color="grey"
-                        v-if="avatarName(itm.first_name, itm.last_name)">
-                        {{ avatarName(itm.first_name, itm.last_name) }}
+                        v-if="getInitials(itm.name)">
+                        {{ getInitials(itm.name) }}
                       </q-avatar>
                       <q-avatar
                         size="30px"
@@ -247,6 +250,7 @@ import ContactInQueueIcon from 'components/icons/contact-in-queue-icon'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { avatarMixin } from 'src/plugins/mixins'
 
 const DIRECTION = {
   top: 1,
@@ -255,6 +259,9 @@ const DIRECTION = {
 
 export default {
   name: 'SessionGroups',
+  mixins: [
+    avatarMixin
+  ],
   components: {
     SessionContactInProgress,
     SearchList,
@@ -305,9 +312,16 @@ export default {
        * everytime items are displayed
        */
 
+      const pdTasks = JSON.parse(JSON.stringify(this.powerDialerTasks))
+
+      // remove redialed if it exists
+      if ('redialed' in pdTasks) {
+        delete pdTasks.redialed
+      }
+
       if (!this.activeTask) {
         return {
-          ...this.powerDialerTasks,
+          ...pdTasks,
           in_queue: this.powerDialerTasks.in_queue
         }
       }
@@ -316,7 +330,7 @@ export default {
         return task && task.contact_list_item_id !== this.activeTask.contact_list_item_id
       })
       return {
-        ...this.powerDialerTasks,
+        ...pdTasks,
         in_queue: inQueue
       }
     },
@@ -469,12 +483,6 @@ export default {
     chipped (data) {
       return data.length || 0
     },
-    avatarName (fname, lname) {
-      if (!fname && !lname) {
-        return false
-      }
-      return `${fname?.[0]}${lname?.[0]}`
-    },
     onOver () {
       this.$refs.dropdown.visible = true
       this.$refs.returnToQueue.visible = true
@@ -533,6 +541,9 @@ export default {
       }
 
       return `${item?.first_name || ''} ${item?.last_name || ''}`
+    },
+    getTotalItems (group) {
+      return get(this.powerDialerTaskFilters[group], 'total_items', 0)
     }
   },
   data () {
