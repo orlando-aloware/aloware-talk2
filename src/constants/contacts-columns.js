@@ -446,16 +446,6 @@ export const ALL_COLUMNS = [
     default: true,
     maxWidth: 130,
     minWidth: 130
-  },
-  {
-    name: 'line_type',
-    label: 'Line Type',
-    category: 0,
-    order: 41,
-    sortable: false,
-    draggable: true,
-    resizable: false,
-    default: false
   }
 ]
 
