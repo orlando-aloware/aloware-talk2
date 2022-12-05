@@ -88,7 +88,7 @@
                       </span>
                     </template>
                   </contact-menu-item>
-                  <contact-menu-item v-if="isHubspotEnabled"
+                  <contact-menu-item v-if="isIntegrationEnabled"
                                      @click="onCreateFromHubspot">
                     <template slot="title">
                       <span class="create-item">
@@ -242,8 +242,8 @@ export default {
     isContact () {
       return this.routeName === 'Contacts' && this.isContactModuleType
     },
-    isHubspotEnabled () {
-      return this.currentCompany && this.currentCompany.hubspot_integration_enabled
+    isIntegrationEnabled () {
+      return this.currentCompany && (this.currentCompany.hubspot_integration_enabled || this.currentCompany.zoho_integration_enabled || this.currentCompany.pipedrive_integration_enabled)
     }
   },
   mounted () {
