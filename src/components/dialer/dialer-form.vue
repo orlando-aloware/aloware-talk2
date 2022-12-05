@@ -189,6 +189,7 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
 import {
   contactMixin,
+  contactV2AttributesMixin,
   timezoneCheckMixin,
   visibilityMixin,
   aclMixin
@@ -199,6 +200,7 @@ export default {
 
   mixins: [
     contactMixin,
+    contactV2AttributesMixin,
     timezoneCheckMixin,
     visibilityMixin,
     aclMixin

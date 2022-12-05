@@ -95,18 +95,20 @@ export default {
       this.source.cancel('Loading of contact data operation is canceled by the user.')
       this.source = this.cancelToken.source()
       this.isBusy = true
-      const contactsData = this.getContactData(value.id, this.source.token)
 
-      if (contactsData) {
-        contactsData.then(res => {
+      this.getContactData(value.id, this.source.token)
+        .then(res => {
           if (!res) {
             return
           }
 
           this.isBusy = false
           this.setContact(res.data)
+          this.$VueEvent.fire('contact_activity_update_contact', res.data)
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          this.isBusy = false
         })
-      }
     }
   }
 }
