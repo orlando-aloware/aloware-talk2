@@ -3,7 +3,7 @@
        data-popper-target="power-dialer-list">
     <contacts-folders
       :is-contact-module-type="false"
-      @openHubspotListImportDialog="onHubspotImportDialogOpen">
+      @openIntegrationListsImportDialog="onHubspotImportDialogOpen">
     </contacts-folders>
     <hubspot-list-import-modal :is-open="isHubspotImportDialogOpen"
                                v-if="isHubspotImportDialogOpen"

@@ -89,7 +89,7 @@
                     </template>
                   </contact-menu-item>
                   <contact-menu-item v-if="isIntegrationEnabled"
-                                     @click="onCreateFromHubspot">
+                                     @click="onCreateFromIntegration">
                     <template slot="title">
                       <span class="create-item">
                         Import from Integration
@@ -333,9 +333,9 @@ export default {
         contact_folder_id: null
       })
     },
-    onCreateFromHubspot () {
+    onCreateFromIntegration () {
       this.destroySubmenu()
-      this.$emit('openHubspotListImportDialog')
+      this.$emit('openIntegrationListsImportDialog')
     },
     onCreateFolderCancel () {
       this.isCreatingFolder = false
