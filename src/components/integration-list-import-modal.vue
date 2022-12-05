@@ -24,7 +24,7 @@
         </div>
 
         <div class="pt-3">
-          <hubspot-list-selector :multiple="false"
+          <integration-list-selector :multiple="false"
                                  :use-chips="false"
                                  :clearable="true"
                                  :generic-styling="false"
@@ -45,7 +45,7 @@
         </div>
       </div>
       <power-dialer-add-modal :params="powerDialerParams"
-                              mode="hubspot"
+                              mode="integration"
                               v-if="isAddPowerDialerOpen"
                               @hidden="onHiddenPowerDialerModal"
                               @submit="onClose">
@@ -56,14 +56,14 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import HubspotListSelector from 'components/generic-selectors/hubspot-list-selector'
+import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 
 export default {
-  name: 'hubspot-list-import-modal',
+  name: 'integration-list-import-modal',
 
   components: {
-    HubspotListSelector,
+    IntegrationListSelector,
     PowerDialerAddModal
   },
 
@@ -90,7 +90,7 @@ export default {
       'isAddPowerDialerOpen'
     ]),
     getTitle () {
-      return 'Import From Hubspot List'
+      return 'Import From Integration List'
     },
     powerDialerParams () {
       return {
