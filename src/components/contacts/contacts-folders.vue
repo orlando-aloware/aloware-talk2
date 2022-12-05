@@ -92,7 +92,7 @@
                                      @click="onCreateFromHubspot">
                     <template slot="title">
                       <span class="create-item">
-                        Import from Hubspot
+                        Import from Integration
                       </span>
                     </template>
                   </contact-menu-item>
