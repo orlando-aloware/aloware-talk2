@@ -395,6 +395,7 @@ export default {
       const options = { data: null }
       const option = { data: null }
       const trueValue = { data: null }
+      const field = { field: null }
 
       for (groupIndex.data in filterGroups) {
         if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
@@ -424,7 +425,18 @@ export default {
             trueValue.data = option.data ? [option.data.label] : trueValue.data
             trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : [trueValue.data]
 
+            // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+            // The content in 'field' will be concatenated at the end of the string
+            if ('field' in filterGroups[groupIndex.data].filters[filterIndex.data]) {
+              field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
+
+              trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].field
+              trueValue.data = option.data ? [option.data.label] : trueValue.data
+              trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].field === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].field.split(',') : [trueValue.data]
+            }
+
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
+              ...field,
               key: filterIndex.data,
               label: found.data.label,
               operator: operator.data ? _.get(operator.data, 'label', null) : null,
@@ -487,10 +499,20 @@ export default {
         }
 
         let joinedValues = labels.join(', ')
-
-        return labels.length > 1
+        let data = labels.length > 1
           ? joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
           : joinedValues
+
+        // add field values at the end if they are present
+        if (filter.field) {
+          let joinedFields = filter.field.join(', ')
+
+          data += ' as ' + (filter.field.length > 1
+            ? joinedFields.substring(0, joinedFields.lastIndexOf(',')) + ' or' + joinedFields.substring(joinedFields.lastIndexOf(',') + 1, joinedFields.length)
+            : joinedFields)
+        }
+
+        return data
       } else {
         return !isSimpleType ? filter.trueValue : ''
       }
