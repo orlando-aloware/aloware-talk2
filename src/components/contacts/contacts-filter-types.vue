@@ -246,10 +246,10 @@ export default {
           return [7].includes(this.filterOperator)
         case this.filter.type === 'date':
           return [5].includes(this.filterOperator)
-        default:
-          return false
         case this.filter.key === 'custom_attribute':
           return true
+        default:
+          return false
       }
     },
 
