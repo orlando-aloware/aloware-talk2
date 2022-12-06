@@ -89,7 +89,7 @@ import { selectorMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
-  name: 'hubspot-list-selector',
+  name: 'integration-list-selector',
 
   mixins: [
     selectorMixin
