@@ -225,7 +225,6 @@ export default {
     return {
       isEnrolling: false,
       isSyncing: false,
-      integration_name: 'hubspot',
       showWorkflowSelectorForm: false,
       workflow: {
         email: null,
@@ -234,10 +233,6 @@ export default {
       integration_data: null,
       contactIntegrationDataLoaded: false
     }
-  },
-
-  async created () {
-    await this.getContactIntegrationData()
   },
 
   async mounted () {
@@ -249,30 +244,18 @@ export default {
   methods: {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
-    getContactIntegrationData () {
-      return window.axios.get(`api/v2/contacts/${this.contact.id}/integration-data`)
-        .then(res => {
-          if (res?.data) {
-            this.contact.integration_data = res.data
-
-            // update contact related states
-            this.setContact(this.contact)
-            this.setContactClone(this.contact)
-
-            this.contactIntegrationDataLoaded = true
-          }
-        })
-    },
-
     getData () {
-      return talk2Api.V1.contact.getIntegrationData(this.contact.id, {
-        params: {
-          integration_name: this.integration_name,
-          dialer_mode: this.dialer_mode ? 1 : 0
-        }
-      }).then(response => {
-        this.integration_data = response.data
-      })
+      return this.getIntegrationData(this.contact)
+        .then(response => {
+          this.integration_data = response.data
+          this.contact.integration_data = response.data
+
+          // update contact related states
+          this.setContact(this.contact)
+          this.setContactClone(this.contact)
+
+          this.contactIntegrationDataLoaded = true
+        })
     },
 
     onWorkflowSelected (workflowId) {
@@ -322,7 +305,6 @@ export default {
     'contact.id': _.debounce(function () {
       if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
         this.contactIntegrationDataLoaded = false
-        this.getContactIntegrationData()
         this.getData()
       }
     }, 500)

@@ -2,12 +2,11 @@
   <div class="row full-height">
     <div class="col-12 p-0">
       <div class="hubspot-iframe-container">
-        <iframe
-          class="hubspot-crm-iframe"
-          v-if="hubspotLink"
-          :src="hubspotLink"
-          frameborder="0"
-          id="hubspot-crm">
+        <iframe class="hubspot-crm-iframe"
+                v-if="hubspotLink"
+                :src="hubspotLink"
+                frameborder="0"
+                id="hubspot-crm">
         </iframe>
       </div>
     </div>
@@ -21,12 +20,18 @@ import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'SessionContactPageCrm',
-  mixins: [hubspotIntegrationMixin],
+
+  mixins: [
+    hubspotIntegrationMixin
+  ],
+
   computed: {
     ...mapState('contacts', ['contact']),
+
     hubspotLink () {
       return this.getHubspotLink(this.contact)
     },
+
     test () {
       const iframe = document.getElementById('hubspot-crm')
       return iframe.contentWindow
