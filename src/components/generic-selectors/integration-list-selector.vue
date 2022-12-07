@@ -1,84 +1,90 @@
 <template>
   <div>
-    <q-select ref="hubspotListSelector"
-              options-selected-class="text-primary"
-              class="q-basic-selector"
-              color="primary"
-              option-value="id"
-              option-label="name"
-              input-debounce="0"
-              style="word-break: break-all;"
-              use-input
-              emit-value
-              map-options
-              outlined
-              dense
-              v-model="selectedId"
-              :options="options"
-              :placeholder="placeholder"
-              :multiple="multiple"
-              :disable="disable"
-              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
-              :use-chips="useChips"
-              :clearable="clearable"
-              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-              :loading="isLoading"
-              @popup-show="onShowMenu"
-              @focus="onFocus"
-              @blur="onBlur"
-              @input="onInput"
-              @filter="filterFn">
-      <template v-slot:prepend
-                v-if="prepend">
-        <span class="text-size-xs text-grey-80">{{ prepend }}</span>
-      </template>
+    <template v-if="isIntegrationEnabled('hubspot')">
+      <q-select ref="hubspotListSelector"
+                options-selected-class="text-primary"
+                class="q-basic-selector"
+                color="primary"
+                option-value="id"
+                option-label="name"
+                input-debounce="0"
+                style="word-break: break-all;"
+                use-input
+                emit-value
+                map-options
+                outlined
+                dense
+                v-model="selectedId"
+                :options="options"
+                :placeholder="placeholder"
+                :multiple="multiple"
+                :disable="disable"
+                :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
+                :use-chips="useChips"
+                :clearable="clearable"
+                :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+                :loading="isLoading"
+                @popup-show="onShowMenu"
+                @focus="onFocus"
+                @blur="onBlur"
+                @input="onInput"
+                @filter="filterFn">
+        <template v-slot:prepend
+                  v-if="prepend">
+          <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+        </template>
 
-      <template v-slot:no-option>
-        <q-item>
-          <q-item-section class="no-results text-grey">
-            No results
-          </q-item-section>
-        </q-item>
-      </template>
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="no-results text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
 
-      <template v-slot:option="scope">
-        <q-item v-if="!scope.opt.group"
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
-          <q-item-section>
-            <q-item-label>
-              <q-item-label v-html="scope.opt.name" ></q-item-label>
+        <template v-slot:option="scope">
+          <q-item v-if="!scope.opt.group"
+                  v-bind="scope.itemProps"
+                  v-on="scope.itemEvents">
+            <q-item-section>
+              <q-item-label>
+                <q-item-label v-html="scope.opt.name" ></q-item-label>
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item v-if="scope.opt.group"
+                  v-bind="scope.itemProps"
+                  v-on="scope.itemEvents">
+            <q-item-label header
+                          class="text-size-xs">
+              {{ scope.opt.group }}
             </q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item v-if="scope.opt.group"
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
-          <q-item-label header
-                        class="text-size-xs">
-            {{ scope.opt.group }}
-          </q-item-label>
-        </q-item>
-      </template>
+          </q-item>
+        </template>
 
-      <template v-slot:selected-item="scope"
-                v-if="useChips">
-        <q-chip dense
-                :tabindex="scope.tabindex"
-                color="white"
-                class="tag-selected-chip"
-                text-color="secondary">
-          <i class="fa fa-circle position-absolute"
-             :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
-          <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
-          <div role="button"
-               class="custom__remove d-flex align-items-center position-absolute r-0"
-               @click="scope.removeAtIndex(scope.index)">
-            <remove-tag-icon class="ml-1 remove-tag-icon"/>
-          </div>
-        </q-chip>
-      </template>
-    </q-select>
+        <template v-slot:selected-item="scope"
+                  v-if="useChips">
+          <q-chip dense
+                  :tabindex="scope.tabindex"
+                  color="white"
+                  class="tag-selected-chip"
+                  text-color="secondary">
+            <i class="fa fa-circle position-absolute"
+               :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+            <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
+            <div role="button"
+                 class="custom__remove d-flex align-items-center position-absolute r-0"
+                 @click="scope.removeAtIndex(scope.index)">
+              <remove-tag-icon class="ml-1 remove-tag-icon"/>
+            </div>
+          </q-chip>
+        </template>
+      </q-select>
+    </template>
+    <template v-else-if="isIntegrationEnabled('zoho')">
+    </template>
+    <template v-else-if="isIntegrationEnabled('pipedrive')">
+    </template>
   </div>
 </template>
 
@@ -224,6 +230,22 @@ export default {
         this.$handleErrors(err.response)
         console.log(err)
       })
+    },
+    isIntegrationEnabled (name) {
+      if (!name) {
+        return false
+      }
+
+      switch (name) {
+        case 'hubspot':
+          return this.hubspot_integration_enabled
+        case 'zoho':
+          return this.zoho_integration_enabled
+        case 'pipedrive':
+          return this.pipedrive_integration_enabled
+      }
+
+      return false
     }
   },
 
