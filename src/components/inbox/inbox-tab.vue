@@ -18,7 +18,7 @@
             <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
             <div class="filter-wrapper"
                  :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
-              <compact-btn v-if="hasChannelFilterChanges"
+              <compact-btn v-if="hasChannelFilterChanges || appliedFilter"
                            borderless
                            customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"
@@ -181,19 +181,25 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import {
+  cloneDeep,
+  isEmpty,
+  debounce,
+  get,
+  clone
+} from 'lodash'
 import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
 import { mapActions, mapState } from 'vuex'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
-import Vue from 'vue'
 import {
   aclMixin,
   inboxMixin,
   visibilityMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  contactV2AttributesMixin
 } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
@@ -211,7 +217,8 @@ export default {
     aclMixin,
     inboxMixin,
     visibilityMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    contactV2AttributesMixin
   ],
 
   components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
@@ -414,6 +421,39 @@ export default {
       'setPendingTaskCount',
       'updateChannelChangedFilterFields'
     ]),
+    initInboxTaskRoute () {
+      const inboxRoutes = [
+        'Inbox',
+        'Inbox Channel Task Status',
+        'Inbox Contact Task',
+        'Inbox Contact Communication'
+      ]
+
+      // if currently in inbox routes which works with contact's
+      // task status, compare if current task is in the correct
+      // inbox route
+      if (!inboxRoutes.includes(this.$route.name) ||
+        (inboxRoutes.includes(this.$route.name) &&
+          !isEmpty(this.$route.params) &&
+          this.$route.params.status !== this.statusText)) {
+        return
+      }
+
+      this.setLoadingPendingTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      this.setLoadingOpenTaskCount(true)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+
+      this.loadContactTasks(false).finally(() => {
+        if (this.$route.params.id) {
+          const id = this.$route.params.id
+          const contact = this.contactTasks.find(item => item.id.toString() === id)
+          if (contact) {
+            this.setSelectedContact(contact)
+          }
+        }
+      })
+    },
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
@@ -435,8 +475,9 @@ export default {
     },
     updateContacts (updatedContact) {
       const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
+
       if (index >= 0) {
-        Vue.set(this.contacts, index, updatedContact)
+        Object.assign(this.contacts[index], updatedContact)
       }
     },
     resetList () {
@@ -505,13 +546,14 @@ export default {
 
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
       await this.setContacts(filteredContacts)
+
       if (typeof callback !== 'undefined') {
         callback()
       }
     },
     onItemSelected (contact) {
       this.setSelectedContact(contact)
-      const contactId = _.get(contact, 'id', null)
+      const contactId = get(contact, 'id', null)
       if (contactId) {
         if (this.currentTask !== contact.task_status) {
           this.currentTask = contact.task_status
@@ -614,25 +656,22 @@ export default {
       this.toggleFilterModelForm(true)
     },
     updateContact (contact) {
-      if (_.isEmpty(this.contact) ||
-        _.isEmpty(contact) ||
-        contact.id !== this.contact.id) {
+      if (isEmpty(this.contact) ||
+        isEmpty(contact) ||
+        parseInt(contact.id) !== parseInt(this.contact.id)) {
         return
       }
 
-      const currentContact = JSON.parse(JSON.stringify(this.contact))
-      const key = { data: null }
-      for (key.data in contact) {
-        if (key.data === 'communications_and_audits') {
-          continue
-        }
+      const currentContact = this.$jsonClone(this.contact)
+      const contactNoCommAndAudits = this.$jsonClone(contact)
 
-        if (typeof currentContact[key.data] !== 'undefined') {
-          currentContact[key.data] = contact[key.data]
-        }
+      // remove communications and audits
+      if ('communications_and_audits' in contactNoCommAndAudits) {
+        delete contactNoCommAndAudits.communications_and_audits
       }
 
-      this.setContact(currentContact)
+      Object.assign(currentContact, contactNoCommAndAudits)
+      this.setSelectedContact(currentContact)
     },
     onRouteChange () {
       this.setStatus()
@@ -688,29 +727,17 @@ export default {
       return null
     },
     processNewCommunicationEvent (data, communication) {
-      const contact = data
+      const contact = this.$jsonClone(data)
 
       // add the last_communication in contact
       // and remove the contact in the communication
-      const newCommunication = JSON.parse(JSON.stringify(communication))
+      const newCommunication = this.$jsonClone(communication)
+      // add the v2 contact attributes that we need
+      Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
 
-      // remove the contact from communication
-      if ('contact' in newCommunication) {
-        delete newCommunication.contact
-      }
-
-      contact.last_communication = newCommunication
-
-      // assign value for contact's last engagement from
-      // communication if it doesn't exist
-      if (!('last_engagement_at' in contact)) {
-        const engagementDate = _.get(newCommunication, 'updated_at', newCommunication.created_at)
-        contact.last_engagement_at = engagementDate
-      }
-
-      const contacts = { data: _.cloneDeep(this.contacts) }
+      const contacts = { data: cloneDeep(this.contacts) }
       const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-      const isInContacts = this.contacts.find(item => item.id === contact.id)
+      const isInContacts = contacts.data.find(item => item.id === contact.id)
       this.updateContact(contact)
 
       // check if communication is a live call
@@ -722,7 +749,7 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(communication.current_status2)) {
-        const liveContacts = _.cloneDeep(this.liveContacts)
+        const liveContacts = cloneDeep(this.liveContacts)
 
         if (!isInLiveContacts) {
           liveContacts.push(contact)
@@ -753,7 +780,7 @@ export default {
       } else {
         const index = contacts.data.findIndex(item => item.id === contact.id)
         if (isInContacts && index !== -1) {
-          contacts.data[index] = contact
+          Object.assign(contacts.data[index], contact)
           this.setContacts(contacts.data)
 
           if (contact.task_status !== this.currentTask) {
@@ -775,7 +802,7 @@ export default {
               }
             } else {
               // get all contacts except the current one
-              contacts.data = _.clone(contacts.data.filter(item => item.id !== contact.id))
+              contacts.data = clone(contacts.data.filter(item => item.id !== contact.id))
             }
 
             if (this.sorting.order === 'asc') {
@@ -801,27 +828,7 @@ export default {
   mounted () {
     this.setContacts([])
     this.setStatus()
-
-    if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
-      if (!_.isEmpty(this.$route.params) && this.$route.params.status !== this.statusText) {
-        // do other possible actions
-      } else {
-        this.setLoadingPendingTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-        this.setLoadingOpenTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-
-        this.loadContactTasks(false).finally(() => {
-          if (this.$route.params.id) {
-            const id = this.$route.params.id
-            const contact = this.contactTasks.find(item => item.id.toString() === id)
-            if (contact) {
-              this.setSelectedContact(contact)
-            }
-          }
-        })
-      }
-    }
+    this.initInboxTaskRoute()
 
     if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
       this.setSelectedContact({})
@@ -858,14 +865,31 @@ export default {
     }
 
     this.listeners.contactUpdated = (data) => {
+      const updatedContact = this.$jsonClone(this.selectedContact)
+      const contact = this.$jsonClone(data)
+      // add the v2 contact attributes that we need
+      Object.assign(updatedContact, this.addV2ContactAttributes(contact))
+
       if (this.selectedContact &&
-        parseInt(this.selectedContact.id) === parseInt(data.id)) {
-        const updatedContact = JSON.parse(JSON.stringify(this.selectedContact))
-        Object.assign(updatedContact, data)
+        parseInt(this.selectedContact.id) === parseInt(data.id) &&
+        !this.isContactMixinUsed) {
         // check data loaded
         this.setSelectedContact(updatedContact)
-        // this.setContact(contact)
         this.updateContacts(updatedContact)
+      }
+
+      this.setContact(updatedContact)
+    }
+
+    this.listeners.contactUpdatedFromContactMixin = (data) => {
+      if (!this.isContactMixinUsed) {
+        return
+      }
+
+      this.updateContacts(data)
+
+      if (parseInt(data.id) === parseInt(this.contact.id)) {
+        this.setSelectedContact(data)
       }
     }
 
@@ -919,13 +943,15 @@ export default {
         return
       }
 
+      const newCommunication = this.$jsonClone(communication)
       // if communication is in live contacts
       const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
       let contactTaskToRemove = null
 
       if (index >= 0 && this.liveContacts[index].last_communication.id === communication.id) {
-        const liveContacts = _.cloneDeep(this.liveContacts)
-        Object.assign(liveContacts[index].last_communication, communication)
+        const liveContacts = cloneDeep(this.liveContacts)
+        // add the v2 contact attributes that we need
+        Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
 
         // if type is call and completed/voicemail then remove from live calls
         if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
@@ -938,7 +964,7 @@ export default {
             contactTaskToRemove.task_status = ContactTaskStatus.STATUS_PENDING
           }
 
-          const contacts = _.cloneDeep(this.contacts)
+          const contacts = cloneDeep(this.contacts)
           if (this.sorting.order === 'asc') {
             contacts.push(contactTaskToRemove)
           } else {
@@ -966,19 +992,14 @@ export default {
 
       const contactIndex = this.contacts.findIndex(item => item.id === communication.contact_id)
       if (contactIndex >= 0) {
-        const contacts = _.cloneDeep(this.contacts)
-        Object.assign(contacts[contactIndex].last_communication, communication)
-
-        // assign value for contact's last engagement from
-        // communication if it doesn't exist
-        if (!('last_engagement_at' in contacts[contactIndex])) {
-          const engagementDate = _.get(communication, 'updated_at', communication.created_at)
-          contacts[contactIndex].last_engagement_at = engagementDate
-        }
-
+        const contacts = cloneDeep(this.contacts)
+        // add the v2 contact attributes that we need
+        Object.assign(contacts[contactIndex], this.addV2ContactAttributes(communication.contact, newCommunication, contacts[contactIndex]))
         this.setContacts(contacts)
-        if (contacts[contactIndex].id === this.contact.id) {
-          this.setContact(contacts[contactIndex])
+
+        if (!isEmpty(this.contact) &&
+          parseInt(contacts[contactIndex].id) === parseInt(this.contact.id)) {
+          this.setSelectedContact(contacts[contactIndex])
         }
       }
 
@@ -1048,7 +1069,7 @@ export default {
         // update task status on live contacts
         const index = this.liveContacts.findIndex(item => item.id === data.contact_id)
         if (index >= 0) {
-          const liveContacts = _.cloneDeep(this.liveContacts)
+          const liveContacts = cloneDeep(this.liveContacts)
           liveContacts[index].task_status = parseInt(data.to)
 
           this.setLiveContacts(
@@ -1071,17 +1092,19 @@ export default {
 
         const contactIndex = this.contacts.findIndex(item => item.id === data.contact_id)
         if (contactIndex >= 0) {
-          const contacts = _.cloneDeep(this.contacts)
+          const contacts = cloneDeep(this.contacts)
           contacts[contactIndex].task_status = parseInt(data.to)
           this.setContacts(contacts)
-          if (contacts[contactIndex].id === this.contact.id) {
-            this.setContact(contacts[contactIndex])
+
+          if (!isEmpty(this.contact) &&
+            contacts[contactIndex].id === this.contact.id) {
+            this.setSelectedContact(contacts[contactIndex])
           }
         }
       }
     }
 
-    this.listeners.inboxLoadContacts = _.debounce((showMyContacts) => {
+    this.listeners.inboxLoadContacts = debounce((showMyContacts) => {
       if (!this.isLoaded) {
         return
       }
@@ -1117,11 +1140,10 @@ export default {
     this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.listen('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.listen('inbox_new_communication', this.listeners.newCommunication)
     this.$VueEvent.listen('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
-
     this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
     this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
     this.$VueEvent.listen('inbox_contact_updated', this.listeners.inboxContactUpdated)
@@ -1140,8 +1162,8 @@ export default {
     this.$VueEvent.stop('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
     this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
     this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
+    this.$VueEvent.stop('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
     this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.stop('inbox_new_communication', this.listeners.newCommunication)
     this.$VueEvent.stop('update_communication', this.listeners.updateInboxCommunication)
     this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
     this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)

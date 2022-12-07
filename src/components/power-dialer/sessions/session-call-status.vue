@@ -85,7 +85,7 @@
           no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
-          @click="onNextTask">
+          @click="onNextTask(false, true)">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
@@ -543,6 +543,13 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
+    processHangup () {
+      this.$VueEvent.fire('hangupCall')
+
+      if (this.wrapUpSeconds === -1) {
+        this.$VueEvent.fire('resetCall')
+      }
+    },
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
 
@@ -593,6 +600,7 @@ export default {
         this.resetTimer()
       }
 
+      clearInterval(this.countdownInterval)
       this.countdownInterval = setInterval(() => {
         // reset next task loading flag
         if (this.loadingNext) {
@@ -865,6 +873,15 @@ export default {
           }
           break
         case 'WRAP_UP':
+          // if task is manually skipped through the
+          // Next button, end the wrap up
+          if (this.skipWrapUp) {
+            this.$VueEvent.fire('endWrapUp')
+            this.wrapUp = false
+            this.skipWrapUp = false
+            return
+          }
+
           this.wrapUp = true
           this.countdownTimer = this.wrapUpSeconds
 
@@ -875,6 +892,7 @@ export default {
             this.wrapUpSeconds === -1) {
             this.onNextTask(true)
           }
+
           break
         case 'MAKING_CALL':
           break
@@ -888,6 +906,7 @@ export default {
           if (!this.togglePause) {
             this.resetTimer()
           }
+
           break
         case 'CALL_DISCONNECTED':
           break
@@ -926,12 +945,20 @@ export default {
         this.startWarmUpCountDown()
       }, 1000)
     },
-    async onNextTask (forceSkip = false) {
+    async onNextTask (forceSkip = false, skipWrapUp = false) {
       this.loadingNext = true
+      this.skipWrapUp = skipWrapUp
       this.onPhoneExpansionReset()
+
+      // end wrap up
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
       // hangup in-progress call
-      if (this.callInProgress) {
-        this.$VueEvent.fire('hangupCall')
+      if (this.callInProgress &&
+        this.dialer.currentStatus !== 'WRAP_UP') {
+        this.processHangup()
       }
 
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
@@ -954,7 +981,7 @@ export default {
       }
 
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.$VueEvent.fire('hangupCall')
+        this.processHangup()
       }
     },
     async onNextTaskWhenOnWrapUp () {
@@ -1014,16 +1041,16 @@ export default {
       this.onPhoneExpansionReset()
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       this.redialTask(this.activeTask).then(() => {
-        if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-          this.$VueEvent.fire('hangupCall')
-        }
-
         this.powerDialerTasks.in_queue.push(this.activeTask)
         this.activeTask = this.taskToCall
+        if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+          this.processHangup()
+        }
 
         setTimeout(() => {
           this.wrapUp = false
           this.hasActiveTask = false
+          this.powerDialerTasks.in_queue.shift()
           this.processSession()
         }, 1000)
       })
@@ -1097,7 +1124,8 @@ export default {
       hangUpInterval: null,
       hangUpIntervalCounter: 0,
       loadingHold: false,
-      loadingUnhold: false
+      loadingUnhold: false,
+      skipWrapUp: false
     }
   }
 }

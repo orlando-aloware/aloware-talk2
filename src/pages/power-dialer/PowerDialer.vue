@@ -81,6 +81,7 @@ import ColumnHeaders from 'components/column-headers'
 import {
   powerDialerMixin,
   contactsMixins,
+  contactV2AttributesMixin,
   powerDialerInitMixin,
   sessionsEngineMixin,
   aclMixin,
@@ -108,6 +109,7 @@ export default {
   mixins: [
     powerDialerMixin,
     contactsMixins,
+    contactV2AttributesMixin,
     powerDialerInitMixin,
     sessionsEngineMixin,
     aclMixin,

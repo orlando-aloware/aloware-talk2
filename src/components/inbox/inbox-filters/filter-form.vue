@@ -106,7 +106,7 @@
                 </communication-direction-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['calls', 'messages', 'all-communications', 'inbox'].includes($route.params.channel)"
+            <b-col v-if="$route.name === 'Inbox' || ['calls', 'all-communications', 'inbox'].includes($route.params.channel)"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
