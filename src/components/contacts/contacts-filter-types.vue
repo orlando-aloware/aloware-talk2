@@ -75,46 +75,41 @@
         ></b-form-datepicker>
       </template>
       <template v-if="['relation', 'multi_relation'].includes(filter.type)">
-        <q-select
-          ref="filterOperation"
-          class="filter-operation border"
-          borderless
-          dense
-          use-chips
-          multiple
-          map-options
-          emit-value
-          use-input
-          input-debounce="0"
-          v-if="operator.value === filterOperator && hasValue"
-          v-model="filterOperatorValue"
-          :options="options"
-          option-disable="disabled"
-          @input="onInput"
-          @filter="filterFn"
-        />
+        <q-select ref="filterOperation"
+                  class="filter-operation border"
+                  borderless
+                  dense
+                  use-chips
+                  multiple
+                  map-options
+                  emit-value
+                  use-input
+                  input-debounce="0"
+                  v-if="operator.value === filterOperator && hasValue"
+                  v-model="filterOperatorValue"
+                  :options="options"
+                  option-disable="disabled"
+                  @input="onInput"
+                  @filter="filterFn"/>
         <label v-if="operator.value === filterOperator && hasSecondaryOperator">
           Content:
         </label>
-        <q-select
-          ref="secondaryFilterOperation"
-          class="filter-operation border"
-          borderless
-          dense
-          use-input
-          use-chips
-          multiple
-          input-debounce="0"
-          v-model="secondaryFilterOperatorValue"
-          :options="filterOptions"
-          option-value="originalLabel"
-          option-label="label"
-          option-disable="disabled"
-          v-if="operator.value === filterOperator && hasSecondaryOperator"
-          @input-value="showSecondaryFilterOperationOptions"
-          @input="addSecondaryValue"
-        >
-        </q-select>
+        <q-select ref="secondaryFilterOperation"
+                  class="filter-operation border"
+                  borderless
+                  dense
+                  use-input
+                  use-chips
+                  multiple
+                  input-debounce="0"
+                  v-model="secondaryFilterOperatorValue"
+                  :options="filterOptions"
+                  option-value="originalLabel"
+                  option-label="label"
+                  option-disable="disabled"
+                  v-if="operator.value === filterOperator && hasSecondaryOperator"
+                  @input-value="showSecondaryFilterOperationOptions"
+                  @input="addSecondaryValue"/>
       </template>
       <template v-if="filter.type === 'boolean'">
         <q-btn-toggle class="w-100"
