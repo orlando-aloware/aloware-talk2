@@ -21,39 +21,39 @@
 
       <q-separator/>
 
-      <q-card-section v-if="integration_data && integration_data.properties">
+      <q-card-section v-if="integrationData && integrationData.properties">
         <p class="mb-0"
-           v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
+           v-if="integrationData.properties.firstname !== undefined && integrationData.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
           <span class="data-value">
              <q-tooltip anchor="top middle"
                         self="center middle">
-              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+              {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
             </q-tooltip>
-            {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
           </span>
         </p>
         <p class="mb-0"
-           v-if="integration_data.properties.email">
+           v-if="integrationData.properties.email">
           <span class="data-icon-label">Email: </span>
-          <span class="data-value">{{ integration_data.properties.email.value }}</span>
+          <span class="data-value">{{ integrationData.properties.email.value }}</span>
         </p>
         <p class="mb-0"
-           v-if="integration_data.properties.company">
+           v-if="integrationData.properties.company">
           <span class="data-icon-label">Company: </span>
-          <span class="data-value">{{ integration_data.properties.company.value }}</span>
+          <span class="data-value">{{ integrationData.properties.company.value }}</span>
         </p>
         <p class="mb-0"
-           v-if="integration_data.properties.hubspot_owner">
+           v-if="integrationData.properties.hubspot_owner">
           <span class="data-icon-label">Owner: </span>
-          <span class="data-value">{{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}</span>
+          <span class="data-value">{{ integrationData.properties.hubspot_owner.firstName + ' ' + integrationData.properties.hubspot_owner.lastName }}</span>
         </p>
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0"
-                      v-if="integration_data && integration_data.properties">
+                      v-if="integrationData && integrationData.properties">
         <q-card class="deals mb-1"
-                v-for="(deal, index) in integration_data.properties.deals"
+                v-for="(deal, index) in integrationData.properties.deals"
                 :key="index"
                 flat bordered>
           <q-card-section>
@@ -127,7 +127,7 @@
       </q-card-section>
 
       <q-card-section
-        v-if="integration_data && integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
+        v-if="integrationData && integrationData.properties && integrationData.properties.email && integrationData.properties.email.value && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
@@ -230,7 +230,7 @@ export default {
         email: null,
         id: null
       },
-      integration_data: null,
+      integrationData: null,
       contactIntegrationDataLoaded: false
     }
   },
@@ -247,7 +247,7 @@ export default {
     getData () {
       return this.getIntegrationData(this.contact)
         .then(response => {
-          this.integration_data = response.data
+          this.integrationData = response.data
           this.contact.integration_data = response.data
 
           // update contact related states
@@ -268,7 +268,7 @@ export default {
 
     enrollToWorkflow () {
       this.isEnrolling = true
-      this.workflow.email = this.integration_data.properties.email ? this.integration_data.properties.email.value : ''
+      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email.value : ''
       return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
         this.resetWorkflowEnrollment()
         // emit on parent if there's a need to do after workflow enrollment

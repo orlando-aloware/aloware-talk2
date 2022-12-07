@@ -5,7 +5,7 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   data () {
     return {
-      integration_name: 'hubspot'
+      integrationName: 'hubspot'
     }
   },
 
@@ -25,7 +25,7 @@ export default {
     getIntegrationData (contact) {
       return talk2Api.V1.contact.getIntegrationData(contact.id, {
         params: {
-          integration_name: this.integration_name,
+          integration_name: this.integrationName,
           dialer_mode: this.dialer_mode ? 1 : 0
         }
       })

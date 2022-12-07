@@ -1,10 +1,9 @@
 <template>
   <div class="w-100 h-100 px-2">
 
-    <b-overlay class="d-flex"
-              :show="loading"
-              rounded="sm"
-              style="display:block;width:100% !important;">
+    <b-overlay class="d-flex d-block w-100"
+               :show="loading"
+               rounded="sm">
       <template #overlay>
         <q-spinner-bars color="primary"
                         size="40px" />
@@ -39,8 +38,8 @@
           </q-card-section>
         </q-card>
 
-        <DetailsContactInformation v-if="contact"
-                                   :resources="contact" />
+        <DetailsContactInformation :resources="contact"
+                                   v-if="contact" />
       </div>
       <div class="col-4 p-1 px-2"
            style="height:70vh;">
