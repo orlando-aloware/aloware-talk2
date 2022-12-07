@@ -568,12 +568,12 @@ export default {
 
         data.data = this.secondaryFilterOperatorValue instanceof Array
           ? this.secondaryFilterOperatorValue
-          : JSON.parse(JSON.stringify(this.secondaryFilterOperatorValue))
+          : this.$jsonClone(this.secondaryFilterOperatorValue)
       }
 
       data[attribute] = this.filterOperatorValue instanceof Array
         ? this.filterOperatorValue
-        : JSON.parse(JSON.stringify(this.filterOperatorValue))
+        : this.$jsonClone(this.filterOperatorValue)
 
       return data
     },
