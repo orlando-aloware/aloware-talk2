@@ -63,14 +63,14 @@ export default {
   methods: {
     ...mapActions('contacts', ['foldersLoaded']),
     onIntegrationImportDialogClose (data = {}) {
-      this.isHubspotImportDialogOpen = false
+      this.isIntegrationImportDialogOpen = false
 
       if (data.notification) {
         this.notification = data.notification
       }
     },
     onIntegrationImportDialogOpen () {
-      this.isHubspotImportDialogOpen = true
+      this.isIntegrationImportDialogOpen = true
     },
     reloadFolders () {
       return this.$axios
