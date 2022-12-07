@@ -14,6 +14,7 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
+    <custom-scripts v-if="authenticated && profile && profile.enabled"></custom-scripts>
     <intercom v-if="authenticated && profile && profile.enabled"></intercom>
   </div>
 </template>
@@ -22,11 +23,13 @@ import * as storage from 'src/plugins/helpers/storage'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
+import CustomScripts from 'components/custom-scripts'
 
 export default {
   name: 'App',
   components: {
     Intercom,
+    CustomScripts,
     ActionNotification
   },
   data () {
