@@ -97,7 +97,6 @@ import SmsTemplateModal from 'components/sms-template-modal'
 import talk2Api from 'src/plugins/api/api'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import PencilOIcon from 'components/icons/pencil-o-icon'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'sms-templates',
@@ -206,12 +205,7 @@ export default {
           this.isLoading = false
           this.templates = response.data
         }).catch((error) => {
-          const {
-            message,
-            html
-          } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
+          this.$handleErrors(error.response)
         })
     }
   },

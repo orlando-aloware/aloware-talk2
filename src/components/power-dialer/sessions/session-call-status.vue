@@ -62,9 +62,30 @@
           no-wrap
           unelevated
           no-caps
+          :disabled="!canRedial "
+          :color="canRedial  ? 'blue-7' : 'grey-8'"
+          @click="onRedial">
+          <RefreshIcon class="mr-2" color="white" />
+          <div class="text-body2">
+            <q-tooltip content-class="bg-grey-light11"
+                       anchor="bottom middle"
+                       self="center middle"
+                       v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
+                {{ redialTooltip }}
+            </q-tooltip>
+            Redial
+          </div>
+        </q-btn>
+
+        <q-btn
+          class="sessions-button free-width mx-1"
+          size="sm"
+          no-wrap
+          unelevated
+          no-caps
           :disabled="!canNextTask "
           :color="canNextTask  ? 'red-7' : 'grey-8'"
-          @click="onNextTask">
+          @click="onNextTask(false, true)">
           <CallDropIcon class="mr-2" color="white" />
           <div class="text-body2">Next</div>
         </q-btn>
@@ -259,13 +280,14 @@ import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
 import CallDropIcon from 'components/icons/call-drop-icon'
+import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep } from 'lodash'
+import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -288,7 +310,8 @@ export default {
     CallDropIcon,
     StopIcon,
     EndCallIcon,
-    RecordIcon
+    RecordIcon,
+    RefreshIcon
   },
   mixins: [ sessionCallStatusMixin ],
   beforeRouteEnter (to, from, next) {
@@ -469,8 +492,18 @@ export default {
     },
     canNextTask () {
       // should be able to next task even if on warm up period
-      return this.statusCallConnected ||
-        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)
+      // and no manual skip (clicked next task) is in-progress
+      return !this.loadingNext &&
+        (this.statusCallConnected ||
+        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus))
+    },
+    canRedial () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        !this.redialed.includes(this.activeTask.id) &&
+        this.powerDialerTasks.in_queue.length >= 1
+    },
+    redialTooltip () {
+      return this.canRedial ? 'This contact will go to the bottom of the current session list' : 'This contact has already been redialed once'
     },
     pauseButtonText () {
       switch (true) {
@@ -510,6 +543,13 @@ export default {
     ...mapActions('contacts', [
       'setContactClone'
     ]),
+    processHangup () {
+      this.$VueEvent.fire('hangupCall')
+
+      if (this.wrapUpSeconds === -1) {
+        this.$VueEvent.fire('resetCall')
+      }
+    },
     findDefaultOutboundCampaign () {
       this.autoDialer.outbound_campaign_id = null
 
@@ -560,7 +600,13 @@ export default {
         this.resetTimer()
       }
 
+      clearInterval(this.countdownInterval)
       this.countdownInterval = setInterval(() => {
+        // reset next task loading flag
+        if (this.loadingNext) {
+          this.loadingNext = false
+        }
+
         this.countdownTimer--
         this.onTimerIsOver()
       }, 1000)
@@ -571,7 +617,8 @@ export default {
         if (
           (this.toggleEnd ||
             !this.hasQueuedTaskLists) &&
-          !this.hasActiveTask) {
+          (!this.hasActiveTask ||
+              !this.activeTask)) {
           this.reRoute()
           return
         }
@@ -581,9 +628,14 @@ export default {
         }
         if (this.wrapUp) {
           this.initialize()
-          this.wrapUpSeconds !== 0 &&
-          (this.wrapUp = false) &&
-          (this.isSessionRunning = false)
+        }
+
+        // end wrap-up if wrap-up seconds
+        // is not indefinite
+        if (this.wrapUp &&
+          this.wrapUpSeconds !== 0) {
+          this.wrapUp = false
+          this.isSessionRunning = false
         }
         if (this.togglePause) {
           this.sessionPaused = true
@@ -627,14 +679,35 @@ export default {
         return
       }
 
+      const task = get(this.powerDialerTasks.in_queue, '0', null)
+      // skip assigning the next task if
+      // there is still an active task and
+      // wrap up seconds is indefinite
+      if (!isEmpty(this.activeTask) &&
+        this.wrapUpSeconds === 0) {
+        return
+      }
+
+      // end session if no more active call,
+      // no tasks in queue, no active task,
+      // and wrap up seconds is not indefinite
+      if (!this.statusCallConnected &&
+        !this.hasQueuedTaskLists &&
+        !task &&
+        this.wrapUpSeconds !== 0) {
+        this.reRoute()
+        return
+      }
+
       // TEMPORARY IMPLEMENTATION
       // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
       if (!this.statusOnACall) {
         if (!this.wrapUp) {
-          this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+          this.loadingNext = true
+          this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
-            this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+            this.powerDialerTasks.in_queue.shift()
           }
 
           this.activeTask = this.taskToCall
@@ -653,15 +726,26 @@ export default {
         }
       }
 
-      if (!this.hasQueuedTaskLists && !this.statusCallConnected) {
-        if (this.timerIsOver && this.selectedList.id !== 'all' && this.isSessionRunning) {
-          this.closePowerDialerNoTasks()
-        }
+      // end power dialer session if:
+      // power dialer has no tasks left in queue,
+      // countdown timer is 0,
+      // and session is still running
+      if (!this.hasQueuedTaskLists &&
+        !this.statusCallConnected &&
+        this.timerIsOver &&
+        this.isSessionRunning) {
+        this.closePowerDialerNoTasks()
       }
 
       this.TOGGLE_SESSION_LOADER(false)
     },
     closePowerDialerNoTasks () {
+      // continue the session if there is still
+      // an active task
+      if (this.hasActiveTask) {
+        return
+      }
+
       this.reRoute(false)
       if (this.redirectNotification) {
         this.$emit('no-tasks-found')
@@ -760,6 +844,7 @@ export default {
         }, 500)
       }
 
+      this.clearRedialedTask()
       clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
@@ -772,20 +857,42 @@ export default {
           // if (this.toggleEnd) {
           //   this.reRoute()
           // }
+
           if (!this.statusCallConnected &&
             this.timerIsOver &&
             this.isSessionRunning) {
             this.resetTimer()
           }
 
+          // automate next task only if no wrap-up and
+          // no manual skip (clicked next task) is in-progress
           if (this.isSessionRunning &&
-            this.wrapUpSeconds === -1) {
+            this.wrapUpSeconds === -1 &&
+            !this.loadingNext) {
             this.onNextTask()
           }
           break
         case 'WRAP_UP':
+          // if task is manually skipped through the
+          // Next button, end the wrap up
+          if (this.skipWrapUp) {
+            this.$VueEvent.fire('endWrapUp')
+            this.wrapUp = false
+            this.skipWrapUp = false
+            return
+          }
+
           this.wrapUp = true
           this.countdownTimer = this.wrapUpSeconds
+
+          // if status is wrap-up and wrap-up seconds
+          // is "no wrap-up", then skip wrap-up countdown timer
+          // and proceed immediately to the next task
+          if (this.isSessionRunning &&
+            this.wrapUpSeconds === -1) {
+            this.onNextTask(true)
+          }
+
           break
         case 'MAKING_CALL':
           break
@@ -799,6 +906,7 @@ export default {
           if (!this.togglePause) {
             this.resetTimer()
           }
+
           break
         case 'CALL_DISCONNECTED':
           break
@@ -837,27 +945,43 @@ export default {
         this.startWarmUpCountDown()
       }, 1000)
     },
-    async onNextTask () {
+    async onNextTask (forceSkip = false, skipWrapUp = false) {
+      this.loadingNext = true
+      this.skipWrapUp = skipWrapUp
       this.onPhoneExpansionReset()
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
+
+      // end wrap up
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      // hangup in-progress call
+      if (this.callInProgress &&
+        this.dialer.currentStatus !== 'WRAP_UP') {
+        this.processHangup()
+      }
+
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
+        forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
+        const task = get(this.powerDialerTasks.in_queue, '0', null)
 
-        this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+        this.taskToCall = cloneDeep(task)
 
-        if (!this.taskToCall) {
+        if (isEmpty(task)) {
           this.hasActiveTask = false
           this.reRoute()
           return
         }
 
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.powerDialerTasks.in_queue.shift()
         this.processSession()
         return
       }
 
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        this.$VueEvent.fire('hangupCall')
+        this.processHangup()
       }
     },
     async onNextTaskWhenOnWrapUp () {
@@ -865,7 +989,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id)
+        this.powerDialerTasks.in_queue.shift()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -912,6 +1036,24 @@ export default {
     },
     onPhoneExpansionReset () {
       this.sessionPhoneExpansion = ''
+    },
+    async onRedial () {
+      this.onPhoneExpansionReset()
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+      this.redialTask(this.activeTask).then(() => {
+        if (this.dialer.currentStatus === 'CALL_CONNECTED') {
+          this.processHangup()
+        }
+
+        this.powerDialerTasks.in_queue.push(this.activeTask)
+        this.activeTask = this.taskToCall
+
+        setTimeout(() => {
+          this.wrapUp = false
+          this.hasActiveTask = false
+          this.processSession()
+        }, 1000)
+      })
     }
   },
   watch: {
@@ -929,9 +1071,19 @@ export default {
     },
     'powerDialerTasks.in_queue': {
       handler (tasks) {
+        // end the session if:
+        // there's no tasks in queue
+        // and there's no active task
+        if (tasks.length === 0 &&
+          !this.hasActiveTask) {
+          this.shouldRedirect = true
+          return
+        }
+
         if (tasks.length === 0 && !this.togglePause) {
           this.shouldRedirect = true
         }
+
         if (tasks.length > 0 && !this.isSessionRunning) {
           this.shouldRedirect = false
           if (!this.wrapUp) {
@@ -972,7 +1124,8 @@ export default {
       hangUpInterval: null,
       hangUpIntervalCounter: 0,
       loadingHold: false,
-      loadingUnhold: false
+      loadingUnhold: false,
+      skipWrapUp: false
     }
   }
 }

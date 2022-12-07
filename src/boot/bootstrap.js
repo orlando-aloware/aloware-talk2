@@ -207,6 +207,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
       case 500:
         message.data = 'Oops! We are having some problems right now, please try again later.'
     }
+
+    if (window._.isEmpty(message.data.trim())) {
+      return
+    }
+
     this.$generalNotification(message.data, 'error', 5000, true)
   }
 }
@@ -279,6 +284,10 @@ Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
+  if (window._.isEmpty(message.trim())) {
+    return
+  }
+
   const uuid = window._.get(actionOptions, 'uuid', null)
   const filename = window._.get(actionOptions, 'filename', null)
   const colorClass = { data: '' }
@@ -490,6 +499,14 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     isStatus: true
   })
 }, 500)
+
+Vue.prototype.$jsonClone = (value) => {
+  if (value) {
+    return JSON.parse(JSON.stringify(value))
+  }
+
+  return value
+}
 
 // eslint-disable-next-line no-extend-native
 String.prototype.capitalize = function () {

@@ -35,7 +35,6 @@
 <script>
 import Avatar from 'components/avatar'
 import { mapGetters } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
 import {
   aclMixin,
   visibilityMixin
@@ -78,26 +77,6 @@ export default {
     return {
       contactItem: this.value
     }
-  },
-
-  created () {
-    this.$VueEvent.listen('new_communication', (data) => {
-      if (this.$route.name !== 'Contact') {
-        return
-      }
-
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
-        return
-      }
-
-      if (data.contact_id !== this.contact.id && data.contact_id === this.contactItem.id) {
-        talk2Api.V2.contacts.get(this.contactItem.id).then(response => {
-          this.contactItem = response.data
-        }).catch(err => {
-          console.log(err)
-        })
-      }
-    })
   },
 
   mounted () {

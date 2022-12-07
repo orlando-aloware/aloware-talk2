@@ -1,4 +1,5 @@
 export const ALL_RELATIONS = [
+  'phone_numbers',
   'broadcasts',
   'tags',
   'campaigns',

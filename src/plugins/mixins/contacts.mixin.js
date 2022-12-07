@@ -9,7 +9,6 @@ import _ from 'lodash'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
-import talk2Api from 'src/plugins/api/api'
 import { DEFAULT_STATE } from 'src/constants/contacts-default'
 
 export default {
@@ -39,6 +38,11 @@ export default {
       listContactsCancelToken: null,
       listContactsSource: null,
       previousSearch: null,
+      listeners: {},
+      addListMetaIds: [
+        'power-dialer-add-queue-list',
+        'power-dialer-add-list'
+      ],
       ALL_COLUMNS
     }
   },
@@ -111,9 +115,17 @@ export default {
         this.setListContactsLoaded(false)
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
-
-        const sort = (this.sorts) ? this.sorts.orderBy : this.defaultContactDateFilter
-        const order = (this.sorts) ? this.sorts.order : 'desc'
+        const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
+        const sort = !isAddList && this.isPowerDialer
+          ? 'order'
+          : ((this.sorts)
+            ? this.sorts.orderBy
+            : this.defaultContactDateFilter)
+        const order = !isAddList
+          ? 'asc'
+          : ((this.sorts)
+            ? this.sorts.order
+            : 'desc')
 
         if (list) {
           path = this.apiEndpoint(this.myQueueId !== null)
@@ -194,6 +206,7 @@ export default {
       }
       switch (this.$route.meta.id) {
         case 'power-dialer-add-list':
+        case 'power-dialer-add-queue-list':
           return `api/v2/contacts`
         case 'power-dialer':
         case 'power-dialer-queue-filter':
@@ -322,7 +335,9 @@ export default {
       }
 
       // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
-      const order = (this.sorts) ? this.sorts.order : _.get(params, 'order', 'desc')
+      const order = (this.sorts)
+        ? this.sorts.order
+        : _.get(params, 'order', 'desc')
 
       if (hasOrder) {
         params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
@@ -398,7 +413,7 @@ export default {
       }
 
       if (!_.isEmpty(this.currentListFilters)) {
-        const listFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+        const listFilters = this.$jsonClone(this.currentListFilters)
         const filterIndex = {
           index1: null,
           index2: null,
@@ -434,9 +449,9 @@ export default {
       }
 
       if (params?.sort) {
-        query.sort = params.sort
+        query.sort = this.getSortByColumn(params.sort)
         query.order = params.order ? params.order : 'asc'
-        powerQuery.sort_by = params.sort
+        powerQuery.sort_by = this.getSortByColumn(params.sort)
         powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
@@ -492,7 +507,7 @@ export default {
         return []
       }
 
-      let defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+      let defaultFilters = !_.isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
 
       if (typeof defaultFilters === 'string') {
         return JSON.parse(defaultFilters)
@@ -614,9 +629,12 @@ export default {
       }
     },
     stopEvents () {
-      this.$VueEvent.stop('fetchContacts')
-      this.$VueEvent.stop('clearContacts')
-      this.$VueEvent.stop('onLoadMoreContacts')
+      this.$VueEvent.stop('filteredFetchContacts', this.listeners.filteredFetchContacts)
+      this.$VueEvent.stop('fetchContacts', this.listeners.fetchContacts)
+      this.$VueEvent.stop('clearContacts', this.listeners.clearContacts)
+      this.$VueEvent.stop('onLoadMoreContacts', this.listeners.onLoadMoreContacts)
+      this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.stop('contactUpdated', this.listeners.contactUpdated)
     },
     initiateFetch (data, fromRefresh = false) {
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
@@ -631,25 +649,38 @@ export default {
       this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },
     startEvents () {
-      this.$VueEvent.listen('filteredFetchContacts', (data) => {
+      this.listeners.filteredFetchContacts = (data) => {
         this.fromContactFilters = true
         this.initiateFetch(data)
-      })
-      this.$VueEvent.listen('fetchContacts', (data) => {
+      }
+
+      this.listeners.fetchContacts = (data) => {
         const fromRefresh = _.get(data, 'fromRefresh', false)
         this.fromContactFilters = false
         data = fromRefresh ? {} : data
         this.initiateFetch(data, fromRefresh)
-      })
-      this.$VueEvent.listen('clearContacts', () => {
-        this.clearContacts()
-      })
-      this.$VueEvent.listen('onLoadMoreContacts', () => {
-        this.onLoadMore()
-      })
+      }
 
-      this.$VueEvent.listen('new_communication', (communication) => {
-        if (['Contact', 'Inbox', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name)) {
+      this.listeners.clearContacts = () => {
+        this.clearContacts()
+      }
+
+      this.listeners.onLoadMoreContacts = () => {
+        this.onLoadMore()
+      }
+
+      this.listeners.newCommunication = (communication) => {
+        const excludeRouteNames = [
+          'Contact',
+          'Inbox',
+          'Inbox Contact Task',
+          'Inbox Channel Task Status',
+          'Inbox Contact',
+          'Inbox Contact Communication',
+          'Inbox Channel'
+        ]
+
+        if (excludeRouteNames.includes(this.$route.name)) {
           return
         }
 
@@ -658,22 +689,30 @@ export default {
         }
 
         const index = this.contactsData.data.findIndex(item => item.id === communication.contact_id)
+
         if (index >= 0) {
-          talk2Api.V2.contacts.get(communication.contact_id).then(response => {
-            this.contactsData.data[index] = response.data
+          const contact = this.$jsonClone(communication.contact)
+          // add the v2 contact attributes that we need
+          Object.assign(contact, this.addV2ContactAttributes(contact))
+          // update the contact attributes
+          Object.assign(this.contactsData.data[index], contact)
 
-            if (this.contact.id === communication.contact_id) {
-              this.setContact(response.data)
-            }
-          }).catch(err => {
-            console.log(err)
-          })
+          if (parseInt(this.contact.id) === parseInt(communication.contact_id)) {
+            this.setContact(this.contactsData.data[index])
+          }
         }
-      })
+      }
 
-      this.$VueEvent.listen('contactUpdated', () => {
+      this.listeners.contactUpdated = () => {
         this.hasContactsListChanges = true
-      })
+      }
+
+      this.$VueEvent.listen('filteredFetchContacts', this.listeners.filteredFetchContacts)
+      this.$VueEvent.listen('fetchContacts', this.listeners.fetchContacts)
+      this.$VueEvent.listen('clearContacts', this.listeners.clearContacts)
+      this.$VueEvent.listen('onLoadMoreContacts', this.listeners.onLoadMoreContacts)
+      this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.listen('contactUpdated', this.listeners.contactUpdated)
     },
     getListData () {
       this.listDataSource.cancel('Loading of contacts list operation is canceled by the user')
@@ -727,6 +766,17 @@ export default {
       }
 
       return filters
+    },
+    /**
+     * Backend columns might differ from front end names being used.
+     * This function maps this if encountered some different column
+     */
+    getSortByColumn (key) {
+      if (key in this.backendTablesDictionary) {
+        return this.backendTablesDictionary[key]
+      }
+
+      return key
     }
   },
 
@@ -903,6 +953,14 @@ export default {
     },
     pdFilters () {
       return POWER_DIALER_FILTERS
+    },
+    backendTablesDictionary () {
+      return {
+        'inbound_calls_count': 'inbound_call_count',
+        'inbound_texts_count': 'inbound_sms_count',
+        'outbound_calls_count': 'outbound_call_count',
+        'outbound_texts_count': 'outbound_sms_count'
+      }
     }
   },
 
@@ -979,8 +1037,6 @@ export default {
   },
 
   beforeDestroy () {
-    if (!(this.$route.meta.id === 'power-dialer-queue-filter' || this.$route.meta.id === 'power-dialer-list-filter')) {
-      this.stopEvents()
-    }
+    this.stopEvents()
   }
 }

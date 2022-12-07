@@ -61,6 +61,7 @@ import SelectListModal from 'components/select-list-modal'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
 import {
   contactsMixins,
+  contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
   contactsListFiltersMixin,
@@ -80,6 +81,7 @@ export default {
 
   mixins: [
     contactsMixins,
+    contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
     contactsListFiltersMixin,

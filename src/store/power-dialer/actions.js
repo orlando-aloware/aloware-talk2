@@ -278,5 +278,11 @@ export default {
   },
   setActiveTask: ({ commit }, task) => {
     commit('SET_ACTIVE_TASK', task)
+  },
+  addRedialedTask: ({ commit }, taskId) => {
+    commit('ADD_REDIALED_TASK', taskId)
+  },
+  clearRedialedTask: ({ commit }) => {
+    commit('CLEAR_REDIALED_TASKS')
   }
 }

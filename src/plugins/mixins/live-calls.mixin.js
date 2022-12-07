@@ -203,7 +203,7 @@ export default {
       'setDialerParkedCall',
       'setShowIncomingCallNotification'
     ]),
-    ...mapActions('inbox', ['setContacts', 'setLiveContacts']),
+    ...mapActions('inbox', ['setLiveContacts']),
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },

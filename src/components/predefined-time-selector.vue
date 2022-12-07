@@ -18,13 +18,27 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
+
 export default {
   name: 'predefined-time-selector',
-  components: { VueMultiselect },
+
+  components: {
+    VueMultiselect
+  },
+
+  props: {
+    value: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
+
   computed: {
     times () {
       const times = []
       const hour = { data: 6 }
+
       for (hour.data = 6; hour.data < 24; hour.data++) {
         times.push({
           label: window.moment({ hour: hour.data }).format('h:mm A'),
@@ -46,14 +60,24 @@ export default {
         }
         )
       }
+
       return times
     }
   },
+
   data () {
     return {
       time: null
     }
   },
+
+  mounted () {
+    // if component value is set, search for that specific time only to fill as the option
+    if (this.value) {
+      this.time = this.times.find(time => time.value === this.value)
+    }
+  },
+
   methods: {
     onSelect (selected) {
       this.$emit('select', selected)
@@ -61,7 +85,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

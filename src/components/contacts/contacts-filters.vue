@@ -97,11 +97,11 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <compact-btn variant="outlined-light"
+                <!--compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
                              @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, false)">
                   OR
-                </compact-btn>
+                </compact-btn-->
               </div>
               <p
                 class="px-2 pt-2"
@@ -199,7 +199,8 @@ export default {
       relationTypes: [
         'relation',
         'multi_relation',
-        'boolean'
+        'boolean',
+        'selection'
       ],
       filterGroups: {
         GROUP_PRIMARY_INFO,
@@ -454,16 +455,14 @@ export default {
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
-      const labels = { data: null }
-      const item = { index: null }
-      const optionFound = { data: null }
-      const joinedValues = { data: null }
-      const values = { data: [] }
+      const isSelectionType = filterFound && filterFound.type === 'selection' // DNC or opt out filter
+      let values = []
+      let labels = []
 
       if (typeof filter.trueValue === 'object') {
         switch (true) {
           case filter.trueValue.length === 1 || (isRelationType):
-            values.data = filter.trueValue
+            values = filter.trueValue
             break
           case filter.trueValue.length === 2 && filter.operator !== 'Is between':
             return filter.trueValue.join(' or ')
@@ -471,25 +470,27 @@ export default {
             return filter.trueValue.join(' and ')
         }
 
-        labels.data = []
-
-        if (filterFound && isRelationType) {
-          for (item.index of values.data) {
-            optionFound.data = filterFound.options.find(option => String(option.value) === String(item.index))
-            labels.data.push(optionFound.data ? optionFound.data.label : '')
+        if (filterFound && (isRelationType || isSelectionType)) {
+          for (let index of values) {
+            filterFound
+              .options
+              // if is array search inside it, if not compare with the value
+              .filter(option => Array.isArray(index) ? index.includes(option.value) : index === option.value)
+              .forEach(option => {
+                labels.push(option.label)
+              })
           }
         } else if (isBoolean) {
-          labels.data = [filter.trueValue[0] === 1]
+          labels.push(filter.trueValue[0] === 1)
         } else {
-          labels.data = filter.trueValue
+          labels = filter.trueValue
         }
 
-        joinedValues.data = labels.data.join(', ')
-        if (labels.data.length > 1) {
-          return joinedValues.data.substring(0, joinedValues.data.lastIndexOf(',')) + ' or' + joinedValues.data.substring(joinedValues.data.lastIndexOf(',') + 1, joinedValues.data.length)
-        }
+        let joinedValues = labels.join(', ')
 
-        return joinedValues.data
+        return labels.length > 1
+          ? joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+          : joinedValues
       } else {
         return !isSimpleType ? filter.trueValue : ''
       }

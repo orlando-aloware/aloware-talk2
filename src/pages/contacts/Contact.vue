@@ -84,6 +84,7 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 import ContactDetails from 'src/components/contacts/contact-details'
 import {
   contactMixin,
+  contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
   inboxMixin
@@ -91,7 +92,6 @@ import {
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
-import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 
 export default {
@@ -99,6 +99,7 @@ export default {
 
   mixins: [
     contactMixin,
+    contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
     inboxMixin
@@ -130,7 +131,8 @@ export default {
       drawer: false,
       detailsOpen: false,
       contactListSidebarOpen: false,
-      leaving: false
+      leaving: false,
+      contactComponentListeners: {}
     }
   },
 
@@ -167,40 +169,46 @@ export default {
       this.fetchContact()
     }
 
-    this.$VueEvent.listen('contact_updated', (data) => {
-      // only fetch the latest contact data when updated contact is also the selected contact
-      // this is to avoid swarm of api request when numbers of contacts get updated
+    this.contactComponentListeners.contactUpdated = (data) => {
       const contactId = parseInt(data.id)
-      if (this.contact && parseInt(this.contact.id) === contactId && parseInt(this.$route.params.id) === contactId) {
-        talk2Api.V2.contacts.get(data.id).then(response => {
-          const contact = response.data
-          // check data loaded
-          this.setContact(contact)
-        }).catch(err => {
-          console.log(err)
-        })
-      }
-    })
 
-    this.$VueEvent.listen('contact_audit_created', (data) => {
-      // only fetch the latest contact data when updated contact is also the selected contact
-      // this is to avoid swarm of api request when numbers of contacts get updated
-      if (this.contact && parseInt(this.contact.id) === parseInt(data.contact_id)) {
-        if (data.property === 'contact_task_status') {
-          const contact = _.cloneDeep(this.contact)
-          contact.task_status = parseInt(data.to)
-          this.setContact(contact)
-        }
+      // check if we're in the correct contact route and
+      // contact object
+      if (this.contact &&
+        parseInt(this.contact.id) === contactId &&
+        parseInt(this.$route.params.id) === contactId) {
+        // just update the contact attributes
+        const updatedContact = this.$jsonClone(this.contact)
+        const contact = this.$jsonClone(data)
+        // add the v2 contact attributes that we need
+        Object.assign(contact, this.addV2ContactAttributes(contact))
+        Object.assign(updatedContact, contact)
+        this.setContact(updatedContact)
       }
-    })
+    }
 
-    this.$VueEvent.listen('contact_disposed', (disposedContact) => {
+    this.contactComponentListeners.contactAuditCreated = (data) => {
+      // check if current contact is the same as audit's contact id
+      if (this.contact &&
+        parseInt(this.contact.id) === parseInt(data.contact_id) &&
+        data.property === 'contact_task_status') {
+        const contact = _.cloneDeep(this.contact)
+        contact.task_status = parseInt(data.to)
+        this.setContact(contact)
+      }
+    }
+
+    this.contactComponentListeners.contactDisposed = (disposedContact) => {
       if (disposedContact.id === this.contact.id) {
         const contact = _.cloneDeep(this.contact)
         contact.disposition_status_id = disposedContact.disposition_status_id
         this.setContact(contact)
       }
-    })
+    }
+
+    this.$VueEvent.listen('contact_updated', this.contactComponentListeners.contactUpdated)
+    this.$VueEvent.listen('contact_audit_created', this.contactComponentListeners.contactAuditCreated)
+    this.$VueEvent.listen('contact_disposed', this.contactComponentListeners.contactDisposed)
   },
 
   created () {
@@ -260,6 +268,9 @@ export default {
     this.setIsContactMixinUsed(false)
     this.removeListeners()
     this.setContact({})
+    this.$VueEvent.stop('contact_updated', this.contactComponentListeners.contactUpdated)
+    this.$VueEvent.stop('contact_audit_created', this.contactComponentListeners.contactAuditCreated)
+    this.$VueEvent.stop('contact_disposed', this.contactComponentListeners.contactDisposed)
   },
 
   beforeRouteLeave (to, from, next) {
