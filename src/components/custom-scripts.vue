@@ -19,22 +19,22 @@ export default {
   methods: {
     setup () {
       // Moderate Genius
-      // if (this.currentCompany && this.currentCompany.reseller_id === 2132) {
-      const moderateGeniusScript = document.createElement('script')
-      moderateGeniusScript.setAttribute(
-        'src',
-        'https://js-na1.hs-scripts.com/20073549.js'
-      )
-      moderateGeniusScript.setAttribute(
-        'id',
-        'hs-script-loader'
-      )
+      if (this.currentCompany && this.currentCompany.reseller_id === 2132) {
+        const moderateGeniusScript = document.createElement('script')
+        moderateGeniusScript.setAttribute(
+          'src',
+          'https://js-na1.hs-scripts.com/20073549.js'
+        )
+        moderateGeniusScript.setAttribute(
+          'id',
+          'hs-script-loader'
+        )
 
-      moderateGeniusScript.async = true
-      moderateGeniusScript.defer = true
+        moderateGeniusScript.async = true
+        moderateGeniusScript.defer = true
 
-      document.body.appendChild(moderateGeniusScript)
-      // }
+        document.body.appendChild(moderateGeniusScript)
+      }
     }
   }
 }
