@@ -416,23 +416,24 @@ export default {
           }
 
           operators.data = found.data ? _.get(found.data, 'operators', null) : null
+          const filter = filterGroups[groupIndex.data].filters[filterIndex.data]
 
           if (operators.data) {
-            operator.data = found.data.operators.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
+            operator.data = found.data.operators.find(item => item.value === filter.operator)
             options.data = operator.data ? _.get(operator.data, 'options', null) : null
-            option.data = options.data ? options.data.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
-            trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].value
+            option.data = options.data ? options.data.find(item => item.value === filter.value) : null
+            trueValue.data = filter.value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : [trueValue.data]
+            trueValue.data = typeof filter.value === 'string' ? filter.value.split(',') : [trueValue.data]
 
             // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
             // The content in 'field' will be concatenated at the end of the string
-            if ('field' in filterGroups[groupIndex.data].filters[filterIndex.data]) {
+            if ('field' in filter) {
               field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
 
-              trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].field
+              trueValue.data = filter.field
               trueValue.data = option.data ? [option.data.label] : trueValue.data
-              trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].field === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].field.split(',') : [trueValue.data]
+              trueValue.data = typeof filter.field === 'string' ? filter.field.split(',') : [trueValue.data]
             }
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
@@ -442,15 +443,15 @@ export default {
               operator: operator.data ? _.get(operator.data, 'label', null) : null,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              default: filter.default || 0
             }
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.data.label,
-              trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
-              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              trueValue: filter.value,
+              value: JSON.stringify(filter.value),
+              default: filter.default || 0
             }
           }
         }
