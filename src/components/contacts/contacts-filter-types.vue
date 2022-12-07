@@ -437,9 +437,7 @@ export default {
 
     showFilterOperationOptions (event) {
       if (!event ||
-        (event &&
-          this.filterOperatorValue &&
-          this.filterOperatorValue.includes(event))) {
+          (event && this.filterOperatorValue && this.filterOperatorValue.includes(event))) {
         this.filterOptions[0].disabled = true
         this.filterOptions[0].label = 'Add a new option'
         return
@@ -458,9 +456,7 @@ export default {
 
     showSecondaryFilterOperationOptions (event) {
       if (!event ||
-        (event &&
-          this.secondaryFilterOperatorValue &&
-          this.secondaryFilterOperatorValue.includes(event))) {
+          (event && this.secondaryFilterOperatorValue && this.secondaryFilterOperatorValue.includes(event))) {
         this.filterOptions[0].disabled = true
         this.filterOptions[0].label = 'Add a new option'
         return
