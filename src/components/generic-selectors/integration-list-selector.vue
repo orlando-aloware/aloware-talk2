@@ -82,8 +82,52 @@
       </q-select>
     </template>
     <template v-else-if="isIntegrationEnabled('zoho')">
+      <el-form ref="add_zoho_view"
+              label-width="100px"
+              label-position="top"
+              :model="zoho_view"
+              :rules="rules_zoho_view"
+              v-if="zohoEnabled"
+              @submit.prevent.native="addZohoView">
+        <zoho-view-selector v-model="zohoView.view_id"
+                            :value="zohoView.view_id"
+                            @change="zohoViewChanged">
+        </zoho-view-selector>
+        <div class="row no-gutter centered-content">
+          <button class="btn btn-block greenish"
+                  :loading="loading_add_zoho_view"
+                  :disabled="loading_add_zoho_view || disable_add_view"
+                  @click.prevent="addZohoView">
+            <i class="material-icons loader"
+                v-if="loading_add_zoho_view">&#xE863;</i>
+            Add Contacts
+          </button>
+        </div>
+      </el-form>
     </template>
     <template v-else-if="isIntegrationEnabled('pipedrive')">
+      <form ref="add_pipedrive_filter"
+              label-width="100px"
+              label-position="top"
+              :model="pipedrive_filter"
+              :rules="rules_pipedrive_filter"
+              v-if="pipedriveEnabled"
+              @submit.prevent.native="addPipedriveFilter">
+        <pipedrive-filter-selector v-model="pipedriveFilter.filter_id"
+                                  :value="pipedriveFilter.filter_id"
+                                  @selectedFilter="pipedriveFilterChanged">
+        </pipedrive-filter-selector>
+        <div class="row no-gutter centered-content">
+          <button class="btn btn-block greenish"
+                  :loading="loading_add_pipedrive_filter"
+                  :disabled="loading_add_pipedrive_filter || disable_add_view"
+                  @click.prevent="addPipedriveFilter">
+            <i class="material-icons loader"
+                v-if="loading_add_pipedrive_filter">&#xE863;</i>
+            Add Contacts
+          </button>
+        </div>
+      </form>
     </template>
   </div>
 </template>
@@ -193,7 +237,14 @@ export default {
       options: [],
       reference: 'hubspotListSelector',
       fullOptionsProperty: 'sorted',
-      lists: []
+      lists: [],
+      disableAddView: false,
+      pipedriveFilter: {
+        filter_id: null
+      },
+      zohoView: {
+        view_id: null
+      }
     }
   },
 
@@ -246,6 +297,14 @@ export default {
       }
 
       return false
+    },
+    zohoViewChanged (viewId) {
+      this.zohoView.view_id = viewId
+      this.disableAddView = !this.validateForm('add_zoho_view')
+    },
+    pipedriveFilterChanged (filter) {
+      this.pipedriveFilter.filter_id = filter.id
+      this.disableAddView = !this.validateForm('add_pipedrive_filter')
     }
   },
 
