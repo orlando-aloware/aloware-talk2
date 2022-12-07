@@ -1041,16 +1041,16 @@ export default {
       this.onPhoneExpansionReset()
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       this.redialTask(this.activeTask).then(() => {
+        this.powerDialerTasks.in_queue.push(this.activeTask)
+        this.activeTask = this.taskToCall
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.processHangup()
         }
 
-        this.powerDialerTasks.in_queue.push(this.activeTask)
-        this.activeTask = this.taskToCall
-
         setTimeout(() => {
           this.wrapUp = false
           this.hasActiveTask = false
+          this.powerDialerTasks.in_queue.shift()
           this.processSession()
         }, 1000)
       })
