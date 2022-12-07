@@ -444,12 +444,16 @@ export default {
       })
     },
 
-    getDesktopToken () {
+    getDesktopToken (reset = false) {
       console.log('Generating desktop token')
 
       this.setDialerCurrentStatus('GENERATING_TOKEN')
 
-      return this.$axios.post('/api/v1/dialer/new-mobile-token').then(res => {
+      let params = {
+        reset
+      }
+
+      return this.$axios.post('/api/v1/dialer/new-mobile-token', params).then(res => {
         this.loading = false
         this.setDialerToken(res.data)
         this.setDialerCurrentStatus('TOKEN_GENERATED')
@@ -1239,6 +1243,11 @@ export default {
       // 9221 => Cannot connect to insights
       if (![31003, 31204, 31205, 9221].includes(err.code)) {
         this.$Sentry.captureException(err)
+      }
+
+      // Request new token if error
+      if ([31204, 31205].includes(err.code)) {
+        return this.getDesktopToken(true)
       }
 
       console.log(error)
