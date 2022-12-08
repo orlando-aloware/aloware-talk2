@@ -155,20 +155,7 @@ export default {
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       this.connection = call
       console.log('Received call invite', call)
-      const map = call._connection.customParameters
-      const customParameters = {}
-      map.forEach((value, key) => {
-        customParameters[key] = value
-      })
-      this.setDialerCall({
-        from: call.from,
-        to: call.to,
-        callSid: call.callSid,
-        state: call.state,
-        isMuted: call.isMuted,
-        customParameters: customParameters,
-        direction: call._connection._direction
-      })
+      this.dialerCallPrep(call)
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', this.dialer.call.callSid, this.dialer.call.from, this.dialer.currentNumber)
@@ -191,79 +178,6 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
-    })
-
-    this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
-      this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled', call)
-      this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.backToDial()
-      this.$closeActionNotification('incomingCall')
-      // if (this.$route.name === 'Incoming Call') {
-      //   this.$router.push({ name: 'Dial' }).catch(err => {
-      //     console.log(err)
-      //   })
-      // }
-    })
-
-    this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
-      console.log('Successfully connected call', call)
-      this.updateUnownedContactLastCommunicationStatus()
-      const map = call._connection.customParameters
-      const customParameters = {}
-      map.forEach((value, key) => {
-        customParameters[key] = value
-      })
-      this.setDialerCall({
-        from: call.from,
-        to: call.to,
-        callSid: call.callSid,
-        state: call.state,
-        isMuted: call.isMuted,
-        customParameters: customParameters,
-        direction: call._connection._direction
-      })
-      this.startCallTimer()
-      this.setDialerCurrentStatus('CALL_CONNECTED')
-      this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
-        // .finally(() => {
-        //   this.$router.push({ name: 'Call' }).catch(err => {
-        //     console.log(err)
-        //   })
-        //   setTimeout(() => {
-        //    this.startCallTimer()
-        //    this.setDialerCurrentStatus('CALL_CONNECTED')
-        //   }, 3000)
-        // })
-        .catch((err) => {
-          console.log(err)
-        })
-
-      // mute the phone
-      if (this.dialer.isMuted) {
-        this.forceMute()
-      }
-
-      // close the dialer form when it's open and incoming call is answered
-      if (this.dialerFormStatus) {
-        this.setDialerFormStatus(false)
-      }
-    })
-
-    this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-      this.removeUnownedLiveContactTask()
-      this.stopCallTimer()
-      this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      if (!this.dialer.parkedCall && !this.dialer.call) {
-        this.startWrapUpTimer()
-      } else if (this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-      } else if (!this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-      } else {
-        this.backToDial()
-      }
     })
 
     // ping getDesktopToken every 24 hours
@@ -561,6 +475,65 @@ export default {
         // remove warning from list
         this.warnings = this.warnings.filter(value => value !== warningName)
         this.setWarnings(this.warnings)
+      })
+
+      this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
+        console.log('Successfully connected call', call)
+        this.updateUnownedContactLastCommunicationStatus()
+        this.dialerCallPrep(call)
+        this.startCallTimer()
+        this.setDialerCurrentStatus('CALL_CONNECTED')
+        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+          // .finally(() => {
+          //   this.$router.push({ name: 'Call' }).catch(err => {
+          //     console.log(err)
+          //   })
+          //   setTimeout(() => {
+          //    this.startCallTimer()
+          //    this.setDialerCurrentStatus('CALL_CONNECTED')
+          //   }, 3000)
+          // })
+          .catch((err) => {
+            console.log(err)
+          })
+
+        // mute the phone
+        if (this.dialer.isMuted) {
+          this.forceMute()
+        }
+
+        // close the dialer form when it's open and incoming call is answered
+        if (this.dialerFormStatus) {
+          this.setDialerFormStatus(false)
+        }
+      })
+      this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
+        this.removeUnownedLiveContactTask()
+        console.log('Call invite canceled', call)
+        this.setDialerCurrentStatus('INVITE_CANCELLED')
+        this.backToDial()
+        this.$closeActionNotification('incomingCall')
+        // if (this.$route.name === 'Incoming Call') {
+        //   this.$router.push({ name: 'Dial' }).catch(err => {
+        //     console.log(err)
+        //   })
+        // }
+      })
+
+      this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
+        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+        this.removeUnownedLiveContactTask()
+        this.stopCallTimer()
+        this.setDialerCurrentStatus('CALL_DISCONNECTED')
+        if (!this.dialer.parkedCall && !this.dialer.call) {
+          this.startWrapUpTimer()
+        } else if (this.dialer.parkedCall && this.dialer.call) {
+          this.startWrapUpTimer()
+        } else if (!this.dialer.parkedCall && this.dialer.call) {
+          this.startWrapUpTimer()
+        } else {
+          this.backToDial()
+        }
       })
     },
 
@@ -1013,6 +986,23 @@ export default {
         this.$handleErrors(err.response)
       }).finally(() => {
         this.loadingAdd = false
+      })
+    },
+
+    dialerCallPrep (call) {
+      const map = call.customParameters
+      const customParameters = {}
+      map.forEach((value, key) => {
+        customParameters[key] = value
+      })
+      this.setDialerCall({
+        from: call.from,
+        to: call.to,
+        callSid: call.parameters.CallSid,
+        state: call.state,
+        isMuted: call.isMuted,
+        customParameters: customParameters,
+        direction: call.direction
       })
     },
 
