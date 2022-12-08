@@ -1047,6 +1047,7 @@ export default {
           this.$VueEvent.fire('hangupCall')
         }
 
+        // when there is wrap up, manually move the queue
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
             this.wrapUp = false
