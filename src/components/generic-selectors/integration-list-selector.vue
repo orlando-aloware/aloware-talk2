@@ -175,6 +175,18 @@ export default {
       }
 
       return []
+    },
+    integrationName () {
+      switch (true) {
+        case this.currentCompany.hubspot_integration_enabled:
+          return 'hubspot'
+        case this.currentCompany.zoho_integration_enabled:
+          return 'zoho'
+        case this.currentCompany.pipedrive_integration_enabled:
+          return 'pipedrive'
+      }
+
+      return null
     }
   },
 
@@ -186,55 +198,26 @@ export default {
       reference: 'hubspotListSelector',
       fullOptionsProperty: 'sorted',
       lists: [],
-      disableAddView: false,
-      pipedriveFilter: {
-        filter_id: null
-      },
-      zohoView: {
-        view_id: null
-      },
-      loadingAddZohoView: false,
-      rulesZohoView: {
-        view_id: [
-          {
-            required: true,
-            message: 'Please select a Zoho custom view',
-            trigger: 'change'
-          }
-        ]
-      },
-      loading_add_pipedrive_filter: false,
-      rulesPipedriveFilter: {
-        filter_id: [
-          {
-            required: true,
-            message: 'Please select a Pipedrive custom filter',
-            trigger: 'change'
-          }
-        ]
-      }
+      disableAddView: false
     }
   },
 
   methods: {
-    isIntegrationEnabled (name) {
-      if (!name) {
-        return false
-      }
-
-      switch (name) {
-        case 'hubspot':
-          return this.currentCompany.hubspot_integration_enabled
-        case 'zoho':
-          return this.currentCompany.zoho_integration_enabled
-        case 'pipedrive':
-          return this.currentCompany.pipedrive_integration_enabled
-      }
-
-      return false
-    },
-    getLists (offset = 0) {
+    getOptions () {
       this.isLoading = true
+
+      this.lists = []
+
+      switch (true) {
+        case this.currentCompany.hubspot_integration_enabled:
+          return this.getHubspotLists()
+        case this.currentCompany.zoho_integration_enabled:
+          return this.getZohoViews()
+        case this.currentCompany.pipedrive_integration_enabled:
+          return this.getPipedriveFilters()
+      }
+    },
+    getHubspotLists (offset = 0) {
       talk2Api.V1.integrations.hubspot.getList({
         params: {
           offset: offset
@@ -243,10 +226,32 @@ export default {
         const result = response.data
         this.lists.push(...result.lists)
         if (result.has_more) {
-          return this.getLists(result.offset)
+          return this.getHubspotLists(result.offset)
         } else {
           this.isLoading = false
         }
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
+    },
+    getZohoViews () {
+      this.zoho_views = []
+      this.loading_zoho_views = true
+      talk2Api.V1.integrations.zoho.getViews.then(response => {
+        this.isLoading = false
+        this.lists.push(...response.data)
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
+    },
+    getPipedriveFilters () {
+      talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
+        this.isLoading = false
+        this.lists.push(...response)
       }).catch((err) => {
         this.isLoading = false
         this.$handleErrors(err.response)
