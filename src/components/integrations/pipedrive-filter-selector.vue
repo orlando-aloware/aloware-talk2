@@ -37,9 +37,10 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { handleVuexApiCall } from '../utils/integration-helpers'
+import { integrationMixin } from 'src/plugins/mixins'
 
 export default {
+  mixins: [integrationMixin],
   props: {
     value: {
       required: false
@@ -121,7 +122,7 @@ export default {
       this.pipedriveFilters = []
       this.loadingPipedriveFilters = true
 
-      await handleVuexApiCall(this.fetchPipedriveFilters)
+      await this.handleVuexApiCall(this.fetchPipedriveFilters)
 
       this.loadingPipedriveFilters = false
     }
