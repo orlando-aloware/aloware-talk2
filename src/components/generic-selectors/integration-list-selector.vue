@@ -94,7 +94,7 @@ export default {
   mixins: [selectorMixin],
 
   components: {
-    RemoveTagIcon,
+    RemoveTagIcon
   },
 
   props: {
