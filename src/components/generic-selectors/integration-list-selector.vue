@@ -1,68 +1,100 @@
 <template>
   <div>
-    <template v-if="isIntegrationEnabled('hubspot')">
-      <q-form ref="add_hubspot_list"
-              :model="hubspotList"
-              :rules="rulesHubspotList"
-              @submit.prevent.native="addHubspotList">
-        <hubspot-list-selector />
-      </q-form>
-    </template>
-    <template v-else-if="isIntegrationEnabled('zoho')">
-      <q-form ref="add_zoho_view"
-              :model="zohoView"
-              :rules="rulesZohoView"
-              @submit.prevent.native="addZohoView">
-        <zoho-view-selector v-model="zohoView.view_id"
-                            :value="zohoView.view_id"
-                            @change="zohoViewChanged"/>
-        <div class="row no-gutter centered-content">
-          <button class="btn btn-block greenish"
-                  :loading="loadingAddZohoView"
-                  :disabled="(loadingAddZohoView || disableAddView)"
-                  @click.prevent="addZohoView">
-            <i class="material-icons loader"
-                v-if="loadingAddZohoView">&#xE863;</i>
-            Add Contacts
-          </button>
-        </div>
-      </q-form>
-    </template>
-    <template v-else-if="isIntegrationEnabled('pipedrive')">
-      <q-form ref="add_pipedrive_filter"
-              :model="pipedriveFilter"
-              :rules="rulesPipedriveFilter"
-              @submit.prevent.native="addPipedriveFilter">
-        <pipedrive-filter-selector v-model="pipedriveFilter.filter_id"
-                                  :value="pipedriveFilter.filter_id"
-                                  @selectedFilter="pipedriveFilterChanged"/>
-        <div class="row no-gutter centered-content">
-          <button class="btn btn-block greenish"
-                  :loading="loadingAddPipedriveFilter"
-                  :disabled="loadingAddPipedriveFilter || disableAddView"
-                  @click.prevent="addPipedriveFilter">
-            <i class="material-icons loader"
-                v-if="loadingAddPipedriveFilter">&#xE863;</i>
-            Add Contacts
-          </button>
-        </div>
-      </q-form>
-    </template>
+    <q-select ref="hubspotListSelector"
+              options-selected-class="text-primary"
+              class="q-basic-selector"
+              color="primary"
+              option-value="id"
+              option-label="name"
+              input-debounce="0"
+              style="word-break: break-all;"
+              use-input
+              emit-value
+              map-options
+              outlined
+              dense
+              v-model="value"
+              :options="options"
+              :placeholder="placeholder"
+              :multiple="multiple"
+              :disable="disable"
+              :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
+              :use-chips="useChips"
+              :clearable="clearable"
+              :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :loading="isLoading"
+              @popup-show="onShowMenu"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
+              @filter="filterFn">
+      <template v-slot:prepend
+                v-if="prepend">
+        <span class="text-size-xs text-grey-80">{{ prepend }}</span>
+      </template>
+
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="no-results text-grey">
+            No results
+          </q-item-section>
+        </q-item>
+      </template>
+
+      <template v-slot:option="scope">
+        <q-item v-if="!scope.opt.group"
+                v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-section>
+            <q-item-label>
+              <q-item-label v-html="scope.opt.name" ></q-item-label>
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item v-if="scope.opt.group"
+                v-bind="scope.itemProps"
+                v-on="scope.itemEvents">
+          <q-item-label header
+                        class="text-size-xs">
+            {{ scope.opt.group }}
+          </q-item-label>
+        </q-item>
+      </template>
+
+      <template v-slot:selected-item="scope"
+                v-if="useChips">
+        <q-chip dense
+                :tabindex="scope.tabindex"
+                color="white"
+                class="tag-selected-chip"
+                text-color="secondary">
+          <i class="fa fa-circle position-absolute"
+              :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+          <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
+          <div role="button"
+                class="custom__remove d-flex align-items-center position-absolute r-0"
+                @click="scope.removeAtIndex(scope.index)">
+            <remove-tag-icon class="ml-1 remove-tag-icon"/>
+          </div>
+        </q-chip>
+      </template>
+    </q-select>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import PipedriveFilterSelector from 'src/components/integrations/pipedrive-filter-selector.vue'
-import ZohoViewSelector from 'src/components/integrations/zoho-view-selector.vue'
-import axios from 'axios'
+import { selectorMixin } from 'src/plugins/mixins'
+import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'integration-list-selector',
 
+  mixins: [selectorMixin],
+
   components: {
-    PipedriveFilterSelector,
-    ZohoViewSelector
+    RemoveTagIcon,
   },
 
   props: {
@@ -201,96 +233,38 @@ export default {
 
       return false
     },
-    zohoViewChanged (viewId) {
-      this.zohoView.view_id = viewId
-      this.disableAddView = !this.validateForm('add_zoho_view')
-    },
-    pipedriveFilterChanged (filter) {
-      this.pipedriveFilter.filter_id = filter.id
-      this.disableAddView = !this.validateForm('add_pipedrive_filter')
-    },
-    addZohoView () {
-      if (this.validateForm('add_zoho_view') === true) {
-        this.loading_add_zoho_view = true
-        let params = {}
-        params.direction = this.direction
-        params.multiple_phone_numbers = this.multiple_phone_numbers
-        params.prevent_duplicates = this.prevent_duplicates
-        params.own_contacts_only = this.own_contacts_only
-        if (this.future_scheduled) {
-          params.future_scheduled_time = this.future_scheduled_time
+    getLists (offset = 0) {
+      this.isLoading = true
+      talk2Api.V1.integrations.hubspot.getList({
+        params: {
+          offset: offset
         }
-        axios.post(`/api/v1/auto-dialer/add-zoho-view/${this.zoho_view.view_id}`, params).then(() => {
-          this.loading_add_zoho_view = false
-          this.resetForms()
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: 'Zoho custom view contacts are now being added to your PowerDialer.',
-            type: 'success',
-            showClose: true
-          })
-          this.$emit('success', true)
-        }).catch((err) => {
-          this.loading_add_zoho_view = false
-          this.resetAddZohoView()
-
-          const res = err.response
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: res.data?.message,
-            type: 'error',
-            showClose: true
-          })
-
-          console.log(err)
-        })
-      } else {
-        return false
-      }
-    },
-    addPipedriveFilter () {
-      if (this.validateForm('add_pipedrive_filter') === true) {
-        this.loading_add_pipedrive_filter = true
-        let params = {}
-        params.direction = this.direction
-        params.multiple_phone_numbers = this.multiple_phone_numbers
-        params.prevent_duplicates = this.prevent_duplicates
-        params.own_contacts_only = this.own_contacts_only
-        params.allow_international_phone_numbers = this.allow_international_phone_numbers
-        if (this.future_scheduled) {
-          params.future_scheduled_time = this.future_scheduled_time
+      }).then(response => {
+        const result = response.data
+        this.lists.push(...result.lists)
+        if (result.has_more) {
+          return this.getLists(result.offset)
+        } else {
+          this.isLoading = false
         }
-        axios.post(`/api/v1/auto-dialer/add-pipedrive-filter/${this.pipedrive_filter.filter_id}`, params).then(() => {
-          this.loading_add_pipedrive_filter = false
-          this.resetForms()
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: 'Pipedrive custom filter contacts are now being added to your PowerDialer.',
-            type: 'success',
-            showClose: true
-          })
-          this.$emit('success', true)
-        }).catch((err) => {
-          this.loading_add_pipedrive_filter = false
-          this.resetAddPipedriveFilter()
-
-          const res = err.response
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: res.data?.message,
-            type: 'error',
-            showClose: true
-          })
-
-          console.log(err)
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
+    },
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.sorted
         })
-      } else {
-        return false
+        return
       }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.sorted.filter((item) => item.name && item.name.toLowerCase().indexOf(needle) > -1)
+      })
     }
   },
 
