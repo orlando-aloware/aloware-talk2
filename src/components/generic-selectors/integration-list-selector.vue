@@ -13,7 +13,7 @@
               map-options
               outlined
               dense
-              v-model="value"
+              v-model="selectedId"
               :options="options"
               :placeholder="placeholder"
               :multiple="multiple"
