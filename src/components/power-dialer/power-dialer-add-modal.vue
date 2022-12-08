@@ -372,6 +372,89 @@ export default {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
         })
     },
+    addZohoView () {
+      if (this.validateForm('add_zoho_view') === true) {
+        this.loading_add_zoho_view = true
+        let params = {}
+        params.direction = this.direction
+        params.multiple_phone_numbers = this.multiple_phone_numbers
+        params.prevent_duplicates = this.prevent_duplicates
+        params.own_contacts_only = this.own_contacts_only
+        if (this.future_scheduled) {
+          params.future_scheduled_time = this.future_scheduled_time
+        }
+        this.$axios.post(`/api/v1/auto-dialer/add-zoho-view/${this.zoho_view.view_id}`, params).then(() => {
+          this.loading_add_zoho_view = false
+          this.resetForms()
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: 'Zoho custom view contacts are now being added to your PowerDialer.',
+            type: 'success',
+            showClose: true
+          })
+          this.$emit('success', true)
+        }).catch((err) => {
+          this.loading_add_zoho_view = false
+          this.resetAddZohoView()
+
+          const res = err.response
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: res.data?.message,
+            type: 'error',
+            showClose: true
+          })
+
+          console.log(err)
+        })
+      } else {
+        return false
+      }
+    },
+    addPipedriveFilter () {
+      if (this.validateForm('add_pipedrive_filter') === true) {
+        this.loading_add_pipedrive_filter = true
+        let params = {}
+        params.direction = this.direction
+        params.multiple_phone_numbers = this.multiple_phone_numbers
+        params.prevent_duplicates = this.prevent_duplicates
+        params.own_contacts_only = this.own_contacts_only
+        params.allow_international_phone_numbers = this.allow_international_phone_numbers
+        if (this.future_scheduled) {
+          params.future_scheduled_time = this.future_scheduled_time
+        }
+        this.$axios.post(`/api/v1/auto-dialer/add-pipedrive-filter/${this.pipedrive_filter.filter_id}`, params).then(() => {
+          this.loading_add_pipedrive_filter = false
+          this.resetForms()
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: 'Pipedrive custom filter contacts are now being added to your PowerDialer.',
+            type: 'success',
+            showClose: true
+          })
+          this.$emit('success', true)
+        }).catch((err) => {
+          this.loading_add_pipedrive_filter = false
+          this.resetAddPipedriveFilter()
+
+          const res = err.response
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: res.data?.message,
+            type: 'error',
+            showClose: true
+          })
+
+          console.log(err)
+        })
+      } else {
+        return false
+      }
+    },
     reloadFolders () {
       return this.$axios
         .get('/api/v2/power-dialer-folders')
