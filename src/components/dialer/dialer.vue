@@ -996,11 +996,11 @@ export default {
         customParameters[key] = value
       })
       this.setDialerCall({
-        from: call.from,
+        from: call.parameters.from,
         to: call.to,
         callSid: call.parameters.CallSid,
-        state: call.state,
-        isMuted: call.isMuted,
+        state: call.status(),
+        isMuted: call.isMuted(),
         customParameters: customParameters,
         direction: call.direction
       })
