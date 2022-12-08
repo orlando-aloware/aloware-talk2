@@ -42,7 +42,6 @@ export default {
       loadingPark: false,
       loadingUnpark: false,
       device: new TwilioDevice(null),
-      call: null,
       connection: null,
       warnings: [],
       hangupInterval: null,
@@ -154,7 +153,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      this.call = call
+      this.connection = call
       console.log('Received call invite', call)
       const map = call._connection.customParameters
       const customParameters = {}
@@ -483,7 +482,7 @@ export default {
     makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
-      if (this.dialer.isBusy) {
+      if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
         return
       }
@@ -516,7 +515,6 @@ export default {
       this.setDialerCurrentNumber(params['To'])
 
       const activeConnectionCounter = { data: 0 }
-
       // check if connection is completely closed before opening a new one
       if (this.device.activeConnection()) {
         this.activeConnectionInterval = setInterval(() => {
@@ -615,14 +613,14 @@ export default {
         return
       }
 
-      if (this.call) {
+      if (this.dialer.activeConnection()) {
         if (this.isMobile && this.$route.name !== 'Phone') {
           this.$router.push({
             name: 'Phone'
           })
         }
         // accept the incoming connection and start two-way audio
-        this.call.accept()
+        this.dialer.activeConnection().accept()
       }
     },
 
@@ -1234,14 +1232,14 @@ export default {
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
       // there may be an issue resolving the hostname provided. If a region is being specified in Device setup, ensure it's a valid region.
       // 31009 => No transport available to send or receive messages.
-      // 31201 => Generic unknown error.
+      // 31201 => Generic unknown error. => New Code 31402
 
       // Handled errors
-      // 31003 => Connection timeout.
+      // 31003 => Connection timeout. => New Code 53405
       // 31204 => Invalid JWT token.
       // 31205 => JWT token expired.
       // 9221 => Cannot connect to insights
-      if (![31003, 31204, 31205, 9221].includes(err.code)) {
+      if (![53405, 31204, 31205, 9221].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
 
