@@ -82,12 +82,9 @@
       </q-select>
     </template>
     <template v-else-if="isIntegrationEnabled('zoho')">
-      <el-form ref="add_zoho_view"
-              label-width="100px"
-              label-position="top"
-              :model="zoho_view"
-              :rules="rules_zoho_view"
-              v-if="zohoEnabled"
+      <q-form ref="add_zoho_view"
+              :model="zohoView"
+              :rules="rulesZohoView"
               @submit.prevent.native="addZohoView">
         <zoho-view-selector v-model="zohoView.view_id"
                             :value="zohoView.view_id"
@@ -95,23 +92,20 @@
         </zoho-view-selector>
         <div class="row no-gutter centered-content">
           <button class="btn btn-block greenish"
-                  :loading="loading_add_zoho_view"
-                  :disabled="loading_add_zoho_view || disable_add_view"
+                  :loading="loadingAddZohoView"
+                  :disabled="(loadingAddZohoView || disableAddView)"
                   @click.prevent="addZohoView">
             <i class="material-icons loader"
-                v-if="loading_add_zoho_view">&#xE863;</i>
+                v-if="loadingAddZohoView">&#xE863;</i>
             Add Contacts
           </button>
         </div>
-      </el-form>
+      </q-form>
     </template>
     <template v-else-if="isIntegrationEnabled('pipedrive')">
-      <form ref="add_pipedrive_filter"
-              label-width="100px"
-              label-position="top"
-              :model="pipedrive_filter"
-              :rules="rules_pipedrive_filter"
-              v-if="pipedriveEnabled"
+      <q-form ref="add_pipedrive_filter"
+              :model="pipedriveFilter"
+              :rules="rulesPipedriveFilter"
               @submit.prevent.native="addPipedriveFilter">
         <pipedrive-filter-selector v-model="pipedriveFilter.filter_id"
                                   :value="pipedriveFilter.filter_id"
@@ -119,15 +113,15 @@
         </pipedrive-filter-selector>
         <div class="row no-gutter centered-content">
           <button class="btn btn-block greenish"
-                  :loading="loading_add_pipedrive_filter"
-                  :disabled="loading_add_pipedrive_filter || disable_add_view"
+                  :loading="loadingAddPipedriveFilter"
+                  :disabled="loadingAddPipedriveFilter || disableAddView"
                   @click.prevent="addPipedriveFilter">
             <i class="material-icons loader"
-                v-if="loading_add_pipedrive_filter">&#xE863;</i>
+                v-if="loadingAddPipedriveFilter">&#xE863;</i>
             Add Contacts
           </button>
         </div>
-      </form>
+      </q-form>
     </template>
   </div>
 </template>
@@ -139,6 +133,7 @@ import { selectorMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import PipedriveFilterSelector from 'src/components/integrations/pipedrive-filter-selector.vue'
 import ZohoViewSelector from 'src/components/integrations/zoho-view-selector.vue'
+import axios from 'axios'
 
 export default {
   name: 'integration-list-selector',
@@ -248,6 +243,26 @@ export default {
       },
       zohoView: {
         view_id: null
+      },
+      loadingAddZohoView: false,
+      rulesZohoView: {
+        view_id: [
+          {
+            required: true,
+            message: 'Please select a Zoho custom view',
+            trigger: 'change'
+          }
+        ]
+      },
+      loading_add_pipedrive_filter: false,
+      rulesPipedriveFilter: {
+        filter_id: [
+          {
+            required: true,
+            message: 'Please select a Pipedrive custom filter',
+            trigger: 'change'
+          }
+        ]
       }
     }
   },
@@ -293,11 +308,11 @@ export default {
 
       switch (name) {
         case 'hubspot':
-          return this.hubspot_integration_enabled
+          return this.currentCompany.hubspot_integration_enabled
         case 'zoho':
-          return this.zoho_integration_enabled
+          return this.currentCompany.zoho_integration_enabled
         case 'pipedrive':
-          return this.pipedrive_integration_enabled
+          return this.currentCompany.pipedrive_integration_enabled
       }
 
       return false
@@ -309,6 +324,89 @@ export default {
     pipedriveFilterChanged (filter) {
       this.pipedriveFilter.filter_id = filter.id
       this.disableAddView = !this.validateForm('add_pipedrive_filter')
+    },
+    addZohoView () {
+      if (this.validateForm('add_zoho_view') === true) {
+        this.loading_add_zoho_view = true
+        let params = {}
+        params.direction = this.direction
+        params.multiple_phone_numbers = this.multiple_phone_numbers
+        params.prevent_duplicates = this.prevent_duplicates
+        params.own_contacts_only = this.own_contacts_only
+        if (this.future_scheduled) {
+          params.future_scheduled_time = this.future_scheduled_time
+        }
+        axios.post(`/api/v1/auto-dialer/add-zoho-view/${this.zoho_view.view_id}`, params).then(() => {
+          this.loading_add_zoho_view = false
+          this.resetForms()
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: 'Zoho custom view contacts are now being added to your PowerDialer.',
+            type: 'success',
+            showClose: true
+          })
+          this.$emit('success', true)
+        }).catch((err) => {
+          this.loading_add_zoho_view = false
+          this.resetAddZohoView()
+
+          const res = err.response
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: res.data?.message,
+            type: 'error',
+            showClose: true
+          })
+
+          console.log(err)
+        })
+      } else {
+        return false
+      }
+    },
+    addPipedriveFilter () {
+      if (this.validateForm('add_pipedrive_filter') === true) {
+        this.loading_add_pipedrive_filter = true
+        let params = {}
+        params.direction = this.direction
+        params.multiple_phone_numbers = this.multiple_phone_numbers
+        params.prevent_duplicates = this.prevent_duplicates
+        params.own_contacts_only = this.own_contacts_only
+        params.allow_international_phone_numbers = this.allow_international_phone_numbers
+        if (this.future_scheduled) {
+          params.future_scheduled_time = this.future_scheduled_time
+        }
+        axios.post(`/api/v1/auto-dialer/add-pipedrive-filter/${this.pipedrive_filter.filter_id}`, params).then(() => {
+          this.loading_add_pipedrive_filter = false
+          this.resetForms()
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: 'Pipedrive custom filter contacts are now being added to your PowerDialer.',
+            type: 'success',
+            showClose: true
+          })
+          this.$emit('success', true)
+        }).catch((err) => {
+          this.loading_add_pipedrive_filter = false
+          this.resetAddPipedriveFilter()
+
+          const res = err.response
+          this.$notify({
+            offset: 175,
+            title: 'PowerDialer',
+            message: res.data?.message,
+            type: 'error',
+            showClose: true
+          })
+
+          console.log(err)
+        })
+      } else {
+        return false
+      }
     }
   },
 
