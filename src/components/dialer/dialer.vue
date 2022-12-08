@@ -479,7 +479,7 @@ export default {
       })
     },
 
-    makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
+    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
@@ -517,9 +517,9 @@ export default {
       const activeConnectionCounter = { data: 0 }
       // check if connection is completely closed before opening a new one
       if (this.device.activeConnection()) {
-        this.activeConnectionInterval = setInterval(() => {
+        this.activeConnectionInterval = setInterval(async () => {
           if (!this.device.activeConnection()) {
-            this.connection = this.device.connect(params, true)
+            this.connection = await this.device.connect(params, true)
             this.initConnectionEvents()
             clearInterval(this.activeConnectionInterval)
           }
@@ -531,7 +531,7 @@ export default {
           }
         }, 500)
       } else {
-        this.connection = this.device.connect(params, true)
+        this.connection = await this.device.connect(params, true)
         this.initConnectionEvents()
       }
 

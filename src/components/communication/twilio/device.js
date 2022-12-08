@@ -22,10 +22,10 @@ export default class TwilioDevice extends MainDevice {
   }
 
   activeConnection () {
-    if (!this._device || this._device.calls.length === 0) {
+    if (!this._device || !this._device._activeCall) {
       return null
     }
-    return this._createConnection(this._device.calls[0])
+    return this._createConnection(this._device._activeCall)
   }
 
   availableInputDevices () {
@@ -70,8 +70,8 @@ export default class TwilioDevice extends MainDevice {
     return this._device.audio.speakerDevices.test()
   }
 
-  connect (params, initEvents = false) {
-    return this._createConnection(this._device.connect(params), initEvents)
+  async connect (params, initEvents = false) {
+    return this._createConnection(await this._device.connect({ params }), initEvents)
   }
 
   destroy () {
