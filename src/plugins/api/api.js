@@ -307,6 +307,16 @@ export default {
             })
           }
         }
+      },
+      zoho: {
+        getViews () {
+          return window.axios.get('/api/v1/integration/zoho/views')
+        }
+      },
+      pipedrive: {
+        getFilters () {
+          return window.axios.get('/api/v1/integration/pipedrive/filters')
+        }
       }
     },
     automations: {
