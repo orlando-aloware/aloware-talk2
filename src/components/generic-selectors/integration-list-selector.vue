@@ -274,7 +274,7 @@ export default {
   },
 
   mounted () {
-    this.getLists()
+    this.getOptions()
   },
 
   watch: {
