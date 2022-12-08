@@ -1044,15 +1044,17 @@ export default {
         this.powerDialerTasks.in_queue.push(this.activeTask)
         this.activeTask = this.taskToCall
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-          this.processHangup()
+          this.$VueEvent.fire('hangupCall')
         }
 
-        setTimeout(() => {
-          this.wrapUp = false
-          this.hasActiveTask = false
-          this.powerDialerTasks.in_queue.shift()
-          this.processSession()
-        }, 1000)
+        if (this.wrapUpSeconds !== -1) {
+          setTimeout(() => {
+            this.wrapUp = false
+            this.hasActiveTask = false
+            this.powerDialerTasks.in_queue.shift()
+            this.processSession()
+          }, 1000)
+        }
       })
     }
   },
