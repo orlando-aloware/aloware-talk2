@@ -137,6 +137,8 @@ import { mapState } from 'vuex'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import PipedriveFilterSelector from 'src/components/integrations/pipedrive-filter-selector.vue'
+import ZohoViewSelector from 'src/components/integrations/zoho-view-selector.vue'
 
 export default {
   name: 'integration-list-selector',
@@ -146,7 +148,9 @@ export default {
   ],
 
   components: {
-    RemoveTagIcon
+    RemoveTagIcon,
+    PipedriveFilterSelector,
+    ZohoViewSelector
   },
 
   props: {
