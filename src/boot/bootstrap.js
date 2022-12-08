@@ -11,6 +11,7 @@ import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 import * as storage from 'src/plugins/helpers/storage'
+import CountriesAndTimezones from 'countries-and-timezones'
 
 import { Screen } from 'quasar'
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
@@ -44,6 +45,9 @@ window.PNF = googlePhone.PhoneNumberFormat
 
 // Get an instance of `PhoneNumberUtil`.
 window.phoneUtil = googlePhone.PhoneNumberUtil.getInstance()
+
+// Timezones for international companies (outside US and CA)
+window.CountriesAndTimezones = CountriesAndTimezones
 
 window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
   if (!phoneNumber) {
