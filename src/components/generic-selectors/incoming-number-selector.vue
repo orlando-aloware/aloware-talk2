@@ -229,6 +229,7 @@ export default {
           })
           .then((res) => {
             this.campaigns = res.data
+            this.phoneNumberOptions = this.incomingNumbers
             this.loadingCampaigns = false
           })
           .catch((err) => {
