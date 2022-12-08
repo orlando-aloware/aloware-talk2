@@ -386,16 +386,16 @@ export default {
     },
 
     generateListFilters () {
-      const filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
+      const filterGroups = this.$jsonClone(this.currentListFilters)
       const groupIndex = { data: null }
       const filterIndex = { data: null }
-      const operators = { data: null }
       const found = { data: null }
       const operator = { data: null }
       const options = { data: null }
       const option = { data: null }
       const trueValue = { data: null }
       const field = { field: null }
+      const filter = { data: null }
 
       for (groupIndex.data in filterGroups) {
         if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
@@ -415,25 +415,24 @@ export default {
             continue
           }
 
-          operators.data = found.data ? _.get(found.data, 'operators', null) : null
-          const filter = filterGroups[groupIndex.data].filters[filterIndex.data]
+          if (_.get(found.data, 'operators', null)) {
+            filter.data = filterGroups[groupIndex.data].filters[filterIndex.data]
 
-          if (operators.data) {
-            operator.data = found.data.operators.find(item => item.value === filter.operator)
+            operator.data = found.data.operators.find(item => item.value === filter.data.operator)
             options.data = operator.data ? _.get(operator.data, 'options', null) : null
-            option.data = options.data ? options.data.find(item => item.value === filter.value) : null
-            trueValue.data = filter.value
+            option.data = options.data ? options.data.find(item => item.value === filter.data.value) : null
+            trueValue.data = filter.data.value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filter.value === 'string' ? filter.value.split(',') : [trueValue.data]
+            trueValue.data = typeof filter.data.value === 'string' ? filter.data.value.split(',') : [trueValue.data]
 
             // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
             // The content in 'field' will be concatenated at the end of the string
-            if ('field' in filter) {
+            if ('field' in filter.data) {
               field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
 
-              trueValue.data = filter.field
+              trueValue.data = filter.data.field
               trueValue.data = option.data ? [option.data.label] : trueValue.data
-              trueValue.data = typeof filter.field === 'string' ? filter.field.split(',') : [trueValue.data]
+              trueValue.data = typeof filter.data.field === 'string' ? filter.data.field.split(',') : [trueValue.data]
             }
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
@@ -443,15 +442,15 @@ export default {
               operator: operator.data ? _.get(operator.data, 'label', null) : null,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
-              default: filter.default || 0
+              default: filter.data.default || 0
             }
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.data.label,
-              trueValue: filter.value,
-              value: JSON.stringify(filter.value),
-              default: filter.default || 0
+              trueValue: filter.data.value,
+              value: JSON.stringify(filter.data.value),
+              default: filter.data.default || 0
             }
           }
         }
