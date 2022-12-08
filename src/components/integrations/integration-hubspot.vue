@@ -21,39 +21,39 @@
 
       <q-separator/>
 
-      <q-card-section v-if="integration_data && integration_data.properties">
+      <q-card-section v-if="integrationData && integrationData.properties">
         <p class="mb-0"
-           v-if="integration_data.properties.firstname !== undefined && integration_data.properties.lastname !== undefined">
+           v-if="integrationData.properties.firstname !== undefined && integrationData.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
           <span class="data-value">
              <q-tooltip anchor="top middle"
                         self="center middle">
-              {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+              {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
             </q-tooltip>
-            {{ integration_data.properties.firstname.value + ' ' + integration_data.properties.lastname.value }}
+            {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
           </span>
         </p>
         <p class="mb-0"
-           v-if="integration_data.properties.email">
+           v-if="integrationData.properties.email">
           <span class="data-icon-label">Email: </span>
-          <span class="data-value">{{ integration_data.properties.email.value }}</span>
+          <span class="data-value">{{ integrationData.properties.email.value }}</span>
         </p>
         <p class="mb-0"
-           v-if="integration_data.properties.company">
+           v-if="integrationData.properties.company">
           <span class="data-icon-label">Company: </span>
-          <span class="data-value">{{ integration_data.properties.company.value }}</span>
+          <span class="data-value">{{ integrationData.properties.company.value }}</span>
         </p>
         <p class="mb-0"
-           v-if="integration_data.properties.hubspot_owner">
+           v-if="integrationData.properties.hubspot_owner">
           <span class="data-icon-label">Owner: </span>
-          <span class="data-value">{{ integration_data.properties.hubspot_owner.firstName + ' ' + integration_data.properties.hubspot_owner.lastName }}</span>
+          <span class="data-value">{{ integrationData.properties.hubspot_owner.firstName + ' ' + integrationData.properties.hubspot_owner.lastName }}</span>
         </p>
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0"
-                      v-if="integration_data && integration_data.properties">
+                      v-if="integrationData && integrationData.properties">
         <q-card class="deals mb-1"
-                v-for="(deal, index) in integration_data.properties.deals"
+                v-for="(deal, index) in integrationData.properties.deals"
                 :key="index"
                 flat bordered>
           <q-card-section>
@@ -127,7 +127,7 @@
       </q-card-section>
 
       <q-card-section
-        v-if="integration_data && integration_data.properties && integration_data.properties.email && integration_data.properties.email.value && false">
+        v-if="integrationData && integrationData.properties && integrationData.properties.email && integrationData.properties.email.value && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
@@ -165,21 +165,27 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'integration-hubspot',
 
   components: { WorkflowSelector },
 
+  mixins: [
+    hubspotIntegrationMixin
+  ],
+
   props: {
     contact: {
       type: Object,
       required: true
     },
+
     dialer_mode: {
       type: Boolean,
       required: false,
@@ -199,28 +205,19 @@ export default {
     },
 
     hubspotContactBaseLink () {
-      if (this.currentCompany &&
-        this.currentCompany.hubspot_integration_enabled &&
-        this.contact &&
-        ((this.contact.integrations &&
-            this.contact.integrations.hubspot) ||
-          (this.contact.integration_data &&
-            this.contact.integration_data.hubspot)
-        ) &&
-        this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
+      if (!this.contactIntegrationDataLoaded) {
+        return
       }
 
-      return false
+      return this.getHubspotContactBaseLink(this.contact)
     },
 
     hubspotLink () {
-      if (this.hubspotContactBaseLink) {
-        const contactId = this.getContactId()
-        return contactId ? `${this.hubspotContactBaseLink}contact/${contactId}` : false
+      if (!this.contactIntegrationDataLoaded) {
+        return
       }
 
-      return false
+      return this.getHubspotLink(this.contact)
     }
   },
 
@@ -228,13 +225,13 @@ export default {
     return {
       isEnrolling: false,
       isSyncing: false,
-      integration_name: 'hubspot',
       showWorkflowSelectorForm: false,
       workflow: {
         email: null,
         id: null
       },
-      integration_data: null
+      integrationData: null,
+      contactIntegrationDataLoaded: false
     }
   },
 
@@ -245,31 +242,20 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', ['setContact', 'setContactClone']),
+
     getData () {
-      return talk2Api.V1.contact.getIntegrationData(this.contact.id, {
-        params: {
-          integration_name: this.integration_name,
-          dialer_mode: this.dialer_mode ? 1 : 0
-        }
-      }).then(response => {
-        this.integration_data = response.data
-      })
-    },
+      return this.getIntegrationData(this.contact)
+        .then(response => {
+          this.integrationData = response.data
+          this.contact.integration_data = response.data
 
-    getContactId () {
-      const contactId = { data: null }
-      switch (true) {
-        case this.contact.integration_data && !_.isEmpty(this.contact.integration_data):
-          contactId.data = this.contact.integration_data.hubspot.contact_id
-          break
-        case this.contact.integrations && !_.isEmpty(this.contact.integrations):
-          contactId.data = this.contact.integrations.hubspot.contact_id
-          break
-        default:
-          contactId.data = null
-      }
+          // update contact related states
+          this.setContact(this.contact)
+          this.setContactClone(this.contact)
 
-      return contactId.data
+          this.contactIntegrationDataLoaded = true
+        })
     },
 
     onWorkflowSelected (workflowId) {
@@ -282,7 +268,7 @@ export default {
 
     enrollToWorkflow () {
       this.isEnrolling = true
-      this.workflow.email = this.integration_data.properties.email ? this.integration_data.properties.email.value : ''
+      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email.value : ''
       return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
         this.resetWorkflowEnrollment()
         // emit on parent if there's a need to do after workflow enrollment
@@ -318,6 +304,7 @@ export default {
   watch: {
     'contact.id': _.debounce(function () {
       if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+        this.contactIntegrationDataLoaded = false
         this.getData()
       }
     }, 500)
