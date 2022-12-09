@@ -11673,6 +11673,12 @@ h1.contact-list-name-label {
       }
     }
   }
+
+  .multiselect {
+    &__content-wrapper {
+      border: none !important;
+    }
+  }
 }
 
 /* Event Colors */
@@ -11767,4 +11773,8 @@ h1.contact-list-name-label {
 
 .sending {
   background-color: #E5EEFF !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
 }

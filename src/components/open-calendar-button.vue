@@ -23,15 +23,24 @@
   </div>
 </template>
 <script>
-
 import CalendarIconOutlined from 'components/icons/calendar-icon-outlined'
+import { mapState } from 'vuex'
+
 export default {
   name: 'open-calendar-button',
-  components: { CalendarIconOutlined },
+
+  components: {
+    CalendarIconOutlined
+  },
+
   props: {
     communicationId: {
       required: true
     }
+  },
+
+  computed: {
+    ...mapState('cache', ['currentCompany'])
   },
 
   data () {
@@ -42,7 +51,10 @@ export default {
 
   methods: {
     openCalendar () {
-      window.open(`${process.env.API_URL}/calendar?communication_id=${this.communicationId}&view=month`)
+      // redirect to Classic only if talk isn't enabled
+      const url = this.currentCompany.talk_enabled ? '' : process.env.API_URL
+
+      window.open(`${url}/calendar?communication_id=${this.communicationId}&view=month`)
     }
   }
 }

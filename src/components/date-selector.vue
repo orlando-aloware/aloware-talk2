@@ -105,6 +105,12 @@ export default {
     if (this.value) {
       this.date = window.moment(this.value)
     }
+  },
+
+  watch: {
+    value (date) {
+      this.date = window.moment(date)
+    }
   }
 }
 </script>
