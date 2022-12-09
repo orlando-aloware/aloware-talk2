@@ -315,7 +315,6 @@ export default {
     },
 
     addValue () {
-      console.log('IN!!')
       if (this.filterOperatorValue &&
         typeof this.filterOperatorValue[this.filterOperatorValue.length - 1] === 'object' &&
         !['relation', 'multi_relation'].includes(this.filter.type)) {
@@ -426,7 +425,6 @@ export default {
     },
 
     applyFilter () {
-      console.log('this.allFilters: ', this.allFilters)
       this.setListContactsLoaded(false)
       const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       this.setCurrentListFilters(this.allFilters)
@@ -511,8 +509,18 @@ export default {
             (this.filterOperatorValue && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
           break
         case 'date':
-          this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
-            ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
+          // if there are two operators in a date filter, check if both operator values
+          // are not empty
+          const isSecondOperatorValidValue = this.filterOperatorValue &&
+            this.hasSecondaryOperator &&
+            this.secondaryFilterOperatorValue
+          // if there's only 1 operator in a date filter, check if operator value
+          // is not empty
+          const isValidFilterOperatorValue = this.filterOperatorValue &&
+            !this.hasSecondaryOperator
+          // we should only allow a date filter to be added if
+          // its operator(s) has/have value(s)
+          this.isValidated = isSecondOperatorValidValue || isValidFilterOperatorValue
           break
         case 'selection':
         case 'boolean':

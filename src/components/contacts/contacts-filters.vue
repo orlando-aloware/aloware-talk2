@@ -97,11 +97,11 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <!--compact-btn variant="outlined-light"
+                <compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
                              @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, false)">
                   OR
-                </compact-btn-->
+                </compact-btn>
               </div>
               <p
                 class="px-2 pt-2"
@@ -516,6 +516,8 @@ export default {
         _.isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
+        // filter group was deleted so we decrement the index
+        this.filterGroupIndex > 0 && (this.filterGroupIndex -= 1)
       }
 
       if (!_.isEqual(updatedFilter, initialListFilters)) {
