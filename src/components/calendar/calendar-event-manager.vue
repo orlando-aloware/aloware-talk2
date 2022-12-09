@@ -73,7 +73,8 @@
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')"
                         v-if="mode === 'edit' && schedule.contact">
-            <contact-selector :disabled="true"
+            <contact-selector disabled
+                              redirect-when-disabled
                               v-model="$v.schedule.contact.$model.id"
                               @loaded="onContactsLoaded">
             </contact-selector>

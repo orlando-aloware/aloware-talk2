@@ -1,22 +1,28 @@
 <template>
-  <vue-multiselect track-by="id"
-                   label="name"
-                   class="mr-1 chip__clear-blue shrink-options"
-                   style="width: 100%"
-                   placeholder="Select contact"
-                   :searchable="true"
-                   :showNoResults="false"
-                   :showNoOptions="false"
-                   :close-on-select="true"
-                   :options="options"
-                   :show-labels="false"
-                   :allow-empty="false"
-                   :disabled="disabled"
-                   :loading="forceLoading"
-                   v-model="contact"
-                   @select="onSelect"
-                   @search-change="onSearch">
-  </vue-multiselect>
+  <div :class="containerStyles"
+       @click.prevent="onRedirectToContact">
+    <vue-multiselect track-by="id"
+                     label="name"
+                     class="mr-1 chip__clear-blue shrink-options"
+                     style="width: 100%;"
+                     placeholder="Select contact"
+                     :searchable="true"
+                     :showNoResults="false"
+                     :showNoOptions="false"
+                     :close-on-select="true"
+                     :options="options"
+                     :show-labels="false"
+                     :allow-empty="false"
+                     :loading="forceLoading"
+                     :disabled="disabled"
+                     v-model="contact"
+                     @select="onSelect"
+                     @search-change="onSearch">
+    </vue-multiselect>
+    <q-tooltip v-if="redirectWhenDisabled">
+      Click to go to contacts page
+    </q-tooltip>
+  </div>
 </template>
 
 <script>
@@ -49,6 +55,11 @@ export default {
     showNumber: {
       type: Boolean,
       default: true
+    },
+
+    redirectWhenDisabled: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -69,6 +80,14 @@ export default {
     }
   },
 
+  computed: {
+    containerStyles () {
+      return {
+        'cursor-pointer': this.redirectWhenDisabled
+      }
+    }
+  },
+
   async mounted () {
     // if component is disabled and the value is set, search for that specific contact only to fill as the option
     if (this.value) {
@@ -79,6 +98,14 @@ export default {
   },
 
   methods: {
+    onRedirectToContact () {
+      if (!this.redirectWhenDisabled || !this.disabled || !this.value) {
+        return
+      }
+
+      window.open(`/contacts/${this.value}`)
+    },
+
     onSearch: _.debounce(function (query) {
       this.search = query
       this.options = []
