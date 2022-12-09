@@ -128,7 +128,7 @@ export default {
 
       return {
         id: contact.id,
-        name: `${name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
+        name: `${name} ${this.showNumber ? '(' + contact.phone_number + ')' : ''}`
       }
     },
 
