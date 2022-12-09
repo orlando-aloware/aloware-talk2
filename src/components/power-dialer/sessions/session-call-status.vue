@@ -1050,7 +1050,8 @@ export default {
         // when there is wrap up, manually move the queue
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
-            this.processSession(true)
+            this.skipWrapUp = true
+            this.processSession()
           }, 1000)
         }
       })
