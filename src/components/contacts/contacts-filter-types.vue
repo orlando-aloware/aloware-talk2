@@ -525,7 +525,7 @@ export default {
           // non numeric operator value is not empty
           const isValidNonNumericFilterOperatorValue = typeof this.filterOperatorValue !== 'number' &&
             !_.isEmpty(this.filterOperatorValue)
-          // if non or numeric filter operator value is not empty,
+          // if non or numeric filter operator value has a value,
           // then it is valid for single operator
           const isValidFilterOperatorValue = (isValidNumericFilterOperatorValue ||
             isValidNonNumericFilterOperatorValue) &&
