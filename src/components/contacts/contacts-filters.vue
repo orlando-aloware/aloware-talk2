@@ -418,9 +418,12 @@ export default {
           if (_.get(found.data, 'operators', null)) {
             filter.data = filterGroups[groupIndex.data].filters[filterIndex.data]
 
+            // try to search for the selected option
             operator.data = found.data.operators.find(item => item.value === filter.data.operator)
             options.data = operator.data ? _.get(operator.data, 'options', null) : null
             option.data = options.data ? options.data.find(item => item.value === filter.data.value) : null
+
+            // set values into an array
             trueValue.data = filter.data.value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
             trueValue.data = typeof filter.data.value === 'string' ? filter.data.value.split(',') : [trueValue.data]
@@ -430,6 +433,7 @@ export default {
             if ('field' in filter.data) {
               field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
 
+              // set values into an array (but using 'field' this time)
               trueValue.data = filter.data.field
               trueValue.data = option.data ? [option.data.label] : trueValue.data
               trueValue.data = typeof filter.data.field === 'string' ? filter.data.field.split(',') : [trueValue.data]
