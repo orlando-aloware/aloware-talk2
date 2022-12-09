@@ -554,6 +554,7 @@ export default {
         filters: updatedFilter
       })
 
+      // decrement the filter group index
       if (this.filterGroupIndex > 0) {
         this.filterGroupIndex -= 1
       }

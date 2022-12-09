@@ -361,9 +361,12 @@ export default {
 
       const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
 
-      if (!value.data && currentFilter && !this.isValidated) {
+      // remove an invalid filter
+      if (!value.data &&
+        currentFilter &&
+        !this.isValidated) {
         delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
-      } else {
+      } else { // add the valid filter
         this.allFilters[this.filterGroupIndex].filters[this.filter.key] = {
           value: JSON.parse(JSON.stringify(value.data)),
           operator: this.filterOperator
