@@ -1052,7 +1052,6 @@ export default {
           setTimeout(() => {
             this.wrapUp = false
             this.hasActiveTask = false
-            this.powerDialerTasks.in_queue.shift()
             this.processSession()
           }, 1000)
         }
