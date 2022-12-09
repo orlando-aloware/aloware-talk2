@@ -516,8 +516,9 @@ export default {
         _.isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
-        // filter group was deleted so we decrement the index
-        this.filterGroupIndex > 0 && (this.filterGroupIndex -= 1)
+        // filter group was deleted so we decrement the index by 1
+        // if current filter group index is greater than 0
+        this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
       }
 
       if (!_.isEqual(updatedFilter, initialListFilters)) {
@@ -554,10 +555,9 @@ export default {
         filters: updatedFilter
       })
 
-      // decrement the filter group index
-      if (this.filterGroupIndex > 0) {
-        this.filterGroupIndex -= 1
-      }
+      // decrement the filter group index by 1 only if
+      // filter group index is more than 0
+      this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
 
       this.$emit('filtersUpdated')
     },
@@ -600,6 +600,10 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+
+      // if there's any change in the current list's filters,
+      // we need to update the filter group index value to
+      // how many filters are currently active
       let keys = Object.keys(this.currentListFilters)
       keys = keys.filter(item => !isNaN(parseInt(item)))
 

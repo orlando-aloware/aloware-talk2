@@ -517,9 +517,18 @@ export default {
           const isSecondOperatorValidValue = this.filterOperatorValue &&
             this.hasSecondaryOperator &&
             this.secondaryFilterOperatorValue
-          // if there's only 1 operator in a date filter, check if operator value
-          // is not empty
-          const isValidFilterOperatorValue = this.filterOperatorValue &&
+          // if there's only 1 operator in a date filter, check if
+          // numeric operator value is greater than or equal to 0
+          const isValidNumericFilterOperatorValue = typeof this.filterOperatorValue === 'number' &&
+            this.filterOperatorValue >= 0
+          // if there's only 1 operator in a date filter, check if
+          // non numeric operator value is not empty
+          const isValidNonNumericFilterOperatorValue = typeof this.filterOperatorValue !== 'number' &&
+            !_.isEmpty(this.filterOperatorValue)
+          // if non or numeric filter operator value is not empty,
+          // then it is valid for single operator
+          const isValidFilterOperatorValue = (isValidNumericFilterOperatorValue ||
+            isValidNonNumericFilterOperatorValue) &&
             !this.hasSecondaryOperator
           // we should only allow a date filter to be added if
           // its operator(s) has/have value(s)
