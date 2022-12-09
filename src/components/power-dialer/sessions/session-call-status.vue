@@ -1064,8 +1064,6 @@ export default {
             this.processSession()
           }, 1000)
         }
-      }).catch(err => {
-        this.isRedialClicked = false
       })
     }
   },
