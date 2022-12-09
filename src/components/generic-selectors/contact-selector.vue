@@ -123,7 +123,7 @@ export default {
 
     formatContact (contact) {
       const name = contact.first_name || contact.last_name
-        ? contact.first_name + ' ' + contact.last_name
+        ? `${contact.first_name} ${contact.last_name}`
         : 'No Name'
 
       return {
