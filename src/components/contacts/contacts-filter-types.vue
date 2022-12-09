@@ -450,8 +450,10 @@ export default {
     },
 
     showSecondaryFilterOperationOptions (event) {
-      if (!event ||
-          (event && this.secondaryFilterOperatorValue && this.secondaryFilterOperatorValue.includes(event))) {
+      const exists = event && this.secondaryFilterOperatorValue && this.secondaryFilterOperatorValue.includes(event)
+
+      // Dont allow addition if event is invalid or option already exists
+      if (!event || exists) {
         this.filterOptions[0].disabled = true
         this.filterOptions[0].label = 'Add a new option'
         return
