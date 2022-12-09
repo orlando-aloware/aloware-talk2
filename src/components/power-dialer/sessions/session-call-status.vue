@@ -1041,11 +1041,12 @@ export default {
       this.onPhoneExpansionReset()
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       this.redialTask(this.activeTask).then(() => {
-        this.powerDialerTasks.in_queue.push(this.activeTask)
-        this.activeTask = this.taskToCall
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
+
+        this.powerDialerTasks.in_queue.push(this.activeTask)
+        this.activeTask = this.taskToCall
 
         // when there is wrap up, manually move the queue
         if (this.wrapUpSeconds !== -1) {
