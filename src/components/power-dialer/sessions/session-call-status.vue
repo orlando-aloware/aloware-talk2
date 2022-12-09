@@ -1047,7 +1047,12 @@ export default {
           this.$VueEvent.fire('hangupCall')
         }
 
-        // when there is wrap up, manually move the queue
+        // if wrap is indefinite, manually move the queue
+        if (this.wrapUpSeconds === 0) {
+          this.powerDialerTasks.in_queue.shift()
+        }
+
+        // when there is wrap up, skip wrap
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
             this.wrapUp = false
