@@ -95,9 +95,13 @@ export default {
     },
 
     formatContact (contact) {
+      const name = contact.first_name || contact.last_name
+        ? contact.first_name + ' ' + contact.last_name
+        : 'No Name'
+
       return {
         id: contact.id,
-        name: `${contact.first_name} ${contact.last_name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
+        name: `${name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
       }
     },
 
