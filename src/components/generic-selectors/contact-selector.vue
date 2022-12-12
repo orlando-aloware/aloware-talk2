@@ -1,27 +1,28 @@
 <template>
-  <vue-multiselect track-by="id"
-                   label="name"
-                   class="mr-1 chip__clear-blue shrink-options"
-                   style="width: 100%"
-                   placeholder="Select type"
-                   :searchable="true"
-                   :showNoResults="false"
-                   :close-on-select="true"
-                   :options="options"
-                   :show-labels="false"
-                   :allow-empty="false"
-                   :disabled="disabled"
-                   :loading="forceLoading"
-                   v-model="contact"
-                   @select="onSelect"
-                   @search-change="onSearch">
-    <template #noResult>
-      {{ noResultsLabel }}
-    </template>
-    <template #noOptions>
-      {{ noResultsLabel }}
-    </template>
-  </vue-multiselect>
+  <div :class="containerStyles"
+       @click.prevent="onRedirectToContact">
+    <vue-multiselect track-by="id"
+                     label="name"
+                     class="mr-1 chip__clear-blue shrink-options"
+                     style="width: 100%;"
+                     placeholder="Select contact"
+                     :searchable="true"
+                     :showNoResults="false"
+                     :showNoOptions="false"
+                     :close-on-select="true"
+                     :options="options"
+                     :show-labels="false"
+                     :allow-empty="false"
+                     :loading="forceLoading"
+                     :disabled="disabled"
+                     v-model="contact"
+                     @select="onSelect"
+                     @search-change="onSearch">
+    </vue-multiselect>
+    <q-tooltip v-if="redirectWhenDisabled">
+      Click to go to contacts page
+    </q-tooltip>
+  </div>
 </template>
 
 <script>
@@ -54,6 +55,11 @@ export default {
     showNumber: {
       type: Boolean,
       default: true
+    },
+
+    redirectWhenDisabled: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -75,10 +81,10 @@ export default {
   },
 
   computed: {
-    noResultsLabel () {
-      return this.search.length < this.threshold
-        ? `Type at least ${this.threshold} characters to search in contacts`
-        : 'No Results found'
+    containerStyles () {
+      return {
+        'cursor-pointer': this.redirectWhenDisabled
+      }
     }
   },
 
@@ -92,6 +98,14 @@ export default {
   },
 
   methods: {
+    onRedirectToContact () {
+      if (!this.redirectWhenDisabled || !this.disabled || !this.value) {
+        return
+      }
+
+      window.open(`/contacts/${this.value}`)
+    },
+
     onSearch: _.debounce(function (query) {
       this.search = query
       this.options = []
@@ -108,9 +122,13 @@ export default {
     },
 
     formatContact (contact) {
+      const name = contact.first_name || contact.last_name
+        ? `${contact.first_name} ${contact.last_name}`
+        : 'No Name'
+
       return {
         id: contact.id,
-        name: `${contact.first_name} ${contact.last_name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
+        name: `${name} ${this.showNumber ? '(' + contact.phone_number + ')' : ''}`
       }
     },
 

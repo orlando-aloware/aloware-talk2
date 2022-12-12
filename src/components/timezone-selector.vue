@@ -39,7 +39,7 @@ export default {
     timezones () {
       if (this.currentCompany && this.currentCompany.country) {
         if (!['US', 'CA'].includes(this.currentCompany.country)) {
-          return window.CountriesAndTimezones().getTimezonesForCountry(this.currentCompany.country)
+          return window.CountriesAndTimezones.getTimezonesForCountry(this.currentCompany.country)
             .map((timezone) => {
               return {
                 name: timezone.name + ' GMT ' + timezone.utcOffsetStr,

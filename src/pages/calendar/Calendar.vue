@@ -18,19 +18,20 @@
                   class="btn-white btn-calendar-prev-next btn-contact-prev-next"
                   @click.prevent="changeDirection('subtract')">
           <i class="material-icons">keyboard_arrow_left</i>
-          <q-tooltip>
+          <q-tooltip anchor="top middle">
             Previous {{ view }}
           </q-tooltip>
         </b-button>
         <date-selector date-only
                        noValueToCustomElem
+                       :value="gotoDate"
                        @dateSelected="onDateSelected">
           <b-button size="sm"
                     variant="light"
                     class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
             <calendar-icon class="mr-2"/>
             {{ currentDate }}
-            <q-tooltip>
+            <q-tooltip anchor="top middle">
               Select date
             </q-tooltip>
           </b-button>
@@ -40,7 +41,7 @@
                   class="btn-white btn-calendar-prev-next btn-contact-prev-next"
                   @click.prevent="changeDirection('add')">
           <i class="material-icons">keyboard_arrow_right</i>
-          <q-tooltip>
+          <q-tooltip anchor="top middle">
             Next {{ view }}
           </q-tooltip>
         </b-button>
@@ -49,7 +50,7 @@
                   class="btn-white btn-rounded px-3 mx-2 btn-calendar-today"
                   @click.prevent="changeDirection('today')">
           Today
-          <q-tooltip>
+          <q-tooltip anchor="top middle">
             Go to today
           </q-tooltip>
         </b-button>
@@ -221,6 +222,14 @@ export default {
         users: this.filters.calendar_users,
         status: this.filters.calendar_status
       }
+    }
+  },
+
+  mounted () {
+    if ('communication_id' in this.$route.query) {
+      this.$axios.get('/api/v1/calendar/events/show/' + this.$route.query.communication_id + '/communication').then(res => {
+        this.editSchedule(res.data)
+      })
     }
   },
 

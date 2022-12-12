@@ -718,11 +718,11 @@
                 <open-calendar-button :communicationId="communication.id"
                                       class="pr-2" />
                 <sms-reminders ref="sms-reminder"
-                               v-if="communication.type === CommunicationTypes.APPOINTMENT"
                                class="d-flex flex-row justify-content-center w-100"
                                :communicationId="communication.id"
                                :campaignId="campaignId"
-                               :appointmentDatetime="communication.engagement_data.appointment_datetime">
+                               :appointmentDatetime="communication.engagement_data.appointment_datetime"
+                               v-if="communication.type === CommunicationTypes.APPOINTMENT && campaignId">
                 </sms-reminders>
               </div>
             </div>
