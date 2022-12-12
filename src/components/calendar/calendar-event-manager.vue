@@ -312,6 +312,7 @@ import PredefinedTimeDurationSelector from 'components/predefined-time-duration-
 import PredefinedTimeSelector from 'components/predefined-time-selector'
 import TimezoneSelector from 'components/timezone-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
+import * as Attendees from 'src/constants/attendees'
 import moment from 'moment'
 require('vue-multiselect/dist/vue-multiselect.min.css')
 
@@ -562,7 +563,7 @@ export default {
       if (sched.is_classic_one_on_one_event) {
         this.loading = true
         sched.attendees.every((attendee, key) => {
-          if (attendee.entity_type === 1) { // there is contract for Contact and User entity type in backend
+          if (attendee.entity_type === Attendees.CONTACT_ENTITY) {
             this.originalSchedule.contact = {
               id: attendee.entity_id,
               name: attendee.name
