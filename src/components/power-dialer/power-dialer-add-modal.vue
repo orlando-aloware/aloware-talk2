@@ -246,15 +246,26 @@ export default {
           text: 'Top'
         }
       ]
+    },
+    integrationName () {
+      switch (true) {
+        case this.currentCompany.hubspot_integration_enabled:
+          return 'hubspot'
+        case this.currentCompany.zoho_integration_enabled:
+          return 'zoho'
+        case this.currentCompany.pipedrive_integration_enabled:
+          return 'pipedrive'
+      }
+      return null
     }
   },
 
   mounted () {
     this.loading++
 
-    if (this.mode === 'hubspot') {
+    if (this.mode === 'integration') {
       // check if Hubspot list already exists
-      this.checkHubspotList()
+      this.checkIntegrationImport()
     }
 
     this.setCount()
@@ -269,11 +280,12 @@ export default {
       'createPdListClose'
     ]),
     setCount () {
+      console.log({ params: this.params })
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
         this.loading--
       } else if (this.params.target) {
-        if (this.mode === 'hubspot') {
+        if (this.mode === 'integration') {
           this.count = this.params.size
           this.loading--
         } else {
@@ -310,8 +322,8 @@ export default {
           return this.addContacts()
         case 'duplicate':
           return this.duplicateList()
-        case 'hubspot':
-          return this.importFromHubspot()
+        case 'integration':
+          return this.importFromIntegration()
       }
 
       return Promise.reject()
@@ -352,7 +364,18 @@ export default {
           }
         })
     },
+    importFromIntegration () {
+      switch (this.integrationName) {
+        case 'hubspot':
+          return this.importFromHubspot()
+        case 'pipedrive':
+          return this.addPipedriveFilter()
+        case 'zoho':
+          return this.addZohoView()
+      }
+    },
     importFromHubspot () {
+      console.log({ requestParams: this.requestParams, params: this.params })
       // remove target and size from params
       let target = this.params.target
       let params = this.requestParams
@@ -373,87 +396,43 @@ export default {
         })
     },
     addZohoView () {
-      if (this.validateForm('add_zoho_view') === true) {
-        this.loading_add_zoho_view = true
-        let params = {}
-        params.direction = this.direction
-        params.multiple_phone_numbers = this.multiple_phone_numbers
-        params.prevent_duplicates = this.prevent_duplicates
-        params.own_contacts_only = this.own_contacts_only
-        if (this.future_scheduled) {
-          params.future_scheduled_time = this.future_scheduled_time
-        }
-        this.$axios.post(`/api/v1/auto-dialer/add-zoho-view/${this.zoho_view.view_id}`, params).then(() => {
-          this.loading_add_zoho_view = false
-          this.resetForms()
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: 'Zoho custom view contacts are now being added to your PowerDialer.',
-            type: 'success',
-            showClose: true
-          })
-          this.$emit('success', true)
-        }).catch((err) => {
-          this.loading_add_zoho_view = false
-          this.resetAddZohoView()
+      // remove target and size from params
+      let target = this.params.target
+      let params = this.requestParams
+      delete params.target
+      delete params.size
 
-          const res = err.response
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: res.data?.message,
-            type: 'error',
-            showClose: true
+      return this.$axios
+        .post('/api/v2/power-dialer-lists/add-zoho-view/' + target, params)
+        .then(response => response.data)
+        .then(data => {
+          const notification = this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
           })
-
-          console.log(err)
         })
-      } else {
-        return false
-      }
+        .catch(_err => {
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
     },
     addPipedriveFilter () {
-      if (this.validateForm('add_pipedrive_filter') === true) {
-        this.loading_add_pipedrive_filter = true
-        let params = {}
-        params.direction = this.direction
-        params.multiple_phone_numbers = this.multiple_phone_numbers
-        params.prevent_duplicates = this.prevent_duplicates
-        params.own_contacts_only = this.own_contacts_only
-        params.allow_international_phone_numbers = this.allow_international_phone_numbers
-        if (this.future_scheduled) {
-          params.future_scheduled_time = this.future_scheduled_time
-        }
-        this.$axios.post(`/api/v1/auto-dialer/add-pipedrive-filter/${this.pipedrive_filter.filter_id}`, params).then(() => {
-          this.loading_add_pipedrive_filter = false
-          this.resetForms()
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: 'Pipedrive custom filter contacts are now being added to your PowerDialer.',
-            type: 'success',
-            showClose: true
-          })
-          this.$emit('success', true)
-        }).catch((err) => {
-          this.loading_add_pipedrive_filter = false
-          this.resetAddPipedriveFilter()
+      // remove target and size from params
+      let target = this.params.target
+      let params = this.requestParams
+      delete params.target
+      delete params.size
 
-          const res = err.response
-          this.$notify({
-            offset: 175,
-            title: 'PowerDialer',
-            message: res.data?.message,
-            type: 'error',
-            showClose: true
+      return this.$axios.post('/api/v2/power-dialer-lists/add-pipedrive-filter/' + target, params)
+        .then(response => response.data)
+        .then(data => {
+          const notification = this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
           })
-
-          console.log(err)
         })
-      } else {
-        return false
-      }
+        .catch(_err => {
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
     },
     reloadFolders () {
       return this.$axios
@@ -467,6 +446,42 @@ export default {
     getListCount (id) {
       return this.$axios
         .get(`${process.env.API_REPORTING_URL}/api/v2/power-dialer-lists/${id}/count`)
+    },
+    checkIntegrationImport () {
+      switch (this.integrationName) {
+        case 'hubspot':
+          return this.checkHubspotList()
+        case 'pipedrive':
+          return this.checkPipedriveFilter()
+        case 'zoho':
+          return this.checkZohoView()
+      }
+    },
+    async checkZohoView () {
+      this.loading++
+
+      const res = await this.$axios
+        .get('/api/v2/power-dialer-lists/zoho-view-exists/' + this.params.target)
+
+      if (res.data.exists) {
+        this.confirm_message = 'The Zoho view you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.confirm = true
+      } else {
+        this.loading--
+      }
+    },
+    async checkPipedriveFilter () {
+      this.loading++
+
+      const res = await this.$axios
+        .get('/api/v2/power-dialer-lists/pipedrive-filter-exists/' + this.params.target)
+
+      if (res.data.exists) {
+        this.confirm_message = 'The Pipedrive filter you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.confirm = true
+      } else {
+        this.loading--
+      }
     },
     async checkHubspotList () {
       this.loading++
