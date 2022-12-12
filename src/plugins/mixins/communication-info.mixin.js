@@ -3,7 +3,6 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
 import { head } from 'lodash'
-import { REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER } from '../../constants/communication-rejection-reasons'
 
 export default {
   methods: {
