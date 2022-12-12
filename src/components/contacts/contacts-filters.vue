@@ -97,11 +97,11 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <!--compact-btn variant="outlined-light"
+                <compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
                              @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, false)">
                   OR
-                </compact-btn-->
+                </compact-btn>
               </div>
               <p
                 class="px-2 pt-2"
@@ -542,6 +542,9 @@ export default {
         _.isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
+        // filter group was deleted so we decrement the index by 1
+        // if current filter group index is greater than 0
+        this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
       }
 
       if (!_.isEqual(updatedFilter, initialListFilters)) {
@@ -577,6 +580,11 @@ export default {
         id: this.selectedList.id,
         filters: updatedFilter
       })
+
+      // decrement the filter group index by 1 only if
+      // filter group index is more than 0
+      this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
+
       this.$emit('filtersUpdated')
     },
 
@@ -618,6 +626,16 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+
+      // if there's any change in the current list's filters,
+      // we need to update the filter group index value to
+      // how many filters are currently active
+      let keys = Object.keys(this.currentListFilters)
+      keys = keys.filter(item => !isNaN(parseInt(item)))
+
+      if (keys.length) {
+        this.filterGroupIndex = keys.length
+      }
     },
     $route: {
       deep: true,

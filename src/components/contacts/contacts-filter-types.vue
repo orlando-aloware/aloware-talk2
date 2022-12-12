@@ -385,11 +385,13 @@ export default {
       }
 
       const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      const toDelete = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
 
-      if (!value.data && currentFilter && !this.isValidated && toDelete) {
+      // remove an invalid filter
+      if (!value.data &&
+        currentFilter &&
+        !this.isValidated) {
         delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
-      } else {
+      } else { // add the valid filter
         const data = {
           value: JSON.parse(JSON.stringify(value.data)),
           operator: this.filterOperator
@@ -601,8 +603,27 @@ export default {
             (this.filterOperatorValue && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
           break
         case 'date':
-          this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
-            ((this.filterOperatorValue || this.filterOperatorValue >= 0) && !this.hasSecondaryOperator)
+          // if there are two operators in a date filter, check if both operator values
+          // are not empty
+          const isSecondOperatorValidValue = this.filterOperatorValue &&
+            this.hasSecondaryOperator &&
+            this.secondaryFilterOperatorValue
+          // if there's only 1 operator in a date filter, check if
+          // numeric operator value is greater than or equal to 0
+          const isOperatorValidNumericValue = typeof this.filterOperatorValue === 'number' &&
+            this.filterOperatorValue >= 0
+          // if there's only 1 operator in a date filter, check if
+          // non numeric operator value is not empty
+          const isOperatorValidNonNumericValue = typeof this.filterOperatorValue !== 'number' &&
+            !_.isEmpty(this.filterOperatorValue)
+          // if non or numeric filter operator value has a value,
+          // then it is valid for single operator
+          const isOperatorValidValue = (isOperatorValidNumericValue ||
+              isOperatorValidNonNumericValue) &&
+            !this.hasSecondaryOperator
+          // we should only allow a date filter to be added if
+          // its operator(s) has/have value(s)
+          this.isValidated = isOperatorValidValue || isSecondOperatorValidValue
           break
         case 'selection':
         case 'boolean':
