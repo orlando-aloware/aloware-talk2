@@ -610,20 +610,20 @@ export default {
             this.secondaryFilterOperatorValue
           // if there's only 1 operator in a date filter, check if
           // numeric operator value is greater than or equal to 0
-          const isValidNumericFilterOperatorValue = typeof this.filterOperatorValue === 'number' &&
+          const isOperatorValidNumericValue = typeof this.filterOperatorValue === 'number' &&
             this.filterOperatorValue >= 0
           // if there's only 1 operator in a date filter, check if
           // non numeric operator value is not empty
-          const isValidNonNumericFilterOperatorValue = typeof this.filterOperatorValue !== 'number' &&
+          const isOperatorValidNonNumericValue = typeof this.filterOperatorValue !== 'number' &&
             !_.isEmpty(this.filterOperatorValue)
           // if non or numeric filter operator value has a value,
           // then it is valid for single operator
-          const isValidFilterOperatorValue = (isValidNumericFilterOperatorValue ||
-            isValidNonNumericFilterOperatorValue) &&
+          const isOperatorValidValue = (isOperatorValidNumericValue ||
+              isOperatorValidNonNumericValue) &&
             !this.hasSecondaryOperator
           // we should only allow a date filter to be added if
           // its operator(s) has/have value(s)
-          this.isValidated = isSecondOperatorValidValue || isValidFilterOperatorValue
+          this.isValidated = isOperatorValidValue || isSecondOperatorValidValue
           break
         case 'selection':
         case 'boolean':
