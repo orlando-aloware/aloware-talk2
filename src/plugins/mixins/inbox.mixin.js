@@ -250,6 +250,8 @@ export default {
         query.relations = ['lastCommunication']
       }
 
+      query.timezone = window.timezone
+
       return query
     },
     resetFilters () {
