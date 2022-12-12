@@ -272,7 +272,6 @@ export default {
       'createPdListClose'
     ]),
     setCount () {
-      console.log({ params: this.params })
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
         this.loading--
