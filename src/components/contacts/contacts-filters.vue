@@ -386,15 +386,16 @@ export default {
     },
 
     generateListFilters () {
-      const filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
+      const filterGroups = this.$jsonClone(this.currentListFilters)
       const groupIndex = { data: null }
       const filterIndex = { data: null }
-      const operators = { data: null }
       const found = { data: null }
       const operator = { data: null }
       const options = { data: null }
       const option = { data: null }
       const trueValue = { data: null }
+      const field = { field: null }
+      const filter = { data: null }
 
       for (groupIndex.data in filterGroups) {
         if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
@@ -414,31 +415,46 @@ export default {
             continue
           }
 
-          operators.data = found.data ? _.get(found.data, 'operators', null) : null
+          if (_.get(found.data, 'operators', null)) {
+            filter.data = filterGroups[groupIndex.data].filters[filterIndex.data]
 
-          if (operators.data) {
-            operator.data = found.data.operators.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
+            // try to search for the selected option
+            operator.data = found.data.operators.find(item => item.value === filter.data.operator)
             options.data = operator.data ? _.get(operator.data, 'options', null) : null
-            option.data = options.data ? options.data.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
-            trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].value
+            option.data = options.data ? options.data.find(item => item.value === filter.data.value) : null
+
+            // set values into an array
+            trueValue.data = filter.data.value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : [trueValue.data]
+            trueValue.data = typeof filter.data.value === 'string' ? filter.data.value.split(',') : [trueValue.data]
+
+            // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+            // The content in 'field' will be concatenated at the end of the string
+            if ('field' in filter.data) {
+              field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
+
+              // set values into an array (but using 'field' this time)
+              trueValue.data = filter.data.field
+              trueValue.data = option.data ? [option.data.label] : trueValue.data
+              trueValue.data = typeof filter.data.field === 'string' ? filter.data.field.split(',') : [trueValue.data]
+            }
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
+              ...field,
               key: filterIndex.data,
               label: found.data.label,
               operator: operator.data ? _.get(operator.data, 'label', null) : null,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              default: filter.data.default || 0
             }
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.data.label,
-              trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
-              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              trueValue: filter.data.value,
+              value: JSON.stringify(filter.data.value),
+              default: filter.data.default || 0
             }
           }
         }
@@ -487,10 +503,20 @@ export default {
         }
 
         let joinedValues = labels.join(', ')
-
-        return labels.length > 1
+        let data = labels.length > 1
           ? joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
           : joinedValues
+
+        // add field values at the end if they are present
+        if (filter.field) {
+          let joinedFields = filter.field.join(', ')
+
+          data += ' as ' + (filter.field.length > 1
+            ? joinedFields.substring(0, joinedFields.lastIndexOf(',')) + ' or' + joinedFields.substring(joinedFields.lastIndexOf(',') + 1, joinedFields.length)
+            : joinedFields)
+        }
+
+        return data
       } else {
         return !isSimpleType ? filter.trueValue : ''
       }
