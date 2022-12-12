@@ -586,6 +586,12 @@ export default {
         .listen('.contact-list.import-hubspot', (event) => {
           window.VueEvent.fire('contact_list_import_hubspot', event)
         })
+        .listen('.contact-list.import-zoho', (event) => {
+          window.VueEvent.fire('contact_list_import_zoho', event)
+        })
+        .listen('.contact-list.import-pipedrive', (event) => {
+          window.VueEvent.fire('contact_list_import_pipedrive', event)
+        })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event
