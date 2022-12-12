@@ -24,6 +24,9 @@
         </div>
 
         <div class="pt-3">
+          <p class="mb-2">
+            Currently enabled integration: {{ integrationName | capitalize }}
+          </p>
           <integration-list-selector :multiple="false"
                                  :use-chips="false"
                                  :clearable="true"
@@ -55,9 +58,11 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
+import { integrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'integration-list-import-modal',
@@ -66,6 +71,8 @@ export default {
     IntegrationListSelector,
     PowerDialerAddModal
   },
+
+  mixins: [integrationMixin],
 
   props: {
     isContactModule: {
@@ -81,7 +88,8 @@ export default {
   data () {
     return {
       isLoading: false,
-      list: null
+      list: null,
+      integration: null
     }
   },
 
@@ -90,12 +98,12 @@ export default {
       'isAddPowerDialerOpen'
     ]),
     getTitle () {
-      return 'Import From Integration List'
+      return 'Import From Integration'
     },
     powerDialerParams () {
       return {
-        target: this.list.listId,
-        size: this.list.metaData.size
+        target: this.list.listId || this.list.id,
+        size: _.get(this.list, 'metaData.size', null)
       }
     }
   },
@@ -109,8 +117,9 @@ export default {
         this.$emit('close', data)
       }
     },
-    onListSelectorChange (list) {
-      this.list = list
+    onListSelectorChange (payload) {
+      this.list = payload.list
+      this.integration = payload.integration
     },
     onSubmit () {
       this.addPowerDialerOpen(true)

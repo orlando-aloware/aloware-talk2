@@ -120,6 +120,7 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
+import { integrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -128,6 +129,8 @@ export default {
     DatePicker,
     InformationCircleIcon
   },
+
+  mixins: [integrationMixin],
 
   props: {
     redirect: {
@@ -246,17 +249,6 @@ export default {
           text: 'Top'
         }
       ]
-    },
-    integrationName () {
-      switch (true) {
-        case this.currentCompany.hubspot_integration_enabled:
-          return 'hubspot'
-        case this.currentCompany.zoho_integration_enabled:
-          return 'zoho'
-        case this.currentCompany.pipedrive_integration_enabled:
-          return 'pipedrive'
-      }
-      return null
     }
   },
 
@@ -403,7 +395,7 @@ export default {
       delete params.size
 
       return this.$axios
-        .post('/api/v2/power-dialer-lists/add-zoho-view/' + target, params)
+        .post('/api/v2/power-dialer-lists/import-zoho-view/' + target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
@@ -422,7 +414,7 @@ export default {
       delete params.target
       delete params.size
 
-      return this.$axios.post('/api/v2/power-dialer-lists/add-pipedrive-filter/' + target, params)
+      return this.$axios.post('/api/v2/power-dialer-lists/import-pipedrive-filter/' + target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')

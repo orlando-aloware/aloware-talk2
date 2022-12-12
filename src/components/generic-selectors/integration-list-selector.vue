@@ -84,14 +84,14 @@
 
 <script>
 import { mapState } from 'vuex'
-import { selectorMixin } from 'src/plugins/mixins'
+import { selectorMixin, integrationMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'integration-list-selector',
 
-  mixins: [selectorMixin],
+  mixins: [selectorMixin, integrationMixin],
 
   components: {
     RemoveTagIcon
@@ -175,18 +175,6 @@ export default {
       }
 
       return []
-    },
-    integrationName () {
-      switch (true) {
-        case this.currentCompany.hubspot_integration_enabled:
-          return 'hubspot'
-        case this.currentCompany.zoho_integration_enabled:
-          return 'zoho'
-        case this.currentCompany.pipedrive_integration_enabled:
-          return 'pipedrive'
-      }
-
-      return null
     }
   },
 
@@ -282,7 +270,15 @@ export default {
       this.selectedId = this.value
     },
     selectedId: function (value) {
-      this.$emit('change', value)
+      let payload = {
+        list: value,
+        integration: this.integrationName
+      }
+      if (typeof value !== 'object') {
+        payload.list = this.options.filter(option => option.id === value)[0]
+      }
+
+      this.$emit('change', payload)
       this.showInputPlaceholder()
     }
   }
