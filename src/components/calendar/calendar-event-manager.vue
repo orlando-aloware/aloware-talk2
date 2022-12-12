@@ -104,7 +104,7 @@
                         :state="validateState('date')">
             <date-selector :min-date="minDate"
                            v-model="$v.schedule.date.$model"
-                           v-if="mode !== 'edit'"
+                           v-if="mode !== 'edit' || !this.schedule.is_past"
                            @dateSelected="dateSelected">
             </date-selector>
             <b-form-input disabled
@@ -120,7 +120,7 @@
                         invalid-feedback="Please select a time for this event"
                         :state="validateState('time')">
             <predefined-time-selector v-model="$v.schedule.time.$model"
-                                      v-if="mode !== 'edit'"
+                                      v-if="mode !== 'edit' || !this.schedule.is_past"
                                       @select="timeSelected">
             </predefined-time-selector>
             <b-form-input disabled
@@ -135,7 +135,7 @@
           <b-form-group class="form-label"
                         label="Duration (minutes)">
             <predefined-time-duration-selector v-model="schedule.duration"
-                                               v-if="mode !== 'edit'"
+                                               v-if="mode !== 'edit' || !this.schedule.is_past"
                                                @select="durationSelected">
             </predefined-time-duration-selector>
             <b-form-input disabled
