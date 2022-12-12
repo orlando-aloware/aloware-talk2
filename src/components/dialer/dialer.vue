@@ -55,7 +55,8 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState('powerDialer', ['activeTask'])
   },
 
   created () {
@@ -74,7 +75,17 @@ export default {
           this.setAddedParty(user)
         }
 
-        if (this.dialer.communication.contact) {
+        const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // if in power dialer session, we must match the active task (contact)'s id
+        // with the communication's contact id
+        // else, set the contact.
+        if ((routeTitle &&
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(this.dialer.communication.contact.id)) ||
+          (routeTitle !== 'Power Dialer Sessions' &&
+            this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
       }
@@ -396,7 +407,17 @@ export default {
 
         this.setDialerCommunication(res.data)
 
-        if (this.dialer.communication.contact) {
+        const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // if in power dialer session, we must match the active task (contact)'s id
+        // with the communication's contact id
+        // else, set the contact.
+        if ((routeTitle &&
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+          (routeTitle !== 'Power Dialer Sessions' &&
+            this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
 
@@ -423,12 +444,16 @@ export default {
       })
     },
 
-    getDesktopToken () {
+    getDesktopToken (reset = false) {
       console.log('Generating desktop token')
 
       this.setDialerCurrentStatus('GENERATING_TOKEN')
 
-      return this.$axios.post('/api/v1/dialer/new-mobile-token').then(res => {
+      let params = {
+        reset
+      }
+
+      return this.$axios.post('/api/v1/dialer/new-mobile-token', params).then(res => {
         this.loading = false
         this.setDialerToken(res.data)
         this.setDialerCurrentStatus('TOKEN_GENERATED')
@@ -1218,6 +1243,11 @@ export default {
       // 9221 => Cannot connect to insights
       if (![31003, 31204, 31205, 9221].includes(err.code)) {
         this.$Sentry.captureException(err)
+      }
+
+      // Request new token if error
+      if ([31204, 31205].includes(err.code)) {
+        return this.getDesktopToken(true)
       }
 
       console.log(error)

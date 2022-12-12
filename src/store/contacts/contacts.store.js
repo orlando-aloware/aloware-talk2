@@ -247,6 +247,7 @@ export default function () {
       }
     },
     isContactMixinUsed: false,
-    isShortenedUrlRemembered: false
+    isShortenedUrlRemembered: false,
+    newCommunicationInprogressContactFetch: []
   }
 }

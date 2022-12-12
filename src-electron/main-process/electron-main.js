@@ -5,7 +5,7 @@ import { Registry } from 'rage-edit'
 import { template } from './menu'
 import { clone } from 'lodash'
 
-let isSilent
+var isSilent = true
 let updateDownloaded = false
 
 // register for tel: links in windows
@@ -442,7 +442,11 @@ process.on('uncaughtException', (err) => {
 })
 
 export function checkForUpdates ({ silent }) {
-  isSilent = silent
+  isSilent = true
+  if (silent !== undefined){
+    isSilent = silent
+  }
+
   changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
   if (updateDownloaded) {
     sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')

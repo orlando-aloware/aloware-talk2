@@ -30,10 +30,10 @@
             :editable="!isMyQueue"
             v-else
             v-model="contactListName"
-            @input="updateListName" />
+            @input="updateListName"/>
         </div>
         <div class="text-muted small action-desc">
-          {{ openEdit ? 'Add contacts by creating a filter or manually selecting' : 'Manually select contacts or create a filter'}}
+          {{ openEdit ? 'Add contacts by creating a filter or manually selecting' : 'Manually select contacts or create a filter' }}
           Manually select contacts or create a filter
         </div>
       </div>
@@ -154,7 +154,7 @@
                     class="checker"
                     :value="contact.id"
                     :checked="checkedItems.find(item => item.id === contact.id) || isAllContactsSelected"
-                    @change="onCheckerClicked(contact)" />
+                    @change="onCheckerClicked(contact)"/>
                   <span class="checkmark"></span>
                 </label>
               </td>
@@ -420,15 +420,17 @@
                 </div>
                 <div
                   v-else-if="column.name.includes('date_of_birth')"
-                  class="text-left ellipse col-indented" >
+                  class="text-left ellipse col-indented">
                   {{ contact[column.name] | fixFullDate }}
                 </div>
                 <div
                   v-else
                   class="ellipse"
                   :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`">
-                  {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
-                  (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : ( contact[column.name] === null ? '-' : contact[column.name] ) ) }}
+                  {{
+                    typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
+                      (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : (contact[column.name] === null ? '-' : contact[column.name]))
+                  }}
                 </div>
               </td>
             </template>
@@ -488,10 +490,10 @@
                         @filtersCount="updateFiltersCount"/>
     </template>
     <template slot="footer">
-      <import-contacts-modal ref="importContacts" />
+      <import-contacts-modal ref="importContacts"/>
       <power-dialer-add-modal :params="attachedParams()"
                               v-if="openPDModal"
-                              @hidden="openPDModal = false" />
+                              @hidden="openPDModal = false"/>
     </template>
   </contacts-screen>
 </template>
@@ -525,7 +527,8 @@ export default {
     onFetch: Function,
     list: {
       type: Object,
-      default: () => {}
+      default: () => {
+      }
     },
     isLoadingDisabled: {
       type: Boolean,
@@ -749,10 +752,16 @@ export default {
         .get('/api/v2/power-dialer-lists/' + stringId)
         .then((response) => response.data)
         .then((response) => {
-          this.listLoaded({ ...response, id: stringId })
+          this.listLoaded({
+            ...response,
+            id: stringId
+          })
         })
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
           this.$router.replace('/power-dialer/')
@@ -771,7 +780,10 @@ export default {
           this.listName = data
         })
         .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
+          const {
+            message,
+            html
+          } = extractErrorMessage(err)
           console.log(html)
           this.$generalNotification(`Error in renaming a list. ${message}`, 'error')
         })

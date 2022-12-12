@@ -18,17 +18,28 @@
 
 <script>
 import VueMultiselect from 'vue-multiselect'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 export default {
   name: 'timezone-selector',
-  components: { VueMultiselect },
+
+  components: {
+    VueMultiselect
+  },
+
+  props: {
+    value: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
+
   computed: {
-    ...mapGetters({ }),
     ...mapState('cache', ['currentCompany']),
     timezones () {
       if (this.currentCompany && this.currentCompany.country) {
         if (!['US', 'CA'].includes(this.currentCompany.country)) {
-          return window.CountriesAndTimezones().getTimezonesForCountry(this.currentCompany.country)
+          return window.CountriesAndTimezones.getTimezonesForCountry(this.currentCompany.country)
             .map((timezone) => {
               return {
                 name: timezone.name + ' GMT ' + timezone.utcOffsetStr,
@@ -68,11 +79,19 @@ export default {
       return []
     }
   },
+
   data () {
     return {
       timezone: null
     }
   },
+
+  mounted () {
+    if (this.value) {
+      this.timezone = this.timezones.find(tz => tz.value === this.value)
+    }
+  },
+
   methods: {
     onSelect (selected) {
       this.$emit('select', selected)
@@ -80,7 +99,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -1,14 +1,11 @@
 <template>
   <b-overlay :show="isBusy">
     <div class="t-flex-group__no-bg flex-column border-top">
-
-      <SessionFilters
-        @selected-tab="selectTab" />
+      <SessionFilters @selected-tab="selectTab" />
 
       <div class="t-panel-container">
-        <q-tab-panels
-          v-model="panel"
-          class="bg-transparent">
+        <q-tab-panels v-model="panel"
+                      class="bg-transparent">
 
           <q-tab-panel class="p-0"
                        name="Details">
@@ -24,7 +21,6 @@
                        name="CRM View">
             <SessionContactPageCrm />
           </q-tab-panel>
-
         </q-tab-panels>
       </div>
     </div>
@@ -47,33 +43,22 @@ import SessionContactPageDetails from './pages/session-contact-page-details'
 import SessionContactPageActivity from './pages/session-contact-page-activity'
 import SessionContactPageCrm from './pages/session-contact-page-crm'
 import { mapActions, mapState } from 'vuex'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'SessionPage',
+
+  mixins: [
+    hubspotIntegrationMixin
+  ],
+
   components: {
     SessionFilters,
     SessionContactPageDetails,
     SessionContactPageActivity,
     SessionContactPageCrm
   },
-  computed: {
-    ...mapState('powerDialer', ['activeTask', 'taskToCall'])
-  },
-  methods: {
-    ...mapActions('contacts', ['setContact']),
-    ...mapActions('powerDialer', ['setActiveTask']),
-    selectTab (val) {
-      this.panel = val.name
-    },
-    getContactData (id, source) {
-      if (!id || id === 'undefined') {
-        console.log('Failed to get contact: Missing contact id!')
-        return null
-      }
 
-      return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })
-    }
-  },
   data () {
     return {
       panel: 'Details',
@@ -82,10 +67,45 @@ export default {
       isBusy: false
     }
   },
+
+  computed: {
+    ...mapState('powerDialer', ['activeTask', 'taskToCall'])
+  },
+
   created () {
     this.cancelToken = window.axios.CancelToken
     this.source = this.cancelToken.source()
   },
+
+  methods: {
+    ...mapActions('contacts', ['setContact', 'setContactClone']),
+    ...mapActions('powerDialer', ['setActiveTask']),
+
+    selectTab (val) {
+      this.panel = val.name
+    },
+
+    getContactData (id, source) {
+      if (!id || id === 'undefined') {
+        console.log('Failed to get contact: Missing contact id!')
+        return null
+      }
+
+      return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })
+    },
+
+    getContactIntegrationData (contact) {
+      return this.getIntegrationData(contact)
+        .then(response => {
+          contact.integration_data = response.data
+
+          // update contact related states
+          this.setContact(contact)
+          this.setContactClone(contact)
+        })
+    }
+  },
+
   watch: {
     'taskToCall': function (value) {
       if (!value) {
@@ -95,18 +115,23 @@ export default {
       this.source.cancel('Loading of contact data operation is canceled by the user.')
       this.source = this.cancelToken.source()
       this.isBusy = true
-      const contactsData = this.getContactData(value.id, this.source.token)
 
-      if (contactsData) {
-        contactsData.then(res => {
+      this.getContactData(value.id, this.source.token)
+        .then(res => {
           if (!res) {
             return
           }
 
           this.isBusy = false
           this.setContact(res.data)
+          this.setContactClone(res.data)
+          this.$VueEvent.fire('contact_activity_update_contact', res.data)
+
+          this.getContactIntegrationData(res.data)
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          this.isBusy = false
         })
-      }
     }
   }
 }

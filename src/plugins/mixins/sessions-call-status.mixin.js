@@ -17,12 +17,14 @@ export default {
       callInProgress: false,
       countdownStarted: false,
       wrapUp: false,
-      reRouteModal: false
+      reRouteModal: false,
+      loadingNext: false
     }
   },
   computed: {
     ...mapState('powerDialer', [
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'redialed'
     ]),
     ...mapState([
       'dialer'
@@ -54,6 +56,9 @@ export default {
 
       switch (this.dialer?.currentStatus) {
         case 'READY':
+          // reset call in-progress flag
+          this.callInProgress = false
+
           if (this.timerIsOver || !this.isSessionRunning || this.reRouteModal) {
             return 'Ready'
           }
@@ -133,10 +138,12 @@ export default {
   },
   methods: {
     ...mapActions('contacts', ['setContact']),
-    ...mapActions(['setShowPhone']),
+    ...mapActions(['setShowPhone', 'setDialerContact']),
     ...mapActions('powerDialer', [
       'moveContactItems',
-      'getSessionTaskByFilter'
+      'getSessionTaskByFilter',
+      'addRedialedTask',
+      'clearRedialedTask'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
@@ -191,6 +198,15 @@ export default {
           companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
           contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
         })
+
+        const dialerContactId = get(this.dialer.contact, 'id', null)
+
+        if (!dialerContactId ||
+          (dialerContactId &&
+            parseInt(this.activeTask.id) !== parseInt(dialerContactId))) {
+          this.setDialerContact(this.activeTask)
+        }
+
         this.callInProgress = true
       } else {
         // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
@@ -217,9 +233,28 @@ export default {
           // }
           // this.skipped_list.push(autoDialTask.id)
           this.$generalNotification(message, 'warning')
+          this.onNextTask()
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)
+          return Promise.reject(err)
+        })
+    },
+
+    redialTask (autoDialTask) {
+      const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
+        return
+      }
+
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
+        .then(res => {
+          this.addRedialedTask(autoDialTask.id)
+
+          this.$generalNotification('Success: contact is at the bottom of the current list')
+          return Promise.resolve(res)
+        }).catch(err => {
           return Promise.reject(err)
         })
     },

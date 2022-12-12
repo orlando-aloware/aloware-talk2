@@ -1,20 +1,16 @@
 <template>
   <div class="w-100 h-100 px-2">
 
-    <b-overlay
-      class="d-flex"
-      :show="loading"
-      rounded="sm"
-      style="display:block;width:100% !important;">
+    <b-overlay class="d-flex d-block w-100"
+               :show="loading"
+               rounded="sm">
       <template #overlay>
-        <q-spinner-bars
-          color="primary"
-          size="40px" />
+        <q-spinner-bars color="primary"
+                        size="40px" />
       </template>
 
-      <div
-        class="col-4 p-1 px-2"
-        style="height:70vh;">
+      <div class="col-4 p-1 px-2"
+           style="height:70vh;">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
             <div
@@ -27,9 +23,8 @@
         <DetailsScripts :resources="scripts" />
       </div>
 
-      <div
-        class="col-4 p-1 px-2"
-        style="height:70vh;">
+      <div class="col-4 p-1 px-2"
+           style="height:70vh;">
         <q-card v-if="isHubspotEnabled && hubspotLink"
                 flat
                 class="p-3">
@@ -43,21 +38,16 @@
           </q-card-section>
         </q-card>
 
-        <DetailsContactInformation
-          v-if="contact"
-          :resources="contact" />
-
+        <DetailsContactInformation :resources="contact"
+                                   v-if="contact" />
       </div>
-      <div
-        class="col-4 p-1 px-2"
-        style="height:70vh;">
+      <div class="col-4 p-1 px-2"
+           style="height:70vh;">
 
         <DetailsTools />
-
       </div>
 
     </b-overlay>
-
   </div>
 </template>
 
@@ -73,7 +63,9 @@ import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 export default {
   name: 'SessionContactPageDetails',
 
-  mixins: [hubspotIntegrationMixin],
+  mixins: [
+    hubspotIntegrationMixin
+  ],
 
   components: {
     DetailsScripts,
@@ -82,18 +74,6 @@ export default {
     HubSpotIcon
   },
 
-  computed: {
-    ...mapState('cache', ['currentCompany']),
-    ...mapGetters('contacts', [
-      'contact'
-    ]),
-    ...mapGetters('powerDialer', [
-      'sessionLoader'
-    ]),
-    hubspotLink () {
-      return this.getHubspotLink(this.contact)
-    }
-  },
   data () {
     return {
       loading: false,
@@ -106,6 +86,18 @@ export default {
         ],
         message: 'Hi, my name’s Natasha. I saw that you recently purchased a home. Are you by chance looking for car insurance?<br/><br/>Great. Let me tell you about some products we offer.<br/><br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.<br/><br/>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Hi, my name’s Natasha. I saw that you recently purchased a home. Are you by chance looking for car insurance?<br/><br/>Great. Let me tell you about some products we offer.'
       }
+    }
+  },
+
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+    ...mapState('contacts', ['contact']),
+    ...mapGetters('powerDialer', [
+      'sessionLoader'
+    ]),
+
+    hubspotLink () {
+      return this.getHubspotLink(this.contact)
     }
   }
 }

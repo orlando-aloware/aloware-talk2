@@ -1,7 +1,14 @@
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
+  data () {
+    return {
+      integrationName: 'hubspot'
+    }
+  },
+
   computed: {
     ...mapState('cache', ['currentCompany']),
 
@@ -13,24 +20,32 @@ export default {
       return this.currentCompany.hubspot_company_ui_domain || 'app.hubspot.com'
     }
   },
+
   methods: {
+    getIntegrationData (contact) {
+      return talk2Api.V1.contact.getIntegrationData(contact.id, {
+        params: {
+          integration_name: this.integrationName,
+          dialer_mode: this.dialer_mode ? 1 : 0
+        }
+      })
+    },
+
     getHubspotContactBaseLink (contact) {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
         contact &&
-        ((contact.integrations &&
-            contact.integrations.hubspot) ||
-          (contact.integration_data &&
-            contact.integration_data.hubspot)
-        ) &&
+        contact.integration_data &&
         this.currentCompany.hubspot_marketing_portal_id) {
         return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
 
       return false
     },
+
     getHubspotLink (contact) {
       const baseLink = this.getHubspotContactBaseLink(contact)
+
       if (baseLink) {
         const contactId = this.getContactId(contact)
         return contactId ? `${baseLink}contact/${contactId}` : false
@@ -38,20 +53,13 @@ export default {
 
       return false
     },
+
     getContactId (contact) {
-      const contactId = { data: null }
-      switch (true) {
-        case contact.integration_data && !isEmpty(contact.integration_data):
-          contactId.data = contact.integration_data.hubspot.contact_id
-          break
-        case contact.integrations && !isEmpty(contact.integrations):
-          contactId.data = contact.integrations.hubspot.contact_id
-          break
-        default:
-          contactId.data = null
+      if (contact?.integration_data && !isEmpty(contact.integration_data)) {
+        return contact.integration_data.vid
       }
 
-      return contactId.data
+      return null
     }
   }
 }

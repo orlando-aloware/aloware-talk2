@@ -199,7 +199,8 @@ export default {
       relationTypes: [
         'relation',
         'multi_relation',
-        'boolean'
+        'boolean',
+        'selection'
       ],
       filterGroups: {
         GROUP_PRIMARY_INFO,
@@ -385,15 +386,16 @@ export default {
     },
 
     generateListFilters () {
-      const filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
+      const filterGroups = this.$jsonClone(this.currentListFilters)
       const groupIndex = { data: null }
       const filterIndex = { data: null }
-      const operators = { data: null }
       const found = { data: null }
       const operator = { data: null }
       const options = { data: null }
       const option = { data: null }
       const trueValue = { data: null }
+      const field = { field: null }
+      const filter = { data: null }
 
       for (groupIndex.data in filterGroups) {
         if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
@@ -413,31 +415,46 @@ export default {
             continue
           }
 
-          operators.data = found.data ? _.get(found.data, 'operators', null) : null
+          if (_.get(found.data, 'operators', null)) {
+            filter.data = filterGroups[groupIndex.data].filters[filterIndex.data]
 
-          if (operators.data) {
-            operator.data = found.data.operators.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
+            // try to search for the selected option
+            operator.data = found.data.operators.find(item => item.value === filter.data.operator)
             options.data = operator.data ? _.get(operator.data, 'options', null) : null
-            option.data = options.data ? options.data.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
-            trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].value
+            option.data = options.data ? options.data.find(item => item.value === filter.data.value) : null
+
+            // set values into an array
+            trueValue.data = filter.data.value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : [trueValue.data]
+            trueValue.data = typeof filter.data.value === 'string' ? filter.data.value.split(',') : [trueValue.data]
+
+            // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+            // The content in 'field' will be concatenated at the end of the string
+            if ('field' in filter.data) {
+              field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
+
+              // set values into an array (but using 'field' this time)
+              trueValue.data = filter.data.field
+              trueValue.data = option.data ? [option.data.label] : trueValue.data
+              trueValue.data = typeof filter.data.field === 'string' ? filter.data.field.split(',') : [trueValue.data]
+            }
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
+              ...field,
               key: filterIndex.data,
               label: found.data.label,
               operator: operator.data ? _.get(operator.data, 'label', null) : null,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              default: filter.data.default || 0
             }
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.data.label,
-              trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
-              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              trueValue: filter.data.value,
+              value: JSON.stringify(filter.data.value),
+              default: filter.data.default || 0
             }
           }
         }
@@ -454,16 +471,14 @@ export default {
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && _.get(filterFound, 'type', null)
-      const labels = { data: null }
-      const item = { index: null }
-      const optionFound = { data: null }
-      const joinedValues = { data: null }
-      const values = { data: [] }
+      const isSelectionType = filterFound && filterFound.type === 'selection' // DNC or opt out filter
+      let values = []
+      let labels = []
 
       if (typeof filter.trueValue === 'object') {
         switch (true) {
           case filter.trueValue.length === 1 || (isRelationType):
-            values.data = filter.trueValue
+            values = filter.trueValue
             break
           case filter.trueValue.length === 2 && filter.operator !== 'Is between':
             return filter.trueValue.join(' or ')
@@ -471,25 +486,37 @@ export default {
             return filter.trueValue.join(' and ')
         }
 
-        labels.data = []
-
-        if (filterFound && isRelationType) {
-          for (item.index of values.data) {
-            optionFound.data = filterFound.options.find(option => String(option.value) === String(item.index))
-            labels.data.push(optionFound.data ? optionFound.data.label : '')
+        if (filterFound && (isRelationType || isSelectionType)) {
+          for (let index of values) {
+            filterFound
+              .options
+              // if is array search inside it, if not compare with the value
+              .filter(option => Array.isArray(index) ? index.includes(option.value) : index === option.value)
+              .forEach(option => {
+                labels.push(option.label)
+              })
           }
         } else if (isBoolean) {
-          labels.data = [filter.trueValue[0] === 1]
+          labels.push(filter.trueValue[0] === 1)
         } else {
-          labels.data = filter.trueValue
+          labels = filter.trueValue
         }
 
-        joinedValues.data = labels.data.join(', ')
-        if (labels.data.length > 1) {
-          return joinedValues.data.substring(0, joinedValues.data.lastIndexOf(',')) + ' or' + joinedValues.data.substring(joinedValues.data.lastIndexOf(',') + 1, joinedValues.data.length)
+        let joinedValues = labels.join(', ')
+        let data = labels.length > 1
+          ? joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
+          : joinedValues
+
+        // add field values at the end if they are present
+        if (filter.field) {
+          let joinedFields = filter.field.join(', ')
+
+          data += ' as ' + (filter.field.length > 1
+            ? joinedFields.substring(0, joinedFields.lastIndexOf(',')) + ' or' + joinedFields.substring(joinedFields.lastIndexOf(',') + 1, joinedFields.length)
+            : joinedFields)
         }
 
-        return joinedValues.data
+        return data
       } else {
         return !isSimpleType ? filter.trueValue : ''
       }

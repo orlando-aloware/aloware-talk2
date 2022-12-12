@@ -25,7 +25,7 @@
                          :value="option.value"
                          :key="option.value"
                          v-model="conversion"
-                         v-for="option in options.conversion">
+                         v-for="option in conversionOptions">
           {{ option.text }}
           <information-circle-icon color="#2F80ED"
                                    v-if="option.helper"/>
@@ -36,6 +36,18 @@
           </q-tooltip>
         </b-form-checkbox>
 
+        <label class="label mt-2 mb-1 text-weight-bold">
+          Direction
+        </label>
+        <b-form-radio-group class="w-100"
+                            button-variant="outline-primary"
+                            name="radio-btn-outline"
+                            size="sm"
+                            buttons
+                            :options="directionOptions"
+                            v-model="direction">
+        </b-form-radio-group>
+
         <hr>
 
         <label class="label mb-1 text-weight-bold">
@@ -45,7 +57,7 @@
                       :value="option.value"
                       :key="option.value"
                       v-model="where"
-                      v-for="option in options.where">
+                      v-for="option in whereOptions">
           {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
         </b-form-radio>
         <date-picker mode="dateTime"
@@ -106,6 +118,8 @@ import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapState } from 'vuex'
+import * as ImportConstants from 'src/constants/power-dialer-import'
+import * as CompanyTiers from 'src/constants/company-international-tier'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -130,17 +144,6 @@ export default {
     }
   },
 
-  mounted () {
-    this.loading++
-
-    if (this.mode === 'hubspot') {
-      // check if Hubspot list already exists
-      this.checkHubspotList()
-    }
-
-    this.setCount()
-  },
-
   data: () => ({
     loading: 0,
     confirm: false,
@@ -150,33 +153,7 @@ export default {
     ],
     where: 'queue',
     schedule: new Date(),
-    options: {
-      conversion: [
-        {
-          value: 'multiple_phone_numbers',
-          text: 'Turn multiple numbers into separated tasks',
-          helper: 'Any non-primary numbers of a contact will be turned into separate tasks'
-        }, {
-          value: 'prevent_duplicates',
-          text: 'Prevent duplicate phone numbers',
-          helper: 'If selected, duplicate numbers will not be included again'
-        }, {
-          value: 'allow_international_phone_numbers',
-          text: 'Add international phone numbers'
-        }
-      ],
-      where: [
-        {
-          value: 'queue',
-          text: 'In queue',
-          description: 'Default'
-        }, {
-          value: 'scheduled',
-          text: 'Scheduled',
-          description: 'If you want to call these contacts at a later time'
-        }
-      ]
-    },
+    direction: ImportConstants.BOTTOM,
     masks: {
       input: 'MM/DD/YYYY HH:mm'
     },
@@ -188,6 +165,7 @@ export default {
 
   computed: {
     ...mapState('contacts', ['isAddPowerDialerOpen']),
+    ...mapState('cache', ['currentCompany']),
     isOpen: {
       get () {
         return this.isAddPowerDialerOpen
@@ -201,7 +179,9 @@ export default {
         ...this.params,
         'prevent_duplicates': this.conversion.includes('prevent_duplicates'),
         'multiple_phone_numbers': this.conversion.includes('multiple_phone_numbers'),
-        'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers')
+        'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers'),
+        'own_contacts_only': this.conversion.includes('own_contacts_only'),
+        'direction': this.direction
       }
 
       if (this.where === 'scheduled') {
@@ -212,7 +192,72 @@ export default {
     },
     contactsDescription () {
       return this.count + (this.count === 1 ? ' contact' : ' contacts')
+    },
+    isAllowedInternationalNumbers () {
+      return this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
+    },
+    conversionOptions () {
+      const options = [
+        {
+          value: 'multiple_phone_numbers',
+          text: 'Turn multiple numbers into separated tasks',
+          helper: 'Any non-primary numbers of a contact will be turned into separate tasks'
+        }, {
+          value: 'prevent_duplicates',
+          text: 'Prevent duplicate phone numbers',
+          helper: 'If selected, duplicate numbers will not be included again'
+        }, {
+          value: 'own_contacts_only',
+          text: 'Add own contacts only',
+          helper: 'If selected, it will add only the contacts owned by you'
+        }
+      ]
+
+      // add option only if company has international enabled and tier higher than 1
+      if (this.isAllowedInternationalNumbers) {
+        options.push({
+          value: 'allow_international_phone_numbers',
+          text: 'Add international phone numbers'
+        })
+      }
+
+      return options
+    },
+    whereOptions () {
+      return [
+        {
+          value: 'queue',
+          text: 'In queue',
+          description: 'Default'
+        }, {
+          value: 'scheduled',
+          text: 'Scheduled',
+          description: 'If you want to call these contacts at a later time'
+        }
+      ]
+    },
+    directionOptions () {
+      return [
+        {
+          value: ImportConstants.BOTTOM,
+          text: 'Bottom'
+        }, {
+          value: ImportConstants.TOP,
+          text: 'Top'
+        }
+      ]
     }
+  },
+
+  mounted () {
+    this.loading++
+
+    if (this.mode === 'hubspot') {
+      // check if Hubspot list already exists
+      this.checkHubspotList()
+    }
+
+    this.setCount()
   },
 
   methods: {
@@ -314,9 +359,10 @@ export default {
         .post('/api/v2/power-dialer-lists/import-hubspot-list/' + target, params)
         .then(response => response.data)
         .then(data => {
-          this.reloadFolders()
-          this.$generalNotification(data.message)
-          this.$emit('submit')
+          const notification = this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
+          })
         })
         .catch(_err => {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')

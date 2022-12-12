@@ -68,7 +68,6 @@ export default {
 
   methods: {
     ...mapActions('inbox', [
-      'setContact',
       'setLiveContacts',
       'setSelectedContact',
       'setHasMoreContacts',
@@ -251,6 +250,8 @@ export default {
         query.relations = ['lastCommunication']
       }
 
+      query.timezone = window.timezone
+
       return query
     },
     resetFilters () {
@@ -261,6 +262,13 @@ export default {
         },
         search: {
         }
+      }
+    },
+    setContact (updatedContact) {
+      const index = this.contacts.findIndex(item => parseInt(item.id) === parseInt(updatedContact.id))
+
+      if (index > -1) {
+        Object.assign(this.contacts[index], updatedContact)
       }
     },
     setContacts (contacts) {

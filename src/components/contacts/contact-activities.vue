@@ -103,6 +103,9 @@ export default {
           break
         }
       }
+    },
+    'contact.id': function () {
+      this.sendingCommunications = []
     }
   },
   computed: {
@@ -129,7 +132,13 @@ export default {
   },
   methods: {
     isSameCommunication (comm1, comm2) {
-      if (comm1.type !== comm2.type) {
+      // check if comms are not empty
+      const isEmptyComms = _.isEmpty(comm1) || _.isEmpty(comm2)
+      // check if both comms' type are not the same
+      const notSameCommType = !isEmptyComms && comm1.type !== comm2.type
+
+      if (isEmptyComms ||
+        notSameCommType) {
         return false
       }
 
@@ -142,13 +151,15 @@ export default {
       }
 
       // If it's an email, the message and subject need to be checked
-      if ([comm1.type, comm2.type].includes(CommunicationTypes.EMAIL)) {
+      if (comm1.type === CommunicationTypes.EMAIL && comm2.type === CommunicationTypes.EMAIL) {
         let body = comm2.body.split(/\r?\n/)
 
         let subject = body[0].split(':')[1].trim()
-        let message = body[3].trim()
+        let message = body.slice(3, body.length).reduce((cumulative, current) => cumulative + current).trim()
 
-        return subject === comm1.subject && message === comm1.message
+        let comparison = this.compareMessages(comm1.message, message)
+
+        return subject === comm1.subject && comparison
       }
 
       // If it's a fax, it won't have any text to compare.
@@ -157,7 +168,26 @@ export default {
         return window.moment.utc(comm2.created_at).diff(comm1.created_at) < 15 * 1000
       }
 
+      // If it's an sms, test to see if there are variables in the body
+      if (comm1.type === CommunicationTypes.SMS && comm2.type === CommunicationTypes.SMS) {
+        return this.compareMessages(comm1.body, comm2.body)
+      }
+
       return comm1.body === comm2.body
+    },
+    compareMessages (string1, string2) {
+      let bodyArray = string1.replace(/\n/g, ' ').split(' ')
+
+      for (let word of bodyArray) {
+        // if contains bracket at beginning or at the end, it's probably a variable
+        // Variables don't need to be checked, because they are not
+        if (!word.includes('[') && !word.includes(']') && !string2.includes(word)) {
+          console.log({ word })
+          return false
+        }
+      }
+
+      return true
     },
     scrollMessages () {
       const activitiesWrap = this.$refs.activitiesWrap

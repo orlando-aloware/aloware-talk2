@@ -11,6 +11,7 @@ import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 import * as storage from 'src/plugins/helpers/storage'
+import CountriesAndTimezones from 'countries-and-timezones'
 
 import { Screen } from 'quasar'
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
@@ -44,6 +45,9 @@ window.PNF = googlePhone.PhoneNumberFormat
 
 // Get an instance of `PhoneNumberUtil`.
 window.phoneUtil = googlePhone.PhoneNumberUtil.getInstance()
+
+// Timezones for international companies (outside US and CA)
+window.CountriesAndTimezones = CountriesAndTimezones
 
 window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
   if (!phoneNumber) {
@@ -207,6 +211,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
       case 500:
         message.data = 'Oops! We are having some problems right now, please try again later.'
     }
+
+    if (window._.isEmpty(message.data.trim())) {
+      return
+    }
+
     this.$generalNotification(message.data, 'error', 5000, true)
   }
 }
@@ -279,6 +288,10 @@ Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
+  if (window._.isEmpty(message.trim())) {
+    return
+  }
+
   const uuid = window._.get(actionOptions, 'uuid', null)
   const filename = window._.get(actionOptions, 'filename', null)
   const colorClass = { data: '' }
@@ -309,6 +322,21 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
       }]
       colorClass.data = 'bg-green-10'
       break
+    case 'redirect':
+      actions = [{
+        label: 'Go to page',
+        color: 'primary',
+        class: 'px-2',
+        handler: () => {
+          if (actionOptions.path) {
+            this.$router.push({
+              path: actionOptions.path
+            })
+          }
+        }
+      }]
+      colorClass.data = 'bg-green-10'
+      break
     default:
       colorClass.data = 'bg-green-10'
   }
@@ -323,7 +351,7 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     actions: actions
   }
 
-  this.$q.notify(options)
+  return this.$q.notify(options)
 }
 
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {
@@ -475,6 +503,14 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     isStatus: true
   })
 }, 500)
+
+Vue.prototype.$jsonClone = (value) => {
+  if (value) {
+    return JSON.parse(JSON.stringify(value))
+  }
+
+  return value
+}
 
 // eslint-disable-next-line no-extend-native
 String.prototype.capitalize = function () {

@@ -62,6 +62,7 @@
 import { mapState, mapGetters, mapActions } from 'vuex'
 import {
   contactMixin,
+  contactV2AttributesMixin,
   aclMixin,
   visibilityMixin
 } from 'src/plugins/mixins'
@@ -69,47 +70,86 @@ import ContactActivities from 'src/components/contacts/contact-activities'
 
 export default {
   name: 'SessionContactPageActivity',
+
   components: {
     ContactActivities
   },
+
   mixins: [
     contactMixin,
+    contactV2AttributesMixin,
     aclMixin,
     visibilityMixin
   ],
+
   props: {
     panel: {
       required: true
     }
   },
-  mounted () {
-    this.flagged = false
-    this.prepareActivities()
-    this.flagged = true
-  },
+
   created () {
     window.addEventListener('resize', this.resizeHandler)
     this.setIsContactMixinUsed(true)
     this.initListeners()
+
+    // listener for clearing contact change
     this.contactActivityListeners.contactTaskStatusUpdated = (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(this.contact)
       }
     }
+
+    // listener for updating the contact from
+    // session contact page component's getContactData
+    this.contactActivityListeners.updateContact = (data) => {
+      // update the contact
+      this.sessionContactActivityContactUpdate(data)
+      // fetch contact info (other contact info because we
+      // already fetched the contact)
+      this.processFetchContactInfo(null, false)
+    }
+
+    // listener for updating the contact from contact mixin fetchContactInfo
+    this.contactActivityListeners.updateContactFromFetch = (data) => {
+      // update the contact
+      this.sessionContactActivityContactUpdate(data)
+    }
+
+    // listener for updating contact task status
+    this.contactActivityListeners.clearContactChangeFromFetch = () => {
+      this.selectedContactChanging(false)
+    }
+
+    this.$VueEvent.listen('contact_activity_update_contact', this.contactActivityListeners.updateContact)
+    this.$VueEvent.listen('contact_activity_update_contact_from_fetch', this.contactActivityListeners.updateContactFromFetch)
     this.$VueEvent.listen('contact_task_status_updated', this.contactActivityListeners.contactTaskStatusUpdated)
+    this.$VueEvent.listen('contact_activity_clear_change_from_fetch', this.contactActivityListeners.clearContactChangeFromFetch)
   },
+
+  mounted () {
+    this.contactId = this.contact.id
+    this.setSelectedContact(this.contact)
+    this.selectedContactChanging(true)
+    // initial fetch after mounting
+    this.processFetchContactInfo()
+  },
+
   computed: {
     ...mapGetters('auth', [
       'authenticated'
     ]),
+
     ...mapGetters('powerDialer', [
       'sessionLoader'
     ]),
+
     ...mapGetters('contacts', [
       'contact',
       'isSidebarCollapsed',
       'changingSelectedContact'
     ]),
+
     ...mapState([
       'contactDetailsDrawer',
       'campaignsIsLoading',
@@ -119,9 +159,11 @@ export default {
       'users',
       'tags'
     ]),
+
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Mention Communication'].includes(this.$route.name)
     },
+
     widthClass () {
       if (this.isInbox) {
         return 'w-less-330px'
@@ -129,6 +171,7 @@ export default {
       return 'w-less-500px'
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'resetChangedContactProperties',
@@ -136,52 +179,39 @@ export default {
       'setContact',
       'setContactClone'
     ]),
+
     ...mapActions(['setContactDetailsDrawer']),
-    fetchContact () {
-      this.selectedContactChanging(true)
-      this.$VueEvent.fire('fetch_contact_info', (selectedContact) => {
-        this.setContact(selectedContact)
-        this.setContactClone(selectedContact)
-        this.resetChangedContactProperties([])
-        this.selectedContactChanging(false)
-      })
-    },
+
     toggleDrawer () {
       this.drawer = !this.drawer
       this.setContactDetailsDrawer(this.drawer)
     },
+
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
     },
+
     toggleContactListSidebar (isOpen) {
       this.contactListSidebarOpen = isOpen
       if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
         this.$refs.contactListSidebar.onSidebarToggle()
       }
     },
+
     prepareActivities () {
       this.contactId = this.contact.id
       this.setSelectedContact(this.contact)
-      if (this.authenticated) {
-        this.fetchContact()
-      }
-    }
-  },
-  watch: {
-    contact (newVal, oldVal) {
-      if (newVal === undefined) {
-        return
-      }
+    },
 
-      if (newVal?.id !== oldVal?.id) {
-        if (this.flagged) {
-          this.flagged = false
-          this.prepareActivities()
-          this.flagged = true
-        }
-      }
+    sessionContactActivityContactUpdate (data) {
+      this.contactId = data.id
+      this.setSelectedContact(data)
+      this.setContact(data)
+      this.setContactClone(data)
+      this.resetChangedContactProperties([])
     }
   },
+
   data () {
     return {
       flagged: false,
@@ -192,10 +222,20 @@ export default {
       contactActivityListeners: {}
     }
   },
+
+  watch: {
+    'contact.id': function () {
+      this.selectedContactChanging(true)
+    }
+  },
+
   beforeDestroy () {
     this.setIsContactMixinUsed(false)
     this.removeListeners()
+    this.$VueEvent.stop('contact_activity_update_contact', this.contactActivityListeners.updateContact)
+    this.$VueEvent.stop('contact_activity_update_contact_from_fetch', this.contactActivityListeners.updateContactFromFetch)
     this.$VueEvent.stop('contact_task_status_updated', this.contactActivityListeners.contactTaskStatusUpdated)
+    this.$VueEvent.stop('contact_activity_clear_change_from_fetch', this.contactActivityListeners.clearContactChangeFromFetch)
   }
 }
 </script>
