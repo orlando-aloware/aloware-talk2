@@ -3,6 +3,7 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
 import { head } from 'lodash'
+import { REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER } from '../../constants/communication-rejection-reasons'
 
 export default {
   methods: {
@@ -244,6 +245,8 @@ export default {
           return 'Company was suspended.'
         case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
           return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
+        case CommunicationRejectionReasons.REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER:
+          return 'ShortCode is not allowed to send messages to non-US numbers.'
       }
     },
 
