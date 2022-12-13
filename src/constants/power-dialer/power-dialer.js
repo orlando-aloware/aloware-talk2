@@ -28,3 +28,8 @@ export const MOVE_CONTACTS_DIRECTION = {
   'top': 1,
   'bottom': 2
 }
+
+export const POWER_DIALER_ORDER = {
+  default: 1,
+  timezone: 2
+}
