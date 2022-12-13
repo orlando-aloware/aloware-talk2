@@ -815,8 +815,10 @@ export default {
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
     },
     deleteEndpoint () {
+      // if selected task is not empty and there's a task list
+      // currently selected/in view, then it's safe to delete
       if (isEmpty(this.selectedItem) ||
-        isEmpty(this.filteredListId)) {
+        [null, undefined].includes(this.filteredListId)) {
         return ''
       }
 
@@ -1020,9 +1022,17 @@ export default {
       })
     },
     onDeleteContact (data) {
+      const deleteEndpoint = this.deleteEndpoint
+
+      // if endpoint is empty, then it's an invalid delete
+      if (isEmpty(deleteEndpoint)) {
+        this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
+        return
+      }
+
       return this.$axios
         .delete(
-          this.deleteEndpoint
+          deleteEndpoint
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
