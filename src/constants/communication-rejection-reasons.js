@@ -70,5 +70,5 @@ export const REJECTION_REASON_COMPANY_DELETED = 34
 export const REJECTION_REASON_COMPANY_SUSPENDED = 35
 // An Sms/Mms was rejected to send by our system because line is sending the same message to the same contact.
 export const REJECTION_REASON_LINE_IS_SPAMMING = 36
-// An Sms/Mms was rejected to send by our system because ShortCode is sending the message to a non-US number.
+// An Sms/Mms was rejected to send by our system because Short Code is sending the message to a non-US number.
 export const REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER = 37
