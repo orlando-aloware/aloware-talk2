@@ -370,7 +370,7 @@ export default {
           // if in edit mode, skip higher than today check
           return this.mode === 'edit'
             ? regex
-            : regex && val >= moment().format('MM/DD/YYYY')
+            : regex && moment(val).format('YYYY-MM-DD') >= moment().format('YYYY-MM-DD')
         }
       },
       timezone: {
