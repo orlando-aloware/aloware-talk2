@@ -244,6 +244,8 @@ export default {
           return 'Company was suspended.'
         case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
           return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
+        case CommunicationRejectionReasons.REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER:
+          return 'Short Code is not allowed to send messages to non-US numbers.'
       }
     },
 
