@@ -1067,7 +1067,7 @@ export default {
       }
 
       this.loadingUpdateEngagement = true
-      API.V1.contact.updateEngagement(this.communication.contact_id, this.communication.id, params).then(res => {
+      API.V1.contact.updateEngagement(this.communication.id, params).then(res => {
         this.loadingUpdateEngagement = false
         this.$generalNotification('Engagement updated.')
         this.$emit('update', res.data)

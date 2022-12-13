@@ -94,8 +94,8 @@ export default {
         }
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
       },
-      updateEngagement (contactId, eventId, params) {
-        return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
+      updateEngagement (eventId, params) {
+        return window.axios.post(`${suffixV1}calendar/events/${eventId}/update`, params)
       },
       getLineIncomingNumber (contactId, lineId) {
         if (!contactId || !lineId) {
