@@ -6,7 +6,7 @@
            class="q-btn-standard"
            @click="toggleFeedbackDialog">
 
-        <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
+        <i class="fas fa-arrow-right"></i>  <span>{{ switchAppName }}</span>
     </q-btn>
     <q-btn-dropdown
       v-else
@@ -18,7 +18,7 @@
     >
 
       <template slot="label">
-        <i class="fas fa-arrow-right"></i>  <span>Aloware Classic</span>
+        <i class="fas fa-arrow-right"></i>  <span>{{ switchAppName }}</span>
         <hr role="separator" aria-orientation="vertical" class="q-separator ml-2 margin-auto position-relative q-separator q-separator--vertical">
       </template>
 
@@ -81,6 +81,13 @@ export default {
       }
 
       return !this.profile.company.force_talk
+    },
+    switchAppName () {
+      if (this.profile.company.force_talk) {
+        return 'Aloware Admin'
+      }
+
+      return 'Aloware Classic'
     }
   },
 
