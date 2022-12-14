@@ -243,7 +243,10 @@ export default {
       return this.routeName === 'Contacts' && this.isContactModuleType
     },
     isIntegrationEnabled () {
-      return this.currentCompany && (this.currentCompany.hubspot_integration_enabled || this.currentCompany.zoho_integration_enabled || this.currentCompany.pipedrive_integration_enabled)
+      return this.currentCompany &&
+          (this.currentCompany.hubspot_integration_enabled ||
+           this.currentCompany.zoho_integration_enabled ||
+           this.currentCompany.pipedrive_integration_enabled)
     }
   },
   mounted () {
