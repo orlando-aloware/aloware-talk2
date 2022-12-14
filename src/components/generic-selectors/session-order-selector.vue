@@ -82,27 +82,15 @@ export default {
   },
 
   created () {
-    this.setOrderObject()
-
-    if (!this.value) {
-      this.order = POWER_DIALER_ORDER.default
-    }
-  },
-
-  methods: {
-    setOrderObject () {
-      if (this.value) {
-        this.order = this.options.find(option => option.id === this.value)
-      }
-    }
+    this.order = this.value ? this.value : POWER_DIALER_ORDER.default
   },
 
   watch: {
-    value () {
-      this.setOrderObject()
+    value (value) {
+      this.order = value
     },
     order () {
-      this.$emit('input', this.order.id)
+      this.$emit('input', this.order)
     }
   }
 }

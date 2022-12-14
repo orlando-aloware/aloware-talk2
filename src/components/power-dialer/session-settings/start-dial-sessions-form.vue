@@ -75,7 +75,7 @@
           <OrderSelector
             v-else-if="cform.name === 'order'"
             class="generic-selector-2"
-            :value="resources[cform.name]" />
+            v-model="resources[cform.name]" />
 
           <CallDispositionSelector
             v-else-if="cform.name === 'call_disposition_ids'"
