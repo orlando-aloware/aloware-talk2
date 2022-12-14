@@ -48,11 +48,12 @@
           </button>
         </div>
       </div>
-      <power-dialer-add-modal :params="powerDialerParams"
-                              mode="integration"
-                              v-if="isAddPowerDialerOpen"
-                              @hidden="onHiddenPowerDialerModal"
-                              @submit="onClose">
+      <power-dialer-add-modal 
+        :params="powerDialerParams"
+        mode="integration"
+        v-if="isAddPowerDialerOpen"
+        @hidden="onHiddenPowerDialerModal"
+        @submit="onClose">
       </power-dialer-add-modal>
     </b-overlay>
   </b-modal>
