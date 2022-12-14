@@ -45,59 +45,10 @@ export default {
     this.$VueEvent.stop('contact_list_import_zoho')
     this.$VueEvent.stop('contact_list_import_pipedrive')
 
-    this.$VueEvent.listen('contact_list_import_hubspot', event => {
-      // return if event is for another user
-      if (event.user_id !== this.profile.id) {
-        return
-      }
-
-      // dismiss the previous notification
-      if (this.notification) {
-        this.notification()
-        this.notification = null
-      }
-
-      this.reloadFolders()
-      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
-        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
-      })
-    })
-
-    this.$VueEvent.listen('contact_list_import_zoho', event => {
-      // return if event is for another user
-      if (event.user_id !== this.profile.id) {
-        return
-      }
-
-      // dismiss the previous notification
-      if (this.notification) {
-        this.notification()
-        this.notification = null
-      }
-
-      this.reloadFolders()
-      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
-        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
-      })
-    })
-
-    this.$VueEvent.listen('contact_list_import_pipedrive', event => {
-      // return if event is for another user
-      if (event.user_id !== this.profile.id) {
-        return
-      }
-
-      // dismiss the previous notification
-      if (this.notification) {
-        this.notification()
-        this.notification = null
-      }
-
-      this.reloadFolders()
-      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
-        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
-      })
-    })
+    // Handle import successfull
+    this.$VueEvent.listen('contact_list_import_hubspot', event => this.handleImportFinishedEvent(event))
+    this.$VueEvent.listen('contact_list_import_zoho', event => this.handleImportFinishedEvent(event))
+    this.$VueEvent.listen('contact_list_import_pipedrive', event => this.handleImportFinishedEvent(event))
   },
 
   methods: {
@@ -120,6 +71,23 @@ export default {
         .catch(() => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
+    },
+    handleImportFinishedEvent (event) {
+      // return if event is for another user
+      if (event.user_id !== this.profile.id) {
+        return
+      }
+
+      // dismiss the previous notification
+      if (this.notification) {
+        this.notification()
+        this.notification = null
+      }
+
+      this.reloadFolders()
+      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
+        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
+      })
     }
   },
 
