@@ -707,7 +707,7 @@ export default {
           this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
-            this.powerDialerTasks.in_queue.shift()
+            this.popFirstInQueueTask()
           }
 
           this.activeTask = this.taskToCall
@@ -928,6 +928,7 @@ export default {
     },
     processSession (noWrapUp = false) {
       this.onPhoneExpansionReset()
+
       if (!noWrapUp) {
         this.$VueEvent.fire('endWrapUp')
       }
@@ -975,7 +976,7 @@ export default {
           return
         }
 
-        this.powerDialerTasks.in_queue.shift()
+        this.popFirstInQueueTask()
         this.processSession()
         return
       }
@@ -989,7 +990,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
-        this.powerDialerTasks.in_queue.shift()
+        this.popFirstInQueueTask()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -1026,6 +1027,7 @@ export default {
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
+          this.popFirstInQueueTask()
           this.processSession(true)
         }, 200)
         return
@@ -1050,10 +1052,15 @@ export default {
         setTimeout(() => {
           this.wrapUp = false
           this.hasActiveTask = false
-          this.powerDialerTasks.in_queue.shift()
+          this.popFirstInQueueTask()
           this.processSession()
         }, 1000)
       })
+    },
+    popFirstInQueueTask () {
+      const pdInQueue = this.$jsonClone(this.powerDialerTasks.in_queue)
+      pdInQueue.shift()
+      this.setPowerDialerTasksInQueue(pdInQueue)
     }
   },
   watch: {
@@ -1107,6 +1114,15 @@ export default {
         this.startWarmUpCountDown()
       } else {
         this.initialize()
+      }
+    },
+    'dialer.isReady': function () {
+      // session is not ready if session failed to call the contact
+      // because dialer is not reaady. If dialer reconnects and status
+      // goes to ready, then we can continue running the task
+      if (this.sessionNotReady) {
+        this.runTask()
+        this.sessionNotReady = false
       }
     }
   },

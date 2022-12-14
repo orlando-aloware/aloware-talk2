@@ -180,5 +180,8 @@ export default {
 
     // else, perform state reset
     state = Object.assign({}, PowerDialerDefault.DEFAULT_STATE)
+  },
+  SET_POWER_DIALER_TASKS_IN_QUEUE (state, payload) {
+    state.powerDialerTasks.in_queue = payload
   }
 }

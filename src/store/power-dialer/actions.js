@@ -284,5 +284,8 @@ export default {
   },
   clearRedialedTask: ({ commit }) => {
     commit('CLEAR_REDIALED_TASKS')
+  },
+  setPowerDialerTasksInQueue: ({ commit }, inQueue) => {
+    commit('SET_POWER_DIALER_TASKS_IN_QUEUE', inQueue)
   }
 }

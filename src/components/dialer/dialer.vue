@@ -208,7 +208,6 @@ export default {
 
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
       console.log('Successfully connected call', call)
-      this.updateUnownedContactLastCommunicationStatus()
       const map = call._connection.customParameters
       const customParameters = {}
       map.forEach((value, key) => {
@@ -226,6 +225,9 @@ export default {
       this.startCallTimer()
       this.setDialerCurrentStatus('CALL_CONNECTED')
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        .then(() => {
+          this.updateUnownedContactLastCommunicationStatus()
+        })
         // .finally(() => {
         //   this.$router.push({ name: 'Call' }).catch(err => {
         //     console.log(err)

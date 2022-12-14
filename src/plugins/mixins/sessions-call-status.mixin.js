@@ -18,7 +18,8 @@ export default {
       countdownStarted: false,
       wrapUp: false,
       reRouteModal: false,
-      loadingNext: false
+      loadingNext: false,
+      sessionNotReady: false
     }
   },
   computed: {
@@ -143,7 +144,8 @@ export default {
       'moveContactItems',
       'getSessionTaskByFilter',
       'addRedialedTask',
-      'clearRedialedTask'
+      'clearRedialedTask',
+      'setPowerDialerTasksInQueue'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
@@ -188,30 +190,26 @@ export default {
         return
       }
 
-      if (this.taskToCall?.contact_list_item_id) {
-        // Fires an event to make a call
-        this.hasActiveTask = true
-        this.$VueEvent.fire('makeCall', {
-          currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
-          outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
-          contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
-          companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
-          contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
-        })
+      this.callInProgress = false
 
-        const dialerContactId = get(this.dialer.contact, 'id', null)
-
-        if (!dialerContactId ||
-          (dialerContactId &&
-            parseInt(this.activeTask.id) !== parseInt(dialerContactId))) {
-          this.setDialerContact(this.activeTask)
-        }
-
-        this.callInProgress = true
-      } else {
-        // this.$generalNotification('A missing detail in contact is found. Unable to make a call.', 'error')
-        this.callInProgress = false
+      // only proceed if task has a contact list item id and
+      // dialer's status is ready
+      if (!this.taskToCall?.contact_list_item_id || !this.dialer.isReady) {
+        this.sessionNotReady = true
+        return
       }
+
+      this.hasActiveTask = true
+      // Fires an event to make a call
+      this.$VueEvent.fire('makeCall', {
+        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
+        outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
+        contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
+        companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
+        contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
+      })
+      this.setDialerContact(this.activeTask)
+      this.callInProgress = true
     },
 
     skipSingleTask (autoDialTask, message, skipTask = false) {
