@@ -225,8 +225,6 @@ export default {
       })
     },
     getZohoViews () {
-      this.zoho_views = []
-      this.loading_zoho_views = true
       talk2Api.V1.integrations.zoho.getViews().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
