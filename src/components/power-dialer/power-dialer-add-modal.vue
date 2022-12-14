@@ -121,6 +121,7 @@ import { mapActions, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import { integrationMixin } from 'src/plugins/mixins'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -372,8 +373,7 @@ export default {
       delete params.target
       delete params.size
 
-      return this.$axios
-        .post('/api/v2/power-dialer-lists/import-hubspot-list/' + target, params)
+      return talk2Api.V2.integrations.zoho.importList(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
@@ -392,8 +392,7 @@ export default {
       delete params.target
       delete params.size
 
-      return this.$axios
-        .post('/api/v2/power-dialer-lists/import-zoho-view/' + target, params)
+      return talk2Api.V2.integrations.zoho.importView(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
@@ -412,7 +411,7 @@ export default {
       delete params.target
       delete params.size
 
-      return this.$axios.post('/api/v2/power-dialer-lists/import-pipedrive-filter/' + target, params)
+      return talk2Api.V2.integrations.pipedrive.importFilter(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')

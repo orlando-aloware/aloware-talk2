@@ -310,12 +310,12 @@ export default {
       },
       zoho: {
         getViews () {
-          return window.axios.get('/api/v1/integration/zoho/views')
+          return window.axios.get(`${suffixV1}integration/zoho/views`)
         }
       },
       pipedrive: {
         getFilters () {
-          return window.axios.get('/api/v1/integration/pipedrive/filters')
+          return window.axios.get(`${suffixV1}integration/pipedrive/filters`)
         }
       }
     },
@@ -502,6 +502,23 @@ export default {
           contact_list_id: contactListId,
           contacts: contacts
         })
+      }
+    },
+    integrations: {
+      hubspot: {
+        importList (target, params) {
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-hubspot-list/` + target, params)
+        }
+      },
+      zoho: {
+        importView (target, params) {
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-zoho-view/` + target, params)
+        }
+      },
+      pipedrive: {
+        importFilter (target, params) {
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/` + target, params)
+        }
       }
     },
     contactList: {
