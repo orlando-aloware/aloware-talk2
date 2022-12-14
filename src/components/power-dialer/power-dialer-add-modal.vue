@@ -256,7 +256,7 @@ export default {
     this.loading++
 
     if (this.mode === 'integration') {
-      // check if Hubspot list already exists
+      // check if a list from integration already exists
       this.checkIntegrationImport()
     }
 
@@ -366,7 +366,6 @@ export default {
       }
     },
     importFromHubspot () {
-      console.log({ requestParams: this.requestParams, params: this.params })
       // remove target and size from params
       let target = this.params.target
       let params = this.requestParams

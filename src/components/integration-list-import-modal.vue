@@ -25,13 +25,14 @@
 
         <div class="pt-3">
           <p class="mb-2">
-            Currently enabled integration: {{ integrationName | capitalize }}
+            Currently enabled integration: <span class="text-bold"> {{ integrationName | capitalize }} </span>
           </p>
-          <integration-list-selector :multiple="false"
-                                 :use-chips="false"
-                                 :clearable="true"
-                                 :generic-styling="false"
-                                 @change="onListSelectorChange"/>
+          <integration-list-selector 
+            :multiple="false"
+            :use-chips="false"
+            :clearable="true"
+            :generic-styling="false"
+            @change="onListSelectorChange"/>
         </div>
 
         <div class="d-flex align-items-center pt-3">
