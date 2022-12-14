@@ -27,7 +27,7 @@
           <p class="mb-2">
             Currently enabled integration: <span class="text-bold"> {{ integrationName | capitalize }} </span>
           </p>
-          <integration-list-selector 
+          <integration-list-selector
             :multiple="false"
             :use-chips="false"
             :clearable="true"
