@@ -96,7 +96,8 @@ export default {
         return ''
       }
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ||
+        this.dialer.currentStatus === 'WRAP_UP') {
         return 'Wrapping Up'
       }
 
