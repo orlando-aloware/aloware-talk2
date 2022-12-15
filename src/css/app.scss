@@ -265,6 +265,14 @@ body,
   background-position: center;
 }
 
+.xmas-bg {
+  background-image: url("../assets/xmas-tree.jpg");
+  background-color: #01132B;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
 @media (max-width: 992px) {
   .page-title {
     font-size: 22px !important;
