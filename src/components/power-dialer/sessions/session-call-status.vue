@@ -948,7 +948,13 @@ export default {
     },
     async onNextTask (forceSkip = false, skipWrapUp = false) {
       this.loadingNext = true
-      this.skipWrapUp = skipWrapUp
+
+      // only skip wrap-up if dialer's status is not yet in
+      // wrap-up
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        this.skipWrapUp = skipWrapUp
+      }
+
       this.onPhoneExpansionReset()
 
       // end wrap up
