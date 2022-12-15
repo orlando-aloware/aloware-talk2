@@ -6,7 +6,7 @@
            class="q-btn-standard"
            @click="toggleFeedbackDialog">
 
-        <i class="fas fa-arrow-right"></i>  <span>{{ switchAppName }}</span>
+        <i class="fas fa-arrow-right"></i>  <span>{{ alowareClassic }}</span>
     </q-btn>
     <q-btn-dropdown
       v-else
@@ -18,7 +18,7 @@
     >
 
       <template slot="label">
-        <i class="fas fa-arrow-right"></i>  <span>{{ switchAppName }}</span>
+        <i class="fas fa-arrow-right"></i>  <span>{{ alowareClassic }}</span>
         <hr role="separator" aria-orientation="vertical" class="q-separator ml-2 margin-auto position-relative q-separator q-separator--vertical">
       </template>
 
@@ -45,7 +45,7 @@
                           :value="AppDefaultLogin.APP_ALOWARE_CLASSIC"
                           v-model="user.default_app"
                           @change="onInput">
-              Aloware Classic
+              {{ alowareClassic }}
             </b-form-radio>
           </q-item-section>
         </q-item>
@@ -82,7 +82,7 @@ export default {
 
       return !this.profile.company.force_talk
     },
-    switchAppName () {
+    alowareClassic () {
       if (this.profile.company.force_talk) {
         return 'Aloware Admin'
       }
