@@ -172,7 +172,6 @@ import ContactsFilterTypes from 'src/components/contacts/contacts-filter-types.v
 import CompactBtn from 'components/compact-btn.vue'
 import { GROUP_CONTACT_COMM_METADATA, GROUP_CONTACT_LOCATION, GROUP_CONTACT_RELEVANCE, GROUP_PRIMARY_INFO } from 'src/constants/contact-filter-groups'
 import talk2Api from 'src/plugins/api/api'
-
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -528,7 +527,7 @@ export default {
 
     onDeleteFilter (index, key) {
       this.setListContactsLoaded(false)
-      const updatedFilter = _.cloneDeep(JSON.parse(JSON.stringify(this.currentListFilters)))
+      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
 
@@ -547,6 +546,8 @@ export default {
         this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
       }
 
+      updatedFilter = this.reindexFilters(updatedFilter)
+
       if (!_.isEqual(updatedFilter, initialListFilters)) {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
@@ -561,7 +562,7 @@ export default {
 
     onDeleteGroupFilter (index) {
       this.setListContactsLoaded(false)
-      const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
 
       if (updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
@@ -570,6 +571,8 @@ export default {
       if (updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
       }
+
+      updatedFilter = this.reindexFilters(updatedFilter)
 
       if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
@@ -603,6 +606,26 @@ export default {
 
     isDefault (filter) {
       return typeof filter.default !== 'undefined' && filter.default === 1
+    },
+
+    reindexFilters (filter) {
+      let newFilter = {}
+      let numericKey = 0
+      let newKey = 0
+      let isNumerickey = false
+
+      for (const key in filter) {
+        // check if original key is numeric
+        isNumerickey = !isNaN(parseInt(key))
+        // if original key is numeric, use the incremental numeric key
+        // else, the original key
+        newKey = isNumerickey ? numericKey : key
+        newFilter[newKey] = filter[key]
+        // increment the numeric key if original key is numeric
+        numericKey += isNumerickey ? 1 : 0
+      }
+
+      return newFilter
     },
 
     ...mapActions('contacts', [
