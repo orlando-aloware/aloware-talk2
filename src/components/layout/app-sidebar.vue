@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex align-items-start flex-column h-100 w-100">
     <div class="w-100">
-      <q-btn icon="img:app-icons/menu/logo_white.svg"
+      <q-btn :icon="appLogo"
              size="1.1rem"
              align="center"
              to="/"
@@ -273,6 +273,11 @@ export default {
     lightMode: {
       required: false,
       type: Boolean
+    },
+    xmasEnabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -283,6 +288,11 @@ export default {
     },
     envName () {
       return storage.local.getItem('env')
+    },
+    appLogo () {
+      return this.xmasEnabled
+        ? 'img:app-icons/menu/xmas/logo_white.svg'
+        : 'img:app-icons/menu/logo_white.svg'
     }
   },
 
