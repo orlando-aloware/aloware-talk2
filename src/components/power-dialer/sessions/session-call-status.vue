@@ -1126,7 +1126,7 @@ export default {
       // session is not ready if session failed to call the contact
       // because dialer is not reaady. If dialer reconnects and status
       // goes to ready, then we can continue running the task
-      if (this.sessionNotReady) {
+      if (!this.sessionNotReady) {
         this.runTask()
         this.sessionNotReady = false
       }
