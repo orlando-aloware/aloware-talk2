@@ -75,6 +75,7 @@
                         v-if="mode === 'edit' && schedule.contact">
             <contact-selector disabled
                               redirect-when-disabled
+                              :contact-data="schedule.contact"
                               v-model="$v.schedule.contact.$model.id"
                               @loaded="onContactsLoaded">
             </contact-selector>
