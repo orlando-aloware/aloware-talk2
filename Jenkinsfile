@@ -16,7 +16,7 @@ pipeline {
 
     stages {
         stage('Setup Dev Env File') {
-            when { branch 'develop' }
+            when { branch 'story/aloware-naming/CORE-3213' }
             steps {
                 script {
                     notificationSender.sendSlackInfo()
