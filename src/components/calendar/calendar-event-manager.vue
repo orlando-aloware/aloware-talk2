@@ -396,7 +396,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: '',
+        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
@@ -750,7 +750,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: '',
+        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
