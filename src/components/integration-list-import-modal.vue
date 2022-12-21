@@ -48,7 +48,7 @@
           </button>
         </div>
       </div>
-      <power-dialer-add-modal 
+      <power-dialer-add-modal
         :params="powerDialerParams"
         mode="integration"
         v-if="isAddPowerDialerOpen"
