@@ -1146,8 +1146,7 @@ export default {
       hangUpInterval: null,
       hangUpIntervalCounter: 0,
       loadingHold: false,
-      loadingUnhold: false,
-      skipWrapUp: false
+      loadingUnhold: false
     }
   }
 }

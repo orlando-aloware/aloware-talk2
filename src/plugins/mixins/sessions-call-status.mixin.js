@@ -19,7 +19,8 @@ export default {
       wrapUp: false,
       reRouteModal: false,
       loadingNext: false,
-      sessionNotReady: false
+      sessionNotReady: false,
+      skipWrapUp: false
     }
   },
   computed: {
@@ -200,6 +201,7 @@ export default {
       }
 
       this.hasActiveTask = true
+      this.skipWrapUp = false
       // Fires an event to make a call
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
