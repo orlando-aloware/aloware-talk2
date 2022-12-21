@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         os: [ 'windows-latest' ]
-        node-version: [ '14.x' ]
+        node-version: [ '16.x' ]
 
     steps:
       - name: Check out Git repository
@@ -40,9 +40,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Update NPM
-        run: npm install -g npm
 
       - name: Node version
         run: node --version
