@@ -494,7 +494,7 @@ export default function (/* { ssrContext } */) {
         }
 
         if (['power-dialer', 'all'].some(item => value.includes(item)) || (value.length === 1 && value.includes('non-cache'))) {
-          commit('power-dialer/RESET_VUEX', value, { root: true })
+          commit('powerDialer/RESET_VUEX', value, { root: true })
 
           if (!['non-cache', 'all'].some(item => value.includes(item))) {
             return
