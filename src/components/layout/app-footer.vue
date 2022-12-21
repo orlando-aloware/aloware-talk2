@@ -49,56 +49,57 @@
         </span>
         Phone
       </q-route-tab>
-      <q-route-tab name="power-dialer-disabled"
-                   content-class="tab-icons xs-text text-grey-5"
-                   :ripple="false"
-                   no-caps
-                   v-if="!profile.auto_dialer_enabled">
-        <span class="tab-icon"
-              @click="toggleProFeatureDialog(true)">
-          <q-badge floating
-                   rounded
-                   color="orange">
-          </q-badge>
-          <power-dialer-mobile-icon
-            color="#BDBDBD"/>
-        </span>
-        Power Dialer
-      </q-route-tab>
-      <q-route-tab name="power-dialer"
-                   to="/power-dialer"
-                   :content-class="tab === 'power-dialer' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'power-dialer'"
-                   no-caps
-                   exact
-                   v-else>
-        <span class="tab-icon">
-          <q-badge floating
-                   rounded
-                   color="orange">
-          </q-badge>
-          <power-dialer-mobile-icon
-            :color="tab === 'power-dialer' ? '#256EFF' : '#A3A3A3'"/>
-        </span>
-        Power Dialer
-      </q-route-tab>
-      <q-route-tab name="calendar-disabled"
-                   content-class="tab-icons xs-text text-grey-5"
-                   :ripple="false"
-                   no-caps
-                   v-if="!profile.calendar_enabled">
-        <span class="tab-icon"
-              @click="toggleProFeatureDialog(true)">
-          <q-badge floating
-                   rounded
-                   color="orange">
-          </q-badge>
-          <calendar-mobile-icon color="#BDBDBD"/>
-        </span>
-        Calendar
-      </q-route-tab>
-      <q-route-tab name="calendar"
+      <template v-if="false">
+        <q-route-tab name="power-dialer-disabled"
+                     content-class="tab-icons xs-text text-grey-5"
+                     :ripple="false"
+                     no-caps
+                     v-if="!profile.auto_dialer_enabled">
+          <span class="tab-icon"
+                @click="toggleProFeatureDialog(true)">
+            <q-badge floating
+                     rounded
+                     color="orange">
+            </q-badge>
+            <power-dialer-mobile-icon
+              color="#BDBDBD"/>
+          </span>
+          Power Dialer
+        </q-route-tab>
+        <q-route-tab name="power-dialer"
+                     to="/power-dialer"
+                     :content-class="tab === 'power-dialer' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
+                     :ripple="false"
+                     :active="tab === 'power-dialer'"
+                     no-caps
+                     exact
+                     v-else>
+          <span class="tab-icon">
+            <q-badge floating
+                     rounded
+                     color="orange">
+            </q-badge>
+            <power-dialer-mobile-icon
+              :color="tab === 'power-dialer' ? '#256EFF' : '#A3A3A3'"/>
+          </span>
+          Power Dialer
+        </q-route-tab>
+        <q-route-tab name="calendar-disabled"
+                     content-class="tab-icons xs-text text-grey-5"
+                     :ripple="false"
+                     no-caps
+                     v-if="!profile.calendar_enabled">
+          <span class="tab-icon"
+                @click="toggleProFeatureDialog(true)">
+            <q-badge floating
+                     rounded
+                     color="orange">
+            </q-badge>
+            <calendar-mobile-icon color="#BDBDBD"/>
+          </span>
+          Calendar
+        </q-route-tab>
+        <q-route-tab name="calendar"
                    to="/calendar"
                    :content-class="tab === 'calendar' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
@@ -115,6 +116,7 @@
         </span>
         Calendar
       </q-route-tab>
+      </template>
       <q-route-tab name="stats"
                    to="/stats"
                    :content-class="tab === 'stats' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"

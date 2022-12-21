@@ -279,6 +279,10 @@ body,
   .page-title {
     font-size: 22px !important;
   }
+
+  .q-drawer--right.q-drawer--bordered {
+    border-left: 0px !important;
+  }
 }
 
 @media (min-width: 605px) {
@@ -10613,7 +10617,7 @@ screen and (max-width: 956px) {
 
         &-header {
           &:not(.call-ended) {
-            height: 142px;
+            height: 92px;
           }
 
           &.call-ended {
@@ -10638,13 +10642,13 @@ screen and (max-width: 956px) {
 
           div:first-child {
             span {
-              font-size: 20px;
+              font-size: 14px;
             }
           }
 
           div:nth-child(2) {
             span {
-              font-size: 17px;
+              font-size: 16px;
             }
           }
 
@@ -10668,6 +10672,10 @@ screen and (max-width: 956px) {
               }
             }
           }
+
+          .phone-settings-icon {
+            font-size: 16px !important;
+          }
         }
 
         &-body {
@@ -10678,7 +10686,7 @@ screen and (max-width: 956px) {
           }
 
           .phone-info {
-            margin-top: 75px;
+            margin-top: 20px;
             width: 100%;
 
             .q-item__label:first-child {
@@ -10721,7 +10729,7 @@ screen and (max-width: 956px) {
 
           .phone-avatar {
             position: fixed;
-            top: 116px;
+            top: 68px;
             margin-top: unset;
             z-index: 9
           }
