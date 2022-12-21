@@ -407,9 +407,22 @@ export default {
           return Promise.resolve()
         }
 
-        this.setDialerCommunication(res.data)
-
         const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // we need to prevent proceeding to the next steps if current task's contact id
+        // is not the same as the communication's contact id in power dialer session
+        // to prevent showing incorrect contact details in the active call component when
+        // making a call just after the previous task was manually ended
+        // (end call or next button click w/o wrap-up), automatically ended (no wrap-up),
+        // or manually clicked the end wrap-up (wrap-up is indefinite).
+        if (routeTitle &&
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          this.activeTask.id !== res.data.contact_id) {
+          return Promise.resolve()
+        }
+
+        this.setDialerCommunication(res.data)
 
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
