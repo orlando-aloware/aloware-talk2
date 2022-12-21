@@ -413,8 +413,11 @@ export default {
         // is not the same as the communication's contact id in power dialer session
         // to prevent showing incorrect contact details in the active call component when
         // making a call just after the previous task was manually ended
-        // (end call or next button click w/o wrap-up), automatically ended (no wrap-up),
-        // or manually clicked the end wrap-up (wrap-up is indefinite).
+        // (end call or next button was clicked w/o wrap-up), automatically ended (no wrap-up),
+        // or manually clicked the end wrap-up when wrap-up is indefinite. The previous task
+        // was already processed/ended but the fetching of the previous task's communication
+        // got delayed so the previous task's contact details will show for brief amount of
+        // seconds, which is being prevented here:
         if (routeTitle &&
           this.activeTask &&
           routeTitle === 'Power Dialer Sessions' &&
