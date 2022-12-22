@@ -349,7 +349,7 @@ export default {
           // if in edit mode, skip higher than today check
           return this.mode === 'edit'
             ? regex
-            : regex && val >= moment().format('MM/DD/YYYY')
+            : regex && this.isFuture(val)
         }
       },
       timezone: {
@@ -500,6 +500,10 @@ export default {
     validateState (input, prop = 'schedule') {
       const { $dirty, $error } = this.$v[prop][input]
       return $dirty ? !$error : null
+    },
+
+    isFuture (date) {
+      return moment(date).format('YYYY-MM-DD') >= moment().format('YYYY-MM-DD')
     },
 
     editSchedule (sched) {

@@ -500,7 +500,8 @@ export default {
     canRedial () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
         !this.redialed.includes(this.activeTask.id) &&
-        this.powerDialerTasks.in_queue.length >= 1
+        this.powerDialerTasks.in_queue.length >= 1 &&
+        !this.isRedialClicked
     },
     redialTooltip () {
       return this.canRedial ? 'This contact will go to the bottom of the current session list' : 'This contact has already been redialed once'
@@ -1046,21 +1047,32 @@ export default {
       this.sessionPhoneExpansion = ''
     },
     async onRedial () {
+      this.isRedialClicked = true
       this.onPhoneExpansionReset()
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       this.redialTask(this.activeTask).then(() => {
         this.powerDialerTasks.in_queue.push(this.activeTask)
         this.activeTask = this.taskToCall
+        this.isRedialClicked = false
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-          this.processHangup()
+          this.$VueEvent.fire('hangupCall')
         }
 
-        setTimeout(() => {
-          this.wrapUp = false
-          this.hasActiveTask = false
-          this.popFirstInQueueTask()
-          this.processSession()
-        }, 1000)
+        // if wrap is indefinite, manually move the queue
+        if (this.wrapUpSeconds === 0) {
+          this.powerDialerTasks.in_queue.shift()
+        }
+
+        // when there is wrap up, skip wrap
+        if (this.wrapUpSeconds !== -1) {
+          setTimeout(() => {
+            this.wrapUp = false
+            this.skipWrapUp = false
+            this.hasActiveTask = false
+            this.popFirstInQueueTask()
+            this.processSession()
+          }, 1000)
+        }
       })
     },
     popFirstInQueueTask () {
@@ -1146,7 +1158,8 @@ export default {
       hangUpInterval: null,
       hangUpIntervalCounter: 0,
       loadingHold: false,
-      loadingUnhold: false
+      loadingUnhold: false,
+      isRedialClicked: false
     }
   }
 }

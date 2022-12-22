@@ -84,13 +84,12 @@ module.exports = function (/* ctx */) {
     devServer: {
       before (app) {
         const cors = require('cors')
-        if (process.env.USE_CORS) {
-          app.use(cors())
-        }
+        app.use(cors())
       },
 
       https: true,
-      host: 'talk2.test',
+      host: 'localhost',
+      port: 9090,
       disableHostCheck: true,
       open: true // opens browser window automatically
     },
