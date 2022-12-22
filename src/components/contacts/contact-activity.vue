@@ -30,7 +30,7 @@
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
       <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
-          <span style="white-space: pre;">
+          <span style="white-space: pre-line;">
             {{ communication.body }}
           </span>
           <span v-if="communication.user_id && getUser(communication.user_id).name.length">
@@ -152,7 +152,7 @@
                 :class="[ communication.direction === CommunicationDirection.INBOUND ? 'left' : 'right' ]">
           </span>
           <div class="p-a p-y-sm handle-whitespace" style="max-width: 40em">
-            <span v-linkify:options="{ target: '_blank' }" style="white-space: pre;">{{ communication.body }}</span>
+            <span v-linkify:options="{ target: '_blank' }" style="white-space: pre-line;">{{ communication.body }}</span>
           </div>
         </div>
       </div>
