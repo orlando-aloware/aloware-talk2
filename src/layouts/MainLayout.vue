@@ -398,7 +398,7 @@ export default {
     },
     mobilePhoneDrawerClass () {
       return {
-        'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.md,
+        'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.lg,
         'mobile-phone-visible': this.isPhoneVisible
       }
     },
@@ -2319,12 +2319,12 @@ export default {
   },
 
   watch: {
-    '$q.screen.lt.md': function () {
+    '$q.screen.lt.lg': function () {
       if (typeof this.$refs.mobilePhone === 'undefined') {
         return
       }
 
-      if (!this.$q.screen.lt.md) {
+      if (!this.$q.screen.lt.lg) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
       }

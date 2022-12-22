@@ -18,7 +18,7 @@
             <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
             <div class="filter-wrapper"
                  :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
-              <compact-btn v-if="hasChannelFilterChanges"
+              <compact-btn v-if="hasChannelFilterChanges || appliedFilter"
                            borderless
                            customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"

@@ -172,7 +172,6 @@ import ContactsFilterTypes from 'src/components/contacts/contacts-filter-types.v
 import CompactBtn from 'components/compact-btn.vue'
 import { GROUP_CONTACT_COMM_METADATA, GROUP_CONTACT_LOCATION, GROUP_CONTACT_RELEVANCE, GROUP_PRIMARY_INFO } from 'src/constants/contact-filter-groups'
 import talk2Api from 'src/plugins/api/api'
-
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -386,15 +385,16 @@ export default {
     },
 
     generateListFilters () {
-      const filterGroups = JSON.parse(JSON.stringify(this.currentListFilters))
+      const filterGroups = this.$jsonClone(this.currentListFilters)
       const groupIndex = { data: null }
       const filterIndex = { data: null }
-      const operators = { data: null }
       const found = { data: null }
       const operator = { data: null }
       const options = { data: null }
       const option = { data: null }
       const trueValue = { data: null }
+      const field = { field: null }
+      const filter = { data: null }
 
       for (groupIndex.data in filterGroups) {
         if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
@@ -414,31 +414,46 @@ export default {
             continue
           }
 
-          operators.data = found.data ? _.get(found.data, 'operators', null) : null
+          if (_.get(found.data, 'operators', null)) {
+            filter.data = filterGroups[groupIndex.data].filters[filterIndex.data]
 
-          if (operators.data) {
-            operator.data = found.data.operators.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].operator)
+            // try to search for the selected option
+            operator.data = found.data.operators.find(item => item.value === filter.data.operator)
             options.data = operator.data ? _.get(operator.data, 'options', null) : null
-            option.data = options.data ? options.data.find(item => item.value === filterGroups[groupIndex.data].filters[filterIndex.data].value) : null
-            trueValue.data = filterGroups[groupIndex.data].filters[filterIndex.data].value
+            option.data = options.data ? options.data.find(item => item.value === filter.data.value) : null
+
+            // set values into an array
+            trueValue.data = filter.data.value
             trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filterGroups[groupIndex.data].filters[filterIndex.data].value === 'string' ? filterGroups[groupIndex.data].filters[filterIndex.data].value.split(',') : [trueValue.data]
+            trueValue.data = typeof filter.data.value === 'string' ? filter.data.value.split(',') : [trueValue.data]
+
+            // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+            // The content in 'field' will be concatenated at the end of the string
+            if ('field' in filter.data) {
+              field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
+
+              // set values into an array (but using 'field' this time)
+              trueValue.data = filter.data.field
+              trueValue.data = option.data ? [option.data.label] : trueValue.data
+              trueValue.data = typeof filter.data.field === 'string' ? filter.data.field.split(',') : [trueValue.data]
+            }
 
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
+              ...field,
               key: filterIndex.data,
               label: found.data.label,
               operator: operator.data ? _.get(operator.data, 'label', null) : null,
               trueValue: trueValue.data,
               value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              default: filter.data.default || 0
             }
           } else {
             filterGroups[groupIndex.data].filters[filterIndex.data] = {
               key: filterIndex.data,
               label: found.data.label,
-              trueValue: filterGroups[groupIndex.data].filters[filterIndex.data].value,
-              value: JSON.stringify(filterGroups[groupIndex.data].filters[filterIndex.data].value),
-              default: filterGroups[groupIndex.data].filters[filterIndex.data].default || 0
+              trueValue: filter.data.value,
+              value: JSON.stringify(filter.data.value),
+              default: filter.data.default || 0
             }
           }
         }
@@ -487,10 +502,20 @@ export default {
         }
 
         let joinedValues = labels.join(', ')
-
-        return labels.length > 1
+        let data = labels.length > 1
           ? joinedValues.substring(0, joinedValues.lastIndexOf(',')) + ' or' + joinedValues.substring(joinedValues.lastIndexOf(',') + 1, joinedValues.length)
           : joinedValues
+
+        // add field values at the end if they are present
+        if (filter.field) {
+          let joinedFields = filter.field.join(', ')
+
+          data += ' as ' + (filter.field.length > 1
+            ? joinedFields.substring(0, joinedFields.lastIndexOf(',')) + ' or' + joinedFields.substring(joinedFields.lastIndexOf(',') + 1, joinedFields.length)
+            : joinedFields)
+        }
+
+        return data
       } else {
         return !isSimpleType ? filter.trueValue : ''
       }
@@ -502,7 +527,7 @@ export default {
 
     onDeleteFilter (index, key) {
       this.setListContactsLoaded(false)
-      const updatedFilter = _.cloneDeep(JSON.parse(JSON.stringify(this.currentListFilters)))
+      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
 
@@ -516,7 +541,12 @@ export default {
         _.isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
+        // filter group was deleted so we decrement the index by 1
+        // if current filter group index is greater than 0
+        this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
       }
+
+      updatedFilter = this.reindexFilters(updatedFilter)
 
       if (!_.isEqual(updatedFilter, initialListFilters)) {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
@@ -532,7 +562,7 @@ export default {
 
     onDeleteGroupFilter (index) {
       this.setListContactsLoaded(false)
-      const updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
 
       if (updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
@@ -541,6 +571,8 @@ export default {
       if (updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
       }
+
+      updatedFilter = this.reindexFilters(updatedFilter)
 
       if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
@@ -551,6 +583,11 @@ export default {
         id: this.selectedList.id,
         filters: updatedFilter
       })
+
+      // decrement the filter group index by 1 only if
+      // filter group index is more than 0
+      this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
+
       this.$emit('filtersUpdated')
     },
 
@@ -569,6 +606,26 @@ export default {
 
     isDefault (filter) {
       return typeof filter.default !== 'undefined' && filter.default === 1
+    },
+
+    reindexFilters (filter) {
+      let newFilter = {}
+      let numericKey = 0
+      let newKey = 0
+      let isNumerickey = false
+
+      for (const key in filter) {
+        // check if original key is numeric
+        isNumerickey = !isNaN(parseInt(key))
+        // if original key is numeric, use the incremental numeric key
+        // else, the original key
+        newKey = isNumerickey ? numericKey : key
+        newFilter[newKey] = filter[key]
+        // increment the numeric key if original key is numeric
+        numericKey += isNumerickey ? 1 : 0
+      }
+
+      return newFilter
     },
 
     ...mapActions('contacts', [
@@ -592,6 +649,16 @@ export default {
     },
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
+
+      // if there's any change in the current list's filters,
+      // we need to update the filter group index value to
+      // how many filters are currently active
+      let keys = Object.keys(this.currentListFilters)
+      keys = keys.filter(item => !isNaN(parseInt(item)))
+
+      if (keys.length) {
+        this.filterGroupIndex = keys.length
+      }
     },
     $route: {
       deep: true,
