@@ -1,0 +1,32 @@
+import { mapState } from 'vuex'
+import { isEmpty } from 'lodash'
+import talk2Api from 'src/plugins/api/api'
+
+export default {
+  data () {
+    return {}
+  },
+
+  computed: {
+    ...mapState('cache', ['currentCompany'])
+  },
+
+  methods: {
+    getIntegrationData (contact, integrationName, dialerMode) {
+      return talk2Api.V1.contact.getIntegrationData(contact.id, {
+        params: {
+          integration_name: integrationName,
+          dialer_mode: dialerMode ? 1 : 0
+        }
+      })
+    },
+
+    getContactId (contact) {
+      if (contact?.integration_data && !isEmpty(contact.integration_data)) {
+        return contact.integration_data.vid
+      }
+
+      return null
+    }
+  }
+}

@@ -4,18 +4,18 @@
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="hubspotLink">
+        <q-item-section v-if="guestyContactLink">
           <b-link target="_blank"
-                  :href="hubspotLink">
+                  :href="guestyContactLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
+            <span class="integration-title">Guesty</span>
           </b-link>
         </q-item-section>
         <q-item-section v-else>
           <a href="#"
              onclick="return false;">
             <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
+            <span class="integration-title">Guesty</span>
           </a>
         </q-item-section>
       </q-item>
@@ -114,7 +114,7 @@
             <q-spinner-bars v-if="isSyncing"
                             color="white">
             </q-spinner-bars>
-            {{ isSyncing ? 'Syncing...' : 'Sync with Hubspot' }}
+            {{ isSyncing ? 'Syncing...' : 'Sync with Guesty' }}
             <q-tooltip anchor="center start"
                        self="center left"
                        :offset="[-220, 10]">
@@ -170,15 +170,15 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
-import { hubspotIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
+import { guestyIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'integration-hubspot',
+  name: 'integration-guesty',
 
   components: { WorkflowSelector },
 
   mixins: [
-    hubspotIntegrationMixin,
+    guestyIntegrationMixin,
     integrationMixin
   ],
 
@@ -202,24 +202,12 @@ export default {
       return this.workflow.id
     },
 
-    companyDomain () {
-      return this.currentCompany.hubspot_company_ui_domain || 'app.hubspot.com'
-    },
-
-    hubspotContactBaseLink () {
+    guestyContactLink () {
       if (!this.contactIntegrationDataLoaded) {
         return
       }
 
-      return this.getHubspotContactBaseLink(this.contact)
-    },
-
-    hubspotLink () {
-      if (!this.contactIntegrationDataLoaded) {
-        return
-      }
-
-      return this.getHubspotContactLink(this.contact)
+      return this.guestyContactLink(this.contact)
     }
   },
 
@@ -247,7 +235,7 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'hubspot')
+      return this.getIntegrationData(this.contact, 'guesty')
         .then(response => {
           this.integrationData = response.data
           this.contact.integration_data = response.data

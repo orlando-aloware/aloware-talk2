@@ -4,18 +4,18 @@
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="hubspotLink">
+        <q-item-section v-if="contactLink">
           <b-link target="_blank"
-                  :href="hubspotLink">
+                  :href="contactLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
+            <span class="integration-title">Pipedrive</span>
           </b-link>
         </q-item-section>
         <q-item-section v-else>
           <a href="#"
              onclick="return false;">
             <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
+            <span class="integration-title">Pipedrive</span>
           </a>
         </q-item-section>
       </q-item>
@@ -109,12 +109,12 @@
                     variant="primary"
                     tabindex="0"
                     block
-                    @click="syncHubspot">
+                    @click="(() => {})"> <!-- PENDING PLAT-972 -->
             <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
             <q-spinner-bars v-if="isSyncing"
                             color="white">
             </q-spinner-bars>
-            {{ isSyncing ? 'Syncing...' : 'Sync with Hubspot' }}
+            {{ isSyncing ? 'Syncing...' : 'Sync with Pipedrive' }}
             <q-tooltip anchor="center start"
                        self="center left"
                        :offset="[-220, 10]">
@@ -127,58 +127,23 @@
         </b-row>
       </q-card-section>
 
-      <q-card-section
-        v-if="integrationData && integrationData.properties && integrationData.properties.email && integrationData.properties.email.value && false">
-        <b-row>
-          <b-button class="text-white btn-block"
-                    size="sm"
-                    variant="primary"
-                    tabindex="0"
-                    @click="onEnrollToWorkflow">
-            <i class="fa fa-user-plus"></i>
-            Enroll to Workflow
-          </b-button>
-        </b-row>
-      </q-card-section>
     </q-card>
 
-    <q-menu content-class="mx-height-300"
-            ref="templatesMenu"
-            no-parent-event
-            no-focus
-            :offset="[366, -105]"
-            v-model="showWorkflowSelectorForm">
-      <div class="no-wrap q-pa-md">
-        <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
-        <b-button class="btn-block"
-                  size="sm"
-                  variant="primary"
-                  :disabled="isEnrolling || !isWorkflowValid"
-                  @click.prevent="enrollToWorkflow">
-          <q-spinner-bars v-if="isEnrolling"
-                          color="white">
-          </q-spinner-bars>
-          {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
-        </b-button>
-      </div>
-    </q-menu>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
-import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
-import { hubspotIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
+import { pipedriveIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'integration-hubspot',
+  name: 'integration-pipedrive',
 
-  components: { WorkflowSelector },
+  components: { },
 
   mixins: [
-    hubspotIntegrationMixin,
+    pipedriveIntegrationMixin,
     integrationMixin
   ],
 
@@ -198,40 +163,18 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
-    isWorkflowValid () {
-      return this.workflow.id
-    },
-
-    companyDomain () {
-      return this.currentCompany.hubspot_company_ui_domain || 'app.hubspot.com'
-    },
-
-    hubspotContactBaseLink () {
+    contactLink () {
       if (!this.contactIntegrationDataLoaded) {
         return
       }
 
-      return this.getHubspotContactBaseLink(this.contact)
-    },
-
-    hubspotLink () {
-      if (!this.contactIntegrationDataLoaded) {
-        return
-      }
-
-      return this.getHubspotContactLink(this.contact)
+      return this.pipedriveContactLink(this.contact)
     }
   },
 
   data () {
     return {
-      isEnrolling: false,
       isSyncing: false,
-      showWorkflowSelectorForm: false,
-      workflow: {
-        email: null,
-        id: null
-      },
       integrationData: null,
       contactIntegrationDataLoaded: false
     }
@@ -239,7 +182,7 @@ export default {
 
   async mounted () {
     if (this.contact && this.contact.id) {
-      await this.getData()
+      this.getData()
     }
   },
 
@@ -247,7 +190,7 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'hubspot')
+      return this.getIntegrationData(this.contact, 'pipedrive')
         .then(response => {
           this.integrationData = response.data
           this.contact.integration_data = response.data
@@ -257,50 +200,11 @@ export default {
           this.setContactClone(this.contact)
 
           this.contactIntegrationDataLoaded = true
+        }).catch(err => {
+          console.log('err', err)
         })
-    },
-
-    onWorkflowSelected (workflowId) {
-      this.workflow.id = workflowId
-    },
-
-    resetWorkflowEnrollment () {
-      this.workflow.id = null
-    },
-
-    enrollToWorkflow () {
-      this.isEnrolling = true
-      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email.value : ''
-      return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
-        this.resetWorkflowEnrollment()
-        // emit on parent if there's a need to do after workflow enrollment
-        this.$emit('enrolledToWorkflow', this.workflow)
-        this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
-        this.$generalNotification('Contact has been successfully enrolled to the workflow.')
-      }).catch(err => {
-        console.log(err)
-        this.$handleErrors(err.response)
-      }).finally(() => {
-        this.isEnrolling = false
-        this.showWorkflowSelectorForm = false
-      })
-    },
-
-    onEnrollToWorkflow () {
-      this.showWorkflowSelectorForm = true
-    },
-
-    syncHubspot (showAlert = true) {
-      this.isSyncing = true
-      talk2Api.V1.contact.syncHubspot(this.contact.id).then(response => {
-        this.isSyncing = false
-        this.getData()
-
-        if (showAlert) {
-          this.$generalNotification('Contact has been successfully synced.')
-        }
-      })
     }
+
   },
 
   watch: {
