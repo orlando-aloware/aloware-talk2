@@ -10,17 +10,17 @@
       Enable your favorite CRM integration to see more details directly from the CRM.
     </p>
     <!-- TODO: change the boolean for each integration properly! -->
-    <!-- <integration-hubspot v-if="isHubspotEnabled"
-                         :contact="contact"/> -->
+    <integration-hubspot v-if="isHubspotEnabled"
+                         :contact="contact"/>
 
     <integration-pipedrive v-if="isPipedriveEnabled"
                          :contact="contact"/>
-<!--
-    <integration-zoho v-if="isHubspotEnabled"
+
+    <integration-zoho v-if="isZohoEnabled"
                          :contact="contact"/>
 
-    <integration-guesty v-if="isHubspotEnabled"
-                         :contact="contact"/> -->
+    <integration-guesty v-if="isGuestyEnabled"
+                         :contact="contact"/>
 
     <contact-crm-links :contact="contact"/>
   </b-card>
@@ -29,10 +29,10 @@
 
 <script>
 import { mapState } from 'vuex'
-// import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
+import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
 import IntegrationPipedrive from 'src/components/integrations/integration-pipedrive'
-// import IntegrationZoho from 'src/components/integrations/integration-zoho'
-// import IntegrationGuesty from 'src/components/integrations/integration-guesty'
+import IntegrationZoho from 'src/components/integrations/integration-zoho'
+import IntegrationGuesty from 'src/components/integrations/integration-guesty'
 import ContactCrmLinks from 'components/contacts/contact-crm-links'
 
 export default {
@@ -51,8 +51,7 @@ export default {
     }
   },
 
-  // components: { ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive, IntegrationZoho, IntegrationGuesty },
-  components: { ContactCrmLinks, IntegrationPipedrive },
+  components: { ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive, IntegrationZoho, IntegrationGuesty },
 
   computed: {
     ...mapState('cache', ['currentCompany']),

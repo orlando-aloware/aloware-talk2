@@ -7,15 +7,23 @@
         <q-item-section v-if="contactLink">
           <b-link target="_blank"
                   :href="contactLink">
-            <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Pipedrive</span>
+            <table>
+              <tr>
+                <td><img class="pipedrive-btn" /></td>
+                <td><span class="integration-title">Pipedrive</span></td>
+              </tr>
+            </table>
           </b-link>
         </q-item-section>
         <q-item-section v-else>
           <a href="#"
              onclick="return false;">
-            <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Pipedrive</span>
+              <table>
+                <tr>
+                  <td><img class="pipedrive-btn" /></td>
+                  <td><span class="integration-title">Pipedrive</span></td>
+                </tr>
+              </table>
           </a>
         </q-item-section>
       </q-item>

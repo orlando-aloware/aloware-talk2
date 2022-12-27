@@ -16,7 +16,8 @@ export default {
       return talk2Api.V1.contact.getIntegrationData(contact.id, {
         params: {
           integration_name: integrationName,
-          dialer_mode: dialerMode ? 1 : 0
+          dialer_mode: dialerMode ? 1 : 0,
+          force: true // temp use - remove after PLAT-972
         }
       })
     },
