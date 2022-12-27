@@ -468,7 +468,7 @@ export default {
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
-        return 'sending text-black'
+        return 'sending text-black text-left'
       }
 
       if (this.communication.direction === CommunicationDirection.INBOUND) {
