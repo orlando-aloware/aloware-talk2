@@ -22,9 +22,10 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-      integrations: [
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+    integrations () {
+      return [
         {
           name: 'pipedrive',
           label: 'Pipedrive',
@@ -57,7 +58,7 @@ export default {
         },
         {
           name: 'helpscout',
-          label: 'Helpscout',
+          label: 'Help Scout',
           link: this.helpscoutLink,
           logo: 'help-scout-icon.png'
         },
@@ -74,10 +75,7 @@ export default {
           logo: 'link-solid.svg'
         }
       ]
-    }
-  },
-  computed: {
-    ...mapState('cache', ['currentCompany']),
+    },
     activeCrmIntegrations () {
       return this.integrations.filter(integration => integration.link)
     },
