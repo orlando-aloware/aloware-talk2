@@ -79,11 +79,11 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.pipedrive_integration_enabled &&
         this.contact &&
-        this.contact.external_integration_data &&
-        this.contact.external_integration_data.pipedrive &&
-        this.contact.external_integration_data.pipedrive.person_id &&
+        this.contact.integration_data &&
+        this.contact.integration_data.pipedrive &&
+        this.contact.integration_data.pipedrive.person_id &&
         this.currentCompany.pipedrive_company_domain) {
-        return `https://${this.currentCompany.pipedrive_company_domain}.pipedrive.com/person/${this.contact.external_integration_data.pipedrive.person_id}`
+        return `https://${this.currentCompany.pipedrive_company_domain}.pipedrive.com/person/${this.contact.integration_data.pipedrive.person_id}`
       }
 
       return false
@@ -115,21 +115,23 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.zoho_integration_enabled &&
         this.contact &&
-        this.contact.external_integration_data &&
-        this.contact.external_integration_data.zoho &&
-        this.contact.external_integration_data.zoho.contact_id &&
-        this.currentCompany.zoho_organization_id) {
-        return `https://crm.zoho.com/crm/org${this.currentCompany.zoho_organization_id}/tab/Contacts/${this.contact.external_integration_data.zoho.contact_id}`
+        this.contact.integration_data &&
+        this.contact.integration_data.zoho &&
+        this.contact.integration_data.zoho.contact_id &&
+        this.currentCompany.zoho_organization_id &&
+        this.currentCompany.zoho_module === 'contacts') {
+        return `https://crm.zoho.com/crm/org${this.currentCompany.zoho_organization_id}/tab/Contacts/${this.contact.integration_data.zoho.contact_id}`
       }
 
       if (this.currentCompany &&
         this.currentCompany.zoho_integration_enabled &&
         this.contact &&
-        this.contact.external_integration_data &&
-        this.contact.external_integration_data.zoho &&
-        this.contact.external_integration_data.zoho.lead_id &&
-        this.currentCompany.zoho_organization_id) {
-        return `https://crm.zoho.com/crm/org${this.currentCompany.zoho_organization_id}/tab/Leads/${this.contact.external_integration_data.zoho.lead_id}`
+        this.contact.integration_data &&
+        this.contact.integration_data.zoho &&
+        this.contact.integration_data.zoho.lead_id &&
+        this.currentCompany.zoho_organization_id &&
+        this.currentCompany.zoho_module === 'leads') {
+        return `https://crm.zoho.com/crm/org${this.currentCompany.zoho_organization_id}/tab/Leads/${this.contact.integration_data.zoho.lead_id}`
       }
 
       return false
@@ -138,11 +140,11 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.helpscout_integration_enabled &&
         this.contact &&
-        this.contact.external_integration_data &&
-        this.contact.external_integration_data.helpscout &&
-        this.contact.external_integration_data.helpscout.customer_id &&
+        this.contact.integration_data &&
+        this.contact.integration_data.helpscout &&
+        this.contact.integration_data.helpscout.customer_id &&
         this.currentCompany.helpscout_mailbox_id) {
-        return `https://secure.helpscout.net/customer/${this.contact.external_integration_data.helpscout.customer_id}/${this.currentCompany.helpscout_mailbox_id}`
+        return `https://secure.helpscout.net/customer/${this.contact.integration_data.helpscout.customer_id}/${this.currentCompany.helpscout_mailbox_id}`
       }
 
       return false
@@ -151,10 +153,10 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.guesty_integration_enabled &&
         this.contact &&
-        this.contact.external_integration_data &&
-        this.contact.external_integration_data.guesty &&
-        this.contact.external_integration_data.guesty.conversation_id) {
-        return `https://app.guesty.com/inbox-v2/${this.contact.external_integration_data.guesty.conversation_id}/reservation`
+        this.contact.integration_data &&
+        this.contact.integration_data.guesty &&
+        this.contact.integration_data.guesty.conversation_id) {
+        return `https://app.guesty.com/inbox-v2/${this.contact.integration_data.guesty.conversation_id}/reservation`
       }
 
       return false
