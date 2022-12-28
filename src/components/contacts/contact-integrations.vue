@@ -14,12 +14,6 @@
     <integration-pipedrive v-if="isPipedriveEnabled"
                          :contact="contact"/>
 
-    <integration-zoho v-if="isZohoEnabled"
-                         :contact="contact"/>
-
-    <integration-guesty v-if="isGuestyEnabled"
-                         :contact="contact"/>
-
     <contact-crm-links :contact="contact"/>
   </b-card>
 </template>
@@ -28,8 +22,6 @@
 import { mapState } from 'vuex'
 import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
 import IntegrationPipedrive from 'src/components/integrations/integration-pipedrive'
-import IntegrationZoho from 'src/components/integrations/integration-zoho'
-import IntegrationGuesty from 'src/components/integrations/integration-guesty'
 import ContactCrmLinks from 'components/contacts/contact-crm-links'
 
 export default {
@@ -48,7 +40,7 @@ export default {
     }
   },
 
-  components: { ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive, IntegrationZoho, IntegrationGuesty },
+  components: { ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive },
 
   computed: {
     ...mapState('cache', ['currentCompany']),

@@ -26,12 +26,6 @@ export default {
     return {
       integrations: [
         {
-          name: 'pipedrive',
-          label: 'Pipedrive',
-          link: this.pipedriveLink,
-          logo: 'pipedrive-icon.svg'
-        },
-        {
           name: 'stripe',
           label: 'Stripe',
           link: this.stripeLink,
