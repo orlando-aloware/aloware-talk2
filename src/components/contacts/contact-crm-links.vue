@@ -1,5 +1,4 @@
 <template>
-<!-- PLAT-972 - INTEGRATION CARDS COMPONENT! -->
 <div class="contact-crm-integrations-wrapper contact-integration-wrapper">
     <b-link class="md-btn md-raised white integrations-link d-flex"
             target="_blank"
@@ -10,7 +9,6 @@
       <span class="integration-title">{{ integration.label }}</span>
     </b-link>
 </div>
-<!-- END: PLAT-972 - INTEGRATION CARDS COMPONENT! -->
 </template>
 
 <script>

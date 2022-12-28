@@ -1,5 +1,4 @@
 <template>
-  <!-- PLAT-972 - INTEGRATION CARDS COMPONENT! -->
   <b-card class="integrations-card border-0">
     <h4 class="mb-2"
         v-if="!no_title">
@@ -9,7 +8,6 @@
        class="status-notice fs-12 text-muted mb-0">
       Enable your favorite CRM integration to see more details directly from the CRM.
     </p>
-    <!-- TODO: change the boolean for each integration properly! -->
     <integration-hubspot v-if="isHubspotEnabled"
                          :contact="contact"/>
 
@@ -24,7 +22,6 @@
 
     <contact-crm-links :contact="contact"/>
   </b-card>
-  <!-- END: PLAT-972 - INTEGRATION CARDS COMPONENT! -->
 </template>
 
 <script>

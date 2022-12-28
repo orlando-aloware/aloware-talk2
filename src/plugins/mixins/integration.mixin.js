@@ -17,7 +17,7 @@ export default {
         params: {
           integration_name: integrationName,
           dialer_mode: dialerMode ? 1 : 0,
-          force: true // temp use - remove after PLAT-972
+          force: true
         }
       })
     },

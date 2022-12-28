@@ -1,5 +1,4 @@
 <template>
-<!-- PLAT-972 - INTEGRATION CARDS COMPONENT! -->
   <div class="hubspot-integration-wrapper">
     <q-card class="hubspot-card"
             flat>
@@ -158,8 +157,6 @@ export default {
           this.setContactClone(this.contact)
 
           this.contactIntegrationDataLoaded = true
-        }).catch(err => {
-          console.log('err', err)
         })
     },
 

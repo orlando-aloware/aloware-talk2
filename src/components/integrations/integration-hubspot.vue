@@ -1,5 +1,4 @@
 <template>
-<!-- PLAT-972 - INTEGRATION CARDS COMPONENT! -->
   <div class="hubspot-integration-wrapper">
     <q-card class="hubspot-card"
             flat>
