@@ -4,9 +4,9 @@
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="hubspotLink">
+        <q-item-section v-if="contactLink">
           <b-link target="_blank"
-                  :href="hubspotLink">
+                  :href="contactLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
           </b-link>
@@ -214,7 +214,7 @@ export default {
       return this.getHubspotContactBaseLink(this.contact)
     },
 
-    hubspotLink () {
+    contactLink () {
       if (!this.contactIntegrationDataLoaded) {
         return
       }

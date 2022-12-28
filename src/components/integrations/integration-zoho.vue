@@ -4,9 +4,9 @@
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="zohoLink">
+        <q-item-section v-if="contactLink">
           <b-link target="_blank"
-                  :href="zohoLink">
+                  :href="contactLink">
             <table>
               <tr>
                 <td><img class="zoho-btn" /></td>
@@ -62,7 +62,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
-    zohoLink () {
+    contactLink () {
       if (!this.contactIntegrationDataLoaded) {
         return
       }

@@ -30,84 +30,33 @@
 
       <q-separator/>
 
-      <q-card-section v-if="integrationData && integrationData.properties">
+      <q-card-section v-if="integrationData && integrationData.contact_details">
         <p class="mb-0"
-           v-if="integrationData.properties.firstname !== undefined && integrationData.properties.lastname !== undefined">
+           v-if="integrationData.contact_details.name !== undefined">
           <span class="data-icon-label">Name: </span>
           <span class="data-value">
              <q-tooltip anchor="top middle"
                         self="center middle">
-              {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
+              {{ integrationData.contact_details.name }}
             </q-tooltip>
-            {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
+            {{ integrationData.contact_details.name }}
           </span>
         </p>
         <p class="mb-0"
-           v-if="integrationData.properties.email">
+           v-if="integrationData.contact_details.email && integrationData.contact_details.email.length > 0 && integrationData.contact_details.email[0].value">
           <span class="data-icon-label">Email: </span>
-          <span class="data-value">{{ integrationData.properties.email.value }}</span>
+          <span class="data-value">{{ integrationData.contact_details.email[0].value }}</span>
         </p>
         <p class="mb-0"
-           v-if="integrationData.properties.company">
+           v-if="integrationData.contact_details.org_name">
           <span class="data-icon-label">Company: </span>
-          <span class="data-value">{{ integrationData.properties.company.value }}</span>
+          <span class="data-value">{{ integrationData.contact_details.org_name }}</span>
         </p>
         <p class="mb-0"
-           v-if="integrationData.properties.hubspot_owner">
+           v-if="integrationData.contact_details.owner_name">
           <span class="data-icon-label">Owner: </span>
-          <span class="data-value">{{ integrationData.properties.hubspot_owner.firstName + ' ' + integrationData.properties.hubspot_owner.lastName }}</span>
+          <span class="data-value">{{ integrationData.contact_details.owner_name }}</span>
         </p>
-      </q-card-section>
-
-      <q-card-section class="pt-0 pb-0"
-                      v-if="integrationData && integrationData.properties">
-        <q-card class="deals mb-1"
-                v-for="(deal, index) in integrationData.properties.deals"
-                :key="index"
-                flat bordered>
-          <q-card-section>
-            <q-card-section class="p-0">
-              <h6 class="mb-2">
-                <b-link class="deals-title ml-0"
-                        :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
-                        target="_blank">
-                  {{ deal.properties.dealname.value }}
-                </b-link>
-              </h6>
-              <p class="mb-1 d-flex">
-                <span class="data-icon-label">Amount: </span>
-                <span class="data-value ml-1"
-                      v-if="deal.properties && deal.properties.amount">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ deal.properties.amount.value | toCurrency }}
-                  </q-tooltip>
-                  {{ deal.properties.amount.value | toCurrency }}
-                </span>
-              </p>
-              <p class="mb-1 d-flex">
-                <span class="data-icon-label">Pipeline: </span>
-                <span class="data-value ml-1">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ deal.properties.pipeline.label }}
-                  </q-tooltip>
-                  {{ deal.properties.pipeline.label }}
-                </span>
-              </p>
-              <p class="mb-1 d-flex">
-                <span class="data-icon-label">Stage: </span>
-                <span class="data-value ml-1">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ deal.properties.dealstage.label }}
-                  </q-tooltip>
-                  {{ deal.properties.dealstage.label }}
-                </span>
-              </p>
-            </q-card-section>
-          </q-card-section>
-        </q-card>
       </q-card-section>
 
       <q-card-section>
@@ -117,7 +66,7 @@
                     variant="primary"
                     tabindex="0"
                     block
-                    @click="(() => {})"> <!-- PENDING PLAT-972 -->
+                    @click="syncPipedrive">
             <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
             <q-spinner-bars v-if="isSyncing"
                             color="white">
@@ -126,10 +75,10 @@
             <q-tooltip anchor="center start"
                        self="center left"
                        :offset="[-220, 10]">
-              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between Aloware and HubSpot.</p>
+              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between Aloware and Pipedrive.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
-              <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
-              <p class="mt-0 mb-0">- You notice any inconsistencies between Aloware and HubSpot data on this contact.</p>
+              <p class="mt-1 mb-0">- The contact was recently merged in Pipedrive with another contact.</p>
+              <p class="mt-0 mb-0">- You notice any inconsistencies between Aloware and Pipedrive data on this contact.</p>
             </q-tooltip>
           </b-button>
         </b-row>
@@ -142,6 +91,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 import { pipedriveIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
 
@@ -211,6 +161,18 @@ export default {
         }).catch(err => {
           console.log('err', err)
         })
+    },
+
+    syncPipedrive (showAlert = true) {
+      this.isSyncing = true
+      talk2Api.V1.contact.syncPipedrive(this.contact.id).then(response => {
+        this.isSyncing = false
+        this.getData()
+
+        if (showAlert) {
+          this.$generalNotification('Contact has been successfully synced.')
+        }
+      })
     }
 
   },
