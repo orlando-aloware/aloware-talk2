@@ -388,7 +388,7 @@ export default {
       }
 
       if (this.isCallWaiting) {
-        return 'Call waiting'
+        return 'Call Waiting'
       }
 
       return 'New Inbound Call'
