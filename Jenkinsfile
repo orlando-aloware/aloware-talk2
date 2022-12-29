@@ -16,7 +16,7 @@ pipeline {
 
     stages {
         stage('Setup Dev Env File') {
-            when { branch 'develop' }
+//             when { branch 'develop' }
             steps {
                 script {
                     notificationSender.sendSlackInfo()
