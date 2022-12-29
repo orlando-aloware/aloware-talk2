@@ -373,7 +373,7 @@ export default {
       delete params.target
       delete params.size
 
-      return talk2Api.V2.integrations.zoho.importList(target, params)
+      return talk2Api.V2.integrations.hubspot.importList(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
