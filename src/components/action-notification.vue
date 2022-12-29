@@ -340,8 +340,7 @@ export default {
       const dialerCommunicationId = get(this.dialer, 'communication.id', null)
       const callFishingCommunicationId = get(this.dialer, 'callFishing.communication', null)
       return (
-          (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
-          (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
+        (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) || (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
         !this.dialer.parkedCall
     },
     queueCount () {
