@@ -96,6 +96,7 @@ export default {
           })
         })
         .listen('.user.in-app.communication.new_call', (event) => {
+          console.log('new call', event)
           const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {
             event.communication.campaign = campaign
