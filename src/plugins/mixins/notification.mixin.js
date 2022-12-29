@@ -254,7 +254,7 @@ export default {
             break
           }
 
-          const callType = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode ? 'callFishing' : 'incomingCall'
+          const callType = (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
