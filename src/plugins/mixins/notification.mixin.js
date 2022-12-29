@@ -258,9 +258,6 @@ export default {
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
-          console.log('callType', callType)
-          console.log('communications', communication)
-          console.log('ringGroup', ringGroup)
 
           params.data = {
             title: name.data,

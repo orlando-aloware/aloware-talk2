@@ -353,6 +353,7 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
+      console.log('answerCommunication item', data)
       this.$VueEvent.fire('answerCallFishing', data)
       this.setShowPhone(true)
     },

@@ -616,6 +616,7 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
+      console.log('answerCommunication notification', data)
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)
