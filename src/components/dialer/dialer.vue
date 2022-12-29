@@ -1262,7 +1262,7 @@ export default {
 
       // store temporarily the parked call
       const parkedCall = this.dialer.parkedCall ? JSON.parse(JSON.stringify(this.dialer.parkedCall)) : null
-      console.log('answerCallFishing', parkedCall, communication, shouldPark, shouldHangup)
+      console.log('answerCallFishing', { parkedCall, communication, shouldPark, shouldHangup })
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
