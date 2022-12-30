@@ -815,6 +815,7 @@ export default {
       const params = {
         communication_id: this.dialer.communication.id
       }
+      console.log('parkCallCombo', shouldAnswer, shouldUnpark, data)
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
         if (shouldAnswer) {
@@ -848,6 +849,7 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
+      console.log('hangupCallCombo', shouldAnswer, shouldUnpark, data)
       if (this.device.activeConnection()) {
         // hangup an incoming call
         this.device.activeConnection().hangup()
