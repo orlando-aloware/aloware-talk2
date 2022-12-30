@@ -1,5 +1,5 @@
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import * as CommunicationStatus from 'src/constants/communication-status'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import { mapActions, mapState } from 'vuex'
@@ -121,15 +121,7 @@ export default {
       }
 
       // make sure that comms has the correct status and is already included in live contacts
-      const ringGroup = this.communication.ring_group_id && this.getRingGroup(this.communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.fishing_mode
-      const condition = [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2) && this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
-      console.log('isConnectedCall', this.communication)
-      if (isFishingMode) {
-        return condition && this.communication.agent_leg_status === CommunicationStatus.STATUS_INPROGRESS_NEW
-      }
-
-      return condition
+      return this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && this.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
 
     isCallFishing () {
