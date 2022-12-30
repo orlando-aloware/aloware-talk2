@@ -120,6 +120,7 @@ export default {
       }
 
       // make sure that comms has the correct status and is already included in live contacts
+      console.log('isConnectedCall', this.communication.current_status2, this.liveContacts)
       return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2) &&
         this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
