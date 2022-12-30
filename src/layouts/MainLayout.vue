@@ -700,6 +700,7 @@ export default {
       // remove the parked call if the caller was disconnected
       if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW && parkedCall && parkedCall.id === communication.id) {
         this.setDialerParkedCall()
+        console.log('park call 4')
         this.removeParkedCall(communication.id)
       }
 

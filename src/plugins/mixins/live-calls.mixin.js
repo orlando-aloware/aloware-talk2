@@ -314,6 +314,7 @@ export default {
 
       if (_.isEmpty(this.dialer.parkedCall)) {
         this.setDialerParkedCall(this.communication)
+        console.log('park call 1', this.communication)
       }
 
       this.answerCommunication(true, true)
@@ -323,6 +324,7 @@ export default {
 
       if (_.isEmpty(this.dialer.parkedCall)) {
         this.setDialerParkedCall(this.communication)
+        console.log('park call 2', this.communication)
       }
 
       this.answerCommunication(false, true)
@@ -336,6 +338,7 @@ export default {
 
       if (_.isEmpty(this.dialer.parkedCall)) {
         this.setDialerParkedCall(this.communication)
+        console.log('park call 3', this.communication)
       }
 
       this.answerCommunication(false, true)

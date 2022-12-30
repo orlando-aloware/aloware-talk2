@@ -94,12 +94,14 @@ export default {
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         data = _.merge(this.dialer.parkedCall, data)
         this.setDialerParkedCall(data)
+        console.log('park call 5', data)
         if (!this.dialer.parkedCallTimer) {
           this.startParkedCallTimer()
         }
 
         if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW || data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
           this.setDialerParkedCall()
+          console.log('park call 6')
           if (this.dialer.parkedCallTimer) {
             this.stopParkedCallTimer()
           }
@@ -757,6 +759,7 @@ export default {
 
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
+      console.log('park call 7', this.dialer.communication)
       this.addNonOwnedParkedTask(this.dialer.communication)
       const params = {
         communication_id: this.dialer.communication.id
@@ -765,6 +768,7 @@ export default {
         console.log('Call parked')
       }).catch(err => {
         this.setDialerParkedCall()
+        console.log('park call 8')
         this.stopParkedCallTimer()
         console.log(err)
       }).finally(_ => {
@@ -782,6 +786,7 @@ export default {
 
       if ((parkedCallData && !preventClear) || !parkedCallData) {
         this.setDialerParkedCall()
+        console.log('park call 9')
         this.stopParkedCallTimer()
       }
 
@@ -812,6 +817,7 @@ export default {
 
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
+      console.log('park call 10', this.dialer.communication)
       const params = {
         communication_id: this.dialer.communication.id
       }
@@ -829,6 +835,7 @@ export default {
         this.setDialerIsMuted(false)
       }).catch(err => {
         this.setDialerParkedCall()
+        console.log('park call 11')
         this.stopParkedCallTimer()
         console.log(err)
       }).finally(_ => {
