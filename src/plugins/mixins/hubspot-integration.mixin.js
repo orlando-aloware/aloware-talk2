@@ -23,8 +23,6 @@ export default {
     getHubspotContactBaseLink (contact) {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
-        contact &&
-        contact.integration_data &&
         this.currentCompany.hubspot_marketing_portal_id) {
         return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
       }
@@ -41,6 +39,18 @@ export default {
       }
 
       return false
+    },
+
+    getContactId (contact) {
+      if (contact.integration_data && contact.integration_data.vid) {
+        return contact.integration_data.vid
+      }
+
+      if (contact.integration_data && contact.integration_data.hubspot && contact.integration_data.hubspot.contact_id) {
+        return contact.integration_data.hubspot.contact_id
+      }
+
+      return null
     }
   }
 }
