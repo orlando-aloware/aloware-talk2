@@ -121,9 +121,11 @@ export default {
       }
 
       // make sure that comms has the correct status and is already included in live contacts
-      const isFishingMode = this.communication.ring_group_id && this.getRingGroup(this.communication.ring_group_id).fishing_mode
+      const ringGroup = this.communication.ring_group_id && this.getRingGroup(this.communication.ring_group_id)
+      const isFishingMode = ringGroup && ringGroup.fishing_mode
       const condition = [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2) && this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
       console.log('isConnectedCall', condition, isFishingMode)
+      console.log('isConnectedCall', ringGroup, condition, isFishingMode)
       if (isFishingMode) {
         return condition && this.communication.agent_leg_status === CommunicationStatus.STATUS_INPROGRESS_NEW
       }
