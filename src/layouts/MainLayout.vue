@@ -71,7 +71,6 @@
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
-                         xmas-enabled
                          @toggleMode="toggleMode">
             </app-sidebar>
           </q-list>
