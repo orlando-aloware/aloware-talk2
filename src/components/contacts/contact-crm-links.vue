@@ -1,5 +1,5 @@
 <template>
-<div class="contact-crm-integrations-wrapper contact-integration-wrapper">
+  <div class="contact-crm-integrations-wrapper contact-integration-wrapper">
     <b-link class="md-btn md-raised white integrations-link d-flex"
             target="_blank"
             :href="integration.link"
@@ -8,7 +8,7 @@
       <div class="integrations-logo mr-3" :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></div>
       <span class="integration-title">{{ integration.label }}</span>
     </b-link>
-</div>
+  </div>
 </template>
 
 <script>
@@ -22,9 +22,10 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-      integrations: [
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+    integrations () {
+      return [
         {
           name: 'pipedrive',
           label: 'Pipedrive',
@@ -45,13 +46,19 @@ export default {
         },
         {
           name: 'zoho',
-          label: 'ZohoCRM',
-          link: this.zohoLink,
+          label: 'ZohoCRM Contact',
+          link: this.zohoContactLink,
+          logo: 'zoho-icon.svg'
+        },
+        {
+          name: 'zoho',
+          label: 'ZohoCRM Lead',
+          link: this.zohoLeadLink,
           logo: 'zoho-icon.svg'
         },
         {
           name: 'helpscout',
-          label: 'Helpscout',
+          label: 'Help Scout',
           link: this.helpscoutLink,
           logo: 'help-scout-icon.png'
         },
@@ -68,10 +75,7 @@ export default {
           logo: 'link-solid.svg'
         }
       ]
-    }
-  },
-  computed: {
-    ...mapState('cache', ['currentCompany']),
+    },
     activeCrmIntegrations () {
       return this.integrations.filter(integration => integration.link)
     },
@@ -111,27 +115,26 @@ export default {
 
       return false
     },
-    zohoLink () {
+    zohoContactLink () {
       if (this.currentCompany &&
         this.currentCompany.zoho_integration_enabled &&
         this.contact &&
         this.contact.integration_data &&
         this.contact.integration_data.zoho &&
-        this.contact.integration_data.zoho.contact_id &&
-        this.currentCompany.zoho_organization_id &&
-        this.currentCompany.zoho_module === 'contacts') {
-        return `https://crm.zoho.com/crm/org${this.currentCompany.zoho_organization_id}/tab/Contacts/${this.contact.integration_data.zoho.contact_id}`
+        this.contact.integration_data.zoho.contact_link) {
+        return this.contact.integration_data.zoho.contact_link
       }
 
+      return false
+    },
+    zohoLeadLink () {
       if (this.currentCompany &&
         this.currentCompany.zoho_integration_enabled &&
         this.contact &&
         this.contact.integration_data &&
         this.contact.integration_data.zoho &&
-        this.contact.integration_data.zoho.lead_id &&
-        this.currentCompany.zoho_organization_id &&
-        this.currentCompany.zoho_module === 'leads') {
-        return `https://crm.zoho.com/crm/org${this.currentCompany.zoho_organization_id}/tab/Leads/${this.contact.integration_data.zoho.lead_id}`
+        this.contact.integration_data.zoho.lead_link) {
+        return this.contact.integration_data.zoho.lead_link
       }
 
       return false
