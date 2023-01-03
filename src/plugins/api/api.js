@@ -301,11 +301,7 @@ export default {
       },
 
       list (params, cancelTokenSource) {
-        params.relations = _.get(params, 'relations', [
-          'lastCommunication',
-          'initialCampaign',
-          'dispositionStatus'
-        ])
+        params.relations = _.get(params, 'relations', [])
 
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
       },
