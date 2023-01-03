@@ -1501,7 +1501,7 @@ export default {
           })
 
           // keep requesting until data is returned
-          if (res.data.data.length === size) {
+          if (res.data.current_page !== res.data.last_page) {
             return this.getWorkflows(++page)
           } else {
             this.loadingWorkflows = false
