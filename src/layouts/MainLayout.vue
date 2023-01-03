@@ -1484,20 +1484,29 @@ export default {
         })
     },
 
-    getWorkflows () {
+    getWorkflows (page = 1) {
       if (this.hasPermissionTo('list workflow')) {
         this.loadingWorkflows = true
+        const size = 100
+
         return this.$axios.get('/api/v1/automations/workflows', {
           mode: 'no-cors',
           params: {
-            size: 100
+            size,
+            page
           }
         }).then(res => {
-          this.loadingWorkflows = false
           res.data.data.forEach((workflow) => {
             this.newWorkflow(workflow)
           })
-          return Promise.resolve()
+
+          // keep requesting until data is returned
+          if (res.data.current_page !== res.data.last_page) {
+            return this.getWorkflows(++page)
+          } else {
+            this.loadingWorkflows = false
+            return Promise.resolve()
+          }
         }).catch(err => {
           this.loadingWorkflows = false
           console.log(err)
