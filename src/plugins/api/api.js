@@ -123,6 +123,9 @@ export default {
       syncHubspot (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
       },
+      syncPipedrive (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
+      },
       bulkSaveCustomAttributes (contactId, params) {
         return window.axios.patch(`${suffixV1}contact-attributes/${contactId}`, params)
       },
