@@ -2373,7 +2373,9 @@ i.option-separator {
   }
 }
 
-.hubspot-integration-wrapper {
+.integration-wrapper {
+  margin-bottom: 10px;
+
   .hubspot-card {
     box-shadow: 0 2px 10px rgb(4 4 4 / 10%) !important;
   }
@@ -2425,24 +2427,8 @@ i.option-separator {
     font-size: 20px;
   }
 
-  .guesty-btn {
-    content: url(/integrations/guesty-icon.png?6a1467527439fd6cf84cf4e2f2c81fe5);
-    margin-right: 20px;
-    line-height: 48px;
-    width: 32px;
-    height: 32px;
-  }
-
-  .zoho-btn {
-    content: url(/integrations/zoho-icon.svg?6a1467527439fd6cf84cf4e2f2c81fe5);
-    margin-right: 20px;
-    line-height: 48px;
-    width: 48px;
-    height: 48px;
-  }
-
   .pipedrive-btn {
-    content: url(/integrations/pipedrive-icon.svg?6a1467527439fd6cf84cf4e2f2c81fe5);
+    content: url(/integrations/pipedrive-icon.svg);
     margin-right: 20px;
     line-height: 48px;
     width: 32px;

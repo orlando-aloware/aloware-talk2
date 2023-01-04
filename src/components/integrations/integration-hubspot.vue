@@ -249,12 +249,6 @@ export default {
       return this.getIntegrationData(this.contact, 'hubspot')
         .then(response => {
           this.integrationData = response.data
-          this.contact.integration_data = response.data
-
-          // update contact related states
-          this.setContact(this.contact)
-          this.setContactClone(this.contact)
-
           this.contactIntegrationDataLoaded = true
         })
     },
