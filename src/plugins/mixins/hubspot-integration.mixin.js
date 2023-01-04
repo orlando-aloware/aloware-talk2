@@ -31,26 +31,7 @@ export default {
     },
 
     getHubspotContactLink (contact) {
-      const baseLink = this.getHubspotContactBaseLink(contact)
-
-      if (baseLink) {
-        const contactId = this.getContactId(contact)
-        return contactId ? `${baseLink}contact/${contactId}` : false
-      }
-
-      return false
-    },
-
-    getContactId (contact) {
-      if (contact.integration_data && contact.integration_data.vid) {
-        return contact.integration_data.vid
-      }
-
-      if (contact.integration_data && contact.integration_data.hubspot && contact.integration_data.hubspot.contact_id) {
-        return contact.integration_data.hubspot.contact_id
-      }
-
-      return null
+      return contact?.integration_data?.hubspot?.link
     }
   }
 }
