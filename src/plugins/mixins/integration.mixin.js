@@ -23,8 +23,12 @@ export default {
     },
 
     getContactId (contact) {
-      if (contact?.integration_data && !isEmpty(contact.integration_data)) {
+      if (contact.integration_data && contact.integration_data.vid) {
         return contact.integration_data.vid
+      }
+
+      if (contact.integration_data && contact.integration_data.hubspot && contact.integration_data.hubspot.contact_id) {
+        return contact.integration_data.hubspot.contact_id
       }
 
       return null
