@@ -196,6 +196,41 @@ export default {
       this.$emit('cancel')
 
       close()
+    },
+
+    keepStatusConsistent () {
+      const remove = []
+
+      this.search.status.forEach((status, index) => {
+        // for every selected status, check if exists in dropdown
+        const exists = this.statuses.some(s => s.id === status)
+
+        // if dont exists, means that the user deselected the option (toggler) but the status remain selected
+        if (!exists) {
+          remove.push(index)
+        }
+      })
+
+      // remove reverse to not mess with indexes
+      remove
+        .reverse()
+        .forEach(index => {
+          this.search.status.splice(index, 1)
+        })
+    }
+  },
+
+  watch: {
+    'search.appointments' (state) {
+      if (!state) {
+        this.keepStatusConsistent()
+      }
+    },
+
+    'search.reminders' (state) {
+      if (!state) {
+        this.keepStatusConsistent()
+      }
     }
   }
 }
