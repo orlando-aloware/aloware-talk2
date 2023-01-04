@@ -1,5 +1,5 @@
 <template>
-  <div class="hubspot-integration-wrapper">
+  <div class="integration-wrapper">
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
