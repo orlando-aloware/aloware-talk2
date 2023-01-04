@@ -97,11 +97,11 @@
                     </compact-btn>
                   </b-card>
                 </template>
-                <compact-btn variant="outlined-light"
+                <!--compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
                              @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, false)">
                   OR
-                </compact-btn>
+                </compact-btn-->
               </div>
               <p
                 class="px-2 pt-2"

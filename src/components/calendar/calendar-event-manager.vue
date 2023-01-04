@@ -75,7 +75,6 @@
                         v-if="mode === 'edit' && schedule.contact">
             <contact-selector disabled
                               redirect-when-disabled
-                              :contact-data="schedule.contact"
                               v-model="$v.schedule.contact.$model.id"
                               @loaded="onContactsLoaded">
             </contact-selector>
@@ -397,7 +396,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
+        body: '',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
@@ -751,7 +750,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
+        body: '',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
