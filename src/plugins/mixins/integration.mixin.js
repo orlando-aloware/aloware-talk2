@@ -1,5 +1,4 @@
 import { mapState } from 'vuex'
-import { isEmpty } from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
