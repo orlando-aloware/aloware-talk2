@@ -1,11 +1,11 @@
 <template>
-  <div class="hubspot-integration-wrapper">
+  <div class="integration-wrapper">
     <q-card class="hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="hubspotLink">
+        <q-item-section v-if="contactLink">
           <b-link target="_blank"
-                  :href="hubspotLink">
+                  :href="contactLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
           </b-link>
@@ -169,7 +169,7 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
-import { hubspotIntegrationMixin } from 'src/plugins/mixins'
+import { hubspotIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'integration-hubspot',
@@ -177,7 +177,8 @@ export default {
   components: { WorkflowSelector },
 
   mixins: [
-    hubspotIntegrationMixin
+    hubspotIntegrationMixin,
+    integrationMixin
   ],
 
   props: {
@@ -212,12 +213,12 @@ export default {
       return this.getHubspotContactBaseLink(this.contact)
     },
 
-    hubspotLink () {
+    contactLink () {
       if (!this.contactIntegrationDataLoaded) {
         return
       }
 
-      return this.getHubspotLink(this.contact)
+      return this.getHubspotContactLink(this.contact)
     }
   },
 
@@ -245,15 +246,9 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact)
+      return this.getIntegrationData(this.contact, 'hubspot')
         .then(response => {
           this.integrationData = response.data
-          this.contact.integration_data = response.data
-
-          // update contact related states
-          this.setContact(this.contact)
-          this.setContactClone(this.contact)
-
           this.contactIntegrationDataLoaded = true
         })
     },

@@ -10,6 +10,10 @@
     </p>
     <integration-hubspot v-if="isHubspotEnabled"
                          :contact="contact"/>
+
+    <integration-pipedrive v-if="isPipedriveEnabled"
+                         :contact="contact"/>
+
     <contact-crm-links :contact="contact"/>
   </b-card>
 </template>
@@ -17,6 +21,7 @@
 <script>
 import { mapState } from 'vuex'
 import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
+import IntegrationPipedrive from 'src/components/integrations/integration-pipedrive'
 import ContactCrmLinks from 'components/contacts/contact-crm-links'
 
 export default {
@@ -35,7 +40,7 @@ export default {
     }
   },
 
-  components: { ContactCrmLinks, IntegrationHubspot },
+  components: { ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
