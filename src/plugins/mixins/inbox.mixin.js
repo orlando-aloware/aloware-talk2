@@ -246,7 +246,7 @@ export default {
 
       query.filter_groups.push({ 'filters': this.filters, 'is_conjunction': true })
 
-      if (!count) {
+      if (!count && !this.searchText) {
         query.relations = ['lastCommunication']
       }
 
