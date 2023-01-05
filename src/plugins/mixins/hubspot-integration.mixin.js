@@ -20,7 +20,7 @@ export default {
   },
 
   methods: {
-    getHubspotContactBaseLink (contact) {
+    getHubspotContactBaseLink () {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
         this.currentCompany.hubspot_marketing_portal_id) {
