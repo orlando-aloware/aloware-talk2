@@ -210,7 +210,7 @@ export default {
         return
       }
 
-      return this.getHubspotContactBaseLink(this.contact)
+      return this.getHubspotContactBaseLink()
     },
 
     contactLink () {
