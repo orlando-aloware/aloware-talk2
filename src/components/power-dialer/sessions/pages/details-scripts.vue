@@ -1,22 +1,15 @@
 <template>
-  <q-card
-    :disabled="sessionLoader"
-    flat
-    class="p-0">
+  <q-card class="p-0"
+          flat
+          :disabled="sessionLoader">
     <q-card-section class="px-0"
                     style="overflow:auto;">
-
-      <ScriptSelector
-        v-model="scriptId"
-        class="px-3 w-100"
-        @on-change="changeScript" />
-
-      <div
-        v-html="scriptText"
-        class="t-scroll-y2 py-3 px-3"
-        style="overflow:auto;">
-      </div>
-
+      <ScriptSelector class="px-3 w-100"
+                      v-model="scriptId"
+                      @on-change="changeScript" />
+      <div class="t-scroll-y2 py-3 px-3"
+           style="overflow:auto;"
+           v-html="scriptText" />
     </q-card-section>
   </q-card>
 </template>
