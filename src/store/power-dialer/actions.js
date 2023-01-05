@@ -256,6 +256,9 @@ export default {
     const res = await window.axios.get(`api/v1/communication/${id}/scripts`)
     return res
   },
+  getScript ({ commit }, id) {
+    return window.axios.get(`api/v1/script/${id}`)
+  },
   setFinishedPowerDialerSession: ({ commit }, data = true) => {
     commit('SET_FINISHED_PD_SESSION', data)
   },
