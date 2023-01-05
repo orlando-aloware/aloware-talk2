@@ -218,6 +218,10 @@ export default {
       }
     },
 
+    isAgentOnCall () {
+      return this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
+    },
+
     personalPhoneNumber () {
       const found = this.campaigns.find(campaign => campaign.id === this.profile.campaign_id)
       if (found && found.incoming_numbers.length) {
