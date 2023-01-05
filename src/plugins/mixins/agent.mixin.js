@@ -15,6 +15,9 @@ export default {
     ...mapState('auth', ['profile', 'authenticated']),
     agentStatus () {
       return _.get(this.profile, 'agent_status', null)
+    },
+    isAgentOnCall () {
+      return this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
 

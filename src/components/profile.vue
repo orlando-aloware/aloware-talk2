@@ -8,7 +8,7 @@
                       ref="menu"
                       flat
                       :ripple="false"
-                      :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus)"
+                      :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus) || isAgentOnCall"
                       :menu-offset="[4, 16]">
         <template v-slot:label>
           <q-item-section class="contact-info-wrapper"
