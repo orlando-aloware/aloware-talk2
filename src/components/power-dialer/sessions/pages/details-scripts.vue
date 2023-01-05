@@ -62,6 +62,8 @@ export default {
   },
   mounted () {
     this.scriptId = this.sessionSettings.script_id
+
+    this.changeScript()
   },
   data () {
     return {
@@ -71,13 +73,21 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
+      'getScript',
       'getLastCommunicationScript'
     ]),
     async changeScript (val) {
       const lastCommunication = { data: null, id: null }
       lastCommunication.id = _.get(this.activeTask, 'last_communication.id', null)
 
+      // if last_communication isnt present, search in script directly
       if (!lastCommunication.id) {
+        if (this.scriptId) {
+          const res = await this.getScript(this.scriptId)
+
+          this.script = res.data
+        }
+
         return
       }
 
