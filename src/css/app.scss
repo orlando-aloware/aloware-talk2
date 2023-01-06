@@ -2373,7 +2373,9 @@ i.option-separator {
   }
 }
 
-.hubspot-integration-wrapper {
+.integration-wrapper {
+  margin-bottom: 10px;
+
   .hubspot-card {
     box-shadow: 0 2px 10px rgb(4 4 4 / 10%) !important;
   }
@@ -2423,6 +2425,14 @@ i.option-separator {
     color: #FF7A59;
     margin-right: 20px;
     font-size: 20px;
+  }
+
+  .pipedrive-btn {
+    content: url(/integrations/pipedrive-icon.svg);
+    margin-right: 20px;
+    line-height: 48px;
+    width: 32px;
+    height: 32px;
   }
 
   .data-value {

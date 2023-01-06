@@ -368,6 +368,7 @@ export default {
     getColumnSorts (column) {
       this.setDefaultDateFilter(column.name)
       let order = this.sorts.order === 'asc' ? 'desc' : 'asc'
+
       if (this.customSortOptions) {
         switch (this.sorts.order) {
           case 'asc':
@@ -381,6 +382,13 @@ export default {
             break
         }
       }
+
+      // if there's a change in the selected column to be sorted,
+      // default order should be ascending
+      if (column.name !== this.sorts.orderBy) {
+        order = 'asc'
+      }
+
       this.sorts = {
         orderBy: column.name,
         order: order
