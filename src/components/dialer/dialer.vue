@@ -225,8 +225,11 @@ export default {
       this.startCallTimer()
       this.setDialerCurrentStatus('CALL_CONNECTED')
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
-        .then(() => {
-          this.updateUnownedContactLastCommunicationStatus()
+        .then(res => {
+          // execute only if we have a response
+          if (res) {
+            this.updateUnownedContactLastCommunicationStatus(res.data.user_id)
+          }
         })
         // .finally(() => {
         //   this.$router.push({ name: 'Call' }).catch(err => {
