@@ -218,7 +218,7 @@ export default {
     state.contactPhoneNumbers = [...state.contactPhoneNumbers, phoneNumber]
   },
   REMOVE_CONTACT_PHONE_NUMBER: (state, phoneNumber) => {
-    const index = state.contactPhoneNumbers.find(phone => phone.id === phoneNumber.id)
+    const index = state.contactPhoneNumbers.findIndex(phone => phone.id === phoneNumber.id)
 
     state.contactPhoneNumbers.splice(index, 1)
   },
