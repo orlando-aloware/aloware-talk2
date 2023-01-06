@@ -97,7 +97,7 @@ export default {
     ]),
 
     hubspotLink () {
-      return this.getHubspotLink(this.contact)
+      return this.getHubspotContactLink(this.contact)
     }
   }
 }

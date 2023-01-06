@@ -29,7 +29,7 @@ export default {
     ...mapState('contacts', ['contact']),
 
     hubspotLink () {
-      return this.getHubspotLink(this.contact)
+      return this.getHubspotContactLink(this.contact)
     },
 
     test () {
