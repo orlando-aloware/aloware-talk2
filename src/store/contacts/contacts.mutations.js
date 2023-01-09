@@ -217,6 +217,11 @@ export default {
   ADD_CONTACT_PHONE_NUMBER: (state, phoneNumber) => {
     state.contactPhoneNumbers = [...state.contactPhoneNumbers, phoneNumber]
   },
+  REMOVE_CONTACT_PHONE_NUMBER: (state, phoneNumber) => {
+    const index = state.contactPhoneNumbers.findIndex(phone => phone.id === phoneNumber.id)
+
+    state.contactPhoneNumbers.splice(index, 1)
+  },
   SET_SIDEBAR_COLLAPSED: (state, isCollapsed) => {
     state.isSidebarCollapsed = isCollapsed
   },
