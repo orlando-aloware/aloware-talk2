@@ -238,12 +238,16 @@ export default {
           return '[From HubSpot] Could not find the associated contact with the HubSpot deal.'
         case CommunicationRejectionReasons.REJECTION_REASON_HS_INVALID_PHONE_NUMBER:
           return '[From HubSpot] Could not find a phone number associated with the contact on the HubSpot deal.'
+        case CommunicationRejectionReasons.REJECTION_REASON_DAILY_LIMIT_EXCEEDED:
+          return 'Daily outbound messages limit exceeded.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DELETED:
           return 'Company was deleted.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
           return 'Company was suspended.'
         case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
           return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
+        case CommunicationRejectionReasons.REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER:
+          return 'Short Code is not allowed to send messages to non-US numbers.'
       }
     },
 

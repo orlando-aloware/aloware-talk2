@@ -122,7 +122,7 @@ export default {
         return
       }
 
-      talk2Api.V1.contact.get(contactId).then(response => {
+      talk2Api.V2.contacts.get(contactId).then(response => {
         if (response.data.id === contactId) {
           this.setContact(response.data)
         }

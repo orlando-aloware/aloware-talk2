@@ -5,7 +5,7 @@ import { Registry } from 'rage-edit'
 import { template } from './menu'
 import { clone } from 'lodash'
 
-var isSilent = true
+let isSilent = true
 let updateDownloaded = false
 
 // register for tel: links in windows
@@ -67,7 +67,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 400,
     height: 680,
-    minHeight: 630,
+    minHeight: 680,
     minWidth: 360,
     resizable: true,
     fullscreen: false,
@@ -339,21 +339,31 @@ autoUpdater.on('error', (err) => {
   log.info('Error in auto-update: ' + err)
   sendStatusToWindow('update_error', 'Error in auto-update. Please restart the application.')
   updateDownloaded = false
-  changeUpdaterMenu({ label: 'Check for updates', enabled: true })
+  changeUpdaterMenu({
+    label: 'Check for updates',
+    enabled: true
+  })
 })
 autoUpdater.on('update-not-available', () => {
   sendStatusToWindow('Update not available.')
-  changeUpdaterMenu({ label: 'Check for updates', enabled: true })
-  if (isSilent) return
-  dialog.showMessageBox({
-    title: 'No Updates',
-    message: 'Current version is up-to-date.'
+  changeUpdaterMenu({
+    label: 'Check for updates',
+    enabled: true
   })
+  if (!isSilent) {
+    dialog.showMessageBox({
+      title: 'No Updates',
+      message: 'Current version is up-to-date.'
+    })
+  }
 })
 autoUpdater.on('update-downloaded', (info) => {
   sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
   updateDownloaded = true
-  changeUpdaterMenu({ label: 'Updates available', enabled: true })
+  changeUpdaterMenu({
+    label: 'Updates available',
+    enabled: true
+  })
 })
 
 ipcMain.on('restart_app', () => {
@@ -443,20 +453,29 @@ process.on('uncaughtException', (err) => {
 
 export function checkForUpdates ({ silent }) {
   isSilent = true
-  if (silent !== undefined){
+  if (silent !== undefined) {
     isSilent = silent
   }
 
-  changeUpdaterMenu({ label: 'Checking for updates...', enabled: false })
+  changeUpdaterMenu({
+    label: 'Checking for updates...',
+    enabled: false
+  })
   if (updateDownloaded) {
     sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
-    changeUpdaterMenu({ label: 'Updates available', enabled: true })
+    changeUpdaterMenu({
+      label: 'Updates available',
+      enabled: true
+    })
   } else {
     autoUpdater.checkForUpdates()
   }
 }
 
-const changeUpdaterMenu = ({ label, enabled }) => {
+const changeUpdaterMenu = ({
+  label,
+  enabled
+}) => {
   const newTemplate = clone(template)
   newTemplate[0].submenu[2].label = label
   newTemplate[0].submenu[2].enabled = enabled

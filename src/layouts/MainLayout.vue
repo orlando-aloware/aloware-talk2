@@ -397,7 +397,7 @@ export default {
     },
     mobilePhoneDrawerClass () {
       return {
-        'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.md,
+        'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.lg,
         'mobile-phone-visible': this.isPhoneVisible
       }
     },
@@ -1484,20 +1484,29 @@ export default {
         })
     },
 
-    getWorkflows () {
+    getWorkflows (page = 1) {
       if (this.hasPermissionTo('list workflow')) {
         this.loadingWorkflows = true
+        const size = 100
+
         return this.$axios.get('/api/v1/automations/workflows', {
           mode: 'no-cors',
           params: {
-            size: 100
+            size,
+            page
           }
         }).then(res => {
-          this.loadingWorkflows = false
           res.data.data.forEach((workflow) => {
             this.newWorkflow(workflow)
           })
-          return Promise.resolve()
+
+          // keep requesting until data is returned
+          if (res.data.current_page !== res.data.last_page) {
+            return this.getWorkflows(++page)
+          } else {
+            this.loadingWorkflows = false
+            return Promise.resolve()
+          }
         }).catch(err => {
           this.loadingWorkflows = false
           console.log(err)
@@ -2318,12 +2327,12 @@ export default {
   },
 
   watch: {
-    '$q.screen.lt.md': function () {
+    '$q.screen.lt.lg': function () {
       if (typeof this.$refs.mobilePhone === 'undefined') {
         return
       }
 
-      if (!this.$q.screen.lt.md) {
+      if (!this.$q.screen.lt.lg) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
       }

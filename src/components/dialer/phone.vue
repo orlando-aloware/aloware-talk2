@@ -56,7 +56,7 @@
           <template v-slot:label>
             <q-btn icon="img:app-icons/dialer/phone_settings.svg"
                    size="12px"
-                   class="icon-btn auto-size height-12"
+                   class="icon-btn auto-size height-12 phone-settings-icon"
                    padding="none"
                    flat>
             </q-btn>

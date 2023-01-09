@@ -1,27 +1,28 @@
 <template>
-  <vue-multiselect track-by="id"
-                   label="name"
-                   class="mr-1 chip__clear-blue shrink-options"
-                   style="width: 100%"
-                   placeholder="Select type"
-                   :searchable="true"
-                   :showNoResults="false"
-                   :close-on-select="true"
-                   :options="options"
-                   :show-labels="false"
-                   :allow-empty="false"
-                   :disabled="disabled"
-                   :loading="forceLoading"
-                   v-model="contact"
-                   @select="onSelect"
-                   @search-change="onSearch">
-    <template #noResult>
-      {{ noResultsLabel }}
-    </template>
-    <template #noOptions>
-      {{ noResultsLabel }}
-    </template>
-  </vue-multiselect>
+  <div :class="containerStyles"
+       @click.prevent="onRedirectToContact">
+    <vue-multiselect track-by="id"
+                     label="name"
+                     class="mr-1 chip__clear-blue shrink-options"
+                     style="width: 100%;"
+                     placeholder="Select contact"
+                     :searchable="true"
+                     :showNoResults="false"
+                     :showNoOptions="false"
+                     :close-on-select="true"
+                     :options="options"
+                     :show-labels="false"
+                     :allow-empty="false"
+                     :loading="forceLoading"
+                     :disabled="disabled"
+                     v-model="contact"
+                     @select="onSelect"
+                     @search-change="onSearch">
+    </vue-multiselect>
+    <q-tooltip v-if="redirectWhenDisabled">
+      Click to go to contacts page
+    </q-tooltip>
+  </div>
 </template>
 
 <script>
@@ -54,6 +55,16 @@ export default {
     showNumber: {
       type: Boolean,
       default: true
+    },
+
+    redirectWhenDisabled: {
+      type: Boolean,
+      default: false
+    },
+
+    contactData: {
+      type: Object,
+      required: false
     }
   },
 
@@ -65,9 +76,8 @@ export default {
       params: {
         'page': 1,
         'per_page': 25,
-        'filter_groups[0][filters][search][value]': '',
-        'filter_groups[0][is_conjunction]': true,
-        'sort': 'last_engagement_at',
+        'search': null,
+        'sort': 'name',
         'order': 'desc'
       },
       forceLoading: false
@@ -75,29 +85,38 @@ export default {
   },
 
   computed: {
-    noResultsLabel () {
-      return this.search.length < this.threshold
-        ? `Type at least ${this.threshold} characters to search in contacts`
-        : 'No Results found'
+    containerStyles () {
+      return {
+        'cursor-pointer': this.redirectWhenDisabled
+      }
     }
   },
 
   async mounted () {
     // if component is disabled and the value is set, search for that specific contact only to fill as the option
-    if (this.value) {
-      await this.loadContacts(this.value)
-
+    if (this.value && this.contactData) {
+      this.options.push(this.formatContact(this.contactData))
       this.contact = this.options.find(contact => contact.id === this.value)
+
+      this.$emit('loaded')
     }
   },
 
   methods: {
+    onRedirectToContact () {
+      if (!this.redirectWhenDisabled || !this.disabled || !this.value) {
+        return
+      }
+
+      window.open(`/contacts/${this.value}`)
+    },
+
     onSearch: _.debounce(function (query) {
       this.search = query
       this.options = []
 
       if (this.search.length >= this.threshold) {
-        this.params['filter_groups[0][filters][search][value]'] = this.search
+        this.params.search = this.search
 
         this.loadContacts()
       }
@@ -108,28 +127,30 @@ export default {
     },
 
     formatContact (contact) {
+      // Usually, the contact will have first and last name, and the logic is the same if just one is filled
+      // But if any of these fields are not filled, the "name" attribute is used instead (comes from calendar event)
+      // This happens when user dont have enough visibility, for instance
+      const name = contact.first_name || contact.last_name
+        ? `${contact.first_name || ''} ${contact.last_name || ''}`
+        : (contact.name ? contact.name : 'No Name')
+
       return {
         id: contact.id,
-        name: `${contact.first_name} ${contact.last_name} ${this.showNumber ? ' (' + contact.phone_number + ')' : ''}`
+        name: `${name} ${this.showNumber ? '(' + contact.phone_number + ')' : ''}`
       }
     },
 
-    async loadContacts (id = null) {
+    async loadContacts () {
       this.forceLoading = true
       this.$emit('loading')
 
-      const url = '/api/v2/contacts' + (id ? '/' + id : '')
+      const url = '/api/v2/contacts/quick-search'
       const response = await this.$axios.get(url, { params: this.params })
+      const contacts = response.data.data
 
-      if (id) {
-        this.options.push(this.formatContact(response.data))
-      } else {
-        const contacts = response.data.data
-
-        contacts.forEach(contact => {
-          this.options.push(this.formatContact(contact))
-        })
-      }
+      contacts.forEach(contact => {
+        this.options.push(this.formatContact(contact))
+      })
 
       this.forceLoading = false
       this.$emit('loaded')

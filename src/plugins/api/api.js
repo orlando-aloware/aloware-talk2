@@ -123,6 +123,9 @@ export default {
       syncHubspot (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
       },
+      syncPipedrive (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
+      },
       bulkSaveCustomAttributes (contactId, params) {
         return window.axios.patch(`${suffixV1}contact-attributes/${contactId}`, params)
       },
@@ -302,9 +305,7 @@ export default {
 
       list (params, cancelTokenSource) {
         params.relations = _.get(params, 'relations', [
-          'lastCommunication',
-          'initialCampaign',
-          'dispositionStatus'
+          'tags'
         ])
 
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })

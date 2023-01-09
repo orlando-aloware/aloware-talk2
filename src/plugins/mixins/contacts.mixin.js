@@ -116,12 +116,21 @@ export default {
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
         const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
+        // - use 'order' for sort only if in power dialer list and view is not
+        //   in the add contacts or
+        // - if there's no selected column to sort, use the default contact
+        //   date filter (last engagement at or created at), else use the
+        //   selected column.
         const sort = !isAddList && this.isPowerDialer
           ? 'order'
           : ((this.sorts)
             ? this.sorts.orderBy
             : this.defaultContactDateFilter)
-        const order = !isAddList
+        // - use 'asc' for order only if in power dialer list and view is not
+        //   in the add contacts or
+        // - if there's no selected column to order by, use 'desc', else use the
+        //   selected column's order (asc or desc).
+        const order = !isAddList && this.isPowerDialer
           ? 'asc'
           : ((this.sorts)
             ? this.sorts.order
@@ -168,7 +177,7 @@ export default {
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
-        contact_owner: checked ? this.profile.id : undefined,
+        my_contacts: checked,
         search: this.search,
         page: this.contactsData.page
       }, true, true)
@@ -454,14 +463,8 @@ export default {
         powerQuery.sort_order = params.order ? params.order : 'asc'
       }
 
-      if (params.contact_owner) {
-        query.filter_groups.push({ filters: {
-          contact_owner: {
-            value: [params.contact_owner],
-            operator: 1
-          }
-        },
-        is_conjunction: true })
+      if (params?.my_contacts) {
+        query.my_contacts = params.my_contacts
       }
 
       if (params.task_status) {

@@ -10,7 +10,8 @@
                               :auto-close="autoClose"
                               :minute-interval="minuteInterval"
                               :disabled-hours="disabledHours"
-                              :no-value-to-custom-elem="true"
+                              :no-value-to-custom-elem="noValueToCustomElem"
+                              no-keyboard
                               v-model="date"
                               @input="onInput">
       <slot></slot>
@@ -104,6 +105,12 @@ export default {
   created () {
     if (this.value) {
       this.date = window.moment(this.value)
+    }
+  },
+
+  watch: {
+    value (date) {
+      this.date = date ? window.moment(date) : null
     }
   }
 }

@@ -213,7 +213,7 @@ export default {
       this.resetFilters()
       query.filter_groups = []
 
-      if (this.searchText && this.searchText.trim()) {
+      if (this.searchText && this.searchText.trim() && this.searchText.length >= 3) {
         this.filters.search.value = this.searchText
         delete this.filters.contact_task_status
       } else {
@@ -249,6 +249,8 @@ export default {
       if (!count) {
         query.relations = ['lastCommunication']
       }
+
+      query.timezone = window.timezone
 
       return query
     },

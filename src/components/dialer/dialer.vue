@@ -428,22 +428,10 @@ export default {
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])
 
-      const activeConnectionCounter = { data: 0 }
       // check if connection is completely closed before opening a new one
       if (this.device.activeConnection()) {
-        this.activeConnectionInterval = setInterval(async () => {
-          if (!this.device.activeConnection()) {
-            this.connection = await this.device.connect(params, true)
-            this.initConnectionEvents()
-            clearInterval(this.activeConnectionInterval)
-          }
-
-          activeConnectionCounter.data++
-
-          if (activeConnectionCounter.data >= 120) {
-            clearInterval(this.activeConnectionInterval)
-          }
-        }, 500)
+        console.log('Dialer is busy', currentNumber, outboundCampaignId)
+        return
       } else {
         this.connection = await this.device.connect(params, true)
         this.initConnectionEvents()

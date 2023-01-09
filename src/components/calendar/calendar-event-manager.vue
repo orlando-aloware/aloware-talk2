@@ -48,6 +48,9 @@
                         label="Contact"
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')">
+            <q-tooltip anchor="top middle">
+              Type at least 3 characters to search in contacts
+            </q-tooltip>
             <contact-selector v-model="$v.schedule.contact.$model.id">
             </contact-selector>
           </b-form-group>
@@ -70,7 +73,9 @@
                         invalid-feedback="A contact is required"
                         :state="validateState('contact')"
                         v-if="mode === 'edit' && schedule.contact">
-            <contact-selector :disabled="true"
+            <contact-selector disabled
+                              redirect-when-disabled
+                              :contact-data="schedule.contact"
                               v-model="$v.schedule.contact.$model.id"
                               @loaded="onContactsLoaded">
             </contact-selector>
@@ -100,7 +105,7 @@
                         :state="validateState('date')">
             <date-selector :min-date="minDate"
                            v-model="$v.schedule.date.$model"
-                           v-if="mode !== 'edit'"
+                           v-if="mode !== 'edit' || !schedule.is_past"
                            @dateSelected="dateSelected">
             </date-selector>
             <b-form-input disabled
@@ -116,7 +121,7 @@
                         invalid-feedback="Please select a time for this event"
                         :state="validateState('time')">
             <predefined-time-selector v-model="$v.schedule.time.$model"
-                                      v-if="mode !== 'edit'"
+                                      v-if="mode !== 'edit' || !schedule.is_past"
                                       @select="timeSelected">
             </predefined-time-selector>
             <b-form-input disabled
@@ -131,7 +136,7 @@
           <b-form-group class="form-label"
                         label="Duration (minutes)">
             <predefined-time-duration-selector v-model="schedule.duration"
-                                               v-if="mode !== 'edit'"
+                                               v-if="mode !== 'edit' || !schedule.is_past"
                                                @select="durationSelected">
             </predefined-time-duration-selector>
             <b-form-input disabled
@@ -345,7 +350,7 @@ export default {
           // if in edit mode, skip higher than today check
           return this.mode === 'edit'
             ? regex
-            : regex && val >= moment().format('MM/DD/YYYY')
+            : regex && this.isFuture(val)
         }
       },
       timezone: {
@@ -392,7 +397,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: '',
+        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
@@ -496,6 +501,10 @@ export default {
     validateState (input, prop = 'schedule') {
       const { $dirty, $error } = this.$v[prop][input]
       return $dirty ? !$error : null
+    },
+
+    isFuture (date) {
+      return moment(date).format('YYYY-MM-DD') >= moment().format('YYYY-MM-DD')
     },
 
     editSchedule (sched) {
@@ -679,10 +688,6 @@ export default {
           user: this.user.profile,
           calendar_response: 1
         }
-
-        if (this.$refs.contactSelector) {
-          this.$refs.contactSelector.reset()
-        }
       }
 
       this.resetSmsReminder()
@@ -746,7 +751,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: '',
+        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
@@ -754,7 +759,7 @@ export default {
     },
 
     dateSelected (value) {
-      this.schedule.date = moment(value).format('MM/DD/YYYY')
+      this.schedule.date = value ? moment(value).format('MM/DD/YYYY') : null
     },
 
     timeSelected (time) {

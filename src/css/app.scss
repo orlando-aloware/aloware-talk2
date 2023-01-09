@@ -67,7 +67,7 @@ body,
 }
 
 .btn-white:focus,
-.btn-white.focus{
+.btn-white.focus {
   background: $white !important;
 }
 
@@ -207,6 +207,7 @@ body,
     margin-right: 0;
     padding-left: 0;
     padding-right: 8px;
+
     &.q-field__marginal {
       height: auto !important;
     }
@@ -234,6 +235,7 @@ body,
     padding: 0 0 0 0 !important;
     margin: 0 0 0 0 !important;
   }
+
   & .main-content {
     padding: 0 !important;
   }
@@ -265,9 +267,21 @@ body,
   background-position: center;
 }
 
+.xmas-bg {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)), url("../assets/xmas-tree.jpg");
+  background-color: #01132B;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
 @media (max-width: 992px) {
   .page-title {
     font-size: 22px !important;
+  }
+
+  .q-drawer--right.q-drawer--bordered {
+    border-left: 0px !important;
   }
 }
 
@@ -383,6 +397,7 @@ body,
   input {
     cursor: pointer;
   }
+
   .q-checkbox__inner .q-checkbox__bg {
     border-radius: 4px;
   }
@@ -496,12 +511,14 @@ body,
       position: absolute;
     }
   }
+
   .edit-wrapper {
     .dot-wrapper {
       height: 16px;
       //top: 48%;
       //position: absolute;
     }
+
     & > .q-field__inner > .q-field__control {
       &:before {
         border: 0;
@@ -512,6 +529,7 @@ body,
       }
     }
   }
+
   .q-field > .q-field {
     .tag-items {
       max-width: 230px;
@@ -523,25 +541,30 @@ body,
       white-space: nowrap;
     }
   }
+
   .dropdown-select {
     max-height: 160px;
     height: 100%;
+
     .tag-items {
       .tag-text {
         padding-left: 4px;
       }
     }
+
     .select-option {
       &:hover {
         background-color: $grey-50;
         border-radius: 6px;
       }
     }
+
     .select-group {
       .tag-text {
         @include font-size($f-size-h5, 600, true);
       }
     }
+
     .tag-items {
       .is-dot {
         top: 43%;
@@ -679,6 +702,7 @@ body,
   .tab-icons {
     padding-top: 8px !important;
     padding-bottom: 2px !important;
+
     .tab-icon {
       display: flex;
       align-items: center;
@@ -691,6 +715,7 @@ body,
         right: 14px;
       }
     }
+
     font-family: $font-family-body;
     font-size: 10px;
     font-weight: 500;
@@ -728,7 +753,7 @@ body,
     }
   }
 
-  .q-tab__content.tab-active{
+  .q-tab__content.tab-active {
     color: $blue-90;
   }
 }
@@ -895,11 +920,10 @@ body,
     border-radius: 6px;
     background: transparent;
   }
-
 }
 
 .q-menu {
-  max-height: 32vh !important;
+  max-height: 50vh !important;
   font-size: 90%;
 
   .q-virtual-scroll__content {
@@ -1377,6 +1401,7 @@ i.option-separator {
 
 .border-half-rounded {
   border-radius: 6px;
+
   &.q-field--rounded {
     .q-field__control {
       border-radius: 6px;
@@ -1723,6 +1748,7 @@ i.option-separator {
   width: 4.8px;
   padding: 0;
   margin: 0;
+
   &.unread-dot {
     transform: translateX(-14px);
   }
@@ -1742,6 +1768,7 @@ i.option-separator {
 
 .activity-bottom-info {
   height: 30px;
+
   span {
     white-space: nowrap;
   }
@@ -1898,9 +1925,11 @@ i.option-separator {
  */
 .main-content {
   background: $white;
+
   .contacts {
     .main {
       width: calc(100vw - 324px);
+
       .table-header {
         > div {
           > .row {
@@ -1952,13 +1981,16 @@ i.option-separator {
       padding: 0 0.5rem;
       height: 65px;
       margin-bottom: 13px;
+
       > div {
         > div:nth-child(2),
         > div:nth-child(3) {
           height: 65px !important;
         }
+
         div:nth-child(3) {
           border-bottom: 1px solid $grey-60;
+
           .badge {
             padding: 7px 5px 5px;
             height: 20px;
@@ -2076,6 +2108,7 @@ i.option-separator {
 .contact-info-wrapper {
   display: flex;
   min-width: 0;
+
   .contact-name-wrapper {
     display: flex;
     min-width: 0;
@@ -2084,6 +2117,7 @@ i.option-separator {
     white-space: nowrap;
     overflow: hidden;
     flex-grow: 1;
+
     .contact-name {
       display: inline-block;
       white-space: nowrap;
@@ -2338,7 +2372,10 @@ i.option-separator {
     color: #303133;
   }
 }
-.hubspot-integration-wrapper {
+
+.integration-wrapper {
+  margin-bottom: 10px;
+
   .hubspot-card {
     box-shadow: 0 2px 10px rgb(4 4 4 / 10%) !important;
   }
@@ -2388,6 +2425,14 @@ i.option-separator {
     color: #FF7A59;
     margin-right: 20px;
     font-size: 20px;
+  }
+
+  .pipedrive-btn {
+    content: url(/integrations/pipedrive-icon.svg);
+    margin-right: 20px;
+    line-height: 48px;
+    width: 32px;
+    height: 32px;
   }
 
   .data-value {
@@ -2734,6 +2779,7 @@ i.option-separator {
   height: 209px;
   width: 362px;
   padding: 10px;
+
   #fileInput {
     position: relative;
   }
@@ -3700,12 +3746,14 @@ i.option-separator {
         flex: inherit;
         flex-grow: 1;
       }
+
       & > .q-btn-item:nth-child(2) {
         flex-grow: 1;
         min-width: 105px;
       }
     }
   }
+
   .task-list {
     .task-item {
       padding-right: 14px;
@@ -3896,6 +3944,7 @@ i.option-separator {
       white-space: nowrap;
       text-overflow: ellipsis;
     }
+
     span:empty {
       display: none !important;
     }
@@ -3952,6 +4001,7 @@ i.option-separator {
 
   &:hover {
     background: $purple-40 !important;
+
     .q-focus-helper {
       background: unset !important;
     }
@@ -3969,6 +4019,7 @@ i.option-separator {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2px;
+
   .parked-call-content {
     padding-left: 2px;
     display: grid;
@@ -3977,13 +4028,16 @@ i.option-separator {
     font-weight: 600;
     color: $grey-80;
     min-width: 0;
+
     svg {
       margin-right: 14.31px;
     }
   }
+
   button {
     height: 28px;
     color: #9B51E0;
+
     .q-btn__wrapper {
       padding: 0 10px !important;
     }
@@ -4465,13 +4519,14 @@ i.option-separator {
 .basic-selector {
   @include border-radius('8px')
 }
-.q-tooltip{
+
+.q-tooltip {
   background-color: $grey-light11;
   color: $grey-100;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
 }
 
-.contact-save-bar-wrapper{
+.contact-save-bar-wrapper {
   position: fixed;
   width: 100%;
   background: $grey-40;
@@ -4489,7 +4544,7 @@ i.option-separator {
   }
 }
 
-.q-item--active{
+.q-item--active {
   background: $primary !important;
   color: $white !important;
 }
@@ -4591,6 +4646,7 @@ i.option-separator {
     line-height: 30px;
     cursor: pointer;
     transition: background-color 100ms ease-in-out;
+
     &:hover {
       background-color: $light-green2;
     }
@@ -4611,7 +4667,7 @@ i.option-separator {
     overflow: auto;
   }
 
-  .filter-contents.step-2{
+  .filter-contents.step-2 {
     overflow: hidden !important;
 
     .filter-list {
@@ -4625,31 +4681,39 @@ i.option-separator {
     font-weight: bold;
     letter-spacing: 0.5px;
   }
+
   .add-filters {
     font-size: 13px;
+
     .add-icon {
       font-size: 16px;
     }
   }
+
   .step-1,
   .step-3,
   .conjunction-button {
     font-size: 12px;
   }
+
   .step-3 {
     .filter-label {
       font-weight: 600;
     }
+
     .filter-operation {
       border-radius: 0.25rem;
     }
   }
+
   .filter-name {
     color: #0090AF;
     font-weight: bold
   }
+
   .filter-item {
     position: relative;
+
     .delete-filter {
       margin-top: 1rem;
       position: absolute;
@@ -4658,10 +4722,12 @@ i.option-separator {
       z-index: 2;
     }
   }
+
   .delete-group-filter {
     color: #0090AF;
     font-weight: bold;
   }
+
   .group-conjunction {
     line-height: 2.1em;
   }
@@ -4689,6 +4755,7 @@ i.option-separator {
 
     .row {
       color: darken(grey, 5%) !important;
+
       span {
         font-size: 32px;
       }
@@ -4784,12 +4851,14 @@ i.option-separator {
     }
   }
 }
+
 .sublists {
   &.is-root {
     .folder__indent {
       display: none;
     }
   }
+
   > .layer-indent-1 {
     > .folder {
       // padding-right: 0px !important;
@@ -4798,6 +4867,7 @@ i.option-separator {
       }
     }
   }
+
   > .layer-indent-2 {
     > .folder {
       > .folder-item {
@@ -4805,6 +4875,7 @@ i.option-separator {
       }
     }
   }
+
   > .layer-indent-3 {
     > .folder {
       > .folder-item {
@@ -4895,9 +4966,11 @@ i.option-separator {
   @include screen('lg') {
     max-height: 100%;
   }
+
   .ghost {
     border: dashed 1px $green !important;
   }
+
   .category-name {
     font-size: 10px;
     letter-spacing: 0.5px;
@@ -4906,9 +4979,11 @@ i.option-separator {
     margin-top: 15px;
     font-weight: bold;
   }
+
   &__checkboxes {
     overflow: auto;
   }
+
   &__remove {
     width: 10px;
     display: inline-flex;
@@ -4916,50 +4991,63 @@ i.option-separator {
     align-items: center;
     line-height: 10px;
   }
+
   &__selected {
     font-size: 14px;
   }
+
   .handle:hover {
     background-color: $light-green2;
   }
+
   .handle {
     cursor: move;
   }
+
   &__item {
     height: 35px;
+
     &--hidden {
       height: 0;
       visibility: hidden;
       overflow: hidden;
     }
+
     i {
       color: $grey-2;
       font-size: 10px;
     }
   }
+
   &__label {
     font-size: 14px;
   }
+
   .modal-title {
     color: $white;
   }
+
   .modal-header {
     background-color: $dark;
     border-radius: 0;
     padding: 15px;
+
     .close {
       color: $white;
     }
   }
+
   .modal-content {
     border-radius: 0;
     border: none;
   }
+
   .modal-footer {
     .custom-btn {
       min-width: 120px;
     }
   }
+
   .draggable-columns {
     height: calc(100% - 24px) !important;
   }
@@ -4979,6 +5067,7 @@ i.option-separator {
 .btn-outlined-light {
   border-color: $grey-light11;
   color: $black;
+
   &.with-border {
     background-color: #EFF6FE;
   }
@@ -4995,31 +5084,38 @@ i.option-separator {
   padding-right: 10px;
   height: 34px;
   cursor: pointer;
+
   &:hover {
     background-color: white;
   }
+
   &__arrow {
     margin-top: -5px;
     margin-right: 5px;
   }
+
   &__icon {
     margin-top: -5px;
     margin-right: 5px;
   }
+
   &__name {
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   &__indent {
     width: 10px;
   }
+
   &__input {
     height: 100%;
     width: 100%;
     border: none;
     border-radius: 0;
+
     &:focus {
       outline-color: $green;
       -moz-outline-radius: 0;
@@ -5032,12 +5128,14 @@ i.option-separator {
   display: flex;
   align-items: center;
   border-bottom: solid 1px $grey-light3;
+
   &__label {
     padding-left: 20px;
     font-weight: 600;
     font-size: 16px;
     display: flex;
     min-width: 0;
+
     .contact-name {
       flex: 1;
       overflow: hidden;
@@ -5053,19 +5151,23 @@ i.option-separator {
     font-size: 16px;
     font-weight: bold;
   }
+
   .modal-header {
     background-color: $white;
     border-radius: 0;
     padding: 15px;
+
     .close {
       color: $dark;
     }
   }
+
   .modal-content {
     border-radius: 0;
     border: none;
     font-size: 14px;
   }
+
   .modal-footer {
     .action-btn {
       min-width: 120px;
@@ -5079,19 +5181,23 @@ i.option-separator {
   padding-left: 17px;
   padding-right: 8px;
   transition: background-color 100ms ease-in-out;
+
   &__title {
     line-height: 12px;
     font-size: 12px;
     font-weight: 400;
   }
+
   &__icon {
     margin-top: -2px;
   }
+
   &__title,
   &__icon,
   &__suffix * {
     height: 40px;
   }
+
   &:hover {
     background-color: $grey-60;
   }
@@ -5107,6 +5213,7 @@ i.option-separator {
   .form-title {
     font-size: 11px;
   }
+
   .sms-reminder-template-variables {
     cursor: pointer;
   }
@@ -5127,9 +5234,11 @@ i.option-separator {
 
 .contact-menu {
   width: 200px;
+
   &__title {
     padding-left: 2px;
     padding-right: 2px;
+
     &__inner {
       height: 34px;
       font-weight: bold;
@@ -5177,6 +5286,7 @@ i.option-separator {
     padding-right: 5px;
     cursor: pointer;
     transition: background-color 100ms ease-in-out;
+
     &:hover {
       background-color: $light-green2;
     }
@@ -5195,14 +5305,17 @@ i.option-separator {
     font-size: 16px;
     color: $white;
   }
+
   .modal-header {
     background-color: $dark;
     border-radius: 0;
     padding: 15px;
+
     .close {
       color: $white;
     }
   }
+
   .modal-dialog {
     margin: 0;
     height: 100vh;
@@ -5227,11 +5340,13 @@ i.option-separator {
       max-width: 324px;
     }
   }
+
   .filter-contents {
     width: 100%;
     height: calc(100vh - 61px);
     overflow: auto;
   }
+
   .modal-footer {
     .custom-btn {
       min-width: 120px;
@@ -5254,6 +5369,7 @@ button#bs-folder-options {
   flex-direction: column;
   flex-grow: 1;
   padding-bottom: 5px;
+
   &.border-top {
     .folders__header {
       padding-top: 16px;
@@ -5264,6 +5380,7 @@ button#bs-folder-options {
       }
     }
   }
+
   &__header {
     font-size: $f-size-body-sm;
     line-height: 16px;
@@ -5271,26 +5388,32 @@ button#bs-folder-options {
     font-weight: 600;
     text-transform: uppercase;
     padding-bottom: 10px;
+
     &__title {
       color: $grey-90;
     }
   }
+
   &__content {
     overflow: auto;
+
     &:not(.no-folder) {
       max-height: calc(100% - 163px);
     }
+
     &.no-folder {
       padding-left: 18px;
       height: 34px;
     }
   }
+
   .item {
     cursor: pointer;
     font-size: 13px;
     line-height: 34px;
     transition: background-color 100ms ease-in-out;
   }
+
   .item:hover {
     background: $light-blue3;
   }
@@ -5309,12 +5432,14 @@ button#bs-folder-options {
   &__custom {
     padding: 4px !important;
     width: 260px;
+
     .popover-body {
       .contact-menu {
         width: 100%;
       }
     }
   }
+
   .popover-body {
     padding: 0;
   }
@@ -5326,26 +5451,32 @@ button#bs-folder-options {
       max-width: 650px;
     }
   }
+
   .modal-body {
     padding: 0;
   }
+
   &__body {
     padding: 40px;
   }
+
   &__title {
     font-size: 18px;
     font-weight: 400;
     color: $black;
   }
+
   &__close {
     margin-right: -15px;
     margin-top: -30px;
   }
+
   &__list-title {
     font-size: 14px;
     font-weight: 600;
     color: $black;
   }
+
   &__list-desc {
     font-size: 13px;
     color: $grey-light5;
@@ -5358,26 +5489,32 @@ button#bs-folder-options {
       max-width: 650px;
     }
   }
+
   .modal-body {
     padding: 0;
   }
+
   &__body {
     padding: 40px;
   }
+
   &__title {
     font-size: 18px;
     font-weight: 400;
     color: $black;
   }
+
   &__close {
     margin-right: -15px;
     margin-top: -30px;
   }
+
   &__list-title {
     font-size: 14px;
     font-weight: 600;
     color: $black;
   }
+
   &__list-desc {
     font-size: 13px;
     color: $grey-light5;
@@ -5387,6 +5524,7 @@ button#bs-folder-options {
 .table-header {
   min-height: 58px;
 }
+
 .datatable-wrapper {
   height: calc(100vh - 160px);
 }
@@ -5411,17 +5549,22 @@ button#bs-folder-options {
   overflow-x: auto;
   max-height: calc(100vh - 172px);
   height: 100vh !important;
+
   &:not(.mobile-scrollableArea) {
     max-height: calc(100vh - 172px);
   }
+
   &.mobile-scrollableArea {
     max-height: calc(100vh - 242px);
   }
+
   &.scroll-type-1 {
     max-height: calc(100vh - 217px);
+
     &:not(.mobile-scrollableArea) {
       max-height: calc(100vh - 217px);
     }
+
     &.mobile-scrollableArea {
       max-height: calc(100vh - 310);
     }
@@ -5431,11 +5574,13 @@ button#bs-folder-options {
 .paginated {
   .scrollableArea {
     max-height: calc(100vh - 229px);
+
     &.pd-datatable {
       max-height: calc(100vh - 270px) !important;
       min-height: calc(100vh - 270px) !important;
     }
   }
+
   .table-pagination {
     .q-btn__wrapper {
       min-height: 35px !important;
@@ -5484,6 +5629,7 @@ div.tableResizer {
   z-index: 10;
   background-color: transparent;
   border-right: 2px solid rgba(37, 110, 255, 0);
+
   &.resizing {
     background-color: rgba(37, 110, 255, 0.7);
   }
@@ -5543,6 +5689,7 @@ table.datatable {
         text-align: center;
         cursor: pointer;
         padding: 0;
+
         input[type='checkbox'] {
           padding: 0;
           display: block;
@@ -5600,6 +5747,7 @@ table.datatable {
 
         &:not(.checkbox):hover {
           background-color: $grey-60;
+
           &.hovering {
             background-color: #e9f0ff;
           }
@@ -5623,6 +5771,7 @@ table.datatable {
                 position: relative;
                 top: 0;
               }
+
               &:after {
                 //opacity: 0 !important;
               }
@@ -5632,6 +5781,7 @@ table.datatable {
               &:before {
                 //opacity: 0 !important;
               }
+
               &:after {
                 opacity: 1 !important;
                 position: relative;
@@ -5646,11 +5796,13 @@ table.datatable {
           .tableResizer {
             border-right: 2px solid $grey-80;
           }
+
           // border-left: 1px $grey-light3 solid;
           // border-right: 1px $grey-light3 solid;
           > .move-icon-drag-container {
             opacity: 1;
           }
+
           a.sorter:before,
           a.sorter:after {
             opacity: 1;
@@ -5668,6 +5820,7 @@ table.datatable {
                   position: relative;
                   top: 0px;
                 }
+
                 &:after {
                   opacity: 1 !important;
                 }
@@ -5677,6 +5830,7 @@ table.datatable {
                 &:before {
                   opacity: 1 !important;
                 }
+
                 &:after {
                   opacity: 1 !important;
                   position: relative;
@@ -5740,15 +5894,18 @@ table.datatable {
       &:hover {
         background-color: $grey-light8;
       }
+
       &:hover td {
         background-color: $light-green2;
       }
+
       td.checkbox {
         min-width: 40px;
         max-width: 40px;
         vertical-align: middle;
         text-align: center;
         cursor: pointer;
+
         input[type='checkbox'] {
           padding: 0;
           display: block;
@@ -5756,6 +5913,7 @@ table.datatable {
           margin: auto;
         }
       }
+
       td:not(.datatable-row__checkbox) {
         background-color: $white;
         padding: 8px;
@@ -5767,6 +5925,7 @@ table.datatable {
         text-overflow: ellipsis;
         max-width: 0;
         min-width: 0;
+
         &:read-write:focus {
           outline: 1px solid $light-green3;
           background: white;
@@ -5777,6 +5936,7 @@ table.datatable {
           line-height: 1;
         }
       }
+
       td.datatable-row__checkbox {
         background-color: $white;
         border-bottom: solid 1px $grey-60;
@@ -5788,11 +5948,13 @@ table.datatable {
         max-width: 0;
         min-width: 0;
         padding-right: 20px;
+
         &:read-write:focus {
           outline: 1px solid $light-green3;
           background: white;
         }
       }
+
       &:last-child td {
         border-bottom: none;
       }
@@ -5817,9 +5979,11 @@ table.datatable {
   flex-direction: column;
   position: absolute;
 }
+
 .folder-submenu-items {
   width: 200px;
   box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+
   &.extended {
     width: 300px;
   }
@@ -5833,15 +5997,18 @@ table.datatable {
   .modal-content {
     border-radius: 0;
   }
+
   .modal-body {
     padding: 0;
   }
+
   .modal-header {
     color: $white;
     background-color: $dark;
     border-bottom-color: $dark;
     border-radius: 0;
     padding: 15px;
+
     .close {
       color: $white;
     }
@@ -5852,6 +6019,7 @@ table.datatable {
   width: 100px;
   background-color: transparent;
   border-color: $green;
+
   &:hover {
     background-color: darken($green, 5%);
   }
@@ -5860,6 +6028,7 @@ table.datatable {
 .btn-next {
   width: 100px;
   background-color: $green;
+
   &:hover {
     background-color: darken($green, 5%);
   }
@@ -5877,10 +6046,12 @@ table.datatable {
   font-size: 13px;
   padding: 15px;
   width: 100%;
+
   &--success {
     border: solid 1px $green;
     background-color: $light-green2;
   }
+
   &--dark {
     border: solid 1px $dark;
     background-color: lighten($dark, 80%);
@@ -5891,6 +6062,7 @@ table.datatable {
   max-height: 300px;
   max-width: calc(100% - 1px);
   overflow: auto;
+
   table {
     border-collapse: separate;
     border-spacing: 0;
@@ -5927,6 +6099,7 @@ table.datatable {
     .col-indented {
       padding-left: 19px;
     }
+
     &.col-indented-2 {
       padding-left: 28px !important;
     }
@@ -6019,6 +6192,7 @@ table.datatable {
 
   .btn-upload {
     background-color: $green;
+
     &:hover {
       background-color: darken($green, 5%);
     }
@@ -6049,6 +6223,7 @@ table.datatable {
         color: $white !important;
         border-color: $white !important;
       }
+
       &__title {
         color: $white !important;
       }
@@ -6063,6 +6238,7 @@ table.datatable {
         color: $black;
         border-color: $green;
       }
+
       &__title {
         color: $black;
       }
@@ -6123,6 +6299,7 @@ table.datatable {
     border-right: none;
   }
 }
+
 .list-actions {
   .folder {
     padding-left: 10px;
@@ -6167,12 +6344,12 @@ table.datatable {
   }
 }
 
-.templates-list-wrapper{
+.templates-list-wrapper {
   max-height: 250px;
   overflow: auto;
   padding-right: 5px;
 
-  .list-group-title{
+  .list-group-title {
     color: $grey-90;
     font-size: 13px;
     font-weight: 600;
@@ -6242,9 +6419,11 @@ table.datatable {
   display: none;
   flex-direction: column;
   z-index: 100;
+
   &.move-dialog__create {
     width: 280px !important;
   }
+
   &-close {
     margin-right: -5px;
     padding: 5px 5px 5px 5px;
@@ -6252,11 +6431,13 @@ table.datatable {
     align-items: center;
     color: $grey-mid;
     text-decoration: none;
+
     &:hover,
     &:active {
       text-decoration: none;
     }
   }
+
   &-title {
     display: flex;
     align-items: center;
@@ -6267,6 +6448,7 @@ table.datatable {
     font-size: 12px;
     min-height: 35px;
   }
+
   &-footer {
     display: flex;
     align-items: center;
@@ -6277,6 +6459,7 @@ table.datatable {
     min-height: 35px;
     box-shadow: 0px -1px 3px 0px rgb(187, 186, 186, .5);
   }
+
   &-input {
     display: flex;
     align-items: center;
@@ -6291,6 +6474,7 @@ table.datatable {
       height: 30px;
     }
   }
+
   &-lists {
     display: flex;
     flex-direction: column;
@@ -6300,6 +6484,7 @@ table.datatable {
     padding-left: 10px;
     padding-right: 10px;
   }
+
   &__create {
     left: 334px;
     top: 178px;
@@ -6312,18 +6497,22 @@ table.datatable {
   cursor: pointer;
   user-select: none;
   transition: background-color 100ms ease-in-out;
+
   &__arrow {
     min-height: 34px;
     margin-top: -5px;
     margin-right: 5px;
+
     svg {
       margin-top: 5px;
     }
   }
+
   &__icon {
     min-height: 34px;
     margin-right: 5px;
   }
+
   &--target {
     background-color: rgba(37, 110, 255, 0.09);
 
@@ -6332,12 +6521,14 @@ table.datatable {
       opacity: 1 !important;
     }
   }
+
   &:hover {
     .folder__option {
       display: block;
       border: 0 !important;
     }
   }
+
   &__name {
     font-size: 13px;
     overflow: hidden;
@@ -6345,12 +6536,15 @@ table.datatable {
     white-space: nowrap;
     width: 100%;
   }
+
   &__sub {
     padding-left: 10px;
   }
+
   &__indent {
     width: 10px;
   }
+
   &__option {
     line-height: 0;
     width: 20px;
@@ -6359,25 +6553,30 @@ table.datatable {
     justify-content: center;
     height: 34px;
     margin-left: 5px;
+
     &:hover,
     &:active,
     &:focus {
       text-decoration: none !important;
     }
+
     i {
       color: $grey-light4;
+
       &.fa.fa-circle,
       &.fa.fa-check-circle {
         font-size: 16px;
       }
     }
   }
+
   &__input {
     font-size: 12px;
     height: 100%;
     width: 100%;
     border: none;
     border-radius: 0;
+
     &:focus {
       outline-color: $green;
       -moz-outline-radius: 0;
@@ -6391,29 +6590,35 @@ table.datatable {
       max-width: 550px;
     }
   }
+
   .modal-body {
     padding: 0;
     min-height: 90vh;
     max-height: 90vh;
     overflow: hidden !important;
   }
+
   &__body {
     padding: 40px;
   }
+
   &__title {
     font-size: 18px;
     font-weight: 400;
     color: $black;
   }
+
   &__close {
     margin-right: -15px;
     margin-top: -30px;
   }
+
   &__list-title {
     font-size: 14px;
     font-weight: 600;
     color: $black;
   }
+
   &__list-desc {
     font-size: 13px;
     color: $grey-light5;
@@ -6510,22 +6715,27 @@ table.datatable {
     cursor: pointer;
     user-select: none;
     transition: background-color 100ms ease-in-out;
+
     &__arrow {
       margin-top: -5px;
       margin-right: 5px;
     }
+
     &__icon {
       margin-top: -5px;
       margin-right: 5px;
     }
+
     &:hover,
     &--moving,
     &--active {
       background-color: $light-blue3;
     }
+
     &__name {
       display: flex;
       align-items: center;
+
       span {
         display: inline-block;
         font-size: 13px;
@@ -6535,22 +6745,27 @@ table.datatable {
         width: 100%;
       }
     }
+
     &__sub {
       padding-left: 10px;
     }
+
     &__indent {
       width: 10px;
     }
+
     &__option {
       margin-top: -5px;
       margin-left: -5px;
     }
+
     &__input {
       font-size: 12px;
       height: 100%;
       width: 100%;
       border: none;
       border-radius: 0;
+
       &:focus {
         outline-color: $green;
         -moz-outline-radius: 0;
@@ -6570,12 +6785,15 @@ table.datatable {
     min-width: 6px;
     margin-top: -5px;
     margin-right: 5px;
+
     svg {
       margin-top: 5px;
     }
+
     &.pd-arrow {
       margin-top: 0 !important;
     }
+
     &.pd-arrow-create {
       top: 8px !important;
       position: relative;
@@ -6585,9 +6803,11 @@ table.datatable {
   &__icon {
     min-height: 34px;
     margin-right: 5px;
+
     svg {
       margin-top: 0px;
     }
+
     &.pd-icon-create {
       top: 8px !important;
       position: relative;
@@ -6618,6 +6838,7 @@ table.datatable {
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
+
     &.pd-name-create {
       top: 2px !important;
       position: relative;
@@ -6659,6 +6880,7 @@ table.datatable {
   & > .animated > .sublists > .folder {
     padding-left: 7px;
   }
+
   & > .folder,
   & > .sublists > .folder,
   & > .animated > .sublists > .folder,
@@ -6667,6 +6889,7 @@ table.datatable {
       background-color: $light-blue3 !important;
     }
   }
+
   .folder {
     min-height: 34px;
     cursor: pointer;
@@ -6697,6 +6920,7 @@ table.datatable {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+
       &__name {
         font-size: $f-size-h5;
         line-height: 17px;
@@ -6801,6 +7025,7 @@ table.datatable {
       }
     }
   }
+
   .count-label {
     font-size: 13px;
     line-height: 16px;
@@ -6808,9 +7033,11 @@ table.datatable {
     letter-spacing: 8px;
     color: $grey-30;
   }
+
   .open-count {
     color: $grey-20;
   }
+
   .pending-count {
     font-weight: 500;
   }
@@ -6878,6 +7105,7 @@ table.datatable {
       }
     }
   }
+
   .count-label {
     font-size: 13px;
     line-height: 16px;
@@ -6885,9 +7113,11 @@ table.datatable {
     letter-spacing: 8px;
     color: $grey-30;
   }
+
   .open-count {
     color: $grey-20;
   }
+
   .pending-count {
     font-weight: 500;
   }
@@ -6908,6 +7138,7 @@ table.datatable {
     font-weight: 600;
     text-transform: uppercase;
     padding-bottom: 10px;
+
     &__title {
       color: $grey-90;
     }
@@ -6918,6 +7149,7 @@ table.datatable {
     //overflow: auto;
     .counts {
       padding-right: 17px;
+
       .badge-pill {
         padding-right: 6px;
         padding-left: 6px;
@@ -6937,11 +7169,13 @@ table.datatable {
     text-overflow: ellipsis;
     transition: background-color 100ms ease-in-out;
     white-space: nowrap;
+
     .icon {
       svg {
         margin-top: 1px;
       }
     }
+
     .counts {
       .badge {
         font-weight: 500;
@@ -6949,17 +7183,20 @@ table.datatable {
         line-height: 11px;
       }
     }
+
     .icon,
     .item-name,
     .counts {
       min-height: 34px;
     }
+
     .item-name {
       font-size: $f-size-body-sm;
       line-height: 17px;
       color: $grey-100;
       overflow: hidden;
       text-overflow: ellipsis;
+
       span {
         white-space: nowrap;
         overflow: hidden;
@@ -7017,10 +7254,6 @@ table.datatable {
     color: $black;
   }
 
-  @include screen('lg') {
-    overflow: auto;
-  }
-
   &:hover {
     text-decoration: none;
   }
@@ -7031,7 +7264,7 @@ table.datatable {
     width: 100%;
     justify-content: center;
     padding-left: 5px;
-    padding-right: 5px;
+    padding-right: 0px;
   }
 
   &__icon,
@@ -7166,6 +7399,7 @@ table.datatable {
     :before {
       border: 0;
     }
+
     :after {
       display: none;
     }
@@ -7277,6 +7511,7 @@ table.datatable {
 
     .filter-items:hover {
       background: $grey-50;
+
       button {
         display: block;
       }
@@ -7440,12 +7675,15 @@ button.grey-90 {
 .bordered-right {
   border-right: 1px solid $grey-60;
 }
+
 .bordered-left {
   border-left: 1px solid $grey-60;
 }
+
 .bordered-top {
   border-top: 1px solid $grey-60;
 }
+
 .bordered-bottom {
   border-bottom: 1px solid $grey-60;
 }
@@ -7465,17 +7703,20 @@ button.grey-90 {
     margin-top: 2px !important;
   }
 
-  .menu-actions a{
+  .menu-actions a {
     text-decoration: none;
     font-weight: 500;
+
     .fa {
       color: #6F6F6F;
     }
+
     svg {
       margin-top: -5px;
     }
   }
-  .menu-actions{
+
+  .menu-actions {
     font-size: 0.75rem;
 
     .items {
@@ -7491,9 +7732,9 @@ button.grey-90 {
 }
 
 .btn-grey-80 {
-    color: $white;
-    background-color: $grey-80;
-    border-color: $grey-80;
+  color: $white;
+  background-color: $grey-80;
+  border-color: $grey-80;
 }
 
 #create-contact-modal {
@@ -7508,26 +7749,31 @@ button.grey-90 {
   &.bg-green-10 {
     border: 1px solid $green-90;
   }
+
   &.bg-red-10 {
     border: 1px solid $red-90;
   }
+
   .close-button {
     .q-btn__wrapper {
       min-height: auto !important;
       padding: 0;
     }
+
     .q-btn__content {
       display: flex;
       align-items: center;
       padding-top: 1px;
     }
   }
+
   .close-button {
     height: 17px;
     width: 23px;
     display: flex;
     align-items: center;
   }
+
   .q-notification__message,
   .close-button .q-btn__content .q-icon {
     @include font-size($f-size-h5, normal, true);
@@ -7550,16 +7796,20 @@ button.grey-90 {
 
 .b-toast {
   max-width: 300px !important;
+
   .action-notification {
     width: 300px !important;
+
     &.has-clear-queues {
       margin-top: 30px !important;
     }
+
     &.incoming-call-notification {
       .toast-header {
         display: none;
       }
     }
+
     .toast-header {
       .close {
         position: absolute;
@@ -7581,12 +7831,15 @@ button.grey-90 {
         top: -5px;
       }
     }
+
     .toast-body {
       text-decoration: none;
       padding: 0 0 !important;
+
       > div {
         padding: 12px 12px 15px 12px;
       }
+
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 18px;
@@ -7595,24 +7848,29 @@ button.grey-90 {
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .time {
         @include font-size($f-size-h5, normal, true);
         line-height: 16px;
         padding-top: 1px;
       }
+
       .notification-icon {
         padding-top: 2px;
       }
+
       .message-body {
         @include font-size($f-size-body-xs, normal);
         line-height: 15px;
         padding-top: 1.39px;
+
         .message-text {
           display: -webkit-box;
           -webkit-line-clamp: 4;
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
+
           .mention-tag {
             color: $grey-81 !important;
             background: unset;
@@ -7620,6 +7878,7 @@ button.grey-90 {
             font-weight: 600;
           }
         }
+
         .attachment {
           border-radius: 5px;
           max-width: 32px;
@@ -7780,6 +8039,7 @@ span.mention {
     br {
       display: none !important;
     }
+
     .mention,
     .mention-tag {
       background: none;
@@ -8034,7 +8294,8 @@ span.mention {
       padding: 0.5rem !important;
     }
   }
-  .highlighted{
+
+  .highlighted {
     background: #FFFBD4;
     border-radius: 6px;
   }
@@ -8087,22 +8348,22 @@ span.mention {
   }
 }
 
-.recording{
+.recording {
   animation-name: pulse;
   animation-duration: 1.5s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
 
-@keyframes pulse{
-  0%{
-    box-shadow: 0 0 5px 0 rgba(173,0,0,.3);
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px 0 rgba(173, 0, 0, .3);
   }
-  65%{
-    box-shadow: 0 0 5px 13px rgba(173,0,0,.3);
+  65% {
+    box-shadow: 0 0 5px 13px rgba(173, 0, 0, .3);
   }
-  90%{
-    box-shadow: 0 0 5px 13px rgba(173,0,0,0);
+  90% {
+    box-shadow: 0 0 5px 13px rgba(173, 0, 0, 0);
   }
 }
 
@@ -8124,7 +8385,7 @@ span.mention {
 
 .business-hours-container {
 
-  font-family: 'Inter' , sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 
   div.hours {
 
@@ -8163,13 +8424,13 @@ span.mention {
 }
 
 
-.fixed-header{
+.fixed-header {
   table-layout: fixed;
   border-collapse: collapse;
 }
 
-.fixed-header tbody{
-  display:block;
+.fixed-header tbody {
+  display: block;
   width: 100%;
   overflow: auto;
   height: 100px;
@@ -8190,6 +8451,7 @@ span.mention {
       padding-left: 0 !important;
     }
   }
+
   .b-calendar-inner {
     min-width: 215px !important;
     width: 215px !important;
@@ -8296,7 +8558,7 @@ span.mention {
     padding: 0;
 
     .q-item {
-      padding: 0 17px 0  16px !important;
+      padding: 0 17px 0 16px !important;
       font-size: $f-size-body !important;
       height: 33px !important;
 
@@ -8314,6 +8576,7 @@ span.mention {
     .q-item:not(:first-child) {
       margin-top: 8px;
     }
+
     .q-item:nth-child(6) {
       margin-top: 0 !important;
     }
@@ -8404,12 +8667,14 @@ span.mention {
 .contacts {
   &__title {
     height: 19px;
+
     .list-name {
       font-weight: 500;
       font-size: 16px;
       line-height: 19px;
     }
   }
+
   .title-breadcrumb {
     font-family: Roboto;
     font-weight: normal;
@@ -8417,16 +8682,19 @@ span.mention {
     line-height: 14px;
     color: $grey-90;
   }
+
   .title-breadcrumb {
     height: 19px;
     margin-right: 5px;
   }
+
   .title-path:not(:last-child) {
     .title-slash {
       height: 19px;
       margin-right: 5px;
     }
   }
+
   .title-path:last-child {
     .title-slash {
       height: 19px;
@@ -8463,9 +8731,11 @@ span.mention {
       }
     }
   }
+
   &-header-separator {
     margin: 0 15px;
   }
+
   .sessions-main-page {
     &.minimized {
       width: 100vw;
@@ -8541,16 +8811,19 @@ span.mention {
 .contact-details-container {
   max-width: 250px;
   width: 100%;
+
   &-drawer {
     aside {
       border-radius: 0.25rem;
       background: $grey-50;
       padding: 15px 0px 15px 15px;
       box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
+
       .details-component-container {
         padding-right: 15px;
       }
     }
+
     &__close {
       border-radius: 50%;
       background: $grey-90;
@@ -8561,10 +8834,12 @@ span.mention {
       padding: 0 0;
       width: 24px;
     }
+
     .contact-details-wrapper .details-component-container {
       height: calc(100vh - 83px);
     }
   }
+
   .mobile-header {
     margin-left: -15px;
     margin-top: -15px;
@@ -8582,6 +8857,7 @@ span.mention {
   &__mobile {
     display: none;
   }
+
   &__drawer_btn,
   &__mobile_btn {
     border-radius: 50%;
@@ -8590,19 +8866,23 @@ span.mention {
     min-height: 24px;
     display: flex;
     align-items: center;
+
     .q-btn__wrapper {
       padding: 0 0 !important;
     }
+
     .q-btn__wrapper,
     .q-btn__content {
       height: 30px;
       min-height: 30px;
     }
   }
+
   &-dropdown {
     width: 20px;
     height: 20px;
     margin-right: 5px !important;
+
     button {
       width: 100%;
       height: 100%;
@@ -8651,9 +8931,11 @@ span.mention {
   min-height: 27px;
   align-items: center;
   margin-right: 5px;
+
   .q-btn__wrapper {
     padding: 0 0 !important;
   }
+
   .q-btn__wrapper,
   .q-btn__content {
     height: 27px;
@@ -8668,7 +8950,7 @@ span.mention {
 
 .stats-container {
   height: 100vh;
-  max-width: 100wh;
+  max-width: 100 wh;
 }
 
 .settings {
@@ -8698,20 +8980,25 @@ screen and (max-width: 956px) {
       .contact-activity-container {
         .composer-footer {
           flex-direction: column;
+
           .inline-select.q-select--with-input {
             min-width: unset;
           }
+
           & > div {
             width: auto !important;
             height: 24px;
+
             > div {
               float: none !important;
+
               .q-field__append {
                 align-items: center;
                 height: 29px !important;
               }
             }
           }
+
           .q-field__control {
             flex-direction: column;
           }
@@ -8726,20 +9013,25 @@ screen and (max-width: 956px) {
     .contact-activity-container {
       .composer-footer {
         flex-direction: column;
+
         .inline-select.q-select--with-input {
           min-width: unset;
         }
+
         & > div {
           width: auto !important;
           height: 24px;
+
           > div {
             float: none !important;
+
             .q-field__append {
               align-items: center;
               height: 29px !important;
             }
           }
         }
+
         .q-field__control {
           flex-direction: column;
         }
@@ -8752,20 +9044,25 @@ screen and (max-width: 956px) {
   .contact-activity-container {
     .composer-footer {
       flex-direction: column;
+
       .inline-select.q-select--with-input {
         min-width: unset;
       }
+
       & > div {
         width: auto !important;
         height: 24px;
+
         > div {
           float: none !important;
+
           .q-field__append {
             align-items: center;
             height: 29px !important;
           }
         }
       }
+
       .q-field__control {
         flex-direction: column;
       }
@@ -8798,17 +9095,22 @@ screen and (max-width: 956px) {
   .inbox-side {
     &__left {
       max-width: 160px;
+
       .count-label {
         margin-left: 10px;
       }
     }
+
     .inbox-nav-list {
       > div:not(:first-child) {
         .inbox-nav-item__label {
-          margin-right: 41px;
           min-width: 73.88px;
         }
       }
+    }
+
+    .inbox-nav-item__icon {
+      display: none;
     }
   }
 }
@@ -8818,6 +9120,12 @@ screen and (max-width: 956px) {
     position: fixed;
     right: 0;
     z-index: 999;
+  }
+
+  .inbox-side {
+    .inbox-nav-item__icon {
+      display: block;
+    }
   }
 }
 
@@ -8867,8 +9175,10 @@ screen and (max-width: 956px) {
         }
       }
     }
+
     &.inbox-side-mobile-full-width {
       max-width: unset;
+
       .inbox-side {
         max-width: unset;
       }
@@ -8895,15 +9205,18 @@ screen and (max-width: 956px) {
       .table-header > div {
         padding: 0 16px !important;
       }
+
       .table-header {
         > div {
           > .row {
             justify-content: space-between;
+
             > div {
               width: auto !important;
               flex: unset;
               max-width: unset;
             }
+
             > div:first-child {
               > div:nth-child(2) {
                 display: none !important;
@@ -8925,13 +9238,16 @@ screen and (max-width: 956px) {
     &.contact-activity--closed {
       .contact-activities-actions {
         margin-right: 22.81px;
+
         &__mobile {
           display: flex;
           align-items: center;
         }
+
         &__desktop {
           display: none;
         }
+
         &-dropdown {
           button {
             display: flex;
@@ -9009,28 +9325,35 @@ screen and (max-width: 956px) {
       .table-header > div {
         padding: 0 16px !important;
       }
+
       .table-header {
         > div {
           > .row {
             flex-flow: column-reverse;
+
             > div {
               justify-content: space-between;
               width: 100%;
               padding: 0 0 !important;
+
               .contacts-options-dropdown {
                 margin-right: 0 !important;
               }
             }
+
             > div:first-child {
               .width-250 {
                 width: 100%;
               }
             }
+
             > div:nth-child(2) {
               justify-content: flex-end;
+
               > div:first-child {
                 display: none;
               }
+
               > div:nth-child(2) {
                 padding-left: 0 !important;
               }
@@ -9038,10 +9361,12 @@ screen and (max-width: 956px) {
           }
         }
       }
+
       .contacts-total {
         &.mobile {
           display: block !important;
         }
+
         &.desktop {
           display: none;
         }
@@ -9075,17 +9400,20 @@ screen and (max-width: 956px) {
     &:not(.hide) {
       display: grid !important;
       grid-template-rows: 1fr auto;
+
       &.on-text-tab {
         .mobile-parked-calls-list {
           max-height: calc(100vh - 413px);
         }
       }
+
       &.on-call-tab {
         .mobile-parked-calls-list {
           max-height: calc(100vh - 343px);
         }
       }
     }
+
     &.hide {
       display: none !important;
     }
@@ -9099,6 +9427,7 @@ screen and (max-width: 956px) {
   }*/
   .general-notification {
     margin-left: 5px !important;
+
     &:last-child:not(:only-child),
     &:only-child {
       margin-bottom: 50px !important;
@@ -9107,6 +9436,7 @@ screen and (max-width: 956px) {
   .b-toaster {
     &.b-toaster-bottom-right {
       bottom: 50px !important;
+
       .b-toaster-slot {
         max-width: 300px !important;
       }
@@ -9126,6 +9456,7 @@ screen and (max-width: 956px) {
     .stats-container {
       height: calc(100vh - 153px);
     }
+
     .sidebar-active {
       > .page-header {
         top: 45px !important;
@@ -9136,6 +9467,7 @@ screen and (max-width: 956px) {
     .stats-container {
       height: calc(100vh - 129px);
     }
+
     .sidebar-active {
       > .page-header {
         top: 20px !important;
@@ -9145,11 +9477,13 @@ screen and (max-width: 956px) {
   .stats-container {
     padding-bottom: 0 !important;
     height: calc(100vh - 107px);
+
     .stats-header {
       .q-card__actions {
         padding-bottom: 1rem !important;
       }
     }
+
     .stats-metrics-container {
       padding-bottom: 0 !important;
     }
@@ -9158,15 +9492,18 @@ screen and (max-width: 956px) {
     &.desktop {
       display: none;
     }
+
     &.mobile {
       display: block !important;
     }
   }
   .page-header {
     height: 58px;
+
     &.dialer-header {
       left: 0 !important;
     }
+
     & > div > h1 {
       font-size: 18px;
       font-family: $font-family-body;
@@ -9174,6 +9511,7 @@ screen and (max-width: 956px) {
       display: flex;
       align-items: center;
     }
+
     &.q-toolbar {
       height: 58px;
       padding: 0 15px 0 18.5px !important;
@@ -9198,9 +9536,11 @@ screen and (max-width: 956px) {
   }
   .page-layout {
     padding-bottom: 49px;
+
     .page-container {
       padding-left: 0 !important;
     }
+
     .page-footer,
     .page-footer .dropdown-menu.show {
       z-index: 999;
@@ -9211,6 +9551,7 @@ screen and (max-width: 956px) {
       left: 0 !important;
       display: flex;
       justify-content: flex-start;
+
       .page-header {
         & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
         & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
@@ -9234,10 +9575,12 @@ screen and (max-width: 956px) {
       .main {
         width: calc(100vw - 260px);
       }
+
       .table-header {
         > div {
           > .row {
             flex-flow: column-reverse;
+
             > div {
               justify-content: space-between;
               width: 100%;
@@ -9289,10 +9632,12 @@ screen and (max-width: 956px) {
         > div {
           > .row {
             flex-flow: column-reverse;
+
             > div {
               justify-content: space-between;
               width: 100%;
               padding: 0 0 !important;
+
               .contacts-header-separator {
                 margin: 0 13px;
               }
@@ -9382,6 +9727,7 @@ screen and (max-width: 956px) {
     width: 100%;
     padding-left: 10px;
     border-bottom: 1px solid $grey-60;
+
     span {
       color: $grey-92;
       font-size: 18px;
@@ -9399,61 +9745,77 @@ screen and (max-width: 956px) {
     &__drawer_btn {
       display: none;
     }
+
     &__mobile_btn {
       display: flex !important;
     }
   }
   .inbox {
     overflow-x: hidden;
+
     &-wrapper {
       display: initial;
       flex: initial;
       max-width: unset;
+
       &.mobile-contact-active {
         width: 0 !important;
       }
     }
+
     &-side,
     &-details {
       border-left: unset;
       border-right: unset;
     }
+
     &-side {
       max-width: unset;
       overflow-x: inherit;
+
       &__left {
         max-width: unset;
         min-width: unset;
         z-index: 1;
+
         &.inbox-side__left--closed {
           width: 0 !important;
           height: 0;
         }
       }
+
       &__right {
         width: 0;
         z-index: 2;
+
         .task-list-scroller {
           padding-bottom: 60px;
         }
+
         &.inbox-side__right--opened {
           width: 100% !important;
         }
+
         &:not(.inbox-side__right--opened) {
           display: none !important;
         }
+
         .calls-header__label {
           padding-right: 0 !important;
+
           .channel-filter-actions-wrapper {
             margin-left: 17px !important;
           }
+
           .q-select {
             margin-right: 17px !important;
+
             .q-field__append {
               padding-right: 0;
             }
           }
         }
+
         .task-list .task-item {
           padding-right: 14px !important;
         }
@@ -9473,29 +9835,37 @@ screen and (max-width: 956px) {
     &.page-side-menubar__left {
       max-width: unset;
     }
+
     &-content-wrapper {
       padding-right: 0 !important;
+
       & > .row {
         width: 100%;
+
         .settings-form-wrapper,
         .settings-form-wrapper .container {
           padding-right: 0 !important;
           margin: 0 0 !important;
         }
+
         .settings-form-wrapper {
           margin: 0 0 !important;
           padding: 0 18.5px !important;
+
           .container {
             max-width: unset;
+
             .form-row,
             .form-row > div {
               padding-left: 0 !important;
               padding-right: 0 !important;
             }
+
             .form-row:first-child:not(.general-settings-app-block),
             .row:first-child {
               display: none !important;
             }
+
             .form-row:first-child,
             .row:first-child {
               > div > div > button {
@@ -9506,6 +9876,7 @@ screen and (max-width: 956px) {
                 max-height: 24px !important;
                 margin-right: 0;
               }
+
               h1 {
                 line-height: 1;
                 font-size: 18px;
@@ -9513,22 +9884,26 @@ screen and (max-width: 956px) {
                 align-items: center;
               }
             }
+
             .row.row-no-padding {
               & > div,
               & > div table {
                 padding-left: 0 !important;
                 padding-right: 0 !important;
+
                 th:nth-child(2),
                 th:nth-child(3) {
                   min-width: 170px !important;
                 }
               }
             }
+
             .business-hours-container {
               .flex-row:first-child {
                 min-width: 86px;
               }
             }
+
             #voicemail-drop-library-container {
               table tbody tr td audio {
                 max-width: 250px;
@@ -9538,35 +9913,44 @@ screen and (max-width: 956px) {
         }
       }
     }
+
     &-form-wrapper,
     &-form-wrapper .container {
       padding-left: 0 !important;
     }
+
     &-side {
       max-width: unset;
       overflow-x: inherit;
+
       &__left {
         max-width: unset;
         min-width: unset;
         width: 100%;
         z-index: 1;
+
         &.settings-side__left--closed {
           width: 0 !important;
           height: 0;
         }
+
         .page-side-menubar-list-item {
           background-color: unset !important;
         }
       }
+
       &__right {
         width: 0;
         z-index: 2;
+
         &.settings-side__right--opened {
           width: 100% !important;
         }
+
         &:not(.settings-side__right--opened) {
           display: none !important;
         }
+
         .mobile-back-btn {
           display: flex !important;
         }
@@ -9576,6 +9960,7 @@ screen and (max-width: 956px) {
   .contact-activity-wrapper.contact-activity--closed {
     width: 0 !important;
     height: 0;
+
     * {
       display: none;
     }
@@ -9586,22 +9971,28 @@ screen and (max-width: 956px) {
     width: 100% !important;
     display: block !important;
     max-width: unset !important;
+
     .contact-details-wrapper {
       overflow: unset !important;
     }
+
     .details-component-container {
       padding-bottom: 59px;
+
       > div {
         margin-right: 10px !important;
         width: auto !important;
       }
     }
+
     .mobile-header {
       padding-right: 13px !important;
+
       .profile-menu {
         min-width: 63px;
       }
     }
+
     .menu-avatar-wrapper {
       padding-top: 0 !important;
     }
@@ -9610,15 +10001,18 @@ screen and (max-width: 956px) {
     .calls-header {
       &__label {
         padding-left: 10px;
+
         span {
           display: flex;
           align-items: center;
         }
       }
+
       .profile-menu {
         min-width: 63px;
       }
     }
+
     .contact-activities-actions-dropdown {
       height: 27px;
       width: auto;
@@ -9647,10 +10041,12 @@ screen and (max-width: 956px) {
     &.contact-list-sidebar-open {
       flex: 1 0 100%;
     }
+
     .contact-list-sidebar-wrapper {
       .card {
         width: 100%;
         padding-bottom: 50px;
+
         .list-group {
           padding-right: 0.5rem !important;
         }
@@ -9662,6 +10058,7 @@ screen and (max-width: 956px) {
     .mobile-back-btn .q-btn__content {
       height: 27px
     }
+
     .main {
       .mycard {
         padding-top: 15px !important;
@@ -9686,13 +10083,16 @@ screen and (max-width: 956px) {
       max-width: 399px !important;
       width: 100% !important;
     }
+
     .action-notification {
       margin: 0 auto;
+
       &.in-progress {
         button {
           padding: 0 17px;
         }
       }
+
       .toast-body {
         > .notification-body-wrapper {
           > div {
@@ -9706,6 +10106,7 @@ screen and (max-width: 956px) {
           }
         }
       }
+
       .toast-body {
         > .notification-body-wrapper {
           > div {
@@ -9727,6 +10128,7 @@ screen and (max-width: 956px) {
           }
         }
       }
+
       .message-text {
         &.has-ring-group {
           .campaign-wrapper,
@@ -9734,6 +10136,7 @@ screen and (max-width: 956px) {
             padding: 0 0;
           }
         }
+
         div:nth-child(2) {
           padding: 0 5px;
           max-width: 17px;
@@ -9750,8 +10153,10 @@ screen and (max-width: 956px) {
       max-width: 210px !important;
       width: 100% !important;
     }
+
     .action-notification {
       margin: 0 auto;
+
       .message-text {
         &.has-ring-group {
           .campaign-wrapper,
@@ -9759,6 +10164,7 @@ screen and (max-width: 956px) {
             padding: 0 0;
           }
         }
+
         div:nth-child(2) {
           padding: 0 5px;
           max-width: 17px;
@@ -9785,6 +10191,7 @@ screen and (max-width: 956px) {
       button {
         margin: 0 0 !important;
       }
+
       .q-btn__wrapper {
         padding: 0 0 !important;
       }
@@ -9836,15 +10243,19 @@ screen and (max-width: 956px) {
 
 .border {
   border: 1px solid $grey-60;
+
   &-bottom {
     border-bottom: 1px solid $grey-60 !important;
   }
+
   &-top {
     border-top: 1px solid $grey-60 !important;
   }
+
   &-left {
     border-left: 1px solid $grey-60 !important;
   }
+
   &-right {
     border-right: 1px solid $grey-60 !important;
   }
@@ -9856,11 +10267,13 @@ screen and (max-width: 956px) {
   margin-left: 27px;
   font-size: $f-size-h5;
   font-weight: 500;
+
   &:hover {
     border-color: #000;
     border: 1px solid #000 !important;
     transition: border-color 0.36s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
   svg {
     margin-right: 5px;
   }
@@ -9870,15 +10283,19 @@ screen and (max-width: 956px) {
   border-radius: 8px;
   padding: 6px 6px;
   box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+
   .arrow {
     display: none;
   }
+
   .contact-menu-item {
     padding: 6px 10px;
     border-radius: 6px;
+
     &__icon {
       margin-right: 10px;
     }
+
     &__title {
       span {
         color: $grey-100;
@@ -9893,6 +10310,7 @@ screen and (max-width: 956px) {
     border-radius: 8px;
     padding: 6px 6px;
     box-shadow: 0px 0px 12px -2px rgba(0, 0, 0, 0.1), 0px 12px 18px -4px rgba(4, 4, 4, 0.1);
+
     li {
       a {
         display: flex;
@@ -9901,15 +10319,19 @@ screen and (max-width: 956px) {
         border-radius: 6px;
         font-size: 13px;
         font-weight: 500;
+
         &:not(.disabled) {
           color: $grey-100;
+
           i {
             color: $grey-90;
           }
         }
+
         i {
           margin-right: 14px;
         }
+
         svg {
           margin-right: 10px;
         }
@@ -9948,13 +10370,16 @@ screen and (max-width: 956px) {
   &:not(.mobile-phone-visible) {
     height: 100%;
   }
+
   &.mobile-phone-visible {
     height: calc(100vh - 50px);
   }
+
   .q-header {
     left: 0 !important;
     display: flex;
     justify-content: flex-start;
+
     .page-header {
       & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
       & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
@@ -9963,37 +10388,47 @@ screen and (max-width: 956px) {
       }
     }
   }
+
   .phone-header-title {
     font-size: 34px;
     font-weight: 600
   }
+
   .phone-header {
     position: fixed;
     z-index: 9;
   }
+
   .dialerForm {
     padding-top: 75px !important;
   }
+
   .q-drawer__backdrop {
     display: none;
   }
+
   aside {
     max-width: 784px !important;
     width: 100% !important;
     height: calc(100% - 51px);
+
     .q-drawer__content {
       & > div {
         width: 100% !important;
+
         &.row {
           display: flex;
           flex-direction: column;
           padding-bottom: 0 !important;
+
           &.dialerForm {
             height: 100%;
           }
+
           &:not(.dialerForm) {
             height: calc(100% - 51px);
           }
+
           &.loading-cover-screen {
             position: absolute;
             top: 0;
@@ -10004,6 +10439,7 @@ screen and (max-width: 956px) {
             justify-content: center;
             background: $blue-80;
             padding-top: 0 !important;
+
             .loading-container {
               display: flex;
               justify-content: center;
@@ -10011,12 +10447,15 @@ screen and (max-width: 956px) {
             }
           }
         }
+
         .dialer-tabs {
           flex-direction: column !important;
           height: 100%;
+
           & > div {
             padding: 0 0 !important;
             border: unset;
+
             ul[role='tablist'] {
               background: $grey-60;
               border: 2px solid $grey-60;
@@ -10024,17 +10463,21 @@ screen and (max-width: 956px) {
               display: flex;
               flex-direction: row !important;
               margin-bottom: 15px;
+
               li {
                 flex: 1;
+
                 .nav-link {
                   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
                   font-size: $f-size-h5;
+
                   &.active {
                     background-color: #FFFFFF !important;
                     color: $grey-100;
                     border-radius: 5px;
                     font-weight: 600;
                   }
+
                   &:not(.active) {
                     color: #62666E;
                     border-radius: unset;
@@ -10043,30 +10486,37 @@ screen and (max-width: 956px) {
               }
             }
           }
+
           .tab-content {
             display: flex;
             height: 100%;
             width: 100%;
+
             .tab-pane {
               width: 100%;
             }
           }
+
           .mobile-message-composer {
             textarea {
               font-size: 16px !important;
             }
           }
         }
+
         .tab-content {
           .tab-pane {
             .dialer {
               justify-content: flex-start !important;
+
               & > .form-group {
                 flex: 1;
+
                 .search-form {
                   width: 100% !important;
                 }
               }
+
               .q-btn {
                 margin-left: 17px;
               }
@@ -10074,6 +10524,7 @@ screen and (max-width: 956px) {
           }
         }
       }
+
       .line-selector {
         label,
         .generic-selector .q-field__control,
@@ -10085,44 +10536,54 @@ screen and (max-width: 956px) {
         .generic-selector .q-field__native {
           min-height: 40px !important;
         }
+
         label {
           height: unset !important;
           padding-bottom: 0 !important;
         }
+
         .q-field__prepend span,
         .q-field__native span,
         .q-field__control-container input {
           font-size: $f-size-h3;
         }
       }
+
       .search-form {
         .input-group *,
         input::-webkit-input-placeholder {
           font-size: $f-size-h3 !important;
         }
+
         .form-control {
           min-height: 40px !important;
         }
       }
+
       .dialer-contact-info {
         width: 100% !important;
+
         div {
           font-size: $f-size-body-sm;
         }
       }
+
       .invalid-feedback {
         font-size: $f-size-body-sm;
       }
+
       .phone {
         position: unset;
         height: 100%;
         overflow-y: scroll;
         border-radius: unset;
         padding-bottom: 44px;
+
         .mobile-live-call-bar {
           z-index: 10;
           position: absolute;
           top: 28px;
+
           .dropdown-menu {
             max-width: 375px;
             width: 100%;
@@ -10130,6 +10591,7 @@ screen and (max-width: 956px) {
             right: 0;
             margin: auto;
             transform: unset !important;
+
             &.bg-grey-93 {
               .dropdown-item:hover {
                 background: $grey-94;
@@ -10138,63 +10600,81 @@ screen and (max-width: 956px) {
             }
           }
         }
+
         #signal-strength {
           height: 20px;
+
           li {
             width: 4px;
+
             &:not(:last-child) {
               margin-right: 2px;
             }
+
             &.very-weak {
               padding-top: 17px;
             }
+
             &.weak {
               padding-top: 12px;
             }
+
             &.strong {
               padding-top: 6px;
             }
           }
         }
+
         &-header {
           &:not(.call-ended) {
-            height: 142px;
+            height: 92px;
           }
+
           &.call-ended {
             height: 88px;
           }
+
           &.call-ended + .phone-body {
             margin-top: 88px;
+
             .phone-wrap-up {
               padding-top: 0;
             }
           }
+
           padding-bottom: 10px;
+
           div:last-child {
             button:last-child {
               display: none;
             }
           }
+
           div:first-child {
             span {
-              font-size: 20px;
+              font-size: 14px;
             }
           }
+
           div:nth-child(2) {
             span {
-              font-size: 17px;
+              font-size: 16px;
             }
           }
+
           div:nth-child(3) {
             width: 80px;
+
             svg {
               width: 22px !important;
               height: 22px !important;
             }
+
             button {
               .height-12 {
                 height: 20px;
                 width: 19px;
+
                 img {
                   width: 19px;
                   height: 20px;
@@ -10202,35 +10682,48 @@ screen and (max-width: 956px) {
               }
             }
           }
+
+          .phone-settings-icon {
+            font-size: 16px !important;
+          }
         }
+
         &-body {
           .phone-wrap-up {
             max-height: unset;
             padding-top: 36px;
             padding-bottom: 76px;
           }
+
           .phone-info {
-            margin-top: 75px;
+            margin-top: 20px;
             width: 100%;
+
             .q-item__label:first-child {
               margin-top: 25px !important;
+
               > span {
                 font-size: 24px;
                 font-weight: 600;
               }
+
               button {
                 display: block;
                 font-size: 18px;
               }
             }
+
             .q-item__label:nth-child(2) {
               margin-top: 10px !important;
+
               span {
                 font-size: 16px;
               }
             }
+
             .q-item__label:nth-child(3) {
               margin-top: 10px !important;
+
               span {
                 font-size: 14px;
                 color: $grey-90;
@@ -10238,40 +10731,48 @@ screen and (max-width: 956px) {
             }
           }
         }
+
         &-main {
           .dummy {
             height: 92px;
           }
+
           .phone-avatar {
             position: fixed;
-            top: 116px;
+            top: 68px;
             margin-top: unset;
             z-index: 9
           }
         }
+
         .actions-block {
           padding: 0 21px !important;
           max-width: 400px;
           margin-top: 50px !important;
         }
+
         &-expansion {
           .q-expansion-item {
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
             border-bottom-left-radius: unset;
             border-bottom-right-radius: unset;
+
             .q-item {
               height: 44px;
+
               .q-item__label {
                 font-size: 16px;
                 font-weight: 600 !important;
                 color: $grey-90;
               }
             }
+
             &__toggle-icon {
               font-size: 25px;
               color: $grey-90;
             }
+
             &__content {
               .q-card__section {
                 & > div {
@@ -10283,14 +10784,17 @@ screen and (max-width: 956px) {
             }
           }
         }
+
         &-buttons.elevated {
           max-width: 98px;
           width: 100%;
           height: 98px;
+
           &:not(:last-child) {
             margin-right: 10px;
           }
         }
+
         &-footer-buttons {
           border-radius: unset !important;
           padding: 18px 16px !important;
@@ -10299,11 +10803,13 @@ screen and (max-width: 956px) {
           bottom: 0;
           width: 100%;
           box-shadow: 0px -5px 10px 0px rgb(4 4 4 / 20%) !important;
+
           button:first-child {
             background: $success;
             color: #FFFFFF;
             margin-right: 10px;
           }
+
           button {
             height: 40px;
             max-width: 166px;
@@ -10317,18 +10823,22 @@ screen and (max-width: 956px) {
 
 .q-tree {
   width: 100%;
+
   &__node {
     &-header {
       &:before {
         width: 10px !important;
       }
+
       &-content {
         padding-left: 0 !important;
       }
     }
+
     &--child {
       padding: 0 0 3px 22px !important;
     }
+
     &-collapsible {
       .q-tree__node {
         &-header {
@@ -10345,6 +10855,7 @@ screen and (max-width: 956px) {
   display: flex;
   justify-content: center;
   width: 100%;
+
   button {
     display: flex;
     justify-content: center;
@@ -10358,13 +10869,16 @@ screen and (max-width: 956px) {
     padding: 0 10px;
     min-width: 0;
     flex: 1;
+
     &:hover {
       background: $success !important;
       color: white;
     }
+
     svg {
       margin-right: 8px;
     }
+
     .contact-name {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -10404,7 +10918,7 @@ screen and (max-width: 956px) {
   padding-top: 6px !important;
 }
 
-.q-select-auto-width{
+.q-select-auto-width {
   .q-field__control-container {
     width: auto !important;
     max-width: fit-content;
@@ -10494,6 +11008,7 @@ screen and (max-width: 956px) {
 .q-shared-login-menu-dropdown-list {
   padding: 15px !important;
   width: 180px !important;
+
   .q-item {
     min-height: 16px;
     padding-top: 0 !important;
@@ -10535,11 +11050,13 @@ screen and (max-width: 956px) {
     }
   }
 }
+
 .my-lists {
   .q-expansion-item__content {
     > .folders {
       .folders__content {
         overflow-x: hidden;
+
         .tree-folder {
           > .folder,
           .tree-list-item {
@@ -10582,6 +11099,7 @@ screen and (max-width: 956px) {
   padding: 0 0 !important;
   max-width: 180px;
   width: auto;
+
   .tooltip-inner {
     background-color: unset;
     font-size: 10px;
@@ -10590,6 +11108,7 @@ screen and (max-width: 956px) {
     color: $grey-100;
     text-align: left;
   }
+
   .arrow:before {
     display: none;
   }
@@ -10603,6 +11122,7 @@ screen and (max-width: 956px) {
     border-top-left-radius: 6px !important;
     border-bottom-left-radius: 6px !important;
   }
+
   button:nth-child(2) {
     border-top-right-radius: 6px !important;
     border-bottom-right-radius: 6px !important;
@@ -10659,29 +11179,36 @@ screen and (max-width: 956px) {
 
 .call-fishing-actions {
   padding-top: 2px;
+
   > button:first-child {
     margin-right: 10px;
   }
+
   button {
     .q-btn__wrapper {
       margin: 0 0;
       padding: 0 0;
       min-height: 32px !important;
+
       &:before {
         box-shadow: unset;
       }
     }
+
     span {
       font-size: 13px;
       font-weight: 500;
     }
   }
+
   .b-compact-dropdown-button {
     margin: 0 0 !important;
+
     button {
       border: unset;
       padding: 0 0 !important;
     }
+
     ul {
       margin-top: 8px;
       padding: 6px 6px;
@@ -10690,25 +11217,31 @@ screen and (max-width: 956px) {
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
       border-radius: 8px;
+
       li a {
         color: white;
         padding: 6px 12.65px;
+
         &:not(svg) {
           font-size: 13px;
         }
+
         .icon-margin {
           margin-right: 8px;
         }
       }
+
       &[x-placement="bottom-end"] {
         width: 298px;
         transform: translate(-249px, 40px) !important;
       }
+
       &[x-placement="right-start"] {
         margin: 0 !important;
         transform: translate(36px, -6px) !important;
       }
     }
+
     .dropdown-item:hover,
     .dropdown-item:focus {
       background: #585A6D;
@@ -10721,9 +11254,11 @@ screen and (max-width: 956px) {
   .message-text {
     -webkit-line-clamp: unset !important;
     -webkit-box-orient: unset !important;
+
     &.has-ring-group {
       overflow: auto !important;
       text-overflow: unset !important;
+
       .campaign-wrapper,
       .ring-group-wrapper {
         min-width: 0;
@@ -10736,6 +11271,7 @@ screen and (max-width: 956px) {
         overflow: hidden;
       }
     }
+
     &:not(.has-ring-group) {
       display: block !important;
       white-space: nowrap;
@@ -10751,9 +11287,11 @@ screen and (max-width: 956px) {
   /* cursor: pointer; */
   .call-actions {
     padding-top: 2px;
+
     button:first-child {
       margin-right: 10px;
     }
+
     .q-btn__wrapper {
       min-width: unset;
       min-height: unset;
@@ -10795,6 +11333,7 @@ screen and (max-width: 956px) {
 .background-blur {
   box-shadow: 0 10px 20px -4px rgba(4, 4, 4, 0.2);
   border-radius: 8px;
+
   &::before {
     content: '';
     z-index: -1;
@@ -10845,7 +11384,7 @@ screen and (max-width: 956px) {
 }
 
 .contact-phone-number-search {
-  .vbt-autcomplete-list{
+  .vbt-autcomplete-list {
     .list-group-item {
       padding: 0.75rem;
     }
@@ -10898,12 +11437,15 @@ screen and (max-width: 956px) {
 .border-radius-1 {
   border-radius: 5px;
 }
+
 .border-radius-2 {
   border-radius: 10px;
 }
+
 .border-radius-3 {
   border-radius: 15px;
 }
+
 .border-radius-4 {
   border-radius: 20px;
 }
@@ -10936,6 +11478,7 @@ screen and (max-width: 956px) {
 .mobile-header-labels {
   display: flex;
   min-width: 0;
+
   .contact-name {
     flex: 1;
     overflow: hidden;
@@ -11045,19 +11588,19 @@ screen and (max-width: 956px) {
   }
 }
 
-@media (min-width: 401px){
+@media (min-width: 401px) {
   .communication-details-card {
     .header {
-      .header-btn-wrapper  {
-       .report-issue-wrapper {
-         margin-right: 5px !important;
-       }
+      .header-btn-wrapper {
+        .report-issue-wrapper {
+          margin-right: 5px !important;
+        }
       }
     }
   }
 }
 
-@media (max-width: 400px){
+@media (max-width: 400px) {
   .communication-details-card {
     .header {
       flex-direction: column !important;
@@ -11066,7 +11609,7 @@ screen and (max-width: 956px) {
         text-align: center;
       }
 
-      .header-btn-wrapper  {
+      .header-btn-wrapper {
         margin-top: 5px;
         flex-direction: column !important;
 
@@ -11131,9 +11674,11 @@ screen and (max-width: 956px) {
       fill: $green-91 !important;
     }
   }
+
   .q-tab__content {
     color: $green-91 !important;
   }
+
   .q-tab__indicator {
     background: $green-91 !important;
   }
@@ -11145,9 +11690,11 @@ screen and (max-width: 956px) {
       fill: $purple-100 !important;
     }
   }
+
   .q-tab__content {
     color: $purple-100 !important;
   }
+
   .q-tab__indicator {
     background: $purple-100 !important;
   }
@@ -11178,6 +11725,7 @@ screen and (max-width: 956px) {
 .aloicons {
   font-family: $font-family-icons;
   color: #62666E !important;
+
   &.action-icons {
     font-size: $f-size-h3;
   }
@@ -11208,7 +11756,7 @@ h1.contact-list-name-label {
     margin-top: -4px;
 
     path {
-      fill : $primary
+      fill: $primary
     }
   }
 }
@@ -11225,6 +11773,7 @@ h1.contact-list-name-label {
   .q-icon {
     color: var(--q-color-primary);
   }
+
   &.inline-input {
     .q-field__append.q-field__marginal {
       button {
@@ -11233,9 +11782,11 @@ h1.contact-list-name-label {
       }
     }
   }
+
   &.inline-input:focus-within {
     .q-field__append.q-field__marginal {
       opacity: 1 !important;
+
       button {
         padding: 0;
         line-height: 0;
@@ -11248,10 +11799,12 @@ h1.contact-list-name-label {
   .q-date {
     min-width: unset;
     box-shadow: unset;
+
     &__main {
       flex: 10000 1 0% !important;
       padding: 0 !important;
     }
+
     &__main button.close-button,
     &__years-content button,
     &__months-item button,
@@ -11262,31 +11815,37 @@ h1.contact-list-name-label {
         min-height: 1.9em;
       }
     }
+
     &__content {
       min-height: unset;
     }
+
     &__years {
       &-content {
         justify-content: space-between;
         padding-top: 10px;
         padding-left: 0;
         padding-right: 0;
+
         button {
           margin-bottom: 4px;
         }
       }
+
       &-item {
         button {
           width: 45px;
         }
       }
     }
+
     &__years-content button,
     &__months-item button,
     &__view .q-date__navigation .relative-position button {
       padding-left: 4px;
       padding-right: 4px;
     }
+
     &__main,
     &__content,
     &__view {
@@ -11301,13 +11860,15 @@ h1.contact-list-name-label {
   overflow-x: hidden;
   overflow-y: auto;
 }
+
 .session-integration-title {
   color: #303133
 }
 
-.power-dialer-list  {
+.power-dialer-list {
   height: calc(100% - 100px);
   overflow-y: auto;
+
   .sublists {
     overflow-y: auto !important;
   }
@@ -11673,6 +12234,12 @@ h1.contact-list-name-label {
       }
     }
   }
+
+  .multiselect {
+    &__content-wrapper {
+      border: none !important;
+    }
+  }
 }
 
 /* Event Colors */
@@ -11767,4 +12334,8 @@ h1.contact-list-name-label {
 
 .sending {
   background-color: #E5EEFF !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
 }
