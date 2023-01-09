@@ -759,7 +759,7 @@ export default {
     },
 
     dateSelected (value) {
-      this.schedule.date = moment(value).format('MM/DD/YYYY')
+      this.schedule.date = value ? moment(value).format('MM/DD/YYYY') : null
     },
 
     timeSelected (time) {
