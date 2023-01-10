@@ -432,7 +432,6 @@ export default {
       if (this.device.activeConnection()) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
-
       } else {
         this.connection = await this.device.connect(params, true)
         this.initConnectionEvents()
