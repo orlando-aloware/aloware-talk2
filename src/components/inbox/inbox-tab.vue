@@ -1004,7 +1004,7 @@ export default {
       }
 
       if (contactTaskToRemove) {
-        this.$VueEvent.fire('contact_task_status_updated', contactTaskToRemove)
+        this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
       }
     }
 
