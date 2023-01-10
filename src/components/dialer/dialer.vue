@@ -978,19 +978,20 @@ export default {
     },
 
     dialerCallPrep (call) {
-      const map = call.customParameters ?? []
+      const connection = call._connection
+      const map = connection.customParameters
       const customParameters = {}
       map.forEach((value, key) => {
         customParameters[key] = value
       })
       this.setDialerCall({
-        from: call.from,
-        to: call.to,
-        callSid: call.callSid,
-        state: call.state,
-        isMuted: call.isMuted,
+        from: connection.parameters.from,
+        to: connection.to,
+        callSid: connection.parameters.CallSid,
+        state: connection.status(),
+        isMuted: connection.isMuted(),
         customParameters: customParameters,
-        direction: call.direction
+        direction: connection.direction
       })
     },
 
