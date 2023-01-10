@@ -155,7 +155,7 @@ export default {
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       this.connection = call
       console.log('Received call invite', call)
-      this.dialerCallPrep(call)
+      this.dialerCallPrep(call._connection)
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', this.dialer.call.callSid, this.dialer.call.from, this.dialer.currentNumber)
@@ -432,6 +432,7 @@ export default {
       if (this.device.activeConnection()) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
+
       } else {
         this.connection = await this.device.connect(params, true)
         this.initConnectionEvents()
@@ -978,20 +979,19 @@ export default {
     },
 
     dialerCallPrep (call) {
-      const connection = call._connection
-      const map = connection.customParameters
+      const map = call.customParameters
       const customParameters = {}
       map.forEach((value, key) => {
         customParameters[key] = value
       })
       this.setDialerCall({
-        from: connection.parameters.from,
-        to: connection.to,
-        callSid: connection.parameters.CallSid,
-        state: connection.status(),
-        isMuted: connection.isMuted(),
+        from: call.parameters.from,
+        to: call.to,
+        callSid: call.parameters.CallSid,
+        state: call.status(),
+        isMuted: call.isMuted(),
         customParameters: customParameters,
-        direction: connection.direction
+        direction: call.direction
       })
     },
 
