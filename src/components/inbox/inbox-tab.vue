@@ -1028,7 +1028,6 @@ export default {
       }
 
       if (contactTaskToRemove) {
-        console.log('this.listeners.updateInboxCommunication contactTaskToRemove')
         this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
       }
     }
