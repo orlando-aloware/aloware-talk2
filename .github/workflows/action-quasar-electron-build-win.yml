@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'windows-latest' ]
+        os: [ 'macos-latest' ]
         node-version: [ '14.x' ]
 
     steps:
@@ -41,8 +41,26 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-#      - name: Setup Windows Build Tools
-#        run: npm install --global --production windows-build-tools@4.0.0
+      - name: Update NPM
+        run: npm install -g npm
+
+      - name: Node version
+        run: node --version
+
+      - name: NPM version
+        run: npm --version
+
+      - name: Setup Python2
+        uses: actions/setup-python@v4
+        with:
+          python-version: '2.*'
+          architecture: 'x64'
+
+      - name: Prepare for app notarization (macOS)
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
