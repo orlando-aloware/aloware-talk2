@@ -56,12 +56,6 @@ jobs:
           python-version: '2.*'
           architecture: 'x64'
 
-      - name: Prepare for app notarization (macOS)
-        # Import Apple API key for app notarization on macOS
-        run: |
-          mkdir -p ~/private_keys/
-          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
-
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
 
