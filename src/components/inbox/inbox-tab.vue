@@ -817,6 +817,30 @@ export default {
           }
         }
       }
+    },
+    startInboxListeners () {
+      this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
+      this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
+      this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
+      this.$VueEvent.listen('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
+      this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.listen('update_communication', this.listeners.updateInboxCommunication)
+      this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
+      this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
+      this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
+      this.$VueEvent.listen('inbox_contact_updated', this.listeners.inboxContactUpdated)
+    },
+    stopInboxListeners () {
+      this.$VueEvent.stop('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
+      this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
+      this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
+      this.$VueEvent.stop('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
+      this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
+      this.$VueEvent.stop('update_communication', this.listeners.updateInboxCommunication)
+      this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
+      this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
+      this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)
+      this.$VueEvent.stop('inbox_contact_updated', this.listeners.inboxContactUpdated)
     }
   },
 
@@ -1137,16 +1161,9 @@ export default {
       this.processNewCommunicationEvent(data.contact, data.communication)
     }
 
-    this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
-    this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
-    this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
-    this.$VueEvent.listen('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
-    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.listen('update_communication', this.listeners.updateInboxCommunication)
-    this.$VueEvent.listen('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
-    this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
-    this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
-    this.$VueEvent.listen('inbox_contact_updated', this.listeners.inboxContactUpdated)
+    // restart listeners
+    this.stopInboxListeners()
+    this.startInboxListeners()
 
     // this.$VueEvent.listen('inbox_route_change', () => {
     //   this.onRouteChange()
@@ -1159,16 +1176,7 @@ export default {
 
   beforeDestroy () {
     this.setSelectedContact({})
-    this.$VueEvent.stop('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
-    this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
-    this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
-    this.$VueEvent.stop('contact_updated_from_contact_mixin', this.listeners.contactUpdatedFromContactMixin)
-    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.stop('update_communication', this.listeners.updateInboxCommunication)
-    this.$VueEvent.stop('contact_task_status_updated', this.listeners.contactTaskStatusUpdated)
-    this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
-    this.$VueEvent.stop('inbox_load_contacts', this.listeners.inboxLoadContacts)
-    this.$VueEvent.stop('inbox_contact_updated', this.listeners.inboxContactUpdated)
+    this.stopInboxListeners()
   },
 
   watch: {
