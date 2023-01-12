@@ -149,6 +149,9 @@ export default {
       const contacts = response.data.data
 
       contacts.forEach(contact => {
+        // force contact_id to be the id, default is contact phone number
+        contact.id = contact.contact_id
+
         this.options.push(this.formatContact(contact))
       })
 
