@@ -1158,7 +1158,11 @@ export default {
 
     onPhoneVisible (value) {
       this.isPhoneVisible = value
-      if (typeof this.$refs.dialerForm !== 'undefined') {
+
+      // hide the dialer form component if it exists and
+      // phone is currently visible
+      if (typeof this.$refs.dialerForm !== 'undefined' &&
+        this.isPhoneVisible) {
         this.$refs.dialerForm.hideDialer()
       }
     },
@@ -2145,6 +2149,13 @@ export default {
     },
 
     onCloseMobilePhone () {
+      // if dialer's current status is on wrap-up,
+      // don't close the phone yet!
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.isPhoneVisible = true
+        this.mobilePhoneDrawer = true
+      }
+
       if (typeof this.$refs.appFooter !== 'undefined') {
         this.$refs.appFooter.updateTab()
       }
@@ -2410,6 +2421,12 @@ export default {
         this.setSuspended(false)
       }
 
+      // remove drawer for phone page when in login page's
+      // mobile view
+      if (this.$route.name === 'Login') {
+        this.mobilePhoneDrawer = false
+      }
+
       this.resetPowerDialerSession(to)
     },
 
@@ -2440,9 +2457,26 @@ export default {
         this.$options.appFooterCounter = 0
         this.$options.appFooterInterval = setInterval(() => {
           if (this.$refs.appFooter !== undefined) {
+            const dialerNotInprogressCallStatuses = [
+              'TOKEN_GENERATED',
+              'READY',
+              'OFFLINE',
+              'INVITE_CANCELLED',
+              'GENERATING_TOKEN',
+              'GOT_ERROR',
+              'RESTARTING',
+              'CALL_DISCONNECTED'
+            ]
+
+            // do not force the footer's tab to phone if
+            // dialer doesn't have an in-progress call
             this.$refs.appFooter.updateTab(
-              this.dialer.currentStatus && this.dialer.currentStatus !== 'READY' ? 'phone' : null
+              (this.dialer.currentStatus &&
+                !dialerNotInprogressCallStatuses.includes(this.dialer.currentStatus))
+                ? 'phone'
+                : null
             )
+
             clearInterval(this.$options.appFooterInterval)
           }
           this.$options.appFooterCounter++

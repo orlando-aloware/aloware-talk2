@@ -60,6 +60,11 @@ export default {
     redirectWhenDisabled: {
       type: Boolean,
       default: false
+    },
+
+    contactData: {
+      type: Object,
+      required: false
     }
   },
 
@@ -71,9 +76,8 @@ export default {
       params: {
         'page': 1,
         'per_page': 25,
-        'filter_groups[0][filters][search][value]': '',
-        'filter_groups[0][is_conjunction]': true,
-        'sort': 'last_engagement_at',
+        'search': null,
+        'sort': 'name',
         'order': 'desc'
       },
       forceLoading: false
@@ -90,10 +94,11 @@ export default {
 
   async mounted () {
     // if component is disabled and the value is set, search for that specific contact only to fill as the option
-    if (this.value) {
-      await this.loadContacts(this.value)
-
+    if (this.value && this.contactData) {
+      this.options.push(this.formatContact(this.contactData))
       this.contact = this.options.find(contact => contact.id === this.value)
+
+      this.$emit('loaded')
     }
   },
 
@@ -111,7 +116,7 @@ export default {
       this.options = []
 
       if (this.search.length >= this.threshold) {
-        this.params['filter_groups[0][filters][search][value]'] = this.search
+        this.params.search = this.search
 
         this.loadContacts()
       }
@@ -122,9 +127,12 @@ export default {
     },
 
     formatContact (contact) {
+      // Usually, the contact will have first and last name, and the logic is the same if just one is filled
+      // But if any of these fields are not filled, the "name" attribute is used instead (comes from calendar event)
+      // This happens when user dont have enough visibility, for instance
       const name = contact.first_name || contact.last_name
-        ? `${contact.first_name} ${contact.last_name}`
-        : 'No Name'
+        ? `${contact.first_name || ''} ${contact.last_name || ''}`
+        : (contact.name ? contact.name : 'No Name')
 
       return {
         id: contact.id,
@@ -132,22 +140,20 @@ export default {
       }
     },
 
-    async loadContacts (id = null) {
+    async loadContacts () {
       this.forceLoading = true
       this.$emit('loading')
 
-      const url = '/api/v2/contacts' + (id ? '/' + id : '')
+      const url = '/api/v2/contacts/quick-search'
       const response = await this.$axios.get(url, { params: this.params })
+      const contacts = response.data.data
 
-      if (id) {
-        this.options.push(this.formatContact(response.data))
-      } else {
-        const contacts = response.data.data
+      contacts.forEach(contact => {
+        // force contact_id to be the id, default is contact phone number
+        contact.id = contact.contact_id
 
-        contacts.forEach(contact => {
-          this.options.push(this.formatContact(contact))
-        })
-      }
+        this.options.push(this.formatContact(contact))
+      })
 
       this.forceLoading = false
       this.$emit('loaded')
