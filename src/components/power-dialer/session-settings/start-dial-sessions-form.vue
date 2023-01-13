@@ -72,6 +72,11 @@
             :disable="disabled"
             :clearable="true" />
 
+          <OrderSelector
+            v-else-if="cform.name === 'order'"
+            class="generic-selector-2"
+            v-model="resources[cform.name]" />
+
           <CallDispositionSelector
             v-else-if="cform.name === 'call_disposition_ids'"
             class="pb-3"
@@ -143,8 +148,10 @@ import ScriptSelector from 'components/generic-selectors/session-scripts-selecto
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
+import OrderSelector from 'components/generic-selectors/session-order-selector.vue'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 
 export default {
   name: 'StartDialSessionsForm',
@@ -180,7 +187,8 @@ export default {
     ScriptSelector,
     ContactDispositionSelector,
     VmDropSelector,
-    CallDispositionSelector
+    CallDispositionSelector,
+    OrderSelector
   },
   async mounted () {
     // Temporary disabled
@@ -218,6 +226,7 @@ export default {
         this.resources.call_disposition_ids = []
         this.resources.contact_disposition_ids = []
         this.resources.is_company_scope = null
+        this.resources.order = POWER_DIALER_ORDER.default
         return this.resources
       }
     },

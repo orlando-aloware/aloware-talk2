@@ -165,6 +165,9 @@ export default {
   addContactPhoneNumber: ({ commit }, phoneNumber) => {
     commit('ADD_CONTACT_PHONE_NUMBER', phoneNumber)
   },
+  removeContactPhoneNumber: ({ commit }, phoneNumber) => {
+    commit('REMOVE_CONTACT_PHONE_NUMBER', phoneNumber)
+  },
   setSidebarCollapsed: ({ commit }, isCollapsed) => {
     commit('SET_SIDEBAR_COLLAPSED', isCollapsed)
   },
