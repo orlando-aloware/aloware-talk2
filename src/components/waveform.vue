@@ -118,9 +118,6 @@ export default {
         this.player.playPause()
       }
     }
-  },
-  created () {
-    this.playbackSpeed = WaveformPlaybackSpeedOptions.PLAYBACK_SPEED_DEFAULT_VALUE
   }
 }
 </script>

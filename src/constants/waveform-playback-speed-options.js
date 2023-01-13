@@ -16,5 +16,3 @@ export const PLAYBACK_SPEED_OPTIONS = [
     label: '2x'
   }
 ]
-
-export const PLAYBACK_SPEED_DEFAULT_VALUE = 1
