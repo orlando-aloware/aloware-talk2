@@ -26,6 +26,12 @@ export const SESSION_SETTINGS_ALL_FORMS = [
         label: 'Phone Script',
         type: 'select',
         items: []
+      },
+      {
+        name: 'order',
+        label: 'Order by',
+        type: 'select',
+        items: []
       }
     ]
   },
@@ -72,5 +78,6 @@ export const DEFAULT_SETTING_VALUES = {
   script_id: null,
   skip_outside_daytime_hours: 1,
   user_id: null,
-  warmup_period_in_seconds: 0
+  warmup_period_in_seconds: 0,
+  order: 1
 }
