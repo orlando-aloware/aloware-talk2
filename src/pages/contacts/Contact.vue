@@ -214,7 +214,8 @@ export default {
   created () {
     this.setIsContactMixinUsed(true)
     this.initListeners()
-    this.$VueEvent.listen('contact_task_status_updated', (contact) => {
+
+    this.contactComponentListeners.contactTaskStatusUpdated = (contact) => {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
@@ -225,7 +226,9 @@ export default {
         this.setLoadingOpenTaskCount(true)
         this.getContactsCountByTaskStatus(this.ContactTaskStatusOpen)
       }
-    })
+    }
+
+    this.$VueEvent.listen('contact_task_status_updated', this.contactComponentListeners.contactTaskStatusUpdated)
   },
 
   watch: {
@@ -271,6 +274,7 @@ export default {
     this.$VueEvent.stop('contact_updated', this.contactComponentListeners.contactUpdated)
     this.$VueEvent.stop('contact_audit_created', this.contactComponentListeners.contactAuditCreated)
     this.$VueEvent.stop('contact_disposed', this.contactComponentListeners.contactDisposed)
+    this.$VueEvent.stop('contact_task_status_updated', this.contactComponentListeners.contactTaskStatusUpdated)
   },
 
   beforeRouteLeave (to, from, next) {
