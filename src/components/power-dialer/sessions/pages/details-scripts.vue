@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'getScript',
+      'getTranslatedScript',
       'getLastCommunicationScript'
     ]),
     async changeScript (val) {
@@ -75,8 +75,16 @@ export default {
 
       // if last_communication isnt present, search in script directly
       if (!lastCommunication.id) {
-        if (this.scriptId) {
-          const res = await this.getScript(this.scriptId)
+        if (this.scriptId && this.activeTask?.contact_id) {
+          const res = await this.getTranslatedScript({
+            id: this.activeTask.contact_id,
+            params: {
+              campaign_id: this.sessionSettings.campaign_id,
+              phone_number: this.activeTask.contact_phone_number,
+              script_id: this.selectedScript,
+              user_id: this.activeTask.user_id
+            }
+          })
 
           this.script = res.data
         }
