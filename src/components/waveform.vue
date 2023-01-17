@@ -62,7 +62,7 @@ export default {
         barGap: null,
         cursorWidth: 1,
         container: '#waveform-' + this.uniqueId,
-        backend: 'WebAudio',
+        backend: 'MediaElement',
         height: 40,
         progressColor: '#2D5BFF',
         responsive: true,
