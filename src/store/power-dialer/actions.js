@@ -256,6 +256,9 @@ export default {
     const res = await window.axios.get(`api/v1/communication/${id}/scripts`)
     return res
   },
+  getTranslatedScript ({ commit }, { id, params }) {
+    return window.axios.get(`api/v2/contacts/${id}/translate-script`, { params })
+  },
   setFinishedPowerDialerSession: ({ commit }, data = true) => {
     commit('SET_FINISHED_PD_SESSION', data)
   },
@@ -284,5 +287,8 @@ export default {
   },
   clearRedialedTask: ({ commit }) => {
     commit('CLEAR_REDIALED_TASKS')
+  },
+  setPowerDialerTasksInQueue: ({ commit }, inQueue) => {
+    commit('SET_POWER_DIALER_TASKS_IN_QUEUE', inQueue)
   }
 }

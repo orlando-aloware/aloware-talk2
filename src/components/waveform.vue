@@ -10,6 +10,20 @@
     </button>
     <div :id="'waveform-' + uniqueId"
          class="waveform flex-grow-1 mr-2"></div>
+    <div class="waveform-timeline mr-1">
+      <q-select
+        dense
+        emit-value
+        borderless
+        class="mt-2 q-select-pager"
+        option-value="value"
+        option-label="label"
+        @input="changePlaybackSpeed"
+        v-model="playbackSpeed"
+        :options="playbackOptions"
+        :display-value="`${playbackSpeed}x`">
+      </q-select>
+    </div>
     <div class="waveform-timeline mr-2">
       <span class="text-xxs">{{ currentTime | fixDuration(true) }}/{{ duration | fixDuration(true) }}</span>
     </div>
@@ -23,6 +37,7 @@
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
+import * as WaveformPlaybackSpeedOptions from 'src/constants/waveform-playback-speed-options'
 
 export default {
   name: 'waveform',
@@ -47,7 +62,7 @@ export default {
         barGap: null,
         cursorWidth: 1,
         container: '#waveform-' + this.uniqueId,
-        backend: 'WebAudio',
+        backend: 'MediaElement',
         height: 40,
         progressColor: '#2D5BFF',
         responsive: true,
@@ -57,7 +72,8 @@ export default {
       playing: false,
       ready: false,
       duration: 0,
-      currentTime: 0
+      currentTime: 0,
+      playbackSpeed: 1
     }
   },
 
@@ -68,6 +84,9 @@ export default {
       }
 
       return null
+    },
+    playbackOptions () {
+      return WaveformPlaybackSpeedOptions.PLAYBACK_SPEED_OPTIONS
     }
   },
 
@@ -90,6 +109,9 @@ export default {
   },
 
   methods: {
+    changePlaybackSpeed (speed) {
+      this.player.setPlaybackRate(speed)
+    },
     handlePlay () {
       this.playing = !this.playing
       if (this.player) {

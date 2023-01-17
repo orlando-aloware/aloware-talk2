@@ -180,6 +180,86 @@ export default {
       })
     })
 
+    this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
+      this.removeUnownedLiveContactTask()
+      console.log('Call invite canceled', call)
+      this.setDialerCurrentStatus('INVITE_CANCELLED')
+      this.backToDial()
+      this.$closeActionNotification('incomingCall')
+      // if (this.$route.name === 'Incoming Call') {
+      //   this.$router.push({ name: 'Dial' }).catch(err => {
+      //     console.log(err)
+      //   })
+      // }
+    })
+
+    this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
+      console.log('Successfully connected call', call)
+      const map = call._connection.customParameters
+      const customParameters = {}
+      map.forEach((value, key) => {
+        customParameters[key] = value
+      })
+      this.setDialerCall({
+        from: call.from,
+        to: call.to,
+        callSid: call.callSid,
+        state: call.state,
+        isMuted: call.isMuted,
+        customParameters: customParameters,
+        direction: call._connection._direction
+      })
+      this.startCallTimer()
+      this.setDialerCurrentStatus('CALL_CONNECTED')
+      this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        .then(res => {
+          // execute only if we have a response
+          if (res) {
+            this.updateUnownedContactLastCommunicationStatus(res.data.user_id)
+          }
+        })
+        // .finally(() => {
+        //   this.$router.push({ name: 'Call' }).catch(err => {
+        //     console.log(err)
+        //   })
+        //   setTimeout(() => {
+        //    this.startCallTimer()
+        //    this.setDialerCurrentStatus('CALL_CONNECTED')
+        //   }, 3000)
+        // })
+        .catch((err) => {
+          console.log(err)
+        })
+
+      // mute the phone
+      if (this.dialer.isMuted) {
+        this.forceMute()
+      }
+
+      // close the dialer form when it's open and incoming call is answered
+      if (this.dialerFormStatus) {
+        this.setDialerFormStatus(false)
+      }
+    })
+
+    this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
+      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+      this.removeUnownedLiveContactTask()
+      this.stopCallTimer()
+      this.setDialerCurrentStatus('CALL_DISCONNECTED')
+      if (!this.dialer.parkedCall && !this.dialer.call) {
+        this.startWrapUpTimer()
+      } else if (this.dialer.parkedCall && this.dialer.call) {
+        this.startWrapUpTimer()
+      } else if (!this.dialer.parkedCall && this.dialer.call) {
+        this.startWrapUpTimer()
+      } else {
+        this.backToDial()
+      }
+    })
+
+    this.getDesktopToken()
+
     // ping getDesktopToken every 24 hours
     this.$options.webrtcTokenRegenerateInterval = setInterval(() => {
       if (this.authenticated) {
@@ -317,9 +397,25 @@ export default {
           return Promise.resolve()
         }
 
-        this.setDialerCommunication(res.data)
-
         const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // we need to prevent proceeding to the next steps if current task's contact id
+        // is not the same as the communication's contact id in power dialer session
+        // to prevent showing incorrect contact details in the active call component when
+        // making a call just after the previous task was manually ended
+        // (end call or next button was clicked w/o wrap-up), automatically ended (no wrap-up),
+        // or manually clicked the end wrap-up when wrap-up is indefinite. The previous task
+        // was already processed/ended but the fetching of the previous task's communication
+        // got delayed so the previous task's contact details will show for brief amount of
+        // seconds, which is being prevented here:
+        if (routeTitle &&
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          this.activeTask.id !== res.data.contact_id) {
+          return Promise.resolve()
+        }
+
+        this.setDialerCommunication(res.data)
 
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
