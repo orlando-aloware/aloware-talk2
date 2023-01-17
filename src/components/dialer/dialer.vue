@@ -560,7 +560,7 @@ export default {
         return
       }
 
-      console.log('Hanging up call')
+      console.log('Hanging up call 1')
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -852,7 +852,7 @@ export default {
         return
       }
 
-      console.log('Hanging up call')
+      console.log('Hanging up call 2')
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
