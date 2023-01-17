@@ -1,4 +1,6 @@
 export const REGISTERED = 'registered'
+export const READY = 'ready' // deprecated
+export const OFFLINE = 'offline' // deprecated
 export const UNREGISTERED = 'unregistered'
 export const INCOMING = 'incoming'
 export const ERROR = 'error'
