@@ -53,6 +53,10 @@ export default class Device {
   }
 
   register () {
+    if (this._device.state !== Events.UNREGISTERED) {
+      return
+    }
+
     this._device.register()
   }
 
