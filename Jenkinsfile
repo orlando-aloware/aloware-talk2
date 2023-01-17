@@ -17,7 +17,6 @@ pipeline {
     stages {
         stage('Setup Dev Env File') {
             when { branch 'develop' }
-
             steps {
                 script {
                     notificationSender.sendSlackInfo()
@@ -58,7 +57,6 @@ pipeline {
 
         stage('Deploy to Dev Environment') {
             when { branch 'develop' }
-
             steps {
                 sh "aws --region us-west-2 --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
             }
