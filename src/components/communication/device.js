@@ -64,12 +64,6 @@ export default class Device {
     this._device.on(Events.REGISTERED, (device) => {
       this._executeCallback(Events.REGISTERED, [this._device])
     })
-    this._device.on(Events.READY, (device) => {
-      this._executeCallback(Events.READY, [device])
-    })
-    this._device.on(Events.OFFLINE, (device) => {
-      this._executeCallback(Events.OFFLINE, [device])
-    })
     this._device.on(Events.UNREGISTERED, (device) => {
       this._executeCallback(Events.UNREGISTERED, [device])
     })
