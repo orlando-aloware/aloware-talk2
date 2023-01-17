@@ -564,7 +564,7 @@ export default {
       this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
         console.log('Successfully connected call', call)
         this.updateUnownedContactLastCommunicationStatus()
-        this.dialerCallPrep(call)
+        this.dialerCallPrep(call._connection)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
         this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
@@ -1080,8 +1080,8 @@ export default {
         customParameters[key] = value
       })
       this.setDialerCall({
-        from: call.parameters.from,
-        to: call.to,
+        from: call.parameters.From,
+        to: call.parameters.To,
         callSid: call.parameters.CallSid,
         state: call.status(),
         isMuted: call.isMuted(),
