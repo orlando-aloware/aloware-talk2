@@ -94,14 +94,12 @@ export default {
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         data = _.merge(this.dialer.parkedCall, data)
         this.setDialerParkedCall(data)
-        console.log('park call 5', data)
         if (!this.dialer.parkedCallTimer) {
           this.startParkedCallTimer()
         }
 
         if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW || data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
           this.setDialerParkedCall()
-          console.log('park call 6')
           if (this.dialer.parkedCallTimer) {
             this.stopParkedCallTimer()
           }
@@ -560,7 +558,7 @@ export default {
         return
       }
 
-      console.log('Hanging up call 1')
+      console.log('Hanging up call')
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -759,7 +757,6 @@ export default {
 
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
-      console.log('park call 7', this.dialer.communication)
       this.addNonOwnedParkedTask(this.dialer.communication)
       const params = {
         communication_id: this.dialer.communication.id
@@ -786,7 +783,6 @@ export default {
 
       if ((parkedCallData && !preventClear) || !parkedCallData) {
         this.setDialerParkedCall()
-        console.log('park call 9')
         this.stopParkedCallTimer()
       }
 
@@ -817,11 +813,9 @@ export default {
 
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
-      console.log('park call 10', this.dialer.communication)
       const params = {
         communication_id: this.dialer.communication.id
       }
-      console.log('parkCallCombo', shouldAnswer, shouldUnpark, data)
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
         if (shouldAnswer) {
@@ -835,7 +829,6 @@ export default {
         this.setDialerIsMuted(false)
       }).catch(err => {
         this.setDialerParkedCall()
-        console.log('park call 11')
         this.stopParkedCallTimer()
         console.log(err)
       }).finally(_ => {
@@ -852,11 +845,10 @@ export default {
         return
       }
 
-      console.log('Hanging up call 2')
+      console.log('Hanging up call')
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      console.log('hangupCallCombo', shouldAnswer, shouldUnpark, data)
       if (this.device.activeConnection()) {
         // hangup an incoming call
         this.device.activeConnection().hangup()
@@ -1271,7 +1263,6 @@ export default {
 
       // store temporarily the parked call
       const parkedCall = this.dialer.parkedCall ? JSON.parse(JSON.stringify(this.dialer.parkedCall)) : null
-      console.log('answerCallFishing', { parkedCall, communication, shouldPark, shouldHangup })
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {

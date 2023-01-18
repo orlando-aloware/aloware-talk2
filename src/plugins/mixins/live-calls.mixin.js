@@ -121,7 +121,6 @@ export default {
       }
 
       // make sure that comms has the correct status and is already included in live contacts
-      console.log('isConnectedCall', this.communication.id, this.communication.current_status2, this.communication.disposition_status2, this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0)
       return this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && this.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
 
@@ -315,7 +314,6 @@ export default {
 
       if (_.isEmpty(this.dialer.parkedCall)) {
         this.setDialerParkedCall(this.communication)
-        console.log('park call 1', this.communication)
       }
 
       this.answerCommunication(true, true)
@@ -325,7 +323,6 @@ export default {
 
       if (_.isEmpty(this.dialer.parkedCall)) {
         this.setDialerParkedCall(this.communication)
-        console.log('park call 2', this.communication)
       }
 
       this.answerCommunication(false, true)
@@ -339,7 +336,6 @@ export default {
 
       // if (_.isEmpty(this.dialer.parkedCall)) {
       //   this.setDialerParkedCall(this.communication)
-      //   console.log('park call 3', this.communication)
       // }
 
       this.answerCommunication(false, true)
@@ -357,7 +353,6 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
-      console.log('answerCommunication item', data)
       this.$VueEvent.fire('answerCallFishing', data)
       this.setShowPhone(true)
     },
