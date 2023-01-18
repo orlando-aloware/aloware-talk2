@@ -765,7 +765,6 @@ export default {
         console.log('Call parked')
       }).catch(err => {
         this.setDialerParkedCall()
-        console.log('park call 8')
         this.stopParkedCallTimer()
         console.log(err)
       }).finally(_ => {
