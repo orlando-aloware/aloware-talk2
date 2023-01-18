@@ -121,7 +121,9 @@ export default {
       }
 
       // make sure that comms has the correct status and is already included in live contacts
-      return this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && this.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
+      return this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW &&
+      this.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW &&
+      this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
 
     isCallFishing () {
