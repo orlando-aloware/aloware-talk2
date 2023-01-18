@@ -9,9 +9,7 @@ export default class Device {
     this.carrier = carrier
     this._callbacks = {
       registered: [],
-      ready: [],
       unregistered: [],
-      offline: [],
       incoming: [],
       error: [],
       disconnect: [],
