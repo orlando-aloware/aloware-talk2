@@ -563,6 +563,7 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
         console.log('Successfully connected call', call)
+        console.log('heyy')
         this.updateUnownedContactLastCommunicationStatus()
         this.dialerCallPrep(call)
         this.startCallTimer()
