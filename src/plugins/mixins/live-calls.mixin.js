@@ -337,10 +337,10 @@ export default {
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
 
-      if (_.isEmpty(this.dialer.parkedCall)) {
-        this.setDialerParkedCall(this.communication)
-        console.log('park call 3', this.communication)
-      }
+      // if (_.isEmpty(this.dialer.parkedCall)) {
+      //   this.setDialerParkedCall(this.communication)
+      //   console.log('park call 3', this.communication)
+      // }
 
       this.answerCommunication(false, true)
     },
