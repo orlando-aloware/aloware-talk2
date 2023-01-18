@@ -265,7 +265,8 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'setSearch',
       'foldersLoaded',
-      'addPowerDialerOpen'
+      'addPowerDialerOpen',
+      'createPdListClose'
     ]),
     setCount () {
       if (this.params.contact_ids) {
@@ -299,6 +300,7 @@ export default {
         .finally(() => {
           this.loading--
           this.addPowerDialerOpen(false)
+          this.createPdListClose()
         })
     },
     getRequest () {
@@ -311,6 +313,8 @@ export default {
         case 'hubspot':
           return this.importFromHubspot()
       }
+
+      return Promise.reject()
     },
     addContacts () {
       return this.$axios
