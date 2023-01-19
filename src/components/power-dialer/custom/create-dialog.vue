@@ -153,15 +153,22 @@ export default {
       }
     },
     handleClick (evt) {
+      // close this dialog box if:
+      // - when Power Dialer Task Options is not visible and target element does not belong to
+      //   the dialog and class does not contain contact-menu-item and create-item
+      // - when Power Dialer Task Options is visible and powerDialerParams' target is empty
       if (
-        evt.target &&
-        !(this.$refs.createDialog && this.$refs.createDialog.constructor.name === 'Object' && this.$refs.createDialog.contains(evt.target)) &&
-        !evt.path.find(path => path.className && typeof path.className === 'string' && path.className.split(' ').includes('move-dialog')) &&
-        !evt.target.classList.contains('contact-menu-item') &&
-        !evt.target.classList.contains('create-item')
+        (
+          !this.isAddPowerDialerOpen &&
+          evt.target &&
+          (this.$refs.createDialog && ['Object', 'HTMLDivElement'].includes(this.$refs.createDialog.constructor.name) && !this.$refs.createDialog.contains(evt.target)) &&
+          !evt.target.classList.contains('contact-menu-item') &&
+          !evt.target.classList.contains('create-item')
+        ) ||
+        (this.isAddPowerDialerOpen && !this.powerDialerParams.target)
       ) {
-        this.createPdListClose()
         this.searchValue = ''
+        this.createPdListClose()
         document.body.removeEventListener('click', this.handleClick)
       }
     },
