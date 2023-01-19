@@ -11,10 +11,12 @@
       </div>
       <div class="folder__arrow d-flex align-items-center" @click="onToggleFolder">
         <folder-arrow-open-icon v-if="isOpen"
+                                class="pe-none"
                                 :class="{ 'transparent': folders.length === 0 }"
                                 color="#62666E">
         </folder-arrow-open-icon>
         <folder-arrow-close-icon v-if="!isOpen"
+                                 class="pe-none"
                                  :class="{ 'transparent': folders.length === 0 }"
                                  color="#62666E">
         </folder-arrow-close-icon>

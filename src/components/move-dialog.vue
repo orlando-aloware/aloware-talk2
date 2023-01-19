@@ -230,10 +230,12 @@ export default {
       }
     },
     handleClick (evt) {
+      const isReferenceElementExists = this.$refs.moveDialog && ['Object', 'HTMLDivElement'].includes(this.$refs.moveDialog.constructor.name)
+      const dialogContainsTarget = isReferenceElementExists && this.$refs.moveDialog.contains(evt.target)
+
       if (
         evt.target &&
-        !(this.$refs.moveDialog && this.$refs.moveDialog.constructor.name === 'Object' && this.$refs.moveDialog.contains(evt.target)) &&
-        !evt.path.find(path => path.className && typeof path.className === 'string' && path.className.split(' ').includes('move-dialog')) &&
+        !dialogContainsTarget &&
         !evt.target.classList.contains('contact-menu-item') &&
         !evt.target.classList.contains('move-item')
       ) {
