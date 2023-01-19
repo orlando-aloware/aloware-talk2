@@ -76,7 +76,7 @@
                 </div>
               </div>
               <span class="message-text d-flex"
-                   v-else-if="['incomingCall', 'callFishing'].includes(id) && campaignName && !ringGroupName">
+                    v-else-if="['incomingCall', 'callFishing'].includes(id) && campaignName && !ringGroupName">
                 {{ campaignName }}
               </span>
             </div>
@@ -340,8 +340,7 @@ export default {
       const dialerCommunicationId = get(this.dialer, 'communication.id', null)
       const callFishingCommunicationId = get(this.dialer, 'callFishing.communication', null)
       return (
-        (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) ||
-          (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
+        (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) || (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
         !this.dialer.parkedCall
     },
     queueCount () {
@@ -386,6 +385,10 @@ export default {
 
       if (this.isSequence) {
         return 'Call from Sequence'
+      }
+
+      if (this.isCallWaiting) {
+        return 'Call Waiting'
       }
 
       return 'New Inbound Call'
@@ -453,6 +456,14 @@ export default {
       }
 
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
+    },
+
+    isCallWaiting () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
     }
   },
   created () {
