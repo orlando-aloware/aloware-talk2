@@ -1,5 +1,9 @@
 export const PLAYBACK_SPEED_OPTIONS = [
   {
+    value: 0.5,
+    label: '0.5x'
+  },
+  {
     value: 0.75,
     label: '0.75x'
   },
@@ -18,5 +22,9 @@ export const PLAYBACK_SPEED_OPTIONS = [
   {
     value: 1.75,
     label: '1.75x'
+  },
+  {
+    value: 2,
+    label: '2x'
   }
 ]
