@@ -707,7 +707,6 @@ export default {
           if (this.$route.params.channel === 'mentions') {
             this.filter.page = this.nextPage
           } else {
-            console.log(this.nextPage)
             this.filter.cursor = this.nextPage
           }
 
