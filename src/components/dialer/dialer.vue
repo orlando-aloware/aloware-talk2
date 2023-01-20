@@ -193,55 +193,6 @@ export default {
       // }
     })
 
-    this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
-      console.log('Successfully connected call', call)
-      const map = call._connection.customParameters
-      const customParameters = {}
-      map.forEach((value, key) => {
-        customParameters[key] = value
-      })
-      this.setDialerCall({
-        from: call.from,
-        to: call.to,
-        callSid: call.callSid,
-        state: call.state,
-        isMuted: call.isMuted,
-        customParameters: customParameters,
-        direction: call._connection._direction
-      })
-      this.startCallTimer()
-      this.setDialerCurrentStatus('CALL_CONNECTED')
-      this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
-        .then(res => {
-          // execute only if we have a response
-          if (res) {
-            this.updateUnownedContactLastCommunicationStatus(res.data.user_id)
-          }
-        })
-        // .finally(() => {
-        //   this.$router.push({ name: 'Call' }).catch(err => {
-        //     console.log(err)
-        //   })
-        //   setTimeout(() => {
-        //    this.startCallTimer()
-        //    this.setDialerCurrentStatus('CALL_CONNECTED')
-        //   }, 3000)
-        // })
-        .catch((err) => {
-          console.log(err)
-        })
-
-      // mute the phone
-      if (this.dialer.isMuted) {
-        this.forceMute()
-      }
-
-      // close the dialer form when it's open and incoming call is answered
-      if (this.dialerFormStatus) {
-        this.setDialerFormStatus(false)
-      }
-    })
-
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
       this.removeUnownedLiveContactTask()
