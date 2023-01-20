@@ -266,7 +266,10 @@ export default {
       if (this.$route.params.channel === 'mentions') {
         return this.currentPage + 1
       }
-      return this.pagination.next
+
+      // using cursor parameter from next_page_url
+      const nextUrl = new URL(this.pagination.next_page_url)
+      return nextUrl.searchParams.get('cursor')
     },
 
     filterButtonVariant () {
@@ -704,6 +707,7 @@ export default {
           if (this.$route.params.channel === 'mentions') {
             this.filter.page = this.nextPage
           } else {
+            console.log(this.nextPage)
             this.filter.cursor = this.nextPage
           }
 
