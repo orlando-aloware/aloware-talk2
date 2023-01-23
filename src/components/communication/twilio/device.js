@@ -42,6 +42,10 @@ export default class TwilioDevice extends MainDevice {
     return this._device.audio.setInputDevice(inputDevice)
   }
 
+  updateToken (token) {
+    return this._device.updateToken(token)
+  }
+
   availableOutputDevices () {
     if (!this._device || !this._device.audio) {
       return []

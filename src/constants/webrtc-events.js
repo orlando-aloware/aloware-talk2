@@ -5,6 +5,7 @@ export const ERROR = 'error'
 export const DISCONNECT = 'disconnect'
 export const CONNECT = 'connect'
 export const CANCEL = 'cancel'
+export const TOKEN_WILL_EXPIRE = 'tokenWillExpire'
 
 export const CONNECTION_ACCEPT = 'accept'
 export const CONNECTION_CANCEL = 'cancel'

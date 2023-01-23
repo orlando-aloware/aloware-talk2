@@ -146,6 +146,10 @@ export default {
       }
     })
 
+    this.device.on(WebrtcEvents.TOKEN_WILL_EXPIRE, () => {
+      this.getDesktopToken(true)
+    })
+
     this.device.on(WebrtcEvents.ERROR, (error) => {
       this.removeUnownedLiveContactTask()
       this.handleError(error)
@@ -419,18 +423,23 @@ export default {
         console.log('Twilio token', this.dialer.token)
         // setup twilio client
 
-        /**
-         * An ordered list of preferred codecs. Currently, 'pcmu' and 'opus' are supported.
-         * PCMU will remain default until the next breaking release,
-         * however we recommend testing and using Opus as it can provide better quality for lower bandwidth,
-         * particularly noticeable in poor network conditions.
-         */
-        // initialize twilio client
-        this.device.initialize(this.dialer.token, {
-          edge: ['ashburn', 'roaming'],
-          codecPreferences: ['opus', 'pcmu']
-        })
-        this.device.register()
+        if (!reset) {
+          /**
+           * An ordered list of preferred codecs. Currently, 'pcmu' and 'opus' are supported.
+           * PCMU will remain default until the next breaking release,
+           * however we recommend testing and using Opus as it can provide better quality for lower bandwidth,
+           * particularly noticeable in poor network conditions.
+           */
+          // initialize twilio client
+          this.device.initialize(this.dialer.token, {
+            edge: ['ashburn', 'roaming'],
+            codecPreferences: ['opus', 'pcmu']
+          })
+
+          this.device.register()
+        } else {
+          this.device.updateToken(this.dialer.token);
+        }
 
         return Promise.resolve(res)
       }).catch(err => {

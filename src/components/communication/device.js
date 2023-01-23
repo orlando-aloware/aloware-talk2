@@ -2,6 +2,7 @@ import * as Carriers from '../../constants/carriers'
 import * as Events from '../../constants/webrtc-events'
 import DeviceError from './twilio/error'
 import TwilioConnection from './twilio/connection'
+import {TOKEN_WILL_EXPIRE} from "../../constants/webrtc-events";
 const TwilioClientDevice = require('@twilio/voice-sdk').Device
 
 export default class Device {
@@ -14,7 +15,8 @@ export default class Device {
       error: [],
       disconnect: [],
       connect: [],
-      cancel: []
+      cancel: [],
+      token_will_expire: [],
     }
     this._device = null
     this._is_initialized = false
@@ -79,6 +81,9 @@ export default class Device {
     })
     this._device.on(Events.CANCEL, (connection) => {
       this._executeCallback(Events.CANCEL, [this._createConnection(connection)])
+    })
+    this._device.on(Events.TOKEN_WILL_EXPIRE, () => {
+      this._executeCallback(Events.TOKEN_WILL_EXPIRE)
     })
   }
 }
