@@ -438,7 +438,7 @@ export default {
 
           this.device.register()
         } else {
-          this.device.updateToken(this.dialer.token);
+          this.device.updateToken(this.dialer.token)
         }
 
         return Promise.resolve(res)
