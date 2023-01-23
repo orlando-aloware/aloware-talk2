@@ -423,19 +423,19 @@ export default {
         console.log('Twilio token', this.dialer.token)
         // setup twilio client
 
-        if (!reset) {
-          /**
-           * An ordered list of preferred codecs. Currently, 'pcmu' and 'opus' are supported.
-           * PCMU will remain default until the next breaking release,
-           * however we recommend testing and using Opus as it can provide better quality for lower bandwidth,
-           * particularly noticeable in poor network conditions.
-           */
-          // initialize twilio client
-          this.device.initialize(this.dialer.token, {
-            edge: ['ashburn', 'roaming'],
-            codecPreferences: ['opus', 'pcmu']
-          })
+        /**
+         * An ordered list of preferred codecs. Currently, 'pcmu' and 'opus' are supported.
+         * PCMU will remain default until the next breaking release,
+         * however we recommend testing and using Opus as it can provide better quality for lower bandwidth,
+         * particularly noticeable in poor network conditions.
+         */
+        // initialize twilio client
+        this.device.initialize(this.dialer.token, {
+          edge: ['ashburn', 'roaming'],
+          codecPreferences: ['opus', 'pcmu']
+        })
 
+        if (!reset) {
           this.device.register()
         } else {
           this.device.updateToken(this.dialer.token)
