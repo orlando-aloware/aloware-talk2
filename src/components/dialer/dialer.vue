@@ -147,6 +147,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.TOKEN_WILL_EXPIRE, () => {
+      console.log('Regenerating Token.')
       this.getDesktopToken(true)
     })
 
@@ -435,6 +436,7 @@ export default {
           codecPreferences: ['opus', 'pcmu']
         })
 
+        console.log(reset)
         if (!reset) {
           this.device.register()
         } else {
