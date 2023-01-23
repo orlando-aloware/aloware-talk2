@@ -15,7 +15,7 @@ export default class Device {
       disconnect: [],
       connect: [],
       cancel: [],
-      token_will_expire: []
+      tokenWillExpire: []
     }
     this._device = null
     this._is_initialized = false
@@ -81,8 +81,8 @@ export default class Device {
     this._device.on(Events.CANCEL, (connection) => {
       this._executeCallback(Events.CANCEL, [this._createConnection(connection)])
     })
-    // this._device.on(Events.TOKEN_WILL_EXPIRE, () => {
-    //   this._executeCallback(Events.TOKEN_WILL_EXPIRE)
-    // })
+    this._device.on(Events.TOKEN_WILL_EXPIRE, () => {
+      this._executeCallback(Events.TOKEN_WILL_EXPIRE)
+    })
   }
 }
