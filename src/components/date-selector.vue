@@ -110,7 +110,7 @@ export default {
 
   watch: {
     value (date) {
-      this.date = window.moment(date)
+      this.date = date ? window.moment(date) : null
     }
   }
 }

@@ -1,4 +1,5 @@
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import { mapActions, mapState } from 'vuex'
@@ -120,8 +121,9 @@ export default {
       }
 
       // make sure that comms has the correct status and is already included in live contacts
-      return [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(this.communication.current_status2) &&
-        this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
+      return this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW &&
+      this.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW &&
+      this.liveContacts.findIndex(item => item.id === this.contact.id) >= 0
     },
 
     isCallFishing () {
@@ -334,9 +336,9 @@ export default {
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
 
-      if (_.isEmpty(this.dialer.parkedCall)) {
-        this.setDialerParkedCall(this.communication)
-      }
+      // if (_.isEmpty(this.dialer.parkedCall)) {
+      //   this.setDialerParkedCall(this.communication)
+      // }
 
       this.answerCommunication(false, true)
     },

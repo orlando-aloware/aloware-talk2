@@ -1,22 +1,15 @@
 <template>
-  <q-card
-    :disabled="sessionLoader"
-    flat
-    class="p-0">
+  <q-card class="p-0"
+          flat
+          :disabled="sessionLoader">
     <q-card-section class="px-0"
                     style="overflow:auto;">
-
-      <ScriptSelector
-        v-model="scriptId"
-        class="px-3 w-100"
-        @on-change="changeScript" />
-
-      <div
-        v-html="scriptText"
-        class="t-scroll-y2 py-3 px-3"
-        style="overflow:auto;">
-      </div>
-
+      <ScriptSelector class="px-3 w-100"
+                      v-model="scriptId"
+                      @on-change="changeScript" />
+      <div class="t-scroll-y2 py-3 px-3"
+           style="overflow:auto;"
+           v-html="scriptText" />
     </q-card-section>
   </q-card>
 </template>
@@ -62,6 +55,8 @@ export default {
   },
   mounted () {
     this.scriptId = this.sessionSettings.script_id
+
+    this.changeScript()
   },
   data () {
     return {
@@ -71,13 +66,29 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
+      'getTranslatedScript',
       'getLastCommunicationScript'
     ]),
     async changeScript (val) {
       const lastCommunication = { data: null, id: null }
       lastCommunication.id = _.get(this.activeTask, 'last_communication.id', null)
 
+      // if last_communication isnt present, search in script directly
       if (!lastCommunication.id) {
+        if (this.scriptId && this.activeTask?.contact_id) {
+          const res = await this.getTranslatedScript({
+            id: this.activeTask.contact_id,
+            params: {
+              campaign_id: this.sessionSettings.campaign_id,
+              phone_number: this.activeTask.contact_phone_number,
+              script_id: this.selectedScript,
+              user_id: this.activeTask.user_id
+            }
+          })
+
+          this.script = res.data
+        }
+
         return
       }
 

@@ -15,8 +15,10 @@
       <div
         @click="onToggleFolder"
         class="folder__arrow pd-arrow-create">
-        <FolderArrowOpenIcon v-if="isOpen" />
-        <FolderArrowCloseIcon v-if="!isOpen" />
+        <FolderArrowOpenIcon class="pe-none"
+                             v-if="isOpen" />
+        <FolderArrowCloseIcon class="pe-none"
+                              v-if="!isOpen" />
       </div>
 
       <div
