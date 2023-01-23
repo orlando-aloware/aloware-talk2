@@ -146,10 +146,10 @@ export default {
       }
     })
 
-    this.device.on(WebrtcEvents.TOKEN_WILL_EXPIRE, () => {
-      console.log('Regenerating Token.')
-      this.getDesktopToken(true)
-    })
+    // this.device.on(WebrtcEvents.TOKEN_WILL_EXPIRE, () => {
+    //   console.log('Regenerate token')
+    //   this.getDesktopToken(true)
+    // })
 
     this.device.on(WebrtcEvents.ERROR, (error) => {
       this.removeUnownedLiveContactTask()
