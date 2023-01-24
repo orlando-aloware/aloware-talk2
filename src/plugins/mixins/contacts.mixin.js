@@ -183,7 +183,7 @@ export default {
       }, true, true)
     },
     onSearch (searchText) {
-      // ignore search if previous and current search
+      // ignore search if previous and current search are the same
       if (this.previousSearch === searchText) {
         return
       }
