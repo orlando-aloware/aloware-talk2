@@ -450,7 +450,7 @@ export const ALL_COLUMNS = [
   {
     name: 'line_type',
     label: 'Line Type',
-    relationName: 'phoneNumbers',
+    relationName: 'primaryPhoneNumber',
     category: 0,
     order: 41,
     sortable: false,
