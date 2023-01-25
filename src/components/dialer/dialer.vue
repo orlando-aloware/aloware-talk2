@@ -990,7 +990,7 @@ export default {
 
       if (add.mode === 'phone-number') {
         params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
-        this.setAddedParty(this.$options.filters.fixPhone(add.phone_number, 'NATIONAL', true, true))
+        this.setAddedParty(this.$options.filters.fixPhone(add.phoneNumber, 'NATIONAL', true, true))
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
