@@ -277,6 +277,7 @@ export default {
         }
       } else {
         this.powerDialerTaskFilters.in_queue.total_queued -= 1
+        this.$VueEvent.fire('redial_task')
       }
     }
   },

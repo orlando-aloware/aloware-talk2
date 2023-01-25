@@ -330,6 +330,7 @@ export default {
     this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
+    this.$VueEvent.stop('redial_task', this.requeueTask)
   },
   computed: {
     ...mapFields([
@@ -535,6 +536,7 @@ export default {
     this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
+    this.$VueEvent.listen('redial_task', this.requeueTask)
 
     this.isSessionRunning = false
   },
@@ -543,6 +545,10 @@ export default {
     ...mapActions(['setShowPhone']),
     ...mapActions('contacts', [
       'setContactClone'
+    ]),
+    ...mapActions('powerDialer', [
+      'reQueuePowerDialerTask',
+      'removeFirstInQueueTask'
     ]),
     processHangup () {
       this.$VueEvent.fire('hangupCall')
@@ -708,7 +714,7 @@ export default {
           this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
-            this.powerDialerTasks.in_queue.shift()
+            this.removeFirstInQueueTask()
           }
 
           this.activeTask = this.taskToCall
@@ -845,7 +851,7 @@ export default {
         }, 500)
       }
 
-      this.clearRedialedTask()
+      this.clearRedialedTasks()
       clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
@@ -865,11 +871,12 @@ export default {
             this.resetTimer()
           }
 
-          // automate next task only if no wrap-up and
-          // no manual skip (clicked next task) is in-progress
+          // automate next task only if no wrap-up, no in-progress redial,
+          // and no manual skip (clicked next task) is in-progress
           if (this.isSessionRunning &&
             this.wrapUpSeconds === -1 &&
-            !this.loadingNext) {
+            !this.loadingNext &&
+            !this.isRedialClicked) {
             this.onNextTask()
           }
           break
@@ -929,6 +936,7 @@ export default {
     },
     processSession (noWrapUp = false) {
       this.onPhoneExpansionReset()
+
       if (!noWrapUp) {
         this.$VueEvent.fire('endWrapUp')
       }
@@ -948,7 +956,13 @@ export default {
     },
     async onNextTask (forceSkip = false, skipWrapUp = false) {
       this.loadingNext = true
-      this.skipWrapUp = skipWrapUp
+
+      // only skip wrap-up if dialer's status is not yet in
+      // wrap-up
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        this.skipWrapUp = skipWrapUp
+      }
+
       this.onPhoneExpansionReset()
 
       // end wrap up
@@ -976,7 +990,7 @@ export default {
           return
         }
 
-        this.powerDialerTasks.in_queue.shift()
+        this.removeFirstInQueueTask()
         this.processSession()
         return
       }
@@ -990,7 +1004,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
-        this.powerDialerTasks.in_queue.shift()
+        this.removeFirstInQueueTask()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -1027,6 +1041,7 @@ export default {
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
+          this.removeFirstInQueueTask()
           this.processSession(true)
         }, 200)
         return
@@ -1041,30 +1056,61 @@ export default {
     async onRedial () {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
-      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+
+      // get the next task
+      const task = get(this.powerDialerTasks.in_queue, '0', null)
+      this.taskToCall = cloneDeep(task)
+
+      // end session if no more tasks
+      if (isEmpty(task)) {
+        this.hasActiveTask = false
+        this.reRoute()
+        return
+      }
+
       this.redialTask(this.activeTask).then(() => {
-        this.powerDialerTasks.in_queue.push(this.activeTask)
-        this.activeTask = this.taskToCall
-        this.isRedialClicked = false
+        // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
-
-        // if wrap is indefinite, manually move the queue
-        if (this.wrapUpSeconds === 0) {
-          this.powerDialerTasks.in_queue.shift()
-        }
-
         // when there is wrap up, skip wrap
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
+            this.redialedTask = this.$jsonClone(this.activeTask)
+            this.isRedialClicked = false
             this.wrapUp = false
             this.skipWrapUp = false
-            this.hasActiveTask = false
             this.processSession()
           }, 1000)
+          return
         }
+
+        // if no wrap-up, proceed to the next task
+        setTimeout(() => {
+          this.redialedTask = this.$jsonClone(this.activeTask)
+          this.isRedialClicked = false
+          this.processSession()
+        }, 1000)
+      }).catch((err) => {
+        setTimeout(() => {
+          this.redialedTask = {}
+          this.isRedialClicked = false
+        }, 1000)
+        console.log(err)
+        this.$generalNotification('Failed to process the redial.', 'error')
       })
+    },
+    requeueTask () {
+      if (isEmpty(this.redialedTask)) {
+        return
+      }
+
+      const task = this.$jsonClone(this.redialedTask)
+      this.reQueuePowerDialerTask({
+        task: task,
+        id: task.contact_list_item_id
+      })
+      this.redialedTask = {}
     }
   },
   watch: {
@@ -1119,6 +1165,15 @@ export default {
       } else {
         this.initialize()
       }
+    },
+    'dialer.isReady': function () {
+      // session is not ready if session failed to call the contact
+      // because dialer is not reaady. If dialer reconnects and status
+      // goes to ready, then we can continue running the task
+      if (!this.sessionNotReady) {
+        this.runTask()
+        this.sessionNotReady = false
+      }
     }
   },
   data () {
@@ -1136,8 +1191,8 @@ export default {
       hangUpIntervalCounter: 0,
       loadingHold: false,
       loadingUnhold: false,
-      skipWrapUp: false,
-      isRedialClicked: false
+      isRedialClicked: false,
+      redialedTask: {}
     }
   }
 }

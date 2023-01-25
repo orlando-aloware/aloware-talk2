@@ -76,9 +76,8 @@ export default {
       params: {
         'page': 1,
         'per_page': 25,
-        'filter_groups[0][filters][search][value]': '',
-        'filter_groups[0][is_conjunction]': true,
-        'sort': 'last_engagement_at',
+        'search': null,
+        'sort': 'name',
         'order': 'desc'
       },
       forceLoading: false
@@ -117,7 +116,7 @@ export default {
       this.options = []
 
       if (this.search.length >= this.threshold) {
-        this.params['filter_groups[0][filters][search][value]'] = this.search
+        this.params.search = this.search
 
         this.loadContacts()
       }
@@ -145,12 +144,14 @@ export default {
       this.forceLoading = true
       this.$emit('loading')
 
-      const url = '/api/v2/contacts'
-
+      const url = '/api/v2/contacts/quick-search'
       const response = await this.$axios.get(url, { params: this.params })
       const contacts = response.data.data
 
       contacts.forEach(contact => {
+        // force contact_id to be the id, default is contact phone number
+        contact.id = contact.contact_id
+
         this.options.push(this.formatContact(contact))
       })
 

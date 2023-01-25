@@ -2,6 +2,7 @@
 import { CONTACTS_ACCESS_OWNED_ONLY } from 'src/constants/contact-access-types'
 import { mapActions, mapState } from 'vuex'
 import { CURRENT_STATUS_HOLD_NEW, CURRENT_STATUS_INPROGRESS_NEW } from 'src/constants/communication-current-status'
+import { get } from 'lodash'
 
 export default {
   data () {
@@ -50,13 +51,14 @@ export default {
         })
       }
     },
-    updateUnownedContactLastCommunicationStatus () {
+    updateUnownedContactLastCommunicationStatus (userId = null) {
       this.unownedContact.interval = setInterval(() => {
         if (this.dialer.contact) {
+          const commUserId = get(this.dialer, 'communication.user_id', userId)
           this.updateLiveContactLastCommProperties({
             id: this.dialer.contact.id,
             status: CURRENT_STATUS_INPROGRESS_NEW,
-            user_id: this.dialer.communication.user_id
+            user_id: commUserId
           })
           clearInterval(this.unownedContact.interval)
         }

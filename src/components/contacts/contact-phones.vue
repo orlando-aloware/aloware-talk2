@@ -87,7 +87,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContactSelectedPhone', 'setMessageComposerMode', 'setMessageComposerSmsPhoneNumber']),
+    ...mapActions('contacts', [
+      'setContactSelectedPhone',
+      'setMessageComposerMode',
+      'setMessageComposerSmsPhoneNumber',
+      'removeContactPhoneNumber'
+    ]),
 
     onAddPhone () {
       this.setContactSelectedPhone(null)
@@ -126,12 +131,8 @@ export default {
           this.isDeleting = true
           talk2Api.V1.contact.deletePhone(this.contact.id, phone.id)
             .then(response => {
+              this.removeContactPhoneNumber(phone)
               this.$generalNotification('Phone number has been deleted.')
-              talk2Api.V1.contact.getPhoneNumbers()
-                .catch(err => {
-                  console.log(err)
-                  this.$handleErrors(err.response)
-                })
             }).catch(error => {
               console.log(error)
               this.$handleErrors(error.response)

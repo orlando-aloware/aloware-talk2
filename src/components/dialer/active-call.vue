@@ -1,7 +1,7 @@
 <template>
-  <q-item :class="[ sessionPaused ? 'bg-grey-7' : '', profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? 'wrap-up' : '' ]"
+  <q-item :class="activeCallClass"
           class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
-          v-if="dialer && profile && ['MAKING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(dialer.currentStatus)"
+          v-if="showActiveCall"
           clickable
           v-ripple
           :disabled="sessionPaused"
@@ -42,7 +42,7 @@
 
     <q-item-section side>
       <q-btn :disable="dialer.currentStatus === 'MAKING_CALL' || isHangingUp"
-             v-if="profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP"
+             v-if="dialer.currentStatus !== 'WRAP_UP'"
              icon="img:app-icons/dialer/hangup_btn.svg"
              size="22px"
              class="icon-btn auto-size height-22"
@@ -96,7 +96,8 @@ export default {
         return ''
       }
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP ||
+        this.dialer.currentStatus === 'WRAP_UP') {
         return 'Wrapping Up'
       }
 
@@ -150,6 +151,25 @@ export default {
     hasParkedCallContact () {
       return this.dialer.parkedCall &&
         this.dialer.parkedCall.contact
+    },
+    activeCallClass () {
+      return [
+        (this.sessionPaused ? 'bg-grey-7' : ''),
+        (this.dialer.currentStatus === 'WRAP_UP' ? 'wrap-up' : '')
+      ]
+    },
+    showActiveCall () {
+      const statuses = [
+        'MAKING_CALL',
+        'CALL_CONNECTED',
+        'HANGING_UP_CALL',
+        'CALL_DISCONNECTED',
+        'WRAP_UP'
+      ]
+
+      return this.dialer &&
+        this.profile &&
+        statuses.includes(this.dialer.currentStatus)
     }
   },
 

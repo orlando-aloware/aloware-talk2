@@ -351,6 +351,7 @@ import SessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
+import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
 import { isEqual } from 'lodash'
 
@@ -427,7 +428,8 @@ export default {
         script_id: null,
         skip_outside_daytime_hours: 1,
         user_id: null,
-        warmup_period_in_seconds: 0
+        warmup_period_in_seconds: 0,
+        order: POWER_DIALER_ORDER.default
       }
     }
   },
@@ -477,7 +479,7 @@ export default {
       'updateContactsList',
       'getSessionSetting',
       'getPowerDialerList',
-      'clearRedialedTask'
+      'clearRedialedTasks'
     ]),
     ...mapMutations('powerDialer', [
       'ADD_NEW_SESSION_SETTING',
@@ -487,7 +489,7 @@ export default {
       this.dialog = true
     },
     async beginDial () {
-      this.clearRedialedTask()
+      this.clearRedialedTasks()
       const requests = {
         res: null,
         newList: null
@@ -653,7 +655,8 @@ export default {
         script_id: null,
         skip_outside_daytime_hours: 1,
         user_id: null,
-        warmup_period_in_seconds: 0
+        warmup_period_in_seconds: 0,
+        order: POWER_DIALER_ORDER.default
       }
       if (this.sessionSettings?.id && isExistingList) {
         params.id = this.sessionSettings.id
