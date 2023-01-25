@@ -273,8 +273,6 @@ export default {
     onApplyChanges () {
       const typeQuery = _.get(this.$route, 'query.type', null)
 
-      console.log('-- onApplyChanges:', typeQuery, this.currentColumns)
-
       if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) ||
         (typeQuery && typeQuery === 'public') ||
         this.resourceId === 'unsaved') {
