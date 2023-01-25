@@ -285,10 +285,13 @@ export default {
   addRedialedTask: ({ commit }, taskId) => {
     commit('ADD_REDIALED_TASK', taskId)
   },
-  clearRedialedTask: ({ commit }) => {
+  clearRedialedTasks: ({ commit }) => {
     commit('CLEAR_REDIALED_TASKS')
   },
-  setPowerDialerTasksInQueue: ({ commit }, inQueue) => {
-    commit('SET_POWER_DIALER_TASKS_IN_QUEUE', inQueue)
+  removeFirstInQueueTask: ({ commit }) => {
+    commit('REMOVE_FIRST_IN_QUEUE_TASK')
+  },
+  reQueuePowerDialerTask: ({ commit }, payload) => {
+    commit('REQUEUE_POWER_DIALER_TASK', payload)
   }
 }

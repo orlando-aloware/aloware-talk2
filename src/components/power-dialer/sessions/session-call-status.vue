@@ -330,6 +330,7 @@ export default {
     this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
+    this.$VueEvent.stop('redial_task', this.requeueTask)
   },
   computed: {
     ...mapFields([
@@ -535,6 +536,7 @@ export default {
     this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
     this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
     this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
+    this.$VueEvent.listen('redial_task', this.requeueTask)
 
     this.isSessionRunning = false
   },
@@ -543,6 +545,10 @@ export default {
     ...mapActions(['setShowPhone']),
     ...mapActions('contacts', [
       'setContactClone'
+    ]),
+    ...mapActions('powerDialer', [
+      'reQueuePowerDialerTask',
+      'removeFirstInQueueTask'
     ]),
     processHangup () {
       this.$VueEvent.fire('hangupCall')
@@ -708,7 +714,7 @@ export default {
           this.taskToCall = cloneDeep(task)
 
           if (this.taskToCall) {
-            this.popFirstInQueueTask()
+            this.removeFirstInQueueTask()
           }
 
           this.activeTask = this.taskToCall
@@ -845,7 +851,7 @@ export default {
         }, 500)
       }
 
-      this.clearRedialedTask()
+      this.clearRedialedTasks()
       clearInterval(this.countdownInterval)
       setTimeout(() => {
         this.$emit('on-redirect', this.selectedList)
@@ -984,7 +990,7 @@ export default {
           return
         }
 
-        this.popFirstInQueueTask()
+        this.removeFirstInQueueTask()
         this.processSession()
         return
       }
@@ -998,7 +1004,7 @@ export default {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
       if (this.taskToCall) {
-        this.popFirstInQueueTask()
+        this.removeFirstInQueueTask()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -1035,7 +1041,7 @@ export default {
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
-          this.popFirstInQueueTask()
+          this.removeFirstInQueueTask()
           this.processSession(true)
         }, 200)
         return
@@ -1067,14 +1073,13 @@ export default {
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
-
         // when there is wrap up, skip wrap
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
+            this.redialedTask = this.$jsonClone(this.activeTask)
             this.isRedialClicked = false
             this.wrapUp = false
             this.skipWrapUp = false
-            this.popFirstInQueueTask()
             this.processSession()
           }, 1000)
           return
@@ -1082,22 +1087,30 @@ export default {
 
         // if no wrap-up, proceed to the next task
         setTimeout(() => {
+          this.redialedTask = this.$jsonClone(this.activeTask)
           this.isRedialClicked = false
-          this.popFirstInQueueTask()
           this.processSession()
         }, 1000)
       }).catch((err) => {
         setTimeout(() => {
+          this.redialedTask = {}
           this.isRedialClicked = false
         }, 1000)
         console.log(err)
         this.$generalNotification('Failed to process the redial.', 'error')
       })
     },
-    popFirstInQueueTask () {
-      const pdInQueue = this.$jsonClone(this.powerDialerTasks.in_queue)
-      pdInQueue.shift()
-      this.setPowerDialerTasksInQueue(pdInQueue)
+    requeueTask () {
+      if (isEmpty(this.redialedTask)) {
+        return
+      }
+
+      const task = this.$jsonClone(this.redialedTask)
+      this.reQueuePowerDialerTask({
+        task: task,
+        id: task.contact_list_item_id
+      })
+      this.redialedTask = {}
     }
   },
   watch: {
@@ -1178,7 +1191,8 @@ export default {
       hangUpIntervalCounter: 0,
       loadingHold: false,
       loadingUnhold: false,
-      isRedialClicked: false
+      isRedialClicked: false,
+      redialedTask: {}
     }
   }
 }

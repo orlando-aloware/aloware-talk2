@@ -479,7 +479,7 @@ export default {
       'updateContactsList',
       'getSessionSetting',
       'getPowerDialerList',
-      'clearRedialedTask'
+      'clearRedialedTasks'
     ]),
     ...mapMutations('powerDialer', [
       'ADD_NEW_SESSION_SETTING',
@@ -489,7 +489,7 @@ export default {
       this.dialog = true
     },
     async beginDial () {
-      this.clearRedialedTask()
+      this.clearRedialedTasks()
       const requests = {
         res: null,
         newList: null
