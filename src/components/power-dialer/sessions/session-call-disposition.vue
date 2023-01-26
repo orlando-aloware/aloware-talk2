@@ -63,10 +63,7 @@ export default {
   },
   mounted () {
     this.sessionPaused = false
-
-    if (!this.dialer.communication) {
-      this.$refs.callDispositionSelector.showLoading()
-    }
+    this.initCallDisposition()
   },
   computed: {
     ...mapFields('powerDialer', [
@@ -164,6 +161,14 @@ export default {
         this.$handleErrors(err.response)
         this.$refs.contactDispositionSelector.hideLoading()
       })
+    },
+    initCallDisposition () {
+      if (isEmpty(this.dialer.communication)) {
+        this.$refs.callDispositionSelector.showLoading()
+        return
+      }
+
+      this.$refs.callDispositionSelector.hideLoading()
     }
   },
   data () {
@@ -177,18 +182,13 @@ export default {
     'contact.id': function () {
       this.selectedContactDisposition = null
       this.selectedCallDisposition = null
-
-      if (!this.dialer.communication) {
-        this.$refs.callDispositionSelector.showLoading()
-      }
+      this.initCallDisposition()
     },
-    'dialer.communication': function (value) {
-      if (isEmpty(value)) {
-        this.$refs.callDispositionSelector.showLoading()
-        return
-      }
-
-      this.$refs.callDispositionSelector.hideLoading()
+    sessionPaused () {
+      this.initCallDisposition()
+    },
+    'dialer.communication': function () {
+      this.initCallDisposition()
     }
   }
 }

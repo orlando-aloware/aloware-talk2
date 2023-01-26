@@ -481,6 +481,9 @@ export default {
       'getPowerDialerList',
       'clearRedialedTask'
     ]),
+    ...mapActions([
+      'setDialerCommunication'
+    ]),
     ...mapMutations('powerDialer', [
       'ADD_NEW_SESSION_SETTING',
       'SET_SESSION_SETTINGS'
@@ -490,6 +493,7 @@ export default {
     },
     async beginDial () {
       this.clearRedialedTask()
+      this.cleanupDialer()
       const requests = {
         res: null,
         newList: null
@@ -669,6 +673,11 @@ export default {
     },
     isSessionValid (data) {
       return this.selectedItemId === data.id
+    },
+    cleanupDialer () {
+      if (this.dialer.isReady && this.dialer.currentStatus === 'READY') {
+        this.setDialerCommunication()
+      }
     }
   },
   watch: {

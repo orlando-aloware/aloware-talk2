@@ -14,7 +14,7 @@
                    v-show="loading">
           <template #overlay>
             <q-spinner-bars color="primary"
-                            size="40px" />
+                            size="20px" />
           </template>
         </b-overlay>
         <template v-if="hasContent">
