@@ -1,14 +1,5 @@
 <template>
   <div class="position-relative">
-    <b-overlay class="h-100 w-100 position-absolute"
-               rounded="sm"
-               :show="true"
-               v-show="loading">
-      <template #overlay>
-        <q-spinner-bars color="primary"
-                        size="40px" />
-      </template>
-    </b-overlay>
     <div :class="headerClass"
          v-if="headerLabel">
       <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
@@ -16,7 +7,16 @@
       </div>
     </div>
     <div class="d-flex t-menu__content over-flow px-3">
-      <div class="chip-ellipsis">
+      <div class="chip-ellipsis position-relative">
+        <b-overlay class="h-100 w-100 position-absolute"
+                   rounded="sm"
+                   :show="true"
+                   v-show="loading">
+          <template #overlay>
+            <q-spinner-bars color="primary"
+                            size="40px" />
+          </template>
+        </b-overlay>
         <template v-if="hasContent">
           <template
             v-for="(chip, key) in filteredListItems">
