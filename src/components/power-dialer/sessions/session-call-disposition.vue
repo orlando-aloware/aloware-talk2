@@ -9,7 +9,7 @@
     </div>
     <div v-else class="t-menu pb-2">
       <ChipsEllipsis
-        headerLabel="CONTACT DISPOSITION"
+        headerLabel="CALL DISPOSITION"
         headerClass="t-menu__header no-border t-dense d-flex align-items-center"
         ref="callDispositionSelector"
         identity="call-disposition"
