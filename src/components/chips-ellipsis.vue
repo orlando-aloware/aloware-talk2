@@ -38,7 +38,7 @@
             </q-chip>
           </template>
           <b-dropdown
-            v-if="!hasReachedLimit"
+            v-if="hasExceededLimit"
             text="..."
             no-caret
             right size="sm"
@@ -150,8 +150,8 @@ export default {
       }
       return false
     },
-    hasReachedLimit () {
-      return this.listItems.length < this.displayCount
+    hasExceededLimit () {
+      return this.listItems.length > this.displayCount
     }
   },
   methods: {
