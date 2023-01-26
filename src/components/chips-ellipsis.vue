@@ -11,10 +11,12 @@
         <b-overlay class="h-100 w-100 position-absolute"
                    rounded="sm"
                    :show="true"
-                   v-show="loading">
+                   v-show="disabled || loading">
           <template #overlay>
+            <div v-if="disabled"></div>
             <q-spinner-bars color="primary"
-                            size="20px" />
+                            size="20px"
+                            v-else/>
           </template>
         </b-overlay>
         <template v-if="hasContent">
@@ -105,11 +107,17 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+    initiallyDisabled: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
     return {
-      loading: false
+      loading: false,
+      disabled: true
     }
   },
   computed: {
@@ -154,6 +162,9 @@ export default {
       return this.listItems.length > this.displayCount
     }
   },
+  created () {
+    this.disabled = this.initiallyDisabled
+  },
   methods: {
     onClick (chip) {
       this.$emit('on-selected-item', chip)
@@ -164,6 +175,12 @@ export default {
     },
     hideLoading () {
       this.loading = false
+    },
+    disable () {
+      this.disabled = true
+    },
+    enable () {
+      this.disabled = false
     }
   }
 }
