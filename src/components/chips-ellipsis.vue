@@ -74,9 +74,9 @@
 </template>
 
 <script>
-
 export default {
   name: 'ChipsEllipsis',
+
   props: {
     identity: {
       type: String,
@@ -114,12 +114,14 @@ export default {
       default: false
     }
   },
+
   data () {
     return {
       loading: false,
       disabled: true
     }
   },
+
   computed: {
     filteredListItems () {
       const listItems = [...this.listItems]
@@ -139,12 +141,15 @@ export default {
       }
       return this.listItems
     },
+
     hasContent () {
       return this.listItems?.length > 0
     },
+
     selectedItemId () {
       return this.selectedItem || ''
     },
+
     selectedItemObject () {
       return this.filteredListItems.find((list, index) => {
         if (index >= this.displayCount) {
@@ -152,33 +157,41 @@ export default {
         }
       })
     },
+
     hasSelectedObject () {
       if (this.selectedItemObject?.id) {
         return true
       }
       return false
     },
+
     hasExceededLimit () {
       return this.listItems.length > this.displayCount
     }
   },
+
   created () {
     this.disabled = this.initiallyDisabled
   },
+
   methods: {
     onClick (chip) {
       this.$emit('on-selected-item', chip)
       this.loading = true
     },
+
     showLoading () {
       this.loading = true
     },
+
     hideLoading () {
       this.loading = false
     },
+
     disable () {
       this.disabled = true
     },
+
     enable () {
       this.disabled = false
     }

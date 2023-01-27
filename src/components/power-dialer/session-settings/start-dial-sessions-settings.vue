@@ -344,7 +344,6 @@
 </template>
 
 <script>
-
 import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionsForm from './start-dial-sessions-form'
@@ -357,6 +356,7 @@ import { isEqual } from 'lodash'
 
 export default {
   name: 'StartDialSessionsSettings',
+
   props: {
     list: {
       type: Object
@@ -370,31 +370,38 @@ export default {
       default: true
     }
   },
+
   components: {
     SessionsForm,
     PhoneIcon,
     CheckIcon,
     SettingIcon
   },
+
   computed: {
     ...mapState(['dialer']),
+
     ...mapFields('powerDialer', [
       'sessionSettings',
       'dialerSessionSettings',
       'activeList',
       'myQueue'
     ]),
+
     ...mapGetters('powerDialer', [
       'personalSessionSettings',
       'companySessionSettings',
       'sessionSettingGroups'
     ]),
+
     defaultValues () {
       return { ...DEFAULT_SETTING_VALUES }
     },
+
     selectedItemName () {
       return this.selectedItem?.name
     },
+
     hasSelectedTemporarySetting () {
       if (!this.selectedItem?.id) {
         return true
@@ -404,15 +411,18 @@ export default {
       }
       return false
     },
+
     isCompanyScope () {
       return this.selectedItem?.is_company_scope === 1
     },
+
     listId () {
       if (this.list.id === 'my-queue') {
         return this.myQueue.id
       }
       return this.list.id
     },
+
     filterSelectedItem () {
       if (this.selectedItem?.id) {
         return this.selectedItem
@@ -433,10 +443,12 @@ export default {
       }
     }
   },
+
   async mounted () {
     // await this.setSessionSettingGroup()
     this.selectedItem = this.defaultValues
   },
+
   data () {
     return {
       dialog: false,
@@ -466,6 +478,7 @@ export default {
       loadingText: 'Preparing session settings..'
     }
   },
+
   methods: {
     ...mapActions('powerDialer', [
       'setSessionSettingGroup',
@@ -481,16 +494,20 @@ export default {
       'getPowerDialerList',
       'clearRedialedTask'
     ]),
+
     ...mapActions([
       'setDialerCommunication'
     ]),
+
     ...mapMutations('powerDialer', [
       'ADD_NEW_SESSION_SETTING',
       'SET_SESSION_SETTINGS'
     ]),
+
     dialPreparation () {
       this.dialog = true
     },
+
     async beginDial () {
       this.clearRedialedTask()
       this.cleanupDialer()
@@ -548,6 +565,7 @@ export default {
         this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
       }
     },
+
     async loadSettings (data) {
       this.loading = true
       const request = {
@@ -566,6 +584,7 @@ export default {
       this.selectedItem = request.res?.id ? request.res : this.defaultValues
       this.loading = false
     },
+
     async saveAsNew () {
       this.loading = true
       const newSettings = { ...this.filterSelectedItem }
@@ -584,6 +603,7 @@ export default {
       this.loading = false
       this.isBusy = false
     },
+
     async updateSelectedSetting () {
       this.saveDisabled = true
       const res = await this.updateDialerSessionSetting(
@@ -598,20 +618,24 @@ export default {
       this.onUpdatedSessionMetrics()
       this.saveDisabled = false
     },
+
     onUpdatedSessionMetrics () {
       if (isEqual(this.filterSelectedItem, this.sessionSettings)) {
         return
       }
       this.$emit('on-update-session-metrics')
     },
+
     onDeleteRequest (id) {
       this.newSetting = true
       this.deleteId = id
     },
+
     onRename (data) {
       this.newSetting = true
       this.updateObj = data
     },
+
     async renameSetting () {
       this.updateObj.name = this.newSettingName
       this.isBusy = true
@@ -626,6 +650,7 @@ export default {
         this.isBusy = false
       }
     },
+
     async onDeleteSetting () {
       this.isBusy = true
       const res = await this.deleteDialerSessionSetting(this.deleteId)
@@ -637,9 +662,11 @@ export default {
         this.isBusy = false
       }
     },
+
     fetchedGroupSettings (type) {
       return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
     },
+
     toggleSelected () {
       if (this.hoveredMenu) {
         // If hovered, trigger actions
@@ -647,6 +674,7 @@ export default {
         this.hovered = ''
       }
     },
+
     resetDefaults (isExistingList = true) {
       const params = {
         call_disposition_ids: [],
@@ -668,18 +696,22 @@ export default {
       this.selectedItemId = this.list?.dialer_session_id
       this.setDefaultSettings(params)
     },
+
     removeEmptyParams (params) {
       return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== null && v.length !== 0))
     },
+
     isSessionValid (data) {
       return this.selectedItemId === data.id
     },
+
     cleanupDialer () {
       if (this.dialer.isReady && this.dialer.currentStatus === 'READY') {
         this.setDialerCommunication()
       }
     }
   },
+
   watch: {
     async dialog (val) {
       if (val) {
@@ -708,6 +740,7 @@ export default {
         this.selectedItem = {}
       }
     },
+
     newSetting (val) {
       if (!val) {
         this.deleteId = null
