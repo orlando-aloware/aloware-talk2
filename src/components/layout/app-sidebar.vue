@@ -75,6 +75,10 @@
            v-show="!isActive('Power Dialer') && !profile.auto_dialer_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -118,6 +122,10 @@
            v-show="!isActive('Calendar') && !profile.calendar_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
