@@ -361,10 +361,12 @@ export default {
     list: {
       type: Object
     },
+
     disabledTrigger: {
       type: Boolean,
       default: false
     },
+
     defaultTrigger: {
       type: Boolean,
       default: true

@@ -82,32 +82,39 @@ export default {
       type: String,
       default: 'item'
     },
+
     listItems: {
       type: Array,
       default: () => []
     },
+
     selectedItem: {
       type: [Number, String],
       default: null
     },
+
     displayCount: {
       type: Number,
       default: 0
     },
+
     defaultLabel: {
       type: String,
       default: 'No record found'
     },
+
     headerLabel: {
       type: String,
       required: false,
       default: ''
     },
+
     headerClass: {
       type: String,
       required: false,
       default: ''
     },
+
     initiallyDisabled: {
       type: Boolean,
       required: false,
