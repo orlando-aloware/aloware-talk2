@@ -2,12 +2,12 @@
   <q-card
     flat
     style="height: 100%;">
-    <div
-      v-if="sessionPaused"
-      class="text-h6 text-grey-80 full-height fill-width row justify-center items-center">
+    <div class="text-h6 text-grey-80 full-height fill-width row justify-center items-center"
+         v-show="sessionPaused">
       Session Paused
     </div>
-    <div v-else class="t-menu pb-2">
+    <div class="t-menu pb-2"
+         v-show="!sessionPaused">
       <ChipsEllipsis
         initiallyDisabled
         headerLabel="CALL DISPOSITION"
