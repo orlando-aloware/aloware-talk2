@@ -849,7 +849,7 @@ export default {
       'setListContactsLoaded'
     ]),
     onSearch (searchText) {
-      this.$emit('search', searchText)
+      this.$emit('search', searchText.trim())
     },
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
