@@ -79,10 +79,6 @@
            v-show="!isActive('Power Dialer') && !profile.auto_dialer_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
@@ -98,10 +94,6 @@
            class="nav-icons w-100"
            v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
@@ -117,10 +109,6 @@
            class="nav-icons w-100"
            v-show="!isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
       <q-tooltip
         anchor="center right"
         self="center left"
@@ -137,10 +125,6 @@
            v-show="!isActive('Calendar') && !profile.calendar_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -155,10 +139,6 @@
            class="nav-icons w-100"
            v-show="isActive('Calendar') && profile.calendar_enabled"
            flat>
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -173,10 +153,6 @@
            class="nav-icons w-100"
            v-show="!isActive('Calendar') && profile.calendar_enabled"
            flat>
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
