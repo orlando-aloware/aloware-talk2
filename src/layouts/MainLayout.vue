@@ -571,7 +571,7 @@ export default {
 
     // new in-app call notification
     this.$VueEvent.listen('new_in_app_call', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         this.processActionNotification(communication, 'call')
       }
     })
