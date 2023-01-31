@@ -572,7 +572,11 @@ export default {
     // new in-app call notification
     this.$VueEvent.listen('new_in_app_call', (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        this.processActionNotification(communication, 'call')
+        const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+        // ignore call notifications if the call is not fishing mode and the user is in sleep mode
+        if (((ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting) || !this.profile.sleep_mode) {
+          this.processActionNotification(communication, 'call')
+        }
       }
     })
 

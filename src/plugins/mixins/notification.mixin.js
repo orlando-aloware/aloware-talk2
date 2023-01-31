@@ -21,9 +21,6 @@ export default {
       'appointmentNotifiedDesktop',
       'reminderNotifiedDesktop',
       'notificationAudio'
-    ]),
-    ...mapState('auth', [
-      'profile'
     ])
   },
 
@@ -258,10 +255,6 @@ export default {
           }
 
           const callType = (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting ? 'callFishing' : 'incomingCall'
-          // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-          if (callType === 'incomingCall' && this.profile.sleep_mode) {
-            return
-          }
           const campaignName = _.get(communication, 'campaign.name', null)
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
