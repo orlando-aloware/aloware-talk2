@@ -9,7 +9,13 @@
          v-if="!playing"></i>
     </button>
     <div :id="'waveform-' + uniqueId"
-         class="waveform flex-grow-1 mr-2"></div>
+         class="waveform flex-grow-1 mr-2">
+        <div v-if="loading" class="d-flex justify-center position-relative">
+          <q-spinner-bars color="success"
+                        size="28px"
+                        class="position-absolute"/>
+        </div>
+      </div>
     <div class="waveform-timeline mr-1">
       <q-select
         dense
@@ -70,6 +76,7 @@ export default {
         cursorColor: '#2D5BFF'
       },
       playing: false,
+      loading: true,
       ready: false,
       duration: 0,
       currentTime: 0,
@@ -94,6 +101,7 @@ export default {
     if (this.player) {
       this.player.on('ready', () => {
         this.ready = true
+        this.loading = false
         this.$emit('ready')
         this.duration = this.player.getDuration()
       })
