@@ -494,7 +494,7 @@ export default {
       'updateContactsList',
       'getSessionSetting',
       'getPowerDialerList',
-      'clearRedialedTask'
+      'clearRedialedTasks'
     ]),
 
     ...mapActions([
@@ -511,7 +511,7 @@ export default {
     },
 
     async beginDial () {
-      this.clearRedialedTask()
+      this.clearRedialedTasks()
       this.cleanupDialer()
       const requests = {
         res: null,
