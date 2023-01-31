@@ -1,7 +1,7 @@
 <template>
   <div class="w-100">
     <div v-if="hasAudio">
-      <div class="audio-player p-2 ">
+      <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"
              v-if="remoteUrl">
           <waveform :remoteUrl="remoteUrl"
