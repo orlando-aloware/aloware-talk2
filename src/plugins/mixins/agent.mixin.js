@@ -67,7 +67,7 @@ export default {
       })
     },
 
-    resetAgentStatus () {
+    resetAgentStatus (forceStatus = false) {
       const agentStatus = { data: null }
       switch (this.oldAgentStatus) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
@@ -88,11 +88,11 @@ export default {
       console.log('new agent status [reset]: ', agentStatus.data)
       // check status
       if (this.profile.agent_status !== agentStatus.data) {
-        this.changeAgentStatus(agentStatus.data)
+        this.changeAgentStatus(agentStatus.data, forceStatus)
       }
     },
 
-    changeAgentStatus: _.debounce(function (val, changeAgentStatusTry = 1) {
+    changeAgentStatus: _.debounce(function (val, forceStatus = false, changeAgentStatusTry = 1) {
       if (!this.authenticated) {
         return
       }
@@ -109,6 +109,11 @@ export default {
           agent_status: val
         }).then(({ data }) => {
           this.loadingAgentStatus = false
+          if (forceStatus && val !== data.agent_status) {
+            console.log(`Requested Agent status value (${val}) and API response value (${data.agent_status}) is not the same. Retrying request...`)
+            this.changeAgentStatus(val, forceStatus)
+            return
+          }
           this.setAgentStatus(data.agent_status)
           this.$VueEvent.fire('user_updated', data)
           console.log('Changed agent status [api]: ', data.agent_status)
@@ -120,7 +125,7 @@ export default {
           if (changeAgentStatusTry > 3) {
             this.loadingAgentStatus = false
           } else {
-            this.changeAgentStatus(val, changeAgentStatusTry)
+            this.changeAgentStatus(val, forceStatus, changeAgentStatusTry)
           }
         })
       }

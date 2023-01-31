@@ -842,7 +842,7 @@ export default {
         this.hangUpIntervalCounter = 0
         this.hangUpInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.$VueEvent.fire('endWrapUp')
+            this.$VueEvent.fire('forceEndWrapUp')
           }
 
           this.hangUpIntervalCounter++
@@ -886,7 +886,14 @@ export default {
           // if task is manually skipped through the
           // Next button, end the wrap up
           if (this.skipWrapUp) {
-            this.$VueEvent.fire('endWrapUp')
+            // we need to clear the wrap-up (set agent status to available)
+            // after the session ended
+            if (this.powerDialerTasks.in_queue.length === 0) {
+              this.$VueEvent.fire('forceEndWrapUp')
+            } else { // just end the wrap-up
+              this.$VueEvent.fire('endWrapUp')
+            }
+
             this.wrapUp = false
             this.skipWrapUp = false
             return
