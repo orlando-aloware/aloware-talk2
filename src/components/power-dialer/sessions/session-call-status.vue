@@ -629,6 +629,7 @@ export default {
           this.reRoute()
           return
         }
+
         if (!this.togglePause &&
           !this.wrapUp) {
           this.runTask()
@@ -820,7 +821,8 @@ export default {
     resetTimer () {
       if (this.ongoingSession.finishedPdSession ||
         this.countdownTimer <= -1) {
-        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
+        const warmUpPeriod = get(this.sessionSettings, 'warmup_period_in_seconds', 0)
+        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : warmUpPeriod
         return
       }
 
@@ -955,11 +957,11 @@ export default {
       }, 1000)
     },
     async onNextTask (forceSkip = false, skipWrapUp = false) {
+      let noWrapUp = false
       this.loadingNext = true
 
-      // only skip wrap-up if dialer's status is not yet in
-      // wrap-up
-      if (this.dialer.currentStatus !== 'WRAP_UP') {
+      // when there is wrap up, skip wrap
+      if (this.wrapUpSeconds !== -1) {
         this.skipWrapUp = skipWrapUp
       }
 
@@ -968,6 +970,7 @@ export default {
       // end wrap up
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
+        noWrapUp = true
       }
 
       // hangup in-progress call
@@ -991,7 +994,7 @@ export default {
         }
 
         this.removeFirstInQueueTask()
-        this.processSession()
+        this.processSession(noWrapUp)
         return
       }
 
@@ -1162,7 +1165,11 @@ export default {
     wrapUp (value) {
       if (value) {
         this.startWarmUpCountDown()
-      } else {
+        return
+      }
+
+      // re-run/re-initialize only if no manual skip wrap-up
+      if (!this.skipWrapUp) {
         this.initialize()
       }
     },
