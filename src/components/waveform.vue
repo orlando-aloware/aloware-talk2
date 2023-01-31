@@ -8,12 +8,14 @@
       <i class="fa fa-play"
          v-if="!playing"></i>
     </button>
-    <div :id="'waveform-' + uniqueId"
-         class="waveform flex-grow-1 mr-2">
-        <div v-if="loading" class="d-flex justify-center position-relative">
+    <div class="waveform flex-grow-1 mr-2"
+         :id="'waveform-' + uniqueId">
+        <div class="d-flex justify-center position-relative"
+             v-if="loading">
           <q-spinner-bars color="success"
                         size="28px"
-                        class="position-absolute"/>
+                        class="position-absolute">
+          </q-spinner-bars>
         </div>
       </div>
     <div class="waveform-timeline mr-1">
