@@ -311,7 +311,7 @@ export default {
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
       },
       counts (params, cancelTokenSource) {
-        return window.axios.get(`/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
+        return window.axios.get(`https://reporting.aloware.io/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
       inboxCounts () {
         return window.axios.get(`/api/v2/contacts/inbox-counts`)
