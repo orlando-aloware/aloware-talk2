@@ -1078,6 +1078,8 @@ export default {
         return
       }
 
+      this.redialedTask = this.$jsonClone(this.activeTask)
+
       this.redialTask(this.activeTask).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
@@ -1086,7 +1088,6 @@ export default {
         // when there is wrap up, skip wrap
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
-            this.redialedTask = this.$jsonClone(this.activeTask)
             this.isRedialClicked = false
             this.wrapUp = false
             this.skipWrapUp = false
@@ -1097,7 +1098,6 @@ export default {
 
         // if no wrap-up, proceed to the next task
         setTimeout(() => {
-          this.redialedTask = this.$jsonClone(this.activeTask)
           this.isRedialClicked = false
           this.processSession()
         }, 1000)

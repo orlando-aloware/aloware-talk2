@@ -322,7 +322,7 @@ export default {
       if (!this.activeTask) {
         return {
           ...pdTasks,
-          in_queue: this.powerDialerTasks.in_queue
+          in_queue: this.$jsonClone(this.powerDialerTasks.in_queue)
         }
       }
 
