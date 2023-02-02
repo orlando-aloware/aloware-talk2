@@ -812,8 +812,11 @@ export default {
             }
             this.setContacts(contacts.data)
 
-            this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-            this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+            // only trigger counts request if action comes from the same user
+            if (communication.user_id === this.profile.id) {
+              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+            }
           }
         }
       }
