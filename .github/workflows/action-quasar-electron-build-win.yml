@@ -66,6 +66,7 @@ jobs:
           ENV_APP_ENV: ${{ secrets.app_env }}
           ENV_APP_DEBUG: ${{ secrets.app_debug }}
           ENV_API_URL: ${{ secrets.api_url }}
+          ENV_API_REPORTING_URL: ${{ secrets.api_reporting_url }}
           ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
           ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
@@ -87,6 +88,7 @@ jobs:
           APP_ENV: ${{ secrets.app_env }}
           APP_DEBUG: ${{ secrets.app_debug }}
           API_URL: ${{ secrets.api_url }}
+          API_REPORTING_URL: ${{ secrets.api_reporting_url }}
 
           # Pusher Configuration
           PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
