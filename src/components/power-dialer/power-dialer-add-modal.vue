@@ -383,7 +383,7 @@ export default {
     },
     getListCount (id) {
       return this.$axios
-        .get(`/api/v2/power-dialer-lists/${id}/count`)
+        .get(`${process.env.API_REPORTING_URL}/api/v2/power-dialer-lists/${id}/count`)
     },
     async checkHubspotList () {
       this.loading++

@@ -275,15 +275,27 @@ export default {
         if (this.pagesFetched >= 3) {
           this.powerDialerTaskFilters.in_queue.total_queued -= 1
         }
-      } else {
-        this.powerDialerTaskFilters.in_queue.total_queued -= 1
-        this.$VueEvent.fire('redial_task')
+
+        return
       }
+
+      this.powerDialerTaskFilters.in_queue.total_queued -= 1
+      this.$VueEvent.fire('redial_task')
     }
   },
   watch: {
-    totalTasksInQueue () {
-      this.fetchQueuedTasks()
+    activeTask: {
+      handler (newValue, oldValue) {
+        const newContactListItemId = get(newValue, 'contact_list_item_id', null)
+        const oldContactListItemId = get(oldValue, 'contact_list_item_id', null)
+
+        // check if current and previous active task are not the same,
+        // then check if we can fetch more tasks
+        if (newContactListItemId !== oldContactListItemId) {
+          this.fetchQueuedTasks()
+        }
+      },
+      deep: true
     }
   },
   beforeDestroy () {
