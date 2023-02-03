@@ -262,6 +262,7 @@
 
     <template slot="table">
       <datatable
+        ref="contactsTable"
         :stickyHeaders="true"
         :columns="columns"
         :isEmpty="isEmpty || isStartState"
@@ -1571,16 +1572,14 @@ export default {
         }
       }
     },
-    'fixedContactsData': {
-      deep: true,
-      handler: function () {
-        this.hasNextPage = !_.isEmpty(this.fixedContactsData.next_page_url)
-      }
+    'fixedContactsData.next_page_url': function (value) {
+      this.hasNextPage = !_.isEmpty(value)
     },
     list: {
       deep: true,
       handler: function () {
         this.loadList(this.$route.params.id)
+        this.$refs.contactsTable.resetScroll()
       }
     },
     showMyContacts (value) {

@@ -88,7 +88,7 @@ export default {
     getContactData (id, source) {
       if (!id || id === 'undefined') {
         console.log('Failed to get contact: Missing contact id!')
-        return null
+        return Promise.resolve()
       }
 
       return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })

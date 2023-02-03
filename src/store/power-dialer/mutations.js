@@ -172,7 +172,7 @@ export default {
       delete powerDialerDefaultState.redialed
     }
 
-    state = Object.assign(state, PowerDialerDefault.DEFAULT_STATE)
+    state = Object.assign(state, powerDialerDefaultState)
 
     if (!value.includes('all')) {
       return
@@ -180,5 +180,24 @@ export default {
 
     // else, perform state reset
     state = Object.assign({}, PowerDialerDefault.DEFAULT_STATE)
+  },
+  REMOVE_FIRST_IN_QUEUE_TASK (state) {
+    state.powerDialerTasks.in_queue.shift()
+  },
+  REQUEUE_POWER_DIALER_TASK (state, payload) {
+    const task = payload.task
+    const taskId = payload.id
+    const index = state.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.contact_list_item_id === taskId)
+
+    // if task is found, remove it and re-add it again in the queue
+    // (we're just moving it to the end of the queue)
+    if (index !== -1) {
+      const removed = state.powerDialerTasks.in_queue.splice(index, 1)
+      state.powerDialerTasks.in_queue.push(removed[0])
+      return
+    }
+
+    // add the task to the end of the queue
+    state.powerDialerTasks.in_queue.push(task)
   }
 }

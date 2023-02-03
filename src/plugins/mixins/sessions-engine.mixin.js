@@ -1,6 +1,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
+import { isEmpty } from 'lodash'
 
 export default {
   data () {
@@ -20,7 +21,8 @@ export default {
   },
   methods: {
     ...mapActions('powerDialer', [
-      'getSessionTaskByFilter'
+      'getSessionTaskByFilter',
+      'reQueuePowerDialerTask'
     ]),
     ...mapActions(['setShowPhone']),
     async fetchInQueueTasks (task) {
@@ -53,7 +55,7 @@ export default {
       this.setShowPhone(false)
     },
     onStatusInProgress (task) {
-      if (!task) {
+      if (isEmpty(task)) {
         return
       }
 
@@ -72,20 +74,15 @@ export default {
       }
     },
     onStatusQueued (task) {
-      if (!task) {
-        return
-      }
+      // if (isEmpty(task)) {
+      //   return
+      // }
 
       // Status Queued
-      let taskToMove = this.powerDialerTasks.in_queue.find(lst => lst.contact_list_item_id === task.id)
-      if (taskToMove) {
-        this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
-        this.powerDialerTasks.in_queue.push(taskToMove)
-      } else {
-        this.powerDialerTasks.in_queue.push(this.activeTask)
-      }
-
-      window.VueEvent.fire('initiate_session')
+      // this.reQueuePowerDialerTask({
+      //   task: task,
+      //   id: task.id
+      // })
     },
     onStatusScheduled (task) {
       // Status Scheduled
