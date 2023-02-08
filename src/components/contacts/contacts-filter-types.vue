@@ -221,10 +221,13 @@ export default {
         case 'multi_relation':
         case 'boolean':
           return [1, 2].includes(this.filterOperator)
+
         case 'number':
           return [1, 2, 3, 4, 5, 6, 7].includes(this.filterOperator)
+
         case 'date':
           return [1].includes(this.filterOperator)
+
         default:
           return true
       }
@@ -238,10 +241,13 @@ export default {
       switch (true) {
         case this.filter.type === 'number':
           return [7].includes(this.filterOperator)
+
         case this.filter.type === 'date':
           return [5].includes(this.filterOperator)
+
         case this.filter.key === 'custom_attribute':
           return true
+
         default:
           return false
       }
@@ -253,6 +259,7 @@ export default {
     },
 
     specialStringTypeEvents () {
+      // determines if user input should search or create a custom option
       return this.isSpecialStringTypeFilterKey ? {
         'filter': this.filterOptionsFn
       } : {
@@ -266,6 +273,7 @@ export default {
   created () {
     this.options = this.filter.options
 
+    // special string type filters are filters with preloaded list of options
     if (this.isSpecialStringTypeFilterKey) {
       switch (this.filter.key) {
         case 'cnam_country':
@@ -308,6 +316,7 @@ export default {
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
     this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
+
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
       this.setValue()
@@ -327,12 +336,15 @@ export default {
         case 'number':
           this.setNumberValue(value)
           break
+
         case 'date':
           this.setDateValue(value)
           break
+
         case 'relation':
           this.setRelationValue(filter)
           break
+
         default:
           this.filterOperatorValue = value
       }
@@ -369,17 +381,21 @@ export default {
         case 'string':
           value.data = this.getStringValue()
           break
+
         case 'relation':
         case 'multi_relation':
           // write in value object directly because 'data' and 'field' might be assigned
           value = this.getRelationTypesValue()
           break
+
         case 'number':
           value.data = this.getNumberValue()
           break
+
         case 'date':
           value.data = this.getDateValue()
           break
+
         default:
           value.data = this.filterOperatorValue
       }
@@ -489,15 +505,17 @@ export default {
 
     applyFilter () {
       this.setListContactsLoaded(false)
+
       const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+
       this.setCurrentListFilters(this.allFilters)
-      this.updateContactsListFilter({
-        id: this.selectedList.id,
-        filters: this.allFilters
-      })
+
+      // update initial list filters with new set of currently selected filters
       this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+
       this.$emit('filtersApplied')
 
+      // update the results with new query
       if (!_.isEqual(this.initialListFilters, currentListFilters)) {
         this.setShowMyContacts(false)
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
@@ -598,10 +616,12 @@ export default {
 
           this.isValidated = filterOperator && secondaryFilterOperator
           break
+
         case 'number':
           this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
             (this.filterOperatorValue && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
           break
+
         case 'date':
           // if there are two operators in a date filter, check if both operator values
           // are not empty
@@ -625,6 +645,7 @@ export default {
           // its operator(s) has/have value(s)
           this.isValidated = isOperatorValidValue || isSecondOperatorValidValue
           break
+
         case 'selection':
         case 'boolean':
           this.isValidated = this.filterOperator && this.filterOperatorValue !== null

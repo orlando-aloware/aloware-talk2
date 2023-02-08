@@ -78,11 +78,14 @@ export default {
       'setPreviousListId',
       'updateContactsListFilter'
     ]),
+
     ...mapActions('powerDialer', [
       'updateMyQueueListData',
       'setSelectedPDList'
     ]),
+
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
+
     init: _.debounce(function (clear = false) {
       if (this.$route.name === 'Contact') {
         this.isLoadingMore = true
@@ -90,14 +93,17 @@ export default {
 
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
+
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
-      } else {
-        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
-        this.initialListFilters = defaultFilters
-        this.filtersCount = this.getFiltersCount(defaultFilters)
+        return
       }
+
+      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
+      this.initialListFilters = defaultFilters
+      this.filtersCount = this.getFiltersCount(defaultFilters)
     }, 200),
+
     onSortByField (sorts) {
       this.isLoaded = false
       this.sorts = sorts
@@ -109,6 +115,7 @@ export default {
       }, true, true)
       document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
     },
+
     onLoadMore (list = null) {
       let path = 'api/v2/contacts'
       if (this.hasMore) {
@@ -171,9 +178,11 @@ export default {
           })
       }
     },
+
     onPaginate (params) {
       this.fetch(params)
     },
+
     onFetchMyContacts (checked) {
       this.isLoading = true
       this.fetch({
@@ -182,6 +191,7 @@ export default {
         page: this.contactsData.page
       }, true, true)
     },
+
     onSearch (searchText) {
       // ignore search if previous and current search are the same
       if (this.previousSearch === searchText) {
@@ -203,24 +213,30 @@ export default {
         isSearch: true
       }, true, true)
     },
+
     apiEndpoint (queued) {
       if (!this.isPowerDialer) {
         return 'api/v2/contacts'
       }
+
       if (queued) {
         return `api/v2/power-dialer-lists/my-queue/items`
       }
+
       switch (this.$route.meta.id) {
         case 'power-dialer-add-list':
         case 'power-dialer-add-queue-list':
           return `api/v2/contacts`
+
         case 'power-dialer':
         case 'power-dialer-queue-filter':
           return `api/v2/power-dialer-lists/my-queue/items`
+
         default:
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
+
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
@@ -315,6 +331,7 @@ export default {
           console.log(err)
         })
     },
+
     fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
       const isSearch = _.get(params, 'isSearch', false)
 
@@ -351,22 +368,29 @@ export default {
 
       this.isLoading = true
 
+      // for power dialer list contacts fetching
       if (typeof this.isPowerDialer !== 'undefined') {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
             this.processFetch(params, false, true, clear, isSearch)
             break
+
           case 'power-dialer-list-filter':
             this.processFetch(params, false, false, clear, isSearch)
             break
+
           default:
             this.processFetch(params, false, false, clear, isSearch)
         }
-      } else {
-        this.processFetch(params, true, false, clear, isSearch)
+
+        return
       }
+
+      // contacts list contacts fetching
+      this.processFetch(params, true, false, clear, isSearch)
     },
+
     buildQueryString (params, isContactModule = true) {
       // contacts query
       const query = {
@@ -385,13 +409,8 @@ export default {
         !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(this.list.id))
 
       if (params.search) {
-        // for "All Contacts" list and dynamic type actual list
-        // insert search filter as a separate filter entity
-        if (this.list && (this.list.id === 'all' || isDynamicActualList)) {
-          filters.search = {}
-          filters.search.value = params.search
-        }
-
+        // for contacts list
+        query.search = params.search
         // for power dialer query
         powerQuery.keyword = params.search
       }
@@ -429,42 +448,6 @@ export default {
         })
       }
 
-      if (!_.isEmpty(this.currentListFilters)) {
-        const listFilters = this.$jsonClone(this.currentListFilters)
-        const filterIndex = {
-          index1: null,
-          index2: null,
-          filter: null,
-          filterData: null,
-          filterType: null
-        }
-        for (filterIndex.index1 of Object.keys(listFilters)) {
-          // check if filter index is a number
-          if (!isNaN(filterIndex.index1 / 1)) {
-            // let's add the timezone if there are data filters
-            filterIndex.filterData = _.get(listFilters[filterIndex.index1], 'filters', null)
-
-            if (!filterIndex.filterData) {
-              continue
-            }
-
-            // loop through each filters
-            for (filterIndex.index2 of Object.keys(filterIndex.filterData)) {
-              filterIndex.filter = this.filters.find(filterItem => filterItem.key === filterIndex.index2)
-              filterIndex.filterType = _.get(filterIndex.filter, 'type', null)
-
-              if (filterIndex.filterType && filterIndex.filterType !== 'date') {
-                continue
-              }
-
-              // if filter type is 'date', add the browser's timezone
-              listFilters[filterIndex.index1].filters[filterIndex.index2].timezone = moment.tz.guess()
-            }
-            query.filter_groups = query.filter_groups.concat(listFilters[filterIndex.index1])
-          }
-        }
-      }
-
       // for default pinned lists and actual lists,
       // search filter must be joined/associated with the list's initial filter
       // to get correct query results
@@ -476,6 +459,53 @@ export default {
         let filters = query.filter_groups[0].filters
         filters.search = { value: params.search }
         query.filter_groups[0]['filters'] = filters
+      }
+
+      // build filter group(s)
+      if (!_.isEmpty(this.currentListFilters)) {
+        const listFilters = this.$jsonClone(this.currentListFilters)
+
+        for (const filterIndex of Object.keys(listFilters)) {
+          // check if filter index is a number
+          if (isNaN(filterIndex / 1)) {
+            continue
+          }
+
+          const filters = _.get(listFilters[filterIndex], 'filters', null)
+
+          if (!filters) {
+            continue
+          }
+
+          // loop through each filters
+          for (const filterKey of Object.keys(filters)) {
+            const filter = this.filters.find(filterItem => filterItem.key === filterKey)
+            const filterType = _.get(filter, 'type', null)
+
+            if (filterType && filterType !== 'date') {
+              continue
+            }
+
+            // if filter type is 'date', add the browser's timezone
+            listFilters[filterIndex].filters[filterKey].timezone = moment.tz.guess()
+          }
+
+          // first index of list's filter groups must be joined/associated with the list's initial filter
+          // to get correct query results
+          if (query?.filter_groups[0] && +filterIndex === 0) {
+            console.log('-- query.filter_groups 1:', query.filter_groups)
+
+            const mergedFirstFilterIndex = {
+              ...query.filter_groups[0].filters,
+              ...listFilters[filterIndex].filters
+            }
+
+            query.filter_groups[0].filters = mergedFirstFilterIndex
+            continue
+          }
+
+          query.filter_groups = query.filter_groups.concat(listFilters[filterIndex])
+        }
       }
 
       if (params?.sort) {

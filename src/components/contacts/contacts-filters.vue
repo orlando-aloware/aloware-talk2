@@ -215,7 +215,9 @@ export default {
       'isFiltersOpen',
       'selectedList'
     ]),
+
     ...mapState(['filters']),
+
     ...mapGetters('contacts', [
       'currentListFilters',
       'unsavedList'
@@ -227,7 +229,11 @@ export default {
         return this.filters
       }
 
-      return this.filters.filter(filter => filter.label.trim().toLowerCase().includes(this.filterSearch.trim().toLowerCase()))
+      return this.filters.filter(filter =>
+        filter.label.trim()
+          .toLowerCase()
+          .includes(this.filterSearch.trim().toLowerCase())
+      )
     },
 
     isEmptyListFilters () {
@@ -238,19 +244,24 @@ export default {
       // eslint-disable-next-line camelcase
       return function (groupId) {
         const label = { data: '' }
+
         // eslint-disable-next-line camelcase
         switch (groupId) {
           case this.filterGroups.GROUP_PRIMARY_INFO:
             label.data = 'Primary Information'
             break
+
           case this.filterGroups.GROUP_CONTACT_LOCATION:
             label.data = 'Contact Location'
             break
+
           case this.filterGroups.GROUP_CONTACT_RELEVANCE:
             label.data = 'Contact Relevance'
             break
+
           case this.filterGroups.GROUP_CONTACT_COMM_METADATA:
             label.data = 'Contact Communication'
+            break
         }
 
         const compare = function (a, b) {
@@ -258,10 +269,13 @@ export default {
           const filterA = a.label.toUpperCase()
           const filterB = b.label.toUpperCase()
 
-          return filterA > filterB ? 1 : (filterA < filterB ? -1 : 0)
+          return filterA > filterB
+            ? 1
+            : (filterA < filterB ? -1 : 0)
         }
 
-        const filters = !groupId ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
+        const filters = !groupId
+          ? this.filtersFiltered.filter(list => !list.group_id || list.group_id.length < 1)
           : this.filtersFiltered.filter(list => list.group_id === groupId)
 
         return {
@@ -275,9 +289,10 @@ export default {
   created () {
     if (this.filters.length < 1) {
       this.getFilters()
-    } else {
-      this.visibleListFilters = this.generateListFilters()
+      return
     }
+
+    this.visibleListFilters = this.generateListFilters()
   },
 
   mounted () {
@@ -292,6 +307,7 @@ export default {
     getFilters () {
       if (this.hasPermissionTo('list filter')) {
         this.loadingFilters = true
+
         return talk2Api.V2.filters.get()
           .then(response => {
             this.loadingFilters = false
@@ -353,7 +369,9 @@ export default {
       if (typeof filter.default !== 'undefined' && filter.default === 1) {
         return
       }
+
       const found = this.filters.find(item => item.key === filter.key)
+
       if (found) {
         this.selectedFilter = found
         this.toAddFiltersStep(index, conjunction, true)
@@ -372,6 +390,7 @@ export default {
 
       if (this.step > 1) {
         this.step -= 1
+
         // make all filters visible
         if (this.step === 2) {
           this.filterSearch = ''
@@ -386,78 +405,81 @@ export default {
 
     generateListFilters () {
       const filterGroups = this.$jsonClone(this.currentListFilters)
-      const groupIndex = { data: null }
-      const filterIndex = { data: null }
-      const found = { data: null }
-      const operator = { data: null }
-      const options = { data: null }
-      const option = { data: null }
-      const trueValue = { data: null }
-      const field = { field: null }
-      const filter = { data: null }
 
-      for (groupIndex.data in filterGroups) {
-        if (isNaN(groupIndex.data / 1) || groupIndex.data === 'search') {
-          filterGroups instanceof Array && filterGroups.splice(groupIndex.data, 1)
-          !(filterGroups instanceof Array) && delete filterGroups[groupIndex.data]
+      for (const groupIndex in filterGroups) {
+        // do not include any "none filter group filter (e.g. search, sort, order, etc.)"
+        // in the generated/rendered filters
+        if (isNaN(groupIndex / 1) || groupIndex === 'search') {
+          filterGroups instanceof Array && filterGroups.splice(groupIndex, 1)
+          !(filterGroups instanceof Array) && delete filterGroups[groupIndex]
           continue
         }
 
-        for (filterIndex.data in filterGroups[groupIndex.data].filters) {
-          if (filterIndex.data === 'search') {
+        // filter groups are in the numeric index
+        for (const filterKey in filterGroups[groupIndex].filters) {
+          if (filterKey === 'search') {
             continue
           }
 
-          found.data = this.filters.find(filter => filter.key === filterIndex.data)
+          // find and get the equivalent actual filter from all available filters
+          let filterExists = this.filters.find(filter => filter.key === filterKey)
 
-          if (!found.data) {
+          if (!filterExists) {
             continue
           }
 
-          if (_.get(found.data, 'operators', null)) {
-            filter.data = filterGroups[groupIndex.data].filters[filterIndex.data]
+          let filterData = null
+
+          // evaluate list filter's operator against its actual respective filter's operators
+          if (_.get(filterExists, 'operators', null)) {
+            filterData = filterGroups[groupIndex].filters[filterKey]
 
             // try to search for the selected option
-            operator.data = found.data.operators.find(item => item.value === filter.data.operator)
-            options.data = operator.data ? _.get(operator.data, 'options', null) : null
-            option.data = options.data ? options.data.find(item => item.value === filter.data.value) : null
+            const operatorData = filterExists.operators.find(item => item.value === filterData.operator)
+            const options = operatorData ? _.get(operatorData, 'options', null) : null
+            const option = options ? options.find(item => item.value === filterData.value) : null
 
             // set values into an array
-            trueValue.data = filter.data.value
-            trueValue.data = option.data ? [option.data.label] : trueValue.data
-            trueValue.data = typeof filter.data.value === 'string' ? filter.data.value.split(',') : [trueValue.data]
+            let trueValue = filterData.value
+            trueValue = option ? [option.label] : trueValue
+            trueValue = typeof filterData.value === 'string' ? filterData.value.split(',') : [trueValue]
 
-            // When 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
-            // The content in 'field' will be concatenated at the end of the string
-            if ('field' in filter.data) {
-              field.field = Array.isArray(trueValue.data) ? trueValue.data[0] : trueValue.data
+            // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+            // the content in 'field' will be concatenated at the end of the string
+            let field = null
+
+            if ('field' in filterData) {
+              field = Array.isArray(trueValue) ? trueValue[0] : trueValue
 
               // set values into an array (but using 'field' this time)
-              trueValue.data = filter.data.field
-              trueValue.data = option.data ? [option.data.label] : trueValue.data
-              trueValue.data = typeof filter.data.field === 'string' ? filter.data.field.split(',') : [trueValue.data]
+              trueValue = filterData.field
+              trueValue = option ? [option.label] : trueValue
+              trueValue = typeof filterData.field === 'string' ? filterData.field.split(',') : [trueValue]
             }
 
-            filterGroups[groupIndex.data].filters[filterIndex.data] = {
-              ...field,
-              key: filterIndex.data,
-              label: found.data.label,
-              operator: operator.data ? _.get(operator.data, 'label', null) : null,
-              trueValue: trueValue.data,
-              value: JSON.stringify((trueValue.data ? [trueValue.data.join(' and ')] : trueValue.data)),
-              default: filter.data.default || 0
+            filterGroups[groupIndex].filters[filterKey] = {
+              field,
+              key: filterKey,
+              label: filterExists.label,
+              operator: operatorData ? _.get(operatorData, 'label', null) : null,
+              trueValue: trueValue,
+              value: JSON.stringify((trueValue ? [trueValue.join(' and ')] : trueValue)),
+              default: filterData.default || 0
             }
-          } else {
-            filterGroups[groupIndex.data].filters[filterIndex.data] = {
-              key: filterIndex.data,
-              label: found.data.label,
-              trueValue: filter.data.value,
-              value: JSON.stringify(filter.data.value),
-              default: filter.data.default || 0
-            }
+
+            continue
+          }
+
+          filterGroups[groupIndex].filters[filterKey] = {
+            key: filterKey,
+            label: filterExists.label,
+            trueValue: filterData.value,
+            value: JSON.stringify(filterData.value),
+            default: filterData.default || 0
           }
         }
       }
+
       return filterGroups
     },
 
@@ -479,8 +501,10 @@ export default {
           case filter.trueValue.length === 1 || (isRelationType):
             values = filter.trueValue
             break
+
           case filter.trueValue.length === 2 && filter.operator !== 'Is between':
             return filter.trueValue.join(' or ')
+
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
         }
@@ -490,7 +514,9 @@ export default {
             filterFound
               .options
               // if is array search inside it, if not compare with the value
-              .filter(option => Array.isArray(index) ? index.includes(option.value) : index === option.value)
+              .filter(option => Array.isArray(index)
+                ? index.includes(option.value)
+                : index === option.value)
               .forEach(option => {
                 labels.push(option.label)
               })
@@ -516,9 +542,9 @@ export default {
         }
 
         return data
-      } else {
-        return !isSimpleType ? filter.trueValue : ''
       }
+
+      return !isSimpleType ? filter.trueValue : ''
     },
 
     getFilterLength (filter) {
@@ -527,6 +553,7 @@ export default {
 
     onDeleteFilter (index, key) {
       this.setListContactsLoaded(false)
+
       let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
       const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
       delete updatedFilter[index].filters[key]
@@ -541,7 +568,8 @@ export default {
         _.isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
-        // filter group was deleted so we decrement the index by 1
+
+        // filter group was deleted, so we decrement the index by 1
         // if current filter group index is greater than 0
         this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
       }
@@ -557,6 +585,7 @@ export default {
         id: this.selectedList.id,
         filters: updatedFilter
       })
+
       this.$emit('filtersUpdated')
     },
 
@@ -594,6 +623,7 @@ export default {
     hasDefault (filter) {
       const keys = Object.keys(filter.filters)
       const result = { hasDefault: 0 }
+
       for (let value of keys) {
         if (filter.filters[value].default === 1) {
           result.hasDefault = 1
@@ -617,10 +647,12 @@ export default {
       for (const key in filter) {
         // check if original key is numeric
         isNumerickey = !isNaN(parseInt(key))
+
         // if original key is numeric, use the incremental numeric key
         // else, the original key
         newKey = isNumerickey ? numericKey : key
         newFilter[newKey] = filter[key]
+
         // increment the numeric key if original key is numeric
         numericKey += isNumerickey ? 1 : 0
       }
@@ -636,6 +668,7 @@ export default {
       'updateContactsListFilter',
       'setListContactsLoaded'
     ]),
+
     ...mapActions(['setFilters'])
   },
 
@@ -647,6 +680,7 @@ export default {
         this.step = 1
       }
     },
+
     currentListFilters () {
       this.visibleListFilters = this.generateListFilters()
 
@@ -660,6 +694,7 @@ export default {
         this.filterGroupIndex = keys.length
       }
     },
+
     $route: {
       deep: true,
       handler: function () {
