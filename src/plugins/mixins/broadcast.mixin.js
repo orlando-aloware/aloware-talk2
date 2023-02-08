@@ -331,30 +331,10 @@ export default {
          * ------------------------------------
          */
         .listen('.user.contact_list_item.created', (event) => {
-          let contactListItem = event.contact_list_item
-          if (event.contact) {
-            contactListItem.contact = event.contact
-          }
-          if (event.communication) {
-            contactListItem.communication = event.communication
-            if (contactListItem.contact) {
-              contactListItem.communication.contact = contactListItem.contact
-            }
-          }
-          window.VueEvent.fire('contact_list_item_created', contactListItem)
+          window.VueEvent.fire('contact_list_item_created', event.contact_list_item)
         })
         .listen('.user.contact_list_item.updated', (event) => {
-          let contactListItem = event.contact_list_item
-          if (event.contact) {
-            contactListItem.contact = event.contact
-          }
-          if (event.communication) {
-            contactListItem.communication = event.communication
-            if (contactListItem.contact) {
-              contactListItem.communication.contact = contactListItem.contact
-            }
-          }
-          window.VueEvent.fire('contact_list_item_updated', contactListItem)
+          window.VueEvent.fire('contact_list_item_updated', event.contact_list_item)
         })
         .listen('.user.contact_list_item.deleting', (event) => {
           window.VueEvent.fire('contact_list_item_deleting', event.contact_list_item)
