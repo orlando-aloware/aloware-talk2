@@ -34,10 +34,10 @@
                   'column-headers-modal__item--hidden': isHidden(column)
                 }">
                 <div class="pl-2 checkbox d-flex align-items-center cursor-pointer w-100"
-                     @click="onClickedColumn(column, selected.has(column.name))">
+                     @click="onClickedColumn(column, selectedColumns.has(column.name))">
                   <input class="cursor-pointer mt-1"
                          type="checkbox"
-                         :checked="selected.has(column.name)"
+                         :checked="selectedColumns.has(column.name)"
                          :disabled="column.required"
                          :value="column.name"/>
                   <div class="flex-grow-1 pl-2 column-headers-modal__label">
@@ -159,7 +159,7 @@ import {
   DEFAULT_COLUMNS,
   POWER_DIALER_DEFAULT_COLUMNS
 } from 'src/constants/contacts-columns'
-import { ALL_RELATIONS } from 'src/constants/contacts-default-relations'
+import { ALL_COLUMNS_WITH_RELATION } from 'src/constants/contacts-default-relations'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import sortBy from 'lodash/sortBy'
 import draggable from 'vuedraggable'
@@ -175,6 +175,7 @@ export default {
     predefinedId: {
       default: null
     },
+
     previousRelations: {
       type: Array,
       default () {
@@ -182,11 +183,13 @@ export default {
       }
     }
   },
+
   components: {
     draggable,
     Search,
     ConfirmDialog
   },
+
   data () {
     return {
       searchText: '',
@@ -197,65 +200,55 @@ export default {
       confirmedSave: false
     }
   },
+
   methods: {
     ...mapActions('contacts', ['columnsClose', 'columnsUpdated']),
+
     onSearch (searchText) {
       this.searchText = searchText
     },
+
     onCheckMove (evt) {
       return evt.relatedContext.element.draggable
     },
+
     isHidden ({ name }) {
       return name === 'checkbox' || name === 'actions'
     },
-    onClickedColumn (column, selected) {
+
+    onClickedColumn (column, isInSelectedColumns) {
       if (column.required) {
         return
       }
 
-      if (selected) {
+      if (isInSelectedColumns) {
+        // remove item from the selected columns list
         this.currentColumns = this.currentColumns.filter(
           (c) => c.name !== column.name
         )
-      } else {
-        const newItems = JSON.parse(JSON.stringify(this.currentColumns))
-        const index = { data: null }
-        const found = { data: null }
 
-        // now, check if columns have order property, or
-        // check if column is required then update the sortable property.
-        for (index.data in newItems) {
-          found.data = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
-
-          if (newItems[index.data].name !== 'checkbox' && typeof newItems[index.data].order === 'undefined' && found.data) {
-            newItems[index.data].order = found.data.order
-          }
-        }
-
-        // insert the column to the nearest existing neighboring column.
-        const lesserOrder = newItems.find(col => col.order < column.order)
-        const lesserOrderIndex = lesserOrder ? newItems.indexOf(lesserOrder) : null
-        const greaterOrder = newItems.find(col => parseInt(col.order) > column.order)
-        const greaterOrderIndex = greaterOrder ? newItems.indexOf(greaterOrder) : null
-
-        if (greaterOrderIndex !== -1 && greaterOrderIndex !== null) {
-          newItems.splice(greaterOrderIndex, 0, column)
-        } else {
-          newItems.splice((lesserOrderIndex + 1), 0, column)
-        }
-
-        // correct the actions order, should always be at the last.
-        const actions = newItems.find(column => column.label === 'Actions')
-        const actionsIndex = actions ? newItems.indexOf(actions) : null
-
-        if (actionsIndex !== -1 && actionsIndex !== null && actionsIndex < (newItems.length - 1)) {
-          newItems.splice(actionsIndex, 1)
-          newItems.splice(actions.order, 0, actions)
-        }
-
-        this.currentColumns = newItems
+        return
       }
+
+      // add item to the selected columns list
+      const refreshedItems = [...this.$jsonClone(this.currentColumns), column]
+
+      // sort items by order
+      // note: "checkbox" item has undefined 'order' property which should always be first
+      refreshedItems.sort((a, b) => ((a.order > b.order) || typeof b.order === 'undefined') ? 1 : -1)
+
+      // correct the "actions" item order, should always be at the last.
+      const actions = refreshedItems.find(column => column.label === 'Actions')
+      const actionsIndex = actions ? refreshedItems.indexOf(actions) : null
+
+      if (actionsIndex !== -1 && actionsIndex !== null && actionsIndex < (refreshedItems.length - 1)) {
+        refreshedItems.splice(actionsIndex, 1)
+        refreshedItems.splice(actions.order, 0, actions)
+      }
+
+      this.currentColumns = refreshedItems
     },
+
     closeAndMutate () {
       this.columnsUpdated({
         id: this.columns.id,
@@ -263,13 +256,12 @@ export default {
       })
       this.columnsClose()
 
-      // we need to reload contacts data to include relations data
-      const relations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
-
-      if (relations.length && this.hasAddedRelation) {
+      // we need to reload contacts data to include newly added relations data, if there's any
+      if (this.currentRelations.length && this.hasAddedRelation) {
         this.$VueEvent.fire('fetchContacts', { clear: true })
       }
     },
+
     closeAndReset () {
       this.columnsUpdated({
         id: this.columns.id,
@@ -277,6 +269,7 @@ export default {
       })
       this.columnsClose()
     },
+
     onApplyChanges () {
       const typeQuery = _.get(this.$route, 'query.type', null)
 
@@ -310,6 +303,7 @@ export default {
           this.loading = false
         })
     },
+
     onResetAllColumns () {
       if (DEFAULT_PINNED_LIST_IDS.includes(this.columns.id) ||
         this.resourceId === 'unsaved') {
@@ -347,6 +341,7 @@ export default {
 
       // this.closeAndReset()
     },
+
     getAllActiveColumns () {
       const columns = JSON.parse(JSON.stringify(this.activeColumns))
       const headers = _.get(this.columns, 'headers', [])
@@ -357,25 +352,31 @@ export default {
 
       return headers
     },
+
     onModalShow () {
       this.searchText = ''
       this.currentColumns = this.getAllActiveColumns()
     },
+
     onConfirmSave () {
       this.confirmedSave = false
       this.onResetAllColumns()
     }
   },
+
   computed: {
     ...mapGetters('contacts', ['columns']),
+
     resourceId () {
       const columnsId = _.get(this.columns, 'id', '')
       return columnsId === 'my-queue' ? `${this.predefinedId}` : `${columnsId}`
     },
+
     title () {
       const title = this.columns?.name || 'My Queue'
       return `Manage ${String(title).toLowerCase()} columns`
     },
+
     allColumns () {
       const columns = []
       const results = { data: 0 }
@@ -420,35 +421,42 @@ export default {
         results: results.data
       }
     },
-    selected () {
+
+    selectedColumns () {
       if (Array.isArray(this.currentColumns) && this.currentColumns.length) {
         return new Set([...this.currentColumns.map((i) => i.name)])
       } else {
         return new Set()
       }
     },
+
     isContactsRoute () {
       return this.$route.meta.title === 'Contacts'
     },
+
     endpointUrl () {
       if (this.isContactsRoute) {
         return 'contacts-list'
       }
       return 'power-dialer-lists'
     },
+
     activeColumns () {
       return this.isContactsRoute ? DEFAULT_COLUMNS : POWER_DIALER_DEFAULT_COLUMNS
     },
+
     hasAddedRelation () {
-      const currentRelations = this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
-      return currentRelations.length > this.previousRelations.length
+      return this.currentRelations.length > this.previousRelations.length
     },
+
     currentRelations () {
-      return this.currentColumns.filter(item => ALL_RELATIONS.includes(item.name))
+      return this.currentColumns.filter(item => ALL_COLUMNS_WITH_RELATION.includes(item.name))
     },
+
     defaultColumns () {
       return DEFAULT_COLUMNS
     },
+
     powerDialerDefaultColumns () {
       return POWER_DIALER_DEFAULT_COLUMNS
     }
