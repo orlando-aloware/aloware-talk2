@@ -415,7 +415,7 @@ export default {
           continue
         }
 
-        // filter groups are in the numeric index
+        // filter groups are in numeric indexes
         for (const filterKey in filterGroups[groupIndex].filters) {
           if (filterKey === 'search') {
             continue
