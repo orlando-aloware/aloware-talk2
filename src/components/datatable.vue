@@ -515,6 +515,12 @@ export default {
       if (newVal.orderBy !== oldVal.orderBy) {
         this.sorts.order = 'asc'
       }
+    },
+
+    isLoading: function () {
+      if (this.isLoading) {
+        this.resetScroll()
+      }
     }
   }
 }
