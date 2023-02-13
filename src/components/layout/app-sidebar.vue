@@ -190,6 +190,151 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn :to="{ name: 'Messenger' }"
+           :ripple="false"
+           icon="img:app-icons/menu/messenger_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Messenger')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Messenger</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Messenger' }"
+           :ripple="false"
+           icon="img:app-icons/menu/messenger_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Messenger')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Messenger</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'DMS Equity' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dms_equity_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('DMS Equity')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">DMS Equity</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'DMS Equity' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dms_equity_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('DMS Equity')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">DMS Equity</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'Email Blast' }"
+           :ripple="false"
+           icon="img:app-icons/menu/email_blast_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Email Blast')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Email Blast</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Email Blast' }"
+           :ripple="false"
+           icon="img:app-icons/menu/email_blast_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Email Blast')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Email Blast</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'Sold Report' }"
+           :ripple="false"
+           icon="img:app-icons/menu/sold_report_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Sold Report')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Sold Report</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Sold Report' }"
+           :ripple="false"
+           icon="img:app-icons/menu/sold_report_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Sold Report')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Sold Report</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'Dealer Profile' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dealer_profile_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Dealer Profile')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Dealer Profile</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Dealer Profile' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dealer_profile_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Dealer Profile')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Dealer Profile</span>
+      </q-tooltip>
+    </q-btn>
+
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_active.svg"

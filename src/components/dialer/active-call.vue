@@ -166,6 +166,8 @@ export default {
         'CALL_DISCONNECTED',
         'WRAP_UP'
       ]
+      console.log('this.dialer.currentStatus: ', this.dialer.currentStatus)
+      console.log('this.profile: ', this.profile)
 
       return this.dialer &&
         this.profile &&
