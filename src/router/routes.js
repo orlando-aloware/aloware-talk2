@@ -20,6 +20,7 @@ const Phone = () => import('pages/Phone.vue')
 const Error404 = () => import('pages/Error404.vue')
 const Suspended = () => import('pages/Suspended.vue')
 const Messenger = () => import('pages/Messenger.vue')
+const DMSEquity = () => import('pages/DMSEquity.vue')
 
 const routes = [
   {
@@ -336,6 +337,11 @@ const routes = [
         path: 'messenger',
         name: 'Messenger',
         component: Messenger
+      },
+      {
+        path: 'dms-equity',
+        name: 'DMS Equity',
+        component: DMSEquity
       }
     ]
   },

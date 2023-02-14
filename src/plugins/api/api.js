@@ -206,6 +206,11 @@ export default {
           get () {
             return window.axios.get(`/integrations/simpsocial/messenger-source`)
           }
+        },
+        dmsEquity: {
+          get () {
+            return window.axios.get(`/integrations/simpsocial/dms-equity-source`)
+          }
         }
       }
     },
