@@ -8,8 +8,30 @@
       <i class="fa fa-play"
          v-if="!playing"></i>
     </button>
-    <div :id="'waveform-' + uniqueId"
-         class="waveform flex-grow-1 mr-2"></div>
+    <div class="waveform flex-grow-1 mr-2"
+         :id="'waveform-' + uniqueId">
+        <div class="d-flex justify-center position-relative"
+             v-if="loading">
+          <q-spinner-bars color="success"
+                        size="28px"
+                        class="position-absolute">
+          </q-spinner-bars>
+        </div>
+      </div>
+    <div class="waveform-timeline mr-1">
+      <q-select
+        dense
+        emit-value
+        borderless
+        class="mt-2 q-select-pager"
+        option-value="value"
+        option-label="label"
+        @input="changePlaybackSpeed"
+        v-model="playbackSpeed"
+        :options="playbackOptions"
+        :display-value="`${playbackSpeed}x`">
+      </q-select>
+    </div>
     <div class="waveform-timeline mr-2">
       <span class="text-xxs">{{ currentTime | fixDuration(true) }}/{{ duration | fixDuration(true) }}</span>
     </div>
@@ -23,6 +45,7 @@
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
+import * as WaveformPlaybackSpeedOptions from 'src/constants/waveform-playback-speed-options'
 
 export default {
   name: 'waveform',
@@ -47,7 +70,7 @@ export default {
         barGap: null,
         cursorWidth: 1,
         container: '#waveform-' + this.uniqueId,
-        backend: 'WebAudio',
+        backend: 'MediaElement',
         height: 40,
         progressColor: '#2D5BFF',
         responsive: true,
@@ -55,9 +78,11 @@ export default {
         cursorColor: '#2D5BFF'
       },
       playing: false,
+      loading: true,
       ready: false,
       duration: 0,
-      currentTime: 0
+      currentTime: 0,
+      playbackSpeed: 1
     }
   },
 
@@ -68,6 +93,9 @@ export default {
       }
 
       return null
+    },
+    playbackOptions () {
+      return WaveformPlaybackSpeedOptions.PLAYBACK_SPEED_OPTIONS
     }
   },
 
@@ -75,6 +103,7 @@ export default {
     if (this.player) {
       this.player.on('ready', () => {
         this.ready = true
+        this.loading = false
         this.$emit('ready')
         this.duration = this.player.getDuration()
       })
@@ -90,6 +119,9 @@ export default {
   },
 
   methods: {
+    changePlaybackSpeed (speed) {
+      this.player.setPlaybackRate(speed)
+    },
     handlePlay () {
       this.playing = !this.playing
       if (this.player) {

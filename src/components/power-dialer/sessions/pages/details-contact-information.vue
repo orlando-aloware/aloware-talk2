@@ -59,7 +59,6 @@
 </template>
 
 <script>
-
 import { mapState, mapGetters } from 'vuex'
 // import InputField from 'components/contacts/contact-input-field'
 // import SelectField from 'components/generic-selectors/user-selector'
@@ -67,15 +66,21 @@ import { mapState, mapGetters } from 'vuex'
 // import SelectCountryField from 'src/components/contacts/location-country-selector'
 import ContactInfo from 'components/contacts/contact-information'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
+import {
+  contactMixin,
+  contactV2AttributesMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'DetailsContactInformation',
+
   props: {
     resources: {
       type: Object,
       default: () => {}
     }
   },
+
   components: {
     // InputField,
     // SelectField,
@@ -84,21 +89,31 @@ export default {
     ContactSaveBar,
     ContactInfo
   },
+
+  mixins: [
+    contactMixin,
+    contactV2AttributesMixin
+  ],
+
   computed: {
     ...mapGetters('powerDialer', [
       'sessionLoader'
     ]),
+
     ...mapState('contacts', [
       'contact',
       'contactClone'
     ]),
+
     localResource () {
       return { ...this.resources }
     },
+
     isValidResource () {
       return this.contact.id === this.contactClone.id
     }
   },
+
   data () {
     return {
       test: '',
@@ -123,6 +138,14 @@ export default {
         { label: 'HQ Zip Code', name: 'custom-field', type: 'select', disabled: false }
       ]
     }
+  },
+
+  created () {
+    this.$VueEvent.listen('contact_updated', this.listeners.contactUpdated)
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('contact_updated', this.listeners.contactUpdated)
   }
 }
 </script>

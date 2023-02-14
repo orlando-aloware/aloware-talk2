@@ -8,7 +8,7 @@
       <PowerDialerSidebar @fetchMyQueueData="onFetchMyQueueData" />
     </div>
     <div
-      class="px-0 mb-0 main flex-1"
+      class="px-0 mb-0 main flex-1 h-100"
       :class="mainClass">
       <!-- Router Here -->
       <router-view

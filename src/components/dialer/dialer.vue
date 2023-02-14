@@ -208,7 +208,6 @@ export default {
 
     this.device.on(WebrtcEvents.CONNECT, (call) => { // On accept call
       console.log('Successfully connected call', call)
-      this.updateUnownedContactLastCommunicationStatus()
       const map = call._connection.customParameters
       const customParameters = {}
       map.forEach((value, key) => {
@@ -226,6 +225,12 @@ export default {
       this.startCallTimer()
       this.setDialerCurrentStatus('CALL_CONNECTED')
       this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        .then(res => {
+          // execute only if we have a response
+          if (res) {
+            this.updateUnownedContactLastCommunicationStatus(res.data.user_id)
+          }
+        })
         // .finally(() => {
         //   this.$router.push({ name: 'Call' }).catch(err => {
         //     console.log(err)
@@ -279,7 +284,16 @@ export default {
       if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
+
       this.backToDial()
+    })
+
+    this.$VueEvent.listen('forceEndWrapUp', () => {
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        return
+      }
+
+      this.backToDial(true)
     })
 
     this.$VueEvent.listen('resetCall', () => {
@@ -405,9 +419,25 @@ export default {
           return Promise.resolve()
         }
 
-        this.setDialerCommunication(res.data)
-
         const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // we need to prevent proceeding to the next steps if current task's contact id
+        // is not the same as the communication's contact id in power dialer session
+        // to prevent showing incorrect contact details in the active call component when
+        // making a call just after the previous task was manually ended
+        // (end call or next button was clicked w/o wrap-up), automatically ended (no wrap-up),
+        // or manually clicked the end wrap-up when wrap-up is indefinite. The previous task
+        // was already processed/ended but the fetching of the previous task's communication
+        // got delayed so the previous task's contact details will show for brief amount of
+        // seconds, which is being prevented here:
+        if (routeTitle &&
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          this.activeTask.id !== res.data.contact_id) {
+          return Promise.resolve()
+        }
+
+        this.setDialerCommunication(res.data)
 
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
@@ -1111,8 +1141,8 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial () {
-      this.resetAgentStatus()
+    backToDial (forceStatus = false) {
+      this.resetAgentStatus(forceStatus)
       this.resetCall()
     },
 

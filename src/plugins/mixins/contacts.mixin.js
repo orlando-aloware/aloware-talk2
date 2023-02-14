@@ -183,17 +183,14 @@ export default {
       }, true, true)
     },
     onSearch (searchText) {
-      // ignore search if previous and current search
-      // is the same or empty
-      if (this.previousSearch === searchText ||
-        (_.isEmpty(this.previousSearch) &&
-            _.isEmpty(searchText))) {
+      // ignore search if previous and current search are the same
+      if (this.previousSearch === searchText) {
         return
       }
 
       // requires at least 3 characters to allow the request or
       // empty so that the result will reset back to the original
-      if (searchText && searchText.length < 3 && searchText.length >= 1) {
+      if (searchText && searchText.length < 3) {
         return
       }
 
@@ -371,10 +368,12 @@ export default {
       }
     },
     buildQueryString (params, isContactModule = true) {
+      // contacts query
       const query = {
         page: 1
       }
 
+      // power dialer query
       const powerQuery = {
         page: query.page,
         per_page: params.per_page || 25
@@ -382,9 +381,18 @@ export default {
 
       const filters = {}
 
+      const isDynamicActualList = (this.list.type === ContactListTypes.DYNAMIC &&
+        !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(this.list.id))
+
       if (params.search) {
-        filters.search = {}
-        filters.search.value = params.search
+        // for "All Contacts" list and dynamic type actual list
+        // insert search filter as a separate filter entity
+        if (this.list && (this.list.id === 'all' || isDynamicActualList)) {
+          filters.search = {}
+          filters.search.value = params.search
+        }
+
+        // for power dialer query
         powerQuery.keyword = params.search
       }
 
@@ -399,6 +407,7 @@ export default {
 
       query.filter_groups = []
 
+      // initial filter for static contact lists
       if (this.list && this.list.type === ContactListTypes.STATIC) {
         query.filter_groups = [
           {
@@ -454,6 +463,19 @@ export default {
             query.filter_groups = query.filter_groups.concat(listFilters[filterIndex.index1])
           }
         }
+      }
+
+      // for default pinned lists and actual lists,
+      // search filter must be joined/associated with the list's initial filter
+      // to get correct query results
+      if (
+        params.search &&
+        query.filter_groups.length &&
+        (this.list.id !== 'all' || !isDynamicActualList)
+      ) {
+        let filters = query.filter_groups[0].filters
+        filters.search = { value: params.search }
+        query.filter_groups[0]['filters'] = filters
       }
 
       if (params?.sort) {
