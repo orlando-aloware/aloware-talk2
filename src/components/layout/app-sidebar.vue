@@ -248,7 +248,36 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :to="{ name: 'Email Blast' }"
+    <q-btn :to="{ name: 'Digital Lead War' }"
+           :ripple="false"
+           icon="img:app-icons/menu/digital_lead_war_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Digital Lead War')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Digital Lead War</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Digital Lead War' }"
+           :ripple="false"
+           icon="img:app-icons/menu/digital_lead_war_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Digital Lead War')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Digital Lead War</span>
+      </q-tooltip>
+    </q-btn>
+
+    <!--q-btn :to="{ name: 'Email Blast' }"
            :ripple="false"
            icon="img:app-icons/menu/email_blast_active.svg"
            align="left"
@@ -275,9 +304,9 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Email Blast</span>
       </q-tooltip>
-    </q-btn>
+    </q-btn-->
 
-    <q-btn :to="{ name: 'Sold Report' }"
+    <!--q-btn :to="{ name: 'Sold Report' }"
            :ripple="false"
            icon="img:app-icons/menu/sold_report_active.svg"
            align="left"
@@ -304,9 +333,9 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Sold Report</span>
       </q-tooltip>
-    </q-btn>
+    </q-btn-->
 
-    <q-btn :to="{ name: 'Dealer Profile' }"
+    <!--q-btn :to="{ name: 'Dealer Profile' }"
            :ripple="false"
            icon="img:app-icons/menu/dealer_profile_active.svg"
            align="left"
@@ -319,8 +348,9 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Dealer Profile</span>
       </q-tooltip>
-    </q-btn>
-    <q-btn :to="{ name: 'Dealer Profile' }"
+    </q-btn-->
+
+    <!--q-btn :to="{ name: 'Dealer Profile' }"
            :ripple="false"
            icon="img:app-icons/menu/dealer_profile_gray.svg"
            align="center"
@@ -348,7 +378,8 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Settings</span>
       </q-tooltip>
-    </q-btn>
+    </q-btn-->
+
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_gray.svg"

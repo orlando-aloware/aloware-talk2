@@ -211,6 +211,11 @@ export default {
           get () {
             return window.axios.get(`/integrations/simpsocial/dms-equity-source`)
           }
+        },
+        digitalLeadWar: {
+          get () {
+            return window.axios.get(`/integrations/simpsocial/digital-lead-war-source`)
+          }
         }
       }
     },
