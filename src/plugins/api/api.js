@@ -204,7 +204,7 @@ export default {
       simpsocial: {
         messenger: {
           get () {
-            return window.axios.get(`${suffixV1}/integrations/simpsocial/messenger-source`)
+            return window.axios.get(`${suffixV1}integrations/simpsocial/messenger-source`)
           }
         }
       }
