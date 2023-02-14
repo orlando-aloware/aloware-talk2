@@ -200,6 +200,13 @@ export default {
         getList (params) {
           return window.axios.get(`${suffixV1}integration/hubspot/lists`, params)
         }
+      },
+      simpsocial: {
+        messenger: {
+          get () {
+            return window.axios.get(`${suffixV1}/integrations/simpsocial/messenger-source`)
+          }
+        }
       }
     },
     automations: {

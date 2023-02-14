@@ -19,6 +19,7 @@ const Communication = () => import('pages/Communication.vue')
 const Phone = () => import('pages/Phone.vue')
 const Error404 = () => import('pages/Error404.vue')
 const Suspended = () => import('pages/Suspended.vue')
+const Messenger = () => import('pages/Messenger.vue')
 
 const routes = [
   {
@@ -330,6 +331,11 @@ const routes = [
         path: 'suspended',
         name: 'Suspended',
         component: Suspended
+      },
+      {
+        path: 'messenger',
+        name: 'Messenger',
+        component: Messenger
       }
     ]
   },
