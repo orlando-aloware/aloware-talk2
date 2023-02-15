@@ -1690,14 +1690,6 @@ export default {
       this.hasNextPage = !_.isEmpty(value)
     },
 
-    list: {
-      deep: true,
-      handler: function () {
-        this.loadList(this.$route.params.id)
-        this.$refs.contactsTable.resetScroll()
-      }
-    },
-
     showMyContacts (value) {
       if (this.myContacts !== value) {
         this.myContacts = value

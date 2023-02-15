@@ -956,39 +956,36 @@ export default {
       const id = isNaN(this.id) && !this.$route.name.includes('Contacts') ? 'my-queue' : this.id
 
       try {
-        const headers = { data: [] }
+        let headers = {}
+
         if (this.lists[id] && this.lists[id].headers) {
-          headers.data = this.lists[id].headers
-          if (typeof headers.data === 'string') {
-            headers.data = JSON.parse(headers.data)
+          headers = this.lists[id].headers
+
+          if (typeof headers === 'string') {
+            headers = JSON.parse(headers)
           }
         }
 
-        if (!Array.isArray(headers.data)) {
+        if (!Array.isArray(headers)) {
           throw new Error('Headers field is broken')
         }
 
-        const item = { key: null }
-        const found = { data: null }
-        const headerRelation = { data: null }
-        const columnRelation = { data: null }
+        for (const key in headers) {
+          const headerExists = ALL_COLUMNS.find(column => column.name === headers[key].name)
 
-        for (item.key in headers.data) {
-          found.data = ALL_COLUMNS.find(column => column.name === headers.data[item.key].name)
-
-          if (!found.data) {
+          if (!headerExists) {
             continue
           }
 
-          headerRelation.data = _.get(headers.data[item.key], 'relationName', null)
-          columnRelation.data = _.get(found.data, 'relationName', null)
+          const headerRelation = _.get(headers[key], 'relationName', null)
+          const headerExistsRelation = _.get(headerExists, 'relationName', null)
 
-          if (columnRelation.data && columnRelation.data !== headerRelation.data) {
-            headers.data[item.key].relationName = columnRelation.data
+          if (headerExistsRelation && headerExistsRelation !== headerRelation) {
+            headers[key].relationName = headerExistsRelation
           }
         }
 
-        return _.uniqBy(headers.data, 'name')
+        return _.uniqBy(headers, 'name')
       } catch (err) {
         console.log('Error', err)
         return []
