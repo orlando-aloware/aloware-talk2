@@ -255,7 +255,9 @@ export default {
       const queryString = this.buildQueryString(params, isContactModule)
 
       // use the same query string to update the list count
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', queryString.filter_groups)
+      // eslint-disable-next-line camelcase
+      const countQueryString = (({ filter_groups, search }) => ({ filter_groups, search }))(queryString)
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()

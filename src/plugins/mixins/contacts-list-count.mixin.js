@@ -20,12 +20,15 @@ export default {
   created () {
     this.countCancelToken = window.axios.CancelToken
     this.countSource = this.countCancelToken.source()
+
     this.contactsListCountListeners.getListCount = (data) => {
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
+
       this.getListDataCount(data.data, skipCancelToken).then(response => {
         if (data.thenFunctions) {
           const funcs = Object.keys(data.thenFunctions)
+
           for (let func of funcs) {
             if (typeof this[func] !== 'undefined') {
               this[func](this.fixFunctionData(data.thenFunctions[func], response))
@@ -72,6 +75,7 @@ export default {
         }
       })
     }
+
     this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
   },
 
@@ -88,29 +92,40 @@ export default {
         cancelToken: this.countSource.token
       })
     },
+
     getQueryString (filters) {
       const query = {}
-
       const keys = Object.keys(filters)
+
       if (keys.length > 0) {
         query.filter_groups = []
-        keys.forEach(function (value, i) {
-          if (!['sort', 'order', 'search', 'relations'].includes(value)) {
-            query.filter_groups.push(filters[value])
+
+        keys.forEach(function (key, i) {
+          if (!['sort', 'order', 'search', 'relations'].includes(key)) {
+            query.filter_groups.push(...filters[key])
+          }
+
+          // search becomes a separate filter
+          if (key === 'search') {
+            query.search = filters[key]
           }
         })
       }
+
       return query
     },
+
     fixFunctionData (params, response) {
       if (typeof params === 'object') {
         const paramIndexes = Object.keys(params)
+
         for (let index of paramIndexes) {
           params[index] = typeof params[index] === 'string' &&
             params[index].includes('response.')
             ? get(response, params[index].replace('response.', ''), 0)
             : params[index]
         }
+
         return params
       }
 
@@ -119,12 +134,14 @@ export default {
         ? get(response, params.replace('response.', ''), 0)
         : params
     },
+
     ...mapActions('contacts', [
       'pinnedCountLoaded',
       'setPinnedListsLoaded',
       'setSelectedListContactCount'
     ])
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('get-list-count', this.contactsListCountListeners.getListCount)
   }
