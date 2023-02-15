@@ -958,7 +958,7 @@ export default {
       const id = isNaN(this.id) && !this.$route.name.includes('Contacts') ? 'my-queue' : this.id
 
       try {
-        let headers = {}
+        let headers = []
 
         if (this.lists[id] && this.lists[id].headers) {
           headers = this.lists[id].headers
