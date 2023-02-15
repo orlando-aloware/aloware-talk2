@@ -43,6 +43,7 @@
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
         <contact-details v-if="!changingSelectedContact && !isEmptyContact"
+                         :campaign-id="selectedCampaignId"
                          @back="toggleDetails">
         </contact-details>
       </div>
@@ -64,7 +65,9 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer && !changingSelectedContact && !isEmptyContact"></contact-details>
+        <contact-details v-if="drawer && !changingSelectedContact && !isEmptyContact"
+                         :campaign-id="selectedCampaignId">
+        </contact-details>
       </q-drawer>
     </div>
     <template #overlay>

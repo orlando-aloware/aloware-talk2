@@ -159,7 +159,8 @@
     </div>
     <div class="d-flex justify-content-between"
          @dragover.prevent>
-      <message-composer-options @gifSelected="gifSelected"
+      <message-composer-options :campaign-id="campaignId"
+                                @gifSelected="gifSelected"
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
@@ -237,6 +238,9 @@ export default {
     isDisabled: {
       type: Boolean,
       default: false
+    },
+    campaignId: {
+      required: false
     }
   },
 

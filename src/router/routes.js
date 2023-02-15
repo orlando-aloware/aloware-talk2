@@ -22,6 +22,7 @@ const Suspended = () => import('pages/Suspended.vue')
 const Messenger = () => import('pages/Messenger.vue')
 const DMSEquity = () => import('pages/DMSEquity.vue')
 const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
+const EmailBlast = () => import('pages/EmailBlast.vue')
 
 const routes = [
   {
@@ -357,6 +358,14 @@ const routes = [
           title: 'Digital Lead War'
         },
         component: DigitalLeadWar
+      },
+      {
+        path: 'email-blast/:id',
+        name: 'Email Blast',
+        meta: {
+          title: 'Email'
+        },
+        component: EmailBlast
       }
     ]
   },

@@ -348,9 +348,8 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Dealer Profile</span>
       </q-tooltip>
-    </q-btn-->
-
-    <!--q-btn :to="{ name: 'Dealer Profile' }"
+    </q-btn>
+    <q-btn :to="{ name: 'Dealer Profile' }"
            :ripple="false"
            icon="img:app-icons/menu/dealer_profile_gray.svg"
            align="center"
@@ -363,7 +362,7 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Dealer Profile</span>
       </q-tooltip>
-    </q-btn>
+    </q-btn-->
 
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
@@ -378,8 +377,7 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Settings</span>
       </q-tooltip>
-    </q-btn-->
-
+    </q-btn>
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_gray.svg"

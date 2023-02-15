@@ -65,6 +65,37 @@
         Add variable
       </q-tooltip>
     </b-link>
+
+    <b-link v-if="currentCompany && currentCompany.simpsocial_integration_enabled"
+            href="#">
+      <q-menu content-class="mx-height-300"
+              ref="variablesMenu"
+              :offset="[0,5]">
+        <div class="row no-wrap q-pa-md">
+          <new-car ref="newCarMessage"
+                   v-if="hasPermissionTo('update contact')"
+                   :key="prop_counter"
+                   :contact_id="contact_id"
+                   :selected_campaign_id="selected_campaign_id"
+                   @hide="newCarFormClosed">
+          </new-car>
+        </div>
+      </q-menu>
+      <simpsocial-inventory-icon/>
+      <q-tooltip>
+        Inventory
+      </q-tooltip>
+    </b-link>
+
+    <b-link v-if="currentCompany && currentCompany.simpsocial_integration_enabled"
+            href="#"
+            :disabled="creditApplicationSending"
+            @click="sendCreditApplicationLink">
+      <simpsocial-credit-application-icon/>
+      <q-tooltip>
+        Credit Application
+      </q-tooltip>
+    </b-link>
   </div>
 </template>
 
@@ -78,11 +109,24 @@ import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
+import SimpsocialInventoryIcon from 'components/icons/simpsocial-inventory-icon'
+import SimpsocialCreditApplicationIcon from 'components/icons/simpsocial-credit-application-icon'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'message-composer-options',
 
+  props: {
+    campaignId: {
+      type: Number,
+      required: true
+    }
+  },
+
   components: {
+    SimpsocialCreditApplicationIcon,
+    SimpsocialInventoryIcon,
     VariableIcon,
     Variables,
     CalendarTodayIcon,
@@ -93,9 +137,23 @@ export default {
     SearchGiphy
   },
 
+  mixins: [ aclMixin ],
+
+  data () {
+    return {
+      creditApplicationSending: false
+    }
+  },
+
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapGetters('contacts', ['selectedLine', 'messageComposer']),
+
+    ...mapGetters('contacts', [
+      'selectedLine',
+      'messageComposer',
+      'contact'
+    ]),
+
     isDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
     }
@@ -119,6 +177,18 @@ export default {
     onVariableSelected (variable) {
       this.$emit('variableSelected', variable)
       this.$refs.variablesMenu.hide()
+    },
+
+    sendCreditApplicationLink () {
+      this.creditApplicationSending = true
+      talk2Api.V1.integrations.simpsocial.creditApplication.send(this.contact.id, this.campaignId)
+        .then(res => {
+          this.creditApplicationSending = false
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+          this.creditApplicationSending = false
+        })
     }
   }
 }
