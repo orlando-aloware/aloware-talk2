@@ -191,7 +191,7 @@ export default {
   },
 
   methods: {
-    getOptions () {
+    getListsOfEnabledIntegration () {
       this.isLoading = true
 
       this.lists = []
@@ -260,7 +260,7 @@ export default {
   },
 
   mounted () {
-    this.getOptions()
+    this.getListsOfEnabledIntegration()
   },
 
   watch: {
