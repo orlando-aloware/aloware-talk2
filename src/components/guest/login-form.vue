@@ -2,7 +2,7 @@
   <div
     class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
     <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-      <img src="app-icons/misc/logo.svg" class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"/>
+      <img :src="appLogo" class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"/>
       <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1">
         Login
       </div>
@@ -91,11 +91,20 @@ export default {
   name: 'login-form',
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState(['statics']),
     shouldRedirectToClassic () {
       return this.profile &&
         this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC &&
         !this.isAdmin &&
         !this.profile?.company?.force_talk
+    },
+
+    appLogo () {
+      if (this.statics.whitelabel) {
+        return `${process.env.API_URL}${this.statics.logo}`
+      }
+
+      return 'app-icons/misc/logo.svg'
     }
   },
   data () {

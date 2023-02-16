@@ -250,7 +250,20 @@ export default function (/* { ssrContext } */) {
       parkedCalls: [],
       suspended: false,
       showProFeatureDialog: false,
-      leadSources: []
+      leadSources: [],
+      statics: {
+        domain: null,
+        favicon: null,
+        host: null,
+        logo: null,
+        logo_inverse: null,
+        logo_square: null,
+        logo_square_inverse: null,
+        name: null,
+        path: null,
+        referer: null,
+        whitelabel: false
+      }
     },
 
     getters: {
@@ -741,6 +754,9 @@ export default function (/* { ssrContext } */) {
       },
       setLeadSources ({ commit }, leadSources) {
         commit('SET_LEAD_SOURCES', leadSources)
+      },
+      setStatics ({ commit }, statics) {
+        commit('SET_STATICS', statics)
       }
     },
 
@@ -1428,6 +1444,10 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
+      },
+
+      SET_STATICS (state, statics) {
+        state.statics = statics
       },
 
       updateField

@@ -258,6 +258,7 @@ import {
   TYPE_EXPORT_CONTACT_LIST_ITEMS
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'MyLayout',
@@ -1277,6 +1278,7 @@ export default {
       }
 
       this.getTimezones()
+      this.getStatics()
 
       this.initAccount().then(() => {
         this.loading = false
@@ -2222,6 +2224,20 @@ export default {
         })
     },
 
+    getStatics (repeatTimes = 0) {
+      talk2Api.V1.statics.get()
+        .then(res => {
+          this.setStatics(res.data)
+        }).catch(err => {
+          console.log(err)
+          if (repeatTimes >= 3) {
+            this.$handleErrors(err.response)
+          } else {
+            this.getStatics(repeatTimes + 1)
+          }
+        })
+    },
+
     goAvailable () {
       this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
       this.$bvModal.hide('missed-call-modal')
@@ -2317,7 +2333,8 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
-      'updateUserStatus'
+      'updateUserStatus',
+      'setStatics'
     ]),
     ...mapActions('contacts', [
       'resetSearch',

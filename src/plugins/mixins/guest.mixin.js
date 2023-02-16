@@ -1,20 +1,10 @@
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import store from '../../store'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   data () {
     return {
-      statics: {
-        whitelabel: false,
-        logo: null,
-        logo_inverse: null,
-        logo_square: null,
-        logo_square_inverse: null,
-        host: null,
-        name: null
-      },
-      loadingWhitelabel: true,
       loading: false,
       title: 'Sign In'
     }
@@ -22,22 +12,14 @@ export default {
 
   activated () {
     this.init()
-    this.getStatics()
     this.setTitle()
   },
 
-  methods: {
-    getStatics () {
-      this.loadingWhitelabel = true
-      this.$axios.get('/get-statics').then(res => {
-        this.statics = res.data
-        this.loadingWhitelabel = false
-      }).catch(err => {
-        console.log(err)
-        this.loadingWhitelabel = false
-      })
-    },
+  computed: {
+    ...mapState(['statics'])
+  },
 
+  methods: {
     init () {
       if (this.$route.query.api_token && (!storage.local.getItem('api_token') || storage.local.getItem('api_token') !== this.$route.query.api_token)) {
         // document.body.className = 'd-none'
@@ -60,12 +42,12 @@ export default {
     },
 
     setTitle () {
-      this.$axios.get('/get-statics').then(res => {
-        document.title = this.title + ' - ' + res.data.name + ' Talk'
-      }).catch(err => {
+      if (!this.statics.name) {
         document.title = this.title + ' - Aloware Talk'
-        console.log(err)
-      })
+        return
+      }
+
+      document.title = this.title + ' - ' + this.statics.name + ' Talk'
     },
 
     fixAssets (asset) {
@@ -77,6 +59,12 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
     ...mapActions(['resetVuex']),
     ...mapActions('auth', ['check'])
+  },
+
+  watch: {
+    'statics.name': function () {
+      this.setTitle()
+    }
   },
 
   beforeRouteEnter (to, from, next) {

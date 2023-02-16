@@ -430,6 +430,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState(['statics']),
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -437,9 +438,14 @@ export default {
       return storage.local.getItem('env')
     },
     appLogo () {
-      return this.xmasEnabled
-        ? 'img:app-icons/menu/xmas/logo_white.svg'
-        : 'img:app-icons/menu/logo_white.svg'
+      switch (true) {
+        case this.xmasEnabled:
+          return 'img:app-icons/menu/xmas/logo_white.svg'
+        case this.statics.whitelabel:
+          return `img:${process.env.API_URL}${this.statics.logo}`
+        default:
+          return 'img:app-icons/menu/logo_white.svg'
+      }
     }
   },
 

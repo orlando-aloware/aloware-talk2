@@ -76,6 +76,7 @@ export default {
 
   computed: {
     ...mapState('settings', ['user']),
+    ...mapState(['statics']),
     ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapGetters('settings', ['changedUserProperties']),
     isSettingsOpened () {
@@ -86,18 +87,6 @@ export default {
   data () {
     return {
       isLoading: false,
-      statics: {
-        logo: null,
-        logo_inverse: null,
-        logo_square: null,
-        logo_square_inverse: null,
-        host: null,
-        referer: null,
-        name: null,
-        domain: null,
-        whitelabel: false,
-        path: null
-      },
       onLoadShowSettings: false
     }
   },
@@ -110,12 +99,6 @@ export default {
         this.localUser = response.data
         this.setupUser()
         this.isLoading = false
-      })
-    },
-
-    getStatics () {
-      return talk2Api.V1.statics.get().then(response => {
-        this.statics = response.data
       })
     },
     resetUserChanges () {
@@ -152,7 +135,6 @@ export default {
       this.onLoadShowSettings = true
     }
 
-    this.getStatics()
     this.setItems([
       {
         label: 'General',

@@ -3,9 +3,9 @@
     <section class="w-100 mx-0 mt-5">
       <!-- brand -->
       <div class="d-flex justify-content-center w-100 mt-5 mb-5">
-        <img :src="`${apiURL + statics.logo}`"
+        <img :src="`${apiURL}${statics.logo}`"
              height="70px"
-             v-if="!loadingWhitelabel"
+             v-if="statics.logo"
              alt="logo">
       </div>
       <!-- / brand -->
@@ -68,14 +68,12 @@
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
 import { mapState } from 'vuex'
 
 export default {
   name: 'Suspended',
   data () {
     return {
-      statics: null,
       loadingWhitelabel: false,
       apiURL: process.env.API_URL
     }
@@ -85,22 +83,8 @@ export default {
     ...mapState('auth', [
       'authenticated',
       'profile'
-    ])
-  },
-  created () {
-    this.getStatics()
-  },
-  methods: {
-    getStatics () {
-      this.loadingWhitelabel = true
-      talk2Api.V1.statics.get().then(response => {
-        this.statics = response.data
-        this.loadingWhitelabel = false
-      }).catch(err => {
-        this.$handleErrors(err.response)
-        this.loadingWhitelabel = false
-      })
-    }
+    ]),
+    ...mapState(['statics'])
   }
 }
 </script>

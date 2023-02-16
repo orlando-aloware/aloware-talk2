@@ -5,7 +5,7 @@
     <div v-if="!success"
          class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-        <img src="app-icons/misc/logo.svg" class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0"/>
+        <img :src="appLogo" class="col-6 col-sm-auto login-form-logo d-lg-none pb-5 px-0"/>
         <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1">
           Reset Password
         </div>
@@ -92,7 +92,7 @@
 
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { guestMixin } from 'boot/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
@@ -119,11 +119,20 @@ export default {
   },
 
   computed: {
+    ...mapState(['statics']),
     confirmPassword () {
       return [
         (val) => (val && val.length >= 6) || 'Password should have at least 6 characters',
         (val) => val === this.user.password || 'Passwords should match'
       ]
+    },
+
+    appLogo () {
+      if (this.statics.whitelabel) {
+        return `${process.env.API_URL}${this.statics.logo}`
+      }
+
+      return 'app-icons/misc/logo.svg'
     }
   },
 
