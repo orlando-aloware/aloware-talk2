@@ -4503,6 +4503,10 @@ i.option-separator {
   }
 }
 
+.mx-height-600 {
+  max-height: 600px !important;
+}
+
 .mx-height-500 {
   max-height: 500px !important;
 }
@@ -12358,14 +12362,14 @@ h1.contact-list-name-label {
 }
 
 .new-car-container {
-  width: 500px;
-  max-width: 500px;
-  max-height: 476px;
-  height: 476px;
+  width: 600px;
+  max-width: 600px;
+  max-height: 576px;
+  height: 576px;
 
   .container-cars {
     overflow-y: scroll;
-    max-height: 300px;
+    max-height: 400px;
   }
 
   .infinite-scroll-loading {

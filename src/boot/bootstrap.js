@@ -12,6 +12,7 @@ import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 import * as storage from 'src/plugins/helpers/storage'
 import CountriesAndTimezones from 'countries-and-timezones'
+import infiniteScroll from 'vue-infinite-scroll'
 
 import { Screen } from 'quasar'
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
@@ -26,8 +27,6 @@ storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 storage.local.setItem('ak_widget_url', process.env.AK_WIDGET_URL)
-
-const infiniteScroll = require('vue-infinite-scroll')
 
 Vue.use(infiniteScroll)
 Vue.use(BootstrapVue)

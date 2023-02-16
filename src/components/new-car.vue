@@ -44,6 +44,7 @@
 
     <div ref="containerCars"
          class="container-cars position-relative mt-3 h-100"
+         :infinite-scroll-distance="1"
          v-infinite-scroll="load">
       <b-overlay class="h-100 w-100 position-absolute"
                  rounded="sm"
@@ -162,11 +163,9 @@ export default {
 
   props: {
     contactId: {
-      type: Number,
       required: true
     },
     selectedCampaignId: {
-      type: Number,
       required: true
     }
   },
@@ -263,6 +262,7 @@ export default {
     },
 
     load () {
+      console.log('load!')
       if (!this.loading) {
         this.searchCar.page += 1
         this.processSearchCar(this.contactId)

@@ -68,7 +68,7 @@
 
     <b-link v-if="currentCompany && currentCompany.simpsocial_integration_enabled"
             href="#">
-      <q-menu content-class="mx-height-500 overflow-x-hidden"
+      <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
               ref="newCarMenu"
               :offset="[0,5]"
               @hide="onNewCarFormClosed">
@@ -121,7 +121,6 @@ export default {
 
   props: {
     campaignId: {
-      type: Number,
       required: true
     }
   },
