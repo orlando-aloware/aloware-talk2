@@ -2022,10 +2022,8 @@ export default {
     endWrapUp () {
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
-      } else {
-        this.$VueEvent.fire('endWrapUp')
       }
-
+      this.$VueEvent.fire('endWrapUp')
       this.$emit('onPhoneVisible', false)
     },
     makeCall () {
