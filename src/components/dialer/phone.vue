@@ -2020,7 +2020,12 @@ export default {
       this.$emit('onPhoneVisible', false)
     },
     endWrapUp () {
-      this.$VueEvent.fire('endWrapUp')
+      if (this.$route.name === 'Power Dialer') {
+        this.$VueEvent.fire('endWrapUpPDSession')
+      } else {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
       this.$emit('onPhoneVisible', false)
     },
     makeCall () {
