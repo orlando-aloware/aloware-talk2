@@ -9,7 +9,7 @@
         <b-form-row class="mt-2">
           <b-col sm="12" md="12">
             <b-form-group class="mb-1">
-              <search limitSearchCharacters
+              <search ref="search"
                       placeholder="Search for model, make, vin, stock #"
                       :search="searchCar.q"
                       :disabled="loading"
@@ -49,7 +49,7 @@
       <b-overlay class="h-100 w-100 position-absolute"
                  rounded="sm"
                  :show="true"
-                 v-show="loading">
+                 v-show="loading && cars.length === 0">
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px" />
@@ -135,7 +135,7 @@ import {
 } from 'src/plugins/mixins'
 import Search from 'components/search'
 import { mapState } from 'vuex'
-import _ from 'lodash'
+import { concat, debounce, get, uniqBy } from 'lodash'
 
 const sendCarDefault = () => {
   return {
@@ -211,7 +211,7 @@ export default {
   },
 
   methods: {
-    debouncedSearchCar: _.debounce(function (contactId) {
+    debouncedSearchCar: debounce(function (contactId) {
       this.processSearchCar(contactId, true)
     }, 500),
 
@@ -220,8 +220,13 @@ export default {
       this.preValidateForm('searchCar')
     },
 
-    search (text) {
-      this.searchCar.q = text
+    search (text = null) {
+      if (text && typeof text === 'string') {
+        this.searchCar.q = text
+      } else {
+        this.searchCar.q = this.$refs.search.searchValue
+      }
+
       this.processSearchCar(this.contactId, true)
     },
 
@@ -244,11 +249,8 @@ export default {
         this.$axios.get(url, {
           params: this.searchCar
         }).then(res => {
-          if (reset) {
-            this.resetSearch()
-          }
-
-          this.cars = _.concat(this.cars, res.data.data)
+          this.cars = concat(this.cars, res.data.data)
+          this.cars = uniqBy(this.cars, 'id')
           this.loading = false
           this.pagination = res.data.pagination
           this.searchCar.page = res.data.pagination.current_page
@@ -321,7 +323,7 @@ export default {
     resetSendCar () {
       this.sendCar = sendCarDefault()
       this.searchCar = searchCarDefault()
-      let formElement = _.get(this.$refs, 'searchCar', null)
+      let formElement = get(this.$refs, 'searchCar', null)
 
       if (formElement) {
         formElement.clearValidate()
