@@ -64,8 +64,12 @@ export default {
     },
 
     isReferrizer () {
-      // return this.profile.company.id === 2140
-      return true
+      // USS Enterprise (for testing purposes only)
+      if (process.env.APP_ENV !== 'production' && this.profile.company.id === 7) {
+        return true
+      }
+
+      return this.profile.company.id === 2140
     },
 
     test () {
