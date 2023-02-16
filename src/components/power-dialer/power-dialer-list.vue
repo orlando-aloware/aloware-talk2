@@ -3,12 +3,12 @@
        data-popper-target="power-dialer-list">
     <contacts-folders
       :is-contact-module-type="false"
-      @openIntegrationListsImportDialog="onIntegrationImportDialogOpen">
+      @openIntegrationListsImportDialog="onOpenIntegrationImportDialog">
     </contacts-folders>
     <integration-list-import-modal
       :is-open="isIntegrationImportDialogOpen"
       v-if="isIntegrationImportDialogOpen"
-      @close="onIntegrationImportDialogClose">
+      @close="onCloseIntegrationImportDialog">
     </integration-list-import-modal>
   </div>
 </template>
@@ -53,14 +53,14 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['foldersLoaded']),
-    onIntegrationImportDialogClose (data = {}) {
+    onCloseIntegrationImportDialog (data = {}) {
       this.isIntegrationImportDialogOpen = false
 
       if (data.notification) {
         this.notification = data.notification
       }
     },
-    onIntegrationImportDialogOpen () {
+    onOpenIntegrationImportDialog () {
       this.isIntegrationImportDialogOpen = true
     },
     reloadFolders () {
