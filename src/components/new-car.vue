@@ -1,93 +1,127 @@
 <template>
-  <div>
-    <el-form ref="searchCar"
-             class="p-3 border-bottom"
-             label-position="top"
-             :rules="rulesSearchCar"
-             :model="searchCar"
-             @submit.prevent.native="processSearchCar(contactId, true)">
-      <el-form-item prop="q"
-                    class="pb-0">
-        <el-input placeholder="Search for model, make, vin, stock #"
-                  prefix-icon="el-icon-search"
-                  v-model="searchCar.q">
-          <el-button slot="append"
-                     type="submit"
-                     @click="processSearchCar(contactId, true)">
-            <i class="fa fa-search"></i>
-          </el-button>
-        </el-input>
-      </el-form-item>
+  <div class="new-car-container">
+    <b-form @submit.prevent="search">
+      <h5 class="mb-1 section-header fs-24 text-bold _600 text-center">Send a Car</h5>
 
-      <el-form-item label="Price range:"
-                    class="pb-0 mb-0">
-        <div class="pl-2 pr-2">
-          <el-slider v-model="priceRange"
-                     :min="0"
-                     :max="100000"
-                     :step="1000"
-                     :format-tooltip="formatTooltip"
-                     range
-                     @change="updatePriceRange(contact_id)">
-          </el-slider>
-        </div>
-      </el-form-item>
-    </el-form>
+      <q-separator />
 
-    <div class="container-cars"
-         v-infinite-scroll="load">
-      <div class="row pb-3 mb-2"
-           v-if="cars.length > 0"
-           v-for="car in cars"
-           :key="car.id">
-        <div class="col-12">
-          <el-card class="box-card">
-            <div slot="header">
-              <div class="row">
-                <div class="col align-self-center">
-                  <el-switch v-model="car.hide_price" active-text="Hide price?" class="align-self-center">
-                  </el-switch>
-                </div>
-                <div class="col">
-                  <el-button type="primary"
-                             class="w-full"
-                             @click="processSendCar(contactId, car, false)">
-                    <b>Send Link</b>
-                  </el-button>
-                </div>
+      <div class="scrollable pt-2">
+        <b-form-row class="mt-2">
+          <b-col sm="12" md="12">
+            <b-form-group class="mb-1">
+              <search limitSearchCharacters
+                      placeholder="Search for model, make, vin, stock #"
+                      :search="searchCar.q"
+                      :disabled="loading"
+                      @search="search">
+              </search>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
+
+        <b-form-row class="mt-2 mx-0 w-100">
+          <b-col sm="12" md="12">
+            <b-form-group label="Price range"
+                          class="mb-1">
+              <div class="pl-2 pr-2">
+                <q-range v-model="priceRange"
+                         :min="0"
+                         :max="100000"
+                         :step="1000"
+                         :left-label-value="`$${$options.filters.numFormat(priceRange.min)}`"
+                         :right-label-value="`$${$options.filters.numFormat(priceRange.max)}`"
+                         label
+                         @change="updatePriceRange(contactId)">
+                </q-range>
               </div>
-            </div>
-            <img :src="car.galleries[0].url"
-                 v-if="car.galleries && car.galleries.length > 0 && car.galleries[0].url"
-                 class="image img-responsive"/>
-            <div class="p-2">
-              <h5><span class="_600 d-flex">Vin #: {{ car.vin }}</span></h5>
-              <b>Description:</b>
-              <p>{{ car.description | truncate(100) }}</p>
-              <b>Price:</b>
-              <p>{{ car.price | toCurrency }}</p>
-            </div>
-          </el-card>
-        </div>
+            </b-form-group>
+          </b-col>
+        </b-form-row>
       </div>
-      <div v-if="loading"
-           class="height-80"
-           style="background-color: transparent"
-           v-loading="true">
+    </b-form>
+
+    <q-separator />
+
+    <div ref="containerCars"
+         class="container-cars position-relative mt-3 h-100"
+         v-infinite-scroll="load">
+      <b-overlay class="h-100 w-100 position-absolute"
+                 rounded="sm"
+                 :show="true"
+                 v-show="loading">
+        <template #overlay>
+          <q-spinner-bars color="primary"
+                          size="40px" />
+        </template>
+      </b-overlay>
+      <div v-if="cars.length > 0">
+        <div class="row pb-3 mb-2"
+             v-for="car in cars"
+             :key="car.id">
+          <div class="col-12">
+            <q-card class="box-card">
+              <q-card-section>
+                <div class="d-flex justify-content-between">
+                  <div class="d-inline-flex">
+                    <label class="text-primary mr-2 mt-2 cursor-pointer"
+                           :class="{ disabled: (loadingBtn || $route.params.id === 'unassigned') }">Hide price?</label>
+                    <b-form-checkbox
+                      id="my-contacts"
+                      class="mt-2 cursor-pointer"
+                      name="check-button"
+                      size="sm"
+                      switch
+                      v-model="car.hide_price"
+                    >
+                    </b-form-checkbox>
+                  </div>
+                  <div>
+                    <b-button href="#"
+                              variant="outline-primary"
+                              size="sm"
+                              class="mr-1"
+                              :disabled="loadingBtn"
+                              @click="processSendCar(contactId, car, false)">
+                      Send Link
+                    </b-button>
+                  </div>
+                </div>
+              </q-card-section>
+              <q-card-section>
+                <img :src="car.galleries[0].url"
+                     v-if="car.galleries && car.galleries.length > 0 && car.galleries[0].url"
+                     class="image w-100"/>
+                <div class="p-2">
+                  <h5><span class="_600 d-flex">Vin #: {{ car.vin }}</span></h5>
+                  <b>Description:</b>
+                  <p>{{ car.description | truncate(100) }}</p>
+                  <b>Price:</b>
+                  <p>{{ car.price | toCurrency }}</p>
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
       </div>
 
       <div class="text-center"
-           v-if="no_next && !loading && cars.length > 0">
+           v-if="noNext && !loading && cars.length > 0">
         <strong class="text-success">
           <i class="fa fa-check-circle"></i> All data is loaded
         </strong>
       </div>
 
-      <div v-if="pagination.total == 0 && !loading">
+      <div v-if="pagination.total === 0 && !loading">
         <p class="text-center py-5 text-danger">
           No search result
           <span v-if="searchedTerm.length > 0">for "<strong>{{ searchedTerm }}</strong>"</span>
         </p>
+      </div>
+
+      <div class="infinite-scroll-loading w-100 d-flex justify-center"
+           v-if="cars.length > 0 && loading">
+        <q-spinner-bars color="primary"
+                        size="30px" />
       </div>
     </div>
   </div>
@@ -98,7 +132,8 @@ import {
   aclMixin,
   formValidationMixin
 } from 'src/plugins/mixins'
-import {mapState} from 'vuex'
+import Search from 'components/search'
+import { mapState } from 'vuex'
 import _ from 'lodash'
 
 const sendCarDefault = () => {
@@ -125,9 +160,22 @@ export default {
     formValidationMixin
   ],
 
-  props: ['contactId', 'selectedCampaignId'],
+  props: {
+    contactId: {
+      type: Number,
+      required: true
+    },
+    selectedCampaignId: {
+      type: Number,
+      required: true
+    }
+  },
 
-  data() {
+  components: {
+    Search
+  },
+
+  data () {
     return {
       loading: false,
       loadingBtn: false,
@@ -135,9 +183,11 @@ export default {
       showAdd: false,
       searchCar: searchCarDefault(),
       sendCar: sendCarDefault(),
-      priceRange: [0, 100000],
+      priceRange: {
+        min: 0,
+        max: 100000
+      },
       cars: [],
-      rulesSearchCar: {},
       bulkMessageMode: false,
       pagination: {
         current_page: 1,
@@ -151,20 +201,17 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
-    no_next: function () {
+    noNext: function () {
       return this.pagination.current_page >= this.pagination.total_pages
     }
   },
 
   mounted () {
     this.sendCar.campaign_id = this.selectedCampaignId
+    this.startInventory(this.selectedCampaignId)
   },
 
   methods: {
-    formatTooltip (val) {
-      return this.$options.filters.toCurrency(val)
-    },
-
     debouncedSearchCar: _.debounce(function (contactId) {
       this.processSearchCar(contactId, true)
     }, 500),
@@ -174,16 +221,23 @@ export default {
       this.preValidateForm('searchCar')
     },
 
+    search (text) {
+      this.searchCar.q = text
+      this.processSearchCar(this.contactId, true)
+    },
+
     processSearchCar (contactId, reset = false) {
       if (reset) {
-        this.searchCar.page = 1
-        this.pagination.total_pages = 100
-        this.cars = []
+        this.resetSearch()
       }
 
-      if (!this.no_next) {
+      if (!this.noNext) {
         this.loadingBtn = true
         this.loading = true
+
+        setTimeout(() => {
+          this.scrollDown()
+        }, 50)
 
         this.searchCar.contact_id = contactId
 
@@ -191,6 +245,10 @@ export default {
         this.$axios.get(url, {
           params: this.searchCar
         }).then(res => {
+          if (reset) {
+            this.resetSearch()
+          }
+
           this.cars = _.concat(this.cars, res.data.data)
           this.loading = false
           this.pagination = res.data.pagination
@@ -207,24 +265,22 @@ export default {
     load () {
       if (!this.loading) {
         this.searchCar.page += 1
-        this.processSearchCar(this.contact_id)
+        this.processSearchCar(this.contactId)
       }
     },
 
     startInventory (campaignId) {
       this.sendCar.campaign_id = campaignId
       this.showAdd = true
-
-      // this.processSearchCar(this.contact_id)
     },
 
     updatePriceRange (contactId) {
-      if (!this.priceRange || this.priceRange.length !== 2) {
+      if (!this.priceRange) {
         return
       }
 
-      this.searchCar.price_min = this.priceRange[0]
-      this.searchCar.price_max = this.priceRange[1]
+      this.searchCar.price_min = this.priceRange.min
+      this.searchCar.price_max = this.priceRange.max
       this.processSearchCar(contactId, true)
     },
 
@@ -243,7 +299,6 @@ export default {
         this.sendCar.hide_price = car.hide_price
 
         this.$axios.post(url, this.sendCar).then(res => {
-          this.showAdd = false
           this.$emit('success', res.data)
           this.resetSendCar()
         }).catch(err => {
@@ -256,6 +311,12 @@ export default {
         this.showAdd = false
         this.loadingBtn = false
       }
+    },
+
+    resetSearch () {
+      this.searchCar.page = 1
+      this.pagination.total_pages = 100
+      this.cars = []
     },
 
     resetSendCar () {
@@ -288,16 +349,17 @@ export default {
         this.resetSendCar()
         done()
       }
+    },
+
+    scrollDown () {
+      const container = this.$refs.containerCars
+      container.scrollTop = container.scrollHeight
     }
   },
 
   watch: {
-    showAdd () {
-      if (this.showAdd) {
-        this.$emit('show')
-      } else {
-        this.$emit('hide')
-      }
+    selectedCampaignId () {
+      this.sendCar.campaign_id = this.selectedCampaignId
     }
   }
 }

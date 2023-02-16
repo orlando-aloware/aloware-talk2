@@ -70,30 +70,42 @@
             </div>
           </div>
         </div>
-        <div class="px-3 d-inline-flex"
+        <div class="px-3 d-flex"
              v-if="!isMyContactsView && !isTabletOrMobile">
-          <q-tooltip
-            class="text-center"
-            anchor="top middle"
-            self="bottom middle"
-            max-width="185px"
-            v-if="$route.params.id === 'unassigned'">
-            Unable to modify Filters. Duplicate this list if you want to modify
-          </q-tooltip>
-          <label class="text-primary mr-2 mt-2 cursor-pointer"
-                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
-          <b-form-checkbox
-            id="my-contacts"
-            class="mt-2 cursor-pointer"
-            name="check-button"
-            size="sm"
-            switch
-            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
-            :disabled="isLoading || $route.params.id === 'unassigned'"
-            v-model="myContacts"
-            @change="onFetchMyContacts"
-          >
-          </b-form-checkbox>
+          <div class="d-inline-flex">
+            <q-tooltip
+              class="text-center"
+              anchor="top middle"
+              self="bottom middle"
+              max-width="185px"
+              v-if="$route.params.id === 'unassigned'">
+              Unable to modify Filters. Duplicate this list if you want to modify
+            </q-tooltip>
+            <label class="text-primary mr-2 mt-2 cursor-pointer"
+                   :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
+            <b-form-checkbox
+              id="my-contacts"
+              class="mt-2 cursor-pointer"
+              name="check-button"
+              size="sm"
+              switch
+              :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
+              :disabled="isLoading || $route.params.id === 'unassigned'"
+              v-model="myContacts"
+              @change="onFetchMyContacts"
+            >
+            </b-form-checkbox>
+          </div>
+          <div>
+            <compact-btn borderless
+                         variant="outlined-light"
+                         customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                         v-if="currentCompany && currentCompany.reseller_id === 357"
+                         @clicked="onMessengerClick">
+              <iframe id="ss-messenger-button" :src="'https://dealer.simpsocial.com/' + currentCompany.id + '/messenger/unread/count'" frameborder="0" style="">
+              </iframe>
+            </compact-btn>
+          </div>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
@@ -1305,10 +1317,17 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
+    },
+
+    onMessengerClick () {
+      this.$router.push({
+        name: 'Messenger'
+      })
     }
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
     ...mapState('contacts', [
       'folders',
       'showContactsListSidebar',

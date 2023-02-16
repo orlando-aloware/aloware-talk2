@@ -68,16 +68,17 @@
 
     <b-link v-if="currentCompany && currentCompany.simpsocial_integration_enabled"
             href="#">
-      <q-menu content-class="mx-height-300"
-              ref="variablesMenu"
-              :offset="[0,5]">
+      <q-menu content-class="mx-height-500 overflow-x-hidden"
+              ref="newCarMenu"
+              :offset="[0,5]"
+              @hide="onNewCarFormClosed">
         <div class="row no-wrap q-pa-md">
           <new-car ref="newCarMessage"
                    v-if="hasPermissionTo('update contact')"
-                   :key="prop_counter"
-                   :contact_id="contact_id"
-                   :selected_campaign_id="selected_campaign_id"
-                   @hide="newCarFormClosed">
+                   :key="newCarCounter"
+                   :contact-id="contact.id"
+                   :selected-campaign-id="campaignId"
+                   @success="hideNewCarMenu">
           </new-car>
         </div>
       </q-menu>
@@ -105,6 +106,7 @@ import GifIcon from 'components/icons/gif-icon'
 import Attachments from 'components/message-composer/options/attachments'
 import AttachmentIcon from 'components/icons/attachment-icon'
 import MessageTemplates from 'components/message-composer/options/message-templates'
+import NewCar from 'components/new-car'
 import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
 import VariableIcon from 'components/icons/variable-icon'
@@ -134,14 +136,16 @@ export default {
     AttachmentIcon,
     Attachments,
     GifIcon,
-    SearchGiphy
+    SearchGiphy,
+    NewCar
   },
 
   mixins: [ aclMixin ],
 
   data () {
     return {
-      creditApplicationSending: false
+      creditApplicationSending: false,
+      newCarCounter: 0
     }
   },
 
@@ -177,6 +181,14 @@ export default {
     onVariableSelected (variable) {
       this.$emit('variableSelected', variable)
       this.$refs.variablesMenu.hide()
+    },
+
+    onNewCarFormClosed () {
+      this.newCarCounter += 1
+    },
+
+    hideNewCarMenu () {
+      this.$refs.newCarMenu.hide()
     },
 
     sendCreditApplicationLink () {

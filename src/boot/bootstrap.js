@@ -27,6 +27,9 @@ storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 storage.local.setItem('ak_widget_url', process.env.AK_WIDGET_URL)
 
+const infiniteScroll = require('vue-infinite-scroll')
+
+Vue.use(infiniteScroll)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(PortalVue)
