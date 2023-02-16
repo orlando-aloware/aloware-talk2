@@ -262,7 +262,6 @@ export default {
     },
 
     load () {
-      console.log('load!')
       if (!this.loading) {
         this.searchCar.page += 1
         this.processSearchCar(this.contactId)
