@@ -69,7 +69,8 @@
 
         <q-item>
           <q-item-section class="nav-item dropdown">
-            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
+            <!--div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
+                 @click="openUpdates">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
@@ -77,7 +78,14 @@
                            catchClick=".ak-trigger"
                            :user="currentUser"
                            :widget="ak_widget_url" />
-            </div>
+            </div-->
+            <b-link class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
+                    target="_blank"
+                    :href="updatesLink">
+              <span class="fa fa-bullhorn changelog-trigger pointer"
+                    style="font-size: 1.2rem">
+            </span>
+            </b-link>
           </q-item-section>
         </q-item>
 
@@ -172,7 +180,7 @@ import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
-import AnnounceKit from 'announcekit-vue'
+// import AnnounceKit from 'announcekit-vue'
 import * as Roles from 'src/constants/roles'
 
 export default {
@@ -201,8 +209,8 @@ export default {
     Profile,
     CompactBtn,
     RefreshIcon,
-    HeaderHelp,
-    AnnounceKit
+    HeaderHelp
+    // AnnounceKit
   },
 
   props: {
@@ -327,6 +335,10 @@ export default {
 
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
+    },
+
+    updatesLink () {
+      return 'https://news.intercom.com/aloware'
     }
   },
 
