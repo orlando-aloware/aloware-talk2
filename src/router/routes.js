@@ -11,6 +11,10 @@ const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
 const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
+const Wallboard = () => import('pages/wallboard/Wallboard.vue')
+const WallboardOverview = () => import('pages/wallboard/WallboardOverview.vue')
+const WallboardUsers = () => import('pages/wallboard/WallboardUsers.vue')
+const WallboardCalls = () => import('pages/wallboard/WallboardCalls.vue')
 const Calendar = () => import('src/pages/calendar/Calendar.vue')
 const Stats = () => import('pages/stats/Stats.vue')
 const Settings = () => import('pages/Settings.vue')
@@ -248,6 +252,47 @@ const routes = [
         },
         path: 'power-dialer/session',
         component: PowerDialerSession
+      },
+      {
+        name: 'Wallboard',
+        path: 'wallboard',
+        component: Wallboard,
+        meta: {
+          title: 'Wallboard',
+          id: 'wallboard'
+        },
+        redirect: {
+          path: 'wallboard/overview'
+        },
+        children: [
+          {
+            name: 'Wallboard Overview',
+            meta: {
+              title: 'Wallboard Overview',
+              id: 'wallboard-overview'
+            },
+            path: 'overview',
+            component: WallboardOverview
+          },
+          {
+            name: 'Wallboard Users',
+            meta: {
+              title: 'Wallboard Users',
+              id: 'wallboard-users'
+            },
+            path: 'users',
+            component: WallboardUsers
+          },
+          {
+            name: 'Wallboard Calls',
+            meta: {
+              title: 'Wallboard Calls',
+              id: 'wallboard-calls'
+            },
+            path: ':id(queued|live|parked)+',
+            component: WallboardCalls
+          }
+        ]
       },
       {
         path: 'calendar',

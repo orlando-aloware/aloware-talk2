@@ -114,6 +114,35 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn :to="{ name: 'Wallboard' }"
+           :ripple="false"
+           icon="img:app-icons/menu/contacts_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Wallboard')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Wallboard</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Wallboard' }"
+           :ripple="false"
+           icon="img:app-icons/menu/contacts_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Wallboard')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Wallboard</span>
+      </q-tooltip>
+    </q-btn>
+
     <q-btn :ripple="false"
            icon="img:app-icons/menu/calendar_gray.svg"
            align="center"
