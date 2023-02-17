@@ -38,9 +38,20 @@ export default {
     ...mapGetters('contacts', [
       'contact'
     ]),
+
     hasHubspotEnabled () {
       return this.currentCompany?.hubspot_integration_enabled
     },
+
+    isReferrizer () {
+      // USS Enterprise (for testing purposes only)
+      if (process.env.APP_ENV !== 'production' && this.profile.company.id === 7) {
+        return true
+      }
+
+      return this.profile.company.id === 2140
+    },
+
     tabs () {
       return [
         {
@@ -61,6 +72,7 @@ export default {
       ]
     }
   },
+
   methods: {
     clicked (value, enabled = undefined) {
       if (enabled) {
@@ -69,6 +81,7 @@ export default {
       }
     }
   },
+
   data () {
     return {
       id: DEFAULT_TAB
