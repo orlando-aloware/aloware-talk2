@@ -629,6 +629,7 @@ export default {
           this.reRoute()
           return
         }
+
         if (!this.togglePause &&
           !this.wrapUp) {
           this.runTask()
@@ -820,7 +821,8 @@ export default {
     resetTimer () {
       if (this.ongoingSession.finishedPdSession ||
         this.countdownTimer <= -1) {
-        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : this.sessionSettings.warmup_period_in_seconds
+        const warmUpPeriod = get(this.sessionSettings, 'warmup_period_in_seconds', 0)
+        this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : warmUpPeriod
         return
       }
 
@@ -840,7 +842,7 @@ export default {
         this.hangUpIntervalCounter = 0
         this.hangUpInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.$VueEvent.fire('endWrapUp')
+            this.$VueEvent.fire('forceEndWrapUp')
           }
 
           this.hangUpIntervalCounter++
@@ -884,7 +886,14 @@ export default {
           // if task is manually skipped through the
           // Next button, end the wrap up
           if (this.skipWrapUp) {
-            this.$VueEvent.fire('endWrapUp')
+            // we need to clear the wrap-up (set agent status to available)
+            // after the session ended
+            if (this.powerDialerTasks.in_queue.length === 0) {
+              this.$VueEvent.fire('forceEndWrapUp')
+            } else { // just end the wrap-up
+              this.$VueEvent.fire('endWrapUp')
+            }
+
             this.wrapUp = false
             this.skipWrapUp = false
             return
@@ -955,11 +964,11 @@ export default {
       }, 1000)
     },
     async onNextTask (forceSkip = false, skipWrapUp = false) {
+      let noWrapUp = false
       this.loadingNext = true
 
-      // only skip wrap-up if dialer's status is not yet in
-      // wrap-up
-      if (this.dialer.currentStatus !== 'WRAP_UP') {
+      // when there is wrap up, skip wrap
+      if (this.wrapUpSeconds !== -1) {
         this.skipWrapUp = skipWrapUp
       }
 
@@ -968,6 +977,7 @@ export default {
       // end wrap up
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
+        noWrapUp = true
       }
 
       // hangup in-progress call
@@ -991,7 +1001,7 @@ export default {
         }
 
         this.removeFirstInQueueTask()
-        this.processSession()
+        this.processSession(noWrapUp)
         return
       }
 
@@ -1068,6 +1078,8 @@ export default {
         return
       }
 
+      this.redialedTask = this.$jsonClone(this.activeTask)
+
       this.redialTask(this.activeTask).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
@@ -1076,7 +1088,6 @@ export default {
         // when there is wrap up, skip wrap
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
-            this.redialedTask = this.$jsonClone(this.activeTask)
             this.isRedialClicked = false
             this.wrapUp = false
             this.skipWrapUp = false
@@ -1087,7 +1098,6 @@ export default {
 
         // if no wrap-up, proceed to the next task
         setTimeout(() => {
-          this.redialedTask = this.$jsonClone(this.activeTask)
           this.isRedialClicked = false
           this.processSession()
         }, 1000)
@@ -1162,7 +1172,11 @@ export default {
     wrapUp (value) {
       if (value) {
         this.startWarmUpCountDown()
-      } else {
+        return
+      }
+
+      // re-run/re-initialize only if no manual skip wrap-up
+      if (!this.skipWrapUp) {
         this.initialize()
       }
     },

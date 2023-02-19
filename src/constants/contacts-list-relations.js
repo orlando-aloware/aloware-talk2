@@ -1,15 +1,4 @@
-export const RELATIONS = [
-  'phoneNumbers',
-  'leadSource',
-  'broadcasts',
-  'user',
-  'dispositionStatus',
-  'campaigns',
-  'initialCampaign',
-  'contactLists',
-  'ringGroups',
-  'tags',
-  'workflow',
-  'sequence',
-  'lastCommunication'
-]
+import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+export const RELATIONS = ALL_COLUMNS
+  .filter(column => column.relationName)
+  .map(column => column.relationName)

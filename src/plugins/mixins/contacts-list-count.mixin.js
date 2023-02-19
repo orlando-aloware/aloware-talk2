@@ -82,7 +82,7 @@ export default {
         this.countSource = this.countCancelToken.source()
       }
 
-      return this.$axios.get(`api/v2/contacts/count`, {
+      return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
         params: this.getQueryString(typeof data.filters === 'object' ? data.filters : JSON.parse(data.filters)),
         paramsSerializer: qs.stringify,
         cancelToken: this.countSource.token

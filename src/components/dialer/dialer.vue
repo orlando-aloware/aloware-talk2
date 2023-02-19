@@ -284,7 +284,16 @@ export default {
       if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
+
       this.backToDial()
+    })
+
+    this.$VueEvent.listen('forceEndWrapUp', () => {
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        return
+      }
+
+      this.backToDial(true)
     })
 
     this.$VueEvent.listen('resetCall', () => {
@@ -1130,8 +1139,8 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial () {
-      this.resetAgentStatus()
+    backToDial (forceStatus = false) {
+      this.resetAgentStatus(forceStatus)
       this.resetCall()
     },
 

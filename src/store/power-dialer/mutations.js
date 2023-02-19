@@ -172,7 +172,7 @@ export default {
       delete powerDialerDefaultState.redialed
     }
 
-    state = Object.assign(state, PowerDialerDefault.DEFAULT_STATE)
+    state = Object.assign(state, powerDialerDefaultState)
 
     if (!value.includes('all')) {
       return
