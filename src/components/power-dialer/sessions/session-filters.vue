@@ -35,6 +35,7 @@ export default {
   name: 'SessionFilters',
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapGetters('contacts', [
       'contact'
     ]),
@@ -67,7 +68,7 @@ export default {
         {
           id: 3,
           name: 'CRM View',
-          enabled: this.hasHubspotEnabled
+          enabled: this.hasHubspotEnabled || this.isReferrizer
         }
       ]
     }
