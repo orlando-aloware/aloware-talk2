@@ -47,10 +47,10 @@ export default {
     isReferrizer () {
       // dev testing
       if (process.env.APP_ENV !== 'production') {
-        return this.profile.company.id === 2139
+        return this.currentCompany.id === 2139
       }
 
-      return this.profile.company.id === 2140
+      return this.currentCompany.id === 2140
     },
 
     tabs () {
