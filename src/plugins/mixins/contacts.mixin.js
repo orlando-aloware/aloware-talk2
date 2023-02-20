@@ -1016,6 +1016,10 @@ export default {
       for (column.data of this.columns) {
         const relationName = _.get(column.data, 'relationName', null)
 
+        if (this.$route.path === '/power-dialer/list/add' && relationName === 'taskStatus') {
+          continue
+        }
+
         if (relationName && RELATIONS.includes(relationName)) {
           relations.push(relationName)
         }
