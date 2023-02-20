@@ -12,7 +12,7 @@
           <div class="t-badge-name">
             {{ filter.name }}
           </div>
-          <q-tooltip v-if="filter.name === 'CRM View' && !hasHubspotEnabled"
+          <q-tooltip v-if="filter.name === 'CRM View' && !hasHubspotEnabled && !isReferrizer"
                      content-class="bg-grey-light11"
                      anchor="bottom start"
                      self="center start"
