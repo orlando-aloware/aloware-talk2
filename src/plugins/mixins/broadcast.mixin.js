@@ -48,7 +48,6 @@ export default {
         broadcaster: 'pusher',
         key: storage.local.getItem('pusher_app_key'),
         cluster: storage.local.getItem('pusher_cluster'),
-        encrypted: true,
         forceTLS: true,
         auth: {
           headers: {

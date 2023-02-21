@@ -1464,6 +1464,15 @@
     "@types/qs" "*"
     "@types/range-parser" "*"
 
+"@types/express-serve-static-core@4.17.28":
+  version "4.17.28"
+  resolved "https://registry.npmjs.org/@types/express-serve-static-core/-/express-serve-static-core-4.17.28.tgz"
+  integrity sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==
+  dependencies:
+    "@types/node" "*"
+    "@types/qs" "*"
+    "@types/range-parser" "*"
+
 "@types/express@*", "@types/express@^4.17.13":
   version "4.17.13"
   resolved "https://registry.npmjs.org/@types/express/-/express-4.17.13.tgz"
@@ -1540,6 +1549,11 @@
   version "12.20.55"
   resolved "https://registry.npmjs.org/@types/node/-/node-12.20.55.tgz"
   integrity sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==
+
+"@types/node@^14.14.31":
+  version "14.18.36"
+  resolved "https://registry.npmjs.org/@types/node/-/node-14.18.36.tgz"
+  integrity sha512-FXKWbsJ6a1hIrRxv+FoukuHnGTgEzKYGi7kilfMae96AL9UNkPFNWJEEYWzdRI9ooIkbr4AKldyuSTLql06vLQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -10363,10 +10377,14 @@ push.js@^1.0.9:
   resolved "https://registry.npmjs.org/push.js/-/push.js-1.0.12.tgz"
   integrity sha512-Mo/zkrPD58hcbMvC/9WveUPGz0PJ4T5UwQJP6DnMYbyxe7b1xM/9qqmJTMmDcprbZjCtLzf9wWtek7gA8O9QBw==
 
-pusher-js@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.npmjs.org/pusher-js/-/pusher-js-5.1.1.tgz"
-  integrity sha512-f2tdoA7NvJQkU8Y/iCH25ZSNGxnwCXrVbwos38isX6gnjsSZ1aksWvyZddm2N0sHJWyl+oPBz/MzU5cevVDyEQ==
+pusher-js@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.npmjs.org/pusher-js/-/pusher-js-8.0.1.tgz"
+  integrity sha512-DbhfDfghqCF94gb+TFHZAgauXFT7k6onWXcd3Q4vnk/C2f5bC7/qKV14rvdoAAB8FCIBb11ZL0YX7N/oQPVxXA==
+  dependencies:
+    "@types/express-serve-static-core" "4.17.28"
+    "@types/node" "^14.14.31"
+    tweetnacl "^1.0.3"
 
 pusher@^4.0.2:
   version "4.0.2"
@@ -12516,7 +12534,7 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz"
 
-tweetnacl@^1.0.0:
+tweetnacl@^1.0.0, tweetnacl@^1.0.3:
   version "1.0.3"
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
