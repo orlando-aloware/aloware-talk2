@@ -197,6 +197,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Messenger')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -211,6 +212,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Messenger')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -226,6 +228,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('DMS Equity')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -240,6 +243,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('DMS Equity')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -255,6 +259,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Digital Lead War')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -269,6 +274,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Digital Lead War')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -284,6 +290,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Email Blast')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -298,6 +305,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Email Blast')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -313,6 +321,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Sold Report')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -327,6 +336,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Sold Report')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -342,6 +352,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Dealer Profile')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -356,6 +367,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="!isActive('Dealer Profile')"
+           v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -412,6 +424,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-sidebar',
@@ -427,6 +440,8 @@ export default {
       default: false
     }
   },
+
+  mixins: [simpsocialMixin],
 
   computed: {
     ...mapState('auth', ['profile']),

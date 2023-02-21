@@ -100,7 +100,7 @@
             <compact-btn borderless
                          variant="outlined-light"
                          customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                         v-if="currentCompany && currentCompany.reseller_id === 357"
+                         v-if="isSimpsocial"
                          @clicked="onMessengerClick">
               <iframe id="ss-messenger-button" :src="'https://dealer.simpsocial.com/' + currentCompany.id + '/messenger/unread/count'" frameborder="0" style="">
               </iframe>
@@ -725,7 +725,8 @@ import {
   timezoneCheckMixin,
   aclMixin,
   viewMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
@@ -737,7 +738,8 @@ export default {
     timezoneCheckMixin,
     aclMixin,
     viewMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    simpsocialMixin
   ],
 
   inject: [

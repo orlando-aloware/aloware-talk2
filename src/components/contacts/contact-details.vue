@@ -72,7 +72,6 @@ export default {
 
   props: {
     campaignId: {
-      type: Number,
       required: true
     }
   },

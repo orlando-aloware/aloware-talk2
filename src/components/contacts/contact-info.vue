@@ -172,7 +172,8 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                v-if="currentCompany && currentCompany.simpsocial_integration_enabled && profile"
+                :disabled="!isSimpSocialIntegrationEnabled"
+                v-if="isSimpsocial"
                 @click="openEmailBlast">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
@@ -183,7 +184,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="isVideoConferenceLinkSending"
+                :disabled="isSimpsocial"
                 @click="openVideoConference">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
@@ -211,7 +212,7 @@ import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import * as CompanyImportance from 'src/constants/importance-label'
@@ -224,12 +225,14 @@ export default {
 
   props: {
     campaignId: {
-      type: Number,
       required: true
     }
   },
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    simpsocialMixin
+  ],
 
   components: {
     VideoConferenceIcon,
@@ -259,8 +262,6 @@ export default {
       'contactPhoneNumbers',
       'changingSelectedContact'
     ]),
-
-    ...mapState('auth', ['profile']),
 
     contactName () {
       if (this.contact) {

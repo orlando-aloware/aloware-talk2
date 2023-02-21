@@ -66,7 +66,7 @@
       </q-tooltip>
     </b-link>
 
-    <b-link v-if="currentCompany && currentCompany.simpsocial_integration_enabled"
+    <b-link v-if="isSimpSocialIntegrationEnabled"
             href="#">
       <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
               ref="newCarMenu"
@@ -88,7 +88,7 @@
       </q-tooltip>
     </b-link>
 
-    <b-link v-if="currentCompany && currentCompany.simpsocial_integration_enabled"
+    <b-link v-if="isSimpSocialIntegrationEnabled"
             href="#"
             :disabled="creditApplicationSending"
             @click="sendCreditApplicationLink">
@@ -111,7 +111,7 @@ import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import SimpsocialInventoryIcon from 'components/icons/simpsocial-inventory-icon'
 import SimpsocialCreditApplicationIcon from 'components/icons/simpsocial-credit-application-icon'
 import talk2Api from 'src/plugins/api/api'
@@ -139,7 +139,10 @@ export default {
     NewCar
   },
 
-  mixins: [ aclMixin ],
+  mixins: [
+    aclMixin,
+    simpsocialMixin
+  ],
 
   data () {
     return {

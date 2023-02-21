@@ -40,26 +40,26 @@
                   variant="success"
                   size="sm"
                   class="mr-2"
-                  v-if="currentCompany && currentCompany.reseller_id !== 357">
+                  v-if="isNotSimpsocial">
           Send an Email
         </b-button>
         <b-button href="mailto:support@simpsocial.com"
                   variant="success"
                   size="sm"
                   class="mr-2"
-                  v-if="currentCompany && currentCompany.reseller_id === 357">
+                  v-if="isSimpsocial">
           Send an Email
         </b-button>
         <b-button href="tel:+18552562001"
                   variant="primary"
                   size="sm"
-                  v-if="currentCompany && currentCompany.reseller_id !== 357">
+                  v-if="isNotSimpsocial">
           Call us
         </b-button>
         <b-button href="tel:+18888291110"
                   variant="primary"
                   size="sm"
-                  v-if="currentCompany && currentCompany.reseller_id === 357">
+                  v-if="isSimpsocial">
           Call us
         </b-button>
       </div>
@@ -69,9 +69,11 @@
 
 <script>
 import { mapState } from 'vuex'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Suspended',
+  mixins: [simpsocialMixin],
   data () {
     return {
       loadingWhitelabel: false,

@@ -37,3 +37,4 @@ export { default as contactsListFiltersMixin } from './contacts-list-filters.mix
 export { default as addViewMixin } from './add-view.mixin'
 export { default as contactV2AttributesMixin } from './contact-v2-attributes.mixin'
 export { default as resellerMixin } from './reseller.mixin'
+export { default as simpsocialMixin } from './simpsocial.mixin'
