@@ -45,7 +45,7 @@ export default {
 
   created () {
     this.id = this.$route.params.id
-    console.log('this.id: ', this.id)
+
     if (this.contactId !== null) {
       this.id = this.contactId
     }
