@@ -283,7 +283,7 @@
       </q-tooltip>
     </q-btn>
 
-    <!--q-btn :to="{ name: 'Email Blast' }"
+    <q-btn :to="{ name: 'Email Blast' }"
            :ripple="false"
            icon="img:app-icons/menu/email_blast_active.svg"
            align="left"
@@ -312,7 +312,7 @@
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Email Blast</span>
       </q-tooltip>
-    </q-btn-->
+    </q-btn>
 
     <!--q-btn :to="{ name: 'Sold Report' }"
            :ripple="false"
