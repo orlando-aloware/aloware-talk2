@@ -184,7 +184,8 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="isSimpsocial"
+                :disabled="isVideoConferenceLinkSending"
+                v-if="isSimpsocial"
                 @click="openVideoConference">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
