@@ -74,7 +74,7 @@
                     :href="updatesLink">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
-            </span>
+              </span>
             </b-link>
           </q-item-section>
         </q-item>
