@@ -256,7 +256,7 @@ export default {
 
       // use the same query string to update the list count
       // eslint-disable-next-line camelcase
-      const countQueryString = (({ filter_groups, search }) => ({ filter_groups, search }))(queryString)
+      const countQueryString = (({ filter_groups, search, list_id }) => ({ filter_groups, search, list_id }))(queryString)
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
@@ -427,17 +427,7 @@ export default {
 
       // initial filter for static contact lists
       if (this.list && this.list.type === ContactListTypes.STATIC) {
-        query.filter_groups = [
-          {
-            filters: {
-              contact_lists: {
-                value: [this.id],
-                operator: 1
-              }
-            },
-            is_conjunction: true
-          }
-        ]
+        query.list_id = this.id
       }
 
       if (!_.isEmpty(filters)) {
@@ -490,6 +480,11 @@ export default {
 
           query.filter_groups = query.filter_groups.concat(listFilters[filterIndex])
         }
+      }
+
+      // cleanup
+      if (query.filter_groups.length < 1) {
+        delete query.filter_groups
       }
 
       if (params?.sort) {

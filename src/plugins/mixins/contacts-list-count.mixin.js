@@ -101,7 +101,8 @@ export default {
         query.filter_groups = []
 
         keys.forEach(function (key, i) {
-          if (!['sort', 'order', 'search', 'relations'].includes(key)) {
+          // defined and not empty filter groups
+          if (key === 'filter_groups' && filters[key] && filters[key].length > 0) {
             query.filter_groups.push(...filters[key])
           }
 
@@ -109,7 +110,17 @@ export default {
           if (key === 'search') {
             query.search = filters[key]
           }
+
+          // contact list id becomes a separate filter
+          if (key === 'list_id') {
+            query.list_id = filters[key]
+          }
         })
+      }
+
+      // cleanup
+      if (query.filter_groups.length < 1) {
+        delete query.filter_groups
       }
 
       return query
