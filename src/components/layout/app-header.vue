@@ -221,7 +221,8 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      inboxShowMyContactsFilter: false
+      inboxShowMyContactsFilter: false,
+      updatesLink: 'https://news.intercom.com/aloware'
     }
   },
 
@@ -323,10 +324,6 @@ export default {
 
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
-    },
-
-    updatesLink () {
-      return 'https://news.intercom.com/aloware'
     }
   },
 
