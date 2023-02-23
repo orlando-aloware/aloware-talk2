@@ -29,7 +29,7 @@
       </div>
       <div class="d-flex flex-row truncated-text">
         <div class="pr-2">
-          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, channelAnswerStatus)"
+          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, channelAnswerStatus, communication.callback_status)"
                      height="18px"
                      width="18px">
           </component>

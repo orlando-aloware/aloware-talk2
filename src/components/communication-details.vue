@@ -28,7 +28,7 @@
           <q-card-section class="pt-0 comm-type-container">
             <div class="text-lt p-x d-inline-flex"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
-              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
                          v-if="communication.disposition_status2">
               </component>
               <div class="comm-type-wrapper">
