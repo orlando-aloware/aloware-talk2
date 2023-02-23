@@ -141,7 +141,6 @@ const translateDispositionStatusText = (status, callbackStatus = null) => {
     // call is abandoned without ringing target.
     case CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW:
       if (callbackStatus === CallbackStatus.CALLBACK_STATUS_REQUESTED) {
-        // return "Callback Pending" instead
         return 'Callback Pending'
       }
       return CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED
