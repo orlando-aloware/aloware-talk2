@@ -1,5 +1,6 @@
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import * as CallbackStatus from '../../constants/callback-status'
 import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
 
 /**
@@ -129,6 +130,7 @@ const translateCurrentStatusText = (status) => {
 /**
  * Translate disposition status text
  * @param status
+ * @param callbackStatus
  * @returns {string}
  */
 const translateDispositionStatusText = (status, callbackStatus = null) => {
@@ -138,7 +140,7 @@ const translateDispositionStatusText = (status, callbackStatus = null) => {
       return CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS
     // call is abandoned without ringing target.
     case CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW:
-      if (callbackStatus != null) {
+      if (callbackStatus === CallbackStatus.CALLBACK_STATUS_REQUESTED) {
         // return "Callback Pending" instead
         return 'Callback Pending'
       }

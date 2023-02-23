@@ -2,6 +2,7 @@ import * as CommunicationDirections from '../../constants/communication-directio
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
+import * as CallbackStatus from '../../constants/callback-status'
 import { head } from 'lodash'
 
 export default {
@@ -125,8 +126,7 @@ export default {
         return `${icon.data}${(type === CommunicationTypes.CALL ? 'answered' : 'completed')}-icon`
       }
       if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
-        console.log({ direction, callbackStatus })
-        if (direction === CommunicationDirections.INBOUND && callbackStatus !== null) {
+        if (direction === CommunicationDirections.INBOUND && callbackStatus === CallbackStatus.CALLBACK_STATUS_REQUESTED) {
           return `${icon.data}callback-pending-icon`
         }
         return `${icon.data}abandoned-icon`
