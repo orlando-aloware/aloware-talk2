@@ -83,7 +83,7 @@ export default {
       return ''
     },
 
-    stateToIcon: function (dispositionStatus, type, direction = null) {
+    stateToIcon: function (dispositionStatus, type, direction = null, callbackStatus = null) {
       const icon = { data: '' }
 
       if (![CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(type)) {
@@ -125,6 +125,10 @@ export default {
         return `${icon.data}${(type === CommunicationTypes.CALL ? 'answered' : 'completed')}-icon`
       }
       if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
+        console.log({ direction, callbackStatus })
+        if (direction === CommunicationDirections.INBOUND && callbackStatus !== null) {
+          return `${icon.data}callback-pending-icon`
+        }
         return `${icon.data}abandoned-icon`
       }
       if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {

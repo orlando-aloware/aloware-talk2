@@ -21,7 +21,7 @@
             @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
-          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
                      v-if="communication.disposition_status2">
           </component>
         </div>
@@ -189,7 +189,7 @@
         <template slot="header">
           <q-item-section class="communication-header flex-row">
             <div class="ml-3 pr-2">
-              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
                          v-if="communication.disposition_status2">
               </component>
             </div>
