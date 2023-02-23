@@ -16,18 +16,44 @@
         <b-col sm="12"
                md="12">
           <div>
-            <h5 class="form-label">Available by Default, But Allow Manual Changes</h5>
+            <h5 class="form-label">Available by Default, But Allow Manual Changes
+              <span class="mx-1">
+                <information-circle-icon color="#2F80ED">
+                </information-circle-icon>
+                <q-tooltip anchor="center start"
+                           self="center left"
+                           :offset="[-20, 10]">
+                  <div>
+                    <span class="d-flex mb-2">By default, Aloware sets all users' statuses to 'Offline' after they login or have 5 minutes of app inactivity</span>
+                    <span class="d-flex font-weight-bold">Turning on 'Force Users to Always Available' Setting:</span>
+                    <ul class="mb-0">
+                      <li>Users' statuses are set to 'Available' even after they login or have 5 minutes of app inactivity</li>
+                      <li>Users cannot manually change their status</li>
+                      <li>User's application will receive inbound calls until they logout</li>
+                      <li>Admins can still manually change agent's statuses in Wallboard</li>
+                    </ul>
+                  </div>
+                </q-tooltip>
+              </span>
+              <b-badge variant="warning"
+                       v-if="currentCompany && currentCompany.force_users_always_available">
+                Forced at account level
+              </b-badge></h5>
             <p class="form-helper-text">Put user on available status after login and disable idle mode detection (auto offline).</p>
           </div>
 
-          <b-form-group
-            label=""
-          >
+          <b-form-group label="">
             <b-form-checkbox switch
                              v-model="user.go_to_available_after_login"
+                             :disabled="currentCompany && currentCompany.force_users_always_available"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'go_to_available_after_login')">
               Enable available by default, but allow manual changes
             </b-form-checkbox>
+            <q-tooltip anchor="center start"
+                       self="center left"
+                       :offset="[-20, 10]">
+              Disabled - Requires Admin to change Account Setting
+            </q-tooltip>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -87,13 +113,17 @@ import WrapUpSelector from 'components/generic-selectors/wrap-up-selector'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { aclMixin } from 'src/plugins/mixins'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'personalization',
 
   mixins: [aclMixin],
 
-  components: { WrapUpSelector },
+  components: {
+    WrapUpSelector,
+    InformationCircleIcon
+  },
 
   props: {
     user: {
