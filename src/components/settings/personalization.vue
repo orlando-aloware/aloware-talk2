@@ -51,7 +51,8 @@
             </b-form-checkbox>
             <q-tooltip anchor="center start"
                        self="center left"
-                       :offset="[-20, 10]">
+                       :offset="[-20, 10]"
+                       v-if="currentCompany && currentCompany.force_users_always_available">
               Disabled - Requires Admin to change Account Setting
             </q-tooltip>
           </b-form-group>
