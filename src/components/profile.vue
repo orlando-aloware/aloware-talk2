@@ -78,7 +78,7 @@
           <q-item dense
                   clickable
                   v-close-popup
-                  :disable="profile.company.force_users_always_available"
+                  :disable="profile.company.force_users_always_available && !hasRole('Company Admin')"
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)">
             <div class="d-flex align-items-center justify-content-between w-100">
@@ -93,7 +93,7 @@
                    :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'text-primary' : '']"></i>
               </div>
             </div>
-            <q-tooltip v-if="profile.company.force_users_always_available"
+            <q-tooltip v-if="profile.company.force_users_always_available && !hasRole('Company Admin')"
                        anchor="top middle"
                        self="center middle">
               <q-badge color="teal"
@@ -107,7 +107,7 @@
                   clickable
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'cursor-inherit' : '']"
-                  :disable="profile.company.force_users_always_available"
+                  :disable="profile.company.force_users_always_available && !hasRole('Company Admin')"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
@@ -120,7 +120,7 @@
                 <i class="fa fa-check fs-12" :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'text-primary' : '']"></i>
               </div>
             </div>
-            <q-tooltip v-if="profile.company.force_users_always_available"
+            <q-tooltip v-if="profile.company.force_users_always_available && !hasRole('Company Admin')"
                        anchor="top middle"
                        self="center middle">
               <q-badge color="teal"

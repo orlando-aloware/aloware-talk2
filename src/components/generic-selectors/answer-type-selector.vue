@@ -47,6 +47,7 @@
 <script>
 
 import * as AnswerTypes from 'src/constants/answer-types'
+import { mapState } from 'vuex'
 
 export default {
   name: 'answer-type-selector',
@@ -54,7 +55,7 @@ export default {
   props: {
     value: {
       type: [String, Number],
-      default: 0
+      default: AnswerTypes.BY_NONE
     },
     multiple: {
       type: Boolean,
@@ -90,7 +91,9 @@ export default {
         default:
           return ''
       }
-    }
+    },
+
+    ...mapState('cache', ['currentCompany'])
   },
 
   data () {
@@ -142,6 +145,10 @@ export default {
     }
   },
   mounted () {
+    // exclude BY_IP_PHONE if it's not in the hard coded array
+    if ([11, 98, 135, 206, 370, 1004, 1038, 1039, 1040, 1721].includes(this.currentCompany?.id)) {
+      this.optsArray = this.optsArray.filter(item => item.value !== AnswerTypes.BY_IP_PHONE)
+    }
     this.options = this.optsArray
   },
   watch: {
