@@ -131,13 +131,17 @@ const translateCurrentStatusText = (status) => {
  * @param status
  * @returns {string}
  */
-const translateDispositionStatusText = (status) => {
+const translateDispositionStatusText = (status, callbackStatus = null) => {
   switch (status) {
     // Call is still going on.
     case CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW:
       return CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS
     // call is abandoned without ringing target.
     case CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW:
+      if (callbackStatus != null) {
+        // return "Callback Pending" instead
+        return 'Callback Pending'
+      }
       return CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED
     // target party did not answer the call.
     case CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW:
