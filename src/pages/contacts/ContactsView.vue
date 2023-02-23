@@ -1010,7 +1010,7 @@ export default {
       // don't allow filters to be saved empty for dynamic list
       const hasGroupFilters = Object.keys(this.currentListFilters).filter(key => this.currentListFilters[key]?.filters)
       if (_.isEmpty(hasGroupFilters) && this.selectedList.type === this.ContactListTypes.DYNAMIC) {
-        this.$generalNotification('Filters not saved. Dyamic list must have filters.', 'error')
+        this.$generalNotification('Filters not saved. Dynamic list must have filters.', 'error')
         return
       }
 
