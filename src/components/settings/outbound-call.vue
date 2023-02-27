@@ -204,12 +204,12 @@ export default {
       selected: '',
       status: '',
       options: [
-        { text: 'Use Account Default', value: 2, notEnabled: this.outboundCallSettingEnabled },
+        { text: 'Use Company Default', value: 2, notEnabled: this.outboundCallSettingEnabled },
         { text: 'Select Manually', value: 1, notEnabled: this.outboundCallSettingEnabled },
         { text: 'Always Ask', value: 3, notEnabled: this.outboundCallSettingEnabled }
       ],
       callRecordingsOptions: [
-        { text: 'Use Account Default', value: 1 },
+        { text: 'Use Company Default', value: 1 },
         { text: 'Always Record', value: 2 },
         { text: 'Never Record', value: 3 }
       ],
