@@ -695,7 +695,6 @@ export default {
     ...mapActions('contacts', [
       'setCurrentListFilters',
       'setShowMyContacts',
-      'updateContactsListFilter',
       'setListContactsLoaded'
     ])
   },
