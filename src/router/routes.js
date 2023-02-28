@@ -266,9 +266,9 @@ const routes = [
         },
         children: [
           {
-            name: 'Wallboard Overview',
+            name: 'Wallboard',
             meta: {
-              title: 'Wallboard Overview',
+              title: 'Wallboard',
               id: 'wallboard-overview'
             },
             path: 'overview',
@@ -277,7 +277,7 @@ const routes = [
           {
             name: 'Wallboard Users',
             meta: {
-              title: 'Wallboard Users',
+              title: 'Wallboard',
               id: 'wallboard-users'
             },
             path: 'users',
@@ -286,7 +286,7 @@ const routes = [
           {
             name: 'Wallboard Calls',
             meta: {
-              title: 'Wallboard Calls',
+              title: 'Wallboard',
               id: 'wallboard-calls'
             },
             path: ':id(queued|live|parked)+',

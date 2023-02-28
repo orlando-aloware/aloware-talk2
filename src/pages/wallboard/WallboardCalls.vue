@@ -1,6 +1,6 @@
 <template>
   <div>
-    Calls
+    {{  $route.params.id }}
   </div>
 </template>
 

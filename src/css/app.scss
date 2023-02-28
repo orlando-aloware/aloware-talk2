@@ -12343,3 +12343,43 @@ h1.contact-list-name-label {
 .pe-none {
   pointer-events: none;
 }
+
+.wallboard {
+  &__sidebar {
+    width: 200px;
+    height: 100%;
+
+    &__title {
+      font-size: 13px;
+      color: $grey-90;
+      font-weight: 700;
+      margin: 20px 10px 5px 10px;
+    }
+
+    &__item {
+      height: 36px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0px 8px;
+      text-decoration: none !important;
+      margin-bottom: 5px;
+
+      &__icon {
+        margin: 0px 5px;
+      }
+
+      &__name{
+        flex-grow: 1;
+        font-weight: 400;
+        font-size: 14px;
+        color: $grey-92;
+      }
+    }
+  }
+
+  &__header {
+
+  }
+}

@@ -116,7 +116,7 @@
 
     <q-btn :to="{ name: 'Wallboard' }"
            :ripple="false"
-           icon="img:app-icons/menu/contacts_active.svg"
+           icon="img:app-icons/menu/wallboard_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
@@ -130,7 +130,7 @@
     </q-btn>
     <q-btn :to="{ name: 'Wallboard' }"
            :ripple="false"
-           icon="img:app-icons/menu/contacts_gray.svg"
+           icon="img:app-icons/menu/wallboard_grey.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
