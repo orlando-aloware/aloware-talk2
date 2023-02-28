@@ -211,7 +211,7 @@
           <b-col sm="12" md="12">
             <div>
               <h5 class="form-label">Backup Routing (Beta)</h5>
-              <p class="form-helper-text">Call routing will check if the user is online on Aloware. If you check this, the backup phone number will ring if you're not available.</p>
+              <p class="form-helper-text">Call routing will check if the user is online{{ whiteLabelText }}. If you check this, the backup phone number will ring if you're not available.</p>
             </div>
 
             <b-form-group label="" >
@@ -436,7 +436,11 @@ import AnswerTypeSelector from 'components/generic-selectors/answer-type-selecto
 import UserCampaignSelector from 'components/generic-selectors/user-campaign-selector'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as Roles from 'src/constants/roles'
-import { aclMixin, settingsMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  settingsMixin,
+  simpsocialMixin
+} from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
@@ -444,14 +448,21 @@ import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/val
 export default {
   name: 'profile',
 
-  mixins: [aclMixin, settingsMixin],
+  mixins: [
+    aclMixin,
+    settingsMixin,
+    simpsocialMixin
+  ],
 
   components: { UserCampaignSelector, AnswerTypeSelector },
 
   computed: {
     ...mapState(['campaigns']),
+
     ...mapState('settings', ['userClone']),
+
     ...mapState('auth', ['profile']),
+
     userDestinationEditable () {
       return this.user.role_name && !this.user.read_only_access
     },
@@ -467,13 +478,19 @@ export default {
     canBeEdited () {
       return this.user.role_name && !this.user.read_only_access && !this.user.is_destination
     },
+
     requirePassword () {
       return this.showPasswordFields
     },
+
     connectedCampaigns () {
       return this.campaigns.filter((campaign) => {
         return campaign.user_id === this.user.id
       })
+    },
+
+    whiteLabelText () {
+      return this.isSimpsocial ? '' : ' on Aloware'
     }
   },
 

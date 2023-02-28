@@ -8,7 +8,7 @@
       <q-card-section>
         <div>
           <h2>
-            Please select a reason as to why you are choosing to switch back to Aloware Classic:
+            Please select a reason as to why you are choosing to switch back to {{ whiteLabelText }}:
           </h2>
         </div>
         <div class="q-gutter-sm">
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 
 const reasons = [
@@ -118,7 +118,10 @@ const skipUsers = [42]
 
 export default {
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    simpsocialMixin
+  ],
 
   props: {
     shouldOpen: {
@@ -126,6 +129,7 @@ export default {
       default: false
     }
   },
+
   data () {
     return {
       reasons,
@@ -141,6 +145,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
+
     feedback_params () {
       let explanation = ''
 
@@ -161,13 +166,20 @@ export default {
         explanation
       }
     },
+
     isOpen () {
       return this.shouldOpen && !this.shouldSkipForm
     },
+
     shouldSkipForm () {
       // Admins should not see the feedback form
       // Certain companies will not see the form
       return this.isAdmin || this.skipCompanies.includes(this.profile.company_id) || this.skipUsers.includes(this.profile.id)
+    },
+
+    whiteLabelText () {
+      const whiteLabel = this.isSimpsocial ? '' : 'Aloware '
+      return `${whiteLabel}Classic`
     }
   },
   watch: {
@@ -180,15 +192,21 @@ export default {
         this.$emit('submit')
       }
     },
+
     reason (reason) {
       if (reason != null && !this.isDontUnderstand(reason)) {
         this.dontUnderstand = null
       }
     },
+
     dontUnderstand (dontUnderstand) {
       if (dontUnderstand !== null) {
         this.reason = null
       }
+    },
+
+    whiteLabelText (newValue) {
+      this.reasons[6].label = `Talk2 is slower than ${newValue}Classic 🐢`
     }
   },
   methods: {
@@ -205,15 +223,18 @@ export default {
       }
       this.$emit('submit')
     },
+
     closeDialog () {
       this.reason = null
       this.explanations = ['', '']
       this.dontUnderstand = null
       this.$emit('toggle')
     },
+
     getReasonLabel (id) {
       return this.reasons.filter((reason) => reason.id === id)[0].label
     },
+
     isDontUnderstand (reason) {
       return reason >= 2 && reason <= 5 && reason !== null
     }

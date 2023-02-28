@@ -173,7 +173,7 @@
             2. Decide What happens If duplicates exist
           </div>
           <div>
-            Aloware uses phone numbers as a unique identifier for contacts. If
+            {{ whiteLabelText }} phone numbers as a unique identifier for contacts. If
             contacts share the same primary phone number, how do you wnat to
             handle them?
           </div>
@@ -187,7 +187,7 @@
               value="accepted"
               unchecked-value="not_accepted"
             >
-              Don’t add contact from this list if existing Aloware contact has
+              Don’t add contact from this list if existing {{ whiteLabelContactText }} contact has
               same phone number
             </b-form-radio>
           </div>
@@ -199,7 +199,7 @@
               value="accepted"
               unchecked-value="not_accepted"
             >
-              Replace Aloware contact if contact from this list has same phone
+              Replace {{ whiteLabelContactText }} contact if contact from this list has same phone
               number
             </b-form-radio>
           </div>
@@ -211,7 +211,7 @@
               value="accepted"
               unchecked-value="not_accepted"
             >
-              Merge contacts from this list with any Aloware contact that shares
+              Merge contacts from this list with any {{ whiteLabelContactText }} contact that shares
               the same phone number
             </b-form-radio>
           </div>
@@ -234,15 +234,28 @@
 </template>
 
 <script>
+import { simpsocialMixin } from 'src/plugins/mixins'
+
 export default {
-  components: {},
+  mixins: [simpsocialMixin],
+  computed: {
+    whiteLabelText () {
+      return this.isSimpsocial ? 'Uses' : 'Aloware uses'
+    },
+
+    whiteLabelContactText () {
+      return this.isSimpsocial ? '' : 'Aloware'
+    }
+  },
   methods: {
     open () {
       this.isOpen = true
     },
+
     close () {
       this.isOpen = false
     },
+
     onClickNext (nextStep) {
       this.done = [...new Set(this.done).add(nextStep - 1)]
       this.active = nextStep

@@ -67,7 +67,7 @@
 
         <header-help></header-help>
 
-        <q-item>
+        <q-item v-if="isNotSimpsocial">
           <q-item-section class="nav-item dropdown">
             <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
               <span class="fa fa-bullhorn changelog-trigger pointer"
@@ -154,7 +154,8 @@ import {
   aclMixin,
   avatarMixin,
   goBackMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -182,7 +183,8 @@ export default {
     aclMixin,
     avatarMixin,
     goBackMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    simpsocialMixin
   ],
 
   components: {
