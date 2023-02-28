@@ -95,17 +95,7 @@ export default {
     showRingGroupSnapShot () {
       return this.communication.metadata &&
         this.communication.metadata.ring_group_snapshot &&
-        this.ringGroup &&
-        (
-          // and if the call was not queued
-          !this.communication.metadata.reports ||
-          !this.communication.metadata.reports.is_queued ||
-          // or queued but not abandoned
-          (
-            this.communication.metadata.reports.is_queued &&
-            this.communication.disposition_status2 !== DISPOSITION_STATUS_ABANDONED_NEW
-          )
-        )
+        this.ringGroup
     }
   },
 
