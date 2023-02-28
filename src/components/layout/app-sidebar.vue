@@ -318,6 +318,10 @@ export default {
         return true
       }
 
+      if (['Wallboard Users', 'Wallboard Calls'].includes(this.$route.name) && name === 'Wallboard') {
+        return true
+      }
+
       return this.$route.name === name
     },
 
