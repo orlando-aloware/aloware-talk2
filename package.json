@@ -12,6 +12,7 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
     "build-mac": "quasar build -m electron -T mac -b builder -P never",
     "build-linux": "quasar build -m electron -T linux -b builder -P never",
     "build-win": "quasar build -m electron -T win -b builder -P never",
@@ -42,7 +43,6 @@
     "giphy-js-sdk-core": "^1.0.6",
     "google-libphonenumber": "^3.2.32",
     "humanize-duration": "^3.28.0",
-    "laravel-echo": "^1.15.0",
     "lodash": "^4.17.20",
     "moment": "^2.29.4",
     "moment-duration-format": "^2.3.2",
@@ -50,7 +50,6 @@
     "numeral": "^2.0.6",
     "push.js": "^1.0.9",
     "pusher": "^4.0.2",
-    "pusher-js": "^5.1.1",
     "qs": "^6.10.3",
     "quasar": "^1.19.3",
     "rage-edit": "^1.2.0",
@@ -108,6 +107,8 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.1.2",
+    "laravel-echo": "^1.15.0",
+    "pusher-js": "^8.0.1",
     "vue-loader": "^15.9.6",
     "vue-template-compiler": "^2.6.12"
   },

@@ -421,11 +421,14 @@ iframe > html {
   min-width: 300px !important;
 }
 
-.hubspot-iframe-container {
+.hubspot-iframe-container,
+.referrizer-iframe-container {
   height: calc(100% - 12px);
   width: 100%;
   overflow: hidden;
-  #hubspot-crm {
+
+  #hubspot-crm,
+  #referrizer-crm {
     width: calc(100% + 0px);
     height: 100%;
   }

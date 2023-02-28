@@ -1011,10 +1011,14 @@ export default {
 
     contactsRelations () {
       const relations = []
-      const column = { data: null }
 
-      for (column.data of this.columns) {
-        const relationName = _.get(column.data, 'relationName', null)
+      for (const column of this.columns) {
+        const relationName = _.get(column, 'relationName', null)
+        const pdListAddRoutePattern = /\/power-dialer\/list(\/\d*)?\/add/gi
+
+        if (pdListAddRoutePattern.test(this.$route.path) && relationName === 'taskStatus') {
+          continue
+        }
 
         if (relationName && RELATIONS.includes(relationName)) {
           relations.push(relationName)
