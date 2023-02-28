@@ -1,5 +1,5 @@
 <template>
-  <router-link class="wallboard__sidebar__item"
+  <router-link :class="['wallboard__sidebar__item', { 'wallboard__sidebar__item--active': active }]"
                :to="{ path: route }">
     <span class="wallboard__sidebar__item__icon">
       <component :is="icon"/>
@@ -52,6 +52,11 @@ export default {
     loading: {
       type: Boolean,
       required: false,
+      default: false
+    },
+
+    active: {
+      type: Boolean,
       default: false
     }
   }

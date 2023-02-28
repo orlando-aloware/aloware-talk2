@@ -2,7 +2,8 @@
     <div class="wallboard__sidebar h-100 d-flex flex-column no-border-radius bordered-right">
       <wallboard-sidebar-item name="Overview"
                               route="/wallboard/overview"
-                              icon="wallboard-overview-icon">
+                              icon="wallboard-overview-icon"
+                              :active="isActive('/wallboard/overview')">
         <template #action>
           <refresh-icon />
           <q-tooltip anchor="center right"
@@ -21,7 +22,8 @@
                               :icon="item.icon"
                               :loading="item.loading"
                               v-for="item in items"
-                              :key="item.name">
+                              :key="item.name"
+                              :active="isActive(item.route)">
         <template #action>
           <b-badge class="t-badge t-badge__warning text-white p-1">
             {{ item.counter }}
@@ -86,6 +88,12 @@ export default {
           loading: this.isLoadingParkedCalls
         }
       ]
+    }
+  },
+
+  methods: {
+    isActive (route) {
+      return this.$route.path === route
     }
   }
 }

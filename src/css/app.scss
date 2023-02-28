@@ -12348,6 +12348,7 @@ h1.contact-list-name-label {
   &__sidebar {
     width: 200px;
     height: 100%;
+    padding: 6px;
 
     &__title {
       font-size: 13px;
@@ -12365,16 +12366,21 @@ h1.contact-list-name-label {
       padding: 0px 8px;
       text-decoration: none !important;
       margin-bottom: 5px;
+      border-radius: 5px;
 
       &__icon {
         margin: 0px 5px;
       }
 
-      &__name{
+      &__name {
         flex-grow: 1;
         font-weight: 400;
         font-size: 14px;
         color: $grey-92;
+      }
+
+      &--active {
+        background-color: $grey-50;
       }
     }
   }
