@@ -93,13 +93,16 @@
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import { mapActions, mapState } from 'vuex'
-import { guestMixin } from 'boot/mixins'
+import { guestMixin, guestFormsMixin } from 'boot/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'ResetPassword',
 
-  mixins: [guestMixin],
+  mixins: [
+    guestMixin,
+    guestFormsMixin
+  ],
 
   components: { LoginLargeScreensInfo },
 
@@ -120,19 +123,12 @@ export default {
 
   computed: {
     ...mapState(['statics']),
+
     confirmPassword () {
       return [
         (val) => (val && val.length >= 6) || 'Password should have at least 6 characters',
         (val) => val === this.user.password || 'Passwords should match'
       ]
-    },
-
-    appLogo () {
-      if (this.statics.whitelabel) {
-        return `${process.env.API_URL}${this.statics.logo}`
-      }
-
-      return 'app-icons/misc/logo.svg'
     }
   },
 
@@ -163,6 +159,7 @@ export default {
         }
       })
     },
+
     async loginUser (isMobile = false) {
       try {
         const response = await this.login({
@@ -245,7 +242,9 @@ export default {
     },
 
     ...mapActions(['resetVuex', 'setUsage']),
+
     ...mapActions('cache', ['setCurrentCompany']),
+
     ...mapActions('auth', ['login', 'resetPass'])
   }
 }

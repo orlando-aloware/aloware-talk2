@@ -14,7 +14,8 @@
     <div class="contact-details-wrapper">
       <div class="details-component-container"
            ref="detailsComponentContainer">
-        <contact-info :campaign-id="campaignId"/>
+        <contact-info :campaign-id="campaignId">
+        </contact-info>
         <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
                           :contact="contact">
         </contact-sequence>

@@ -73,19 +73,24 @@ import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Suspended',
+
   mixins: [simpsocialMixin],
+
   data () {
     return {
       loadingWhitelabel: false,
       apiURL: process.env.API_URL
     }
   },
+
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapState('auth', [
       'authenticated',
       'profile'
     ]),
+
     ...mapState(['statics'])
   }
 }

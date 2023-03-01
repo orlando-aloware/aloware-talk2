@@ -70,7 +70,9 @@
             href="#">
       <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
               ref="newCarMenu"
+              v-model="newCarMenu"
               :offset="[0,5]"
+              @before-hide="onNewCarBeforeHide"
               @hide="onNewCarFormClosed">
         <div class="row no-wrap q-pa-md">
           <new-car ref="newCarMessage"
@@ -78,7 +80,9 @@
                    :key="newCarCounter"
                    :contact-id="contact.id"
                    :selected-campaign-id="campaignId"
-                   @success="hideNewCarMenu">
+                   @success="hideNewCarMenu"
+                   @preventNewCarMenuClose="onPreventNewCarMenuClose"
+                   @newCarMenuClose="onNewCarMenuClose">
           </new-car>
         </div>
       </q-menu>
@@ -147,7 +151,9 @@ export default {
   data () {
     return {
       creditApplicationSending: false,
-      newCarCounter: 0
+      newCarCounter: 0,
+      newCarMenu: false,
+      isCarMenuClosing: false
     }
   },
 
@@ -180,6 +186,7 @@ export default {
       this.$emit('templateSelected', template)
       this.$refs.templatesMenu.hide()
     },
+
     onVariableSelected (variable) {
       this.$emit('variableSelected', variable)
       this.$refs.variablesMenu.hide()
@@ -187,6 +194,7 @@ export default {
 
     onNewCarFormClosed () {
       this.newCarCounter += 1
+      this.isCarMenuClosing = false
     },
 
     hideNewCarMenu () {
@@ -203,6 +211,26 @@ export default {
           this.$handleErrors(err.response)
           this.creditApplicationSending = false
         })
+    },
+
+    onNewCarBeforeHide () {
+      // prevent confirmation message infinite loop
+      if (!this.isCarMenuClosing) {
+        this.newCarMenu = true
+        this.$refs.newCarMessage.beforeCloseModal()
+      }
+    },
+
+    onNewCarMenuClose () {
+      setTimeout(() => {
+        this.newCarMenu = false
+        this.hideNewCarMenu()
+        this.isCarMenuClosing = true
+      }, 100)
+    },
+
+    onPreventNewCarMenuClose () {
+      this.newCarMenu = true
     }
   }
 }

@@ -116,12 +116,28 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
+    ...mapGetters('contacts', [
+      'contact',
+      'isSidebarCollapsed',
+      'changingSelectedContact'
+    ]),
+
     ...mapGetters('auth', ['authenticated']),
-    ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'tagsFullyLoaded', 'campaigns', 'users', 'tags']),
+
+    ...mapState([
+      'contactDetailsDrawer',
+      'campaignsIsLoading',
+      'usersIsLoading',
+      'tagsFullyLoaded',
+      'campaigns',
+      'users',
+      'tags'
+    ]),
+
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication'].includes(this.$route.name)
     },
+
     isEmptyContact () {
       return Object.keys(this.contact).length === 0
     }
@@ -140,8 +156,15 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['resetChangedContactProperties', 'selectedContactChanging', 'setContact', 'setContactClone']),
+    ...mapActions('contacts', [
+      'resetChangedContactProperties',
+      'selectedContactChanging',
+      'setContact',
+      'setContactClone'
+    ]),
+
     ...mapActions(['setContactDetailsDrawer']),
+
     fetchContact: _.debounce(function () {
       this.selectedContactChanging(true)
 
@@ -158,10 +181,12 @@ export default {
         this.selectedContactChanging(false)
       })
     }, 1000),
+
     toggleDrawer () {
       this.drawer = !this.drawer
       this.setContactDetailsDrawer(this.drawer)
     },
+
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
     }

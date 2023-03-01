@@ -80,13 +80,15 @@
 
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
-import { guestMixin } from '../boot/mixins'
-import { mapState } from 'vuex'
+import { guestMixin, guestFormsMixin } from '../boot/mixins'
 
 export default {
   name: 'forgot-password',
 
-  mixins: [guestMixin],
+  mixins: [
+    guestMixin,
+    guestFormsMixin
+  ],
 
   components: { LoginLargeScreensInfo },
 
@@ -98,18 +100,6 @@ export default {
       loading: false,
       deviceInfo: null,
       success: false
-    }
-  },
-
-  computed: {
-    ...mapState(['statics']),
-
-    appLogo () {
-      if (this.statics.whitelabel) {
-        return `${process.env.API_URL}${this.statics.logo}`
-      }
-
-      return 'app-icons/misc/logo.svg'
     }
   },
 

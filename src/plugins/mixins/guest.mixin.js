@@ -57,7 +57,9 @@ export default {
     },
 
     ...mapActions('cache', ['setCurrentCompany']),
+
     ...mapActions(['resetVuex']),
+
     ...mapActions('auth', ['check'])
   },
 

@@ -210,10 +210,12 @@ export default {
       type: String,
       default: ''
     },
+
     noPadding: {
       type: Boolean,
       default: false
     },
+
     titleOnly: {
       type: Boolean,
       default: false
@@ -234,6 +236,7 @@ export default {
       'authenticated',
       'profile'
     ]),
+
     ...mapState('contacts', [
       'selectedList',
       'pinnedListsLoaded',
@@ -243,16 +246,19 @@ export default {
       'previousListFilters',
       'previousListId'
     ]),
+
     ...mapState('inbox', [
       'inboxShowMyContacts',
       'isInboxFiltersLoaded',
       'isGettingTasksList',
       'isFetchingContacts'
     ]),
+
     ...mapState('stats', [
       'metricLoader',
       'groupMetricLoader'
     ]),
+
     ...mapState([
       'dialer',
       'dialerFormStatus',
@@ -447,12 +453,15 @@ export default {
       'setMetricGroups',
       'setMetricLoader'
     ]),
+
     ...mapActions('contacts', [
       'updateContactsListFilter'
     ]),
+
     ...mapActions('inbox', [
       'setInboxShowMyContacts'
     ]),
+
     ...mapActions(['setDialerFormStatus'])
   },
 
@@ -462,23 +471,29 @@ export default {
         this.hideDialer()
       }
     },
+
     'isMobile': function () {
       if (this.isMobile) {
         this.dialerStatus = false
       }
     },
+
     metricLoader () {
       this.loading = this.metricLoader
     },
+
     groupMetricLoader () {
       this.loading = this.groupMetricLoader
     },
+
     dialerStatus () {
       this.setDialerFormStatus(this.dialerStatus)
     },
+
     dialerFormStatus () {
       this.dialerStatus = this.dialerFormStatus
     },
+
     isDialerReady (value) {
       if (value && this.$route.query && this.$route.query.call) {
         this.$VueEvent.fire('make_new_call', {
@@ -489,14 +504,17 @@ export default {
         this.$router.replace({ query })
       }
     },
+
     $route (to, from) {
       this.prevRoute = from.path
     },
+
     inboxShowMyContacts (value) {
       if (value !== this.inboxShowMyContactsFilter) {
         this.inboxShowMyContactsFilter = value
       }
     },
+
     inboxShowMyContactsFilter () {
       this.onMyContactsChange()
     }

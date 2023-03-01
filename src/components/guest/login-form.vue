@@ -83,30 +83,28 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, guestFormsMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    guestFormsMixin
+  ],
+
   name: 'login-form',
+
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState(['statics']),
+
     shouldRedirectToClassic () {
       return this.profile &&
         this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC &&
         !this.isAdmin &&
         !this.profile?.company?.force_talk
-    },
-
-    appLogo () {
-      if (this.statics.whitelabel) {
-        return `${process.env.API_URL}${this.statics.logo}`
-      }
-
-      return 'app-icons/misc/logo.svg'
     }
   },
+
   data () {
     return {
       user: {
@@ -120,6 +118,7 @@ export default {
       isPwd: true
     }
   },
+
   methods: {
     getLoginParams () {
       return {
@@ -128,6 +127,7 @@ export default {
         rememberMe: this.user.remember_me
       }
     },
+
     async submit () {
       try {
         this.loading = true
@@ -208,16 +208,20 @@ export default {
     ...mapActions('cache', [
       'setCurrentCompany'
     ]),
+
     ...mapActions([
       'resetVuex',
       'setUsage'
     ]),
+
     ...mapActions('auth', [
       'login'
     ]),
+
     ...mapActions('inbox', [
       'setDefaultShowMyContacts'
     ]),
+
     ...mapActions('contacts', [
       'setDefaultIsShortenedUrlRemembered'
     ])

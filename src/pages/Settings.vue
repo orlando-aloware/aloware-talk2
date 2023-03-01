@@ -76,9 +76,13 @@ export default {
 
   computed: {
     ...mapState('settings', ['user']),
+
     ...mapState(['statics']),
+
     ...mapGetters('auth', ['authenticated', 'profile']),
+
     ...mapGetters('settings', ['changedUserProperties']),
+
     isSettingsOpened () {
       return !this.$q.screen.lt.md || this.onLoadShowSettings
     }
@@ -92,7 +96,14 @@ export default {
   },
 
   methods: {
-    ...mapActions('settings', ['setItems', 'setUserClone', 'updateChangedUserProperties', 'resetChangedUserProperties', 'setUser']),
+    ...mapActions('settings', [
+      'setItems',
+      'setUserClone',
+      'updateChangedUserProperties',
+      'resetChangedUserProperties',
+      'setUser'
+    ]),
+
     getUser () {
       this.isLoading = true
       return talk2Api.V1.user.getById(this.profile.id).then(response => {
@@ -101,10 +112,12 @@ export default {
         this.isLoading = false
       })
     },
+
     resetUserChanges () {
       this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
     },
+
     onUpdateFields (value, prop) {
       this.profile[prop] = value
       this.updateChangedUserProperties({
@@ -112,6 +125,7 @@ export default {
         value: value
       })
     },
+
     back () {
       this.$router.push({
         name: 'Settings'

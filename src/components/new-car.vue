@@ -165,6 +165,7 @@ export default {
     contactId: {
       required: true
     },
+
     selectedCampaignId: {
       required: true
     }
@@ -193,7 +194,17 @@ export default {
         total_pages: 100, // temp value
         total: 0
       },
-      searchedTerm: ''
+      searchedTerm: '',
+      confirmDialogParams: {
+        okTitle: 'Ok',
+        cancelTitle: 'Cancel',
+        size: 'sm',
+        buttonSize: 'sm',
+        okVariant: 'primary',
+        headerClass: 'p-2 border-bottom-0',
+        footerClass: 'p-2 border-top-0',
+        centered: true
+      }
     }
   },
 
@@ -333,22 +344,31 @@ export default {
       this.cars = []
     },
 
-    beforeCloseModal (done) {
+    beforeCloseModal () {
       if (this.sendCar.body || this.sendCar.image_url) {
-        this.$confirm('Are you sure you want to leave?', 'Warning', {
-          confirmButtonText: 'Yes, Leave',
-          cancelButtonText: 'No, Stay',
-          customClass: 'width-500 fixed',
-          type: 'warning'
-        }).then(res => {
-          this.resetSendCar()
-          done()
-        }).catch(() => {
-
+        this.$bvModal.msgBoxConfirm('Are you sure you want to leave?', {
+          ...this.confirmDialogParams,
+          title: 'Confirmation',
+          okTitle: 'Yes, Leave',
+          cancelTitle: 'No, Stay',
+          modalClass: 'newCarMsgBox'
         })
+          .then(value => {
+            if (value) {
+              this.resetSendCar()
+              this.$emit('newCarMenuClose')
+              return
+            }
+            this.$emit('preventNewCarMenuClose')
+          })
+
+        setTimeout(() => {
+          document.querySelector('.newCarMsgBox')
+            .parentNode.classList.add('z-index-9999')
+        }, 50)
       } else {
         this.resetSendCar()
-        done()
+        this.$emit('newCarMenuClose')
       }
     },
 

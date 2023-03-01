@@ -22,6 +22,7 @@
 import talk2Api from 'src/plugins/api/api'
 import { resellerMixin } from 'src/plugins/mixins'
 import { get } from 'lodash'
+
 export default {
   name: 'EmailBlast',
 

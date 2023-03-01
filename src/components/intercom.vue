@@ -22,7 +22,9 @@ export default {
 
   computed: {
     ...mapState(['statics']),
+
     ...mapState('cache', ['currentCompany']),
+
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
@@ -123,6 +125,7 @@ export default {
       this.setup(true)
       next()
     })
+
     this.processSetup()
   },
 

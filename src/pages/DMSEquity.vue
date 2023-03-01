@@ -13,17 +13,22 @@
 <script>
 import talk2Api from 'src/plugins/api/api'
 import { resellerMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'DMSEquity',
+
   mixins: [ resellerMixin ],
+
   data () {
     return {
       source: ''
     }
   },
+
   mounted () {
     this.getIntegration()
   },
+
   methods: {
     getIntegration () {
       talk2Api.V1.integrations.simpsocial.dmsEquity.get()

@@ -239,6 +239,7 @@ export default {
       type: Boolean,
       default: false
     },
+
     campaignId: {
       required: false
     }
@@ -250,26 +251,34 @@ export default {
       'messageComposer',
       'selectedLine'
     ]),
+
     ...mapState('contacts', [
       'isShortenedUrlRemembered'
     ]),
+
     ...mapGetters('auth', ['profile']),
+
     ...mapState('cache', ['currentCompany']),
+
     validSms: function () {
       return ((this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0) &&
         this.selectedLine &&
         this.messageComposer.sms.phone_number &&
         this.messageComposer.sms.phone_number.length > 0
     },
+
     messageBody () {
       return this.messageComposer.sms.body
     },
+
     messageAttachments () {
       return this.messageComposer.sms.attachments
     },
+
     isTCPAApprovedTextNotAuthorized () {
       return this.currentCompany.enforce_tcpa && !this.contact.text_authorized
     },
+
     sendButtonText () {
       switch (true) {
         case this.generatingShortUrl:
@@ -350,6 +359,7 @@ export default {
       'scheduleMessageOpen',
       'setIsShortenedUrlRemembered'
     ]),
+
     processFilesToQueue (file) {
       if (!file) {
         return
@@ -375,6 +385,7 @@ export default {
       this.filesOnQueue.push(file)
       this.onUpload(file)
     },
+
     onDrop (e) {
       const files = e.dataTransfer.files
       const index = { i: 0 }
@@ -382,6 +393,7 @@ export default {
         this.processFilesToQueue(files[index.i])
       }
     },
+
     onPaste (e) {
       const index = { i: 0, item: null, file: null, found: false }
 
@@ -400,6 +412,7 @@ export default {
         }
       }
     },
+
     onKeyDown (evt) {
       if (evt.keyCode === 13 && !evt.shiftKey) {
         if (this.validSms) {
@@ -408,6 +421,7 @@ export default {
         evt.preventDefault()
       }
     },
+
     processDetectLongUrl (detected) {
       if (detected &&
         !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
@@ -427,6 +441,7 @@ export default {
         this.generateShortUrl()
       }
     },
+
     onBlur () {
       if (this.urlShortenerDialog) {
         return
@@ -434,6 +449,7 @@ export default {
 
       this.processDetectLongUrl(this.detectLongUrl(this.messageComposer.sms.body))
     },
+
     formatMessage () {
       return {
         body: this.messageComposer.sms.body,
@@ -444,12 +460,14 @@ export default {
         gif: this.messageComposer.sms.gif_url
       }
     },
+
     messageSentFormatMessage () {
       return {
         ...this.formatMessage(),
         attachments: this.messageComposer.sms.attachments
       }
     },
+
     onSend () {
       const detected = this.detectLongUrl()
       this.processDetectLongUrl(detected)
@@ -477,32 +495,41 @@ export default {
           this.urlShortenerDontAskUntilSend = false
         })
     },
+
     gifSelected (gif) {
       this.setMessageComposerSmsGif(gif)
     },
+
     removeMessageGif () {
       this.setMessageComposerSmsGif('')
     },
+
     removeAttachment (attachment) {
       this.removeMessageComposerSmsAttachment(attachment)
     },
+
     getPreviewLink (uuid) {
       return process.env.API_URL + '/static/uploaded_file/' + uuid
     },
+
     templateSelected (template) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
     },
+
     variableSelected (variable) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
     },
+
     attachmentUploaded (files) {
       files.forEach((file) => {
         this.appendMessageComposerSmsAttachments(file)
       })
     },
+
     showScheduleMessage () {
       this.scheduleMessageOpen(true)
     },
+
     focusInput () {
       const count = { data: 0 }
       this.focusInterval = setInterval(() => {
@@ -516,6 +543,7 @@ export default {
         }
       }, 250)
     },
+
     onUpload (file) {
       const formData = new FormData()
       formData.append('file', file)
@@ -537,10 +565,12 @@ export default {
         this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
       })
     },
+
     onRemoveFileInQueue (file) {
       this.filesOnQueue.splice(this.filesOnQueue.findIndex(item => item.name === file.name), 1)
       this.filesOnQueueToken[file.name].cancel()
     },
+
     base64ToBlob (b64Data, contentType, sliceSize) {
       contentType = contentType || ''
       sliceSize = sliceSize || 512
@@ -568,6 +598,7 @@ export default {
 
       return new Blob(byteArrays, { type: contentType })
     },
+
     detectLongUrl () {
       // check only the long URL if:
       // - company is not white label
@@ -585,6 +616,7 @@ export default {
       }
       return false
     },
+
     closeUrlShortener () {
       this.urlShortenerDontAskUntilSend = true
       if (this.urlShortenerDontAsk &&
@@ -592,6 +624,7 @@ export default {
         this.disableUrlShortener()
       }
     },
+
     async generateShortUrl (send = false) {
       this.generatingShortUrl = true
 
@@ -616,6 +649,7 @@ export default {
           this.urlShortenerDialog = false
         })
     },
+
     disableUrlShortener () {
       this.urlShortenerDontAsk = false
       talk2Api.V1.user.update(
@@ -624,6 +658,7 @@ export default {
       )
       this.$generalNotification('URL Shortener disabled. To enable it again visit Settings > Personalization', 'success')
     },
+
     getDomains () {
       talk2Api.V1.urlShortener.domains()
         .then(({ data }) => {

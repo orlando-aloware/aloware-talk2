@@ -434,6 +434,7 @@ export default {
       required: false,
       type: Boolean
     },
+
     xmasEnabled: {
       type: Boolean,
       required: false,
@@ -445,13 +446,17 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile']),
+
     ...mapState(['statics']),
+
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
+
     envName () {
       return storage.local.getItem('env')
     },
+
     appLogo () {
       switch (true) {
         case this.statics.whitelabel:
@@ -500,6 +505,7 @@ export default {
     },
 
     ...mapActions(['toggleProFeatureDialog']),
+
     ...mapActions('auth', ['logout'])
   },
 

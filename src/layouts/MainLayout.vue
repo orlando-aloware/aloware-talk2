@@ -1016,7 +1016,7 @@ export default {
       this.initAuth()
       this.fetchAllParkedCalls()
     } else {
-      this.check().then(() => {
+      this.check().then((res) => {
         this.loading = false
         this.authCheckStatus = true
         this.showRefreshButton = false
@@ -1037,6 +1037,11 @@ export default {
             this.showRefreshButton = true
           })
         }
+
+        if (this.isGuest) {
+          this.getStatics()
+        }
+
         this.loading = false
         this.authCheckStatus = false
       })
@@ -2228,6 +2233,7 @@ export default {
       talk2Api.V1.statics.get()
         .then(res => {
           this.setStatics(res.data)
+          storage.local.setItem('statics', res.data)
         }).catch(err => {
           console.log(err)
           if (repeatTimes >= 3) {

@@ -862,22 +862,28 @@ export default {
       'updateContactsListFilter',
       'setListContactsLoaded'
     ]),
+
     onSearch (searchText) {
       this.$emit('search', searchText.trim())
     },
+
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
+
     onSortByField (sorts) {
       this.$emit('sort', sorts)
     },
+
     onPaginate (params) {
       this.$emit('paginated', params)
     },
+
     onLoadMore () {
       this.$emit('loadMore')
     },
+
     getListData (id) {
       return this.$axios
         .get('/api/v2/contacts-list/' + id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
@@ -892,6 +898,7 @@ export default {
           this.$router.replace('/contacts')
         })
     },
+
     loadList (id) {
       if (!id) {
         id = 'all'
@@ -912,6 +919,7 @@ export default {
       }
       this.setCurrentListFilters(filters)
     },
+
     setData (id) {
       const list = this.lists[id] || {}
       if (Object.values(list).length > 0) {
@@ -920,12 +928,14 @@ export default {
         this.setSelectedList({ id: this.id, name: this.name, type: this.type })
       }
     },
+
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
         id: this.id,
         headers: nextColumns
       })
     },
+
     onCheckAllItems (checked) {
       const items = { data: [] }
       document
@@ -940,6 +950,7 @@ export default {
       this.setAllContactsSelected(false)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
+
     onCheckAllItemsFromTheList (checked) {
       const items = { data: [] }
       document
@@ -950,6 +961,7 @@ export default {
       this.setAllContactsSelected(true)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
+
     onEditColumnsClicked () {
       this.columnsOpen({
         id: this.id,
@@ -957,9 +969,11 @@ export default {
         name: this.list.name
       })
     },
+
     onImportContactsClicked () {
       this.$refs.importContacts.open()
     },
+
     onFiltersClicked () {
       if (this.isFiltersOpen) {
         this.closeFilters()
@@ -967,6 +981,7 @@ export default {
         this.openFilters()
       }
     },
+
     onCreateStaticList () {
       this.createListOpen({
         type: 1,
@@ -974,6 +989,7 @@ export default {
         contact_folder_id: null
       })
     },
+
     onCreateDynamicList () {
       this.createListOpen({
         type: 2,
@@ -981,6 +997,7 @@ export default {
         contact_folder_id: null
       })
     },
+
     onUpdateContactList () {
       if (this.selectedList.type === this.ContactListTypes.STATIC || this.defaultIds.includes(this.id)) {
         return
@@ -1051,6 +1068,7 @@ export default {
           this.isUpdatingList = false
         })
     },
+
     loadFolders () {
       this.$axios
         .get('/api/v2/contact-folders')
@@ -1060,13 +1078,16 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
+
     onShowCreateContact (e) {
       this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
       e.stopImmediatePropagation()
     },
+
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
     },
+
     discardList () {
       this.$bvModal.msgBoxConfirm('Are you sure you want to discard your contact list?', {
         buttonSize: 'sm',
@@ -1080,6 +1101,7 @@ export default {
         }
       })
     },
+
     onRemoveList () {
       if (this.unsavedList) {
         this.discardList()
@@ -1088,12 +1110,15 @@ export default {
 
       this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
     },
+
     hasFilterChanges () {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
+
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
+
     clearFilters () {
       this.setCurrentListFilters({})
       this.setListContactsLoaded(false)
@@ -1105,6 +1130,7 @@ export default {
       this.setShowMyContacts(false)
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
     },
+
     resetFilters (resetSearch = false) {
       this.setListContactsLoaded(false)
       if (this.selectedList.id === this.previousListId) {
@@ -1129,6 +1155,7 @@ export default {
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       this.filterHasChanges = false
     },
+
     fixDefaultFilters () {
       if (_.isEmpty(this.list)) {
         return []
@@ -1159,6 +1186,7 @@ export default {
         })
       }
     },
+
     generateFolderPath (folders = [], folderNames = [], level = 0) {
       const tempFolderNames = { data: _.clone(folderNames) }
 
@@ -1222,14 +1250,17 @@ export default {
 
       return []
     },
+
     toggleSidebar () {
       this.setShowContactsListSidebar(!this.showContactsListSidebar)
     },
+
     reRouteToBase () {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
     },
+
     onRemove (contact, contactListId) {
       this.setShouldUpdateSelectedListContactCount(false)
       this.setBulkDelete(false)
@@ -1239,13 +1270,16 @@ export default {
       })
       // this.$emit('on-action-remove', true)
     },
+
     onMessage (contactId) {
       this.setMessageComposerMode('sms')
       this.$router.push(`/contacts/${contactId}`)
     },
+
     onCall (contact) {
       this.checkContactTimezone(contact, () => { this.makeCall(contact) })
     },
+
     makeCall (contact) {
       if (this.profile.enabled_two_legged_outbound) {
         const message = { data: 'We will call your secondary phone' }
@@ -1272,6 +1306,7 @@ export default {
       }
       this.$VueEvent.fire('callContact', data)
     },
+
     makeTwoLeggedCall (id, phoneNumber) {
       this.$axios
         .post('/api/v1/contacts/' + id + '/make-two-legged-call', {
@@ -1282,16 +1317,19 @@ export default {
         .catch(() => {
         })
     },
+
     onNavigate (contactId, e) {
       e.preventDefault()
       this.$router.push(this.generateRoute(contactId))
     },
+
     onNavigateToAdd (e) {
       e.preventDefault()
       this.$router.push({
         path: `/contacts/list/${this.$route.params.id}/add`
       })
     },
+
     setDataCount (data, updatePinned = false) {
       const fireData = {
         data: { filters: data },
@@ -1312,6 +1350,7 @@ export default {
 
       this.$VueEvent.fire('get-list-count', fireData)
     },
+
     getOwnerName (userId) {
       if (!userId) {
         return ''
@@ -1330,6 +1369,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapState('contacts', [
       'folders',
       'showContactsListSidebar',
@@ -1340,6 +1380,7 @@ export default {
       'previousListId',
       'listContactsLoaded'
     ]),
+
     ...mapGetters('contacts', [
       'lists',
       'listItems',
@@ -1349,14 +1390,17 @@ export default {
       'currentListFilters',
       'unsavedList'
     ]),
+
     ...mapState([
       'isTabletOrMobile',
       'campaigns',
       'users'
     ]),
+
     ...mapState('auth', [
       'profile'
     ]),
+
     fixedContactsData () {
       if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
         return this.$parent.$data.contactsData
@@ -1364,6 +1408,7 @@ export default {
 
       return this.contactsData
     },
+
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return this.$route.params.id
@@ -1371,14 +1416,17 @@ export default {
 
       return 'all'
     },
+
     defaultIds () {
       return Object.keys(DEFAULT_PINNED_LIST)
         .map((k) => DEFAULT_PINNED_LIST[k].id)
         .concat(['static'])
     },
+
     contactList () {
       return this.lists[this.id]
     },
+
     isLoaded () {
       if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return true
@@ -1387,9 +1435,11 @@ export default {
       return !!(this.listItems[String(this.id)] &&
         this.lists[String(this.id)])
     },
+
     checked () {
       return this.selectedContacts[this.id] || []
     },
+
     saveFilterButtonClass () {
       return {
         'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
@@ -1398,35 +1448,45 @@ export default {
           this.defaultIds.includes(this.id)
       }
     },
+
     listItemsHasData () {
       return !_.isEmpty(this.fixedContactsData)
     },
+
     listItemsDataCount () {
       const total = _.get(this.fixedContactsData, 'data.length', null)
       return total !== null ? total : 0
     },
+
     listItemsTotalContacts () {
       const data = _.get(this.fixedContactsData, `data`, null)
       return data.length || 0
     },
+
     filterButtonVariant () {
       return this.isFiltersOpen ? 'primary' : 'outlined-light'
     },
+
     filterBadgeVariant () {
       return this.isFiltersOpen ? 'light' : 'primary'
     },
+
     resetButtonVariant () {
       return this.isFilterHasChanges ? 'primary' : 'outlined-light'
     },
+
     saveFilterButtonVariant () {
       return this.isFilterHasChanges ? 'primary' : 'secondary'
     },
+
     saveFilterButtonCustomClass () {
       return this.isDisabledSaveFilter ? 'button-disabled' : ''
     },
+
     isResetDisabled () {
       return !this.isFilterHasChanges
     },
+
     isListDeletable () {
       // eslint-disable-next-line no-unused-vars
       for (const [key, list] of Object.entries(this.defaultContactLists)) {
@@ -1437,18 +1497,23 @@ export default {
 
       return false
     },
+
     hasAppliedFilters () {
       return this.filtersCount > 0
     },
+
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
+
     canSeeAddContacts () {
       return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
     },
+
     canAddContacts () {
       return this.list.type === ContactListTypes.STATIC && this.isEditable
     },
+
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
       // now, check if columns have order, label, maxWidth or minWidth property, or
@@ -1468,12 +1533,14 @@ export default {
       }
       return newItems
     },
+
     hasMore () {
       return (this.hasNextPage &&
           !this.isLoadingMore &&
           !this.isLoading) ||
         false
     },
+
     isCurrentAndPreviousFiltersMismatch () {
       const previousListFilters = JSON.parse(JSON.stringify(this.previousListFilters))
 
@@ -1483,9 +1550,11 @@ export default {
 
       return !_.isEqual(this.currentListFilters, previousListFilters)
     },
+
     isFilterHasChanges () {
       return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
     },
+
     isDisabledSaveFilter () {
       return !this.isFilterHasChanges ||
         this.defaultIds.includes(this.id) ||
@@ -1561,30 +1630,35 @@ export default {
       }
       this.setAllContactsSelected(false)
     },
+
     selectedList: function (value) {
       if (this.selectedContacts[value.id]) {
         this.setListSelectedContacts({ id: value.id, contacts: [] })
       }
       this.folderPath = this.generateFolderPath(this.folders)
     },
+
     shouldUpdateSelectedListContactCount (val) {
       if (val) {
         this.setShouldUpdateSelectedListContactCount(true)
         // this.$VueEvent.fire('fetchContacts')
       }
     },
+
     id (value) {
       this.reRouteToBase()
       if (this.pinnedCounts.hasOwnProperty(value)) {
         this.setSelectedListContactCount(this.pinnedCounts[value])
       }
     },
+
     checked: function (value) {
       const elem = document.querySelector('.data-table-check-all')
       if (elem) {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
       }
     },
+
     'pinnedCounts': {
       deep: true,
       handler (value) {
@@ -1593,9 +1667,11 @@ export default {
         }
       }
     },
+
     'fixedContactsData.next_page_url': function (value) {
       this.hasNextPage = !_.isEmpty(value)
     },
+
     list: {
       deep: true,
       handler: function () {
@@ -1603,12 +1679,14 @@ export default {
         this.$refs.contactsTable.resetScroll()
       }
     },
+
     showMyContacts (value) {
       if (this.myContacts !== value) {
         this.myContacts = value
       }
     }
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)

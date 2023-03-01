@@ -125,10 +125,8 @@ export default {
   },
 
   watch: {
-    showRingGroupSnapShot (newValue) {
-      if (newValue) {
-        this.setLayers()
-      }
+    layers () {
+      this.setLayers()
     }
   }
 }
