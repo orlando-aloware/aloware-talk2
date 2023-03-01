@@ -1036,6 +1036,11 @@ export default {
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
+      if (this.isContactMixinUsed) {
+        // prevent duplicate task status count request when Contact component is active
+        return
+      }
+
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch) {
         return
       }

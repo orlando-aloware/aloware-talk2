@@ -69,15 +69,13 @@
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
-            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
+            <b-link class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
+                    target="_blank"
+                    :href="updatesLink">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
-              <AnnounceKit style="position: fixed;"
-                           catchClick=".ak-trigger"
-                           :user="currentUser"
-                           :widget="ak_widget_url" />
-            </div>
+            </b-link>
           </q-item-section>
         </q-item>
 
@@ -172,7 +170,6 @@ import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
-import AnnounceKit from 'announcekit-vue'
 import * as Roles from 'src/constants/roles'
 
 export default {
@@ -201,8 +198,7 @@ export default {
     Profile,
     CompactBtn,
     RefreshIcon,
-    HeaderHelp,
-    AnnounceKit
+    HeaderHelp
   },
 
   props: {
@@ -227,7 +223,8 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      inboxShowMyContactsFilter: false
+      inboxShowMyContactsFilter: false,
+      updatesLink: 'https://news.intercom.com/aloware'
     }
   },
 

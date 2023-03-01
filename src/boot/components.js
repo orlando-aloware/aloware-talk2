@@ -17,6 +17,7 @@ Vue.component('inbound-call-inprogress-icon', require('src/components/icons/cont
 Vue.component('inbound-call-failed-icon', require('src/components/icons/contact-activity/inbound-call-failed-icon').default)
 Vue.component('inbound-call-deadend-icon', require('src/components/icons/contact-activity/inbound-call-deadend-icon').default)
 Vue.component('inbound-call-abandoned-icon', require('src/components/icons/contact-activity/inbound-call-abandoned-icon').default)
+Vue.component('inbound-call-callback-pending-icon', require('components/icons/contact-activity/inbound-call-callback-pending-icon.vue').default)
 Vue.component('inbound-call-missed-icon', require('src/components/icons/contact-activity/inbound-call-missed-icon').default)
 Vue.component('inbound-call-voicemail-icon', require('src/components/icons/contact-activity/inbound-call-voicemail-icon').default)
 Vue.component('outbound-recorded-answered-icon', require('src/components/icons/contact-activity/outbound-recorded-answered-icon').default)

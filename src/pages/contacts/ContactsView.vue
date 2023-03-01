@@ -144,7 +144,7 @@
           <div
             class="small text-muted fs-13 text-right"
             v-else>
-            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
@@ -779,42 +779,52 @@ export default {
       type: Object,
       default: () => {}
     },
+
     isLoadingDisabled: {
       type: Boolean,
       default: false
     },
+
     isStartState: {
       type: Boolean,
       default: false
     },
+
     isEditable: {
       type: Boolean,
       default: false
     },
+
     search: {
       type: String,
       default: ''
     },
+
     isMyContactsView: {
       type: Boolean,
       default: false
     },
+
     isLoading: {
       type: Boolean,
       default: false
     },
+
     columns: {
       type: Array,
       default: () => []
     },
+
     isEmpty: {
       type: Boolean,
       default: false
     },
+
     isLoadingMore: {
       type: Boolean,
       default: false
     },
+
     filtersCount: {
       type: Number,
       default: 0
@@ -917,11 +927,13 @@ export default {
           value: [stringId]
         }
       }
+
       this.setCurrentListFilters(filters)
     },
 
     setData (id) {
       const list = this.lists[id] || {}
+
       if (Object.values(list).length > 0) {
         this.name = list.name
         this.type = list.type
@@ -938,6 +950,7 @@ export default {
 
     onCheckAllItems (checked) {
       const items = { data: [] }
+
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
@@ -947,17 +960,20 @@ export default {
             items.data = items.data.filter(item => item.id !== Number(checkbox.value))
           }
         })
+
       this.setAllContactsSelected(false)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
 
     onCheckAllItemsFromTheList (checked) {
       const items = { data: [] }
+
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
         })
+
       this.setAllContactsSelected(true)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
@@ -977,9 +993,10 @@ export default {
     onFiltersClicked () {
       if (this.isFiltersOpen) {
         this.closeFilters()
-      } else {
-        this.openFilters()
+        return
       }
+
+      this.openFilters()
     },
 
     onCreateStaticList () {
@@ -999,12 +1016,23 @@ export default {
     },
 
     onUpdateContactList () {
+      // not applicable for static lists and default lists
       if (this.selectedList.type === this.ContactListTypes.STATIC || this.defaultIds.includes(this.id)) {
         return
       }
+
+      // don't allow filters to be saved empty for dynamic list
+      const hasGroupFilters = Object.keys(this.currentListFilters).filter(key => this.currentListFilters[key]?.filters)
+      if (_.isEmpty(hasGroupFilters) && this.selectedList.type === this.ContactListTypes.DYNAMIC) {
+        this.$generalNotification('Filters not saved. Dynamic list must have filters.', 'error')
+        return
+      }
+
       this.isUpdatingList = true
+
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
+
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
           .then((res) => {
@@ -1019,31 +1047,37 @@ export default {
                 id: this.selectedList.id,
                 count: this.listItems[this.selectedList.id].total
               })
-            } else {
-              if (this.list.type === this.ContactListTypes.DYNAMIC) {
-                this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
-              } else {
-                this.setDataCount({
-                  filters: {
-                    contact_lists: {
-                      operator: 1,
-                      value: [this.list.id]
-                    }
-                  },
-                  is_conjunction: true
-                }, true)
-              }
+
+              return
             }
+
+            if (this.list.type === this.ContactListTypes.DYNAMIC) {
+              this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
+              return
+            }
+
+            this.setDataCount({
+              filters: {
+                contact_lists: {
+                  operator: 1,
+                  value: [this.list.id]
+                }
+              },
+              is_conjunction: true
+            }, true)
           })
           .catch((_err) => {
             console.log(_err)
             this.$generalNotification('Unable to update contact list.', 'error')
           })
       }
+
       console.log('Creating new dynamic list...')
+
       // debugger
       const params = this.unsavedList.params
       params.filters = this.currentListFilters
+
       return this.$axios
         .post('/api/v2/contacts-list', params)
         .then((response) => {
@@ -1133,6 +1167,7 @@ export default {
 
     resetFilters (resetSearch = false) {
       this.setListContactsLoaded(false)
+
       if (this.selectedList.id === this.previousListId) {
         this.setCurrentListFilters(this.previousListFilters)
         this.updateContactsListFilter({
@@ -1160,7 +1195,9 @@ export default {
       if (_.isEmpty(this.list)) {
         return []
       }
+
       const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+
       if (this.$route.params.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
@@ -1168,6 +1205,7 @@ export default {
           defaultFilters[0].filters.contact_owner.value = [profileId]
         }
       }
+
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     },
 
@@ -1177,14 +1215,16 @@ export default {
           this.$VueEvent.fire('shouldUpdateListCount')
           this.$VueEvent.fire('fetchContacts')
         })
-      } else {
-        this.$VueEvent.fire('shouldUpdateListCount')
-        this.$VueEvent.fire('fetchContacts', {
-          params: {
-            page: this.fixedContactsData.current_page
-          }
-        })
+
+        return
       }
+
+      this.$VueEvent.fire('shouldUpdateListCount')
+      this.$VueEvent.fire('fetchContacts', {
+        params: {
+          page: this.fixedContactsData.current_page
+        }
+      })
     },
 
     generateFolderPath (folders = [], folderNames = [], level = 0) {
@@ -1585,17 +1625,18 @@ export default {
     this.$VueEvent.listen('shouldUpdateListCount', () => {
       if (this.list.type === this.ContactListTypes.DYNAMIC) {
         this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
-      } else {
-        this.setDataCount({
-          filters: {
-            contact_lists: {
-              operator: 1,
-              value: [this.list.id]
-            }
-          },
-          is_conjunction: true
-        })
+        return
       }
+
+      this.setDataCount({
+        filters: {
+          contact_lists: {
+            operator: 1,
+            value: [this.list.id]
+          }
+        },
+        is_conjunction: true
+      })
     })
 
     this.viewListeners.setDataCount = _.debounce((filters) => {
@@ -1670,14 +1711,6 @@ export default {
 
     'fixedContactsData.next_page_url': function (value) {
       this.hasNextPage = !_.isEmpty(value)
-    },
-
-    list: {
-      deep: true,
-      handler: function () {
-        this.loadList(this.$route.params.id)
-        this.$refs.contactsTable.resetScroll()
-      }
     },
 
     showMyContacts (value) {
