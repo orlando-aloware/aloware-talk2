@@ -44,6 +44,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
+
     ...mapState(['statics']),
 
     isFromClassic () {
