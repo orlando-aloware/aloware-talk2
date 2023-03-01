@@ -1,12 +1,116 @@
 <template>
-  <div>
-    Overview
+  <div class="wallboard__body">
+    <div :class="['wallboard__body__content', , `wallboard__body__content--${viewMode}`]">
+      <wallboard-overview-card :value="item.value"
+                               :description="item.name"
+                               :icon="item.icon"
+                               :key="index"
+                               v-for="(item, index) in items"/>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import WallboardOverviewCard from 'src/components/wallboard/wallboard-overview-card.vue'
 
 export default {
-  name: 'WallboardOverview'
+  name: 'WallboardOverview',
+
+  components: {
+    WallboardOverviewCard
+  },
+
+  computed: {
+    ...mapGetters('wallboard', {
+      summary: 'getSummary',
+      viewMode: 'getViewMode'
+    }),
+
+    items () {
+      return [
+        {
+          name: 'Total Calls',
+          value: this.summary.totalCalls,
+          icon: 'wallboard-overview-total-calls-icon'
+        },
+        {
+          name: 'Answered Calls',
+          value: this.summary.answeredCalls,
+          icon: 'wallboard-overview-answered-calls-icon'
+        },
+        {
+          name: 'Missed Calls',
+          value: this.summary.missedCalls,
+          icon: 'wallboard-overview-missed-calls-icon'
+        },
+        {
+          name: 'Abandoned Calls',
+          value: this.summary.abandonedCalls,
+          icon: 'wallboard-overview-abandoned-calls-icon'
+        },
+        {
+          name: 'Average Talk Time',
+          value: this.summary.averageTalkTime,
+          icon: 'wallboard-overview-average-talk-time-icon'
+        },
+        {
+          name: 'Average Wait Time',
+          value: this.summary.averageWaitTime,
+          icon: 'wallboard-overview-average-wait-time-icon'
+        },
+        {
+          name: 'Total Occupancy',
+          value: this.summary.totalOccupancy,
+          icon: 'wallboard-overview-total-occupancy-icon'
+        },
+        {
+          name: 'Appointments Set',
+          value: this.summary.appointmentsSet,
+          icon: 'wallboard-overview-appointments-set-icon'
+        },
+        {
+          name: 'Reminders Set',
+          value: this.summary.remindersSet,
+          icon: 'wallboard-overview-reminders-set-icon'
+        },
+        {
+          name: 'Emails Sent',
+          value: this.summary.emailsSent,
+          icon: 'wallboard-overview-emails-sent-icon'
+        },
+        {
+          name: 'Emails Received',
+          value: this.summary.emailsReceived,
+          icon: 'wallboard-overview-emails-received-icon'
+        },
+        {
+          name: 'Texts Received',
+          value: this.summary.textsReceived,
+          icon: 'wallboard-overview-texts-received-icon'
+        },
+        {
+          name: 'Faxes Sent',
+          value: this.summary.faxesSent,
+          icon: 'wallboard-overview-faxes-sent-icon'
+        },
+        {
+          name: 'Faxes Received',
+          value: this.summary.faxesReceived,
+          icon: 'wallboard-overview-faxes-received-icon'
+        },
+        {
+          name: 'Texts Sent',
+          value: this.summary.textsSent,
+          icon: 'wallboard-overview-texts-sent-icon'
+        }
+      ]
+    }
+  },
+
+  data () {
+    return {
+    }
+  }
 }
 </script>

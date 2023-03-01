@@ -17,5 +17,9 @@ export default {
     state.isLoadingParkedCalls = data
   },
 
+  SET_FILTER: (state, { filter, value }) => {
+    state.filters[filter] = value
+  },
+
   updateField
 }

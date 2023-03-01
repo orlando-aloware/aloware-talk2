@@ -17,5 +17,17 @@ export default {
     return state.calls.parked
   },
 
+  getFilters: (state) => {
+    return state.filters
+  },
+
+  getSummary: (state) => {
+    return state.summary
+  },
+
+  getViewMode: (state) => {
+    return state.viewMode
+  },
+
   getField
 }

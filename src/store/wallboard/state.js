@@ -5,12 +5,15 @@ export default function () {
       live: [],
       parked: []
     },
+    filters: {
+      ringGroup: null
+    },
     isLoadingUsers: false,
     isLoadingQueuedCalls: false,
     isLoadingLiveCalls: false,
     isLoadingParkedCalls: false,
     summary: {
-      abbandonedCalls: 0,
+      abandonedCalls: 0,
       answeredCalls: 0,
       appointmentsSet: 0,
       averageTalkTime: 0,
@@ -28,6 +31,7 @@ export default function () {
       totalCalls: 0,
       totalOccupancy: 0
     },
-    users: []
+    users: [],
+    viewMode: 'comfort' // comfort, compact
   }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="wallboard__sidebar h-100 d-flex flex-column no-border-radius bordered-right">
+    <div class="wallboard__sidebar d-flex flex-column no-border-radius bordered-right">
       <wallboard-sidebar-item name="Overview"
                               route="/wallboard/overview"
                               icon="wallboard-overview-icon"

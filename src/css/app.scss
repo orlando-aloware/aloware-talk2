@@ -12349,10 +12349,11 @@ h1.contact-list-name-label {
     width: 200px;
     height: 100%;
     padding: 6px;
+    float: left;
+    color: $grey-90;
 
     &__title {
       font-size: 13px;
-      color: $grey-90;
       font-weight: 700;
       margin: 20px 10px 5px 10px;
     }
@@ -12386,6 +12387,103 @@ h1.contact-list-name-label {
   }
 
   &__header {
+    height: 100px;
+    margin-left: 200px;
 
+    &__title {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      padding: 0px 15px;
+    }
+
+    &__actions {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0px 15px;
+      color: $grey-92;
+
+      .ring-group-filter {
+        max-width: 300px;
+      }
+    }
+  }
+
+  &__body {
+    margin-left: 200px;
+    height: calc(100% - 100px);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    &__content {
+      height: 650px;
+      width: calc(100% - 40px);
+      margin: 20px;
+      padding: 20px;
+      border-radius: 15px;
+      border: 1px solid $grey-60;
+      display: grid;
+      column-gap: 20px;
+      row-gap: 20px;
+
+      &--comfort {
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+
+        .overview__card {
+          flex-direction: column;
+          justify-content: space-between;
+        }
+      }
+
+      &--compact {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+
+        .overview__card {
+          flex-direction: row;
+        }
+      }
+
+      .overview {
+        &__card {
+          border: 1px solid $grey-60;
+          border-radius: 10px;
+          display: flex;
+          padding: 20px;
+
+          &__body {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: center;
+
+            &__value {
+              font-size: 22px;
+              font-weight: bold;
+            }
+
+            &__description {
+
+            }
+          }
+        }
+      }
+    }
+
+    // &--confort {
+
+    // }
+
+    // &--compact {
+
+    // }
+  }
+
+  .q-basic-selector {
+    margin-bottom: 0px;
   }
 }
