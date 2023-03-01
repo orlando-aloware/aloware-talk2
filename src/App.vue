@@ -15,7 +15,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-if="authenticated && profile && profile.enabled"></custom-scripts>
-    <intercom v-if="authenticated && profile && profile.enabled && isNotSimpsocial"></intercom>
+    <intercom v-if="authenticated && profile && profile.enabled && !statics.whitelabel"></intercom>
   </div>
 </template>
 <script>
@@ -24,12 +24,9 @@ import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import CustomScripts from 'components/custom-scripts'
-import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'App',
-
-  mixins: [simpsocialMixin],
 
   components: {
     Intercom,
@@ -47,6 +44,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
+    ...mapState(['statics']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)

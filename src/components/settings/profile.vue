@@ -438,8 +438,7 @@ import * as AnswerTypes from 'src/constants/answer-types'
 import * as Roles from 'src/constants/roles'
 import {
   aclMixin,
-  settingsMixin,
-  simpsocialMixin
+  settingsMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
@@ -450,14 +449,13 @@ export default {
 
   mixins: [
     aclMixin,
-    settingsMixin,
-    simpsocialMixin
+    settingsMixin
   ],
 
   components: { UserCampaignSelector, AnswerTypeSelector },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'statics']),
 
     ...mapState('settings', ['userClone']),
 
@@ -490,7 +488,7 @@ export default {
     },
 
     whiteLabelText () {
-      return this.isSimpsocial ? '' : ' on Aloware'
+      return this.statics.whitelabel ? '' : ' on Aloware'
     }
   },
 

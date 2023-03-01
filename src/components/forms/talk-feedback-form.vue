@@ -67,8 +67,8 @@
 </template>
 
 <script>
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
+import { mapGetters, mapState } from 'vuex'
 
 const reasons = [
   {
@@ -119,8 +119,7 @@ const skipUsers = [42]
 export default {
 
   mixins: [
-    aclMixin,
-    simpsocialMixin
+    aclMixin
   ],
 
   props: {
@@ -145,6 +144,8 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['profile']),
+
+    ...mapState(['statics']),
 
     feedback_params () {
       let explanation = ''
@@ -178,10 +179,15 @@ export default {
     },
 
     whiteLabelText () {
-      const whiteLabel = this.isSimpsocial ? '' : 'Aloware '
+      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
       return `${whiteLabel}Classic`
     }
   },
+
+  mounted () {
+    this.initializeReasonsWhitelabel()
+  },
+
   watch: {
     shouldOpen (value) {
       /**
@@ -205,8 +211,8 @@ export default {
       }
     },
 
-    whiteLabelText (newValue) {
-      this.reasons[6].label = `Talk2 is slower than ${newValue}Classic 🐢`
+    whiteLabelText () {
+      this.initializeReasonsWhitelabel()
     }
   },
   methods: {
@@ -237,6 +243,10 @@ export default {
 
     isDontUnderstand (reason) {
       return reason >= 2 && reason <= 5 && reason !== null
+    },
+
+    initializeReasonsWhitelabel () {
+      this.reasons[6].label = `Talk2 is slower than ${this.whiteLabelText}Classic 🐢`
     }
   }
 }

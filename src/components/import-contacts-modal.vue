@@ -234,17 +234,18 @@
 </template>
 
 <script>
-import { simpsocialMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 
 export default {
-  mixins: [simpsocialMixin],
   computed: {
+    ...mapState(['statics']),
+
     whiteLabelText () {
-      return this.isSimpsocial ? 'Uses' : 'Aloware uses'
+      return this.statics.whitelabel ? 'Uses' : 'Aloware uses'
     },
 
     whiteLabelContactText () {
-      return this.isSimpsocial ? '' : 'Aloware'
+      return this.statics.whitelabel ? '' : 'Aloware'
     }
   },
   methods: {

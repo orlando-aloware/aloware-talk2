@@ -94,8 +94,7 @@ import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 import {
   pipedriveIntegrationMixin,
-  integrationMixin,
-  simpsocialMixin
+  integrationMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -105,8 +104,7 @@ export default {
 
   mixins: [
     pipedriveIntegrationMixin,
-    integrationMixin,
-    simpsocialMixin
+    integrationMixin
   ],
 
   props: {
@@ -125,6 +123,8 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
+    ...mapState(['statics']),
+
     contactLink () {
       if (!this.contactIntegrationDataLoaded) {
         return
@@ -134,7 +134,7 @@ export default {
     },
 
     whiteLabelText () {
-      return this.isSimpsocial ? 'SimpSocial' : 'Aloware'
+      return this.statics.whitelabel ? this.statics.name : 'Aloware'
     }
   },
 

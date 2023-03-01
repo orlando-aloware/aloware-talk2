@@ -3,10 +3,10 @@
     <section class="w-100 mx-0 mt-5">
       <!-- brand -->
       <div class="d-flex justify-content-center w-100 mt-5 mb-5">
-        <img :src="`${apiURL}${statics.logo}`"
-             height="70px"
-             v-if="statics.logo"
-             alt="logo">
+        <img height="70px"
+             alt="logo"
+             :src="`${statics.logo}`"
+             v-if="statics.logo">
       </div>
       <!-- / brand -->
       <div class="w-100 mb-4">
@@ -15,20 +15,20 @@
           <h2>Hey! It looks like that your account has been suspended. Please
             contact our support at
             <span class="text-primary"
-                  v-if="currentCompany && currentCompany.reseller_id != 357">
+                  v-if="isNotSimpsocial">
               support@aloware.com
             </span>
             <span class="text-primary"
-                  v-if="currentCompany && currentCompany.reseller_id == 357">
+                  v-if="isSimpsocial">
               support@simpsocial.com
             </span>
             or call
             <span class="text-primary"
-                  v-if="currentCompany && currentCompany.reseller_id != 357">
+                  v-if="isNotSimpsocial">
                 855-256-2001
             </span>
             <span class="text-primary"
-                  v-if="currentCompany && currentCompany.reseller_id == 357">
+                  v-if="isSimpsocial">
                 888-829-1110
             </span>
             for assistance.

@@ -60,24 +60,25 @@
 <script>
 import TalkFeedbackForm from './forms/talk-feedback-form.vue'
 import talk2Api from 'src/plugins/api/api'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { cloneDeep } from 'lodash'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'shared-login-menu',
 
   mixins: [
-    aclMixin,
-    simpsocialMixin
+    aclMixin
   ],
 
   components: { TalkFeedbackForm },
 
   computed: {
     ...mapGetters('auth', ['profile']),
+
+    ...mapState(['statics']),
 
     canSwitchApps () {
       if (this.isAdmin) {
@@ -88,7 +89,7 @@ export default {
     },
 
     alowareClassic () {
-      const whiteLabel = this.isSimpsocial ? '' : 'Aloware '
+      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
 
       if (this.profile.company.force_talk) {
         return `${whiteLabel}Admin`
@@ -98,13 +99,13 @@ export default {
     },
 
     alowareTalk () {
-      const whiteLabel = this.isSimpsocial ? '' : 'Aloware '
+      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
 
       return `${whiteLabel} Talk`
     },
 
     whiteLabelText () {
-      return this.isSimpsocial ? '' : 'Aloware '
+      return this.statics.whitelabel ? '' : 'Aloware '
     }
   },
 

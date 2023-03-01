@@ -171,8 +171,7 @@ import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
 import {
   hubspotIntegrationMixin,
-  integrationMixin,
-  simpsocialMixin
+  integrationMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -182,8 +181,7 @@ export default {
 
   mixins: [
     hubspotIntegrationMixin,
-    integrationMixin,
-    simpsocialMixin
+    integrationMixin
   ],
 
   props: {
@@ -201,6 +199,8 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
+    ...mapState(['statics']),
 
     isWorkflowValid () {
       return this.workflow.id
@@ -227,7 +227,7 @@ export default {
     },
 
     whiteLabelText () {
-      return this.isSimpsocial ? 'SimpSocial' : 'Aloware'
+      return this.statics.whitelabel ? this.statics.name : 'Aloware'
     }
   },
 
