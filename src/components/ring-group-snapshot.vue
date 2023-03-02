@@ -115,8 +115,10 @@ export default {
   },
 
   watch: {
-    layers () {
-      this.setLayers()
+    showRingGroupSnapShot (newValue) {
+      if (newValue) {
+        this.setLayers()
+      }
     }
   }
 }
