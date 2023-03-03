@@ -1036,11 +1036,6 @@ export default {
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
-      if (this.isContactMixinUsed) {
-        // prevent duplicate task status count request when Contact component is active
-        return
-      }
-
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch) {
         return
       }
@@ -1053,8 +1048,10 @@ export default {
         this.setOpenTaskCount(this.taskCounts.open - 1)
       }
 
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      if (!this.isContactMixinUsed) {
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      }
 
       const index = this.contacts.findIndex(item => item.id === contact.id)
       switch (true) {
