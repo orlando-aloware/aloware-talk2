@@ -146,15 +146,22 @@ export default {
           path = this.apiEndpoint(this.myQueueId !== null)
         }
 
+        let params = {
+          page: nextPage,
+          search: this.search,
+          sort: sort,
+          order: order,
+          relations: this.contactsRelations
+        }
+
+        // my contacts toggle is not applicable in "Unassigned Contacts" list
+        if (this.$route.params.id !== 'unassigned') {
+          params.my_contacts = this.showMyContacts
+        }
+
         return this.$axios
           .get(path, {
-            params: this.buildQueryString({
-              page: nextPage,
-              search: this.search,
-              sort: sort,
-              order: order,
-              relations: this.contactsRelations
-            }),
+            params: this.buildQueryString(params),
             paramsSerializer: qs.stringify
           })
           .then((response) => response.data)
@@ -249,13 +256,18 @@ export default {
         this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
 
+      // my contacts toggle is not applicable in "Unassigned Contacts" list
+      if (this.$route.params.id === 'unassigned' && params.hasOwnProperty('my_contacts')) {
+        delete params.my_contacts
+      }
+
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.id, contacts: [] })
       const queryString = this.buildQueryString(params, isContactModule)
 
       // use the same query string to update the list count
       // eslint-disable-next-line camelcase
-      const countQueryString = (({ filter_groups, search, list_id }) => ({ filter_groups, search, list_id }))(queryString)
+      const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
