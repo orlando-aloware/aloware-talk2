@@ -140,7 +140,8 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label>Disposition: </q-item-label>
               </b-col>
-              <b-col v-if="communication.direction === CommunicationDirections.INBOUND
+              <b-col class="text-capitalize"
+                     v-if="communication.direction === CommunicationDirections.INBOUND
                             && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW
                             && [CommunicationCallbackStatus.CALLBACK_STATUS_INITIATED, CommunicationCallbackStatus.CALLBACK_STATUS_REQUESTED].includes(communication.callback_status)">
                 {{ $options.filters.translateDispositionStatusText(communication.disposition_status2, communication.callback_status) | replaceDash | capitalize }}
