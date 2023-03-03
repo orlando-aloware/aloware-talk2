@@ -12408,6 +12408,14 @@ h1.contact-list-name-label {
       .ring-group-filter {
         max-width: 300px;
       }
+
+      .form-group {
+        margin-bottom: 0px;
+        
+        span {
+          font-size: 14px;
+        }
+      }
     }
   }
 
@@ -12429,6 +12437,7 @@ h1.contact-list-name-label {
       column-gap: 20px;
       row-gap: 20px;
 
+      // taller
       &--comfort {
         grid-template-columns: repeat(5, 1fr);
         grid-template-rows: repeat(3, 1fr);
@@ -12439,12 +12448,22 @@ h1.contact-list-name-label {
         }
       }
 
+      // wider
       &--compact {
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(5, 1fr);
 
         .overview__card {
           flex-direction: row;
+
+          &__icon {
+            display: flex;
+            align-items: center;
+          }
+
+          &__body {
+            padding-left: 20px;
+          }
         }
       }
 
@@ -12473,14 +12492,6 @@ h1.contact-list-name-label {
         }
       }
     }
-
-    // &--confort {
-
-    // }
-
-    // &--compact {
-
-    // }
   }
 
   .q-basic-selector {

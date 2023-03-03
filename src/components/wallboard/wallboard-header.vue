@@ -12,17 +12,23 @@
                            :value="filters.ringGroup"
                            @change="onFilterRingGroup">
       </ring-group-selector>
+
+      <div class="flex-grow-1 text-right">
+        <wallboard-view-mode-button class="ml-2"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import RingGroupSelector from 'src/components/generic-selectors/ring-group-selector.vue'
+import WallboardViewModeButton from 'src/components/wallboard/wallboard-view-mode-button.vue'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
-    RingGroupSelector
+    RingGroupSelector,
+    WallboardViewModeButton
   },
 
   computed: {

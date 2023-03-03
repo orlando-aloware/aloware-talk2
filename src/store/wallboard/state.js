@@ -8,10 +8,11 @@ export default function () {
     filters: {
       ringGroup: null
     },
-    isLoadingUsers: false,
-    isLoadingQueuedCalls: false,
-    isLoadingLiveCalls: false,
-    isLoadingParkedCalls: false,
+    isLiveCallsLoading: false,
+    isParkedCallsLoading: false,
+    isQueuedCallsLoading: false,
+    isSummaryLoading: false,
+    isUsersLoading: false,
     summary: {
       abandonedCalls: 0,
       answeredCalls: 0,

@@ -5,7 +5,19 @@
     </div>
     <div class="overview__card__body">
       <div class="overview__card__body__value">
-        {{ value }}
+        <q-skeleton type="text"
+                    animation="fade"
+                    height="26px"
+                    width="100px"
+                    v-if="loading" />
+        <counter-up :startVal="countUp.startVal"
+                    :endVal="value"
+                    :duration="countUp.duration"
+                    :options="countUp.options"
+                    v-else-if="!filter" />
+        <span v-else>
+          {{ getValue }}
+        </span>
       </div>
       <div class="overview__card__body__description">
         {{ description }}
@@ -15,6 +27,8 @@
 </template>
 
 <script>
+import CounterUp from 'vue-countup-v2'
+import { isNumber } from 'lodash'
 import WallboardOverviewAbandonedCallsIcon from 'src/components/icons/wallboard/overview-abandoned-calls-icon'
 import WallboardOverviewAnsweredCallsIcon from 'src/components/icons/wallboard/overview-answered-calls-icon'
 import WallboardOverviewAppointmentsSetIcon from 'src/components/icons/wallboard/overview-appointments-set-icon'
@@ -35,6 +49,7 @@ export default {
   name: 'WallboardOverviewCard',
 
   components: {
+    CounterUp,
     WallboardOverviewAbandonedCallsIcon,
     WallboardOverviewAnsweredCallsIcon,
     WallboardOverviewAppointmentsSetIcon,
@@ -66,6 +81,48 @@ export default {
     icon: {
       type: String,
       required: true
+    },
+
+    filter: {
+      type: String,
+      required: false
+    },
+
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  computed: {
+    getValue () {
+      return this.filter
+        ? this.$options.filters[this.filter](this.value)
+        : this.value
+    }
+  },
+
+  data () {
+    return {
+      countUp: {
+        startVal: 0,
+        duration: 2.5,
+        options: {
+          useEasing: true,
+          useGrouping: true,
+          easingFn: (t, b, c, d) => {
+            let ts = (t /= d) * t
+            let tc = ts * t
+            return b + c * (tc + -3 * ts + 3 * t)
+          }
+        }
+      }
+    }
+  },
+
+  methods: {
+    isNumber (v) {
+      return isNumber(v)
     }
   }
 }

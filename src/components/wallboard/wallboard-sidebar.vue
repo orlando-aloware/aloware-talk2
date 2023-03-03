@@ -5,11 +5,16 @@
                               icon="wallboard-overview-icon"
                               :active="isActive('/wallboard/overview')">
         <template #action>
-          <refresh-icon />
-          <q-tooltip anchor="center right"
-                     self="center left">
-            <span class="font-weight-bold text-sm">Refresh counts</span>
-          </q-tooltip>
+          <span class="spinner-border spinner-border-sm"
+                v-if="isSummaryLoading" />
+          <span v-else
+                @click="fetchSummary">
+            <refresh-icon />
+            <q-tooltip anchor="center right"
+                      self="center left">
+              <span class="font-weight-bold text-sm">Refresh counts</span>
+            </q-tooltip>
+          </span>
         </template>
       </wallboard-sidebar-item>
 
@@ -35,7 +40,7 @@
 <script>
 import WallboardSidebarItem from './wallboard-sidebar-item.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'wallboard-sidebar',
@@ -54,10 +59,11 @@ export default {
     }),
 
     ...mapState('wallboard', [
-      'isLoadingUsers',
-      'isLoadingQueuedCalls',
-      'isLoadingLiveCalls',
-      'isLoadingParkedCalls'
+      'isLiveCallsLoading',
+      'isParkedCallLoadings',
+      'isQueuedCallsLoading',
+      'isSummaryLoading',
+      'isUsersLoading'
     ]),
 
     items () {
@@ -92,6 +98,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('wallboard', [
+      'fetchSummary'
+    ]),
+
     isActive (route) {
       return this.$route.path === route
     }

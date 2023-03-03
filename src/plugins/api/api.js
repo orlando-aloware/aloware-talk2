@@ -285,6 +285,13 @@ export default {
       domains () {
         return window.axios.get(`${suffixV1}url-shortener/domains`)
       }
+    },
+    contactCenter: {
+      summary: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/summary-report`, params)
+        }
+      }
     }
   },
   V2: {

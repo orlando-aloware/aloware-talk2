@@ -4,6 +4,8 @@
       <wallboard-overview-card :value="item.value"
                                :description="item.name"
                                :icon="item.icon"
+                               :filter="item.filter"
+                               :loading="isSummaryLoading"
                                :key="index"
                                v-for="(item, index) in items"/>
     </div>
@@ -11,7 +13,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import WallboardOverviewCard from 'src/components/wallboard/wallboard-overview-card.vue'
 
 export default {
@@ -22,6 +24,10 @@ export default {
   },
 
   computed: {
+    ...mapState('wallboard', [
+      'isSummaryLoading'
+    ]),
+
     ...mapGetters('wallboard', {
       summary: 'getSummary',
       viewMode: 'getViewMode'
@@ -52,17 +58,20 @@ export default {
         {
           name: 'Average Talk Time',
           value: this.summary.averageTalkTime,
-          icon: 'wallboard-overview-average-talk-time-icon'
+          icon: 'wallboard-overview-average-talk-time-icon',
+          filter: 'fullDuration'
         },
         {
           name: 'Average Wait Time',
           value: this.summary.averageWaitTime,
-          icon: 'wallboard-overview-average-wait-time-icon'
+          icon: 'wallboard-overview-average-wait-time-icon',
+          filter: 'fullDuration'
         },
         {
           name: 'Total Occupancy',
           value: this.summary.totalOccupancy,
-          icon: 'wallboard-overview-total-occupancy-icon'
+          icon: 'wallboard-overview-total-occupancy-icon',
+          filter: 'fullDuration'
         },
         {
           name: 'Appointments Set',
@@ -108,9 +117,14 @@ export default {
     }
   },
 
-  data () {
-    return {
-    }
+  mounted () {
+    this.fetchSummary()
+  },
+
+  methods: {
+    ...mapActions('wallboard', [
+      'fetchSummary'
+    ])
   }
 }
 </script>
