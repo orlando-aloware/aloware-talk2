@@ -28,7 +28,7 @@
           {{ queueCount }}
         </b-badge>
         <div class="mr-2 notification-icon"
-             :class="[['incomingCall', 'callFishing'].includes(id) && getSource ? 'mt-2' : '']"
+             :class="notificationIconClasses"
              @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
           <sms-icon v-if="id === 'sms'"/>
@@ -216,6 +216,7 @@ export default {
       type: String,
       default: 'system'
     },
+
     position: {
       required: false,
       type: String,
@@ -233,6 +234,7 @@ export default {
 
   computed: {
     ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
+
     toastClass () {
       const toastClass = { data: 'action-notification notification-border-round' }
 
@@ -278,9 +280,11 @@ export default {
 
       return this.parseMentionToView(message)
     },
+
     messageIcon () {
       return get(this.notifications[this.id], 'messageIcon', null)
     },
+
     title () {
       const title = get(this.notifications[this.id], 'title', '')
 
@@ -292,57 +296,74 @@ export default {
 
       return fixedTitle
     },
+
     dateTime () {
       return get(this.notifications[this.id], 'dateTime', '')
     },
+
     contactId () {
       return get(this.notifications[this.id], 'contactId', '')
     },
+
     communicationId () {
       return get(this.notifications[this.id], 'communicationId', '')
     },
+
     link () {
       if (['system', 'incomingCall', 'callFishing'].includes(this.id)) {
         return null
       }
+
       return {
         path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
       }
     },
+
     attachment () {
       return get(this.notifications[this.id], 'attachment', '')
     },
+
     noAutoHide () {
       return ['system', 'incomingCall', 'callFishing'].includes(this.id)
     },
+
     campaignId () {
       return get(this.notifications[this.id], 'campaignId', null)
     },
+
     campaignName () {
       return get(this.notifications[this.id], 'campaignName', null)
     },
+
     ringGroupId () {
       return get(this.notifications[this.id], 'ringGroupId', null)
     },
+
     ringGroupName () {
       return get(this.notifications[this.id], 'ringGroupName', null)
     },
+
     phoneNumber () {
       return get(this.notifications[this.id], 'phoneNumber', null)
     },
+
     communication () {
       return get(this.notifications[this.id], 'communication', null)
     },
+
     contact () {
       return get(this.notifications[this.id], 'contact', null)
     },
+
     isValidPhoneShowInfo () {
       const dialerCommunicationId = get(this.dialer, 'communication.id', null)
       const callFishingCommunicationId = get(this.dialer, 'callFishing.communication', null)
+
       return (
         (this.id === 'incomingCall' && this.communicationId === dialerCommunicationId) || (this.id === 'callFishing' && !this.dialer.call && !callFishingCommunicationId)) &&
         !this.dialer.parkedCall
     },
+
     queueCount () {
       if (isEmpty(this.queue)) {
         return 1
@@ -350,6 +371,7 @@ export default {
 
       return this.queue.length + 1
     },
+
     isCommunicationInCallFishingQueue () {
       return !isEmpty(this.callFishingQueue.find(queue => get(queue, 'communicationId', null) === this.communicationId))
     },
@@ -464,8 +486,16 @@ export default {
       }
 
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
+    },
+
+    notificationIconClasses () {
+      return [
+        ['incomingCall', 'callFishing'].includes(this.id) && this.getSource ? 'mt-2' : '',
+        this.id === 'system' ? 'system-update' : ''
+      ]
     }
   },
+
   created () {
     this.$VueEvent.listen('update_communication', (data) => {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
@@ -490,11 +520,14 @@ export default {
       'removeFromCallFishingQueue'
       // 'setShowIncomingCallNotification'
     ]),
+
     onShow () {
       this.isValidNotification = false
     },
+
     autoClose () {
       this.runDateTimeInterval()
+
       if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
           !this.isCommunicationInCallFishingQueue) ||
         (this.id === 'incomingCall' && document.getElementById('incomingCall') &&
@@ -528,6 +561,7 @@ export default {
       this.isValidNotification = true
       this.playAudio()
     },
+
     runDateTimeInterval () {
       if (this.dateTime) {
         this.runningDateTime = this.$options.filters.shortDateTimePassed(this.dateTime, false)
@@ -536,9 +570,11 @@ export default {
         }, 60000)
       }
     },
+
     clearDateTimeInterval () {
       clearInterval(this.runningDateTimeInterval)
     },
+
     onHidden () {
       if (this.id === 'call') {
         return
@@ -572,6 +608,7 @@ export default {
         })
       }
     },
+
     type () {
       switch (this.id) {
         case 'sms':
@@ -586,6 +623,7 @@ export default {
       }
       return 'sms'
     },
+
     answerCall () {
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
@@ -599,10 +637,12 @@ export default {
       this.$VueEvent.fire('answerCall')
       this.setShowPhone(true)
     },
+
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
       this.closeCallNotifications(this.id, this.communicationId)
     },
+
     answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
@@ -620,6 +660,7 @@ export default {
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)
     },
+
     rejectCall () {
       if (this.id !== 'callFishing' ||
         (this.id === 'callFishing' &&
@@ -644,12 +685,11 @@ export default {
         }
       }
     },
+
     onNotificationClick (event) {
-      const className = { data: null }
-      const found = event.path.find((item) => {
-        className.data = get(item, 'className', null)
-        return className.data && typeof className.data === 'string' && (className.data.includes('call-actions') || className.data.includes('call-fishing-actions'))
-      })
+      // check if there are call buttons in the notification
+      let found = document.querySelector('.notification-body-wrapper .call-actions')
+      found = !found ? document.querySelector('.notification-body-wrapper .call-fishing-actions') : found
 
       // 07/12/2022 - Removed for now
       // if (!found &&
@@ -663,9 +703,14 @@ export default {
 
       if (!found &&
         this.id === 'system') {
-        window.location.reload()
+        this.$closeActionNotification(this.id)
+
+        setTimeout(() => {
+          window.location.reload()
+        }, 500)
       }
     },
+
     clearNotificationQueue () {
       this.setNotifications({
         type: this.id,
@@ -676,16 +721,13 @@ export default {
       this.clearCallFishingQueue()
       this.$closeActionNotification(this.id)
     },
+
     toInbox (event) {
       if (this.isValidPhoneShowInfo) {
         return
       }
 
-      const className = { data: null }
-      const found = event.path.find((item) => {
-        className.data = get(item, 'className', null)
-        return className.data && typeof className.data === 'string' && (className.data.includes('notification-icon'))
-      })
+      let found = document.querySelector('.notification-body-wrapper .notification-icon:not(.system-update)')
 
       if (!found) {
         return
@@ -697,6 +739,7 @@ export default {
         })
       }
     },
+
     toContact () {
       if (!['incomingCall', 'callFishing'].includes(this.id)) {
         return
@@ -722,7 +765,6 @@ export default {
         })
       }
     }
-
   },
 
   beforeDestroy () {

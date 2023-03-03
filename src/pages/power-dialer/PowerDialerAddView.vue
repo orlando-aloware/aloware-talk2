@@ -523,6 +523,7 @@ import { isEqual } from 'lodash'
 
 export default {
   name: 'PowerDialerAddView',
+
   props: {
     onFetch: Function,
     list: {
@@ -579,6 +580,7 @@ export default {
       default: null
     }
   },
+
   mixins: [
     aclMixin,
     visibilityMixin,
@@ -586,9 +588,11 @@ export default {
     avatarMixin,
     addViewMixin
   ],
+
   inject: [
     'contactsData'
   ],
+
   components: {
     ContactsFilters,
     CompactBtn,
@@ -600,6 +604,7 @@ export default {
     FolderStaticIcon,
     PowerDialerAddModal
   },
+
   mounted () {
     this.loadList(this.$route.params.id)
 
@@ -617,59 +622,72 @@ export default {
 
     this.listName = ''
   },
+
   computed: {
-    // ...mapGetters('powerDialer', ['powerDialerListItems']),
     ...mapGetters('contacts', ['lists', 'listItems', 'isFiltersOpen']),
     ...mapGetters('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
+
     contactList () {
       return this.lists[this.id]
     },
+
     isLoaded () {
       return !!this.lists[String(this.id)]
     },
-    // powerDialerList () {
-    //   return this.powerDialerListItems[String(this.$route.params.id)]
-    // },
+
     id () {
       if (this.$route.meta.id === 'power-dialer-add-queue-list') {
         return 'my-queue'
       }
+
       return this.$route.params.id || 'my-queue'
     },
+
     filteredName () {
       return this.contactList?.name || ''
     },
+
     items () {
       if (this.listItems[this.id]) {
         return this.listItems[this.id].data
       }
+
       return []
     },
+
     currentPage () {
       if (this.listItems[this.id]) {
         return this.listItems[this.id].current_page
       }
+
       return 1
     },
+
     hasAppliedFilters () {
       return this.filtersCount > 0
     },
+
     isResetDisabled () {
       return !this.filterHasChanges
     },
+
     validColumns () {
-      return this.columns.filter(column => column.label !== 'Actions')
+      return this.columns.filter(column => column.label !== 'Actions' && column.name !== 'task_status_name')
     },
+
     urlRoutePath () {
       if (this.isContactModule) {
         return '/contacts/list/'
       }
+
       return '/power-dialer/list/'
     },
+
     addItemEndpoint () {
       return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
     },
+
     checkedItemIds () {
       const ids = []
       this.checkedItems.forEach(check => {
@@ -677,26 +695,33 @@ export default {
       })
       return ids
     },
+
     contactListName () {
       return this.listName || (this.contactList?.name || '')
     },
+
     linkToRoute () {
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
+
     isMyQueue () {
       return this.contactList.id === 'my-queue'
     },
+
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
     },
+
     totalRows () {
       return this.listItems?.[this.id]?.total || 0
     },
+
     contactWithNoPrimaryNumbers () {
       return this.fixedContactsData.data.filter(contact => {
         return contact.phone_numbers[0].is_primary === false
       })
     },
+
     fixedContactsData () {
       if (isEqual(this.$parent.$data.contactsData, this.contactsData)) {
         return this.contactsData
@@ -705,6 +730,7 @@ export default {
       return this.$parent.$data.contactsData
     }
   },
+
   data () {
     return {
       name: 'Power Dialer X',
@@ -718,6 +744,7 @@ export default {
       contactCount: 0
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'columnsOpen',
@@ -730,6 +757,7 @@ export default {
       'setShowMyContacts',
       'addPowerDialerOpen'
     ]),
+
     loadList (id) {
       if (!id) {
         id = 'my-queue'
@@ -739,13 +767,6 @@ export default {
 
       if (this.$route.meta.id === 'power-dialer-add-queue-list' || this.$route.meta.id === 'power-dialer-queue-filter') {
         stringId = 'my-queue'
-      }
-
-      if (!this.listItems[stringId]) {
-        // this.contactsLoaded({
-        //   id: stringId,
-        //   ...DEFAULT_CONTACT_LIST_ITEMS
-        // })
       }
 
       this.$axios
@@ -767,6 +788,7 @@ export default {
           this.$router.replace('/power-dialer/')
         })
     },
+
     updateListName (data) {
       const id = this.contactList.id === 'my-queue' ? this.selectedList.id : this.contactList.id
       this.$axios
@@ -788,6 +810,7 @@ export default {
           this.$generalNotification(`Error in renaming a list. ${message}`, 'error')
         })
     },
+
     reloadFolders () {
       return this.$axios
         .get('/api/v2/power-dialer-folders')
@@ -797,55 +820,59 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
+
     addSelectedContacts () {
       this.openPDModal = true
       this.addPowerDialerOpen(true)
     },
+
     attachedParams () {
       if (this.isContactModule) {
         return {
           contact_list_id: this.contactList.id,
           contacts: this.checkedItems
         }
-      } else {
-        if (this.contactList.id === 'my-queue') {
-          return {
-            // allow_international_phone_numbers: 1,
-            // multiple_phone_numbers: 1,
-            // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-            contact_ids: this.checkedItemIds
-          }
-        }
+      }
+
+      if (this.contactList.id === 'my-queue') {
         return {
-          // allow_international_phone_numbers: 1,
-          // multiple_phone_numbers: 1,
-          // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-          contact_list_id: this.contactList.id,
           contact_ids: this.checkedItemIds
         }
       }
+
+      return {
+        contact_list_id: this.contactList.id,
+        contact_ids: this.checkedItemIds
+      }
     },
+
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>
         this.checkedItems.includes(i.id)
       )
     },
+
     onCancel () {
       this.closeFilters()
+
       if (this.contactList.name === 'My Queue') {
         this.$router.push({ path: '/power-dialer/in-queue' })
-      } else {
-        this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+        return
       }
+
+      this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
     },
+
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
         id: this.id,
         headers: nextColumns
       })
     },
+
     onCheckAllItems (checked) {
       this.checkedItems = []
+
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
@@ -863,63 +890,81 @@ export default {
           }
         })
     },
+
     onCheckedRows (checked) {
       this.checkedItems = checked
     },
+
     onFiltersClicked () {
       if (this.isFiltersOpen) {
         this.closeFilters()
-      } else {
-        this.openFilters()
+        return
       }
+
+      this.openFilters()
     },
+
     resetFilters (resetSearch = false) {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
+
       if (resetSearch) {
         this.resetSearch()
       }
+
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     },
+
     hasFilterChanges () {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
+
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
+
     updateFiltersCount (count) {
       this.filtersCount = count
     },
+
     onPagination (params) {
       this.checkedItems = []
       this.onPaginate(params)
     },
+
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
+
     onSearch (searchText) {
       this.$emit('search', searchText)
     },
+
     onSortByField (sorts) {
       this.$emit('sort', sorts)
     },
+
     onPaginate (params) {
       this.$emit('paginated', params)
     },
+
     onLoadMore () {
       this.$emit('loadMore')
     },
+
     onCheckerClicked (contact) {
       const items = { data: [] }
       const found = this.checkedItems.find(item => item.id === contact.id)
+
       if (found) {
         items.data = this.checkedItems.filter(item => item.id !== contact.id)
       } else {
         items.data = [...this.checkedItems]
         items.data.push(contact)
       }
+
       this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
     }
@@ -930,15 +975,18 @@ export default {
         this.loadList(id)
       }
     },
+
     checkedItemIds: function (value) {
       if (this.isContactModule) {
         document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === this.fixedContactsData.data.length
-      } else {
-        const filteredContacts = this.fixedContactsData.data.filter(c => {
-          return !c.is_dnc && !c.is_blocked
-        })
-        document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
+        return
       }
+
+      const filteredContacts = this.fixedContactsData.data.filter(c => {
+        return !c.is_dnc && !c.is_blocked
+      })
+
+      document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
     }
   }
 }
