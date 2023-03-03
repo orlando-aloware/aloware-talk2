@@ -1048,6 +1048,7 @@ export default {
         this.setOpenTaskCount(this.taskCounts.open - 1)
       }
 
+      // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
         this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
