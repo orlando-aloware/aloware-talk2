@@ -140,7 +140,13 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label>Disposition: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col class="text-capitalize"
+                     v-if="communication.direction === CommunicationDirections.INBOUND
+                            && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW
+                            && [CommunicationCallbackStatus.CALLBACK_STATUS_INITIATED, CommunicationCallbackStatus.CALLBACK_STATUS_REQUESTED].includes(communication.callback_status)">
+                {{ $options.filters.translateDispositionStatusText(communication.disposition_status2, communication.callback_status) | replaceDash | capitalize }}
+              </b-col>
+              <b-col v-else>
                 {{
                   communication.disposition_status2 | translateDispositionStatusText | replaceDash |
                     capitalize
@@ -778,6 +784,7 @@ import RingGroupSnapshot from 'components/ring-group-snapshot'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
   name: 'communication-details',
@@ -805,7 +812,8 @@ export default {
       CommunicationCurrentStatus,
       CommunicationDispositionStatus,
       CommunicationDirections,
-      UploadedFileTypes
+      UploadedFileTypes,
+      CommunicationCallbackStatus
     }
   },
 

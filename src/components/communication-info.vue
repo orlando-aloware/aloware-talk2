@@ -14,7 +14,7 @@
       </q-item>
     </q-list>
 
-    <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall) || isCallFishingMode"
+    <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall && !communication.callback_status) || isCallFishingMode"
             bordered
             class="rounded-contact-activity b-radius-12"
             :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
