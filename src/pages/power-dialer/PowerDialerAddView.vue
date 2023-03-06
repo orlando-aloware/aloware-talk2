@@ -622,6 +622,8 @@ export default {
     }
 
     this.listName = ''
+
+    this.setAddViewShowMyContacts(this.myContacts)
   },
 
   computed: {
@@ -702,6 +704,7 @@ export default {
     },
 
     linkToRoute () {
+      this.setSearch('')
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
 
@@ -756,6 +759,7 @@ export default {
       'setSearch',
       'listLoaded',
       'setShowMyContacts',
+      'setAddViewShowMyContacts',
       'addPowerDialerOpen'
     ]),
 
@@ -935,11 +939,12 @@ export default {
     },
 
     onFetchMyContacts (checked) {
-      this.setShowMyContacts(checked)
+      this.setAddViewShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
 
     onSearch (searchText) {
+      this.setAddViewShowMyContacts(this.myContacts)
       this.$emit('search', searchText)
     },
 

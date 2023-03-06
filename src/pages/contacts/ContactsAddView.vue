@@ -582,6 +582,7 @@ export default {
       default: 0
     }
   },
+
   mixins: [
     aclMixin,
     visibilityMixin,
@@ -667,6 +668,7 @@ export default {
     },
 
     linkToRoute () {
+      this.setSearch('')
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
 
@@ -721,7 +723,8 @@ export default {
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount',
       'setSearch',
-      'setShowMyContacts'
+      'setShowMyContacts',
+      'setAddViewShowMyContacts'
     ]),
 
     loadList (id) {
@@ -910,12 +913,12 @@ export default {
     },
 
     onFetchMyContacts (checked) {
-      this.setShowMyContacts(checked)
+      this.setAddViewShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
 
     onSearch (searchText) {
-      searchText = searchText.trim()
+      this.setAddViewShowMyContacts(this.myContacts)
       this.$emit('search', searchText)
     },
 
@@ -953,6 +956,8 @@ export default {
     if (this.contactList && this.contactList.type === this.ContactListTypes.DYNAMIC) {
       this.openFilters()
     }
+
+    this.setAddViewShowMyContacts(this.myContacts)
   },
 
   watch: {
