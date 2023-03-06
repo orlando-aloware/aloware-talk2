@@ -10,6 +10,7 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
 import { DEFAULT_STATE } from 'src/constants/contacts-default'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   data () {
@@ -771,6 +772,18 @@ export default {
           this.setSelectedList({ id: response.id, name: response.name, type: response.type })
           this.setPreviousListFilters(response.filters)
           this.setPreviousListId(this.id)
+        }).catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+
+          // if page is not in contacts page root (All Contacts), navigate to it
+          if (this.$route.name === 'Contacts' &&
+            this.$route.meta.page !== 'Contacts') {
+            this.$router.push({
+              name: 'Contacts'
+            })
+          }
         })
     },
 
