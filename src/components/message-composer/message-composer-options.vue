@@ -76,10 +76,10 @@
               @hide="onNewCarFormClosed">
         <div class="row no-wrap q-pa-md">
           <new-car ref="newCarMessage"
-                   v-if="hasPermissionTo('update contact')"
                    :key="newCarCounter"
                    :contact-id="contact.id"
                    :selected-campaign-id="campaignId"
+                   v-if="hasPermissionTo('update contact')"
                    @success="hideNewCarMenu"
                    @preventNewCarMenuClose="onPreventNewCarMenuClose"
                    @newCarMenuClose="onNewCarMenuClose">

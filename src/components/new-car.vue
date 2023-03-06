@@ -1,13 +1,16 @@
 <template>
   <div class="new-car-container">
     <b-form @submit.prevent="search">
-      <h5 class="mb-1 section-header fs-24 text-bold _600 text-center">Send a Car</h5>
+      <h5 class="mb-1 section-header fs-24 text-bold _600 text-center">
+        Send a Car
+      </h5>
 
       <q-separator />
 
       <div class="scrollable pt-2">
         <b-form-row class="mt-2">
-          <b-col sm="12" md="12">
+          <b-col sm="12"
+                 md="12">
             <b-form-group class="mb-1">
               <search ref="search"
                       placeholder="Search for model, make, vin, stock #"
@@ -20,7 +23,8 @@
         </b-form-row>
 
         <b-form-row class="mt-2 mx-0 w-100">
-          <b-col sm="12" md="12">
+          <b-col sm="12"
+                 md="12">
             <b-form-group label="Price range"
                           class="mb-1">
               <div class="pl-2 pr-2">
@@ -66,14 +70,12 @@
                   <div class="d-inline-flex">
                     <label class="text-primary mr-2 mt-2 cursor-pointer"
                            :class="{ disabled: (loadingBtn || $route.params.id === 'unassigned') }">Hide price?</label>
-                    <b-form-checkbox
-                      id="my-contacts"
-                      class="mt-2 cursor-pointer"
-                      name="check-button"
-                      size="sm"
-                      switch
-                      v-model="car.hide_price"
-                    >
+                    <b-form-checkbox id="my-contacts"
+                                     class="mt-2 cursor-pointer"
+                                     name="check-button"
+                                     size="sm"
+                                     switch
+                                     v-model="car.hide_price">
                     </b-form-checkbox>
                   </div>
                   <div>
@@ -93,7 +95,11 @@
                      v-if="car.galleries && car.galleries.length > 0 && car.galleries[0].url"
                      class="image w-100"/>
                 <div class="p-2">
-                  <h5><span class="_600 d-flex">Vin #: {{ car.vin }}</span></h5>
+                  <h5>
+                    <span class="_600 d-flex">
+                      Vin #: {{ car.vin }}
+                    </span>
+                  </h5>
                   <b>Description:</b>
                   <p>{{ car.description | truncate(100) }}</p>
                   <b>Price:</b>
@@ -211,7 +217,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
-    noNext: function () {
+    noNext () {
       return this.pagination.current_page >= this.pagination.total_pages
     }
   },
@@ -300,7 +306,7 @@ export default {
       // Send to contact when not bulked_message_mode
       if (!this.bulkMessageMode) {
         this.loadingBtn = true
-        let url = `/api/v1/contact/${contactId}/send-car`
+
         if (car.galleries && car.galleries.length > 0 && car.galleries[0].url) {
           this.sendCar.image_url = car.galleries[0].url
         }
@@ -310,6 +316,7 @@ export default {
         this.sendCar.has_credit_link = hasCreditApplication
         this.sendCar.hide_price = car.hide_price
 
+        let url = `/api/v1/contact/${contactId}/send-car`
         this.$axios.post(url, this.sendCar).then(res => {
           this.$emit('success', res.data)
           this.resetSendCar()
@@ -359,6 +366,7 @@ export default {
               this.$emit('newCarMenuClose')
               return
             }
+
             this.$emit('preventNewCarMenuClose')
           })
 
@@ -366,10 +374,12 @@ export default {
           document.querySelector('.newCarMsgBox')
             .parentNode.classList.add('z-index-9999')
         }, 50)
-      } else {
-        this.resetSendCar()
-        this.$emit('newCarMenuClose')
+
+        return
       }
+
+      this.resetSendCar()
+      this.$emit('newCarMenuClose')
     },
 
     scrollDown () {

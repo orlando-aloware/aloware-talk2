@@ -1016,7 +1016,7 @@ export default {
       this.initAuth()
       this.fetchAllParkedCalls()
     } else {
-      this.check().then((res) => {
+      this.check().then(() => {
         this.loading = false
         this.authCheckStatus = true
         this.showRefreshButton = false
@@ -2236,11 +2236,13 @@ export default {
           storage.local.setItem('statics', res.data)
         }).catch(err => {
           console.log(err)
+
           if (repeatTimes >= 3) {
             this.$handleErrors(err.response)
-          } else {
-            this.getStatics(repeatTimes + 1)
+            return
           }
+
+          this.getStatics(repeatTimes + 1)
         })
     },
 

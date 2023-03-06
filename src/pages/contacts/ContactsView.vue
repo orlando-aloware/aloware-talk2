@@ -73,27 +73,24 @@
         <div class="px-3 d-flex"
              v-if="!isMyContactsView && !isTabletOrMobile">
           <div class="d-inline-flex">
-            <q-tooltip
-              class="text-center"
-              anchor="top middle"
-              self="bottom middle"
-              max-width="185px"
-              v-if="$route.params.id === 'unassigned'">
+            <q-tooltip class="text-center"
+                       anchor="top middle"
+                       self="bottom middle"
+                       max-width="185px"
+                       v-if="$route.params.id === 'unassigned'">
               Unable to modify Filters. Duplicate this list if you want to modify
             </q-tooltip>
             <label class="text-primary mr-2 mt-2 cursor-pointer"
                    :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
-            <b-form-checkbox
-              id="my-contacts"
-              class="mt-2 cursor-pointer"
-              name="check-button"
-              size="sm"
-              switch
-              :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
-              :disabled="isLoading || $route.params.id === 'unassigned'"
-              v-model="myContacts"
-              @change="onFetchMyContacts"
-            >
+            <b-form-checkbox id="my-contacts"
+                             class="mt-2 cursor-pointer"
+                             name="check-button"
+                             size="sm"
+                             switch
+                             :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
+                             :disabled="isLoading || $route.params.id === 'unassigned'"
+                             v-model="myContacts"
+                             @change="onFetchMyContacts">
             </b-form-checkbox>
           </div>
           <div>
@@ -102,7 +99,10 @@
                          customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                          v-if="isSimpsocial"
                          @clicked="onMessengerClick">
-              <iframe id="ss-messenger-button" :src="'https://dealer.simpsocial.com/' + currentCompany.id + '/messenger/unread/count'" frameborder="0" style="">
+              <iframe id="ss-messenger-button"
+                      frameborder="0"
+                      style=""
+                      :src="simpsocialMessengerIframeLink">
               </iframe>
             </compact-btn>
           </div>
@@ -1600,6 +1600,10 @@ export default {
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         this.list.show_in_public_folder
+    },
+
+    simpsocialMessengerIframeLink () {
+      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
     }
   },
 

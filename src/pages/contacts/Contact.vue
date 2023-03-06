@@ -65,8 +65,8 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer && !changingSelectedContact && !isEmptyContact"
-                         :campaign-id="selectedCampaignId">
+        <contact-details :campaign-id="selectedCampaignId"
+                         v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>
     </div>
