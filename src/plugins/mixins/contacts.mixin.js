@@ -1005,7 +1005,7 @@ export default {
         return this.lists['all']
       }
 
-      if (this.myQueueId) {
+      if (this.myQueueId && this.isPowerDialer) {
         return this.lists['my-queue']
       }
 
