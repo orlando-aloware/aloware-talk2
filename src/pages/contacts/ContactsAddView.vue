@@ -121,6 +121,7 @@
         :columns="validColumns"
         :is-empty="isEmpty"
         :is-loading-more="isLoadingMore"
+        :is-loading="isLoading"
         :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
@@ -530,42 +531,52 @@ export default {
       type: Object,
       default: () => {}
     },
+
     isLoadingDisabled: {
       type: Boolean,
       default: false
     },
+
     isStartState: {
       type: Boolean,
       default: false
     },
+
     isEditable: {
       type: Boolean,
       default: false
     },
+
     search: {
       type: String,
       default: ''
     },
+
     isMyContactsView: {
       type: Boolean,
       default: false
     },
+
     isLoading: {
       type: Boolean,
       default: false
     },
+
     columns: {
       type: Array,
       default: () => []
     },
+
     isEmpty: {
       type: Boolean,
       default: false
     },
+
     isLoadingMore: {
       type: Boolean,
       default: false
     },
+
     filtersCount: {
       type: Number,
       default: 0
@@ -578,80 +589,105 @@ export default {
     avatarMixin,
     addViewMixin
   ],
+
   inject: [
     'contactsData'
   ],
+
   computed: {
     ...mapGetters('auth', ['profile']),
+
     ...mapState('cache', ['currentCompany']),
+
     ...mapGetters('contacts', [
       'lists',
       'listItems',
       'isFiltersOpen'
     ]),
+
     contactList () {
       return this.lists[String(this.$route.params.id)]
     },
+
     isLoaded () {
       return !!this.lists[String(this.$route.params.id)]
     },
+
     items () {
       if (this.listItems[this.id]) {
         return this.listItems[this.id].data
       }
+
       return []
     },
+
     currentPage () {
       if (this.listItems[this.id]) {
         return this.listItems[this.id].current_page
       }
+
       return 1
     },
+
     hasAppliedFilters () {
       return this.filtersCount > 0
     },
+
     isResetDisabled () {
       return !this.filterHasChanges
     },
+
     validColumns () {
       return this.columns.filter(column => column.label !== 'Actions')
     },
+
     urlRoutePath () {
       if (this.isContactModule) {
         return '/contacts/list/'
       }
+
       return '/power-dialer/list/'
     },
+
     addItemEndpoint () {
       return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
     },
+
     checkedItemIds () {
       const ids = []
       this.checkedItems.forEach(check => {
         ids.push(check.id)
       })
+
       return ids
     },
+
     contactListName () {
       return this.listName || this.contactList.name
     },
+
     linkToRoute () {
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
+
     isMyQueue () {
       return this.contactList && this.contactList.id === 'my-queue'
     },
+
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
     },
+
     totalRows () {
       return this.listItems?.[this.id]?.total || 0
     },
+
     contactWithNoPrimaryNumbers () {
       return this.fixedContactsData.data.filter(contact => {
         return contact.phone_numbers[0].is_primary === false
       })
     },
+
     fixedContactsData () {
       if (isEqual(this.$parent.$data.contactsData, this.contactsData)) {
         return this.contactsData
@@ -660,6 +696,7 @@ export default {
       return this.$parent.$data.contactsData
     }
   },
+
   data () {
     return {
       ContactListTypes,
@@ -673,6 +710,7 @@ export default {
       contactCount: 0
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
@@ -685,6 +723,7 @@ export default {
       'setSearch',
       'setShowMyContacts'
     ]),
+
     loadList (id) {
       if (!id) {
         id = 'all'
@@ -704,6 +743,7 @@ export default {
           this.$router.replace('/contacts/')
         })
     },
+
     updateListName (data) {
       this.$axios
         .patch(`/api/v2/contacts-list/${this.$route.params.id}`, {
@@ -721,6 +761,7 @@ export default {
           this.$generalNotification(`Error in renaming a list. ${message}`, 'error')
         })
     },
+
     reloadFolders () {
       return this.$axios
         .get('/api/v2/contact-folders')
@@ -730,9 +771,11 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
+
     addSelectedContacts () {
       this.clicked = true
       this.closeFilters()
+
       return this.$axios
         .post(this.addItemEndpoint, this.attachedParams())
         .then(() => {
@@ -751,51 +794,60 @@ export default {
           this.$generalNotification(message, 'error')
         })
     },
+
     attachedParams () {
       if (this.isContactModule) {
         return {
           contact_list_id: this.contactList.id,
           contacts: this.checkedItems
         }
-      } else {
-        if (this.contactList.id === 'my-queue') {
-          return {
-            // allow_international_phone_numbers: 1,
-            // multiple_phone_numbers: 1,
-            // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-            contact_ids: this.checkedItemIds
-          }
-        }
+      }
+
+      if (this.contactList.id === 'my-queue') {
         return {
           // allow_international_phone_numbers: 1,
           // multiple_phone_numbers: 1,
           // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-          contact_list_id: this.contactList.id,
           contact_ids: this.checkedItemIds
         }
       }
+
+      return {
+        // allow_international_phone_numbers: 1,
+        // multiple_phone_numbers: 1,
+        // future_scheduled_time: '2022-03-09T14:41:36.296Z',
+        contact_list_id: this.contactList.id,
+        contact_ids: this.checkedItemIds
+      }
     },
+
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>
         this.checkedItems.includes(i.id)
       )
     },
+
     onCancel () {
       this.closeFilters()
+
       if (this.contactList.name === 'My Queue') {
         this.$router.push(this.$router.history._startLocation)
-      } else {
-        this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+        return
       }
+
+      this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
     },
+
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
         id: this.id,
         headers: nextColumns
       })
     },
+
     onCheckAllItems (checked) {
       this.checkedItems = []
+
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
@@ -813,67 +865,88 @@ export default {
           }
         })
     },
+
     onCheckedRows (checked) {
       this.checkedItems = checked
     },
+
     onFiltersClicked () {
       if (this.isFiltersOpen) {
         this.closeFilters()
-      } else {
-        this.openFilters()
+        return
       }
+
+      this.openFilters()
     },
+
     resetFilters (resetSearch = false) {
       const defaultFilters = this.fixDefaultFilters()
+
       this.setCurrentListFilters(defaultFilters)
+
       if (resetSearch) {
         this.resetSearch()
       }
+
       this.$VueEvent.fire('filters-reset')
       this.filterHasChanges = false
     },
+
     hasFilterChanges () {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
+
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
+
     updateFiltersCount (count) {
       this.filtersCount = count
     },
+
     onPagination (params) {
       this.checkedItems = []
       this.onPaginate(params)
     },
+
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
+
     onSearch (searchText) {
+      searchText = searchText.trim()
       this.$emit('search', searchText)
     },
+
     onSortByField (sorts) {
       this.$emit('sort', sorts)
     },
+
     onPaginate (params) {
       this.$emit('paginated', params)
     },
+
     onLoadMore () {
       this.$emit('loadMore')
     },
+
     onCheckerClicked (contact) {
       const items = { data: [] }
       const found = this.checkedItems.find(item => item.id === contact.id)
+
       if (found) {
         items.data = this.checkedItems.filter(item => item.id !== contact.id)
       } else {
         items.data = [...this.checkedItems]
         items.data.push(contact)
       }
+
       this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
     }
   },
+
   mounted () {
     this.loadList(this.$route.params.id)
 
@@ -881,22 +954,26 @@ export default {
       this.openFilters()
     }
   },
+
   watch: {
     '$route.params.id': function (id) {
       if (this.$route.name === 'Contacts' && id) {
         this.loadList(id)
       }
     },
+
     checkedItemIds: function (value) {
       if (this.isContactModule) {
         document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === this.fixedContactsData.data.length
-      } else {
-        const filteredContacts = this.fixedContactsData.data.filter(c => {
-          return !c.is_dnc && !c.is_blocked
-        })
-        document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
+        return
       }
+
+      const filteredContacts = this.fixedContactsData.data.filter(c => {
+        return !c.is_dnc && !c.is_blocked
+      })
+      document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
     },
+
     clicked: function (value) {
       if (value) {
         setTimeout(() => { this.clicked = false }, 2000)

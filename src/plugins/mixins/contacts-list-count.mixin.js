@@ -124,7 +124,7 @@ export default {
       }
 
       // cleanup
-      if (query.filter_groups.length < 1) {
+      if (query.hasOwnProperty('filter_groups') && query.filter_groups.length < 1) {
         delete query.filter_groups
       }
 

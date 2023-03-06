@@ -199,6 +199,9 @@ export default {
     },
 
     onSearch (searchText) {
+      searchText = searchText.trim()
+      this.setSearch(searchText)
+
       // ignore search if previous and current search are the same
       if (this.previousSearch === searchText) {
         return
@@ -212,9 +215,8 @@ export default {
 
       this.previousSearch = searchText
       this.isLoaded = false
-      this.setSearch(searchText)
       this.fetch({
-        contact_owner: this.showMyContacts ? this.profile.id : undefined,
+        my_contacts: this.showMyContacts,
         search: this.search,
         isSearch: true
       }, true, true)
@@ -494,7 +496,7 @@ export default {
       }
 
       // cleanup
-      if (query.filter_groups.length < 1) {
+      if (query.hasOwnProperty('filter_groups') && query.filter_groups.length < 1) {
         delete query.filter_groups
       }
 
@@ -697,7 +699,7 @@ export default {
       fetchData.isLoading = _.get(data, 'isLoading', false)
 
       // Keeps only user's contacts on list after fetching
-      _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
+      _.set(fetchData, 'params.my_contacts', this.showMyContacts)
 
       this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },

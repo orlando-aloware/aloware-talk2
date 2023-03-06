@@ -122,6 +122,7 @@
         :columns="validColumns"
         :is-empty="isEmpty"
         :is-loading-more="isLoadingMore"
+        :is-loading="isLoading"
         :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
@@ -673,7 +674,7 @@ export default {
     },
 
     validColumns () {
-      return this.columns.filter(column => column.label !== 'Actions' && column.name !== 'task_status_name')
+      return this.columns.filter(column => column.label !== 'Actions' && !(column.name === 'task_status_name' || column.name === 'task_status'))
     },
 
     urlRoutePath () {
