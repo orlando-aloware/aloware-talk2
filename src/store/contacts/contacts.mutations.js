@@ -406,6 +406,9 @@ export default {
   SET_SHOW_MY_CONTACTS: (state, value) => {
     state.showMyContacts = value
   },
+  SET_ADD_VIEW_SHOW_MY_CONTACTS: (state, value) => {
+    state.showAddViewMyContacts = value
+  },
   SET_UNSAVED_LIST: (state, data) => {
     state.unsavedList = data
   },

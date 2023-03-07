@@ -48,7 +48,7 @@ export default {
   },
 
   created () {
-    this.processFetch = _.debounce(this.debouncedFetch, 1000)
+    this.processFetch = _.debounce(this.debouncedFetch, 300)
     this.listDataCancelToken = window.axios.CancelToken
     this.listDataSource = this.listDataCancelToken.source()
     this.listContactsCancelToken = window.axios.CancelToken
@@ -94,13 +94,20 @@ export default {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
 
+      // path for add modal
+      if (this.isAddContactsView) {
+        this.onFetchMyContacts(this.showAddViewMyContacts)
+        return
+      }
+
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
-      } else {
-        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
-        this.initialListFilters = defaultFilters
-        this.filtersCount = this.getFiltersCount(defaultFilters)
+        return
       }
+
+      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
+      this.initialListFilters = defaultFilters
+      this.filtersCount = this.getFiltersCount(defaultFilters)
     }, 200),
 
     onSortByField (sorts) {
@@ -146,15 +153,22 @@ export default {
           path = this.apiEndpoint(this.myQueueId !== null)
         }
 
+        let params = {
+          page: nextPage,
+          search: this.search,
+          sort: sort,
+          order: order,
+          relations: this.contactsRelations
+        }
+
+        // my contacts toggle is not applicable in "Unassigned Contacts" list
+        if (this.$route.params.id !== 'unassigned') {
+          params.my_contacts = this.showMyContactsViewBased
+        }
+
         return this.$axios
           .get(path, {
-            params: this.buildQueryString({
-              page: nextPage,
-              search: this.search,
-              sort: sort,
-              order: order,
-              relations: this.contactsRelations
-            }),
+            params: this.buildQueryString(params),
             paramsSerializer: qs.stringify
           })
           .then((response) => response.data)
@@ -207,7 +221,7 @@ export default {
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
-        contact_owner: this.showMyContacts ? this.profile.id : undefined,
+        my_contacts: this.showMyContactsViewBased,
         search: this.search,
         isSearch: true
       }, true, true)
@@ -249,13 +263,18 @@ export default {
         this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
 
+      // my contacts toggle is not applicable in "Unassigned Contacts" list
+      if (this.$route.params.id === 'unassigned' && params.hasOwnProperty('my_contacts')) {
+        delete params.my_contacts
+      }
+
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.id, contacts: [] })
       const queryString = this.buildQueryString(params, isContactModule)
 
       // use the same query string to update the list count
       // eslint-disable-next-line camelcase
-      const countQueryString = (({ filter_groups, search, list_id }) => ({ filter_groups, search, list_id }))(queryString)
+      const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
@@ -482,7 +501,7 @@ export default {
       }
 
       // cleanup
-      if (query.filter_groups.length < 1) {
+      if (query.hasOwnProperty('filter_groups') && query.filter_groups.length < 1) {
         delete query.filter_groups
       }
 
@@ -685,7 +704,7 @@ export default {
       fetchData.isLoading = _.get(data, 'isLoading', false)
 
       // Keeps only user's contacts on list after fetching
-      _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
+      _.set(fetchData, 'params.my_contacts', this.showMyContactsViewBased)
 
       this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },
@@ -834,6 +853,7 @@ export default {
       'search',
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
+      'showAddViewMyContacts',
       'previousListId',
       'previousListFilters',
       'isAllContactsSelected'
@@ -1042,6 +1062,15 @@ export default {
         'outbound_calls_count': 'outbound_call_count',
         'outbound_texts_count': 'outbound_sms_count'
       }
+    },
+
+    isAddContactsView () {
+      // e.g. contacts/list/3/add; power-dialer/list/add; power-dialer/list/1/add
+      return /list\/(\d+\/)?add/.test(this.$route.path)
+    },
+
+    showMyContactsViewBased () {
+      return this.isAddContactsView ? this.showAddViewMyContacts : this.showMyContacts
     }
   },
 
