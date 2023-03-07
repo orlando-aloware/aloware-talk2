@@ -122,6 +122,7 @@
         :columns="validColumns"
         :is-empty="isEmpty"
         :is-loading-more="isLoadingMore"
+        :is-loading="isLoading"
         :paginated="false"
         :show-pagination="!isStartState"
         scroll-area-class="pd-datatable"
@@ -621,6 +622,8 @@ export default {
     }
 
     this.listName = ''
+
+    this.setAddViewShowMyContacts(this.myContacts)
   },
 
   computed: {
@@ -673,7 +676,7 @@ export default {
     },
 
     validColumns () {
-      return this.columns.filter(column => column.label !== 'Actions' && column.name !== 'task_status_name')
+      return this.columns.filter(column => column.label !== 'Actions' && !(column.name === 'task_status_name' || column.name === 'task_status'))
     },
 
     urlRoutePath () {
@@ -753,8 +756,10 @@ export default {
       'foldersLoaded',
       'columnsReordered',
       'setSearch',
+      'resetSearch',
       'listLoaded',
       'setShowMyContacts',
+      'setAddViewShowMyContacts',
       'addPowerDialerOpen'
     ]),
 
@@ -934,11 +939,12 @@ export default {
     },
 
     onFetchMyContacts (checked) {
-      this.setShowMyContacts(checked)
+      this.setAddViewShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
 
     onSearch (searchText) {
+      this.setAddViewShowMyContacts(this.myContacts)
       this.$emit('search', searchText)
     },
 
