@@ -28,7 +28,6 @@
 
 <script>
 import CounterUp from 'vue-countup-v2'
-import { isNumber } from 'lodash'
 import WallboardOverviewAbandonedCallsIcon from 'src/components/icons/wallboard/overview-abandoned-calls-icon'
 import WallboardOverviewAnsweredCallsIcon from 'src/components/icons/wallboard/overview-answered-calls-icon'
 import WallboardOverviewAppointmentsSetIcon from 'src/components/icons/wallboard/overview-appointments-set-icon'
@@ -117,12 +116,6 @@ export default {
           }
         }
       }
-    }
-  },
-
-  methods: {
-    isNumber (v) {
-      return isNumber(v)
     }
   }
 }
