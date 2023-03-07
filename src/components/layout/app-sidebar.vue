@@ -460,7 +460,7 @@ export default {
     appLogo () {
       switch (true) {
         case this.statics.whitelabel:
-          return `img:${this.statics.logo.replace(/\//, '')}` // replace first occurrence of '/'
+          return `img:${this.statics.logo_square.replace(/\//, '')}` // replace first occurrence of '/'
         case this.xmasEnabled:
           return 'img:app-icons/menu/xmas/logo_white.svg'
         default:
