@@ -203,6 +203,7 @@ export const DEFAULT_STATE = {
   showContactsHeader: true,
   showContactsListSidebar: false,
   showMyContacts: false,
+  showAddViewMyContacts: false,
   unsavedList: null,
   activeFolder: '',
   pinnedListsLoaded: false,
