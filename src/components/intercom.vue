@@ -109,14 +109,14 @@ export default {
     },
 
     processSetup () {
-      // if (!this.hasReporterAccess &&
-      //   (this.statics && !this.statics.whitelabel) &&
-      //   this.currentCompany &&
-      //   !this.currentCompany.reseller_id &&
-      //   this.profile &&
-      //   process.env.APP_ENV !== 'local') {
-      this.setup()
-      // }
+      if (!this.hasReporterAccess &&
+        (this.statics && !this.statics.whitelabel) &&
+        this.currentCompany &&
+        !this.currentCompany.reseller_id &&
+        this.profile &&
+        process.env.APP_ENV !== 'local') {
+        this.setup()
+      }
     }
   },
 
