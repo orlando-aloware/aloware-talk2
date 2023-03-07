@@ -71,25 +71,17 @@
           </div>
         </div>
         <div class="px-3 d-inline-flex"
-             v-if="!isMyContactsView && !isTabletOrMobile">
-          <q-tooltip
-            class="text-center"
-            anchor="top middle"
-            self="bottom middle"
-            max-width="185px"
-            v-if="$route.params.id === 'unassigned'">
-            Unable to modify Filters. Duplicate this list if you want to modify
-          </q-tooltip>
+             v-if="!isMyContactsView && !isTabletOrMobile && $route.params.id !== 'unassigned'">
           <label class="text-primary mr-2 mt-2 cursor-pointer"
-                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
+                 :class="{ disabled: isLoading }">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
-            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
-            :disabled="isLoading || $route.params.id === 'unassigned'"
+            :class="{ disabled: isLoading }"
+            :disabled="isLoading"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -99,25 +91,17 @@
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
         <div class="flex-grow-1"></div>
         <div class="px-3 d-inline-flex"
-             v-if="!isMyContactsView && isTabletOrMobile">
-          <q-tooltip
-            class="text-center"
-            anchor="top middle"
-            self="bottom middle"
-            max-width="185px"
-            v-if="$route.params.id === 'unassigned'">
-            Unable to modify Filters. Duplicate this list if you want to modify
-          </q-tooltip>
+             v-if="!isMyContactsView && isTabletOrMobile && $route.params.id !== 'unassigned'">
           <label class="text-primary mr-2 mt-2 cursor-pointer"
-                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
+                 :class="{ disabled: isLoading }">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
-            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
-            :disabled="isLoading || $route.params.id === 'unassigned'"
+            :class="{ disabled: isLoading }"
+            :disabled="isLoading"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
