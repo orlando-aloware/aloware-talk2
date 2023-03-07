@@ -48,7 +48,7 @@ export default {
   },
 
   created () {
-    this.processFetch = _.debounce(this.debouncedFetch, 1000)
+    this.processFetch = _.debounce(this.debouncedFetch, 500)
     this.listDataCancelToken = window.axios.CancelToken
     this.listDataSource = this.listDataCancelToken.source()
     this.listContactsCancelToken = window.axios.CancelToken
