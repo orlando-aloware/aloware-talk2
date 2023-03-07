@@ -26,9 +26,9 @@
                               :route="item.route"
                               :icon="item.icon"
                               :loading="item.loading"
-                              v-for="item in items"
                               :key="item.name"
-                              :active="isActive(item.route)">
+                              :active="isActive(item.route)"
+                              v-for="item in items">
         <template #action>
           <b-badge class="t-badge t-badge__warning text-white p-1">
             {{ item.counter }}
