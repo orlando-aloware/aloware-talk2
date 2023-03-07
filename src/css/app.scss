@@ -12345,6 +12345,8 @@ h1.contact-list-name-label {
 }
 
 .wallboard {
+  height: 100%;
+
   &__sidebar {
     width: 200px;
     height: 100%;
@@ -12431,7 +12433,7 @@ h1.contact-list-name-label {
     flex-wrap: wrap;
 
     &__content {
-      height: 650px;
+      height: 550px;
       width: calc(100% - 40px);
       margin: 20px;
       padding: 20px;
@@ -12487,10 +12489,6 @@ h1.contact-list-name-label {
             &__value {
               font-size: 22px;
               font-weight: bold;
-            }
-
-            &__description {
-
             }
           }
         }

@@ -1,5 +1,5 @@
 <template>
-  <div class="wallboard mx-0 overflow-hidden h-100"
+  <div class="wallboard"
        v-if="authenticated">
     <wallboard-sidebar/>
     <wallboard-header/>
