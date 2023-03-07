@@ -163,7 +163,7 @@ export default {
 
         // my contacts toggle is not applicable in "Unassigned Contacts" list
         if (this.$route.params.id !== 'unassigned') {
-          params.my_contacts = this.showMyContacts
+          params.my_contacts = this.showMyContactsViewBased
         }
 
         return this.$axios

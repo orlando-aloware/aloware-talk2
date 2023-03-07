@@ -668,7 +668,6 @@ export default {
     },
 
     linkToRoute () {
-      this.setSearch('')
       return this.isMyQueue ? `/power-dialer` : `${this.urlRoutePath}${this.$route.params.id}`
     },
 
@@ -723,6 +722,7 @@ export default {
       'columnsReordered',
       'setShouldUpdateSelectedListContactCount',
       'setSearch',
+      'resetSearch',
       'setShowMyContacts',
       'setAddViewShowMyContacts'
     ]),
