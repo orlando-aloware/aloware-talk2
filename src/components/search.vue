@@ -72,13 +72,13 @@ export default {
 
   methods: {
     onInput: _.debounce(function () {
-      this.searchValue = this.searchValue.trim()
       // send an empty string on null value
       // (happens when page is from contact page - clicked from result)
       if (!this.searchValue) {
         this.searchValue = ''
       }
 
+      this.searchValue = this.searchValue.trim()
       this.$emit('search', this.searchValue)
     }, 500),
 
