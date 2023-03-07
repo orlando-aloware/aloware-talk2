@@ -1,5 +1,5 @@
 <template>
-  <div class="wallboard__header d-flex flex-column">
+  <div class="wallboard__header">
     <div class="wallboard__header__title bordered-bottom">
       Your Contact Center
     </div>

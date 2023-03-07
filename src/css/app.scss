@@ -12389,6 +12389,8 @@ h1.contact-list-name-label {
   &__header {
     height: 100px;
     margin-left: 200px;
+    display: flex;
+    flex-direction: column;
 
     &__title {
       height: 40px;
