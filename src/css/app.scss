@@ -12348,6 +12348,8 @@ h1.contact-list-name-label {
   &__sidebar {
     width: 200px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 6px;
     float: left;
     color: $grey-90;

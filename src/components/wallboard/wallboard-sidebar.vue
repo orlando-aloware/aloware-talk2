@@ -1,5 +1,5 @@
 <template>
-    <div class="wallboard__sidebar d-flex flex-column no-border-radius bordered-right">
+    <div class="wallboard__sidebar bordered-right">
       <wallboard-sidebar-item name="Overview"
                               route="/wallboard/overview"
                               icon="wallboard-overview-icon"
@@ -18,7 +18,7 @@
         </template>
       </wallboard-sidebar-item>
 
-      <span class="wallboard__sidebar__title ">
+      <span class="wallboard__sidebar__title">
         MONITOR
       </span>
 
