@@ -38,8 +38,11 @@ export default {
     }),
 
     date () {
-      // "28 Jan 2023" format
-      return new Date().toGMTString().substr(4, 12)
+      // "8 Jan 2023" format
+      return new Date()
+        .toGMTString()
+        .substr(5, 12)
+        .replace(/^0/, '')
     }
   },
 
