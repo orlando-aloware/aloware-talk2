@@ -6,7 +6,8 @@
     <div class="wallboard__header__actions bordered-bottom">
       For today {{ date }}
 
-      <ring-group-selector class="ml-2 ring-group-filter"
+      <ring-group-selector clearable
+                           class="ml-2 ring-group-filter"
                            :force-remove-missing-values="true"
                            :generic-multiselect="false"
                            :value="filters.ringGroup"
@@ -44,7 +45,8 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
-      'setFilter'
+      'setFilter',
+      'fetchSummary'
     ]),
 
     onFilterRingGroup (value) {
@@ -52,6 +54,9 @@ export default {
         filter: 'ringGroup',
         value
       })
+
+      // automatically refresh summary when ring group changes
+      this.fetchSummary()
     }
   }
 }
