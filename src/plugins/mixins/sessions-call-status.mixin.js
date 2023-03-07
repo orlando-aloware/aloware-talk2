@@ -145,8 +145,7 @@ export default {
       'moveContactItems',
       'getSessionTaskByFilter',
       'addRedialedTask',
-      'clearRedialedTask',
-      'setPowerDialerTasksInQueue'
+      'clearRedialedTasks'
     ]),
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'

@@ -121,6 +121,20 @@
       </div>
 
       <div class="d-block">
+        <p class="text-muted custom-input-label mb-0">Lead Source</p>
+        <lead-source-selector v-model="contact.lead_source"
+                              useInput
+                              clearable
+                              borderless
+                              :genericStyling="false"
+                              :outlined="false"
+                              specificClass="inline-select"
+                              :disabled="!hasPermissionTo('update contact')"
+                              @change="(eventPayload) => onUpdateFields(eventPayload, 'lead_source')">
+        </lead-source-selector>
+      </div>
+
+      <div class="d-block">
         <p class="text-muted custom-input-label mb-0">Initial Line</p>
         <line-selector v-model="contact.initial_campaign_id"
                        :genericMultiselect="false"
@@ -200,6 +214,8 @@ import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
 import ContactAttributes from 'components/contacts/contact-attributes'
+import LeadSourceSelector from 'components/generic-selectors/lead-source-selector.vue'
+
 export default {
   name: 'contact-information',
   mixins: [aclMixin],
@@ -219,7 +235,8 @@ export default {
     ContactInputField,
     LocationCountrySelector,
     LocationStateSelector,
-    LineSelector
+    LineSelector,
+    LeadSourceSelector
   },
   computed: {
     ...mapGetters('contacts', ['contact', 'contactAttributes']),

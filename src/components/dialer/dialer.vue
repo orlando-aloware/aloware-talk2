@@ -227,7 +227,16 @@ export default {
       if (this.dialer.currentStatus !== 'WRAP_UP') {
         return
       }
+
       this.backToDial()
+    })
+
+    this.$VueEvent.listen('forceEndWrapUp', () => {
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        return
+      }
+
+      this.backToDial(true)
     })
 
     this.$VueEvent.listen('resetCall', () => {
@@ -1020,7 +1029,9 @@ export default {
 
       if (add.mode === 'phone-number') {
         params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
-        this.setAddedParty(this.$options.filters.fixPhone(add.phone_number, 'NATIONAL', true, true))
+        this.setAddedParty({
+          name: this.$options.filters.fixPhone(add.phoneNumber, 'NATIONAL', true, true)
+        })
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
@@ -1156,8 +1167,8 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial () {
-      this.resetAgentStatus()
+    backToDial (forceStatus = false) {
+      this.resetAgentStatus(forceStatus)
       this.resetCall()
     },
 

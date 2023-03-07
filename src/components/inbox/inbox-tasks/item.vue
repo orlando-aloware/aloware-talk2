@@ -33,7 +33,7 @@
       <div v-if="contact.last_communication"
            class="d-grid grid-2-col task-item-body">
         <div class="pr-2">
-          <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction)"
+          <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction, contact.last_communication.callback_status)"
                      height="18px"
                      width="18px">
           </component>

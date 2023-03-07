@@ -14,14 +14,14 @@
       </q-item>
     </q-list>
 
-    <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall) || isCallFishingMode"
+    <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall && !communication.callback_status) || isCallFishingMode"
             bordered
             class="rounded-contact-activity b-radius-12"
             :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
             @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
-          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+          <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
                      v-if="communication.disposition_status2">
           </component>
         </div>
@@ -189,7 +189,7 @@
         <template slot="header">
           <q-item-section class="communication-header flex-row">
             <div class="ml-3 pr-2">
-              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction)"
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
                          v-if="communication.disposition_status2">
               </component>
             </div>
@@ -209,7 +209,7 @@
           </q-item-section>
           <q-tooltip anchor="top middle"
                      self="center middle">
-            {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash | capitalize }}
+            {{ $options.filters.translateDispositionStatusText(communication.disposition_status2, communication.callback_status) | replaceDash | capitalize }}
           </q-tooltip>
         </template>
         <div class="px-3 pt-2 pb-2 text-left"
@@ -257,9 +257,14 @@
 
             <div class="font-weight-light-bold my-2"
                  v-if="communication.type === CommunicationTypes.CALL">
-              This call
-              {{ communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ? 'is' : 'was' }}
-              {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash }}.
+              <template v-if="communication.callback_status === CommunicationCallbackStatus.CALLBACK_STATUS_REQUESTED">
+                Callback requested
+              </template>
+              <template v-else>
+                This call
+                {{ communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ? 'is' : 'was' }}
+                {{ communication.disposition_status2 | translateDispositionStatusText | replaceDash }}.
+              </template>
             </div>
 
             <div class="w-100"
@@ -783,6 +788,7 @@ import * as CommunicationTypes from '../constants/communication-types'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
@@ -924,7 +930,8 @@ export default {
       CommunicationDispositionStatus,
       CommunicationTypes,
       UploadedFileTypes,
-      CommunicationRejectionReasons
+      CommunicationRejectionReasons,
+      CommunicationCallbackStatus
     }
   },
 

@@ -812,8 +812,11 @@ export default {
             }
             this.setContacts(contacts.data)
 
-            this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-            this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+            // only trigger counts request if action comes from the same user
+            if (communication.user_id === this.profile.id) {
+              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+            }
           }
         }
       }
@@ -1045,8 +1048,11 @@ export default {
         this.setOpenTaskCount(this.taskCounts.open - 1)
       }
 
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      // prevent duplicate task status count request when Contact component is active
+      if (!this.isContactMixinUsed) {
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      }
 
       const index = this.contacts.findIndex(item => item.id === contact.id)
       switch (true) {

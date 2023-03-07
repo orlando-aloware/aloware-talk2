@@ -505,7 +505,7 @@
             <q-item-section class="d-flex flex-row border-bottom justify-content-start flex-grow-0 pt-2 pb-2"
                             v-if="dialer.communication">
               <div class="pr-2">
-                <component :is="stateToIcon(dialer.communication.disposition_status2, dialer.communication.type, dialer.communication.direction)"
+                <component :is="stateToIcon(dialer.communication.disposition_status2, dialer.communication.type, dialer.communication.direction, dialer.communication.callback_status)"
                            v-if="dialer.communication.disposition_status2">
                 </component>
               </div>
@@ -2020,6 +2020,9 @@ export default {
       this.$emit('onPhoneVisible', false)
     },
     endWrapUp () {
+      if (this.$route.name === 'Power Dialer') {
+        this.$VueEvent.fire('endWrapUpPDSession')
+      }
       this.$VueEvent.fire('endWrapUp')
       this.$emit('onPhoneVisible', false)
     },

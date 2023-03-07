@@ -64,7 +64,8 @@
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
           <line-selector :campaignId="campaignId"
-                         @change="onLineChange"></line-selector>
+                         @change="onLineChange">
+          </line-selector>
         </div>
       </div>
     </div>
