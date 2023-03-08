@@ -64,7 +64,7 @@ export default {
   },
 
   watch: {
-    'staticsLoaded': function (newValue) {
+    staticsLoaded (newValue) {
       if (newValue) {
         this.setTitle()
       }
