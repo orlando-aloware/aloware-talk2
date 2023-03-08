@@ -15,7 +15,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-if="authenticated && profile && profile.enabled"></custom-scripts>
-    <intercom v-if="authenticated && profile && profile.enabled && !statics.whitelabel"></intercom>
+    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"></intercom>
   </div>
 </template>
 <script>
@@ -45,7 +45,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
 
-    ...mapState(['statics']),
+    ...mapState(['statics', 'staticsLoaded']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)

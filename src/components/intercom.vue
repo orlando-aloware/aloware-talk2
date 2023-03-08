@@ -5,6 +5,7 @@
 <script>
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
+import { get } from 'lodash'
 
 export default {
   name: 'intercom',
@@ -25,12 +26,16 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+
+    isWhiteLabel () {
+      return get(this.statics, 'whitelabel', false)
+    }
   },
 
   methods: {
     setup (newRoute = false) {
-      if (!this.authenticated || !this.profile?.enabled) {
+      if (!this.authenticated || !this.profile?.enabled || this.isWhiteLabel) {
         return
       }
 
@@ -110,7 +115,7 @@ export default {
 
     processSetup () {
       if (!this.hasReporterAccess &&
-        (this.statics && !this.statics.whitelabel) &&
+        !this.isWhiteLabel &&
         this.currentCompany &&
         !this.currentCompany.reseller_id &&
         this.profile &&
@@ -130,8 +135,10 @@ export default {
   },
 
   watch: {
-    'statics.whitelabel': function () {
-      this.processSetup()
+    'statics.whitelabel': function (newValue) {
+      if (!newValue) {
+        this.processSetup()
+      }
     }
   },
 
