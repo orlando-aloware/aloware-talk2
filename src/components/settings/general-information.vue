@@ -173,7 +173,7 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState(['ringGroups', 'statics'])
+    ...mapState(['ringGroups'])
   },
 
   data () {
