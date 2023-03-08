@@ -4,6 +4,7 @@ import routes from './routes'
 import VueGtagEsm from 'vue-gtag'
 Vue.use(VueRouter)
 import * as storage from 'src/plugins/helpers/storage'
+import { get } from 'lodash'
 
 // This listener will execute before router.beforeEach only if registered
 // before vue-router is registered with Vue.use(VueRouter)
@@ -46,7 +47,8 @@ export default function ({ store }) {
     }
 
     const statics = storage.local.getItem('statics')
-    const whiteLabelText = statics.whitelabel ? `${statics.name} ` : 'Aloware '
+    const whitelabel = get(statics, 'whitelabel', false)
+    const whiteLabelText = whitelabel ? `${statics.name} ` : 'Aloware '
 
     document.title = `${documentTitle.data} - ${whiteLabelText}Talk`
   })
