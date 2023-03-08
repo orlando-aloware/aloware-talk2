@@ -183,7 +183,7 @@
                    v-close-popup flat>
             </q-btn>
             <q-btn label="Restart"
-                   text-color="green"
+                   text-color="green-7"
                    @click="restartApp"
                    flat>
             </q-btn>
