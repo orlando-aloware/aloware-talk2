@@ -127,8 +127,9 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-blue">
+                          class="bg-white">
             <q-btn label="Close"
+                   text-color="blue"
                    v-close-popup flat>
             </q-btn>
           </q-card-actions>
@@ -150,7 +151,7 @@
           <q-card-actions align="right"
                           class="bg-white">
             <q-btn label="Close"
-                   text-color="red"
+                   text-color="blue"
                    v-close-popup flat>
             </q-btn>
             <q-btn label="Quit"
@@ -176,8 +177,13 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-green-7">
+                          class="bg-white">
+            <q-btn label="Close"
+                   text-color="blue"
+                   v-close-popup flat>
+            </q-btn>
             <q-btn label="Restart"
+                   text-color="green"
                    @click="restartApp"
                    flat>
             </q-btn>
