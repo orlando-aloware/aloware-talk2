@@ -105,6 +105,7 @@ export default {
 
   created () {
     this.title = 'Forgot Password'
+    this.setTitle()
   },
 
   methods: {

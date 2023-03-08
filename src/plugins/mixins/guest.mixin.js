@@ -16,7 +16,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['statics'])
+    ...mapState(['statics', 'staticsLoaded'])
   },
 
   methods: {
@@ -64,8 +64,10 @@ export default {
   },
 
   watch: {
-    'statics.name': function () {
-      this.setTitle()
+    'staticsLoaded': function (newValue) {
+      if (newValue) {
+        this.setTitle()
+      }
     }
   },
 

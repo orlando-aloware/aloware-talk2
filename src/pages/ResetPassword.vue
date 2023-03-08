@@ -134,6 +134,7 @@ export default {
 
   created () {
     this.title = 'Reset Password'
+    this.setTitle()
     this.user.email = this.$route.query.email
     this.user.token = this.$route.params.token
   },
