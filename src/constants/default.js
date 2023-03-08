@@ -224,5 +224,6 @@ export const DEFAULT_STATE = {
     path: null,
     referer: null,
     whitelabel: false
-  }
+  },
+  staticsLoaded: false
 }

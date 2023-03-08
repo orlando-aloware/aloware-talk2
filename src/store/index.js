@@ -264,7 +264,8 @@ export default function (/* { ssrContext } */) {
         path: null,
         referer: null,
         whitelabel: false
-      }
+      },
+      staticsLoaded: false
     },
 
     getters: {
@@ -768,6 +769,10 @@ export default function (/* { ssrContext } */) {
 
       setStatics ({ commit }, statics) {
         commit('SET_STATICS', statics)
+      },
+
+      setStaticsLoaded ({ commit }, value) {
+        commit('SET_STATICS_LOADED', value)
       }
     },
 
@@ -1463,6 +1468,10 @@ export default function (/* { ssrContext } */) {
 
       SET_STATICS (state, statics) {
         state.statics = statics
+      },
+
+      SET_STATICS_LOADED (state, value) {
+        state.staticsLoaded = value
       },
 
       updateField

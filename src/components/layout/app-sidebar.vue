@@ -1,13 +1,27 @@
 <template>
   <div class="d-flex align-items-start flex-column h-100 w-100">
     <div class="w-100">
-      <q-btn :icon="appLogo"
-             size="1.1rem"
+      <q-btn size="1.1rem"
              align="center"
              to="/"
              class="app-logo w-100 p-2"
-             flat>
+             flat
+             :icon="appLogo"
+             v-if="staticsLoaded">
       </q-btn>
+      <div class="w-100 d-flex align-items-center justify-center px-1 flex-column"
+           style="height: 61px;"
+           v-else>
+        <q-spinner-bars color="white"
+                        size="18px">
+        </q-spinner-bars>
+        <!--q-skeleton class="bg-blue-80 w-100"
+                    type="text">
+        </q-skeleton>
+        <q-skeleton class="bg-blue-80 w-100"
+                    type="text">
+        </q-skeleton-->
+      </div>
     </div>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
@@ -447,7 +461,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
 
-    ...mapState(['statics']),
+    ...mapState(['statics', 'staticsLoaded']),
 
     isProd () {
       return storage.local.getItem('env') === 'production'

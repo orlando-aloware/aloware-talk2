@@ -2236,10 +2236,12 @@ export default {
     },
 
     getStatics (repeatTimes = 0) {
+      this.setStaticsLoaded(false)
       talk2Api.V1.statics.get()
         .then(res => {
           this.setStatics(res.data)
           storage.local.setItem('statics', res.data)
+          this.setStaticsLoaded(true)
         }).catch(err => {
           console.log(err)
 
@@ -2348,7 +2350,8 @@ export default {
       'setSuspended',
       'setLeadSources',
       'updateUserStatus',
-      'setStatics'
+      'setStatics',
+      'setStaticsLoaded'
     ]),
     ...mapActions('contacts', [
       'resetSearch',
