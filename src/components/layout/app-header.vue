@@ -29,7 +29,7 @@
       <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
       <div class="px-3 d-inline-flex"
-           v-if="$route.name === 'Inbox' || ($route.meta && $route.meta.title && $route.meta.title === 'Communications')">
+           v-if="$route.name === 'Inbox' || ($route.meta && $route.meta.title && $route.meta.title === 'Communications' && $route.params.channel !== 'mentions')">
         <b-form-checkbox
           class="mt-2 cursor-pointer"
           :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"

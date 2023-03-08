@@ -115,11 +115,16 @@ export default {
           if (key === 'list_id') {
             query.list_id = filters[key]
           }
+
+          // contact list id becomes a separate filter
+          if (key === 'my_contacts') {
+            query.my_contacts = filters[key]
+          }
         })
       }
 
       // cleanup
-      if (query.filter_groups.length < 1) {
+      if (query.hasOwnProperty('filter_groups') && query.filter_groups.length < 1) {
         delete query.filter_groups
       }
 
