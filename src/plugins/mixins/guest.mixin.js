@@ -44,7 +44,12 @@ export default {
 
     setTitle () {
       let title = get(this.statics, 'name', '')
-      title = !title ? '' : title
+
+      if (!title) {
+        const statics = JSON.parse(storage.local.getItem('statics'))
+        let staticName = get(statics, 'name', '')
+        title = !staticName ? title : staticName
+      }
 
       document.title = `${this.title} - ${title} Talk`
     },
