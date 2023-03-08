@@ -15,12 +15,6 @@
         <q-spinner-bars color="white"
                         size="18px">
         </q-spinner-bars>
-        <!--q-skeleton class="bg-blue-80 w-100"
-                    type="text">
-        </q-skeleton>
-        <q-skeleton class="bg-blue-80 w-100"
-                    type="text">
-        </q-skeleton-->
       </div>
     </div>
     <q-btn :to="{ name: 'Inbox' }"
