@@ -70,12 +70,14 @@
             </div>
           </div>
         </div>
-        <div class="px-3 d-flex"
-             v-if="!isMyContactsView && !isTabletOrMobile">
+        <div class="px-3 d-flex">
           <div class="d-inline-flex"
-               v-if="$route.params.id !== 'unassigned'">
+               v-if="!isMyContactsView && !isTabletOrMobile && $route.params.id !== 'unassigned'">
             <label class="text-primary mr-2 mt-2 cursor-pointer"
-                   :class="{ disabled: isLoading }">My Contacts</label>
+                   style="min-width: 84px;"
+                   :class="{ disabled: isLoading }">
+              My Contacts
+            </label>
             <b-form-checkbox
               id="my-contacts"
               class="mt-2 cursor-pointer"
