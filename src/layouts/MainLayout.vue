@@ -2240,7 +2240,7 @@ export default {
       talk2Api.V1.statics.get()
         .then(res => {
           this.setStatics(res.data)
-          storage.local.setItem('statics', res.data)
+          storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
         }).catch(err => {
           console.log(err)

@@ -46,11 +46,11 @@ export default function ({ store }) {
       documentTitle.data = (record.meta.title || '')
     }
 
-    const statics = storage.local.getItem('statics')
-    const whitelabel = get(statics, 'whitelabel', false)
-    const whiteLabelText = whitelabel ? `${statics.name} ` : 'Aloware '
+    const statics = JSON.parse(storage.local.getItem('statics'))
+    let staticName = get(statics, 'name', '')
+    staticName = !staticName ? '' : staticName
 
-    document.title = `${documentTitle.data} - ${whiteLabelText}Talk`
+    document.title = `${documentTitle.data} - ${staticName} Talk`
   })
 
   Router.afterEach((to, from) => {

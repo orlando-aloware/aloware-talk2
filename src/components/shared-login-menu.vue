@@ -99,9 +99,7 @@ export default {
     },
 
     alowareTalk () {
-      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
-
-      return `${whiteLabel} Talk`
+      return `${this.statics.name} Talk`
     },
 
     whiteLabelText () {

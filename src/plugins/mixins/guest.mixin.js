@@ -1,6 +1,7 @@
 import { mapActions, mapState } from 'vuex'
 import store from '../../store'
 import * as storage from 'src/plugins/helpers/storage'
+import { get } from 'lodash'
 
 export default {
   data () {
@@ -42,12 +43,10 @@ export default {
     },
 
     setTitle () {
-      if (!this.statics.name) {
-        document.title = this.title + ' - Aloware Talk'
-        return
-      }
+      let title = get(this.statics, 'name', '')
+      title = !title ? '' : title
 
-      document.title = this.title + ' - ' + this.statics.name + ' Talk'
+      document.title = `${this.title} - ${title} Talk`
     },
 
     fixAssets (asset) {
