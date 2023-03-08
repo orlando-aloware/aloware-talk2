@@ -15,28 +15,20 @@ export default {
     return {
       intercomBannerHeight: 0,
       env: null,
-      statics: null,
       app_id: process.env.INTERCOM_APP_ID,
       timeInterval: null
     }
   },
 
   computed: {
+    ...mapState(['statics']),
+
     ...mapState('cache', ['currentCompany']),
+
     ...mapState('auth', ['profile', 'authenticated'])
   },
 
   methods: {
-    getStatics () {
-      return window.axios.get('/get-statics').then(res => {
-        this.statics = res.data
-        return Promise.resolve(res.data)
-      }).catch(err => {
-        console.log(err)
-        return Promise.reject(err)
-      })
-    },
-
     setup (newRoute = false) {
       if (!this.authenticated || !this.profile?.enabled) {
         return
@@ -114,6 +106,17 @@ export default {
       let intercomIframeInnerDoc = intercomIframe ? (intercomIframe.contentDocument || intercomIframe.contentWindow.document) : null
       let intercomIframeDomBody = intercomIframeInnerDoc ? intercomIframeInnerDoc.getElementById('intercom-container-body') : null
       return intercomIframeDomBody ? intercomIframeDomBody.clientHeight : 0
+    },
+
+    processSetup () {
+      if (!this.hasReporterAccess &&
+        (this.statics && !this.statics.whitelabel) &&
+        this.currentCompany &&
+        !this.currentCompany.reseller_id &&
+        this.profile &&
+        process.env.APP_ENV !== 'local') {
+        this.setup()
+      }
     }
   },
 
@@ -123,16 +126,13 @@ export default {
       next()
     })
 
-    this.getStatics().then(() => {
-      if (!this.hasReporterAccess &&
-        (this.statics && !this.statics.whitelabel) &&
-        this.currentCompany &&
-        !this.currentCompany.reseller_id &&
-        this.profile &&
-        process.env.APP_ENV !== 'local') {
-        this.setup()
-      }
-    })
+    this.processSetup()
+  },
+
+  watch: {
+    'statics.whitelabel': function () {
+      this.processSetup()
+    }
   },
 
   beforeDestroy () {

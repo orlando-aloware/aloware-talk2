@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import routes from './routes'
 import VueGtagEsm from 'vue-gtag'
 Vue.use(VueRouter)
+import * as storage from 'src/plugins/helpers/storage'
 
 // This listener will execute before router.beforeEach only if registered
 // before vue-router is registered with Vue.use(VueRouter)
@@ -39,10 +40,15 @@ export default function ({ store }) {
     next()
     const record = to.matched.find(record => record.meta.title)
     const documentTitle = { data: '' }
+
     if (record) {
       documentTitle.data = (record.meta.title || '')
     }
-    document.title = documentTitle.data + ' - Aloware Talk'
+
+    const statics = storage.local.getItem('statics')
+    const whiteLabelText = statics.whitelabel ? `${statics.name} ` : 'Aloware '
+
+    document.title = `${documentTitle.data} - ${whiteLabelText}Talk`
   })
 
   Router.afterEach((to, from) => {

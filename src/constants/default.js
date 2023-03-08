@@ -209,5 +209,20 @@ export const DEFAULT_STATE = {
   notificationAudio: null,
   loadingParkedCalls: false,
   parkedCalls: [],
-  suspended: false
+  suspended: false,
+  showProFeatureDialog: false,
+  leadSources: [],
+  statics: {
+    domain: null,
+    favicon: null,
+    host: null,
+    logo: null,
+    logo_inverse: null,
+    logo_square: null,
+    logo_square_inverse: null,
+    name: null,
+    path: null,
+    referer: null,
+    whitelabel: false
+  }
 }

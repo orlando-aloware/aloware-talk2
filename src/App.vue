@@ -15,7 +15,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-if="authenticated && profile && profile.enabled"></custom-scripts>
-    <intercom v-if="authenticated && profile && profile.enabled"></intercom>
+    <intercom v-if="authenticated && profile && profile.enabled && !statics.whitelabel"></intercom>
   </div>
 </template>
 <script>
@@ -27,11 +27,13 @@ import CustomScripts from 'components/custom-scripts'
 
 export default {
   name: 'App',
+
   components: {
     Intercom,
     CustomScripts,
     ActionNotification
   },
+
   data () {
     return {
       cookieValidated: false,
@@ -39,13 +41,18 @@ export default {
       fullstoryOrgId: process.env.FULLSTORY_ORG_ID
     }
   },
+
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
+
+    ...mapState(['statics']),
+
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
       return Number(urlParams.get('from_classic'))
     }
   },
+
   created () {
     // proceed to cookie validation if account is talk allowed access
     this.getSharedCookie().then(sharedCookie => {
@@ -62,6 +69,7 @@ export default {
       this.setDefaultIsShortenedUrlRemembered()
     }
   },
+
   mounted () {
     // if account is not allowed to access talk, we need to logout
     if (this.profile && !this.profile.company.talk_enabled) {
@@ -131,11 +139,13 @@ export default {
       }
     })
   },
+
   watch: {
     authenticated () {
       this.setFullStory()
     }
   },
+
   methods: {
     async validateCookieUser () {
       if (this.sharedCookie) {
@@ -149,6 +159,7 @@ export default {
         this.cookieValidated = true
       }
     },
+
     async cookieUserValidated ({ data: { data } }) {
       const {
         usage,
@@ -167,6 +178,7 @@ export default {
         location.href = '/'
       }
     },
+
     logout () {
       this.logoutUser().then((res) => {
         this.setFullStory()
@@ -178,6 +190,7 @@ export default {
         console.log(err)
       })
     },
+
     fullStoryIdentify (profile) {
       // Sanity check: verify if user is really there
       if (!profile) {
@@ -201,6 +214,7 @@ export default {
         })
       })
     },
+
     // identify or anonymize user
     setFullStory () {
       // Identify user on fullstory
@@ -214,22 +228,27 @@ export default {
       }
       this.$FullStory.anonymize()
     },
+
     ...mapActions('auth', {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
       getSharedCookie: 'getSharedCookie',
       clearUser: 'clear'
     }),
+
     ...mapActions('cache', [
       'setCurrentCompany'
     ]),
+
     ...mapActions([
       'resetVuex',
       'setUsage'
     ]),
+
     ...mapActions('inbox', [
       'setDefaultShowMyContacts'
     ]),
+
     ...mapActions('contacts', [
       'setDefaultIsShortenedUrlRemembered'
     ])

@@ -14,7 +14,8 @@
     <div class="contact-details-wrapper">
       <div class="details-component-container"
            ref="detailsComponentContainer">
-        <contact-info></contact-info>
+        <contact-info :campaign-id="campaignId">
+        </contact-info>
         <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
                           :contact="contact">
         </contact-sequence>
@@ -70,6 +71,12 @@ import {
 export default {
   name: 'contact-details',
 
+  props: {
+    campaignId: {
+      required: true
+    }
+  },
+
   mixins: [
     contactMixin,
     contactV2AttributesMixin,
@@ -113,6 +120,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setContact', 'updateChangedContactProperties']),
+
     onNotesInput (value) {
       this.updateChangedContactProperties({
         name: 'notes',

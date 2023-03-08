@@ -861,6 +861,9 @@ body,
   z-index: 1 !important;
 }
 
+.z-index-9999 {
+  z-index: 9999 !important;
+}
 
 .badge-tag {
   font-size: $f-size-body-sm;
@@ -4501,6 +4504,10 @@ i.option-separator {
   div.img-box.default-card-animation {
     cursor: pointer;
   }
+}
+
+.mx-height-600 {
+  max-height: 600px !important;
 }
 
 .mx-height-500 {
@@ -12342,4 +12349,41 @@ h1.contact-list-name-label {
 
 .pe-none {
   pointer-events: none;
+}
+
+#ss-messenger-button {
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  pointer-events: none;
+  height: 49px;
+  overflow: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.new-car-container {
+  width: 600px;
+  max-width: 600px;
+  max-height: 576px;
+  height: 576px;
+
+  .container-cars {
+    overflow-y: scroll;
+    max-height: 400px;
+  }
+
+  .infinite-scroll-loading {
+    height: 50px;
+  }
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.vh-100 {
+  height: 100vh;
 }

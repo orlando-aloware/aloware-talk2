@@ -67,7 +67,7 @@
 
         <header-help></header-help>
 
-        <q-item>
+        <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
             <b-link class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
                     target="_blank"
@@ -206,10 +206,12 @@ export default {
       type: String,
       default: ''
     },
+
     noPadding: {
       type: Boolean,
       default: false
     },
+
     titleOnly: {
       type: Boolean,
       default: false
@@ -231,6 +233,7 @@ export default {
       'authenticated',
       'profile'
     ]),
+
     ...mapState('contacts', [
       'selectedList',
       'pinnedListsLoaded',
@@ -240,20 +243,24 @@ export default {
       'previousListFilters',
       'previousListId'
     ]),
+
     ...mapState('inbox', [
       'inboxShowMyContacts',
       'isInboxFiltersLoaded',
       'isGettingTasksList',
       'isFetchingContacts'
     ]),
+
     ...mapState('stats', [
       'metricLoader',
       'groupMetricLoader'
     ]),
+
     ...mapState([
       'dialer',
       'dialerFormStatus',
-      'isMobile'
+      'isMobile',
+      'statics'
     ]),
 
     isDialerReady () {
@@ -443,12 +450,15 @@ export default {
       'setMetricGroups',
       'setMetricLoader'
     ]),
+
     ...mapActions('contacts', [
       'updateContactsListFilter'
     ]),
+
     ...mapActions('inbox', [
       'setInboxShowMyContacts'
     ]),
+
     ...mapActions(['setDialerFormStatus'])
   },
 

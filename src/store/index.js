@@ -37,6 +37,7 @@ export default function (/* { ssrContext } */) {
       settings,
       cache
     },
+
     state: {
       showMenu: false,
       filter: {},
@@ -250,7 +251,20 @@ export default function (/* { ssrContext } */) {
       parkedCalls: [],
       suspended: false,
       showProFeatureDialog: false,
-      leadSources: []
+      leadSources: [],
+      statics: {
+        domain: null,
+        favicon: null,
+        host: null,
+        logo: null,
+        logo_inverse: null,
+        logo_square: null,
+        logo_square_inverse: null,
+        name: null,
+        path: null,
+        referer: null,
+        whitelabel: false
+      }
     },
 
     getters: {
@@ -715,32 +729,45 @@ export default function (/* { ssrContext } */) {
       removeReminderNotifiedDesktop ({ commit }, value) {
         commit('REMOVE_REMINDER_NOTIFIED_DESKTOP', value)
       },
+
       setDefaultDateFilter ({ commit }, value) {
         commit('SET_DEFAULT_DATE_FILTER', value)
       },
+
       setNotificationAudio ({ commit }) {
         commit('SET_NOTIFICATION_AUDIO')
       },
+
       setLoadingParkedCalls ({ commit }, value) {
         commit('SET_LOADING_PARKED_CALLS', value)
       },
+
       setParkedCalls ({ commit }, communications) {
         commit('SET_PARKED_CALLS', communications)
       },
+
       addParkedCall ({ commit }, communication) {
         commit('ADD_PARKED_CALL', communication)
       },
+
       removeParkedCall ({ commit }, communicationId) {
         commit('REMOVE_PARKED_CALL', communicationId)
       },
+
       setSuspended ({ commit }, value) {
         commit('SET_SUSPENDED', value)
       },
+
       toggleProFeatureDialog ({ commit }, value) {
         commit('TOGGLE_PRO_FEATURE_DIALOG', value)
       },
+
       setLeadSources ({ commit }, leadSources) {
         commit('SET_LEAD_SOURCES', leadSources)
+      },
+
+      setStatics ({ commit }, statics) {
+        commit('SET_STATICS', statics)
       }
     },
 
@@ -1224,15 +1251,18 @@ export default function (/* { ssrContext } */) {
       SET_PREV_ROUTE (state, data) {
         state.prevRoute = data
       },
+
       SET_CURRENT_ROUTE (state, data) {
         state.currentRoute = data
       },
+
       SET_BREADCRUMBS: (state, data) => {
         state.breadcrumbs = {
           crumbs: data.crumbs,
           name: data.name
         }
       },
+
       SET_DIALER_FORM_STATUS (state, value) {
         state.dialerFormStatus = value
       },
@@ -1240,6 +1270,7 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_CALL_FISHING (state, payload) {
         state.dialer.callFishing = payload
       },
+
       SET_IS_MOBILE (state, value) {
         state.isMobile = value
       },
@@ -1428,6 +1459,10 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
+      },
+
+      SET_STATICS (state, statics) {
+        state.statics = statics
       },
 
       updateField
