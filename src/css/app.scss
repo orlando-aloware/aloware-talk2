@@ -12432,7 +12432,7 @@ h1.contact-list-name-label {
     flex-direction: column;
     flex-wrap: wrap;
 
-    &__content {
+    .overview {
       height: 550px;
       width: calc(100% - 40px);
       margin: 20px;
@@ -12473,23 +12473,21 @@ h1.contact-list-name-label {
         }
       }
 
-      .overview {
-        &__card {
-          border: 1px solid $grey-60;
-          border-radius: 10px;
+      &__card {
+        border: 1px solid $grey-60;
+        border-radius: 10px;
+        display: flex;
+        padding: 20px;
+
+        &__body {
           display: flex;
-          padding: 20px;
+          flex-direction: column;
+          flex-grow: 1;
+          justify-content: center;
 
-          &__body {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: center;
-
-            &__value {
-              font-size: 22px;
-              font-weight: bold;
-            }
+          &__value {
+            font-size: 22px;
+            font-weight: bold;
           }
         }
       }

@@ -1,6 +1,6 @@
 <template>
   <div class="wallboard__body">
-    <div :class="['wallboard__body__content', `wallboard__body__content--${viewMode}`]">
+    <div :class="['overview', `overview--${viewMode}`]">
       <wallboard-overview-card :value="item.value"
                                :description="item.name"
                                :icon="item.icon"
