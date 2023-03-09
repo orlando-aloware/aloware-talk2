@@ -70,22 +70,40 @@
             </div>
           </div>
         </div>
-        <div class="px-3 d-inline-flex"
-             v-if="!isMyContactsView && !isTabletOrMobile && $route.params.id !== 'unassigned'">
-          <label class="text-primary mr-2 mt-2 cursor-pointer"
-                 :class="{ disabled: isLoading }">My Contacts</label>
-          <b-form-checkbox
-            id="my-contacts"
-            class="mt-2 cursor-pointer"
-            name="check-button"
-            size="sm"
-            switch
-            :class="{ disabled: isLoading }"
-            :disabled="isLoading"
-            v-model="myContacts"
-            @change="onFetchMyContacts"
-          >
-          </b-form-checkbox>
+        <div class="px-3 d-flex">
+          <div class="d-inline-flex"
+               v-if="!isMyContactsView && !isTabletOrMobile && $route.params.id !== 'unassigned'">
+            <label class="text-primary mr-2 mt-2 cursor-pointer"
+                   style="min-width: 84px;"
+                   :class="{ disabled: isLoading }">
+              My Contacts
+            </label>
+            <b-form-checkbox
+              id="my-contacts"
+              class="mt-2 cursor-pointer"
+              name="check-button"
+              size="sm"
+              switch
+              :class="{ disabled: isLoading }"
+              :disabled="isLoading"
+              v-model="myContacts"
+              @change="onFetchMyContacts"
+            >
+            </b-form-checkbox>
+          </div>
+          <div>
+            <compact-btn borderless
+                         variant="outlined-light"
+                         customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                         v-if="isSimpsocial"
+                         @clicked="onMessengerClick">
+              <iframe id="ss-messenger-button"
+                      frameborder="0"
+                      style=""
+                      :src="simpsocialMessengerIframeLink">
+              </iframe>
+            </compact-btn>
+          </div>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
@@ -697,7 +715,8 @@ import {
   timezoneCheckMixin,
   aclMixin,
   viewMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
@@ -709,7 +728,8 @@ export default {
     timezoneCheckMixin,
     aclMixin,
     viewMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    simpsocialMixin
   ],
 
   inject: [
@@ -1368,10 +1388,18 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
+    },
+
+    onMessengerClick () {
+      this.$router.push({
+        name: 'Messenger'
+      })
     }
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     ...mapState('contacts', [
       'folders',
       'showContactsListSidebar',
@@ -1556,11 +1584,16 @@ export default {
     isFilterHasChanges () {
       return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
     },
+
     isDisabledSaveFilter () {
       return !this.isFilterHasChanges ||
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         this.list.show_in_public_folder
+    },
+
+    simpsocialMessengerIframeLink () {
+      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
     }
   },
 

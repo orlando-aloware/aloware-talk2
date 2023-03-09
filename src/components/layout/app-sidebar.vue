@@ -1,13 +1,21 @@
 <template>
   <div class="d-flex align-items-start flex-column h-100 w-100">
     <div class="w-100">
-      <q-btn :icon="appLogo"
-             size="1.1rem"
+      <q-btn size="1.1rem"
              align="center"
              to="/"
              class="app-logo w-100 p-2"
-             flat>
+             flat
+             :icon="appLogo"
+             v-if="staticsLoaded">
       </q-btn>
+      <div class="w-100 d-flex align-items-center justify-center px-1 flex-column"
+           style="height: 61px;"
+           v-else>
+        <q-spinner-bars color="white"
+                        size="18px">
+        </q-spinner-bars>
+      </div>
     </div>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
@@ -190,6 +198,192 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn :to="{ name: 'Messenger' }"
+           :ripple="false"
+           icon="img:app-icons/menu/messenger_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Messenger')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Messenger</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Messenger' }"
+           :ripple="false"
+           icon="img:app-icons/menu/messenger_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Messenger')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Messenger</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'DMS Equity' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dms_equity_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('DMS Equity')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">DMS Equity</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'DMS Equity' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dms_equity_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('DMS Equity')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">DMS Equity</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'Digital Lead War' }"
+           :ripple="false"
+           icon="img:app-icons/menu/digital_lead_war_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Digital Lead War')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Digital Lead War</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Digital Lead War' }"
+           :ripple="false"
+           icon="img:app-icons/menu/digital_lead_war_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Digital Lead War')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Digital Lead War</span>
+      </q-tooltip>
+    </q-btn>
+
+    <q-btn :to="{ name: 'Email Blast' }"
+           :ripple="false"
+           icon="img:app-icons/menu/email_blast_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Email Blast')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Email Blast</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Email Blast' }"
+           :ripple="false"
+           icon="img:app-icons/menu/email_blast_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Email Blast')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Email Blast</span>
+      </q-tooltip>
+    </q-btn>
+
+    <!--q-btn :to="{ name: 'Sold Report' }"
+           :ripple="false"
+           icon="img:app-icons/menu/sold_report_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Sold Report')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Sold Report</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Sold Report' }"
+           :ripple="false"
+           icon="img:app-icons/menu/sold_report_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Sold Report')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Sold Report</span>
+      </q-tooltip>
+    </q-btn-->
+
+    <!--q-btn :to="{ name: 'Dealer Profile' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dealer_profile_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Dealer Profile')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Dealer Profile</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ name: 'Dealer Profile' }"
+           :ripple="false"
+           icon="img:app-icons/menu/dealer_profile_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Dealer Profile')"
+           v-if="isSimpSocialIntegrationEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Dealer Profile</span>
+      </q-tooltip>
+    </q-btn-->
+
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_active.svg"
@@ -238,6 +432,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-sidebar',
@@ -247,6 +442,7 @@ export default {
       required: false,
       type: Boolean
     },
+
     xmasEnabled: {
       type: Boolean,
       required: false,
@@ -254,18 +450,30 @@ export default {
     }
   },
 
+  mixins: [simpsocialMixin],
+
   computed: {
     ...mapState('auth', ['profile']),
+
+    ...mapState(['statics', 'staticsLoaded']),
+
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
+
     envName () {
       return storage.local.getItem('env')
     },
+
     appLogo () {
-      return this.xmasEnabled
-        ? 'img:app-icons/menu/xmas/logo_white.svg'
-        : 'img:app-icons/menu/logo_white.svg'
+      switch (true) {
+        case this.statics.whitelabel:
+          return `img:${this.statics.logo_square.replace(/\//, '')}` // replace first occurrence of '/'
+        case this.xmasEnabled:
+          return 'img:app-icons/menu/xmas/logo_white.svg'
+        default:
+          return 'img:app-icons/menu/logo_white.svg'
+      }
     }
   },
 
@@ -305,6 +513,7 @@ export default {
     },
 
     ...mapActions(['toggleProFeatureDialog']),
+
     ...mapActions('auth', ['logout'])
   },
 
