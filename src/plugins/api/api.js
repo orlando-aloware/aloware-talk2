@@ -363,8 +363,12 @@ export default {
       }
     },
     statics: {
-      get () {
-        return window.axios.get('/get-statics')
+      get (companyId) {
+        return window.axios.get('/get-statics', {
+          params: {
+            company_id: companyId
+          }
+        })
       }
     },
     library: {
