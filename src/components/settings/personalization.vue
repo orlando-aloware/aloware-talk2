@@ -30,7 +30,7 @@
                     </span>
                     <span class="d-flex mb-2"
                           v-else>
-                      By default, Aloware sets all users' statuses to 'Offline' after they login or have 5 minutes of app inactivity
+                      By default, we set all users' statuses to 'Offline' after they login or have 5 minutes of app inactivity
                     </span>
                     <span class="d-flex font-weight-bold">Turning on 'Force Users to Always Available' Setting:</span>
                     <ul class="mb-0">
