@@ -21,7 +21,8 @@
       </form>
     </div>
     <div class="d-flex justify-content-between">
-      <message-composer-options @templateSelected="templateSelected"
+      <message-composer-options :campaign-id="campaignId"
+                                @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
       <div>
         <q-btn color="primary"
@@ -50,28 +51,43 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'message-composer-email',
+
+  props: {
+    campaignId: {
+      required: false
+    }
+  },
+
   components: { MessageComposerOptions, SmsTemplateModal },
+
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
+
     ...mapState('auth', ['profile']),
+
     validEmail () {
       return (this.messageComposer.email.body && this.messageComposer.email.body.trim().length > 0) && (this.messageComposer.email.subject && this.messageComposer.email.subject.trim().length > 0)
     },
+
     isSubjectValid () {
       return this.messageComposer.email.subject.length > 2
     }
   },
+
   data () {
     return {
       isSending: false,
       message: ''
     }
   },
+
   methods: {
     ...mapActions('contacts', ['setMessageComposerEmailBody', 'resetMessageComposerEmail']),
+
     updateMessage (value) {
       this.setMessageComposerEmailBody(value)
     },
+
     formatMessage () {
       return {
         campaign_id: this.selectedLine.id,
@@ -80,6 +96,7 @@ export default {
         subject: this.messageComposer.email.subject
       }
     },
+
     onSend () {
       this.isSending = true
 
@@ -99,9 +116,11 @@ export default {
         this.isSending = false
       })
     },
+
     templateSelected (template) {
       this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + template.body)
     },
+
     variableSelected (variable) {
       this.setMessageComposerEmailBody((this.messageComposer.email.body ?? '') + ' ' + variable)
       this.focusEmailBody()
@@ -111,6 +130,7 @@ export default {
       this.$refs.emailMessageBody.focus()
     }
   },
+
   mounted () {
     if (this.messageComposer.mode === 'email') {
       this.focusEmailBody()

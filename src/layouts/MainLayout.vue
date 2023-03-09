@@ -127,8 +127,9 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-blue">
+                          class="bg-white">
             <q-btn label="Close"
+                   text-color="blue"
                    v-close-popup flat>
             </q-btn>
           </q-card-actions>
@@ -150,7 +151,7 @@
           <q-card-actions align="right"
                           class="bg-white">
             <q-btn label="Close"
-                   text-color="red"
+                   text-color="blue"
                    v-close-popup flat>
             </q-btn>
             <q-btn label="Quit"
@@ -176,8 +177,13 @@
           </q-card-section>
 
           <q-card-actions align="right"
-                          class="bg-white text-green-7">
+                          class="bg-white">
+            <q-btn label="Close"
+                   text-color="blue"
+                   v-close-popup flat>
+            </q-btn>
             <q-btn label="Restart"
+                   text-color="green-7"
                    @click="restartApp"
                    flat>
             </q-btn>
@@ -258,6 +264,7 @@ import {
   TYPE_EXPORT_CONTACT_LIST_ITEMS
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'MyLayout',
@@ -1036,6 +1043,11 @@ export default {
             this.showRefreshButton = true
           })
         }
+
+        if (this.isGuest) {
+          this.getStatics()
+        }
+
         this.loading = false
         this.authCheckStatus = false
       })
@@ -1277,6 +1289,7 @@ export default {
       }
 
       this.getTimezones()
+      this.getStatics()
 
       this.initAccount().then(() => {
         this.loading = false
@@ -2222,6 +2235,25 @@ export default {
         })
     },
 
+    getStatics (repeatTimes = 0) {
+      this.setStaticsLoaded(false)
+      talk2Api.V1.statics.get(this.currentCompany.id)
+        .then(res => {
+          this.setStatics(res.data)
+          storage.local.setItem('statics', JSON.stringify(res.data))
+          this.setStaticsLoaded(true)
+        }).catch(err => {
+          console.log(err)
+
+          if (repeatTimes >= 3) {
+            this.$handleErrors(err.response)
+            return
+          }
+
+          this.getStatics(repeatTimes + 1)
+        })
+    },
+
     goAvailable () {
       this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
       this.$bvModal.hide('missed-call-modal')
@@ -2317,7 +2349,9 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
-      'updateUserStatus'
+      'updateUserStatus',
+      'setStatics',
+      'setStaticsLoaded'
     ]),
     ...mapActions('contacts', [
       'resetSearch',

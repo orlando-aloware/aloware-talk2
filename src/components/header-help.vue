@@ -1,7 +1,7 @@
 <template>
   <q-item class="header-help-wrapper">
     <q-item-section class="nav-item dropdown"
-                    v-if="!whitelabel && !loading_whitelabel && !isMobileSize">
+                    v-if="statics.name && !statics.whitelabel && !isMobileSize">
       <q-btn-dropdown class="tab-dropdown"
                       ref="menu"
                       flat
@@ -41,53 +41,38 @@
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
 import * as Roles from 'src/constants/roles'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   data () {
     return {
       env: null,
       branch: null,
-      whitelabel: false,
-      loading_whitelabel: true,
-      window_size: null,
+      windowSize: null,
       Roles
     }
   },
 
   created () {
     // initialize window width size
-    this.window_size = window.screen.width
+    this.windowSize = window.screen.width
 
     // Add listener to window resize
     window.addEventListener('resize', this.windowResize)
-
-    this.getWhitelabelStatus()
   },
 
   computed: {
     ...mapGetters('auth', ['user']),
+    ...mapState(['statics']),
     isMobileSize () {
-      return this.window_size <= 425
+      return this.windowSize <= 425
     }
   },
 
   methods: {
-    getWhitelabelStatus () {
-      this.loading_whitelabel = true
-      talk2Api.V1.statics.get().then(res => {
-        this.whitelabel = res.data.whitelabel
-        this.loading_whitelabel = false
-      }).catch(err => {
-        console.log(err)
-        this.loading_whitelabel = false
-        this.$handleErrors(err.response)
-      })
-    },
     windowResize () {
-      this.window_size = window.screen.width
+      this.windowSize = window.screen.width
     },
     noClose (event) {
       if (event) {
@@ -97,7 +82,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>

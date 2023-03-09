@@ -89,7 +89,7 @@
     <div class="d-inline-flex flex-wrap contact-action-button">
       <b-button variant="light"
                 size="sm"
-                class="custom-action-button"
+                class="custom-action-button my-1"
                 @click="callContact">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
@@ -101,7 +101,7 @@
       <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 variant="light"
                 size="sm"
-                class="custom-action-button"
+                class="custom-action-button my-1"
                 :disabled="isProcessingBlock"
                 @click="blockContact">
         <q-tooltip anchor="bottom middle"
@@ -119,7 +119,7 @@
       <b-button v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 variant="light"
                 size="sm"
-                class="custom-action-button"
+                class="custom-action-button my-1"
                 :disabled="isProcessingBlock"
                 @click="unBlockContact">
         <q-tooltip anchor="bottom middle"
@@ -134,12 +134,12 @@
         </i>
       </b-button>
 
-      <contact-dnc-actions class="mr-2"
+      <contact-dnc-actions class="mr-2 my-1"
                            :contact="contact"></contact-dnc-actions>
 
       <b-button variant="light"
                 size="sm"
-                class="custom-action-button"
+                class="custom-action-button my-1"
                 :disabled="contact.is_dnc"
                 @click="openAppointmentModal">
         <q-tooltip anchor="bottom middle"
@@ -150,7 +150,7 @@
       </b-button>
       <b-button variant="light"
                 size="sm"
-                class="custom-action-button"
+                class="custom-action-button my-1"
                 :disabled="contact.is_dnc"
                 @click="openAddReminderModal">
         <q-tooltip anchor="bottom middle"
@@ -161,13 +161,37 @@
       </b-button>
       <b-button variant="light"
                 size="sm"
-                class="custom-action-button"
+                class="custom-action-button my-1"
                 @click="openPowerDialerModal">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add to power dialer
         </q-tooltip>
         <add-call-icon></add-call-icon>
+      </b-button>
+      <b-button variant="light"
+                size="sm"
+                class="custom-action-button my-1"
+                :disabled="!isSimpSocialIntegrationEnabled"
+                v-if="isSimpsocial"
+                @click="openEmailBlast">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle">
+          Email
+        </q-tooltip>
+        <email-icon width="16" />
+      </b-button>
+      <b-button variant="light"
+                size="sm"
+                class="custom-action-button my-1"
+                :disabled="isVideoConferenceLinkSending"
+                v-if="isSimpsocial"
+                @click="openVideoConference">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle">
+          Video Conference
+        </q-tooltip>
+        <video-conference-icon width="16"/>
       </b-button>
     </div>
     <appointment-form-modal :contact="contact"></appointment-form-modal>
@@ -189,18 +213,31 @@ import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import * as CompanyImportance from 'src/constants/importance-label'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
+import EmailIcon from 'components/icons/email-icon'
+import VideoConferenceIcon from 'components/icons/video-conference-icon'
 
 export default {
   name: 'contact-info',
 
-  mixins: [aclMixin],
+  props: {
+    campaignId: {
+      required: true
+    }
+  },
+
+  mixins: [
+    aclMixin,
+    simpsocialMixin
+  ],
 
   components: {
+    VideoConferenceIcon,
+    EmailIcon,
     ContactDncActions,
     DigitalClock,
     ContactAddReminderModal,
@@ -217,8 +254,15 @@ export default {
 
   computed: {
     ...mapState(['isMobile']),
+
     ...mapState('cache', ['currentCompany']),
-    ...mapGetters('contacts', ['contact', 'isContactNameEditOpen', 'contactPhoneNumbers', 'changingSelectedContact']),
+
+    ...mapGetters('contacts', [
+      'contact',
+      'isContactNameEditOpen',
+      'contactPhoneNumbers',
+      'changingSelectedContact'
+    ]),
 
     contactName () {
       if (this.contact) {
@@ -244,12 +288,14 @@ export default {
       showEditForm: false,
       isProcessingDNC: false,
       isProcessingBlock: false,
+      isVideoConferenceLinkSending: false,
       CompanyImportance
     }
   },
 
   methods: {
     ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'addReminderOpen', 'addPowerDialerOpen']),
+
     ...mapActions(['setShowPhone']),
 
     openAddReminderModal () {
@@ -262,6 +308,30 @@ export default {
 
     openPowerDialerModal () {
       this.addPowerDialerOpen(true)
+    },
+
+    openEmailBlast () {
+      this.$router.push({
+        name: 'Email Blast',
+        params: {
+          id: this.contact.id
+        }
+      })
+    },
+
+    openVideoConference () {
+      if (this.isVideoConferenceLinkSending) {
+        return
+      }
+
+      this.isVideoConferenceLinkSending = true
+      talk2Api.V1.integrations.simpsocial.videoConference.send(this.contact.id, this.campaignId)
+        .then(res => {
+          this.isVideoConferenceLinkSending = false
+        }).catch(err => {
+          this.isVideoConferenceLinkSending = false
+          this.$handleErrors(err.response)
+        })
     },
 
     onOpenEditForm () {
