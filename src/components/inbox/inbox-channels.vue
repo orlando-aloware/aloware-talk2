@@ -730,12 +730,15 @@ export default {
       if (this.campaignId) {
         this.filter.campaign_id = this.campaignId
       }
+
       if (this.ringGroupId) {
         this.filter.ring_group_id = this.ringGroupId
       }
+
       if (this.userId) {
         this.filter.user_id = this.userId
       }
+
       if (this.workflowId) {
         this.filter.workflow_id = this.workflowId
       }
