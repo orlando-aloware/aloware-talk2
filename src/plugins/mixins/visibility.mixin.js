@@ -10,7 +10,7 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 export default {
   data () {
     return {
-      searchFields: ['contacts.phone_number', 'contacts.name']
+      searchFields: ['contact.phone_number', 'contact.name']
     }
   },
 
