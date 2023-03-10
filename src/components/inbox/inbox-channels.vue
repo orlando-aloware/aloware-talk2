@@ -832,6 +832,7 @@ export default {
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
+
       return api.data.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {
@@ -850,11 +851,12 @@ export default {
         }).catch(thrown => {
           if (window.axios.isCancel(thrown) && thrown) {
             console.log('Request canceled', thrown.message)
-          } else {
-            this.gettingTasksList(false)
-            this.communicationsListHasError = true
-            this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
+            return
           }
+
+          this.gettingTasksList(false)
+          this.communicationsListHasError = true
+          this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
         })
     },
 
@@ -934,6 +936,7 @@ export default {
 
     onTaskListBottomScroll () {
       clearTimeout(this.scrollTimeout)
+
       // Set a timeout to run after scrolling ends
       this.scrollTimeout = setTimeout(() => {
         // Run the callback
@@ -993,6 +996,7 @@ export default {
       if (this.mentionType === MentionType.TYPE_SENT) {
         this.filter.mentioned_user_id = this.mentionUserId
       }
+
       this.getCommunications(this.filter)
     },
 
@@ -1038,7 +1042,7 @@ export default {
     },
 
     onSearch (value) {
-      this.searchText = value
+      this.searchText = value.trim()
       console.trace('onSearch:', this.searchText)
     },
 
@@ -1054,11 +1058,13 @@ export default {
 
     onSearchClosed () {
       this.searchText = null
+
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
         this.filter.cursor = null
       }
+
       this.filter.search_text = this.searchText
       this.isSearch = false
       this.getCommunications(this.filter)
@@ -1149,6 +1155,7 @@ export default {
       }
 
       this.filter.search_text = value
+
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
