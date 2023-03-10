@@ -721,6 +721,7 @@ export default {
       this.filter.search_text = this.searchText
       this.filter.search_fields = this.searchFields
       this.filter.per_page = 20
+
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
