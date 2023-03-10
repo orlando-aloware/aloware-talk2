@@ -237,7 +237,7 @@ export default {
     getPipedriveFilters () {
       talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
         this.isLoading = false
-        this.lists.push(...response)
+        this.lists.push(...response.data)
       }).catch((err) => {
         this.isLoading = false
         this.$handleErrors(err.response)
