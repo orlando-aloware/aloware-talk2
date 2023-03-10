@@ -170,7 +170,9 @@ export default {
 
   computed: {
     ...mapGetters('auth', ['profile']),
+
     ...mapState('cache', ['currentCompany']),
+
     ...mapState(['ringGroups'])
   },
 
@@ -205,6 +207,7 @@ export default {
     getRingGroup (id) {
       return this.ringGroups.find(item => item.id === id)
     },
+
     getRingGroupName (id) {
       const ringGroup = this.getRingGroup(id)
 
