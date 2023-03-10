@@ -36,7 +36,6 @@ export { default as unownedContactTaskMixin } from './unowned-contact-task.mixin
 export { default as contactsListFiltersMixin } from './contacts-list-filters.mixin'
 export { default as addViewMixin } from './add-view.mixin'
 export { default as contactV2AttributesMixin } from './contact-v2-attributes.mixin'
-export { default as integrationMixin } from './integration.mixin'
 export { default as resellerMixin } from './reseller.mixin'
 export { default as simpsocialMixin } from './simpsocial.mixin'
 export { default as guestFormsMixin } from './guest-forms.mixin'
