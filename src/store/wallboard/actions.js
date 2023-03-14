@@ -43,6 +43,27 @@ export default {
     }
   },
 
+  /**
+   * Fetch users
+   */
+  async fetchUsers ({ commit, state }) {
+    try {
+      if (state.isUsersLoading) {
+        return
+      }
+
+      commit('SET_USERS_LOADING', true)
+
+      const response = await API.V2.users.get()
+
+      commit('SET_USERS', response.data)
+      commit('SET_USERS_LOADING', false)
+    } catch (err) {
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
   setFilter ({ commit }, { filter, value }) {
     commit('SET_FILTER', { filter, value })
   },
@@ -54,7 +75,7 @@ export default {
 
     commit('SET_VIEW_MODE', mode)
   }
-  // fetchUsers
+
   // fetchQueuedCalls
   // fetchLiveCalls
   // fetchParkedCalls

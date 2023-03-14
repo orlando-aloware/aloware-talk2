@@ -413,6 +413,11 @@ export default {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
       }
+    },
+    users: {
+      get (params) {
+        return window.axios.get(`${suffixV2}users`, { params })
+      }
     }
   }
 }

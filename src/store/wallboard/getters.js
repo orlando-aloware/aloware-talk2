@@ -1,12 +1,8 @@
 import { getField } from 'vuex-map-fields'
 
 export default {
-  getUsers: (state) => {
-    return state.users
-  },
-
-  getQueuedCalls: (state) => {
-    return state.calls.queued
+  getFilters: (state) => {
+    return state.filters
   },
 
   getLiveCalls: (state) => {
@@ -17,8 +13,8 @@ export default {
     return state.calls.parked
   },
 
-  getFilters: (state) => {
-    return state.filters
+  getQueuedCalls: (state) => {
+    return state.calls.queued
   },
 
   getSummary: (state) => {
@@ -27,6 +23,11 @@ export default {
 
   getViewMode: (state) => {
     return state.viewMode
+  },
+
+  getUsers: (state) => {
+    // return only valid users to be used
+    return state.users.filter(user => !user.is_destination && !user.read_only_access && user.enabled && user.active)
   },
 
   getField
