@@ -279,6 +279,7 @@ export default {
         integration: this.integrationName
       }
 
+      // When the payload is an array, instead of a single value
       if (typeof value !== 'object') {
         payload.list = this.options.filter(option => option.id === value)[0]
       }
