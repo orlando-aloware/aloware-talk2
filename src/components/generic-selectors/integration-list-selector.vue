@@ -216,9 +216,9 @@ export default {
         this.lists.push(...result.lists)
         if (result.has_more) {
           return this.getHubspotLists(result.offset)
-        } else {
-          this.isLoading = false
         }
+
+        this.isLoading = false
       }).catch((err) => {
         this.isLoading = false
         this.$handleErrors(err.response)
