@@ -12492,6 +12492,22 @@ h1.contact-list-name-label {
         }
       }
     }
+
+    .users {
+      &__header {
+
+      }
+
+      &__table {
+        &--comfort {
+
+        }
+  
+        &--compact {
+  
+        } 
+      }
+    }
   }
 
   .q-basic-selector {
