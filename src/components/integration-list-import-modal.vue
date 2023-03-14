@@ -99,9 +99,11 @@ export default {
     ...mapState('contacts', [
       'isAddPowerDialerOpen'
     ]),
+
     getTitle () {
       return 'Import From Integration'
     },
+
     powerDialerParams () {
       return {
         target: this.list.listId || this.list.id,
@@ -119,10 +121,12 @@ export default {
         this.$emit('close', data)
       }
     },
+
     onListSelectorChange (payload) {
       this.list = payload.list
       this.integration = payload.integration
     },
+
     onSubmit () {
       this.addPowerDialerOpen(true)
     },

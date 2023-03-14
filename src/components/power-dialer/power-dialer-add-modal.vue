@@ -356,6 +356,7 @@ export default {
           }
         })
     },
+
     importFromIntegration () {
       switch (this.integrationName) {
         case 'HubSpot':
@@ -366,6 +367,7 @@ export default {
           return this.addZohoView()
       }
     },
+
     importFromHubspot () {
       // remove target and size from params
       let target = this.params.target
@@ -385,6 +387,7 @@ export default {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
         })
     },
+
     addZohoView () {
       // remove target and size from params
       let target = this.params.target
@@ -404,6 +407,7 @@ export default {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
         })
     },
+
     addPipedriveFilter () {
       // remove target and size from params
       let target = this.params.target
@@ -423,6 +427,7 @@ export default {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
         })
     },
+
     reloadFolders () {
       return this.$axios
         .get('/api/v2/power-dialer-folders')
@@ -436,6 +441,7 @@ export default {
       return this.$axios
         .get(`${process.env.API_REPORTING_URL}/api/v2/power-dialer-lists/${id}/count`)
     },
+
     checkIntegrationImport () {
       switch (this.integrationName) {
         case 'HubSpot':
@@ -472,6 +478,7 @@ export default {
         this.loading--
       }
     },
+
     async checkHubspotList () {
       this.loading++
 

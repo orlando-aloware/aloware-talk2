@@ -242,6 +242,7 @@ export default {
     isContact () {
       return this.routeName === 'Contacts' && this.isContactModuleType
     },
+
     isIntegrationEnabled () {
       return this.currentCompany &&
           (this.currentCompany.hubspot_integration_enabled ||
@@ -336,10 +337,12 @@ export default {
         contact_folder_id: null
       })
     },
+
     onCreateFromIntegration () {
       this.destroySubmenu()
       this.$emit('openIntegrationListsImportDialog')
     },
+
     onCreateFolderCancel () {
       this.isCreatingFolder = false
     },

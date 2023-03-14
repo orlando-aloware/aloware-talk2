@@ -53,6 +53,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['foldersLoaded']),
+
     onCloseIntegrationImportDialog (data = {}) {
       this.isIntegrationImportDialogOpen = false
 
@@ -60,9 +61,11 @@ export default {
         this.notification = data.notification
       }
     },
+
     onOpenIntegrationImportDialog () {
       this.isIntegrationImportDialogOpen = true
     },
+
     reloadFolders () {
       return this.$axios
         .get('/api/v2/power-dialer-folders')
@@ -72,6 +75,7 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
+
     handleImportFinishedEvent (event) {
       // return if event is for another user
       if (event.user_id !== this.profile.id) {

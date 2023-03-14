@@ -205,6 +205,7 @@ export default {
           return this.getPipedriveFilters()
       }
     },
+
     getHubspotLists (offset = 0) {
       talk2Api.V1.integrations.hubspot.getList({
         params: {
@@ -224,6 +225,7 @@ export default {
         console.log(err)
       })
     },
+
     getZohoViews () {
       talk2Api.V1.integrations.zoho.getViews().then(response => {
         this.isLoading = false
@@ -234,6 +236,7 @@ export default {
         console.log(err)
       })
     },
+
     getPipedriveFilters () {
       talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
         this.isLoading = false
@@ -244,11 +247,13 @@ export default {
         console.log(err)
       })
     },
+
     filterFn (val, update) {
       if (val === '') {
         update(() => {
           this.options = this.sorted
         })
+
         return
       }
 
@@ -267,11 +272,13 @@ export default {
     value () {
       this.selectedId = this.value
     },
+
     selectedId: function (value) {
       let payload = {
         list: value,
         integration: this.integrationName
       }
+
       if (typeof value !== 'object') {
         payload.list = this.options.filter(option => option.id === value)[0]
       }

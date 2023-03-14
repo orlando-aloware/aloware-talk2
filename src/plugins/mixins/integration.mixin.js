@@ -2,9 +2,11 @@ import { mapState } from 'vuex'
 
 export default {
   computed: {
+
     ...mapState('cache', [
       'currentCompany'
     ]),
+
     integrationName () {
       switch (true) {
         case this.currentCompany.hubspot_integration_enabled:
