@@ -35,7 +35,7 @@
                           :value="AppDefaultLogin.APP_ALOWARE_TALK"
                           v-model="user.default_app"
                           @change="onInput">
-              Aloware Talk
+              {{ alowareTalk }}
             </b-form-radio>
           </q-item-section>
         </q-item>
@@ -60,21 +60,26 @@
 <script>
 import TalkFeedbackForm from './forms/talk-feedback-form.vue'
 import talk2Api from 'src/plugins/api/api'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import { aclMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'shared-login-menu',
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin
+  ],
 
   components: { TalkFeedbackForm },
 
   computed: {
     ...mapGetters('auth', ['profile']),
+
+    ...mapState(['statics']),
+
     canSwitchApps () {
       if (this.isAdmin) {
         return true
@@ -82,12 +87,23 @@ export default {
 
       return !this.profile.company.force_talk
     },
+
     alowareClassic () {
+      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
+
       if (this.profile.company.force_talk) {
-        return 'Aloware Admin'
+        return `${whiteLabel}Admin`
       }
 
-      return 'Aloware Classic'
+      return `${whiteLabel} Classic`
+    },
+
+    alowareTalk () {
+      return `${this.statics.name} Talk`
+    },
+
+    whiteLabelText () {
+      return this.statics.whitelabel ? '' : 'Aloware '
     }
   },
 
@@ -104,27 +120,30 @@ export default {
     onGoToClassic () {
       window.location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
     },
+
     updateDefaultLogin () {
       talk2Api.V1.users.setDefaultLogin(this.profile.id, { default_app: this.user.default_app }).then(response => {
         const message = this.user.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC ? 'Classic' : 'Talk'
-        const user = _.cloneDeep(this.user)
+        const user = cloneDeep(this.user)
         this.setProfile(user)
 
-        this.$generalNotification('Default application login has been set to Aloware ' + message + '.')
+        this.$generalNotification(`Default application login has been set to ${this.whiteLabelText}${message}.`)
       }).catch((err) => {
         this.$handleErrors(err.response)
       })
     },
+
     onInput () {
       this.updateDefaultLogin()
     },
+
     toggleFeedbackDialog () {
       this.isFeedbackModalOpen = !this.isFeedbackModalOpen
     }
   },
 
   created () {
-    this.user = _.cloneDeep(this.profile)
+    this.user = cloneDeep(this.profile)
   }
 }
 </script>

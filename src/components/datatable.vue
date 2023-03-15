@@ -163,57 +163,71 @@ export default {
     columns: {
       type: Array
     },
+
     customClass: {
       type: String
     },
+
     customHeaders: {
       type: Array,
       default: () => []
     },
+
     stickyHeaders: {
       type: Boolean,
       default: false
     },
+
     isEmpty: {
       type: Boolean,
       default: false
     },
+
     isLoadingMore: {
       type: Boolean,
       default: false
     },
+
     scrollAreaClass: {
       type: String,
       default: ''
     },
+
     isScrollable: {
       type: Boolean,
       default: true
     },
+
     paginated: {
       type: Boolean,
       default: false
     },
+
     showPagination: {
       type: Boolean,
       default: true
     },
+
     totalRows: {
       type: Number,
       default: 0
     },
+
     currentPage: {
       type: Number,
       default: 1
     },
+
     lastPage: {
       type: Number,
       default: 1
     },
+
     isLoading: {
       type: Boolean,
       default: false
     },
+
     useEmptySlot: {
       type: Boolean,
       default: false
@@ -222,13 +236,17 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapState(['isMobile']),
+
     defaultContactDateFilter () {
       if (this.currentCompany.default_contact_date_filter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
       }
+
       return 'last_engagement_at'
     },
+
     computedClass () {
       return {
         datatable: true,
@@ -236,14 +254,17 @@ export default {
         'datatable--sticky-columns': this.stickyHeaders
       }
     },
+
     hasEmptySlot () {
       return this.useEmptySlot
     },
+
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
       const index = { data: null }
+
       for (index.data in newItems) {
         const found = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
         if (found && found.required) {
@@ -257,20 +278,26 @@ export default {
           newItems[index.data].minWidth = found.minWidth
         }
       }
+
       return newItems
     },
+
     maxPaginationPages () {
       if (this.$q.screen.xl) {
         return 11
       }
+
       if (this.$q.screen.lg) {
         return 7
       }
+
       return 3
     },
+
     scrollableAreaClasses () {
       let isDefault = this.$route.name === 'Contacts' || this.$route.name === 'Contact'
       let optScroll = `scrollableArea ${isDefault ? '' : 'scroll-type-1'} position-relative `
+
       return [
         `${this.isScrollable ? optScroll : ' '}d-flex flex-column h-100 w-100 flex-grow-1`,
         this.scrollAreaClass,
@@ -278,13 +305,16 @@ export default {
         `${this.isMobile ? 'mobile-scrollableArea' : ''}`
       ]
     },
+
     customSortOptions () {
       return this.$route.meta.title === 'Power Dialer'
     },
+
     defaultPlaceholderMessage () {
       if (this.$route.name === 'Contacts' || this.$route.name === 'Contact') {
         return 'No contacts found based on the current filters'
       }
+
       return 'No contacts found on the current list'
     }
   },
@@ -308,23 +338,37 @@ export default {
       hoverKey: null,
       moveColor: '#4F4F4F',
       column: null,
-      scrollTimeout: null
+      scrollTimeout: null,
+      lastScrollTop: 0
     }
   },
 
   methods: {
     ...mapActions(['setDefaultDateFilter']),
+
     resetScroll () {
       this.$refs.scrollableArea.scrollTop = 0
+      this.lastScrollTop = this.$refs.scrollableArea.scrollTop
     },
+
     handleScroll (element) {
-      // if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= (element.srcElement.scrollHeight + 5)) {
-      if ((element.srcElement.offsetHeight + element.srcElement.scrollTop) >= element.srcElement.scrollHeight) {
+      // detect scroll direction; don't trigger api call if scroll direction is up
+      if (element.srcElement.scrollTop < this.lastScrollTop) {
+        this.onVisibilityChanged(false)
+        return
+      }
+
+      if ((element.srcElement.clientHeight + element.srcElement.scrollTop) >= element.srcElement.offsetHeight) {
+        this.lastScrollTop = element.srcElement.scrollTop
         this.onVisibilityChanged(true)
-      } else if (this.isLoaderVisible) {
+        return
+      }
+
+      if (this.isLoaderVisible) {
         this.onVisibilityChanged(false)
       }
     },
+
     onResizeMouseMove (evt) {
       if (this.column) {
         const index = { i: 0 }
@@ -338,19 +382,23 @@ export default {
         }
       }
     },
+
     onResizerMouseUp () {
       this.column = null
       this.startOffset = 0
       document.body.style.cursor = ''
     },
+
     onResizerMouseDown (evt) {
       this.column = evt.target.parentNode
       this.startOffset = this.column.offsetWidth - evt.pageX
       document.body.style.cursor = 'col-resize'
     },
+
     onCheckboxClicked (evt) {
       this.$emit('checked', evt.target.checked)
     },
+
     onOrderChanged ({ oldIndex, newIndex }) {
       const columns = [...this.fixedColumns]
 
@@ -359,12 +407,14 @@ export default {
 
       this.$emit('reordered', [...columns])
     },
+
     onColumnSort (column) {
       let sorts = Object.assign({}, this.getColumnSorts(column))
       setTimeout(() => {
         this.$emit('sort', sorts)
       }, 100)
     },
+
     getColumnSorts (column) {
       this.setDefaultDateFilter(column.name)
       let order = this.sorts.order === 'asc' ? 'desc' : 'asc'
@@ -393,16 +443,25 @@ export default {
         orderBy: column.name,
         order: order
       }
+
       return this.sorts
     },
+
     onCheckMove (evt) {
       return evt.relatedContext.element.draggable
     },
+
     onVisibilityChanged (isLoaderVisible) {
       this.isLoaderVisible = isLoaderVisible
     },
+
     onScroll () {
       if (this.paginated) {
+        return
+      }
+
+      // detect scroll direction; don't trigger api call if scroll direction is up
+      if (this.$refs.scrollableArea.scrollTop < this.lastScrollTop) {
         return
       }
 
@@ -415,6 +474,7 @@ export default {
         }
       }, 66)
     },
+
     onInitReorder (value, key) {
       this.moveColor = value ? '#256eff' : '#4F4F4F'
       this.isHovering = value
@@ -424,8 +484,10 @@ export default {
 
   mounted () {
     if (this.$refs.scrollableArea) {
+      this.lastScrollTop = this.$refs.scrollableArea.scrollTop
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
+
     this.sorts.orderBy = this.defaultContactDateFilter
     this.sorts.order = this.customSortOptions ? '' : 'desc'
     document.addEventListener('mouseup', this.onResizerMouseUp)
@@ -434,6 +496,7 @@ export default {
 
   beforeDestroy () {
     clearTimeout(this.scrollTimeout)
+    this.resetScroll()
     this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)
@@ -443,12 +506,20 @@ export default {
     paginationPage: function () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
     },
+
     perPage: function () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
     },
+
     sorts (newVal, oldVal) {
       if (newVal.orderBy !== oldVal.orderBy) {
         this.sorts.order = 'asc'
+      }
+    },
+
+    isLoading: function () {
+      if (this.isLoading) {
+        this.resetScroll()
       }
     }
   }

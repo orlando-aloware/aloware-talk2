@@ -305,6 +305,9 @@ export default {
   setShowMyContacts: ({ commit }, value) => {
     commit('SET_SHOW_MY_CONTACTS', value)
   },
+  setAddViewShowMyContacts: ({ commit }, value) => {
+    commit('SET_ADD_VIEW_SHOW_MY_CONTACTS', value)
+  },
   setUnsavedList: ({ commit }, data) => {
     commit('SET_UNSAVED_LIST', data)
   },

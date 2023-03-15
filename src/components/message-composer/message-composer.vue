@@ -42,11 +42,13 @@
       </div>
       <div>
         <message-composer-sms :is-disabled="isSmsDisabled"
+                              :campaignId="campaignId"
                               v-if="messageComposer.mode === 'sms'"
                               @message-sent="onMessageSent"/>
         <message-composer-fax v-if="messageComposer.mode === 'fax'"
                               @message-sent="onMessageSent"/>
         <message-composer-email v-if="messageComposer.mode === 'email' && contact.email"
+                                :campaignId="campaignId"
                                 @message-sent="onMessageSent"/>
         <message-composer-note v-if="messageComposer.mode === 'note'"
                                @message-sent="onMessageSent"/>
@@ -106,19 +108,32 @@ export default {
     }
   },
 
-  components: { MessageComposerNote, MessageComposerEmail, MessageComposerFax, LineSelector, ContactPhoneNumberSelector, MessageComposerSms },
+  components: {
+    MessageComposerNote,
+    MessageComposerEmail,
+    MessageComposerFax,
+    LineSelector,
+    ContactPhoneNumberSelector,
+    MessageComposerSms
+  },
 
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
+
     ...mapState(['templates']),
+
     ...mapState('cache', ['currentCompany']),
+
     ...mapState('auth', ['profile']),
+
     disableFax () {
       return this.selectedLine ? !this.selectedLine.is_fax : true
     },
+
     isSmsDisabled () {
       return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
     },
+
     isPhoneNumberInvalid () {
       if (this.selectContact && this.selectContact.phone_numbers && this.selectContact.phone_numbers.length) {
         const number = this.selectContact.phone_numbers.find(num => num.phone_number === this.selectContact.phone_number)
@@ -132,12 +147,20 @@ export default {
 
   methods: {
     ...mapActions(
-      'contacts', ['setMessageComposerSmsPhoneNumber', 'setMessageComposerAttachments', 'setMessageComposerMode', 'setSelectedLine']
+      'contacts', [
+        'setMessageComposerSmsPhoneNumber',
+        'setMessageComposerAttachments',
+        'setMessageComposerMode',
+        'setSelectedLine'
+      ]
     ),
+
+    ...mapActions(['setTemplates']),
+
     setMode (mode) {
       this.setMessageComposerMode(mode)
     },
-    ...mapActions(['setTemplates']),
+
     setSelectedPhone (phone) {
       if (!phone) {
         return
@@ -152,9 +175,11 @@ export default {
           this.setTemplates(response.data)
         })
     },
+
     onLineChange (line) {
       this.setSelectedLine(line)
     },
+
     onMessageSent (message) {
       const sendingMessage = {
         ...message,

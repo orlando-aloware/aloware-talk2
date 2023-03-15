@@ -117,10 +117,10 @@
             <q-tooltip anchor="center start"
                        self="center left"
                        :offset="[-220, 10]">
-              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between Aloware and HubSpot.</p>
+              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelText }} and HubSpot.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
               <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
-              <p class="mt-0 mb-0">- You notice any inconsistencies between Aloware and HubSpot data on this contact.</p>
+              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelText }} and HubSpot data on this contact.</p>
             </q-tooltip>
           </b-button>
         </b-row>
@@ -169,7 +169,10 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import _ from 'lodash'
-import { hubspotIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
+import {
+  hubspotIntegrationMixin,
+  integrationMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'integration-hubspot',
@@ -197,6 +200,8 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
+    ...mapState(['statics']),
+
     isWorkflowValid () {
       return this.workflow.id
     },
@@ -219,6 +224,10 @@ export default {
       }
 
       return this.getHubspotContactLink(this.contact)
+    },
+
+    whiteLabelText () {
+      return this.statics.whitelabel ? this.statics.name : 'Aloware'
     }
   },
 
