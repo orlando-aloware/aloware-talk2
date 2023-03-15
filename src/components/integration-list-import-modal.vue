@@ -27,12 +27,11 @@
           <p class="mb-2">
             Currently enabled integration: <span class="text-bold"> {{ integrationName }} </span>
           </p>
-          <integration-list-selector
-            :multiple="false"
-            :use-chips="false"
-            :clearable="true"
-            :generic-styling="false"
-            @change="onListSelectorChange"/>
+          <integration-list-selector :use-chips="false"
+                                     :multiple="false"
+                                     :clearable="true"
+                                     :generic-styling="false"
+                                     @change="onListSelectorChange"/>
         </div>
 
         <div class="d-flex align-items-center pt-3">
@@ -48,12 +47,11 @@
           </button>
         </div>
       </div>
-      <power-dialer-add-modal
-        :params="powerDialerParams"
-        mode="integration"
-        v-if="isAddPowerDialerOpen"
-        @hidden="onHiddenPowerDialerModal"
-        @submit="onClose">
+      <power-dialer-add-modal mode="integration"
+                              :params="powerDialerParams"
+                              v-if="isAddPowerDialerOpen"
+                              @hidden="onHiddenPowerDialerModal"
+                              @submit="onClose">
       </power-dialer-add-modal>
     </b-overlay>
   </b-modal>
