@@ -161,11 +161,6 @@ export default {
     },
 
     loadSelectionOptions () {
-      console.log({
-        refs: this.$refs,
-        list_selector: this.$refs['list-selector']
-      })
-
       if (this.$refs['list-selector'] === undefined) {
         return
       }

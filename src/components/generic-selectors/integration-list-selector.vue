@@ -213,7 +213,6 @@ export default {
     },
 
     getHubspotLists (offset = 0) {
-      console.log('getting hubspot lists')
       talk2Api.V1.integrations.hubspot.getList({
         params: {
           offset: offset
@@ -234,7 +233,6 @@ export default {
     },
 
     getZohoViews () {
-      console.log('getting zoho views')
       talk2Api.V1.integrations.zoho.getViews().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
@@ -246,7 +244,6 @@ export default {
     },
 
     getPipedriveFilters () {
-      console.log('getting pipedrive filters')
       talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
@@ -298,7 +295,6 @@ export default {
     },
 
     integration (val) {
-      console.log({ val })
       this.getListsOfEnabledIntegration()
     }
   }
