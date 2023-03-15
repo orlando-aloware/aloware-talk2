@@ -5,10 +5,9 @@
       :is-contact-module-type="false"
       @openIntegrationListsImportDialog="onOpenIntegrationImportDialog">
     </contacts-folders>
-    <integration-list-import-modal
-      :is-open="isIntegrationImportDialogOpen"
-      v-if="isIntegrationImportDialogOpen"
-      @close="onCloseIntegrationImportDialog">
+    <integration-list-import-modal :is-open="isIntegrationImportDialogOpen"
+                                   v-if="isIntegrationImportDialogOpen"
+                                   @close="onCloseIntegrationImportDialog">
     </integration-list-import-modal>
   </div>
 </template>
