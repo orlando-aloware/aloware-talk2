@@ -517,7 +517,7 @@ export default {
 
       zoho: {
         importView (target, params) {
-          return window.axios.post(`${suffixV2}power-dialer-lists/import-zoho-view/` + target, params)
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-zoho-view/${target}`, params)
         }
       },
 
