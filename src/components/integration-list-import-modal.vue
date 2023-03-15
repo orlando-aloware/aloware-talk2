@@ -22,24 +22,41 @@
             <i class="fa fa-times"></i>
           </button>
         </div>
-
         <div class="pt-3">
-          <p class="mb-2">
-            Currently enabled integration: <span class="text-bold"> {{ integrationName }} </span>
+          <div class="mb-3"
+               v-if="integrationsEnabled.length > 1">
+            <div class="row">
+              <div class="col-6 d-flex align-items-center pl-0">
+                <span>Select from available integrations: </span>
+              </div>
+              <div class="col-6 pr-0">
+                <q-select style="word-break: break-all;"
+                          color="primary"
+                          use-input
+                          emit-value
+                          map-options
+                          dense
+                          hide-bottom-space
+                          v-model="selectedIntegration"
+                          :options="integrationsEnabled">
+                </q-select>
+              </div>
+            </div>
+          </div>
+          <p class="mb-2"
+             v-else>
+            Currently enabled integration: <span class="text-bold"> {{ integrationsEnabled[0] }} </span>
           </p>
-          <integration-list-selector :use-chips="false"
+          <integration-list-selector ref="list-selector"
+                                     :use-chips="false"
                                      :multiple="false"
                                      :clearable="true"
                                      :generic-styling="false"
+                                     :integration="selectedIntegration"
                                      @change="onListSelectorChange"/>
         </div>
 
         <div class="d-flex align-items-center pt-3">
-          <button class="btn btn-block btn-light mt-0 mr-2"
-                  :disabled="isLoading"
-                  @click="onClose">
-            Cancel
-          </button>
           <button class="btn btn-block btn-primary mt-0"
                   :disabled="!list || isLoading"
                   @click="onSubmit">
@@ -49,6 +66,7 @@
       </div>
       <power-dialer-add-modal mode="integration"
                               :params="powerDialerParams"
+                              :integration="selectedIntegration"
                               v-if="isAddPowerDialerOpen"
                               @hidden="onHiddenPowerDialerModal"
                               @submit="onClose">
@@ -89,7 +107,8 @@ export default {
     return {
       isLoading: false,
       list: null,
-      integration: null
+      integration: null,
+      selectedIntegration: null
     }
   },
 
@@ -110,10 +129,18 @@ export default {
     }
   },
 
+  mounted () {
+    if (this.integrationsEnabled.length === 1) {
+      this.selectedIntegration = this.integrationsEnabled[0]
+      this.loadSelectionOptions()
+    }
+  },
+
   methods: {
     ...mapActions('contacts', [
       'addPowerDialerOpen'
     ]),
+
     onClose (data = null) {
       if (!this.isLoading) {
         this.$emit('close', data)
@@ -128,8 +155,23 @@ export default {
     onSubmit () {
       this.addPowerDialerOpen(true)
     },
+
     onHiddenPowerDialerModal () {
       this.addPowerDialerOpen(false)
+    },
+
+    loadSelectionOptions () {
+      console.log({
+        refs: this.$refs,
+        list_selector: this.$refs['list-selector']
+      })
+
+      if (this.$refs['list-selector'] === undefined) {
+        return
+      }
+
+      this.$refs['list-selector'].selectedId = null
+      this.$refs['list-selector'].getListsOfEnabledIntegration()
     }
   }
 }

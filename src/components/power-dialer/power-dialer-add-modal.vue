@@ -134,6 +134,10 @@ export default {
   mixins: [integrationMixin],
 
   props: {
+    integration: {
+      type: String,
+      required: true
+    },
     redirect: {
       type: Boolean,
       default: true
@@ -195,7 +199,14 @@ export default {
       return params
     },
     contactsDescription () {
-      return this.count + (this.count === 1 ? ' contact' : ' contacts')
+      let description = ''
+
+      if (this.count !== null) {
+        description += this.count
+      }
+
+      description += (this.count === 1 ? ' contact' : ' contacts')
+      return description
     },
     isAllowedInternationalNumbers () {
       return this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
@@ -364,7 +375,7 @@ export default {
     },
 
     importFromIntegration () {
-      switch (this.integrationName) {
+      switch (this.integration) {
         case 'HubSpot':
           return this.importFromHubspot()
         case 'Pipedrive':
@@ -449,7 +460,7 @@ export default {
     },
 
     checkIntegrationImport () {
-      switch (this.integrationName) {
+      switch (this.integration) {
         case 'HubSpot':
           return this.checkHubspotList()
         case 'Pipedrive':

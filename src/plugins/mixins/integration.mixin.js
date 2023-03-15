@@ -19,6 +19,22 @@ export default {
       }
 
       return null
+    },
+
+    integrationsEnabled () {
+      let integrations = []
+
+      if (this.currentCompany.hubspot_integration_enabled) {
+        integrations.push('Hubspot')
+      }
+      if (this.currentCompany.zoho_integration_enabled) {
+        integrations.push('Zoho')
+      }
+      if (this.currentCompany.pipedrive_integration_enabled) {
+        integrations.push('Pipedrive')
+      }
+
+      return integrations
     }
   },
 

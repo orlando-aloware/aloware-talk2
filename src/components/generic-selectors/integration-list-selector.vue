@@ -98,6 +98,10 @@ export default {
   },
 
   props: {
+    integration: {
+      type: String,
+      required: true
+    },
     value: {
       required: false
     },
@@ -196,17 +200,20 @@ export default {
 
       this.lists = []
 
-      switch (true) {
-        case this.currentCompany.hubspot_integration_enabled:
-          return this.getHubspotLists()
-        case this.currentCompany.zoho_integration_enabled:
-          return this.getZohoViews()
-        case this.currentCompany.pipedrive_integration_enabled:
-          return this.getPipedriveFilters()
+      switch (this.integration) {
+        case 'Hubspot':
+          this.getHubspotLists()
+          return
+        case 'Zoho':
+          this.getZohoViews()
+          return
+        case 'Pipedrive':
+          this.getPipedriveFilters()
       }
     },
 
     getHubspotLists (offset = 0) {
+      console.log('getting hubspot lists')
       talk2Api.V1.integrations.hubspot.getList({
         params: {
           offset: offset
@@ -227,6 +234,7 @@ export default {
     },
 
     getZohoViews () {
+      console.log('getting zoho views')
       talk2Api.V1.integrations.zoho.getViews().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
@@ -238,6 +246,7 @@ export default {
     },
 
     getPipedriveFilters () {
+      console.log('getting pipedrive filters')
       talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
@@ -276,7 +285,7 @@ export default {
     selectedId: function (value) {
       let payload = {
         list: value,
-        integration: this.integrationName
+        integration: this.integration
       }
 
       // When the payload is an array, instead of a single value
@@ -286,6 +295,11 @@ export default {
 
       this.$emit('change', payload)
       this.showInputPlaceholder()
+    },
+
+    integration (val) {
+      console.log({ val })
+      this.getListsOfEnabledIntegration()
     }
   }
 }
