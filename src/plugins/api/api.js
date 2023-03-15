@@ -523,7 +523,7 @@ export default {
 
       pipedrive: {
         importFilter (target, params) {
-          return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/` + target, params)
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/${target}`, params)
         }
       }
 
