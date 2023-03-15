@@ -78,6 +78,7 @@ export default {
         this.searchValue = ''
       }
 
+      this.searchValue = this.searchValue.trim()
       this.$emit('search', this.searchValue)
     }, 500),
 

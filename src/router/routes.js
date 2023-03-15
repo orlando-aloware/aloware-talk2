@@ -23,6 +23,10 @@ const Communication = () => import('pages/Communication.vue')
 const Phone = () => import('pages/Phone.vue')
 const Error404 = () => import('pages/Error404.vue')
 const Suspended = () => import('pages/Suspended.vue')
+const Messenger = () => import('pages/Messenger.vue')
+const DMSEquity = () => import('pages/DMSEquity.vue')
+const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
+const EmailBlast = () => import('pages/EmailBlast.vue')
 
 const routes = [
   {
@@ -375,6 +379,38 @@ const routes = [
         path: 'suspended',
         name: 'Suspended',
         component: Suspended
+      },
+      {
+        path: 'messenger',
+        name: 'Messenger',
+        meta: {
+          title: 'Messenger'
+        },
+        component: Messenger
+      },
+      {
+        path: 'dms-equity',
+        name: 'DMS Equity',
+        meta: {
+          title: 'DMS Equity'
+        },
+        component: DMSEquity
+      },
+      {
+        path: 'digital-lead',
+        name: 'Digital Lead War',
+        meta: {
+          title: 'Digital Lead War'
+        },
+        component: DigitalLeadWar
+      },
+      {
+        path: 'email-blast/:id',
+        name: 'Email Blast',
+        meta: {
+          title: 'Email'
+        },
+        component: EmailBlast
       }
     ]
   },

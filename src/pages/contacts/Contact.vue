@@ -43,6 +43,7 @@
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
         <contact-details v-if="!changingSelectedContact && !isEmptyContact"
+                         :campaign-id="selectedCampaignId"
                          @back="toggleDetails">
         </contact-details>
       </div>
@@ -64,7 +65,9 @@
                       icon-color="white">
           </close-icon>
         </compact-btn>
-        <contact-details v-if="drawer && !changingSelectedContact && !isEmptyContact"></contact-details>
+        <contact-details :campaign-id="selectedCampaignId"
+                         v-if="drawer && !changingSelectedContact && !isEmptyContact">
+        </contact-details>
       </q-drawer>
     </div>
     <template #overlay>
@@ -113,12 +116,28 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'isSidebarCollapsed', 'changingSelectedContact']),
+    ...mapGetters('contacts', [
+      'contact',
+      'isSidebarCollapsed',
+      'changingSelectedContact'
+    ]),
+
     ...mapGetters('auth', ['authenticated']),
-    ...mapState(['contactDetailsDrawer', 'campaignsIsLoading', 'usersIsLoading', 'tagsFullyLoaded', 'campaigns', 'users', 'tags']),
+
+    ...mapState([
+      'contactDetailsDrawer',
+      'campaignsIsLoading',
+      'usersIsLoading',
+      'tagsFullyLoaded',
+      'campaigns',
+      'users',
+      'tags'
+    ]),
+
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication'].includes(this.$route.name)
     },
+
     isEmptyContact () {
       return Object.keys(this.contact).length === 0
     }
@@ -137,8 +156,15 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['resetChangedContactProperties', 'selectedContactChanging', 'setContact', 'setContactClone']),
+    ...mapActions('contacts', [
+      'resetChangedContactProperties',
+      'selectedContactChanging',
+      'setContact',
+      'setContactClone'
+    ]),
+
     ...mapActions(['setContactDetailsDrawer']),
+
     fetchContact: _.debounce(function () {
       this.selectedContactChanging(true)
 
@@ -155,10 +181,12 @@ export default {
         this.selectedContactChanging(false)
       })
     }, 1000),
+
     toggleDrawer () {
       this.drawer = !this.drawer
       this.setContactDetailsDrawer(this.drawer)
     },
+
     toggleDetails () {
       this.detailsOpen = !this.detailsOpen
     }

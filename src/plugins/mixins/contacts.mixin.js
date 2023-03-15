@@ -10,6 +10,7 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
 import { DEFAULT_STATE } from 'src/constants/contacts-default'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   data () {
@@ -48,7 +49,7 @@ export default {
   },
 
   created () {
-    this.processFetch = _.debounce(this.debouncedFetch, 1000)
+    this.processFetch = _.debounce(this.debouncedFetch, 300)
     this.listDataCancelToken = window.axios.CancelToken
     this.listDataSource = this.listDataCancelToken.source()
     this.listContactsCancelToken = window.axios.CancelToken
@@ -94,13 +95,20 @@ export default {
       const defaultFilters = this.fixDefaultFilters()
       this.setCurrentListFilters(defaultFilters)
 
+      // path for add modal
+      if (this.isAddContactsView) {
+        this.onFetchMyContacts(this.showAddViewMyContacts)
+        return
+      }
+
       if (this.showMyContacts && this.$route.name === 'Contacts') {
         this.onFetchMyContacts(true)
-      } else {
-        this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
-        this.initialListFilters = defaultFilters
-        this.filtersCount = this.getFiltersCount(defaultFilters)
+        return
       }
+
+      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
+      this.initialListFilters = defaultFilters
+      this.filtersCount = this.getFiltersCount(defaultFilters)
     }, 200),
 
     onSortByField (sorts) {
@@ -146,15 +154,22 @@ export default {
           path = this.apiEndpoint(this.myQueueId !== null)
         }
 
+        let params = {
+          page: nextPage,
+          search: this.search,
+          sort: sort,
+          order: order,
+          relations: this.contactsRelations
+        }
+
+        // my contacts toggle is not applicable in "Unassigned Contacts" list
+        if (this.$route.params.id !== 'unassigned') {
+          params.my_contacts = this.showMyContactsViewBased
+        }
+
         return this.$axios
           .get(path, {
-            params: this.buildQueryString({
-              page: nextPage,
-              search: this.search,
-              sort: sort,
-              order: order,
-              relations: this.contactsRelations
-            }),
+            params: this.buildQueryString(params),
             paramsSerializer: qs.stringify
           })
           .then((response) => response.data)
@@ -207,7 +222,7 @@ export default {
       this.isLoaded = false
       this.setSearch(searchText)
       this.fetch({
-        contact_owner: this.showMyContacts ? this.profile.id : undefined,
+        my_contacts: this.showMyContactsViewBased,
         search: this.search,
         isSearch: true
       }, true, true)
@@ -217,16 +232,20 @@ export default {
       if (!this.isPowerDialer) {
         return 'api/v2/contacts'
       }
+
       if (queued) {
         return `api/v2/power-dialer-lists/my-queue/items`
       }
+
       switch (this.$route.meta.id) {
         case 'power-dialer-add-list':
         case 'power-dialer-add-queue-list':
           return `api/v2/contacts`
+
         case 'power-dialer':
         case 'power-dialer-queue-filter':
           return `api/v2/power-dialer-lists/my-queue/items`
+
         default:
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
@@ -235,6 +254,7 @@ export default {
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
       this.setListContactsLoaded(false)
       params.search = this.search
+
       if (this.$route.name === 'Contacts' || this.$route.name === 'Power Dialer') {
         this.previousRelations = this.contactsRelations
         params.relations = this.contactsRelations
@@ -244,12 +264,19 @@ export default {
         this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
       }
 
+      // my contacts toggle is not applicable in "Unassigned Contacts" list
+      if (this.$route.params.id === 'unassigned' && params.hasOwnProperty('my_contacts')) {
+        delete params.my_contacts
+      }
+
       // clear out selections every contact fetch request
       this.setListSelectedContacts({ id: this.id, contacts: [] })
       const queryString = this.buildQueryString(params, isContactModule)
 
       // use the same query string to update the list count
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', queryString.filter_groups)
+      // eslint-disable-next-line camelcase
+      const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
@@ -362,21 +389,27 @@ export default {
 
       this.isLoading = true
 
+      // for power dialer list contacts fetching
       if (typeof this.isPowerDialer !== 'undefined') {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
             this.processFetch(params, false, true, clear, isSearch)
             break
+
           case 'power-dialer-list-filter':
             this.processFetch(params, false, false, clear, isSearch)
             break
+
           default:
             this.processFetch(params, false, false, clear, isSearch)
         }
-      } else {
-        this.processFetch(params, true, false, clear, isSearch)
+
+        return
       }
+
+      // contacts list contacts fetching
+      this.processFetch(params, true, false, clear, isSearch)
     },
 
     buildQueryString (params, isContactModule = true) {
@@ -393,17 +426,9 @@ export default {
 
       const filters = {}
 
-      const isDynamicActualList = (this.list.type === ContactListTypes.DYNAMIC &&
-        !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(this.list.id))
-
       if (params.search) {
-        // for "All Contacts" list and dynamic type actual list
-        // insert search filter as a separate filter entity
-        if (this.list && (this.list.id === 'all' || isDynamicActualList)) {
-          filters.search = {}
-          filters.search.value = params.search
-        }
-
+        // for contacts list
+        query.search = params.search
         // for power dialer query
         powerQuery.keyword = params.search
       }
@@ -421,17 +446,7 @@ export default {
 
       // initial filter for static contact lists
       if (this.list && this.list.type === ContactListTypes.STATIC) {
-        query.filter_groups = [
-          {
-            filters: {
-              contact_lists: {
-                value: [this.id],
-                operator: 1
-              }
-            },
-            is_conjunction: true
-          }
-        ]
+        query.list_id = this.id
       }
 
       if (!_.isEmpty(filters)) {
@@ -441,53 +456,54 @@ export default {
         })
       }
 
+      // build filter group(s)
       if (!_.isEmpty(this.currentListFilters)) {
         const listFilters = this.$jsonClone(this.currentListFilters)
-        const filterIndex = {
-          index1: null,
-          index2: null,
-          filter: null,
-          filterData: null,
-          filterType: null
-        }
-        for (filterIndex.index1 of Object.keys(listFilters)) {
-          // check if filter index is a number
-          if (!isNaN(filterIndex.index1 / 1)) {
-            // let's add the timezone if there are data filters
-            filterIndex.filterData = _.get(listFilters[filterIndex.index1], 'filters', null)
 
-            if (!filterIndex.filterData) {
+        for (const filterIndex of Object.keys(listFilters)) {
+          // check if filter index is a number
+          if (isNaN(filterIndex / 1)) {
+            continue
+          }
+
+          const filters = _.get(listFilters[filterIndex], 'filters', null)
+
+          if (!filters) {
+            continue
+          }
+
+          // loop through each filters
+          for (const filterKey of Object.keys(filters)) {
+            const filter = this.filters.find(filterItem => filterItem.key === filterKey)
+            const filterType = _.get(filter, 'type', null)
+
+            if (filterType && filterType !== 'date') {
               continue
             }
 
-            // loop through each filters
-            for (filterIndex.index2 of Object.keys(filterIndex.filterData)) {
-              filterIndex.filter = this.filters.find(filterItem => filterItem.key === filterIndex.index2)
-              filterIndex.filterType = _.get(filterIndex.filter, 'type', null)
-
-              if (filterIndex.filterType && filterIndex.filterType !== 'date') {
-                continue
-              }
-
-              // if filter type is 'date', add the browser's timezone
-              listFilters[filterIndex.index1].filters[filterIndex.index2].timezone = moment.tz.guess()
-            }
-            query.filter_groups = query.filter_groups.concat(listFilters[filterIndex.index1])
+            // if filter type is 'date', add the browser's timezone
+            listFilters[filterIndex].filters[filterKey].timezone = moment.tz.guess()
           }
+
+          // first index of list's filter groups must be joined/associated with the list's initial filter
+          // to get correct query results
+          if (query?.filter_groups[0] && +filterIndex === 0) {
+            const mergedFirstFilterIndex = {
+              ...query.filter_groups[0].filters,
+              ...listFilters[filterIndex].filters
+            }
+
+            query.filter_groups[0].filters = mergedFirstFilterIndex
+            continue
+          }
+
+          query.filter_groups = query.filter_groups.concat(listFilters[filterIndex])
         }
       }
 
-      // for default pinned lists and actual lists,
-      // search filter must be joined/associated with the list's initial filter
-      // to get correct query results
-      if (
-        params.search &&
-        query.filter_groups.length &&
-        (this.list.id !== 'all' || !isDynamicActualList)
-      ) {
-        let filters = query.filter_groups[0].filters
-        filters.search = { value: params.search }
-        query.filter_groups[0]['filters'] = filters
+      // cleanup
+      if (query.hasOwnProperty('filter_groups') && query.filter_groups.length < 1) {
+        delete query.filter_groups
       }
 
       if (params?.sort) {
@@ -520,12 +536,14 @@ export default {
       const filtersCount = { data: 0 }
       if (filters && filters.constructor.name === 'Object' && Object.keys(filters).length) {
         const index = { data: null }
+
         for (index.data of Object.keys(filters)) {
           const filter = _.get(filters[index.data], 'filters', null)
           filtersCount.data += filter ? Object.keys(filter).length : 0
         }
       } else if (filters.constructor.name === 'Array' && filters.length) {
         const group = { data: null }
+
         for (group.data of filters) {
           const filter = _.get(group.data, 'filters', null)
           filtersCount.data += filter ? Object.keys(filter).length : 0
@@ -687,7 +705,7 @@ export default {
       fetchData.isLoading = _.get(data, 'isLoading', false)
 
       // Keeps only user's contacts on list after fetching
-      _.set(fetchData, 'params.contact_owner', this.showMyContacts ? this.profile.id : undefined)
+      _.set(fetchData, 'params.my_contacts', this.showMyContactsViewBased)
 
       this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
     },
@@ -773,6 +791,18 @@ export default {
           this.setSelectedList({ id: response.id, name: response.name, type: response.type })
           this.setPreviousListFilters(response.filters)
           this.setPreviousListId(this.id)
+        }).catch((err) => {
+          const { message, html } = extractErrorMessage(err)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+
+          // if page is not in contacts page root (All Contacts), navigate to it
+          if (this.$route.name === 'Contacts' &&
+            this.$route.meta.page !== 'Contacts') {
+            this.$router.push({
+              name: 'Contacts'
+            })
+          }
         })
     },
 
@@ -783,14 +813,16 @@ export default {
         }).catch(err => {
           console.log(err)
         })
-      } else {
-        if (!skipCancelToken) {
-          this.listDataSource.cancel('Loading of contacts list operation is canceled by the user')
-          this.listDataSource = this.listDataCancelToken.source()
-        }
 
-        this.init(clear)
+        return
       }
+
+      if (!skipCancelToken) {
+        this.listDataSource.cancel('Loading of contacts list operation is canceled by the user')
+        this.listDataSource = this.listDataCancelToken.source()
+      }
+
+      this.init(clear)
     },
 
     loadUrlFilters (filters) {
@@ -802,6 +834,7 @@ export default {
 
         // filter by tag
         const tag = params.has('tag_id') ? _.parseInt(params.get('tag_id')) : false
+
         if (tag) {
           filters[0].filters.tags = {
             operator: 1,
@@ -833,6 +866,7 @@ export default {
       'search',
       'shouldUpdateSelectedListContactCount',
       'showMyContacts',
+      'showAddViewMyContacts',
       'previousListId',
       'previousListFilters',
       'isAllContactsSelected'
@@ -893,9 +927,11 @@ export default {
       if (this.currentCompany && this.defaultDateFilter === DefaultContactDateFilter.DEFAULT_CONTACT_DATE_FILTER_CREATED_AT) {
         return 'created_at'
       }
+
       if (typeof this.isPowerDialer !== 'undefined' && this.isPowerDialer) {
         return 'created_at'
       }
+
       return 'last_engagement_at'
     },
 
@@ -947,39 +983,38 @@ export default {
 
     columns () {
       const id = isNaN(this.id) && !this.$route.name.includes('Contacts') ? 'my-queue' : this.id
+
       try {
-        const headers = { data: [] }
+        let headers = []
+
         if (this.lists[id] && this.lists[id].headers) {
-          headers.data = this.lists[id].headers
-          if (typeof headers.data === 'string') {
-            headers.data = JSON.parse(headers.data)
+          headers = this.lists[id].headers
+
+          if (typeof headers === 'string') {
+            headers = JSON.parse(headers)
           }
         }
 
-        if (!Array.isArray(headers.data)) {
+        if (!Array.isArray(headers)) {
           throw new Error('Headers field is broken')
         }
 
-        const item = { key: null }
-        const found = { data: null }
-        const headerRelation = { data: null }
-        const columnRelation = { data: null }
-        for (item.key in headers.data) {
-          found.data = ALL_COLUMNS.find(column => column.name === headers.data[item.key].name)
+        for (const key in headers) {
+          const headerExists = ALL_COLUMNS.find(column => column.name === headers[key].name)
 
-          if (!found.data) {
+          if (!headerExists) {
             continue
           }
 
-          headerRelation.data = _.get(headers.data[item.key], 'relationName', null)
-          columnRelation.data = _.get(found.data, 'relationName', null)
+          const headerRelation = _.get(headers[key], 'relationName', null)
+          const headerExistsRelation = _.get(headerExists, 'relationName', null)
 
-          if (columnRelation.data && columnRelation.data !== headerRelation.data) {
-            headers.data[item.key].relationName = columnRelation.data
+          if (headerExistsRelation && headerExistsRelation !== headerRelation) {
+            headers[key].relationName = headerExistsRelation
           }
         }
 
-        return _.uniqBy(headers.data, 'name')
+        return _.uniqBy(headers, 'name')
       } catch (err) {
         console.log('Error', err)
         return []
@@ -1002,7 +1037,8 @@ export default {
       if (!this.id) {
         return this.lists['all']
       }
-      if (this.myQueueId) {
+
+      if (this.myQueueId && this.isPowerDialer) {
         return this.lists['my-queue']
       }
 
@@ -1039,6 +1075,15 @@ export default {
         'outbound_calls_count': 'outbound_call_count',
         'outbound_texts_count': 'outbound_sms_count'
       }
+    },
+
+    isAddContactsView () {
+      // e.g. contacts/list/3/add; power-dialer/list/add; power-dialer/list/1/add
+      return /list\/(\d+\/)?add/.test(this.$route.path)
+    },
+
+    showMyContactsViewBased () {
+      return this.isAddContactsView ? this.showAddViewMyContacts : this.showMyContacts
     }
   },
 

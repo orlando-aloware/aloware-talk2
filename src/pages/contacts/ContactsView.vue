@@ -70,54 +70,56 @@
             </div>
           </div>
         </div>
-        <div class="px-3 d-inline-flex"
-             v-if="!isMyContactsView && !isTabletOrMobile">
-          <q-tooltip
-            class="text-center"
-            anchor="top middle"
-            self="bottom middle"
-            max-width="185px"
-            v-if="$route.params.id === 'unassigned'">
-            Unable to modify Filters. Duplicate this list if you want to modify
-          </q-tooltip>
-          <label class="text-primary mr-2 mt-2 cursor-pointer"
-                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
-          <b-form-checkbox
-            id="my-contacts"
-            class="mt-2 cursor-pointer"
-            name="check-button"
-            size="sm"
-            switch
-            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
-            :disabled="isLoading || $route.params.id === 'unassigned'"
-            v-model="myContacts"
-            @change="onFetchMyContacts"
-          >
-          </b-form-checkbox>
+        <div class="px-3 d-flex">
+          <div class="d-inline-flex"
+               v-if="!isMyContactsView && !isTabletOrMobile && $route.params.id !== 'unassigned'">
+            <label class="text-primary mr-2 mt-2 cursor-pointer"
+                   style="min-width: 84px;"
+                   :class="{ disabled: isLoading }">
+              My Contacts
+            </label>
+            <b-form-checkbox
+              id="my-contacts"
+              class="mt-2 cursor-pointer"
+              name="check-button"
+              size="sm"
+              switch
+              :class="{ disabled: isLoading }"
+              :disabled="isLoading"
+              v-model="myContacts"
+              @change="onFetchMyContacts"
+            >
+            </b-form-checkbox>
+          </div>
+          <div>
+            <compact-btn borderless
+                         variant="outlined-light"
+                         customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                         v-if="isSimpsocial"
+                         @clicked="onMessengerClick">
+              <iframe id="ss-messenger-button"
+                      frameborder="0"
+                      style=""
+                      :src="simpsocialMessengerIframeLink">
+              </iframe>
+            </compact-btn>
+          </div>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
         <div class="flex-grow-1"></div>
         <div class="px-3 d-inline-flex"
-             v-if="!isMyContactsView && isTabletOrMobile">
-          <q-tooltip
-            class="text-center"
-            anchor="top middle"
-            self="bottom middle"
-            max-width="185px"
-            v-if="$route.params.id === 'unassigned'">
-            Unable to modify Filters. Duplicate this list if you want to modify
-          </q-tooltip>
+             v-if="!isMyContactsView && isTabletOrMobile && $route.params.id !== 'unassigned'">
           <label class="text-primary mr-2 mt-2 cursor-pointer"
-                 :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }">My Contacts</label>
+                 :class="{ disabled: isLoading }">My Contacts</label>
           <b-form-checkbox
             id="my-contacts"
             class="mt-2 cursor-pointer"
             name="check-button"
             size="sm"
             switch
-            :class="{ disabled: (isLoading || $route.params.id === 'unassigned') }"
-            :disabled="isLoading || $route.params.id === 'unassigned'"
+            :class="{ disabled: isLoading }"
+            :disabled="isLoading"
             v-model="myContacts"
             @change="onFetchMyContacts"
           >
@@ -132,7 +134,7 @@
           <div
             class="small text-muted fs-13 text-right"
             v-else>
-            {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
@@ -713,7 +715,8 @@ import {
   timezoneCheckMixin,
   aclMixin,
   viewMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 
@@ -725,7 +728,8 @@ export default {
     timezoneCheckMixin,
     aclMixin,
     viewMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    simpsocialMixin
   ],
 
   inject: [
@@ -765,42 +769,52 @@ export default {
       type: Object,
       default: () => {}
     },
+
     isLoadingDisabled: {
       type: Boolean,
       default: false
     },
+
     isStartState: {
       type: Boolean,
       default: false
     },
+
     isEditable: {
       type: Boolean,
       default: false
     },
+
     search: {
       type: String,
       default: ''
     },
+
     isMyContactsView: {
       type: Boolean,
       default: false
     },
+
     isLoading: {
       type: Boolean,
       default: false
     },
+
     columns: {
       type: Array,
       default: () => []
     },
+
     isEmpty: {
       type: Boolean,
       default: false
     },
+
     isLoadingMore: {
       type: Boolean,
       default: false
     },
+
     filtersCount: {
       type: Number,
       default: 0
@@ -848,22 +862,28 @@ export default {
       'updateContactsListFilter',
       'setListContactsLoaded'
     ]),
+
     onSearch (searchText) {
       this.$emit('search', searchText.trim())
     },
+
     onFetchMyContacts (checked) {
       this.setShowMyContacts(checked)
       this.$emit('checkboxChanged', checked)
     },
+
     onSortByField (sorts) {
       this.$emit('sort', sorts)
     },
+
     onPaginate (params) {
       this.$emit('paginated', params)
     },
+
     onLoadMore () {
       this.$emit('loadMore')
     },
+
     getListData (id) {
       return this.$axios
         .get('/api/v2/contacts-list/' + id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
@@ -878,6 +898,7 @@ export default {
           this.$router.replace('/contacts')
         })
     },
+
     loadList (id) {
       if (!id) {
         id = 'all'
@@ -896,24 +917,30 @@ export default {
           value: [stringId]
         }
       }
+
       this.setCurrentListFilters(filters)
     },
+
     setData (id) {
       const list = this.lists[id] || {}
+
       if (Object.values(list).length > 0) {
         this.name = list.name
         this.type = list.type
         this.setSelectedList({ id: this.id, name: this.name, type: this.type })
       }
     },
+
     onColumnsReordered (nextColumns) {
       this.columnsReordered({
         id: this.id,
         headers: nextColumns
       })
     },
+
     onCheckAllItems (checked) {
       const items = { data: [] }
+
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
@@ -923,19 +950,24 @@ export default {
             items.data = items.data.filter(item => item.id !== Number(checkbox.value))
           }
         })
+
       this.setAllContactsSelected(false)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
+
     onCheckAllItemsFromTheList (checked) {
       const items = { data: [] }
+
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
         })
+
       this.setAllContactsSelected(true)
       this.setListSelectedContacts({ id: this.id, contacts: items.data })
     },
+
     onEditColumnsClicked () {
       this.columnsOpen({
         id: this.id,
@@ -943,16 +975,20 @@ export default {
         name: this.list.name
       })
     },
+
     onImportContactsClicked () {
       this.$refs.importContacts.open()
     },
+
     onFiltersClicked () {
       if (this.isFiltersOpen) {
         this.closeFilters()
-      } else {
-        this.openFilters()
+        return
       }
+
+      this.openFilters()
     },
+
     onCreateStaticList () {
       this.createListOpen({
         type: 1,
@@ -960,6 +996,7 @@ export default {
         contact_folder_id: null
       })
     },
+
     onCreateDynamicList () {
       this.createListOpen({
         type: 2,
@@ -967,13 +1004,25 @@ export default {
         contact_folder_id: null
       })
     },
+
     onUpdateContactList () {
+      // not applicable for static lists and default lists
       if (this.selectedList.type === this.ContactListTypes.STATIC || this.defaultIds.includes(this.id)) {
         return
       }
+
+      // don't allow filters to be saved empty for dynamic list
+      const hasGroupFilters = Object.keys(this.currentListFilters).filter(key => this.currentListFilters[key]?.filters)
+      if (_.isEmpty(hasGroupFilters) && this.selectedList.type === this.ContactListTypes.DYNAMIC) {
+        this.$generalNotification('Filters not saved. Dynamic list must have filters.', 'error')
+        return
+      }
+
       this.isUpdatingList = true
+
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
+
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
           .then((res) => {
@@ -988,31 +1037,37 @@ export default {
                 id: this.selectedList.id,
                 count: this.listItems[this.selectedList.id].total
               })
-            } else {
-              if (this.list.type === this.ContactListTypes.DYNAMIC) {
-                this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
-              } else {
-                this.setDataCount({
-                  filters: {
-                    contact_lists: {
-                      operator: 1,
-                      value: [this.list.id]
-                    }
-                  },
-                  is_conjunction: true
-                }, true)
-              }
+
+              return
             }
+
+            if (this.list.type === this.ContactListTypes.DYNAMIC) {
+              this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
+              return
+            }
+
+            this.setDataCount({
+              filters: {
+                contact_lists: {
+                  operator: 1,
+                  value: [this.list.id]
+                }
+              },
+              is_conjunction: true
+            }, true)
           })
           .catch((_err) => {
             console.log(_err)
             this.$generalNotification('Unable to update contact list.', 'error')
           })
       }
+
       console.log('Creating new dynamic list...')
+
       // debugger
       const params = this.unsavedList.params
       params.filters = this.currentListFilters
+
       return this.$axios
         .post('/api/v2/contacts-list', params)
         .then((response) => {
@@ -1037,6 +1092,7 @@ export default {
           this.isUpdatingList = false
         })
     },
+
     loadFolders () {
       this.$axios
         .get('/api/v2/contact-folders')
@@ -1046,13 +1102,16 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
+
     onShowCreateContact (e) {
       this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
       e.stopImmediatePropagation()
     },
+
     onAddContactsToList () {
       this.$router.push(`/contacts/list/${this.$route.params.id}/add`)
     },
+
     discardList () {
       this.$bvModal.msgBoxConfirm('Are you sure you want to discard your contact list?', {
         buttonSize: 'sm',
@@ -1066,6 +1125,7 @@ export default {
         }
       })
     },
+
     onRemoveList () {
       if (this.unsavedList) {
         this.discardList()
@@ -1074,12 +1134,15 @@ export default {
 
       this.removeListOpen({ id: this.selectedList.id, name: this.selectedList.name })
     },
+
     hasFilterChanges () {
       return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
     },
+
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
     },
+
     clearFilters () {
       this.setCurrentListFilters({})
       this.setListContactsLoaded(false)
@@ -1091,8 +1154,10 @@ export default {
       this.setShowMyContacts(false)
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
     },
+
     resetFilters (resetSearch = false) {
       this.setListContactsLoaded(false)
+
       if (this.selectedList.id === this.previousListId) {
         this.setCurrentListFilters(this.previousListFilters)
         this.updateContactsListFilter({
@@ -1115,11 +1180,14 @@ export default {
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       this.filterHasChanges = false
     },
+
     fixDefaultFilters () {
       if (_.isEmpty(this.list)) {
         return []
       }
+
       const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+
       if (this.$route.params.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
@@ -1127,6 +1195,7 @@ export default {
           defaultFilters[0].filters.contact_owner.value = [profileId]
         }
       }
+
       return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
     },
 
@@ -1136,15 +1205,18 @@ export default {
           this.$VueEvent.fire('shouldUpdateListCount')
           this.$VueEvent.fire('fetchContacts')
         })
-      } else {
-        this.$VueEvent.fire('shouldUpdateListCount')
-        this.$VueEvent.fire('fetchContacts', {
-          params: {
-            page: this.fixedContactsData.current_page
-          }
-        })
+
+        return
       }
+
+      this.$VueEvent.fire('shouldUpdateListCount')
+      this.$VueEvent.fire('fetchContacts', {
+        params: {
+          page: this.fixedContactsData.current_page
+        }
+      })
     },
+
     generateFolderPath (folders = [], folderNames = [], level = 0) {
       const tempFolderNames = { data: _.clone(folderNames) }
 
@@ -1208,14 +1280,17 @@ export default {
 
       return []
     },
+
     toggleSidebar () {
       this.setShowContactsListSidebar(!this.showContactsListSidebar)
     },
+
     reRouteToBase () {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
     },
+
     onRemove (contact, contactListId) {
       this.setShouldUpdateSelectedListContactCount(false)
       this.setBulkDelete(false)
@@ -1225,13 +1300,16 @@ export default {
       })
       // this.$emit('on-action-remove', true)
     },
+
     onMessage (contactId) {
       this.setMessageComposerMode('sms')
       this.$router.push(`/contacts/${contactId}`)
     },
+
     onCall (contact) {
       this.checkContactTimezone(contact, () => { this.makeCall(contact) })
     },
+
     makeCall (contact) {
       if (this.profile.enabled_two_legged_outbound) {
         const message = { data: 'We will call your secondary phone' }
@@ -1258,6 +1336,7 @@ export default {
       }
       this.$VueEvent.fire('callContact', data)
     },
+
     makeTwoLeggedCall (id, phoneNumber) {
       this.$axios
         .post('/api/v1/contacts/' + id + '/make-two-legged-call', {
@@ -1268,16 +1347,19 @@ export default {
         .catch(() => {
         })
     },
+
     onNavigate (contactId, e) {
       e.preventDefault()
       this.$router.push(this.generateRoute(contactId))
     },
+
     onNavigateToAdd (e) {
       e.preventDefault()
       this.$router.push({
         path: `/contacts/list/${this.$route.params.id}/add`
       })
     },
+
     setDataCount (data, updatePinned = false) {
       const fireData = {
         data: { filters: data },
@@ -1298,6 +1380,7 @@ export default {
 
       this.$VueEvent.fire('get-list-count', fireData)
     },
+
     getOwnerName (userId) {
       if (!userId) {
         return ''
@@ -1305,10 +1388,18 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
+    },
+
+    onMessengerClick () {
+      this.$router.push({
+        name: 'Messenger'
+      })
     }
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     ...mapState('contacts', [
       'folders',
       'showContactsListSidebar',
@@ -1319,6 +1410,7 @@ export default {
       'previousListId',
       'listContactsLoaded'
     ]),
+
     ...mapGetters('contacts', [
       'lists',
       'listItems',
@@ -1328,14 +1420,17 @@ export default {
       'currentListFilters',
       'unsavedList'
     ]),
+
     ...mapState([
       'isTabletOrMobile',
       'campaigns',
       'users'
     ]),
+
     ...mapState('auth', [
       'profile'
     ]),
+
     fixedContactsData () {
       if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
         return this.$parent.$data.contactsData
@@ -1343,6 +1438,7 @@ export default {
 
       return this.contactsData
     },
+
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return this.$route.params.id
@@ -1350,14 +1446,17 @@ export default {
 
       return 'all'
     },
+
     defaultIds () {
       return Object.keys(DEFAULT_PINNED_LIST)
         .map((k) => DEFAULT_PINNED_LIST[k].id)
         .concat(['static'])
     },
+
     contactList () {
       return this.lists[this.id]
     },
+
     isLoaded () {
       if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return true
@@ -1366,9 +1465,11 @@ export default {
       return !!(this.listItems[String(this.id)] &&
         this.lists[String(this.id)])
     },
+
     checked () {
       return this.selectedContacts[this.id] || []
     },
+
     saveFilterButtonClass () {
       return {
         'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
@@ -1377,35 +1478,45 @@ export default {
           this.defaultIds.includes(this.id)
       }
     },
+
     listItemsHasData () {
       return !_.isEmpty(this.fixedContactsData)
     },
+
     listItemsDataCount () {
       const total = _.get(this.fixedContactsData, 'data.length', null)
       return total !== null ? total : 0
     },
+
     listItemsTotalContacts () {
       const data = _.get(this.fixedContactsData, `data`, null)
       return data.length || 0
     },
+
     filterButtonVariant () {
       return this.isFiltersOpen ? 'primary' : 'outlined-light'
     },
+
     filterBadgeVariant () {
       return this.isFiltersOpen ? 'light' : 'primary'
     },
+
     resetButtonVariant () {
       return this.isFilterHasChanges ? 'primary' : 'outlined-light'
     },
+
     saveFilterButtonVariant () {
       return this.isFilterHasChanges ? 'primary' : 'secondary'
     },
+
     saveFilterButtonCustomClass () {
       return this.isDisabledSaveFilter ? 'button-disabled' : ''
     },
+
     isResetDisabled () {
       return !this.isFilterHasChanges
     },
+
     isListDeletable () {
       // eslint-disable-next-line no-unused-vars
       for (const [key, list] of Object.entries(this.defaultContactLists)) {
@@ -1416,18 +1527,23 @@ export default {
 
       return false
     },
+
     hasAppliedFilters () {
       return this.filtersCount > 0
     },
+
     isUnsavedList () {
       return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
     },
+
     canSeeAddContacts () {
       return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
     },
+
     canAddContacts () {
       return this.list.type === ContactListTypes.STATIC && this.isEditable
     },
+
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
       // now, check if columns have order, label, maxWidth or minWidth property, or
@@ -1447,12 +1563,14 @@ export default {
       }
       return newItems
     },
+
     hasMore () {
       return (this.hasNextPage &&
           !this.isLoadingMore &&
           !this.isLoading) ||
         false
     },
+
     isCurrentAndPreviousFiltersMismatch () {
       const previousListFilters = JSON.parse(JSON.stringify(this.previousListFilters))
 
@@ -1462,14 +1580,20 @@ export default {
 
       return !_.isEqual(this.currentListFilters, previousListFilters)
     },
+
     isFilterHasChanges () {
       return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
     },
+
     isDisabledSaveFilter () {
       return !this.isFilterHasChanges ||
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         this.list.show_in_public_folder
+    },
+
+    simpsocialMessengerIframeLink () {
+      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
     }
   },
 
@@ -1495,17 +1619,18 @@ export default {
     this.$VueEvent.listen('shouldUpdateListCount', () => {
       if (this.list.type === this.ContactListTypes.DYNAMIC) {
         this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
-      } else {
-        this.setDataCount({
-          filters: {
-            contact_lists: {
-              operator: 1,
-              value: [this.list.id]
-            }
-          },
-          is_conjunction: true
-        })
+        return
       }
+
+      this.setDataCount({
+        filters: {
+          contact_lists: {
+            operator: 1,
+            value: [this.list.id]
+          }
+        },
+        is_conjunction: true
+      })
     })
 
     this.viewListeners.setDataCount = _.debounce((filters) => {
@@ -1540,30 +1665,35 @@ export default {
       }
       this.setAllContactsSelected(false)
     },
+
     selectedList: function (value) {
       if (this.selectedContacts[value.id]) {
         this.setListSelectedContacts({ id: value.id, contacts: [] })
       }
       this.folderPath = this.generateFolderPath(this.folders)
     },
+
     shouldUpdateSelectedListContactCount (val) {
       if (val) {
         this.setShouldUpdateSelectedListContactCount(true)
         // this.$VueEvent.fire('fetchContacts')
       }
     },
+
     id (value) {
       this.reRouteToBase()
       if (this.pinnedCounts.hasOwnProperty(value)) {
         this.setSelectedListContactCount(this.pinnedCounts[value])
       }
     },
+
     checked: function (value) {
       const elem = document.querySelector('.data-table-check-all')
       if (elem) {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
       }
     },
+
     'pinnedCounts': {
       deep: true,
       handler (value) {
@@ -1572,22 +1702,18 @@ export default {
         }
       }
     },
+
     'fixedContactsData.next_page_url': function (value) {
       this.hasNextPage = !_.isEmpty(value)
     },
-    list: {
-      deep: true,
-      handler: function () {
-        this.loadList(this.$route.params.id)
-        this.$refs.contactsTable.resetScroll()
-      }
-    },
+
     showMyContacts (value) {
       if (this.myContacts !== value) {
         this.myContacts = value
       }
     }
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)

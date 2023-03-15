@@ -56,7 +56,10 @@ export default {
             const { message, html } = extractErrorMessage(error)
             console.log(html)
             this.$generalNotification(message, 'error')
-            if (this.$route.name === 'Power Dialer') {
+
+            // if page is not in power dialer page root (My Queue), navigate to it
+            if (this.$route.name === 'Power Dialer' &&
+              this.$route.meta.id !== 'power-dialer-queue-filter') {
               this.$router.replace('/power-dialer/')
             }
           })

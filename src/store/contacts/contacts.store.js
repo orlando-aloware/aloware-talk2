@@ -220,6 +220,7 @@ export default function () {
     showContactsHeader: true,
     showContactsListSidebar: false,
     showMyContacts: false,
+    showAddViewMyContacts: false,
     unsavedList: null,
     activeFolder: '',
     clearList: false,
