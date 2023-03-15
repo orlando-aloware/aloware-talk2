@@ -511,7 +511,7 @@ export default {
 
       hubspot: {
         importList (target, params) {
-          return window.axios.post(`${suffixV2}power-dialer-lists/import-hubspot-list/` + target, params)
+          return window.axios.post(`${suffixV2}power-dialer-lists/import-hubspot-list/${target}`, params)
         }
       },
 
