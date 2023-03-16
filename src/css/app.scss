@@ -12538,6 +12538,8 @@ h1.contact-list-name-label {
     }
 
     .users {
+      color: $grey-92;
+
       &__header {
 
       }
@@ -12549,7 +12551,48 @@ h1.contact-list-name-label {
   
         &--compact {
   
-        } 
+        }
+
+        &__agent-name {
+          a {
+            color: $grey-92;
+            text-decoration: none !important;
+          }
+        }
+
+        &__agent-status {
+          &__button {
+            color: $white;
+            transition: all .3s;
+          }
+
+          &__popover {
+            &__header {
+              color: $grey-92;
+              font-size: 13px;
+              margin-bottom: 10px;
+            }
+
+            &__body {
+              color: $grey-92;
+              font-size: 13px;
+              display: flex;
+              flex-direction: column;
+
+              span {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                cursor: pointer;
+                padding: 4px;
+                
+                &:hover {
+                  background-color: $light-grey;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

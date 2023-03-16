@@ -28,15 +28,20 @@
                   </td>
 
                   <!-- agent name -->
-                  <td :key="`col-${colIndex}`"
+                  <td class="users__table__agent-name"
+                      :key="`col-${colIndex}`"
                       v-if="column.name === 'name'">
-                    {{ user.name }}
+                    <a :href="apiUrl + `/users/dialog/${user.id}`"
+                       target="_blank">
+                      {{ user.name }}
+                    </a>
                   </td>
 
                   <!-- status -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'status'">
-                    status
+                    <wallboard-agent-status :value="user.agent_status"
+                                            @status-change="onStatusChanged(user, $event)"/>
                   </td>
 
                   <!-- status duration -->
@@ -77,6 +82,7 @@
 </template>
 
 <script>
+import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
 import Datatable from 'src/components/datatable.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -89,6 +95,7 @@ export default {
   ],
 
   components: {
+    WallboardAgentStatus,
     Datatable
   },
 
@@ -194,6 +201,10 @@ export default {
 
     lastPage () {
       return Math.ceil(this.users.length / this.pagination.perPage)
+    },
+
+    apiUrl () {
+      return process.env.API_URL
     }
   },
 
@@ -214,7 +225,8 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
-      'fetchUsers'
+      'fetchUsers',
+      'setAgentStatus'
     ]),
 
     onPaginated (pageData) {
@@ -226,6 +238,13 @@ export default {
 
     onSort (sortData) {
       this.sort = sortData
+    },
+
+    onStatusChanged (user, status) {
+      this.setAgentStatus({
+        userId: user.id,
+        status
+      })
     }
   }
 }
