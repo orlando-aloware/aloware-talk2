@@ -47,7 +47,7 @@
                   <!-- status duration -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'status-duration'">
-                    status-duration
+                    <time-ago :from="convertTimeToUTC(user.last_agent_status_change)" />
                   </td>
 
                   <!-- ring groups -->
@@ -82,8 +82,10 @@
 </template>
 
 <script>
-import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
 import Datatable from 'src/components/datatable.vue'
+import moment from 'moment'
+import TimeAgo from 'src/components/time-ago.vue'
+import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
@@ -95,8 +97,9 @@ export default {
   ],
 
   components: {
-    WallboardAgentStatus,
-    Datatable
+    Datatable,
+    TimeAgo,
+    WallboardAgentStatus
   },
 
   computed: {
@@ -245,6 +248,10 @@ export default {
         userId: user.id,
         status
       })
+    },
+
+    convertTimeToUTC (time) {
+      return moment.utc(time).toDate()
     }
   }
 }
