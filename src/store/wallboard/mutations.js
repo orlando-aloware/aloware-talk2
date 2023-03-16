@@ -1,6 +1,15 @@
 import { updateField } from 'vuex-map-fields'
 
 export default {
+  SET_AGENT_STATUS: (state, data) => {
+    const userIndex = state.users.findIndex(user => user.id === data.user_id)
+
+    // update user status in store if found
+    if (userIndex >= 0) {
+      state.users[userIndex].agent_status = data.agent_status
+    }
+  },
+
   SET_FILTER: (state, { filter, value }) => {
     state.filters[filter] = value
   },

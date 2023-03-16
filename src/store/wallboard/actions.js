@@ -64,6 +64,20 @@ export default {
     }
   },
 
+  /**
+   * Set agent status, calling the API and updating the store
+   */
+  async setAgentStatus ({ commit }, params) {
+    try {
+      const response = await API.V1.users.setAgentStatus(params.userId, params.status)
+
+      commit('SET_AGENT_STATUS', response.data)
+    } catch (err) {
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
   setFilter ({ commit }, { filter, value }) {
     commit('SET_FILTER', { filter, value })
   },
@@ -75,7 +89,6 @@ export default {
 
     commit('SET_VIEW_MODE', mode)
   }
-
   // fetchQueuedCalls
   // fetchLiveCalls
   // fetchParkedCalls

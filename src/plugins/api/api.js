@@ -322,6 +322,11 @@ export default {
       },
       setDefaultLogin (userId, params) {
         return window.axios.patch(`${suffixV1}user/${userId}/set-default-app`, params)
+      },
+      setAgentStatus (userId, status) {
+        return window.axios.post(`${suffixV1}user/${userId}/agent-status`, {
+          agent_status: status
+        })
       }
     },
     reports: {
