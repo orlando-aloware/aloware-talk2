@@ -163,14 +163,14 @@ export default {
       this.dialerCallPrep(call._connection)
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
-      console.log('call information', this.dialer.call.callSid, this.dialer.call.from, this.dialer.currentNumber)
+      console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
 
       // restore app when a call comes
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
+      this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
