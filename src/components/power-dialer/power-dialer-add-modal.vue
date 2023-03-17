@@ -375,12 +375,12 @@ export default {
     },
 
     importFromIntegration () {
-      switch (this.integration) {
-        case 'HubSpot':
+      switch (this.integration.toLowerCase()) {
+        case 'hubspot':
           return this.importFromHubspot()
-        case 'Pipedrive':
+        case 'pipedrive':
           return this.addPipedriveFilter()
-        case 'Zoho':
+        case 'zoho':
           return this.addZohoView()
       }
     },
@@ -460,12 +460,12 @@ export default {
     },
 
     checkIntegrationImport () {
-      switch (this.integration) {
-        case 'HubSpot':
+      switch (this.integration.toLowerCase()) {
+        case 'hubspot':
           return this.checkHubspotList()
-        case 'Pipedrive':
+        case 'pipedrive':
           return this.checkPipedriveFilter()
-        case 'Zoho':
+        case 'zoho':
           return this.checkZohoView()
       }
     },

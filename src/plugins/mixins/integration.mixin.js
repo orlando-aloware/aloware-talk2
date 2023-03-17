@@ -11,7 +11,7 @@ export default {
     integrationName () {
       switch (true) {
         case this.currentCompany.hubspot_integration_enabled:
-          return 'HubSpot'
+          return 'Hubspot'
         case this.currentCompany.zoho_integration_enabled:
           return 'Zoho'
         case this.currentCompany.pipedrive_integration_enabled:
