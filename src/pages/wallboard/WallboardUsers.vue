@@ -53,7 +53,7 @@
                   <!-- ring groups -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'ring-groups'">
-                    ring groups
+                    <agent-ring-groups :ring-groups="user.ring_group_ids" />
                   </td>
 
                   <!-- last login -->
@@ -82,6 +82,7 @@
 </template>
 
 <script>
+import AgentRingGroups from 'src/components/wallboard/agent-ring-groups'
 import Datatable from 'src/components/datatable.vue'
 import moment from 'moment'
 import TimeAgo from 'src/components/time-ago.vue'
@@ -97,6 +98,7 @@ export default {
   ],
 
   components: {
+    AgentRingGroups,
     Datatable,
     TimeAgo,
     WallboardAgentStatus
@@ -142,7 +144,8 @@ export default {
           name: 'ring-groups',
           label: 'Ring Groups',
           order: 4,
-          sortable: true
+          sortable: true,
+          minWidth: 200
         },
         {
           name: 'last-login',
@@ -185,6 +188,7 @@ export default {
           case 'name':
             condition = a.name > b.name
             break
+          // FIXME: add below
           // status
           // status duration
           // ring groups
