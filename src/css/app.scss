@@ -12602,6 +12602,11 @@ h1.contact-list-name-label {
             overflow: hidden;
             float: left;
           }
+
+          .popover-body {
+            color: $grey-92;
+            font-size: 13px;
+          }
         }
       }
     }

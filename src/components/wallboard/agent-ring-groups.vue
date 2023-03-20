@@ -1,14 +1,23 @@
 <template>
-  <div class="users__table__agent-ring-groups">
+  <div class="users__table__agent-ring-groups"
+       :id="`rg-container-${_uid}`">
     <div v-if="ringGroups.length > 0">
       <div class="users__table__agent-ring-groups__ring-group-name">
         {{ firstRingGroup.name }}
       </div>
-      <span class="text-primary ml-1"
+      <span class="text-primary ml-1 cursor-pointer"
+            :id="`rg-more-${_uid}`"
             v-if="ringGroups.length > 1">
         + {{ ringGroups.length - 1 }} more
       </span>
-      <b-popover>
+      <b-popover :container="`rg-container-${_uid}`"
+                 :target="`rg-more-${_uid}`"
+                 triggers="hover">
+        <span class="d-block mb-1"
+              :key="ringGroup.id"
+              v-for="ringGroup in userRingGroups">
+          {{ ringGroup.name }}
+        </span>
       </b-popover>
     </div>
     <div v-else>
@@ -35,7 +44,12 @@ export default {
     }),
 
     firstRingGroup () {
-      return this.allRingGroups.find(rg => rg.id === this.ringGroups[0])
+      return this.allRingGroups.find(rg => rg.id === this.ringGroups[0]) || {}
+    },
+
+    userRingGroups () {
+      // using map + find to keep the order of user's ring groups
+      return this.ringGroups.map(id => this.allRingGroups.find(rg => rg.id === id))
     }
   }
 }
