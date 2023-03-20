@@ -55,7 +55,7 @@
                   <!-- ring groups -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'ring-groups'">
-                    <agent-ring-groups :ring-groups="user.ring_group_ids" />
+                    <wallboard-agent-ring-groups :ring-groups="user.ring_group_ids" />
                   </td>
 
                   <!-- last login -->
@@ -84,10 +84,10 @@
 </template>
 
 <script>
-import AgentRingGroups from 'src/components/wallboard/agent-ring-groups'
 import Datatable from 'src/components/datatable.vue'
 import moment from 'moment'
 import TimeAgo from 'src/components/time-ago.vue'
+import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-ring-groups'
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -100,9 +100,9 @@ export default {
   ],
 
   components: {
-    AgentRingGroups,
     Datatable,
     TimeAgo,
+    WallboardAgentRingGroups,
     WallboardAgentStatus
   },
 

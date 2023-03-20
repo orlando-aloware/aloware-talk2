@@ -30,6 +30,8 @@
 import { mapState } from 'vuex'
 
 export default {
+  name: 'wallboard-agent-ring-groups',
+
   props: {
     ringGroups: {
       type: Array,
