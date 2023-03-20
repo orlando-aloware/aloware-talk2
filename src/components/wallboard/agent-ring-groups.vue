@@ -1,7 +1,7 @@
 <template>
   <div class="users__table__agent-ring-groups"
        :id="`rg-container-${_uid}`">
-    <div v-if="ringGroups.length > 0">
+    <div v-if="hasRingGroups">
       <div class="users__table__agent-ring-groups__ring-group-name">
         {{ firstRingGroup.name }}
       </div>
@@ -50,6 +50,10 @@ export default {
     userRingGroups () {
       // using map + find to keep the order of user's ring groups
       return this.ringGroups.map(id => this.allRingGroups.find(rg => rg.id === id))
+    },
+
+    hasRingGroups () {
+      return this.ringGroups.length > 0 && this.allRingGroups.length > 0
     }
   }
 }
