@@ -12540,19 +12540,19 @@ h1.contact-list-name-label {
     .users {
       color: $grey-92;
 
+      &--comfort {
+
+      }
+
+      &--compact {
+
+      }
+
       &__header {
 
       }
 
       &__table {
-        &--comfort {
-
-        }
-  
-        &--compact {
-  
-        }
-
         &__agent-name {
           a {
             color: $grey-92;
