@@ -572,6 +572,38 @@ const fullDuration = (duration, shouldDisplaySeconds = true) => {
   }
 }
 
+/**
+ * Converts datetime to string format, considering timezone
+ * @param {String} dt datetime
+ * @returns String
+ */
+const fixFullDateUTCRelative = (dt) => {
+  if (dt) {
+    let now = window.moment.utc()
+    let datetime = window.moment.utc(dt)
+
+    if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
+      if (window.timezone) {
+        return datetime.tz(window.timezone).fromNow()
+      } else {
+        return datetime.local().fromNow()
+      }
+    } else {
+      if (window.timezone) {
+        if (window.timezone === 'Asia/Manila') {
+          return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY h:mma') + ' MNL'
+        }
+
+        return datetime.tz(window.timezone).format('MMM D, YYYY h:mma z')
+      } else {
+        return datetime.local().format('MMM D, YYYY h:mma z')
+      }
+    }
+  } else {
+    return '--'
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -606,7 +638,8 @@ export default ({ Vue }) => {
     numberPlusFormatter,
     sortObjectByKey,
     objAlphabeticalOrder,
-    fullDuration
+    fullDuration,
+    fixFullDateUTCRelative
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

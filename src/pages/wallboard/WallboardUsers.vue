@@ -59,13 +59,13 @@
                   <!-- last login -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'last-login'">
-                    last login
+                    {{ user.last_login | fixFullDateUTCRelative }}
                   </td>
 
                   <!-- last updated -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'last-updated'">
-                    last updated
+                    {{ user.updated_at | fixFullDateUTCRelative }}
                   </td>
                 </template>
               </tr>
