@@ -641,14 +641,14 @@ export default {
         return
       }
 
-      if (this.dialer.activeConnection()) {
+      if (this.device.activeConnection()) {
         if (this.isMobile && this.$route.name !== 'Phone') {
           this.$router.push({
             name: 'Phone'
           })
         }
         // accept the incoming connection and start two-way audio
-        this.dialer.activeConnection().accept()
+        this.device.activeConnection().accept()
       }
     },
 
