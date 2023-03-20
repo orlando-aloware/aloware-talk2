@@ -47,7 +47,9 @@
                   <!-- status duration -->
                   <td :key="`col-${colIndex}`"
                       v-if="column.name === 'status-duration'">
-                    <time-ago :from="convertTimeToUTC(user.last_agent_status_change)" />
+                    <time-ago :from="convertTimeToUTC(user.last_agent_status_change)"
+                              v-if="user.last_agent_status_change"/>
+                    <span v-else>--</span>
                   </td>
 
                   <!-- ring groups -->
