@@ -78,10 +78,16 @@ export default {
     }
   },
 
+  /**
+   * Update filter value
+   */
   setFilter ({ commit }, { filter, value }) {
     commit('SET_FILTER', { filter, value })
   },
 
+  /**
+   * Change view mode
+   */
   setViewMode ({ commit }, mode) {
     if (!['compact', 'comfort'].includes(mode)) {
       throw new Error('Invalid mode!')

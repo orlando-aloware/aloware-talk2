@@ -241,13 +241,8 @@ export default {
     }
   }),
 
-  mounted () {
-    this.fetchUsers()
-  },
-
   methods: {
     ...mapActions('wallboard', [
-      'fetchUsers',
       'setAgentStatus'
     ]),
 

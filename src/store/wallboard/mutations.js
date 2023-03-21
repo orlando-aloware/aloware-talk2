@@ -7,6 +7,11 @@ export default {
     // update user status in store if found
     if (userIndex >= 0) {
       state.users[userIndex].agent_status = data.agent_status
+
+      // update last status date field if present
+      if ('last_agent_status_change' in data) {
+        state.users[userIndex].last_agent_status_change = data.last_agent_status_change
+      }
     }
   },
 
@@ -36,6 +41,15 @@ export default {
 
   SET_VIEW_MODE: (state, mode) => {
     state.viewMode = mode
+  },
+
+  SET_USER: (state, user) => {
+    const userIndex = state.users.findIndex(u => u.id === user.id)
+
+    // update user status in store if found
+    if (userIndex >= 0) {
+      state.users.splice(userIndex, 1, user)
+    }
   },
 
   SET_USERS: (state, data) => {
