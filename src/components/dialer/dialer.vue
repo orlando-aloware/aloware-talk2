@@ -538,7 +538,7 @@ export default {
         this.dialerCallPrep(call)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
-        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        this.getCommunication(call.callSid, call.from)
           // .finally(() => {
           //   this.$router.push({ name: 'Call' }).catch(err => {
           //     console.log(err)
