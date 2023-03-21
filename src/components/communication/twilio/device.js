@@ -1,5 +1,6 @@
 import * as Carriers from '../../../constants/carriers'
 import MainDevice from './../device'
+import { get, first } from 'lodash'
 
 export default class TwilioDevice extends MainDevice {
   constructor () {
