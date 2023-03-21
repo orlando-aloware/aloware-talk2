@@ -161,7 +161,7 @@ export default {
       this.connection = call
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
-      this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
+      this.setDialerCurrentNumber(this.$options.filters.fixPhone(call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
 
@@ -386,9 +386,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-          this.activeTask &&
-          routeTitle === 'Power Dialer Sessions' &&
-          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -512,92 +512,84 @@ export default {
       }
     },
 
-    onConnectionWarning (warningName, warningData) {
-      console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
-      // add warning to list
-      if (this.warnings.indexOf(warningName) === -1) {
-        this.warnings.push(warningName)
-      }
-      this.setWarnings(this.warnings)
-    },
-
-    onConnectionWarningCleared (warningName) {
-      console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
-      // remove warning from list
-      this.warnings = this.warnings.filter(value => value !== warningName)
-      this.setWarnings(this.warnings)
-    },
-
-    onConnectionAccept (call) {
-      console.log('Successfully connected call', call)
-      this.updateUnownedContactLastCommunicationStatus()
-      this.dialerCallPrep(call)
-      this.startCallTimer()
-      this.setDialerCurrentStatus('CALL_CONNECTED')
-      this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
-        // .finally(() => {
-        //   this.$router.push({ name: 'Call' }).catch(err => {
-        //     console.log(err)
-        //   })
-        //   setTimeout(() => {
-        //    this.startCallTimer()
-        //    this.setDialerCurrentStatus('CALL_CONNECTED')
-        //   }, 3000)
-        // })
-        .catch((err) => {
-          console.log(err)
-        })
-
-      // mute the phone
-      if (this.dialer.isMuted) {
-        this.forceMute()
-      }
-
-      // close the dialer form when it's open and incoming call is answered
-      if (this.dialerFormStatus) {
-        this.setDialerFormStatus(false)
-      }
-    },
-
-    onConnectionCancel (call) {
-      this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled', call)
-      this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.backToDial()
-      this.$closeActionNotification('incomingCall')
-      // if (this.$route.name === 'Incoming Call') {
-      //   this.$router.push({ name: 'Dial' }).catch(err => {
-      //     console.log(err)
-      //   })
-      // }
-    },
-
-    onConnectionDisconnect (call) {
-      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-      this.removeUnownedLiveContactTask()
-      this.stopCallTimer()
-      this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      if (!this.dialer.parkedCall && !this.dialer.call) {
-        this.startWrapUpTimer()
-      } else if (this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-      } else if (!this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-      } else {
-        this.backToDial()
-      }
-    },
-
     initConnectionEvents () {
       if (!this.connection) {
         return
       }
 
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING, this.onConnectionWarning)
-      this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, this.onConnectionWarningCleared)
-      this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, this.onConnectionAccept)
-      this.connection.on(WebrtcEvents.CONNECTION_CANCEL, this.onConnectionCancel)
-      this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, this.onConnectionDisconnect)
+      this.connection.on(WebrtcEvents.CONNECTION_WARNING, (warningName, warningData) => {
+        console.log(WebrtcEvents.CONNECTION_WARNING, warningName, warningData)
+        // add warning to list
+        if (this.warnings.indexOf(warningName) === -1) {
+          this.warnings.push(warningName)
+        }
+        this.setWarnings(this.warnings)
+      })
+      this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
+        console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
+        // remove warning from list
+        this.warnings = this.warnings.filter(value => value !== warningName)
+        this.setWarnings(this.warnings)
+      })
+
+      this.connection.on(WebrtcEvents.CONNECTION_ACCEPT, (call) => { // On accept call
+        console.log('Successfully connected call', call)
+        this.updateUnownedContactLastCommunicationStatus()
+        this.dialerCallPrep(call)
+        this.startCallTimer()
+        this.setDialerCurrentStatus('CALL_CONNECTED')
+        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+          // .finally(() => {
+          //   this.$router.push({ name: 'Call' }).catch(err => {
+          //     console.log(err)
+          //   })
+          //   setTimeout(() => {
+          //    this.startCallTimer()
+          //    this.setDialerCurrentStatus('CALL_CONNECTED')
+          //   }, 3000)
+          // })
+          .catch((err) => {
+            console.log(err)
+          })
+
+        // mute the phone
+        if (this.dialer.isMuted) {
+          this.forceMute()
+        }
+
+        // close the dialer form when it's open and incoming call is answered
+        if (this.dialerFormStatus) {
+          this.setDialerFormStatus(false)
+        }
+      })
+      this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
+        this.removeUnownedLiveContactTask()
+        console.log('Call invite canceled', call)
+        this.setDialerCurrentStatus('INVITE_CANCELLED')
+        this.backToDial()
+        this.$closeActionNotification('incomingCall')
+        // if (this.$route.name === 'Incoming Call') {
+        //   this.$router.push({ name: 'Dial' }).catch(err => {
+        //     console.log(err)
+        //   })
+        // }
+      })
+
+      this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
+        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+        this.removeUnownedLiveContactTask()
+        this.stopCallTimer()
+        this.setDialerCurrentStatus('CALL_DISCONNECTED')
+        if (!this.dialer.parkedCall && !this.dialer.call) {
+          this.startWrapUpTimer()
+        } else if (this.dialer.parkedCall && this.dialer.call) {
+          this.startWrapUpTimer()
+        } else if (!this.dialer.parkedCall && this.dialer.call) {
+          this.startWrapUpTimer()
+        } else {
+          this.backToDial()
+        }
+      })
     },
 
     hangupCall () {
@@ -649,16 +641,14 @@ export default {
         return
       }
 
-      if (this.device.activeConnection()) {
+      if (this.dialer.activeConnection()) {
         if (this.isMobile && this.$route.name !== 'Phone') {
           this.$router.push({
             name: 'Phone'
           })
         }
         // accept the incoming connection and start two-way audio
-        this.connection = this.device.activeConnection()
-        this.initConnectionEvents()
-        this.connection.accept()
+        this.dialer.activeConnection().accept()
       }
     },
 

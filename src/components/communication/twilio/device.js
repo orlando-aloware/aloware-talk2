@@ -1,6 +1,5 @@
 import * as Carriers from '../../../constants/carriers'
 import MainDevice from './../device'
-import { get, first } from 'lodash'
 
 export default class TwilioDevice extends MainDevice {
   constructor () {
@@ -23,16 +22,10 @@ export default class TwilioDevice extends MainDevice {
   }
 
   activeConnection () {
-    const calls = get(this._device, '_calls', [])
-    const hasCalls = calls instanceof Array ? calls.length > 0 : false
-
-    if (!this._device || !hasCalls) {
+    if (!this._device || !this._device._activeCall) {
       return null
     }
-
-    // prevent connection events from re-initialization
-    const initEvents = !this._device.isEventsStarted
-    return this._createConnection(first(calls), initEvents)
+    return this._createConnection(this._device._activeCall)
   }
 
   availableInputDevices () {
@@ -82,11 +75,6 @@ export default class TwilioDevice extends MainDevice {
   }
 
   async connect (params, initEvents = false) {
-    // prevent connection events from re-initialization
-    if (initEvents && !this._device.isEventsStarted) {
-      this._device.isEventsStarted = initEvents
-    }
-
     return this._createConnection(await this._device.connect({ params }), initEvents)
   }
 
