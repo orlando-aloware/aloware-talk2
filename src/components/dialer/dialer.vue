@@ -159,6 +159,7 @@ export default {
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       this.connection = call
+      this.initConnectionEvents()
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
       this.setDialerCurrentNumber(this.$options.filters.fixPhone(call.from, 'E164'))
@@ -568,11 +569,6 @@ export default {
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial()
         this.$closeActionNotification('incomingCall')
-        // if (this.$route.name === 'Incoming Call') {
-        //   this.$router.push({ name: 'Dial' }).catch(err => {
-        //     console.log(err)
-        //   })
-        // }
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
