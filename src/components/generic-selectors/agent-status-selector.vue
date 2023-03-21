@@ -149,7 +149,7 @@ export default {
     },
 
     status (val) {
-      this.$emit('select', this.status ? this.status : 'all')
+      this.$emit('select', this.status)
     }
   }
 }

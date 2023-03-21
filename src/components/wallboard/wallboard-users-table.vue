@@ -1,17 +1,19 @@
 <template>
   <div class="users__table">
-    <datatable custom-class="pr-3"
-                :sticky-headers="true"
-                :columns="columns"
-                :is-empty="users.length === 0"
-                :paginated="true"
-                :show-pagination="true"
-                :total-rows="users.length"
-                :current-page="pagination.page"
-                :last-page="lastPage"
-                @paginated="onPaginated"
-                @sort="onSort">
-      <template slot="tbody">
+    <datatable paginated
+               show-pagination
+               sticky-headers
+               use-empty-slot
+               custom-class="pr-3"
+               scroll-area-class="scroll-type-2"
+               :columns="columns"
+               :is-empty="filteredUsers.length === 0"
+               :total-rows="filteredUsers.length"
+               :current-page="pagination.page"
+               :last-page="lastPage"
+               @paginated="onPaginated"
+               @sort="onSort">
+      <template #tbody>
         <tr class="datatable-row"
             :key="`${index}`"
             v-for="(user, index) in paginatedUsers">
@@ -67,6 +69,15 @@
           </template>
         </tr>
       </template>
+
+      <template #empty>
+        <div class="empty-state"
+             v-if="filteredUsers.length === 0">
+          <div class="h5">
+            No agents found based on the current filters
+          </div>
+        </div>
+      </template>
     </datatable>
   </div>
 </template>
@@ -86,6 +97,19 @@ export default {
     TimeAgo,
     WallboardAgentRingGroups,
     WallboardAgentStatus
+  },
+
+  props: {
+    filters: {
+      agent: {
+        type: String,
+        default: null
+      },
+      status: {
+        type: [String, Number],
+        default: 'all'
+      }
+    }
   },
 
   computed: {
@@ -182,11 +206,23 @@ export default {
     },
 
     filteredUsers () {
-      return this.users
+      return this.users.filter(user => {
+        // agent name filter
+        const name = !this.filters.agent
+          ? true
+          : user.name.toUpperCase().includes(this.filters.agent.toUpperCase())
+
+        // status filter
+        const status = this.filters.status === 'all'
+          ? true
+          : user.agent_status === this.filters.status
+
+        return name && status
+      })
     },
 
     lastPage () {
-      return Math.ceil(this.users.length / this.pagination.perPage)
+      return Math.ceil(this.filteredUsers.length / this.pagination.perPage)
     },
 
     apiUrl () {
