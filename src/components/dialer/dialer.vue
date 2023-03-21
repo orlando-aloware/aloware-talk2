@@ -158,7 +158,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      this.connection = call
+      this.connection = this.device._createConnection(call, true)
       this.initConnectionEvents()
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
