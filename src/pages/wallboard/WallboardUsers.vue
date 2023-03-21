@@ -4,8 +4,9 @@
       <b-overlay
         :show="isUsersLoading"
         rounded="sm">
-        <wallboard-users-header />
-        <wallboard-users-table />
+        <wallboard-users-header @agent="onFilterAgent"
+                                @status="onFilterStatus"/>
+        <wallboard-users-table :filters="filters"/>
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px"/>
@@ -41,6 +42,23 @@ export default {
     ...mapGetters('wallboard', {
       viewMode: 'getViewMode'
     })
+  },
+
+  data: () => ({
+    filters: {
+      agent: null,
+      status: 'all'
+    }
+  }),
+
+  methods: {
+    onFilterAgent (name) {
+      this.filters.agent = name || null
+    },
+
+    onFilterStatus (status) {
+      this.filters.status = status
+    }
   }
 }
 </script>

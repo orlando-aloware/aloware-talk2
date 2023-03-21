@@ -3253,6 +3253,10 @@ i.option-separator {
   &.bordered {
     border: 2px solid #FFFFFF;
   }
+
+  &.bordered-grey {
+    border: 2px solid $grey-light;
+  }
 }
 
 .tab-dropdown-list {
@@ -12549,7 +12553,26 @@ h1.contact-list-name-label {
       }
 
       &__header {
+        display: flex;
+        padding: 10px 20px;
 
+        &__status {
+          border: solid 1px $grey-light;
+          height: 32px;
+          border-radius: 0.25rem;
+          margin-left: 10px;
+          min-width: 120px;
+
+          .q-field {
+            font-size: 12px;
+
+            &__native,
+            &__control {
+              color: $grey-11;
+              min-height: 32px;
+            }
+          }
+        }
       }
 
       &__table {
