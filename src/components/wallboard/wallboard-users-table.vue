@@ -29,9 +29,13 @@
                 :key="`col-${colIndex}`"
                 v-if="column.name === 'name'">
               <a :href="apiUrl + `/users/dialog/${user.id}`"
-                  target="_blank">
+                  target="_blank"
+                  v-if="hasPermissionTo('list user')">
                 {{ user.name }}
               </a>
+              <span v-else>
+                {{ user.name }}
+              </span>
             </td>
 
             <!-- status -->
@@ -89,9 +93,14 @@ import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-r
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
 import { mapActions, mapGetters } from 'vuex'
 import { LABELS } from 'src/constants/agent-status-labels'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'wallboard-users-table',
+
+  mixins: [
+    aclMixin
+  ],
 
   components: {
     Datatable,

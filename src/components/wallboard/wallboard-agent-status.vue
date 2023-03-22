@@ -10,7 +10,8 @@
     <b-popover ref="popover"
                :container="`status-container-${_uid}`"
                :target="`status-btn-${_uid}`"
-               triggers="click blur">
+               triggers="click blur"
+               v-if="hasRole('Company Admin')">
       <div class="users__table__agent-status__popover__header">
         <span>Modify Agent's Status</span>
       </div>
@@ -28,9 +29,14 @@
 
 <script>
 import { LABELS } from 'src/constants/agent-status-labels'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'wallboard-agent-status',
+
+  mixins: [
+    aclMixin
+  ],
 
   props: {
     value: {
