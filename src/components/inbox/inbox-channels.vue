@@ -483,94 +483,111 @@ export default {
         return communication.id === data.id
       })
 
-      if (!found.length) {
-        if (data.type === CommunicationTypes.NOTE) {
-          this.handleNewMention(data)
-          return
-        }
+      if (found.length) {
+        return
+      }
 
-        if (this.checkCommunicationChannels(data) &&
-          this.checkCommunicationMatchesSearch(this.searchText, data) &&
-          this.checkCommunicationMatchesFilters(this.filter, data, true) &&
-          this.checkCommunicationMatchesUserAccessibility(data) &&
-          this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
-          this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
-          this.checkCommunicationMatchesUser(this.userId, data) &&
-          this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
-          this.pagination.total += 1
-          // push new data to top of array
-          this.communications.unshift(data)
+      if (data.type === CommunicationTypes.NOTE) {
+        this.handleNewMention(data)
+        return
+      }
 
-          if (this.communications.length > this.filter.per_page) {
-            // push out last data from bottom of array
-            this.communications.pop()
-          }
+      const isCommMatchesMinReq = this.checkCommunicationChannels(data) &&
+        this.checkCommunicationMatchesSearch(this.searchText, data) &&
+        this.checkCommunicationMatchesFilters(this.filter, data, true) &&
+        this.checkCommunicationMatchesUserAccessibility(data) &&
+        this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+        this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+        this.checkCommunicationMatchesUser(this.userId, data) &&
+        this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)
+
+      if (isCommMatchesMinReq) {
+        this.pagination.total += 1
+
+        // push new data to top of array
+        this.communications.unshift(data)
+
+        if (this.communications.length > this.filter.per_page) {
+          // push out last data from bottom of array
+          this.communications.pop()
         }
       }
     }
 
     this.listeners.updateCommunication = (data) => {
-      // disable live dashboard for end clients
-      // check data loaded
-      if (this.pagination.prev === null) {
-        // check new communication exists in the old list
-        const found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (found.length) {
-          // update communication
-          data = _.extend({}, found[0], data)
-          if (this.checkCommunicationChannels(data) &&
-            this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
-            this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
-            this.checkCommunicationMatchesUser(this.userId, data) &&
-            this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
-            this.$set(this.communications, this.communications.indexOf(found[0]), data)
-          } else {
-            this.communications = this.communications.filter(communication => {
-              return communication.id !== data.id
-            })
-            this.pagination.total -= 1
-          }
-        } else {
-          // add the communication if it's not already there and if it matches the criteria
-          if (this.checkCommunicationChannels(data) &&
-            this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
-            this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
-            this.checkCommunicationMatchesUser(this.userId, data) &&
-            this.pagination.prev === null &&
-            this.communications.length > 0 &&
-            data.id > this.communications[0].id) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
+      if (this.pagination.prev !== null) {
+        return
+      }
 
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
-          }
+      /*
+        disable live dashboard for end clients;
+        check data loaded
+       */
+      // check new communication exists in the old list
+      const found = this.communications.filter(communication => {
+        return communication.id === data.id
+      })
+
+      const isCommMatchesMinReq = this.checkCommunicationChannels(data) &&
+        this.checkCommunicationMatchesSearch(this.searchText, data) &&
+        this.checkCommunicationMatchesFilters(this.filter, data, true) &&
+        this.checkCommunicationMatchesUserAccessibility(data) &&
+        this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+        this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+        this.checkCommunicationMatchesUser(this.userId, data)
+
+      if (found.length) {
+        // update communication
+        data = _.extend({}, found[0], data)
+
+        if (isCommMatchesMinReq && this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
+          this.$set(this.communications, this.communications.indexOf(found[0]), data)
+
+          return
+        }
+
+        this.communications = this.communications.filter(communication => {
+          return communication.id !== data.id
+        })
+
+        this.pagination.total -= 1
+
+        return
+      }
+
+      // add the communication if it's not already there and if it matches the criteria
+      if (isCommMatchesMinReq &&
+        this.pagination.prev === null &&
+        this.communications.length > 0 &&
+        data.id > this.communications[0].id) {
+        this.pagination.total += 1
+
+        // push new data to top of array
+        this.communications.unshift(data)
+
+        if (this.communications.length > this.filter.per_page) {
+          // push out last data from bottom of array
+          this.communications.pop()
         }
       }
     }
 
     this.listeners.deleteCommunication = (data) => {
       // check data loaded
-      if (this.pagination.prev === null) {
-        // try to find the communication
-        const found = this.communications.find(communication => communication.id === data.id)
-        if (found) {
-          // remove it from the list
-          this.communications.splice(this.communications.indexOf(found), 1)
-          this.pagination.total -= 1
-        }
+      if (this.pagination.prev !== null) {
+        return
       }
+
+      // try to find the communication
+      const found = this.communications.find(communication => communication.id === data.id)
+
+      if (found) {
+        return
+      }
+
+      // remove it from the list
+      this.communications.splice(this.communications.indexOf(found), 1)
+      this.pagination.total -= 1
     }
 
     this.listeners.markContactCommunicationsAllAsRead = (data) => {
@@ -627,6 +644,7 @@ export default {
       } else {
         this.filter.cursor = this.nextPage
       }
+
       this.loadMoreCommunications(this.filter).then(() => {
         const communication = this.communications[lastNavigatedIndex + 1]
         this.setSelectedCommunication(communication)
