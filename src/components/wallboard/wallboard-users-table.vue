@@ -88,6 +88,7 @@ import TimeAgo from 'src/components/time-ago.vue'
 import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-ring-groups.vue'
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
 import { mapActions, mapGetters } from 'vuex'
+import { LABELS } from 'src/constants/agent-status-labels'
 
 export default {
   name: 'wallboard-users-table',
@@ -147,7 +148,7 @@ export default {
           name: 'ring-groups',
           label: 'Ring Groups',
           order: 4,
-          sortable: true,
+          sortable: false,
           minWidth: 200
         },
         {
@@ -191,12 +192,29 @@ export default {
           case 'name':
             condition = a.name > b.name
             break
-          // FIXME: add below
-          // status
-          // status duration
-          // ring groups
-          // last login
-          // last updated
+          case 'status':
+            // use status names
+            let nameA = LABELS.find(status => status.value === a.agent_status) || {}
+            let nameB = LABELS.find(status => status.value === b.agent_status) || {}
+
+            condition = nameA.label > nameB.label
+            break
+          case 'status-duration':
+            condition = a.last_agent_status_change && b.last_agent_status_change
+              ? a.last_agent_status_change < b.last_agent_status_change // compare values if both are present
+              : !a.last_agent_status_change // use inverted logic otherwise
+
+            break
+          case 'last-login':
+            condition = a.last_login && b.last_login
+              ? a.last_login < b.last_login // compare values if both are present
+              : !a.last_login // use inverted logic otherwise
+
+            break
+          case 'last-updated':
+            condition = a.updated_at < b.updated_at
+
+            break
         }
 
         return this.sort.order === 'asc'
