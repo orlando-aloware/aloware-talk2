@@ -501,16 +501,18 @@ export default {
         this.checkCommunicationMatchesUser(this.userId, data) &&
         this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)
 
-      if (isCommMatchesMinReq) {
-        this.pagination.total += 1
+      if (!isCommMatchesMinReq) {
+        return
+      }
 
-        // push new data to top of array
-        this.communications.unshift(data)
+      this.pagination.total += 1
 
-        if (this.communications.length > this.filter.per_page) {
-          // push out last data from bottom of array
-          this.communications.pop()
-        }
+      // push new data to top of array
+      this.communications.unshift(data)
+
+      if (this.communications.length > this.filter.per_page) {
+        // push out last data from bottom of array
+        this.communications.pop()
       }
     }
 
