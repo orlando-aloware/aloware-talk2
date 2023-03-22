@@ -408,6 +408,7 @@ $orange-light: #FFF9F7;
 // System Colors
 $blue: $primary;
 $orange: #ff9f1c;
+$orange2: #F15A22;
 $red: $danger;
 $turquoise: #00c0cc;
 $light-green: #cff8df;
@@ -444,7 +445,7 @@ $completed-event: #00BF4A;
 // Wallboard colors
 $agent-status-offline: $grey-80;
 $agent-status-available: $success;
-$agent-status-busy: $orange;
+$agent-status-busy: $orange2;
 $agent-status-on-break: $light-orange2;
 $agent-status-wrap-up: $purple-2;
 $agent-status-on-call: $light-blue1;
