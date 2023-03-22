@@ -185,6 +185,7 @@ export default {
       return users.sort((a, b) => {
         let condition = null
 
+        // use a different rule based on order field
         switch (this.sort.orderBy) {
           case 'id':
             condition = a.id > b.id

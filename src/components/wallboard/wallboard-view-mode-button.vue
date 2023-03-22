@@ -1,7 +1,7 @@
 <template>
   <b-form-group>
       <b-form-radio-group buttons
-                          button-variant="outline-primary"
+                          button-variant="outline-success"
                           :options="options"
                           v-model="mode"
                           @change="onChange"/>

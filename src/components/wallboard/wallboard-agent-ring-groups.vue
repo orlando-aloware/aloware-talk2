@@ -5,14 +5,15 @@
       <div class="users__table__agent-ring-groups__ring-group-name">
         {{ firstRingGroup.name }}
       </div>
-      <span class="text-primary ml-1 cursor-pointer"
+      <span class="text-success ml-1 cursor-pointer"
             :id="`rg-more-${_uid}`"
             v-if="ringGroups.length > 1">
         + {{ ringGroups.length - 1 }} more
       </span>
       <b-popover :container="`rg-container-${_uid}`"
                  :target="`rg-more-${_uid}`"
-                 triggers="hover">
+                 triggers="hover"
+                 v-if="ringGroups.length > 1">
         <span class="d-block mb-1"
               :key="ringGroup.id"
               v-for="ringGroup in userRingGroups">

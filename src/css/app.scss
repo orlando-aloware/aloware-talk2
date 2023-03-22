@@ -12556,12 +12556,18 @@ h1.contact-list-name-label {
     .users {
       color: $grey-92;
 
-      &--comfort {
-
-      }
+      &--comfort {}
 
       &--compact {
-
+        .users {
+          &__table {
+            table.datatable {
+              td {
+                padding: 2px 8px;
+              }
+            }
+          }
+        }
       }
 
       &__header {
@@ -12588,6 +12594,12 @@ h1.contact-list-name-label {
       }
 
       &__table {
+        table.datatable {
+          td {
+            transition: all .3s;
+          }
+        }
+
         &__agent-name {
           a {
             color: $grey-92;
