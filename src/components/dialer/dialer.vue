@@ -171,7 +171,7 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(call.callSid, call.from).then(res => {
+      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
@@ -539,16 +539,7 @@ export default {
         this.dialerCallPrep(call)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
-        this.getCommunication(call.callSid, call.from)
-          // .finally(() => {
-          //   this.$router.push({ name: 'Call' }).catch(err => {
-          //     console.log(err)
-          //   })
-          //   setTimeout(() => {
-          //    this.startCallTimer()
-          //    this.setDialerCurrentStatus('CALL_CONNECTED')
-          //   }, 3000)
-          // })
+        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
           .catch((err) => {
             console.log(err)
           })
@@ -597,10 +588,7 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      if (this.device.activeConnection()) {
-        // hangup an incoming call
-        this.device.activeConnection().hangup()
-      }
+      this.connection.hangup()
 
       // this.resetCall()
     },
@@ -1049,8 +1037,8 @@ export default {
         customParameters[key] = value
       })
       this.setDialerCall({
-        from: call.parameters.from,
-        to: call.to,
+        from: call.parameters.From,
+        to: call.parameters.To,
         callSid: call.parameters.CallSid,
         state: call.status(),
         isMuted: call.isMuted(),

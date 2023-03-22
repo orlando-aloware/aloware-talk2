@@ -18,8 +18,8 @@ export default class TwilioDevice extends MainDevice {
     return this._device.status()
   }
 
-  disconnectAll (connection) {
-    this._device.disconnectAll(connection._connection)
+  disconnectAll () {
+    this._device.disconnectAll()
   }
 
   activeConnection () {
