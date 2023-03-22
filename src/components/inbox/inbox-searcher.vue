@@ -3,10 +3,9 @@
     <compact-btn borderless
                  customClass="fs-14 _500 position-relative primary not-focusable filter-toggle-button"
                  variant="outlined-light"
-
-    :disabled="isLoading"
-    @clicked="$emit('opened')">
-    <search-icon :color="searchIconColor"></search-icon>
+                 :disabled="isLoading"
+                 @clicked="$emit('opened')">
+      <search-icon :color="searchIconColor"></search-icon>
     </compact-btn>
   </div>
 </template>
@@ -24,6 +23,7 @@ export default {
     isLoading: {
       type: Boolean
     },
+
     searchIconColor: {
       type: String,
       default: '#62666E'
