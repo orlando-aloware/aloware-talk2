@@ -46,7 +46,6 @@
 import ConfirmDialog from 'components/confirm-dialog.vue'
 
 import { mapActions, mapGetters } from 'vuex'
-import { LIST_ONLY } from 'src/constants/remove-list-action-types'
 
 export default {
   components: {
@@ -84,7 +83,6 @@ export default {
 
   data () {
     return {
-      ActionTypes: { LIST_ONLY },
       flagged: false
     }
   },
@@ -104,8 +102,7 @@ export default {
     ...mapActions('contacts', [
       'removeListClose',
       'removeListOpen',
-      'foldersLoaded',
-      'setRemoveListActionType'
+      'foldersLoaded'
     ]),
 
     confirmClose () {
@@ -162,12 +159,11 @@ export default {
     },
 
     onRemoveListOnly () {
-      this.showConfirmDialog(this.ActionTypes.LIST_ONLY)
+      this.showConfirmDialog()
     },
 
-    showConfirmDialog (actionType) {
+    showConfirmDialog () {
       this.flagged = true
-      this.setRemoveListActionType(actionType)
       this.$bvModal.show('remove-list-confirmation-dialog')
       this.$bvModal.hide('remove-list-dialog')
     },
