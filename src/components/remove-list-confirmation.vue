@@ -38,7 +38,7 @@
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
-import { LIST_ONLY, LIST_AND_CONTACT } from 'src/constants/remove-list-action-types'
+import { LIST_ONLY } from 'src/constants/remove-list-action-types'
 
 export default {
   components: {
@@ -86,7 +86,7 @@ export default {
     return {
       isBusy: false,
       listName: null,
-      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT }
+      ActionTypes: { LIST_ONLY }
     }
   },
   watch: {
