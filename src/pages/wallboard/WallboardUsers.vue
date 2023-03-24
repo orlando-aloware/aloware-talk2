@@ -40,14 +40,16 @@ export default {
     ]),
 
     ...mapGetters('wallboard', {
-      viewMode: 'getViewMode'
+      viewMode: 'getViewMode',
+      wallboardFilters: 'getFilters'
     })
   },
 
   data: () => ({
     filters: {
       agent: null,
-      status: 'all'
+      status: 'all',
+      ringGroup: null
     }
   }),
 
@@ -58,6 +60,12 @@ export default {
 
     onFilterStatus (status) {
       this.filters.status = status
+    }
+  },
+
+  watch: {
+    'wallboardFilters.ringGroup' (value) {
+      this.filters.ringGroup = value
     }
   }
 }

@@ -118,6 +118,10 @@ export default {
       status: {
         type: [String, Number],
         default: 'all'
+      },
+      ringGroup: {
+        type: Number,
+        default: null
       }
     }
   },
@@ -245,7 +249,12 @@ export default {
           ? true
           : user.agent_status === this.filters.status
 
-        return name && status
+        // ring group filter
+        const ringGroup = !this.filters.ringGroup
+          ? true
+          : user.ring_group_ids.includes(this.filters.ringGroup)
+
+        return name && status && ringGroup
       })
     },
 
