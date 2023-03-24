@@ -33,6 +33,7 @@ export default {
 
   created () {
     // FIXME: fetch all things here
+    this.fetchSummary()
     this.fetchUsers()
   },
 
@@ -50,6 +51,7 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
+      'fetchSummary',
       'fetchUsers'
     ]),
 
