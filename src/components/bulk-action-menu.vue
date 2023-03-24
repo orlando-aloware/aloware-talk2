@@ -38,7 +38,8 @@
           Create Static List
         </a>
       </div>
-      <div class="items">
+      <div class="items"
+           v-if="hasPermissionTo('archive contact')">
         <a href="" @click="onDelete">
           <i class="fa fa-trash"></i>
           Delete
@@ -52,32 +53,57 @@
 
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'bulk-action-menu',
+
+  mixins: [
+    aclMixin
+  ],
+
   props: {
     id: {
       type: String,
       required: true
     }
   },
+
   computed: {
-    ...mapGetters('contacts', ['selectedContacts', 'selectedList']),
-    ...mapState('contacts', ['isAllContactsSelected']),
+    ...mapGetters('contacts', [
+      'selectedContacts',
+      'selectedList'
+    ]),
+
+    ...mapState('contacts', [
+      'isAllContactsSelected'
+    ]),
+
     getSelectedCount () {
       return this.selectedContacts[this.id].length || 0
     },
+
     forceAllSelection () {
       return false
     }
   },
+
   methods: {
-    ...mapActions('contacts', ['removeContactOpen', 'setBulkDelete', 'createListOpen', 'selectListOpen', 'setSelectedStaticList', 'setAllContactsSelected']),
+    ...mapActions('contacts', [
+      'removeContactOpen',
+      'setBulkDelete',
+      'createListOpen',
+      'selectListOpen',
+      'setSelectedStaticList',
+      'setAllContactsSelected'
+    ]),
+
     onDelete (e) {
       this.setBulkDelete(true)
       this.$bvModal.show('remove-contact-dialog')
       e.preventDefault()
     },
+
     onCreateStaticList (e) {
       this.createListOpen({
         type: 1,
@@ -86,6 +112,7 @@ export default {
       })
       e.preventDefault()
     },
+
     onAddToStaticList (e) {
       this.selectListOpen({
         contact_folder_id: null
@@ -93,6 +120,7 @@ export default {
       this.setSelectedStaticList({ id: null, name: '', type: null })
       e.preventDefault()
     },
+
     onSetAllContactsSelected (e) {
       this.setAllContactsSelected(true)
       this.$emit('onSetAllContactsSelected')
