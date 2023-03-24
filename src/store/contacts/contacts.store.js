@@ -119,7 +119,6 @@ export default function () {
     isBulkDelete: false,
     removeFolder: null,
     removeList: null,
-    removeListActionType: null,
     removedFolder: null,
     moveDialog: {
       open: false,
