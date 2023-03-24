@@ -1,12 +1,12 @@
 <template>
-  <div :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone }"
-       class="phone d-flex flex-column"
+  <div class="phone d-flex flex-column"
        ref="phone"
+       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
-         :class="{ 'call-ended': isCallCompleted }"
-         ref="phoneHeader">
+         ref="phoneHeader"
+         :class="{ 'call-ended': isCallCompleted }">
       <div v-if="shouldShow"
            class="d-flex flex-row text-size-rg _500 text-white width-65">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
@@ -17,12 +17,14 @@
       </div>
       <div class="d-flex flex-row text-xs text-white">
         <span v-if="isCallCompleted">Call Ended</span>
-        <span v-else-if="dialer.communication && getCampaign(dialer.communication.campaign_id)">{{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}</span>
+        <span v-else-if="dialer.communication && getCampaign(dialer.communication.campaign_id)">
+          {{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}
+        </span>
       </div>
       <div class="d-flex flex-row justify-content-between align-items-center width-65">
         <pause-record-icon width="14"
                            height="14"
-                           v-show="(!isCallCompleted || devMode) && dialer.recordingStatus === 'in-progress' && dialer.communication && dialer.communication.should_record === true">
+                           v-show="pauseRecordIconShow">
         </pause-record-icon>
 
         <ul id="signal-strength">
@@ -48,11 +50,11 @@
           </li>
         </ul>
 
-        <q-btn-dropdown :ripple="false"
-                        :menu-offset="[29, 8]"
-                        class="tab-dropdown no-arrow"
+        <q-btn-dropdown class="tab-dropdown no-arrow"
                         ref="menu"
-                        flat>
+                        flat
+                        :ripple="false"
+                        :menu-offset="[29, 8]">
           <template v-slot:label>
             <q-btn icon="img:app-icons/dialer/phone_settings.svg"
                    size="12px"
@@ -102,10 +104,8 @@
     </div>
     <div v-if="loadingPhone"
          class="bg-dark d-flex align-items-center justify-content-center h-100">
-      <q-spinner-bars
-        color="white"
-        size="2em"
-      />
+      <q-spinner-bars color="white"
+                      size="2em" />
     </div>
     <template v-if="!loadingPhone && shouldShow">
       <div class="phone-body d-flex flex-column flex-grow-1 align-items-center justify-content-around">
@@ -136,12 +136,14 @@
             </q-banner>
           </div>
           <div class="phone-info d-flex flex-column align-items-center">
-            <person-icon></person-icon>
+            <person-icon />
 
             <div class="text-white text-center">
               <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                             v-if="contact || hasCallFishingContact">
-                <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
+                <span class="d-inline-flex">
+                  {{ contactName | truncate(15) }}
+                </span>
                 <q-btn color="white"
                        icon="o_info"
                        class="text-size-rg d-inline-flex ml-1"
@@ -154,12 +156,9 @@
                 <span class="d-inline-flex">{{ leadNumber }}</span>
                 <b-link href="#"
                         class="copy-phone-number text-white d-inline-flex ml-1"
-                        @click.prevent="copyPhoneNumber">
+                        @click.prevent="copyPhoneNumber(leadNumberRaw)">
                   <copy-icon />
                 </b-link>
-                <input :value="leadNumberRaw"
-                       type="hidden"
-                       id="phone-number-clone"/>
               </q-item-label>
               <q-item-label class="text-size-sm _400 mt-1"
                             v-if="companyName">
@@ -173,7 +172,7 @@
           </div>
           <div class="phone-cta">
             <div class="d-flex flex-row"
-                 :class="[ isUnparkCallVisible || (!isDeclineCallVisible && !isIgnoreCallVisible && isAnswerCallVisible) ? 'justify-content-center' : 'justify-content-between' ]"
+                 :class="phoneCtaClass"
                  v-if="isPhoneCTAVisible">
               <div class="d-flex flex-column align-items-center"
                    v-if="isDeclineCallVisible">
@@ -203,7 +202,7 @@
               </div>
 
               <div class="d-flex flex-column align-items-center"
-              v-if="isAnswerCallVisible">
+                   v-if="isAnswerCallVisible">
                 <q-btn class="height-52"
                        ripple
                        round
@@ -233,11 +232,11 @@
 
             <div class="d-flex flex-column justify-content-center align-items-center"
                  v-if="isHangupCallVisible">
-              <q-btn :disable="dialer.currentStatus === 'MAKING_CALL'"
-                     :class="[ dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '']"
-                     class="height-52"
+              <q-btn class="height-52"
                      round
                      no-caps
+                     :disable="dialer.currentStatus === 'MAKING_CALL'"
+                     :class="hangupCallClass"
                      @click="hangupCall">
                 <cancel-call-icon width="52"
                                   height="52">
@@ -251,13 +250,13 @@
           <div class="phone-main d-flex flex-column align-items-center">
             <div class="dummy bg-dark w-100 height-36"></div>
             <div class="phone-avatar">
-              <avatar :name="contactName"
-                      v-if="!isCallAdding && !isCallAdded"
+              <avatar v-if="!isCallAdding && !isCallAdded"
                       class="contact-avatar"
                       width="50"
-                      height="50">
+                      height="50"
+                      :name="contactName">
               </avatar>
-              <participants-icon v-else></participants-icon>
+              <participants-icon v-else />
             </div>
             <div class="phone-info small d-flex flex-column align-items-center"
                  v-if="!isCallAdding && !isCallAdded">
@@ -277,12 +276,9 @@
                   <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
                   <b-link href="#"
                           class="copy-phone-number text-grey-100 d-inline-flex ml-1"
-                          @click.prevent="copyPhoneNumber">
+                          @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
                     <copy-icon />
                   </b-link>
-                  <input :value="dialer.communication.lead_number"
-                         type="hidden"
-                         id="phone-number-clone"/>
                 </q-item-label>
                 <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
                               v-if="contact && (contact.company_name || currentLocalTime)">
@@ -300,18 +296,15 @@
               <div class="d-flex justify-content-between align-items-center w-100 pr-2">
                 <q-item-label v-if="contact"
                               class="cursor-pointer"
-                              @click="openMembers">
+                              @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
-                    <ready-icon v-if="!shouldIntroduce"></ready-icon>
-                    <waiting-icon v-else></waiting-icon>
+                    <ready-icon v-if="!shouldIntroduce" />
+                    <waiting-icon v-else />
                     <span class="ml-2 text-size-xxl _600 text-grey-100">{{ contactName | truncate(15) }}</span>
                   </div>
                 </q-item-label>
-                <q-btn :loading="loadingMerge"
-                       :disabled="loadingMerge || !dialer.communication.legc_status || dialer.communication.legc_status !== CommunicationStatus.STATUS_INPROGRESS_NEW"
-                       v-if="shouldIntroduce"
+                <q-btn class="d-flex align-items-center justify-content-between merge-btn"
                        color="success"
-                       class="d-flex align-items-center justify-content-between merge-btn"
                        label="Merge"
                        ripple
                        outline
@@ -319,17 +312,20 @@
                        no-caps
                        unelevated
                        dense
+                       :loading="loadingMerge"
+                       :disabled="isIntroduceDisabled"
+                       v-if="shouldIntroduce"
                        @click="mergeCalls">
-                  <merge-icon class="ml-2"></merge-icon>
+                  <merge-icon class="ml-2" />
                 </q-btn>
               </div>
 
               <div class="d-flex justify-content-between align-items-center mt-3 w-100 pr-2"
                    v-if="addedParty">
                 <q-item-label class="cursor-pointer"
-                              @click="openMembers">
+                              @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
-                    <ready-icon></ready-icon>
+                    <ready-icon />
                     <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty.name | truncate(15) }}</span>
                   </div>
                   <div class="mt-1">
@@ -343,22 +339,22 @@
                     </span>
                   </div>
                 </q-item-label>
-                <q-btn :loading="loadingDropThirdParty"
-                       :disabled="loadingDropThirdParty"
-                       class="height-24"
+                <q-btn class="height-24"
                        ripple
                        round
                        no-caps
                        unelevated
+                       :loading="loadingDropThirdParty"
+                       :disabled="loadingDropThirdParty"
                        @click="dropThirdParty">
-                  <drop-participant-icon></drop-participant-icon>
+                  <drop-participant-icon />
                 </q-btn>
               </div>
             </div>
 
             <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
-              <button :disabled="isMuteDisabled"
-                      class="phone-buttons btn"
+              <button class="phone-buttons btn"
+                      :disabled="isMuteDisabled"
                       @click="toggleMute">
                 <mute-icon :width="iconSizes.mute.width"
                            :height="iconSizes.mute.height"
@@ -370,8 +366,8 @@
                 </unmute-icon>
                 <span>{{ dialer.isMuted ? 'Unmute' : 'Mute' }}</span>
               </button>
-              <button :disabled="isHoldDisabled || loadingHold || loadingUnhold"
-                      class="phone-buttons btn"
+              <button class="phone-buttons btn"
+                      :disabled="isHoldDisabled || loadingHold || loadingUnhold"
                       @click="toggleHold">
                 <hold-icon :width="iconSizes.hold.width"
                            :height="iconSizes.hold.height"
@@ -384,14 +380,14 @@
                 <span>{{ dialer.isHeld ? 'Unhold' : 'Hold' }}</span>
               </button>
               <button class="phone-buttons btn"
-                      @click="openDialpad">
+                      @click="openExpansion('dialpad')">
                 <dialpad-icon :width="iconSizes.keypad.width"
                               :height="iconSizes.keypad.height">
                 </dialpad-icon>
                 <span>Keypad</span>
               </button>
-              <button :disabled="isRecordingDisabled || loadingToggleRecordingStatus || dialer.communication.should_record === false"
-                      class="phone-buttons btn"
+              <button class="phone-buttons btn"
+                      :disabled="isDisabledPhoneButtons"
                       @click="toggleRecordingStatus">
                 <record-icon :width="iconSizes.recording.width"
                              :height="iconSizes.recording.height"
@@ -406,22 +402,22 @@
             </div>
             <div class="d-flex justify-content-between w-100 mt-3 pl-3 pr-3 actions-block">
               <button class="phone-buttons elevated btn"
-                      @click="openNotes">
+                      @click="openExpansion('notes')">
                 <notes-icon :width="iconSizes.notes.width"
                             :height="iconSizes.notes.height">
                 </notes-icon>
                 <span>Notes</span>
               </button>
               <button class="phone-buttons elevated btn"
-                      @click="openTags">
+                      @click="openExpansion('tags')">
                 <tags-icon :width="iconSizes.tags.width"
                            :height="iconSizes.tags.height">
                 </tags-icon>
                 <span>Tags</span>
               </button>
-              <button :disabled="isVmDropDisabled"
-                      class="phone-buttons elevated btn"
-                      @click="openVmDrop">
+              <button class="phone-buttons elevated btn"
+                      :disabled="isVmDropDisabled"
+                      @click="openExpansion('vm-drop')">
                 <vm-drop-icon :width="iconSizes.vmdrop.width"
                               :height="iconSizes.vmdrop.height">
                 </vm-drop-icon>
@@ -429,32 +425,32 @@
               </button>
             </div>
             <div class="d-flex justify-content-between w-100 mt-5 pl-3 pr-3 actions-block">
-              <button :disabled="isHangupDisabled"
-                      class="phone-buttons btn"
+              <button class="phone-buttons btn"
+                      :disabled="isHangupDisabled"
                       @click="endCall">
                 <cancel-call-icon :width="iconSizes.call.width"
                                   :height="iconSizes.call.height">
                 </cancel-call-icon>
               </button>
-              <button :disabled="isAddDisabled"
-                      class="phone-buttons btn"
-                      @click="openAdd">
+              <button class="phone-buttons btn"
+                      :disabled="isAddDisabled"
+                      @click="openExpansion('add')">
                 <add-icon :width="iconSizes.add.width"
                           :height="iconSizes.add.height">
                 </add-icon>
                 <span>Add</span>
               </button>
-              <button :disabled="isTransferDisabled"
-                      class="phone-buttons btn"
-                      @click="openTransfer">
+              <button class="phone-buttons btn"
+                      :disabled="isTransferDisabled"
+                      @click="openExpansion('transfer')">
                 <transfer-icon :width="iconSizes.transfer.width"
                                :height="iconSizes.transfer.height">
                 </transfer-icon>
                 <span>Transfer</span>
               </button>
-              <button :disabled="isMoreDisabled"
-                      class="phone-buttons btn"
-                      @click="openMore">
+              <button class="phone-buttons btn"
+                      :disabled="isMoreDisabled"
+                      @click="openExpansion('more')">
                 <more-icon :width="iconSizes.more.width"
                            :height="iconSizes.more.height">
                 </more-icon>
@@ -470,8 +466,8 @@
                 <avatar class="contact-avatar"
                         width="40"
                         height="40"
-                        v-if="contact"
-                        :name="contact.name">
+                        :name="contact.name"
+                        v-if="contact">
                 </avatar>
                 <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
                   <div class="mr-auto">
@@ -490,12 +486,9 @@
                       <span>{{ contact.phone_number | fixPhone }}</span>
                       <b-link href="#"
                               class="copy-phone-number text-grey-100 d-inline-flex ml-1"
-                              @click.prevent="copyPhoneNumber">
+                              @click.prevent="copyPhoneNumber(contact.phone_number)">
                         <copy-icon/>
                       </b-link>
-                      <input :value="contact.phone_number"
-                             type="hidden"
-                             id="phone-number-clone"/>
                     </p>
                   </div>
                 </div>
@@ -524,8 +517,8 @@
                 Call Disposition
               </label>
               <div class="d-flex flex-row align-items-center w-100">
-                <call-disposition-wrapper :communication="dialer.communication"
-                                          class="w-100">
+                <call-disposition-wrapper class="w-100"
+                                          :communication="dialer.communication">
                 </call-disposition-wrapper>
               </div>
             </div>
@@ -535,8 +528,8 @@
                 Contact Disposition
               </label>
               <div class="d-flex flex-row align-items-center w-100">
-                <contact-disposition-wrapper :contact="contact"
-                                             class="w-100">
+                <contact-disposition-wrapper class="w-100"
+                                             :contact="contact">
                 </contact-disposition-wrapper>
               </div>
             </div>
@@ -553,10 +546,10 @@
                   </template-selector>
                 </div>
                 <div class="d-flex flex-shrink-0 ml-2">
-                  <b-button :loading="loadingSendMessage"
-                            :disabled="loadingSendMessage || !template"
-                            variant="primary"
+                  <b-button variant="primary"
                             size="sm"
+                            :loading="loadingSendMessage"
+                            :disabled="loadingSendMessage || !template"
                             @click="sendMessage">
                     <span>Send</span>
                   </b-button>
@@ -648,7 +641,9 @@
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
                   @click="makeCall">
-          <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
+          <b-icon icon="telephone-fill"
+                  aria-hidden="true">
+          </b-icon>
           <span class="ml-1">Call Back</span>
         </b-button>
 
@@ -659,28 +654,28 @@
         </b-button>
       </div>
       <div class="phone-expansion d-flex overlay"
-           v-if="(devMode || !isCallCompleted) && (contact || hasCallFishingCommunication) && expansionEnabled">
-        <q-expansion-item v-model="expanded"
-                          class="shadow-1 overflow-hidden w-100"
+           v-if="isPhoneExpansionAvailable">
+        <q-expansion-item class="shadow-1 overflow-hidden w-100"
                           header-class="text-sm bg-white text-center"
                           expand-icon-class="text-grey-100"
                           switch-toggle-side
-                          dense>
+                          dense
+                          v-model="expanded">
           <template v-slot:header>
             <q-item-section>
               <q-item-label>{{ bottomExpansionLabel }}</q-item-label>
             </q-item-section>
 
             <q-item-section side>
-              <q-btn :ripple="false"
-                     :class="[ !expanded ? 'invisible' : '']"
+              <q-btn class="no-q-btn-focus"
                      color="primary"
-                     :label="phoneExpansionLabel"
-                     class="no-q-btn-focus"
                      no-caps
                      unelevated
                      dense
                      flat
+                     :ripple="false"
+                     :class="[ !expanded ? 'invisible' : '']"
+                     :label="phoneExpansionLabel"
                      @click="saveAndResetExpansion">
               </q-btn>
             </q-item-section>
@@ -699,12 +694,9 @@
                     <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
                     <b-link href="#"
                             class="copy-phone-number text-grey-100 d-inline-flex ml-1"
-                            @click.prevent="copyPhoneNumber">
+                            @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
                       <i class="material-icons">content_copy</i>
                     </b-link>
-                    <input :value="dialer.communication.lead_number"
-                           type="hidden"
-                           id="phone-number-clone"/>
                   </q-item-label>
                   <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
                                 v-if="contact && contact.company_name">
@@ -761,8 +753,8 @@
               <q-card-section class="height-445">
                 <div class="d-flex flex-column justify-content-around h-100 pt-3 pb-3">
                   <div class="d-flex flex-column">
-                    <b-form-input v-model="digits"
-                                  class="phone-digits"
+                    <b-form-input class="phone-digits"
+                                  v-model="digits"
                                   type="text">
                     </b-form-input>
                   </div>
@@ -863,10 +855,12 @@
               <q-card-section class="height-445">
                 <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
                   <div class="d-flex">
-                    <communication-note :communication="dialer.communication"
+                    <communication-note class="flex-grow-1 h-100 phone-notes"
+                                        ref="communicationNotes"
+                                        :communication="dialer.communication"
                                         :no-auto-save="true"
-                                        class="flex-grow-1 h-100 phone-notes"
-                                        ref="communicationNotes">
+                                        @notesChanged="storeNotes"
+                                        @onUnsavedChanges="onCommunicationNotesUnsaved">
                     </communication-note>
                   </div>
                   <div class="d-flex">
@@ -883,8 +877,8 @@
             </template>
             <template v-if="bottomExpansion === 'tags'">
               <q-card-section class="height-240 mx-2 px-3">
-                <communication-tags :communication="dialer.communication"
-                                    buttonText="Modify Tags"
+                <communication-tags buttonText="Modify Tags"
+                                    :communication="dialer.communication"
                                     ref="communicationTags">
                 </communication-tags>
               </q-card-section>
@@ -892,9 +886,9 @@
             <template v-if="bottomExpansion === 'scripts'">
               <q-card-section class="height-445 overflow-hidden-y">
                 <div class="d-flex flex-column justify-content-start w-100 pt-3 pl-3 pr-3">
-                  <script-selector :communication="dialer.communication"
+                  <script-selector class="w-100"
+                                   :communication="dialer.communication"
                                    v-model="scriptId"
-                                   class="w-100"
                                    @change="changeScript">
                   </script-selector>
                 </div>
@@ -913,20 +907,20 @@
                               class="pl-0 pr-0"
                               dense>
                         <q-item-section avatar>
-                          <q-radio v-model="add.mode"
-                                   val="user"
+                          <q-radio val="user"
                                    color="primary"
                                    size="xs"
-                                   dense>
+                                   dense
+                                   v-model="add.mode">
                           </q-radio>
                         </q-item-section>
                         <q-item-section>
                           <template v-if="add.mode === 'user'">
                             <div class="d-inline-flex w-100">
-                              <available-user-selector :communication="dialer.communication"
-                                                       v-model="add.userId"
+                              <available-user-selector class="flex-grow-1"
                                                        ref="availableUserSelector"
-                                                       class="flex-grow-1"
+                                                       :communication="dialer.communication"
+                                                       v-model="add.userId"
                                                        @change="changeAddUser">
                               </available-user-selector>
                               <q-btn color="black"
@@ -947,19 +941,19 @@
                               class="pl-0 pr-0"
                               dense>
                         <q-item-section avatar>
-                          <q-radio v-model="add.mode"
-                                   val="ring-group"
+                          <q-radio val="ring-group"
                                    color="primary"
                                    size="xs"
-                                   dense>
+                                   dense
+                                   v-model="add.mode">
                           </q-radio>
                         </q-item-section>
                         <q-item-section>
                           <template v-if="add.mode === 'ring-group'">
-                            <ring-group-selector v-model="add.ringGroupId"
-                                                 :genericMultiselect="false"
+                            <ring-group-selector :genericMultiselect="false"
                                                  :isGenericSelectorStyle="true"
                                                  :clearable="true"
+                                                 v-model="add.ringGroupId"
                                                  @change="changeAddRingGroup">
                             </ring-group-selector>
                           </template>
@@ -972,21 +966,21 @@
                               class="pl-0 pr-0"
                               dense>
                         <q-item-section avatar>
-                          <q-radio v-model="add.mode"
-                                   val="phone-number"
+                          <q-radio val="phone-number"
                                    color="primary"
                                    size="xs"
-                                   dense>
+                                   dense
+                                   v-model="add.mode">
                           </q-radio>
                         </q-item-section>
                         <q-item-section>
                           <template v-if="add.mode === 'phone-number'">
-                            <q-input v-model="add.phoneNumber"
-                                     class="form-control-search form-control"
+                            <q-input class="form-control-search form-control"
                                      placeholder="Enter phone number"
                                      borderless
                                      clearable
                                      dense
+                                     v-model="add.phoneNumber"
                                      @input="changeAddPhoneNumber">
                             </q-input>
                           </template>
@@ -1000,22 +994,22 @@
                   <div class="d-flex flex-inline">
                     <div class="d-flex flex-grow-1">
                       <div class="d-flex flex-even pl-1 pr-1">
-                        <b-button :loading="loadingAdd"
-                                  :disabled="loadingAdd || !addValidated"
-                                  variant="outline-dark-primary"
+                        <b-button variant="outline-dark-primary"
                                   size="sm"
                                   block
+                                  :loading="loadingAdd"
+                                  :disabled="loadingAdd || !addValidated"
                                   @click="addParticipant">
                           <i class="material-icons-outlined">person_add_alt</i>
                           <span class="ml-2">Add</span>
                         </b-button>
                       </div>
                       <div class="d-flex flex-even pl-1 pr-1">
-                        <b-button :loading="loadingIntroduce"
-                                  :disabled="loadingIntroduce || !introduceValidated"
-                                  variant="outline-dark-primary"
+                        <b-button variant="outline-dark-primary"
                                   size="sm"
                                   block
+                                  :loading="loadingIntroduce"
+                                  :disabled="loadingIntroduce || !introduceValidated"
                                   @click="introduceParticipant">
                           <i class="material-icons-outlined">people</i>
                           <span class="ml-2">Introduce</span>
@@ -1055,20 +1049,20 @@
                               class="pl-0 pr-0"
                               dense>
                         <q-item-section avatar>
-                          <q-radio v-model="transfer.mode"
-                                   val="user"
+                          <q-radio val="user"
                                    color="primary"
                                    size="xs"
-                                   dense>
+                                   dense
+                                   v-model="transfer.mode">
                           </q-radio>
                         </q-item-section>
                         <q-item-section>
                           <template v-if="transfer.mode === 'user'">
                             <div class="d-inline-flex w-100">
-                              <available-user-selector :communication="dialer.communication"
-                                                       v-model="transfer.userId"
-                                                       ref="availableUserSelector"
+                              <available-user-selector ref="availableUserSelector"
                                                        class="flex-grow-1"
+                                                       :communication="dialer.communication"
+                                                       v-model="transfer.userId"
                                                        @change="changeTransferUser">
                               </available-user-selector>
                               <q-btn color="black"
@@ -1089,19 +1083,19 @@
                               class="pl-0 pr-0"
                               dense>
                         <q-item-section avatar>
-                          <q-radio v-model="transfer.mode"
-                                   val="ring-group"
+                          <q-radio val="ring-group"
                                    color="primary"
                                    size="xs"
-                                   dense>
+                                   dense
+                                   v-model="transfer.mode">
                           </q-radio>
                         </q-item-section>
                         <q-item-section class="test">
                           <template v-if="transfer.mode === 'ring-group'">
-                            <ring-group-selector v-model="transfer.ringGroupId"
-                                                 :genericMultiselect="false"
+                            <ring-group-selector :genericMultiselect="false"
                                                  :isGenericSelectorStyle="true"
                                                  :clearable="true"
+                                                 v-model="transfer.ringGroupId"
                                                  @change="changeTransferRingGroup">
                             </ring-group-selector>
                           </template>
@@ -1114,21 +1108,21 @@
                               class="pl-0 pr-0"
                               dense>
                         <q-item-section avatar>
-                          <q-radio v-model="transfer.mode"
-                                   val="phone-number"
+                          <q-radio val="phone-number"
                                    color="primary"
                                    size="xs"
-                                   dense>
+                                   dense
+                                   v-model="transfer.mode">
                           </q-radio>
                         </q-item-section>
                         <q-item-section>
                           <template v-if="transfer.mode === 'phone-number'">
-                            <q-input v-model="transfer.phoneNumber"
-                                     class="form-control-search form-control"
+                            <q-input class="form-control-search form-control"
                                      placeholder="Enter phone number"
                                      borderless
                                      clearable
                                      dense
+                                     v-model="transfer.phoneNumber"
                                      @input="changeTransferPhoneNumber">
                             </q-input>
                           </template>
@@ -1140,11 +1134,11 @@
                     </q-list>
                   </div>
                   <div class="d-flex">
-                    <b-button :loading="loadingTransfer"
-                              :disabled="loadingTransfer || !transferValidated"
-                              variant="primary"
+                    <b-button variant="primary"
                               size="sm"
                               block
+                              :loading="loadingTransfer"
+                              :disabled="loadingTransfer || !transferValidated"
                               @click="transferCall">
                       <span>Transfer</span>
                     </b-button>
@@ -1156,17 +1150,17 @@
               <q-card-section class="height-445">
                 <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
                   <div class="d-flex">
-                    <vm-drop-selector v-model="vmDropId"
-                                      class="w-100"
+                    <vm-drop-selector class="w-100"
+                                      v-model="vmDropId"
                                       @change="changeVmDrop">
                     </vm-drop-selector>
                   </div>
                   <div class="d-flex">
-                    <b-button :loading="loadingSendVmDrop"
-                              :disabled="loadingSendVmDrop || !vmDropId"
-                              variant="primary"
+                    <b-button variant="primary"
                               size="sm"
                               block
+                              :loading="loadingSendVmDrop"
+                              :disabled="loadingSendVmDrop || !vmDropId"
                               @click="sendVmDrop">
                       <span>Leave Voicemail</span>
                     </b-button>
@@ -1178,14 +1172,14 @@
               <q-card-section class="height-140">
                 <div class="d-flex justify-content-start w-100 pt-3 pl-3 pr-3">
                   <button class="phone-buttons btn"
-                          @click="openScripts">
+                          @click="openExpansion('scripts')">
                     <scripts-icon :width="iconSizes.scripts.width"
                                   :height="iconSizes.scripts.height">
                     </scripts-icon>
                     <span>Scripts</span>
                   </button>
-                  <button :disabled="isParkDisabled"
-                          class="phone-buttons btn"
+                  <button class="phone-buttons btn"
+                          :disabled="isParkDisabled"
                           @click="parkCall">
                     <park-call-icon :width="iconSizes.parkCall.width"
                                     :height="iconSizes.parkCall.height">
@@ -1200,7 +1194,7 @@
                     <span>Contact</span>
                   </button>
                   <button class="phone-buttons btn"
-                          @click="openIntegrations">
+                          @click="openExpansion('integrations')">
                     <integrations-icon :width="iconSizes.integrations.width"
                                        :height="iconSizes.integrations.height">
                     </integrations-icon>
@@ -1271,8 +1265,10 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
+
 export default {
   name: 'phone',
+
   components: {
     ParkedCallIcon,
     MobileLiveCallBar,
@@ -1317,27 +1313,32 @@ export default {
     ContactIntegrations,
     DeviceSelector
   },
+
   mixins: [
     communicationInfoMixin,
     notificationMixin
   ],
+
   props: {
     is_widget: {
       type: Boolean,
       required: false,
       default: false
     },
+
     ignore_calls: {
       type: Boolean,
       required: false,
       default: false
     },
+
     isMobile: {
       type: Boolean,
       required: false,
       default: false
     }
   },
+
   data () {
     return {
       pos1: 0,
@@ -1400,6 +1401,9 @@ export default {
         phoneNumber: ''
       },
       loadingPhone: false,
+      communicationNotes: '',
+      hasCommunicationNotesUnsavedChanges: false,
+      phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1408,6 +1412,7 @@ export default {
       UploadedFileTypes
     }
   },
+
   computed: {
     ...mapState([
       'dialer',
@@ -1425,26 +1430,33 @@ export default {
       'parkedCalls',
       'callFishingQueue'
     ]),
+
     ...mapState('cache', ['currentCompany']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
+
     isHangupDisabled () {
       return this.isCallCompleted
     },
+
     isAddDisabled () {
       return !this.devMode && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
+
     isTransferDisabled () {
       return !this.devMode && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
+
     isMoreDisabled () {
       return !this.devMode && this.isCallCompleted
     },
+
     isVmDropDisabled () {
       return !this.devMode && this.isCallCompleted
     },
+
     isHoldDisabled () {
       return (!this.dialer.communication ||
         this.loadingHold ||
@@ -1454,21 +1466,27 @@ export default {
         (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
         (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
+
     isParkDisabled () {
       return (_.isEmpty(this.dialer.communication) || this.loadingPark || this.isCallCompleted || (!_.isEmpty(this.currentCompany) && !this.currentCompany.conferencing_enabled) || (!_.isEmpty(this.dialer.communication.legc_uuid) && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (!_.isEmpty(this.dialer.communication.legz_uuid) && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
     },
+
     isMuteDisabled () {
       return this.isCallCompleted
     },
+
     isRecordingDisabled () {
       return this.isCallCompleted
     },
+
     isCallAdded () {
       return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
     },
+
     isCallAdding () {
       return this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_RINGING_NEW
     },
+
     transferValidated () {
       if (this.transfer.mode === 'user' && this.transfer.userId) {
         return true
@@ -1481,6 +1499,7 @@ export default {
       }
       return false
     },
+
     addValidated () {
       if (this.add.mode === 'user' && this.add.userId) {
         return true
@@ -1495,6 +1514,7 @@ export default {
       }
       return false
     },
+
     introduceValidated () {
       if (this.add.mode === 'user' && this.add.userId) {
         return true
@@ -1510,6 +1530,7 @@ export default {
 
       return false
     },
+
     bottomExpansionLabel () {
       switch (this.bottomExpansion) {
         case 'integrations':
@@ -1536,9 +1557,11 @@ export default {
           return ''
       }
     },
+
     phoneExpansionLabel () {
       return this.bottomExpansion === 'tags' ? 'Done' : 'Cancel'
     },
+
     phoneStatus () {
       if (!this.dialer.communication) {
         return ''
@@ -1550,6 +1573,7 @@ export default {
           return ''
       }
     },
+
     recordingText () {
       if (this.dialer.recordingStatus === 'in-progress' && this.dialer.communication && this.dialer.communication.should_record === true) {
         return 'Pause Rec'
@@ -1559,9 +1583,11 @@ export default {
       }
       return 'Start Rec'
     },
+
     signalStrength () {
       return 100 - (this.warnings.length * 25)
     },
+
     contactName () {
       if (this.contact) {
         return this.contact.name || 'No Name'
@@ -1573,21 +1599,26 @@ export default {
       }
       return 'No Name'
     },
+
     leadNumberRaw () {
       const leadNumber = _.get(this.dialer, 'communication.lead_number', null)
       return !leadNumber ? _.get(this.dialer, 'callFishing.communication.lead_number', null) : leadNumber
     },
+
     leadNumber () {
       return this.$options.filters.fixPhone(this.leadNumberRaw)
     },
+
     companyName () {
       const companyName = _.get(this.dialer, 'contact.company_name', '')
       return !companyName ? _.get(this.dialer, 'callFishing.contact.company_name', '') : companyName
     },
+
     contact () {
       const contact = this.dialer.contact
       return !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
     },
+
     shouldShow () {
       const callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
       if (callFishingCommunication) {
@@ -1604,6 +1635,7 @@ export default {
 
       return this.dialer && !_.isEmpty(this.dialer.communication)
     },
+
     iconSizes () {
       return {
         mute: {
@@ -1668,30 +1700,37 @@ export default {
         }
       }
     },
+
     hasCallFishingCommunication () {
       return _.get(this.dialer, 'callFishing.communication', null) !== null
     },
+
     hasCallFishingContact () {
       return _.get(this.dialer, 'callFishing.contact', null) !== null
     },
+
     isPhoneBodyVisible () {
       return this.screen === 'call' &&
         (!_.isEmpty(this.dialer.call) ||
           !this.hasCallFishingCommunication)
     },
+
     isPhoneCTAVisible () {
       return (!_.isEmpty(this.dialer.call) &&
         this.dialer.call.direction === 'INCOMING') ||
         this.hasCallFishingCommunication
     },
+
     isHangupCallVisible () {
       return !_.isEmpty(this.dialer.call) &&
         this.dialer.call.direction === 'OUTGOING' &&
         !this.hasCallFishingCommunication
     },
+
     isOnPowerDialerSessionRoute () {
       return this.$route.meta.id === 'power-dialer-session'
     },
+
     isCallFishingCommunicationInParkedCalls () {
       if (_.isEmpty(this.parkedCalls)) {
         return false
@@ -1701,6 +1740,7 @@ export default {
 
       return !_.isEmpty(found)
     },
+
     isIgnored () {
       if (_.isEmpty(this.callFishingQueue)) {
         return true
@@ -1709,48 +1749,101 @@ export default {
       const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
       return _.isEmpty(found)
     },
+
     isDeclineCallVisible () {
       return this.dialer.call !== undefined ||
         !this.hasCallFishingCommunication
     },
+
     isIgnoreCallVisible () {
       return this.hasCallFishingCommunication &&
         !this.isCallFishingCommunicationInParkedCalls &&
         !this.isIgnored
     },
+
     isAnswerCallVisible () {
       return (this.dialer.call !== undefined &&
           !this.hasCallFishingCommunication) ||
         (this.hasCallFishingCommunication &&
           !this.isCallFishingCommunicationInParkedCalls)
     },
+
     isUnparkCallVisible () {
       return this.hasCallFishingCommunication &&
         this.isCallFishingCommunicationInParkedCalls
+    },
+
+    pauseRecordIconShow () {
+      return (!this.isCallCompleted || this.devMode) &&
+        this.dialer.recordingStatus === 'in-progress' &&
+        this.dialer.communication && this.dialer.communication.should_record === true
+    },
+
+    phoneCtaClass () {
+      return [
+        this.isUnparkCallVisible ||
+        (!this.isDeclineCallVisible && !this.isIgnoreCallVisible && this.isAnswerCallVisible)
+          ? 'justify-content-center' : 'justify-content-between'
+      ]
+    },
+
+    hangupCallClass () {
+      return [ this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '' ]
+    },
+
+    isIntroduceDisabled () {
+      return this.loadingMerge || !this.dialer.communication.legc_status ||
+        this.dialer.communication.legc_status !== CommunicationStatus.STATUS_INPROGRESS_NEW
+    },
+
+    isDisabledPhoneButtons () {
+      return this.isRecordingDisabled || this.loadingToggleRecordingStatus ||
+        this.dialer.communication.should_record === false
+    },
+
+    isPhoneExpansionAvailable () {
+      return (this.devMode || !this.isCallCompleted) &&
+        (this.contact || this.hasCallFishingCommunication) && this.expansionEnabled
     }
   },
+
   created () {
-    this.$VueEvent.listen('showLoadingPhone', () => {
+    this.phoneListeners.showLoadingPhone = () => {
       // Disable phone visibility on power dialer sessions
       this.isVisible = this.$route.meta.id !== 'power-dialer-session'
       this.loadingPhone = true
       this.$emit('onPhoneVisible', true)
-    })
-  },
-  mounted () {
-    this.$VueEvent.listen('togglePhone', () => {
-      this.togglePhone()
-    })
+    }
 
-    this.$VueEvent.listen('showPhone', () => {
+    this.phoneListeners.togglePhone = () => {
+      this.togglePhone()
+    }
+
+    this.phoneListeners.showPhone = () => {
       this.isVisible = true
       this.$emit('onPhoneVisible', true)
-    })
+    }
 
-    this.$VueEvent.listen('hidePhone', () => {
+    this.phoneListeners.hidePhone = () => {
       this.isVisible = false
-    })
+    }
 
+    this.phoneListeners.callDisconnected = (communicationId) => {
+      if (this.hasCommunicationNotesUnsavedChanges) {
+        this.$axios.patch(`/api/v1/communication/${communicationId}`, {
+          notes: this.communicationNotes
+        })
+      }
+    }
+
+    this.$VueEvent.listen('showLoadingPhone', this.phoneListeners.showLoadingPhone)
+    this.$VueEvent.listen('togglePhone', this.phoneListeners.togglePhone)
+    this.$VueEvent.listen('showPhone', this.phoneListeners.showPhone)
+    this.$VueEvent.listen('hidePhone', this.phoneListeners.hidePhone)
+    this.$VueEvent.listen('callDisconnected', this.phoneListeners.callDisconnected)
+  },
+
+  mounted () {
     this.setupDraggable()
     this.setupContactLocalTime()
     // Disable phone visibility on power dialer sessions
@@ -1761,6 +1854,7 @@ export default {
       this.changeScreen('wrap-up')
     }
   },
+
   methods: {
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
@@ -1771,6 +1865,7 @@ export default {
         }, 100)
       }
     },
+
     setupContactLocalTime () {
       const contact = !this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
 
@@ -1779,9 +1874,11 @@ export default {
         this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
       }
     },
+
     hideLocalTime () {
       this.showLocalTime = false
     },
+
     getContactLocalTime () {
       const contact = !this.contact ? _.get(this.dialer, 'callFishing.contact', null) : this.contact
 
@@ -1789,6 +1886,7 @@ export default {
         this.currentLocalTime = this.$moment.utc().tz(contact.timezone).format('h:mm a')
       }
     },
+
     goToContact () {
       if (this.contact) {
         this.$router.push({
@@ -1801,28 +1899,22 @@ export default {
         })
       }
     },
-    copyPhoneNumber () {
-      const phoneNumberClone = document.querySelector('#phone-number-clone')
-      phoneNumberClone.setAttribute('type', 'text')
-      phoneNumberClone.select()
-      try {
-        document.execCommand('copy')
-        this.$generalNotification('Phone number copied to clipboard.')
-      } catch (err) {
-        this.$generalNotification('Error copying phone number to clipboard.', 'error')
-      }
-      /* unselect the range */
-      phoneNumberClone.setAttribute('type', 'hidden')
-      window.getSelection().removeAllRanges()
+
+    copyPhoneNumber (phoneNumber) {
+      this.$copyToClipboard(phoneNumber)
+      this.$generalNotification('Phone number copied to clipboard.')
     },
+
     endCall ($event) {
       this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
+
     hangupCall ($event) {
       this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
+
     answerCall () {
       this.$VueEvent.fire('answerCall')
 
@@ -1839,22 +1931,28 @@ export default {
 
       this.changeScreen('menu')
     },
+
     rejectCall () {
       this.$VueEvent.fire('rejectCall')
+
       if (this.dialer.callFishing) {
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
+
       this.closePhone()
     },
+
     toggleMute () {
       this.$VueEvent.fire('toggleMute')
     },
+
     toggleHold () {
       if (this.dialer.isHeld) {
         this.loadingUnhold = true
       } else {
         this.loadingHold = true
       }
+
       this.$VueEvent.fire('toggleHold')
       this.$options.holdIntervalCount = 0
       this.$options.holdInterval = setInterval(() => {
@@ -1875,81 +1973,24 @@ export default {
         }
       }, 500)
     },
-    openDialpad () {
+
+    openExpansion (mode) {
+      if (mode === 'transfer') {
+        this.resetTransfer()
+      }
+
       this.expansionEnabled = true
-      this.bottomExpansion = 'dialpad'
+      this.bottomExpansion = mode
       setTimeout(() => {
         this.expanded = true
       }, 50)
     },
-    openNotes () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'notes'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openTags () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'tags'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openScripts () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'scripts'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openAdd () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'add'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openTransfer () {
-      this.resetTransfer()
-      this.expansionEnabled = true
-      this.bottomExpansion = 'transfer'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openMore () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'more'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openVmDrop () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'vm-drop'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openIntegrations () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'integrations'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
-    openMembers () {
-      this.expansionEnabled = true
-      this.bottomExpansion = 'members'
-      setTimeout(() => {
-        this.expanded = true
-      }, 50)
-    },
+
     openContact ($event) {
       this.saveAndResetExpansion($event)
       this.goToContact()
     },
+
     parkCall ($event) {
       this.loadingPark = true
       this.$VueEvent.fire('parkCall')
@@ -1958,6 +1999,7 @@ export default {
         this.loadingPark = false
       }, 1000)
     },
+
     unparkCommunication () {
       if (!this.hasCallFishingCommunication) {
         return
@@ -1965,17 +2007,20 @@ export default {
 
       this.$VueEvent.fire('unparkCall', this.dialer.callFishing.communication)
     },
+
     saveAndResetExpansion ($event) {
       if ($event) {
         $event.stopPropagation()
         $event.preventDefault()
       }
+
       this.expansionEnabled = false
       this.expanded = false
       this.resetAdd()
       this.resetTransfer()
       this.$VueEvent.fire('phoneExpansionReset')
     },
+
     toggleRecordingStatus () {
       this.loadingToggleRecordingStatus = true
       this.$VueEvent.fire('toggleRecordingStatus')
@@ -1983,17 +2028,21 @@ export default {
         this.loadingToggleRecordingStatus = false
       }, 1000)
     },
+
     handleLongPress (isLong = false) {
       if (isLong) {
         this.sendDigit('+')
-      } else {
-        this.sendDigit('0')
+        return
       }
+
+      this.sendDigit('0')
     },
+
     sendDigit (digit) {
       this.digits += digit.toString()
       this.$VueEvent.fire('sendDigit', digit)
     },
+
     getCampaign (id) {
       if (!id) {
         return null
@@ -2004,28 +2053,35 @@ export default {
       if (found) {
         return found
       }
+
       return null
     },
+
     togglePhone () {
       this.isVisible = !this.isVisible
       this.$emit('onPhoneVisible', true)
     },
+
     openPhone () {
       this.isVisible = this.$route.meta.id !== 'power-dialer-session'
       // this.isVisible = true
       this.$emit('onPhoneVisible', true)
     },
+
     closePhone () {
       this.isVisible = false
       this.$emit('onPhoneVisible', false)
     },
+
     endWrapUp () {
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
+
       this.$VueEvent.fire('endWrapUp')
       this.$emit('onPhoneVisible', false)
     },
+
     makeCall () {
       if (!this.dialer.communication) {
         return
@@ -2038,23 +2094,28 @@ export default {
         companyName: (this.contact) ? this.contact.company_name : '',
         contactId: this.dialer.communication.contact_id
       }
+
       this.endWrapUp()
 
       this.$VueEvent.fire('makeCall', data)
     },
+
     resizeHandler (e) {
       e = e || window.event
+
       if (this.$refs.phone) {
         this.$refs.phone.style.bottom = 'auto'
         this.$refs.phone.style.left = 'auto'
       }
     },
+
     dragElement () {
       if (this.$refs.phoneHeader) {
         // if present, the header is where you move the DIV from:
         this.$refs.phoneHeader.onmousedown = this.dragMouseDown
       }
     },
+
     dragMouseDown (e) {
       e = e || window.event
       e.preventDefault()
@@ -2073,6 +2134,7 @@ export default {
       // call a function whenever the cursor moves:
       document.onmousemove = this.elementDrag
     },
+
     elementDrag (e) {
       e = e || window.event
       e.preventDefault()
@@ -2097,6 +2159,7 @@ export default {
         this.$refs.phone.style.left = (this.$refs.phone.offsetLeft - this.pos1) + 'px'
       }
     },
+
     closeDragElement () {
       // remove active class
       this.$refs.phone.classList.remove('active')
@@ -2104,15 +2167,19 @@ export default {
       document.onmouseup = null
       document.onmousemove = null
     },
+
     setInputDevice () {
       this.$VueEvent.fire('setInputDevice', this.inputDevice)
     },
+
     setOutputDevice () {
       this.$VueEvent.fire('setOutputDevice', this.outputDevice)
     },
+
     testOutputDevice () {
       this.$VueEvent.fire('testOutputDevice', this.outputDevice)
     },
+
     forceRefreshCommunication ($event) {
       $event.target.blur()
       this.loadingCommunication = true
@@ -2121,33 +2188,42 @@ export default {
         this.loadingCommunication = false
       }, 1000)
     },
+
     resetBottomExpansion () {
       this.bottomExpansion = 'integrations'
       this.expanded = false
       this.expansionEnabled = true
     },
+
     changeTemplate (template) {
       if (template) {
         this.templateId = template.id
       }
+
       this.template = template
     },
+
     changeScript (script) {
       if (script) {
         this.scriptId = script.id
       }
+
       this.script = script
     },
+
     changeVmDrop (vmDrop) {
       if (vmDrop) {
         this.vmDropId = vmDrop.id
       }
+
       this.vmDrop = vmDrop
     },
+
     sendVmDrop ($event) {
       if (!this.dialer.communication || this.isCallCompleted || !this.vmDrop) {
         return
       }
+
       this.loadingSendVmDrop = true
       this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
         communication_id: this.dialer.communication.id,
@@ -2165,10 +2241,12 @@ export default {
         this.loadingSendVmDrop = false
       })
     },
+
     sendMessage () {
       if (!this.dialer.communication || !this.template) {
         return
       }
+
       this.loadingSendMessage = true
       this.$axios.post('/api/v1/campaign/send-message/' + this.dialer.communication.campaign_id + '/' + this.dialer.communication.contact_id, {
         message: this.template.body,
@@ -2184,26 +2262,31 @@ export default {
         this.loadingSendMessage = false
       })
     },
+
     resetTransfer () {
       this.transfer.userId = null
       this.transfer.ringGroupId = null
       this.transfer.phoneNumber = ''
       this.transfer.mode = 'user'
     },
+
     changeTransferUser (userId) {
       this.transfer.ringGroupId = null
       this.transfer.phoneNumber = ''
       this.transfer.userId = userId
     },
+
     changeTransferRingGroup (ringGroupId) {
       this.transfer.userId = null
       this.transfer.phoneNumber = ''
       this.transfer.ringGroupId = ringGroupId
     },
+
     changeTransferPhoneNumber () {
       this.transfer.userId = null
       this.transfer.ringGroupId = null
     },
+
     resetAdd () {
       this.add.introduce = false
       this.add.userId = null
@@ -2211,27 +2294,33 @@ export default {
       this.add.phoneNumber = ''
       this.add.mode = 'user'
     },
+
     changeAddUser (userId) {
       this.add.phoneNumber = ''
       this.add.ringGroupId = null
       this.add.userId = userId
     },
+
     changeAddRingGroup (ringGroupId) {
       this.add.phoneNumber = ''
       this.add.userId = null
       this.add.ringGroupId = ringGroupId
     },
+
     changeAddPhoneNumber () {
       this.add.userId = null
       this.ringGroupId = null
     },
+
     getUsers () {
       this.add.userId = null
       this.transfer.userId = null
+
       if (this.$refs.availableUserSelector) {
         this.$refs.availableUserSelector.getUsers()
       }
     },
+
     transferCall ($event) {
       this.loadingTransfer = true
       this.$VueEvent.fire('transferCall', this.transfer)
@@ -2241,6 +2330,7 @@ export default {
         this.loadingTransfer = false
       }, 1000)
     },
+
     addParticipant ($event) {
       this.loadingAdd = true
       this.$VueEvent.fire('addParticipant', this.add)
@@ -2250,6 +2340,7 @@ export default {
         this.loadingAdd = false
       }, 1000)
     },
+
     introduceParticipant ($event) {
       this.loadingIntroduce = true
       this.add.introduce = true
@@ -2260,6 +2351,7 @@ export default {
         this.loadingIntroduce = false
       }, 1000)
     },
+
     dropThirdParty () {
       this.loadingDropThirdParty = true
       this.$VueEvent.fire('dropThirdParty')
@@ -2267,6 +2359,7 @@ export default {
         this.loadingDropThirdParty = false
       }, 1000)
     },
+
     mergeCalls () {
       this.loadingMerge = true
       this.$VueEvent.fire('mergeCalls')
@@ -2274,15 +2367,18 @@ export default {
         this.loadingMerge = false
       }, 1000)
     },
+
     saveNotes () {
       if (this.$refs.communicationNotes) {
         this.$refs.communicationNotes.saveNote()
       }
     },
+
     getLabel (user) {
       if (!user) {
         return
       }
+
       switch (user.answer_by) {
         case AnswerTypes.BY_PHONE_NUMBER:
           return 'Phone Number (' + user.phone_number + ')'
@@ -2294,18 +2390,30 @@ export default {
           return 'Will Not Answer'
       }
     },
+
     changeScreen (screen) {
       // don't go from wrap-up to menu (edge case)
       if (this.screen === 'wrap_up' && screen === 'menu') {
         return
       }
+
       this.screen = screen
     },
+
+    storeNotes (notes) {
+      this.communicationNotes = notes
+    },
+
+    onCommunicationNotesUnsaved (value) {
+      this.hasCommunicationNotesUnsavedChanges = value
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
     ])
   },
+
   watch: {
     shouldShow () {
       this.loadingCommunication = false
@@ -2338,20 +2446,24 @@ export default {
 
       this.$emit('onPhoneVisible', true)
     },
+
     screen () {
       console.log('Current screen: ' + this.screen)
     },
+
     dialer: {
       handler () {
         if (!this.dialer.communication) {
           return
         }
+
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
           this.changeScreen('menu')
         }
       },
       deep: true
     },
+
     'dialer.currentStatus': function (value) {
       switch (value) {
         case 'READY':
@@ -2396,8 +2508,7 @@ export default {
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
             this.changeScreen('menu')
             this.loadingPhone = false
-          }
-          if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
+          } else if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             setTimeout(() => {
               if (this.screen !== 'wrap-up') {
                 this.changeScreen('menu')
@@ -2424,32 +2535,30 @@ export default {
         this.loadingPhone = false
       }
     },
+
     'dialer.contact': function () {
       this.setupContactLocalTime()
     },
+
     isCallCompleted () {
       this.resetBottomExpansion()
       this.expansionEnabled = false
     },
+
     sessionPhoneExpansion (value) {
-      switch (value) {
-        case 'add':
-          this.openAdd()
-          break
-        case 'dialpad':
-          this.openDialpad()
-          break
-        case 'transfer':
-          this.openTransfer()
-          break
+      if (['add', 'dialpad', 'transfer'].includes(value)) {
+        this.openExpansion(value)
       }
     }
   },
+
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
-    this.$VueEvent.stop('togglePhone')
-    this.$VueEvent.stop('showPhone')
-    this.$VueEvent.stop('hidePhone')
+    this.$VueEvent.stop('showLoadingPhone', this.phoneListeners.showLoadingPhone)
+    this.$VueEvent.stop('togglePhone', this.phoneListeners.togglePhone)
+    this.$VueEvent.stop('showPhone', this.phoneListeners.showPhone)
+    this.$VueEvent.stop('hidePhone', this.phoneListeners.hidePhone)
+    this.$VueEvent.listen('call_disconnected', this.phoneListeners.callDisconnected)
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
     clearInterval(this.$options.holdInterval)
