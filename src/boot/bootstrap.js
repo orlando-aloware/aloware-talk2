@@ -533,8 +533,6 @@ Vue.prototype.$copyToClipboard = (value) => {
       document.getSelection().addRange(selected)
     }
   }
-
-  return value
 }
 
 // eslint-disable-next-line no-extend-native
