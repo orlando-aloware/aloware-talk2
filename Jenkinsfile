@@ -75,6 +75,7 @@ pipeline {
                         sh "terraform workspace new ${env.GIT_BRANCH}"
                       } catch (Exception e) {
                         echo "The workspace already exists, running TF Commands..."
+                        sh "terraform workspace select ${env.GIT_BRANCH}"
                       }
 
                       sh "terraform apply -var environment='develop' -var domainName='${env.GIT_BRANCH}.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
