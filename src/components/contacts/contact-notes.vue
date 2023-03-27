@@ -3,7 +3,8 @@
           v-if="contact">
     <h4 v-if="!no_title">Notes</h4>
     <div v-if="!isEdit"
-         class="notes mt-1" @click="onEditNotes" v-html="contact.notes">
+         class="notes mt-1" @click="onEditNotes" v-html="contact.notes"
+         style="min-height: 15px;">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
          class="notes-empty-placeholder" @click="onEditNotes">Add notes here..</div>
