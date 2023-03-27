@@ -48,10 +48,12 @@ export default {
       if (!title) {
         const statics = JSON.parse(storage.local.getItem('statics'))
         let staticName = get(statics, 'name', '')
-        title = !staticName ? title : staticName
+        title = staticName ?? ''
       }
 
-      document.title = `${this.title} - ${title} Talk`
+      title = title ? `${title} ` : title
+
+      document.title = `${this.title} - ${title}Talk`
     },
 
     fixAssets (asset) {
