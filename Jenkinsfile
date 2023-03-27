@@ -79,7 +79,7 @@ pipeline {
                         sh "terraform workspace select ${branchName}"
                       }
 
-                      sh "terraform apply -var environment='develop' -var domainName='${branchName}.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                      sh "terraform apply -var environment='develop' -var domainName='${branchName}.talk.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                   }
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${branchName}.${DEV_DOMAIN}"
