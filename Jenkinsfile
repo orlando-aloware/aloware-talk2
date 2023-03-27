@@ -78,9 +78,9 @@ pipeline {
                       }
 
                       sh """
-                        export TF_environment=develop; \
+                        export TF_environment='develop'; \
                         export TF_domainName="${utils.taskName(env.GIT_BRANCH)}.${DEV_DOMAIN}"; \
-                        export TF_route53_zone=${DEV_DOMAIN}; \
+                        export TF_route53_zone='${DEV_DOMAIN}'; \
                         terraform apply --auto-approve;
                       """
                   }
