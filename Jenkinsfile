@@ -72,7 +72,7 @@ pipeline {
                       '''
 
                       try {
-                          terraform workspace new ${utils.taskName(env.GIT_BRANCH)}
+                        sh "terraform workspace new ${utils.taskName(env.GIT_BRANCH)}"
                       } catch (Exception e) {
                         echo "The workspace already exists, running TF Commands..."
                       }
