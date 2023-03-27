@@ -2,12 +2,16 @@
   <b-card class="border-0 contact-notes-wrapper"
           v-if="contact">
     <h4 v-if="!no_title">Notes</h4>
-    <div v-if="!isEdit"
-         class="notes mt-1" @click="onEditNotes" v-html="contact.notes"
-         style="min-height: 15px;">
+    <div class="notes mt-1"
+         style="min-height: 15px;"
+         v-if="!isEdit"
+         v-html="contact.notes"
+         @click="onEditNotes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
-         class="notes-empty-placeholder" @click="onEditNotes">Add notes here..</div>
+         class="notes-empty-placeholder" @click="onEditNotes">
+      Add notes here..
+    </div>
     <div v-if="isEdit"
          class="mt-1"
          style="max-width: 300px">
