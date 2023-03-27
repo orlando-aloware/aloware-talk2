@@ -50,7 +50,7 @@ pipeline {
             }
         }
 
-        stage('Deploy New Dev-Env Cloudfront Distribution) {
+        stage('Deploy New Dev-Env Cloudfront Distribution') {
             steps {
                 sshagent(credentials: ['jenkins-github-creds']) {
                   echo '==> Clone GitOps Repo';
