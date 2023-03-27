@@ -93,7 +93,7 @@ pipeline {
                     }
 
                     def date = sh(returnStdout: true, script: "date -u").trim()
-                    pullRequest.comment("Build ${env.BUILD_ID} ran at ${date} and generated the following environment: ${envUrl})
+                    pullRequest.comment("Build ${env.BUILD_ID} ran at ${date} and generated the following environment: ${envUrl}")
                   }
                 }
             }
