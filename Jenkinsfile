@@ -15,7 +15,7 @@ pipeline {
         TERRAFORM_REPO = 'terraform-groundwork'
         GITHUB_ORG = 'aloware'
         AWS_CREDS = credentials('aws-credentials')
-        AWS_REGION = '${AWS_REGION}'
+        AWS_REGION = 'us-west-2'
     }
 
     stages {
