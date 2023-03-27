@@ -65,11 +65,11 @@ pipeline {
 
                 script {
                   dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
-                      sh '''
+                      sh """
                         terraform init; \
                         terraform validate; \
                         terraform fmt
-                      '''
+                      """
 
                       try {
                         sh "terraform workspace new ${utils.taskName(env.GIT_BRANCH)}"
@@ -77,12 +77,12 @@ pipeline {
                         echo "The workspace already exists, running TF Commands..."
                       }
 
-                      sh '''
+                      sh """
                         export TF_environment=develop
                         export TF_domainName="${utils.taskName(env.GIT_BRANCH)}.${DEV_DOMAIN}"
                         export TF_route53_zone=${DEV_DOMAIN}
                         terraform apply --auto-approve;
-                      '''
+                      """
                   }
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${utils.taskName(env.GIT_BRANCH)}.${DEV_DOMAIN}"
