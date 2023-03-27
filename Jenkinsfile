@@ -72,20 +72,20 @@ pipeline {
                       """
 
                       try {
-                        sh "terraform workspace new ${utils.taskName(env.GIT_BRANCH)}"
+                        sh "terraform workspace new ${env.GIT_BRANCH}"
                       } catch (Exception e) {
                         echo "The workspace already exists, running TF Commands..."
                       }
 
                       sh """
                         export TF_environment='develop'; \
-                        export TF_domainName="${utils.taskName(env.GIT_BRANCH)}.${DEV_DOMAIN}"; \
+                        export TF_domainName="${env.GIT_BRANCH}.${DEV_DOMAIN}"; \
                         export TF_route53_zone='${DEV_DOMAIN}'; \
                         terraform apply --auto-approve;
                       """
                   }
 
-                  sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${utils.taskName(env.GIT_BRANCH)}.${DEV_DOMAIN}"
+                  sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${env.GIT_BRANCH}.${DEV_DOMAIN}"
                 }
             }
         }
