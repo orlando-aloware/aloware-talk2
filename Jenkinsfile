@@ -64,7 +64,7 @@ pipeline {
                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                 script {
-                  dir("${WORKSPACE}/${API_CORE_GITOPS}/s3_cloudfront") {
+                  dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                       sh '''
                         terraform init; \
                         terraform validate; \
