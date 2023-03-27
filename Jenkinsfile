@@ -84,6 +84,17 @@ pipeline {
                   }
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
+
+                  if (env.CHANGE_ID) {
+                    for (comment in pullRequest.comments) {
+                      if (comment.user == "kassiel-aloware") {
+                        pullRequest.deleteComment(comment.id)
+                      }
+                    }
+
+                    def date = sh(returnStdout: true, script: "date -u").trim()
+                    pullRequest.comment("Build ${env.BUILD_ID} ran at ${date} and generated the following environment: ${envUrl})
+                  }
                 }
             }
         }
