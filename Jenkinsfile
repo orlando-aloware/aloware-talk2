@@ -64,6 +64,7 @@ pipeline {
 
                 script {
                   def branchName = env.GIT_BRANCH.toLowerCase()
+                  def envUrl = "${branchName}.talk.${DEV_DOMAIN}"
 
                   dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                       sh """
@@ -79,10 +80,10 @@ pipeline {
                         sh "terraform workspace select ${branchName}"
                       }
 
-                      sh "terraform apply -var environment='develop' -var domainName='${branchName}.talk.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                      sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                   }
 
-                  sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${branchName}.${DEV_DOMAIN}"
+                  sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
                 }
             }
         }
