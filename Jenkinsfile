@@ -77,7 +77,7 @@ pipeline {
                         echo "The workspace already exists, running TF Commands..."
                       }
 
-                      sh "terraform apply -var environment='develop' -var domainName="${env.GIT_BRANCH}.${DEV_DOMAIN}" -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                      sh "terraform apply -var environment='develop' -var domainName='${env.GIT_BRANCH}.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                   }
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${env.GIT_BRANCH}.${DEV_DOMAIN}"
