@@ -31,6 +31,7 @@
 <script>
 import _ from 'lodash'
 import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'communication-note',
 
@@ -121,6 +122,7 @@ export default {
     'communication.notes': function () {
       this.showNote()
     },
+
     hasUnsavedChanges (newValue) {
       this.$emit('onUnsavedChanges', newValue)
     }

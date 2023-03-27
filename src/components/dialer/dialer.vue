@@ -60,7 +60,12 @@ export default {
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask'])
+    ...mapState('powerDialer', ['activeTask']),
+
+    isNotInprogressCall () {
+      return !this.dialer.call || !this.dialer.communication ||
+        !['connected', 'open'].includes(this.dialer.call.state)
+    }
   },
 
   created () {
@@ -81,15 +86,16 @@ export default {
         }
 
         const routeTitle = _.get(this.$route, 'meta.title', null)
+        const isActiveTaskInPowerDialerSession = routeTitle && this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          parseInt(this.activeTask.id) === parseInt(this.dialer.communication.contact.id)
+        const dialerCommunicationHasContact = routeTitle !== 'Power Dialer Sessions' &&
+          this.dialer.communication.contact
 
         // if in power dialer session, we must match the active task (contact)'s id
-        // with the communication's contact id
-        // else, set the contact.
-        if ((routeTitle && this.activeTask &&
-            routeTitle === 'Power Dialer Sessions' &&
-            parseInt(this.activeTask.id) === parseInt(this.dialer.communication.contact.id)) ||
-          (routeTitle !== 'Power Dialer Sessions' &&
-            this.dialer.communication.contact)) {
+        // with the communication's contact id OR if in other pages and dialer's
+        // communication has a contact, set the contact.
+        if (isActiveTaskInPowerDialerSession || dialerCommunicationHasContact) {
           this.setDialerContact(this.dialer.communication.contact)
         }
       }
@@ -526,8 +532,9 @@ export default {
         return
       }
 
-      if ((this.dialer.call && this.dialer.call.state !== 'pending') ||
-        !currentNumber || !outboundCampaignId) {
+      const isCallNotPending = this.dialer.call && this.dialer.call.state !== 'pending'
+
+      if (isCallNotPending || !currentNumber || !outboundCampaignId) {
         console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
       }
@@ -713,8 +720,7 @@ export default {
     },
 
     toggleRecordingStatus () {
-      if (!this.dialer.call || !this.dialer.communication ||
-        !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInprogressCall) {
         return
       }
 
@@ -736,32 +742,35 @@ export default {
         if (res.data.result) {
           this.setDialerRecordingStatus(newStatus)
 
-          if (newStatus === 'paused') {
-            console.log('Recording paused')
-            return
-          }
-
-          if (newStatus === 'in-progress') {
-            console.log('Recording started')
+          switch (newStatus) {
+            case 'paused':
+              console.log('Recording paused')
+              break
+            case 'in-progress':
+              console.log('Recording started')
+              break
           }
 
           return
         }
 
         // alert didn't change
-        if (newStatus === 'paused') {
-          console.log('Failed to pause recording')
-          return
-        }
-
-        if (newStatus === 'in-progress') {
-          console.log('Failed to start recording')
+        switch (newStatus) {
+          case 'paused':
+            console.log('Failed to pause recording')
+            break
+          case 'in-progress':
+            console.log('Failed to start recording')
+            break
         }
       }).catch(err => {
-        if (newStatus === 'paused') {
-          console.log('Failed to pause recording')
-        } else if (newStatus === 'in-progress') {
-          console.log('Failed to start recording')
+        switch (newStatus) {
+          case 'paused':
+            console.log('Failed to pause recording')
+            break
+          case 'in-progress':
+            console.log('Failed to start recording')
+            break
         }
 
         this.loadingToggleRecordingStatus = false
@@ -810,8 +819,7 @@ export default {
     },
 
     parkCall () {
-      if (!this.dialer.communication || !this.dialer.call ||
-        !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInprogressCall) {
         return
       }
 
@@ -867,9 +875,7 @@ export default {
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (!this.dialer.communication || !this.dialer.call ||
-        !['connected', 'open'].includes(this.dialer.call.state) ||
-        (!shouldUnpark && this.dialer.parkedCall)) {
+      if (this.isNotInprogressCall || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
 
@@ -945,8 +951,7 @@ export default {
     },
 
     mergeCalls () {
-      if (!this.dialer.communication || !this.dialer.call ||
-        !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInprogressCall) {
         return
       }
 
@@ -966,8 +971,7 @@ export default {
     },
 
     dropThirdParty () {
-      if (!this.dialer.communication || !this.dialer.call ||
-        !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInprogressCall) {
         return
       }
 
@@ -986,8 +990,7 @@ export default {
     },
 
     transferCall (transfer) {
-      if (!this.dialer.communication || !this.dialer.call ||
-        !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInprogressCall) {
         return
       }
 
@@ -1023,9 +1026,7 @@ export default {
     },
 
     addParticipant (add) {
-      if (!this.dialer.communication ||
-        !this.dialer.call ||
-        !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInprogressCall) {
         return
       }
 
@@ -1039,25 +1040,29 @@ export default {
         type: 'warm'
       }
 
-      if (add.mode === 'user') {
-        params.user_id = add.userId
-        const user = this.getUser(add.userId)
+      switch (add.mode) {
+        case 'user':
+          params.user_id = add.userId
+          const user = this.getUser(add.userId)
 
-        if (user) {
-          this.setAddedParty(user)
-        }
-      } else if (add.mode === 'ring-group') {
-        params.ring_group_id = add.ringGroupId
-        const ringGroup = this.getRingGroup(add.ringGroupId)
+          if (user) {
+            this.setAddedParty(user)
+          }
+          break
+        case 'ring-group':
+          params.ring_group_id = add.ringGroupId
+          const ringGroup = this.getRingGroup(add.ringGroupId)
 
-        if (ringGroup) {
-          this.setAddedParty(ringGroup)
-        }
-      } else if (add.mode === 'phone-number') {
-        params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
-        this.setAddedParty({
-          name: this.$options.filters.fixPhone(add.phoneNumber, 'NATIONAL', true, true)
-        })
+          if (ringGroup) {
+            this.setAddedParty(ringGroup)
+          }
+          break
+        case 'phone-number':
+          params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
+          this.setAddedParty({
+            name: this.$options.filters.fixPhone(add.phoneNumber, 'NATIONAL', true, true)
+          })
+          break
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
@@ -1141,7 +1146,8 @@ export default {
     startWrapUpTimer () {
       this.setDialerCurrentStatus('WRAP_UP')
       const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
-        ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
+        ? this.currentCompany.wrap_up_seconds
+        : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
 
       if (wrapUpTimer < 0) {

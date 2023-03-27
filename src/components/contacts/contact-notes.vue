@@ -9,7 +9,8 @@
          @click="onEditNotes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
-         class="notes-empty-placeholder" @click="onEditNotes">
+         class="notes-empty-placeholder"
+         @click="onEditNotes">
       Add notes here..
     </div>
     <div v-if="isEdit"

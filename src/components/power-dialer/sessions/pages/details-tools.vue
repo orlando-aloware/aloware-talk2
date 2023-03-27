@@ -45,6 +45,7 @@ export default {
     ...mapActions('contacts', [
       'updateChangedContactProperties'
     ]),
+
     onNotesInput (value) {
       this.updateChangedContactProperties({
         name: 'notes',

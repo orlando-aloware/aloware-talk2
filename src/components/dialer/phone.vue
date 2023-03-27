@@ -1780,15 +1780,21 @@ export default {
     },
 
     phoneCtaClass () {
-      return [
-        this.isUnparkCallVisible ||
-        (!this.isDeclineCallVisible && !this.isIgnoreCallVisible && this.isAnswerCallVisible)
-          ? 'justify-content-center' : 'justify-content-between'
-      ]
+      const isOnlyAnswerCallVisible = !this.isDeclineCallVisible &&
+        !this.isIgnoreCallVisible && this.isAnswerCallVisible
+      const classValue = this.isUnparkCallVisible || isOnlyAnswerCallVisible
+        ? 'justify-content-center'
+        : 'justify-content-between'
+
+      return [classValue]
     },
 
     hangupCallClass () {
-      return [ this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ? 'ripple' : '' ]
+      const classValue = this.dialer.communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+        ? 'ripple'
+        : ''
+
+      return [ classValue ]
     },
 
     isIntroduceDisabled () {
