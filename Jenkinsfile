@@ -64,6 +64,8 @@ pipeline {
                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                 script {
+                  def branchName = env.GIT_BRANCH.toLowerCase()
+
                   dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                       sh """
                         terraform init; \
@@ -72,16 +74,16 @@ pipeline {
                       """
 
                       try {
-                        sh "terraform workspace new ${env.GIT_BRANCH}"
+                        sh "terraform workspace new ${branchName} && terraform workspace select ${branchName}"
                       } catch (Exception e) {
                         echo "The workspace already exists, running TF Commands..."
-                        sh "terraform workspace select ${env.GIT_BRANCH}"
+                        sh "terraform workspace select ${branchName}"
                       }
 
-                      sh "terraform apply -var environment='develop' -var domainName='${env.GIT_BRANCH}.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                      sh "terraform apply -var environment='develop' -var domainName='${branchName}.${DEV_DOMAIN}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                   }
 
-                  sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${env.GIT_BRANCH}.${DEV_DOMAIN}"
+                  sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${branchName}.${DEV_DOMAIN}"
                 }
             }
         }
