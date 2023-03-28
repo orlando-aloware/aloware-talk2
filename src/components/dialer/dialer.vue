@@ -1280,6 +1280,7 @@ export default {
     handleError (error) {
       this.setDialerCurrentStatus('GOT_ERROR')
       this.setDialerError({
+        message: error.message,
         code: error.code
       })
       const err = new Error(`${error.message} Code: ${error.code}`)
