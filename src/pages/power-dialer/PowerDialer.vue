@@ -343,7 +343,7 @@ export default {
     },
 
     setFilters (id = null) {
-      // id is numeric and starts at 0 so we must include it
+      // id is numeric and starts at 0 so we must exclude it
       // when checking for emptiness
       if (!id && id !== 0) {
         return
