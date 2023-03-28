@@ -102,13 +102,12 @@
             <p class="form-helper-text">Receive daily emails for account activity:</p>
           </div>
 
-          <b-form-group label="">
+          <b-form-group label="" v-if='isBillingAdmin'>
             <b-form-checkbox switch
                              v-model="user.enabled_billing_warnings"
                              :value="true"
                              :unchecked-value="false"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')"
-                              v-if='isBillingAdmin'>
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
               Billing Warnings
             </b-form-checkbox>
             <div class="account-level-notification-tooltip-wrapper">
