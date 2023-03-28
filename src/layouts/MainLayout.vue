@@ -1280,7 +1280,6 @@ export default {
     },
 
     initAuth () {
-      let fetchingStatics = false
       this.loading = true
       this.setCampaignsIsLoading(true)
       this.setTagsFullyLoaded(true)
