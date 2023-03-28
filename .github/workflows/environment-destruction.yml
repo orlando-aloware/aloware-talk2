@@ -16,6 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: trigger destruction workflow
-        run: |
-          apt-get update && apg-get install -y curl
-          curl -X POST "https://jenkins.alodev.org/job/DevOps/job/talk2_destruction_workflow/buildWithParameters?PR_NUMBER=${{ github.event.number }}" --user ${{ secrets.jenkins_user }}:${{ secrets.jenkins_token }}
+        uses: wei/curl@master
+        with:
+          args: -X POST https://jenkins.alodev.org/job/DevOps/job/talk2_destruction_workflow/buildWithParameters?PR_NUMBER=${{ github.event.number }} --user ${{ secrets.jenkins_user }}:${{ secrets.jenkins_token }}
