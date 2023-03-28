@@ -1,17 +1,14 @@
 name: Environment Destruction
 
 on:
-  push:
-    branches:
-      - 'feature/PLAT-1002/add-pipeline-v2'
   pull_request:
     branches:
       - develop
-    types: [closed, open]
+    types: [closed]
 
 jobs:
   trigger:
-#    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     name: jenkins
     runs-on: ubuntu-latest
     steps:
@@ -19,7 +16,7 @@ jobs:
       - uses: jwalton/gh-find-current-pr@v1
         id: findPr
         with:
-          state: open
+          state: closed
       - name: trigger destruction workflow
         uses: wei/curl@master
         with:
