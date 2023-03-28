@@ -10,7 +10,6 @@ pipeline {
 
     environment {
         DEV_DOMAIN = 'alodev.org'
-        PROD_DOMAIN = 'aloware.com'
         NODE_MODULES_PATH = '/cached_modules/npm/talk2/node_modules'
         TERRAFORM_REPO = 'terraform-groundwork'
         TALK2_REPO = 'aloware-talk2'
@@ -86,11 +85,6 @@ pipeline {
                   }
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
-
-                  echo '==> Add PR Comment';
-                  script {
-
-                  }
                 }
             }
         }
