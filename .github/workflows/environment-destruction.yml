@@ -15,7 +15,12 @@ jobs:
     name: jenkins
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+        with:
+          state: open
       - name: trigger destruction workflow
         uses: wei/curl@master
         with:
-          args: -X POST https://jenkins.alodev.org/job/DevOps/job/talk2_destruction_workflow/buildWithParameters?PR_NUMBER=${{ github.event.number }} --user ${{ secrets.jenkins_user }}:${{ secrets.jenkins_token }}
+          args: -X POST https://jenkins.alodev.org/job/DevOps/job/talk2_destruction_workflow/buildWithParameters?PR_NUMBER=${PR} --user ${{ secrets.jenkins_user }}:${{ secrets.jenkins_token }}
