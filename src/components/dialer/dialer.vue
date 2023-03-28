@@ -62,7 +62,7 @@ export default {
 
     ...mapState('powerDialer', ['activeTask']),
 
-    isNotInprogressCall () {
+    isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
         !['connected', 'open'].includes(this.dialer.call.state)
     }
@@ -269,17 +269,11 @@ export default {
       this.stopCallTimer()
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      if (!this.dialer.parkedCall && !this.dialer.call) {
-        this.startWrapUpTimer()
-        return
-      }
+      const hasNoParkedCall = !this.dialer.parkedCall && !this.dialer.call
+      const hasParkedCall = this.dialer.parkedCall && this.dialer.call
+      const hasCallInProgressNotParked = !this.dialer.parkedCall && this.dialer.call
 
-      if (this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-        return
-      }
-
-      if (!this.dialer.parkedCall && this.dialer.call) {
+      if (hasNoParkedCall || hasParkedCall || hasCallInProgressNotParked) {
         this.startWrapUpTimer()
         return
       }
@@ -724,7 +718,7 @@ export default {
     },
 
     toggleRecordingStatus () {
-      if (this.isNotInprogressCall) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -823,7 +817,7 @@ export default {
     },
 
     parkCall () {
-      if (this.isNotInprogressCall) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -879,7 +873,7 @@ export default {
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (this.isNotInprogressCall || (!shouldUnpark && this.dialer.parkedCall)) {
+      if (this.isNotInProgressCall || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
 
@@ -955,7 +949,7 @@ export default {
     },
 
     mergeCalls () {
-      if (this.isNotInprogressCall) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -975,7 +969,7 @@ export default {
     },
 
     dropThirdParty () {
-      if (this.isNotInprogressCall) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -994,7 +988,7 @@ export default {
     },
 
     transferCall (transfer) {
-      if (this.isNotInprogressCall) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -1030,7 +1024,7 @@ export default {
     },
 
     addParticipant (add) {
-      if (this.isNotInprogressCall) {
+      if (this.isNotInProgressCall) {
         return
       }
 
