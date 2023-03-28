@@ -125,14 +125,19 @@
                      placement="bottomleft"
                      v-if="dialer.error.code">
             <template #title>Connection timeout</template>
-            {{ dialer.error.message }}
+            Click here to reset or please check the <a href="https://support.aloware.com/" target="_blank">troubleshooting guide here</a>. Error Code: [{{ dialer.error.code }}]
             <br>
-            Error code: {{ dialer.error.code }}
-            <button v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
-                    @click="reconnectDialer"
-                    class="font-weight-light-bold btn btn-sm">
-              Reconnect
-            </button>
+            <q-btn
+              v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
+              class="start-dial-button p-0"
+              color="success"
+              no-caps
+              unelevated
+              @click="reconnectDialer">
+              <div class="button-label">
+                Reconnect
+              </div>
+            </q-btn>
             <a href="https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208" target="_blank"
                v-if="dialer.error.code === 31208">
               See fix
