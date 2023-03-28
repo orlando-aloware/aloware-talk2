@@ -56,7 +56,10 @@ export default {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState('powerDialer', ['activeTask'])
+    ...mapState('powerDialer', ['activeTask']),
+    ...mapState({
+      dialerState: state => state.dialer
+    })
   },
 
   created () {
@@ -451,6 +454,10 @@ export default {
         } else {
           this.device.updateToken(this.dialer.token)
         }
+
+        // remove the errors if we successfully generated a token
+        this.setDialerErrorDefault()
+        this.setDialerResetIndicator(false)
 
         return Promise.resolve(res)
       }).catch(err => {
@@ -1270,7 +1277,6 @@ export default {
     handleError (error) {
       this.setDialerCurrentStatus('GOT_ERROR')
       this.setDialerError({
-        message: error.message,
         code: error.code
       })
       const err = new Error(`${error.message} Code: ${error.code}`)
@@ -1349,6 +1355,7 @@ export default {
     },
 
     ...mapActions([
+      'setDialerResetIndicator',
       'setDialerToken',
       'setDialerCall',
       'setDialerParkedCall',
@@ -1387,6 +1394,11 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
+      }
+    },
+    'dialerState.resetIndicator': function (value) {
+      if (value) {
+        this.rebootPhone()
       }
     }
   },

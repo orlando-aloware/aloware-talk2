@@ -124,9 +124,15 @@
                      triggers="hover"
                      placement="bottomleft"
                      v-if="dialer.error.code">
-            <template #title>Error code: {{ dialer.error.code }}</template>
+            <template #title>Connection timeout</template>
             {{ dialer.error.message }}
             <br>
+            Error code: {{ dialer.error.code }}
+            <button v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
+                    @click="reconnectDialer"
+                    class="font-weight-light-bold btn btn-sm">
+              Reconnect
+            </button>
             <a href="https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208" target="_blank"
                v-if="dialer.error.code === 31208">
               See fix
@@ -345,6 +351,10 @@ export default {
   },
 
   methods: {
+    reconnectDialer () {
+      this.setDialerResetIndicator(true)
+    },
+
     toggleSidebar () {
       this.$emit('toggleSidebar')
     },
@@ -459,7 +469,7 @@ export default {
       'setInboxShowMyContacts'
     ]),
 
-    ...mapActions(['setDialerFormStatus'])
+    ...mapActions(['setDialerFormStatus', 'setDialerResetIndicator'])
   },
 
   watch: {

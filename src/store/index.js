@@ -84,7 +84,8 @@ export default function (/* { ssrContext } */) {
         error: {
           message: '',
           code: null
-        }
+        },
+        resetIndicator: false
       },
       warnings: [],
       shouldIntroduce: false,
@@ -357,6 +358,10 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
+      },
+
+      setDialerResetIndicator ({ commit }, value) {
+        commit('SET_DIALER_RESET_INDICATOR', value)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -884,6 +889,10 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_ERROR (state, error) {
         state.dialer.error.message = error.message
         state.dialer.error.code = error.code
+      },
+
+      SET_DIALER_RESET_INDICATOR (state, value) {
+        state.dialer.resetIndicator = value
       },
 
       SET_OLD_AGENT_STATUS (state, status) {
