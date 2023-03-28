@@ -89,12 +89,7 @@ pipeline {
 
                   echo '==> Add PR Comment';
                   script {
-                    try {
-                      sh "echo ${GIT_AUTH_PSW} > tmp_token.txt && gh auth login --with-token < tmp_token.txt"
-                      sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${envUrl}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
-                    } catch (Exception e) {
-                        echo "We could not add the comment in Github PR for some reason, please check #dev-deployments channel in Slack for the environment URL."
-                    }
+
                   }
                 }
             }
@@ -111,6 +106,14 @@ pipeline {
         success {
             script {
                 notificationSender.sendSlackSuccess()
+                try {
+                  if (env.CHANGE_BRANCH) {
+                    sh "echo ${GIT_AUTH_PSW} > tmp_token.txt && gh auth login --with-token < tmp_token.txt"
+                    sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${envUrl}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                  }
+                } catch (Exception e) {
+                    echo "We could not add the comment in Github PR for some reason, please check #dev-deployments channel in Slack for the environment URL."
+                }
             }
         }
         failure {
