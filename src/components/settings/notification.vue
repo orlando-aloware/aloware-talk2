@@ -102,7 +102,8 @@
             <p class="form-helper-text">Receive daily emails for account activity:</p>
           </div>
 
-          <b-form-group label="" v-if='isBillingAdmin'>
+          <b-form-group label=""
+                        v-if="isBillingAdmin">
             <b-form-checkbox switch
                              v-model="user.enabled_billing_warnings"
                              :value="true"
