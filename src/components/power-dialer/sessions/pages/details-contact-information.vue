@@ -14,10 +14,8 @@
             class="mt-1 p-0 py-0 session-contact-info-scroller"
             :disabled="sessionLoader">
       <q-card-section class="p-0">
-        <ContactInfo
-          :has-expanded="false" />
-        <ContactSaveBar
-          v-if="isValidResource" />
+        <ContactInfo :has-expanded="false" />
+        <ContactSaveBar v-if="isValidResource" />
       </q-card-section>
       <!-- <q-card-section
         v-for="(f, i) in form"

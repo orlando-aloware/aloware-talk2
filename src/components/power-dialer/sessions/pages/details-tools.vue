@@ -1,15 +1,14 @@
 <template>
-  <q-card
-    class="bg-grey-1"
-    :disabled="sessionLoader"
-    flat>
+  <q-card class="bg-grey-1 h-100"
+          flat
+          :disabled="sessionLoader">
     <div class="pb-2">
       <ContactPhones />
     </div>
     <div class="pb-2">
       <ContactTags :contact="contact" />
     </div>
-    <div class="pb-2">
+    <div class="pb-4">
       <ContactNotes :contact="contact"
                     @input="onNotesInput" />
     </div>
@@ -17,7 +16,6 @@
 </template>
 
 <script>
-
 import { mapActions, mapGetters } from 'vuex'
 import ContactPhones from 'components/contacts/contact-phones'
 import ContactTags from 'components/generic-selectors/contact-tags'
@@ -41,6 +39,7 @@ export default {
       'contact'
     ])
   },
+
   methods: {
     ...mapActions('contacts', [
       'updateChangedContactProperties'
