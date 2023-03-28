@@ -107,7 +107,8 @@
                              v-model="user.enabled_billing_warnings"
                              :value="true"
                              :unchecked-value="false"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')"
+                              v-if='isBillingAdmin'>
               Billing Warnings
             </b-form-checkbox>
             <div class="account-level-notification-tooltip-wrapper">
