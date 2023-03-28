@@ -109,7 +109,7 @@ export default {
     this.$VueEvent.listen('reconnectDialer', () => {
       this.getDesktopToken(true)
         .then(() => {
-          this.device.register(true)
+          this.device.register()
           this.rebootPhone()
         })
     })
