@@ -18,15 +18,10 @@
 <script>
 import WallboardUsersHeader from 'src/components/wallboard/wallboard-users-header.vue'
 import WallboardUsersTable from 'src/components/wallboard/wallboard-users-table.vue'
-import { aclMixin } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'WallboardUsers',
-
-  mixins: [
-    aclMixin
-  ],
 
   components: {
     WallboardUsersHeader,
