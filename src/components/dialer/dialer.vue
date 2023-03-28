@@ -1398,7 +1398,7 @@ export default {
     },
     'dialerState.resetIndicator': function (value) {
       if (value) {
-        this.rebootPhone()
+        this.rebootPhone(true)
       }
     }
   },
