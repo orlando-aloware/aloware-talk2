@@ -56,10 +56,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState('powerDialer', ['activeTask']),
-    ...mapState({
-      dialerState: state => state.dialer
-    })
+    ...mapState('powerDialer', ['activeTask'])
   },
 
   created () {
@@ -108,6 +105,13 @@ export default {
           }
         }
       }
+    })
+    this.$VueEvent.listen('reconnectDialer', () => {
+      this.getDesktopToken(true)
+        .then(() => {
+          this.device.register(true)
+          this.rebootPhone()
+        })
     })
 
     this.getDesktopToken()
@@ -457,7 +461,6 @@ export default {
 
         // remove the errors if we successfully generated a token
         this.setDialerErrorDefault()
-        this.setDialerResetIndicator(false)
 
         return Promise.resolve(res)
       }).catch(err => {
@@ -1355,7 +1358,6 @@ export default {
     },
 
     ...mapActions([
-      'setDialerResetIndicator',
       'setDialerToken',
       'setDialerCall',
       'setDialerParkedCall',
@@ -1394,11 +1396,6 @@ export default {
     'dialer.currentStatus': function (value) {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
-      }
-    },
-    'dialerState.resetIndicator': function (value) {
-      if (value) {
-        this.rebootPhone(true)
       }
     }
   },

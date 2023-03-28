@@ -357,7 +357,7 @@ export default {
 
   methods: {
     reconnectDialer () {
-      this.setDialerResetIndicator(true)
+      this.$VueEvent.fire('reconnectDialer')
     },
 
     toggleSidebar () {
@@ -474,7 +474,7 @@ export default {
       'setInboxShowMyContacts'
     ]),
 
-    ...mapActions(['setDialerFormStatus', 'setDialerResetIndicator'])
+    ...mapActions(['setDialerFormStatus'])
   },
 
   watch: {

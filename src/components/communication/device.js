@@ -51,8 +51,8 @@ export default class Device {
     this._initEvents()
   }
 
-  register () {
-    if (this._device.state !== Events.UNREGISTERED) {
+  register (force = false) {
+    if (this._device.state !== Events.UNREGISTERED && !force) {
       return
     }
 
