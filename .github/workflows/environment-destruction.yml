@@ -23,4 +23,4 @@ jobs:
       - name: trigger destruction workflow
         uses: wei/curl@master
         with:
-          args: -X POST https://jenkins.alodev.org/job/DevOps/job/talk2_destruction_workflow/buildWithParameters?PR_NUMBER=${PR} --user ${{ secrets.jenkins_user }}:${{ secrets.jenkins_token }}
+          args: -X POST https://jenkins.alodev.org/job/DevOps/job/talk2_destruction_workflow/buildWithParameters?PR_NUMBER=${{ steps.findPr.outputs.pr }} --user ${{ secrets.jenkins_user }}:${{ secrets.jenkins_token }}
