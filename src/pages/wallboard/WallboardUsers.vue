@@ -1,9 +1,8 @@
 <template>
   <div class="wallboard__body">
     <div :class="['users', `users--${viewMode}`]">
-      <b-overlay
-        :show="isUsersLoading"
-        rounded="sm">
+      <b-overlay :show="isUsersLoading"
+                 rounded="sm">
         <wallboard-users-header @agent="onFilterAgent"
                                 @status="onFilterStatus"/>
         <wallboard-users-table :filters="filters"/>
