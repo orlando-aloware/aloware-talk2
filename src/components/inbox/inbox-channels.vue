@@ -251,159 +251,6 @@ export default {
     }
   },
 
-  computed: {
-    ...mapState('inbox', [
-      'isGettingTasksList',
-      'activeChannel',
-      'communications',
-      'channelChangedFilterFields',
-      'appliedFilter',
-      'hasMoreCommunications',
-      'inboxShowMyContacts'
-    ]),
-
-    nextPage () {
-      if (this.$route.params.channel === 'mentions') {
-        return this.currentPage + 1
-      }
-
-      // using cursor parameter from next_page_url
-      const nextUrl = new URL(this.pagination.next_page_url)
-      return nextUrl.searchParams.get('cursor')
-    },
-
-    filterButtonVariant () {
-      return 'outlined-light'
-    },
-
-    hasChannelFilterChanges () {
-      return this.channelChangedFilterFields.length > 0
-    },
-
-    channelDefaultFilterModel () {
-      const defaultFilterModel = {
-        name: '',
-        type: ChannelType.CHANNEL_MESSAGES,
-        filter: [],
-        scope: 'user'
-      }
-      switch (true) {
-        case ['voicemails'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact
-          }
-          break
-        case ['calls', 'recordings'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_CALLS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact
-          }
-
-          if (['recordings'].includes(this.$route.params.channel)) {
-            defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-            defaultFilterModel.filter.answer_status = 'recorded'
-          }
-          break
-        case ['mentions'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_MENTIONS
-          defaultFilterModel.filter = {
-            users: Filters.DEFAULT_STATE.filter.users,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
-          }
-          break
-        case ['all-communications'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-            creator_type: Filters.DEFAULT_STATE.filter.creator_type
-          }
-          break
-        case ['messages'].includes(this.$route.params.channel):
-        default:
-          defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-            creator_type: Filters.DEFAULT_STATE.filter.creator_type
-          }
-      }
-
-      return defaultFilterModel
-    },
-
-    changedFilterFieldCount () {
-      const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
-      if (dateFieldIndex >= 0) {
-        return this.channelChangedFilterFields.length - 1
-      }
-      return this.channelChangedFilterFields.length
-    }
-  },
-
   data () {
     return {
       filter: null,
@@ -463,6 +310,411 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('inbox', [
+      'isGettingTasksList',
+      'activeChannel',
+      'communications',
+      'channelChangedFilterFields',
+      'appliedFilter',
+      'hasMoreCommunications',
+      'inboxShowMyContacts'
+    ]),
+
+    nextPage () {
+      if (this.$route.params.channel === 'mentions') {
+        return this.currentPage + 1
+      }
+
+      // using cursor parameter from next_page_url
+      const nextUrl = new URL(this.pagination.next_page_url)
+      return nextUrl.searchParams.get('cursor')
+    },
+
+    filterButtonVariant () {
+      return 'outlined-light'
+    },
+
+    hasChannelFilterChanges () {
+      return this.channelChangedFilterFields.length > 0
+    },
+
+    channelDefaultFilterModel () {
+      const defaultFilterModel = {
+        name: '',
+        type: ChannelType.CHANNEL_MESSAGES,
+        filter: [],
+        scope: 'user'
+      }
+
+      switch (true) {
+        case ['voicemails'].includes(this.$route.params.channel):
+          defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact
+          }
+          break
+
+        case ['calls', 'recordings'].includes(this.$route.params.channel):
+          defaultFilterModel.type = ChannelType.CHANNEL_CALLS
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact
+          }
+
+          if (['recordings'].includes(this.$route.params.channel)) {
+            defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
+            defaultFilterModel.filter.answer_status = 'recorded'
+          }
+          break
+
+        case ['mentions'].includes(this.$route.params.channel):
+          defaultFilterModel.type = ChannelType.CHANNEL_MENTIONS
+          defaultFilterModel.filter = {
+            users: Filters.DEFAULT_STATE.filter.users,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
+          }
+          break
+
+        case ['all-communications'].includes(this.$route.params.channel):
+          defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+            creator_type: Filters.DEFAULT_STATE.filter.creator_type
+          }
+          break
+
+        case ['messages'].includes(this.$route.params.channel):
+        default:
+          defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
+          defaultFilterModel.filter = {
+            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+            direction: Filters.DEFAULT_STATE.filter.direction,
+            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+            tags: Filters.DEFAULT_STATE.filter.tags,
+            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+            users: Filters.DEFAULT_STATE.filter.users,
+            workflows: Filters.DEFAULT_STATE.filter.workflows,
+            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+            from_date: Filters.DEFAULT_STATE.filter.from_date,
+            to_date: Filters.DEFAULT_STATE.filter.to_date,
+            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+            creator_type: Filters.DEFAULT_STATE.filter.creator_type
+          }
+      }
+
+      return defaultFilterModel
+    },
+
+    changedFilterFieldCount () {
+      const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
+
+      if (dateFieldIndex >= 0) {
+        return this.channelChangedFilterFields.length - 1
+      }
+
+      return this.channelChangedFilterFields.length
+    }
+  },
+
+  created () {
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
+
+    this.resetFilters()
+    this.setMentionType()
+
+    this.listeners.newCommunication = (data) => {
+      // check new communication exists in the old list
+      const found = this.communications.filter(communication => {
+        return communication.id === data.id
+      })
+
+      if (found.length) {
+        return
+      }
+
+      if (data.type === CommunicationTypes.NOTE) {
+        this.handleNewMention(data)
+        return
+      }
+
+      const isCommMatchesMinReq = this.checkCommunicationChannels(data) &&
+        this.checkCommunicationMatchesSearch(this.searchText, data) &&
+        this.checkCommunicationMatchesFilters(this.filter, data, true) &&
+        this.checkCommunicationMatchesUserAccessibility(data) &&
+        this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+        this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+        this.checkCommunicationMatchesUser(this.userId, data) &&
+        this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)
+
+      if (!isCommMatchesMinReq) {
+        return
+      }
+
+      this.pagination.total += 1
+
+      // push new data to top of array
+      this.communications.unshift(data)
+
+      if (this.communications.length > this.filter.per_page) {
+        // push out last data from bottom of array
+        this.communications.pop()
+      }
+    }
+
+    this.listeners.updateCommunication = (data) => {
+      if (this.pagination.prev !== null) {
+        return
+      }
+
+      /*
+        disable live dashboard for end clients;
+        check data loaded
+       */
+      // check new communication exists in the old list
+      const found = this.communications.filter(communication => {
+        return communication.id === data.id
+      })
+
+      const isCommMatchesMinReq = this.checkCommunicationChannels(data) &&
+        this.checkCommunicationMatchesSearch(this.searchText, data) &&
+        this.checkCommunicationMatchesFilters(this.filter, data, true) &&
+        this.checkCommunicationMatchesUserAccessibility(data) &&
+        this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
+        this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
+        this.checkCommunicationMatchesUser(this.userId, data)
+
+      if (found.length) {
+        // update communication
+        data = _.extend({}, found[0], data)
+
+        if (isCommMatchesMinReq && this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
+          this.$set(this.communications, this.communications.indexOf(found[0]), data)
+
+          return
+        }
+
+        this.communications = this.communications.filter(communication => {
+          return communication.id !== data.id
+        })
+
+        this.pagination.total -= 1
+
+        return
+      }
+
+      // add the communication if it's not already there and if it matches the criteria
+      if (isCommMatchesMinReq &&
+        this.pagination.prev === null &&
+        this.communications.length > 0 &&
+        data.id > this.communications[0].id) {
+        this.pagination.total += 1
+
+        // push new data to top of array
+        this.communications.unshift(data)
+
+        if (this.communications.length > this.filter.per_page) {
+          // push out last data from bottom of array
+          this.communications.pop()
+        }
+      }
+    }
+
+    this.listeners.deleteCommunication = (data) => {
+      // check data loaded
+      if (this.pagination.prev !== null) {
+        return
+      }
+
+      // try to find the communication
+      const found = this.communications.find(communication => communication.id === data.id)
+
+      if (found) {
+        return
+      }
+
+      // remove it from the list
+      this.communications.splice(this.communications.indexOf(found), 1)
+      this.pagination.total -= 1
+    }
+
+    this.listeners.markContactCommunicationsAllAsRead = (data) => {
+      const contactId = _.get(data, 'id', null)
+
+      if (!contactId) {
+        return
+      }
+
+      // get current contact's communications
+      const contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
+      const index = { data: null }
+
+      // iterate through and update is_read value
+      contactCommunications.forEach((communication) => {
+        index.data = this.communications.findIndex(item => item.id === communication.id)
+        this.communications[index.data].is_read = true
+      })
+
+      // set updated communications
+      this.setCommunications(this.communications)
+    }
+
+    this.listeners.inboxLoadCommunications = (showMyContacts) => {
+      this.filter = this.filterMyContacts(this.filter, showMyContacts)
+
+      if (this.filter.cursor !== undefined) {
+        delete this.filter.cursor
+      }
+
+      if (showMyContacts) {
+        this.filter.contact_owner = []
+        this.updateChannelChangedFilterFields({
+          name: 'contact_owner',
+          value: []
+        })
+      }
+
+      this.isLoaded = false
+      this.getCommunications(this.filter)
+    }
+
+    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+    this.$VueEvent.listen('delete_communication', this.listeners.deleteCommunication)
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.listeners.markContactCommunicationsAllAsRead)
+    this.$VueEvent.listen('inbox_load_communications', this.listeners.inboxLoadCommunications)
+  },
+
+  mounted () {
+    this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = this.nextPage
+      } else {
+        this.filter.cursor = this.nextPage
+      }
+
+      this.loadMoreCommunications(this.filter).then(() => {
+        const communication = this.communications[lastNavigatedIndex + 1]
+        this.setSelectedCommunication(communication)
+
+        if (this.$route.name === 'Inbox Contact') {
+          this.redirectChannel(communication)
+        }
+
+        if (this.$route.name === 'Inbox Contact Communication') {
+          this.redirectMentionsChannel(communication)
+        }
+
+        this.makeSelectedItemVisible()
+      })
+    })
+
+    this.$VueEvent.listen('navigate_channel', (communication) => {
+      this.setSelectedCommunication(communication)
+
+      if (this.$route.name === 'Inbox Contact') {
+        this.redirectChannel(communication)
+      }
+
+      if (this.$route.name === 'Inbox Contact Communication') {
+        this.redirectMentionsChannel(communication)
+      }
+
+      this.makeSelectedItemVisible()
+    })
+
+    this.$VueEvent.listen('contact_updated', (data) => {
+      const communications = [...this.communications]
+      if (['calls', 'messages', 'mentions', 'voicemails', 'recordings'].includes(this.$route.params.channel)) {
+        if (this.$route.params.channel === 'mentions') {
+          communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
+            value.mention_subject.contact = data
+          })
+        } else {
+          communications.filter(item => item.contact && data && item.contact.id === data.id).forEach((value) => {
+            value.contact = data
+          })
+        }
+
+        this.setCommunications(communications)
+      }
+    })
+
+    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
+      this.getCommunications(this.filter, () => {
+        if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
+          if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
+            const communication = { data: null }
+
+            if (this.$route.name === 'Inbox Contact Communication') {
+              communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
+            } else {
+              communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
+            }
+
+            if (communication.data) {
+              this.setSelectedCommunication(communication.data)
+            }
+          }
+        }
+      })
+    }
+  },
+
   methods: {
     ...mapActions('inbox', [
       'gettingTasksList',
@@ -489,6 +741,7 @@ export default {
       this.filter.search_text = this.searchText
       this.filter.search_fields = this.searchFields
       this.filter.per_page = 20
+
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
@@ -498,12 +751,15 @@ export default {
       if (this.campaignId) {
         this.filter.campaign_id = this.campaignId
       }
+
       if (this.ringGroupId) {
         this.filter.ring_group_id = this.ringGroupId
       }
+
       if (this.userId) {
         this.filter.user_id = this.userId
       }
+
       if (this.workflowId) {
         this.filter.workflow_id = this.workflowId
       }
@@ -570,6 +826,7 @@ export default {
 
       const api = { data: talk2Api.V1.reports.communications }
 
+      // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
         api.data = talk2Api.V2.mentions
         params = {
@@ -596,6 +853,7 @@ export default {
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
+
       return api.data.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {
@@ -614,11 +872,12 @@ export default {
         }).catch(thrown => {
           if (window.axios.isCancel(thrown) && thrown) {
             console.log('Request canceled', thrown.message)
-          } else {
-            this.gettingTasksList(false)
-            this.communicationsListHasError = true
-            this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
+            return
           }
+
+          this.gettingTasksList(false)
+          this.communicationsListHasError = true
+          this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
         })
     },
 
@@ -698,6 +957,7 @@ export default {
 
     onTaskListBottomScroll () {
       clearTimeout(this.scrollTimeout)
+
       // Set a timeout to run after scrolling ends
       this.scrollTimeout = setTimeout(() => {
         // Run the callback
@@ -732,15 +992,17 @@ export default {
     },
 
     setMentionType () {
-      if (this.$route.params.channel === 'mentions') {
-        switch (this.$route.params.status) {
-          case 'sent':
-            this.mentionType = MentionType.TYPE_SENT
-            break
-          case 'received':
-          default:
-            this.mentionType = MentionType.TYPE_RECEIVED
-        }
+      if (this.$route.params.channel !== 'mentions') {
+        return
+      }
+
+      switch (this.$route.params.status) {
+        case 'sent':
+          this.mentionType = MentionType.TYPE_SENT
+          break
+        case 'received':
+        default:
+          this.mentionType = MentionType.TYPE_RECEIVED
       }
     },
 
@@ -755,6 +1017,7 @@ export default {
       if (this.mentionType === MentionType.TYPE_SENT) {
         this.filter.mentioned_user_id = this.mentionUserId
       }
+
       this.getCommunications(this.filter)
     },
 
@@ -800,7 +1063,8 @@ export default {
     },
 
     onSearch (value) {
-      this.searchText = value
+      this.searchText = value.trim()
+      console.trace('onSearch:', this.searchText)
     },
 
     onSearchOpened () {
@@ -815,24 +1079,31 @@ export default {
 
     onSearchClosed () {
       this.searchText = null
+
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = 1
       } else {
         this.filter.cursor = null
       }
+
       this.filter.search_text = this.searchText
       this.isSearch = false
       this.getCommunications(this.filter)
     },
 
     searching (value) {
-      if ((value && value.length >= 3) || value === '') {
-        if (value === '') {
-          this.setCommunications([])
-        } else {
-          this.searchText = value
-        }
+      value = value.trim()
+
+      // sanity check: minimum of 3 characters required
+      if (!value || value.length < 3) {
+        return
       }
+
+      if (value === '') {
+        this.setCommunications([])
+      }
+
+      this.searchText = value
     },
 
     handleNewMention (communication) {
@@ -882,6 +1153,7 @@ export default {
         this.isLoaded = false
       }
     },
+
     'activeChannel': function (value) {
       if (this.$route.name === 'Inbox Channel') {
         this.searchText = null
@@ -889,21 +1161,31 @@ export default {
         this.isSearch = false
       }
     },
+
     'searchText': function (value) {
-      if ((value && value.length >= 3) || value === '') {
-        if (value === '') {
-          this.setCommunications([])
-        } else {
-          this.filter.search_text = value
-          if (this.$route.params.channel === 'mentions') {
-            this.filter.page = 1
-          } else {
-            this.filter.cursor = null
-          }
-          this.getCommunications(this.filter)
-        }
+      value = value.trim()
+
+      // sanity check: minimum of 3 character required
+      if (!value || value.length < 3) {
+        return
       }
+
+      if (value === '') {
+        this.setCommunications([])
+        return
+      }
+
+      this.filter.search_text = value
+
+      if (this.$route.params.channel === 'mentions') {
+        this.filter.page = 1
+      } else {
+        this.filter.cursor = null
+      }
+
+      this.getCommunications(this.filter)
     },
+
     '$route.name': function (value) {
       if (['Inbox Contact', 'Inbox Contact Communication'].includes(value)) {
         // since mention has different data structure to other channels, need to set property to compare as comm id
@@ -912,6 +1194,7 @@ export default {
         this.setSelectedCommunication(communication)
       }
     },
+
     '$route.params.status': function (value) {
       if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value) && !this.$route.params.id) {
         this.resetFilters()
@@ -930,236 +1213,11 @@ export default {
         this.getCommunications(this.filter)
       }
     },
+
     '$route.params.channel': function (value) {
       if (['mentions', 'calls', 'messages', 'voicemails', 'recordings', 'all-communications'].includes(value)) {
         this.getCommunications(this.filter)
       }
-    }
-  },
-
-  created () {
-    this.cancelToken = window.axios.CancelToken
-    this.source = this.cancelToken.source()
-
-    this.resetFilters()
-
-    this.setMentionType()
-
-    this.listeners.newCommunication = (data) => {
-      // check new communication exists in the old list
-      const found = this.communications.filter(communication => {
-        return communication.id === data.id
-      })
-
-      if (!found.length) {
-        if (data.type === CommunicationTypes.NOTE) {
-          this.handleNewMention(data)
-          return
-        }
-
-        if (this.checkCommunicationChannels(data) &&
-          this.checkCommunicationMatchesSearch(this.searchText, data) &&
-          this.checkCommunicationMatchesFilters(this.filter, data, true) &&
-          this.checkCommunicationMatchesUserAccessibility(data) &&
-          this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
-          this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
-          this.checkCommunicationMatchesUser(this.userId, data) &&
-          this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
-          this.pagination.total += 1
-          // push new data to top of array
-          this.communications.unshift(data)
-
-          if (this.communications.length > this.filter.per_page) {
-            // push out last data from bottom of array
-            this.communications.pop()
-          }
-        }
-      }
-    }
-
-    this.listeners.updateCommunication = (data) => {
-      // disable live dashboard for end clients
-      // check data loaded
-      if (this.pagination.prev === null) {
-        // check new communication exists in the old list
-        const found = this.communications.filter(communication => {
-          return communication.id === data.id
-        })
-        if (found.length) {
-          // update communication
-          data = _.extend({}, found[0], data)
-          if (this.checkCommunicationChannels(data) &&
-            this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
-            this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
-            this.checkCommunicationMatchesUser(this.userId, data) &&
-            this.checkCommunicationMatchesRingGroup(this.ringGroupId, data)) {
-            this.$set(this.communications, this.communications.indexOf(found[0]), data)
-          } else {
-            this.communications = this.communications.filter(communication => {
-              return communication.id !== data.id
-            })
-            this.pagination.total -= 1
-          }
-        } else {
-          // add the communication if it's not already there and if it matches the criteria
-          if (this.checkCommunicationChannels(data) &&
-            this.checkCommunicationMatchesSearch(this.searchText, data) &&
-            this.checkCommunicationMatchesFilters(this.filter, data, true) &&
-            this.checkCommunicationMatchesUserAccessibility(data) &&
-            this.checkCommunicationMatchesCampaign(this.campaignId, data) &&
-            this.checkCommunicationMatchesWorkflow(this.workflowId, data) &&
-            this.checkCommunicationMatchesUser(this.userId, data) &&
-            this.pagination.prev === null &&
-            this.communications.length > 0 &&
-            data.id > this.communications[0].id) {
-            this.pagination.total += 1
-            // push new data to top of array
-            this.communications.unshift(data)
-
-            if (this.communications.length > this.filter.per_page) {
-              // push out last data from bottom of array
-              this.communications.pop()
-            }
-          }
-        }
-      }
-    }
-
-    this.listeners.deleteCommunication = (data) => {
-      // check data loaded
-      if (this.pagination.prev === null) {
-        // try to find the communication
-        const found = this.communications.find(communication => communication.id === data.id)
-        if (found) {
-          // remove it from the list
-          this.communications.splice(this.communications.indexOf(found), 1)
-          this.pagination.total -= 1
-        }
-      }
-    }
-
-    this.listeners.markContactCommunicationsAllAsRead = (data) => {
-      const contactId = _.get(data, 'id', null)
-
-      if (!contactId) {
-        return
-      }
-
-      // get current contact's communications
-      const contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
-      const index = { data: null }
-
-      // iterate through and update is_read value
-      contactCommunications.forEach((communication) => {
-        index.data = this.communications.findIndex(item => item.id === communication.id)
-        this.communications[index.data].is_read = true
-      })
-
-      // set updated communications
-      this.setCommunications(this.communications)
-    }
-
-    this.listeners.inboxLoadCommunications = (showMyContacts) => {
-      this.filter = this.filterMyContacts(this.filter, showMyContacts)
-
-      if (this.filter.cursor !== undefined) {
-        delete this.filter.cursor
-      }
-
-      if (showMyContacts) {
-        this.filter.contact_owner = []
-        this.updateChannelChangedFilterFields({
-          name: 'contact_owner',
-          value: []
-        })
-      }
-
-      this.isLoaded = false
-      this.getCommunications(this.filter)
-    }
-
-    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
-    this.$VueEvent.listen('delete_communication', this.listeners.deleteCommunication)
-    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.listeners.markContactCommunicationsAllAsRead)
-    this.$VueEvent.listen('inbox_load_communications', this.listeners.inboxLoadCommunications)
-  },
-
-  mounted () {
-    this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
-      if (this.$route.params.channel === 'mentions') {
-        this.filter.page = this.nextPage
-      } else {
-        this.filter.cursor = this.nextPage
-      }
-      this.loadMoreCommunications(this.filter).then(() => {
-        const communication = this.communications[lastNavigatedIndex + 1]
-        this.setSelectedCommunication(communication)
-
-        if (this.$route.name === 'Inbox Contact') {
-          this.redirectChannel(communication)
-        }
-
-        if (this.$route.name === 'Inbox Contact Communication') {
-          this.redirectMentionsChannel(communication)
-        }
-
-        this.makeSelectedItemVisible()
-      })
-    })
-
-    this.$VueEvent.listen('navigate_channel', (communication) => {
-      this.setSelectedCommunication(communication)
-
-      if (this.$route.name === 'Inbox Contact') {
-        this.redirectChannel(communication)
-      }
-
-      if (this.$route.name === 'Inbox Contact Communication') {
-        this.redirectMentionsChannel(communication)
-      }
-
-      this.makeSelectedItemVisible()
-    })
-
-    this.$VueEvent.listen('contact_updated', (data) => {
-      const communications = [...this.communications]
-      if (['calls', 'messages', 'mentions', 'voicemails', 'recordings'].includes(this.$route.params.channel)) {
-        if (this.$route.params.channel === 'mentions') {
-          communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
-            value.mention_subject.contact = data
-          })
-        } else {
-          communications.filter(item => item.contact && data && item.contact.id === data.id).forEach((value) => {
-            value.contact = data
-          })
-        }
-
-        this.setCommunications(communications)
-      }
-    })
-
-    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
-      this.getCommunications(this.filter, () => {
-        if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-          if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
-            const communication = { data: null }
-
-            if (this.$route.name === 'Inbox Contact Communication') {
-              communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
-            } else {
-              communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
-            }
-
-            if (communication.data) {
-              this.setSelectedCommunication(communication.data)
-            }
-          }
-        }
-      })
     }
   },
 
