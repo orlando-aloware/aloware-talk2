@@ -1,6 +1,10 @@
 import { getField } from 'vuex-map-fields'
 
 export default {
+  getCallsEnabledColumns: (state) => {
+    return state.callsEnabledColumns
+  },
+
   getFilters: (state) => {
     return state.filters
   },

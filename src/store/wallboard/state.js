@@ -5,6 +5,18 @@ export default function () {
       live: [],
       parked: []
     },
+    callsEnabledColumns: [
+      'incoming_number',
+      'ring_group',
+      'workflow',
+      'created_at',
+      'lead_number',
+      'location',
+      'callback_status',
+      'tags',
+      'notes',
+      'operations'
+    ],
     filters: {
       ringGroup: null
     },

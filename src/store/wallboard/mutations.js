@@ -49,6 +49,8 @@ export default {
     // update user status in store if found
     if (userIndex >= 0) {
       state.users.splice(userIndex, 1, user)
+    } else {
+      state.users.push(user)
     }
   },
 
@@ -58,6 +60,16 @@ export default {
 
   SET_USERS_LOADING: (state, data) => {
     state.isUsersLoading = data
+  },
+
+  TOGGLE_CALLS_COLUMN: (state, column) => {
+    const index = state.callsEnabledColumns.findIndex(c => c === column)
+
+    if (index >= 0) {
+      state.callsEnabledColumns.splice(index, 1)
+    } else {
+      state.callsEnabledColumns.push(column)
+    }
   },
 
   updateField

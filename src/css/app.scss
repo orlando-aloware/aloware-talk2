@@ -12657,6 +12657,33 @@ h1.contact-list-name-label {
         }
       }
     }
+
+    .calls {
+      color: $grey-92;
+
+      &--comfort {}
+
+      &--compact {
+        .calls {
+          &__table {
+            table.datatable {
+              td {
+                padding: 2px 8px;
+              }
+            }
+          }
+        }
+      }
+
+      &__header {
+        display: flex;
+        padding: 10px 20px;
+      }
+
+      &__table {
+
+      }
+    }
   }
 
   .q-basic-selector {
