@@ -13,7 +13,9 @@ pipeline {
         PROD_DOMAIN = 'aloware.com'
         NODE_MODULES_PATH = '/cached_modules/npm/talk2/node_modules'
         TERRAFORM_REPO = 'terraform-groundwork'
+        TALK2_REPO = 'aloware-talk2'
         GITHUB_ORG = 'aloware'
+        GIT_AUTH = credentials('jenkins-github-user')
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
     }
@@ -76,8 +78,8 @@ pipeline {
                       try {
                         sh "terraform workspace new ${branchName} && terraform workspace select ${branchName}"
                       } catch (Exception e) {
-                        echo "The workspace already exists, running TF Commands..."
-                        sh "terraform workspace select ${branchName}"
+                          echo "The workspace already exists, running TF Commands..."
+                          sh "terraform workspace select ${branchName}"
                       }
 
                       sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
@@ -85,13 +87,14 @@ pipeline {
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
 
-                  sshagent(credentials: ['jenkins-github-creds']) {
-                    echo '==> Add PR Comment';
-                    sh ("""
-                      [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-                      gh pr comment ${env.GIT_BRANCH} --body "Hi, your environment is ready to use at: ${envUrl}
-                    """);
+                  echo '==> Add PR Comment';
+                  script {
+                    try {
+                      sh "echo ${GIT_AUTH_PSW} > tmp_token.txt && gh auth login --with-token < tmp_token.txt"
+                      sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${envUrl}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                    } catch (Exception e) {
+                        echo "We could not add the comment in Github PR for some reason, please check #dev-deployments channel in Slack for the environment URL."
+                    }
                   }
                 }
             }
