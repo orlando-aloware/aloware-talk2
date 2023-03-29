@@ -158,10 +158,11 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      this.connection = call
+      this.connection = this.device._createConnection(call._connection, true)
+      this.initConnectionEvents()
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
-      this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
+      this.setDialerCurrentNumber(this.$options.filters.fixPhone(call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
 
@@ -170,7 +171,7 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(call.callSid, call.from).then(res => {
+      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
@@ -190,6 +191,7 @@ export default {
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial()
+      this.connection = null
       this.$closeActionNotification('incomingCall')
       // if (this.$route.name === 'Incoming Call') {
       //   this.$router.push({ name: 'Dial' }).catch(err => {
@@ -202,6 +204,7 @@ export default {
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
       this.removeUnownedLiveContactTask()
       this.stopCallTimer()
+      this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
       if (!this.dialer.parkedCall && !this.dialer.call) {
         this.startWrapUpTimer()
@@ -386,9 +389,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-          this.activeTask &&
-          routeTitle === 'Power Dialer Sessions' &&
-          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -496,13 +499,13 @@ export default {
       this.setDialerCurrentNumber(params['To'])
 
       // check if connection is completely closed before opening a new one
-      if (this.device.activeConnection()) {
+      if (this.connection) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
-      } else {
-        this.connection = await this.device.connect(params, true)
-        this.initConnectionEvents()
       }
+
+      this.connection = await this.device.connect(params, true)
+      this.initConnectionEvents()
 
       // Make sure that phone number is string in this part before proceeding
       currentNumber = currentNumber.toString()
@@ -539,15 +542,6 @@ export default {
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
         this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
-          // .finally(() => {
-          //   this.$router.push({ name: 'Call' }).catch(err => {
-          //     console.log(err)
-          //   })
-          //   setTimeout(() => {
-          //    this.startCallTimer()
-          //    this.setDialerCurrentStatus('CALL_CONNECTED')
-          //   }, 3000)
-          // })
           .catch((err) => {
             console.log(err)
           })
@@ -565,20 +559,17 @@ export default {
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         this.removeUnownedLiveContactTask()
         console.log('Call invite canceled', call)
+        this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial()
         this.$closeActionNotification('incomingCall')
-        // if (this.$route.name === 'Incoming Call') {
-        //   this.$router.push({ name: 'Dial' }).catch(err => {
-        //     console.log(err)
-        //   })
-        // }
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
+        this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
         if (!this.dialer.parkedCall && !this.dialer.call) {
           this.startWrapUpTimer()
@@ -601,10 +592,7 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      if (this.device.activeConnection()) {
-        // hangup an incoming call
-        this.device.activeConnection().hangup()
-      }
+      this.connection.hangup()
 
       // this.resetCall()
     },
@@ -620,8 +608,8 @@ export default {
 
       console.log('Sending digit to call: ' + digit)
 
-      if (this.device.activeConnection()) {
-        this.device.activeConnection().sendDigits(digit)
+      if (this.connection) {
+        this.connection.sendDigits(digit)
       }
     },
 
@@ -641,14 +629,14 @@ export default {
         return
       }
 
-      if (this.dialer.activeConnection()) {
+      if (this.connection) {
         if (this.isMobile && this.$route.name !== 'Phone') {
           this.$router.push({
             name: 'Phone'
           })
         }
         // accept the incoming connection and start two-way audio
-        this.dialer.activeConnection().accept()
+        this.connection.accept()
       }
     },
 
@@ -662,9 +650,9 @@ export default {
       this.removeUnownedLiveContactTask()
       this.setDialerCurrentStatus('REJECTING_CALL')
 
-      if (this.device.activeConnection()) {
+      if (this.connection) {
         // rejecting an incoming call
-        this.device.activeConnection().reject()
+        this.connection.reject()
       }
 
       // set agent status to busy if it's an answer by browser/apps user
@@ -683,14 +671,14 @@ export default {
 
       if (!this.dialer.isMuted) {
         console.log('Muting call')
-        if (this.device.activeConnection()) {
-          this.device.activeConnection().mute(true)
+        if (this.connection) {
+          this.connection.mute(true)
         }
         this.setDialerIsMuted(true)
       } else {
         console.log('Unmuting call')
-        if (this.device.activeConnection()) {
-          this.device.activeConnection().mute(false)
+        if (this.connection) {
+          this.connection.mute(false)
         }
         this.setDialerIsMuted(false)
       }
@@ -698,7 +686,7 @@ export default {
 
     forceMute () {
       this.setDialerIsMuted(true)
-      this.device.activeConnection().mute(true)
+      this.connection.mute(true)
     },
 
     toggleRecordingStatus () {
@@ -887,9 +875,9 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      if (this.device.activeConnection()) {
+      if (this.connection) {
         // hangup an incoming call
-        this.device.activeConnection().hangup()
+        this.connection.hangup()
 
         const counter = { data: 0 }
         this.$options.hangupInterval = setInterval(() => {
@@ -1053,8 +1041,8 @@ export default {
         customParameters[key] = value
       })
       this.setDialerCall({
-        from: call.parameters.from,
-        to: call.to,
+        from: call.parameters.From,
+        to: call.parameters.To,
         callSid: call.parameters.CallSid,
         state: call.status(),
         isMuted: call.isMuted(),

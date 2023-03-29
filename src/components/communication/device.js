@@ -47,6 +47,7 @@ export default class Device {
       return
     }
     this._device = this.carrier === Carriers.TWILIO ? new TwilioClientDevice(token, options) : null
+    this._device.isEventsStarted = false
     this._is_initialized = true
     this._initEvents()
   }
