@@ -335,6 +335,9 @@ export default {
         TYPE_EXPORT_CONTACT_LIST_ITEMS,
         TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
       ],
+      mainListeners: {},
+      isElectronEventsStarted: false,
+      isMainEventsStarted: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -478,7 +481,7 @@ export default {
     if (this.$q.platform.is.electron) {
       this.$q.electron.ipcRenderer.send('app_version')
 
-      this.$q.electron.ipcRenderer.on('open-url', (event, data) => {
+      this.mainListeners.openUrl = (event, data) => {
         const action = data.replace(/(^\w+:|^)\/\//, '')
 
         if (data.indexOf('callto:') > -1) {
@@ -501,58 +504,59 @@ export default {
           this.setHubSpotDeal(phoneNumber)
           return this.sendCall(phoneNumber)
         }
-      })
+      }
 
-      this.$q.electron.ipcRenderer.on('update_available', (event, data) => {
+      this.mainListeners.updateAvailable = (event, data) => {
         this.updateDialogText = data
         this.showUpdateDownloadedDialog = false
         this.showUpdateErrorDialog = false
         this.showNewVersionDialog = true
-      })
+      }
 
-      this.$q.electron.ipcRenderer.on('update_downloaded', (event, data) => {
+      this.mainListeners.updateDownloaded = (event, data) => {
         this.updateDialogText = data
         this.showNewVersionDialog = false
         this.showUpdateErrorDialog = false
         this.showUpdateDownloadedDialog = true
-      })
+      }
 
-      this.$q.electron.ipcRenderer.on('update_error', (event, data) => {
+      this.mainListeners.updateError = (event, data) => {
         this.updateDialogText = data
         this.showNewVersionDialog = false
         this.showUpdateDownloadedDialog = false
         this.showUpdateErrorDialog = true
-      })
+      }
 
-      this.$q.electron.ipcRenderer.on('app_version', (event, data) => {
+      this.mainListeners.appVersion = (event, data) => {
         this.version = data.version
         storage.local.setItem('version', this.version)
         window.axios.defaults.headers.common['Version'] = this.version
         this.$axios = window.axios
-      })
+      }
 
-      // bounce dock
-      this.$VueEvent.listen('bounce_dock', () => {
+      this.mainListeners.bounceDock = () => {
         this.bounceDock()
-      })
+      }
 
-      // set dock badge
-      this.$VueEvent.listen('set_badge', (badgeText) => {
+      this.mainListeners.setBadge = (badgeText) => {
         if (badgeText === undefined) {
           return
         }
         this.setBadge(badgeText.toString())
-      })
+      }
 
-      // increase dock badge
-      this.$VueEvent.listen('increase_badge', (count) => {
+      this.mainListeners.increaseBadge = (count) => {
         this.increaseAppBadge(count)
-      })
+      }
 
-      // decrease dock badge
-      this.$VueEvent.listen('decrease_badge', (count) => {
+      this.mainListeners.decreaseBadge = (count) => {
         this.decreaseAppBadge(count)
-      })
+      }
+
+      if (!this.isElectronEventsStarted) {
+        this.isElectronEventsStarted = true
+        this.startElectronEvents()
+      }
     }
 
     // new in-app contact assigned notification
@@ -576,130 +580,95 @@ export default {
     //   }
     // })
 
-    // new in-app call notification
-    this.$VueEvent.listen('new_in_app_call', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-        const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
-        const communicationType = communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW &&
-          communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
-          ? 'missed call'
-          : 'call'
-
-        // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-        if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
-          this.processActionNotification(communication, communicationType)
-        }
+    this.mainListeners.newInAppCall = (communication) => {
+      if (!this.authenticated || !this.checkCommunicationMatchesUserAccessibility(communication)) {
+        return
       }
-    })
 
-    // new in-app sms notification
-    this.$VueEvent.listen('new_in_app_sms', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
-        this.processActionNotification(communication, 'sms')
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+      const communicationType = communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW &&
+      communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
+        ? 'missed call'
+        : 'call'
+
+      // ignore call notifications if the call is not fishing mode and the user is in sleep mode
+      if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
+        this.processActionNotification(communication, communicationType)
       }
-    })
+    }
 
-    // new in-app voicemail notification
-    this.$VueEvent.listen('new_in_app_voicemail', (communication) => {
-      if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
-        this.processActionNotification(communication, 'missed voicemail')
+    this.mainListeners.newInAppSms = (communication) => {
+      if (!this.authenticated || !this.checkCommunicationMatchesUserAccessibility(communication) ||
+        this.profile.sleep_mode) {
+        return
       }
-    })
 
-    // new in-app fax notification
-    // this.$VueEvent.listen('new_in_app_fax', (communication) => {
-    //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
-    //     this.handleInAppCommunicationNotification(communication)
-    //   }
-    // })
+      this.processActionNotification(communication, 'sms')
+    }
 
-    // new desktop contact assigned notification
-    this.$VueEvent.listen('new_desktop_contact_assigned', (contact) => {
-      if (this.checkContactMatchesUserAccessibility(contact)) {
-        this.handleDesktopContactNotification(contact)
+    this.mainListeners.newInAppVoicemail = (communication) => {
+      if (!this.authenticated || !this.checkCommunicationMatchesUserAccessibility(communication) ||
+        this.profile.sleep_mode) {
+        return
       }
-    })
 
-    // new desktop appointment notification
-    this.$VueEvent.listen(
-      'new_desktop_appointment',
-      ({
-        engagement,
-        contact,
-        timeDiff,
-        unit
-      }) => {
-        this.handleDesktopAppointmentNotification(
-          engagement,
-          contact,
-          timeDiff,
-          unit
-        )
+      this.processActionNotification(communication, 'missed voicemail')
+    }
+
+    this.mainListeners.newDesktopContactAssigned = (contact) => {
+      if (!this.authenticated || !this.checkContactMatchesUserAccessibility(contact)) {
+        return
       }
-    )
 
-    // new desktop reminder notification
-    this.$VueEvent.listen(
-      'new_desktop_reminder',
-      ({
-        engagement,
-        contact,
-        timeDiff,
-        unit
-      }) => {
-        this.handleDesktopReminderNotification(
-          engagement,
-          contact,
-          timeDiff,
-          unit
-        )
-      }
-    )
+      this.handleDesktopContactNotification(contact)
+    }
 
-    // new desktop call notification
-    this.$VueEvent.listen('new_desktop_call', (communication) => {
+    this.mainListeners.newDesktopAppointment = ({ engagement, contact, timeDiff, unit }) => {
+      this.handleDesktopAppointmentNotification(engagement, contact, timeDiff, unit)
+    }
+
+    this.mainListeners.newDesktopReminder = ({ engagement, contact, timeDiff, unit }) => {
+      this.handleDesktopReminderNotification(engagement, contact, timeDiff, unit)
+    }
+
+    this.mainListeners.newDesktopCall = (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         this.handleDesktopCommunicationNotification(communication)
       }
-    })
+    }
 
-    // answered desktop call notification
-    this.$VueEvent.listen('answered_desktop_call', (communication) => {
+    this.mainListeners.answeredDesktopCall = (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         this.handleDesktopCommunicationNotification(communication)
       }
-    })
+    }
 
-    // new desktop sms notification
-    this.$VueEvent.listen('new_desktop_sms', (communication) => {
+    this.mainListeners.newDesktopSms = (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         this.handleDesktopCommunicationNotification(communication)
       }
-    })
+    }
 
-    // new desktop fax notification
-    this.$VueEvent.listen('new_desktop_fax', (communication) => {
+    this.mainListeners.newDesktopFax = (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         this.handleDesktopCommunicationNotification(communication)
       }
-    })
+    }
 
-    // new desktop voicemail notification
-    this.$VueEvent.listen('new_desktop_voicemail', (communication) => {
+    this.mainListeners.newDesktopVoicemail = (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         this.handleDesktopVoicemailNotification(communication)
       }
-    })
+    }
 
-    // user mention notification
-    this.$VueEvent.listen('mention', (data) => {
+    this.mainListeners.mention = (data) => {
       if (this.checkMentionMatchesUserAccessibility(data)) {
         this.processActionNotification(data, 'mention')
       }
-    })
+    }
 
-    this.$VueEvent.listen('update_communication', (communication) => {
+    this.mainListeners.updateCommunication = (communication) => {
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
       const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
@@ -805,9 +774,9 @@ export default {
           }
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('new_version', () => {
+    this.mainListeners.newVersion = () => {
       // if (this.isWidget) {
       //  return
       // }
@@ -820,9 +789,9 @@ export default {
       //   type: 'system'
       // }
       // this.$actionNotification(data)
-    })
+    }
 
-    this.$VueEvent.listen('contact_updated', (data) => {
+    this.mainListeners.contactUpdated = (data) => {
       const contact = this.$jsonClone(data)
       // add the v2 contact attributes that we need
       Object.assign(contact, this.addV2ContactAttributes(contact))
@@ -839,9 +808,9 @@ export default {
 
       // update contact in group
       this.$VueEvent.fire('update-contact-in-group', contact)
-    })
+    }
 
-    this.$VueEvent.listen('new_communication', (communication) => {
+    this.mainListeners.newCommunication = (communication) => {
       if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
@@ -918,9 +887,9 @@ export default {
           )
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('user_updated', (user) => {
+    this.mainListeners.userUpdated = (user) => {
       this.checkSuspended(user, true)
 
       // if (this.profile && user.id === this.profile.id && this.profile.agent_status !== user.agent_status) {
@@ -929,13 +898,13 @@ export default {
         this.setProfile(user)
         console.log('Changed agent status [event]: ', user.agent_status)
       }
-    })
+    }
 
-    this.$VueEvent.listen('company_updated', (company) => {
+    this.mainListeners.companyUpdated = (company) => {
       this.checkSuspended(company)
-    })
+    }
 
-    this.$VueEvent.listen('agent_status_updated', (event) => {
+    this.mainListeners.agentStatusUpdated = (event) => {
       // store.commit('UPDATE_AGENT_STATUS', event)
       this.updateUserStatus(event)
       if (this.currentCompany &&
@@ -947,11 +916,56 @@ export default {
         this.setAgentStatus(event.agent_status)
         console.log('Changed agent status [event]: ', event.agent_status)
       }
-    })
+    }
 
-    this.$VueEvent.listen('change_agent_status', (agentStatus) => {
+    this.mainListeners.changeAgentStatus = (agentStatus) => {
       this.changeAgentStatus(agentStatus)
-    })
+    }
+
+    this.mainListeners.exportEventCreate = (task) => {
+      if (!this.allowedExports.includes(task.export.type) ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
+      this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
+    }
+
+    this.mainListeners.exportEventUpdate = (task) => {
+      if (!this.allowedExports.includes(task.export.type) ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
+      this.$generalNotification(
+        `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+        'export-csv',
+        0,
+        true,
+        {
+          uuid: task.export.uuid,
+          filename: `${task.export.uuid}.csv`
+        }
+      )
+    }
+
+    this.mainListeners.exportEventDelete = (task) => {
+      if (!this.allowedExports.includes(task.export.type) ||
+        task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
+    }
+
+    // new in-app fax notification
+    // this.$VueEvent.listen('new_in_app_fax', (communication) => {
+    //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
+    //     this.handleInAppCommunicationNotification(communication)
+    //   }
+    // })
 
     // update agent status every 2 minutes
     // disabled by Sohrab on July 26th, 2022
@@ -972,43 +986,10 @@ export default {
     }
     */
 
-    this.$VueEvent.listen('export_event_create', (task) => {
-      if (!this.allowedExports.includes(task.export.type) ||
-        task.export.user_id !== this.profile.id) {
-        return
-      }
-
-      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
-      this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
-    })
-
-    this.$VueEvent.listen('export_event_update', (task) => {
-      if (!this.allowedExports.includes(task.export.type) ||
-        task.export.user_id !== this.profile.id) {
-        return
-      }
-
-      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
-      this.$generalNotification(
-        `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
-        'export-csv',
-        0,
-        true,
-        {
-          uuid: task.export.uuid,
-          filename: `${task.export.uuid}.csv`
-        }
-      )
-    })
-
-    this.$VueEvent.listen('export_event_delete', (task) => {
-      if (!this.allowedExports.includes(task.export.type) ||
-        task.export.user_id !== this.profile.id) {
-        return
-      }
-
-      console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
-    })
+    if (!this.isMainEventsStarted) {
+      this.isMainEventsStarted = true
+      this.startMainEvents()
+    }
 
     if (this.$q.platform.is.electron) {
       this.$q.notify.setDefaults({
@@ -1123,6 +1104,90 @@ export default {
   },
 
   methods: {
+    startElectronEvents () {
+      if (!this.$q.platform.is.electron) {
+        return
+      }
+
+      this.$q.electron.ipcRenderer.on('open-url', this.mainListeners.openUrl)
+      this.$q.electron.ipcRenderer.on('update_available', this.mainListeners.updateAvailable)
+      this.$q.electron.ipcRenderer.on('update_downloaded', this.mainListeners.updateDownloaded)
+      this.$q.electron.ipcRenderer.on('update_error', this.mainListeners.updateError)
+      this.$q.electron.ipcRenderer.on('app_version', this.mainListeners.appVersion)
+      this.$VueEvent.listen('bounce_dock', this.mainListeners.bounceDock)
+      this.$VueEvent.listen('set_badge', this.mainListeners.setBadge)
+      this.$VueEvent.listen('increase_badge', this.mainListeners.increaseBadge)
+      this.$VueEvent.listen('decrease_badge', this.mainListeners.decreaseBadge)
+    },
+
+    stopElectronEvents () {
+      if (!this.$q.platform.is.electron) {
+        return
+      }
+
+      this.$q.electron.ipcRenderer.off('open-url', this.mainListeners.openUrl)
+      this.$q.electron.ipcRenderer.off('update_available', this.mainListeners.updateAvailable)
+      this.$q.electron.ipcRenderer.off('update_downloaded', this.mainListeners.updateDownloaded)
+      this.$q.electron.ipcRenderer.off('update_error', this.mainListeners.updateError)
+      this.$q.electron.ipcRenderer.off('app_version', this.mainListeners.appVersion)
+      this.$VueEvent.stop('bounce_dock', this.mainListeners.bounceDock)
+      this.$VueEvent.stop('set_badge', this.mainListeners.setBadge)
+      this.$VueEvent.stop('increase_badge', this.mainListeners.increaseBadge)
+      this.$VueEvent.stop('decrease_badge', this.mainListeners.decreaseBadge)
+    },
+
+    startMainEvents () {
+      this.$VueEvent.listen('new_in_app_call', this.mainListeners.newInAppCall)
+      this.$VueEvent.listen('new_in_app_sms', this.mainListeners.newInAppSms)
+      this.$VueEvent.listen('new_in_app_voicemail', this.mainListeners.newInAppVoicemail)
+      this.$VueEvent.listen('new_desktop_contact_assigned', this.mainListeners.newDesktopContactAssigned)
+      this.$VueEvent.listen('new_desktop_appointment', this.mainListeners.newDesktopAppointment)
+      this.$VueEvent.listen('new_desktop_reminder', this.mainListeners.newDesktopReminder)
+      this.$VueEvent.listen('new_desktop_call', this.mainListeners.newDesktopCall)
+      this.$VueEvent.listen('answered_desktop_call', this.mainListeners.answeredDesktopCall)
+      this.$VueEvent.listen('new_desktop_sms', this.mainListeners.newDesktopSms)
+      this.$VueEvent.listen('new_desktop_fax', this.mainListeners.newDesktopFax)
+      this.$VueEvent.listen('new_desktop_voicemail', this.mainListeners.newDesktopVoicemail)
+      this.$VueEvent.listen('mention', this.mainListeners.mention)
+      this.$VueEvent.listen('update_communication', this.mainListeners.updateCommunication)
+      this.$VueEvent.listen('new_version', this.mainListeners.newVersion)
+      this.$VueEvent.listen('contact_updated', this.mainListeners.contactUpdated)
+      this.$VueEvent.listen('new_communication', this.mainListeners.newCommunication)
+      this.$VueEvent.listen('user_updated', this.mainListeners.userUpdated)
+      this.$VueEvent.listen('company_updated', this.mainListeners.companyUpdated)
+      this.$VueEvent.listen('agent_status_updated', this.mainListeners.agentStatusUpdated)
+      this.$VueEvent.listen('change_agent_status', this.mainListeners.changeAgentStatus)
+      this.$VueEvent.listen('export_event_create', this.mainListeners.exportEventCreate)
+      this.$VueEvent.listen('export_event_update', this.mainListeners.exportEventUpdate)
+      this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
+    },
+
+    stopMainEvents () {
+      this.$VueEvent.stop('new_in_app_call', this.mainListeners.newInAppCall)
+      this.$VueEvent.stop('new_in_app_sms', this.mainListeners.newInAppSms)
+      this.$VueEvent.stop('new_in_app_voicemail', this.mainListeners.newInAppVoicemail)
+      this.$VueEvent.stop('new_desktop_contact_assigned', this.mainListeners.newDesktopContactAssigned)
+      this.$VueEvent.stop('new_desktop_appointment', this.mainListeners.newDesktopAppointment)
+      this.$VueEvent.stop('new_desktop_reminder', this.mainListeners.newDesktopReminder)
+      this.$VueEvent.stop('new_desktop_call', this.mainListeners.newDesktopCall)
+      this.$VueEvent.stop('answered_desktop_call', this.mainListeners.answeredDesktopCall)
+      this.$VueEvent.stop('new_desktop_sms', this.mainListeners.newDesktopSms)
+      this.$VueEvent.stop('new_desktop_fax', this.mainListeners.newDesktopFax)
+      this.$VueEvent.stop('new_desktop_voicemail', this.mainListeners.newDesktopVoicemail)
+      this.$VueEvent.stop('mention', this.mainListeners.mention)
+      this.$VueEvent.stop('update_communication', this.mainListeners.updateCommunication)
+      this.$VueEvent.stop('new_version', this.mainListeners.newVersion)
+      this.$VueEvent.stop('contact_updated', this.mainListeners.contactUpdated)
+      this.$VueEvent.stop('new_communication', this.mainListeners.newCommunication)
+      this.$VueEvent.stop('user_updated', this.mainListeners.userUpdated)
+      this.$VueEvent.stop('company_updated', this.mainListeners.companyUpdated)
+      this.$VueEvent.stop('agent_status_updated', this.mainListeners.agentStatusUpdated)
+      this.$VueEvent.stop('change_agent_status', this.mainListeners.changeAgentStatus)
+      this.$VueEvent.stop('export_event_create', this.mainListeners.exportEventCreate)
+      this.$VueEvent.stop('export_event_update', this.mainListeners.exportEventUpdate)
+      this.$VueEvent.stop('export_event_delete', this.mainListeners.exportEventDelete)
+    },
+
     checkSuspended (data, isUser = false) {
       const isCurrentUser = isUser ? this.profile.id === data.id : false
 
@@ -2271,32 +2336,8 @@ export default {
     },
 
     beforeUnload () {
-      this.$VueEvent.stop('bounce_dock')
-      this.$VueEvent.stop('set_badge')
-      this.$VueEvent.stop('increase_badge')
-      this.$VueEvent.stop('decrease_badge')
-      this.$VueEvent.stop('new_in_app_call')
-      this.$VueEvent.stop('new_in_app_sms')
-      this.$VueEvent.stop('new_in_app_voicemail')
-      // this.$VueEvent.stop('new_in_app_fax')
-      this.$VueEvent.stop('new_desktop_contact_assigned')
-      this.$VueEvent.stop('new_desktop_appointment')
-      this.$VueEvent.stop('new_desktop_reminder')
-      this.$VueEvent.stop('new_desktop_call')
-      this.$VueEvent.stop('answered_desktop_call')
-      this.$VueEvent.stop('new_desktop_sms')
-      this.$VueEvent.stop('new_desktop_fax')
-      this.$VueEvent.stop('new_desktop_voicemail')
-      this.$VueEvent.stop('mention')
-      this.$VueEvent.stop('update_communication')
-      this.$VueEvent.stop('new_version')
-      this.$VueEvent.stop('user_updated')
-      this.$VueEvent.stop('company_updated')
-      this.$VueEvent.stop('agent_status_updated')
-      this.$VueEvent.stop('change_agent_status')
-      this.$VueEvent.stop('export_event_create')
-      this.$VueEvent.stop('export_event_update')
-      this.$VueEvent.stop('export_event_delete')
+      this.stopElectronEvents()
+      this.stopMainEvents()
       this.unsubscribeFromPusher()
       this.resetVuex([
         'contacts',
@@ -2479,12 +2520,26 @@ export default {
         this.initAuth()
       }
 
-      if (!this.authenticated) {
+      if (!newVal) {
         this.resetCall()
+        this.stopElectronEvents()
+        this.stopMainEvents()
+        this.isElectronEventsStarted = false
+        this.isMainEventsStarted = false
+
+        return
       }
 
-      if (this.authenticated) {
-        this.sidebarVisible = true
+      this.sidebarVisible = true
+
+      if (!this.isElectronEventsStarted) {
+        this.isElectronEventsStarted = true
+        this.startElectronEvents()
+      }
+
+      if (!this.isMainEventsStarted) {
+        this.isMainEventsStarted = true
+        this.startMainEvents()
       }
     },
 
