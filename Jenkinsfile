@@ -65,7 +65,8 @@ pipeline {
 
                 script {
                   def branchName = env.GIT_BRANCH.toLowerCase()
-                  def envUrl = "${branchName}.talk.${DEV_DOMAIN}"
+                  def subDomain = branchName.contains('pr') ? "${branchName}.talk" : branchName
+                  def envUrl = "${subDomain}.${DEV_DOMAIN}"
 
                   dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                       sh """
@@ -75,7 +76,7 @@ pipeline {
                       """
 
                       try {
-                        sh "terraform workspace new ${branchName} && terraform workspace select ${branchName}"
+                        sh "terraform workspace new ${branchName}"
                       } catch (Exception e) {
                           echo "The workspace already exists, running TF Commands..."
                           sh "terraform workspace select ${branchName}"
