@@ -20,12 +20,17 @@ pipeline {
     }
 
     stages {
-        stage('Setup Dev Env File') {
+        stage('Send Job Start Notification') {
             steps {
                 script {
                     notificationSender.sendSlackInfo()
                 }
+            }
+        }
 
+        stage('Setup Dev Env File') {
+            when { not { branch 'master' } }
+            steps {
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
@@ -33,24 +38,28 @@ pipeline {
         }
 
         stage('Load Cached Modules') {
+            when { not { branch 'master' } }
             steps {
                 sh "cp -r ${env.NODE_MODULES_PATH} ."
             }
         }
 
         stage('Install Dependencies') {
+            when { not { branch 'master' } }
             steps {
                 sh 'npm install --no-audit'
             }
         }
 
         stage('Build Talk2 Assets') {
+            when { not { branch 'master' } }
             steps {
                 sh 'quasar build'
             }
         }
 
         stage('Deploy New Dev-Env Cloudfront Distribution') {
+            when { not { branch 'master' } }
             steps {
                 sshagent(credentials: ['jenkins-github-creds']) {
                   echo '==> Clone GitOps Repo';
@@ -65,7 +74,7 @@ pipeline {
 
                 script {
                   def branchName = env.GIT_BRANCH.toLowerCase()
-                  def subDomain = branchName.contains('pr') ? "${branchName}.talk" : branchName
+                  def subDomain = branchName.contains('pr') ? "${branchName}.talk" : "talk"
                   def envUrl = "${subDomain}.${DEV_DOMAIN}"
 
                   dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
@@ -87,13 +96,6 @@ pipeline {
 
                   sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
                 }
-            }
-        }
-
-        stage('Deploy to Dev Environment') {
-            when { branch 'develop' }
-            steps {
-                sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://talk.${env.DEV_DOMAIN} --delete"
             }
         }
     }
