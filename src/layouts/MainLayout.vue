@@ -581,7 +581,7 @@ export default {
     // })
 
     this.mainListeners.newInAppCall = (communication) => {
-      if (!this.authenticated || !this.checkCommunicationMatchesUserAccessibility(communication)) {
+      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
 
@@ -599,8 +599,7 @@ export default {
     }
 
     this.mainListeners.newInAppSms = (communication) => {
-      if (!this.authenticated || !this.checkCommunicationMatchesUserAccessibility(communication) ||
-        this.profile.sleep_mode) {
+      if (!this.checkCommunicationMatchesUserAccessibility(communication) || this.profile.sleep_mode) {
         return
       }
 
@@ -608,8 +607,7 @@ export default {
     }
 
     this.mainListeners.newInAppVoicemail = (communication) => {
-      if (!this.authenticated || !this.checkCommunicationMatchesUserAccessibility(communication) ||
-        this.profile.sleep_mode) {
+      if (!this.checkCommunicationMatchesUserAccessibility(communication) || this.profile.sleep_mode) {
         return
       }
 
@@ -617,7 +615,7 @@ export default {
     }
 
     this.mainListeners.newDesktopContactAssigned = (contact) => {
-      if (!this.authenticated || !this.checkContactMatchesUserAccessibility(contact)) {
+      if (!this.checkContactMatchesUserAccessibility(contact)) {
         return
       }
 
