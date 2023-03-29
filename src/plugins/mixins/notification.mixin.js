@@ -181,6 +181,7 @@ export default {
     },
 
     processActionNotification (communication, type) {
+      console.trace('type: ', type)
       const name = { data: '' }
       const companyName = { data: '' }
       const firstAttachment = { data: null }

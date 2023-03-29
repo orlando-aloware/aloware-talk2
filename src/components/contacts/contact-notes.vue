@@ -97,6 +97,11 @@ export default {
         this.prevValue = this.contact.notes
       })
     }
+  },
+  watch: {
+    'contact.id': function () {
+      this.isEdit = false
+    }
   }
 }
 </script>
