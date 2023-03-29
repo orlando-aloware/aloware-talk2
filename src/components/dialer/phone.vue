@@ -1626,6 +1626,12 @@ export default {
         return true
       }
 
+      if (this.dialer.call && this.dialer.call.direction === 'INCOMING' &&
+        this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' &&
+        this.showIncomingCallNotification) {
+        return false
+      }
+
       if (['menu', 'wrap-up'].includes(this.screen)) {
         return true
       }
@@ -2418,7 +2424,7 @@ export default {
   },
 
   watch: {
-    shouldShow (newValue) {
+    shouldShow () {
       this.loadingCommunication = false
       this.loadingDropThirdParty = false
       this.loadingToggleRecordingStatus = false
