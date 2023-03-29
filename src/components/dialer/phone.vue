@@ -1621,12 +1621,9 @@ export default {
 
     shouldShow () {
       const callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+
       if (callFishingCommunication) {
         return true
-      }
-
-      if (this.dialer.call && this.dialer.call.direction === 'INCOMING' && this.showIncomingCallNotification) {
-        return false
       }
 
       if (['menu', 'wrap-up'].includes(this.screen)) {
@@ -2421,7 +2418,7 @@ export default {
   },
 
   watch: {
-    shouldShow () {
+    shouldShow (newValue) {
       this.loadingCommunication = false
       this.loadingDropThirdParty = false
       this.loadingToggleRecordingStatus = false
