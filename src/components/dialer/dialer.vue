@@ -106,6 +106,7 @@ export default {
         }
       }
     })
+
     this.$VueEvent.listen('reconnectDialer', () => {
       this.getDesktopToken(true)
         .then(() => {
