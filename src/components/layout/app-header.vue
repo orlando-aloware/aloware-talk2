@@ -125,7 +125,7 @@
                      placement="bottomleft"
                      v-if="dialer.error.code">
             <template #title>Connection timeout</template>
-            <p>Click here to reset or please check the <a href="https://support.aloware.com/en/articles/6958138-common-dialer-errors" target="_blank">troubleshooting guide here</a>.</p>
+            <p>Click here to reconnect or please check the <a href="https://support.aloware.com/en/articles/6958138-common-dialer-errors" target="_blank">troubleshooting guide here</a>.</p>
             <p>Error Code: [{{ dialer.error.code }}]</p>
             <q-btn
               v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
