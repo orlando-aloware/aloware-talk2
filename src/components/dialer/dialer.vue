@@ -65,6 +65,18 @@ export default {
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
         !['connected', 'open'].includes(this.dialer.call.state)
+    },
+
+    hasNoParkedAndInprogressCall () {
+      return !this.dialer.parkedCall && !this.dialer.call
+    },
+
+    hasParkedAndInprogressCall () {
+      return this.dialer.parkedCall && this.dialer.call
+    },
+
+    hasCallInProgressNoParkedCall () {
+      return !this.dialer.parkedCall && this.dialer.call
     }
   },
 
@@ -217,11 +229,7 @@ export default {
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      const hasNoParkedCall = !this.dialer.parkedCall && !this.dialer.call
-      const hasParkedCall = this.dialer.parkedCall && this.dialer.call
-      const hasCallInProgressNotParked = !this.dialer.parkedCall && this.dialer.call
-
-      if (hasNoParkedCall || hasParkedCall || hasCallInProgressNotParked) {
+      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
         this.startWrapUpTimer()
         return
       }
@@ -576,6 +584,7 @@ export default {
           this.setDialerFormStatus(false)
         }
       })
+
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         this.removeUnownedLiveContactTask()
         console.log('Call invite canceled', call)
@@ -586,20 +595,22 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
+        if (this.dialer.communication) {
+          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+        }
+
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        if (!this.dialer.parkedCall && !this.dialer.call) {
+
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
           this.startWrapUpTimer()
-        } else if (this.dialer.parkedCall && this.dialer.call) {
-          this.startWrapUpTimer()
-        } else if (!this.dialer.parkedCall && this.dialer.call) {
-          this.startWrapUpTimer()
-        } else {
-          this.backToDial()
+          return
         }
+
+        this.backToDial()
       })
     },
 
