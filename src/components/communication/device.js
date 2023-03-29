@@ -35,6 +35,7 @@ export default class Device {
     if (!connection) {
       return undefined
     }
+
     return new TwilioConnection(this, connection, initEvents)
   }
 
@@ -46,6 +47,7 @@ export default class Device {
     if (this._is_initialized) {
       return
     }
+
     this._device = this.carrier === Carriers.TWILIO ? new TwilioClientDevice(token, options) : null
     this._device.isEventsStarted = false
     this._is_initialized = true
@@ -64,24 +66,31 @@ export default class Device {
     this._device.on(Events.REGISTERED, (device) => {
       this._executeCallback(Events.REGISTERED, [this._device])
     })
+
     this._device.on(Events.UNREGISTERED, (device) => {
       this._executeCallback(Events.UNREGISTERED, [device])
     })
+
     this._device.on(Events.INCOMING, (connection) => {
       this._executeCallback(Events.INCOMING, [this._createConnection(connection)])
     })
+
     this._device.on(Events.ERROR, (error) => {
       this._executeCallback(Events.ERROR, [new DeviceError(error)])
     })
+
     this._device.on(Events.DISCONNECT, (connection) => {
       this._executeCallback(Events.DISCONNECT, [this._createConnection(connection)])
     })
+
     this._device.on(Events.CONNECT, (connection) => {
       this._executeCallback(Events.CONNECT, [this._createConnection(connection)])
     })
+
     this._device.on(Events.CANCEL, (connection) => {
       this._executeCallback(Events.CANCEL, [this._createConnection(connection)])
     })
+
     this._device.on(Events.TOKEN_WILL_EXPIRE, () => {
       this._executeCallback(Events.TOKEN_WILL_EXPIRE)
     })

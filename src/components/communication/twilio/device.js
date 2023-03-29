@@ -15,6 +15,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device) {
       return null
     }
+
     return this._device.status()
   }
 
@@ -39,6 +40,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return []
     }
+
     return this._device.audio.availableInputDevices
   }
 
@@ -46,6 +48,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return Promise.reject('Device is not yet initialized.')
     }
+
     return this._device.audio.setInputDevice(inputDevice)
   }
 
@@ -57,6 +60,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return []
     }
+
     return this._device.audio.availableOutputDevices
   }
 
@@ -64,6 +68,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return []
     }
+
     return this._device.audio.speakerDevices.get()
   }
 
@@ -71,6 +76,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return Promise.reject('Device is not yet initialized.')
     }
+
     return this._device.audio.speakerDevices.set(outputDevice)
   }
 
@@ -78,6 +84,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return Promise.reject('Device is not yet initialized.')
     }
+
     return this._device.audio.speakerDevices.test()
   }
 

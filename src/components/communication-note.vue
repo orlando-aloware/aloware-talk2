@@ -31,6 +31,7 @@
 <script>
 import _ from 'lodash'
 import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'communication-note',
 
@@ -63,7 +64,6 @@ export default {
   },
 
   computed: {
-
     hasUnsavedChanges () {
       return this.communication && this.note !== this.communication.notes
     }
@@ -75,6 +75,8 @@ export default {
 
   methods: {
     showNote () {
+      this.$emit('onUnsavedChanges', false)
+      this.$emit('notesChanged', '')
       this.note = this.communication.notes
     },
 
@@ -82,6 +84,8 @@ export default {
       if (this.hasPermissionTo('note communication') && !this.noAutoSave) {
         this.saveNote()
       }
+
+      this.$emit('notesChanged', this.note)
     }, 2000),
 
     onBlur () {
@@ -96,6 +100,8 @@ export default {
         this.communication.notes = this.note
         this.loadingBtn = false
         this.loading = true
+        this.$emit('onUnsavedChanges', false)
+        this.$emit('notesChanged', '')
         this.$generalNotification('Notes updated')
         setTimeout(() => {
           this.loading = false
@@ -115,6 +121,10 @@ export default {
   watch: {
     'communication.notes': function () {
       this.showNote()
+    },
+
+    hasUnsavedChanges (newValue) {
+      this.$emit('onUnsavedChanges', newValue)
     }
   }
 }
