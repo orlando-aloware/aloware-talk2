@@ -1,5 +1,6 @@
 import * as Carriers from '../../../constants/carriers'
 import MainDevice from './../device'
+import { get, first } from 'lodash'
 
 export default class TwilioDevice extends MainDevice {
   constructor () {
@@ -18,16 +19,21 @@ export default class TwilioDevice extends MainDevice {
     return this._device.status()
   }
 
-  disconnectAll (connection) {
-    this._device.disconnectAll(connection._connection)
+  disconnectAll () {
+    this._device.disconnectAll()
   }
 
   activeConnection () {
-    if (!this._device) {
+    const calls = get(this._device, '_calls', [])
+    const hasCalls = calls instanceof Array ? calls.length > 0 : false
+
+    if (!this._device || !hasCalls) {
       return null
     }
 
-    return this._createConnection(this._device.activeConnection())
+    // prevent connection events from re-initialization
+    const initEvents = !this._device.isEventsStarted
+    return this._createConnection(first(calls), initEvents)
   }
 
   availableInputDevices () {
@@ -44,6 +50,10 @@ export default class TwilioDevice extends MainDevice {
     }
 
     return this._device.audio.setInputDevice(inputDevice)
+  }
+
+  updateToken (token) {
+    return this._device.updateToken(token)
   }
 
   availableOutputDevices () {
@@ -78,8 +88,13 @@ export default class TwilioDevice extends MainDevice {
     return this._device.audio.speakerDevices.test()
   }
 
-  connect (params, initEvents = false) {
-    return this._createConnection(this._device.connect(params), initEvents)
+  async connect (params, initEvents = false) {
+    // prevent connection events from re-initialization
+    if (initEvents && !this._device.isEventsStarted) {
+      this._device.isEventsStarted = initEvents
+    }
+
+    return this._createConnection(await this._device.connect({ params }), initEvents)
   }
 
   destroy () {
