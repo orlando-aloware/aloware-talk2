@@ -1,20 +1,18 @@
 <template>
   <div class="w-100 h-100 px-2">
 
-    <b-overlay class="d-flex d-block w-100"
-               :show="loading"
-               rounded="sm">
+    <b-overlay class="d-flex w-100 h-100"
+               rounded="sm"
+               :show="loading">
       <template #overlay>
         <q-spinner-bars color="primary"
                         size="40px" />
       </template>
 
-      <div class="col-4 p-1 px-2"
-           style="height:70vh;">
+      <div class="col-4 p-1 px-2">
         <q-card flat class="p-3">
           <q-card-section class="p-0">
-            <div
-              class="text-subtitle1 text-weight-medium">
+            <div class="text-subtitle1 text-weight-medium">
               Scripts
             </div>
           </q-card-section>
@@ -23,11 +21,10 @@
         <DetailsScripts :resources="scripts" />
       </div>
 
-      <div class="col-4 p-1 px-2"
-           style="height:70vh;">
-        <q-card v-if="isHubspotEnabled && hubspotLink"
-                flat
-                class="p-3">
+      <div class="col-4 p-1 px-2">
+        <q-card flat
+                class="p-3"
+                v-if="isHubspotEnabled && hubspotLink">
           <q-card-section class="p-0">
             <b-link class="text-weight-medium text-decoration-none"
                     target="_blank"
@@ -41,8 +38,7 @@
         <DetailsContactInformation :resources="contact"
                                    v-if="contact" />
       </div>
-      <div class="col-4 p-1 px-2"
-           style="height:70vh;">
+      <div class="col-4 p-1 px-2 h-100 overflow-y-scroll">
 
         <DetailsTools />
       </div>
@@ -91,7 +87,9 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapState('contacts', ['contact']),
+
     ...mapGetters('powerDialer', [
       'sessionLoader'
     ]),

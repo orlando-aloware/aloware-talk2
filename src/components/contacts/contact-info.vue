@@ -26,7 +26,7 @@
 
               <b-link href="#"
                       class="copy-phone-number ml-1"
-                      @click.prevent="copyPhoneNumber">
+                      @click.prevent="copyPhoneNumber(contact.phone_number)">
                 <q-tooltip anchor="top middle"
                            self="center middle">
                   Copy
@@ -53,10 +53,6 @@
                         class="badge-phone-info mr-1">
                 DNC
               </b-badge>
-
-              <input :value="contact.phone_number"
-                     type="hidden"
-                     id="phone-number-clone"/>
             </span>
             <span v-else>
               Phone number unavailable
@@ -342,21 +338,9 @@ export default {
       this.showEditForm = false
     },
 
-    copyPhoneNumber () {
-      const phoneNumberClone = document.querySelector('#phone-number-clone')
-      phoneNumberClone.setAttribute('type', 'text')
-      phoneNumberClone.select()
-
-      try {
-        document.execCommand('copy')
-        this.$generalNotification('Phone number copied to clipboard.')
-      } catch (err) {
-        this.$generalNotification('Error copying phone number to clipboard.', 'error')
-      }
-
-      /* unselect the range */
-      phoneNumberClone.setAttribute('type', 'hidden')
-      window.getSelection().removeAllRanges()
+    copyPhoneNumber (phoneNumber) {
+      this.$copyToClipboard(phoneNumber)
+      this.$generalNotification('Phone number copied to clipboard.')
     },
 
     getPhoneObject () {

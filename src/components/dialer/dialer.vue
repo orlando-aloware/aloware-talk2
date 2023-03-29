@@ -35,6 +35,7 @@ export default {
     return {
       loadingCommunication: false,
       loadingDropThirdParty: false,
+      loadingTransfer: false,
       loadingToggleRecordingStatus: false,
       loadingMerge: false,
       loadingHold: false,
@@ -45,18 +46,38 @@ export default {
       connection: null,
       warnings: [],
       hangupInterval: null,
+      activeConnectionInterval: null,
       AgentStatus,
       WebrtcEvents,
-      CommunicationDispositionStatus,
-      activeConnectionInterval: null
+      CommunicationDispositionStatus
     }
   },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
+
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState('powerDialer', ['activeTask'])
+
+    ...mapState('powerDialer', ['activeTask']),
+
+    isNotInProgressCall () {
+      return !this.dialer.call || !this.dialer.communication ||
+        !['connected', 'open'].includes(this.dialer.call.state)
+    },
+
+    hasNoParkedAndInprogressCall () {
+      return !this.dialer.parkedCall && !this.dialer.call
+    },
+
+    hasParkedAndInprogressCall () {
+      return this.dialer.parkedCall && this.dialer.call
+    },
+
+    hasCallInProgressNoParkedCall () {
+      return !this.dialer.parkedCall && this.dialer.call
+    }
   },
 
   created () {
@@ -71,21 +92,22 @@ export default {
         this.setDialerCommunication(data)
 
         const user = this.getUser(this.dialer.communication.added_user_id)
+
         if (user.name) {
           this.setAddedParty(user)
         }
 
         const routeTitle = _.get(this.$route, 'meta.title', null)
+        const isActiveTaskInPowerDialerSession = routeTitle && this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          parseInt(this.activeTask.id) === parseInt(this.dialer.communication.contact.id)
+        const dialerCommunicationHasContact = routeTitle !== 'Power Dialer Sessions' &&
+          this.dialer.communication.contact
 
         // if in power dialer session, we must match the active task (contact)'s id
-        // with the communication's contact id
-        // else, set the contact.
-        if ((routeTitle &&
-            this.activeTask &&
-            routeTitle === 'Power Dialer Sessions' &&
-            parseInt(this.activeTask.id) === parseInt(this.dialer.communication.contact.id)) ||
-          (routeTitle !== 'Power Dialer Sessions' &&
-            this.dialer.communication.contact)) {
+        // with the communication's contact id OR if in other pages and dialer's
+        // communication has a contact, set the contact.
+        if (isActiveTaskInPowerDialerSession || dialerCommunicationHasContact) {
           this.setDialerContact(this.dialer.communication.contact)
         }
       }
@@ -94,12 +116,15 @@ export default {
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         data = _.merge(this.dialer.parkedCall, data)
         this.setDialerParkedCall(data)
+
         if (!this.dialer.parkedCallTimer) {
           this.startParkedCallTimer()
         }
 
-        if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW || data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
+        if (data.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW ||
+          data.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
           this.setDialerParkedCall()
+
           if (this.dialer.parkedCallTimer) {
             this.stopParkedCallTimer()
           }
@@ -139,6 +164,7 @@ export default {
 
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
+
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         this.setDialerIsReady(false)
@@ -158,10 +184,11 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      this.connection = call
+      this.connection = this.device._createConnection(call._connection, true)
+      this.initConnectionEvents()
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
-      this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.call.from, 'E164'))
+      this.setDialerCurrentNumber(this.$options.filters.fixPhone(call.from, 'E164'))
       this.setDialerCurrentStatus('RECEIVED_CALL_INVITE')
       console.log('call information', call.callSid, call.from, this.dialer.currentNumber)
 
@@ -170,16 +197,12 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(call.callSid, call.from).then(res => {
+      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
           this.addNonOwnedLiveContact(res.data)
         }
-      }).finally(() => {
-        // this.$router.push({ name: 'Incoming Call' }).catch(err => {
-        //   console.log(err)s
-        // })
       }).catch((err) => {
         console.log(err)
       })
@@ -190,28 +213,28 @@ export default {
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial()
+      this.connection = null
       this.$closeActionNotification('incomingCall')
-      // if (this.$route.name === 'Incoming Call') {
-      //   this.$router.push({ name: 'Dial' }).catch(err => {
-      //     console.log(err)
-      //   })
-      // }
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+
+      if (this.dialer.communication) {
+        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+      }
+
       this.removeUnownedLiveContactTask()
       this.stopCallTimer()
+      this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      if (!this.dialer.parkedCall && !this.dialer.call) {
+
+      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
         this.startWrapUpTimer()
-      } else if (this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-      } else if (!this.dialer.parkedCall && this.dialer.call) {
-        this.startWrapUpTimer()
-      } else {
-        this.backToDial()
+        return
       }
+
+      this.backToDial()
     })
 
     this.getDesktopToken()
@@ -348,9 +371,11 @@ export default {
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
       console.log('Getting communication', sid, from, getCommunicationTry)
+
       if (this.dialer.communication && !force) {
         return Promise.resolve()
       }
+
       this.loadingCommunication = true
       return this.$axios.get('/api/v1/communication/info', {
         params: {
@@ -373,8 +398,7 @@ export default {
         // was already processed/ended but the fetching of the previous task's communication
         // got delayed so the previous task's contact details will show for brief amount of
         // seconds, which is being prevented here:
-        if (routeTitle &&
-          this.activeTask &&
+        if (routeTitle && this.activeTask &&
           routeTitle === 'Power Dialer Sessions' &&
           this.activeTask.id !== res.data.contact_id) {
           return Promise.resolve()
@@ -386,9 +410,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-          this.activeTask &&
-          routeTitle === 'Power Dialer Sessions' &&
-          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -397,6 +421,7 @@ export default {
         this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.communication.lead_number, 'E164'))
         this.$VueEvent.fire('communicationLoaded')
         this.loadingCommunication = false
+
         return Promise.resolve(res)
       }).catch(err => {
         getCommunicationTry++
@@ -411,9 +436,9 @@ export default {
           this.loadingCommunication = false
 
           return Promise.reject(err)
-        } else {
-          return this.getCommunication(sid, from, getCommunicationTry)
         }
+
+        return this.getCommunication(sid, from, getCommunicationTry)
       })
     },
 
@@ -468,18 +493,22 @@ export default {
         return
       }
 
-      if ((this.dialer.call && this.dialer.call.state !== 'pending') || !currentNumber || !outboundCampaignId) {
+      const isCallNotPending = this.dialer.call && this.dialer.call.state !== 'pending'
+
+      if (isCallNotPending || !currentNumber || !outboundCampaignId) {
         console.log('Dialer requirements are not met', currentNumber, outboundCampaignId)
         return
-      } else {
-        this.rejectCall()
       }
+
+      // reject ongoing call if there is one
+      this.rejectCall()
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'
         })
       }
+
       this.$VueEvent.fire('showLoadingPhone')
       const params = {
         'To': this.$options.filters.fixPhone(currentNumber, 'E164'),
@@ -496,13 +525,13 @@ export default {
       this.setDialerCurrentNumber(params['To'])
 
       // check if connection is completely closed before opening a new one
-      if (this.device.activeConnection()) {
+      if (this.connection) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
-      } else {
-        this.connection = await this.device.connect(params, true)
-        this.initConnectionEvents()
       }
+
+      this.connection = await this.device.connect(params, true)
+      this.initConnectionEvents()
 
       // Make sure that phone number is string in this part before proceeding
       currentNumber = currentNumber.toString()
@@ -523,8 +552,10 @@ export default {
         if (this.warnings.indexOf(warningName) === -1) {
           this.warnings.push(warningName)
         }
+
         this.setWarnings(this.warnings)
       })
+
       this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
         console.log(WebrtcEvents.CONNECTION_WARNING_CLEARED, warningName)
         // remove warning from list
@@ -539,15 +570,6 @@ export default {
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
         this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
-          // .finally(() => {
-          //   this.$router.push({ name: 'Call' }).catch(err => {
-          //     console.log(err)
-          //   })
-          //   setTimeout(() => {
-          //    this.startCallTimer()
-          //    this.setDialerCurrentStatus('CALL_CONNECTED')
-          //   }, 3000)
-          // })
           .catch((err) => {
             console.log(err)
           })
@@ -562,33 +584,33 @@ export default {
           this.setDialerFormStatus(false)
         }
       })
+
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         this.removeUnownedLiveContactTask()
         console.log('Call invite canceled', call)
+        this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial()
         this.$closeActionNotification('incomingCall')
-        // if (this.$route.name === 'Incoming Call') {
-        //   this.$router.push({ name: 'Dial' }).catch(err => {
-        //     console.log(err)
-        //   })
-        // }
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
+        if (this.dialer.communication) {
+          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+        }
+
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
+        this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        if (!this.dialer.parkedCall && !this.dialer.call) {
+
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
           this.startWrapUpTimer()
-        } else if (this.dialer.parkedCall && this.dialer.call) {
-          this.startWrapUpTimer()
-        } else if (!this.dialer.parkedCall && this.dialer.call) {
-          this.startWrapUpTimer()
-        } else {
-          this.backToDial()
+          return
         }
+
+        this.backToDial()
       })
     },
 
@@ -601,12 +623,7 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      if (this.device.activeConnection()) {
-        // hangup an incoming call
-        this.device.activeConnection().hangup()
-      }
-
-      // this.resetCall()
+      this.connection.hangup()
     },
 
     sendDigit (digit) {
@@ -620,8 +637,8 @@ export default {
 
       console.log('Sending digit to call: ' + digit)
 
-      if (this.device.activeConnection()) {
-        this.device.activeConnection().sendDigits(digit)
+      if (this.connection) {
+        this.connection.sendDigits(digit)
       }
     },
 
@@ -641,14 +658,14 @@ export default {
         return
       }
 
-      if (this.dialer.activeConnection()) {
+      if (this.connection) {
         if (this.isMobile && this.$route.name !== 'Phone') {
           this.$router.push({
             name: 'Phone'
           })
         }
         // accept the incoming connection and start two-way audio
-        this.dialer.activeConnection().accept()
+        this.connection.accept()
       }
     },
 
@@ -662,14 +679,15 @@ export default {
       this.removeUnownedLiveContactTask()
       this.setDialerCurrentStatus('REJECTING_CALL')
 
-      if (this.device.activeConnection()) {
+      if (this.connection) {
         // rejecting an incoming call
-        this.device.activeConnection().reject()
+        this.connection.reject()
       }
 
       // set agent status to busy if it's an answer by browser/apps user
       // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
-      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) && !this.currentCompany.force_users_always_available) {
+      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) &&
+        !this.currentCompany.force_users_always_available) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
       }
 
@@ -683,26 +701,32 @@ export default {
 
       if (!this.dialer.isMuted) {
         console.log('Muting call')
-        if (this.device.activeConnection()) {
-          this.device.activeConnection().mute(true)
+
+        if (this.connection) {
+          this.connection.mute(true)
         }
+
         this.setDialerIsMuted(true)
-      } else {
-        console.log('Unmuting call')
-        if (this.device.activeConnection()) {
-          this.device.activeConnection().mute(false)
-        }
-        this.setDialerIsMuted(false)
+
+        return
       }
+
+      console.log('Unmuting call')
+
+      if (this.connection) {
+        this.connection.mute(false)
+      }
+
+      this.setDialerIsMuted(false)
     },
 
     forceMute () {
       this.setDialerIsMuted(true)
-      this.device.activeConnection().mute(true)
+      this.connection.mute(true)
     },
 
     toggleRecordingStatus () {
-      if (!this.dialer.call || !this.dialer.communication || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -710,44 +734,51 @@ export default {
 
       if (newStatus === 'paused') {
         console.log('Pausing recording')
-      }
-
-      if (newStatus === 'in-progress') {
+      } else if (newStatus === 'in-progress') {
         console.log('Starting recording')
       }
 
       this.loadingToggleRecordingStatus = true
-      this.$axios.post('/api/v1/communication/' + this.dialer.communication.id + '/toggle-recording-status', {
+
+      this.$axios.post(`/api/v1/communication/${this.dialer.communication.id}/toggle-recording-status`, {
         status: newStatus
       }).then((res) => {
         this.loadingToggleRecordingStatus = false
+
         if (res.data.result) {
           this.setDialerRecordingStatus(newStatus)
-          if (newStatus === 'paused') {
-            console.log('Recording paused')
+
+          switch (newStatus) {
+            case 'paused':
+              console.log('Recording paused')
+              break
+            case 'in-progress':
+              console.log('Recording started')
+              break
           }
 
-          if (newStatus === 'in-progress') {
-            console.log('Recording started')
-          }
-        } else {
-          // alert didn't change
-          if (newStatus === 'paused') {
+          return
+        }
+
+        // alert didn't change
+        switch (newStatus) {
+          case 'paused':
             console.log('Failed to pause recording')
-          }
-
-          if (newStatus === 'in-progress') {
+            break
+          case 'in-progress':
             console.log('Failed to start recording')
-          }
+            break
         }
       }).catch(err => {
-        if (newStatus === 'paused') {
-          console.log('Failed to pause recording')
+        switch (newStatus) {
+          case 'paused':
+            console.log('Failed to pause recording')
+            break
+          case 'in-progress':
+            console.log('Failed to start recording')
+            break
         }
 
-        if (newStatus === 'in-progress') {
-          console.log('Failed to start recording')
-        }
         this.loadingToggleRecordingStatus = false
         console.log(err)
       })
@@ -764,6 +795,7 @@ export default {
         const params = {
           communication_id: this.dialer.communication.id
         }
+
         this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
           this.setDialerIsHeld(true)
           console.log('Call parked')
@@ -772,25 +804,28 @@ export default {
         }).finally(_ => {
           this.loadingHold = false
         })
-      } else {
-        console.log('Unparking call')
-        this.loadingUnhold = true
-        const params = {
-          communication_id: this.dialer.communication.id
-        }
-        this.$axios.post('/api/v1/dialer/new-unhold', params).then(() => {
-          this.setDialerIsHeld(false)
-          console.log('Call unparked')
-        }).catch(err => {
-          console.log(err)
-        }).finally(_ => {
-          this.loadingUnhold = false
-        })
+
+        return
       }
+
+      console.log('Unparking call')
+      this.loadingUnhold = true
+      const params = {
+        communication_id: this.dialer.communication.id
+      }
+
+      this.$axios.post('/api/v1/dialer/new-unhold', params).then(() => {
+        this.setDialerIsHeld(false)
+        console.log('Call unparked')
+      }).catch(err => {
+        console.log(err)
+      }).finally(_ => {
+        this.loadingUnhold = false
+      })
     },
 
     parkCall () {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -800,6 +835,7 @@ export default {
       const params = {
         communication_id: this.dialer.communication.id
       }
+
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
       }).catch(err => {
@@ -845,7 +881,7 @@ export default {
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state) || (!shouldUnpark && this.dialer.parkedCall)) {
+      if (this.isNotInProgressCall || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
 
@@ -854,13 +890,13 @@ export default {
       const params = {
         communication_id: this.dialer.communication.id
       }
+
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
+
         if (shouldAnswer) {
           this.makeCall('call:' + data.id, data.campaignId)
-        }
-
-        if (shouldUnpark) {
+        } else if (shouldUnpark) {
           this.unparkCall(data, true)
         }
 
@@ -887,39 +923,41 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      if (this.device.activeConnection()) {
-        // hangup an incoming call
-        this.device.activeConnection().hangup()
-
-        const counter = { data: 0 }
-        this.$options.hangupInterval = setInterval(() => {
-          if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.backToDial()
-
-            setTimeout(() => {
-              switch (true) {
-                case shouldUnpark:
-                  this.unparkCall(data)
-                  break
-                case shouldAnswer:
-                  this.makeCall('call:' + data.id, data.campaignId)
-                  break
-              }
-              this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
-              clearInterval(this.$options.hangupInterval)
-            }, 1000)
-          }
-
-          counter.data++
-          if (counter.data > 120) {
-            clearInterval(this.$options.hangupInterval)
-          }
-        }, 500)
+      if (!this.connection) {
+        return
       }
+
+      // hangup an incoming call
+      this.connection.hangup()
+
+      const counter = { data: 0 }
+
+      this.$options.hangupInterval = setInterval(() => {
+        if (this.dialer.currentStatus === 'WRAP_UP') {
+          this.backToDial()
+
+          setTimeout(() => {
+            if (shouldUnpark) {
+              this.unparkCall(data)
+            } else if (shouldAnswer) {
+              this.makeCall('call:' + data.id, data.campaignId)
+            }
+
+            this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
+            clearInterval(this.$options.hangupInterval)
+          }, 1000)
+        }
+
+        counter.data++
+
+        if (counter.data > 120) {
+          clearInterval(this.$options.hangupInterval)
+        }
+      }, 500)
     },
 
     mergeCalls () {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -927,6 +965,7 @@ export default {
       const params = {
         communication_id: this.dialer.communication.id
       }
+
       this.$axios.post('/api/v1/dialer/merge-calls', params).then(res => {
         this.setShouldIntroduce(false)
         console.log('Merge successful.')
@@ -938,7 +977,7 @@ export default {
     },
 
     dropThirdParty () {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -957,7 +996,7 @@ export default {
     },
 
     transferCall (transfer) {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -972,13 +1011,9 @@ export default {
 
       if (transfer.mode === 'user') {
         params.user_id = transfer.userId
-      }
-
-      if (transfer.mode === 'ring-group') {
+      } else if (transfer.mode === 'ring-group') {
         params.ring_group_id = transfer.ringGroupId
-      }
-
-      if (transfer.mode === 'phone-number') {
+      } else if (transfer.mode === 'phone-number') {
         params.phone_number = this.$options.filters.fixPhone(transfer.phoneNumber, 'E164', true, true)
       }
 
@@ -997,7 +1032,7 @@ export default {
     },
 
     addParticipant (add) {
-      if (!this.dialer.communication || !this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (this.isNotInProgressCall) {
         return
       }
 
@@ -1011,27 +1046,29 @@ export default {
         type: 'warm'
       }
 
-      if (add.mode === 'user') {
-        params.user_id = add.userId
-        const user = this.getUser(add.userId)
-        if (user) {
-          this.setAddedParty(user)
-        }
-      }
+      switch (add.mode) {
+        case 'user':
+          params.user_id = add.userId
+          const user = this.getUser(add.userId)
 
-      if (add.mode === 'ring-group') {
-        params.ring_group_id = add.ringGroupId
-        const ringGroup = this.getRingGroup(add.ringGroupId)
-        if (ringGroup) {
-          this.setAddedParty(ringGroup)
-        }
-      }
+          if (user) {
+            this.setAddedParty(user)
+          }
+          break
+        case 'ring-group':
+          params.ring_group_id = add.ringGroupId
+          const ringGroup = this.getRingGroup(add.ringGroupId)
 
-      if (add.mode === 'phone-number') {
-        params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
-        this.setAddedParty({
-          name: this.$options.filters.fixPhone(add.phoneNumber, 'NATIONAL', true, true)
-        })
+          if (ringGroup) {
+            this.setAddedParty(ringGroup)
+          }
+          break
+        case 'phone-number':
+          params.phone_number = this.$options.filters.fixPhone(add.phoneNumber)
+          this.setAddedParty({
+            name: this.$options.filters.fixPhone(add.phoneNumber, 'NATIONAL', true, true)
+          })
+          break
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
@@ -1049,12 +1086,14 @@ export default {
     dialerCallPrep (call) {
       const map = call.customParameters
       const customParameters = {}
+
       map.forEach((value, key) => {
         customParameters[key] = value
       })
+
       this.setDialerCall({
-        from: call.parameters.from,
-        to: call.to,
+        from: call.parameters.From,
+        to: call.parameters.To,
         callSid: call.parameters.CallSid,
         state: call.status(),
         isMuted: call.isMuted(),
@@ -1094,6 +1133,7 @@ export default {
       const timer = this.secondsToHms(duration)
       this.setDialerWrapUpDuration(duration)
       this.setDialerWrapUpTimer(timer)
+
       if (duration <= 0) {
         this.stopWrapUpTimer()
         this.backToDial()
@@ -1130,7 +1170,9 @@ export default {
 
     startWrapUpTimer () {
       this.setDialerCurrentStatus('WRAP_UP')
-      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up ? this.currentCompany.wrap_up_seconds : this.profile.wrap_up_seconds
+      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
+        ? this.currentCompany.wrap_up_seconds
+        : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
 
       if (wrapUpTimer < 0) {
@@ -1255,12 +1297,6 @@ export default {
       this.setOutputDevices(this.getOutputDevices())
     },
 
-    closeNotification (communication) {
-      if (communication && this.$q.platform.is.electron) {
-        window.Push.close('communication-notification-' + communication.id)
-      }
-    },
-
     bounceDock () {
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('bounce', 'critical')
@@ -1301,17 +1337,20 @@ export default {
 
     rebootPhone (login = false) {
       this.backToDial()
+
       if (login) {
         this.setDialerCurrentStatus('RESTARTING')
         this.getDesktopToken()
-      } else {
-        this.setDialerIsReady(true)
-        this.setDialerCurrentStatus('READY')
+        return
       }
+
+      this.setDialerIsReady(true)
+      this.setDialerCurrentStatus('READY')
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
       this.setShowIncomingCallNotification(false)
+
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'

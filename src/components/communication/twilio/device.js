@@ -1,5 +1,6 @@
 import * as Carriers from '../../../constants/carriers'
 import MainDevice from './../device'
+import { get, first } from 'lodash'
 
 export default class TwilioDevice extends MainDevice {
   constructor () {
@@ -14,24 +15,32 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device) {
       return null
     }
+
     return this._device.status()
   }
 
-  disconnectAll (connection) {
-    this._device.disconnectAll(connection._connection)
+  disconnectAll () {
+    this._device.disconnectAll()
   }
 
   activeConnection () {
-    if (!this._device || !this._device._activeCall) {
+    const calls = get(this._device, '_calls', [])
+    const hasCalls = calls instanceof Array ? calls.length > 0 : false
+
+    if (!this._device || !hasCalls) {
       return null
     }
-    return this._createConnection(this._device._activeCall)
+
+    // prevent connection events from re-initialization
+    const initEvents = !this._device.isEventsStarted
+    return this._createConnection(first(calls), initEvents)
   }
 
   availableInputDevices () {
     if (!this._device || !this._device.audio) {
       return []
     }
+
     return this._device.audio.availableInputDevices
   }
 
@@ -39,6 +48,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return Promise.reject('Device is not yet initialized.')
     }
+
     return this._device.audio.setInputDevice(inputDevice)
   }
 
@@ -50,6 +60,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return []
     }
+
     return this._device.audio.availableOutputDevices
   }
 
@@ -57,6 +68,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return []
     }
+
     return this._device.audio.speakerDevices.get()
   }
 
@@ -64,6 +76,7 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return Promise.reject('Device is not yet initialized.')
     }
+
     return this._device.audio.speakerDevices.set(outputDevice)
   }
 
@@ -71,10 +84,16 @@ export default class TwilioDevice extends MainDevice {
     if (!this._device || !this._device.audio) {
       return Promise.reject('Device is not yet initialized.')
     }
+
     return this._device.audio.speakerDevices.test()
   }
 
   async connect (params, initEvents = false) {
+    // prevent connection events from re-initialization
+    if (initEvents && !this._device.isEventsStarted) {
+      this._device.isEventsStarted = initEvents
+    }
+
     return this._createConnection(await this._device.connect({ params }), initEvents)
   }
 
