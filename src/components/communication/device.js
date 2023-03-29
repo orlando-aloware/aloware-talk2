@@ -34,6 +34,7 @@ export default class Device {
     if (!connection) {
       return undefined
     }
+
     return new TwilioConnection(this, connection, initEvents)
   }
 
@@ -45,6 +46,7 @@ export default class Device {
     if (this._is_initialized) {
       return
     }
+
     this._device = this.carrier === Carriers.TWILIO ? new TwilioClientDevice() : null
     this._is_initialized = true
     this._initEvents()
@@ -54,21 +56,27 @@ export default class Device {
     this._device.on(Events.READY, (device) => {
       this._executeCallback(Events.READY, [device])
     })
+
     this._device.on(Events.OFFLINE, (device) => {
       this._executeCallback(Events.OFFLINE, [device])
     })
+
     this._device.on(Events.INCOMING, (connection) => {
       this._executeCallback(Events.INCOMING, [this._createConnection(connection)])
     })
+
     this._device.on(Events.ERROR, (error) => {
       this._executeCallback(Events.ERROR, [new DeviceError(error)])
     })
+
     this._device.on(Events.DISCONNECT, (connection) => {
       this._executeCallback(Events.DISCONNECT, [this._createConnection(connection)])
     })
+
     this._device.on(Events.CONNECT, (connection) => {
       this._executeCallback(Events.CONNECT, [this._createConnection(connection)])
     })
+
     this._device.on(Events.CANCEL, (connection) => {
       this._executeCallback(Events.CANCEL, [this._createConnection(connection)])
     })
