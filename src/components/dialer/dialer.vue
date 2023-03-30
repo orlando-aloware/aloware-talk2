@@ -132,6 +132,14 @@ export default {
       }
     })
 
+    this.$VueEvent.listen('reconnectDialer', () => {
+      this.getDesktopToken(true)
+        .then(() => {
+          this.device.register()
+          this.rebootPhone()
+        })
+    })
+
     this.getDesktopToken()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -476,6 +484,9 @@ export default {
         } else {
           this.device.updateToken(this.dialer.token)
         }
+
+        // remove the errors if we successfully generated a token
+        this.setDialerErrorDefault()
 
         return Promise.resolve(res)
       }).catch(err => {
