@@ -1064,7 +1064,6 @@ export default {
 
     onSearch (value) {
       this.searchText = value.trim()
-      console.trace('onSearch:', this.searchText)
     },
 
     onSearchOpened () {
