@@ -515,6 +515,30 @@ Vue.prototype.$jsonClone = (value) => {
   return value
 }
 
+Vue.prototype.$copyToClipboard = (value) => {
+  if (!value) {
+    return
+  }
+
+  const el = document.createElement('textarea')
+  el.value = value
+  el.setAttribute('readonly', '')
+  el.style.position = 'absolute'
+  el.style.left = '-9999px'
+  document.body.appendChild(el)
+
+  const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false
+
+  el.select()
+  document.execCommand('copy')
+  document.body.removeChild(el)
+
+  if (selected) {
+    document.getSelection().removeAllRanges()
+    document.getSelection().addRange(selected)
+  }
+}
+
 // eslint-disable-next-line no-extend-native
 String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1)

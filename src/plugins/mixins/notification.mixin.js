@@ -276,7 +276,10 @@ export default {
       }
 
       if (!_.isEmpty(params.data)) {
-        ['callFishing', 'incomingCall'].includes(params.data.type) && this.setShowIncomingCallNotification(true)
+        if (['callFishing', 'incomingCall'].includes(params.data.type)) {
+          this.setShowIncomingCallNotification(true)
+        }
+
         this.$actionNotification(params.data)
       }
     },

@@ -426,7 +426,7 @@
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Ring Group Activity', params: { ringGroupId: communication.ring_group_id }}"
-                    v-if="usedRingGroup">
+                    v-if="usedRingGroup && !usedRingGroup.call_waiting">
                     <q-tooltip
                       anchor="top middle"
                       self="bottom middle"
@@ -436,7 +436,12 @@
                     {{ usedRingGroup.name }}
                   </router-link>
                   <template v-else>
-                    Deleted Ring Group
+                    <span v-if="usedRingGroup.call_waiting">
+                      Call waiting Queue
+                    </span>
+                    <span v-else>
+                      Deleted Ring Group
+                    </span>
                   </template>
                 </div>
               </b-col>
