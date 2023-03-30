@@ -8,7 +8,7 @@
     <div class="pb-2">
       <ContactTags :contact="contact" />
     </div>
-    <div class="pb-4">
+    <div style="padding-bottom: 100px;">
       <ContactNotes :contact="contact"
                     @input="onNotesInput" />
     </div>
