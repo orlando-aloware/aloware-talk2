@@ -10,6 +10,7 @@
             map-options
             outlined
             dense
+            bottom-slots
             :use-chips="useChips"
             :use-input="useInput"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
@@ -17,7 +18,7 @@
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '' ]"
+            :class="selectorClass"
             v-model="callDisposition"
             @popup-show="onShowMenu"
             @filter="filterFn">
@@ -39,12 +40,12 @@
               v-on="scope.itemEvents">
         <q-item-section avatar>
           <q-icon name="fa fa-bolt"
-                  v-show="!scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="!scope.opt.is_external">
           </q-icon>
           <q-icon name="fa fa-lock"
-                  v-show="scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="scope.opt.is_external">
           </q-icon>
         </q-item-section>
         <q-item-section>
@@ -54,22 +55,25 @@
     </template>
 
     <template v-slot:selected-item="scope">
-      <q-chip
-        dense
-        :tabindex="scope.tabindex"
-        color="white"
-        class="tag-selected-chip"
-        text-color="secondary"
-      >
+      <q-chip dense
+              class="tag-selected-chip"
+              text-color="secondary"
+              color="white"
+              :tabindex="scope.tabindex">
         <i class="fa fa-circle position-absolute"
-           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`" />
         <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
-        <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+        <div role="button"
+             class="custom__remove d-flex align-items-center position-absolute r-0"
              @click="scope.removeAtIndex(scope.index)">
-          <remove-tag-icon class="ml-1 remove-tag-icon">
-          </remove-tag-icon>
+          <remove-tag-icon class="ml-1 remove-tag-icon" />
         </div>
       </q-chip>
+    </template>
+    <template v-slot:hint>
+      <span :class="hintClass">
+        {{ hint }}
+      </span>
     </template>
   </q-select>
 </template>
@@ -81,7 +85,9 @@ import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
   name: 'call-disposition-selector',
+
   components: { RemoveTagIcon },
+
   props: {
     value: {
       required: false,
@@ -104,21 +110,30 @@ export default {
       type: String,
       required: false
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     useChips: {
       type: Boolean,
       default: false
     },
+
     useInput: {
       type: Boolean,
       default: true
+    },
+
+    required: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -177,6 +192,29 @@ export default {
 
     values () {
       return this.multiple ? _.filter(this.value, (item) => { return !!item }) : this.value
+    },
+
+    selectorClass () {
+      const prependClass = this.prepend ? 'with-prepend' : ''
+      const highlightedClass = this.highlighted ? this.highlightedClass : ''
+      const requiredClass = this.required ? 'required mb-0' : ''
+
+      return [
+        prependClass,
+        highlightedClass,
+        requiredClass
+      ]
+    },
+
+    hint () {
+      return this.required ? 'Required' : ''
+    },
+
+    hintClass () {
+      const requiredClass = this.required ? 'text-danger' : ''
+      return [
+        requiredClass
+      ]
     }
   },
 

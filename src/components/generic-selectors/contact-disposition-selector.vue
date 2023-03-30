@@ -8,6 +8,7 @@
             ref="contactDispositionSelect"
             map-options
             dense
+            bottom-slots
             :use-input="useInput"
             :use-chips="useChips"
             :emit-value="emitValue"
@@ -15,7 +16,7 @@
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
+            :class="selectorClass"
             :outlined="outlined"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             v-model="selectedId"
@@ -42,18 +43,23 @@
               v-on="scope.itemEvents">
         <q-item-section avatar>
           <q-icon name="fa fa-bolt"
-                  v-show="!scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="!scope.opt.is_external">
           </q-icon>
           <q-icon name="fa fa-lock"
-                  v-show="scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="scope.opt.is_external">
           </q-icon>
         </q-item-section>
         <q-item-section>
           <q-item-label v-html="scope.opt.name"/>
         </q-item-section>
       </q-item>
+    </template>
+    <template v-slot:hint>
+      <span :class="hintClass">
+        {{ hint }}
+      </span>
     </template>
   </q-select>
 </template>
@@ -96,14 +102,17 @@ export default {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     customClass: {
       type: String,
       default: ''
@@ -123,13 +132,20 @@ export default {
       type: Boolean,
       default: true
     },
+
     useChips: {
       type: Boolean,
       default: true
     },
+
     useInput: {
       type: Boolean,
       default: true
+    },
+
+    required: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -177,6 +193,32 @@ export default {
       }
 
       return []
+    },
+
+    selectorClass () {
+      const prependClass = this.prepend ? 'with-prepend' : ''
+      const genericStylingClass = this.genericStyling ? 'generic-selector' : ''
+      const highlightedClass = this.highlighted ? this.highlightedClass : ''
+      const requiredClass = this.required ? 'required mb-0' : ''
+
+      return [
+        prependClass,
+        genericStylingClass,
+        highlightedClass,
+        requiredClass,
+        this.customClass
+      ]
+    },
+
+    hint () {
+      return this.required ? 'Required' : ''
+    },
+
+    hintClass () {
+      const requiredClass = this.required ? 'text-danger' : ''
+      return [
+        requiredClass
+      ]
     }
   },
 
@@ -218,6 +260,7 @@ export default {
       }
       this.showInputPlaceholder()
     },
+
     contactDispositionsAlphabeticalOrder () {
       this.options = this.contactDispositionsAlphabeticalOrder
     }

@@ -518,7 +518,10 @@
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <call-disposition-wrapper class="w-100"
-                                          :communication="dialer.communication">
+                                          :highlighted="!isCallDisposed"
+                                          :required="!isCallDisposed"
+                                          :communication="dialer.communication"
+                                          @change="onCallDisposed">
                 </call-disposition-wrapper>
               </div>
             </div>
@@ -529,7 +532,10 @@
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <contact-disposition-wrapper class="w-100"
-                                             :contact="contact">
+                                             :highlighted="!isContactDisposed"
+                                             :required="!isContactDisposed"
+                                             :contact="contact"
+                                             @change="onContactDisposed">
                 </contact-disposition-wrapper>
               </div>
             </div>
@@ -640,6 +646,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
+                  :disabled="disableCallBackButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -648,6 +655,7 @@
         </b-button>
 
         <b-button variant="primary"
+                  :disabled="disableCallBackButton"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1404,6 +1412,8 @@ export default {
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
       phoneListeners: {},
+      isCallDisposed: false,
+      isContactDisposed: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1813,6 +1823,13 @@ export default {
     isPhoneExpansionAvailable () {
       return (this.devMode || !this.isCallCompleted) &&
         (this.contact || this.hasCallFishingCommunication) && this.expansionEnabled
+    },
+
+    disableCallBackButton () {
+      const isForceCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition && !this.isCallDisposed
+      const isForceContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition && !this.isContactDisposed
+
+      return isForceCallDisposition || isForceContactDisposition
     }
   },
 
@@ -2417,6 +2434,29 @@ export default {
       this.hasCommunicationNotesUnsavedChanges = value
     },
 
+    onCallDisposed (value) {
+      this.isCallDisposed = value || value === 0
+    },
+
+    onContactDisposed (value) {
+      this.isContactDisposed = value || value === 0
+    },
+
+    clearDispositions () {
+      const hasCallDispositionId = this.dialer.communication &&
+        (this.dialer.communication.call_disposition_id || this.dialer.communication.call_disposition_id === 0)
+      const hasContactDispositionId = this.contact &&
+        (this.contact.disposition_status_id || this.contact.disposition_status_id === 0)
+
+      if (!hasCallDispositionId) {
+        this.isCallDisposed = false
+      }
+
+      if (!hasContactDispositionId) {
+        this.isContactDisposed = false
+      }
+    },
+
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -2489,6 +2529,7 @@ export default {
           this.changeScreen('call')
           break
         case 'WRAP_UP':
+          this.clearDispositions()
           this.changeScreen('wrap-up')
           this.resetBottomExpansion()
           break
@@ -2546,7 +2587,19 @@ export default {
     },
 
     'dialer.contact': function () {
+      if (this.dialer.contact &&
+        (this.dialer.contact.disposition_status_id || this.dialer.contact.disposition_status_id === 0)) {
+        this.isContactDisposed = true
+      }
+
       this.setupContactLocalTime()
+    },
+
+    'dialer.communication': function () {
+      if (this.dialer.communication &&
+        (this.dialer.communication.call_disposition_id || this.dialer.communication.call_disposition_id === 0)) {
+        this.isCallDisposed = true
+      }
     },
 
     isCallCompleted () {

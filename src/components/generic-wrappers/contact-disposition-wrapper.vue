@@ -1,5 +1,8 @@
 <template>
-  <contact-disposition-selector v-model="dispositionStatusId"
+  <contact-disposition-selector :highlighted="highlighted"
+                                :highlighted-class="highlightedClass"
+                                :required="required"
+                                v-model="dispositionStatusId"
                                 @change="changeContactDisposition">
   </contact-disposition-selector>
 </template>
@@ -15,6 +18,21 @@ export default {
   props: {
     contact: {
       required: true
+    },
+
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    },
+
+    required: {
+      type: Boolean,
+      default: false
     }
   },
 
