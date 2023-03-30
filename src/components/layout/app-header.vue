@@ -124,9 +124,19 @@
                      triggers="hover"
                      placement="bottomleft"
                      v-if="dialer.error.code">
-            <template #title>Error code: {{ dialer.error.code }}</template>
-            {{ dialer.error.message }}
-            <br>
+            <template #title>Connection timeout</template>
+            <p>Click here to reconnect or please check the <a href="https://support.aloware.com/en/articles/6958138-common-dialer-errors" target="_blank">troubleshooting guide here</a>.</p>
+            <p>Error Code: [{{ dialer.error.code }}]</p>
+            <q-btn class="start-dial-button p-0"
+                   v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
+                   color="success"
+                   no-caps
+                   unelevated
+                   @click="reconnectDialer">
+              <div class="button-label">
+                Reconnect
+              </div>
+            </q-btn>
             <a href="https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208" target="_blank"
                v-if="dialer.error.code === 31208">
               See fix
@@ -345,6 +355,10 @@ export default {
   },
 
   methods: {
+    reconnectDialer () {
+      this.$VueEvent.fire('reconnectDialer')
+    },
+
     toggleSidebar () {
       this.$emit('toggleSidebar')
     },

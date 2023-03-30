@@ -7,7 +7,6 @@ export default {
   folderToRemove: (state) => state.removeFolder || {},
   isRemoveListOpen: (state) => !!state.removeList,
   listToRemove: (state) => state.removeList || {},
-  removeListActionType: (state) => state.removeListActionType,
   isRemoveContactOpen: (state) => !!state.removeContact,
   contactToRemove: (state) => state.removeContact,
   removeContactActionType: (state) => state.removeContactActionType,

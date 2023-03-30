@@ -37,7 +37,8 @@
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Ring Groups</h5>
-            <p class="form-helper-text" v-if="profile.ring_group_ids && profile.ring_group_ids.length > 0">
+            <p class="form-helper-text"
+               v-if="profile.ring_group_ids && profile.ring_group_ids.length > 0">
               This user is a member of the following ring groups
             </p>
 
@@ -45,21 +46,20 @@
                 v-if="profile.ring_group_ids && profile.ring_group_ids.length > 0">
               <li class="pb-0"
                   :key="ringGroupId"
-                  v-for="ringGroupId in profile.ring_group_ids"
-                  >
+                  v-for="ringGroupId in profile.ring_group_ids">
                   <span class="text-grey-90 _400 fs-12"
-                      v-if="ringGroups.length > 0">
+                        v-if="ringGroups.length > 0">
                       {{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}
                   </span>
-                  <q-skeleton
-                      type="text"
-                      animation="fade"
-                      height="20px"
-                      v-else />
+                  <q-skeleton type="text"
+                              animation="fade"
+                              height="20px"
+                              v-else />
               </li>
             </ul>
 
-            <p class="form-helper-text text-bold text-red-8" v-else>
+            <p class="form-helper-text text-bold text-red-8"
+               v-else>
               You are not connected to any ring group.
             </p>
           </div>
@@ -76,11 +76,9 @@
               </p>
             </div>
 
-            <b-form-group
-              label=""
-              class="form-label"
-            >
-              <input-group-with-copy v-model="profile.sip_uri"></input-group-with-copy>
+            <b-form-group label=""
+                          class="form-label">
+              <input-group-with-copy v-model="profile.sip_uri" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -92,10 +90,9 @@
               <p class="form-helper-text">This is the domain the SIP phones connect to.</p>
             </div>
 
-            <b-form-group
-              label=""
-              class="form-label">
-              <input-group-with-copy :value="profile.sip_uri | filterDomain"></input-group-with-copy>
+            <b-form-group label=""
+                          class="form-label">
+              <input-group-with-copy :value="profile.sip_uri | filterDomain" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -107,11 +104,9 @@
               <p class="form-helper-text">The username / authorization name for this SIP device.</p>
             </div>
 
-            <b-form-group
-              label=""
-              class="form-label"
-            >
-              <input-group-with-copy v-model="profile.sip_details.username"></input-group-with-copy>
+            <b-form-group label=""
+                          class="form-label">
+              <input-group-with-copy v-model="profile.sip_details.username" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -123,11 +118,9 @@
               <p class="form-helper-text">Password for this SIP device.</p>
             </div>
 
-            <b-form-group
-              label=""
-              class="form-label"
-            >
-              <input-group-with-copy v-model="profile.sip_details.password"></input-group-with-copy>
+            <b-form-group label=""
+                          class="form-label">
+              <input-group-with-copy v-model="profile.sip_details.password" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -139,11 +132,9 @@
               <p class="form-helper-text">An internal label for this device. Might be displayed on the physical phone.</p>
             </div>
 
-            <b-form-group
-              label=""
-              class="form-label"
-            >
-              <input-group-with-copy v-model="profile.sip_details.alias"></input-group-with-copy>
+            <b-form-group label=""
+                          class="form-label">
+              <input-group-with-copy v-model="profile.sip_details.alias" />
             </b-form-group>
           </b-col>
         </b-form-row>
@@ -186,21 +177,7 @@ export default {
 
   methods: {
     copyCode (code) {
-      const el = document.createElement('textarea')
-      el.value = code
-      el.setAttribute('readonly', '')
-      el.style.position = 'absolute'
-      el.style.left = '-9999px'
-      document.body.appendChild(el)
-      const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false
-      el.select()
-      document.execCommand('copy')
-      document.body.removeChild(el)
-      if (selected) {
-        document.getSelection().removeAllRanges()
-        document.getSelection().addRange(selected)
-      }
-
+      this.$copyToClipboard(code)
       this.$generalNotification('Copied to clipboard.')
     },
 

@@ -112,7 +112,6 @@ export const DEFAULT_STATE = {
   isBulkDelete: false,
   removeFolder: null,
   removeList: null,
-  removeListActionType: null,
   moveDialog: {
     open: false,
     id: null,
