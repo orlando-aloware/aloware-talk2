@@ -293,7 +293,7 @@ const routes = [
               title: 'Wallboard',
               id: 'wallboard-calls'
             },
-            path: ':id(queued|live|parked)+',
+            path: ':id(queued|live|parked)+-calls',
             component: WallboardCalls
           }
         ]

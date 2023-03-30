@@ -76,19 +76,19 @@ export default {
           loading: this.isUsersLoading
         }, {
           name: 'Queued Calls',
-          route: '/wallboard/queued',
+          route: '/wallboard/queued-calls',
           icon: 'wallboard-queued-call-icon',
           counter: this.queuedCalls.length,
           loading: this.isQueuedCallsLoading
         }, {
           name: 'Live Calls',
-          route: '/wallboard/live',
+          route: '/wallboard/live-calls',
           icon: 'wallboard-live-call-icon',
           counter: this.liveCalls.length,
           loading: this.isLiveCallsLoading
         }, {
           name: 'Parked Calls',
-          route: '/wallboard/parked',
+          route: '/wallboard/parked-calls',
           icon: 'wallboard-parked-call-icon',
           counter: this.parkedCalls.length,
           loading: this.isParkedCallLoadings
