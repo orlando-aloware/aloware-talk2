@@ -546,30 +546,30 @@ const objAlphabeticalOrder = (object, sortProp) => {
  * @returns String
  */
 const fullDuration = (duration, shouldDisplaySeconds = true) => {
-  if (duration !== undefined) {
-    let seconds = duration
-    let hour = Math.floor(seconds / 3600)
-    let min = Math.floor(seconds / 60 % 60)
-    let sec = Math.floor(seconds % 60)
-
-    if (hour) {
-      if (shouldDisplaySeconds) {
-        return `${hour}h ${min}m ${sec}s`
-      }
-      return `${hour}h ${min}m`
-    }
-
-    if (!hour && min) {
-      if (shouldDisplaySeconds) {
-        return `${min}m ${sec}s`
-      }
-      return `${min}m`
-    }
-
-    return `${sec}s`
-  } else {
+  if (duration === undefined) {
     return '-'
   }
+
+  let seconds = duration
+  let hour = Math.floor(seconds / 3600)
+  let min = Math.floor(seconds / 60 % 60)
+  let sec = Math.floor(seconds % 60)
+
+  if (hour) {
+    if (shouldDisplaySeconds) {
+      return `${hour}h ${min}m ${sec}s`
+    }
+
+    return `${hour}h ${min}m`
+  } else if (!hour && min) {
+    if (shouldDisplaySeconds) {
+      return `${min}m ${sec}s`
+    }
+
+    return `${min}m`
+  }
+
+  return `${sec}s`
 }
 
 /**
