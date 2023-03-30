@@ -604,6 +604,19 @@ const fixFullDateUTCRelative = (dt) => {
   }
 }
 
+/**
+ * Converts date to short text ("8 Jan 2023")
+ *
+ * @param {Date} date
+ * @returns String
+ */
+const fullShortDate = (date) => {
+  return date
+    .toGMTString()
+    .substr(5, 12)
+    .replace(/^0/, '')
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -639,7 +652,8 @@ export default ({ Vue }) => {
     sortObjectByKey,
     objAlphabeticalOrder,
     fullDuration,
-    fixFullDateUTCRelative
+    fixFullDateUTCRelative,
+    fullShortDate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

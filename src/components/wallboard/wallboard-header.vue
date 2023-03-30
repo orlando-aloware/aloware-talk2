@@ -4,7 +4,7 @@
       Your Contact Center
     </div>
     <div class="wallboard__header__actions bordered-bottom">
-      For today {{ date }}
+      For today {{ new Date() | fullShortDate }}
 
       <ring-group-selector clearable
                            class="ml-2 ring-group-filter"
@@ -35,15 +35,7 @@ export default {
   computed: {
     ...mapGetters('wallboard', {
       filters: 'getFilters'
-    }),
-
-    date () {
-      // "8 Jan 2023" format
-      return new Date()
-        .toGMTString()
-        .substr(5, 12)
-        .replace(/^0/, '')
-    }
+    })
   },
 
   methods: {
