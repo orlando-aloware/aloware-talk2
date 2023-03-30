@@ -652,6 +652,7 @@ export default ({ Vue }) => {
     sortObjectByKey,
     objAlphabeticalOrder,
     fullDuration,
+    fixFullDateUTCRelative,
     fullShortDate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
