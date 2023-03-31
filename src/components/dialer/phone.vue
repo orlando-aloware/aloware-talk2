@@ -518,8 +518,8 @@
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <call-disposition-wrapper class="w-100"
-                                          :highlighted="!isCallDisposed"
-                                          :required="!isCallDisposed"
+                                          :highlighted="isHighlightedCallDisposition"
+                                          :required="isHighlightedCallDisposition"
                                           :communication="dialer.communication"
                                           @change="onCallDisposed">
                 </call-disposition-wrapper>
@@ -532,8 +532,8 @@
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <contact-disposition-wrapper class="w-100"
-                                             :highlighted="!isContactDisposed"
-                                             :required="!isContactDisposed"
+                                             :highlighted="isHighlightedContactDisposition"
+                                             :required="isHighlightedContactDisposition"
                                              :contact="contact"
                                              @change="onContactDisposed">
                 </contact-disposition-wrapper>
@@ -1830,6 +1830,26 @@ export default {
       const isForceContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition && !this.isContactDisposed
 
       return isForceCallDisposition || isForceContactDisposition
+    },
+
+    isHighlightedCallDisposition () {
+      if (this.isCallDisposed) {
+        return false
+      }
+
+      const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
+
+      return isForcedCallDisposition && !this.isCallDisposed
+    },
+
+    isHighlightedContactDisposition () {
+      if (this.isContactDisposed) {
+        return false
+      }
+
+      const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
+
+      return isForcedContactDisposition && !this.isContactDisposed
     }
   },
 

@@ -64,6 +64,7 @@ export default {
         this.loadingContactDisposition = false
         console.log(err)
         this.$handleErrors(err.response)
+        this.$emit('change', dispositionStatusId)
       })
     }
   }
