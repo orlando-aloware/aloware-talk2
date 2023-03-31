@@ -1,13 +1,14 @@
 <template>
-  <b-overlay :show="isBusy">
-    <div class="t-flex-group__no-bg flex-column border-top">
+  <b-overlay class="h-100"
+             :show="isBusy">
+    <div class="t-flex-group__no-bg flex-column border-top h-100">
       <SessionFilters @selected-tab="selectTab" />
 
-      <div class="t-panel-container">
+      <div class="t-panel-container h-100">
         <q-tab-panels v-model="panel"
                       class="bg-transparent">
 
-          <q-tab-panel class="p-0"
+          <q-tab-panel class="p-0 h-100"
                        name="Details">
             <SessionContactPageDetails />
           </q-tab-panel>

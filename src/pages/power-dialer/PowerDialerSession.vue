@@ -1,35 +1,30 @@
 <template>
-  <b-overlay :show="sessionLoader">
+  <b-overlay class="h-100"
+             :show="sessionLoader">
     <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
-    <div
-      class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar sidebar-1"
-      :class="`${sessionSidebarExpanded ? 'minimized' : ''}`">
-      <SessionSidebar />
-    </div>
-    <div
-      :class="`${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 mb-0`"
-      class="sessions-main-page px-0 mb-0 main flex-1"
-      :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
-      <div class="t-flex-group">
-
-        <!-- Session Header -->
-        <div class="d-flex bg-white">
-          <div class="col-7 p-0 bordered-right">
-            <CallDisposition />
+      <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar sidebar-1"
+           :class="`${sessionSidebarExpanded ? 'minimized' : ''}`">
+        <SessionSidebar />
+      </div>
+      <div :class="`sessions-main-page px-0 mb-0 main flex-1 ${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 mb-0 h-100`"
+           :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
+        <div class="d-flex flex-column h-100">
+          <!-- Session Header -->
+          <div class="d-flex bg-white h-100">
+            <div class="col-7 p-0 bordered-right">
+              <CallDisposition />
+            </div>
+            <div class="col-5 p-0">
+              <session-call-status @on-redirect="redirectRoute"
+                                   @no-tasks-found="onNoTasksFound"
+                                   @on-all-tasks-are-skipped="onAllTasksAreSkipped" />
+            </div>
           </div>
-          <div class="col-5 p-0">
-            <session-call-status
-              @on-redirect="redirectRoute"
-              @no-tasks-found="onNoTasksFound"
-              @on-all-tasks-are-skipped="onAllTasksAreSkipped" />
-          </div>
+          <!-- Session Main Page -->
+          <SessionContactPage />
         </div>
-
-        <!-- Session Main Page -->
-        <SessionContactPage />
       </div>
     </div>
-  </div>
     <template #overlay>
       <div class="text-center">
         <q-spinner-bars color="primary"
@@ -53,30 +48,36 @@ import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-lis
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
+
   components: {
     SessionSidebar,
     CallDisposition,
     SessionCallStatus,
     SessionContactPage
   },
+
   mixins: [
     sessionCallStatusMixin,
     broadcast
   ],
+
   computed: {
     ...mapState(['dialer']),
+
     ...mapGetters('contacts', [
       'contact',
       'selectedList'
     ]),
+
     ...mapGetters('powerDialer', [
       'sessionSidebarExpanded',
       'sessionLoader'
     ]),
+
     ...mapFields('powerDialer', [
       'powerDialerTaskFilters',
       'activeList',
@@ -84,19 +85,24 @@ export default {
       'myQueue',
       'hasActiveTask'
     ]),
+
     listFilters () {
       return DEFAULT_FILTER_LIST
     },
+
     isValidList () {
       if (this.selectedList.id !== this.$route.params.id) {
         return false
       }
+
       return this.selectedList.name.length > 0
     },
+
     totalTasksInQueue () {
       return this.powerDialerTasks.in_queue.length
     }
   },
+
   data () {
     return {
       listeners: {},
@@ -107,6 +113,7 @@ export default {
       pagesFetched: 0
     }
   },
+
   async created () {
     await this.fetchCurrentList()
     this.TOGGLE_SESSION_LOADER(true)
@@ -119,13 +126,17 @@ export default {
         this.fetchTasks(AutoDialTaskStatus.STATUS_FAILED)
       }
     }
+
     this.$VueEvent.listen('endWrapUp', this.listeners.endWrapUp)
   },
+
   async mounted () {
     this.resetPowerDialerTasks()
+
     if (!this.myQueue) {
       await this.getMyQueueList()
     }
+
     await this.fetchTasks()
   },
   methods: {
@@ -135,15 +146,18 @@ export default {
       'setSelectedPDList',
       'getMyQueueList'
     ]),
+
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
     ]),
+
     getTaskByFilter (params = {}) {
       const listId = params.id === 'all'
         ? 'my-queue'
         : params.id
       delete params.name
       delete params.id
+
       return window.axios.get(
         `api/v2/power-dialer-lists/${listId}/items`,
         {
@@ -152,6 +166,7 @@ export default {
         }
       )
     },
+
     fetchTasks (status, isNextPage = false) {
       if (status) {
         const taskType = { data: '' }
@@ -175,19 +190,15 @@ export default {
           task_status: status
         }
 
-        if (isNextPage) {
-          params.page = 2
-        } else {
-          params.page = 1
-        }
-
+        params.page = isNextPage ? 2 : 1
         const isInProgress = get(this.inProgressFetchTasks, taskType.data, false)
 
-        if (!isInProgress) {
-          this.inProgressFetchTasks[taskType.data] = true
-        } else { // skip if there's an in-progress tasks fetch
+        // skip if there's an in-progress tasks fetch
+        if (isInProgress) {
           return
         }
+
+        this.inProgressFetchTasks[taskType.data] = true
 
         this.getTaskByFilter(params)
           .then(res => {
@@ -208,24 +219,29 @@ export default {
               status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.$VueEvent.fire('initiate_session_no_tasks')
             }
+
             this.inProgressFetchTasks[taskType.data] = false
           })
-      } else {
-        Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
-          let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
 
-          let params = stat === 'all' ? { id: this.selectedList.id } : { id: this.selectedList.id, task_status: taskStatus }
-
-          this.getTaskByFilter(params).then(res => {
-            this.powerDialerTasks[stat] = res.data.data
-            this.powerDialerTaskFilters[stat] = res.data
-          })
-        })
+        return
       }
+
+      Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
+        let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+
+        let params = stat === 'all' ? { id: this.selectedList.id } : { id: this.selectedList.id, task_status: taskStatus }
+
+        this.getTaskByFilter(params).then(res => {
+          this.powerDialerTasks[stat] = res.data.data
+          this.powerDialerTaskFilters[stat] = res.data
+        })
+      })
     },
+
     async fetchCurrentList () {
       let response = null
       let id = ''
+
       if (this.isValidList) {
         id = this.selectedList.id
         response = await this.getPowerDialerList(id)
@@ -233,6 +249,7 @@ export default {
         id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
         response = await this.getPowerDialerList(this.$route.params.id)
       }
+
       this.activeList = response
       this.activeMetrics = response.session_metrics
       this.setSelectedPDList({
@@ -241,21 +258,27 @@ export default {
         type: response.type
       })
     },
+
     redirectRoute (route) {
       this.$VueEvent.fire('call_sessions_ended')
       let isMyQueueList = this.selectedList.name === 'My Queue'
       let routePath = '/power-dialer'
+
       if (!isMyQueueList) {
         routePath += `/list/${route.id}`
       }
+
       this.$router.push(routePath)
     },
+
     onNoTasksFound () {
       this.$generalNotification('Stopping PowerDialer: No more tasks found', 'warning')
     },
+
     onAllTasksAreSkipped () {
       this.$generalNotification('All remaining tasks are skipped. Redirecting to Power Dialer list.', 'warning')
     },
+
     fetchQueuedTasks () {
       // fetch tasks only if:
       // total queued tasks for the next task is more than
@@ -279,10 +302,14 @@ export default {
         return
       }
 
-      this.powerDialerTaskFilters.in_queue.total_queued -= 1
+      if (!isEmpty(this.powerDialerTaskFilters.in_queue)) {
+        this.powerDialerTaskFilters.in_queue.total_queued -= 1
+      }
+
       this.$VueEvent.fire('redial_task')
     }
   },
+
   watch: {
     activeTask: {
       handler (newValue, oldValue) {
@@ -298,6 +325,7 @@ export default {
       deep: true
     }
   },
+
   beforeDestroy () {
     this.powerDialerTaskFilters.in_queue = []
     this.$VueEvent.stop('endWrapUp', this.listeners.endWrapUp)
