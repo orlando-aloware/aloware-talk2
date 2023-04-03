@@ -12659,6 +12659,7 @@ h1.contact-list-name-label {
     }
 
     .calls {
+      width: 100%;
       color: $grey-92;
 
       &--comfort {}
@@ -12681,7 +12682,10 @@ h1.contact-list-name-label {
       }
 
       &__table {
-
+        .relative-time {
+          font-size: 13px !important;
+          color: $grey-92;
+        }
       }
     }
   }

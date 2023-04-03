@@ -1,10 +1,11 @@
 export const COLUMNS = [
   {
-    name: 'disposition_status',
-    label: 'Disposition Status',
+    name: 'disposition',
+    label: ' ',
     order: 0,
     sortable: false,
-    selectable: false
+    selectable: false,
+    minWidth: 50
   },
   {
     name: 'line',
@@ -18,7 +19,8 @@ export const COLUMNS = [
     label: 'Number',
     order: 2,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 150
   },
   {
     name: 'ring_group',
@@ -35,11 +37,12 @@ export const COLUMNS = [
     selectable: true
   },
   {
-    name: 'created_at',
+    name: 'start',
     label: 'Start Time',
     order: 5,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 200
   },
   {
     name: 'wait_time',

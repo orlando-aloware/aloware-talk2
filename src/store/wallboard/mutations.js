@@ -23,12 +23,24 @@ export default {
     state.isLiveCallsLoading = data
   },
 
+  SET_LIVE_CALLS: (state, data) => {
+    state.calls.live = data
+  },
+
   SET_PARKED_CALLS_LOADING: (state, data) => {
     state.isParkedCallsLoading = data
   },
 
+  SET_PARKED_CALLS: (state, data) => {
+    state.calls.parked = data
+  },
+
   SET_QUEUED_CALLS_LOADING: (state, data) => {
     state.isQueuedCallsLoading = data
+  },
+
+  SET_QUEUED_CALLS: (state, data) => {
+    state.calls.queued = data
   },
 
   SET_SUMMARY: (state, data) => {

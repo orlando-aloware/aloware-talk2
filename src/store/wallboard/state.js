@@ -6,6 +6,7 @@ export default function () {
       parked: []
     },
     callsEnabledColumns: [
+      'disposition',
       'incoming_number',
       'ring_group',
       'workflow',

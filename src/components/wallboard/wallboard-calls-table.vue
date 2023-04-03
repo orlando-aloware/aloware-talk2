@@ -1,5 +1,5 @@
 <template>
-  <div class="users__table">
+  <div class="calls__table">
     <datatable paginated
                show-pagination
                sticky-headers
@@ -18,9 +18,102 @@
             :key="`${index}`"
             v-for="(call, index) in paginatedCalls">
           <template v-for="(column, colIndex) in filteredColumns">
+            <!-- icon -->
             <td :key="`col-${colIndex}`"
-                v-if="column.name === 'disposition_status'">
-              {{ call.id }}
+                v-if="column.name === 'disposition'">
+              <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
+                  <component :is="stateToIcon(call.disposition_status2, call.type, call.direction, call.callback_status)"
+                             v-if="call.disposition_status2">
+                  </component>
+                  <q-tooltip>
+                    {{ dispositionTooltipData(call.disposition_status2, call.type, call.direction) }}
+                  </q-tooltip>
+              </router-link>
+            </td>
+
+            <!-- line ? -->
+
+            <!-- incoming number -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'incoming_number'">
+              <div class="row">
+                <div class="col-12 mb-1">
+                  <!-- FIXME: link to campaign -->
+                  {{ getCampaign(call.campaign_id) }}
+                </div>
+                <div class="col-12">
+                  {{ call.incoming_number | fixPhone }}
+                </div>
+              </div>
+            </td>
+
+            <!-- ring group -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'ring_group'">
+              <!-- FIXME: link to RG -->
+              {{ getRingGroup(call.ring_group_id) }}
+            </td>
+
+            <!-- sequence -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'workflow'">
+              <!-- FIXME: link to workflow -->
+              {{ getWorkflow(call.workflow_id) }}
+            </td>
+
+            <!-- start time -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'start'">
+              <span class="text-greyish">
+                {{ call.created_at | fixFullDateTime }}
+              </span>
+                <div class="d-flex align-items-center justify-content-left"
+                v-if="call.call_disposition_id">
+                  <i class="fa fa-bolt"
+                    :style="{ color: callDispositionColor(call.call_disposition_id) }"></i>
+                  <span class="ml-1">{{ callDispositionName(call.call_disposition_id) }}</span>
+                </div>
+            </td>
+
+            <!-- wait time -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'wait_time'">
+                <span v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(call.type)">
+                  {{ call.wait_time | fixDuration }}
+                </span>
+                <span v-else>
+                  --
+                </span>
+            </td>
+
+            <!-- talk time -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'talk_time'">
+              <div class="d-flex flex-column"
+                   v-if="[CommunicationTypes.CALL].includes(call.type)">
+                <span v-if="call.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW">
+                  {{ call.talk_time | fixDuration }}
+                </span>
+                <relative-time :from-time="call.created_at"
+                                v-else-if="call.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW">
+                </relative-time>
+              </div>
+              <div class="d-flex align-items-center justify-content-left">
+                <span>{{ getVisibleStatus(call) }}</span>
+              </div>
+            </td>
+
+            <!-- duration -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'duration'">
+              <div class="d-flex flex-column">
+                <span>
+                  {{ call.duration | fixDuration }}
+                </span>
+                <span>
+                  {{ getVisibleStatus(call) }}
+                </span>
+              </div>
             </td>
           </template>
         </tr>
@@ -39,20 +132,27 @@
 </template>
 
 <script>
-import { COLUMNS } from 'src/constants/wallboard/calls-columns'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
 import Datatable from 'src/components/datatable.vue'
-import { aclMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
+import RelativeTime from 'src/components/relative-time.vue'
+import { COLUMNS } from 'src/constants/wallboard/calls-columns'
+import { aclMixin, callDispositionMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'wallboard-calls-table',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    callDispositionMixin,
+    communicationInfoMixin
   ],
 
   components: {
-    Datatable
+    Datatable,
+    RelativeTime
   },
 
   props: {
@@ -77,6 +177,12 @@ export default {
     ...mapGetters('wallboard', {
       enabledColumns: 'getCallsEnabledColumns'
     }),
+
+    ...mapState([
+      'campaigns',
+      'ringGroups',
+      'workflows'
+    ]),
 
     filteredColumns () {
       return COLUMNS.filter(column => this.enabledColumns.includes(column.name))
@@ -170,7 +276,10 @@ export default {
     sort: {
       orderBy: 'id',
       order: 'asc'
-    }
+    },
+    CommunicationCurrentStatus,
+    CommunicationDispositionStatus,
+    CommunicationTypes
   }),
 
   methods: {
@@ -183,6 +292,26 @@ export default {
 
     onSort (sortData) {
       this.sort = sortData
+    },
+
+    getCampaign (campaignId) {
+      return this.campaigns.find(campaign => campaign.id === campaignId)?.name
+    },
+
+    getRingGroup (ringGroupId) {
+      return this.ringGroups.find(rg => rg.id === ringGroupId)?.name || '--'
+    },
+
+    getWorkflow (worfkflowId) {
+      return this.workflows.find(workflow => workflow.id === worfkflowId)?.name || '--'
+    },
+
+    getVisibleStatus (communication) {
+      if (communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateCurrentStatusText(communication.current_status2)))
+      }
+
+      return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateDispositionStatusText(communication.disposition_status2)))
     }
   }
 }

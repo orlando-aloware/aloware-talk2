@@ -32,7 +32,9 @@ export default {
   },
 
   created () {
-    // FIXME: fetch all things here
+    this.fetchLiveCalls()
+    this.fetchParkedCalls()
+    this.fetchQueuedCalls()
     this.fetchSummary()
     this.fetchUsers()
   },
@@ -51,6 +53,9 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
+      'fetchLiveCalls',
+      'fetchParkedCalls',
+      'fetchQueuedCalls',
       'fetchSummary',
       'fetchUsers'
     ]),

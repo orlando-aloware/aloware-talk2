@@ -44,7 +44,7 @@ export default {
     }),
 
     isLoading () {
-      switch (true) {
+      switch (this.$route.params.id) {
         case 'live':
           return this.isLiveCallsLoading
         case 'parked':
@@ -57,7 +57,7 @@ export default {
     },
 
     calls () {
-      switch (true) {
+      switch (this.$route.params.id) {
         case 'live':
           return this.liveCalls
         case 'parked':
