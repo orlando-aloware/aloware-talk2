@@ -14,9 +14,9 @@
                 <close-o-icon></close-o-icon>
               </q-item-section>
             </template>
-            <q-tooltip  anchor="bottom left"
-                        self="bottom left"
-            v-if="!searchText || (searchText && searchText.length < 3)">
+            <q-tooltip anchor="bottom left"
+                       self="bottom left"
+                       v-if="!searchText || (searchText && searchText.length < 3)">
               Search requires at least 3 characters
             </q-tooltip>
           </q-input>
@@ -31,12 +31,15 @@ import CloseOIcon from 'components/icons/close-o-icon'
 
 export default {
   name: 'search-toggle',
+
   components: { CloseOIcon },
+
   data () {
     return {
       searchText: ''
     }
   },
+
   methods: {
     inputFocus () {
       this.$nextTick(function () {
@@ -44,8 +47,10 @@ export default {
       }.bind(this))
     }
   },
+
   watch: {
     'searchText': function () {
+      this.searchText = this.searchText.trim()
       this.$emit('searching', this.searchText)
     }
   }

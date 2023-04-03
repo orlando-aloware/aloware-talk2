@@ -38,7 +38,6 @@
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters } from 'vuex'
-import { LIST_ONLY, LIST_AND_CONTACT } from 'src/constants/remove-list-action-types'
 
 export default {
   components: {
@@ -46,7 +45,6 @@ export default {
   },
   computed: {
     ...mapGetters('contacts', [
-      'removeListActionType',
       'selectedList',
       'listToRemove',
       'isRemoveListOpen',
@@ -85,8 +83,7 @@ export default {
   data () {
     return {
       isBusy: false,
-      listName: null,
-      ActionTypes: { LIST_ONLY, LIST_AND_CONTACT }
+      listName: null
     }
   },
   watch: {
@@ -109,10 +106,10 @@ export default {
       this.removeListClose()
       this.$bvModal.hide('remove-list-confirmation-dialog')
     },
-    handleDeletion (params) {
+    handleDeletion () {
       this.isBusy = true
       return this.$axios
-        .delete(`${this.listEndpoint}/${this.listToRemove.id}`, { params })
+        .delete(`${this.listEndpoint}/${this.listToRemove.id}`)
         .then(() => {
           this.$generalNotification('List has been successfully removed.')
           this.removeListFromFolders(this.listToRemove.id, this.folders)
@@ -138,7 +135,7 @@ export default {
         })
     },
     onConfirm () {
-      this.handleDeletion({ deletion_type: this.removeListActionType })
+      this.handleDeletion()
     },
     removeListFromFolders (id, haystack) {
       const index = { i: 0 }

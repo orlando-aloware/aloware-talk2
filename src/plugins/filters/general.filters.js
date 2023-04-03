@@ -546,30 +546,30 @@ const objAlphabeticalOrder = (object, sortProp) => {
  * @returns String
  */
 const fullDuration = (duration, shouldDisplaySeconds = true) => {
-  if (duration !== undefined) {
-    let seconds = duration
-    let hour = Math.floor(seconds / 3600)
-    let min = Math.floor(seconds / 60 % 60)
-    let sec = Math.floor(seconds % 60)
-
-    if (hour) {
-      if (shouldDisplaySeconds) {
-        return `${hour}h ${min}m ${sec}s`
-      }
-      return `${hour}h ${min}m`
-    }
-
-    if (!hour && min) {
-      if (shouldDisplaySeconds) {
-        return `${min}m ${sec}s`
-      }
-      return `${min}m`
-    }
-
-    return `${sec}s`
-  } else {
+  if (duration === undefined) {
     return '-'
   }
+
+  let seconds = duration
+  let hour = Math.floor(seconds / 3600)
+  let min = Math.floor(seconds / 60 % 60)
+  let sec = Math.floor(seconds % 60)
+
+  if (hour) {
+    if (shouldDisplaySeconds) {
+      return `${hour}h ${min}m ${sec}s`
+    }
+
+    return `${hour}h ${min}m`
+  } else if (!hour && min) {
+    if (shouldDisplaySeconds) {
+      return `${min}m ${sec}s`
+    }
+
+    return `${min}m`
+  }
+
+  return `${sec}s`
 }
 
 /**
@@ -578,30 +578,43 @@ const fullDuration = (duration, shouldDisplaySeconds = true) => {
  * @returns String
  */
 const fixFullDateUTCRelative = (dt) => {
-  if (dt) {
-    let now = window.moment.utc()
-    let datetime = window.moment.utc(dt)
-
-    if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
-      if (window.timezone) {
-        return datetime.tz(window.timezone).fromNow()
-      } else {
-        return datetime.local().fromNow()
-      }
-    } else {
-      if (window.timezone) {
-        if (window.timezone === 'Asia/Manila') {
-          return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY h:mma') + ' MNL'
-        }
-
-        return datetime.tz(window.timezone).format('MMM D, YYYY h:mma z')
-      } else {
-        return datetime.local().format('MMM D, YYYY h:mma z')
-      }
-    }
-  } else {
+  if (!dt) {
     return '--'
   }
+
+  let now = window.moment.utc()
+  let datetime = window.moment.utc(dt)
+
+  if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
+    if (window.timezone) {
+      return datetime.tz(window.timezone).fromNow()
+    }
+
+    return datetime.local().fromNow()
+  }
+
+  if (!window.timezone) {
+    return datetime.local().format('MMM D, YYYY h:mma z')
+  }
+
+  if (window.timezone === 'Asia/Manila') {
+    return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY h:mma') + ' MNL'
+  }
+
+  return datetime.tz(window.timezone).format('MMM D, YYYY h:mma z')
+}
+
+/**
+ * Converts date to short text ("8 Jan 2023")
+ *
+ * @param {Date} date
+ * @returns String
+ */
+const fullShortDate = (date) => {
+  return date
+    .toGMTString()
+    .substr(5, 12)
+    .replace(/^0/, '')
 }
 
 /**
@@ -655,7 +668,8 @@ export default ({ Vue }) => {
     objAlphabeticalOrder,
     fullDuration,
     fixFullDateUTCRelative,
-    fixDuration
+    fixDuration,
+    fullShortDate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
