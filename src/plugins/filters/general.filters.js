@@ -578,30 +578,30 @@ const fullDuration = (duration, shouldDisplaySeconds = true) => {
  * @returns String
  */
 const fixFullDateUTCRelative = (dt) => {
-  if (dt) {
-    let now = window.moment.utc()
-    let datetime = window.moment.utc(dt)
-
-    if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
-      if (window.timezone) {
-        return datetime.tz(window.timezone).fromNow()
-      } else {
-        return datetime.local().fromNow()
-      }
-    } else {
-      if (window.timezone) {
-        if (window.timezone === 'Asia/Manila') {
-          return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY h:mma') + ' MNL'
-        }
-
-        return datetime.tz(window.timezone).format('MMM D, YYYY h:mma z')
-      } else {
-        return datetime.local().format('MMM D, YYYY h:mma z')
-      }
-    }
-  } else {
+  if (!dt) {
     return '--'
   }
+
+  let now = window.moment.utc()
+  let datetime = window.moment.utc(dt)
+
+  if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
+    if (window.timezone) {
+      return datetime.tz(window.timezone).fromNow()
+    }
+
+    return datetime.local().fromNow()
+  }
+
+  if (!window.timezone) {
+    return datetime.local().format('MMM D, YYYY h:mma z')
+  }
+
+  if (window.timezone === 'Asia/Manila') {
+    return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY h:mma') + ' MNL'
+  }
+
+  return datetime.tz(window.timezone).format('MMM D, YYYY h:mma z')
 }
 
 /**
