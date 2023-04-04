@@ -1,35 +1,31 @@
 <template>
-  <q-card
-    flat
-    style="height: 100%;">
+  <q-card flat
+          style="height: 100%;">
     <div class="text-h6 text-grey-80 full-height fill-width row justify-center items-center"
          v-show="sessionPaused">
       Session Paused
     </div>
     <div class="t-menu pb-2"
          v-show="!sessionPaused">
-      <ChipsEllipsis
-        initiallyDisabled
-        headerLabel="CALL DISPOSITION"
-        headerClass="t-menu__header no-border t-dense d-flex align-items-center"
-        ref="callDispositionSelector"
-        identity="call-disposition"
-        default-label="No Call Dispositions"
-        :list-items="filteredCallDispositions"
-        :selected-item="callDisposition"
-        :display-count="4"
-        @on-selected-item="onSelectedCallDisposition" />
-      <ChipsEllipsis
-        headerLabel="CONTACT DISPOSITION"
-        headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
-        ref="contactDispositionSelector"
-        identity="contact-disposition"
-        default-label="No Contact Dispositions"
-        :list-items="filteredContactDispositions"
-        :selected-item="contactDisposition"
-        :display-count="6"
-        @on-selected-item="onSelectedContactDisposition" />
-
+      <ChipsEllipsis initiallyDisabled
+                     headerLabel="CALL DISPOSITION"
+                     headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                     ref="callDispositionSelector"
+                     identity="call-disposition"
+                     default-label="No Call Dispositions"
+                     :list-items="filteredCallDispositions"
+                     :selected-item="callDisposition"
+                     :display-count="4"
+                     @on-selected-item="onSelectedCallDisposition" />
+      <ChipsEllipsis headerLabel="CONTACT DISPOSITION"
+                     headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
+                     ref="contactDispositionSelector"
+                     identity="contact-disposition"
+                     default-label="No Contact Dispositions"
+                     :list-items="filteredContactDispositions"
+                     :selected-item="contactDisposition"
+                     :display-count="6"
+                     @on-selected-item="onSelectedContactDisposition" />
       <!--div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
         <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
           VOICEMAIL
@@ -37,15 +33,13 @@
       </div>
       <div class="d-flex t-menu__content over-flow px-3 pb-0"-->
         <!-- <VmDropSelector /> -->
-        <!--ChipsEllipsis
-          @on-selected-item="onSelectedContactDisposition"
-          :list-items="[]"
-          :selected-item="''"
-          :display-count="6"
-          identity="contact-disposition"
-          default-label="No Voicemail" />
+        <!--ChipsEllipsis @on-selected-item="onSelectedContactDisposition"
+                          :list-items="[]"
+                          :selected-item="''"
+                          :display-count="6"
+                          identity="contact-disposition"
+                          default-label="No Voicemail" />
       </div-->
-
     </div>
   </q-card>
 </template>
@@ -95,6 +89,7 @@ export default {
           return this.sessionSettings.call_disposition_ids.includes(d.id)
         })
       }
+
       return this.callDispositions
     },
 
@@ -105,6 +100,7 @@ export default {
           return this.sessionSettings.contact_disposition_ids.includes(d.id)
         })
       }
+
       return this.dispositionStatuses
     },
 
@@ -116,6 +112,7 @@ export default {
       return this.selectedCallDisposition || this.dialer?.communication?.id
     }
   },
+
   methods: {
     ...mapActions('powerDialer', [
       'updateContactDisposition',

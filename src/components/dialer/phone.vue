@@ -646,7 +646,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="disableCallBackButton"
+                  :disabled="disableWrapUpButtons"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -655,7 +655,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="disableCallBackButton"
+                  :disabled="disableWrapUpButtons"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1825,7 +1825,7 @@ export default {
         (this.contact || this.hasCallFishingCommunication) && this.expansionEnabled
     },
 
-    disableCallBackButton () {
+    disableWrapUpButtons () {
       const isForceCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition && !this.isCallDisposed
       const isForceContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition && !this.isContactDisposed
 
@@ -2552,6 +2552,11 @@ export default {
           this.clearDispositions()
           this.changeScreen('wrap-up')
           this.resetBottomExpansion()
+
+          if (this.disableWrapUpButtons) {
+            this.$VueEvent.fire('pauseWrapUp', true)
+          }
+
           break
         case 'GENERATING_TOKEN':
           this.changeScreen('call')
@@ -2631,6 +2636,10 @@ export default {
       if (['add', 'dialpad', 'transfer'].includes(value)) {
         this.openExpansion(value)
       }
+    },
+
+    disableWrapUpButtons (newValue) {
+      this.$VueEvent.fire('pauseWrapUp', newValue)
     }
   },
 
