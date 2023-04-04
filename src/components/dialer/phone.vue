@@ -2649,7 +2649,7 @@ export default {
     this.$VueEvent.stop('togglePhone', this.phoneListeners.togglePhone)
     this.$VueEvent.stop('showPhone', this.phoneListeners.showPhone)
     this.$VueEvent.stop('hidePhone', this.phoneListeners.hidePhone)
-    this.$VueEvent.listen('call_disconnected', this.phoneListeners.callDisconnected)
+    this.$VueEvent.stop('callDisconnected', this.phoneListeners.callDisconnected)
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
     clearInterval(this.$options.holdInterval)

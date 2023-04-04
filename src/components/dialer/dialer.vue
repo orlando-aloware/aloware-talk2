@@ -881,6 +881,7 @@ export default {
           console.log('Call parked')
         }).catch(err => {
           console.log(err)
+          this.$VueEvent.fire('holdFailed')
         }).finally(_ => {
           this.loadingHold = false
         })
@@ -899,6 +900,7 @@ export default {
         console.log('Call unparked')
       }).catch(err => {
         console.log(err)
+        this.$VueEvent.fire('unholdFailed')
       }).finally(_ => {
         this.loadingUnhold = false
       })
