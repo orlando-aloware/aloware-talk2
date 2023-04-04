@@ -115,6 +115,64 @@
                 </span>
               </div>
             </td>
+
+            <!-- contact -->
+            <td class="calls__table__contact"
+                :key="`col-${colIndex}`"
+                v-if="column.name === 'lead_number'">
+              <div class="d-flex">
+                <div class="d-flex flex-column justify-center flex-grow-1">
+                  <!-- contact with link -->
+                  <router-link :to="{ path: `/contacts/${call.contact_id}` }"
+                              v-if="call.contact">
+                    {{ call.contact.name | capitalize }}
+                  </router-link>
+
+                  <!-- lead number -->
+                  <div class="d-flex align-items-center">
+                    <span>
+                      {{ call.lead_number | fixPhone }}
+                    </span>
+                    <q-badge color="success"
+                            class="rounded-badge bordered ml-1"
+                            v-if="call.first_time_caller"/>
+                  </div>
+
+                  <!-- disposition -->
+                  <div class="d-flex align-items-center">
+                    <i class="material-icons"
+                      :style="{ color: dispositionStatusColor(call.contact.disposition_status_id) }">
+                      label
+                    </i>
+                    <span class="ml-1 text-grey-900">
+                      {{ dispositionStatusName(call.contact.disposition_status_id) }}
+                    </span>
+                  </div>
+
+                  <!-- company -->
+                  <div class="d-flex align-items-center">
+                    <i class="material-icons">business_center</i>
+                    <span class="ml-1">{{ call.contact.company_name }}</span>
+                  </div>
+                </div>
+
+                <!-- tags -->
+                <div class="calls__table__contact__tags flex-grow-1 d-flex flex-column"
+                     v-if="call.contact && call.contact.tags && call.contact.tags.length">
+                  <div v-for="tag in getLastTags(call.contact.tags)"
+                       :key="tag.id"
+                       class="d-flex align-items-center text-xs">
+                    <i class="fa fa-circle"
+                       :style="{ color: tag.color }"></i>
+                    <span class="ml-1 mb-1">{{ tag.name }}</span>
+                  </div>
+                  <div class="d-flex justify-center"
+                       v-if="call.contact.tags.length > 3">
+                    <span>...</span>
+                  </div>
+                </div>
+              </div>
+            </td>
           </template>
         </tr>
       </template>
@@ -138,7 +196,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import Datatable from 'src/components/datatable.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
-import { aclMixin, callDispositionMixin, communicationInfoMixin } from 'src/plugins/mixins'
+import { aclMixin, callDispositionMixin, communicationInfoMixin, contactDispositionMixin } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
@@ -147,7 +205,8 @@ export default {
   mixins: [
     aclMixin,
     callDispositionMixin,
-    communicationInfoMixin
+    communicationInfoMixin,
+    contactDispositionMixin
   ],
 
   components: {
@@ -312,6 +371,18 @@ export default {
       }
 
       return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateDispositionStatusText(communication.disposition_status2)))
+    },
+
+    getLastTags (tags, count = 3) {
+      if (!tags.length) {
+        return []
+      }
+
+      if (tags.length < count) {
+        return tags.slice().reverse()
+      }
+
+      return tags.slice(-1 * count)
     }
   }
 }

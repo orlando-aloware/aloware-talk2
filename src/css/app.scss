@@ -12682,6 +12682,13 @@ h1.contact-list-name-label {
       }
 
       &__table {
+        &__contact {
+          &__tags {
+            white-space: break-spaces;
+            word-break: break-word;
+          }
+        }
+        
         .relative-time {
           font-size: 13px !important;
           color: $grey-92;

@@ -70,7 +70,8 @@ export const COLUMNS = [
     label: 'Contact',
     order: 9,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 300
   },
   {
     name: 'owner_id',
