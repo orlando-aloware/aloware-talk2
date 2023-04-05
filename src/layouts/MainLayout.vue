@@ -1362,6 +1362,7 @@ export default {
     },
 
     initAuth () {
+      let fetchingStatics = false
       this.loading = true
       this.setCampaignsIsLoading(true)
       this.setTagsFullyLoaded(true)
@@ -1371,10 +1372,18 @@ export default {
       }
 
       this.getTimezones()
-      this.getStatics()
+
+      const companyId = this.currentCompany?.id
+
+      // get statics if company id is already available
+      if (companyId !== undefined) {
+        this.getStatics()
+        fetchingStatics = true
+      }
 
       this.initAccount().then(() => {
         this.loading = false
+
         if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
           if (!this.profile.go_to_available_after_login) {
             this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE)
@@ -1383,6 +1392,11 @@ export default {
 
         if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+        }
+
+        // company id should be available by now so fetch statics if it's not yet fetched
+        if (!fetchingStatics) {
+          this.getStatics()
         }
 
         this.broadcastInit()
