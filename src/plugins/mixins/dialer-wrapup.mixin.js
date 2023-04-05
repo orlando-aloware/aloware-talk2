@@ -4,7 +4,7 @@ export default {
   data () {
     return {
       wrapUpPaused: false,
-      dialerListeners: {}
+      wrapUpListeners: {}
     }
   },
 
@@ -13,7 +13,7 @@ export default {
   },
 
   created () {
-    this.dialerListeners.pauseWrapUp = (pauseWrapUp) => {
+    this.wrapUpListeners.pauseWrapUp = (pauseWrapUp) => {
       this.wrapUpPaused = pauseWrapUp
     }
 
@@ -22,11 +22,11 @@ export default {
 
   methods: {
     startDialerWrapUpEvents () {
-      this.$VueEvent.listen('pauseWrapUp', this.dialerListeners.pauseWrapUp)
+      this.$VueEvent.listen('pauseWrapUp', this.wrapUpListeners.pauseWrapUp)
     },
 
     stopDialerWrapUpEvents () {
-      this.$VueEvent.stop('pauseWrapUp', this.dialerListeners.pauseWrapUp)
+      this.$VueEvent.stop('pauseWrapUp', this.wrapUpListeners.pauseWrapUp)
     }
   },
 

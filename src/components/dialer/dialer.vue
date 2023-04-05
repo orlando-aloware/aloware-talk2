@@ -49,6 +49,7 @@ export default {
       warnings: [],
       hangupInterval: null,
       activeConnectionInterval: null,
+      dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus
@@ -260,7 +261,6 @@ export default {
     }
 
     this.startDialerEvents()
-    this.startDialerWrapUpEvents()
     this.getDesktopToken()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
