@@ -646,7 +646,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="disableWrapUpButtons"
+                  :disabled="isNotDisposed"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -655,7 +655,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="disableWrapUpButtons"
+                  :disabled="isNotDisposed"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1222,7 +1222,8 @@ import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import {
   communicationInfoMixin,
-  notificationMixin
+  notificationMixin,
+  dispositionsMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1324,7 +1325,8 @@ export default {
 
   mixins: [
     communicationInfoMixin,
-    notificationMixin
+    notificationMixin,
+    dispositionsMixin
   ],
 
   props: {
@@ -1412,8 +1414,6 @@ export default {
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
       phoneListeners: {},
-      isCallDisposed: false,
-      isContactDisposed: false,
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationStatus,
@@ -1823,33 +1823,6 @@ export default {
     isPhoneExpansionAvailable () {
       return (this.devMode || !this.isCallCompleted) &&
         (this.contact || this.hasCallFishingCommunication) && this.expansionEnabled
-    },
-
-    disableWrapUpButtons () {
-      const isForceCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition && !this.isCallDisposed
-      const isForceContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition && !this.isContactDisposed
-
-      return isForceCallDisposition || isForceContactDisposition
-    },
-
-    isHighlightedCallDisposition () {
-      if (this.isCallDisposed) {
-        return false
-      }
-
-      const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
-
-      return isForcedCallDisposition && !this.isCallDisposed
-    },
-
-    isHighlightedContactDisposition () {
-      if (this.isContactDisposed) {
-        return false
-      }
-
-      const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
-
-      return isForcedContactDisposition && !this.isContactDisposed
     }
   },
 
@@ -2454,29 +2427,6 @@ export default {
       this.hasCommunicationNotesUnsavedChanges = value
     },
 
-    onCallDisposed (value) {
-      this.isCallDisposed = value || value === 0
-    },
-
-    onContactDisposed (value) {
-      this.isContactDisposed = value || value === 0
-    },
-
-    clearDispositions () {
-      const hasCallDispositionId = this.dialer.communication &&
-        (this.dialer.communication.call_disposition_id || this.dialer.communication.call_disposition_id === 0)
-      const hasContactDispositionId = this.contact &&
-        (this.contact.disposition_status_id || this.contact.disposition_status_id === 0)
-
-      if (!hasCallDispositionId) {
-        this.isCallDisposed = false
-      }
-
-      if (!hasContactDispositionId) {
-        this.isContactDisposed = false
-      }
-    },
-
     ...mapActions([
       'setDialerContact',
       'setDialerContactTags'
@@ -2549,14 +2499,8 @@ export default {
           this.changeScreen('call')
           break
         case 'WRAP_UP':
-          this.clearDispositions()
           this.changeScreen('wrap-up')
           this.resetBottomExpansion()
-
-          if (this.disableWrapUpButtons) {
-            this.$VueEvent.fire('pauseWrapUp', true)
-          }
-
           break
         case 'GENERATING_TOKEN':
           this.changeScreen('call')
@@ -2612,19 +2556,7 @@ export default {
     },
 
     'dialer.contact': function () {
-      if (this.dialer.contact &&
-        (this.dialer.contact.disposition_status_id || this.dialer.contact.disposition_status_id === 0)) {
-        this.isContactDisposed = true
-      }
-
       this.setupContactLocalTime()
-    },
-
-    'dialer.communication': function () {
-      if (this.dialer.communication &&
-        (this.dialer.communication.call_disposition_id || this.dialer.communication.call_disposition_id === 0)) {
-        this.isCallDisposed = true
-      }
     },
 
     isCallCompleted () {
@@ -2636,10 +2568,6 @@ export default {
       if (['add', 'dialpad', 'transfer'].includes(value)) {
         this.openExpansion(value)
       }
-    },
-
-    disableWrapUpButtons (newValue) {
-      this.$VueEvent.fire('pauseWrapUp', newValue)
     }
   },
 

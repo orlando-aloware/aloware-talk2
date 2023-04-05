@@ -16,6 +16,7 @@
                      :list-items="filteredCallDispositions"
                      :selected-item="callDisposition"
                      :display-count="4"
+                     :forced="isHighlightedCallDisposition"
                      @on-selected-item="onSelectedCallDisposition" />
       <ChipsEllipsis headerLabel="CONTACT DISPOSITION"
                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
@@ -25,6 +26,7 @@
                      :list-items="filteredContactDispositions"
                      :selected-item="contactDisposition"
                      :display-count="6"
+                     :forced="isHighlightedContactDisposition"
                      @on-selected-item="onSelectedContactDisposition" />
       <!--div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
         <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
@@ -49,9 +51,14 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
 import { get, isEmpty } from 'lodash'
+import { dispositionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'SessionCallDisposition',
+
+  mixins: [
+    dispositionsMixin
+  ],
 
   components: {
     ChipsEllipsis
@@ -109,7 +116,7 @@ export default {
     },
 
     callDisposition () {
-      return this.selectedCallDisposition || this.dialer?.communication?.id
+      return this.selectedCallDisposition || this.dialer?.communication?.call_disposition_id
     }
   },
 
@@ -136,10 +143,12 @@ export default {
           this.selectedCallDisposition = res?.call_disposition_id
         }
 
+        this.onCallDisposed(data.id)
         this.$refs.callDispositionSelector.hideLoading()
       }).catch((err) => {
         console.log(err)
         this.$handleErrors(err.response)
+        this.onCallDisposed(this.callDisposition)
         this.$refs.callDispositionSelector.hideLoading()
       })
     },
@@ -164,10 +173,12 @@ export default {
           this.selectedContactDisposition = status.id
         }
 
+        this.onContactDisposed(data.id)
         this.$refs.contactDispositionSelector.hideLoading()
       }).catch((err) => {
         console.log(err)
         this.$handleErrors(err.response)
+        this.onContactDisposed(this.contactDisposition)
         this.$refs.contactDispositionSelector.hideLoading()
       })
     },

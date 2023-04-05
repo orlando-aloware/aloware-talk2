@@ -12,7 +12,8 @@ import {
   userMixin,
   notificationMixin,
   visibilityMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  dialerWrapUpMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -28,7 +29,8 @@ export default {
     userMixin,
     notificationMixin,
     visibilityMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    dialerWrapUpMixin
   ],
 
   data () {
@@ -47,8 +49,6 @@ export default {
       warnings: [],
       hangupInterval: null,
       activeConnectionInterval: null,
-      wrapUpPaused: false,
-      dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus
@@ -259,11 +259,8 @@ export default {
       this.initializeSettings()
     }
 
-    this.dialerListeners.pauseWrapUp = (pauseWrapUp) => {
-      this.wrapUpPaused = pauseWrapUp
-    }
-
     this.startDialerEvents()
+    this.startDialerWrapUpEvents()
     this.getDesktopToken()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -408,7 +405,6 @@ export default {
       this.$VueEvent.listen('setOutputDevice', this.dialerListeners.setOutputDevice)
       this.$VueEvent.listen('testOutputDevice', this.dialerListeners.testOutputDevice)
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
-      this.$VueEvent.listen('pauseWrapUp', this.dialerListeners.pauseWrapUp)
     },
 
     stopDialerEvents () {
@@ -439,7 +435,6 @@ export default {
       this.$VueEvent.stop('setOutputDevice', this.dialerListeners.setOutputDevice)
       this.$VueEvent.stop('testOutputDevice', this.dialerListeners.testOutputDevice)
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
-      this.$VueEvent.stop('pauseWrapUp', this.dialerListeners.pauseWrapUp)
     },
 
     forceRefreshCommunication () {
@@ -1517,6 +1512,7 @@ export default {
   },
 
   beforeDestroy () {
+    this.stopDialerWrapUpEvents()
     this.stopDialerEvents()
     clearInterval(this.$options.callDurationInterval)
     clearInterval(this.$options.wrapUpDurationInterval)

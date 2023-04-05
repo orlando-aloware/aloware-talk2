@@ -10289,6 +10289,10 @@ screen and (max-width: 956px) {
   }
 }
 
+.border-required {
+  border: 1px solid $danger;
+}
+
 .stats-refresh-btn {
   height: 32px;
   font-size: $f-size-body-sm;
