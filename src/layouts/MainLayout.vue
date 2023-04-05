@@ -1360,10 +1360,10 @@ export default {
 
       this.getTimezones()
 
-      const companyId = _.get(this.currentCompany, 'id', null)
+      const companyId = this.currentCompany?.id
 
       // get statics if company id is already available
-      if (companyId !== null) {
+      if (companyId !== undefined) {
         this.getStatics()
         fetchingStatics = true
       }
