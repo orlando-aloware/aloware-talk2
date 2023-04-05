@@ -1029,9 +1029,22 @@ export default {
           })
         }
 
-        if (this.isGuest) {
-          this.getStatics()
-        }
+        // sometimes company is not yet fetched so we have to wait
+        let staticsIntervalCounter = 0
+        let staticsInterval = setInterval(() => {
+          if (this.currentCompany && this.isGuest) {
+            this.getStatics()
+            clearInterval(staticsInterval)
+          }
+
+          // we have to stop this loop if it reaches more than
+          // 60 seconds, the fetching of company info might have
+          // failed.
+          if (staticsIntervalCounter >= 60) {
+            clearInterval(staticsInterval)
+          }
+          staticsIntervalCounter++
+        }, 1000)
 
         this.loading = false
         this.authCheckStatus = false
