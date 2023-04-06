@@ -12686,7 +12686,13 @@ h1.contact-list-name-label {
           &__tags {
             white-space: break-spaces;
             word-break: break-word;
+            font-size: 12px;
           }
+        }
+
+        &__user {
+          white-space: break-spaces !important;
+          word-break: break-word !important;
         }
         
         .relative-time {

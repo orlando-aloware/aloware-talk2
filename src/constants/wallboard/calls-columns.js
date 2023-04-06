@@ -20,7 +20,7 @@ export const COLUMNS = [
     order: 2,
     sortable: true,
     selectable: true,
-    minWidth: 150
+    minWidth: 160
   },
   {
     name: 'ring_group',
@@ -78,21 +78,24 @@ export const COLUMNS = [
     label: 'Owner',
     order: 10,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 130
   },
   {
     name: 'lead_location',
     label: 'Location',
     order: 11,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 140
   },
   {
     name: 'user',
     label: 'User',
     order: 12,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 150
   },
   {
     name: 'in_cold_transfer',
@@ -127,7 +130,8 @@ export const COLUMNS = [
     label: 'Notes',
     order: 17,
     sortable: false,
-    selectable: true
+    selectable: true,
+    minWidth: 150
   },
   {
     name: 'operations',

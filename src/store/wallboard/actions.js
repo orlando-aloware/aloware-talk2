@@ -80,6 +80,9 @@ export default {
           'last_call_source': null,
           'has_transcription': false,
           'tags': [],
+          'user': {
+            'name': 'Keanu Reaves'
+          },
           'contact': {
             'id': 261777,
             'company_id': 7,

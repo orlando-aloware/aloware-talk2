@@ -124,22 +124,27 @@
                 <div class="d-flex flex-column justify-center flex-grow-1">
                   <!-- contact with link -->
                   <router-link :to="{ path: `/contacts/${call.contact_id}` }"
-                              v-if="call.contact">
+                               class="mb-1"
+                               v-if="call.contact">
                     {{ call.contact.name | capitalize }}
                   </router-link>
 
                   <!-- lead number -->
-                  <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center mb-1">
                     <span>
                       {{ call.lead_number | fixPhone }}
                     </span>
                     <q-badge color="success"
                             class="rounded-badge bordered ml-1"
-                            v-if="call.first_time_caller"/>
+                            v-if="call.first_time_caller">
+                      <q-tooltip>
+                        First time caller
+                      </q-tooltip>
+                    </q-badge>
                   </div>
 
                   <!-- disposition -->
-                  <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center mb-1">
                     <i class="material-icons"
                       :style="{ color: dispositionStatusColor(call.contact.disposition_status_id) }">
                       label
@@ -157,14 +162,14 @@
                 </div>
 
                 <!-- tags -->
-                <div class="calls__table__contact__tags flex-grow-1 d-flex flex-column"
+                <div class="calls__table__contact__tags flex-grow-1 d-flex flex-column ml-1"
                      v-if="call.contact && call.contact.tags && call.contact.tags.length">
                   <div v-for="tag in getLastTags(call.contact.tags)"
                        :key="tag.id"
-                       class="d-flex align-items-center text-xs">
+                       class="d-flex align-items-center mb-1">
                     <i class="fa fa-circle"
                        :style="{ color: tag.color }"></i>
-                    <span class="ml-1 mb-1">{{ tag.name }}</span>
+                    <span class="ml-1">{{ tag.name }}</span>
                   </div>
                   <div class="d-flex justify-center"
                        v-if="call.contact.tags.length > 3">
@@ -172,6 +177,102 @@
                   </div>
                 </div>
               </div>
+            </td>
+
+            <!-- owner -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'owner_id'">
+              <span v-if="call.user">
+                {{ call.user.name | fixName }}
+              </span>
+              <div v-else>
+                <span>
+                  -
+                </span>
+              </div>
+            </td>
+
+            <!-- localtion -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'lead_location'">
+              <span class="text-greyish"
+                    v-if="call.state">
+                {{ call.city || '' }}{{ (call.city && call.state) ? ', ' : '' }}{{ call.state }}
+              </span>
+              <span v-else>
+                -
+              </span>
+            </td>
+
+            <!-- user -->
+            <td class="calls__table__user"
+                :key="`col-${colIndex}`"
+                v-if="column.name === 'user'">
+              <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}"
+                           v-if="call.rejected_by_app !== 0">
+                <q-icon class="status-icon d-inline-block text-danger"
+                        :state="call.rejected_by_app"
+                        :name="rejectionToIcon(call.rejected_by_app)">
+                  <q-tooltip>
+                    {{ rejectionTooltipData(call.rejected_by_app, call.type) }}
+                  </q-tooltip>
+                </q-icon>
+              </router-link>
+              <div class=""
+                   v-else-if="call.user_id && getUser(call.user_id)">
+                <span>{{ getUserName(getUser(call.user_id)) }}</span>
+              </div>
+              <div v-else>
+                <span>
+                  -
+                </span>
+              </div>
+            </td>
+
+            <!-- cold transfered -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'in_cold_transfer'">
+              <span>
+                {{ call.in_cold_transfer ? 'Yes' : 'No' }}
+              </span>
+            </td>
+
+            <!-- transfer type -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'transfer_type'">
+              <span>
+                {{ call.transfer_type | translateTransferTypeText }}
+              </span>
+            </td>
+
+            <!-- callback status -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'callback_status'">
+              <span>
+                {{ call.callback_status | translateCallbackStatusText }}
+              </span>
+            </td>
+
+            <!-- tags -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'tags'">
+              <communication-tags :communication="call" />
+            </td>
+
+            <!-- notes -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'notes'">
+              <wallboard-calls-note :communication="call" />
+            </td>
+
+            <!-- operations -->
+            <td :key="`col-${colIndex}`"
+                v-if="column.name === 'operations'">
+              <!-- go to messages -->
+              <!-- go to comm info -->
+              <!-- terminate comm -->
+              <!-- barge -->
+              <!-- whisper -->
             </td>
           </template>
         </tr>
@@ -193,10 +294,12 @@
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import CommunicationTags from 'src/components/generic-selectors/communication-tags.vue'
 import Datatable from 'src/components/datatable.vue'
 import RelativeTime from 'src/components/relative-time.vue'
+import WallboardCallsNote from 'src/components/wallboard/wallboard-calls-note.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
-import { aclMixin, callDispositionMixin, communicationInfoMixin, contactDispositionMixin } from 'src/plugins/mixins'
+import { aclMixin, callDispositionMixin, communicationInfoMixin, contactDispositionMixin, userMixin } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
@@ -206,12 +309,15 @@ export default {
     aclMixin,
     callDispositionMixin,
     communicationInfoMixin,
-    contactDispositionMixin
+    contactDispositionMixin,
+    userMixin
   ],
 
   components: {
+    CommunicationTags,
     Datatable,
-    RelativeTime
+    RelativeTime,
+    WallboardCallsNote
   },
 
   props: {
