@@ -269,10 +269,37 @@
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'operations'">
               <!-- go to messages -->
+              <router-link :to="{ path: `/contacts/${call.contact_id}` }"
+                            v-if="call.contact && call.type === 2 && hasPermissionTo('send sms')">
+                <button class="btn btn-sm btn-primary">
+                  <i class="material-icons">reply</i>
+                  <q-tooltip>
+                    Reply
+                  </q-tooltip>
+                </button>
+              </router-link>
+
               <!-- go to comm info -->
+              <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
+                <button class="btn btn-sm btn-light ml-1">
+                  <i class="material-icons">info_outline</i>
+                  <q-tooltip>
+                    More Details
+                  </q-tooltip>
+                </button>
+              </router-link>
+
               <!-- terminate comm -->
+              <!-- <terminate-communication-button :communication="call"
+                                              custom-class="btn-danger ml-1" /> -->
+
               <!-- barge -->
+              <barge-communication-button :communication="call"
+                                          custom-class="btn-warning ml-1" />
+
               <!-- whisper -->
+              <!-- <whisper-communication-button :communication="call"
+                                              custom-class="btn-dark ml-1" /> -->
             </td>
           </template>
         </tr>
@@ -294,12 +321,21 @@
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import BargeCommunicationButton from 'src/components/communication/barge-communication-button.vue'
 import CommunicationTags from 'src/components/generic-selectors/communication-tags.vue'
 import Datatable from 'src/components/datatable.vue'
 import RelativeTime from 'src/components/relative-time.vue'
+import TerminateCommunicationButton from 'src/components/communication/terminate-communication-button.vue'
 import WallboardCallsNote from 'src/components/wallboard/wallboard-calls-note.vue'
+import WhisperCommunicationButton from 'src/components/communication/whisper-communication-button.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
-import { aclMixin, callDispositionMixin, communicationInfoMixin, contactDispositionMixin, userMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  callDispositionMixin,
+  communicationInfoMixin,
+  contactDispositionMixin,
+  userMixin
+} from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
@@ -314,10 +350,13 @@ export default {
   ],
 
   components: {
+    BargeCommunicationButton,
     CommunicationTags,
     Datatable,
     RelativeTime,
-    WallboardCallsNote
+    TerminateCommunicationButton,
+    WallboardCallsNote,
+    WhisperCommunicationButton
   },
 
   props: {
@@ -342,6 +381,10 @@ export default {
     ...mapGetters('wallboard', {
       enabledColumns: 'getCallsEnabledColumns'
     }),
+
+    ...mapGetters('auth', [
+      'profile'
+    ]),
 
     ...mapState([
       'campaigns',

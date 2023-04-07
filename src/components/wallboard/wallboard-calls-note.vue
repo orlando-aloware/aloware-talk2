@@ -16,7 +16,9 @@
     </div>
     <div class="d-flex align-items-center"
          v-if="isEditingNote">
-      <communication-note :communication="communication"
+      <communication-note ref="communicationNote"
+                          :auto-focus="true"
+                          :communication="communication"
                           @notesBlurred="onEditNote(false)">
       </communication-note>
     </div>

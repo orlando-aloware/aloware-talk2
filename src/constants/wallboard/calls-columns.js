@@ -138,6 +138,7 @@ export const COLUMNS = [
     label: 'Operations',
     order: 18,
     sortable: false,
-    selectable: true
+    selectable: true,
+    minWidth: 200
   }
 ]

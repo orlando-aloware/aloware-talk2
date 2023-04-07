@@ -33,15 +33,15 @@ export default {
           'lead_number': '+18183925284',
           'target_users': [
             [
-              867
+              866
             ]
           ],
           'attempt': 1,
           'attempting_users': [
-            867
+            866
           ],
-          'user_id': 867,
-          'destination_number': 'client:agent867',
+          'user_id': 866,
+          'destination_number': 'client:agent866',
           'transfer_prior_user_ids': null,
           'transfer_target_user_ids': null,
           'in_cold_transfer': false,
