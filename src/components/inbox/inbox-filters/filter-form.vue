@@ -68,7 +68,7 @@
           <b-form-row class="mt-2">
             <b-col sm="12"
                    md="6"
-                   v-if="$route.name === 'Inbox' || isInboxOrAllCallsChannel">
+                   v-if="isInboxOrAllCallsChannel">
               <b-form-group class="form-label"
                             label="Ring Groups">
                 <ring-group-selector :force-remove-missing-values="true"
@@ -448,11 +448,11 @@ export default {
     },
 
     isMentionsOrInboxChannel () {
-      return ['mentions', 'inbox'].includes(this.$route.params.channel)
+      return this.$route.name === 'Inbox' || ['mentions', 'inbox'].includes(this.$route.params.channel)
     },
 
     isInboxOrAllCallsChannel () {
-      return ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes(this.$route.params.channel)
+      return this.$route.name === 'Inbox' || ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
