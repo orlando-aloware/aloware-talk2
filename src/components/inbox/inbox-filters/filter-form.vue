@@ -249,11 +249,12 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsOrInboxChannel">
+        <div>
           <h5 class="mt-4 section-header">Attribution</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
-                   md="6">
+                   md="6"
+                   v-if="!isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
                 <incoming-number-selector :multiple="true"
@@ -265,7 +266,8 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6">
+                   md="6"
+                   v-if="!isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Communication Owners">
                 <div class="comm-owner-filter-tooltip-wrapper">
@@ -298,7 +300,8 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6">
+                   md="6"
+                   v-if="!isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector :force-remove-missing-values="true"
@@ -312,7 +315,8 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6">
+                   md="6"
+                   v-if="!isMentionsChannel">
               <b-form-group class="form-label"
                             label="Contact Owners">
                 <user-selector custom-placeholder="Select Contact Owners"
