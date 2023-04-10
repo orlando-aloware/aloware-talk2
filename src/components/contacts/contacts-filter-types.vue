@@ -618,8 +618,11 @@ export default {
           break
 
         case 'number':
-          this.isValidated = (this.filterOperatorValue && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
-            (this.filterOperatorValue && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
+          // only numbers regex
+          const isValueValid = /^\d*$/.test(this.filterOperatorValue)
+
+          this.isValidated = (isValueValid && this.hasSecondaryOperator && this.secondaryFilterOperatorValue) ||
+            (isValueValid && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
           break
 
         case 'date':
