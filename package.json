@@ -27,6 +27,7 @@
     "@gkt/microphone": "^1.0.3",
     "@popperjs/core": "^2.9.2",
     "@quasar/extras": "^1.15.10",
+    "@sentry/browser": "^7.47.0",
     "@sentry/tracing": "^7.47.0",
     "@sentry/vue": "^7.34.0",
     "@twilio/voice-sdk": "^2.1.2",

@@ -150,7 +150,27 @@ if (
     },
     attachProps: true,
     trackComponents: true,
-    tracesSampleRate: process.env.MIX_SENTRY_TRACES_SAMPLE_RATE
+    tracesSampleRate: process.env.MIX_SENTRY_TRACES_SAMPLE_RATE,
+    ignoreErrors: [
+      'Non-Error promise rejection captured with value: undefined',
+      'Cannot read property \'is_reseller\' of null',
+      'Cannot set property \'_height\' of undefined',
+      'Cannot read property \'offsetHeight\' of undefined',
+      'No error message',
+      '$ is not defined',
+      'ResizeObserver loop limit exceeded',
+      'ResizeObserver loop completed with undelivered notifications.',
+      'Request failed with status code 504',
+      'Request failed with status code 500',
+      'Action timed out',
+      'Network Error',
+      'Expired token',
+      'Network request failed',
+      'Failed to fetch',
+      'NetworkError',
+      'Navigation cancelled from',
+      'Blocked a frame with origin'
+    ]
   })
 
   Sentry.configureScope((scope) => {
@@ -186,13 +206,13 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         }
 
         if (response.data.errors.length && response.data.error) {
-          message.data = `<p class="pt-1 pb-1">- ${response.data.error}</p>`
+          message.data = `<p class='pt-1 pb-1'>- ${response.data.error}</p>`
         }
 
         if (response.data.errors.length) {
           response.data.errors = ''
           for (error.data of response.data.errors) {
-            message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
+            message.data += `<p class='pt-1 pb-1'>- ${error.data}</p>`
           }
         }
 
@@ -213,7 +233,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         message.data = ''
         const keys = Object.keys(response.data.errors)
         keys.forEach((value) => {
-          message.data += keys.length > 1 ? `<p class="pt-1 pb-1">- ${response.data.errors[value]}</p>` : response.data.errors[value]
+          message.data += keys.length > 1 ? `<p class='pt-1 pb-1'>- ${response.data.errors[value]}</p>` : response.data.errors[value]
         })
         break
       case 500:
