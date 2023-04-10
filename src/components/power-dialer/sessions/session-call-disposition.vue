@@ -124,6 +124,7 @@ export default {
         if (res?.id) {
           this.selectedCallDisposition = res?.call_disposition_id
         }
+
         this.onCallDisposed(data.id)
         this.$refs.callDispositionSelector.hideLoading()
       }).catch((err) => {

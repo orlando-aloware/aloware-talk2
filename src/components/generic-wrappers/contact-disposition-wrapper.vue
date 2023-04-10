@@ -9,7 +9,7 @@
 
 <script>
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'contact-disposition-wrapper',
@@ -55,14 +55,11 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setDialerContact']),
-
     changeContactDisposition (dispositionStatusId) {
       this.loadingContactDisposition = true
       this.$axios.post('/api/v1/contact/' + this.contact.id + '/dispose', {
         disposition_status: dispositionStatusId
       }).then((res) => {
-        // this.setDialerContact(res.data)
         this.loadingContactDisposition = false
         this.dispositionStatusId = dispositionStatusId
         this.$emit('change', dispositionStatusId)

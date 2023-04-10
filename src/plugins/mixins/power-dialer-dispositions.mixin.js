@@ -4,7 +4,6 @@ import { clone } from 'lodash'
 export default {
   data () {
     return {
-      dispositions: [],
       type: null
     }
   },
@@ -34,15 +33,8 @@ export default {
           break
       }
 
-      console.log('this.$options.name: ', this.$options.name)
-      console.log('this.type: ', this.type)
-      console.log('this.$route.meta.id: ', this.$route.meta.id)
-      console.log('dispositions: ', dispositions)
-      console.log('idProperty: ', idProperty)
-      console.log('this.sessionSettings[idProperty]: ', this.sessionSettings[idProperty])
       if (this.$route.meta.id === 'power-dialer-session' && dispositions &&
         this.sessionSettings[idProperty] && this.sessionSettings[idProperty].length > 0) {
-        console.log('IN PD!')
         return dispositions.filter(disposition => {
           return this.sessionSettings[idProperty].includes(disposition.id)
         })
