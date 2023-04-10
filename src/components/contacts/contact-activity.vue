@@ -449,8 +449,7 @@ export default {
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
-      CommunicationTypes,
-      ContactThreadStatusTypes
+      CommunicationTypes
     }
   },
 
