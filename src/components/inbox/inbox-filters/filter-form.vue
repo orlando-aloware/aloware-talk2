@@ -154,13 +154,13 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsOrInboxChannel">
+        <div v-if="!isMentions">
           <h5 class="mt-4 section-header">Properties</h5>
           <b-form-row class="mt-2">
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            label="Tags">
+                            :label="tagsFilterLabel">
                 <tag-selector ref="tagSelector"
                               :multiple="true"
                               :highlighted="isChanged('tags')"
@@ -171,7 +171,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="!isInbox && isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -182,7 +182,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row>
+          <b-form-row v-if="!isInbox">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -444,7 +444,11 @@ export default {
     },
 
     isMentionsChannel () {
-      return ['mentions'].includes(this.$route.params.channel)
+      return this.$route.params.channel === 'mentions'
+    },
+
+    isInbox () {
+      return this.$route.name === 'Inbox' || this.$route.params.channel === 'inbox'
     },
 
     isMentionsOrInboxChannel () {
@@ -452,7 +456,8 @@ export default {
     },
 
     isInboxOrAllCallsChannel () {
-      return this.$route.name === 'Inbox' || ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes(this.$route.params.channel)
+      return this.$route.name === 'Inbox' ||
+        ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
@@ -465,6 +470,10 @@ export default {
 
     isMessagesOnlyChannel () {
       return ['messages', 'all-communications'].includes(this.$route.params.channel)
+    },
+
+    tagsFilterLabel () {
+      return this.isInbox ? 'Contact Tags' : 'Tags'
     }
   },
 

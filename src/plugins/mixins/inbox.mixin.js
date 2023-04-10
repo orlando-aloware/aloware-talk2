@@ -2,6 +2,7 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import { isEmpty } from 'lodash'
 
 export default {
 
@@ -12,7 +13,9 @@ export default {
       'liveContacts',
       'inboxShowMyContacts'
     ]),
+
     ...mapState('auth', ['profile']),
+
     nextPage () {
       return this.contactsCurrentPage + 1
     }
@@ -62,7 +65,6 @@ export default {
       contacts: [],
       cancelToken: null,
       source: null
-
     }
   },
 
@@ -81,6 +83,7 @@ export default {
       'gettingTasksList',
       'setTaskCount'
     ]),
+
     getNoneLiveCallContactTasks (contacts) {
       if (this.liveContacts.length >= 0) {
         // get all live contacts id
@@ -90,21 +93,23 @@ export default {
         // we are getting some duplicate records from the api so we implemented reduce and remove those dupes
         return contacts.filter(item => !ids.includes(item.id)).reduce((acc, current) => {
           const x = acc.find(item => item.id === current.id)
+
           if (!x) {
             return acc.concat([current])
-          } else {
-            return acc
           }
+
+          return acc
         }, [])
-      } else {
-        return contacts.filter(contact => (contact.last_communication &&
-          ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2)) || !contact.last_communication)
       }
+
+      return contacts.filter(contact => (contact.last_communication &&
+        ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2)) || !contact.last_communication)
     },
+
     getLiveCallContactTasks (contacts) {
       return contacts.filter(contact => contact.last_communication &&
         [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
@@ -113,10 +118,12 @@ export default {
           CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
           CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
     },
+
     loadContactTasks (loadCount = true, showLoading = true) {
       this.setIsInboxFiltersLoaded(this.isLoaded)
       this.gettingTasksList(false)
       this.taskListHasError = false
+
       if (showLoading) {
         this.gettingContactsList(true)
         this.setContacts([])
@@ -133,15 +140,19 @@ export default {
         if (this.currentTask === ContactTaskStatus.STATUS_PENDING && showLoading) {
           this.setLoadingPendingTaskCount(true)
         }
+
         this.getContactsCountByTaskStatus(this.currentTask)
       }
+
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.taskListHasError = false
+
         if (response) {
           // only empty contacts after the request is done since we are now showing the animation
           if (!showLoading) {
             this.setContacts([])
           }
+
           this.setContacts(this.getNoneLiveCallContactTasks(response.data.data))
           this.gettingContactsList(false)
           this.setContactsCurrentPage(response.data.current_page)
@@ -155,23 +166,28 @@ export default {
           console.log(thrown.message)
         } else {
           this.taskListHasError = true
+
           if (showLoading) {
             this.gettingContactsList(false)
           }
+
           this.$generalNotification(`An exception was encountered while fetching contact tasks.`, 'error')
         }
+
         this.isLoaded = true
         this.setIsInboxFiltersLoaded(this.isLoaded)
       })
     },
+
     loadMoreContactTasks () {
       this.isLoaded = false
       this.isLoadingMore = true
+
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
         this.setContacts([...this.contacts, ...this.getNoneLiveCallContactTasks(response.data.data)])
-
         this.setContactsCurrentPage(response.data.current_page)
         this.setHasMoreContacts(response.data.next_page_url)
+
         this.isLoadingMore = false
         this.isLoaded = true
       }).catch(() => {
@@ -179,11 +195,14 @@ export default {
         this.setIsInboxFiltersLoaded(this.isLoaded)
       })
     },
+
     getContactsByTaskStatus (taskId) {
       this.source.cancel('Loading of contact task operation is canceled by the user.')
       this.source = this.cancelToken.source()
+
       return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
+
     getContactsCountByTaskStatus (taskId) {
       return talk2Api.V2.contacts.counts(this.getParameters(taskId, true)).then(response => {
         if (response) {
@@ -196,19 +215,23 @@ export default {
             this.setPendingTaskCount(response.data.count)
             this.setLoadingPendingTaskCount(false)
           }
-        } else {
-          if (taskId === ContactTaskStatus.STATUS_OPEN) {
-            this.setLoadingOpenTaskCount(false)
-          }
 
-          if (taskId === ContactTaskStatus.STATUS_PENDING) {
-            this.setLoadingPendingTaskCount(false)
-          }
+          return
+        }
+
+        if (taskId === ContactTaskStatus.STATUS_OPEN) {
+          this.setLoadingOpenTaskCount(false)
+        }
+
+        if (taskId === ContactTaskStatus.STATUS_PENDING) {
+          this.setLoadingPendingTaskCount(false)
         }
       })
     },
+
     getParameters (taskId, count = false) {
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
+      query.relations = []
 
       this.resetFilters()
       query.filter_groups = []
@@ -244,16 +267,22 @@ export default {
         this.filters = { ...this.filters, 'last_engagement_at': { value: [this.filter.from_date, this.filter.to_date], operator: 5 } }
       }
 
+      if (this.filter && !isEmpty(this.filter.tags)) {
+        this.filters = { ...this.filters, 'tags': { value: this.filter.tags, operator: 1 } }
+        query.relations.push('tags')
+      }
+
       query.filter_groups.push({ 'filters': this.filters, 'is_conjunction': true })
 
       if (!count) {
-        query.relations = ['lastCommunication']
+        query.relations.push('lastCommunication')
       }
 
       query.timezone = window.timezone
 
       return query
     },
+
     resetFilters () {
       this.filters = {
         contact_task_status: {
@@ -264,6 +293,7 @@ export default {
         }
       }
     },
+
     setContact (updatedContact) {
       const index = this.contacts.findIndex(item => parseInt(item.id) === parseInt(updatedContact.id))
 
@@ -271,14 +301,17 @@ export default {
         Object.assign(this.contacts[index], updatedContact)
       }
     },
+
     setContacts (contacts) {
       this.contacts = contacts
     },
+
     fetchTaskCounts () {
       this.setLoadingPendingTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       this.setLoadingOpenTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+
       return talk2Api.V2.contacts.inboxCounts().then(res => {
         this.setTaskCount({
           new: res.data.open,
