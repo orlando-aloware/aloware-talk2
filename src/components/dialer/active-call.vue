@@ -215,9 +215,7 @@ export default {
     },
 
     togglePhone () {
-      if (this.$route.meta.id !== 'power-dialer-session') {
-        this.$VueEvent.fire('togglePhone')
-      }
+      this.$VueEvent.fire('togglePhone')
     },
 
     getContactName (contactName) {

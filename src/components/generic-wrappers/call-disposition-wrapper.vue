@@ -64,6 +64,12 @@ export default {
         this.$emit('change', callDispositionId)
       })
     }
+  },
+
+  watch: {
+    'communication.call_disposition_id': function (newValue) {
+      this.callDispositionId = newValue
+    }
   }
 }
 </script>

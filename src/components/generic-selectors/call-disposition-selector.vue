@@ -14,7 +14,7 @@
             :use-chips="useChips"
             :use-input="useInput"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            :options="callDispositionsOptions"
+            :options="options"
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
@@ -82,11 +82,14 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import { powerDialerDispositionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'call-disposition-selector',
 
   components: { RemoveTagIcon },
+
+  mixins: [powerDialerDispositionsMixin],
 
   props: {
     value: {
@@ -145,8 +148,9 @@ export default {
   data () {
     return {
       callDisposition: this.value,
-      callDispositionsOptions: [],
-      selectWidth: 0
+      options: [],
+      selectWidth: 0,
+      type: 'call'
     }
   },
 
@@ -164,18 +168,6 @@ export default {
         default:
           return ''
       }
-    },
-
-    callDispositionsAlphabeticalOrder () {
-      if (this.callDispositions) {
-        return _.clone(this.callDispositions).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
-      }
-
-      return []
     },
 
     callDispositionId () {
@@ -219,7 +211,7 @@ export default {
   },
 
   created () {
-    this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder
+    this.options = this.orderedDispositions
     this.callDisposition = this.multiple ? [] : this.callDisposition
     this.getCallDisposition()
   },
@@ -230,7 +222,7 @@ export default {
         this.callDisposition = []
         const callDispId = { data: null }
         for (callDispId.data in this.values) {
-          const found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === callDispId.data)
+          const found = this.orderedDispositions.find(callDispo => callDispo.id === callDispId.data)
 
           if (found) {
             this.callDisposition.push(found)
@@ -240,7 +232,7 @@ export default {
       }
 
       if (!_.isEmpty(this.values) && !this.multiple) {
-        this.callDisposition = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === this.values)
+        this.callDisposition = this.orderedDispositions.find(callDispo => callDispo.id === this.values)
       }
     },
 
@@ -251,21 +243,21 @@ export default {
     filterFn (val, update) {
       if (this.callDispositionId && val === this.callDispositionId) {
         update(() => {
-          this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder.filter(script => script.id === this.callDispositionId)
+          this.options = this.orderedDispositions.filter(script => script.id === this.callDispositionId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder
+          this.options = this.orderedDispositions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder.filter(script => script.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.orderedDispositions.filter(script => script.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },

@@ -51,13 +51,17 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
 import { get, isEmpty } from 'lodash'
-import { dispositionsMixin } from 'src/plugins/mixins'
+import {
+  dispositionsMixin,
+  powerDialerDispositionsMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'SessionCallDisposition',
 
   mixins: [
-    dispositionsMixin
+    dispositionsMixin,
+    powerDialerDispositionsMixin
   ],
 
   components: {
@@ -75,7 +79,6 @@ export default {
     ]),
 
     ...mapState([
-      'callDispositions',
       'dispositionStatuses',
       'dialer'
     ]),
@@ -85,31 +88,8 @@ export default {
     ]),
 
     ...mapGetters('powerDialer', [
-      'sessionLoader',
-      'sessionSettings'
+      'sessionLoader'
     ]),
-
-    filteredCallDispositions () {
-      if (this.sessionSettings.call_disposition_ids &&
-        this.sessionSettings.call_disposition_ids.length > 0) {
-        return this.callDispositions.filter(d => {
-          return this.sessionSettings.call_disposition_ids.includes(d.id)
-        })
-      }
-
-      return this.callDispositions
-    },
-
-    filteredContactDispositions () {
-      if (this.sessionSettings.contact_disposition_ids &&
-        this.sessionSettings.contact_disposition_ids.length > 0) {
-        return this.dispositionStatuses.filter(d => {
-          return this.sessionSettings.contact_disposition_ids.includes(d.id)
-        })
-      }
-
-      return this.dispositionStatuses
-    },
 
     contactDisposition () {
       return this.selectedContactDisposition || this.contact?.disposition_status_id
@@ -125,6 +105,8 @@ export default {
       'updateContactDisposition',
       'updateCallDisposition'
     ]),
+
+    ...mapActions(['setDialerContact']),
 
     async onSelectedCallDisposition (data) {
       const communicationId = get(this.dialer, 'communication.id', null)
@@ -142,7 +124,6 @@ export default {
         if (res?.id) {
           this.selectedCallDisposition = res?.call_disposition_id
         }
-
         this.onCallDisposed(data.id)
         this.$refs.callDispositionSelector.hideLoading()
       }).catch((err) => {
@@ -173,6 +154,7 @@ export default {
           this.selectedContactDisposition = status.id
         }
 
+        this.setDialerContact(res)
         this.onContactDisposed(data.id)
         this.$refs.contactDispositionSelector.hideLoading()
       }).catch((err) => {

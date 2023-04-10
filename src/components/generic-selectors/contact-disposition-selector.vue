@@ -66,14 +66,14 @@
 
 <script>
 import { mapState } from 'vuex'
-import _ from 'lodash'
-import { selectorMixin } from 'src/plugins/mixins'
+import { selectorMixin, powerDialerDispositionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-disposition-selector',
 
   mixins: [
-    selectorMixin
+    selectorMixin,
+    powerDialerDispositionsMixin
   ],
 
   props: {
@@ -158,8 +158,9 @@ export default {
     return {
       selectedId: this.value,
       options: [],
+      type: 'contact',
       reference: 'contactDispositionSelect',
-      fullOptionsProperty: 'contactDispositionsAlphabeticalOrder'
+      fullOptionsProperty: 'orderedDispositions'
     }
   },
 
@@ -181,18 +182,6 @@ export default {
         default:
           return ''
       }
-    },
-
-    contactDispositionsAlphabeticalOrder () {
-      if (this.dispositionStatuses) {
-        return _.clone(this.dispositionStatuses).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
-      }
-
-      return []
     },
 
     selectorClass () {
@@ -222,29 +211,29 @@ export default {
     }
   },
 
-  mounted () {
-    this.options = this.contactDispositionsAlphabeticalOrder
+  created () {
+    this.options = this.orderedDispositions
   },
 
   methods: {
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.options = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.id === this.selectedId)
+          this.options = this.orderedDispositions.filter(contactDisposition => contactDisposition.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.options = this.contactDispositionsAlphabeticalOrder
+          this.options = this.orderedDispositions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.orderedDispositions.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
@@ -261,8 +250,8 @@ export default {
       this.showInputPlaceholder()
     },
 
-    contactDispositionsAlphabeticalOrder () {
-      this.options = this.contactDispositionsAlphabeticalOrder
+    orderedDispositions () {
+      this.options = this.orderedDispositions
     }
   }
 }
