@@ -289,17 +289,17 @@
                 </button>
               </router-link>
 
-              <!-- terminate comm -->
-              <!-- <terminate-communication-button :communication="call"
-                                              custom-class="btn-danger ml-1" /> -->
+              <!-- terminate -->
+              <terminate-communication-button :communication="call"
+                                              custom-class="btn-danger ml-1" />
 
               <!-- barge -->
               <barge-communication-button :communication="call"
                                           custom-class="btn-warning ml-1" />
 
               <!-- whisper -->
-              <!-- <whisper-communication-button :communication="call"
-                                              custom-class="btn-dark ml-1" /> -->
+              <whisper-communication-button :communication="call"
+                                            custom-class="btn-dark ml-1" />
             </td>
           </template>
         </tr>
