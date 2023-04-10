@@ -154,7 +154,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentions">
+        <div v-if="!isMentionsChannel">
           <h5 class="mt-4 section-header">Properties</h5>
           <b-form-row class="mt-2">
             <b-col md="6"
@@ -164,6 +164,7 @@
                 <tag-selector ref="tagSelector"
                               :multiple="true"
                               :highlighted="isChanged('tags')"
+                              :category="tagsFilterCategory"
                               v-model="filter.tags"
                               @change="(eventPayload) => onFilterChange(eventPayload, 'tags')">
                 </tag-selector>
@@ -372,6 +373,7 @@ import { mapActions, mapState } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import * as TagCategory from 'src/constants/tag-categories'
 
 export default {
   name: 'filter-form',
@@ -474,6 +476,10 @@ export default {
 
     tagsFilterLabel () {
       return this.isInbox ? 'Contact Tags' : 'Tags'
+    },
+
+    tagsFilterCategory () {
+      return this.isInbox ? TagCategory.CAT_CONTACTS : TagCategory.CAT_COMMUNICATIONS
     }
   },
 
@@ -496,7 +502,8 @@ export default {
         'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
-      rangePicker: null
+      rangePicker: null,
+      TagCategory
     }
   },
 
