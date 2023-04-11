@@ -1139,6 +1139,8 @@ export default {
         return
       }
 
+      this.filter.my_contact = +showMyContacts
+
       if (showMyContacts) {
         this.filter.contact_owner = []
         this.updateChannelChangedFilterFields({
