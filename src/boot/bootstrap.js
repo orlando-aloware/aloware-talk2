@@ -546,8 +546,8 @@ String.prototype.capitalize = function () {
 
 Vue.prototype.$alphabeticalSort = (items, property = 'name') => {
   return window._.clone(items).sort((a, b) => {
-    const textA = a.property.toUpperCase()
-    const textB = b.property.toUpperCase()
+    const textA = a[property].toUpperCase()
+    const textB = b[property].toUpperCase()
     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
   })
 }

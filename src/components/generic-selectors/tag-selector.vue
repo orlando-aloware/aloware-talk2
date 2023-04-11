@@ -79,6 +79,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { mapState } from 'vuex'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'tags-selector',
@@ -184,6 +185,10 @@ export default {
     },
 
     optionsAlphabeticalOrder () {
+      if (isEmpty(this.filteredOptions)) {
+        return this.filteredOptions
+      }
+
       return this.$alphabeticalSort(this.filteredOptions)
     }
   },

@@ -316,7 +316,10 @@ export default {
             // find the tags filter and sort the options alphabetically
             const tagsFilter = filters.find(filter => filter.label === 'Tags')
             const tagsFilterIndex = filters.indexOf(tagsFilter)
-            filters[tagsFilterIndex].options = this.$alphabeticalSort(tagsFilter.options, 'label')
+
+            if (!isEmpty(tagsFilter)) {
+              filters[tagsFilterIndex].options = this.$alphabeticalSort(tagsFilter.options, 'label')
+            }
 
             this.setFilters(filters)
             this.visibleListFilters = this.generateListFilters()

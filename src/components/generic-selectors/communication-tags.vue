@@ -21,7 +21,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import * as TagCategory from 'src/constants/tag-categories'
-import { clone } from 'lodash'
+import { clone, isEmpty } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 import AddIconCircle from 'components/icons/add-icon-circle'
 
@@ -72,13 +72,13 @@ export default {
     },
 
     tagsAlphabeticalOrder () {
-      if (this.availableTags) {
-        const tags = this.category ? clone(this.availableTags).filter(tag => tag.category === this.category) : clone(this.availableTags)
-
-        return this.$alphabeticalSort(tags)
+      if (isEmpty(this.availableTags)) {
+        return this.availableTags
       }
 
-      return []
+      const tags = this.category ? clone(this.availableTags).filter(tag => tag.category === this.category) : clone(this.availableTags)
+
+      return this.$alphabeticalSort(tags)
     },
 
     companyTagsAlphabeticalOrder () {
