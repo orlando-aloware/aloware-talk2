@@ -21,7 +21,7 @@ export default {
           'id': 179953,
           'company_id': 7,
           'campaign_id': 722,
-          'ring_group_id': null,
+          'ring_group_id': 295,
           'owner_id': 867,
           'workflow_id': null,
           'broadcast_id': null,

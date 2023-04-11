@@ -27,14 +27,16 @@ export const COLUMNS = [
     label: 'Ring Group',
     order: 3,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 150
   },
   {
     name: 'workflow',
     label: 'Sequence',
     order: 4,
     sortable: true,
-    selectable: true
+    selectable: true,
+    minWidth: 150
   },
   {
     name: 'start',

@@ -1,7 +1,6 @@
 <template>
   <div class="calls__header">
-    <search placeholder="Search Agent"
-            @search="onSearch"/>
+    <wallboard-agent-name />
     <div class="flex-grow-1 text-right">
       <wallboard-calls-columns-dropdown />
     </div>
@@ -9,21 +8,15 @@
 </template>
 
 <script>
-import Search from 'src/components/search.vue'
+import WallboardAgentName from 'src/components/wallboard/wallboard-agent-name.vue'
 import WallboardCallsColumnsDropdown from 'src/components/wallboard/wallboard-calls-columns-dropdown.vue'
 
 export default {
   name: 'wallboard-calls-header',
 
   components: {
-    Search,
+    WallboardAgentName,
     WallboardCallsColumnsDropdown
-  },
-
-  methods: {
-    onSearch (data) {
-      this.$emit('agent', data)
-    }
   }
 }
 </script>
