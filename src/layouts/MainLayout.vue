@@ -2320,6 +2320,12 @@ export default {
 
     getStatics (repeatTimes = 0) {
       this.setStaticsLoaded(false)
+
+      // sanity check
+      if (!this.currentCompany) {
+        return
+      }
+
       talk2Api.V1.statics.get(this.currentCompany?.id)
         .then(res => {
           this.setStatics(res.data)
