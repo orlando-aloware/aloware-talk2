@@ -17,7 +17,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import GenericMultiSelect from 'src/components/generic-selectors/generic-multi-select'
 import * as TagCategory from 'src/constants/tag-categories'
-import _ from 'lodash'
+import { clone } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 
 export default {
@@ -50,6 +50,7 @@ export default {
 
   computed: {
     ...mapState(['tagsFullyLoaded', 'tags']),
+
     availableTags () {
       if (this.options) {
         return this.options.filter((tag) => {
@@ -62,15 +63,13 @@ export default {
 
     tagsAlphabeticalOrder () {
       if (this.availableTags) {
-        const tags = { data: _.clone(this.availableTags) }
+        const tags = { data: clone(this.availableTags) }
+
         if (this.category) {
           tags.data = tags.data.filter(tag => tag.category === this.category)
         }
-        return tags.data.sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
+
+        return this.$alphabeticalSort(tags.data)
       }
 
       return []
@@ -157,6 +156,7 @@ export default {
       const params = {
         full_load: true
       }
+
       return this.$axios.get('/api/v1/tag', { params }).then(res => {
         this.options = res.data
         this.loadingTags = false
@@ -173,6 +173,7 @@ export default {
       }
 
       this.loadingTag = true
+
       this.$axios.post('/api/v1/contact/' + this.contact.id + '/tag', {
         tags: tags
       }).then(res => {
@@ -183,13 +184,16 @@ export default {
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingTag = false
+
         if (this.contact.tags) {
           this.contact.tag_ids = this.contact.tags.map((o) => o.id)
         }
       })
     },
+
     ...mapActions(['setTagsFullyLoaded'])
   },
+
   watch: {
     tags: {
       deep: true,

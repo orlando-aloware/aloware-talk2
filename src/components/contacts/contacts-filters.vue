@@ -165,7 +165,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import { get, isEmpty, isEqual } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Search from 'src/components/search.vue'
 import ContactsFilterTypes from 'src/components/contacts/contacts-filter-types.vue'
@@ -224,7 +224,7 @@ export default {
     ]),
 
     filtersFiltered () {
-      if (_.isEmpty(this.visibleListFilters) &&
+      if (isEmpty(this.visibleListFilters) &&
         (!this.filterSearch || !this.filterSearch.length)) {
         return this.filters
       }
@@ -237,7 +237,7 @@ export default {
     },
 
     isEmptyListFilters () {
-      return _.isEmpty(this.visibleListFilters)
+      return isEmpty(this.visibleListFilters)
     },
 
     filterByGroup () {
@@ -311,7 +311,14 @@ export default {
         return talk2Api.V2.filters.get()
           .then(response => {
             this.loadingFilters = false
-            this.setFilters(response.data.filters)
+
+            const filters = response.data.filters
+            // find the tags filter and sort the options alphabetically
+            const tagsFilter = filters.find(filter => filter.label === 'Tags')
+            const tagsFilterIndex = filters.indexOf(tagsFilter)
+            filters[tagsFilterIndex].options = this.$alphabeticalSort(tagsFilter.options, 'label')
+
+            this.setFilters(filters)
             this.visibleListFilters = this.generateListFilters()
             return Promise.resolve()
           })
@@ -435,12 +442,12 @@ export default {
           let filterData = null
 
           // evaluate list filter's operator against its actual respective filter's operators
-          if (_.get(filterExists, 'operators', null)) {
+          if (get(filterExists, 'operators', null)) {
             filterData = filterGroups[groupIndex].filters[filterKey]
 
             // try to search for the selected option
             const operatorData = filterExists.operators.find(item => item.value === filterData.operator)
-            const options = operatorData ? _.get(operatorData, 'options', null) : null
+            const options = operatorData ? get(operatorData, 'options', null) : null
             const option = options ? options.find(item => item.value === filterData.value) : null
 
             // set values into an array
@@ -465,7 +472,7 @@ export default {
               field,
               key: filterKey,
               label: filterExists.label,
-              operator: operatorData ? _.get(operatorData, 'label', null) : null,
+              operator: operatorData ? get(operatorData, 'label', null) : null,
               trueValue: trueValue,
               value: JSON.stringify((trueValue ? [trueValue.join(' and ')] : trueValue)),
               default: filterData.default || 0
@@ -495,7 +502,7 @@ export default {
       const filterFound = this.filters.find(filter => filter.key === key)
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
-      const isSimpleType = filterFound && _.get(filterFound, 'type', null)
+      const isSimpleType = filterFound && get(filterFound, 'type', null)
       const isSelectionType = filterFound && filterFound.type === 'selection' // DNC or opt out filter
       let values = []
       let labels = []
@@ -563,13 +570,13 @@ export default {
       delete updatedFilter[index].filters[key]
 
       if (typeof updatedFilter[index] !== 'undefined' &&
-        _.isEmpty(updatedFilter[index].filters) &&
+        isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
       }
 
       if (typeof updatedFilter[index] !== 'undefined' &&
-        _.isEmpty(updatedFilter[index].filters) &&
+        isEmpty(updatedFilter[index].filters) &&
         updatedFilter.constructor.name === 'Object') {
         delete updatedFilter[index]
 
@@ -580,7 +587,7 @@ export default {
 
       updatedFilter = this.reindexFilters(updatedFilter)
 
-      if (!_.isEqual(updatedFilter, initialListFilters)) {
+      if (!isEqual(updatedFilter, initialListFilters)) {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
 
@@ -607,7 +614,7 @@ export default {
 
       updatedFilter = this.reindexFilters(updatedFilter)
 
-      if (!_.isEqual(this.updatedFilter, this.currentListFilters)) {
+      if (!isEqual(this.updatedFilter, this.currentListFilters)) {
         this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       }
 
@@ -667,7 +674,6 @@ export default {
     ...mapActions('contacts', [
       'openFilters',
       'closeFilters',
-      'setFilters',
       'setCurrentListFilters',
       'updateContactsListFilter',
       'setListContactsLoaded'

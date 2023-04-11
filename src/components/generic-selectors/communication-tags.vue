@@ -21,9 +21,10 @@ import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import * as TagCategory from 'src/constants/tag-categories'
-import _ from 'lodash'
+import { clone } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 import AddIconCircle from 'components/icons/add-icon-circle'
+
 export default {
   name: 'communication-tags',
 
@@ -72,12 +73,9 @@ export default {
 
     tagsAlphabeticalOrder () {
       if (this.availableTags) {
-        const tags = this.category ? _.clone(this.availableTags).filter(tag => tag.category === this.category) : _.clone(this.availableTags)
-        return tags.sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
+        const tags = this.category ? clone(this.availableTags).filter(tag => tag.category === this.category) : clone(this.availableTags)
+
+        return this.$alphabeticalSort(tags)
       }
 
       return []

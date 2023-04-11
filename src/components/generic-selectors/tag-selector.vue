@@ -3,7 +3,7 @@
     <generic-multi-select :label="label"
                           :buttonText="buttonText"
                           :values="selectedTags"
-                          :options="filteredOptions"
+                          :options="optionsAlphabeticalOrder"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           v-if="genericMultiselect"
                           @valuesUpdated="select">
@@ -21,7 +21,7 @@
               menu-shrink
               outlined
               dense
-              :options="filteredOptions"
+              :options="optionsAlphabeticalOrder"
               :placeholder="placeholder"
               :disable="disable"
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '']"
@@ -181,6 +181,10 @@ export default {
       }
 
       return this[tagsVarName].filter(tag => tag.category === this.category)
+    },
+
+    optionsAlphabeticalOrder () {
+      return this.$alphabeticalSort(this.filteredOptions)
     }
   },
 
