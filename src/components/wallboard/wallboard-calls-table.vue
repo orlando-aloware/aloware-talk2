@@ -19,13 +19,12 @@
               :key="`${index}`">
             <template v-for="(column, colIndex) in filteredColumns">
               <!-- colapse button-->
-              <td :key="`col-${colIndex}`"
+              <td :class="['calls__table__collapse', { 'calls__table__collapse--collapsed': expandedItem === index }]"
+                  :key="`col-${colIndex}`"
                   v-if="column.name === 'details'">
                 <span class="cursor-pointer"
                       @click="setExpandedItem(index)">
-                  <i class="material-icons">
-                    arrow_forward_ios
-                  </i>
+                  <i class="material-icons">arrow_forward_ios</i>
                   <q-tooltip>
                     {{ expandedItem !== index ? 'See details' : 'Hide details' }}
                   </q-tooltip>
@@ -35,7 +34,7 @@
               <!-- icon -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'disposition'">
-                <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
+                <router-link :to="{ name: 'Communication', params: { contactId: call.contact_id, communicationId: call.id }}">
                     <component :is="stateToIcon(call.disposition_status2, call.type, call.direction, call.callback_status)"
                               v-if="call.disposition_status2">
                     </component>
@@ -44,8 +43,6 @@
                     </q-tooltip>
                 </router-link>
               </td>
-
-              <!-- line ? -->
 
               <!-- incoming number -->
               <td :key="`col-${colIndex}`"
@@ -78,15 +75,15 @@
               <!-- start time -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'start'">
-                <span class="text-greyish">
+                <span>
                   {{ call.created_at | fixFullDateTime }}
                 </span>
-                  <div class="d-flex align-items-center justify-content-left"
-                  v-if="call.call_disposition_id">
-                    <i class="fa fa-bolt"
-                      :style="{ color: callDispositionColor(call.call_disposition_id) }"></i>
-                    <span class="ml-1">{{ callDispositionName(call.call_disposition_id) }}</span>
-                  </div>
+                <div class="d-flex align-items-center justify-content-left"
+                     v-if="call.call_disposition_id">
+                  <i class="fa fa-bolt"
+                    :style="{ color: callDispositionColor(call.call_disposition_id) }"></i>
+                  <span class="ml-1">{{ callDispositionName(call.call_disposition_id) }}</span>
+                </div>
               </td>
 
               <!-- wait time -->
@@ -95,21 +92,19 @@
                   <span v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(call.type)">
                     {{ call.wait_time | fixDuration }}
                   </span>
-                  <span v-else>
-                    --
-                  </span>
+                  <span v-else>--</span>
               </td>
 
               <!-- talk time -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'talk_time'">
                 <div class="d-flex flex-column"
-                    v-if="[CommunicationTypes.CALL].includes(call.type)">
+                     v-if="[CommunicationTypes.CALL].includes(call.type)">
                   <span v-if="call.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW">
                     {{ call.talk_time | fixDuration }}
                   </span>
                   <relative-time :from-time="call.created_at"
-                                  v-else-if="call.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW">
+                                 v-else-if="call.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW && call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW">
                   </relative-time>
                 </div>
                 <div class="d-flex align-items-center justify-content-left">
@@ -138,8 +133,8 @@
                   <div class="d-flex flex-column justify-center flex-grow-1">
                     <!-- contact with link -->
                     <router-link :to="{ path: `/contacts/${call.contact_id}` }"
-                                class="mb-1"
-                                v-if="call.contact">
+                                 class="mb-1"
+                                 v-if="call.contact">
                       {{ call.contact.name | capitalize }}
                     </router-link>
 
@@ -149,11 +144,9 @@
                         {{ call.lead_number | fixPhone }}
                       </span>
                       <q-badge color="success"
-                              class="rounded-badge bordered ml-1"
-                              v-if="call.first_time_caller">
-                        <q-tooltip>
-                          First time caller
-                        </q-tooltip>
+                               class="rounded-badge bordered ml-1"
+                               v-if="call.first_time_caller">
+                        <q-tooltip>First time caller</q-tooltip>
                       </q-badge>
                     </div>
 
@@ -171,7 +164,9 @@
                     <!-- company -->
                     <div class="d-flex align-items-center">
                       <i class="material-icons">business_center</i>
-                      <span class="ml-1">{{ call.contact.company_name }}</span>
+                      <span class="ml-1">
+                        {{ call.contact.company_name }}
+                      </span>
                     </div>
                   </div>
 
@@ -186,7 +181,7 @@
                       <span class="ml-1">{{ tag.name }}</span>
                     </div>
                     <div class="d-flex justify-center"
-                        v-if="call.contact.tags.length > 3">
+                         v-if="call.contact.tags.length > 3">
                       <span>...</span>
                     </div>
                   </div>
@@ -199,23 +194,16 @@
                 <span v-if="call.user">
                   {{ call.user.name | fixName }}
                 </span>
-                <div v-else>
-                  <span>
-                    -
-                  </span>
-                </div>
+                <span v-else>--</span>
               </td>
 
               <!-- location -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'lead_location'">
-                <span class="text-greyish"
-                      v-if="call.state">
+                <span v-if="call.state">
                   {{ call.city || '' }}{{ (call.city && call.state) ? ', ' : '' }}{{ call.state }}
                 </span>
-                <span v-else>
-                  -
-                </span>
+                <span v-else>--</span>
               </td>
 
               <!-- user -->
@@ -232,14 +220,11 @@
                     </q-tooltip>
                   </q-icon>
                 </router-link>
-                <div class=""
-                    v-else-if="call.user_id && getUser(call.user_id)">
+                <div v-else-if="call.user_id && getUser(call.user_id)">
                   <span>{{ getUserName(getUser(call.user_id)) }}</span>
                 </div>
                 <div v-else>
-                  <span>
-                    -
-                  </span>
+                  <span>--</span>
                 </div>
               </td>
 
@@ -287,9 +272,7 @@
                               v-if="call.contact && call.type === 2 && hasPermissionTo('send sms')">
                   <button class="btn btn-sm btn-primary">
                     <i class="material-icons">reply</i>
-                    <q-tooltip>
-                      Reply
-                    </q-tooltip>
+                    <q-tooltip>Reply</q-tooltip>
                   </button>
                 </router-link>
 
@@ -297,9 +280,7 @@
                 <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
                   <button class="btn btn-sm btn-light ml-1">
                     <i class="material-icons">info_outline</i>
-                    <q-tooltip>
-                      More Details
-                    </q-tooltip>
+                    <q-tooltip>More Details</q-tooltip>
                   </button>
                 </router-link>
 
@@ -319,13 +300,15 @@
           </tr>
 
           <!-- collapsed data -->
-          <tr :key="`collapse-${index}`"
-              v-if="expandedItem === index">
-            <td :colspan="filteredColumns.length">
-              <div class="d-flex">
-                <div class="flex-grow-1"
-                     v-if="call.contact">
-                  <div class="d-flex flex-column">
+          <tr :key="`collapse-${index}`">
+            <td class="p-0"
+                :colspan="filteredColumns.length">
+              <transition name="vertical-collapse"
+                          mode="out-in">
+                <div class="d-flex p-2"
+                     v-if="expandedItem === index">
+                  <div class="flex-grow-1 d-flex flex-column justify-content-center"
+                       v-if="call.contact">
                     <span>
                       {{ call.contact.name | capitalize }}
                     </span>
@@ -336,12 +319,12 @@
                       {{ call.city || '' }}{{ (call.city && call.state) ? ', ' : '' }}{{ call.state }}
                     </span>
                   </div>
+                  <div class="flex-grow-1"
+                       v-if="call.type === CommunicationTypes.CALL">
+                    <target-users-tree :communication="call"/>
+                  </div>
                 </div>
-                <div class="flex-grow-1"
-                     v-if="call.type === CommunicationTypes.CALL">
-                  <target-users-tree :communication="call"/>
-                </div>
-              </div>
+              </transition>
             </td>
           </tr>
         </template>

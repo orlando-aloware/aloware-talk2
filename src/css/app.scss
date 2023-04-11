@@ -6,7 +6,7 @@
 @import 'svg.scss';
 @import 'components/styles.scss';
 @import "dhtmlxscheduler_material.css"; // from ~dhtmlx-scheduler/codebase/dhtmlxscheduler_material.css
-
+@import "animations.scss";
 
 html {
   overflow-y: hidden;
@@ -12682,6 +12682,18 @@ h1.contact-list-name-label {
       }
 
       &__table {
+        &__collapse {
+          i {
+            transition: all .3s;
+          }
+
+          &--collapsed {
+            i {
+              transform: rotate(90deg);
+            }
+          }
+        }
+
         &__contact {
           &__tags {
             white-space: break-spaces;
