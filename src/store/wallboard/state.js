@@ -6,6 +6,7 @@ export default function () {
       parked: []
     },
     callsEnabledColumns: [
+      'details',
       'disposition',
       'incoming_number',
       'ring_group',

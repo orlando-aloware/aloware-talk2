@@ -1,5 +1,10 @@
 export const COLUMNS = [
   {
+    name: 'details',
+    label: ' ',
+    minWidth: 30
+  },
+  {
     name: 'disposition',
     label: ' ',
     order: 0,
