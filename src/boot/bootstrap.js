@@ -6,7 +6,6 @@ import 'moment-timezone'
 import momentDurationFormatSetup from 'moment-duration-format'
 import Bowser from 'bowser'
 import * as Sentry from '@sentry/vue'
-import { Integrations } from '@sentry/tracing'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
 import 'vue-popperjs/dist/vue-popper.css'
@@ -138,13 +137,13 @@ if (process.env.APP_ENV !== 'production') {
 
 if (
   (process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'development') &&
+    process.env.NODE_ENV === 'development') ||
   process.env.APP_ENV !== 'local'
 ) {
   Sentry.init({
     Vue,
     dsn: storage.local.getItem('sentry_dsn_public'),
-    integrations: [new Integrations.BrowserTracing()],
+    integrations: [new Sentry.BrowserTracing()],
     tracingOptions: {
       trackComponents: true
     },
