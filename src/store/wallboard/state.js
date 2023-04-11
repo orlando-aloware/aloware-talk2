@@ -19,7 +19,8 @@ export default function () {
       'operations'
     ],
     filters: {
-      ringGroup: null
+      ringGroup: null,
+      agent: null
     },
     isLiveCallsLoading: false,
     isParkedCallsLoading: false,
