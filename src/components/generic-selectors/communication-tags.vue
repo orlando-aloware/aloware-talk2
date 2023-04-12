@@ -20,7 +20,10 @@
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import * as TagCategory from 'src/constants/tag-categories'
+import {
+  TAG_CATEGORIES as TagCategories,
+  TAG_CATEGORIES_VALUES as TagCategoriesValues
+} from 'src/constants/tag-categories'
 import { clone, isEmpty } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 import AddIconCircle from 'components/icons/add-icon-circle'
@@ -55,7 +58,7 @@ export default {
       loadingTag: false,
       loadingTags: false,
       options: [],
-      category: TagCategory.CAT_COMMUNICATIONS
+      category: TagCategories.CAT_COMMUNICATIONS
     }
   },
 
@@ -76,7 +79,7 @@ export default {
         return this.availableTags
       }
 
-      const tags = this.category
+      const tags = TagCategoriesValues.includes(this.category)
         ? clone(this.availableTags).filter(tag => tag.category === this.category)
         : clone(this.availableTags)
 
@@ -92,7 +95,7 @@ export default {
     },
 
     importTagsAlphabeticalOrder () {
-      if (this.category && this.category !== TagCategory.CAT_CONTACTS) {
+      if (TagCategoriesValues.includes(this.category) && this.category !== TagCategories.CAT_CONTACTS) {
         return []
       }
 

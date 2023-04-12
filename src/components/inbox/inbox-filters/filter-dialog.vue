@@ -22,8 +22,7 @@
               <span>New (Untitled)
                 <span class="float-right check-icon"
                       v-if="!selectedFilter">
-                  <check-o-icon color="#040404">
-                  </check-o-icon>
+                  <check-o-icon color="#040404" />
                 </span>
               </span>
             </div>
@@ -570,7 +569,7 @@ export default {
     },
 
     inboxShowMyContacts: function (newValue) {
-      this.filter.my_contact = +newValue
+      this.filter.my_contact = +newValue // convert boolean to numeric
     }
   },
 

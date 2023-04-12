@@ -16,7 +16,10 @@
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import GenericMultiSelect from 'src/components/generic-selectors/generic-multi-select'
-import * as TagCategory from 'src/constants/tag-categories'
+import {
+  TAG_CATEGORIES as TagCategories,
+  TAG_CATEGORIES_VALUES as TagCategoriesValues
+} from 'src/constants/tag-categories'
 import { clone, isEmpty } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 
@@ -44,7 +47,7 @@ export default {
       loadingTag: false,
       loadingTags: false,
       options: [],
-      category: TagCategory.CAT_CONTACTS
+      category: TagCategories.CAT_CONTACTS
     }
   },
 
@@ -68,7 +71,7 @@ export default {
 
       let tags = clone(this.availableTags)
 
-      if (this.category) {
+      if (TagCategoriesValues.includes(this.category)) {
         tags = tags.filter(tag => tag.category === this.category)
       }
 
@@ -84,7 +87,7 @@ export default {
     },
 
     importTagsAlphabeticalOrder () {
-      if (this.category && this.category !== TagCategory.CAT_CONTACTS) {
+      if (TagCategoriesValues.includes(this.category) && this.category !== TagCategories.CAT_CONTACTS) {
         return []
       }
 

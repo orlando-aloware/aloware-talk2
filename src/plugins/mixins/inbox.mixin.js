@@ -210,9 +210,7 @@ export default {
           if (taskId === ContactTaskStatus.STATUS_OPEN) {
             this.setOpenTaskCount(response.data.count)
             this.setLoadingOpenTaskCount(false)
-          }
-
-          if (taskId === ContactTaskStatus.STATUS_PENDING) {
+          } else if (taskId === ContactTaskStatus.STATUS_PENDING) {
             this.setPendingTaskCount(response.data.count)
             this.setLoadingPendingTaskCount(false)
           }
@@ -222,9 +220,7 @@ export default {
 
         if (taskId === ContactTaskStatus.STATUS_OPEN) {
           this.setLoadingOpenTaskCount(false)
-        }
-
-        if (taskId === ContactTaskStatus.STATUS_PENDING) {
+        } else if (taskId === ContactTaskStatus.STATUS_PENDING) {
           this.setLoadingPendingTaskCount(false)
         }
       })

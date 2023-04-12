@@ -373,7 +373,7 @@ import { mapActions, mapState } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
-import * as TagCategory from 'src/constants/tag-categories'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
 export default {
   name: 'filter-form',
@@ -479,7 +479,7 @@ export default {
     },
 
     tagsFilterCategory () {
-      return this.isInbox ? TagCategory.CAT_CONTACTS : TagCategory.CAT_COMMUNICATIONS
+      return this.isInbox ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
     }
   },
 
@@ -503,7 +503,7 @@ export default {
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
       rangePicker: null,
-      TagCategory
+      TagCategories
     }
   },
 

@@ -79,7 +79,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { mapState } from 'vuex'
-import { isEmpty } from 'lodash'
+import { TAG_CATEGORIES_VALUES as TagCategoriesValues } from 'src/constants/tag-categories'
 
 export default {
   name: 'tags-selector',
@@ -175,22 +175,16 @@ export default {
     },
 
     filteredOptions () {
-      const tagsVarName = this.genericMultiselect ? 'tags' : 'tagsOptions'
+      const tagsVariableName = this.genericMultiselect ? 'tags' : 'tagsOptions'
 
-      // check if category is empty,
-      // exclude 0 as category is a numeric variable
-      if (!this.category && this.category !== 0) {
-        return this[tagsVarName]
+      if (!TagCategoriesValues.includes(this.category)) {
+        return this[tagsVariableName]
       }
 
-      return this[tagsVarName].filter(tag => tag.category === this.category)
+      return this[tagsVariableName].filter(tag => tag.category === this.category)
     },
 
     optionsAlphabeticalOrder () {
-      if (isEmpty(this.filteredOptions)) {
-        return this.filteredOptions
-      }
-
       return this.$alphabeticalSort(this.filteredOptions)
     }
   },
