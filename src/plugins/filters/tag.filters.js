@@ -1,10 +1,10 @@
-import * as TagCategory from 'src/constants/tag-categories'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
-const translateTagCategory = (category) => {
+const translateTagCategories = (category) => {
   switch (category) {
-    case TagCategory.CAT_COMMUNICATIONS:
+    case TagCategories.CAT_COMMUNICATIONS:
       return 'Communication'
-    case TagCategory.CAT_CONTACTS:
+    case TagCategories.CAT_CONTACTS:
       return 'Contact'
   }
   return '-'
@@ -12,7 +12,7 @@ const translateTagCategory = (category) => {
 
 export default ({ Vue }) => {
   const filters = {
-    translateTagCategory
+    translateTagCategories
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
