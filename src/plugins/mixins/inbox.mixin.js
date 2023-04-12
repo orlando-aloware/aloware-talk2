@@ -3,6 +3,7 @@ import talk2Api from 'src/plugins/api/api'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { isEmpty } from 'lodash'
+import { RELATIONS as CONTACT_RELATIONS } from 'src/constants/contacts-list-relations'
 
 export default {
 
@@ -231,7 +232,7 @@ export default {
 
     getParameters (taskId, count = false) {
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
-      query.relations = []
+      let relations = []
 
       this.resetFilters()
       query.filter_groups = []
@@ -269,13 +270,17 @@ export default {
 
       if (this.filter && !isEmpty(this.filter.tags)) {
         this.filters = { ...this.filters, 'tags': { value: this.filter.tags, operator: 1 } }
-        query.relations.push('tags')
+        relations.push('tags')
       }
 
       query.filter_groups.push({ 'filters': this.filters, 'is_conjunction': true })
 
       if (!count) {
-        query.relations.push('lastCommunication')
+        relations.push('lastCommunication')
+      }
+
+      if (!isEmpty(relations)) {
+        query.relations = relations.filter(relation => CONTACT_RELATIONS.includes(relation))
       }
 
       query.timezone = window.timezone
