@@ -1,17 +1,15 @@
 <template>
-  <b-modal
-    id="inbox-channel-filter-modal"
-    size="lg"
-    modal-class="confirm-dialog"
-    hide-header-close
-    hide-header
-    hide-footer
-    ref="inboxChannelFilterModal"
-    v-model="isOpen"
-    @hidden="onHidden"
-    @show="onShow"
-    @shown="onShown">
-
+  <b-modal id="inbox-channel-filter-modal"
+           ref="inboxChannelFilterModal"
+           size="lg"
+           modal-class="confirm-dialog"
+           hide-header-close
+           hide-header
+           hide-footer
+           v-model="isOpen"
+           @hidden="onHidden"
+           @show="onShow"
+           @shown="onShown">
     <div class="modal-body-wrapper d-flex">
       <div class="left-column-wrapper">
         <span class="filter-type-description">{{ channelFilterName }} Filters</span>
@@ -22,9 +20,9 @@
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
               <span>New (Untitled)
-                <span v-if="!selectedFilter"
-                      class="float-right check-icon">
-                  <check-o-icon color="#040404"></check-o-icon>
+                <span class="float-right check-icon"
+                      v-if="!selectedFilter">
+                  <check-o-icon color="#040404" />
                 </span>
               </span>
             </div>
@@ -35,7 +33,9 @@
                         v-if="isGettingFilters" />
             <p class="text-muted fs-12 empty-filter-placeholder pl-2"
                v-show="!isGettingFilters"
-               v-if="personalFilters.length < 1">None</p>
+               v-if="personalFilters.length < 1">
+              None
+            </p>
             <filter-list-items v-for="item in personalFilters"
                                :key="item.id"
                                :filter="item"
@@ -54,13 +54,13 @@
               None
             </p>
             <div class="filter-items cursor-pointer"
-                 v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === item.id }"
                  v-for="item in companyFilters"
+                 :class="{ 'active' : selectedFilter && selectedFilter.id === item.id }"
                  :key="item.id"
                  @click="onSelectFilter(item)">
               <span>
                 <q-tooltip anchor="top middle"
-                               self="center middle">
+                           self="center middle">
                   {{ item.name }}
                 </q-tooltip>
                 {{ item.name }}
@@ -99,9 +99,9 @@
                          class="ml-3"
                          :disabled="false"
                          @clicked="onApply">
-              <q-spinner-bars v-if="isUpdatingFilter"
-                              color="white"
-                              class="mr-1" />
+              <q-spinner-bars color="white"
+                              class="mr-1"
+                              v-if="isUpdatingFilter"/>
               {{ applyButtonText }}
             </compact-btn>
           </div>
@@ -109,11 +109,10 @@
       </div>
     </div>
     <template #modal-footer="{ hide }">
-      <b-button
-        variant="success"
-        class="custom-btn"
-        size="sm"
-        @click="hide()">
+      <b-button variant="success"
+                class="custom-btn"
+                size="sm"
+                @click="hide()">
         Close
       </b-button>
     </template>
@@ -141,6 +140,7 @@ export default {
       type: Object,
       default: () => {}
     },
+
     defaultFilterModel: {
       type: Object,
       required: true
@@ -157,14 +157,17 @@ export default {
       'appliedFilter',
       'inboxShowMyContacts'
     ]),
+
     isOpen: {
       get () {
         return this.isFilterDialogShown
       },
+
       set (isOpen) {
         return isOpen
       }
     },
+
     channelFilterName () {
       switch (true) {
         case !this.$route.params.channel && this.$route.name === 'Inbox':
@@ -183,13 +186,18 @@ export default {
           return 'Calls & Recordings'
       }
     },
+
     selectedFilterHasChanges () {
       if (!this.selectedFilter || !this.selectedFilterClone) {
         return false
       }
 
-      return JSON.stringify(this.$options.filters.sortObjectByKey(this.filter)) !== JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilterClone.filter))
+      const filterStringified = JSON.stringify(this.$options.filters.sortObjectByKey(this.filter))
+      const selectedFilterStringified = JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilterClone.filter))
+
+      return filterStringified !== selectedFilterStringified
     },
+
     filterHasChanges () {
       const hasChanges = { data: false }
 
@@ -269,6 +277,23 @@ export default {
     }
   },
 
+  created () {
+    this.setSelectedFilter(null)
+  },
+
+  mounted () {
+    this.toggleFilterDialog()
+
+    this.$VueEvent.listen('channel_filter_created', filter => {
+      if (filter.is_on_company) {
+        this.companyFilters.push(filter)
+        return
+      }
+
+      this.personalFilters.push(filter)
+    })
+  },
+
   methods: {
     ...mapActions('inbox', [
       'toggleFilterModelForm',
@@ -280,6 +305,7 @@ export default {
       'setChannelClonedFilter',
       'setInboxShowMyContacts'
     ]),
+
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
     },
@@ -297,6 +323,7 @@ export default {
       this.companyFilters = []
       this.filterFields = Object.keys(this.defaultFilterModel.filter)
       this.getFilters()
+
       if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter, ...this.filter }
       } else {
@@ -308,6 +335,7 @@ export default {
 
     onShown () {
       this.refreshTagSelector()
+
       if (!this.appliedFilter) {
         this.setSelectedFilter(null)
         this.filter = _.pick(this.value, this.filterFields)
@@ -318,6 +346,7 @@ export default {
     refreshTagSelector () {
       if (this.$refs.inboxChannelFilterForm?.$refs.tagSelector) {
         this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
+
         setTimeout(() => {
           this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
           this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
@@ -334,6 +363,7 @@ export default {
           this.filter[item] = +useFilter[item]
           continue
         }
+
         this.filter[item] = useFilter[item]
       }
     },
@@ -374,6 +404,7 @@ export default {
 
       if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
         this.isUpdatingFilter = true
+
         this.updateFilter(this.selectedFilter, {
           filter: this.filter,
           type: this.defaultFilterModel.type,
@@ -408,12 +439,13 @@ export default {
     onSaveFilter () {
       if (!this.selectedFilter) {
         this.toggleFilterModelForm(true)
-      } else {
-        this.isUpdatingFilter = true
-        this.updateFilter(this.selectedFilter, { ...this.filter, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
-          this.isUpdatingFilter = false
-        })
+        return
       }
+
+      this.isUpdatingFilter = true
+      this.updateFilter(this.selectedFilter, { ...this.filter, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
+        this.isUpdatingFilter = false
+      })
     },
 
     onSaveNewFilter () {
@@ -440,6 +472,7 @@ export default {
       }
 
       this.isGettingFilters = true
+
       return talk2Api.V2.inbox.filters.get({ type: this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.defaultFilterModel.type }).then(response => {
         this.personalFilters = response.data.data.user || []
         this.companyFilters = response.data.data.company || []
@@ -459,6 +492,7 @@ export default {
 
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {
         const updatedFilter = res.data.filter
+
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
           const filter = { ...this.selectedFilter }
           filter.filter = { ...this.filter }
@@ -467,6 +501,7 @@ export default {
 
         if (!updatedFilter.is_on_company) {
           const index = this.personalFilters.findIndex(item => item.id === filter.id)
+
           if (index >= 0) {
             this.personalFilters[index] = updatedFilter
           }
@@ -480,13 +515,16 @@ export default {
 
     onDeleteFilter (filter) {
       this.isDeletingFilter = true
+
       return talk2Api.V2.inbox.filters.delete(filter.id).then(res => {
         this.selectedFilterClone = { ...this.selectedFilter }
         this.isDeletingFilter = false
+
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
           this.setSelectedFilter(null)
           this.selectedFilterClone = null
         }
+
         if (!filter.is_on_company) {
           this.personalFilters = this.personalFilters.filter(item => item.id !== filter.id)
         }
@@ -496,9 +534,10 @@ export default {
     filterCreated (filter) {
       if (filter.is_on_company) {
         this.companyFilters.push(filter)
-      } else {
-        this.personalFilters.push(filter)
+        return
       }
+
+      this.personalFilters.push(filter)
     },
 
     applyFilter () {
@@ -527,23 +566,15 @@ export default {
   watch: {
     '$route.params.channel': function () {
       this.setSelectedFilter(null)
+    },
+
+    inboxShowMyContacts: function (newValue) {
+      this.filter.my_contact = +newValue // convert boolean to numeric
     }
   },
-  created () {
-    this.setSelectedFilter(null)
-  },
+
   beforeDestroy () {
     clearTimeout(this.inputTimeout)
-  },
-  mounted () {
-    this.toggleFilterDialog()
-    this.$VueEvent.listen('channel_filter_created', filter => {
-      if (filter.is_on_company) {
-        this.companyFilters.push(filter)
-      } else {
-        this.personalFilters.push(filter)
-      }
-    })
   }
 }
 </script>
