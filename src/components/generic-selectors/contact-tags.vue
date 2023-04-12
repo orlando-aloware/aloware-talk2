@@ -66,13 +66,13 @@ export default {
         return this.availableTags
       }
 
-      const tags = { data: clone(this.availableTags) }
+      let tags = clone(this.availableTags)
 
       if (this.category) {
-        tags.data = tags.data.filter(tag => tag.category === this.category)
+        tags = tags.filter(tag => tag.category === this.category)
       }
 
-      return this.$alphabeticalSort(tags.data)
+      return this.$alphabeticalSort(tags)
     },
 
     companyTagsAlphabeticalOrder () {

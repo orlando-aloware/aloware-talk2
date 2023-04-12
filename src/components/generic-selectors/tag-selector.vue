@@ -177,6 +177,8 @@ export default {
     filteredOptions () {
       const tagsVarName = this.genericMultiselect ? 'tags' : 'tagsOptions'
 
+      // check if category is empty,
+      // exclude 0 as category is a numeric variable
       if (!this.category && this.category !== 0) {
         return this[tagsVarName]
       }

@@ -65,7 +65,14 @@ export default {
       lineOrRingGroupFilteredId: null,
       contacts: [],
       cancelToken: null,
-      source: null
+      source: null,
+      communicationInProgressStatuses: [
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+      ]
     }
   },
 
@@ -104,20 +111,13 @@ export default {
       }
 
       return contacts.filter(contact => (contact.last_communication &&
-        ![ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2)) || !contact.last_communication)
+        !this.communicationInProgressStatuses.includes(contact.last_communication.current_status2)) ||
+        !contact.last_communication)
     },
 
     getLiveCallContactTasks (contacts) {
       return contacts.filter(contact => contact.last_communication &&
-        [ CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW ].includes(contact.last_communication.current_status2))
+        this.communicationInProgressStatuses.includes(contact.last_communication.current_status2))
     },
 
     loadContactTasks (loadCount = true, showLoading = true) {

@@ -76,7 +76,9 @@ export default {
         return this.availableTags
       }
 
-      const tags = this.category ? clone(this.availableTags).filter(tag => tag.category === this.category) : clone(this.availableTags)
+      const tags = this.category
+        ? clone(this.availableTags).filter(tag => tag.category === this.category)
+        : clone(this.availableTags)
 
       return this.$alphabeticalSort(tags)
     },
