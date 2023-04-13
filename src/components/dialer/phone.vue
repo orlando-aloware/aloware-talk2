@@ -2067,6 +2067,15 @@ export default {
         return null
       }
 
+      // reference the campaign object in communication if it has
+      if (this.dialer.communication?.campaign) {
+        return this.dialer.communication.campaign
+      }
+
+      if (this?.communication?.campaign) {
+        return this.communication.campaign
+      }
+
       const found = this.campaigns.find(campaign => campaign.id === id)
 
       if (found) {
