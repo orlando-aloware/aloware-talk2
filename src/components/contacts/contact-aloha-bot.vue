@@ -1,5 +1,6 @@
 <template>
   <b-overlay :show="isBusy"
+             v-if="profile.company.alohabot_enabled"
              rounded="sm"
              variant="white">
 
@@ -48,6 +49,7 @@
 <script>
 import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
+import { mapState } from 'vuex'
 
 export default {
   name: 'contact-aloha-bot',
@@ -65,6 +67,10 @@ export default {
       type: Object,
       required: true
     }
+  },
+
+  computed: {
+    ...mapState('auth', ['profile'])
   },
 
   methods: {

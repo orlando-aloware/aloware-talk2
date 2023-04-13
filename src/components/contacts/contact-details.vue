@@ -19,7 +19,7 @@
         <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
                           :contact="contact">
         </contact-sequence>
-        <contact-aloha-bot v-if="contact && profile.company.alohabot_enabled && !contact.is_dnc && hasPermissionTo('update contact')"
+        <contact-aloha-bot v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
                           :contact="contact">
         </contact-aloha-bot>
         <contact-phones></contact-phones>
@@ -57,7 +57,7 @@ import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
-import { mapGetters, mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
@@ -108,7 +108,6 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile']),
     ...mapGetters('contacts', ['contact', 'contactClone']),
 
     contactName () {
