@@ -19,6 +19,9 @@
         <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
                           :contact="contact">
         </contact-sequence>
+        <contact-aloha-bot v-if="contact && profile.company.alohabot_enabled && !contact.is_dnc && hasPermissionTo('update contact')"
+                          :contact="contact">
+        </contact-aloha-bot>
         <contact-phones></contact-phones>
         <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
         </contact-information>
@@ -54,13 +57,14 @@ import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
+import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
 import {
   aclMixin,
   contactMixin,
@@ -99,10 +103,12 @@ export default {
     ContactInfo,
     ContactPhones,
     ContactTags,
-    BackButton
+    BackButton,
+    ContactAlohaBot
   },
 
   computed: {
+    ...mapState('auth', ['profile']),
     ...mapGetters('contacts', ['contact', 'contactClone']),
 
     contactName () {
