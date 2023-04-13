@@ -2058,7 +2058,7 @@ export default {
       }
 
       // reference the campaign object in communication if it has
-      if (this.dialier.communication?.campaign) {
+      if (this.dialer.communication?.campaign) {
         return this.dialer.communication.campaign
       }
 
