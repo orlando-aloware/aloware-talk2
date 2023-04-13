@@ -2319,12 +2319,8 @@ export default {
     },
 
     getStatics (repeatTimes = 0) {
-      if (!this.currentCompany) {
-        return
-      }
-
       this.setStaticsLoaded(false)
-      talk2Api.V1.statics.get(this.currentCompany.id)
+      talk2Api.V1.statics.get(this.currentCompany?.id)
         .then(res => {
           this.setStatics(res.data)
           storage.local.setItem('statics', JSON.stringify(res.data))
