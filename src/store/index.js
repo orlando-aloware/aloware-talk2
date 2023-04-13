@@ -265,7 +265,9 @@ export default function (/* { ssrContext } */) {
         referer: null,
         whitelabel: false
       },
-      staticsLoaded: false
+      staticsLoaded: false,
+      isCallDisposed: false,
+      isContactDisposed: false
     },
 
     getters: {
@@ -773,6 +775,14 @@ export default function (/* { ssrContext } */) {
 
       setStaticsLoaded ({ commit }, value) {
         commit('SET_STATICS_LOADED', value)
+      },
+
+      setIsCallDisposed ({ commit }, value) {
+        commit('SET_IS_CALL_DISPOSED', value)
+      },
+
+      setIsContactDisposed ({ commit }, value) {
+        commit('SET_IS_CONTACT_DISPOSED', value)
       }
     },
 
@@ -1472,6 +1482,14 @@ export default function (/* { ssrContext } */) {
 
       SET_STATICS_LOADED (state, value) {
         state.staticsLoaded = value
+      },
+
+      SET_IS_CALL_DISPOSED (state, value) {
+        state.isCallDisposed = value
+      },
+
+      SET_IS_CONTACT_DISPOSED (state, value) {
+        state.isContactDisposed = value
       },
 
       updateField

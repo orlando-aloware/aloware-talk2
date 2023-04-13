@@ -12,7 +12,8 @@ import {
   userMixin,
   notificationMixin,
   visibilityMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  dialerWrapUpMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -28,7 +29,8 @@ export default {
     userMixin,
     notificationMixin,
     visibilityMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    dialerWrapUpMixin
   ],
 
   data () {
@@ -47,6 +49,7 @@ export default {
       warnings: [],
       hangupInterval: null,
       activeConnectionInterval: null,
+      dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus
@@ -81,7 +84,7 @@ export default {
   },
 
   created () {
-    this.$VueEvent.listen('update_communication', (data) => {
+    this.dialerListeners.updateCommunication = (data) => {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
@@ -130,16 +133,134 @@ export default {
           }
         }
       }
-    })
+    }
 
-    this.$VueEvent.listen('reconnectDialer', () => {
+    this.dialerListeners.reconnectDialer = () => {
       this.getDesktopToken(true)
         .then(() => {
           this.device.register()
           this.rebootPhone()
         })
-    })
+    }
 
+    this.dialerListeners.endWrapUp = () => {
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        return
+      }
+
+      this.backToDial()
+    }
+
+    this.dialerListeners.forceEndWrapUp = () => {
+      if (this.dialer.currentStatus !== 'WRAP_UP') {
+        return
+      }
+
+      this.backToDial(true)
+    }
+
+    this.dialerListeners.resetCall = () => {
+      console.log('Resetting call')
+      this.resetCall()
+    }
+
+    this.dialerListeners.makeCall = (data) => {
+      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
+    }
+
+    this.dialerListeners.transferCall = (data) => {
+      this.transferCall(data)
+    }
+
+    this.dialerListeners.addParticipant = (data) => {
+      this.addParticipant(data)
+    }
+
+    this.dialerListeners.hangupCall = () => {
+      this.hangupCall()
+    }
+
+    this.dialerListeners.answerCall = (communication = null) => {
+      this.answerCall(communication)
+      this.$closeActionNotification('incomingCall')
+      this.$closeActionNotification('callFishing')
+    }
+
+    this.dialerListeners.rejectCall = () => {
+      this.rejectCall()
+    }
+
+    this.dialerListeners.sendDigit = (data) => {
+      this.sendDigit(data)
+    }
+
+    this.dialerListeners.toggleMute = () => {
+      this.toggleMute()
+    }
+
+    this.dialerListeners.toggleHold = () => {
+      this.toggleHold()
+    }
+
+    this.dialerListeners.toggleRecordingStatus = () => {
+      this.toggleRecordingStatus()
+    }
+
+    this.dialerListeners.forceRefreshCommunication = () => {
+      this.forceRefreshCommunication()
+    }
+
+    this.dialerListeners.parkCall = () => {
+      this.parkCall()
+    }
+
+    this.dialerListeners.hangupAndAnswerCall = () => {
+      this.answerCall()
+      this.$nextTick(() => {
+        this.parkCall()
+      })
+    }
+
+    this.dialerListeners.parkAndAnswerCall = () => {
+      this.answerCall()
+      this.$nextTick(() => {
+        this.parkCall()
+      })
+    }
+
+    this.dialerListeners.unparkCall = (data = null, preventClear = false) => {
+      this.unparkCall(data, preventClear)
+    }
+
+    this.dialerListeners.mergeCalls = () => {
+      this.mergeCalls()
+    }
+
+    this.dialerListeners.dropThirdParty = () => {
+      this.dropThirdParty()
+    }
+
+    this.dialerListeners.answerCallFishing = (data) => {
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
+    }
+
+    this.dialerListeners.setInputDevice = (inputDevice) => {
+      this.setInputDevice(inputDevice)
+    }
+
+    this.dialerListeners.setOutputDevice = (outputDevice) => {
+      this.setOutputDevice(outputDevice)
+    }
+
+    this.dialerListeners.testOutputDevice = (outputDevice) => {
+      this.testOutputDevice(outputDevice)
+    }
+
+    this.dialerListeners.initializeSettings = () => {
+      this.initializeSettings()
+    }
+
+    this.startDialerEvents()
     this.getDesktopToken()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
@@ -253,126 +374,69 @@ export default {
         this.getDesktopToken()
       }
     }, 24 * 60 * 60 * 1000)
-
-    this.$VueEvent.listen('endWrapUp', () => {
-      if (this.dialer.currentStatus !== 'WRAP_UP') {
-        return
-      }
-
-      this.backToDial()
-    })
-
-    this.$VueEvent.listen('forceEndWrapUp', () => {
-      if (this.dialer.currentStatus !== 'WRAP_UP') {
-        return
-      }
-
-      this.backToDial(true)
-    })
-
-    this.$VueEvent.listen('resetCall', () => {
-      console.log('Resetting call')
-      this.resetCall()
-    })
-
-    this.$VueEvent.listen('makeCall', (data) => {
-      this.makeCall(data.currentNumber, data.outboundCampaignId, data.contactName, data.companyName, data.contactId)
-    })
-
-    this.$VueEvent.listen('transferCall', (data) => {
-      this.transferCall(data)
-    })
-
-    this.$VueEvent.listen('addParticipant', (data) => {
-      this.addParticipant(data)
-    })
-
-    this.$VueEvent.listen('hangupCall', () => {
-      this.hangupCall()
-    })
-
-    this.$VueEvent.listen('answerCall', (communication = null) => {
-      this.answerCall(communication)
-      this.$closeActionNotification('incomingCall')
-      this.$closeActionNotification('callFishing')
-    })
-
-    this.$VueEvent.listen('rejectCall', () => {
-      this.rejectCall()
-    })
-
-    this.$VueEvent.listen('sendDigit', (data) => {
-      this.sendDigit(data)
-    })
-
-    this.$VueEvent.listen('toggleMute', () => {
-      this.toggleMute()
-    })
-
-    this.$VueEvent.listen('toggleHold', () => {
-      this.toggleHold()
-    })
-
-    this.$VueEvent.listen('toggleRecordingStatus', () => {
-      this.toggleRecordingStatus()
-    })
-
-    this.$VueEvent.listen('forceRefreshCommunication', () => {
-      this.forceRefreshCommunication()
-    })
-
-    this.$VueEvent.listen('parkCall', () => {
-      this.parkCall()
-    })
-
-    this.$VueEvent.listen('hangupAndAnswerCall', () => {
-      this.answerCall()
-      this.$nextTick(() => {
-        this.parkCall()
-      })
-    })
-
-    this.$VueEvent.listen('parkAndAnswerCall', () => {
-      this.answerCall()
-      this.$nextTick(() => {
-        this.parkCall()
-      })
-    })
-
-    this.$VueEvent.listen('unparkCall', (data = null, preventClear = false) => {
-      this.unparkCall(data, preventClear)
-    })
-
-    this.$VueEvent.listen('mergeCalls', () => {
-      this.mergeCalls()
-    })
-
-    this.$VueEvent.listen('dropThirdParty', () => {
-      this.dropThirdParty()
-    })
-
-    this.$VueEvent.listen('answerCallFishing', (data) => {
-      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
-    })
-
-    this.$VueEvent.listen('setInputDevice', (inputDevice) => {
-      this.setInputDevice(inputDevice)
-    })
-
-    this.$VueEvent.listen('setOutputDevice', (outputDevice) => {
-      this.setOutputDevice(outputDevice)
-    })
-
-    this.$VueEvent.listen('testOutputDevice', (outputDevice) => {
-      this.testOutputDevice(outputDevice)
-    })
-
-    this.$VueEvent.listen('initializeSettings', () => {
-      this.initializeSettings()
-    })
   },
 
   methods: {
+    startDialerEvents () {
+      this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
+      this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
+      this.$VueEvent.listen('forceEndWrapUp', this.dialerListeners.forceEndWrapUp)
+      this.$VueEvent.listen('resetCall', this.dialerListeners.resetCall)
+      this.$VueEvent.listen('makeCall', this.dialerListeners.makeCall)
+      this.$VueEvent.listen('transferCall', this.dialerListeners.transferCall)
+      this.$VueEvent.listen('addParticipant', this.dialerListeners.addParticipant)
+      this.$VueEvent.listen('hangupCall', this.dialerListeners.hangupCall)
+      this.$VueEvent.listen('answerCall', this.dialerListeners.answerCall)
+      this.$VueEvent.listen('rejectCall', this.dialerListeners.rejectCall)
+      this.$VueEvent.listen('sendDigit', this.dialerListeners.sendDigit)
+      this.$VueEvent.listen('toggleMute', this.dialerListeners.toggleMute)
+      this.$VueEvent.listen('toggleHold', this.dialerListeners.toggleHold)
+      this.$VueEvent.listen('toggleRecordingStatus', this.dialerListeners.toggleRecordingStatus)
+      this.$VueEvent.listen('forceRefreshCommunication', this.dialerListeners.forceRefreshCommunication)
+      this.$VueEvent.listen('parkCall', this.dialerListeners.parkCall)
+      this.$VueEvent.listen('hangupAndAnswerCall', this.dialerListeners.hangupAndAnswerCall)
+      this.$VueEvent.listen('parkAndAnswerCall', this.dialerListeners.parkAndAnswerCall)
+      this.$VueEvent.listen('unparkCall', this.dialerListeners.unparkCall)
+      this.$VueEvent.listen('mergeCalls', this.dialerListeners.mergeCalls)
+      this.$VueEvent.listen('dropThirdParty', this.dialerListeners.dropThirdParty)
+      this.$VueEvent.listen('answerCallFishing', this.dialerListeners.answerCallFishing)
+      this.$VueEvent.listen('setInputDevice', this.dialerListeners.setInputDevice)
+      this.$VueEvent.listen('setOutputDevice', this.dialerListeners.setOutputDevice)
+      this.$VueEvent.listen('testOutputDevice', this.dialerListeners.testOutputDevice)
+      this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
+    },
+
+    stopDialerEvents () {
+      this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
+      this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
+      this.$VueEvent.stop('forceEndWrapUp', this.dialerListeners.forceEndWrapUp)
+      this.$VueEvent.stop('resetCall', this.dialerListeners.resetCall)
+      this.$VueEvent.stop('makeCall', this.dialerListeners.makeCall)
+      this.$VueEvent.stop('transferCall', this.dialerListeners.transferCall)
+      this.$VueEvent.stop('addParticipant', this.dialerListeners.addParticipant)
+      this.$VueEvent.stop('hangupCall', this.dialerListeners.hangupCall)
+      this.$VueEvent.stop('answerCall', this.dialerListeners.answerCall)
+      this.$VueEvent.stop('rejectCall', this.dialerListeners.rejectCall)
+      this.$VueEvent.stop('sendDigit', this.dialerListeners.sendDigit)
+      this.$VueEvent.stop('toggleMute', this.dialerListeners.toggleMute)
+      this.$VueEvent.stop('toggleHold', this.dialerListeners.toggleHold)
+      this.$VueEvent.stop('toggleRecordingStatus', this.dialerListeners.toggleRecordingStatus)
+      this.$VueEvent.stop('forceRefreshCommunication', this.dialerListeners.forceRefreshCommunication)
+      this.$VueEvent.stop('parkCall', this.dialerListeners.parkCall)
+      this.$VueEvent.stop('hangupAndAnswerCall', this.dialerListeners.hangupAndAnswerCall)
+      this.$VueEvent.stop('parkAndAnswerCall', this.dialerListeners.parkAndAnswerCall)
+      this.$VueEvent.stop('unparkCall', this.dialerListeners.unparkCall)
+      this.$VueEvent.stop('mergeCalls', this.dialerListeners.mergeCalls)
+      this.$VueEvent.stop('dropThirdParty', this.dialerListeners.dropThirdParty)
+      this.$VueEvent.stop('answerCallFishing', this.dialerListeners.answerCallFishing)
+      this.$VueEvent.stop('setInputDevice', this.dialerListeners.setInputDevice)
+      this.$VueEvent.stop('setOutputDevice', this.dialerListeners.setOutputDevice)
+      this.$VueEvent.stop('testOutputDevice', this.dialerListeners.testOutputDevice)
+      this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
+    },
+
     forceRefreshCommunication () {
       return this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
     },
@@ -1142,6 +1206,10 @@ export default {
     },
 
     countWrapUpDuration () {
+      if (this.wrapUpPaused) {
+        return
+      }
+
       const duration = this.dialer.wrapUpDuration - 1
       const timer = this.secondsToHms(duration)
       this.setDialerWrapUpDuration(duration)
@@ -1444,28 +1512,8 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('endWrapUp')
-    this.$VueEvent.stop('resetCall')
-    this.$VueEvent.stop('makeCall')
-    this.$VueEvent.stop('transferCall')
-    this.$VueEvent.stop('addParticipant')
-    this.$VueEvent.stop('hangupCall')
-    this.$VueEvent.stop('answerCall')
-    this.$VueEvent.stop('rejectCall')
-    this.$VueEvent.stop('sendDigit')
-    this.$VueEvent.stop('toggleMute')
-    this.$VueEvent.stop('toggleHold')
-    this.$VueEvent.stop('toggleRecordingStatus')
-    this.$VueEvent.stop('forceRefreshCommunication')
-    this.$VueEvent.stop('parkCall')
-    this.$VueEvent.stop('unparkCall')
-    this.$VueEvent.stop('answerCallFishing')
-    this.$VueEvent.stop('mergeCalls')
-    this.$VueEvent.stop('dropThirdParty')
-    this.$VueEvent.stop('setInputDevice')
-    this.$VueEvent.stop('setOutputDevice')
-    this.$VueEvent.stop('testOutputDevice')
-    this.$VueEvent.stop('initializeSettings')
+    this.stopDialerWrapUpEvents()
+    this.stopDialerEvents()
     clearInterval(this.$options.callDurationInterval)
     clearInterval(this.$options.wrapUpDurationInterval)
     clearInterval(this.$options.parkedCallDurationInterval)

@@ -39,3 +39,6 @@ export { default as contactV2AttributesMixin } from './contact-v2-attributes.mix
 export { default as resellerMixin } from './reseller.mixin'
 export { default as simpsocialMixin } from './simpsocial.mixin'
 export { default as guestFormsMixin } from './guest-forms.mixin'
+export { default as dispositionsMixin } from './dispositions.mixin'
+export { default as dialerWrapUpMixin } from './dialer-wrapup.mixin'
+export { default as dispositionsOptionsMixin } from './dispositions-options.mixin'
