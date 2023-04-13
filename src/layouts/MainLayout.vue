@@ -1029,7 +1029,7 @@ export default {
           })
         }
 
-        if (this.isGuest) {
+        if (this.currentCompany && this.isGuest) {
           this.getStatics()
         }
 

@@ -267,7 +267,10 @@ import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import { sessionCallStatusMixin } from 'src/plugins/mixins'
+import {
+  sessionCallStatusMixin,
+  dialerWrapUpMixin
+} from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
@@ -296,7 +299,10 @@ export default {
     RefreshIcon
   },
 
-  mixins: [ sessionCallStatusMixin ],
+  mixins: [
+    sessionCallStatusMixin,
+    dialerWrapUpMixin
+  ],
 
   data () {
     return {
@@ -514,9 +520,9 @@ export default {
     },
 
     canNextTask () {
-      // should be able to next task even if on warm up period
-      // and no manual skip (clicked next task) is in-progress
-      return !this.loadingNext &&
+      // should be able to next task even if wrap-up is not paused and
+      // status is on warm up period and no manual skip (clicked next task) is in-progress
+      return !this.wrapUpPaused && !this.loadingNext &&
         (this.statusCallConnected ||
         ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus))
     },
@@ -641,7 +647,23 @@ export default {
 
       clearInterval(this.countdownInterval)
 
+      const wasInWrapUpStatusAndPaused = this.dialer.currentStatus === 'WRAP_UP' &&
+        this.wrapUpPaused
+
       this.countdownInterval = setInterval(() => {
+        // if status in wrap-up and has wrap-up seconds but wrap up is paused due to
+        // forced call or contact disposition, we should not continue the countdown
+        if (this.wrapUpSeconds !== -1 && this.dialer.currentStatus === 'WRAP_UP' &&
+          this.wrapUpPaused) {
+          return
+        }
+
+        // end countdown if previously in wrap-up status and paused due to forced
+        // call and contact disposition and status changed and is no longer in wrap-up
+        if (wasInWrapUpStatusAndPaused && this.dialer.currentStatus !== 'WRAP_UP') {
+          this.countdownTimer = 0
+        }
+
         // reset next task loading flag
         if (this.loadingNext) {
           this.loadingNext = false
