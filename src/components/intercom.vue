@@ -113,21 +113,21 @@ export default {
       return intercomIframeDomBody ? intercomIframeDomBody.clientHeight : 0
     },
 
-    processSetup () {
+    processSetup (newRoute = false) {
       if (!this.hasReporterAccess &&
         !this.isWhiteLabel &&
         this.currentCompany &&
         !this.currentCompany.reseller_id &&
         this.profile &&
         process.env.APP_ENV !== 'local') {
-        this.setup()
+        this.setup(newRoute)
       }
     }
   },
 
   created () {
     this.$router.beforeEach((to, from, next) => {
-      this.setup(true)
+      this.processSetup(true)
       next()
     })
 

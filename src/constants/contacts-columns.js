@@ -425,7 +425,6 @@ export const ALL_COLUMNS = [
   },
   {
     name: 'task_status_name',
-    relationName: 'taskStatus',
     label: 'Task Status',
     category: 2,
     order: 39,

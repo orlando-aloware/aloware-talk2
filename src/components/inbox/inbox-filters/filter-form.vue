@@ -2,15 +2,13 @@
   <div>
     <b-form class="inbox-channel-filter-form">
       <b-container>
-        <div v-if="$route.name === 'Inbox' || !['mentions'].includes($route.params.channel)">
+        <div v-if="$route.name === 'Inbox' || !isMentionsChannel">
           <h5 class="section-header">Quick Access</h5>
           <b-form-row class="mt-2 quick-access">
             <b-col sm="12"
                    md="6">
-              <b-form-group
-                class="form-label"
-                :label="dateRangeLabel"
-              >
+              <b-form-group class="form-label"
+                            :label="dateRangeLabel">
                 <div class="last-engagement-tooltip-wrapper"
                      v-if="isInboxOrAllComms">
                   <information-circle-icon color="#2F80ED">
@@ -21,15 +19,13 @@
                   </q-tooltip>
                 </div>
 
-                <date-range-picker
-                  ref="picker"
-                  v-model="dateRange"
-                  :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
-                  :opens="opens"
-                  :ranges="ranges"
-                  :always-show-calendars="true"
-                  :auto-apply="true"
-                >
+                <date-range-picker ref="picker"
+                                   :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
+                                   :opens="opens"
+                                   :ranges="ranges"
+                                   :always-show-calendars="true"
+                                   :auto-apply="true"
+                                   v-model="dateRange">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
                   </template>
@@ -55,35 +51,31 @@
           <b-form-row class="mt-2"-->
             <b-col sm="12"
                    md="6">
-              <b-form-group
-                label="Lines"
-                class="form-label"
-              >
-                <line-selector v-model="filter.campaigns"
-                               :force-remove-missing-values="true"
+              <b-form-group label="Lines"
+                            class="form-label">
+                <line-selector :force-remove-missing-values="true"
                                :multiple="true"
                                :use-chips="true"
                                :generic-styling="false"
                                :generic-multiselect="false"
                                :highlighted="isChanged('campaigns')"
+                               v-model="filter.campaigns"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')">
                 </line-selector>
               </b-form-group>
             </b-col>
           </b-form-row>
           <b-form-row class="mt-2">
-            <b-col v-if="$route.name === 'Inbox' || ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes($route.params.channel)"
-                   sm="12"
-                   md="6">
-              <b-form-group
-                class="form-label"
-                label="Ring Groups"
-              >
-                <ring-group-selector v-model="filter.ring_groups"
-                                     :force-remove-missing-values="true"
+            <b-col sm="12"
+                   md="6"
+                   v-if="isInboxOrAllCallsChannel">
+              <b-form-group class="form-label"
+                            label="Ring Groups">
+                <ring-group-selector :force-remove-missing-values="true"
                                      :multiple="true"
                                      :highlighted="isChanged('ring_groups')"
                                      :generic-multiselect="false"
+                                     v-model="filter.ring_groups"
                                      @change="(eventPayload) => onFilterChange(eventPayload, 'ring_groups')">
                 </ring-group-selector>
               </b-form-group>
@@ -91,72 +83,70 @@
           </b-form-row>
         </div>
 
-        <div v-if="!['mentions'].includes($route.params.channel)">
+        <div v-if="!isMentionsOrInboxChannel">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
                    md="6">
               <b-form-group class="form-label"
                             label="Direction">
-                <communication-direction-selector v-model="filter.direction"
-                                                  custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                <communication-direction-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
                                                   :highlighted="isChanged('direction')"
                                                   :use-input="false"
+                                                  v-model="filter.direction"
                                                   @select="(eventPayload) => onFilterChange(eventPayload, 'direction')">
                 </communication-direction-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['calls', 'all-communications', 'inbox'].includes($route.params.channel)"
+            <b-col v-if="isCallsOnlyChannel"
                    sm="12"
                    md="6">
               <b-form-group class="form-label"
                             label="Answer Status">
-                <answer-status-selector v-model="filter.answer_status"
-                                        custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                <answer-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
                                         :highlighted="isChanged('answer_status')"
                                         :use-input="false"
+                                        v-model="filter.answer_status"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'answer_status')">
                 </answer-status-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
-                   sm="12"
-                   md="6">
+            <b-col sm="12"
+                   md="6"
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Talk Time">
-                <talk-time-selector v-model="filter.min_talk_time"
-                                    custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                <talk-time-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
                                     :highlighted="isChanged('min_talk_time')"
                                     :use-input="false"
+                                    v-model="filter.min_talk_time"
                                     @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')">
                 </talk-time-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
-                   sm="12"
-                   md="6">
+            <b-col sm="12"
+                   md="6"
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Transfer Type">
-                <transfer-type-selector v-model="filter.transfer_type"
-                                        custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                <transfer-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
                                         :highlighted="isChanged('transfer_type')"
                                         :use-input="false"
+                                        v-model="filter.transfer_type"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')">
                 </transfer-type-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
-                   sm="12"
-                   md="6">
-              <b-form-group
-                class="form-label"
-                label="Callback Status"
-              >
+            <b-col sm="12"
+                   md="6"
+                   v-if="isCallsAndRecordingsChannel">
+              <b-form-group class="form-label"
+                            label="Callback Status">
                 <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
-                                          v-model="filter.callback_status"
                                           :clearable="true"
                                           :highlighted="isChanged('callback_status')"
                                           :use-input="false"
+                                          v-model="filter.callback_status"
                                           @select="(eventPayload) => onFilterChange(eventPayload, 'callback_status')">
                 </callback-status-selector>
               </b-form-group>
@@ -164,43 +154,44 @@
           </b-form-row>
         </div>
 
-        <div v-if="!['mentions'].includes($route.params.channel)">
+        <div v-if="!isMentionsChannel">
           <h5 class="mt-4 section-header">Properties</h5>
           <b-form-row class="mt-2">
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            label="Tags">
+                            :label="tagsFilterLabel">
                 <tag-selector ref="tagSelector"
-                              v-model="filter.tags"
                               :multiple="true"
                               :highlighted="isChanged('tags')"
+                              :category="tagsFilterCategory"
+                              v-model="filter.tags"
                               @change="(eventPayload) => onFilterChange(eventPayload, 'tags')">
                 </tag-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="$route.name === 'Inbox' || ['calls', 'recordings', 'all-communications', 'inbox'].includes($route.params.channel)"
-                   md="6"
-                   sm="12">
+            <b-col md="6"
+                   sm="12"
+                   v-if="!isInbox && isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
-                <call-disposition-selector v-model="filter.call_dispositions"
-                                           :multiple="true"
+                <call-disposition-selector :multiple="true"
                                            :highlighted="isChanged('call_dispositions')"
+                                           v-model="filter.call_dispositions"
                                            @change="(eventPayload) => onFilterChange(eventPayload, 'call_dispositions')">
                 </call-disposition-selector>
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row>
+          <b-form-row v-if="!isInbox">
             <b-col md="6"
                    sm="12">
               <b-form-group>
                 <span class="form-label">Show Only First Time Communications</span>
                 <div>
-                  <b-form-checkbox switch
-                                   class="cursor-pointer switch-success"
+                  <b-form-checkbox class="cursor-pointer switch-success"
                                    size="lg"
+                                   switch
                                    :value="1"
                                    :unchecked-value="0"
                                    v-model="filter.first_time_only">
@@ -214,9 +205,9 @@
               <b-form-group>
                 <span class="form-label">Show Only Untagged Communications</span>
                 <div>
-                  <b-form-checkbox switch
-                                   class="switch-success"
+                  <b-form-checkbox class="switch-success"
                                    size="lg"
+                                   switch
                                    :value="1"
                                    :unchecked-value="0"
                                    v-model="filter.untagged_only">
@@ -230,9 +221,9 @@
               <b-form-group>
                 <span class="form-label">Exclude Communications Sent From Sequences</span>
                 <div>
-                  <b-form-checkbox switch
-                                   class="switch-success"
+                  <b-form-checkbox class="switch-success"
                                    size="lg"
+                                   switch
                                    :value="1"
                                    :unchecked-value="0"
                                    v-model="filter.exclude_automated_communications">
@@ -264,19 +255,20 @@
           <b-form-row class="mt-2">
             <b-col sm="12"
                    md="6"
-                   v-if="!['mentions'].includes($route.params.channel)">
+                   v-if="!isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
-                <incoming-number-selector v-model="filter.incoming_numbers"
-                                          :multiple="true"
+                <incoming-number-selector :multiple="true"
                                           :use-chips="true"
                                           :highlighted="isChanged('incoming_numbers')"
+                                          v-model="filter.incoming_numbers"
                                           @change="(eventPayload) => onFilterChange(eventPayload, 'incoming_numbers')">
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6">
+                   md="6"
+                   v-if="!isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Communication Owners">
                 <div class="comm-owner-filter-tooltip-wrapper">
@@ -297,37 +289,38 @@
                     <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
                   </q-tooltip>
                 </div>
-                <user-selector v-model="filter.users"
-                               custom-placeholder="Select Communication Owners"
+                <user-selector custom-placeholder="Select Communication Owners"
                                :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
                                :highlighted="isChanged('users')"
+                               v-model="filter.users"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'users')">
                 </user-selector>
               </b-form-group>
             </b-col>
-            <b-col  sm="12"
-                    md="6"
-                    v-if="!['mentions'].includes($route.params.channel)">
+            <b-col sm="12"
+                   md="6"
+                   v-if="!isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Sequences">
-                <sequence-selector v-model="filter.workflows"
-                                   :force-remove-missing-values="true"
+                <sequence-selector :force-remove-missing-values="true"
                                    :multiple="true"
                                    :generic-styling="false"
                                    :use-chips="true"
                                    :highlighted="isChanged('workflows')"
+                                   v-model="filter.workflows"
                                    @change="(eventPayload) => onFilterChange(eventPayload, 'workflows')">
                 </sequence-selector>
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6">
+                   md="6"
+                   v-if="!isMentionsChannel">
               <b-form-group class="form-label"
                             label="Contact Owners">
-                <user-selector v-model="filter.contact_owner"
+                <user-selector custom-placeholder="Select Contact Owners"
                                :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
@@ -335,21 +328,21 @@
                                :highlighted="isChanged('contact_owner')"
                                :clearable="false"
                                :disable="disableContactOwner"
-                               custom-placeholder="Select Contact Owners"
+                               v-model="filter.contact_owner"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'contact_owner')">
                 </user-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="['messages', 'all-communications'].includes($route.params.channel)"
-                   sm="12"
-                   md="6">
+            <b-col sm="12"
+                   md="6"
+                   v-if="isMessagesOnlyChannel">
               <b-form-group class="form-label"
                             label="Broadcasts">
-                <broadcast-selector v-model="filter.broadcasts"
-                                    :multiple="true"
+                <broadcast-selector :multiple="true"
                                     :generic-styling="false"
                                     :use-chips="true"
                                     :highlighted="isChanged('broadcasts')"
+                                    v-model="filter.broadcasts"
                                     @change="(eventPayload) => onFilterChange(eventPayload, 'broadcasts')">
                 </broadcast-selector>
               </b-form-group>
@@ -377,10 +370,10 @@ import CallbackStatusSelector from 'components/generic-selectors/callback-status
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
 import { mapActions, mapState } from 'vuex'
-
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
 export default {
   name: 'filter-form',
@@ -409,6 +402,7 @@ export default {
       type: Object,
       required: true
     },
+
     defaultFilterModel: {
       type: Object,
       required: true
@@ -422,9 +416,11 @@ export default {
       'isFilterModelFormShown',
       'inboxShowMyContacts'
     ]),
+
     ...mapState('auth', [
       'profile'
     ]),
+
     isInboxOrAllComms () {
       return [
         'Inbox Channel Task Status',
@@ -432,20 +428,59 @@ export default {
         'Inbox Contact Task'
       ].includes(this.$route.name) || ['all-communications'].includes(this.$route.params.channel)
     },
+
     dateRangeLabel () {
       return this.isInboxOrAllComms ? 'Last Engagement Date' : 'Time'
     },
+
     dateHasChanges () {
       return this.filter.from_date !== this.defaultFilterModel.filter.from_date ||
         this.filter.to_date !== this.defaultFilterModel.filter.to_date
     },
+
     isRangeSelectionOpen () {
       if (!this.rangePicker) {
         return false
       }
       return this.rangePicker.$data.showCustomRangeCalendars
-    }
+    },
 
+    isMentionsChannel () {
+      return this.$route.params.channel === 'mentions'
+    },
+
+    isInbox () {
+      return this.$route.name === 'Inbox' || this.$route.params.channel === 'inbox'
+    },
+
+    isMentionsOrInboxChannel () {
+      return this.$route.name === 'Inbox' || ['mentions', 'inbox'].includes(this.$route.params.channel)
+    },
+
+    isInboxOrAllCallsChannel () {
+      return this.$route.name === 'Inbox' ||
+        ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes(this.$route.params.channel)
+    },
+
+    isCallsOnlyChannel () {
+      return ['calls', 'all-communications'].includes(this.$route.params.channel)
+    },
+
+    isCallsAndRecordingsChannel () {
+      return ['calls', 'recordings', 'all-communications'].includes(this.$route.params.channel)
+    },
+
+    isMessagesOnlyChannel () {
+      return ['messages', 'all-communications'].includes(this.$route.params.channel)
+    },
+
+    tagsFilterLabel () {
+      return this.isInbox ? 'Contact Tags' : 'Tags'
+    },
+
+    tagsFilterCategory () {
+      return this.isInbox ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+    }
   },
 
   data () {
@@ -467,7 +502,8 @@ export default {
         'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
-      rangePicker: null
+      rangePicker: null,
+      TagCategories
     }
   },
 
@@ -481,16 +517,20 @@ export default {
     ...mapActions('inbox', [
       'updateChannelChangedFilterFields'
     ]),
+
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },
+
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
     },
+
     getDateRangeInputLabel () {
       if (this.dateRange.startDate && this.dateRange.endDate) {
         return this.$options.filters.date(this.dateRange.startDate) + ' - ' + this.$options.filters.date(this.dateRange.endDate)
       }
+
       return 'All Time'
     }
   },
@@ -530,6 +570,7 @@ export default {
         this.filter.to_date = this.dateRange.endDate ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD') : null
       }
     },
+
     'filter.my_contact': {
       deep: true,
       handler (value) {
@@ -538,6 +579,7 @@ export default {
         }
       }
     },
+
     'filter.contact_owner': {
       deep: true,
       handler (value) {
@@ -546,12 +588,14 @@ export default {
         }
       }
     },
+
     isRangeSelectionOpen: function (value) {
       if (value) {
         this.dateRange.startDate = window.moment().subtract(1, 'day').format('YYYY-MM-DD')
         this.dateRange.endDate = window.moment().format('YYYY-MM-DD')
       }
     },
+
     'rangePicker.$data.open': function (value) {
       if (value && this.dateRange.startDate && this.dateRange.endDate) {
         this.rangePicker.$data.start = window.moment(this.dateRange.startDate)._d
