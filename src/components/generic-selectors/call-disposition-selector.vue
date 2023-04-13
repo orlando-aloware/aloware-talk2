@@ -19,7 +19,7 @@
             :placeholder="placeholder"
             :disable="disable"
             :class="selectorClass"
-            v-model="callDisposition"
+            v-model="selectedId"
             @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
@@ -147,7 +147,6 @@ export default {
 
   data () {
     return {
-      callDisposition: this.value,
       options: [],
       selectWidth: 0,
       type: 'call'
@@ -159,11 +158,11 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && (!this.callDisposition || (this.callDisposition && this.callDisposition.length < 1)):
+        case this.multiple && (!this.selectedId || (this.selectedId && this.selectedId.length < 1)):
           return 'Select Call Dispositions'
         case !this.multiple && !this.callDispositionId:
           return 'Select Call Disposition'
-        case this.multiple && this.callDisposition && this.callDisposition.length > 0:
+        case this.multiple && this.selectedId && this.selectedId.length > 0:
         case !this.multiple && this.callDispositionId:
         default:
           return ''
@@ -171,15 +170,15 @@ export default {
     },
 
     callDispositionId () {
-      if (!this.callDisposition) {
+      if (!this.selectedId) {
         return null
       }
 
       if (this.multiple) {
-        return this.callDisposition.id
+        return this.selectedId.id
       }
 
-      return this.callDisposition
+      return this.selectedId
     },
 
     values () {
@@ -212,27 +211,27 @@ export default {
 
   created () {
     this.options = this.orderedDispositions
-    this.callDisposition = this.multiple ? [] : this.callDisposition
+    this.selectedId = this.multiple ? [] : this.selectedId
     this.getCallDisposition()
   },
 
   methods: {
     getCallDisposition () {
       if (!_.isEmpty(this.values) && this.multiple) {
-        this.callDisposition = []
+        this.selectedId = []
         const callDispId = { data: null }
         for (callDispId.data in this.values) {
           const found = this.orderedDispositions.find(callDispo => callDispo.id === callDispId.data)
 
           if (found) {
-            this.callDisposition.push(found)
+            this.selectedId.push(found)
           }
         }
         return
       }
 
       if (!_.isEmpty(this.values) && !this.multiple) {
-        this.callDisposition = this.orderedDispositions.find(callDispo => callDispo.id === this.values)
+        this.selectedId = this.orderedDispositions.find(callDispo => callDispo.id === this.values)
       }
     },
 
@@ -265,10 +264,10 @@ export default {
   watch: {
     value () {
       this.getCallDisposition()
-      this.callDisposition = this.value
+      this.selectedId = this.value
     },
 
-    callDisposition (val) {
+    selectedId (val) {
       if (!this.multiple && val !== this.values) {
         this.$emit('change', val)
         return

@@ -1,9 +1,12 @@
 import { mapGetters, mapState } from 'vuex'
-import { clone } from 'lodash'
+import { isEmpty } from 'lodash'
 
 export default {
   data () {
     return {
+      selectedId: this.value,
+      selectedContactDisposition: null,
+      selectedCallDisposition: null,
       type: null
     }
   },
@@ -19,10 +22,36 @@ export default {
     ]),
 
     orderedDispositions () {
-      let dispositions = null
+      if (this.type) {
+        return this.getOrderedDispositions(this.type)
+      }
+
+      return []
+    },
+
+    contactDisposition () {
+      return this.selectedContactDisposition || this.contact?.disposition_status_id
+    },
+
+    callDisposition () {
+      return this.selectedCallDisposition || this.dialer?.communication?.call_disposition_id
+    },
+
+    filteredCallDispositions () {
+      return this.getOrderedDispositions('call')
+    },
+
+    filteredContactDispositions () {
+      return this.getOrderedDispositions('contact')
+    }
+  },
+
+  methods: {
+    getOrderedDispositions (type) {
+      let dispositions = []
       let idProperty = null
 
-      switch (this.type) {
+      switch (type) {
         case 'call':
           idProperty = 'call_disposition_ids'
           dispositions = this.callDispositions
@@ -33,44 +62,37 @@ export default {
           break
       }
 
-      if (this.$route.meta.id === 'power-dialer-session' && dispositions &&
-        this.sessionSettings[idProperty] && this.sessionSettings[idProperty].length > 0) {
-        return dispositions.filter(disposition => {
-          return this.sessionSettings[idProperty].includes(disposition.id)
+      if (isEmpty(dispositions)) {
+        return dispositions
+      }
+
+      let orderedOptions = this.$jsonClone(dispositions)
+      const isInPowerDialerSession = this.$route?.meta?.id === 'power-dialer-session'
+      const selectedIdvariableName = isInPowerDialerSession && this.type
+        ? 'selectedId'
+        : `${type}Disposition`
+      let selectedOptionId = this[selectedIdvariableName]
+
+      if (!this.multiple) {
+        selectedOptionId = [selectedOptionId]
+      }
+
+      if (isInPowerDialerSession && this.sessionSettings[idProperty] &&
+        this.sessionSettings[idProperty].length > 0) {
+        let sessionSettingsOptionIds = this.$jsonClone(this.sessionSettings[idProperty])
+
+        // if disposition is selected and doesn't exist in the options,
+        // add it temporarily
+        if (!isEmpty(selectedOptionId)) {
+          sessionSettingsOptionIds = [...new Set(sessionSettingsOptionIds.concat(selectedOptionId))]
+        }
+
+        orderedOptions = dispositions.filter(disposition => {
+          return sessionSettingsOptionIds.includes(disposition.id)
         })
       }
 
-      if (dispositions) {
-        return clone(dispositions).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
-      }
-
-      return []
-    },
-
-    filteredCallDispositions () {
-      if (this.sessionSettings.call_disposition_ids &&
-        this.sessionSettings.call_disposition_ids.length > 0) {
-        return this.callDispositions.filter(d => {
-          return this.sessionSettings.call_disposition_ids.includes(d.id)
-        })
-      }
-
-      return this.callDispositions
-    },
-
-    filteredContactDispositions () {
-      if (this.sessionSettings.contact_disposition_ids &&
-        this.sessionSettings.contact_disposition_ids.length > 0) {
-        return this.dispositionStatuses.filter(d => {
-          return this.sessionSettings.contact_disposition_ids.includes(d.id)
-        })
-      }
-
-      return this.dispositionStatuses
+      return this.$alphabeticalSort(orderedOptions)
     }
   },
 

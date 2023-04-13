@@ -31,7 +31,7 @@ export default {
   },
 
   watch: {
-    'dialer.contact': function () {
+    'dialer.contact.id': function () {
       this.wrapUpPaused = false
     }
   },

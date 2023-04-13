@@ -156,7 +156,6 @@ export default {
 
   data () {
     return {
-      selectedId: this.value,
       options: [],
       type: 'contact',
       reference: 'contactDispositionSelect',

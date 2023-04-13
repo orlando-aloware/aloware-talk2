@@ -68,9 +68,10 @@ export default {
     ChipsEllipsis
   },
 
-  mounted () {
-    this.sessionPaused = false
-    this.initCallDisposition()
+  data () {
+    return {
+      voicemail: []
+    }
   },
 
   computed: {
@@ -89,15 +90,12 @@ export default {
 
     ...mapGetters('powerDialer', [
       'sessionLoader'
-    ]),
+    ])
+  },
 
-    contactDisposition () {
-      return this.selectedContactDisposition || this.contact?.disposition_status_id
-    },
-
-    callDisposition () {
-      return this.selectedCallDisposition || this.dialer?.communication?.call_disposition_id
-    }
+  mounted () {
+    this.sessionPaused = false
+    this.initCallDisposition()
   },
 
   methods: {
@@ -189,14 +187,6 @@ export default {
       }
 
       this.$refs.callDispositionSelector.enable()
-    }
-  },
-
-  data () {
-    return {
-      selectedContactDisposition: null,
-      selectedCallDisposition: null,
-      voicemail: []
     }
   },
 
