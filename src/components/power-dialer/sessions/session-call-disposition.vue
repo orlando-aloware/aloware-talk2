@@ -53,7 +53,7 @@ import ChipsEllipsis from 'components/chips-ellipsis'
 import { get, isEmpty } from 'lodash'
 import {
   dispositionsMixin,
-  powerDialerDispositionsMixin
+  dispositionsOptionsMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -61,7 +61,7 @@ export default {
 
   mixins: [
     dispositionsMixin,
-    powerDialerDispositionsMixin
+    dispositionsOptionsMixin
   ],
 
   components: {
@@ -106,7 +106,10 @@ export default {
       'updateCallDisposition'
     ]),
 
-    ...mapActions(['setDialerContact']),
+    ...mapActions([
+      'setDialerContact',
+      'setDialerCommunication'
+    ]),
 
     async onSelectedCallDisposition (data) {
       const communicationId = get(this.dialer, 'communication.id', null)
@@ -123,6 +126,13 @@ export default {
       }).then(res => {
         if (res?.id) {
           this.selectedCallDisposition = res?.call_disposition_id
+        }
+
+        const dialerCommunication = this.$jsonClone(this.dialer.communication)
+
+        if (dialerCommunication) {
+          dialerCommunication.call_disposition_id = data.id
+          this.setDialerCommunication(dialerCommunication)
         }
 
         this.onCallDisposed(data.id)
@@ -155,7 +165,13 @@ export default {
           this.selectedContactDisposition = status.id
         }
 
-        this.setDialerContact(res)
+        const dialerContact = this.$jsonClone(this.dialer.contact)
+
+        if (dialerContact) {
+          dialerContact.disposition_status_id = data.id
+          this.setDialerContact(dialerContact)
+        }
+
         this.onContactDisposed(data.id)
         this.$refs.contactDispositionSelector.hideLoading()
       }).catch((err) => {

@@ -82,14 +82,14 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import { powerDialerDispositionsMixin } from 'src/plugins/mixins'
+import { dispositionsOptionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'call-disposition-selector',
 
   components: { RemoveTagIcon },
 
-  mixins: [powerDialerDispositionsMixin],
+  mixins: [dispositionsOptionsMixin],
 
   props: {
     value: {

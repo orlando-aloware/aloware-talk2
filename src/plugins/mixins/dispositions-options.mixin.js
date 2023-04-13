@@ -72,5 +72,18 @@ export default {
 
       return this.dispositionStatuses
     }
+  },
+
+  watch: {
+    orderedDispositions () {
+      const referenceName = `${this.type}DispositionSelect`
+
+      // clear search (filter) when disposition's options are updated
+      if (this.useInput && this.$refs[referenceName]) {
+        this.$refs[referenceName].updateInputValue('')
+      }
+
+      this.options = this.orderedDispositions
+    }
   }
 }

@@ -66,14 +66,14 @@
 
 <script>
 import { mapState } from 'vuex'
-import { selectorMixin, powerDialerDispositionsMixin } from 'src/plugins/mixins'
+import { selectorMixin, dispositionsOptionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-disposition-selector',
 
   mixins: [
     selectorMixin,
-    powerDialerDispositionsMixin
+    dispositionsOptionsMixin
   ],
 
   props: {
@@ -248,10 +248,6 @@ export default {
         this.$emit('change', val)
       }
       this.showInputPlaceholder()
-    },
-
-    orderedDispositions () {
-      this.options = this.orderedDispositions
     }
   }
 }
