@@ -211,7 +211,7 @@
                   :key="`col-${colIndex}`"
                   v-if="column.name === 'user'">
                 <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}"
-                            v-if="call.rejected_by_app !== 0">
+                             v-if="call.rejected_by_app !== 0">
                   <q-icon class="status-icon d-inline-block text-danger"
                           :state="call.rejected_by_app"
                           :name="rejectionToIcon(call.rejected_by_app)">
@@ -443,37 +443,47 @@ export default {
         let condition = null
 
         // use a different rule based on order field
-        // switch (this.sort.orderBy) {
-        //   case 'id':
-        //     condition = a.id > b.id
-        //     break
-        //   case 'name':
-        //     condition = a.name > b.name
-        //     break
-        //   case 'status':
-        //     // use status names
-        //     let nameA = LABELS.find(status => status.value === a.agent_status) || {}
-        //     let nameB = LABELS.find(status => status.value === b.agent_status) || {}
+        switch (this.sort.orderBy) {
+          case 'incoming_number':
+            condition = a.incoming_number > b.incoming_number
+            break
+          case 'ring_group':
+            const ringGroupA = this.getRingGroup(a.ring_group_id)
+            const ringGroupB = this.getRingGroup(b.ring_group_id)
 
-        //     condition = nameA.label > nameB.label
-        //     break
-        //   case 'status-duration':
-        //     condition = a.last_agent_status_change && b.last_agent_status_change
-        //       ? a.last_agent_status_change < b.last_agent_status_change // compare values if both are present
-        //       : !a.last_agent_status_change // use inverted logic otherwise
+            condition = ringGroupA > ringGroupB
+            break
+          case 'workflow':
+            const workflowA = this.getWorkflow(a.workflow_id)
+            const workflowB = this.getWorkflow(b.workflow_id)
 
-        //     break
-        //   case 'last-login':
-        //     condition = a.last_login && b.last_login
-        //       ? a.last_login < b.last_login // compare values if both are present
-        //       : !a.last_login // use inverted logic otherwise
-
-        //     break
-        //   case 'last-updated':
-        //     condition = a.updated_at < b.updated_at
-
-        //     break
-        // }
+            condition = workflowA > workflowB
+            break
+          case 'start':
+            condition = a.created_at < b.created_at
+            break
+          case 'wait_time':
+            condition = a.wait_time > b.wait_time
+            break
+          case 'talk_time':
+            condition = a.talk_time > b.talk_time
+            break
+          case 'duration':
+            condition = a.duration > b.duration
+            break
+          case 'lead_number':
+            condition = (a.contact?.name || a.lead_number) > (b.contact?.name || b.lead_number)
+            break
+          case 'owner_id':
+            condition = (a.user?.name || '') > (b.user?.name || '')
+            break
+          case 'lead_location':
+            condition = (a.city + a.state) > (b.city + b.state)
+            break
+          case 'user':
+            condition = this.getUserName(this.getUser(a.user_id)) > this.getUserName(this.getUser(b.user_id))
+            break
+        }
 
         return this.sort.order === 'asc'
           ? condition > 0 ? 1 : -1

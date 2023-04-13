@@ -108,21 +108,21 @@ export const COLUMNS = [
     name: 'in_cold_transfer',
     label: 'Cold Transferred?',
     order: 13,
-    sortable: true,
+    sortable: false,
     selectable: true
   },
   {
     name: 'transfer_type',
     label: 'Transfer Type',
     order: 14,
-    sortable: true,
+    sortable: false,
     selectable: true
   },
   {
     name: 'callback_status',
     label: 'Callback Status',
     order: 15,
-    sortable: true,
+    sortable: false,
     selectable: true
   },
   {
