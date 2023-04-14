@@ -231,7 +231,7 @@ export default {
     },
 
     addSentryContext () {
-      if (!this.user) {
+      if (!this.profile) {
         return
       }
 
