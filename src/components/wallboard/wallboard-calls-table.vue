@@ -49,8 +49,14 @@
                   v-if="column.name === 'incoming_number'">
                 <div class="row">
                   <div class="col-12 mb-1">
-                    <!-- FIXME: link to campaign -->
-                    {{ getCampaign(call.campaign_id) }}
+                    <a :href="getCampaignURL(call.campaign_id)"
+                       target="_blank"
+                       v-if="hasRole('Company Admin')">
+                       {{ getCampaign(call.campaign_id) }}
+                    </a>
+                    <span v-else>
+                      {{ getCampaign(call.campaign_id) }}
+                    </span>
                   </div>
                   <div class="col-12">
                     {{ call.incoming_number | fixPhone }}
@@ -61,15 +67,27 @@
               <!-- ring group -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'ring_group'">
-                <!-- FIXME: link to RG -->
-                {{ getRingGroup(call.ring_group_id) }}
+                <a :href="getRingGroupURL(call.ring_group_id)"
+                    target="_blank"
+                    v-if="hasRole('Company Admin')">
+                    {{ getRingGroup(call.ring_group_id) }}
+                </a>
+                <span v-else>
+                  {{ getRingGroup(call.ring_group_id) }}
+                </span>
               </td>
 
-              <!-- sequence -->
+              <!-- workflow -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'workflow'">
-                <!-- FIXME: link to workflow -->
-                {{ getWorkflow(call.workflow_id) }}
+                <a :href="getWorkflowURL(call.workflow_id)"
+                    target="_blank"
+                    v-if="hasRole('Company Admin')">
+                    {{ getWorkflow(call.workflow_id) }}
+                </a>
+                <span v-else>
+                  {{ getWorkflow(call.workflow_id) }}
+                </span>
               </td>
 
               <!-- start time -->
@@ -221,7 +239,10 @@
                   </q-icon>
                 </router-link>
                 <div v-else-if="call.user_id && getUser(call.user_id)">
-                  <span>{{ getUserName(getUser(call.user_id)) }}</span>
+                  <a :href="getUserURL(call.user_id)"
+                      target="_blank"
+                      v-if="hasRole('Company Admin')">{{ getUserName(getUser(call.user_id)) }}</a>
+                  <span v-else>{{ getUserName(getUser(call.user_id)) }}</span>
                 </div>
                 <div v-else>
                   <span>--</span>
@@ -358,6 +379,7 @@ import { COLUMNS } from 'src/constants/wallboard/calls-columns'
 import {
   aclMixin,
   callDispositionMixin,
+  classicMixin,
   communicationInfoMixin,
   contactDispositionMixin,
   userMixin
@@ -370,6 +392,7 @@ export default {
   mixins: [
     aclMixin,
     callDispositionMixin,
+    classicMixin,
     communicationInfoMixin,
     contactDispositionMixin,
     userMixin

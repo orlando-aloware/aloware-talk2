@@ -12682,6 +12682,12 @@ h1.contact-list-name-label {
       }
 
       &__table {
+        table.datatable {
+          td {
+            transition: all .3s;
+          }
+        }
+
         &__collapse {
           i {
             transition: all .3s;
