@@ -1,11 +1,20 @@
 <template>
-  <b-form-group>
-      <b-form-radio-group buttons
-                          button-variant="outline-success"
-                          :options="options"
-                          v-model="mode"
-                          @change="onChange"/>
-  </b-form-group>
+  <q-btn-toggle class="mx-2 mt-2 mb-1 custom-toggle-button"
+                dense
+                no-caps
+                :options="options"
+                unelevated
+                v-model="mode">
+    <template v-for="option in options"
+              v-slot:[option.slot]>
+      <div class="options"
+           :key="option.slot">
+        <span :class="['text-left task-status-name p-2', viewMode === option.value ? 'text-white' : 'text-grey-90']">
+          {{ option.name }}
+        </span>
+      </div>
+    </template>
+  </q-btn-toggle>
 </template>
 
 <script>
@@ -22,22 +31,22 @@ export default {
     options () {
       return [
         {
-          text: 'Comfort',
-          value: 'comfort'
+          slot: 'one',
+          value: 'comfort',
+          name: 'Comfort'
         },
         {
-          text: 'Compact',
-          value: 'compact'
+          slot: 'two',
+          value: 'compact',
+          name: 'Compact'
         }
       ]
     }
   },
 
-  data () {
-    return {
-      mode: null
-    }
-  },
+  data: () => ({
+    mode: null
+  }),
 
   mounted () {
     this.mode = this.viewMode
@@ -46,9 +55,11 @@ export default {
   methods: {
     ...mapActions('wallboard', [
       'setViewMode'
-    ]),
+    ])
+  },
 
-    onChange (value) {
+  watch: {
+    mode (value) {
       this.setViewMode(value)
     }
   }
