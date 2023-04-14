@@ -12,10 +12,9 @@
            @hidden="onHidden"
            @show="onShow"
            @shown="autoClose">
-    <button
-      class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-full-rounded position-absolute call-fishing-clear-queues"
-      v-if="queueCount > 1"
-      @click="clearNotificationQueue">
+    <button class="btn btn-sm text-white text-xxs2 bg-blue-60-opaque border-full-rounded position-absolute call-fishing-clear-queues"
+            v-if="queueCount > 1"
+            @click="clearNotificationQueue">
       Clear All
     </button>
     <div class="notification-body-wrapper"
@@ -35,7 +34,7 @@
           <call-icon v-if="id === 'call'"/>
           <voicemail-icon v-if="id === 'voicemail'"/>
           <mention-icon v-if="id === 'mention'"/>
-          <call-incoming-icon v-if="['incomingCall', 'callFishing'].includes(id)"/>
+          <call-incoming-icon v-if="isCall"/>
         </div>
         <div class="notification-details"
              :class="[(!['incomingCall','callFishing'].includes(id) ? 'w-100' : 'flex-grow-1'), (id === 'callFishing' && queue ? 'pl-2' : '')]"
@@ -52,7 +51,7 @@
               {{ title }}
             </strong>
             <small class="mr-2 text-grey-82 time text-nowrap"
-                   v-if="!['incomingCall', 'callFishing'].includes(id)">
+                   v-if="!isCall">
               {{ runningDateTime }}
             </small>
           </div>
@@ -61,12 +60,12 @@
               <component class="message-icon mr-1"
                          :is="messageIcon"
                          v-if="messageIcon"/>
-              <span v-if="!['incomingCall', 'callFishing'].includes(id) && message"
+              <span v-if="!isCall && message"
                     class="message-text"
                     v-html="$options.filters.nl2br(message, false)">
               </span>
               <div class="message-text row has-ring-group"
-                   v-else-if="['incomingCall', 'callFishing'].includes(id) && campaignName && ringGroupName">
+                   v-else-if="isCall && campaignName && ringGroupName">
                 <div class="campaign-wrapper col-5">
                   <div class="campaign-name">{{ campaignName }}</div>
                 </div>
@@ -76,7 +75,7 @@
                 </div>
               </div>
               <span class="message-text d-flex"
-                    v-else-if="['incomingCall', 'callFishing'].includes(id) && campaignName && !ringGroupName">
+                    v-else-if="isCall && campaignName && !ringGroupName">
                 {{ campaignName }}
               </span>
             </div>
@@ -90,7 +89,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
-             :class="[['incomingCall', 'callFishing'].includes(id) && getSource ? 'mt-2' : '']"
+             :class="[isCall && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -235,14 +234,18 @@ export default {
   computed: {
     ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
 
+    isCall () {
+      return ['incomingCall', 'callFishing'].includes(this.id)
+    },
+
     toastClass () {
       const toastClass = { data: 'action-notification notification-border-round' }
 
-      if (!['incomingCall', 'callFishing'].includes(this.id)) {
+      if (!this.isCall) {
         toastClass.data += ' bg-grey-80'
       }
 
-      if (['incomingCall', 'callFishing'].includes(this.id)) {
+      if (this.isCall) {
         toastClass.data += ' bg-blue-60-opaque position-relative background-blur incoming-call-notification'
       }
 
@@ -260,11 +263,11 @@ export default {
     headerClass () {
       const headerClass = { data: 'border-0 p-0' }
 
-      if (!['incomingCall', 'callFishing'].includes(this.id)) {
+      if (!this.isCall) {
         headerClass.data += ' bg-grey-80'
       }
 
-      if (['incomingCall', 'callFishing'].includes(this.id)) {
+      if (this.isCall) {
         headerClass.data += ' bg-blue-60-opaque'
       }
 
@@ -490,7 +493,7 @@ export default {
 
     notificationIconClasses () {
       return [
-        ['incomingCall', 'callFishing'].includes(this.id) && this.getSource ? 'mt-2' : '',
+        this.isCall && this.getSource ? 'mt-2' : '',
         this.id === 'system' ? 'system-update' : ''
       ]
     }
@@ -718,6 +721,7 @@ export default {
           queue: null
         }
       })
+
       this.clearCallFishingQueue()
       this.$closeActionNotification(this.id)
     },
@@ -741,7 +745,7 @@ export default {
     },
 
     toContact () {
-      if (!['incomingCall', 'callFishing'].includes(this.id)) {
+      if (!this.isCall) {
         return
       }
 

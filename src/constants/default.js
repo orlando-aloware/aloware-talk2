@@ -225,5 +225,7 @@ export const DEFAULT_STATE = {
     referer: null,
     whitelabel: false
   },
-  staticsLoaded: false
+  staticsLoaded: false,
+  isCallDisposed: false,
+  isContactDisposed: false
 }

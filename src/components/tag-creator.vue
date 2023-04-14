@@ -33,7 +33,7 @@
           <q-select ref="tag-select"
                     class="w-full"
                     option-value="name"
-                    :option-label="name | translateTagCategory"
+                    :option-label="name | translateTagCategories"
                     :placeholder="placeholder"
                     :options="categories"
                     v-model="tag.category">
@@ -87,7 +87,7 @@ import {
   aclMixin,
   formValidationMixin
 } from 'src/plugins/mixins'
-import * as TagCategory from 'src/constants/tag-categories'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 export default {
   name: 'tag-creator',
 
@@ -132,10 +132,10 @@ export default {
       },
       categories: [
         {
-          name: TagCategory.CAT_CONTACTS
+          name: TagCategories.CAT_CONTACTS
         },
         {
-          name: TagCategory.CAT_COMMUNICATIONS
+          name: TagCategories.CAT_COMMUNICATIONS
         }
       ],
       rules_tag: {
