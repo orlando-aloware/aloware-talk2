@@ -3772,6 +3772,10 @@ i.option-separator {
   opacity: 1 !important;
 }
 
+.opacity-05 {
+  opacity: 0.5 !important;
+}
+
 .btn-header-nav-back {
   color: $grey-90;
 }
@@ -11740,6 +11744,9 @@ screen and (max-width: 956px) {
   cursor: default !important;
 }
 
+.cursor-blocked {
+  cursor: not-allowed !important;
+}
 
 .template-preview {
   min-width: 15rem !important;

@@ -1,15 +1,17 @@
 <template>
-  <button :class="['btn', 'btn-sm', customClass]"
-          v-if="userCanBargeAndWhisper(communication)"
-          @click="dialog(communication)">
-    <i class="material-icons">volume_up</i>
+  <span class="cursor-pointer"
+        v-if="userCanBargeAndWhisper(communication)"
+        @click="dialog(communication)">
+    <volume-high-icon height="22"
+                      width="22"/>
     <q-tooltip>
       Barge
     </q-tooltip>
-  </button>
+  </span>
 </template>
 
 <script>
+import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
 import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
@@ -20,6 +22,10 @@ export default {
     agentMixin,
     communicationMixin
   ],
+
+  components: {
+    VolumeHighIcon
+  },
 
   props: {
     communication: {

@@ -1,19 +1,19 @@
 <template>
-  <button :class="['btn', 'btn-sm', customClass]"
-          :disabled="loading"
-          v-if="show"
-          @click="dialog(communication)">
-    <i class="material-icons">
-      power_settings_new
-    </i>
+  <span :class="['cursor-pointer', { 'opacity-05 cursor-blocked': loading }]"
+        :disabled="loading"
+        v-if="show"
+        @click="dialog(communication)">
+    <power-icon height="22"
+                width="22"/>
     <q-tooltip>
       Terminate
     </q-tooltip>
-  </button>
+  </span>
 </template>
 
 <script>
 import API from 'src/plugins/api/api'
+import PowerIcon from 'src/components/icons/power-icon.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import { DISPOSITION_STATUS_INPROGRESS_NEW } from 'src/constants/communication-disposition-status'
 
@@ -23,6 +23,10 @@ export default {
   mixins: [
     aclMixin
   ],
+
+  components: {
+    PowerIcon
+  },
 
   props: {
     communication: {
@@ -49,6 +53,10 @@ export default {
 
   methods: {
     dialog () {
+      if (this.loading) {
+        return
+      }
+
       this.$bvModal.msgBoxConfirm('Terminating communication will forcefully dispose it. Continue?', {
         buttonSize: 'sm',
         okTitle: 'Yes',

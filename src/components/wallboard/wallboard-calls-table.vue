@@ -299,23 +299,22 @@
 
                 <!-- go to comm info -->
                 <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
-                  <button class="btn btn-sm btn-light ml-1">
-                    <i class="material-icons">info_outline</i>
-                    <q-tooltip>More Details</q-tooltip>
-                  </button>
+                  <information-circle-icon height="22"
+                                           width="22" />
+                  <q-tooltip>More Details</q-tooltip>
                 </router-link>
 
                 <!-- terminate -->
-                <terminate-communication-button :communication="call"
-                                                custom-class="btn-danger ml-1" />
+                <terminate-communication-button class="ml-2"
+                                                :communication="call" />
 
                 <!-- barge -->
-                <barge-communication-button :communication="call"
-                                            custom-class="btn-warning ml-1" />
+                <barge-communication-button class="ml-2"
+                                            :communication="call" />
 
                 <!-- whisper -->
-                <whisper-communication-button :communication="call"
-                                              custom-class="btn-dark ml-1" />
+                <whisper-communication-button class="ml-2"
+                                              :communication="call" />
               </td>
             </template>
           </tr>
@@ -370,6 +369,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import BargeCommunicationButton from 'src/components/communication/barge-communication-button.vue'
 import CommunicationTags from 'src/components/generic-selectors/communication-tags.vue'
 import Datatable from 'src/components/datatable.vue'
+import InformationCircleIcon from 'src/components/icons/information-circle-icon.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import TargetUsersTree from 'src/components/target-users-tree.vue'
 import TerminateCommunicationButton from 'src/components/communication/terminate-communication-button.vue'
@@ -402,6 +402,7 @@ export default {
     BargeCommunicationButton,
     CommunicationTags,
     Datatable,
+    InformationCircleIcon,
     RelativeTime,
     TargetUsersTree,
     TerminateCommunicationButton,

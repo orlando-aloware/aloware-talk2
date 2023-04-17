@@ -1,17 +1,17 @@
 <template>
-  <button :class="['btn', 'btn-sm', customClass]"
-          v-if="userCanBargeAndWhisper(communication)"
-          @click="dialog(communication)">
-    <i class="material-icons">
-      hearing
-    </i>
+  <span class="cursor-pointer"
+        v-if="userCanBargeAndWhisper(communication)"
+        @click="dialog(communication)">
+    <ear-icon height="22"
+              width="22"/>
     <q-tooltip>
       Whisper
     </q-tooltip>
-  </button>
+  </span>
 </template>
 
 <script>
+import EarIcon from 'src/components/icons/ear-icon.vue'
 import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
@@ -22,6 +22,10 @@ export default {
     agentMixin,
     communicationMixin
   ],
+
+  components: {
+    EarIcon
+  },
 
   props: {
     communication: {
