@@ -21,7 +21,8 @@ export default function () {
     ],
     filters: {
       ringGroup: null,
-      agent: null
+      agent: null,
+      agentStatus: 'all'
     },
     isLiveCallsLoading: false,
     isParkedCallsLoading: false,

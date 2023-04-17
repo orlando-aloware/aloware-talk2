@@ -7,8 +7,8 @@
                custom-class="pr-3"
                scroll-area-class="scroll-type-2"
                :columns="columns"
-               :is-empty="filteredUsers.length === 0"
-               :total-rows="filteredUsers.length"
+               :is-empty="users.length === 0"
+               :total-rows="users.length"
                :current-page="pagination.page"
                :last-page="lastPage"
                @paginated="onPaginated"
@@ -76,7 +76,7 @@
 
       <template #empty>
         <div class="empty-state"
-             v-if="filteredUsers.length === 0">
+             v-if="users.length === 0">
           <div class="h5">
             No agents found based on the current filters
           </div>
@@ -107,23 +107,6 @@ export default {
     TimeAgo,
     WallboardAgentRingGroups,
     WallboardAgentStatus
-  },
-
-  props: {
-    filters: {
-      agent: {
-        type: String,
-        default: null
-      },
-      status: {
-        type: [String, Number],
-        default: 'all'
-      },
-      ringGroup: {
-        type: Number,
-        default: null
-      }
-    }
   },
 
   computed: {
@@ -193,7 +176,7 @@ export default {
     },
 
     orderedUsers () {
-      let users = this.filteredUsers
+      let users = this.users
 
       return users.sort((a, b) => {
         let condition = null
@@ -237,29 +220,8 @@ export default {
       })
     },
 
-    filteredUsers () {
-      return this.users.filter(user => {
-        // agent name filter
-        const name = !this.filters.agent
-          ? true
-          : user.name.toUpperCase().includes(this.filters.agent.toUpperCase())
-
-        // status filter
-        const status = this.filters.status === 'all'
-          ? true
-          : user.agent_status === this.filters.status
-
-        // ring group filter
-        const ringGroup = !this.filters.ringGroup
-          ? true
-          : user.ring_group_ids.includes(this.filters.ringGroup)
-
-        return name && status && ringGroup
-      })
-    },
-
     lastPage () {
-      return Math.ceil(this.filteredUsers.length / this.pagination.perPage)
+      return Math.ceil(this.users.length / this.pagination.perPage)
     },
 
     apiUrl () {
