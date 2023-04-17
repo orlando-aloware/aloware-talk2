@@ -12493,7 +12493,6 @@ h1.contact-list-name-label {
     flex-wrap: wrap;
 
     .overview {
-      height: 550px;
       width: calc(100% - 40px);
       margin: 20px;
       padding: 20px;
@@ -12505,6 +12504,7 @@ h1.contact-list-name-label {
 
       // taller
       &--comfort {
+        height: 550px;
         grid-template-columns: repeat(5, 1fr);
         grid-template-rows: repeat(3, 1fr);
 
@@ -12516,6 +12516,7 @@ h1.contact-list-name-label {
 
       // wider
       &--compact {
+        height: 600px;
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(5, 1fr);
 

@@ -51,11 +51,11 @@
                   <div class="col-12 mb-1">
                     <a :href="getCampaignURL(call.campaign_id)"
                        target="_blank"
-                       v-if="hasRole('Company Admin')">
+                       v-if="hasRole('Company Admin') && getCampaign(call.campaign_id)">
                        {{ getCampaign(call.campaign_id) }}
                     </a>
                     <span v-else>
-                      {{ getCampaign(call.campaign_id) }}
+                      {{ getCampaign(call.campaign_id) || '--' }}
                     </span>
                   </div>
                   <div class="col-12">
@@ -69,11 +69,11 @@
                   v-if="column.name === 'ring_group'">
                 <a :href="getRingGroupURL(call.ring_group_id)"
                     target="_blank"
-                    v-if="hasRole('Company Admin')">
+                    v-if="hasRole('Company Admin') && getRingGroup(call.ring_group_id)">
                     {{ getRingGroup(call.ring_group_id) }}
                 </a>
                 <span v-else>
-                  {{ getRingGroup(call.ring_group_id) }}
+                  {{ getRingGroup(call.ring_group_id) || '--' }}
                 </span>
               </td>
 
@@ -82,11 +82,11 @@
                   v-if="column.name === 'workflow'">
                 <a :href="getWorkflowURL(call.workflow_id)"
                     target="_blank"
-                    v-if="hasRole('Company Admin')">
+                    v-if="hasRole('Company Admin') && getWorkflow(call.workflow_id)">
                     {{ getWorkflow(call.workflow_id) }}
                 </a>
                 <span v-else>
-                  {{ getWorkflow(call.workflow_id) }}
+                  {{ getWorkflow(call.workflow_id) || '--' }}
                 </span>
               </td>
 
@@ -547,15 +547,15 @@ export default {
     },
 
     getCampaign (campaignId) {
-      return this.campaigns.find(campaign => campaign.id === campaignId)?.name
+      return this.campaigns.find(campaign => campaign.id === campaignId)?.name || null
     },
 
     getRingGroup (ringGroupId) {
-      return this.ringGroups.find(rg => rg.id === ringGroupId)?.name || '--'
+      return this.ringGroups.find(rg => rg.id === ringGroupId)?.name || null
     },
 
     getWorkflow (worfkflowId) {
-      return this.workflows.find(workflow => workflow.id === worfkflowId)?.name || '--'
+      return this.workflows.find(workflow => workflow.id === worfkflowId)?.name || null
     },
 
     getVisibleStatus (communication) {

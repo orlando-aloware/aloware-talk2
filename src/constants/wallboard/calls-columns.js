@@ -13,16 +13,9 @@ export const COLUMNS = [
     minWidth: 50
   },
   {
-    name: 'line',
-    label: 'Line',
-    order: 1,
-    sortable: false,
-    selectable: true
-  },
-  {
     name: 'incoming_number',
     label: 'Number',
-    order: 2,
+    order: 1,
     sortable: true,
     selectable: true,
     minWidth: 160
@@ -30,7 +23,7 @@ export const COLUMNS = [
   {
     name: 'ring_group',
     label: 'Ring Group',
-    order: 3,
+    order: 2,
     sortable: true,
     selectable: true,
     minWidth: 150
@@ -38,7 +31,7 @@ export const COLUMNS = [
   {
     name: 'workflow',
     label: 'Sequence',
-    order: 4,
+    order: 3,
     sortable: true,
     selectable: true,
     minWidth: 150
@@ -46,7 +39,7 @@ export const COLUMNS = [
   {
     name: 'start',
     label: 'Start Time',
-    order: 5,
+    order: 4,
     sortable: true,
     selectable: true,
     minWidth: 200
@@ -54,28 +47,28 @@ export const COLUMNS = [
   {
     name: 'wait_time',
     label: 'Wait Time',
-    order: 6,
+    order: 5,
     sortable: true,
     selectable: true
   },
   {
     name: 'talk_time',
     label: 'Talk Time',
-    order: 7,
+    order: 6,
     sortable: true,
     selectable: true
   },
   {
     name: 'duration',
     label: 'Duration',
-    order: 8,
+    order: 7,
     sortable: true,
     selectable: true
   },
   {
     name: 'lead_number',
     label: 'Contact',
-    order: 9,
+    order: 8,
     sortable: true,
     selectable: true,
     minWidth: 300
@@ -83,7 +76,7 @@ export const COLUMNS = [
   {
     name: 'owner_id',
     label: 'Owner',
-    order: 10,
+    order: 9,
     sortable: true,
     selectable: true,
     minWidth: 130
@@ -91,7 +84,7 @@ export const COLUMNS = [
   {
     name: 'lead_location',
     label: 'Location',
-    order: 11,
+    order: 10,
     sortable: true,
     selectable: true,
     minWidth: 140
@@ -99,7 +92,7 @@ export const COLUMNS = [
   {
     name: 'user',
     label: 'User',
-    order: 12,
+    order: 11,
     sortable: true,
     selectable: true,
     minWidth: 150
@@ -107,35 +100,35 @@ export const COLUMNS = [
   {
     name: 'in_cold_transfer',
     label: 'Cold Transferred?',
-    order: 13,
+    order: 12,
     sortable: false,
     selectable: true
   },
   {
     name: 'transfer_type',
     label: 'Transfer Type',
-    order: 14,
+    order: 13,
     sortable: false,
     selectable: true
   },
   {
     name: 'callback_status',
     label: 'Callback Status',
-    order: 15,
+    order: 14,
     sortable: false,
     selectable: true
   },
   {
     name: 'tags',
     label: 'Tags',
-    order: 16,
+    order: 15,
     sortable: false,
     selectable: true
   },
   {
     name: 'notes',
     label: 'Notes',
-    order: 17,
+    order: 16,
     sortable: false,
     selectable: true,
     minWidth: 150
@@ -143,7 +136,7 @@ export const COLUMNS = [
   {
     name: 'operations',
     label: 'Operations',
-    order: 18,
+    order: 17,
     sortable: false,
     selectable: true,
     minWidth: 200
