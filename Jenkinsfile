@@ -91,8 +91,6 @@ pipeline {
                           sh "terraform workspace select ${branchName}"
                       }
 
-                      sh "echo ${AWS_CREDS_USR}-${AWS_REGION}"
-
                       sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                   }
 
