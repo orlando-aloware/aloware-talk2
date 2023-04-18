@@ -7,7 +7,7 @@ module.exports = {
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: process.env.SENTRY_ORGANIZATION,
       project: process.env.SENTRY_PROJECT,
-      include: '../dist'
+      include: ['../../dist', '../../src-electron/build', '..']
       // release: process.env.SENTRY_RELEASE
     })
   ]
