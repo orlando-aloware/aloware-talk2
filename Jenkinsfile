@@ -90,8 +90,6 @@ pipeline {
                           echo "The workspace already exists, running TF Commands..."
                           sh "terraform workspace select ${branchName}"
                       }
-                    
-                      sh "echo ${AWS_CREDS_USR}-${AWS_CREDS_PSW}-${AWS_REGION} > tmp_aws_token.txt"
 
                       sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                   }
