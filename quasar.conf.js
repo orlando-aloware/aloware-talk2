@@ -89,7 +89,7 @@ module.exports = function (/* ctx */) {
           rewrite: true,
 
           // webpack specific configuration
-          include: cfg.output.path,
+          include: ['./dist', './src-electron', './src'],
           ignore: ['node_modules']
         })
 
