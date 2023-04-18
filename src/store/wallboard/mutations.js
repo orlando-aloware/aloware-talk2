@@ -1,5 +1,3 @@
-import { updateField } from 'vuex-map-fields'
-
 export default {
   SET_AGENT_STATUS: (state, data) => {
     const userIndex = state.users.findIndex(user => user.id === data.user_id)
@@ -82,7 +80,5 @@ export default {
     } else {
       state.callsEnabledColumns.push(column)
     }
-  },
-
-  updateField
+  }
 }
