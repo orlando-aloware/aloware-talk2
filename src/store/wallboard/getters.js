@@ -28,9 +28,9 @@ export default {
   },
 
   getUsers: (state) => {
-    // return only valid users to be used
     return state.users
       .filter(user => {
+        // only valid users
         if (user.is_destination || user.read_only_access || !user.enabled || !user.active) {
           return false
         }

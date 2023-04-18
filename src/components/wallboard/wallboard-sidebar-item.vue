@@ -10,7 +10,7 @@
             v-if="!loading"/>
       <q-spinner-tail size="12px"
                       color="blue"
-                      v-else />
+                      v-else/>
     </span>
   </router-link>
 </template>

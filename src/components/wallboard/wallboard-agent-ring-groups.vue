@@ -5,7 +5,7 @@
       <div class="users__table__agent-ring-groups__ring-group-name">
         {{ firstRingGroup.name }}
       </div>
-      <span class="text-success ml-1 cursor-pointer"
+      <span class="text-primary ml-1 cursor-pointer"
             :id="`rg-more-${_uid}`"
             v-if="ringGroups.length > 1">
         + {{ ringGroups.length - 1 }} more

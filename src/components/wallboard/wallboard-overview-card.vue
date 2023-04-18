@@ -45,7 +45,7 @@ import WallboardOverviewTotalCallsIcon from 'src/components/icons/wallboard/over
 import WallboardOverviewTotalOccupancyIcon from 'src/components/icons/wallboard/overview-total-occupancy-icon'
 
 export default {
-  name: 'WallboardOverviewCard',
+  name: 'wallboard-overview-card',
 
   components: {
     CounterUp,

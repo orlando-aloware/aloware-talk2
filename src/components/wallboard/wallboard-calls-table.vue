@@ -99,7 +99,7 @@
                 <div class="d-flex align-items-center justify-content-left"
                      v-if="call.call_disposition_id">
                   <i class="fa fa-bolt"
-                    :style="{ color: callDispositionColor(call.call_disposition_id) }"></i>
+                     :style="{ color: callDispositionColor(call.call_disposition_id) }"/>
                   <span class="ml-1">{{ callDispositionName(call.call_disposition_id) }}</span>
                 </div>
               </td>
@@ -290,7 +290,7 @@
                   v-if="column.name === 'operations'">
                 <!-- go to messages -->
                 <router-link :to="{ path: `/contacts/${call.contact_id}` }"
-                              v-if="call.contact && call.type === 2 && hasPermissionTo('send sms')">
+                              v-if="call.contact && call.type === CommunicationTypes.SMS && hasPermissionTo('send sms')">
                   <button class="btn btn-sm btn-primary">
                     <i class="material-icons">reply</i>
                     <q-tooltip>Reply</q-tooltip>

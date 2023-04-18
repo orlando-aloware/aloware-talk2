@@ -27,6 +27,8 @@ import WallboardViewModeButton from 'src/components/wallboard/wallboard-view-mod
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
+  name: 'wallboard-header',
+
   components: {
     RingGroupSelector,
     WallboardViewModeButton

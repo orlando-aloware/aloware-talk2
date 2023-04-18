@@ -11,7 +11,7 @@
                 @click="fetchSummary">
             <refresh-icon />
             <q-tooltip anchor="center right"
-                      self="center left">
+                       self="center left">
               <span class="font-weight-bold text-sm">Refresh counts</span>
             </q-tooltip>
           </span>
