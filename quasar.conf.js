@@ -28,7 +28,7 @@ module.exports = function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['sentry-webpack', 'bootstrap', 'axios', 'VueEvent', 'Push', 'filters', 'directives', 'components', 'fullstory'],
+    boot: ['bootstrap', 'axios', 'VueEvent', 'Push', 'filters', 'directives', 'components', 'fullstory'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.scss'],
@@ -78,6 +78,22 @@ module.exports = function (/* ctx */) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
+
+        const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+        const sentryPluginInstance = new SentryWebpackPlugin({
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          org: process.env.SENTRY_ORGANIZATION,
+          project: process.env.SENTRY_PROJECT,
+          // release: process.env.SENTRY_RELEASE
+          stripCommonPrefix: true,
+          rewrite: true,
+
+          // webpack specific configuration
+          include: cfg.output.path,
+          ignore: ['node_modules']
+        })
+
+        cfg.plugins.push(sentryPluginInstance)
       }
     },
 
