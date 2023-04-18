@@ -1,5 +1,5 @@
 const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-console.log(process.env.SENTRY_AUTH_TOKEN, process.env.SENTRY_ORGANIZATION, process.env.SENTRY_PROJECT)
+
 module.exports = {
   devtool: 'source-map', // Source map generation must be turned on
   plugins: [
