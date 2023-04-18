@@ -28,7 +28,7 @@ module.exports = function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['bootstrap', 'axios', 'VueEvent', 'Push', 'filters', 'directives', 'components', 'fullstory', 'sentry-webpack'],
+    boot: ['sentry-webpack', 'bootstrap', 'axios', 'VueEvent', 'Push', 'filters', 'directives', 'components', 'fullstory'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.scss'],
