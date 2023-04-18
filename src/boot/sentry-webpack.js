@@ -8,7 +8,8 @@ module.exports = {
       org: process.env.SENTRY_ORGANIZATION,
       project: process.env.SENTRY_PROJECT,
       include: ['./dist', './src-electron', './src'],
-      sourceMapStyle: 'hidden-source-map'
+      urlPrefix: ['~/dist', '~/src-electron', '~/src'],
+      rewrite: true
       // release: process.env.SENTRY_RELEASE
     })
   ]
