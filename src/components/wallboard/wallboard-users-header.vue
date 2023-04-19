@@ -13,7 +13,7 @@
 <script>
 import WallboardAgentName from 'src/components/wallboard/wallboard-agent-name.vue'
 import AgentStatusSelector from '../generic-selectors/agent-status-selector.vue'
-import { mapActions } from 'vuex'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'wallboard-users-header',
@@ -24,9 +24,9 @@ export default {
   },
 
   methods: {
-    ...mapActions('wallboard', [
-      'setFilter'
-    ]),
+    ...mapMutations('wallboard', {
+      setFilter: 'SET_FILTER'
+    }),
 
     onStatus (data) {
       this.setFilter({

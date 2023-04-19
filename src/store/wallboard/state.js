@@ -1,9 +1,9 @@
 export default function () {
   return {
     calls: {
-      queued: [],
       live: [],
-      parked: []
+      parked: [],
+      queued: []
     },
     callsEnabledColumns: [
       'details',

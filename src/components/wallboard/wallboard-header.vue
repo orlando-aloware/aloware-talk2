@@ -24,7 +24,7 @@
 <script>
 import RingGroupSelector from 'src/components/generic-selectors/ring-group-selector.vue'
 import WallboardViewModeButton from 'src/components/wallboard/wallboard-view-mode-button.vue'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'wallboard-header',
@@ -42,9 +42,12 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
-      'setFilter',
       'fetchSummary'
     ]),
+
+    ...mapMutations('wallboard', {
+      setFilter: 'SET_FILTER'
+    }),
 
     onFilterRingGroup (value) {
       this.setFilter({

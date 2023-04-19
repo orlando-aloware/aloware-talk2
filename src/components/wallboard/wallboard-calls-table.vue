@@ -354,7 +354,7 @@
         <div class="empty-state"
              v-if="calls.length === 0">
           <div class="h5">
-            No calls found based on the current filters
+            No {{ $route.params.id }} calls found based on the current filters
           </div>
         </div>
       </template>
@@ -414,17 +414,6 @@ export default {
     calls: {
       type: Array,
       required: true
-    },
-
-    filters: {
-      agent: {
-        type: String,
-        default: null
-      },
-      ringGroup: {
-        type: Number,
-        default: null
-      }
     }
   },
 

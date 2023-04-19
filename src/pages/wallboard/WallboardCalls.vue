@@ -3,9 +3,8 @@
     <div :class="['calls', `calls--${viewMode}`]">
       <b-overlay :show="isLoading"
                  rounded="sm">
-        <wallboard-calls-header @agent="onFilterAgent"/>
-        <wallboard-calls-table :calls="calls"
-                               :filters="filters"/>
+        <wallboard-calls-header/>
+        <wallboard-calls-table :calls="calls"/>
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px"/>
@@ -67,25 +66,6 @@ export default {
         default:
           return []
       }
-    }
-  },
-
-  data: () => ({
-    filters: {
-      agent: null,
-      ringGroup: null
-    }
-  }),
-
-  methods: {
-    onFilterAgent (name) {
-      this.filters.agent = name || null
-    }
-  },
-
-  watch: {
-    'wallboardFilters.ringGroup' (value) {
-      this.filters.ringGroup = value
     }
   }
 }

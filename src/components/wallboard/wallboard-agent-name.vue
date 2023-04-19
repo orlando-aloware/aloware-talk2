@@ -6,7 +6,7 @@
 
 <script>
 import Search from 'src/components/search.vue'
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'wallboard-agent-name',
@@ -26,9 +26,9 @@ export default {
   },
 
   methods: {
-    ...mapActions('wallboard', [
-      'setFilter'
-    ]),
+    ...mapMutations('wallboard', {
+      setFilter: 'SET_FILTER'
+    }),
 
     onSearch (value) {
       this.setFilter({

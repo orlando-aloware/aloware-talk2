@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'wallboard-view-mode-button',
@@ -53,9 +53,9 @@ export default {
   },
 
   methods: {
-    ...mapActions('wallboard', [
-      'setViewMode'
-    ])
+    ...mapMutations('wallboard', {
+      setViewMode: 'SET_VIEW_MODE'
+    })
   },
 
   watch: {
