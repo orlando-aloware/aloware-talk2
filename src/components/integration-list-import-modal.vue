@@ -52,6 +52,7 @@
                                      :multiple="false"
                                      :clearable="true"
                                      :generic-styling="false"
+                                     :disable="shouldDisableListSelector"
                                      :integration="selectedIntegration"
                                      @change="onListSelectorChange"/>
         </div>
@@ -126,6 +127,10 @@ export default {
         target: this.list.listId || this.list.id,
         size: _.get(this.list, 'metaData.size', null)
       }
+    },
+
+    shouldDisableListSelector () {
+      return this.selectedIntegration === null
     }
   },
 
