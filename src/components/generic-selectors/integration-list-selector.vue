@@ -196,8 +196,6 @@ export default {
 
   methods: {
     getListsOfEnabledIntegration () {
-      this.isLoading = true
-
       this.lists = []
 
       switch (this.integration.toLowerCase()) {
@@ -213,6 +211,8 @@ export default {
     },
 
     getHubspotLists (offset = 0) {
+      this.isLoading = true
+
       talk2Api.V1.integrations.hubspot.getList({
         params: {
           offset: offset
@@ -233,6 +233,8 @@ export default {
     },
 
     getZohoViews () {
+      this.isLoading = true
+
       talk2Api.V1.integrations.zoho.getViews().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
@@ -244,6 +246,8 @@ export default {
     },
 
     getPipedriveFilters () {
+      this.isLoading = true
+
       talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
         this.isLoading = false
         this.lists.push(...response.data)
