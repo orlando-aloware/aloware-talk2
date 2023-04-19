@@ -261,7 +261,6 @@ export default {
     }
 
     this.startDialerEvents()
-    this.getDesktopToken()
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
       // Subscribe to the event for when the list of devices changes
