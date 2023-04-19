@@ -142,14 +142,14 @@ if (
 ) {
   Sentry.init({
     Vue,
-    dsn: storage.local.getItem('sentry_dsn_public'),
+    dsn: process.env.SENTRY_DSN_PUBLIC,
     integrations: [new Sentry.BrowserTracing()],
     tracingOptions: {
       trackComponents: true
     },
     attachProps: true,
     trackComponents: true,
-    tracesSampleRate: process.env.MIX_SENTRY_TRACES_SAMPLE_RATE,
+    tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE,
     ignoreErrors: [
       'Non-Error promise rejection captured with value: undefined',
       'Cannot read property \'is_reseller\' of null',

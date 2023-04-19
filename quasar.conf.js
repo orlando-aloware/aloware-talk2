@@ -82,14 +82,12 @@ module.exports = function (/* ctx */) {
         const SentryWebpackPlugin = require('@sentry/webpack-plugin')
         const sentryPluginInstance = new SentryWebpackPlugin({
           authToken: process.env.SENTRY_AUTH_TOKEN,
-          org: process.env.SENTRY_ORGANIZATION,
+          org: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
-          // release: process.env.SENTRY_RELEASE
-          stripCommonPrefix: true,
-          rewrite: true,
+          release: process.env.SENTR_VERSION,
 
           // webpack specific configuration
-          include: ['./dist', './src-electron', './src'],
+          include: cfg.output.path,
           ignore: ['node_modules']
         })
 
