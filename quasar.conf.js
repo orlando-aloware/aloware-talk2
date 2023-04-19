@@ -84,7 +84,7 @@ module.exports = function (/* ctx */) {
           authToken: process.env.SENTRY_AUTH_TOKEN,
           org: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
-          release: process.env.SENTR_VERSION,
+          release: process.env.SENTRY_VERSION,
 
           // webpack specific configuration
           include: cfg.output.path,
@@ -247,9 +247,23 @@ module.exports = function (/* ctx */) {
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: true,
 
-      extendWebpack (/* cfg */) {
+      extendWebpack (cfg) {
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
+
+        const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+        const sentryPluginInstance = new SentryWebpackPlugin({
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          org: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          release: process.env.SENTR_VERSION,
+
+          // webpack specific configuration
+          include: cfg.output.path,
+          ignore: ['node_modules']
+        })
+
+        cfg.plugins.push(sentryPluginInstance)
       }
     }
   }
