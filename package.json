@@ -13,14 +13,14 @@
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build-mac": "quasar build -m electron -T mac -b builder -P never",
-    "build-linux": "quasar build -m electron -T linux -b builder -P never",
-    "build-win": "quasar build -m electron -T win -b builder -P never",
-    "build-win32": "quasar build -m electron -T win32 -b builder -P never",
-    "deploy-mac": "quasar build -m electron -T mac -b builder -P always",
-    "deploy-linux": "quasar build -m electron -T linux -b builder -P always",
-    "deploy-win": "quasar build -m electron -T win -b builder -P always",
-    "deploy-win32": "quasar build -m electron -T win32 -b builder -P always"
+    "build-mac": "quasar build -d -m electron -T mac -b builder -P never",
+    "build-linux": "quasar build -d -m electron -T linux -b builder -P never",
+    "build-win": "quasar build -d -m electron -T win -b builder -P never",
+    "build-win32": "quasar build -d -m electron -T win32 -b builder -P never",
+    "deploy-mac": "quasar build -d -m electron -T mac -b builder -P always",
+    "deploy-linux": "quasar build -d -m electron -T linux -b builder -P always",
+    "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
+    "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always"
   },
   "dependencies": {
     "@fullstory/browser": "^1.5.1",
