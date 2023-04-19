@@ -1,5 +1,8 @@
 <template>
-  <call-disposition-selector v-model="callDispositionId"
+  <call-disposition-selector :highlighted="highlighted"
+                             :highlighted-class="highlightedClass"
+                             :required="required"
+                             v-model="callDispositionId"
                              @change="changeCallDisposition">
   </call-disposition-selector>
 </template>
@@ -15,6 +18,21 @@ export default {
   props: {
     communication: {
       required: true
+    },
+
+    highlighted: {
+      type: Boolean,
+      default: false
+    },
+
+    highlightedClass: {
+      type: String,
+      default: 'q-field--highlighted'
+    },
+
+    required: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -43,7 +61,14 @@ export default {
         this.loadingCallDisposition = false
         console.log(err)
         this.$handleErrors(err.response)
+        this.$emit('change', callDispositionId)
       })
+    }
+  },
+
+  watch: {
+    'communication.call_disposition_id': function (newValue) {
+      this.callDispositionId = newValue
     }
   }
 }

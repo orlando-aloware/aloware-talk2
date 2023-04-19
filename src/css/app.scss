@@ -223,6 +223,27 @@ body,
   }
 }
 
+.q-field--outlined {
+  &.q-field--highlighted {
+    &.required {
+      .q-field__control:after {
+        border-color: $danger
+      }
+    }
+  }
+  &.q-field--with-bottom {
+    padding-bottom: 15px;
+    height: initial !important;
+    .q-field__bottom {
+      min-height: 15px;
+      padding-left: 0;
+      .q-field__messages {
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
 .q-notifications {
   .q-notification__message.col {
     padding-left: 0px;
@@ -10286,6 +10307,10 @@ screen and (max-width: 956px) {
   &-right {
     border-right: 1px solid $grey-60 !important;
   }
+}
+
+.border-required {
+  border: 1px solid $danger;
 }
 
 .stats-refresh-btn {

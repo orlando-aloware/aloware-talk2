@@ -48,7 +48,7 @@ import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-lis
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -302,7 +302,10 @@ export default {
         return
       }
 
-      this.powerDialerTaskFilters.in_queue.total_queued -= 1
+      if (!isEmpty(this.powerDialerTaskFilters.in_queue)) {
+        this.powerDialerTaskFilters.in_queue.total_queued -= 1
+      }
+
       this.$VueEvent.fire('redial_task')
     }
   },
