@@ -150,6 +150,8 @@ export default {
             return 'grey-90'
           case 'Closed':
             return 'success'
+          case 'New':
+            return 'secondary'
           default:
             return 'primary'
         }
@@ -180,6 +182,8 @@ export default {
             return 'Pending'
           case ContactTaskStatus.STATUS_CLOSED:
             return 'Closed'
+          case ContactTaskStatus.STATUS_NEW:
+            return 'New'
           case ContactTaskStatus.STATUS_OPEN:
           default:
             return 'Open'
