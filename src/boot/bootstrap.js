@@ -143,6 +143,7 @@ if (
   Sentry.init({
     Vue,
     dsn: process.env.SENTRY_DSN_PUBLIC,
+    environment: process.env.APP_ENV,
     integrations: [new Sentry.BrowserTracing()],
     tracingOptions: {
       trackComponents: true
