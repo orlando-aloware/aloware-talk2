@@ -19,6 +19,9 @@
         <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
                           :contact="contact">
         </contact-sequence>
+        <contact-aloha-bot v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
+                          :contact="contact">
+        </contact-aloha-bot>
         <contact-phones></contact-phones>
         <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
         </contact-information>
@@ -61,6 +64,7 @@ import ContactSaveBar from 'components/contacts/contact-save-bar'
 import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
+import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
 import {
   aclMixin,
   contactMixin,
@@ -99,7 +103,8 @@ export default {
     ContactInfo,
     ContactPhones,
     ContactTags,
-    BackButton
+    BackButton,
+    ContactAlohaBot
   },
 
   computed: {
