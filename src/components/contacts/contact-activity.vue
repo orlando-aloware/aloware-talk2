@@ -28,7 +28,7 @@
 
     <div class="w-100"
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
-      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+      <div class="m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span style="white-space: pre-line;word-break: break-word;">
             {{ communication.body }}
@@ -54,7 +54,7 @@
     <div class="w-100"
          v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) &&
          (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
-      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+      <div class="m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
