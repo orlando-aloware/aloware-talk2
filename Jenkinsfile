@@ -29,12 +29,15 @@ pipeline {
         }
 
         stage('Setup Dev Env File') {
+            String text
             when { not { branch 'master' } }
             steps {
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
+                   text = readFile(dev_env)
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
-                   println "${dev_env}"
                 }
+
+                println "${text}"
             }
         }
 
