@@ -4,6 +4,32 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 /**
+ * Filter calls based on currently used filters
+ * @param {array} calls
+ * @param {object} state
+ * @returns {array}
+ */
+export function filterCalls (calls, state) {
+  return calls.filter(call => {
+    // ring group filter
+    const ringGroup = !state.filters.ringGroup
+      ? true
+      : call.ring_group_id === state.filters.ringGroup
+
+    // agent name filter
+    let agentName = true
+    if (state.filters.agent) {
+      const user = state.users.find(user => user.id === call.user_id)
+
+      // checks if user name contains the term searched
+      agentName = user.name.toUpperCase().includes(state.filters.agent.toUpperCase())
+    }
+
+    return ringGroup && agentName
+  })
+}
+
+/**
  * Checks if communication is live
  *
  * @param {Object} communication
