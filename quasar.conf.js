@@ -87,7 +87,7 @@ module.exports = function (/* ctx */) {
           // release: process.env.SENTRY_VERSION,
 
           // webpack specific configuration
-          include: './dist',
+          include: cfg.output.path,
           ignore: ['node_modules']
         })
 
@@ -259,7 +259,7 @@ module.exports = function (/* ctx */) {
           // release: process.env.SENTRY_VERSION,
 
           // webpack specific configuration
-          include: './dist',
+          include: cfg.output.path,
           ignore: ['node_modules']
         })
 
