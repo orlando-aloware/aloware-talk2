@@ -83,9 +83,6 @@ export default {
           this.validateCookieUser()
         }
       })
-
-      // for sentry testing purpose: REMOVE this please
-      throw new Error('Exception message')
     }
 
     this.$VueEvent.listen('make_new_call', (data) => {
