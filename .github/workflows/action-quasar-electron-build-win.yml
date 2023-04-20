@@ -125,4 +125,4 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
           SENTRY_ORG: ${{ secrets.sentry_org }}
           SENTRY_PROJECT: ${{ secrets.sentry_project }}
-          SENTRY_VERSION: ${{ secrets.sentry_version }}
+          #SENTRY_VERSION: ${{ secrets.sentry_version }}
