@@ -143,6 +143,7 @@ export default {
   watch: {
     authenticated () {
       this.setFullStory()
+      this.addSentryContext()
     }
   },
 
@@ -227,6 +228,22 @@ export default {
         return
       }
       this.$FullStory.anonymize()
+    },
+
+    addSentryContext () {
+      if (!this.profile) {
+        return
+      }
+
+      this.$Sentry.configureScope((scope) => {
+        scope.setUser({
+          id: this.profile.id,
+          email: this.profile.email,
+          name: this.profile.name,
+          company_id: this.profile.company_id,
+          company_name: this.profile.company_name
+        })
+      })
     },
 
     ...mapActions('auth', {
