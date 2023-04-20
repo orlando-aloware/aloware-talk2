@@ -12,6 +12,7 @@
                :current-page="pagination.page"
                :last-page="lastPage"
                @paginated="onPaginated"
+               @reordered="onColumnsReordered"
                @sort="onSort">
       <template #tbody>
         <tr class="datatable-row"
@@ -91,6 +92,7 @@ import Datatable from 'src/components/datatable.vue'
 import TimeAgo from 'src/components/time-ago.vue'
 import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-ring-groups.vue'
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
+import { COLUMNS } from 'src/constants/wallboard/users-columns'
 import { mapActions, mapGetters } from 'vuex'
 import { LABELS } from 'src/constants/agent-status-labels'
 import { aclMixin } from 'src/plugins/mixins'
@@ -113,54 +115,6 @@ export default {
     ...mapGetters('wallboard', {
       users: 'getUsers'
     }),
-
-    columns () {
-      return [
-        {
-          name: 'id',
-          label: 'ID',
-          order: 0,
-          sortable: true
-        },
-        {
-          name: 'name',
-          label: 'Agents',
-          order: 1,
-          sortable: true
-        },
-        {
-          name: 'status',
-          label: 'Status',
-          order: 2,
-          sortable: true
-        },
-        {
-          name: 'status-duration',
-          label: 'Status Duration',
-          order: 3,
-          sortable: true
-        },
-        {
-          name: 'ring-groups',
-          label: 'Ring Groups',
-          order: 4,
-          sortable: false,
-          minWidth: 200
-        },
-        {
-          name: 'last-login',
-          label: 'Last Login',
-          order: 5,
-          sortable: true
-        },
-        {
-          name: 'last-updated',
-          label: 'Last Updated',
-          order: 6,
-          sortable: true
-        }
-      ]
-    },
 
     paginatedUsers () {
       let from = this.pagination.perPage * (this.pagination.page - 1)
@@ -237,7 +191,8 @@ export default {
     sort: {
       orderBy: 'id',
       order: 'asc'
-    }
+    },
+    columns: COLUMNS
   }),
 
   methods: {
@@ -254,6 +209,10 @@ export default {
 
     onSort (sortData) {
       this.sort = sortData
+    },
+
+    onColumnsReordered (columns) {
+      this.columns = columns
     },
 
     onStatusChanged (user, status) {

@@ -12,6 +12,7 @@
                :current-page="pagination.page"
                :last-page="lastPage"
                @paginated="onPaginated"
+               @reordered="onColumnsReordered"
                @sort="onSort">
       <template #tbody>
         <template v-for="(call, index) in paginatedCalls">
@@ -433,7 +434,7 @@ export default {
     ]),
 
     filteredColumns () {
-      return COLUMNS.filter(column => this.enabledColumns.includes(column.name))
+      return this.columns.filter(column => this.enabledColumns.includes(column.name))
     },
 
     paginatedCalls () {
@@ -518,6 +519,7 @@ export default {
       orderBy: 'id',
       order: 'asc'
     },
+    columns: COLUMNS,
     expandedItem: null,
     CommunicationCurrentStatus,
     CommunicationDispositionStatus,
@@ -534,6 +536,10 @@ export default {
 
     onSort (sortData) {
       this.sort = sortData
+    },
+
+    onColumnsReordered (columns) {
+      this.columns = columns
     },
 
     getCampaign (campaignId) {

@@ -18,6 +18,7 @@ export const COLUMNS = [
     order: 1,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 160
   },
   {
@@ -26,6 +27,7 @@ export const COLUMNS = [
     order: 2,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 150
   },
   {
@@ -34,6 +36,7 @@ export const COLUMNS = [
     order: 3,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 150
   },
   {
@@ -42,6 +45,7 @@ export const COLUMNS = [
     order: 4,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 200
   },
   {
@@ -49,21 +53,24 @@ export const COLUMNS = [
     label: 'Wait Time',
     order: 5,
     sortable: true,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'talk_time',
     label: 'Talk Time',
     order: 6,
     sortable: true,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'duration',
     label: 'Duration',
     order: 7,
     sortable: true,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'lead_number',
@@ -71,6 +78,7 @@ export const COLUMNS = [
     order: 8,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 300
   },
   {
@@ -79,6 +87,7 @@ export const COLUMNS = [
     order: 9,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 130
   },
   {
@@ -87,6 +96,7 @@ export const COLUMNS = [
     order: 10,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 140
   },
   {
@@ -95,6 +105,7 @@ export const COLUMNS = [
     order: 11,
     sortable: true,
     selectable: true,
+    draggable: true,
     minWidth: 150
   },
   {
@@ -102,28 +113,32 @@ export const COLUMNS = [
     label: 'Cold Transferred?',
     order: 12,
     sortable: false,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'transfer_type',
     label: 'Transfer Type',
     order: 13,
     sortable: false,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'callback_status',
     label: 'Callback Status',
     order: 14,
     sortable: false,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'tags',
     label: 'Tags',
     order: 15,
     sortable: false,
-    selectable: true
+    selectable: true,
+    draggable: true
   },
   {
     name: 'notes',
@@ -131,6 +146,7 @@ export const COLUMNS = [
     order: 16,
     sortable: false,
     selectable: true,
+    draggable: true,
     minWidth: 150
   },
   {
@@ -139,6 +155,7 @@ export const COLUMNS = [
     order: 17,
     sortable: false,
     selectable: true,
+    draggable: true,
     minWidth: 200
   }
 ]
