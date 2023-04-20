@@ -52,6 +52,7 @@ module.exports = function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: 'history',
+      devtool: 'source-map',
 
       // transpile: false,
 
@@ -77,6 +78,20 @@ module.exports = function (/* ctx */) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
+
+        const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+        const sentryPluginInstance = new SentryWebpackPlugin({
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          org: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          // release: process.env.SENTRY_VERSION,
+
+          // webpack specific configuration
+          include: cfg.output.path,
+          ignore: ['node_modules']
+        })
+
+        cfg.plugins.push(sentryPluginInstance)
       }
     },
 
@@ -232,9 +247,23 @@ module.exports = function (/* ctx */) {
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: true,
 
-      extendWebpack (/* cfg */) {
+      extendWebpack (cfg) {
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
+
+        const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+        const sentryPluginInstance = new SentryWebpackPlugin({
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          org: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          // release: process.env.SENTRY_VERSION,
+
+          // webpack specific configuration
+          include: cfg.output.path,
+          ignore: ['node_modules']
+        })
+
+        cfg.plugins.push(sentryPluginInstance)
       }
     }
   }

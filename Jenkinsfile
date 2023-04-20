@@ -60,7 +60,7 @@ pipeline {
         stage('Build Talk2 Assets') {
             when { not { branch 'master' } }
             steps {
-                sh 'quasar build'
+                sh 'quasar build --debug'
             }
         }
 

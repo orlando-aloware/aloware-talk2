@@ -141,11 +141,36 @@ if (
   process.env.APP_ENV !== 'local'
 ) {
   Sentry.init({
-    Vue: Vue,
+    Vue,
+    dsn: process.env.SENTRY_DSN_PUBLIC,
+    environment: process.env.APP_ENV,
+    integrations: [new Sentry.BrowserTracing()],
     tracingOptions: {
       trackComponents: true
     },
-    dsn: storage.local.getItem('sentry_dsn_public')
+    attachProps: true,
+    trackComponents: true,
+    tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE,
+    ignoreErrors: [
+      'Non-Error promise rejection captured with value: undefined',
+      'Cannot read property \'is_reseller\' of null',
+      'Cannot set property \'_height\' of undefined',
+      'Cannot read property \'offsetHeight\' of undefined',
+      'No error message',
+      '$ is not defined',
+      'ResizeObserver loop limit exceeded',
+      'ResizeObserver loop completed with undelivered notifications.',
+      'Request failed with status code 504',
+      'Request failed with status code 500',
+      'Action timed out',
+      'Network Error',
+      'Expired token',
+      'Network request failed',
+      'Failed to fetch',
+      'NetworkError',
+      'Navigation cancelled from',
+      'Blocked a frame with origin'
+    ]
   })
 
   Sentry.configureScope((scope) => {
