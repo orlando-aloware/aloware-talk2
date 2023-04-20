@@ -32,6 +32,9 @@
         <div>Preparing session...</div>
       </div>
     </template>
+    <appointment-form-modal :contact="contact">
+    </appointment-form-modal>
+    <contact-add-reminder-modal />
   </b-overlay>
 </template>
 
@@ -43,6 +46,8 @@ import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar
 import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionContactPage from 'src/components/power-dialer/sessions/session-contact-page'
+import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
+import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
@@ -57,7 +62,9 @@ export default {
     SessionSidebar,
     CallDisposition,
     SessionCallStatus,
-    SessionContactPage
+    SessionContactPage,
+    AppointmentFormModal,
+    ContactAddReminderModal
   },
 
   mixins: [

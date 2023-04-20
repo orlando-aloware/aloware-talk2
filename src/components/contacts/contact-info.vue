@@ -3,10 +3,10 @@
     <b-media class="min-w-0">
       <template #aside>
         <q-item-section avatar>
-          <avatar :name="contact.name"
-                  class="contact-avatar"
+          <avatar class="contact-avatar"
                   width="40"
-                  height="40">
+                  height="40"
+                  :name="contact.name">
           </avatar>
         </q-item-section>
       </template>
@@ -36,21 +36,21 @@
 
               <br/>
 
-              <b-badge v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
+              <b-badge class="badge-phone-info mr-1"
                        :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
-                       class="badge-phone-info mr-1">
+                       v-if="phone && $options.filters.validLrnType(phone.lrn_type)">
                 {{ phone.lrn_type | fixLrnType }}
               </b-badge>
 
-               <b-badge v-if="phone && phone.is_invalid"
-                        variant="danger"
-                        class="badge-phone-info mr-1">
+               <b-badge variant="danger"
+                        class="badge-phone-info mr-1"
+                        v-if="phone && phone.is_invalid">
                 Invalid Number
               </b-badge>
 
-               <b-badge v-if="contact.is_dnc"
-                        variant="danger"
-                        class="badge-phone-info mr-1">
+               <b-badge variant="danger"
+                        class="badge-phone-info mr-1"
+                        v-if="contact.is_dnc">
                 DNC
               </b-badge>
             </span>
@@ -62,14 +62,16 @@
             <span class="material-icons">
                 schedule
             </span>
-            <digital-clock class="ml-2" :timezone="contact.timezone"></digital-clock>
+            <digital-clock class="ml-2"
+                           :timezone="contact.timezone">
+            </digital-clock>
           </div>
         </div>
         <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                   size="sm"
                   variant="light"
                   @click="onOpenEditForm">
-          <pencil-o-icon></pencil-o-icon>
+          <pencil-o-icon />
         </b-button>
         <q-menu content-class="mx-height-300"
                 no-focus
@@ -91,42 +93,42 @@
                    self="center middle">
           Call
         </q-tooltip>
-        <call-icon></call-icon>
+        <call-icon />
       </b-button>
 
-      <b-button v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
-                variant="light"
+      <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
                 :disabled="isProcessingBlock"
+                v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 @click="blockContact">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
           Block
         </q-tooltip>
-        <i v-if="!isProcessingBlock"
-           class="fa fa-lock">
+        <i class="fa fa-lock"
+           v-if="!isProcessingBlock">
         </i>
-        <q-spinner-bars v-if="isProcessingBlock"
-                        class="mr-1"
-                        color="blue" />
+        <q-spinner-bars class="mr-1"
+                        color="blue"
+                        v-if="isProcessingBlock"/>
       </b-button>
 
-      <b-button v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
-                variant="light"
+      <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
                 :disabled="isProcessingBlock"
+                v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 @click="unBlockContact">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
           Unblock
         </q-tooltip>
-        <q-spinner-bars v-if="isProcessingBlock"
-                        class="mr-1"
-                        color="blue" />
-        <i v-if="!isProcessingBlock"
-           class="fa fa-lock-open">
+        <q-spinner-bars class="mr-1"
+                        color="blue"
+                        v-if="isProcessingBlock"/>
+        <i class="fa fa-lock-open"
+           v-if="!isProcessingBlock">
         </i>
       </b-button>
 
@@ -137,18 +139,18 @@
                 size="sm"
                 class="custom-action-button my-1"
                 :disabled="contact.is_dnc"
-                @click="openAppointmentModal">
+                @click="addAppointmentOpen(true)">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add appointment
         </q-tooltip>
-        <calendar-icon></calendar-icon>
+        <calendar-icon />
       </b-button>
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
                 :disabled="contact.is_dnc"
-                @click="openAddReminderModal">
+                @click="addReminderOpen(true)">
         <q-tooltip anchor="bottom middle"
                    self="center middle">
           Add reminder
@@ -163,7 +165,7 @@
                    self="center middle">
           Add to power dialer
         </q-tooltip>
-        <add-call-icon></add-call-icon>
+        <add-call-icon />
       </b-button>
       <b-button variant="light"
                 size="sm"
@@ -290,17 +292,14 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContactNameEditOpen', 'addAppointmentOpen', 'addReminderOpen', 'addPowerDialerOpen']),
+    ...mapActions('contacts', [
+      'setContactNameEditOpen',
+      'addAppointmentOpen',
+      'addReminderOpen',
+      'addPowerDialerOpen'
+    ]),
 
     ...mapActions(['setShowPhone']),
-
-    openAddReminderModal () {
-      this.addReminderOpen(true)
-    },
-
-    openAppointmentModal () {
-      this.addAppointmentOpen(true)
-    },
 
     openPowerDialerModal () {
       this.addPowerDialerOpen(true)
@@ -321,6 +320,7 @@ export default {
       }
 
       this.isVideoConferenceLinkSending = true
+
       talk2Api.V1.integrations.simpsocial.videoConference.send(this.contact.id, this.campaignId)
         .then(res => {
           this.isVideoConferenceLinkSending = false
@@ -358,9 +358,11 @@ export default {
 
       if (this.isMobile) {
         this.setShowPhone(true)
+
         setTimeout(() => {
           this.$VueEvent.fire('changePhoneNumber', data)
         }, 100)
+
         return
       }
 
@@ -369,6 +371,7 @@ export default {
 
     blockContact () {
       this.isProcessingBlock = true
+
       talk2Api.V1.contact.update(this.contact.id, { is_blocked: 1 }).then(() => {
         this.contact.is_blocked = true
         this.isProcessingBlock = false
@@ -378,6 +381,7 @@ export default {
 
     unBlockContact () {
       this.isProcessingBlock = true
+
       talk2Api.V1.contact.update(this.contact.id, { is_blocked: 0 }).then(() => {
         this.contact.is_blocked = false
         this.isProcessingBlock = false
