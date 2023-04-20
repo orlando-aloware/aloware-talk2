@@ -8,7 +8,7 @@
                       ref="menu"
                       flat
                       :ripple="false"
-                      :disabled="loadingAgentStatus || ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(dialer.currentStatus) || isAgentOnCall"
+                      :disabled="isProfileDropdownDisabled"
                       :menu-offset="[4, 16]">
         <template v-slot:label>
           <q-item-section class="contact-info-wrapper"
@@ -177,7 +177,9 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'profile',
+
   components: { HalfMoonIcon, LogoutIcon },
+
   mixins: [aclMixin, avatarMixin, agentMixin],
 
   props: {
@@ -196,6 +198,9 @@ export default {
 
   computed: {
     ...mapState(['dialer', 'campaigns']),
+
+    ...mapState('cache', ['currentCompany']),
+
     ...mapGetters('auth', ['profile']),
 
     statusLabel () {
@@ -224,20 +229,36 @@ export default {
 
     personalPhoneNumber () {
       const found = this.campaigns.find(campaign => campaign.id === this.profile.campaign_id)
+
       if (found && found.incoming_numbers.length) {
         return found.incoming_numbers[0].phone_number
       }
+
       return ''
+    },
+
+    isProfileDropdownDisabled () {
+      const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
+      const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
+      const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
+        this.dialer.currentStatus === 'WRAP_UP'
+
+      return this.loadingAgentStatus ||
+        ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
+        this.isAgentOnCall || isForcedDispositionOnWrapUp
     }
   },
 
   methods: {
     ...mapActions('auth', ['logout', 'setProfile']),
+
     ...mapActions(['resetVuex']),
+
     changeStatus (status) {
       if (this.agentStatus === status) {
         return
       }
+
       this.changeAgentStatus(status)
     },
 
@@ -249,6 +270,7 @@ export default {
 
     toggleSleepMode () {
       this.togglingSleepMode = true
+
       talk2Api.V1.profile.store({ sleep_mode: !this.profile.sleep_mode }).then(response => {
         this.setProfile({ ...this.profile, sleep_mode: response.data.sleep_mode })
         this.togglingSleepMode = false

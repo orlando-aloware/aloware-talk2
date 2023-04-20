@@ -28,7 +28,7 @@
 
     <div class="w-100"
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
-      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+      <div class="m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span style="white-space: pre-line;word-break: break-word;">
             {{ communication.body }}
@@ -54,7 +54,7 @@
     <div class="w-100"
          v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) &&
          (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
-      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+      <div class="m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
@@ -351,7 +351,6 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as ContactThreadStatusTypes from 'src/constants/contact-thread-status-types'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
@@ -399,7 +398,6 @@ export default {
       relativeDatetime: null,
       excluded_audits: [
         'phone_number',
-        'thread_status',
         'email',
         'first_name',
         'last_name',
@@ -439,12 +437,6 @@ export default {
           'Contact has been unblocked',
           'Contact has been blocked'
         ],
-        'thread_status': [
-          'Open',
-          'Pending',
-          'Closed',
-          'Live'
-        ],
         'contact_task_status': {
           1: 'New',
           2: 'Open',
@@ -457,8 +449,7 @@ export default {
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
-      CommunicationTypes,
-      ContactThreadStatusTypes
+      CommunicationTypes
     }
   },
 
@@ -553,15 +544,6 @@ export default {
         case 'is_dnc':
         case 'is_blocked':
           return [0, 1].includes((data.to !== null ? parseInt(data.to) : data.to))
-        case 'thread_status':
-          const allowedData = [
-            ContactThreadStatusTypes.THREAD_STATUS_OPEN,
-            ContactThreadStatusTypes.THREAD_STATUS_PENDING,
-            ContactThreadStatusTypes.THREAD_STATUS_CLOSED,
-            ContactThreadStatusTypes.THREAD_STATUS_LIVE
-          ]
-          return allowedData.includes((data.from !== null ? parseInt(data.from) : data.from)) ||
-            allowedData.includes((data.to !== null ? parseInt(data.to) : data.to))
         case 'contact_task_status':
           const allowedStatus = [
             ContactTaskStatus.STATUS_NEW,
@@ -673,7 +655,7 @@ export default {
     },
 
     generateCustomAuditMessage (communication) {
-      if (['thread_status', 'contact_task_status'].includes(communication.property)) {
+      if (communication.property === 'contact_task_status') {
         return this.$options.filters.ucwords(communication.property.replace(/_/g, ' ')) +
           ' has been changed ' +
           (this.custom_audit_messages[communication.property][communication.from] ? `from ${this.custom_audit_messages[communication.property][communication.from]}` : '') +

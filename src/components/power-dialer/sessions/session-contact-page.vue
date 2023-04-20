@@ -5,8 +5,8 @@
       <SessionFilters @selected-tab="selectTab" />
 
       <div class="t-panel-container h-100">
-        <q-tab-panels v-model="panel"
-                      class="bg-transparent">
+        <q-tab-panels class="bg-transparent"
+                      v-model="panel">
 
           <q-tab-panel class="p-0 h-100"
                        name="Details">
@@ -45,6 +45,7 @@ import SessionContactPageActivity from './pages/session-contact-page-activity'
 import SessionContactPageCrm from './pages/session-contact-page-crm'
 import { mapActions, mapState } from 'vuex'
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'SessionPage',
@@ -79,7 +80,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', ['setContact', 'setContactClone']),
+    ...mapActions('contacts', [
+      'setContact',
+      'setContactClone',
+      'setContactPhoneNumbers'
+    ]),
+
     ...mapActions('powerDialer', ['setActiveTask']),
 
     selectTab (val) {
@@ -93,6 +99,16 @@ export default {
       }
 
       return window.axios.get(`/api/v2/contacts/${id}`, { cancelToken: source })
+    },
+
+    getContactPhoneNumbers (contactId) {
+      talk2Api.V1.contact.getPhoneNumbers(contactId)
+        .then(response => {
+          this.setContactPhoneNumbers(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
     },
 
     getContactIntegrationData (contact) {
@@ -128,6 +144,7 @@ export default {
           this.setContactClone(res.data)
           this.$VueEvent.fire('contact_activity_update_contact', res.data)
 
+          this.getContactPhoneNumbers(res.data.id)
           this.getContactIntegrationData(res.data)
         }).catch(err => {
           this.$handleErrors(err.response)

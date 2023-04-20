@@ -8,6 +8,7 @@
             ref="contactDispositionSelect"
             map-options
             dense
+            bottom-slots
             :use-input="useInput"
             :use-chips="useChips"
             :emit-value="emitValue"
@@ -15,7 +16,7 @@
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
+            :class="selectorClass"
             :outlined="outlined"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             v-model="selectedId"
@@ -42,12 +43,12 @@
               v-on="scope.itemEvents">
         <q-item-section avatar>
           <q-icon name="fa fa-bolt"
-                  v-show="!scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="!scope.opt.is_external">
           </q-icon>
           <q-icon name="fa fa-lock"
-                  v-show="scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="scope.opt.is_external">
           </q-icon>
         </q-item-section>
         <q-item-section>
@@ -55,19 +56,24 @@
         </q-item-section>
       </q-item>
     </template>
+    <template v-slot:hint>
+      <span :class="hintClass">
+        {{ hint }}
+      </span>
+    </template>
   </q-select>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import _ from 'lodash'
-import { selectorMixin } from 'src/plugins/mixins'
+import { selectorMixin, dispositionsOptionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-disposition-selector',
 
   mixins: [
-    selectorMixin
+    selectorMixin,
+    dispositionsOptionsMixin
   ],
 
   props: {
@@ -96,14 +102,17 @@ export default {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     customClass: {
       type: String,
       default: ''
@@ -123,13 +132,20 @@ export default {
       type: Boolean,
       default: true
     },
+
     useChips: {
       type: Boolean,
       default: true
     },
+
     useInput: {
       type: Boolean,
       default: true
+    },
+
+    required: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -140,10 +156,10 @@ export default {
 
   data () {
     return {
-      selectedId: this.value,
       options: [],
+      type: 'contact',
       reference: 'contactDispositionSelect',
-      fullOptionsProperty: 'contactDispositionsAlphabeticalOrder'
+      fullOptionsProperty: 'orderedDispositions'
     }
   },
 
@@ -167,42 +183,56 @@ export default {
       }
     },
 
-    contactDispositionsAlphabeticalOrder () {
-      if (this.dispositionStatuses) {
-        return _.clone(this.dispositionStatuses).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
-      }
+    selectorClass () {
+      const prependClass = this.prepend ? 'with-prepend' : ''
+      const genericStylingClass = this.genericStyling ? 'generic-selector' : ''
+      const highlightedClass = this.highlighted ? this.highlightedClass : ''
+      const requiredClass = this.required ? 'required mb-0' : ''
 
-      return []
+      return [
+        prependClass,
+        genericStylingClass,
+        highlightedClass,
+        requiredClass,
+        this.customClass
+      ]
+    },
+
+    hint () {
+      return this.required ? 'Required' : ''
+    },
+
+    hintClass () {
+      const requiredClass = this.required ? 'text-danger' : ''
+      return [
+        requiredClass
+      ]
     }
   },
 
-  mounted () {
-    this.options = this.contactDispositionsAlphabeticalOrder
+  created () {
+    this.options = this.orderedDispositions
   },
 
   methods: {
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.options = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.id === this.selectedId)
+          this.options = this.orderedDispositions.filter(contactDisposition => contactDisposition.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.options = this.contactDispositionsAlphabeticalOrder
+          this.options = this.orderedDispositions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.contactDispositionsAlphabeticalOrder.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.orderedDispositions.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
@@ -217,9 +247,6 @@ export default {
         this.$emit('change', val)
       }
       this.showInputPlaceholder()
-    },
-    contactDispositionsAlphabeticalOrder () {
-      this.options = this.contactDispositionsAlphabeticalOrder
     }
   }
 }

@@ -518,7 +518,10 @@
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <call-disposition-wrapper class="w-100"
-                                          :communication="dialer.communication">
+                                          :highlighted="isHighlightedCallDisposition"
+                                          :required="isHighlightedCallDisposition"
+                                          :communication="dialer.communication"
+                                          @change="onCallDisposed">
                 </call-disposition-wrapper>
               </div>
             </div>
@@ -529,7 +532,10 @@
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <contact-disposition-wrapper class="w-100"
-                                             :contact="contact">
+                                             :highlighted="isHighlightedContactDisposition"
+                                             :required="isHighlightedContactDisposition"
+                                             :contact="contact"
+                                             @change="onContactDisposed">
                 </contact-disposition-wrapper>
               </div>
             </div>
@@ -640,6 +646,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
+                  :disabled="isNotDisposed"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -648,6 +655,7 @@
         </b-button>
 
         <b-button variant="primary"
+                  :disabled="isNotDisposed"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1214,7 +1222,8 @@ import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import {
   communicationInfoMixin,
-  notificationMixin
+  notificationMixin,
+  dispositionsMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1316,7 +1325,8 @@ export default {
 
   mixins: [
     communicationInfoMixin,
-    notificationMixin
+    notificationMixin,
+    dispositionsMixin
   ],
 
   props: {
@@ -2057,6 +2067,15 @@ export default {
         return null
       }
 
+      // reference the campaign object in communication if it has
+      if (this.dialer.communication?.campaign) {
+        return this.dialer.communication.campaign
+      }
+
+      if (this?.communication?.campaign) {
+        return this.communication.campaign
+      }
+
       const found = this.campaigns.find(campaign => campaign.id === id)
 
       if (found) {
@@ -2567,7 +2586,7 @@ export default {
     this.$VueEvent.stop('togglePhone', this.phoneListeners.togglePhone)
     this.$VueEvent.stop('showPhone', this.phoneListeners.showPhone)
     this.$VueEvent.stop('hidePhone', this.phoneListeners.hidePhone)
-    this.$VueEvent.listen('call_disconnected', this.phoneListeners.callDisconnected)
+    this.$VueEvent.stop('callDisconnected', this.phoneListeners.callDisconnected)
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
     clearInterval(this.$options.holdInterval)

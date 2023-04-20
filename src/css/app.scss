@@ -223,6 +223,27 @@ body,
   }
 }
 
+.q-field--outlined {
+  &.q-field--highlighted {
+    &.required {
+      .q-field__control:after {
+        border-color: $danger
+      }
+    }
+  }
+  &.q-field--with-bottom {
+    padding-bottom: 15px;
+    height: initial !important;
+    .q-field__bottom {
+      min-height: 15px;
+      padding-left: 0;
+      .q-field__messages {
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
 .q-notifications {
   .q-notification__message.col {
     padding-left: 0px;
@@ -2252,7 +2273,7 @@ i.option-separator {
   }
 
   div.options {
-    margin-top: -14px;
+    margin-top: -3px;
     opacity: 0;
   }
 
@@ -10284,6 +10305,10 @@ screen and (max-width: 956px) {
   }
 }
 
+.border-required {
+  border: 1px solid $danger;
+}
+
 .stats-refresh-btn {
   height: 32px;
   font-size: $f-size-body-sm;
@@ -11919,6 +11944,10 @@ h1.contact-list-name-label {
 #talk-feedback-form .q-btn__content .block {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.line-height-1 {
+  line-height: 1 !important;
 }
 
 .line-height-15 {

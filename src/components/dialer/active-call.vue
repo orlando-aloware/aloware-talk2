@@ -1,10 +1,10 @@
 <template>
-  <q-item :class="activeCallClass"
-          class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
-          v-if="showActiveCall"
+  <q-item class="mr-3 pl-2 pr-2 active-call cursor-pointer no-select"
           clickable
           v-ripple
+          :class="activeCallClass"
           :disabled="sessionPaused"
+          v-if="showActiveCall"
           @click="togglePhone">
     <q-item-section>
       <q-item-label class="_600">
@@ -41,26 +41,26 @@
     </q-item-section>
 
     <q-item-section side>
-      <q-btn :disable="dialer.currentStatus === 'MAKING_CALL' || isHangingUp"
-             v-if="dialer.currentStatus !== 'WRAP_UP'"
-             icon="img:app-icons/dialer/hangup_btn.svg"
+      <q-btn icon="img:app-icons/dialer/hangup_btn.svg"
              size="22px"
              class="icon-btn auto-size height-22"
              padding="none"
              ripple
              rounded
              flat
+             :disable="isDisabledHangUpCallBtn"
+             v-if="dialer.currentStatus !== 'WRAP_UP'"
              @click="hangupCall">
       </q-btn>
-      <q-btn :disable="dialer.currentStatus !== 'WRAP_UP'"
-             v-else
-             icon="img:app-icons/dialer/end_wrap_up.svg"
+      <q-btn icon="img:app-icons/dialer/end_wrap_up.svg"
              size="22px"
              class="icon-btn auto-size height-22"
              padding="none"
              ripple
              rounded
              flat
+             :disable="isDisabledEndWrapUpBtn"
+             v-else
              @click="endWrapUp">
       </q-btn>
     </q-item-section>
@@ -73,9 +73,12 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as AgentStatus from 'src/constants/agent-status'
+import { dialerWrapUpMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'active-call',
+
+  mixins: [dialerWrapUpMixin],
 
   data () {
     return {
@@ -86,11 +89,14 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile']),
+
     ...mapState(['dialer']),
+
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask'
     ]),
+
     phoneStatus () {
       if (!this.dialer.communication) {
         return ''
@@ -108,6 +114,7 @@ export default {
           return ''
       }
     },
+
     dialerCurrentNumber () {
       const number = this.dialer.currentNumber.includes('power_dialer') ? this.activeTask.phone_number : this.dialer.currentNumber
 
@@ -117,6 +124,7 @@ export default {
 
       return number
     },
+
     activeCallPhoneNumber () {
       if (this.dialer.communication) {
         return this.$options.filters.fixPhone(this.dialer.communication.lead_number)
@@ -136,28 +144,33 @@ export default {
 
       return ''
     },
+
     hasCustomParametersContactName () {
       return this.dialer.call &&
         this.dialer.call.customParameters &&
         this.dialer.call.customParameters.ContactName &&
         this.dialer.call.customParameters.ContactName !== 'null null'
     },
+
     hasCustomParametersNullContactName () {
       return this.dialer.call &&
         this.dialer.call.customParameters &&
         this.dialer.call.customParameters.ContactName &&
         this.dialer.call.customParameters.ContactName === 'null null'
     },
+
     hasParkedCallContact () {
       return this.dialer.parkedCall &&
         this.dialer.parkedCall.contact
     },
+
     activeCallClass () {
       return [
         (this.sessionPaused ? 'bg-grey-7' : ''),
         (this.dialer.currentStatus === 'WRAP_UP' ? 'wrap-up' : '')
       ]
     },
+
     showActiveCall () {
       const statuses = [
         'MAKING_CALL',
@@ -170,6 +183,14 @@ export default {
       return this.dialer &&
         this.profile &&
         statuses.includes(this.dialer.currentStatus)
+    },
+
+    isDisabledHangUpCallBtn () {
+      return this.dialer.currentStatus === 'MAKING_CALL' || this.isHangingUp
+    },
+
+    isDisabledEndWrapUpBtn () {
+      return this.dialer.currentStatus !== 'WRAP_UP' || this.wrapUpPaused
     }
   },
 
@@ -194,10 +215,7 @@ export default {
     },
 
     togglePhone () {
-      if (this.$route.meta.id !== 'power-dialer-session') {
-        this.$VueEvent.fire('togglePhone')
-      }
-      // this.$VueEvent.fire('togglePhone')
+      this.$VueEvent.fire('togglePhone')
     },
 
     getContactName (contactName) {
@@ -214,6 +232,7 @@ export default {
         this.isHangingUp = false
       }
     },
+
     'profile.agent_status': function (value) {
       if (value === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
         this.isHangingUp = false

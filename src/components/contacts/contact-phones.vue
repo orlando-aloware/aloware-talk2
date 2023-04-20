@@ -1,39 +1,47 @@
 <template>
-  <div v-if="contact">
-    <b-card class="border-0">
-      <h4>All Numbers</h4>
-      <contact-phones-list-items :phones="primaryPhone"
-                                 @edit="onEditPhone"
-                                 @delete="onDeletePhone"
-                                 @composerMedia="setComposerVariables"
-                                 @call="onCall">
-      </contact-phones-list-items>
+  <div class="w-100"
+       v-if="contact">
+    <b-card class="border-0 w-100"
+            no-body>
+      <b-card-body :class="bodyClass">
+        <div class="w-100">
+          <h4>All Numbers</h4>
+          <contact-phones-list-items :phones="primaryPhone"
+                                     @edit="onEditPhone"
+                                     @delete="onDeletePhone"
+                                     @composerMedia="setComposerVariables"
+                                     @call="onCall">
+          </contact-phones-list-items>
 
-      <contact-phones-list-items :phones="otherPhones"
-                                 @edit="onEditPhone"
-                                 @delete="onDeletePhone"
-                                 @composerMedia="setComposerVariables"
-                                 @call="onCall">
-      </contact-phones-list-items>
+          <contact-phones-list-items :phones="otherPhones"
+                                     @edit="onEditPhone"
+                                     @delete="onDeletePhone"
+                                     @composerMedia="setComposerVariables"
+                                     @call="onCall">
+          </contact-phones-list-items>
 
-      <b-link ref="phone_form"
-              href="#"
-              class="custom-link text-decoration-none"
-              @click="onAddPhone">
-        <plus-circle-icon></plus-circle-icon>
-        Add Phone Number
-      </b-link>
+          <b-link ref="phone_form"
+                  href="#"
+                  class="custom-link text-decoration-none"
+                  @click="onAddPhone">
+            <plus-circle-icon />
+            Add Phone Number
+          </b-link>
 
-      <q-menu content-class="mx-height-300"
-              ref="templatesMenu"
-              no-parent-event
-              no-focus
-              :offset="[284, -105]"
-              v-model="showPhonesForm">
-        <div class="row no-wrap q-pa-md">
-          <contact-phones-form :phone="phone" @close="onClosePhoneForm"></contact-phones-form>
+          <q-menu content-class="mx-height-300"
+                  ref="templatesMenu"
+                  no-parent-event
+                  no-focus
+                  :offset="[284, -105]"
+                  v-model="showPhonesForm">
+            <div class="row no-wrap q-pa-md">
+              <contact-phones-form :phone="phone"
+                                   @close="onClosePhoneForm">
+              </contact-phones-form>
+            </div>
+          </q-menu>
         </div>
-      </q-menu>
+      </b-card-body>
     </b-card>
   </div>
 </template>
@@ -53,6 +61,13 @@ export default {
 
   mixins: [aclMixin],
 
+  props: {
+    noBottomPadding: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   components: {
     ContactPhonesListItems,
     PlusCircleIcon,
@@ -60,12 +75,27 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact', 'contactPhoneNumbers']),
+    ...mapGetters('contacts', [
+      'contact',
+      'contactPhoneNumbers'
+    ]),
+
     otherPhones () {
       return this.contactPhoneNumbers.filter(phone => phone.phone_number !== this.contact.phone_number)
     },
+
     primaryPhone () {
-      return this.contact.phone_number === '0' ? [] : this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
+      return this.contact.phone_number === '0'
+        ? []
+        : this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
+    },
+
+    bodyClass () {
+      const paddingClass = this.noBottomPadding ? 'pb-0' : ''
+
+      return [
+        paddingClass
+      ]
     }
   },
 
@@ -154,9 +184,11 @@ export default {
 
       if (this.isMobile) {
         this.setShowPhone(true)
+
         setTimeout(() => {
           this.$VueEvent.fire('changePhoneNumber', data)
         }, 100)
+
         return
       }
 
@@ -171,7 +203,9 @@ export default {
 
   watch: {
     'contact.id': _.debounce(function () {
-      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+      const contactId = this.contact?.id
+
+      if (contactId && this.$route.params.id === contactId.toString()) {
         talk2Api.V1.contact.getPhoneNumbers()
           .catch(err => {
             console.log(err)

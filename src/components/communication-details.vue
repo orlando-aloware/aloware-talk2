@@ -917,17 +917,20 @@ export default {
       if (!communicationIncomingNumber) {
         return null
       }
-      const campaign = this.campaigns.find(campaign => campaign.id === this.campaignId)
-      if (campaign) {
-        return campaign.name
-      }
 
-      return null
+      return this.getCampaign(this.campaignId)?.name
     },
+
     getCampaign (id) {
       if (!id) {
         return null
       }
+
+      // reference the campaign object in communication if it has
+      if (this?.communication?.campaign) {
+        return this.communication.campaign
+      }
+
       const campaign = this.campaigns.find(campaign => campaign.id === id)
       if (campaign) {
         return campaign
@@ -969,6 +972,7 @@ export default {
         console.log(err)
       })
     },
+
     onDelete () {
       talk2Api.V1.communication.delete(this.communication.id).then(() => {
         this.$generalNotification('Communication has been successfully archived.', 'success')
@@ -984,6 +988,7 @@ export default {
         })
       })
     },
+
     onEditNote () {
       this.isEditingNote = true
     },
