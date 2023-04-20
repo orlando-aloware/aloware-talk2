@@ -84,7 +84,7 @@ module.exports = function (/* ctx */) {
           authToken: process.env.SENTRY_AUTH_TOKEN,
           org: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
-          release: process.env.SENTRY_VERSION,
+          // release: process.env.SENTRY_VERSION,
 
           // webpack specific configuration
           include: cfg.output.path,
@@ -256,7 +256,7 @@ module.exports = function (/* ctx */) {
           authToken: process.env.SENTRY_AUTH_TOKEN,
           org: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
-          release: process.env.SENTRY_VERSION,
+          // release: process.env.SENTRY_VERSION,
 
           // webpack specific configuration
           include: cfg.output.path,
