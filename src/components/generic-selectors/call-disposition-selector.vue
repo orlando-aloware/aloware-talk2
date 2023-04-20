@@ -10,15 +10,16 @@
             map-options
             outlined
             dense
+            bottom-slots
             :use-chips="useChips"
             :use-input="useInput"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-            :options="callDispositionsOptions"
+            :options="options"
             :multiple="multiple"
             :placeholder="placeholder"
             :disable="disable"
-            :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '' ]"
-            v-model="callDisposition"
+            :class="selectorClass"
+            v-model="selectedId"
             @popup-show="onShowMenu"
             @filter="filterFn">
     <template v-slot:prepend
@@ -39,12 +40,12 @@
               v-on="scope.itemEvents">
         <q-item-section avatar>
           <q-icon name="fa fa-bolt"
-                  v-show="!scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="!scope.opt.is_external">
           </q-icon>
           <q-icon name="fa fa-lock"
-                  v-show="scope.opt.is_external"
-                  :style="{ color: scope.opt.color, fontSize: '14px' }">
+                  :style="{ color: scope.opt.color, fontSize: '14px' }"
+                  v-show="scope.opt.is_external">
           </q-icon>
         </q-item-section>
         <q-item-section>
@@ -54,22 +55,25 @@
     </template>
 
     <template v-slot:selected-item="scope">
-      <q-chip
-        dense
-        :tabindex="scope.tabindex"
-        color="white"
-        class="tag-selected-chip"
-        text-color="secondary"
-      >
+      <q-chip dense
+              class="tag-selected-chip"
+              text-color="secondary"
+              color="white"
+              :tabindex="scope.tabindex">
         <i class="fa fa-circle position-absolute"
-           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`" />
         <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
-        <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+        <div role="button"
+             class="custom__remove d-flex align-items-center position-absolute r-0"
              @click="scope.removeAtIndex(scope.index)">
-          <remove-tag-icon class="ml-1 remove-tag-icon">
-          </remove-tag-icon>
+          <remove-tag-icon class="ml-1 remove-tag-icon" />
         </div>
       </q-chip>
+    </template>
+    <template v-slot:hint>
+      <span :class="hintClass">
+        {{ hint }}
+      </span>
     </template>
   </q-select>
 </template>
@@ -78,10 +82,15 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import { dispositionsOptionsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'call-disposition-selector',
+
   components: { RemoveTagIcon },
+
+  mixins: [dispositionsOptionsMixin],
+
   props: {
     value: {
       required: false,
@@ -104,21 +113,30 @@ export default {
       type: String,
       required: false
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     useChips: {
       type: Boolean,
       default: false
     },
+
     useInput: {
       type: Boolean,
       default: true
+    },
+
+    required: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -129,9 +147,9 @@ export default {
 
   data () {
     return {
-      callDisposition: this.value,
-      callDispositionsOptions: [],
-      selectWidth: 0
+      options: [],
+      selectWidth: 0,
+      type: 'call'
     }
   },
 
@@ -140,69 +158,80 @@ export default {
 
     placeholder () {
       switch (true) {
-        case this.multiple && (!this.callDisposition || (this.callDisposition && this.callDisposition.length < 1)):
+        case this.multiple && (!this.selectedId || (this.selectedId && this.selectedId.length < 1)):
           return 'Select Call Dispositions'
         case !this.multiple && !this.callDispositionId:
           return 'Select Call Disposition'
-        case this.multiple && this.callDisposition && this.callDisposition.length > 0:
+        case this.multiple && this.selectedId && this.selectedId.length > 0:
         case !this.multiple && this.callDispositionId:
         default:
           return ''
       }
     },
 
-    callDispositionsAlphabeticalOrder () {
-      if (this.callDispositions) {
-        return _.clone(this.callDispositions).sort((a, b) => {
-          const textA = a.name.toUpperCase()
-          const textB = b.name.toUpperCase()
-          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
-        })
-      }
-
-      return []
-    },
-
     callDispositionId () {
-      if (!this.callDisposition) {
+      if (!this.selectedId) {
         return null
       }
 
       if (this.multiple) {
-        return this.callDisposition.id
+        return this.selectedId.id
       }
 
-      return this.callDisposition
+      return this.selectedId
     },
 
     values () {
       return this.multiple ? _.filter(this.value, (item) => { return !!item }) : this.value
+    },
+
+    selectorClass () {
+      const prependClass = this.prepend ? 'with-prepend' : ''
+      const highlightedClass = this.highlighted ? this.highlightedClass : ''
+      const requiredClass = this.required ? 'required mb-0' : ''
+
+      return [
+        prependClass,
+        highlightedClass,
+        requiredClass
+      ]
+    },
+
+    hint () {
+      return this.required ? 'Required' : ''
+    },
+
+    hintClass () {
+      const requiredClass = this.required ? 'text-danger' : ''
+      return [
+        requiredClass
+      ]
     }
   },
 
   created () {
-    this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder
-    this.callDisposition = this.multiple ? [] : this.callDisposition
+    this.options = this.orderedDispositions
+    this.selectedId = this.multiple ? [] : this.selectedId
     this.getCallDisposition()
   },
 
   methods: {
     getCallDisposition () {
       if (!_.isEmpty(this.values) && this.multiple) {
-        this.callDisposition = []
+        this.selectedId = []
         const callDispId = { data: null }
         for (callDispId.data in this.values) {
-          const found = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === callDispId.data)
+          const found = this.orderedDispositions.find(callDispo => callDispo.id === callDispId.data)
 
           if (found) {
-            this.callDisposition.push(found)
+            this.selectedId.push(found)
           }
         }
         return
       }
 
       if (!_.isEmpty(this.values) && !this.multiple) {
-        this.callDisposition = this.callDispositionsAlphabeticalOrder.find(callDispo => callDispo.id === this.values)
+        this.selectedId = this.orderedDispositions.find(callDispo => callDispo.id === this.values)
       }
     },
 
@@ -213,21 +242,21 @@ export default {
     filterFn (val, update) {
       if (this.callDispositionId && val === this.callDispositionId) {
         update(() => {
-          this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder.filter(script => script.id === this.callDispositionId)
+          this.options = this.orderedDispositions.filter(script => script.id === this.callDispositionId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder
+          this.options = this.orderedDispositions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.callDispositionsOptions = this.callDispositionsAlphabeticalOrder.filter(script => script.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.orderedDispositions.filter(script => script.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
@@ -235,10 +264,10 @@ export default {
   watch: {
     value () {
       this.getCallDisposition()
-      this.callDisposition = this.value
+      this.selectedId = this.value
     },
 
-    callDisposition (val) {
+    selectedId (val) {
       if (!this.multiple && val !== this.values) {
         this.$emit('change', val)
         return

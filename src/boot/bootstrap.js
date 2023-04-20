@@ -543,3 +543,15 @@ Vue.prototype.$copyToClipboard = (value) => {
 String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1)
 }
+
+Vue.prototype.$alphabeticalSort = (items, property = 'name') => {
+  if (window._.isEmpty(items)) {
+    return items
+  }
+
+  return window._.clone(items).sort((a, b) => {
+    const textA = a[property].toUpperCase()
+    const textB = b[property].toUpperCase()
+    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+  })
+}

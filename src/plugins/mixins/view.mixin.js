@@ -22,21 +22,26 @@ export default {
       countFields: COUNT_FIELDS
     }
   },
+
   computed: {
     ...mapState('contacts', ['isAllContactsSelected']),
     ...mapState([
       'users',
       'campaigns'
     ]),
+
     checked () {
       return get(this.selectedContacts, this.id, [])
     },
+
     computedStyle () {
       return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     },
+
     pdColumns () {
       return POWER_DIALER_DEFAULT_COLUMNS
     },
+
     filteredColumns () {
       if (!isEmpty(this.columns)) {
         return this.columns
@@ -47,27 +52,33 @@ export default {
       }
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'setListSelectedContacts',
       'setAllContactsSelected'
     ]),
+
     onCheckerClicked (contact) {
       const items = { data: [] }
       const found = this.checked.find(item => item.id === contact.id)
+
       if (found) {
         items.data = this.checked.filter(item => item.id !== contact.id)
       } else {
         items.data = [...this.checked]
         items.data.push(contact)
       }
+
       this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
     },
+
     onCheckedRows (checked) {
       this.setAllContactsSelected(false)
       this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
+
     generateRoute (contactId) {
       const routeData = {
         path: `/contacts/${contactId}`
@@ -81,6 +92,7 @@ export default {
 
       return routeData
     },
+
     datatableOnMouseMove (e) {
       if (e.target.closest('.popover-items') !== null) {
         this.datatableTarget = e.target.closest('.popover-items').getAttribute('id')
@@ -94,6 +106,7 @@ export default {
         return false
       }
     },
+
     showPopover: debounce(function (title, id, index, colName, e) {
       if (this.datatableTarget !== id) {
         this.hoverPopover.target = null
@@ -108,13 +121,16 @@ export default {
       this.hoverPopover.key = (this.hoverPopover.key + 1)
       this.hoverPopover.title = title
       this.hoverPopover.target = id
-      this.hoverPopover.data = this.fixedContactsData.data[index][colName].slice(0, 10)
-      this.hoverPopover.dataLength = this.fixedContactsData.data[index][colName].length
+      const data = this.fixedContactsData.data[index][colName]
+      this.hoverPopover.data = data ? data.slice(0, 10) : ''
+      this.hoverPopover.dataLength = data.length
       this.hoverPopover.show = true
     }, 200),
+
     onMouseOverPopover (title, id, index, colName, e) {
       this.showPopover(title, id, index, colName, e)
     },
+
     onMouseLeavePopover (e) {
       this.hoverPopover.target = null
       this.hoverPopover.title = ''
@@ -122,6 +138,7 @@ export default {
       this.hoverPopover.data = []
       this.hoverPopover.dataLength = 0
     },
+
     getStatusColor (taskStatusName, module = null) {
       if (!taskStatusName) {
         return taskStatusName
@@ -133,6 +150,8 @@ export default {
             return 'grey-90'
           case 'Closed':
             return 'success'
+          case 'New':
+            return 'secondary'
           default:
             return 'primary'
         }
@@ -149,6 +168,7 @@ export default {
           return 'primary'
       }
     },
+
     getStatusName (taskStatus, module = null) {
       const integerTaskStatus = taskStatus ? parseInt(taskStatus) : taskStatus
 
@@ -162,6 +182,8 @@ export default {
             return 'Pending'
           case ContactTaskStatus.STATUS_CLOSED:
             return 'Closed'
+          case ContactTaskStatus.STATUS_NEW:
+            return 'New'
           case ContactTaskStatus.STATUS_OPEN:
           default:
             return 'Open'
@@ -181,17 +203,21 @@ export default {
           return 'Scheduled'
       }
     },
+
     getUserName (userId) {
       const user = this.users.find(item => item.id === userId)
       return user ? user.name : '-'
     },
+
     getLineName (id) {
       const found = this.campaigns.find(campaign => campaign.id === id)
       return found ? found.name : '-'
     },
+
     isCountField (columnName) {
       return this.countFields.includes(columnName)
     },
+
     exportAsCsv () {
       let id = null
       let module = null

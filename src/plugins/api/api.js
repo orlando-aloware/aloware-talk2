@@ -397,6 +397,14 @@ export default {
         return window.axios.get(`${suffixV1}url-shortener/domains`)
       }
     },
+    alohabot: {
+      getContactSession (id) {
+        return window.axios.get(`${suffixV1}bots/contact/${id}/session`)
+      },
+      disengageContact (id, params) {
+        return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
+      }
+    },
     contactCenter: {
       summary: {
         get (params) {
