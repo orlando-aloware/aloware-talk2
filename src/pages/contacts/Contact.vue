@@ -1,28 +1,26 @@
 <template>
-  <b-overlay v-if="authenticated"
-             class="h-100 w-100"
+  <b-overlay class="h-100 w-100"
              variant="white"
              rounded="sm"
-             :show="changingSelectedContact || campaignsIsLoading || usersIsLoading || !tagsFullyLoaded || !campaigns || !users || !tags || leaving || loadingContact || isEmptyContact"
+             :show="isShowContact"
              :opacity="0.85"
-             >
+             v-if="authenticated">
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
-           v-if="!campaignsIsLoading && !usersIsLoading && tagsFullyLoaded && campaigns && users && tags">
-        <contact-activities v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
-                            ref="contactActivities"
+           v-if="isShowContactActivities">
+        <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
+                            v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
                             @toggleDetails="toggleDetails">
           <template v-slot:moreActivities>
-            <q-btn v-if="hasMoreCommunications"
-                   outline
+            <q-btn outline
                    dense
                    rounded
                    no-caps
@@ -31,6 +29,7 @@
                    size="md"
                    :loading="isLoadingPreviousActivities"
                    :disable="isLoadingPreviousActivities"
+                   v-if="hasMoreCommunications"
                    @click="loadMorePreviousActivities">
               <div class="px-2">
                 Previous Activities
@@ -42,20 +41,19 @@
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <contact-details v-if="!changingSelectedContact && !isEmptyContact"
-                         :campaign-id="selectedCampaignId"
+        <contact-details :campaign-id="selectedCampaignId"
+                         v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
       </div>
-      <q-drawer
-        overlay
-        bordered
-        class="contact-details-container-drawer position-relative"
-        side="right"
-        :breakpoint="0"
-        :width="300"
-        v-model="drawer"
-        v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
+      <q-drawer overlay
+                bordered
+                class="contact-details-container-drawer position-relative"
+                side="right"
+                :breakpoint="0"
+                :width="300"
+                v-model="drawer"
+                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
         <compact-btn borderless
                      customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
@@ -72,10 +70,8 @@
     </div>
     <template #overlay>
       <div class="text-center">
-        <q-spinner-bars
-          color="primary"
-          size="2em"
-        />
+        <q-spinner-bars color="primary"
+                        size="2em" />
         <p id="cancel-label">Fetching contact...</p>
       </div>
     </template>
@@ -142,6 +138,17 @@ export default {
 
     isEmptyContact () {
       return Object.keys(this.contact).length === 0
+    },
+
+    isShowContact () {
+      return this.changingSelectedContact || this.campaignsIsLoading ||
+        this.usersIsLoading || !this.tagsFullyLoaded || !this.campaigns ||
+        !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
+    },
+
+    isShowContactActivities () {
+      return !this.campaignsIsLoading && !this.usersIsLoading &&
+        this.tagsFullyLoaded && this.campaigns && this.users && this.tags
     }
   },
 
@@ -269,6 +276,7 @@ export default {
       this.selectedContactChanging(true)
 
       this.contactListSidebarOpen = false
+
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
@@ -279,6 +287,7 @@ export default {
       if (this.contact.id === this.selectedContact.id) {
         this.setContact(this.selectedContact)
       }
+
       this.resetSelectedContact()
     },
 
@@ -293,6 +302,7 @@ export default {
         this.drawer = false
       }
     },
+
     'contact.task_status': function (newValue, oldValue) {
       if (newValue === ContactTaskStatus.STATUS_PENDING &&
         oldValue === ContactTaskStatus.STATUS_OPEN) {
