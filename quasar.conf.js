@@ -79,19 +79,21 @@ module.exports = function (/* ctx */) {
           exclude: /node_modules/
         })
 
-        const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-        const sentryPluginInstance = new SentryWebpackPlugin({
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-          org: process.env.SENTRY_ORG,
-          project: process.env.SENTRY_PROJECT,
-          // release: process.env.SENTRY_VERSION,
+        if (process.env.APP_ENV !== 'local') {
+          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+          const sentryPluginInstance = new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            // release: process.env.SENTRY_VERSION,
 
-          // webpack specific configuration
-          include: './dist',
-          ignore: ['node_modules']
-        })
+            // webpack specific configuration
+            include: cfg.output.path,
+            ignore: ['node_modules']
+          })
 
-        cfg.plugins.push(sentryPluginInstance)
+          cfg.plugins.push(sentryPluginInstance)
+        }
       }
     },
 
@@ -251,19 +253,21 @@ module.exports = function (/* ctx */) {
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
 
-        const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-        const sentryPluginInstance = new SentryWebpackPlugin({
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-          org: process.env.SENTRY_ORG,
-          project: process.env.SENTRY_PROJECT,
-          // release: process.env.SENTRY_VERSION,
+        if (process.env.APP_ENV !== 'local') {
+          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+          const sentryPluginInstance = new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            // release: process.env.SENTRY_VERSION,
 
-          // webpack specific configuration
-          include: './dist',
-          ignore: ['node_modules']
-        })
+            // webpack specific configuration
+            include: cfg.output.path,
+            ignore: ['node_modules']
+          })
 
-        cfg.plugins.push(sentryPluginInstance)
+          cfg.plugins.push(sentryPluginInstance)
+        }
       }
     }
   }
