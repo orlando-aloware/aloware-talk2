@@ -102,6 +102,10 @@ pipeline {
     post {
         success {
             script {
+                def branchName = env.GIT_BRANCH.toLowerCase()
+                def subDomain = branchName.contains('pr') ? "${branchName}.talk" : "talk"
+                def envUrl = "${subDomain}.${DEV_DOMAIN}"
+
                 notificationSender.sendSlackSuccess()
                 try {
                   if (env.CHANGE_BRANCH) {
