@@ -95,6 +95,8 @@ import {
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import CloseIcon from 'components/icons/close-icon'
+import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as CommunicationDirections from 'src/constants/communication-direction'
 import _ from 'lodash'
 
 export default {
@@ -151,7 +153,9 @@ export default {
       detailsOpen: false,
       contactListSidebarOpen: false,
       leaving: false,
-      contactComponentListeners: {}
+      contactComponentListeners: {},
+      ContactTaskStatus,
+      CommunicationDirections
     }
   },
 
@@ -287,6 +291,16 @@ export default {
     contactDetailsDrawer () {
       if (!this.contactDetailsDrawer) {
         this.drawer = false
+      }
+    },
+    'contact.task_status': function (newValue, oldValue) {
+      if (newValue === ContactTaskStatus.STATUS_PENDING &&
+        oldValue === ContactTaskStatus.STATUS_OPEN) {
+        this.communicationsAndAudits.map((communicationsAndAudit, index) => {
+          if (communicationsAndAudit?.direction === CommunicationDirections.INBOUND) {
+            this.communicationsAndAudits[index].is_read = true
+          }
+        })
       }
     }
   },
