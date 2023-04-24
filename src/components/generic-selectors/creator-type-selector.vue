@@ -3,7 +3,7 @@
     <q-select ref="creatorTypeSelect"
               options-selected-class="text-primary"
               color="primary"
-              option-value="value"
+              option-value="id"
               option-label="label"
               input-debounce="0"
               style="word-break: break-all;"
@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import { ALL_CREATOR_TYPES } from 'src/constants/creator-types'
+
 export default {
   name: 'creator-type-selector',
 
@@ -89,19 +91,6 @@ export default {
         default:
           return ''
       }
-    },
-    optionsArray () {
-      return [
-        { value: 1, label: 'Manual' },
-        { value: 2, label: 'API' },
-        { value: 3, label: 'Workflow' },
-        { value: 4, label: 'Broadcast' },
-        { value: 5, label: 'Power Dialer' },
-        { value: 6, label: 'SMS Reminder' },
-        { value: 7, label: 'APP Notifications' },
-        { value: 8, label: 'HubSpot' },
-        { value: 9, label: 'Zapier' }
-      ]
     }
   },
 
@@ -109,7 +98,8 @@ export default {
     return {
       creatorType: this.value,
       options: [],
-      selectWidth: 0
+      selectWidth: 0,
+      optionsArray: ALL_CREATOR_TYPES
     }
   },
 
@@ -124,7 +114,7 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.optionsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
+        this.options = this.optionsArray.filter(item => item.id.toLowerCase().indexOf(needle) > -1)
       })
     },
     onShowMenu () {
