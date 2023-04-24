@@ -307,8 +307,16 @@ export default {
       if (newValue === ContactTaskStatus.STATUS_PENDING &&
         oldValue === ContactTaskStatus.STATUS_OPEN) {
         this.communicationsAndAudits.map((communicationsAndAudit, index) => {
+          // make all inbound communications already read and
+          // set contact unread counts to 0 when contact status
+          // changes from open to pending.
           if (communicationsAndAudit?.direction === CommunicationDirections.INBOUND) {
             this.communicationsAndAudits[index].is_read = true
+            let newContact = this.$jsonClone(this.contact)
+            newContact.unread_texts_count = 0
+            newContact.unread_missed_calls_count = 0
+            newContact.unread_voicemails_count = 0
+            this.setContact(newContact)
           }
         })
       }
