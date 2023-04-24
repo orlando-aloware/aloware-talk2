@@ -202,7 +202,7 @@ const fixLrnTypeBadge = (type) => {
  * @param {int} creatorTypeId
  * @returns {string}
  */
-const fixCreatorType = (creatorTypeId) => {
+const translateCreatorType = (creatorTypeId) => {
   const type = ALL_CREATOR_TYPES.find(creatorType => creatorType.id === creatorTypeId)
 
   if (!type) {
@@ -220,7 +220,7 @@ export default ({ Vue }) => {
     translateCurrentStatusText,
     translateDispositionStatusText,
     fixLrnTypeBadge,
-    fixCreatorType
+    translateCreatorType
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
