@@ -1,7 +1,7 @@
 <template>
   <span class="cursor-pointer"
         v-if="userCanBargeAndWhisper(communication)"
-        @click="dialog(communication)">
+        @click="dialog">
     <volume-high-icon height="22"
                       width="22"/>
     <q-tooltip>
@@ -31,11 +31,6 @@ export default {
     communication: {
       type: Object,
       required: true
-    },
-
-    customClass: {
-      required: false,
-      default: null
     }
   },
 
