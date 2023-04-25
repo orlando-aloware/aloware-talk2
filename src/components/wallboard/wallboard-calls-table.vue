@@ -37,7 +37,7 @@
                   v-if="column.name === 'disposition'">
                 <router-link :to="{ name: 'Communication', params: { contactId: call.contact_id, communicationId: call.id }}">
                     <component :is="stateToIcon(call.disposition_status2, call.type, call.direction, call.callback_status)"
-                              v-if="call.disposition_status2">
+                               v-if="call.disposition_status2">
                     </component>
                     <q-tooltip>
                       {{ dispositionTooltipData(call.disposition_status2, call.type, call.direction) }}
@@ -172,7 +172,7 @@
                     <!-- disposition -->
                     <div class="d-flex align-items-center mb-1">
                       <i class="material-icons"
-                        :style="{ color: dispositionStatusColor(call.contact.disposition_status_id) }">
+                         :style="{ color: dispositionStatusColor(call.contact.disposition_status_id) }">
                         label
                       </i>
                       <span class="ml-1 text-grey-900">
@@ -191,12 +191,12 @@
 
                   <!-- tags -->
                   <div class="calls__table__contact__tags flex-grow-1 d-flex flex-column ml-1"
-                      v-if="call.contact && call.contact.tags && call.contact.tags.length">
-                    <div v-for="tag in getLastTags(call.contact.tags)"
-                        :key="tag.id"
-                        class="d-flex align-items-center mb-1">
+                       v-if="call.contact && call.contact.tags && call.contact.tags.length">
+                    <div class="d-flex align-items-center mb-1"
+                         :key="tag.id"
+                         v-for="tag in getLastTags(call.contact.tags)">
                       <i class="fa fa-circle"
-                        :style="{ color: tag.color }"></i>
+                        :style="{ color: tag.color }"/>
                       <span class="ml-1">{{ tag.name }}</span>
                     </div>
                     <div class="d-flex justify-center"

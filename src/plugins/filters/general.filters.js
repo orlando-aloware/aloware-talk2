@@ -627,9 +627,9 @@ const fixDuration = (duration) => {
     return window.moment.duration(duration, 'seconds').format('m:ss', {
       trim: false
     })
-  } else {
-    return '-'
   }
+
+  return '-'
 }
 
 export default ({ Vue }) => {
