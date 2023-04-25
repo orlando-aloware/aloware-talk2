@@ -720,6 +720,20 @@
             </b-form-row>
           </q-card-section>
 
+          <!-- CREATOR TYPE -->
+          <q-card-section class="pt-0 pb-0">
+            <b-form-row>
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Creator Type: </q-item-label>
+              </b-col>
+              <b-col>
+                <span>
+                  {{ communication.creator_type | translateCreatorType }}
+                </span>
+              </b-col>
+            </b-form-row>
+          </q-card-section>
+
           <q-card-section class="pt-0 pb-0">
             <!--TAGS-->
             <b-form-row>

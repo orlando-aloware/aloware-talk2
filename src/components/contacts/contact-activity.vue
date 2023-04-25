@@ -243,6 +243,13 @@
               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             &nbsp;to {{ communication.lead_number | fixPhone }}
         </span>
+
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              communication.creator_type && communication.creator_type !== CREATOR_TYPE_MANUAL">
+          - {{ communication.creator_type | translateCreatorType }}
+        </span>
+
         <span href="#"
            class="text-sm text-primary cursor-pointer"
            v-if="communication.direction === CommunicationDirection.OUTBOUND &&
@@ -356,8 +363,8 @@ import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
-
 import talk2Api from 'src/plugins/api/api'
+import { CREATOR_TYPE_MANUAL } from 'src/constants/creator-types'
 
 export default {
   mixins: [
@@ -449,7 +456,8 @@ export default {
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
-      CommunicationTypes
+      CommunicationTypes,
+      CREATOR_TYPE_MANUAL
     }
   },
 
