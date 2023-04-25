@@ -7,7 +7,7 @@
     <b-dropdown-item href=""
                      :key="column.name"
                      v-for="column in availableColumns"
-                     @click="TOGGLE_CALLS_COLUMN(column.name)">
+                     @click="toggleCallsColumn(column.name)">
       <div class="d-flex align-items-center cursor-pointer w-100">
         <input class="cursor-pointer mt-1"
                type="checkbox"
@@ -39,9 +39,9 @@ export default {
   },
 
   methods: {
-    ...mapMutations('wallboard', [
-      'TOGGLE_CALLS_COLUMN'
-    ])
+    ...mapMutations('wallboard', {
+      toggleCallsColumn: 'TOGGLE_CALLS_COLUMN'
+    })
   }
 }
 </script>
