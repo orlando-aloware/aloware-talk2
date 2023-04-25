@@ -30,7 +30,7 @@ export const ALL_CREATOR_TYPES = [
   },
   {
     id: CREATOR_TYPE_WORKFLOW,
-    label: 'Workflow'
+    label: 'Sequence'
   },
   {
     id: CREATOR_TYPE_BROADCAST,
