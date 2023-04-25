@@ -19,6 +19,7 @@ export default {
       commit('SET_LIVE_CALLS', res.data)
       commit('SET_LIVE_CALLS_LOADING', false)
     } catch (err) {
+      commit('SET_LIVE_CALLS_LOADING', false)
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
     }
@@ -42,6 +43,7 @@ export default {
       commit('SET_PARKED_CALLS', res.data)
       commit('SET_PARKED_CALLS_LOADING', false)
     } catch (err) {
+      commit('SET_PARKED_CALLS_LOADING', false)
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
     }
@@ -65,6 +67,7 @@ export default {
       commit('SET_QUEUED_CALLS', res.data)
       commit('SET_QUEUED_CALLS_LOADING', false)
     } catch (err) {
+      commit('SET_QUEUED_CALLS_LOADING', false)
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
     }
@@ -107,6 +110,7 @@ export default {
 
       commit('SET_SUMMARY_LOADING', false)
     } catch (err) {
+      commit('SET_SUMMARY_LOADING', false)
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
     }
@@ -128,6 +132,7 @@ export default {
       commit('SET_USERS', response.data)
       commit('SET_USERS_LOADING', false)
     } catch (err) {
+      commit('SET_USERS_LOADING', false)
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
     }
