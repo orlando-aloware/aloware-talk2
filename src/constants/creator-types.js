@@ -50,7 +50,7 @@ export const ALL_CREATOR_TYPES = [
   },
   {
     id: CREATOR_TYPE_HUBSPOT,
-    label: 'Hubspot'
+    label: 'HubSpot'
   },
   {
     id: CREATOR_TYPE_ZAPIER,
