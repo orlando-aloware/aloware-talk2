@@ -2,7 +2,7 @@
   <span :class="['cursor-pointer', { 'opacity-05 cursor-blocked': loading }]"
         :disabled="loading"
         v-if="show"
-        @click="dialog(communication)">
+        @click="dialog">
     <power-icon height="22"
                 width="22"/>
     <q-tooltip>
@@ -32,11 +32,6 @@ export default {
     communication: {
       type: Object,
       required: true
-    },
-
-    customClass: {
-      required: false,
-      default: null
     }
   },
 
