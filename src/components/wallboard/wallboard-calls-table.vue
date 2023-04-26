@@ -132,19 +132,6 @@
                 </div>
               </td>
 
-              <!-- duration -->
-              <td :key="`col-${colIndex}`"
-                  v-if="column.name === 'duration'">
-                <div class="d-flex flex-column">
-                  <span>
-                    {{ call.duration | fixDuration }}
-                  </span>
-                  <span>
-                    {{ getVisibleStatus(call) }}
-                  </span>
-                </div>
-              </td>
-
               <!-- contact -->
               <td class="calls__table__contact"
                   :key="`col-${colIndex}`"
@@ -208,15 +195,6 @@
                 </div>
               </td>
 
-              <!-- owner -->
-              <td :key="`col-${colIndex}`"
-                  v-if="column.name === 'owner_id'">
-                <span v-if="call.user">
-                  {{ call.user.name | fixName }}
-                </span>
-                <span v-else>--</span>
-              </td>
-
               <!-- location -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'lead_location'">
@@ -249,22 +227,6 @@
                 <div v-else>
                   <span>--</span>
                 </div>
-              </td>
-
-              <!-- cold transfered -->
-              <td :key="`col-${colIndex}`"
-                  v-if="column.name === 'in_cold_transfer'">
-                <span>
-                  {{ call.in_cold_transfer ? 'Yes' : 'No' }}
-                </span>
-              </td>
-
-              <!-- transfer type -->
-              <td :key="`col-${colIndex}`"
-                  v-if="column.name === 'transfer_type'">
-                <span>
-                  {{ call.transfer_type | translateTransferTypeText }}
-                </span>
               </td>
 
               <!-- callback status -->
@@ -483,14 +445,8 @@ export default {
           case 'talk_time':
             condition = a.talk_time > b.talk_time
             break
-          case 'duration':
-            condition = a.duration > b.duration
-            break
           case 'lead_number':
             condition = (a.contact?.name || a.lead_number) > (b.contact?.name || b.lead_number)
-            break
-          case 'owner_id':
-            condition = (a.user?.name || '') > (b.user?.name || '')
             break
           case 'lead_location':
             condition = (a.city + a.state) > (b.city + b.state)

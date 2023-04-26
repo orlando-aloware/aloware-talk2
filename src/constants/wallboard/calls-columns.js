@@ -65,35 +65,18 @@ export const COLUMNS = [
     draggable: true
   },
   {
-    name: 'duration',
-    label: 'Duration',
-    order: 7,
-    sortable: true,
-    selectable: true,
-    draggable: true
-  },
-  {
     name: 'lead_number',
     label: 'Contact',
-    order: 8,
+    order: 7,
     sortable: true,
     selectable: true,
     draggable: true,
     minWidth: 300
   },
   {
-    name: 'owner_id',
-    label: 'Owner',
-    order: 9,
-    sortable: true,
-    selectable: true,
-    draggable: true,
-    minWidth: 130
-  },
-  {
     name: 'lead_location',
     label: 'Location',
-    order: 10,
+    order: 8,
     sortable: true,
     selectable: true,
     draggable: true,
@@ -102,32 +85,16 @@ export const COLUMNS = [
   {
     name: 'user',
     label: 'User',
-    order: 11,
+    order: 9,
     sortable: true,
     selectable: true,
     draggable: true,
     minWidth: 150
   },
   {
-    name: 'in_cold_transfer',
-    label: 'Cold Transferred?',
-    order: 12,
-    sortable: false,
-    selectable: true,
-    draggable: true
-  },
-  {
-    name: 'transfer_type',
-    label: 'Transfer Type',
-    order: 13,
-    sortable: false,
-    selectable: true,
-    draggable: true
-  },
-  {
     name: 'callback_status',
     label: 'Callback Status',
-    order: 14,
+    order: 10,
     sortable: false,
     selectable: true,
     draggable: true
@@ -135,7 +102,7 @@ export const COLUMNS = [
   {
     name: 'tags',
     label: 'Tags',
-    order: 15,
+    order: 11,
     sortable: false,
     selectable: true,
     draggable: true
@@ -143,7 +110,7 @@ export const COLUMNS = [
   {
     name: 'notes',
     label: 'Notes',
-    order: 16,
+    order: 12,
     sortable: false,
     selectable: true,
     draggable: true,
@@ -152,7 +119,7 @@ export const COLUMNS = [
   {
     name: 'operations',
     label: 'Operations',
-    order: 17,
+    order: 13,
     sortable: false,
     selectable: true,
     draggable: true,
