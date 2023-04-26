@@ -12724,6 +12724,12 @@ h1.contact-list-name-label {
       &__header {
         display: flex;
         padding: 10px 20px;
+
+        &__columns-dropdown {
+          .dropdown-item {
+            padding-bottom: 0px;
+          }
+        }
       }
 
       &__table {

@@ -3,13 +3,13 @@
               no-caret
               right
               variant="light"
-              class="m-2 b-compact-dropdown-button text-bold dropdown-white">
+              class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white">
     <b-dropdown-item href=""
                      :key="column.name"
                      v-for="column in availableColumns"
                      @click="toggleCallsColumn(column.name)">
-      <div class="d-flex align-items-center cursor-pointer w-100">
-        <input class="cursor-pointer mt-1"
+      <div class="d-flex align-items-center cursor-pointer w-100 text-sm">
+        <input class="cursor-pointer"
                type="checkbox"
                :checked="enabledColumns.includes(column.name)"
                :value="column.name"/>
