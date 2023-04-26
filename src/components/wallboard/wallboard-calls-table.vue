@@ -20,7 +20,7 @@
               :key="`${index}`">
             <template v-for="(column, colIndex) in filteredColumns">
               <!-- colapse button-->
-              <td :class="['calls__table__collapse', { 'calls__table__collapse--collapsed': expandedItem === index }]"
+              <td :class="['calls__table__collapse pl-3', { 'calls__table__collapse--collapsed': expandedItem === index }]"
                   :key="`col-${colIndex}`"
                   v-if="column.name === 'details'">
                 <span class="cursor-pointer"
@@ -33,7 +33,8 @@
               </td>
 
               <!-- icon -->
-              <td :key="`col-${colIndex}`"
+              <td class="pl-3"
+                  :key="`col-${colIndex}`"
                   v-if="column.name === 'disposition'">
                 <router-link :to="{ name: 'Communication', params: { contactId: call.contact_id, communicationId: call.id }}">
                     <component :is="stateToIcon(call.disposition_status2, call.type, call.direction, call.callback_status)"
@@ -48,8 +49,8 @@
               <!-- incoming number -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'incoming_number'">
-                <div class="row">
-                  <div class="col-12 mb-1">
+                <div class="d-flex flex-column">
+                  <div class="mb-1">
                     <a :href="getCampaignURL(call.campaign_id)"
                        target="_blank"
                        v-if="hasRole('Company Admin') && getCampaign(call.campaign_id)">
@@ -59,7 +60,7 @@
                       {{ getCampaign(call.campaign_id) || '--' }}
                     </span>
                   </div>
-                  <div class="col-12">
+                  <div>
                     {{ call.incoming_number | fixPhone }}
                   </div>
                 </div>

@@ -12731,6 +12731,12 @@ h1.contact-list-name-label {
           td {
             transition: all .5s;
           }
+
+          tbody {
+            td {
+              padding-left: 28px;
+            }
+          }
         }
 
         &__collapse {
