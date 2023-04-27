@@ -51,14 +51,12 @@
           <b-form-group id="input-group-2"
                         label="Note"
                         label-for="input-2">
-            <b-form-textarea
-              class="textarea-no-auto-shrink"
-              placeholder="Write a note for this event.."
-              rows="3"
-              max-rows="8"
-              no-auto-shrink
-              v-model="appointment.body">
-            </b-form-textarea>
+            <b-form-textarea class="textarea-no-auto-shrink"
+                             placeholder="Write a note for this event.."
+                             rows="3"
+                             max-rows="8"
+                             no-auto-shrink
+                             v-model="appointment.body"/>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -71,15 +69,15 @@
           <b-form-group id="input-group-2"
                         label=""
                         class="checkbox-wrapper">
-            <b-form-checkbox
-              v-model="appointment.smsReminder.enabled"
-              :value="true"
-              :unchecked-value="false">
+            <b-form-checkbox :value="true"
+                             :unchecked-value="false"
+                             v-model="appointment.smsReminder.enabled">
               <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
           </b-form-group>
         </b-col>
-        <b-col v-show="appointment.smsReminder.enabled" cols="12">
+        <b-col cols="12"
+               v-show="appointment.smsReminder.enabled">
           <b-form-group id="input-group-2"
                         label="Send From"
                         label-for="input-2">
@@ -91,13 +89,13 @@
           <b-form-group id="input-group-2"
                         label="Time"
                         label-for="input-2">
-            <predefined-time-selector @select="smsReminderTimeSelected"></predefined-time-selector>
+            <predefined-time-selector @select="smsReminderTimeSelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
                         label="Send (n) days before"
                         label-for="input-2">
-            <number-of-days-selector @select="smsReminderFrequencySelected"></number-of-days-selector>
+            <number-of-days-selector @select="smsReminderFrequencySelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -105,46 +103,40 @@
                         label-for="input-2">
             <div class="mb-1">
               <span class="text-danger sms-reminder-template-variables"
-                    v-for="item in appointment.smsReminder.template_variables"
                     :key="item"
+                    v-for="item in appointment.smsReminder.template_variables"
                     @click="appendSmsReminderTemplateVariable(item)">
                 {{ item }}
             </span>
             </div>
-            <b-form-textarea
-              class="textarea-no-auto-shrink"
-              placeholder=""
-              rows="3"
-              max-rows="8"
-              no-auto-shrink
-              v-model="appointment.smsReminder.body">
-            </b-form-textarea>
+            <b-form-textarea class="textarea-no-auto-shrink"
+                             placeholder=""
+                             rows="3"
+                             max-rows="8"
+                             no-auto-shrink
+                             v-model="appointment.smsReminder.body"/>
           </b-form-group>
         </b-col>
       </b-form-row>
     </b-form>
 
     <template slot="modal-footer">
-      <b-button
-        variant="success"
-        class="custom-btn"
-        size="sm"
-        @click="onHidden"
-      >
+      <b-button variant="success"
+                class="custom-btn"
+                size="sm"
+                @click="onHidden">
         Close
       </b-button>
-      <b-button
-        variant="primary"
-        class="custom-btn"
-        size="sm"
-        :disabled="isSaving || !isValid"
-        @click="onSubmit"
-      >
-        <q-spinner-bars v-if="isSaving" color="white"/>
+      <b-button variant="primary"
+                class="custom-btn"
+                size="sm"
+                :disabled="isSaving || !isValid"
+                @click="onSubmit">
+        <q-spinner-bars color="white"
+                        v-if="isSaving"/>
         {{ isSaving ? 'Adding Event...' : 'Add Event' }}
       </b-button>
     </template>
-
   </b-modal>
 </template>
 

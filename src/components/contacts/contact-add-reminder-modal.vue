@@ -19,36 +19,31 @@
                     label="Time"
                     label-for="input-2">
         <predefined-time-selector v-model="reminder.time"
-                                  @select="onTimeSelected">
-        </predefined-time-selector>
+                                  @select="onTimeSelected"/>
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Timezone"
                     label-for="input-2">
-        <timezone-selector @select="timezoneSelected"></timezone-selector>
+        <timezone-selector @select="timezoneSelected"/>
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Notes"
                     label-for="input-2">
-        <b-form-textarea
-          id="textarea-no-auto-shrink"
-          placeholder="Reminder notes"
-          rows="3"
-          max-rows="8"
-          no-auto-shrink
-          v-model="reminder.note"
-        ></b-form-textarea>
+        <b-form-textarea id="textarea-no-auto-shrink"
+                         placeholder="Reminder notes"
+                         rows="3"
+                         max-rows="8"
+                         no-auto-shrink
+                         v-model="reminder.note"/>
       </b-form-group>
     </b-form>
     <template slot="modal-footer">
-      <b-button
-        variant="success"
-        class="custom-btn"
-        size="sm"
-        @click="onHidden"
-      >
+      <b-button variant="success"
+                class="custom-btn"
+                size="sm"
+                @click="onHidden">
         Close
       </b-button>
       <b-button type="button"
@@ -56,7 +51,8 @@
                 variant="primary"
                 :disabled="isAdding || !isValid"
                 @click="onSubmit">
-        <q-spinner-bars v-if="isAdding" color="white" />
+        <q-spinner-bars color="white"
+                        v-if="isAdding"/>
         {{ isAdding ? 'Adding Reminder...' : 'Add Reminder' }}
       </b-button>
     </template>
