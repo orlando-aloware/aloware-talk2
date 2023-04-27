@@ -134,8 +134,8 @@ export default {
       }
     },
     onHidden () {
-      this.resetForm()
       this.addReminderOpen(false)
+      this.resetForm()
     },
     onShow () {
       this.reminder.date = window.moment().format('MM/DD/YYYY')
@@ -147,7 +147,7 @@ export default {
     },
     resetForm () {
       this.reminder = {
-        date: window.moment('MM/DD/YYYY').format(),
+        date: window.moment().format('MM/DD/YYYY'),
         time: '',
         note: '',
         timezone: this.profile.timezone
