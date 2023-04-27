@@ -1,29 +1,31 @@
 <template>
-  <div class='position-relative'>
+  <div class="position-relative">
     <q-btn-toggle v-model="currentTab"
                   :options="options"
-                  class="custom-toggle-button"
+                  class="custom-toggle-button tags__tabs"
                   no-caps
-                  spread
                   dense
-                  :toggle-color="statusToggleColor"
-                  unelevatedolor="statusToggleColor"
+                  spread
+                  unelevated
+                  :toggle-color="categorySelectToggleColor"
                   color="transparent"
                   text-color="primary">
       <template v-slot:one>
-        <div class="d-flex justify-content-center w-100 options"
-             :class="[currentTab === CommmunicationTags ?  'active' : 'text-grey-90']">
-          <span class="text-left tag-cat-name">
-            Communication Tags
+        <div :class="[currentTab === CommmunicationTags ?  'active' : 'text-grey-90']">
+          <span>Communication Tags</span>
+          <span class="ml-1 align-middle badge"
+                :class="[currentTab === CommmunicationTags ?  'badge-primary' : 'grey-light']">
+            {{ tagCategoriesCount.communications }}
           </span>
         </div>
       </template>
 
       <template v-slot:two>
-        <div class="d-flex justify-content-center w-100 options"
-             :class="[currentTab === ContactTags ?  'active' : 'text-grey-90']">
-          <span class="text-left tag-cat-name">
-            Contact Tags
+        <div :class="[currentTab === ContactTags ?  'active' : 'text-grey-90']">
+          <span>Contact Tag</span>
+          <span class="ml-1 align-middle badge"
+                :class="[currentTab === ContactTags ?  'badge-primary' : 'grey-light']">
+            {{ tagCategoriesCount.contacts }}
           </span>
         </div>
       </template>
@@ -39,6 +41,11 @@ export default {
   props: {
     selectedTagCategory: {
       type: Number,
+      required: true
+    },
+
+    tagCategoriesCount: {
+      type: Object,
       required: true
     }
   },
@@ -62,7 +69,7 @@ export default {
   },
 
   computed: {
-    statusToggleColor () {
+    categorySelectToggleColor () {
       return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
     }
   },

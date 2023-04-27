@@ -1576,6 +1576,10 @@ i.option-separator {
   background: $danger;
 }
 
+.badge-grey {
+  background: $grey;
+}
+
 .badge-grey-80 {
   background: $grey-80;
 }
@@ -12420,4 +12424,26 @@ h1.contact-list-name-label {
 
 .vh-100 {
   height: 100vh;
+}
+
+.tags {
+  &__tabs {
+    &.q-btn-group--spread {
+      & > .q-btn-item {
+        flex: inherit;
+        flex-grow: 1;
+        min-width: 200px;
+      }
+    }
+  }
+
+  &__helper {
+    &__popover {
+      .popover-header {
+        background-color: #fff;
+        border-bottom: none;
+        font-weight: 500;
+      }
+    }
+  }
 }

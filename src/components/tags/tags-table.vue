@@ -63,13 +63,17 @@
             <td :key="`col-${colIndex}`"
                 v-if="category === TAG_CATEGORIES.CAT_COMMUNICATIONS && column.name === 'communications_count'">
               <span v-if="tag.communications_count > 0"
-                    class="badge badge-light">{{ tag.communications_count }}</span>
+                    class="badge badge-light">
+                {{ tag.communications_count }}
+              </span>
             </td>
 
             <td :key="`col-${colIndex}`"
                 v-if="category === TAG_CATEGORIES.CAT_CONTACTS && column.name === 'contacts_count'">
               <span v-if="tag.contacts_count > 0"
-                    class="badge badge-light">{{ tag.contacts_count }}</span>
+                    class="badge badge-light">
+                {{ tag.contacts_count }}
+              </span>
             </td>
 
             <td :key="`col-${colIndex}`"
@@ -92,8 +96,23 @@
                     <i class="fa fa-user pull-left"></i> Contacts
                   </b-button>
                 </div>
+
                 <div v-if="hasRole('Company Admin')">
-                  <div></div>
+                  <div v-if="tag.contacts_count > 50">
+                    <tag-contacts-splitter />
+                  </div>
+
+                  <div>
+                    <assign-contacts-by-tag />
+                  </div>
+
+                  <div>
+                    <tag-contacts-add-to-power-dialer />
+                  </div>
+
+                  <div>
+                    <tag-contacts-workflow-enroller />
+                  </div>
                 </div>
               </div>
 
@@ -128,11 +147,15 @@ import Datatable from 'components/datatable.vue'
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import { aclMixin } from 'src/plugins/mixins'
 import { fixDateTime } from '../../plugins/filters/datetime.filters'
+import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
+import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
+import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 export default {
   name: 'tags-table',
   methods: { fixDateTime },
 
-  components: { Datatable },
+  components: { TagContactsWorkflowEnroller, TagContactsAddToPowerDialer, TagContactsSplitter, AssignContactsByTag, Datatable },
 
   mixins: [
     aclMixin

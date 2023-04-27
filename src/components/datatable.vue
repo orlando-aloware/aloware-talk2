@@ -261,6 +261,11 @@ export default {
 
     fixedColumns () {
       const newItems = JSON.parse(JSON.stringify(this.columns))
+
+      // does not need to reference contacts
+      if (!['Contacts', 'Power Dialer'].includes(this.$route.name)) {
+        return newItems
+      }
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
       const index = { data: null }

@@ -1,6 +1,6 @@
 <template>
   <div class="tags position-relative">
-    <div class="d-flex tags-header">
+    <div class="tags__header d-flex justify-between p-3">
       <!-- search -->
       <div>
         <search
@@ -14,30 +14,32 @@
       <!-- category tabs -->
       <div>
         <tags-tabs :selectedTagCategory="tagCategory"
-                   @loadTags="loadTags">
+                   :tagCategoriesCount="tagCategoriesCount"
+                   @loadTags="getTags">
         </tags-tabs>
       </div>
 
       <div class="d-flex">
         <!-- add tag -->
-        <b-button class="btn-blue align-items-center"
+        <b-button class="mr-1"
                   size="sm"
-                  variant="light">
+                  variant="primary">
           <i class="fa fa-plus"></i> Add {{ tagCategoryName }} Tag
         </b-button>
 
         <!-- help -->
-        <b-button id="tag-helper"
+        <b-button id="tags-helper"
                   class="btn-light align-items-center"
                   size="sm"
                   variant="light">
-          <i class="fa fa-question-circle"></i> Help
+          <i class="large material-icons mr-1">help_outline</i> Help
         </b-button>
-        <b-popover
-          target="tag-helper"
-          placement="auto"
-          title="What are tags?"
-          triggers="hover focus">
+        <b-popover custom-class="tags__helper__popover"
+                   target="tags-helper"
+                   placement="bottomleft"
+                   title="What are Tags?"
+                   width="300"
+                   triggers="click blur">
           <div>
             <p>Tags help you categorize and segment your audience in a way like Lists, but with the added benefit of having the same person in multiple places.</p>
             <p>The entire audience of a Tag can be enrolled in a sequence. Your contact imports show up as a new tag with the date of upload.</p>
@@ -87,6 +89,10 @@ export default {
       isLoading: false,
       tags: [],
       tagCategory: TAG_CATEGORIES.CAT_COMMUNICATIONS,
+      tagCategoriesCount: {
+        communications: 0,
+        contacts: 0
+      },
       pagination: {
         currentPage: 1,
         lastPage: 1,
@@ -97,17 +103,18 @@ export default {
   },
 
   created () {
-    this.loadTags(this.tagCategory)
+    this.getTagCategoriesCount()
+    this.getTags(this.tagCategory)
   },
 
   computed: {
     tagCategoryName () {
       switch (this.tagCategory) {
         case TAG_CATEGORIES.CAT_CONTACTS:
-          return 'Contacts'
+          return 'Contact'
 
         case TAG_CATEGORIES.CAT_COMMUNICATIONS:
-          return 'Communications'
+          return 'Communication'
       }
 
       return ''
@@ -119,7 +126,12 @@ export default {
       return ''
     },
 
-    loadTags (tagCategory, page = 1, perPage = 25, orderBy = 'id', order = 'descending') {
+    getTagCategoriesCount () {
+      this.tagCategoriesCount.communications = 809
+      this.tagCategoriesCount.contacts = 30
+    },
+
+    getTags (tagCategory, page = 1, perPage = 25, orderBy = 'id', order = 'descending') {
       this.isLoading = true
       this.tags = []
       this.tagCategory = +tagCategory
