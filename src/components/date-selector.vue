@@ -11,6 +11,7 @@
                               :minute-interval="minuteInterval"
                               :disabled-hours="disabledHours"
                               :no-value-to-custom-elem="noValueToCustomElem"
+                              :no-clear-button="noClearButton"
                               no-keyboard
                               v-model="date"
                               @input="onInput">
@@ -85,6 +86,10 @@ export default {
       default: 'l'
     },
     noValueToCustomElem: {
+      type: Boolean,
+      default: false
+    },
+    noClearButton: {
       type: Boolean,
       default: false
     }
