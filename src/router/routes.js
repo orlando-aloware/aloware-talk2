@@ -12,6 +12,7 @@ const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
 const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
 const Calendar = () => import('src/pages/calendar/Calendar.vue')
+const Tags = () => import('pages/tags/Tags.vue')
 const Stats = () => import('pages/stats/Stats.vue')
 const Settings = () => import('pages/Settings.vue')
 const Account = () => import('pages/Account.vue')
@@ -259,6 +260,14 @@ const routes = [
         component: Calendar,
         meta: {
           title: 'Calendar'
+        }
+      },
+      {
+        path: 'tags',
+        name: 'Tags',
+        component: Tags,
+        meta: {
+          title: 'Tags'
         }
       },
       {
