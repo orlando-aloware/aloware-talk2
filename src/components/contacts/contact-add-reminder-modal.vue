@@ -5,12 +5,12 @@
            @hidden="onHidden"
            @show="onShow">
     <b-form @submit.prevent="onSubmit">
-      <b-form-group
-        id="input-group-1"
-        label="Date"
-        label-for="input-1">
-        <date-selector v-model="reminder.date"
-                       :min-date="minDate"
+      <b-form-group id="input-group-1"
+                    label="Date"
+                    label-for="input-1">
+        <date-selector :min-date="minDate"
+                       :no-clear-button="true"
+                       v-model="reminder.date"
                        @dateSelected="dateSelected">
         </date-selector>
       </b-form-group>

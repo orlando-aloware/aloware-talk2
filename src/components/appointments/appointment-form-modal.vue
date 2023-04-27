@@ -12,13 +12,13 @@
             @reset="resetForm">
       <b-form-row>
         <b-col sm="12">
-          <b-form-group
-            id="input-group-1"
-            label="Select date"
-            label-for="input-1"
-            description="">
-            <date-selector v-model="appointment.date"
-                           :min-date="minDate"
+          <b-form-group id="input-group-1"
+                        label="Select date"
+                        label-for="input-1"
+                        description="">
+            <date-selector :min-date="minDate"
+                           :no-clear-button="true"
+                           v-model="appointment.date"
                            @dateSelected="dateSelected">
             </date-selector>
           </b-form-group>
