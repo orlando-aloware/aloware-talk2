@@ -1,106 +1,97 @@
 <template>
-  <div
-    class="d-flex flex-column"
-    :class="[paginated ? 'paginated' : '']"
-    @mousemove="$emit('onMouseMove', $event)"
-    @mouseleave="$emit('onMouseLeave', $event)">
-    <div
-      ref="scrollableArea"
-      :class="scrollableAreaClasses"
-      @scroll="handleScroll">
+  <div class="d-flex flex-column"
+       :class="[paginated ? 'paginated' : '']"
+       @mousemove="$emit('onMouseMove', $event)"
+       @mouseleave="$emit('onMouseLeave', $event)">
 
-      <table
-        ref="table"
-        :class="[computedClass, 'pl-3']">
+    <div ref="scrollableArea"
+         :class="scrollableAreaClasses"
+         @scroll="handleScroll">
+
+      <table ref="table"
+             :class="[computedClass, 'pl-3']">
 
         <thead>
-          <draggable
-            tag="tr"
-            ghost-class="ghost"
-            handle=".handle"
-            :list="fixedColumns"
-            :move="onCheckMove"
-            @change="onOrderChanged"
-            class="dragable-header"
-          >
-            <th
-              v-for="(column, key) in fixedColumns"
-              :key="column.name"
-              :data-column-id="column.name"
-              :class="{
-                checkbox: column.name === 'checkbox',
-                sticky: column.sticky,
-                hovering: hoverKey === key ? isHovering : false
-              }"
-              :id="`cols-${column.name}`"
-              :style="{
-                maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
-                minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
-              }"
-              @mouseout="onInitReorder(false, null)">
+          <draggable tag="tr"
+                     ghost-class="ghost"
+                     handle=".handle"
+                     :list="fixedColumns"
+                     :move="onCheckMove"
+                     @change="onOrderChanged"
+                     class="dragable-header">
 
-              <label
-                v-if="column.name === 'checkbox'"
-                class="custom-checkbox-container check-all">
-                <input
-                  type="checkbox"
-                  class="data-table-check-all"
-                  ref="dataTableCheckAll"
-                  @change="onCheckboxClicked" />
+            <th v-for="(column, key) in fixedColumns"
+                :key="column.name"
+                :data-column-id="column.name"
+                :class="{
+                  checkbox: column.name === 'checkbox',
+                  sticky: column.sticky,
+                  hovering: hoverKey === key ? isHovering : false
+                }"
+                :id="`cols-${column.name}`"
+                :style="{
+                  maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
+                  minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
+                }"
+                @mouseout="onInitReorder(false, null)">
+
+              <label v-if="column.name === 'checkbox'"
+                     class="custom-checkbox-container check-all">
+                <input type="checkbox"
+                       class="data-table-check-all"
+                       ref="dataTableCheckAll"
+                       @change="onCheckboxClicked" />
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
-                <div
-                  v-if="column.draggable"
-                  @mouseover="onInitReorder(true, key)"
-                  class="move-icon-drag-container"
-                  style="display:inline-block;">
-                  <MoveIcon
-                    v-if="column.draggable"
-                    class="move-icon-drag"
-                    :color="moveColor"
-                    :class="{ handle: column.draggable }" />
+                <div v-if="column.draggable"
+                     @mouseover="onInitReorder(true, key)"
+                     class="move-icon-drag-container"
+                     style="display:inline-block;">
+                  <MoveIcon v-if="column.draggable"
+                            class="move-icon-drag"
+                            :color="moveColor"
+                            :class="{ handle: column.draggable }" />
                 </div>
                 <span class="handle-label"
                       :class="{ 'pl-2': column.label === 'Actions' }">
                   {{ column.label }}
                 </span>
-                <div
-                  class="sorter-container"
-                  :class="{ 'has-sorting': sorts.orderBy === column.name }">
-                <a
-                  href="#"
-                  class="sorter"
-                  :class="{
+                <div class="sorter-container"
+                     :class="{ 'has-sorting': sorts.orderBy === column.name }">
+                <a href="#"
+                   class="sorter"
+                   :class="{
                     'sorter-asc':
                       sorts.order === 'asc' && sorts.orderBy === column.name,
                     'sorter-desc':
                       sorts.order === 'desc' && sorts.orderBy === column.name
-                  }"
-                  v-if="column.sortable"
-                  @click.prevent="onColumnSort(column)">
+                    }"
+                   v-if="column.sortable"
+                   @click.prevent="onColumnSort(column)">
                 </a>
                 </div>
-                <div
-                  class="tableResizer"
-                  :data-resizer-id="column.name"
-                  v-if="column.resizable"
-                  @mousedown="onResizerMouseDown">
+                <div class="tableResizer"
+                     :data-resizer-id="column.name"
+                     v-if="column.resizable"
+                     @mousedown="onResizerMouseDown">
                   {{ column.label }}
                 </div>
               </template>
+
             </th>
           </draggable>
         </thead>
+
         <tbody>
           <slot name="tbody" />
         </tbody>
       </table>
-      <b-overlay
-        class="table-more-rows-spinner"
-        :show="isLoadingMore"
-        rounded="sm"
-        v-if="!paginated">
+
+      <b-overlay class="table-more-rows-spinner"
+                 :show="isLoadingMore"
+                 rounded="sm"
+                 v-if="!paginated">
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="20px" />
@@ -110,36 +101,36 @@
       <template v-if="hasEmptySlot">
         <slot name="empty" />
       </template>
+
       <div class="empty-state"
            v-else-if="!hasEmptySlot && isEmpty &&  !isLoading">
         <div class="h5">{{ defaultPlaceholderMessage }}</div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-center" v-if="paginated">
-      <q-pagination
-        boundary-links
-        direction-links
-        dense
-        class="table-pagination"
-        v-model="paginationPage"
-        :max="lastPage"
-        :max-pages="maxPaginationPages"
-        :ellipses="false"
-        :boundary-numbers="false"
-        padding="0 15px">
+    <div v-if="paginated"
+         class="d-flex justify-content-center">
+      <q-pagination boundary-links
+                    direction-links
+                    dense
+                    class="table-pagination"
+                    v-model="paginationPage"
+                    :max="lastPage"
+                    :max-pages="maxPaginationPages"
+                    :ellipses="false"
+                    :boundary-numbers="false"
+                    padding="0 15px">
       </q-pagination>
 
-      <q-select
-        outlined
-        dense
-        emit-value
-        class="mt-2 q-select-pager"
-        option-value="value"
-        option-label="label"
-        v-model="perPage"
-        :options="perPageOptions"
-        :display-value="`${perPage} per page`">
+      <q-select outlined
+                dense
+                emit-value
+                class="mt-2 q-select-pager"
+                option-value="value"
+                option-label="label"
+                v-model="perPage"
+                :options="perPageOptions"
+                :display-value="`${perPage} per page`">
       </q-select>
 
     </div>
@@ -266,21 +257,20 @@ export default {
       if (!['Contacts', 'Power Dialer'].includes(this.$route.name)) {
         return newItems
       }
+
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
-      const index = { data: null }
-
-      for (index.data in newItems) {
-        const found = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
+      for (const index in newItems) {
+        const found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
         if (found && found.required) {
-          newItems[index.data].sortable = found.sortable
+          newItems[index].sortable = found.sortable
         }
         if (found) {
-          newItems[index.data].label = found.label
-          newItems[index.data].default = found.default
-          newItems[index.data].sortable = found.sortable
-          newItems[index.data].maxWidth = found.maxWidth
-          newItems[index.data].minWidth = found.minWidth
+          newItems[index].label = found.label
+          newItems[index].default = found.default
+          newItems[index].sortable = found.sortable
+          newItems[index].maxWidth = found.maxWidth
+          newItems[index].minWidth = found.minWidth
         }
       }
 
