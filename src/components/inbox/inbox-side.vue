@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-wrapper">
+  <div class="inbox-wrapper border-right">
     <div class="mobile-header align-items-center justify-content-between pr-3"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center">

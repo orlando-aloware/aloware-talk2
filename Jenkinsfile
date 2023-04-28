@@ -31,9 +31,15 @@ pipeline {
         stage('Setup Dev Env File') {
             when { not { branch 'master' } }
             steps {
+              script {
+                //String text
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
+                   //text = readFile(dev_env)
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
+
+                //println "${text}"
+              }
             }
         }
 
