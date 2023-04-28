@@ -118,9 +118,7 @@ export default {
   },
 
   computed: {
-    ...mapState({
-      broadcasts: state => state.broadcasts
-    }),
+    ...mapState('broadcast', ['broadcasts']),
     ...mapState('cache', ['currentCompany']),
     broadcastsAlphabeticalOrder () {
       if (this.broadcasts) {

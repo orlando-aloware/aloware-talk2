@@ -306,7 +306,6 @@ export default {
       loadingCallDispositionStatuses: false,
       loadingScripts: false,
       loadingTemplates: false,
-      loadingBroadcasts: false,
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
@@ -1394,7 +1393,7 @@ export default {
         }
 
         this.getRingGroups()
-        this.getBroadcasts()
+        this.fetchBroadcasts()
         this.getTemplates()
 
         this.getCampaigns()
@@ -1667,23 +1666,6 @@ export default {
         }).catch(err => {
           console.log(err)
           this.loadingTemplates = false
-          return Promise.reject()
-        })
-      }
-    },
-
-    getBroadcasts () {
-      if (this.hasPermissionTo('list broadcast')) {
-        this.loadingBroadcasts = true
-        return this.$axios.get('/api/v1/broadcasts', {
-          mode: 'no-cors'
-        }).then(res => {
-          this.loadingBroadcasts = false
-          this.setBroadcasts(res.data)
-          return Promise.resolve()
-        }).catch(err => {
-          console.log(err)
-          this.loadingBroadcasts = false
           return Promise.reject()
         })
       }
@@ -2371,7 +2353,6 @@ export default {
       'setDispositionStatuses',
       'setCallDispositions',
       'setTemplates',
-      'setBroadcasts',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',
@@ -2417,6 +2398,9 @@ export default {
       'updateLiveContactLastCommProperties',
       'setIsInboxFiltersLoaded',
       'gettingTasksList'
+    ]),
+    ...mapActions('broadcast', [
+      'fetchBroadcasts'
     ])
   },
 
