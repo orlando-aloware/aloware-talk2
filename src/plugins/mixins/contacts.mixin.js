@@ -481,8 +481,10 @@ export default {
               continue
             }
 
-            // if filter type is 'date', add the browser's timezone
-            listFilters[filterIndex].filters[filterKey].timezone = moment.tz.guess()
+            for (const filterItemKey in filters[filterKey]) {
+              // if filter type is 'date', add the browser's timezone
+              listFilters[filterIndex].filters[filterKey][filterItemKey].timezone = moment.tz.guess()
+            }
           }
 
           // first index of list's filter groups must be joined/associated with the list's initial filter
