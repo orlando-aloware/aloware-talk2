@@ -3,11 +3,10 @@
     <div class="tags__header d-flex justify-between p-3">
       <!-- search -->
       <div>
-        <search
-          class="width-260"
-          limitSearchCharacters
-          :search="search"
-          @search="onSearch">
+        <search placeholder="Search ID or name"
+                class="width-260"
+                :search="search"
+                @search="onSearch">
         </search>
       </div>
 
@@ -15,7 +14,7 @@
       <div>
         <tags-tabs :selectedTagCategory="tagCategory"
                    :tagCategoriesCount="tagCategoriesCount"
-                   @loadTags="getTags">
+                   @loadTags="loadTags">
         </tags-tabs>
       </div>
 
@@ -61,9 +60,11 @@
 
     <!-- table -->
     <tags-table :category="tagCategory"
-                    :tags="tags"
-                    :isLoading="isLoading"
-                    :pagination="pagination"/>
+                :tags="tags"
+                :isLoading="isLoading"
+                :pagination="pagination"
+                @paginated="paginate"
+                @sort="sort" />
 
   </div>
 </template>
@@ -74,6 +75,7 @@ import TagsTabs from 'components/tags/tags-tabs'
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import axios from 'axios'
 import TagsTable from 'components/tags/tags-table.vue'
+import { debounce } from 'lodash'
 export default {
   name: 'Tags',
 
@@ -95,8 +97,11 @@ export default {
       },
       pagination: {
         currentPage: 1,
-        lastPage: 1,
         perPage: 25,
+        orderBy: 'id',
+        order: 'desc',
+        lastPage: 1,
+        page: 1,
         total: 0
       }
     }
@@ -104,7 +109,7 @@ export default {
 
   created () {
     this.getTagCategoriesCount()
-    this.getTags(this.tagCategory)
+    this.getTags()
   },
 
   computed: {
@@ -122,8 +127,21 @@ export default {
   },
 
   methods: {
-    onSearch () {
-      return ''
+    onSearch (value) {
+      this.search = value.trim()
+      this.getTags()
+    },
+
+    reloadData () {
+      this.isLoading = true
+      this.tags = []
+    },
+
+    loadTags (tagCategory) {
+      this.reloadData()
+      this.resetPaginationAndSearch()
+      this.tagCategory = +tagCategory
+      this.getTags()
     },
 
     getTagCategoriesCount () {
@@ -131,25 +149,47 @@ export default {
       this.tagCategoriesCount.contacts = 30
     },
 
-    getTags (tagCategory, page = 1, perPage = 25, orderBy = 'id', order = 'descending') {
+    paginate (pagination) {
+      this.pagination.page = pagination.page
+      this.pagination.perPage = pagination.per_page
+      this.getTags()
+    },
+
+    sort (sorts) {
+      this.pagination.order = sorts.order
+      this.pagination.orderBy = sorts.orderBy
+      this.getTags()
+    },
+
+    getTags: debounce(function () {
       this.isLoading = true
       this.tags = []
-      this.tagCategory = +tagCategory
+      const { page, perPage, orderBy, order } = this.pagination
 
-      axios.get(`/api/v1/tag-new?category=${tagCategory}&search_text=${this.search}&per_page=${perPage}&order_by=${orderBy}&order=${order}&page=${page}`)
+      axios.get(`/api/v1/tag-new?category=${this.tagCategory}&search_text=${this.search}&per_page=${perPage}&order_by=${orderBy}&order=${order}&page=${page}`)
         .then(res => {
-          this.tags = res.data.data
-          this.pagination = {
-            currentPage: res.data.current_page,
-            lastPage: res.data.last_page,
-            perPage: res.data.per_page,
-            total: res.data.total
-          }
           this.isLoading = false
+          this.tags = res.data.data
+          this.pagination.page = res.data.current_page
+          this.pagination.currentPage = res.data.current_page
+          this.pagination.lastPage = res.data.last_page
+          this.pagination.perPage = res.data.per_page
+          this.pagination.total = res.data.total
         })
         .catch(err => {
           console.log(err)
         })
+    }, 500),
+
+    resetPaginationAndSearch () {
+      // reset everything except per page
+      this.pagination.currentPage = 1
+      this.pagination.orderBy = 'id'
+      this.pagination.order = 'desc'
+      this.pagination.lastPage = 1
+      this.pagination.page = 1
+      this.pagination.total = 0
+      this.search = ''
     }
   }
 }

@@ -12,7 +12,9 @@
                :is-loading-more="isLoading"
                :total-rows="pagination.total"
                :current-page="pagination.currentPage"
-               :last-page="pagination.lastPage">
+               :last-page="pagination.lastPage"
+               @paginated="paginated"
+               @sort="sort">
 
       <template #tbody>
         <tr class="datatable-row"
@@ -63,7 +65,7 @@
             <td :key="`col-${colIndex}`"
                 v-if="category === TAG_CATEGORIES.CAT_COMMUNICATIONS && column.name === 'communications_count'">
               <span v-if="tag.communications_count > 0"
-                    class="badge badge-light">
+                    class="badge bg-grey-12 text-size-xs">
                 {{ tag.communications_count }}
               </span>
             </td>
@@ -71,7 +73,7 @@
             <td :key="`col-${colIndex}`"
                 v-if="category === TAG_CATEGORIES.CAT_CONTACTS && column.name === 'contacts_count'">
               <span v-if="tag.contacts_count > 0"
-                    class="badge badge-light">
+                    class="badge bg-grey-12 text-size-xs">
                 {{ tag.contacts_count }}
               </span>
             </td>
@@ -82,7 +84,8 @@
               <div v-if="category === TAG_CATEGORIES.CAT_COMMUNICATIONS && tag.communications_count > 0">
                 <b-button variant="light"
                           size="sm"
-                          class="mb-1 w-100">
+                          class="mb-1 w-100"
+                          @click="openTagCommunications(tag.id)">
                   <i class="fa fa-signal pull-left"></i> Communications
                 </b-button>
               </div>
@@ -146,14 +149,12 @@
 import Datatable from 'components/datatable.vue'
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import { aclMixin } from 'src/plugins/mixins'
-import { fixDateTime } from '../../plugins/filters/datetime.filters'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 export default {
   name: 'tags-table',
-  methods: { fixDateTime },
 
   components: { TagContactsWorkflowEnroller, TagContactsAddToPowerDialer, TagContactsSplitter, AssignContactsByTag, Datatable },
 
@@ -192,26 +193,40 @@ export default {
     columns () {
       let cols = [
         { name: 'checkbox', label: 'Checkbox' },
-        { name: 'id', label: 'ID' },
-        { name: 'name', label: 'Name' },
-        { name: 'color', label: 'Color' },
-        { name: 'updated_at', label: 'Date' },
-        { name: 'description', label: 'Description' }
+        { name: 'id', label: 'ID', sortable: true },
+        { name: 'name', label: 'Name', sortable: true, resizable: true, minWidth: 150 },
+        { name: 'color', label: 'Color', maxWidth: 20 },
+        { name: 'updated_at', label: 'Date', sortable: true },
+        { name: 'description', label: 'Description', sortable: true, resizable: true, minWidth: 120 }
       ]
 
       switch (this.category) {
         case TAG_CATEGORIES.CAT_COMMUNICATIONS:
-          cols.push({ name: 'communications_count', label: '# of Communications' })
+          cols.push({ name: 'communications_count', label: '# of Communications', sortable: true })
           break
 
         case TAG_CATEGORIES.CAT_CONTACTS:
-          cols.push({ name: 'contacts_count', label: '# of Contacts' })
+          cols.push({ name: 'contacts_count', label: '# of Contacts', sortable: true })
           break
       }
 
-      cols.push({ name: 'actions', label: 'Actions' })
+      cols.push({ name: 'actions', label: 'Actions', maxWidth: 80 })
 
       return cols
+    }
+  },
+
+  methods: {
+    paginated (pagination) {
+      this.$emit('paginated', pagination)
+    },
+
+    sort (sorts) {
+      this.$emit('sort', sorts)
+    },
+
+    openTagCommunications (tagId) {
+      window.open(`/channels/all-communications?tagId=${tagId}`, '_blank')
     }
   }
 }
