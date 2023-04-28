@@ -28,7 +28,7 @@
 
     <div class="w-100"
          v-if="communication.type === CommunicationTypes.SYSNOTE && communication.body">
-      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+      <div class="m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span style="white-space: pre-line;word-break: break-word;">
             {{ communication.body }}
@@ -54,7 +54,7 @@
     <div class="w-100"
          v-if="communication.property !== undefined && !excluded_audits.includes(communication.property) &&
          (generalAuditsConditions(communication) || customAuditsConditions(communication) || hasAuditNotes(communication))">
-      <div class="pt-3 pb-3 m-b audit-separator d-flex justify-center text-center">
+      <div class="m-b audit-separator d-flex justify-center text-center">
         <div class="contact-audit">
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
@@ -243,6 +243,13 @@
               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
             &nbsp;to {{ communication.lead_number | fixPhone }}
         </span>
+
+        <span class="text-muted"
+              v-if="communication.direction === CommunicationDirection.OUTBOUND &&
+              communication.creator_type && communication.creator_type !== CREATOR_TYPE_MANUAL">
+          - {{ communication.creator_type | translateCreatorType }}
+        </span>
+
         <span href="#"
            class="text-sm text-primary cursor-pointer"
            v-if="communication.direction === CommunicationDirection.OUTBOUND &&
@@ -356,8 +363,8 @@ import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
-
 import talk2Api from 'src/plugins/api/api'
+import { CREATOR_TYPE_MANUAL } from 'src/constants/creator-types'
 
 export default {
   mixins: [
@@ -449,7 +456,8 @@ export default {
       CommunicationDirection,
       CommunicationDispositionStatus,
       CommunicationCurrentStatus,
-      CommunicationTypes
+      CommunicationTypes,
+      CREATOR_TYPE_MANUAL
     }
   },
 
