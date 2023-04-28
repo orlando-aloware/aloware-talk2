@@ -2,6 +2,78 @@ import API from 'src/plugins/api/api'
 
 export default {
   /**
+   * Fetch live calls
+   */
+  async fetchLiveCalls ({ commit, state }) {
+    try {
+      if (state.isLiveCallsLoading) {
+        return
+      }
+
+      commit('SET_LIVE_CALLS_LOADING', true)
+
+      const res = await API.V1.contactCenter.liveCalls.get({
+        ring_group_id: state.filters.ringGroup
+      })
+
+      commit('SET_LIVE_CALLS', res.data)
+      commit('SET_LIVE_CALLS_LOADING', false)
+    } catch (err) {
+      commit('SET_LIVE_CALLS_LOADING', false)
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
+  /**
+   * Fetch parked calls
+   */
+  async fetchParkedCalls ({ commit, state }) {
+    try {
+      if (state.isParkedCallsLoading) {
+        return
+      }
+
+      commit('SET_PARKED_CALLS_LOADING', true)
+
+      const res = await API.V1.contactCenter.parkedCalls.get({
+        ring_group_id: state.filters.ringGroup
+      })
+
+      commit('SET_PARKED_CALLS', res.data)
+      commit('SET_PARKED_CALLS_LOADING', false)
+    } catch (err) {
+      commit('SET_PARKED_CALLS_LOADING', false)
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
+  /**
+   * Fetch live calls
+   */
+  async fetchQueuedCalls ({ commit, state }) {
+    try {
+      if (state.isQueuedCallsLoading) {
+        return
+      }
+
+      commit('SET_QUEUED_CALLS_LOADING', true)
+
+      const res = await API.V1.contactCenter.queuedCalls.get({
+        ring_group_id: state.filters.ringGroup
+      })
+
+      commit('SET_QUEUED_CALLS', res.data)
+      commit('SET_QUEUED_CALLS_LOADING', false)
+    } catch (err) {
+      commit('SET_QUEUED_CALLS_LOADING', false)
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
+  /**
    * Fetch summary data for contact center
    */
   async fetchSummary ({ commit, state }) {
@@ -38,24 +110,45 @@ export default {
 
       commit('SET_SUMMARY_LOADING', false)
     } catch (err) {
+      commit('SET_SUMMARY_LOADING', false)
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
     }
   },
 
-  setFilter ({ commit }, { filter, value }) {
-    commit('SET_FILTER', { filter, value })
+  /**
+   * Fetch users
+   */
+  async fetchUsers ({ commit, state }) {
+    try {
+      if (state.isUsersLoading) {
+        return
+      }
+
+      commit('SET_USERS_LOADING', true)
+
+      const response = await API.V2.users.get()
+
+      commit('SET_USERS', response.data)
+      commit('SET_USERS_LOADING', false)
+    } catch (err) {
+      commit('SET_USERS_LOADING', false)
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
   },
 
-  setViewMode ({ commit }, mode) {
-    if (!['compact', 'comfort'].includes(mode)) {
-      throw new Error('Invalid mode!')
-    }
+  /**
+   * Set agent status, calling the API and updating the store
+   */
+  async setAgentStatus ({ commit }, params) {
+    try {
+      const response = await API.V1.users.setAgentStatus(params.userId, params.status)
 
-    commit('SET_VIEW_MODE', mode)
+      commit('SET_AGENT_STATUS', response.data)
+    } catch (err) {
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
   }
-  // fetchUsers
-  // fetchQueuedCalls
-  // fetchLiveCalls
-  // fetchParkedCalls
 }

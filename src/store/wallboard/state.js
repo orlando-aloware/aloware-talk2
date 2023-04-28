@@ -1,12 +1,28 @@
 export default function () {
   return {
     calls: {
-      queued: [],
       live: [],
-      parked: []
+      parked: [],
+      queued: []
     },
+    callsEnabledColumns: [
+      'details',
+      'disposition',
+      'incoming_number',
+      'ring_group',
+      'workflow',
+      'created_at',
+      'lead_number',
+      'location',
+      'callback_status',
+      'tags',
+      'notes',
+      'operations'
+    ],
     filters: {
-      ringGroup: null
+      ringGroup: null,
+      agent: null,
+      agentStatus: 'all'
     },
     isLiveCallsLoading: false,
     isParkedCallsLoading: false,

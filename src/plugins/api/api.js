@@ -322,6 +322,11 @@ export default {
       },
       setDefaultLogin (userId, params) {
         return window.axios.patch(`${suffixV1}user/${userId}/set-default-app`, params)
+      },
+      setAgentStatus (userId, status) {
+        return window.axios.post(`${suffixV1}user/${userId}/agent-status`, {
+          agent_status: status
+        })
       }
     },
     reports: {
@@ -409,6 +414,21 @@ export default {
       summary: {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/summary-report`, params)
+        }
+      },
+      liveCalls: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/live-calls`, params)
+        }
+      },
+      parkedCalls: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/parked-calls`, params)
+        }
+      },
+      queuedCalls: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
         }
       }
     }
@@ -531,6 +551,11 @@ export default {
         delete (filterId) {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
+      }
+    },
+    users: {
+      get (params) {
+        return window.axios.get(`${suffixV2}users`, { params })
       }
     }
   }

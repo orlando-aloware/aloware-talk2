@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import WallboardOverviewCard from 'src/components/wallboard/wallboard-overview-card.vue'
 
 export default {
@@ -115,16 +115,6 @@ export default {
         }
       ]
     }
-  },
-
-  mounted () {
-    this.fetchSummary()
-  },
-
-  methods: {
-    ...mapActions('wallboard', [
-      'fetchSummary'
-    ])
   }
 }
 </script>
