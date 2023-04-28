@@ -11,10 +11,10 @@
                   color="transparent"
                   text-color="primary">
       <template v-slot:one>
-        <div :class="[currentTab === CommmunicationTags ?  'active' : 'text-grey-90']">
+        <div :class="[currentTab === CommunicationTags ?  'active' : 'text-grey-90']">
           <span>Communication Tags</span>
           <span class="ml-1 align-middle badge"
-                :class="[currentTab === CommmunicationTags ?  'badge-primary' : 'grey-light']">
+                :class="[currentTab === CommunicationTags ?  'badge-primary' : 'grey-light']">
             {{ tagCategoriesCount.communications }}
           </span>
         </div>
@@ -35,15 +35,16 @@
 
 <script>
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
+import { tagsMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'tags-tabs',
 
-  props: {
-    selectedTagCategory: {
-      type: Number,
-      required: true
-    },
+  mixins: [
+    tagsMixin
+  ],
 
+  props: {
     tagCategoriesCount: {
       type: Object,
       required: true
@@ -52,9 +53,7 @@ export default {
 
   data () {
     return {
-      currentTab: this.selectedTagCategory,
-      CommmunicationTags: TAG_CATEGORIES.CAT_COMMUNICATIONS,
-      ContactTags: TAG_CATEGORIES.CAT_CONTACTS,
+      currentTab: null,
       options: [
         {
           value: TAG_CATEGORIES.CAT_COMMUNICATIONS,
@@ -68,15 +67,22 @@ export default {
     }
   },
 
+  mounted () {
+    this.currentTab = this.selectedTagCategory
+  },
+
   computed: {
     categorySelectToggleColor () {
-      return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
+      return (this.$route.params.id && this.$route.params.status !== this.statusText
+        ? 'bg-grey-80'
+        : 'primary') + ' active'
     }
   },
 
   watch: {
     currentTab: function () {
-      this.$emit('loadTags', this.currentTab)
+      this.setSelectedTagCategory(this.currentTab)
+      this.$emit('loadTags')
     }
   }
 }

@@ -42,28 +42,23 @@
 
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'name'">
-              {{ tag.name }}
-            </td>
-
-            <td :key="`col-${colIndex}`"
-                v-if="column.name === 'color'">
-              <i class="fa fa-square"
+              <i class="fa fa-square mr-1"
                  :style="{ color: tag.color }">
-              </i>
+              </i> <span>{{ tag.name }}</span>
             </td>
 
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'updated_at'">
-              {{ tag.updated_at | fixFullDateTime }}
+              {{ tag.updated_at | fixDate }}
             </td>
 
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'description'">
-              {{ tag.description }}
+              <span>{{ tag.description }}</span>
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="category === TAG_CATEGORIES.CAT_COMMUNICATIONS && column.name === 'communications_count'">
+                v-if="currentTagCategory === CommunicationTags && column.name === 'communications_count'">
               <span v-if="tag.communications_count > 0"
                     class="badge bg-grey-12 text-size-xs">
                 {{ tag.communications_count }}
@@ -71,7 +66,7 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="category === TAG_CATEGORIES.CAT_CONTACTS && column.name === 'contacts_count'">
+                v-if="currentTagCategory === ContactTags && column.name === 'contacts_count'">
               <span v-if="tag.contacts_count > 0"
                     class="badge bg-grey-12 text-size-xs">
                 {{ tag.contacts_count }}
@@ -81,7 +76,7 @@
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'actions'">
               <!-- Redirect to Communications -->
-              <div v-if="category === TAG_CATEGORIES.CAT_COMMUNICATIONS && tag.communications_count > 0">
+              <div v-if="currentTagCategory === CommunicationTags && tag.communications_count > 0">
                 <b-button variant="light"
                           size="sm"
                           class="mb-1 w-100"
@@ -91,7 +86,7 @@
               </div>
 
               <!-- Redirect to Contacts -->
-              <div v-if="category === TAG_CATEGORIES.CAT_CONTACTS && tag.contacts_count > 0">
+              <div v-if="currentTagCategory === ContactTags && tag.contacts_count > 0">
                 <div>
                   <b-button variant="light"
                             size="sm"
@@ -147,29 +142,32 @@
 
 <script>
 import Datatable from 'components/datatable.vue'
-import { TAG_CATEGORIES } from 'src/constants/tag-categories'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, tagsMixin } from 'src/plugins/mixins'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import { mapActions, mapState } from 'vuex'
+
 export default {
   name: 'tags-table',
 
-  components: { TagContactsWorkflowEnroller, TagContactsAddToPowerDialer, TagContactsSplitter, AssignContactsByTag, Datatable },
+  components: {
+    TagContactsWorkflowEnroller,
+    TagContactsAddToPowerDialer,
+    TagContactsSplitter,
+    AssignContactsByTag,
+    Datatable
+  },
 
   mixins: [
-    aclMixin
+    aclMixin,
+    tagsMixin
   ],
 
   props: {
     tags: {
       type: Array,
-      required: true
-    },
-
-    category: {
-      type: Number,
       required: true
     },
 
@@ -186,26 +184,25 @@ export default {
   },
 
   computed: {
-    TAG_CATEGORIES () {
-      return TAG_CATEGORIES
-    },
+    ...mapState('tags', [
+      'selectedTagCategory'
+    ]),
 
     columns () {
       let cols = [
         { name: 'checkbox', label: 'Checkbox' },
         { name: 'id', label: 'ID', sortable: true },
         { name: 'name', label: 'Name', sortable: true, resizable: true, minWidth: 150 },
-        { name: 'color', label: 'Color', maxWidth: 20 },
         { name: 'updated_at', label: 'Date', sortable: true },
         { name: 'description', label: 'Description', sortable: true, resizable: true, minWidth: 120 }
       ]
 
-      switch (this.category) {
-        case TAG_CATEGORIES.CAT_COMMUNICATIONS:
+      switch (this.selectedTagCategory) {
+        case this.CommunicationTags:
           cols.push({ name: 'communications_count', label: '# of Communications', sortable: true })
           break
 
-        case TAG_CATEGORIES.CAT_CONTACTS:
+        case this.ContactTags:
           cols.push({ name: 'contacts_count', label: '# of Contacts', sortable: true })
           break
       }
@@ -217,6 +214,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('tags', [
+      'setSelectedTagCategory'
+    ]),
+
     paginated (pagination) {
       this.$emit('paginated', pagination)
     },

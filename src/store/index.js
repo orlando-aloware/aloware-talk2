@@ -12,6 +12,7 @@ import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
+import tags from './tags'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
 
@@ -35,7 +36,8 @@ export default function (/* { ssrContext } */) {
       stats,
       powerDialer,
       settings,
-      cache
+      cache,
+      tags
     },
 
     state: {

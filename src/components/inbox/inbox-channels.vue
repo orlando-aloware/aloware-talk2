@@ -407,6 +407,10 @@ export default {
           break
 
         case ['all-communications'].includes(this.$route.params.channel):
+          const filteredTags = this.$route.query?.tagId
+            ? Filters.DEFAULT_STATE.filter.tagsFilter
+            : [this.$route.query.tagId]
+
           defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
           defaultFilterModel.filter = {
             campaigns: Filters.DEFAULT_STATE.filter.campaigns,
@@ -416,7 +420,7 @@ export default {
             min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
             transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
             callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
+            tags: filteredTags,
             call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
             first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
             untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
@@ -640,6 +644,13 @@ export default {
   },
 
   mounted () {
+    // check for url parameter filter to preselect and load
+    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId) {
+      let filters = this.channelDefaultFilterModel.filter
+      filters.tags = [this.$route.query.tagId]
+      this.onApplyFilter(filters)
+    }
+
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = this.nextPage

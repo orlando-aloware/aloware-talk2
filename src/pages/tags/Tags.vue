@@ -12,8 +12,7 @@
 
       <!-- category tabs -->
       <div>
-        <tags-tabs :selectedTagCategory="tagCategory"
-                   :tagCategoriesCount="tagCategoriesCount"
+        <tags-tabs :tagCategoriesCount="tagCategoriesCount"
                    @loadTags="loadTags">
         </tags-tabs>
       </div>
@@ -22,7 +21,8 @@
         <!-- add tag -->
         <b-button class="mr-1"
                   size="sm"
-                  variant="primary">
+                  variant="primary"
+                  @click="openTagForm">
           <i class="fa fa-plus"></i> Add {{ tagCategoryName }} Tag
         </b-button>
 
@@ -59,38 +59,45 @@
     </b-overlay>
 
     <!-- table -->
-    <tags-table :category="tagCategory"
-                :tags="tags"
+    <tags-table :tags="tags"
                 :isLoading="isLoading"
                 :pagination="pagination"
                 @paginated="paginate"
                 @sort="sort" />
 
+    <tag-form :is-show="isOpenTagForm"
+              @closeTagForm="closeTagForm"/>
   </div>
 </template>
 
 <script>
 import Search from 'components/search'
 import TagsTabs from 'components/tags/tags-tabs'
-import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import axios from 'axios'
 import TagsTable from 'components/tags/tags-table.vue'
 import { debounce } from 'lodash'
+import TagForm from 'components/tags/tag-form.vue'
+import { tagsMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'Tags',
 
   components: {
+    TagForm,
     TagsTable,
     TagsTabs,
     Search
   },
+
+  mixins: [
+    tagsMixin
+  ],
 
   data () {
     return {
       search: '',
       isLoading: false,
       tags: [],
-      tagCategory: TAG_CATEGORIES.CAT_COMMUNICATIONS,
       tagCategoriesCount: {
         communications: 0,
         contacts: 0
@@ -103,27 +110,14 @@ export default {
         lastPage: 1,
         page: 1,
         total: 0
-      }
+      },
+      isOpenTagForm: false
     }
   },
 
   created () {
     this.getTagCategoriesCount()
     this.getTags()
-  },
-
-  computed: {
-    tagCategoryName () {
-      switch (this.tagCategory) {
-        case TAG_CATEGORIES.CAT_CONTACTS:
-          return 'Contact'
-
-        case TAG_CATEGORIES.CAT_COMMUNICATIONS:
-          return 'Communication'
-      }
-
-      return ''
-    }
   },
 
   methods: {
@@ -137,10 +131,9 @@ export default {
       this.tags = []
     },
 
-    loadTags (tagCategory) {
+    loadTags () {
       this.reloadData()
       this.resetPaginationAndSearch()
-      this.tagCategory = +tagCategory
       this.getTags()
     },
 
@@ -166,7 +159,7 @@ export default {
       this.tags = []
       const { page, perPage, orderBy, order } = this.pagination
 
-      axios.get(`/api/v1/tag-new?category=${this.tagCategory}&search_text=${this.search}&per_page=${perPage}&order_by=${orderBy}&order=${order}&page=${page}`)
+      axios.get(`/api/v1/tag-new?category=${this.selectedTagCategory}&search_text=${this.search}&per_page=${perPage}&order_by=${orderBy}&order=${order}&page=${page}`)
         .then(res => {
           this.isLoading = false
           this.tags = res.data.data
@@ -190,6 +183,14 @@ export default {
       this.pagination.page = 1
       this.pagination.total = 0
       this.search = ''
+    },
+
+    openTagForm () {
+      this.isOpenTagForm = true
+    },
+
+    closeTagForm () {
+      this.isOpenTagForm = false
     }
   }
 }
