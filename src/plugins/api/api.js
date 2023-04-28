@@ -404,6 +404,20 @@ export default {
       disengageContact (id, params) {
         return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
       }
+    },
+    broadcast: {
+      delete (id) {
+        return window.axios.delete(`${suffixV1}broadcasts/${id}`)
+      },
+      enable (id) {
+        return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
+      },
+      get (id = null) {
+        return window.axios.get(`${suffixV1}broadcasts` + (id ? `/${id}` : ''))
+      },
+      sendBulkMessage (params) {
+        return window.axios.post(`${suffixV1}broadcasts/send-bulk-messages`, params)
+      }
     }
   },
   V2: {
