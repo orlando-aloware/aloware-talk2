@@ -12,6 +12,7 @@ import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
+import broadcast from './broadcast'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
 
@@ -35,6 +36,7 @@ export default function (/* { ssrContext } */) {
       stats,
       powerDialer,
       settings,
+      broadcast,
       cache
     },
 
@@ -52,7 +54,6 @@ export default function (/* { ssrContext } */) {
       dispositionStatuses: [],
       callDispositions: [],
       templates: [],
-      broadcasts: [],
       filters: [],
       firstLogin: false,
       userStatus: false,
@@ -447,10 +448,6 @@ export default function (/* { ssrContext } */) {
 
       setTemplates ({ commit }, templates) {
         commit('SET_TEMPLATES', templates)
-      },
-
-      setBroadcasts ({ commit }, broadcasts) {
-        commit('SET_BROADCASTS', broadcasts)
       },
 
       newTag ({ commit }, tag) {
@@ -1031,10 +1028,6 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.templates.splice(state.templates.indexOf(found), 1)
         }
-      },
-
-      SET_BROADCASTS (state, broadcasts) {
-        state.broadcasts = broadcasts
       },
 
       NEW_FILTER (state, filter) {
