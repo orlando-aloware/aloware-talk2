@@ -564,7 +564,7 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.metadata.new_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.new_communication_id }}">
                     More info
                   </router-link>
                 </div>
@@ -578,7 +578,7 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.metadata.original_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.original_communication_id }}">
                     More info
                   </router-link>
                 </div>
@@ -592,7 +592,7 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.metadata.active_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.active_communication_id }}">
                     More info
                   </router-link>
                 </div>
@@ -606,7 +606,7 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: contactId, communicationId: communication.metadata.fake_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.fake_communication_id }}">
                     More info
                   </router-link>
                 </div>
@@ -720,6 +720,20 @@
             </b-form-row>
           </q-card-section>
 
+          <!-- CREATOR TYPE -->
+          <q-card-section class="pt-0 pb-0">
+            <b-form-row>
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Creator Type: </q-item-label>
+              </b-col>
+              <b-col>
+                <span>
+                  {{ communication.creator_type | translateCreatorType }}
+                </span>
+              </b-col>
+            </b-form-row>
+          </q-card-section>
+
           <q-card-section class="pt-0 pb-0">
             <!--TAGS-->
             <b-form-row>
@@ -807,7 +821,11 @@ export default {
     DownloadButton
   },
 
-  mixins: [communicationInfoMixin, userMixin, aclMixin],
+  mixins: [
+    communicationInfoMixin,
+    userMixin,
+    aclMixin
+  ],
 
   data () {
     return {
@@ -826,11 +844,13 @@ export default {
     communication: {
       required: true
     },
+
     verbose: {
       required: false,
       default: false,
       type: Boolean
     },
+
     dialerMode: {
       required: false,
       default: false,
@@ -892,6 +912,7 @@ export default {
     attemptLabel () {
       return this.communication.attempt ? `attempt ${this.communication.attempt}` : 'no attempts'
     },
+
     callDescriptionText () {
       const text = 'This call '
 
@@ -905,9 +926,6 @@ export default {
         default:
           return text + 'was'
       }
-    },
-    contactId () {
-      return _.get(this.communication, 'contact.id', null)
     }
   },
 

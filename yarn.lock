@@ -1348,58 +1348,89 @@
     dotenv-parse-variables "^2.0.0"
     fs "^0.0.2"
 
-"@sentry/browser@7.34.0":
-  version "7.34.0"
-  resolved "https://registry.npmjs.org/@sentry/browser/-/browser-7.34.0.tgz"
-  integrity sha512-5Jmjj0DLxx+31o12T+VH4U+gO7wz3L+ftjuTxcQaC8GeFVe5qCyXZoDmWKNV9NEyREiZ3azV62bJc5wojZrIIg==
+"@sentry-internal/tracing@7.49.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry-internal/tracing/-/tracing-7.49.0.tgz"
+  integrity sha512-ESh3+ZneQk/3HESTUmIPNrW5GVPu/HrRJU+eAJJto74vm+6vP7zDn2YV2gJ1w18O/37nc7W/bVCgZJlhZ3cwew==
   dependencies:
-    "@sentry/core" "7.34.0"
-    "@sentry/replay" "7.34.0"
-    "@sentry/types" "7.34.0"
-    "@sentry/utils" "7.34.0"
+    "@sentry/core" "7.49.0"
+    "@sentry/types" "7.49.0"
+    "@sentry/utils" "7.49.0"
     tslib "^1.9.3"
 
-"@sentry/core@7.34.0":
-  version "7.34.0"
-  resolved "https://registry.npmjs.org/@sentry/core/-/core-7.34.0.tgz"
-  integrity sha512-J1oxsYZX1N0tkEcaHt/uuDqk6zOnaivyampp+EvBsUMCdemjg7rwKvawlRB0ZtBEQu3HAhi8zecm03mlpWfCDw==
+"@sentry/browser@7.49.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry/browser/-/browser-7.49.0.tgz"
+  integrity sha512-x2DekKkQoY7/dhBzE4J25mdQ978NtPBTVQb+uZqlF/t5mp4K44TAszmPqy8lC/CmVHkp7qcpRGSCIzeboUL4KA==
   dependencies:
-    "@sentry/types" "7.34.0"
-    "@sentry/utils" "7.34.0"
+    "@sentry-internal/tracing" "7.49.0"
+    "@sentry/core" "7.49.0"
+    "@sentry/replay" "7.49.0"
+    "@sentry/types" "7.49.0"
+    "@sentry/utils" "7.49.0"
     tslib "^1.9.3"
 
-"@sentry/replay@7.34.0":
-  version "7.34.0"
-  resolved "https://registry.npmjs.org/@sentry/replay/-/replay-7.34.0.tgz"
-  integrity sha512-4L4YZfWt8mcVNcI99RxHORPb308URI1R9xsFj97fagk0ATjexLKr5QCA2ApnKaSn8Q0q1Zdzd4XmFtW9anU45Q==
+"@sentry/cli@^1.74.6":
+  version "1.75.0"
+  resolved "https://registry.npmjs.org/@sentry/cli/-/cli-1.75.0.tgz"
+  integrity sha512-vT8NurHy00GcN8dNqur4CMIYvFH3PaKdkX3qllVvi4syybKqjwoz+aWRCvprbYv0knweneFkLt1SmBWqazUMfA==
   dependencies:
-    "@sentry/core" "7.34.0"
-    "@sentry/types" "7.34.0"
-    "@sentry/utils" "7.34.0"
+    https-proxy-agent "^5.0.0"
+    mkdirp "^0.5.5"
+    node-fetch "^2.6.7"
+    progress "^2.0.3"
+    proxy-from-env "^1.1.0"
+    which "^2.0.2"
 
-"@sentry/types@7.34.0":
-  version "7.34.0"
-  resolved "https://registry.npmjs.org/@sentry/types/-/types-7.34.0.tgz"
-  integrity sha512-K+OeHIrl35PSYn6Zwqe4b8WWyAJQoI5NeWxHVkM7oQTGJ1YLG4BvLsR+UiUXnKdR5krE4EDtEA5jLsDlBEyPvw==
-
-"@sentry/utils@7.34.0":
-  version "7.34.0"
-  resolved "https://registry.npmjs.org/@sentry/utils/-/utils-7.34.0.tgz"
-  integrity sha512-VIHHXEBw0htzqxnU8A7WkXKvmsG2pZVqHlAn0H9W/yyFQtXMuP1j1i0NsjADB/3JXUKK83kTNWGzScXvp0o+Jg==
+"@sentry/core@7.49.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry/core/-/core-7.49.0.tgz"
+  integrity sha512-AlSnCYgfEbvK8pkNluUkmdW/cD9UpvOVCa+ERQswXNRkAv5aDGCL6Ihv6fnIajE++BYuwZh0+HwZUBVKTFzoZg==
   dependencies:
-    "@sentry/types" "7.34.0"
+    "@sentry/types" "7.49.0"
+    "@sentry/utils" "7.49.0"
     tslib "^1.9.3"
 
-"@sentry/vue@^7.34.0":
-  version "7.34.0"
-  resolved "https://registry.npmjs.org/@sentry/vue/-/vue-7.34.0.tgz"
-  integrity sha512-aC0IRjgh6qZ/e0T+/tMYop2w88dVwuqxTPjimuceAXo7exF1nbFWxJ6J6PnBvH+gR4ERaw3XLkXdUI3EHq3X9g==
+"@sentry/replay@7.49.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry/replay/-/replay-7.49.0.tgz"
+  integrity sha512-UY3bHoBDPOu4Dpq3m3oxNjLrq09NiFVYUfrTN4QOq1Am2SA04XbuCj/YZ+jNVy/NrFtoz9cTovK6oQbNw53jog==
   dependencies:
-    "@sentry/browser" "7.34.0"
-    "@sentry/core" "7.34.0"
-    "@sentry/types" "7.34.0"
-    "@sentry/utils" "7.34.0"
+    "@sentry/core" "7.49.0"
+    "@sentry/types" "7.49.0"
+    "@sentry/utils" "7.49.0"
+
+"@sentry/types@7.49.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry/types/-/types-7.49.0.tgz"
+  integrity sha512-9yXXh7iv76+O6h2ONUVx0wsL1auqJFWez62mTjWk4350SgMmWp/zUkBxnVXhmcYqscz/CepC+Loz9vITLXtgxg==
+
+"@sentry/utils@7.49.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry/utils/-/utils-7.49.0.tgz"
+  integrity sha512-JdC9yGnOgev4ISJVwmIoFsk8Zx0psDZJAj2DV7x4wMZsO6QK+YjC7G3mUED/S5D5lsrkBZ/3uvQQhr8DQI4UcQ==
+  dependencies:
+    "@sentry/types" "7.49.0"
     tslib "^1.9.3"
+
+"@sentry/vue@^7.47.0":
+  version "7.49.0"
+  resolved "https://registry.npmjs.org/@sentry/vue/-/vue-7.49.0.tgz"
+  integrity sha512-n/LLdhQeID7brIiSOyx7mQ4lEBBeAnX7UK6Vph2Yp1vn2sePT3X+9zNV7CNGZe6FQ4bkfx98FYN9944IWxDzFA==
+  dependencies:
+    "@sentry/browser" "7.49.0"
+    "@sentry/core" "7.49.0"
+    "@sentry/types" "7.49.0"
+    "@sentry/utils" "7.49.0"
+    tslib "^1.9.3"
+
+"@sentry/webpack-plugin@^1.20.0":
+  version "1.20.0"
+  resolved "https://registry.npmjs.org/@sentry/webpack-plugin/-/webpack-plugin-1.20.0.tgz"
+  integrity sha512-Ssj1mJVFsfU6vMCOM2d+h+KQR7QHSfeIP16t4l20Uq/neqWXZUQ2yvQfe4S3BjdbJXz/X4Rw8Hfy1Sd0ocunYw==
+  dependencies:
+    "@sentry/cli" "^1.74.6"
+    webpack-sources "^2.0.0 || ^3.0.0"
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -8689,13 +8720,6 @@ mkdirp@^0.5.4:
   dependencies:
     minimist "^1.2.6"
 
-mkdirp@^0.5.5:
-  version "0.5.6"
-  resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.6.tgz"
-  integrity sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==
-  dependencies:
-    minimist "^1.2.6"
-
 mkdirp@^1.0.3, mkdirp@^1.0.4, mkdirp@~1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
@@ -10421,6 +10445,11 @@ proxy-addr@~2.0.7:
   dependencies:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
+
+proxy-from-env@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
+  integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
 prr@~1.0.1:
   version "1.0.1"
@@ -13471,6 +13500,11 @@ webpack-sources@^1.1.0, webpack-sources@^1.4.0, webpack-sources@^1.4.1, webpack-
   dependencies:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
+
+"webpack-sources@^2.0.0 || ^3.0.0":
+  version "3.2.3"
+  resolved "https://registry.npmjs.org/webpack-sources/-/webpack-sources-3.2.3.tgz"
+  integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
 webpack@*, "webpack@^2.0.0 || ^3.0.0 || ^4.0.0", "webpack@^3.0.0 || ^4.1.0 || ^5.0.0-0", webpack@^4.0.0, "webpack@^4.0.0 || ^5.0.0", "webpack@^4.36.0 || ^5.0.0", "webpack@^4.37.0 || ^5.0.0", "webpack@^4.4.0 || ^5.0.0", webpack@^4.44.2, "webpack@>= 4", webpack@>=2:
   version "4.46.0"
