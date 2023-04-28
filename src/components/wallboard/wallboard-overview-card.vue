@@ -1,26 +1,28 @@
 <template>
   <div class="overview__card">
-    <div class="overview__card__icon">
-      <component :is="icon"/>
-    </div>
-    <div class="overview__card__body">
-      <div class="overview__card__body__value">
-        <q-skeleton type="text"
-                    animation="fade"
-                    height="26px"
-                    width="100px"
-                    v-if="loading" />
-        <counter-up :startVal="countUp.startVal"
-                    :endVal="value"
-                    :duration="countUp.duration"
-                    :options="countUp.options"
-                    v-else-if="!filter" />
-        <span v-else>
-          {{ getValue }}
-        </span>
+    <div class="overview__card__container">
+      <div class="overview__card__container__icon">
+        <component :is="icon"/>
       </div>
-      <div class="overview__card__body__description">
-        {{ description }}
+      <div class="overview__card__container__body">
+        <div class="overview__card__container__body__value">
+          <q-skeleton type="text"
+                      animation="fade"
+                      height="26px"
+                      width="100px"
+                      v-if="loading" />
+          <counter-up :startVal="countUp.startVal"
+                      :endVal="value"
+                      :duration="countUp.duration"
+                      :options="countUp.options"
+                      v-else-if="!filter" />
+          <span v-else>
+            {{ getValue }}
+          </span>
+        </div>
+        <div class="overview__card__container__body__description">
+          {{ description }}
+        </div>
       </div>
     </div>
   </div>
@@ -45,7 +47,7 @@ import WallboardOverviewTotalCallsIcon from 'src/components/icons/wallboard/over
 import WallboardOverviewTotalOccupancyIcon from 'src/components/icons/wallboard/overview-total-occupancy-icon'
 
 export default {
-  name: 'WallboardOverviewCard',
+  name: 'wallboard-overview-card',
 
   components: {
     CounterUp,

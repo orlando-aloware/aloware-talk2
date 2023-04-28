@@ -617,6 +617,21 @@ const fullShortDate = (date) => {
     .replace(/^0/, '')
 }
 
+/**
+ * Converts duration (seconds) in time format
+ * @param {duration} duration
+ * @returns String
+ */
+const fixDuration = (duration) => {
+  if (duration) {
+    return window.moment.duration(duration, 'seconds').format('m:ss', {
+      trim: false
+    })
+  }
+
+  return '-'
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -653,6 +668,7 @@ export default ({ Vue }) => {
     objAlphabeticalOrder,
     fullDuration,
     fixFullDateUTCRelative,
+    fixDuration,
     fullShortDate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))

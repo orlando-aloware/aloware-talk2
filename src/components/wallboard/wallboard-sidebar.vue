@@ -6,13 +6,13 @@
                               :active="isActive('/wallboard/overview')">
         <template #action>
           <span class="spinner-border spinner-border-sm"
-                v-if="isSummaryLoading" />
+                v-if="isLoading" />
           <span v-else
-                @click="fetchSummary">
+                @click="fetchAll">
             <refresh-icon />
             <q-tooltip anchor="center right"
-                      self="center left">
-              <span class="font-weight-bold text-sm">Refresh counts</span>
+                       self="center left">
+              <span class="font-weight-bold text-sm">Refresh</span>
             </q-tooltip>
           </span>
         </template>
@@ -60,7 +60,7 @@ export default {
 
     ...mapState('wallboard', [
       'isLiveCallsLoading',
-      'isParkedCallLoadings',
+      'isParkedCallsLoading',
       'isQueuedCallsLoading',
       'isSummaryLoading',
       'isUsersLoading'
@@ -76,31 +76,47 @@ export default {
           loading: this.isUsersLoading
         }, {
           name: 'Queued Calls',
-          route: '/wallboard/queued',
+          route: '/wallboard/queued-calls',
           icon: 'wallboard-queued-call-icon',
           counter: this.queuedCalls.length,
           loading: this.isQueuedCallsLoading
         }, {
           name: 'Live Calls',
-          route: '/wallboard/live',
+          route: '/wallboard/live-calls',
           icon: 'wallboard-live-call-icon',
           counter: this.liveCalls.length,
           loading: this.isLiveCallsLoading
         }, {
           name: 'Parked Calls',
-          route: '/wallboard/parked',
+          route: '/wallboard/parked-calls',
           icon: 'wallboard-parked-call-icon',
           counter: this.parkedCalls.length,
-          loading: this.isParkedCallLoadings
+          loading: this.isParkedCallsLoading
         }
       ]
+    },
+
+    isLoading () {
+      return this.isLiveCallsLoading || this.isParkedCallsLoading || this.isQueuedCallsLoading || this.isSummaryLoading || this.isUsersLoading
     }
   },
 
   methods: {
     ...mapActions('wallboard', [
-      'fetchSummary'
+      'fetchLiveCalls',
+      'fetchParkedCalls',
+      'fetchQueuedCalls',
+      'fetchSummary',
+      'fetchUsers'
     ]),
+
+    fetchAll () {
+      this.fetchLiveCalls()
+      this.fetchParkedCalls()
+      this.fetchQueuedCalls()
+      this.fetchSummary()
+      this.fetchUsers()
+    },
 
     isActive (route) {
       return this.$route.path === route

@@ -7,11 +7,12 @@
                custom-class="pr-3"
                scroll-area-class="scroll-type-2"
                :columns="columns"
-               :is-empty="filteredUsers.length === 0"
-               :total-rows="filteredUsers.length"
+               :is-empty="users.length === 0"
+               :total-rows="users.length"
                :current-page="pagination.page"
                :last-page="lastPage"
                @paginated="onPaginated"
+               @reordered="onColumnsReordered"
                @sort="onSort">
       <template #tbody>
         <tr class="datatable-row"
@@ -76,7 +77,7 @@
 
       <template #empty>
         <div class="empty-state"
-             v-if="filteredUsers.length === 0">
+             v-if="users.length === 0">
           <div class="h5">
             No agents found based on the current filters
           </div>
@@ -91,6 +92,7 @@ import Datatable from 'src/components/datatable.vue'
 import TimeAgo from 'src/components/time-ago.vue'
 import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-ring-groups.vue'
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
+import { COLUMNS } from 'src/constants/wallboard/users-columns'
 import { mapActions, mapGetters } from 'vuex'
 import { LABELS } from 'src/constants/agent-status-labels'
 import { aclMixin } from 'src/plugins/mixins'
@@ -109,75 +111,10 @@ export default {
     WallboardAgentStatus
   },
 
-  props: {
-    filters: {
-      agent: {
-        type: String,
-        default: null
-      },
-      status: {
-        type: [String, Number],
-        default: 'all'
-      },
-      ringGroup: {
-        type: Number,
-        default: null
-      }
-    }
-  },
-
   computed: {
     ...mapGetters('wallboard', {
       users: 'getUsers'
     }),
-
-    columns () {
-      return [
-        {
-          name: 'id',
-          label: 'ID',
-          order: 0,
-          sortable: true
-        },
-        {
-          name: 'name',
-          label: 'Agents',
-          order: 1,
-          sortable: true
-        },
-        {
-          name: 'status',
-          label: 'Status',
-          order: 2,
-          sortable: true
-        },
-        {
-          name: 'status-duration',
-          label: 'Status Duration',
-          order: 3,
-          sortable: true
-        },
-        {
-          name: 'ring-groups',
-          label: 'Ring Groups',
-          order: 4,
-          sortable: false,
-          minWidth: 200
-        },
-        {
-          name: 'last-login',
-          label: 'Last Login',
-          order: 5,
-          sortable: true
-        },
-        {
-          name: 'last-updated',
-          label: 'Last Updated',
-          order: 6,
-          sortable: true
-        }
-      ]
-    },
 
     paginatedUsers () {
       let from = this.pagination.perPage * (this.pagination.page - 1)
@@ -193,7 +130,7 @@ export default {
     },
 
     orderedUsers () {
-      let users = this.filteredUsers
+      let users = this.users
 
       return users.sort((a, b) => {
         let condition = null
@@ -237,29 +174,8 @@ export default {
       })
     },
 
-    filteredUsers () {
-      return this.users.filter(user => {
-        // agent name filter
-        const name = !this.filters.agent
-          ? true
-          : user.name.toUpperCase().includes(this.filters.agent.toUpperCase())
-
-        // status filter
-        const status = this.filters.status === 'all'
-          ? true
-          : user.agent_status === this.filters.status
-
-        // ring group filter
-        const ringGroup = !this.filters.ringGroup
-          ? true
-          : user.ring_group_ids.includes(this.filters.ringGroup)
-
-        return name && status && ringGroup
-      })
-    },
-
     lastPage () {
-      return Math.ceil(this.filteredUsers.length / this.pagination.perPage)
+      return Math.ceil(this.users.length / this.pagination.perPage)
     },
 
     apiUrl () {
@@ -275,7 +191,8 @@ export default {
     sort: {
       orderBy: 'id',
       order: 'asc'
-    }
+    },
+    columns: COLUMNS
   }),
 
   methods: {
@@ -292,6 +209,10 @@ export default {
 
     onSort (sortData) {
       this.sort = sortData
+    },
+
+    onColumnsReordered (columns) {
+      this.columns = columns
     },
 
     onStatusChanged (user, status) {

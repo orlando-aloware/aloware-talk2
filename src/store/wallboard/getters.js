@@ -1,20 +1,24 @@
-import { getField } from 'vuex-map-fields'
+import { filterCalls } from 'src/plugins/helpers/functions'
 
 export default {
+  getCallsEnabledColumns: (state) => {
+    return state.callsEnabledColumns
+  },
+
   getFilters: (state) => {
     return state.filters
   },
 
   getLiveCalls: (state) => {
-    return state.calls.live
+    return filterCalls(state.calls.live, state)
   },
 
   getParkedCalls: (state) => {
-    return state.calls.parked
+    return filterCalls(state.calls.parked, state)
   },
 
   getQueuedCalls: (state) => {
-    return state.calls.queued
+    return filterCalls(state.calls.queued, state)
   },
 
   getSummary: (state) => {
@@ -26,9 +30,29 @@ export default {
   },
 
   getUsers: (state) => {
-    // return only valid users to be used
-    return state.users.filter(user => !user.is_destination && !user.read_only_access && user.enabled && user.active)
-  },
+    return state.users
+      .filter(user => {
+        // only valid users
+        if (user.is_destination || user.read_only_access || !user.enabled || !user.active) {
+          return false
+        }
 
-  getField
+        // agent name filter
+        const name = !state.filters.agent
+          ? true
+          : user.name.toUpperCase().includes(state.filters.agent.toUpperCase())
+
+        // status filter
+        const status = state.filters.agentStatus === 'all'
+          ? true
+          : user.agent_status === state.filters.agentStatus
+
+        // ring group filter
+        const ringGroup = !state.filters.ringGroup
+          ? true
+          : user.ring_group_ids.includes(state.filters.ringGroup)
+
+        return name && status && ringGroup
+      })
+  }
 }

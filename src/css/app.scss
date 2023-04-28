@@ -6,7 +6,7 @@
 @import 'svg.scss';
 @import 'components/styles.scss';
 @import "dhtmlxscheduler_material.css"; // from ~dhtmlx-scheduler/codebase/dhtmlxscheduler_material.css
-
+@import "animations.scss";
 
 html {
   overflow-y: hidden;
@@ -3791,6 +3791,10 @@ i.option-separator {
 
 .opacity-1 {
   opacity: 1 !important;
+}
+
+.opacity-05 {
+  opacity: 0.5 !important;
 }
 
 .btn-header-nav-back {
@@ -11765,6 +11769,9 @@ screen and (max-width: 956px) {
   cursor: default !important;
 }
 
+.cursor-blocked {
+  cursor: not-allowed !important;
+}
 
 .template-preview {
   min-width: 15rem !important;
@@ -12522,61 +12529,70 @@ h1.contact-list-name-label {
     flex-wrap: wrap;
 
     .overview {
-      height: 550px;
       width: calc(100% - 40px);
       margin: 20px;
       padding: 20px;
       border-radius: 15px;
       border: 1px solid $grey-60;
-      display: grid;
-      column-gap: 20px;
-      row-gap: 20px;
+      display: flex;
+      flex-wrap: wrap;
 
       // taller
       &--comfort {
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(3, 1fr);
+        height: 550px;
 
         .overview__card {
-          flex-direction: column;
-          justify-content: space-between;
+          width: 20%;
+          height: calc(100% / 3);
+          
+          &__container {
+            flex-direction: column;
+            justify-content: space-between;
+          }
         }
       }
 
       // wider
       &--compact {
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(5, 1fr);
+        height: 600px;
 
         .overview__card {
-          flex-direction: row;
+          width: calc(100% / 3);
+          height: 20%;
+          
+          &__container {
+            flex-direction: row;
 
-          &__icon {
-            display: flex;
-            align-items: center;
-          }
+            &__icon {
+              display: flex;
+              align-items: center;
+            }
 
-          &__body {
-            padding-left: 20px;
+            &__body {
+              padding-left: 20px;
+            }
           }
         }
       }
 
       &__card {
-        border: 1px solid $grey-60;
-        border-radius: 10px;
         display: flex;
-        padding: 20px;
+        padding: 10px;
+        transition: all .5s;
 
-        &__body {
+        &__container {
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-          justify-content: center;
+          border: 1px solid $grey-60;
+          border-radius: 10px;
+          padding: 10px;
 
-          &__value {
-            font-size: 22px;
-            font-weight: bold;
+          &__body {
+            &__value {
+              font-size: 22px;
+              font-weight: bold;
+            }
           }
         }
       }
@@ -12625,7 +12641,7 @@ h1.contact-list-name-label {
       &__table {
         table.datatable {
           td {
-            transition: all .3s;
+            transition: all .5s;
           }
         }
 
@@ -12673,7 +12689,7 @@ h1.contact-list-name-label {
         &__agent-ring-groups {
           &__ring-group-name {
             text-overflow: ellipsis;
-            max-width: 275px;
+            max-width: 270px;
             white-space: nowrap;
             overflow: hidden;
             float: left;
@@ -12683,6 +12699,80 @@ h1.contact-list-name-label {
             color: $grey-92;
             font-size: 13px;
           }
+        }
+      }
+    }
+
+    .calls {
+      width: 100%;
+      color: $grey-92;
+
+      &--comfort {}
+
+      &--compact {
+        .calls {
+          &__table {
+            table.datatable {
+              td {
+                padding: 2px 8px;
+              }
+            }
+          }
+        }
+      }
+
+      &__header {
+        display: flex;
+        padding: 10px 20px;
+
+        &__columns-dropdown {
+          .dropdown-item {
+            padding-bottom: 0px;
+          }
+        }
+      }
+
+      &__table {
+        table.datatable {
+          td {
+            transition: all .5s;
+          }
+
+          tbody {
+            td {
+              padding-left: 28px;
+            }
+          }
+        }
+
+        &__collapse {
+          i {
+            transition: all .5s;
+          }
+
+          &--collapsed {
+            i {
+              transform: rotate(90deg);
+            }
+          }
+        }
+
+        &__contact {
+          &__tags {
+            white-space: break-spaces;
+            word-break: break-word;
+            font-size: 12px;
+          }
+        }
+
+        &__user {
+          white-space: break-spaces !important;
+          word-break: break-word !important;
+        }
+        
+        .relative-time {
+          font-size: 13px !important;
+          color: $grey-92;
         }
       }
     }

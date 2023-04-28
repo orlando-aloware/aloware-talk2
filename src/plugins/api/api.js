@@ -415,6 +415,21 @@ export default {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/summary-report`, params)
         }
+      },
+      liveCalls: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/live-calls`, params)
+        }
+      },
+      parkedCalls: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/parked-calls`, params)
+        }
+      },
+      queuedCalls: {
+        get (params) {
+          return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
+        }
       }
     }
   },

@@ -3,9 +3,8 @@
     <div :class="['users', `users--${viewMode}`]">
       <b-overlay :show="isUsersLoading"
                  rounded="sm">
-        <wallboard-users-header @agent="onFilterAgent"
-                                @status="onFilterStatus"/>
-        <wallboard-users-table :filters="filters"/>
+        <wallboard-users-header />
+        <wallboard-users-table />
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px"/>
@@ -37,30 +36,6 @@ export default {
       viewMode: 'getViewMode',
       wallboardFilters: 'getFilters'
     })
-  },
-
-  data: () => ({
-    filters: {
-      agent: null,
-      status: 'all',
-      ringGroup: null
-    }
-  }),
-
-  methods: {
-    onFilterAgent (name) {
-      this.filters.agent = name || null
-    },
-
-    onFilterStatus (status) {
-      this.filters.status = status
-    }
-  },
-
-  watch: {
-    'wallboardFilters.ringGroup' (value) {
-      this.filters.ringGroup = value
-    }
   }
 }
 </script>
