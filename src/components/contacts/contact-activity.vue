@@ -462,8 +462,9 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'dispositionStatuses', 'leadSources']),
+    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources']),
     ...mapState('cache', ['currentCompany']),
+    ...mapState('broadcast', ['broadcasts']),
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
