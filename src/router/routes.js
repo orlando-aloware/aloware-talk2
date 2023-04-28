@@ -23,6 +23,8 @@ const Messenger = () => import('pages/Messenger.vue')
 const DMSEquity = () => import('pages/DMSEquity.vue')
 const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
 const EmailBlast = () => import('pages/EmailBlast.vue')
+const Broadcast = () => import('pages/broadcast/Broadcast.vue')
+const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 
 const routes = [
   {
@@ -268,6 +270,23 @@ const routes = [
         meta: {
           title: 'Stats'
         }
+      },
+      {
+        path: 'broadcast',
+        name: 'Broadcast',
+        component: Broadcast,
+        meta: {
+          title: 'Broadcast'
+        }
+      },
+      {
+        name: 'Broadcast',
+        meta: {
+          id: 'broadcast-add',
+          title: 'Broadcast'
+        },
+        path: 'broadcast/new',
+        component: BroadcastAdd
       },
       {
         path: 'settings',
