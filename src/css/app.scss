@@ -12607,7 +12607,8 @@ h1.contact-list-name-label {
           &__table {
             table.datatable {
               td {
-                padding: 2px 8px;
+                padding-top: 2px;
+                padding-bottom: 2px;
               }
             }
           }
@@ -12641,6 +12642,12 @@ h1.contact-list-name-label {
         table.datatable {
           td {
             transition: all .5s;
+          }
+
+          tbody {
+            td {
+              padding-left: 28px;
+            }
           }
         }
 
