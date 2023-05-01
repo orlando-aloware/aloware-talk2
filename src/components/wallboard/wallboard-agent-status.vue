@@ -11,7 +11,7 @@
                :container="`status-container-${_uid}`"
                :target="`status-btn-${_uid}`"
                triggers="click blur"
-               v-if="hasRole('Company Admin')">
+               v-if="isAllowed">
       <div class="users__table__agent-status__popover__header">
         <span>Modify Agent's Status</span>
       </div>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import * as AgentStatus from 'src/constants/agent-status'
 import { LABELS } from 'src/constants/agent-status-labels'
 import { aclMixin } from 'src/plugins/mixins'
 
@@ -52,8 +53,16 @@ export default {
 
     availableStatus () {
       return LABELS.filter(status => status.disabled !== true)
+    },
+
+    isAllowed () {
+      return this.hasRole('Company Admin') && ![AgentStatus.AGENT_STATUS_ON_CALL].includes(this.value)
     }
   },
+
+  data: () => ({
+    AgentStatus
+  }),
 
   methods: {
     onStatusChange (status) {
