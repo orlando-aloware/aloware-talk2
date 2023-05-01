@@ -89,10 +89,10 @@ export default {
         this.notification = null
       }
 
+      console.log({ event })
+
       this.reloadFolders()
-      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
-        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
-      })
+      this.$generalNotification('An error prevented the list from being imported. Please, try again later.', 'error')
     },
 
     handleImportFinishedEvent (event) {
