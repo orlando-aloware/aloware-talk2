@@ -80,7 +80,7 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 140
+    minWidth: 300
   },
   {
     name: 'user',
