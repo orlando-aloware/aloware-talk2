@@ -271,15 +271,16 @@ export default {
 
     groupItemIndex () {
       const keyFilters = get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      let filterGroupItemIndex = 0
 
       if (this.filterGroupItemIndex === null && !isEmpty(keyFilters)) {
-        filterGroupItemIndex = keyFilters.length
-      } else if (this.filterGroupItemIndex !== null) {
-        filterGroupItemIndex = this.filterGroupItemIndex
+        return keyFilters.length
       }
 
-      return filterGroupItemIndex
+      if (this.filterGroupItemIndex !== null) {
+        return this.filterGroupItemIndex
+      }
+
+      return 0
     }
   },
 
@@ -416,7 +417,7 @@ export default {
           value.data = this.filterOperatorValue
       }
 
-      const currentFilter = this.$jsonClone(this.allFilters[this.filterGroupIndex].filters[this.filter.key])
+      let currentFilter = this.$jsonClone(this.allFilters[this.filterGroupIndex].filters[this.filter.key])
       let currentFilterItem = null
 
       if (currentFilter) {
@@ -427,7 +428,7 @@ export default {
       if (!value.data &&
         !isEmpty(currentFilterItem) &&
         !this.isValidated) {
-        delete this.allFilters[this.filterGroupIndex].filters[this.filter.key][this.groupItemIndex]
+        delete currentFilter[this.groupItemIndex]
       } else { // add the valid filter
         const data = {
           value: this.$jsonClone(value.data),
@@ -439,16 +440,20 @@ export default {
           data.field = this.$jsonClone(value.field)
         }
 
-        if (!this.allFilters[this.filterGroupIndex].filters[this.filter.key]) {
-          this.allFilters[this.filterGroupIndex].filters[this.filter.key] = []
+        // initialize the certain key's filters if it doesn't exists
+        if (!currentFilter) {
+          currentFilter = []
         }
 
-        if (!isEmpty(this.allFilters[this.filterGroupIndex].filters[this.filter.key][this.groupItemIndex])) {
-          this.allFilters[this.filterGroupIndex].filters[this.filter.key][this.groupItemIndex] = data
+        // we assign the filter data
+        if (!isEmpty(currentFilter[this.groupItemIndex])) {
+          currentFilter[this.groupItemIndex] = data
         } else {
-          this.allFilters[this.filterGroupIndex].filters[this.filter.key].push(data)
+          currentFilter.push(data)
         }
       }
+
+      this.allFilters[this.filterGroupIndex].filters[this.filter.key] = currentFilter
 
       this.$VueEvent.stop('filters-back')
       this.$VueEvent.listen('filters-back', () => {
@@ -649,7 +654,8 @@ export default {
         case 'string':
         case 'relation':
         case 'multi_relation':
-          const filterOperator = this.filterOperator && (!this.hasValue || (this.hasValue && !isEmpty(this.filterOperatorValue)))
+          const isValidFilterOperator = (!this.hasValue || (this.hasValue && !isEmpty(this.filterOperatorValue)))
+          const filterOperator = this.filterOperator && isValidFilterOperator
           const secondaryFilterOperator = this.hasSecondaryOperator ? !isEmpty(this.secondaryFilterOperatorValue) : true
 
           this.isValidated = filterOperator && secondaryFilterOperator
@@ -697,8 +703,9 @@ export default {
     },
 
     resetForm () {
-      const operatorPath = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}].operator`
-      const valuePath = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}].value`
+      const filterPath = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}]`
+      const operatorPath = `${filterPath}.operator`
+      const valuePath = `${filterPath}.value`
       this.filterOperator = get(this.currentListFilters, operatorPath, 1)
       this.$nextTick(() => {
         this.filterOperatorValue = get(this.currentListFilters, valuePath, [])

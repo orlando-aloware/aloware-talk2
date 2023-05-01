@@ -692,13 +692,16 @@ export default {
     },
 
     isShowAndLabel (groupIndex, filterIndex, key, itemIndex) {
-      const groupAllFiltersSize = Object.values(this.visibleListFilters[groupIndex].filters).flat().length
-      const groupFiltersSize = Object.keys(this.visibleListFilters[groupIndex].filters).length
-      const filtersSize = this.visibleListFilters[groupIndex].filters[key].length
+      const groupFilters = this.visibleListFilters[groupIndex].filters
+      const groupAllFiltersSize = Object.values(groupFilters).flat().length
+      const groupFiltersSize = Object.keys(groupFilters).length
+      const filtersSize = groupFilters[key].length
       const isFirstItemInGroup = groupIndex === 0 && itemIndex < 1
       const isLastItemInGroup = filterIndex === (groupFiltersSize - 1) && itemIndex === (filtersSize - 1)
       const isNotBetweenFirstAndLast = isFirstItemInGroup || isLastItemInGroup
 
+      // don't show "AND" label if there's only 1 filter in the group or
+      // if there are more than 1 filters in the group and the filter is the last
       if (groupAllFiltersSize === 1 ||
         (isNotBetweenFirstAndLast && groupAllFiltersSize > 1)) {
         return false
