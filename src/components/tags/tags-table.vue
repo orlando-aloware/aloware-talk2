@@ -58,7 +58,7 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="currentTagCategory === CommunicationTags && column.name === 'communications_count'">
+                v-if="selectedTagCategory === CommunicationTags && column.name === 'communications_count'">
               <span v-if="tag.communications_count > 0"
                     class="badge bg-grey-12 text-size-xs">
                 {{ tag.communications_count }}
@@ -66,7 +66,7 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="currentTagCategory === ContactTags && column.name === 'contacts_count'">
+                v-if="selectedTagCategory === ContactTags && column.name === 'contacts_count'">
               <span v-if="tag.contacts_count > 0"
                     class="badge bg-grey-12 text-size-xs">
                 {{ tag.contacts_count }}
@@ -76,7 +76,7 @@
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'actions'">
               <!-- Redirect to Communications -->
-              <div v-if="currentTagCategory === CommunicationTags && tag.communications_count > 0">
+              <div v-if="selectedTagCategory === CommunicationTags && tag.communications_count > 0">
                 <b-button variant="light"
                           size="sm"
                           class="mb-1 w-100"
@@ -86,7 +86,7 @@
               </div>
 
               <!-- Redirect to Contacts -->
-              <div v-if="currentTagCategory === ContactTags && tag.contacts_count > 0">
+              <div v-if="selectedTagCategory === ContactTags && tag.contacts_count > 0">
                 <div>
                   <b-button variant="light"
                             size="sm"
@@ -147,7 +147,6 @@ import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
-import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'tags-table',
@@ -184,10 +183,6 @@ export default {
   },
 
   computed: {
-    ...mapState('tags', [
-      'selectedTagCategory'
-    ]),
-
     columns () {
       let cols = [
         { name: 'checkbox', label: 'Checkbox' },
@@ -214,10 +209,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('tags', [
-      'setSelectedTagCategory'
-    ]),
-
     paginated (pagination) {
       this.$emit('paginated', pagination)
     },

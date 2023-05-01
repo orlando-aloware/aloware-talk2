@@ -5,22 +5,21 @@ export default {
   data () {
     return {
       CommunicationTags: TAG_CATEGORIES.CAT_COMMUNICATIONS,
-      ContactTags: TAG_CATEGORIES.CAT_CONTACTS,
-      currentTagCategory: TAG_CATEGORIES.CAT_COMMUNICATIONS
+      ContactTags: TAG_CATEGORIES.CAT_CONTACTS
     }
   },
 
-  mounted () {
-    this.currentTagCategory = this.selectedTagCategory
+  created () {
+    this.setSelectedTagCategory(this.CommunicationTags)
   },
 
   computed: {
-    ...mapState('tags', [
+    ...mapState('tagsModule', [
       'selectedTagCategory'
     ]),
 
     tagCategoryName () {
-      switch (this.currentTagCategory) {
+      switch (this.selectedTagCategory) {
         case TAG_CATEGORIES.CAT_CONTACTS:
           return 'Contact'
 
@@ -33,7 +32,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('tags', [
+    ...mapActions('tagsModule', [
       'setSelectedTagCategory'
     ])
   }
