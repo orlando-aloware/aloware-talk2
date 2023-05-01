@@ -111,7 +111,7 @@ export default {
       this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
         path: `/power-dialer/list/${event.contact_list.id}/in-queue`
       })
-    },
+    }
   },
 
   watch: {
