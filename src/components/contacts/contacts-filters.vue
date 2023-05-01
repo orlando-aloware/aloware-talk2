@@ -466,7 +466,9 @@ export default {
               // set values into an array
               let trueValue = filterItem.value
               trueValue = option ? [option.label] : trueValue
-              trueValue = typeof filterItem.value === 'string' ? filterItem.value.split(',') : [trueValue]
+              trueValue = typeof filterItem.value === 'string'
+                ? filterItem.value.split(',')
+                : [trueValue]
 
               // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
               // the content in 'field' will be concatenated at the end of the string
@@ -478,7 +480,9 @@ export default {
                 // set values into an array (but using 'field' this time)
                 trueValue = filterItem.field
                 trueValue = option ? [option.label] : trueValue
-                trueValue = typeof filterItem.field === 'string' ? filterItem.field.split(',') : [trueValue]
+                trueValue = typeof filterItem.field === 'string'
+                  ? filterItem.field.split(',')
+                  : [trueValue]
               }
 
               newFilterItems.push({
