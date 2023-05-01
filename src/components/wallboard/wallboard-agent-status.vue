@@ -2,7 +2,7 @@
   <div class="users__table__agent-status"
        :id="`status-container-${_uid}`">
     <b-button block
-              :class="['users__table__agent-status__button', `bg-agent-status-${status.name}`]"
+              :class="['users__table__agent-status__button', `bg-agent-status-${status.name}`, { 'cursor-blocked': !isAllowed }]"
               :id="`status-btn-${_uid}`"
               size="sm">
       {{ status.label }}
