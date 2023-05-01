@@ -19,7 +19,7 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 160
+    minWidth: 300
   },
   {
     name: 'ring_group',
