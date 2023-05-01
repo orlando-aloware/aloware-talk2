@@ -1192,7 +1192,7 @@ export default {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
         if (filter && profileId) {
-          defaultFilters[0].filters.contact_owner.value = [profileId]
+          defaultFilters[0].filters.contact_owner[0].value = [profileId]
         }
       }
 
