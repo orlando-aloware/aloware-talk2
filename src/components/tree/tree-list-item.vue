@@ -98,6 +98,7 @@
 import _ from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
@@ -302,7 +303,7 @@ export default {
             0: {
               filters: {
                 contact_lists: {
-                  operator: 1,
+                  operator: OPERATORS.IS_ANY_OF,
                   value: [this.id]
                 }
               },

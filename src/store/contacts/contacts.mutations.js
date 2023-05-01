@@ -3,6 +3,7 @@ import _ from 'lodash'
 import * as ContactsListDefaultList from 'src/constants/default-lists'
 import * as ContactsDefault from 'src/constants/contacts-default'
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   TOGGLE_FOLDER: (state, id) => {
@@ -486,7 +487,7 @@ export default {
         filters: {
           contact_owner: [
             {
-              operator: 1,
+              operator: OPERATORS.IS_ANY_OF,
               value: [ownerId]
             }
           ]

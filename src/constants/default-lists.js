@@ -85,7 +85,7 @@ export const DEFAULT_STATE = {
             contact_task_status: [
               {
                 value: [1],
-                operator: 1,
+                operator: OPERATORS.IS_ANY_OF,
                 default: 1
               }
             ]

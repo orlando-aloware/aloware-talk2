@@ -11,6 +11,7 @@ import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
 import { DEFAULT_STATE } from 'src/constants/contacts-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   data () {
@@ -840,7 +841,7 @@ export default {
         if (tag) {
           filters[0].filters.tags = [
             {
-              operator: 1,
+              operator: OPERATORS.IS_ANY_OF,
               value: [ tag ]
             }
           ]

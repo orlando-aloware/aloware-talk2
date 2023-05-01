@@ -147,6 +147,7 @@ import {
 } from 'lodash'
 import * as Countries from 'src/constants/countries'
 import { State } from 'country-state-city'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   name: 'contacts-filter-types',
@@ -179,7 +180,7 @@ export default {
 
   data () {
     return {
-      filterOperator: 1,
+      filterOperator: OPERATORS.IS_ANY_OF,
       filterOperatorValue: null,
       secondaryFilterOperatorValue: null,
       filterOptions: [

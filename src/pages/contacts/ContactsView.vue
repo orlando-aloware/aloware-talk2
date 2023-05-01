@@ -719,6 +719,7 @@ import {
   simpsocialMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   name: 'contacts-view',
@@ -913,7 +914,7 @@ export default {
 
       const filters = this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
         contact_lists: {
-          operator: 1,
+          operator: OPERATORS.IS_ANY_OF,
           value: [stringId]
         }
       }
@@ -1049,7 +1050,7 @@ export default {
             this.setDataCount({
               filters: {
                 contact_lists: {
-                  operator: 1,
+                  operator: OPERATORS.IS_ANY_OF,
                   value: [this.list.id]
                 }
               },
@@ -1625,7 +1626,7 @@ export default {
       this.setDataCount({
         filters: {
           contact_lists: {
-            operator: 1,
+            operator: OPERATORS.IS_ANY_OF,
             value: [this.list.id]
           }
         },
