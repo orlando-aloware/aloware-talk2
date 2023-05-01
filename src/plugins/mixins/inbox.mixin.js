@@ -237,19 +237,34 @@ export default {
         this.filters.search.value = this.searchText
         delete this.filters.contact_task_status
       } else {
-        this.filters.contact_task_status.value = [taskId]
+        this.filters.contact_task_status[0].value = [taskId]
       }
 
       if (this.filter && this.filter.campaigns.length) {
-        this.filters = { ...this.filters, 'lines': { value: this.filter.campaigns, operator: 1 } }
+        this.filters = {
+          ...this.filters,
+          'lines': [
+            { value: this.filter.campaigns, operator: 1 }
+          ]
+        }
       }
 
       if (this.filter && this.filter.ring_groups.length) {
-        this.filters = { ...this.filters, 'ring_groups': { value: this.filter.ring_groups, operator: 1 } }
+        this.filters = {
+          ...this.filters,
+          'ring_groups': [
+            { value: this.filter.ring_groups, operator: 1 }
+          ]
+        }
       }
 
       if (this.filter && this.filter.contact_owner.length && !this.filter.my_contact) {
-        this.filters = { ...this.filters, 'contact_owner': { value: this.filter.contact_owner, operator: 1 } }
+        this.filters = {
+          ...this.filters,
+          'contact_owner': [
+            { value: this.filter.contact_owner, operator: 1 }
+          ]
+        }
       }
 
       if (this.filter && this.filter.my_contact) {
@@ -257,15 +272,30 @@ export default {
       }
 
       if ((this.filter && this.filter.my_contact) || this.inboxShowMyContacts) {
-        this.filters = { ...this.filters, 'contact_owner': { value: [this.profile.id], operator: 1 } }
+        this.filters = {
+          ...this.filters,
+          'contact_owner': [
+            { value: [this.profile.id], operator: 1 }
+          ]
+        }
       }
 
       if (this.filter && this.filter.from_date && this.filter.to_date) {
-        this.filters = { ...this.filters, 'last_engagement_at': { value: [this.filter.from_date, this.filter.to_date], operator: 5 } }
+        this.filters = {
+          ...this.filters,
+          'last_engagement_at': [
+            { value: [this.filter.from_date, this.filter.to_date], operator: 5 }
+          ]
+        }
       }
 
       if (this.filter && !isEmpty(this.filter.tags)) {
-        this.filters = { ...this.filters, 'tags': { value: this.filter.tags, operator: 1 } }
+        this.filters = {
+          ...this.filters,
+          'tags': [
+            { value: this.filter.tags, operator: 1 }
+          ]
+        }
         relations.push('tags')
       }
 
@@ -286,10 +316,12 @@ export default {
 
     resetFilters () {
       this.filters = {
-        contact_task_status: {
-          value: [ContactTaskStatus.STATUS_OPEN],
-          operator: 1
-        },
+        contact_task_status: [
+          {
+            value: [ContactTaskStatus.STATUS_OPEN],
+            operator: 1
+          }
+        ],
         search: {
         }
       }

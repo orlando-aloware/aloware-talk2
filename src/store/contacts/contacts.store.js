@@ -28,10 +28,12 @@ export default function () {
         filters: [
           {
             filters: {
-              contact_owner: {
-                value: null,
-                operator: OPERATORS.IS_ANY_OF
-              }
+              contact_owner: [
+                {
+                  value: null,
+                  operator: OPERATORS.IS_ANY_OF
+                }
+              ]
             },
             is_conjunction: true
           }
@@ -45,9 +47,11 @@ export default function () {
         filters: [
           {
             filters: {
-              is_unassigned: {
-                value: 1
-              }
+              is_unassigned: [
+                {
+                  value: 1
+                }
+              ]
             },
             is_conjunction: true
           }
@@ -61,9 +65,11 @@ export default function () {
         filters: [
           {
             filters: {
-              is_unanswered_contact: {
-                value: 1
-              }
+              is_unanswered_contact: [
+                {
+                  value: 1
+                }
+              ]
             },
             is_conjunction: true
           }
@@ -77,10 +83,12 @@ export default function () {
         filters: [
           {
             filters: {
-              contact_task_status: {
-                value: [1],
-                operator: 1
-              }
+              contact_task_status: [
+                {
+                  value: [1],
+                  operator: 1
+                }
+              ]
             },
             is_conjunction: true
           }

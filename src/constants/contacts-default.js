@@ -26,10 +26,12 @@ export const DEFAULT_STATE = {
       id: 'my-contacts',
       headers: DEFAULT_COLUMNS,
       filters: {
-        contact_owner: {
-          value: null,
-          operator: OPERATORS.IS_ANY_OF
-        }
+        contact_owner: [
+          {
+            value: null,
+            operator: OPERATORS.IS_ANY_OF
+          }
+        ]
       },
       type: 2,
       module_type: 0,
@@ -39,9 +41,11 @@ export const DEFAULT_STATE = {
       id: 'unassigned',
       headers: DEFAULT_COLUMNS,
       filters: {
-        is_unassigned: {
-          value: 1
-        }
+        is_unassigned: [
+          {
+            value: 1
+          }
+        ]
       },
       type: 2,
       module_type: 0,
@@ -51,9 +55,11 @@ export const DEFAULT_STATE = {
       id: 'unanswered',
       headers: DEFAULT_COLUMNS,
       filters: {
-        is_unanswered_contact: {
-          value: 1
-        }
+        is_unanswered_contact: [
+          {
+            value: 1
+          }
+        ]
       },
       type: 2,
       module_type: 0,
@@ -63,10 +69,12 @@ export const DEFAULT_STATE = {
       id: 'new-leads',
       headers: DEFAULT_COLUMNS,
       filters: {
-        contact_task_status: {
-          value: [1],
-          operator: 1
-        }
+        contact_task_status: [
+          {
+            value: [1],
+            operator: 1
+          }
+        ]
       },
       type: 2,
       module_type: 0,
