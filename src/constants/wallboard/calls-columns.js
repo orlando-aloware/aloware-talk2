@@ -114,7 +114,7 @@ export const COLUMNS = [
     sortable: false,
     selectable: true,
     draggable: true,
-    minWidth: 150
+    minWidth: 300
   },
   {
     name: 'operations',
