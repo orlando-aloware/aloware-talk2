@@ -75,7 +75,7 @@ export default {
 
   methods: {
     getContactSessionInfo () {
-      if (!this.contact.id) {
+      if (!this.contact.id || !this.profile.company.alohabot_enabled) {
         return
       }
       this.isBusy = true
