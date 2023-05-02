@@ -418,7 +418,7 @@ export default {
         return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
       }
     },
-    broadcast: {
+    broadcasts: {
       delete (id) {
         return window.axios.delete(`${suffixV1}broadcasts/${id}`)
       },

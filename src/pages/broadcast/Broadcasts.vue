@@ -9,8 +9,8 @@
                         size="40px" />
       </template>
     </b-overlay>
-    Broadcast Home Page
-    <router-link :to="{ path: '/broadcast/new' }">
+    Broadcasts Home Page
+    <router-link :to="{ path: '/broadcasts/new' }">
       New
     </router-link>
   </div>
@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: 'broadcast',
+  name: 'broadcasts',
 
   data: () => ({
     loading: false
