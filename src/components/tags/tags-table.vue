@@ -21,16 +21,14 @@
             :key="`${index}`"
             v-for="(tag, index) in tags">
           <template v-for="(column, colIndex) in columns">
-            <td
-                v-if="column.name === 'checkbox'"
+            <td v-if="column.name === 'checkbox' && hasRole('Company Admin')"
                 :key="`col-${colIndex}`"
                 class="text-left pull-left datatable-row__checkbox">
 
                 <label class="custom-checkbox-container">
-                  <input
-                    type="checkbox"
-                    class="checker"
-                    :value="tag.id" />
+                  <input type="checkbox"
+                          class="checker"
+                          :value="tag.id" />
                   <span class="checkmark"></span>
                 </label>
               </td>
@@ -59,78 +57,77 @@
 
             <td :key="`col-${colIndex}`"
                 v-if="selectedTagCategory === CommunicationTags && column.name === 'communications_count'">
-              <span v-if="tag.communications_count > 0"
-                    class="badge bg-grey-12 text-size-xs">
+              <span class="badge bg-grey-12 text-size-xs">
                 {{ tag.communications_count }}
               </span>
             </td>
 
             <td :key="`col-${colIndex}`"
                 v-if="selectedTagCategory === ContactTags && column.name === 'contacts_count'">
-              <span v-if="tag.contacts_count > 0"
-                    class="badge bg-grey-12 text-size-xs">
+              <span class="badge bg-grey-12 text-size-xs">
                 {{ tag.contacts_count }}
               </span>
             </td>
 
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'actions'">
-              <!-- Redirect to Communications -->
-              <div v-if="selectedTagCategory === CommunicationTags && tag.communications_count > 0">
-                <b-button variant="light"
-                          size="sm"
-                          class="mb-1 w-100"
-                          @click="openTagCommunications(tag.id)">
-                  <i class="fa fa-signal pull-left"></i> Communications
+              <!-- Admins -->
+              <div v-if="hasRole('Company Admin')"
+                   class="text-right w-75"
+                  style="{ position: initial }">
+                <b-button v-if="hasPermissionTo('update tag') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
+                          title="Communications"
+                          variant="transparent"
+                          size="sm">
+                  <communication-signal-icon />
                 </b-button>
-              </div>
-
-              <!-- Redirect to Contacts -->
-              <div v-if="selectedTagCategory === ContactTags && tag.contacts_count > 0">
-                <div>
-                  <b-button variant="light"
+                <b-button v-if="hasPermissionTo('update tag') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
+                          title="Contacts"
+                          variant="transparent"
+                          size="sm">
+                  <contact-alt-icon />
+                </b-button>
+                <b-button title="Edit"
+                          variant="transparent"
+                          size="sm">
+                  <edit-pen-icon />
+                </b-button>
+                <b-dropdown class="ml-1 position-absolute"
                             size="sm"
-                            class="mb-1 w-100">
-                    <i class="fa fa-user pull-left"></i> Contacts
-                  </b-button>
-                </div>
-
-                <div v-if="hasRole('Company Admin')">
-                  <div v-if="tag.contacts_count > 50">
-                    <tag-contacts-splitter />
+                            right
+                            variant="light"
+                            no-caret>
+                  <template #button-content>
+                    <ellipse-icon />
+                  </template>
+                  <div v-if="selectedTagCategory === ContactTags">
+                    <b-dropdown-item>Assign Contacts</b-dropdown-item>
+                    <b-dropdown-item>Add to PowerDialer</b-dropdown-item>
+                    <b-dropdown-item>Enroll Contacts</b-dropdown-item>
                   </div>
-
-                  <div>
-                    <assign-contacts-by-tag />
-                  </div>
-
-                  <div>
-                    <tag-contacts-add-to-power-dialer />
-                  </div>
-
-                  <div>
-                    <tag-contacts-workflow-enroller />
-                  </div>
-                </div>
+                  <b-dropdown-item @click="deleteTag(tag)">
+                    <span class="text-danger"><delete-red-icon></delete-red-icon> Delete</span>
+                  </b-dropdown-item>
+                </b-dropdown>
               </div>
 
-              <!-- Edit -->
-              <div v-if="hasPermissionTo('update tag')">
-                <b-button variant="primary"
-                          size="sm"
-                          class="mb-1 w-100  btn-sm">
-                  <i class="fa fa-edit pull-left"></i> Edit
-                </b-button>
-              </div>
+              <!-- Agent's Button: Redirect to Communications -->
+              <b-button v-if="hasRole('Company Agent') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
+                        variant="light"
+                        size="sm"
+                        class="mb-1 w-100"
+                        @click="openTagCommunications(tag.id)">
+                <span v-if="hasRole('Company Agent')"><communication-signal-icon /> Communications</span>
+              </b-button>
 
-              <!-- Delete -->
-              <div v-if="hasPermissionTo('delete tag')">
-                <b-button variant="danger"
-                          size="sm"
-                          class="w-100">
-                  <i class="fa fa-trash pull-left"></i> Delete
-                </b-button>
-              </div>
+              <!-- Agent's Button: Redirect to Contacts -->
+              <b-button v-if="hasRole('Company Agent') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
+                        variant="light"
+                        size="sm"
+                        class="mb-1 w-100"
+                        @click="openTagContacts(tag.id)">
+                <span v-if="hasRole('Company Agent')"><contact-alt-icon /> Contacts</span>
+              </b-button>
             </td>
           </template>
         </tr>
@@ -143,20 +140,23 @@
 <script>
 import Datatable from 'components/datatable.vue'
 import { aclMixin, tagsMixin } from 'src/plugins/mixins'
-import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
-import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
-import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
-import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import CommunicationSignalIcon from 'components/icons/communication-signal-icon.vue'
+import ContactAltIcon from 'components/icons/contact-alt-icon.vue'
+import EditPenIcon from 'components/icons/edit-pen-icon.vue'
+import EllipseIcon from 'components/icons/ellipse-icon.vue'
+import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'tags-table',
 
   components: {
-    TagContactsWorkflowEnroller,
-    TagContactsAddToPowerDialer,
-    TagContactsSplitter,
-    AssignContactsByTag,
-    Datatable
+    Datatable,
+    CommunicationSignalIcon,
+    ContactAltIcon,
+    EditPenIcon,
+    EllipseIcon,
+    DeleteRedIcon
   },
 
   mixins: [
@@ -185,30 +185,38 @@ export default {
   computed: {
     columns () {
       let cols = [
-        { name: 'checkbox', label: 'Checkbox' },
         { name: 'id', label: 'ID', sortable: true },
         { name: 'name', label: 'Name', sortable: true, resizable: true, minWidth: 150 },
         { name: 'updated_at', label: 'Date', sortable: true },
-        { name: 'description', label: 'Description', sortable: true, resizable: true, minWidth: 120 }
+        { name: 'description', label: 'Description', sortable: true, resizable: true, minWidth: 150 }
       ]
+
+      if (this.hasRole('Company Admin')) {
+        cols = [{ name: 'checkbox', label: 'Checkbox' }, ...cols]
+      }
 
       switch (this.selectedTagCategory) {
         case this.CommunicationTags:
-          cols.push({ name: 'communications_count', label: '# of Communications', sortable: true })
+          cols.push({ name: 'communications_count', label: '# of Communications', sortable: true, maxWidth: 80 })
           break
 
         case this.ContactTags:
-          cols.push({ name: 'contacts_count', label: '# of Contacts', sortable: true })
+          cols.push({ name: 'contacts_count', label: '# of Contacts', sortable: true, maxWidth: 80 })
           break
       }
 
-      cols.push({ name: 'actions', label: 'Actions', maxWidth: 80 })
+      cols.push({ name: 'actions', label: 'Actions', maxWidth: 50 })
 
       return cols
     }
   },
 
   methods: {
+    ...mapActions([
+      'updateTag',
+      'deleteTag'
+    ]),
+
     paginated (pagination) {
       this.$emit('paginated', pagination)
     },
