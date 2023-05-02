@@ -389,7 +389,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isActive('Broadcast') && !profile.bulk_sms_enabled"
+           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -399,35 +399,35 @@
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Broadcast</span>
+        <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ path: '/broadcast' }"
+    <q-btn :to="{ path: '/broadcasts' }"
            :ripple="false"
            icon="img:app-icons/menu/broadcast_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Broadcast') && profile.bulk_sms_enabled"
+           v-show="isActive('Broadcasts') && profile.bulk_sms_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Broadcast</span>
+        <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ path: '/broadcast' }"
+    <q-btn :to="{ path: '/broadcasts' }"
            :ripple="false"
            icon="img:app-icons/menu/broadcast_gray.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Broadcast') && profile.bulk_sms_enabled"
+           v-show="!isActive('Broadcasts') && profile.bulk_sms_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Broadcast</span>
+        <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
 

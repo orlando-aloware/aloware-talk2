@@ -26,7 +26,7 @@ export default {
 
       commit('SET_BROADCASTS_LOADING', true)
 
-      const res = await API.V1.broadcast.get()
+      const res = await API.V1.broadcasts.get()
 
       commit('SET_BROADCASTS', res.data)
       commit('SET_BROADCASTS_LOADING', false)

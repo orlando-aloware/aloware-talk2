@@ -9,8 +9,8 @@
                         size="40px" />
       </template>
     </b-overlay>
-    Broadcast Add Page
-    <router-link :to="{ path: '/broadcast' }">
+    Broadcasts Add Page
+    <router-link :to="{ path: '/broadcasts' }">
       Back
     </router-link>
   </div>
