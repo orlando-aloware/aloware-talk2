@@ -39,7 +39,8 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="column.name === 'name'">
+                v-if="column.name === 'name'"
+                :title="tag.name">
               <i class="fa fa-square mr-1"
                  :style="{ color: tag.color }">
               </i> <span>{{ tag.name }}</span>
@@ -51,7 +52,8 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="column.name === 'description'">
+                v-if="column.name === 'description'"
+                :title="tag.description">
               <span>{{ tag.description }}</span>
             </td>
 
@@ -101,9 +103,15 @@
                     <ellipse-icon />
                   </template>
                   <div v-if="selectedTagCategory === ContactTags">
-                    <b-dropdown-item>Assign Contacts</b-dropdown-item>
-                    <b-dropdown-item>Add to PowerDialer</b-dropdown-item>
-                    <b-dropdown-item>Enroll Contacts</b-dropdown-item>
+                    <b-dropdown-item>
+                      <i class="fas fa-sign-in-alt"></i> Assign Contacts
+                    </b-dropdown-item>
+                    <b-dropdown-item>
+                      <i class="fas fa-phone"></i> Add to PowerDialer
+                    </b-dropdown-item>
+                    <b-dropdown-item>
+                      <i class="fas fa-user-plus"></i> Enroll Contacts
+                    </b-dropdown-item>
                   </div>
                   <b-dropdown-item @click="deleteTag(tag)">
                     <span class="text-danger"><delete-red-icon></delete-red-icon> Delete</span>
