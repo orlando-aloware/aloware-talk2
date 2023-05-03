@@ -1,5 +1,5 @@
 <template>
-  <div class="broadcast position-relative">
+  <div class="broadcasts__add position-relative">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -9,19 +9,58 @@
                         size="40px" />
       </template>
     </b-overlay>
-    Broadcasts Add Page
-    <router-link :to="{ path: '/broadcasts' }">
-      Back
-    </router-link>
+
+    <broadcast-add-sidebar :current-step="currentStep"
+                           :steps="steps"/>
+
+    <broadcast-add-view :current-step="currentStep"
+                        :steps="steps"/>
+
+    <broadcast-add-filters />
   </div>
 </template>
 
 <script>
+import BroadcastAddFilters from 'src/components/broadcasts/broadcast-add-filters.vue'
+import BroadcastAddSidebar from 'src/components/broadcasts/broadcast-add-sidebar.vue'
+import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
+
 export default {
   name: 'broadcast-add',
 
+  components: {
+    BroadcastAddFilters,
+    BroadcastAddSidebar,
+    BroadcastAddView
+  },
+
+  computed: {
+    currentStep () {
+      return this.steps.find(step => step.id === this.step)
+    }
+  },
+
   data: () => ({
-    loading: false
+    step: 1,
+    loading: false,
+    steps: [
+      {
+        id: 1,
+        name: 'Select Contacts'
+      },
+      {
+        id: 2,
+        name: 'Select Message'
+      },
+      {
+        id: 3,
+        name: 'Set Schedule'
+      },
+      {
+        id: 4,
+        name: 'Preview & Send'
+      }
+    ]
   })
 }
 </script>
