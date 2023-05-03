@@ -9,7 +9,7 @@
                           v-if="genericMultiselect"
                           @valuesUpdated="onInput">
     </generic-multi-select>
-    <q-select v-else
+    <q-select style="word-break: break-all;"
               ref="lineSelect"
               options-selected-class="text-primary"
               class="q-basic-selector"
@@ -17,7 +17,6 @@
               option-value="id"
               option-label="name"
               input-debounce="0"
-              style="word-break: break-all;"
               emit-value
               map-options
               dense
@@ -34,6 +33,7 @@
               :multiple="multiple"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              v-else
               v-model="selectedId"
               @popup-show="onShowMenu"
               @focus="onFocus"
@@ -54,20 +54,18 @@
 
       <template v-if="multiple"
                 v-slot:selected-item="scope">
-        <q-chip
-          dense
-          :tabindex="scope.tabindex"
-          color="white"
-          class="tag-selected-chip"
-          text-color="secondary"
-        >
+        <q-chip dense
+                color="white"
+                class="tag-selected-chip"
+                text-color="secondary"
+                :tabindex="scope.tabindex">
           <i class="fa fa-circle position-absolute"
-             :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+             :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`" />
           <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
-          <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+          <div role="button"
+               class="custom__remove d-flex align-items-center position-absolute r-0"
                @click="scope.removeAtIndex(scope.index)">
-            <remove-tag-icon class="ml-1 remove-tag-icon">
-            </remove-tag-icon>
+            <remove-tag-icon class="ml-1 remove-tag-icon" />
           </div>
         </q-chip>
       </template>
@@ -116,60 +114,74 @@ export default {
       type: String,
       required: false
     },
+
     label: {
       type: String,
       default: 'Lines',
       required: false
     },
+
     buttonText: {
       type: String,
       default: 'Modify Lines',
       required: false
     },
+
     genericMultiselect: {
       type: Boolean,
       default: true
     },
+
     genericStyling: {
       type: Boolean,
       default: true
     },
+
     useChips: {
       type: Boolean,
       default: false
     },
+
     useInput: {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     hasError: {
       type: Boolean,
       default: false
     },
+
     useOnlyActives: {
       type: Boolean,
       default: false
     },
+
     clearable: {
       type: Boolean,
       default: false
     },
+
     specificClass: {
       type: String,
       required: false
     },
+
     outlined: {
       type: Boolean,
       default: true
     },
+
     borderless: {
       type: Boolean,
       default: false
@@ -257,6 +269,7 @@ export default {
 
   created () {
     this.options = this.activeCampaignsAlphabeticalOrder
+
     if (!this.campaignsIsLoading && !_.isEmpty(this.campaigns)) {
       this.selectedId = this.value
     }
@@ -283,6 +296,7 @@ export default {
         this.options = this.activeCampaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     updateLines (val) {
       if (!this.genericMultiselect) {
         this.$refs.lineSelect.blur()
@@ -317,9 +331,14 @@ export default {
 
       this.selectedId = this.value
       this.options = this.campaignsAlphabeticalOrder
+
       if (typeof this.$refs.lineSelect !== 'undefined') {
         this.$refs.lineSelect.refresh()
       }
+    },
+
+    activeCampaignsAlphabeticalOrder (value) {
+      this.options = value
     }
   }
 }
