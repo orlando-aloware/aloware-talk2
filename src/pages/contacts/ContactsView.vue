@@ -1043,7 +1043,7 @@ export default {
             }
 
             if (this.list.type === this.ContactListTypes.DYNAMIC) {
-              this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
+              this.setDataCount(res.data.filters, true)
               return
             }
 

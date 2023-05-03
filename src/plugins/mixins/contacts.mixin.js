@@ -536,24 +536,18 @@ export default {
     },
 
     getFiltersCount (filters) {
-      const filtersCount = { data: 0 }
-      if (filters && filters.constructor.name === 'Object' && Object.keys(filters).length) {
-        const index = { data: null }
+      let groupAllFiltersSize = 0
+      let regex = /^-{0,1}\d*\.{0,1}\d+$/
+      const keys = Object.keys(filters)
 
-        for (index.data of Object.keys(filters)) {
-          const filter = _.get(filters[index.data], 'filters', null)
-          filtersCount.data += filter ? Object.keys(filter).length : 0
+      keys.forEach((key) => {
+        // only proceed if key is numeric
+        if (regex.test(key)) {
+          groupAllFiltersSize += Object.values(filters[key].filters).flat().length
         }
-      } else if (filters.constructor.name === 'Array' && filters.length) {
-        const group = { data: null }
+      })
 
-        for (group.data of filters) {
-          const filter = _.get(group.data, 'filters', null)
-          filtersCount.data += filter ? Object.keys(filter).length : 0
-        }
-      }
-
-      return filtersCount.data
+      return groupAllFiltersSize
     },
 
     markCheckedAll () {
