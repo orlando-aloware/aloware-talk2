@@ -4,6 +4,7 @@ import {
 } from 'src/constants/contacts-columns'
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
+import { BOOLEAN_OPERATORS } from 'src/constants/contacts-boolean-filter-operators'
 
 export const DEFAULT_STATE = {
   listItems: {
@@ -43,7 +44,8 @@ export const DEFAULT_STATE = {
       filters: {
         is_unassigned: [
           {
-            value: 1
+            value: 1,
+            operator: BOOLEAN_OPERATORS.IS_EQUAL_TO
           }
         ]
       },
@@ -57,7 +59,8 @@ export const DEFAULT_STATE = {
       filters: {
         is_unanswered_contact: [
           {
-            value: 1
+            value: 1,
+            operator: BOOLEAN_OPERATORS.IS_EQUAL_TO
           }
         ]
       },

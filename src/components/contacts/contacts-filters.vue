@@ -700,14 +700,12 @@ export default {
       const groupAllFiltersSize = Object.values(groupFilters).flat().length
       const groupFiltersSize = Object.keys(groupFilters).length
       const filtersSize = groupFilters[key].length
-      const isFirstItemInGroup = groupIndex === 0 && itemIndex < 1
       const isLastItemInGroup = filterIndex === (groupFiltersSize - 1) && itemIndex === (filtersSize - 1)
-      const isNotBetweenFirstAndLast = isFirstItemInGroup || isLastItemInGroup
 
       // don't show "AND" label if there's only 1 filter in the group or
       // if there are more than 1 filters in the group and the filter is the last
       if (groupAllFiltersSize === 1 ||
-        (isNotBetweenFirstAndLast && groupAllFiltersSize > 1)) {
+        (isLastItemInGroup && groupAllFiltersSize > 1)) {
         return false
       }
 

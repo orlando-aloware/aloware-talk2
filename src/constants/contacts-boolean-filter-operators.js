@@ -1,0 +1,4 @@
+export const BOOLEAN_OPERATORS = {
+  IS_EQUAL_TO: 1,
+  IS_NOT_EQUAL_TO: 2
+}
