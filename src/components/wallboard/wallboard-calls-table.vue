@@ -496,7 +496,21 @@ export default {
     },
 
     onColumnsReordered (columns) {
-      this.columns = columns
+      this.filteredColumns.forEach((oldColumn, index) => {
+        // find the index of this column in the new order
+        const newColumn = columns[index]
+
+        // if they are equal means that this column wasnt changed
+        if (oldColumn.name === newColumn.name) {
+          return
+        }
+
+        // find the newColumn index in the all columns container
+        const newIndex = this.columns.findIndex(col => col.name === newColumn.name)
+
+        // move the column to the new place
+        this.columns.splice(newIndex, 1, oldColumn)
+      })
     },
 
     getCampaign (campaignId) {
