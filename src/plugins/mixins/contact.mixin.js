@@ -1049,20 +1049,10 @@ export default {
     checkEmailCapability () {
       if (this.currentCompany && (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled)) {
         this.canEmail = true
-      } else {
-        this.canEmail = false
-        this.$axios.get(`/api/v1/intake-route/${this.selectedCampaign.id}/line`).then(res => {
-          const intakeRoutes = res.data
-          intakeRoutes.filter((route) => {
-            if (route.type === 'email') {
-              this.canEmail = true
-            }
-          })
-        }).catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-        })
+        return
       }
+
+      this.canEmail = (this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id)
     },
 
     updateMessageComposer () {
