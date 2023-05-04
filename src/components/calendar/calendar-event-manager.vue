@@ -397,7 +397,7 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
+        body: '',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
@@ -733,7 +733,7 @@ export default {
     },
 
     setSmsReminderBody () {
-      this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text
+      this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text || ''
     },
 
     addTemplateVariableToBody (variable) {
@@ -751,11 +751,13 @@ export default {
         template_variables: [
           '[FirstName]', '[CompanyName]', '[AgentName]', '[DateTime]', '[TimeLeft]'
         ],
-        body: 'This is a reminder of your appointment on [DateTime] with [AgentName].',
+        body: '',
         campaign_id: null,
         frequencies: ['1'],
         time: '10:00'
       }
+
+      this.setSmsReminderBody()
     },
 
     dateSelected (value) {
