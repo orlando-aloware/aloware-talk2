@@ -91,7 +91,8 @@
                 </b-button>
                 <b-button title="Edit"
                           variant="transparent"
-                          size="sm">
+                          size="sm"
+                          @click="editTag(tag)">
                   <edit-pen-icon />
                 </b-button>
                 <b-dropdown class="ml-1 position-absolute"
@@ -107,13 +108,17 @@
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
                     <b-dropdown-item>
+                      <i class="fas fa-columns"></i> Split
+                    </b-dropdown-item>
+                    <b-dropdown-item>
                       <i class="fas fa-phone"></i> Add to PowerDialer
                     </b-dropdown-item>
                     <b-dropdown-item>
                       <i class="fas fa-user-plus"></i> Enroll Contacts
                     </b-dropdown-item>
                   </div>
-                  <b-dropdown-item @click="deleteTag(tag)">
+                  <b-dropdown-item v-if="hasPermissionTo('delete tag')"
+                                   @click="deleteTag(tag)">
                     <span class="text-danger"><delete-red-icon></delete-red-icon> Delete</span>
                   </b-dropdown-item>
                 </b-dropdown>
@@ -153,7 +158,6 @@ import ContactAltIcon from 'components/icons/contact-alt-icon.vue'
 import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
-import { mapActions } from 'vuex'
 
 export default {
   name: 'tags-table',
@@ -220,11 +224,6 @@ export default {
   },
 
   methods: {
-    ...mapActions([
-      'updateTag',
-      'deleteTag'
-    ]),
-
     paginated (pagination) {
       this.$emit('paginated', pagination)
     },
@@ -235,6 +234,14 @@ export default {
 
     openTagCommunications (tagId) {
       window.open(`/channels/all-communications?tagId=${tagId}`, '_blank')
+    },
+
+    editTag (tag) {
+      this.$emit('editTag', tag)
+    },
+
+    deleteTag (tag) {
+      this.$emit('deleteTag', tag)
     }
   }
 }

@@ -12447,4 +12447,37 @@ h1.contact-list-name-label {
       }
     }
   }
+
+  &__form {
+    .color-picker {
+      .dropdown-toggle::after {
+        margin-left: 0.5em;
+        vertical-align: 0.5em;
+      }
+
+      ul.dropdown-menu {
+        & {
+          text-align: center;
+          min-width: 20rem;
+        }
+
+        li {
+          display: inline-block;
+        }
+      }
+
+      a.dropdown-item {
+        padding: 0
+      }
+
+      span.color-pick.selected::after {
+        content: "\2713";
+        color: #fff;
+        font-size: medium;
+        vertical-align: super;
+        margin-left: -25px;
+        padding-right: 10px;
+      }
+    }
+  }
 }

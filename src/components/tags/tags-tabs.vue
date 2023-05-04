@@ -15,7 +15,7 @@
           <span>Communication Tags</span>
           <span class="ml-1 align-middle badge"
                 :class="[currentTab === CommunicationTags ?  'badge-primary' : 'grey-light']">
-            {{ tagCategoriesCount.communications }}
+            {{ categoriesCount.communications }}
           </span>
         </div>
       </template>
@@ -25,7 +25,7 @@
           <span>Contact Tag</span>
           <span class="ml-1 align-middle badge"
                 :class="[currentTab === ContactTags ?  'badge-primary' : 'grey-light']">
-            {{ tagCategoriesCount.contacts }}
+            {{ categoriesCount.contacts }}
           </span>
         </div>
       </template>
@@ -45,7 +45,7 @@ export default {
   ],
 
   props: {
-    tagCategoriesCount: {
+    categoriesCount: {
       type: Object,
       required: true
     }

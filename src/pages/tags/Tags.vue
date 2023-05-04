@@ -12,7 +12,7 @@
 
       <!-- category tabs -->
       <div>
-        <tags-tabs :tagCategoriesCount="tagCategoriesCount"
+        <tags-tabs :categories-count="tagCategoriesCount"
                    @loadTags="loadTags">
         </tags-tabs>
       </div>
@@ -63,10 +63,18 @@
                 :isLoading="isLoading"
                 :pagination="pagination"
                 @paginated="paginate"
-                @sort="sort" />
+                @sort="sort"
+                @editTag="editTag"
+                @deleteTag="deleteTag"/>
 
     <tag-form :is-show="isOpenTagForm"
+              :tag-category="selectedTagCategory"
+              :editable-tag="tag"
               @closeTagForm="closeTagForm"/>
+
+    <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
+                       :tag="toDeleteTag"
+                       @closeDeleteTagDialog="closeDeleteTagDialog"/>
   </div>
 </template>
 
@@ -78,11 +86,13 @@ import TagsTable from 'components/tags/tags-table.vue'
 import { debounce } from 'lodash'
 import TagForm from 'components/tags/tag-form.vue'
 import { tagsMixin } from 'src/plugins/mixins'
+import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 
 export default {
   name: 'Tags',
 
   components: {
+    DeleteTagDialog,
     TagForm,
     TagsTable,
     TagsTabs,
@@ -98,10 +108,6 @@ export default {
       search: '',
       isLoading: false,
       tags: [],
-      tagCategoriesCount: {
-        communications: 0,
-        contacts: 0
-      },
       pagination: {
         currentPage: 1,
         perPage: 25,
@@ -111,13 +117,49 @@ export default {
         page: 1,
         total: 0
       },
-      isOpenTagForm: false
+      isOpenTagForm: false,
+      tag: null,
+      toDeleteTag: null,
+      isOpenDeleteTagDialog: false
     }
   },
 
   created () {
     this.getTagCategoriesCount()
     this.getTags()
+  },
+
+  mounted () {
+    this.$VueEvent.listen('tag_created', (data) => {
+      this.getTagCategoriesCount(data.category)
+      this.getTags()
+    })
+
+    this.$VueEvent.listen('tag_updated', (data) => {
+      const parsedTags = this.$jsonClone(this.tags)
+      const index = parsedTags.findIndex(item => item.id === data.id)
+
+      // update tag details on that index
+      if (index > -1) {
+        // get count data from table
+        switch (data.category) {
+          case this.CommunicationTags:
+            data.communications_count = parsedTags[index].communications_count
+            break
+
+          case this.ContactTags:
+            data.contacts_count = parsedTags[index].contacts_count
+        }
+
+        parsedTags[index] = data
+        this.tags = parsedTags
+      }
+    })
+
+    this.$VueEvent.listen('tag_deleting', (data) => {
+      this.getTagCategoriesCount(data.category)
+      this.getTags()
+    })
   },
 
   methods: {
@@ -137,9 +179,21 @@ export default {
       this.getTags()
     },
 
-    getTagCategoriesCount () {
-      this.tagCategoriesCount.communications = 809
-      this.tagCategoriesCount.contacts = 30
+    getTagCategoriesCount (category = null) {
+      switch (category) {
+        case this.CommunicationTags:
+          this.tagCategoriesCount.communications = this.getCommunicationTagsCount() ?? 0
+          break
+
+        case this.ContactTags:
+          this.tagCategoriesCount.contacts = this.getContactTagsCount() ?? 0
+          break
+
+        default:
+          console.log(this.getCommunicationTagsCount())
+          this.tagCategoriesCount.communications = this.getCommunicationTagsCount() ?? 0
+          this.tagCategoriesCount.contacts = this.getContactTagsCount() ?? 0
+      }
     },
 
     paginate (pagination) {
@@ -168,6 +222,17 @@ export default {
           this.pagination.lastPage = res.data.last_page
           this.pagination.perPage = res.data.per_page
           this.pagination.total = res.data.total
+
+          // update tab count badge
+          switch (this.selectedTagCategory) {
+            case this.CommunicationTags:
+              this.tagCategoriesCount.communications = res.data.total
+              break
+
+            case this.ContactTags:
+              this.tagCategoriesCount.contacts = res.data.total
+              break
+          }
         })
         .catch(err => {
           console.log(err)
@@ -190,7 +255,23 @@ export default {
     },
 
     closeTagForm () {
+      this.tag = null
       this.isOpenTagForm = false
+    },
+
+    editTag (tag) {
+      this.tag = tag
+      this.openTagForm()
+    },
+
+    deleteTag (tag) {
+      this.toDeleteTag = tag
+      this.isOpenDeleteTagDialog = true
+    },
+
+    closeDeleteTagDialog () {
+      this.toDeleteTag = null
+      this.isOpenDeleteTagDialog = false
     }
   }
 }

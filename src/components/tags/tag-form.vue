@@ -1,15 +1,18 @@
 <template>
-  <b-modal id="tag-form-modal"
-           :title="title"
+  <b-modal :title="title"
            no-close-on-esc
            no-close-on-backdrop
            v-model="openModal"
-           @hidden="onHidden"
-           @shown="onShow">
-    <b-form ref="tagForm">
+           @hidden="closeTagForm"
+           @show="openTagForm">
+
+    <b-form ref="tagForm"
+            class="tags__form">
       <b-form-group class="font-weight-light text-13"
-                    label="Name">
-        <b-form-input v-model="tag.name"
+                    label="Name"
+                    invalid-feedback="Please provide a tag name"
+                    :state="validateState('name')">
+        <b-form-input v-model.trim="$v.tag.name.$model"
                       placeholder="Enter tag name"
                       required />
       </b-form-group>
@@ -18,20 +21,26 @@
         <b-col class="p-0"
                cols="2">
           <b-form-group class="font-weight-light text-13"
-                        label="Color">
+                        label="Color"
+                        invalid-feedback="Please select a tag color"
+                        :state="validateState('color')">
             <b-dropdown variant="light"
-                        size="sm">
+                        size="sm"
+                        class="color-picker">
               <template #button-content>
-                <i class="fa fa-square fa-2x" :style="{ color: tag.color }"></i>
+                <i class="fa fa-square fa-2x"
+                  :style="{ color: tag.color }"></i>
               </template>
 
               <b-dropdown-item v-for="option in colorOptions"
                                :key="`color-${option}`"
                                @click="selectTagColor(option)">
-                  <i class="fa fa-2x mx-1"
-                     :class="[tag.color === option ? 'check-square' : 'fa-square']"
-                     :style="{ color: option }">
-                  </i>
+                  <span class="color-pick"
+                        :class="[tag.color === option ? 'selected' : '']">
+                    <i class="fa fa-square fa-2x mx-1"
+                      :style="{ color: option }">
+                    </i>
+                  </span>
               </b-dropdown-item>
             </b-dropdown>
           </b-form-group>
@@ -50,19 +59,21 @@
                              :options="categoryOptions"
                              :show-labels="false"
                              :allow-empty="false"
-                             v-model="tag.category"
+                             :disabled="disabled"
+                             v-model="category"
+                             invalid-feedback="Please select a tag category"
+                             :state="validateState('category')"
                              @select="selectTagCategory"/>
           </b-form-group>
         </b-col>
       </b-row>
 
       <b-form-group class="font-weight-light text-13"
-                    label="Description">
+                    label="Description (Optional)">
         <b-form-textarea id="textarea"
                          v-model="tag.description"
                          placeholder="Enter tag description"
-                         rows="3"
-                         max-rows="6"/>
+                         rows="3"/>
       </b-form-group>
     </b-form>
 
@@ -75,7 +86,7 @@
             </button>
             <button class="btn btn-sm bg-primary text-white"
                     @click.prevent="saveTag">
-              Add
+              {{ submitButtonLabel }}
             </button>
         </div>
       </div>
@@ -87,6 +98,8 @@
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import { tagsMixin } from 'src/plugins/mixins'
 import VueMultiselect from 'vue-multiselect'
+import { required, numeric } from 'vuelidate/lib/validators'
+import axios from 'axios'
 
 export default {
   name: 'tag-form',
@@ -105,10 +118,14 @@ export default {
       required: true
     },
 
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: true
+    tagCategory: {
+      type: Number,
+      required: true
+    },
+
+    editableTag: {
+      type: Object,
+      required: false
     }
   },
 
@@ -120,6 +137,7 @@ export default {
         description: null,
         category: null
       },
+      category: null,
       categoryOptions: [
         {
           value: TAG_CATEGORIES.CAT_COMMUNICATIONS,
@@ -147,12 +165,31 @@ export default {
         '#6AC1AC',
         '#B5BECC',
         '#6B6B6B'
-      ]
+      ],
+      disabled: false
+    }
+  },
+
+  validations () {
+    return {
+      tag: {
+        name: {
+          required
+        },
+        color: {
+          required
+        },
+        category: {
+          required,
+          numeric
+        }
+      }
     }
   },
 
   mounted () {
-    this.tag.category = this.selectedTagCategory
+    this.setTag()
+    this.setTagCategory(this.presetCategory)
   },
 
   computed: {
@@ -167,21 +204,50 @@ export default {
     },
 
     title () {
-      return `Create a New ${this.tagCategoryName} Tag`
+      return this.editableTag
+        ? `Edit ${this.getTagCategoryName(this.tag.category)} Tag`
+        : `Create a New ${this.getTagCategoryName(this.tag.category)} Tag`
+    },
+
+    presetCategory () {
+      return this.editableTag ? this.editableTag.category : this.tagCategory
+    },
+
+    submitButtonLabel () {
+      return this.editableTag ? 'Update' : 'Add'
     }
   },
 
   methods: {
-    onShow () {
-      this.tag.category = this.selectedTagCategory
+    validateState (input) {
+      const { $dirty, $error } = this.$v.tag[input]
+      return $dirty ? !$error : null
     },
 
-    onHidden () {
-      this.$emit('closeTagForm')
+    setTag () {
+      if (!this.editableTag) {
+        return
+      }
+
+      this.tag.name = this.editableTag.name
+      this.tag.color = this.editableTag.color
+      this.tag.category = this.editableTag.category
+      this.tag.description = this.editableTag.description
+      this.disabled = true
+    },
+
+    setTagCategory (category) {
+      this.category = this.categoryOptions.find(option => option.value === category)
+      this.tag.category = this.category.value
+    },
+
+    openTagForm () {
+      this.setTag()
+      this.setTagCategory(this.presetCategory)
     },
 
     selectTagCategory (category) {
-      this.tag.category = category
+      this.setTagCategory(category.value)
     },
 
     selectTagColor (color) {
@@ -189,22 +255,44 @@ export default {
     },
 
     closeTagForm () {
+      this.resetForm()
       this.$emit('closeTagForm')
     },
 
-    saveTag () {
-      // let url = '/api/v1/tag'
+    resetForm () {
+      this.tag = {
+        name: null,
+        color: '#CA66D6',
+        description: null,
+        category: null
+      }
 
-      // axios.post(url, tag)
-      //   .then(res => {
-      //     this.$emit('success', res.data)
-      //     this.resetTag()
-      //   })
-      //   .catch(err => {
-      //     this.$root.handleErrors(err.response)
-      //     this.loading_btn = false
-      //     this.resetTag()
-      //   })
+      this.$v.$reset()
+
+      this.category = null
+      this.disabled = false
+    },
+
+    saveTag () {
+      this.$v.$touch()
+      let url = '/api/v1/tag'
+      let xhr = null
+
+      if (this.editableTag) {
+        url += `/${this.editableTag.id}`
+        const cloneTag = (({ category, ...o }) => o)(this.tag) // except category
+        xhr = axios.patch(url, this.$jsonClone(cloneTag))
+      } else {
+        xhr = axios.post(url, this.tag)
+      }
+
+      xhr.then(() => {
+        this.closeTagForm()
+      })
+        .catch(err => {
+          this.$root.handleErrors(err.response)
+          this.closeTagForm()
+        })
     }
   }
 }
