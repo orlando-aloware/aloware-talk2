@@ -238,7 +238,8 @@
               </td>
 
               <!-- tags -->
-              <td :key="`col-${colIndex}`"
+              <td class="calls__table__tags"
+                  :key="`col-${colIndex}`"
                   v-if="column.name === 'tags'">
                 <communication-tags :communication="call" />
               </td>

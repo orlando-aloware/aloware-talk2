@@ -12766,15 +12766,19 @@ h1.contact-list-name-label {
 
         &__contact {
           &__tags {
-            white-space: break-spaces;
+            white-space: normal !important;
             word-break: break-word;
             font-size: 12px;
           }
         }
 
         &__user {
-          white-space: break-spaces !important;
+          white-space: normal !important;
           word-break: break-word !important;
+        }
+
+        &__tags {
+          white-space: normal !important;
         }
         
         .relative-time {
