@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty, get } from 'lodash'
 
 export default {
   data () {
@@ -51,15 +51,15 @@ export default {
     },
 
     fixDefaultFilters () {
-      if (_.isEmpty(this.list)) {
+      if (isEmpty(this.list)) {
         return []
       }
 
-      let defaultFilters = !_.isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
+      let defaultFilters = !isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
 
       if (this.$route.params.id === 'my-contacts') {
-        const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
-        const profileId = _.get(this.profile, 'id', null)
+        const filter = get(defaultFilters, '[0].filters.contact_owner', null)
+        const profileId = get(this.profile, 'id', null)
 
         if (filter && profileId) {
           defaultFilters[0].filters.contact_owner[0].value = [profileId]
