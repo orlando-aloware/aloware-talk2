@@ -121,7 +121,7 @@ export default {
     },
 
     deleteTag () {
-      console.log(this.tag)
+      this.$emit('deleteTagFinal', this.tag.id)
     }
   },
 

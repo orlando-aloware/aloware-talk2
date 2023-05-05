@@ -25,6 +25,14 @@ export default {
 
     tagCategoryName () {
       return this.getTagCategoryName(this.selectedTagCategory)
+    },
+
+    isCommunicationTagsSelected () {
+      return this.selectedTagCategory === this.CommunicationTags
+    },
+
+    isContactTagsSelected () {
+      return this.selectedTagCategory === this.ContactTags
     }
   },
 
@@ -52,6 +60,7 @@ export default {
         })
         .catch(err => {
           console.log(err)
+          this.$handleErrors(err.response)
         })
     },
 
@@ -62,6 +71,7 @@ export default {
         })
         .catch(err => {
           console.log(err)
+          this.$handleErrors(err.response)
         })
     }
   }

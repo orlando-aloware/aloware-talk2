@@ -65,7 +65,7 @@
                 @paginated="paginate"
                 @sort="sort"
                 @editTag="editTag"
-                @deleteTag="deleteTag"/>
+                @deleteTag="openDeleteTagDialog"/>
 
     <tag-form :is-show="isOpenTagForm"
               :tag-category="selectedTagCategory"
@@ -74,7 +74,8 @@
 
     <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
                        :tag="toDeleteTag"
-                       @closeDeleteTagDialog="closeDeleteTagDialog"/>
+                       @closeDeleteTagDialog="closeDeleteTagDialog"
+                       @deleteTagFinal="deleteTag"/>
   </div>
 </template>
 
@@ -155,11 +156,6 @@ export default {
         this.tags = parsedTags
       }
     })
-
-    this.$VueEvent.listen('tag_deleting', (data) => {
-      this.getTagCategoriesCount(data.category)
-      this.getTags()
-    })
   },
 
   methods: {
@@ -236,6 +232,7 @@ export default {
         })
         .catch(err => {
           console.log(err)
+          this.$handleErrors(err.response)
         })
     }, 500),
 
@@ -264,7 +261,7 @@ export default {
       this.openTagForm()
     },
 
-    deleteTag (tag) {
+    openDeleteTagDialog (tag) {
       this.toDeleteTag = tag
       this.isOpenDeleteTagDialog = true
     },
@@ -272,6 +269,25 @@ export default {
     closeDeleteTagDialog () {
       this.toDeleteTag = null
       this.isOpenDeleteTagDialog = false
+    },
+
+    deleteTag (tagId) {
+      this.closeDeleteTagDialog()
+
+      // temp
+      if (this.isContactTagsSelected) {
+        return
+      }
+
+      axios.delete('/api/v1/tag/' + tagId)
+        .then(() => {
+          // todo: show notification
+          this.getTags()
+        })
+        .catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
     }
   }
 }

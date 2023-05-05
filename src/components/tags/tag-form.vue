@@ -279,18 +279,23 @@ export default {
       let xhr = null
 
       if (this.editableTag) {
+        // edit/update api
         url += `/${this.editableTag.id}`
         const cloneTag = (({ category, ...o }) => o)(this.tag) // except category
         xhr = axios.patch(url, this.$jsonClone(cloneTag))
       } else {
+        // add api
         xhr = axios.post(url, this.tag)
       }
 
+      this.closeTagForm()
+
       xhr.then(() => {
-        this.closeTagForm()
+        // todo: show notification
       })
         .catch(err => {
-          this.$root.handleErrors(err.response)
+          console.log(err)
+          this.$handleErrors(err.response)
           this.closeTagForm()
         })
     }
