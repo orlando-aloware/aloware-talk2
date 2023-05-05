@@ -1,5 +1,6 @@
 <template>
-  <b-modal :title="`Delete ${tagCategoryName} Tag`"
+  <b-modal id="tags-delete-dialog"
+           :title="`Delete ${tagCategoryName} Tag`"
            no-close-on-esc
            no-close-on-backdrop
            size="md"

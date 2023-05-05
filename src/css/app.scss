@@ -12427,6 +12427,18 @@ h1.contact-list-name-label {
   height: 100vh;
 }
 
+#tags-form-modal,
+#tags-delete-dialog {
+  .modal-header,
+  .modal-footer {
+    border: none
+  }
+
+  .modal-body {
+    padding-bottom: 0
+  }
+}
+
 .tags {
   &__tabs {
     &.q-btn-group--spread {

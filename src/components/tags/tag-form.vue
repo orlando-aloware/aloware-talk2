@@ -1,5 +1,6 @@
 <template>
-  <b-modal :title="title"
+  <b-modal id="tags-form-modal"
+           :title="title"
            no-close-on-esc
            no-close-on-backdrop
            v-model="openModal"
