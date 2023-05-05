@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export default {
   data () {
     return {
@@ -46,6 +48,29 @@ export default {
           addViewSetCount: 'response.data.count'
         }
       })
+    },
+
+    fixDefaultFilters () {
+      if (_.isEmpty(this.list)) {
+        return []
+      }
+
+      let defaultFilters = !_.isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
+
+      if (this.$route.params.id === 'my-contacts') {
+        const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
+        const profileId = _.get(this.profile, 'id', null)
+
+        if (filter && profileId) {
+          defaultFilters[0].filters.contact_owner[0].value = [profileId]
+        }
+      }
+
+      if (typeof defaultFilters === 'string') {
+        defaultFilters = JSON.parse(defaultFilters)
+      }
+
+      return defaultFilters
     }
   },
   beforeDestroy () {

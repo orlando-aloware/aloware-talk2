@@ -537,12 +537,11 @@ export default {
 
     getFiltersCount (filters) {
       let groupAllFiltersSize = 0
-      let regex = /^-{0,1}\d*\.{0,1}\d+$/
       const keys = Object.keys(filters)
 
       keys.forEach((key) => {
         // only proceed if key is numeric
-        if (regex.test(key)) {
+        if (this.$isNumeric(key)) {
           groupAllFiltersSize += Object.values(filters[key].filters).flat().length
         }
       })
