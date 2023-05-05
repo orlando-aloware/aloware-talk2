@@ -258,7 +258,7 @@ export default {
     onHidden () {
       this.addAppointmentOpen(false)
       this.appointment.smsReminder.enabled = false
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
       this.resetForm()
     },
     onSubmit () {
@@ -322,7 +322,7 @@ export default {
         contact: null,
         user: null
       }
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
     },
     durationSelected (duration) {
       this.appointment.duration = duration.value
@@ -350,8 +350,19 @@ export default {
     appendSmsReminderTemplateVariable (variable) {
       this.appointment.smsReminder.body = `${(this.appointment.smsReminder.body ?? '')} ${variable}`
     },
-    setSmsReminderBody () {
-      this.appointment.smsReminder.body = this.currentCompany ? this.currentCompany.sms_reminder_default_text : ''
+    setSmsReminderFields () {
+      this.appointment.smsReminder.campaign_id = this.currentCompany?.sms_reminder_default_campaign_id
+      this.appointment.smsReminder.body = this.currentCompany?.sms_reminder_default_text || ''
+
+      // update time if its set in account config
+      if (this.currentCompany?.sms_reminder_default_time) {
+        this.appointment.smsReminder.time = this.currentCompany.sms_reminder_default_time
+      }
+
+      // update frequency if its set in account config
+      if (this.currentCompany?.sms_reminder_default_send_before_days) {
+        this.appointment.smsReminder.frequencies = this.currentCompany.sms_reminder_default_send_before_days
+      }
     }
   },
   watch: {
@@ -360,7 +371,7 @@ export default {
     }
   },
   mounted () {
-    this.setSmsReminderBody()
+    this.setSmsReminderFields()
   }
 }
 </script>
