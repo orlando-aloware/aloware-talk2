@@ -197,12 +197,14 @@
           </b-form-group>
 
           <b-form-group label="Time">
-            <predefined-time-selector @select="smsReminderTimeSelected">
+            <predefined-time-selector v-model="sms_reminder_fields.time"
+                                      @select="smsReminderTimeSelected">
             </predefined-time-selector>
           </b-form-group>
 
           <b-form-group label="Send (n) days before">
-            <number-of-days-selector @select="smsReminderFrequencySelected">
+            <number-of-days-selector v-model="sms_reminder_fields.frequencies"
+                                     @select="smsReminderFrequencySelected">
             </number-of-days-selector>
           </b-form-group>
 
@@ -744,7 +746,7 @@ export default {
 
       // update frequency if its set in account config
       if (this.profile.company.sms_reminder_default_send_before_days) {
-        this.sms_reminder_fields.frequencies = this.profile.company.sms_reminder_default_send_before_days
+        this.sms_reminder_fields.frequencies = this.profile.company.sms_reminder_default_send_before_days.split(',').map(v => +v)
       }
     },
 

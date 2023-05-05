@@ -84,6 +84,7 @@
                         label="Send From"
                         label-for="input-2">
             <contact-line-selector :showPaused="false"
+                                   v-model="appointment.smsReminder.campaign_id"
                                    @select="lineSelected">
             </contact-line-selector>
           </b-form-group>
@@ -91,13 +92,15 @@
           <b-form-group id="input-group-2"
                         label="Time"
                         label-for="input-2">
-            <predefined-time-selector @select="smsReminderTimeSelected"></predefined-time-selector>
+            <predefined-time-selector v-model="appointment.smsReminder.time"
+                                      @select="smsReminderTimeSelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
                         label="Send (n) days before"
                         label-for="input-2">
-            <number-of-days-selector @select="smsReminderFrequencySelected"></number-of-days-selector>
+            <number-of-days-selector v-model="appointment.smsReminder.frequencies"
+                                     @select="smsReminderFrequencySelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -361,7 +364,7 @@ export default {
 
       // update frequency if its set in account config
       if (this.currentCompany?.sms_reminder_default_send_before_days) {
-        this.appointment.smsReminder.frequencies = this.currentCompany.sms_reminder_default_send_before_days
+        this.appointment.smsReminder.frequencies = this.currentCompany.sms_reminder_default_send_before_days.split(',').map(v => +v)
       }
     }
   },
