@@ -45,6 +45,7 @@ export default {
         'power-dialer-add-queue-list',
         'power-dialer-add-list'
       ],
+      appliedFiltersPreviousFilters: null,
       ALL_COLUMNS
     }
   },
@@ -309,7 +310,6 @@ export default {
 
       const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
 
-      // temporarily set selected list from what we have in our vuex state
       this.setSelectedList({
         id: listData.id,
         name: list.name,
@@ -348,6 +348,12 @@ export default {
           this.isLoadingMore = false
         })
         .catch((err) => {
+          // revert  list's filters to previous
+          if (!_.isEmpty(this.appliedFiltersPreviousFilters)) {
+            this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
+            this.$VueEvent.fire('updateHasFilterChanges')
+          }
+
           this.isLoading = false
           this.isLoaded = true
           this.isLoadingMore = false
@@ -696,6 +702,7 @@ export default {
     },
 
     initiateFetch (data, fromRefresh = false) {
+      this.appliedFiltersPreviousFilters = _.get(data, 'previousFilters', null)
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
       fetchData.params = _.get(data, 'params', {})
       fetchData.hasOrder = _.get(data, 'hasOrder', true)

@@ -553,6 +553,7 @@ export default {
 
       this.setCurrentListFilters(allFilters)
 
+      const previousFilters = this.$jsonClone(this.initialListFilters)
       // update initial list filters with new set of currently selected filters
       this.initialListFilters = this.$jsonClone(this.currentListFilters)
 
@@ -561,7 +562,10 @@ export default {
       // update the results with new query
       if (!isEqual(this.initialListFilters, currentListFilters)) {
         this.setShowMyContacts(false)
-        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', {
+          clear: true,
+          previousFilters: this.$jsonClone(previousFilters)
+        })
       }
     },
 

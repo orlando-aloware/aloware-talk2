@@ -732,17 +732,20 @@ export default {
       }
     },
 
-    currentListFilters () {
-      this.visibleListFilters = this.generateListFilters()
+    currentListFilters: {
+      deep: true,
+      handler: function () {
+        this.visibleListFilters = this.generateListFilters()
 
-      // if there's any change in the current list's filters,
-      // we need to update the filter group index value to
-      // how many filters are currently active
-      let keys = Object.keys(this.currentListFilters)
-      keys = keys.filter(item => !isNaN(parseInt(item)))
+        // if there's any change in the current list's filters,
+        // we need to update the filter group index value to
+        // how many filters are currently active
+        let keys = Object.keys(this.currentListFilters)
+        keys = keys.filter(item => !isNaN(parseInt(item)))
 
-      if (keys.length) {
-        this.filterGroupIndex = keys.length
+        if (keys.length) {
+          this.filterGroupIndex = keys.length
+        }
       }
     },
 
