@@ -4,11 +4,11 @@
               right
               variant="light"
               class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white">
-    <b-dropdown-item href=""
-                     :key="column.name"
-                     v-for="column in availableColumns"
-                     @click="toggleCallsColumn(column.name)">
-      <div class="d-flex align-items-center cursor-pointer w-100 text-sm">
+    <div class="px-2">
+      <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
+           :key="column.name"
+           v-for="column in availableColumns"
+           @click="toggleCallsColumn(column.name)">
         <input class="cursor-pointer"
                type="checkbox"
                :checked="enabledColumns.includes(column.name)"
@@ -17,7 +17,7 @@
           {{ column.label }}
         </div>
       </div>
-    </b-dropdown-item>
+    </div>
   </b-dropdown>
 </template>
 
