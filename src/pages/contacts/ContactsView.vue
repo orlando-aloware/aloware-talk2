@@ -149,7 +149,7 @@
                        tooltip-text="Reset"
                        borderless
                        v-if="isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
-                       @clicked="resetFilters">
+                       @clicked="resetFilters(false, false)">
             <refresh-icon width="14px"
                           height="14px"
                           icon-color="grey-90">
@@ -807,7 +807,8 @@ export default {
       'setMessageComposerMode',
       'updateContactsList',
       'updateContactsListFilter',
-      'setListContactsLoaded'
+      'setListContactsLoaded',
+      'setPreviouslySavedListId'
     ]),
 
     onSearch (searchText) {
@@ -974,6 +975,7 @@ export default {
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
           .then((res) => {
+            this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data)
             this.initialListFilters = this.currentListFilters
             this.updateFilterHasChanges()
@@ -1111,7 +1113,15 @@ export default {
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
     },
 
-    resetFilters (resetSearch = false) {
+    resetFilters (resetSearch = false, skipPreviouslySavedListId = true) {
+      // don't reset currently selected list's filter to
+      // its previous filter if list's id is equal to
+      // previously saved list id.
+      if (skipPreviouslySavedListId &&
+        this.selectedList.id === this.previouslySavedListId) {
+        return
+      }
+
       this.setListContactsLoaded(false)
 
       if (this.selectedList.id === this.previousListId) {
@@ -1371,6 +1381,7 @@ export default {
       'showMyContacts',
       'pinnedCounts',
       'previousListFilters',
+      'previouslySavedListId',
       'previousListId',
       'listContactsLoaded'
     ]),

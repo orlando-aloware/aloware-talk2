@@ -499,6 +499,9 @@ export default {
   SET_PREVIOUS_LIST_FILTERS (state, payload) {
     state.previousListFilters = payload
   },
+  SET_PREVIOUSLY_SAVED_LIST_ID (state, id) {
+    state.previouslySavedListId = id
+  },
   SET_PREVIOUS_LIST_ID (state, id) {
     state.previousListId = id
   },

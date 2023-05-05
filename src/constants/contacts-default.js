@@ -221,6 +221,7 @@ export const DEFAULT_STATE = {
   myListsLoaded: false,
   listContactsLoaded: false,
   previousListFilters: {},
+  previouslySavedListId: null,
   previousListId: null,
   sequenceInfo: {
     sequence: null,

@@ -77,6 +77,7 @@ export default {
       'setContact',
       'listLoaded',
       'setPreviousListFilters',
+      'setPreviouslySavedListId',
       'setPreviousListId',
       'updateContactsListFilter'
     ]),
@@ -282,6 +283,39 @@ export default {
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
 
+      const listData = {
+        id: this.id,
+        isMyQueuePaths: [
+          'power-dialer/in-queue',
+          'power-dialer/called',
+          'power-dialer/failed',
+          'power-dialer/scheduled',
+          'power-dialer/all'
+        ],
+        isInMyQueuePaths: false
+      }
+
+      listData.isInMyQueuePaths = listData.isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
+      const isInMyQueue = listData.isInMyQueuePaths ||
+        this.id === 'my-queue'
+
+      if (this.$route.name.includes('Power Dialer') && isInMyQueue) {
+        listData.id = this.myQueue?.id
+      }
+
+      if (listData.id === null) {
+        listData.id = 'all'
+      }
+
+      const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
+
+      // temporarily set selected list from what we have in our vuex state
+      this.setSelectedList({
+        id: listData.id,
+        name: list.name,
+        type: list.type
+      })
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: queryString,
@@ -305,38 +339,6 @@ export default {
             // TODOs: Use vuex for storing filtered power dialer contact lists
             this.updateMyQueueListData(data)
           }
-
-          const listData = {
-            id: this.id,
-            isMyQueuePaths: [
-              'power-dialer/in-queue',
-              'power-dialer/called',
-              'power-dialer/failed',
-              'power-dialer/scheduled',
-              'power-dialer/all'
-            ],
-            isInMyQueuePaths: false
-          }
-
-          listData.isInMyQueuePaths = listData.isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
-
-          if (this.$route.name.includes('Power Dialer') &&
-            (listData.isInMyQueuePaths ||
-              this.id === 'my-queue')) {
-            listData.id = this.myQueue?.id
-          }
-
-          if (listData.id === null) {
-            listData.id = 'all'
-          }
-
-          const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
-
-          this.setSelectedList({
-            id: listData.id,
-            name: list.name,
-            type: list.type
-          })
 
           this.markCheckedAll()
         })
@@ -866,6 +868,7 @@ export default {
       'showMyContacts',
       'showAddViewMyContacts',
       'previousListId',
+      'previouslySavedListId',
       'previousListFilters',
       'isAllContactsSelected'
     ]),
@@ -1151,10 +1154,16 @@ export default {
     },
 
     id: function (newValue, oldValue) {
-      if (this.initiateUpdateContactsListFilter !== undefined) {
+      // we only revert back the previous filter of the previous list
+      // only if the changes in the list's filter was not saved.
+      if (this.previouslySavedListId !== oldValue &&
+        this.initiateUpdateContactsListFilter !== undefined) {
         this.initiateUpdateContactsListFilter({
           oldIdValue: oldValue
         })
+        this.setPreviousListFilters({})
+        this.setPreviouslySavedListId(null)
+        this.setPreviousListId(null)
       }
     }
   },

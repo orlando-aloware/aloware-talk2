@@ -239,6 +239,7 @@ export default function () {
     myListsLoaded: false,
     listContactsLoaded: false,
     previousListFilters: {},
+    previouslySavedListId: null,
     previousListId: null,
     sequenceInfo: {
       sequence: null,
