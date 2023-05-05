@@ -59,16 +59,27 @@
 
             <td :key="`col-${colIndex}`"
                 v-if="selectedTagCategory === CommunicationTags && column.name === 'communications_count'">
-              <span class="badge bg-grey-12 text-size-xs">
+              <i class="fas fa-spin fa-spinner"
+                 v-show="isLoadingRefreshCount && refreshedTagId === tag.id">
+              </i>
+              <b-button class="badge bg-grey-12 text-size-xs"
+                        v-show="refreshedTagId !== tag.id"
+                        v-b-tooltip.hover.left="'Click to Refresh'"
+                        @click="refreshCount(tag.id)">
                 {{ tag.communications_count }}
-              </span>
+              </b-button>
             </td>
 
             <td :key="`col-${colIndex}`"
                 v-if="selectedTagCategory === ContactTags && column.name === 'contacts_count'">
-              <span class="badge bg-grey-12 text-size-xs">
+              <i class="fas fa-spinner"
+                 v-show="refreshedTagId === tag.id">
+              </i>
+              <b-button class="badge bg-grey-12 text-size-xs"
+                        v-b-tooltip.hover.left="'Click to Refresh'"
+                        @click="refreshCount(tag.id)">
                 {{ tag.contacts_count }}
-              </span>
+              </b-button>
             </td>
 
             <td :key="`col-${colIndex}`"
@@ -188,9 +199,21 @@ export default {
       default: false
     },
 
+    isLoadingRefreshCount: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+
     pagination: {
       type: Object,
       required: true
+    }
+  },
+
+  data () {
+    return {
+      refreshedTagId: null
     }
   },
 
@@ -242,6 +265,19 @@ export default {
 
     deleteTag (tag) {
       this.$emit('deleteTag', tag)
+    },
+
+    refreshCount (tagId) {
+      this.refreshedTagId = tagId
+      this.$emit('updateTagCount', tagId)
+    }
+  },
+
+  watch: {
+    isLoadingRefreshCount (value) {
+      if (!value) {
+        this.refreshedTagId = null
+      }
     }
   }
 }
