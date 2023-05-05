@@ -8,7 +8,7 @@
           <span class="spinner-border spinner-border-sm"
                 v-if="isLoading" />
           <span v-else
-                @click="fetchAll">
+                @click.prevent="fetchAll">
             <refresh-icon />
             <q-tooltip anchor="center right"
                        self="center left">
