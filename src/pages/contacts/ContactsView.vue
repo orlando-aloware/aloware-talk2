@@ -958,13 +958,17 @@ export default {
     },
 
     isCurrentAndPreviousFiltersMismatch () {
-      const previousListFilters = this.$jsonClone(this.previousListFilters)
-
-      if (!this.currentListFilters.search && !previousListFilters.search) {
-        previousListFilters.search = this.currentListFilters.search
+      if (_.isEmpty(this.previousListFilters)) {
+        return false
       }
 
-      return !_.isEqual(this.currentListFilters, previousListFilters)
+      const previousListFilters = this.$jsonClone(this.previousListFilters)
+
+      if (this.cleanedCurrentListFilters?.search && !previousListFilters?.search) {
+        previousListFilters.search = this.cleanedCurrentListFilters.search
+      }
+
+      return JSON.stringify(this.cleanedCurrentListFilters) !== JSON.stringify(previousListFilters)
     },
 
     isFilterHasChanges () {
@@ -981,6 +985,14 @@ export default {
 
     simpsocialMessengerIframeLink () {
       return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
+    },
+
+    cleanedCurrentListFilters () {
+      const currentFilters = _.isEmpty(this.currentListFilters)
+        ? {}
+        : this.currentListFilters
+
+      return currentFilters
     }
   },
 
@@ -1344,12 +1356,15 @@ export default {
     },
 
     hasFilterChanges () {
-      return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
+      const initialFilters = _.isEmpty(this.initialListFilters)
+        ? {}
+        : this.initialListFilters
+
+      return JSON.stringify(initialFilters) !== JSON.stringify(this.cleanedCurrentListFilters)
     },
 
     updateFilterHasChanges () {
       this.filterHasChanges = this.hasFilterChanges()
-      console.log('this.filterHasChanges: ', this.filterHasChanges)
     },
 
     clearFilters () {
@@ -1663,6 +1678,7 @@ export default {
     },
 
     id (value) {
+      this.updateFilterHasChanges()
       this.reRouteToBase()
       if (this.pinnedCounts.hasOwnProperty(value)) {
         this.setSelectedListContactCount(this.pinnedCounts[value])
