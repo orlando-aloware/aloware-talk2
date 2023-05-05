@@ -117,11 +117,12 @@
                     <ellipse-icon />
                   </template>
                   <div v-if="selectedTagCategory === ContactTags">
-                    <b-dropdown-item>
-                      <i class="fas fa-sign-in-alt"></i> Assign Contacts
+                    <b-dropdown-item v-if="tag.contacts_count > 0"
+                                     @click="openTagContactsSplitterDialog(tag)">
+                      <i class="fas fa-columns"></i> Split
                     </b-dropdown-item>
                     <b-dropdown-item>
-                      <i class="fas fa-columns"></i> Split
+                      <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
                     <b-dropdown-item>
                       <i class="fas fa-phone"></i> Add to PowerDialer
@@ -160,6 +161,11 @@
       </template>
 
     </datatable>
+
+    <!-- contacts tag actions -->
+    <tag-contacts-splitter :is-show="isOpenTagContactsSplitterDialog"
+                           :tag="selectedRowTag"
+                            @closeTagContactSplitterDialog="closeTagContactSplitterDialog"/>
   </div>
 </template>
 
@@ -171,11 +177,13 @@ import ContactAltIcon from 'components/icons/contact-alt-icon.vue'
 import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
+import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 
 export default {
   name: 'tags-table',
 
   components: {
+    TagContactsSplitter,
     Datatable,
     CommunicationSignalIcon,
     ContactAltIcon,
@@ -215,7 +223,9 @@ export default {
 
   data () {
     return {
-      refreshedTagId: null
+      refreshedTagId: null,
+      selectedRowTag: null,
+      isOpenTagContactsSplitterDialog: false
     }
   },
 
@@ -276,6 +286,16 @@ export default {
     refreshCount (tagId) {
       this.refreshedTagId = tagId
       this.$emit('updateTagCount', tagId)
+    },
+
+    openTagContactsSplitterDialog (tag) {
+      this.selectedRowTag = tag
+      this.isOpenTagContactsSplitterDialog = true
+    },
+
+    closeTagContactSplitterDialog () {
+      this.selectedRowTag = null
+      this.isOpenTagContactsSplitterDialog = false
     }
   },
 
