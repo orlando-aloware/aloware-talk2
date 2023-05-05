@@ -494,7 +494,7 @@ export default {
 
   mounted () {
     // Preset sms reminder text
-    this.setSmsReminderBody()
+    this.setSmsReminderFields()
   },
 
   methods: {
@@ -724,16 +724,28 @@ export default {
       if (this.schedule.time) {
         this.sms_reminder_fields.time = this.schedule.time
       }
+
       // Set default time to 09:00 if reseller is SimpSocial
       if (this.profile.company.reseller_id === 357) {
         this.sms_reminder_fields.time = '09:00'
       }
 
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
     },
 
-    setSmsReminderBody () {
+    setSmsReminderFields () {
+      this.sms_reminder_fields.campaign_id = this.profile.company.sms_reminder_default_campaign_id
       this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text || ''
+
+      // update time if its set in account config
+      if (this.profile.company.sms_reminder_default_time) {
+        this.sms_reminder_fields.time = this.profile.company.sms_reminder_default_time
+      }
+
+      // update frequency if its set in account config
+      if (this.profile.company.sms_reminder_default_send_before_days) {
+        this.sms_reminder_fields.frequencies = this.profile.company.sms_reminder_default_send_before_days
+      }
     },
 
     addTemplateVariableToBody (variable) {
@@ -757,7 +769,7 @@ export default {
         time: '10:00'
       }
 
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
     },
 
     dateSelected (value) {
