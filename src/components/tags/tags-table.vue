@@ -91,13 +91,15 @@
                 <b-button v-if="hasPermissionTo('update tag') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
                           title="Communications"
                           variant="transparent"
-                          size="sm">
+                          size="sm"
+                          @click="openTagCommunications(tag.id)">
                   <communication-signal-icon />
                 </b-button>
                 <b-button v-if="hasPermissionTo('update tag') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
                           title="Contacts"
                           variant="transparent"
-                          size="sm">
+                          size="sm"
+                          @click="openTagContacts(tag.id)">
                   <contact-alt-icon />
                 </b-button>
                 <b-button title="Edit"
@@ -257,6 +259,10 @@ export default {
 
     openTagCommunications (tagId) {
       window.open(`/channels/all-communications?tagId=${tagId}`, '_blank')
+    },
+
+    openTagContacts (tagId) {
+      console.log('placeholder for contacts tag: ' + tagId)
     },
 
     editTag (tag) {
