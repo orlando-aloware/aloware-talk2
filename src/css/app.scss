@@ -12427,20 +12427,18 @@ h1.contact-list-name-label {
   height: 100vh;
 }
 
-#tags-form-modal,
-#tags-delete-dialog,
-#tag-contacts-splitter-dialog {
-  .modal-header,
-  .modal-footer {
-    border: none
-  }
-
-  .modal-body {
-    padding-bottom: 0
-  }
-}
-
 .tags {
+  &__modal {
+    .modal-header,
+    .modal-footer {
+      border: none
+    }
+
+    .modal-body {
+      padding-bottom: 0
+    }
+  }
+
   &__tabs {
     &.q-btn-group--spread {
       & > .q-btn-item {

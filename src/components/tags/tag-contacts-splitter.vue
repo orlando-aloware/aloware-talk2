@@ -1,16 +1,17 @@
 <template>
-  <b-modal id="tag-contacts-splitter-dialog"
-           :title="`Split Tag`"
+  <b-modal id="tag-contacts-splitter-modal"
+           modal-class="tags__modal"
+           title="Split Tag"
            no-close-on-esc
            no-close-on-backdrop
            size="sm"
            v-model="openModal"
-           @hidden="closeTagContactSplitter">
+           @hidden="closeModal">
     <p>
       Split <span class="font-italic font-weight-bold">{{ tagName }}</span> tag into smaller tags.
     </p>
     <p v-show="!allowSplit"
-       class="text-red text-sm">
+       class="text-red text-11 mb-0">
       Contact count is less than or equal to page size.
     </p>
     <vue-multiselect track-by="value"
@@ -24,12 +25,12 @@
                      :show-labels="false"
                      :allow-empty="false"
                      v-model="selectetdPageSize"
-                     @select="splitTag"/>
+                     @select="setSplitPageSize"/>
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
-                  @click.prevent="closeTagContactSplitter">
+                  @click.prevent="closeModal">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
@@ -125,18 +126,21 @@ export default {
   },
 
   methods: {
-    closeTagContactSplitter () {
-      this.$emit('closeTagContactSplitterDialog')
+    closeModal () {
+      this.splitPageSize = null
+      this.selectetdPageSize = null
+      this.$emit('closeAssignContactsTagModal')
+    },
+
+    setSplitPageSize () {
+      this.splitPageSize = this.selectetdPageSize.value
     },
 
     splitTag () {
-      this.splitPageSize = this.selectetdPageSize.value
-
       if (!this.allowSplit) {
         return
       }
 
-      console.log(this.splitPageSize)
       axios.post('/api/v1/tags/' + this.tag.id + '/split', {
         page_size: this.splitPageSize
       }).then(res => {

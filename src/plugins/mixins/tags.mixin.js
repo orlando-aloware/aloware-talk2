@@ -15,7 +15,7 @@ export default {
   },
 
   created () {
-    this.setSelectedTagCategory(this.CommunicationTags)
+    this.setSelectedTagCategory(this.ContactTags)
   },
 
   computed: {

@@ -121,7 +121,7 @@
                                      @click="openTagContactsSplitterDialog(tag)">
                       <i class="fas fa-columns"></i> Split
                     </b-dropdown-item>
-                    <b-dropdown-item>
+                    <b-dropdown-item @click="openAssignContactsTagDialog(tag)">
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
                     <b-dropdown-item>
@@ -164,8 +164,12 @@
 
     <!-- contacts tag actions -->
     <tag-contacts-splitter :is-show="isOpenTagContactsSplitterDialog"
-                           :tag="selectedRowTag"
-                            @closeTagContactSplitterDialog="closeTagContactSplitterDialog"/>
+                           :tag="selectedTag"
+                            @closeAssignContactsTagModal="closeContactTagsActionsModals"/>
+
+    <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
+                            :tag="selectedTag"
+                            @closeAssignContactsTagModal="closeContactTagsActionsModals"/>
   </div>
 </template>
 
@@ -178,11 +182,13 @@ import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
+import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 
 export default {
   name: 'tags-table',
 
   components: {
+    AssignContactsByTag,
     TagContactsSplitter,
     Datatable,
     CommunicationSignalIcon,
@@ -224,8 +230,9 @@ export default {
   data () {
     return {
       refreshedTagId: null,
-      selectedRowTag: null,
-      isOpenTagContactsSplitterDialog: false
+      selectedTag: null,
+      isOpenTagContactsSplitterDialog: false,
+      isOpenAssignContactsTagDialog: false
     }
   },
 
@@ -289,13 +296,19 @@ export default {
     },
 
     openTagContactsSplitterDialog (tag) {
-      this.selectedRowTag = tag
+      this.selectedTag = tag
       this.isOpenTagContactsSplitterDialog = true
     },
 
-    closeTagContactSplitterDialog () {
-      this.selectedRowTag = null
+    openAssignContactsTagDialog (tag) {
+      this.selectedTag = tag
+      this.isOpenAssignContactsTagDialog = true
+    },
+
+    closeContactTagsActionsModals () {
+      this.selectedTag = null
       this.isOpenTagContactsSplitterDialog = false
+      this.isOpenAssignContactsTagDialog = false
     }
   },
 

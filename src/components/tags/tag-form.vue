@@ -1,5 +1,6 @@
 <template>
   <b-modal id="tags-form-modal"
+           modal-class="tags__modal"
            :title="title"
            no-close-on-esc
            no-close-on-backdrop
