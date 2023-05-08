@@ -82,23 +82,38 @@
     </div>
     <q-separator/>
     <div>
-      <q-table hide-pagination
-               separator="none"
-               row-key="id"
-               :data="broadcastData"
-               :columns="broadcastsColumns">
-        <template v-slot:header="props">
-          <q-tr :props="props">
-            <q-th
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-            >
-              {{ col.label ?? col.string }}
-            </q-th>
-          </q-tr>
+      <datatable ref="broadcastsTable"
+                 :stickyHeaders="true"
+                 :columns="broadcastsColumns"
+                 :isEmpty="isBroadcastsTableEmpty"
+                 :paginated="false"
+                 :total-rows="broadcastData.length ?? 0"
+                 @checked="onCheckerClicked()">
+        <template slot="tbody">
+          <tr v-for="(row, rowIndex) in broadcastData"
+              v-bind:key="rowIndex">
+            <template v-for="(col, colIndex) in broadcastsColumns">
+              <td :key="`c-${colIndex}`"
+                  v-if="col.name == 'checkbox'"
+                  class="text-left pull-left datatable-row__checkbox">
+                  <label class="custom-checkbox-container">
+                  <input
+                    type="checkbox"
+                    class="checker"
+                    :value="row.id"
+                    :checked="checked.find(item => item.id === row.id) || isAllChecked"
+                    @change="onCheckerClicked(row)" />
+                  <span class="checkmark"></span>
+                </label>
+              </td>
+              <td :key="`c-${colIndex}`"
+                  v-else>
+                {{ row[col.field] }}
+              </td>
+            </template>
+          </tr>
         </template>
-      </q-table>
+      </datatable>
     </div>
   </div>
 </template>
@@ -106,51 +121,58 @@
 <script>
 import Search from 'src/components/search.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import talk2Api from 'src/plugins/api/api'
+import Datatable from 'src/components/datatable.vue'
 
 const broadcastsColumns = [
   {
+    name: 'checkbox',
+    label: '',
+    field: ''
+  },
+  {
     name: 'id',
-    string: 'id',
+    label: 'Id',
     field: 'id'
   },
   {
     name: 'name',
-    string: 'Name',
+    label: 'Name',
     field: 'name'
   },
   {
     name: 'status',
-    string: 'Status',
+    label: 'Status',
     field: 'status'
   },
   {
     name: 'pending_tasks',
-    string: 'Pending Tasks',
+    label: 'Pending Tasks',
     field: 'pending_tasks'
   },
   {
     name: 'engagement',
-    string: 'Engagement',
+    label: 'Engagement',
     field: 'engagement'
   },
   {
     name: 'unsubscribed',
-    string: 'Unsubscribed',
+    label: 'Unsubscribed',
     field: 'unsubscribed'
   },
   {
     name: 'target_group',
-    string: 'Target Group',
+    label: 'Target Group',
     field: 'target_group'
   },
   {
     name: 'line_used',
-    string: 'Line Used',
+    label: 'Line Used',
     field: 'line_used'
   },
   {
     name: 'throttling',
-    string: 'Throttling',
+    label: 'Throttling',
     field: 'throttling'
   }
 ]
@@ -160,7 +182,8 @@ export default {
 
   components: {
     Search,
-    PlusIcon
+    PlusIcon,
+    Datatable
   },
 
   data: () => ({
@@ -189,7 +212,39 @@ export default {
       }
     ],
     broadcastData: [],
-    broadcastsColumns
-  })
+    broadcastsColumns,
+    checked: [],
+    isAllChecked: false
+  }),
+
+  mounted () {
+    talk2Api.V1.broadcasts.get().then(res => {
+      this.broadcastData = res.data
+    })
+  },
+
+  computed: {
+    isBroadcastsTableEmpty () {
+      return this.broadcastData.length === 0
+    }
+  },
+
+  methods: {
+    onCheckerClicked (row) {
+      if (!row) {
+        this.isAllChecked = !this.isAllChecked
+        return
+      }
+
+      let foundItem = this.checked.find(item => item.id === row.id)
+
+      if (foundItem) {
+        this.checked = this.checked.filter(item => item.id !== row.id)
+        return
+      }
+
+      this.checked.push(row)
+    }
+  }
 }
 </script>
