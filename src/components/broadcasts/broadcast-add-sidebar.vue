@@ -1,6 +1,15 @@
 <template>
   <div class="broadcasts__add__sidebar">
-    {{ currentStep }}
+    <q-stepper class="h-100"
+               vertical
+               animated
+               v-model="currentStep.id">
+      <q-step :title="step.name"
+              :name="step.id"
+              v-for="step in steps"
+              v-bind:key="step.id">
+      </q-step>
+    </q-stepper>
   </div>
 </template>
 
