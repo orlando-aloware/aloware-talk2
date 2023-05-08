@@ -81,12 +81,79 @@
       </div>
     </div>
     <q-separator/>
+    <div>
+      <q-table hide-pagination
+               separator="none"
+               row-key="id"
+               :data="broadcastData"
+               :columns="broadcastsColumns">
+        <template v-slot:header="props">
+          <q-tr :props="props">
+            <q-th
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+            >
+              {{ col.label ?? col.string }}
+            </q-th>
+          </q-tr>
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
 <script>
 import Search from 'src/components/search.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+
+const broadcastsColumns = [
+  {
+    name: 'id',
+    string: 'id',
+    field: 'id'
+  },
+  {
+    name: 'name',
+    string: 'Name',
+    field: 'name'
+  },
+  {
+    name: 'status',
+    string: 'Status',
+    field: 'status'
+  },
+  {
+    name: 'pending_tasks',
+    string: 'Pending Tasks',
+    field: 'pending_tasks'
+  },
+  {
+    name: 'engagement',
+    string: 'Engagement',
+    field: 'engagement'
+  },
+  {
+    name: 'unsubscribed',
+    string: 'Unsubscribed',
+    field: 'unsubscribed'
+  },
+  {
+    name: 'target_group',
+    string: 'Target Group',
+    field: 'target_group'
+  },
+  {
+    name: 'line_used',
+    string: 'Line Used',
+    field: 'line_used'
+  },
+  {
+    name: 'throttling',
+    string: 'Throttling',
+    field: 'throttling'
+  }
+]
 
 export default {
   name: 'broadcasts',
@@ -120,7 +187,9 @@ export default {
         value: 5,
         slot: 'five'
       }
-    ]
+    ],
+    broadcastData: [],
+    broadcastsColumns
   })
 }
 </script>
