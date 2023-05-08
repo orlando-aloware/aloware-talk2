@@ -4,7 +4,7 @@
       Your Contact Center
     </div>
     <div class="wallboard__header__actions bordered-bottom">
-      For today {{ new Date() | fullShortDate }}
+      For {{ new Date() | fullShortDate }}
 
       <ring-group-selector clearable
                            class="ml-2 ring-group-filter"

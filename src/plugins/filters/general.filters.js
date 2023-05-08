@@ -611,10 +611,7 @@ const fixFullDateUTCRelative = (dt) => {
  * @returns String
  */
 const fullShortDate = (date) => {
-  return date
-    .toGMTString()
-    .substr(5, 12)
-    .replace(/^0/, '')
+  return window.moment(date).format('MMM D, YYYY')
 }
 
 /**
