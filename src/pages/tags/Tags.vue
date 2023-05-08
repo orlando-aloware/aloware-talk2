@@ -74,10 +74,10 @@
               :editable-tag="tag"
               @closeTagForm="closeTagForm"/>
 
-    <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
-                       :tag="toDeleteTag"
-                       @closeDeleteTagDialog="closeDeleteTagDialog"
-                       @deleteTagFinal="deleteTag"/>
+    <!--<delete-tag-dialog :is-show="isOpenDeleteTagDialog"-->
+    <!--                   :tag="toDeleteTag"-->
+    <!--                   @closeDeleteTagDialog="closeDeleteTagDialog"-->
+    <!--                   @deleteTagFinal="deleteTag"/>-->
   </div>
 </template>
 
@@ -89,13 +89,11 @@ import TagsTable from 'components/tags/tags-table.vue'
 import { debounce } from 'lodash'
 import TagForm from 'components/tags/tag-form.vue'
 import { tagsMixin } from 'src/plugins/mixins'
-import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 
 export default {
   name: 'Tags',
 
   components: {
-    DeleteTagDialog,
     TagForm,
     TagsTable,
     TagsTabs,
@@ -272,25 +270,6 @@ export default {
     closeDeleteTagDialog () {
       this.toDeleteTag = null
       this.isOpenDeleteTagDialog = false
-    },
-
-    deleteTag (tagId) {
-      this.closeDeleteTagDialog()
-
-      // temp
-      if (this.isContactTagsSelected) {
-        return
-      }
-
-      axios.delete('/api/v1/tag/' + tagId)
-        .then(() => {
-          // todo: show notification
-          this.getTags()
-        })
-        .catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-        })
     },
 
     updateTagCount (tagId) {

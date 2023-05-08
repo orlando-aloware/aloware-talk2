@@ -131,7 +131,7 @@
                     </b-dropdown-item>
                   </div>
                   <b-dropdown-item v-if="hasPermissionTo('delete tag')"
-                                   @click="deleteTag(tag)">
+                                   @click="openDeleteTagDialog(tag)">
                     <span class="text-danger"><delete-red-icon></delete-red-icon> Delete</span>
                   </b-dropdown-item>
                 </b-dropdown>
@@ -177,6 +177,10 @@
     <tag-contacts-workflow-enroller :is-show="isOpenEnrollTagContactsToSequenceDialog"
                                     :tag="selectedTag"
                                     @closeEnrollTagContactsToSequenceDialog="closeContactTagsActionsModals"/>
+
+    <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
+                       :tag="selectedTag"
+                       @closeDeleteTagDialog="closeDeleteTagDialog"/>
   </div>
 </template>
 
@@ -192,11 +196,13 @@ import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 
 export default {
   name: 'tags-table',
 
   components: {
+    DeleteTagDialog,
     TagContactsWorkflowEnroller,
     TagContactsAddToPowerDialer,
     AssignContactsByTag,
@@ -245,7 +251,8 @@ export default {
       isOpenTagContactsSplitterDialog: false,
       isOpenAssignContactsTagDialog: false,
       isOpenAddTagContactsToPowerDialerDialog: false,
-      isOpenEnrollTagContactsToSequenceDialog: false
+      isOpenEnrollTagContactsToSequenceDialog: false,
+      isOpenDeleteTagDialog: false
     }
   },
 
@@ -299,8 +306,14 @@ export default {
       this.$emit('editTag', tag)
     },
 
-    deleteTag (tag) {
-      this.$emit('deleteTag', tag)
+    openDeleteTagDialog (tag) {
+      this.selectedTag = tag
+      this.isOpenDeleteTagDialog = true
+    },
+
+    closeDeleteTagDialog () {
+      this.selectedTag = null
+      this.isOpenDeleteTagDialog = false
     },
 
     refreshCount (tagId) {

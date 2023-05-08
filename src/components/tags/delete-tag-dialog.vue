@@ -61,6 +61,8 @@
 
 <script>
 import { tagsMixin } from 'src/plugins/mixins'
+import axios from 'axios'
+
 export default {
   name: 'delete-tag-dialog',
 
@@ -69,14 +71,14 @@ export default {
   ],
 
   props: {
-    isShow: {
-      type: Boolean,
-      required: true
-    },
-
     tag: {
       type: Object,
       required: false
+    },
+
+    isShow: {
+      type: Boolean,
+      required: true
     }
   },
 
@@ -137,7 +139,24 @@ export default {
     },
 
     deleteTag () {
-      this.$emit('deleteTagFinal', this.tag.id)
+      this.loading = true
+
+      // temporary
+      if (this.isContactTagsSelected) {
+        return
+      }
+
+      axios.delete('/api/v1/tag/' + this.tag.id)
+        .then(res => {
+          this.loading = false
+          this.$generalNotification(res.data.message)
+          this.getTags()
+        })
+        .catch(err => {
+          this.loading = false
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
     }
   },
 
