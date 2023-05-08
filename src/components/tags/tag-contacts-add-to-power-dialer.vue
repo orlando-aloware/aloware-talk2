@@ -26,8 +26,10 @@
     </p>
 
     <div class="pt-2">
-      <label class="label mt-2 mb-1">Add Tasks to this User's PowerDialer</label>
-      <user-selector/>
+      <label class="label mt-2 mb-1">Add Tasks to this User's PowerDialer (My Queue)</label>
+      <user-selector :generic-styling="false"
+                     v-model="userId"
+                     @change="setUserId"/>
     </div>
 
     <div class="py-4">
@@ -43,10 +45,10 @@
       </b-form-radio-group>
 
       <b-form-checkbox class="mx-2 mt-2"
-                     :value="option.value"
-                     :key="option.value"
-                     v-model="conversion"
-                     v-for="option in conversionOptions">
+                       :value="option.value"
+                       :key="option.value"
+                       v-model="conversion"
+                       v-for="option in conversionOptions">
           {{ option.text }}
         <information-circle-icon color="#2F80ED"
                                  v-if="option.helper"/>
@@ -85,6 +87,7 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapState } from 'vuex'
+import axios from 'axios'
 
 export default {
   name: 'tag-contacts-add-to-power-dialer',
@@ -112,7 +115,8 @@ export default {
       direction: ImportConstants.BOTTOM,
       conversion: [
         'prevent_duplicates'
-      ]
+      ],
+      userId: null
     }
   },
 
@@ -180,11 +184,57 @@ export default {
 
   methods: {
     closeModal () {
+      this.reset()
       this.$emit('closeAddTagContactsToPowerDialer')
     },
 
+    reset () {
+      this.direction = ImportConstants.BOTTOM
+      this.conversion = [
+        'prevent_duplicates'
+      ]
+      this.userId = null
+    },
+
+    setUserId (userId) {
+      this.userId = userId
+    },
+
     addTasksToPowerDialer () {
-      console.log('Add Tasks to PowerDialer')
+      this.loading = true
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabName}?`, {
+        title: 'Event Confirmation',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        size: 'sm',
+        buttonSize: 'sm'
+      })
+        .then(confirm => {
+          if (!confirm) {
+            this.loading = false
+            this.closeModal()
+          }
+
+          let params = {
+            user_id: this.userId,
+            direction: this.direction,
+            prevent_duplicates: this.conversion.includes('prevent_duplicates'),
+            multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
+            allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers')
+          }
+
+          axios.post(`/api/v1/tags/${this.tag.id}/add-to-user-power-dialer`, params)
+            .then(res => {
+              this.$generalNotification(res.data.message)
+            }).catch(err => {
+              this.$handleErrors(err.response)
+              console.log(err)
+            }).finally(() => {
+              this.loading = false
+              this.closeModal()
+            })
+        })
     }
   }
 }

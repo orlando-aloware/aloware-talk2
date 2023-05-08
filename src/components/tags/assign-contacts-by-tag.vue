@@ -151,6 +151,7 @@ export default {
 
     assignContacts () {
       this.loading = true
+
       this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabName}?`, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
@@ -158,10 +159,8 @@ export default {
         size: 'sm',
         buttonSize: 'sm'
       })
-        .then(value => {
-          console.log('assign contacts', value)
-
-          if (!value) {
+        .then(confirm => {
+          if (!confirm) {
             this.loading = false
             this.closeModal()
           }
@@ -173,16 +172,16 @@ export default {
             force: this.distributeContacts
           }
 
-          axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, data).then(res => {
-            this.$generalNotification(res.data.message)
-            this.resetForm()
-          }).catch(err => {
-            console.log(err)
-            this.$handleErrors(err.response)
-          }).finally(() => {
-            this.loading = false
-            this.closeModal()
-          })
+          axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, data)
+            .then(res => {
+              this.$generalNotification(res.data.message)
+            }).catch(err => {
+              this.$handleErrors(err.response)
+              console.log(err)
+            }).finally(() => {
+              this.loading = false
+              this.closeModal()
+            })
         })
     }
   }
