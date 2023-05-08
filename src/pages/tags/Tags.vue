@@ -66,7 +66,6 @@
                 @paginated="paginate"
                 @sort="sort"
                 @editTag="editTag"
-                @deleteTag="openDeleteTagDialog"
                 @updateTagCount="updateTagCount"/>
 
     <tag-form :is-show="isOpenTagForm"
@@ -120,9 +119,7 @@ export default {
         total: 0
       },
       isOpenTagForm: false,
-      tag: null,
-      toDeleteTag: null,
-      isOpenDeleteTagDialog: false
+      tag: null
     }
   },
 
@@ -156,6 +153,10 @@ export default {
         parsedTags[index] = data
         this.tags = parsedTags
       }
+    })
+
+    this.$VueEvent.listen('tag_deleting', () => {
+      this.getTags()
     })
   },
 
@@ -260,16 +261,6 @@ export default {
     editTag (tag) {
       this.tag = tag
       this.openTagForm()
-    },
-
-    openDeleteTagDialog (tag) {
-      this.toDeleteTag = tag
-      this.isOpenDeleteTagDialog = true
-    },
-
-    closeDeleteTagDialog () {
-      this.toDeleteTag = null
-      this.isOpenDeleteTagDialog = false
     },
 
     updateTagCount (tagId) {

@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            no-close-on-esc
            no-close-on-backdrop
+           centered
            v-model="openModal"
            @hidden="closeTagForm"
            @show="openTagForm">
@@ -293,21 +294,23 @@ export default {
       this.loading = true
       let url = '/api/v1/tag'
       let xhr = null
+      let message = ''
 
       if (this.editableTag) {
         // edit/update api
         url += `/${this.editableTag.id}`
         const cloneTag = (({ category, ...o }) => o)(this.tag) // except category
         xhr = axios.patch(url, this.$jsonClone(cloneTag))
+        message = this.tagCategoryName + ' tag updated successfully'
       } else {
         // add api
         xhr = axios.post(url, this.tag)
+        message = this.tagCategoryName + ' tag created successfully'
       }
 
-      xhr.then(res => {
-        // todo: show notification
+      xhr.then(() => {
         this.loading = false
-        this.$generalNotification(res.data.message)
+        this.$generalNotification(message)
       })
         .catch(err => {
           console.log(err)

@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            no-close-on-esc
            no-close-on-backdrop
+           centered
            size="md"
            v-model="openModal"
            @hidden="closeDeleteTagDialog">
@@ -141,22 +142,18 @@ export default {
     deleteTag () {
       this.loading = true
 
-      // temporary
-      if (this.isContactTagsSelected) {
-        return
-      }
-
       axios.delete('/api/v1/tag/' + this.tag.id)
         .then(res => {
           this.loading = false
           this.$generalNotification(res.data.message)
-          this.getTags()
         })
         .catch(err => {
           this.loading = false
           console.log(err)
           this.$handleErrors(err.response)
         })
+
+      this.$emit('closeDeleteTagDialog')
     }
   },
 

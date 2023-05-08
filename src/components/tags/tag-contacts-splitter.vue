@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            no-close-on-esc
            no-close-on-backdrop
+           centered
            size="sm"
            v-model="openModal"
            @hidden="closeModal">

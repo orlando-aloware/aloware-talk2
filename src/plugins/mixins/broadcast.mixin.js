@@ -456,6 +456,10 @@ export default {
           this.$VueEvent.fire('tag_created', event.tag)
         })
         .listen('.tag.updated', (event) => {
+          if (event.name.includes('_deleted_')) {
+            return
+          }
+
           this.updateTag(event.tag)
           this.$VueEvent.fire('tag_updated', event.tag)
         })
