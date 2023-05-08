@@ -117,7 +117,8 @@
                     <ellipse-icon />
                   </template>
                   <div v-if="selectedTagCategory === ContactTags && tag.contacts_count > 0">
-                    <b-dropdown-item @click="openTagContactsSplitterDialog(tag)">
+                    <b-dropdown-item v-if="tag.contacts_count > 50"
+                                     @click="openTagContactsSplitterDialog(tag)">
                       <i class="fas fa-columns"></i> Split
                     </b-dropdown-item>
                     <b-dropdown-item @click="openAssignContactsTagDialog(tag)">

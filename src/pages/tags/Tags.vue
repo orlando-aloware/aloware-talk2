@@ -254,8 +254,12 @@ export default {
     },
 
     closeTagForm () {
-      this.tag = null
       this.isOpenTagForm = false
+
+      // Fix submit button label slight glitch upon closing
+      setTimeout(() => {
+        this.tag = null
+      }, 200)
     },
 
     editTag (tag) {
