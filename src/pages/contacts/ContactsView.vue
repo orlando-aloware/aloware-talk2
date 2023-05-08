@@ -1246,7 +1246,7 @@ export default {
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
-            this.updateContactsList(res.data)
+            this.updateContactsList(res.data.data)
             this.initialListFilters = this.currentListFilters
             this.updateFilterHasChanges()
             this.isUpdatingList = false
