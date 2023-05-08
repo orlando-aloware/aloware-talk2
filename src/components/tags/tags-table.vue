@@ -116,15 +116,14 @@
                   <template #button-content>
                     <ellipse-icon />
                   </template>
-                  <div v-if="selectedTagCategory === ContactTags">
-                    <b-dropdown-item v-if="tag.contacts_count > 0"
-                                     @click="openTagContactsSplitterDialog(tag)">
+                  <div v-if="selectedTagCategory === ContactTags && tag.contacts_count > 0">
+                    <b-dropdown-item @click="openTagContactsSplitterDialog(tag)">
                       <i class="fas fa-columns"></i> Split
                     </b-dropdown-item>
                     <b-dropdown-item @click="openAssignContactsTagDialog(tag)">
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
-                    <b-dropdown-item>
+                    <b-dropdown-item @click="openAddTagContactsToPowerDialerDialog(tag)">
                       <i class="fas fa-phone"></i> Add to PowerDialer
                     </b-dropdown-item>
                     <b-dropdown-item>
@@ -170,6 +169,10 @@
     <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
                             :tag="selectedTag"
                             @closeAssignContactsTagModal="closeContactTagsActionsModals"/>
+
+    <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
+                                      :tag="selectedTag"
+                                      @closeAddTagContactsToPowerDialer="closeContactTagsActionsModals"/>
   </div>
 </template>
 
@@ -183,11 +186,13 @@ import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
+import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 
 export default {
   name: 'tags-table',
 
   components: {
+    TagContactsAddToPowerDialer,
     AssignContactsByTag,
     TagContactsSplitter,
     Datatable,
@@ -232,7 +237,8 @@ export default {
       refreshedTagId: null,
       selectedTag: null,
       isOpenTagContactsSplitterDialog: false,
-      isOpenAssignContactsTagDialog: false
+      isOpenAssignContactsTagDialog: false,
+      isOpenAddTagContactsToPowerDialerDialog: false
     }
   },
 
@@ -305,10 +311,16 @@ export default {
       this.isOpenAssignContactsTagDialog = true
     },
 
+    openAddTagContactsToPowerDialerDialog (tag) {
+      this.selectedTag = tag
+      this.isOpenAddTagContactsToPowerDialerDialog = true
+    },
+
     closeContactTagsActionsModals () {
       this.selectedTag = null
       this.isOpenTagContactsSplitterDialog = false
       this.isOpenAssignContactsTagDialog = false
+      this.isOpenAddTagContactsToPowerDialerDialog = false
     }
   },
 

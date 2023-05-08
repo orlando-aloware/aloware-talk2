@@ -56,7 +56,11 @@ import RingGroupSelector from 'components/generic-selectors/ring-group-selector.
 
 export default {
   name: 'assign-contacts-by-tag',
-  components: { RingGroupSelector, UserSelector },
+
+  components: {
+    RingGroupSelector,
+    UserSelector
+  },
 
   props: {
     tag: {
