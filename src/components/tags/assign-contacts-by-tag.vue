@@ -7,13 +7,13 @@
            size="md"
            v-model="openModal"
            @hidden="closeModal">
-    <b-overlay class="h-100 w-100 position-absolute"
+    <b-overlay no-wrap
                rounded="sm"
                :show="true"
                v-show="loading">
       <template #overlay>
         <q-spinner-bars color="primary"
-                        size="40px" />
+                        size="30px" />
       </template>
     </b-overlay>
 
