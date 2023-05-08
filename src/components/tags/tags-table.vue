@@ -126,7 +126,7 @@
                     <b-dropdown-item @click="openAddTagContactsToPowerDialerDialog(tag)">
                       <i class="fas fa-phone"></i> Add to PowerDialer
                     </b-dropdown-item>
-                    <b-dropdown-item>
+                    <b-dropdown-item @click="openEnrollTagContactsToSequenceDialog(tag)">
                       <i class="fas fa-user-plus"></i> Enroll Contacts
                     </b-dropdown-item>
                   </div>
@@ -173,6 +173,10 @@
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :tag="selectedTag"
                                       @closeAddTagContactsToPowerDialer="closeContactTagsActionsModals"/>
+
+    <tag-contacts-workflow-enroller :is-show="isOpenEnrollTagContactsToSequenceDialog"
+                                    :tag="selectedTag"
+                                    @closeEnrollTagContactsToSequenceDialog="closeContactTagsActionsModals"/>
   </div>
 </template>
 
@@ -187,11 +191,13 @@ import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 
 export default {
   name: 'tags-table',
 
   components: {
+    TagContactsWorkflowEnroller,
     TagContactsAddToPowerDialer,
     AssignContactsByTag,
     TagContactsSplitter,
@@ -238,7 +244,8 @@ export default {
       selectedTag: null,
       isOpenTagContactsSplitterDialog: false,
       isOpenAssignContactsTagDialog: false,
-      isOpenAddTagContactsToPowerDialerDialog: false
+      isOpenAddTagContactsToPowerDialerDialog: false,
+      isOpenEnrollTagContactsToSequenceDialog: false
     }
   },
 
@@ -316,11 +323,17 @@ export default {
       this.isOpenAddTagContactsToPowerDialerDialog = true
     },
 
+    openEnrollTagContactsToSequenceDialog (tag) {
+      this.selectedTag = tag
+      this.isOpenEnrollTagContactsToSequenceDialog = true
+    },
+
     closeContactTagsActionsModals () {
       this.selectedTag = null
       this.isOpenTagContactsSplitterDialog = false
       this.isOpenAssignContactsTagDialog = false
       this.isOpenAddTagContactsToPowerDialerDialog = false
+      this.isOpenEnrollTagContactsToSequenceDialog = false
     }
   },
 
