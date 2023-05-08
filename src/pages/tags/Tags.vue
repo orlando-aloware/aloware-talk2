@@ -112,7 +112,7 @@ export default {
       pagination: {
         currentPage: 1,
         perPage: 25,
-        orderBy: 'id',
+        orderBy: 'updated_at',
         order: 'desc',
         lastPage: 1,
         page: 1,
@@ -241,7 +241,7 @@ export default {
     resetPaginationAndSearch () {
       // reset everything except per page
       this.pagination.currentPage = 1
-      this.pagination.orderBy = 'id'
+      this.pagination.orderBy = 'updated_at'
       this.pagination.order = 'desc'
       this.pagination.lastPage = 1
       this.pagination.page = 1

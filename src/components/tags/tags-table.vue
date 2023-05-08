@@ -343,11 +343,14 @@ export default {
     },
 
     closeContactTagsActionsModals () {
-      this.selectedTag = null
       this.isOpenTagContactsSplitterDialog = false
       this.isOpenAssignContactsTagDialog = false
       this.isOpenAddTagContactsToPowerDialerDialog = false
       this.isOpenEnrollTagContactsToSequenceDialog = false
+
+      setTimeout(() => {
+        this.selectedTag = null
+      }, 200)
     }
   },
 

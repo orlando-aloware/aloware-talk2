@@ -104,7 +104,11 @@ export default {
     },
 
     tagName () {
-      return this?.tag?.name || ''
+      if (!this.tag) {
+        return ''
+      }
+
+      return `#${this.tag.id} - ${this.tag.name}`
     },
 
     showDeleteContactsQuestion () {

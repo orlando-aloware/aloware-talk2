@@ -21,24 +21,29 @@
       <h6>Assign Contacts to</h6>
     </template>
 
-    <b-tabs content-class="mt-3">
-      <b-tab title="User" active>
+    <b-tabs content-class="mt-3"
+            v-model="selectedTabIndex">
+      <b-tab title="User">
         <p>Assign the leads to this user</p>
-        <user-selector />
+        <user-selector :generic-styling="false"
+                       v-model="userId"
+                       @change="setUserId"/>
       </b-tab>
 
       <b-tab title="Ring Group">
         <p>Assign the leads evenly and randomly between the users on this ring group</p>
-        <ring-group-selector :force-remove-missing-values="true"
-                             :generic-multiselect="false" />
+        <ring-group-selector class="text-13"
+                             v-model="ringGroupId"
+                             :force-remove-missing-values="true"
+                             :generic-multiselect="false"
+                             @change="setRingGroupId"/>
       </b-tab>
     </b-tabs>
 
     <div class="py-4">
       <p class="mb-1">By default, this tool only distributes unassigned contacts.</p>
       <b-form-checkbox v-model="distributeContacts"
-                       value="yes"
-                       unchecked-value="no">
+                       switch>
         <span class="font-weight-bold">Also distribute assigned contacts</span>
       </b-form-checkbox>
     </div>
@@ -67,6 +72,7 @@
 <script>
 import UserSelector from 'components/generic-selectors/user-selector.vue'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector.vue'
+import axios from 'axios'
 
 export default {
   name: 'assign-contacts-by-tag',
@@ -91,7 +97,10 @@ export default {
   data () {
     return {
       loading: false,
-      distributeContacts: 'no'
+      distributeContacts: false,
+      selectedTabIndex: 0,
+      userId: null,
+      ringGroupId: null
     }
   },
 
@@ -107,17 +116,74 @@ export default {
     },
 
     tagName () {
-      return this?.tag?.name || ''
+      if (!this.tag) {
+        return ''
+      }
+
+      return `#${this.tag.id} - ${this.tag.name}`
+    },
+
+    tabName () {
+      return this.selectedTabIndex === 1 ? 'ring_group' : 'user'
     }
   },
 
   methods: {
     closeModal () {
+      this.reset()
       this.$emit('closeAssignContactsTagModal')
     },
 
+    reset () {
+      this.selectedTabIndex = 0
+      this.userId = null
+      this.ringGroupId = null
+      this.distributeContacts = false
+    },
+
+    setUserId (userId) {
+      this.userId = userId
+    },
+
+    setRingGroupId (ringGroupId) {
+      this.ringGroupId = ringGroupId
+    },
+
     assignContacts () {
-      console.log('assign contacts')
+      this.loading = true
+      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabName}?`, {
+        title: 'Event Confirmation',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        size: 'sm',
+        buttonSize: 'sm'
+      })
+        .then(value => {
+          console.log('assign contacts', value)
+
+          if (!value) {
+            this.loading = false
+            this.closeModal()
+          }
+
+          let data = {
+            assign_contacts_to: this.tabName,
+            user_id: this.userId,
+            ring_group_id: this.ringGroupId,
+            force: this.distributeContacts
+          }
+
+          axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, data).then(res => {
+            this.$generalNotification(res.data.message)
+            this.resetForm()
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          }).finally(() => {
+            this.loading = false
+            this.closeModal()
+          })
+        })
     }
   }
 }

@@ -128,7 +128,11 @@ export default {
     },
 
     tagName () {
-      return this?.tag?.name || ''
+      if (!this.tag) {
+        return ''
+      }
+
+      return `#${this.tag.id} - ${this.tag.name}`
     },
 
     allowSplit () {
@@ -156,9 +160,13 @@ export default {
         return
       }
 
-      axios.post('/api/v1/tags/' + this.tag.id + '/split', {
+      this.loading = true
+
+      axios.post(`/api/v1/tags/${this.tag.id}/split`, {
         page_size: this.splitPageSize
       }).then(res => {
+        this.loading = false
+
         switch (res.status) {
           case 200:
             this.$generalNotification('Currently splitting the tag into smaller tags.')
@@ -172,6 +180,8 @@ export default {
           this.$handleErrors(err.response)
           this.loading = false
         })
+
+      this.closeModal()
     }
   }
 }
