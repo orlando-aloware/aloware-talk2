@@ -17,7 +17,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Enroll to sequence</h6>
+      <h6>Enroll to Sequence</h6>
     </template>
 
     <div>

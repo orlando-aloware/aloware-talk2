@@ -1,12 +1,25 @@
 <template>
   <b-modal id="tag-assign-contact-modal"
            modal-class="tags__modal"
-           title="Assign Contacts to"
            no-close-on-esc
            no-close-on-backdrop
            size="md"
            v-model="openModal"
            @hidden="closeModal">
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
+    <template #modal-title>
+      <h6>Assign Contacts to</h6>
+    </template>
+
     <b-tabs content-class="mt-3">
       <b-tab title="User" active>
         <p>Assign the leads to this user</p>
@@ -76,6 +89,7 @@ export default {
 
   data () {
     return {
+      loading: false,
       distributeContacts: 'no'
     }
   },

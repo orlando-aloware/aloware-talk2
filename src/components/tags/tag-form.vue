@@ -1,12 +1,24 @@
 <template>
   <b-modal id="tags-form-modal"
            modal-class="tags__modal"
-           :title="title"
            no-close-on-esc
            no-close-on-backdrop
            v-model="openModal"
            @hidden="closeTagForm"
            @show="openTagForm">
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
+    <template #modal-title>
+      <h6>{{ title }}</h6>
+    </template>
 
     <b-form ref="tagForm"
             class="tags__form">
@@ -133,6 +145,7 @@ export default {
 
   data () {
     return {
+      loading: false,
       tag: {
         name: null,
         color: '#CA66D6',
@@ -277,6 +290,7 @@ export default {
 
     saveTag () {
       this.$v.$touch()
+      this.loading = true
       let url = '/api/v1/tag'
       let xhr = null
 
@@ -290,16 +304,17 @@ export default {
         xhr = axios.post(url, this.tag)
       }
 
-      this.closeTagForm()
-
-      xhr.then(() => {
+      xhr.then(res => {
         // todo: show notification
+        this.loading = false
+        this.$generalNotification(res.data.message)
       })
         .catch(err => {
           console.log(err)
           this.$handleErrors(err.response)
-          this.closeTagForm()
         })
+
+      this.closeTagForm()
     }
   }
 }

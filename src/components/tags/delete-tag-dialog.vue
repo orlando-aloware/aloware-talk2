@@ -1,12 +1,25 @@
 <template>
   <b-modal id="tags-delete-dialog"
            modal-class="tags__modal"
-           :title="`Delete ${tagCategoryName} Tag`"
            no-close-on-esc
            no-close-on-backdrop
            size="md"
            v-model="openModal"
            @hidden="closeDeleteTagDialog">
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
+    <template #modal-title>
+      <h6>Delete {{ tagCategoryName }} Tag</h6>
+    </template>
+
     <span>
       Deleting <span class="font-italic font-weight-bold">{{ tagName }}</span> tag will remove it from all contacts and communications. Continue?
     </span>
@@ -69,6 +82,7 @@ export default {
 
   data () {
     return {
+      loading: false,
       isDeleteContacts: 'no',
       confirmDeleteInfo: false,
       confirmDeleteContactsCount: null

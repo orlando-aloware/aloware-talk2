@@ -1,12 +1,24 @@
 <template>
   <b-modal id="tag-add-tag-contacts-to-pd"
            modal-class="tags__modal"
-           title="Add Tasks to User's PowerDialer"
            no-close-on-esc
            no-close-on-backdrop
            size="md"
            v-model="openModal"
            @hidden="closeModal">
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
+    <template #modal-title>
+      <h6>Add Tasks to User's PowerDialer</h6>
+    </template>
 
     <p class="text-11">
       <span class="font-weight-bold">Note:</span>  This tool will respect user's visibility limits
@@ -70,13 +82,15 @@
 import UserSelector from 'components/generic-selectors/user-selector.vue'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapState } from 'vuex'
 
 export default {
   name: 'tag-contacts-add-to-power-dialer',
 
   components: {
-    UserSelector
+    UserSelector,
+    InformationCircleIcon
   },
 
   props: {
@@ -93,6 +107,7 @@ export default {
 
   data () {
     return {
+      loading: false,
       direction: ImportConstants.BOTTOM,
       conversion: [
         'prevent_duplicates'

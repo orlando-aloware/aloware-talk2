@@ -1,12 +1,25 @@
 <template>
   <b-modal id="tag-contacts-splitter-modal"
            modal-class="tags__modal"
-           title="Split Tag"
            no-close-on-esc
            no-close-on-backdrop
            size="sm"
            v-model="openModal"
            @hidden="closeModal">
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="true"
+               v-show="loading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
+    <template #modal-title>
+      <h6>Spit Tag</h6>
+    </template>
+
     <p>
       Split <span class="font-italic font-weight-bold">{{ tagName }}</span> tag into smaller tags.
     </p>
@@ -74,6 +87,7 @@ export default {
 
   data () {
     return {
+      loading: false,
       options: [
         {
           value: 50,
