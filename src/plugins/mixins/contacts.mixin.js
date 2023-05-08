@@ -133,25 +133,28 @@ export default {
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
         const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
+        let sort = ''
+        let order = ''
+
+        // - if there's a selected column to sort, use the selected column or
         // - use 'order' for sort only if in power dialer list and view is not
-        //   in the add contacts or
-        // - if there's no selected column to sort, use the default contact
-        //   date filter (last engagement at or created at), else use the
-        //   selected column.
-        const sort = !isAddList && this.isPowerDialer
-          ? 'order'
-          : ((this.sorts)
-            ? this.sorts.orderBy
-            : this.defaultContactDateFilter)
+        //   in the add contacts
+        // - else, use default contact date filter (last engagement at or created at)
+
+        // - if there's a selected column to order by, use the selected column's order
+        //   (asc or desc) or
         // - use 'asc' for order only if in power dialer list and view is not
-        //   in the add contacts or
-        // - if there's no selected column to order by, use 'desc', else use the
-        //   selected column's order (asc or desc).
-        const order = !isAddList && this.isPowerDialer
-          ? 'asc'
-          : ((this.sorts)
-            ? this.sorts.order
-            : 'desc')
+        //   in the add contacts or else, use 'desc'
+        if (this.sorts) {
+          sort = this.sorts.orderBy
+          order = this.sorts.order
+        } else if (!isAddList && this.isPowerDialer) {
+          sort = 'order'
+          order = 'asc'
+        } else {
+          sort = this.defaultContactDateFilter
+          order = 'desc'
+        }
 
         if (list) {
           path = this.apiEndpoint(this.myQueueId !== null)
