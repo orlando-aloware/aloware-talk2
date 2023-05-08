@@ -128,9 +128,9 @@
     </div>
     <compact-btn class="mr-2 mt-3 p-3"
                  variant="success"
-                 :disabled="!isValidated"
+                 :disabled="!isValidated || appliedFiltersInProgress"
                  @clicked="applyFilter">
-      Apply filter
+      {{ applyFilterText }}
     </compact-btn>
   </div>
 </template>
@@ -196,7 +196,11 @@ export default {
       debounceDelay: 0,
       format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' },
       allFilters: [],
-      options: []
+      options: [],
+      filterOperatorDebounceInProgress: false,
+      filterOperatorValueDebounceInProgress: false,
+      secondaryFilterOperatorValueDebounceInProgress: false,
+      appliedFiltersInProgress: false
     }
   },
 
@@ -281,6 +285,18 @@ export default {
       }
 
       return 0
+    },
+
+    applyFilterText () {
+      return this.appliedFiltersInProgress
+        ? 'Applying filter...'
+        : 'Apply filter'
+    },
+
+    isDebounceInProgress () {
+      return this.filterOperatorDebounceInProgress ||
+        this.filterOperatorValueDebounceInProgress ||
+        this.secondaryFilterOperatorValueDebounceInProgress
     }
   },
 
@@ -537,7 +553,7 @@ export default {
       })
     },
 
-    applyFilter () {
+    processFilters () {
       this.setListContactsLoaded(false)
 
       const currentListFilters = this.$jsonClone(this.currentListFilters)
@@ -564,9 +580,27 @@ export default {
         this.setShowMyContacts(false)
         this.$VueEvent.fire('filteredFetchContacts', {
           clear: true,
+          // added the previous filter so that if the fetch fails,
+          // we revert the filters to its previous state
           previousFilters: this.$jsonClone(previousFilters)
         })
       }
+    },
+
+    applyFilter () {
+      this.appliedFiltersInProgress = true
+      let debounceDelay = this.isDebounceInProgress
+        ? this.debounceDelay
+        : 0
+      let applyFilterInterval = null
+
+      applyFilterInterval = setInterval(() => {
+        if (!this.isDebounceInProgress) {
+          this.processFilters()
+          this.appliedFiltersInProgress = false
+          clearInterval(applyFilterInterval)
+        }
+      }, debounceDelay)
     },
 
     getStringValue () {
@@ -759,8 +793,10 @@ export default {
       this.secondaryFilterOperatorValue = null
 
       if (!this.hasValue) {
+        this.filterOperatorDebounceInProgress = true
         const debounceFunction = debounce(() => {
           this.addValue()
+          this.filterOperatorDebounceInProgress = false
         }, this.debounceDelay)
         debounceFunction()
       }
@@ -769,16 +805,20 @@ export default {
     },
 
     filterOperatorValue () {
+      this.filterOperatorValueDebounceInProgress = true
       const debounceFunction = debounce(() => {
         this.addValue()
+        this.filterOperatorValueDebounceInProgress = false
       }, this.debounceDelay)
       debounceFunction()
       this.validateValue()
     },
 
     secondaryFilterOperatorValue () {
+      this.secondaryFilterOperatorValueDebounceInProgress = true
       const debounceFunction = debounce(() => {
         this.addValue()
+        this.secondaryFilterOperatorValueDebounceInProgress = false
       }, this.debounceDelay)
       debounceFunction()
       this.validateValue()

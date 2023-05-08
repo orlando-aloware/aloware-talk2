@@ -699,7 +699,7 @@ export default {
       const groupFilters = this.visibleListFilters[groupIndex].filters
       const groupAllFiltersSize = Object.values(groupFilters).flat().length
       const groupFiltersSize = Object.keys(groupFilters).length
-      const filtersSize = groupFilters[key].length
+      const filtersSize = groupFilters[key] ? groupFilters[key].length : 0
       const isLastItemInGroup = filterIndex === (groupFiltersSize - 1) && itemIndex === (filtersSize - 1)
 
       // don't show "AND" label if there's only 1 filter in the group or

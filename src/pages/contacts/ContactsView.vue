@@ -41,7 +41,7 @@
               v-if="!isStartState">
       <compact-btn variant="primary"
                    :class="`${isUnsavedList ? 'hidden' : ''}`"
-                   :disabled="isFiltersOpen"
+                   :disabled="isDisabledAddFiltersButton"
                    v-if="list.type === ContactListTypes.DYNAMIC && isEditable"
                    @clicked="onFiltersClicked">
         <i class="fa fa-plus mr-2" /> Add Filters
@@ -158,7 +158,7 @@
           <compact-btn variant="outlined-light"
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        borderless
-                       :disabled="isStartState"
+                       :disabled="isDisabledFiltersButton"
                        @clicked="onFiltersClicked">
             <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
             <b-badge class="d-flex align-items-center contact-filter-count"
@@ -973,6 +973,14 @@ export default {
 
     isFilterHasChanges () {
       return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
+    },
+
+    isDisabledAddFiltersButton () {
+      return this.isFiltersOpen || !this.listContactsLoaded
+    },
+
+    isDisabledFiltersButton () {
+      return this.isStartState || !this.listContactsLoaded
     },
 
     isDisabledSaveFilter () {
