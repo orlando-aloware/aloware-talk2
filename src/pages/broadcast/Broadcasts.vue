@@ -82,6 +82,10 @@
     </div>
     <q-separator/>
     <div>
+      Chart goes here
+    </div>
+    <q-separator/>
+    <div class="px-2">
       <datatable ref="broadcastsTable"
                  :stickyHeaders="true"
                  :columns="broadcastsColumns"
