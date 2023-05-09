@@ -118,8 +118,8 @@
                  @more="onLoadMore">
         <template slot="tbody">
           <tr class="datatable-row"
-              v-for="(contact, index) in fixedContactsData.data"
-              :key="`${index}`">
+              :key="`${index}`"
+              v-for="(contact, index) in fixedContactsData.data">
             <template v-for="(column, key) in validColumns">
               <!-- change date added to date created -->
               <!-- COLUMN: Checkboxes -->
@@ -363,17 +363,7 @@
                 <div class="ellipse"
                      :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`"
                      v-else>
-                  {{
-                    typeof contact[column.name] === 'boolean'
-                      ? ( contact[column.name]
-                        ? 'Yes'
-                        : 'No' )
-                      : ( typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0
-                        ? contact[column.name].toString()
-                        : ( contact[column.name] === null
-                          ? '-'
-                          : contact[column.name] ) )
-                  }}
+                  {{ getColumnValue(column.name) }}
                 </div>
               </td>
             </template>
@@ -405,8 +395,8 @@
         </template>
         <template v-if="hoverPopover.title !== 'Tags'">
           <div class="ml-1 w-100"
-               v-for="(item, index) in hoverPopover.data"
-               :key="`ct-${index}`">
+               :key="`ct-${index}`"
+               v-for="(item, index) in hoverPopover.data">
             <i class="fa fa-circle text-black"
               :style="`font-size:36%;position: relative; top: -3px;`" />
             <span v-if="typeof item.phone_number !== 'undefined'">
@@ -933,6 +923,20 @@ export default {
 
       this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
+    },
+
+    getColumnValue (columnName) {
+      if (typeof this.contact[columnName] === 'boolean') {
+        return this.contact[columnName] ? 'Yes' : 'No'
+      }
+
+      if (typeof this.contact[columnName] !== 'undefined' && this.contact[columnName] !== 0) {
+        return this.contact[columnName].toString()
+      }
+
+      return this.contact[columnName] === null
+        ? '-'
+        : this.contact[columnName]
     }
   },
 
