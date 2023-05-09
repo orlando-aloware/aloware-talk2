@@ -56,7 +56,7 @@ export default {
     },
 
     isAllowed () {
-      return this.hasRole('Company Admin') && ![AgentStatus.AGENT_STATUS_ON_CALL].includes(this.value)
+      return this.hasRole('Company Admin') && ![AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(this.value)
     }
   },
 
