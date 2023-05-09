@@ -88,8 +88,6 @@ export default {
         this.notification = null
       }
 
-      console.log({ event })
-
       this.reloadFolders()
       this.$generalNotification('An error prevented the list from being imported. Please, try again later.', 'error')
     },
