@@ -41,8 +41,17 @@
       </div>
     </div>
 
-    <div class="broadcasts__add__view__details">
-
+    <div class="broadcasts__add__view__info row">
+      <q-card class="col-3 py-3 mr-2"
+              flat>
+        <span class="d-block text-h5 text-weight-medium">100</span>
+        <span class="text-h6 text-weight-light">Contacts</span>
+      </q-card>
+      <q-card class="col-3 py-3 mx-2"
+              flat>
+        <span class="d-block text-h5 text-weight-medium">$0.00</span>
+        <span class="text-h6 text-weight-light">Estimated Cost</span>
+      </q-card>
     </div>
   </div>
 </template>

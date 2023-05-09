@@ -12516,12 +12516,11 @@ h1.contact-list-name-label {
       }
 
       &__details {
-
       }
-
-      &__form,
-      &__details {
-        flex-grow: 1;
+      
+      &__form {
+        min-height: 50vh;
+        // flex-grow: 1;
       }
     }
 
