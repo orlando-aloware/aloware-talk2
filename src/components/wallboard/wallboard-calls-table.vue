@@ -106,15 +106,6 @@
                 </div>
               </td>
 
-              <!-- wait time -->
-              <td :key="`col-${colIndex}`"
-                  v-if="column.name === 'wait_time'">
-                  <span v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL].includes(call.type)">
-                    {{ call.wait_time | fixDuration }}
-                  </span>
-                  <span v-else>--</span>
-              </td>
-
               <!-- talk time -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'talk_time'">
@@ -448,9 +439,6 @@ export default {
             break
           case 'start':
             condition = a.created_at < b.created_at
-            break
-          case 'wait_time':
-            condition = a.wait_time > b.wait_time
             break
           case 'talk_time':
             condition = a.talk_time > b.talk_time

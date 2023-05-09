@@ -37,7 +37,8 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 150
+    minWidth: 150,
+    exclude: ['parked']
   },
   {
     name: 'start',
@@ -49,17 +50,9 @@ export const COLUMNS = [
     minWidth: 200
   },
   {
-    name: 'wait_time',
-    label: 'Wait Time',
-    order: 5,
-    sortable: true,
-    selectable: true,
-    draggable: true
-  },
-  {
     name: 'talk_time',
     label: 'Talk Time',
-    order: 6,
+    order: 5,
     sortable: true,
     selectable: true,
     draggable: true
@@ -67,7 +60,7 @@ export const COLUMNS = [
   {
     name: 'lead_number',
     label: 'Contact',
-    order: 7,
+    order: 6,
     sortable: true,
     selectable: true,
     draggable: true,
@@ -76,7 +69,7 @@ export const COLUMNS = [
   {
     name: 'lead_location',
     label: 'Location',
-    order: 8,
+    order: 7,
     sortable: true,
     selectable: true,
     draggable: true,
@@ -85,7 +78,7 @@ export const COLUMNS = [
   {
     name: 'user',
     label: 'User',
-    order: 9,
+    order: 8,
     sortable: true,
     selectable: true,
     draggable: true,
@@ -94,7 +87,7 @@ export const COLUMNS = [
   {
     name: 'callback_status',
     label: 'Callback Status',
-    order: 10,
+    order: 9,
     sortable: false,
     selectable: true,
     draggable: true
@@ -102,7 +95,7 @@ export const COLUMNS = [
   {
     name: 'tags',
     label: 'Tags',
-    order: 11,
+    order: 10,
     sortable: false,
     selectable: true,
     draggable: true
@@ -110,7 +103,7 @@ export const COLUMNS = [
   {
     name: 'notes',
     label: 'Notes',
-    order: 12,
+    order: 11,
     sortable: false,
     selectable: true,
     draggable: true,
@@ -119,7 +112,7 @@ export const COLUMNS = [
   {
     name: 'operations',
     label: 'Operations',
-    order: 13,
+    order: 12,
     sortable: false,
     selectable: true,
     draggable: true,
