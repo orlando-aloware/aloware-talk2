@@ -1,25 +1,39 @@
 <template>
   <div class="broadcast-add broadcast-add__contacts">
-    <p>Select a group of contacts</p>
-    <div class="broadcast-add__contacts__options">
-      <div class="flex-grow-1"
-           :key="option.id"
-           :tabindex="option.id"
-           v-for="option in options">
-        <input type="radio"
-               class="d-none"
-               name="broadcast-add-view-contacts-option"
-               :id="`contacts-option-${option.value}`"
-               :value="option.value"
-               @input="onOptionSelected(option)">
-        <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
-               :for="`contacts-option-${option.value}`">
-          {{ option.text }}
-          <span class="broadcast-add__contacts__options__option__icon"
-                v-if="optionSelected === option.value">
-            <check-o-icon color="#fff"/>
-          </span>
-        </label>
+    <div class="w-50"
+         v-show="optionSelected == 'list'">
+      <p>From</p>
+      <line-selector v-model="selectedLine"
+                     :multiple="false"
+                     :use-chips="false"
+                     :generic-styling="false"
+                     :generic-multiselect="false"
+                     :clearable="true"
+                     @change="onLineChange">
+      </line-selector>
+    </div>
+    <div>
+      <p>Select a group of contacts</p>
+      <div class="broadcast-add__contacts__options">
+        <div class="flex-grow-1"
+            :key="option.id"
+            :tabindex="option.id"
+            v-for="option in options">
+          <input type="radio"
+                class="d-none"
+                name="broadcast-add-view-contacts-option"
+                :id="`contacts-option-${option.value}`"
+                :value="option.value"
+                @input="onOptionSelected(option)">
+          <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
+                :for="`contacts-option-${option.value}`">
+            {{ option.text }}
+            <span class="broadcast-add__contacts__options__option__icon"
+                  v-if="optionSelected === option.value">
+              <check-o-icon color="#fff"/>
+            </span>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -31,7 +45,7 @@
 
       <!-- Integration option -->
       <template v-else-if="optionSelected === 'integration'">
-        <small>Select a contact list</small>
+        <small>Select a list</small>
         <!-- shows the selector based on which integration is enabled  -->
       </template>
     </div>
@@ -40,12 +54,14 @@
 
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
+import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
   name: 'broadcast-add-view-contacts',
 
   components: {
-    CheckOIcon
+    CheckOIcon,
+    LineSelector
   },
 
   computed: {
@@ -73,12 +89,16 @@ export default {
         value: 'integration',
         text: 'Integrations'
       }
-    ]
+    ],
+    selectedLine: null
   }),
 
   methods: {
     onOptionSelected (option) {
       this.optionSelected = option.value
+    },
+    onLineChange (line) {
+      this.selectedLine = line
     }
   },
 
