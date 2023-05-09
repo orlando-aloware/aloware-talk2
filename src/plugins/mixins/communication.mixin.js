@@ -13,15 +13,21 @@ export default {
   methods: {
     isCallInProgress (dispositionStatus, currentStatus) {
       return dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW &&
-             currentStatus === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+        currentStatus === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
     },
 
     userCanBargeAndWhisper (communication) {
       return (this.hasRole('Company Admin') || this.isAnAgentPermittedToBargeAndWhisperOnCall) &&
-      this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL &&
-      communication.type === CommunicationTypes.CALL &&
-      this.isCallInProgress(communication.disposition_status2, communication.current_status2) &&
-      this.profile.id !== communication.user_id
+        this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL &&
+        communication.type === CommunicationTypes.CALL &&
+        this.isCallInProgress(communication.disposition_status2, communication.current_status2) &&
+        this.profile.id !== communication.user_id
+    },
+
+    canUnparkCommunication (communication) {
+      return communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW &&
+        this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL &&
+        communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
     }
   }
 }

@@ -253,6 +253,11 @@
               <!-- operations -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'operations'">
+                <!-- unpark -->
+                <unpark-communication-button class="ml-2"
+                                             :communication="call"
+                                             v-if="isParkedCall(call)" />
+
                 <!-- go to messages -->
                 <router-link :to="{ path: `/contacts/${call.contact_id}` }"
                               v-if="call.contact && call.type === CommunicationTypes.SMS && hasPermissionTo('send sms')">
@@ -264,8 +269,9 @@
 
                 <!-- go to comm info -->
                 <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
-                  <information-circle-icon height="22"
-                                           width="22" />
+                  <information-circle-icon class="ml-2"
+                                           height="24"
+                                           width="24" />
                   <q-tooltip>More Details</q-tooltip>
                 </router-link>
 
@@ -338,9 +344,11 @@ import InformationCircleIcon from 'src/components/icons/information-circle-icon.
 import RelativeTime from 'src/components/relative-time.vue'
 import TargetUsersTree from 'src/components/target-users-tree.vue'
 import TerminateCommunicationButton from 'src/components/communication/terminate-communication-button.vue'
+import UnparkCommunicationButton from 'src/components/communication/unpark-communication-button.vue'
 import WallboardCallsNote from 'src/components/wallboard/wallboard-calls-note.vue'
 import WhisperCommunicationButton from 'src/components/communication/whisper-communication-button.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
+import { isParkedCall } from 'src/plugins/helpers/functions'
 import {
   aclMixin,
   callDispositionMixin,
@@ -371,6 +379,7 @@ export default {
     RelativeTime,
     TargetUsersTree,
     TerminateCommunicationButton,
+    UnparkCommunicationButton,
     WallboardCallsNote,
     WhisperCommunicationButton
   },
@@ -485,6 +494,8 @@ export default {
   }),
 
   methods: {
+    isParkedCall,
+
     onPaginated (pageData) {
       this.pagination = {
         page: pageData.page,
