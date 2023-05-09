@@ -77,9 +77,19 @@ export const COLUMNS = [
     minWidth: 300
   },
   {
+    name: 'attempting_users',
+    label: 'Attempting',
+    order: 8,
+    sortable: true,
+    selectable: true,
+    draggable: true,
+    minWidth: 300,
+    exclude: ['live', 'parked']
+  },
+  {
     name: 'user',
     label: 'User',
-    order: 8,
+    order: 9,
     sortable: true,
     selectable: true,
     draggable: true,
@@ -89,7 +99,7 @@ export const COLUMNS = [
   {
     name: 'callback_status',
     label: 'Callback Status',
-    order: 9,
+    order: 10,
     sortable: false,
     selectable: true,
     draggable: true,
@@ -98,7 +108,7 @@ export const COLUMNS = [
   {
     name: 'tags',
     label: 'Tags',
-    order: 10,
+    order: 11,
     sortable: false,
     selectable: true,
     draggable: true
@@ -106,7 +116,7 @@ export const COLUMNS = [
   {
     name: 'notes',
     label: 'Notes',
-    order: 11,
+    order: 12,
     sortable: false,
     selectable: true,
     draggable: true,
@@ -115,7 +125,7 @@ export const COLUMNS = [
   {
     name: 'operations',
     label: 'Operations',
-    order: 12,
+    order: 13,
     sortable: false,
     selectable: true,
     draggable: true,

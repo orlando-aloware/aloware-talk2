@@ -12,6 +12,10 @@ export default {
       return process.env.API_URL + `/users/dialog/${userId}`
     },
 
+    getUserActivityURL (userId) {
+      return process.env.API_URL + `/users/${userId}/activity`
+    },
+
     getWorkflowURL (workflowId) {
       return process.env.API_URL + `/sequences2/manager/${workflowId}`
     }

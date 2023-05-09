@@ -195,6 +195,57 @@
                 <span v-else>--</span>
               </td>
 
+              <!-- attempting -->
+              <td :key="`col-${colIndex}`"
+                  v-if="column.name === 'attempting_users'">
+                <span v-if="call.attempting_users && call.attempting_users.length > 0">
+                  <ul class="list list-unstyled inset mb-0">
+                    <div v-if="!showMoreList.includes(call.id)">
+                      <li class="pb-1"
+                          :key="attemptingUser"
+                          v-for="attemptingUser in getAttemptingUsers(call, 3)">
+                        <a :href="getUserActivityURL(attemptingUser)"
+                           target="_blank"
+                           v-if="hasRole('Company Admin')">
+                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
+                                :title="getUserName(getUser(attemptingUser))">
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
+                        </a>
+                        <span v-else>
+                          {{ getUserName(getUser(attemptingUser)) }}
+                        </span>
+                      </li>
+                    </div>
+                    <div v-else>
+                      <li class="pb-1"
+                          :key="attemptingUser"
+                          v-for="attemptingUser in getAttemptingUsers(call)">
+                        <a :href="getUserActivityURL(attemptingUser)"
+                           target="_blank"
+                           v-if="hasRole('Company Admin')">
+                            <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
+                                  :title="getUserName(getUser(attemptingUser))">
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
+                        </a>
+                        <span v-else>
+                          {{ getUserName(getUser(attemptingUser)) }}
+                        </span>
+                      </li>
+                    </div>
+                    <a class="d-flex btn align-items-center justify-content-center text-muted text-sm"
+                       v-if="call.attempting_users.length > 3"
+                       @click="showMore(call)">
+                      {{ !showMoreList.includes(call.id) ? 'more ...' : 'less'}}
+                    </a>
+                  </ul>
+                </span>
+                <span v-else>
+                  -
+                </span>
+              </td>
+
               <!-- user -->
               <td class="calls__table__user"
                   :key="`col-${colIndex}`"
@@ -476,6 +527,7 @@ export default {
     },
     columns: COLUMNS,
     expandedItem: null,
+    showMoreList: [],
     CommunicationCurrentStatus,
     CommunicationDispositionStatus,
     CommunicationTypes
@@ -548,6 +600,28 @@ export default {
     setExpandedItem (index) {
       // logic to collapse only one row
       this.expandedItem = this.expandedItem === index ? null : index
+    },
+
+    showMore (comm) {
+      if (this.showMoreList.includes(comm.id)) {
+        let index = this.showMoreList.indexOf(comm.id)
+
+        if (index > -1) {
+          this.showMoreList.splice(index, 1)
+        }
+
+        return
+      }
+
+      this.showMoreList.push(comm.id)
+    },
+
+    getAttemptingUsers (communication, size = null) {
+      const users = size
+        ? communication.attempting_users.slice(0, size)
+        : communication.attempting_users
+
+      return users.filter(user => this.getUser(user)?.id)
     }
   }
 }
