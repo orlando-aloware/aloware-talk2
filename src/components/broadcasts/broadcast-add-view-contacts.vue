@@ -16,17 +16,17 @@
       <p>Select a group of contacts</p>
       <div class="broadcast-add__contacts__options">
         <div class="flex-grow-1"
-            :key="option.id"
-            :tabindex="option.id"
-            v-for="option in options">
+             :key="option.id"
+             :tabindex="option.id"
+             v-for="option in options">
           <input type="radio"
-                class="d-none"
-                name="broadcast-add-view-contacts-option"
-                :id="`contacts-option-${option.value}`"
-                :value="option.value"
-                @input="onOptionSelected(option)">
+                 class="d-none"
+                 name="broadcast-add-view-contacts-option"
+                 :id="`contacts-option-${option.value}`"
+                 :value="option.value"
+                 @input="onOptionSelected(option)">
           <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
-                :for="`contacts-option-${option.value}`">
+                 :for="`contacts-option-${option.value}`">
             {{ option.text }}
             <span class="broadcast-add__contacts__options__option__icon"
                   v-if="optionSelected === option.value">
