@@ -55,7 +55,8 @@ export const COLUMNS = [
     order: 5,
     sortable: true,
     selectable: true,
-    draggable: true
+    draggable: true,
+    exclude: ['parked', 'queued']
   },
   {
     name: 'lead_number',
@@ -82,7 +83,8 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 150
+    minWidth: 150,
+    exclude: ['queued']
   },
   {
     name: 'callback_status',
@@ -90,7 +92,8 @@ export const COLUMNS = [
     order: 9,
     sortable: false,
     selectable: true,
-    draggable: true
+    draggable: true,
+    exclude: ['parked']
   },
   {
     name: 'tags',

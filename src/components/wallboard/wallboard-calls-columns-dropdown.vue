@@ -34,7 +34,7 @@ export default {
     }),
 
     availableColumns () {
-      return COLUMNS.filter(column => column.selectable)
+      return COLUMNS.filter(column => column.selectable && (!column.exclude || !column.exclude.includes(this.$route.params.id)))
     }
   },
 

@@ -398,7 +398,7 @@ export default {
     ]),
 
     filteredColumns () {
-      return this.columns.filter(column => this.enabledColumns.includes(column.name))
+      return this.columns.filter(column => (!column.exclude || !column.exclude.includes(this.$route.params.id)) && this.enabledColumns.includes(column.name))
     },
 
     paginatedCalls () {
