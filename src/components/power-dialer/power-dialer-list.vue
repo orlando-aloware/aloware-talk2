@@ -1,9 +1,8 @@
 <template>
   <div class="power-dialer-list t-menu border-top"
        data-popper-target="power-dialer-list">
-    <contacts-folders
-      :is-contact-module-type="false"
-      @openIntegrationListsImportDialog="onOpenIntegrationImportDialog">
+    <contacts-folders :is-contact-module-type="false"
+                      @openIntegrationListsImportDialog="onOpenIntegrationImportDialog">
     </contacts-folders>
     <integration-list-import-modal :is-open="isIntegrationImportDialogOpen"
                                    v-if="isIntegrationImportDialogOpen"
