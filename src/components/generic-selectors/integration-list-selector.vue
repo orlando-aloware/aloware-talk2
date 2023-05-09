@@ -200,13 +200,11 @@ export default {
 
       switch (this.integration.toLowerCase()) {
         case 'hubspot':
-          this.getHubspotLists()
-          return
+          return this.getHubspotLists()
         case 'zoho':
-          this.getZohoViews()
-          return
+          return this.getZohoViews()
         case 'pipedrive':
-          this.getPipedriveFilters()
+          return this.getPipedriveFilters()
       }
     },
 
