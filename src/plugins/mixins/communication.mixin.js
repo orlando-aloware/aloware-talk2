@@ -18,7 +18,7 @@ export default {
 
     userCanBargeAndWhisper (communication) {
       return (this.hasRole('Company Admin') || this.isAnAgentPermittedToBargeAndWhisperOnCall) &&
-        this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL &&
+        ![AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_SENTRY].includes(this.agentStatus) &&
         communication.type === CommunicationTypes.CALL &&
         this.isCallInProgress(communication.disposition_status2, communication.current_status2) &&
         this.profile.id !== communication.user_id
