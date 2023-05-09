@@ -11,7 +11,7 @@ export default {
     integrationName () {
       switch (true) {
         case this.currentCompany.hubspot_integration_enabled:
-          return 'Hubspot'
+          return 'HubSpot'
         case this.currentCompany.zoho_integration_enabled:
           return 'Zoho'
         case this.currentCompany.pipedrive_integration_enabled:
@@ -25,7 +25,7 @@ export default {
       let integrations = []
 
       if (this.currentCompany.hubspot_integration_enabled) {
-        integrations.push('Hubspot')
+        integrations.push('HubSpot')
       }
       if (this.currentCompany.zoho_integration_enabled) {
         integrations.push('Zoho')
