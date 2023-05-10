@@ -381,6 +381,11 @@ export default {
     state.changedContactAttributes = []
   },
   UPDATE_CONTACTS: (state, payload) => {
+    // sanity check
+    if (!state.listItems[state.selectedList.id]?.data) {
+      return
+    }
+
     const found = { data: state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id) }
     found.data = found.data ? state.listItems[state.selectedList.id].data.indexOf(found.data) : null
 
