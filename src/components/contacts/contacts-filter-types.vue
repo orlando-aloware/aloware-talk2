@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="filter-types"
-         :key="(filter.key + '-' + operator.value)"
+         :key="`${filter.key}-${operator.value}`"
          v-for="operator in filter.operators">
       <q-radio class="my-2 flex-nowrap"
                dense
