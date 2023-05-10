@@ -82,6 +82,7 @@
                         label="Send From"
                         label-for="input-2">
             <contact-line-selector :showPaused="false"
+                                   v-model="appointment.smsReminder.campaign_id"
                                    @select="lineSelected">
             </contact-line-selector>
           </b-form-group>
@@ -89,13 +90,15 @@
           <b-form-group id="input-group-2"
                         label="Time"
                         label-for="input-2">
-            <predefined-time-selector @select="smsReminderTimeSelected"/>
+            <predefined-time-selector v-model="appointment.smsReminder.time"
+                                      @select="smsReminderTimeSelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
                         label="Send (n) days before"
                         label-for="input-2">
-            <number-of-days-selector @select="smsReminderFrequencySelected"/>
+            <number-of-days-selector v-model="appointment.smsReminder.frequencies"
+                                     @select="smsReminderFrequencySelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -250,7 +253,7 @@ export default {
     onHidden () {
       this.addAppointmentOpen(false)
       this.appointment.smsReminder.enabled = false
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
       this.resetForm()
     },
     onSubmit () {
@@ -314,7 +317,7 @@ export default {
         contact: null,
         user: null
       }
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
     },
     durationSelected (duration) {
       this.appointment.duration = duration.value
@@ -342,8 +345,19 @@ export default {
     appendSmsReminderTemplateVariable (variable) {
       this.appointment.smsReminder.body = `${(this.appointment.smsReminder.body ?? '')} ${variable}`
     },
-    setSmsReminderBody () {
-      this.appointment.smsReminder.body = this.currentCompany ? this.currentCompany.sms_reminder_default_text : ''
+    setSmsReminderFields () {
+      this.appointment.smsReminder.campaign_id = this.currentCompany?.sms_reminder_default_campaign_id
+      this.appointment.smsReminder.body = this.currentCompany?.sms_reminder_default_text || ''
+
+      // update time if its set in account config
+      if (this.currentCompany?.sms_reminder_default_time) {
+        this.appointment.smsReminder.time = this.currentCompany.sms_reminder_default_time
+      }
+
+      // update frequency if its set in account config
+      if (this.currentCompany?.sms_reminder_default_send_before_days) {
+        this.appointment.smsReminder.frequencies = this.currentCompany.sms_reminder_default_send_before_days.split(',').map(v => +v)
+      }
     }
   },
   watch: {
@@ -352,7 +366,7 @@ export default {
     }
   },
   mounted () {
-    this.setSmsReminderBody()
+    this.setSmsReminderFields()
   }
 }
 </script>
