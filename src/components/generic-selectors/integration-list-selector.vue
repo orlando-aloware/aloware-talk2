@@ -212,8 +212,10 @@ export default {
       switch (this.integration.toLowerCase()) {
         case 'hubspot':
           return this.getHubspotLists()
+
         case 'zoho':
           return this.getZohoViews()
+
         case 'pipedrive':
           return this.getPipedriveFilters()
       }
