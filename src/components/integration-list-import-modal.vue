@@ -98,6 +98,7 @@ export default {
       type: Boolean,
       default: false
     },
+
     isOpen: {
       type: Boolean,
       default: false
