@@ -96,6 +96,8 @@ export default {
   methods: {
     onOptionSelected (option) {
       this.optionSelected = option.value
+
+      this.$emit('optionSelectedChanged')
     },
     onLineChange (line) {
       this.selectedLine = line
@@ -105,6 +107,9 @@ export default {
   watch: {
     isValid (state) {
       this.$emit('input', state)
+    },
+    optionSelected (optionSelected) {
+      this.$emit('contactGroupChanged', optionSelected)
     }
   }
 }
