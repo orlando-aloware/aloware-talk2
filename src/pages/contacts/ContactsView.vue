@@ -281,8 +281,8 @@
                  @more="onLoadMore">
         <template slot="tbody">
           <tr class="datatable-row"
-              v-for="(contact, index) in fixedContactsData.data"
-              :key="`${index}`">
+              :key="`${index}`"
+              v-for="(contact, index) in fixedContactsData.data">
             <template v-for="(column, colIndx) in fixedColumns">
               <td class="text-left pull-left datatable-row__checkbox"
                   :key="`c-${colIndx}`"
@@ -600,8 +600,8 @@
         </template>
         <template v-if="hoverPopover.title !== 'Tags'">
           <div class="ml-1 w-100"
-               v-for="(item, index) in hoverPopover.data"
-               :key="`ct-${index}`">
+               :key="`ct-${index}`"
+               v-for="(item, index) in hoverPopover.data">
             <i class="fa fa-circle text-black"
                :style="`font-size:36%;position: relative; top: -3px;`" />
             <span v-if="typeof item.phone_number !== 'undefined'">
@@ -950,13 +950,6 @@ export default {
       }
 
       return newItems
-    },
-
-    hasMore () {
-      return (this.hasNextPage &&
-          !this.isLoadingMore &&
-          !this.isLoading) ||
-        false
     },
 
     isCurrentAndPreviousFiltersMismatch () {
