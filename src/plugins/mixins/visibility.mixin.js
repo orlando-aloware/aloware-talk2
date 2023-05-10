@@ -538,7 +538,7 @@ export default {
         return false
       }
 
-      const found = this.ringGroups.find(ringGroup => ringGroup.id === ringGroupId)
+      const found = this.getRingGroup(ringGroupId)
 
       if (!found) {
         return false
@@ -555,17 +555,7 @@ export default {
     },
 
     getRingGroup (id) {
-      if (!id) {
-        return null
-      }
-
-      let ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === id)
-
-      if (ringGroup) {
-        return ringGroup
-      }
-
-      return null
+      return id ? this.ringGroups.find(ringGroup => ringGroup.id === id) : null
     },
 
     isUserDoesntHaveUnassignedAccess (data, type) {
