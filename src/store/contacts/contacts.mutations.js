@@ -261,7 +261,7 @@ export default {
     state.messageComposer.sms = { ...state.messageComposer.sms, phone_number: phoneNumber }
   },
   SET_MESSAGE_COMPOSER_SMS_BODY: (state, body) => {
-    state.messageComposer.sms = { ...state.messageComposer.sms, body: body }
+    state.messageComposer.sms = { ...state.messageComposer.sms, body: body.trim() }
   },
   SET_MESSAGE_COMPOSER_SMS_GIF: (state, gif) => {
     state.messageComposer.sms = { ...state.messageComposer.sms, gif_url: gif }
