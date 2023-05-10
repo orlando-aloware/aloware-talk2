@@ -11,6 +11,7 @@
                      :options="formattedLineOptions"
                      :show-labels="false"
                      :allow-empty="false"
+                     :preselect-first="preselectFirst"
                      v-model="line"
                      @select="onSelect"/>
   </div>
@@ -40,6 +41,16 @@ export default {
     showPaused: {
       type: Boolean,
       default: true
+    },
+
+    useGroups: {
+      type: Boolean,
+      default: true
+    },
+
+    preselectFirst: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -48,20 +59,27 @@ export default {
       const contactLines = { data: [] }
       if (this.contactCampaignsFromCommunications.length > 0) {
         contactLines.data = [...this.contactCampaignsFromCommunications]
-        contactLines.data.unshift({
-          group: 'Contact Lines',
-          disable: true
-        })
+
+        if (this.useGroups) {
+          contactLines.data.unshift({
+            group: 'Contact Lines',
+            disable: true
+          })
+        }
       }
 
       const linesArray = { data: contactLines.data }
 
       if (this.otherCampaignsFromCommunications && this.otherCampaignsFromCommunications.length > 0) {
         const otherLines = [...this.otherCampaignsFromCommunications]
-        otherLines.unshift({
-          group: 'Other Lines',
-          disable: true
-        })
+
+        if (this.useGroups) {
+          otherLines.unshift({
+            group: 'Other Lines',
+            disable: true
+          })
+        }
+
         linesArray.data = [...contactLines.data, ...otherLines]
       }
 
@@ -82,9 +100,9 @@ export default {
 
   mounted () {
     // if component value is set, search for that specific line to fill as the option
-    if (this.value) {
-      this.line = this.formattedLineOptions.find(line => line.id === this.value)
-    }
+    // if (this.value) {
+    //   this.line = this.formattedLineOptions.find(line => line.id === this.value)
+    // }
   },
 
   methods: {
