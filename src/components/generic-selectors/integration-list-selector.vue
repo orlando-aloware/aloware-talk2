@@ -102,50 +102,61 @@ export default {
       type: String,
       required: true
     },
+
     value: {
       required: false
     },
+
     exclude: {
       required: false,
       default: null
     },
+
     blockBroadcast: {
       type: Boolean,
       required: false,
       default: false
     },
+
     multiple: {
       type: Boolean,
       default: false,
       required: false
     },
+
     clearable: {
       type: Boolean,
       default: false,
       required: false
     },
+
     useChips: {
       type: Boolean,
       default: false,
       required: false
     },
+
     disable: {
       type: Boolean,
       default: false,
       required: false
     },
+
     prepend: {
       type: String,
       required: false
     },
+
     genericStyling: {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
