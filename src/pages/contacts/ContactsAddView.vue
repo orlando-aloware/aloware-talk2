@@ -19,7 +19,7 @@
             </span>
             {{ contactList.name }}
           </div>
-          <TextPopover :id="contactList.id"
+          <text-popover :id="contactList.id"
                        :editable="!isMyQueue"
                        v-else-if="contactList"
                        v-model="contactListName"
@@ -187,7 +187,7 @@
                 <div class="ml-1 text-grey-7 text-center "
                      :class="`${column.draggable ? 'col-indented' : ''}`"
                      v-else>
-                  --
+                  -
                 </div>
               </td>
               <td :key="`c-${key}`"
@@ -213,7 +213,7 @@
                   v-else-if="column.name === 'tags'"
                   @mouseleave="onMouseLeavePopover($event)">
                 <template v-if="!contact.tags || (contact.tags && !contact.tags.length)">
-                  --
+                  -
                 </template>
 
                 <template v-if="Array.isArray(contact.tags) && contact.tags.length">
@@ -310,7 +310,7 @@
                   v-else
                   @mouseleave="onMouseLeavePopover($event)">
                 <div class="text-left"
-                     v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)">
+                     v-if="isColumnArrayValueEmpty(contact[column.name])">
                   <div :class="`${column.draggable ? 'col-indented' : ''}`">
                     -
                   </div>
@@ -359,9 +359,9 @@
                   {{ contact[column.name] | fixFullDate }}
                 </div>
                 <div class="ellipse"
-                     :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`"
+                     :class="getColumnClass(column.name, column.draggable)"
                      v-else>
-                  {{ getColumnValue(column.name) }}
+                  {{ getColumnValue(contact[column.name]) }}
                 </div>
               </td>
             </template>
@@ -883,20 +883,6 @@ export default {
 
       this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
-    },
-
-    getColumnValue (columnName) {
-      if (typeof this.contact[columnName] === 'boolean') {
-        return this.contact[columnName] ? 'Yes' : 'No'
-      }
-
-      if (typeof this.contact[columnName] !== 'undefined' && this.contact[columnName] !== 0) {
-        return this.contact[columnName].toString()
-      }
-
-      return this.contact[columnName] === null
-        ? '-'
-        : this.contact[columnName]
     }
   },
 

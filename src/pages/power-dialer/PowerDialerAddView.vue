@@ -20,7 +20,7 @@
             </span>
             {{ contactList.name }}
           </div>
-          <TextPopover :id="contactList.id"
+          <text-popover :id="contactList.id"
                        :editable="!isMyQueue"
                        v-else
                        v-model="contactListName"
@@ -189,7 +189,7 @@
                 <div class="ml-1 text-grey-7 text-center "
                      :class="`${column.draggable ? 'col-indented' : ''}`"
                      v-else>
-                  --
+                  -
                 </div>
               </td>
               <td :key="`c-${key}`"
@@ -215,7 +215,7 @@
                   v-else-if="column.name === 'tags'"
                   @mouseleave="onMouseLeavePopover($event)">
                 <template v-if="!contact.tags || (contact.tags && !contact.tags.length)">
-                  --
+                  -
                 </template>
 
                 <template v-if="Array.isArray(contact.tags) && contact.tags.length">
@@ -342,14 +342,14 @@
                   </span>
                 </div>
                 <div class="text-left"
-                     v-else-if="contact[column.name] && contact[column.name] instanceof Object && Object.keys(contact[column.name]).length">
+                     v-else-if="isColumnObjectValueNotEmpty(contact[column.name])">
                   <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
                        v-if="contact[column.name].id && typeof contact[column.name].name !== 'undefined'">
                     {{ contact[column.name].name }}
                   </div>
                 </div>
                 <span class="text-left"
-                      v-else-if="contact[column.name] && contact[column.name] instanceof Object && !Object.keys(contact[column.name]).length">
+                      v-else-if="isColumnObjectValueEmpty(contact[column.name])">
                   - {{ contact[column.name] }}
                 </span>
                 <div class="text-left ellipse col-indented"
@@ -361,7 +361,7 @@
                   {{ contact[column.name] | fixFullDate }}
                 </div>
                 <div class="ellipse"
-                     :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`"
+                     :class="getColumnClass(column.name, column.draggable)"
                      v-else>
                   {{ getColumnValue(column.name) }}
                 </div>
@@ -923,20 +923,6 @@ export default {
 
       this.setAllContactsSelected(false)
       this.onCheckedRows(items.data)
-    },
-
-    getColumnValue (columnName) {
-      if (typeof this.contact[columnName] === 'boolean') {
-        return this.contact[columnName] ? 'Yes' : 'No'
-      }
-
-      if (typeof this.contact[columnName] !== 'undefined' && this.contact[columnName] !== 0) {
-        return this.contact[columnName].toString()
-      }
-
-      return this.contact[columnName] === null
-        ? '-'
-        : this.contact[columnName]
     }
   },
 
