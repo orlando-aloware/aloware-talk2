@@ -502,14 +502,14 @@
                   @mouseleave="onMouseLeavePopover($event)">
 
                 <div class="text-left"
-                     v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)">
+                     v-if="isColumnValueEmpty(contact[column.name])">
                   <div :class="`${column.draggable ? 'col-indented' : ''}`">
                     -
                   </div>
                 </div>
 
                 <div class="text-left"
-                     v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
+                     v-else-if="isColumnValueNotEmpty(contact[column.name])">
                   <div class="d-flex align-items-center popover-items"
                        :id="`ot-${index}-${colIndx}`"
                        v-if="contact[column.name].length > 0"
@@ -532,14 +532,14 @@
                   </span>
                 </div>
                 <div class="text-left"
-                     v-else-if="contact[column.name] && contact[column.name] instanceof Object && Object.keys(contact[column.name]).length">
+                     v-else-if="isColumnObjectValueNotEmpty(contact[column.name])">
                   <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
                        v-if="contact[column.name].id && typeof contact[column.name].name !== 'undefined'">
                     {{ contact[column.name].name }}
                   </div>
                 </div>
                 <span class="text-left"
-                      v-else-if="contact[column.name] && contact[column.name] instanceof Object && !Object.keys(contact[column.name]).length">
+                      v-else-if="isColumnObjectValueEmpty(contact[column.name])">
                   - {{ contact[column.name] }}
                 </span>
                 <div class="text-left ellipse col-indented"
@@ -932,21 +932,23 @@ export default {
 
     fixedColumns () {
       const newItems = this.$jsonClone(this.columns)
+
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
-      const index = { data: null }
-      const found = { data: null }
-      for (index.data in newItems) {
-        found.data = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
-        if (found.data && found.required) {
-          newItems[index.data].sortable = found.sortable
+      for (let index in newItems) {
+        let column = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+
+        if (column && column.required) {
+          newItems[index].sortable = column.sortable
         }
-        if (found.data) {
-          newItems[index.data].label = found.data.label
-          newItems[index.data].maxWidth = found.data.maxWidth
-          newItems[index.data].minWidth = found.data.minWidth
+
+        if (column) {
+          newItems[index].label = column.label
+          newItems[index].maxWidth = column.maxWidth
+          newItems[index].minWidth = column.minWidth
         }
       }
+
       return newItems
     },
 
@@ -1642,6 +1644,31 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    isColumnValueEmpty (columnValue) {
+      const isEmptyArray = columnValue instanceof Array && !columnValue.length
+
+      return columnValue === '' ||
+        columnValue === null ||
+        columnValue === 'NULL' ||
+        isEmptyArray
+    },
+
+    isColumnValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Array &&
+        columnValue.length
+    },
+
+    isColumnObjectValueEmpty (columnValue) {
+      return columnValue && columnValue instanceof Object && !Object.keys(columnValue).length
+    },
+
+    isColumnObjectValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Object &&
+        Object.keys(columnValue).length
     }
   },
 
