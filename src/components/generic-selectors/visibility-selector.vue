@@ -109,11 +109,18 @@ export default {
           value: ContactAccessTypes.CONTACTS_ACCESS_EVERYONE,
           label: 'Everything',
           description: 'Can see all contacts.'
-        }, {
+        },
+        {
+          value: ContactAccessTypes.CONTACTS_ACCESS_TEAM,
+          label: 'Team Only',
+          description: 'Can only see contacts owned by users in any ring groups that this user belongs to.'
+        },
+        {
           value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP,
           label: 'Ring Group Only',
           description: 'Can only see owned contacts and contacts that have interacted with the ring groups that this user belongs to.'
-        }, {
+        },
+        {
           value: ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY,
           label: 'Owned Only',
           description: 'Can only see their own contacts.'

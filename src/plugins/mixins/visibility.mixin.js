@@ -308,9 +308,7 @@ export default {
       // ring group only access
       if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
         // if user does not have unassigned access
-        if (communication.contact &&
-          !communication.contact.user_id &&
-          !this.profile.can_view_unassigned_contacts) {
+        if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
           return false
         }
 
@@ -322,12 +320,39 @@ export default {
         // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
       }
 
+      // team only access
+      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_TEAM) {
+        // if user does not have unassigned access
+        if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
+          return false
+        }
+
+        // checks if user is part of the communication's ring group
+        if (communication.ring_group_id && !this.profile.ring_group_ids.includes(communication.ring_group_id)) {
+          return false
+        }
+
+        // checks if communication's contact is owned by the team
+        if (communication.contact && communication.contact.user_id) {
+          for (let ringGroupId of this.profile.ring_group_ids) {
+            let ringGroup = this.getRingGroup(ringGroupId)
+
+            if (ringGroup && ringGroup.user_ids.includes(communication.contact.user_id)) {
+              return true
+            }
+          }
+        }
+
+        // if contact does not exist
+        if (!communication.contact) {
+          return false
+        }
+      }
+
       // owned only access
       if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
         // if user does not have unassigned access
-        if (communication.contact &&
-          !communication.contact.user_id &&
-          !this.profile.can_view_unassigned_contacts) {
+        if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
           return false
         }
 
@@ -429,7 +454,7 @@ export default {
       // ring group only access
       if (this.profile && this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
         // if user does not have unassigned access
-        if (!contact.user_id && !this.profile.can_view_unassigned_contacts) {
+        if (this.isUserDoesntHaveUnassignedAccess(contact, 'contact')) {
           return false
         }
 
@@ -439,7 +464,7 @@ export default {
       // owned only access
       if (this.profile && this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_OWNED_ONLY) {
         // if user does not have unassigned access
-        if (!contact.user_id && !this.profile.can_view_unassigned_contacts) {
+        if (this.isUserDoesntHaveUnassignedAccess(contact, 'contact')) {
           return false
         }
 
@@ -468,9 +493,7 @@ export default {
         }
 
         // if user does not have unassigned access
-        if (mention.contact &&
-          !mention.contact.user_id &&
-          !this.profile.can_view_unassigned_contacts) {
+        if (this.isUserDoesntHaveUnassignedAccess(mention, 'mention')) {
           return false
         }
 
@@ -485,9 +508,7 @@ export default {
         }
 
         // if user does not have unassigned access
-        if (mention.contact &&
-          !mention.contact.user_id &&
-          !this.profile.can_view_unassigned_contacts) {
+        if (this.isUserDoesntHaveUnassignedAccess(mention, 'mention')) {
           return false
         }
 
@@ -531,6 +552,30 @@ export default {
       }
 
       return false
+    },
+
+    getRingGroup (id) {
+      if (!id) {
+        return null
+      }
+
+      let ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === id)
+
+      if (ringGroup) {
+        return ringGroup
+      }
+
+      return null
+    },
+
+    isUserDoesntHaveUnassignedAccess (data, type) {
+      if (type === 'contact') {
+        return !data.user_id && !this.profile.can_view_unassigned_contacts
+      }
+
+      return data.contact &&
+        !data.contact.user_id &&
+        !this.profile.can_view_unassigned_contacts
     }
   }
 }
