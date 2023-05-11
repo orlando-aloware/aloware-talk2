@@ -43,7 +43,7 @@ export const COLUMNS = [
   },
   {
     name: 'last-updated',
-    label: 'Last Updated',
+    label: 'Last Status Update',
     order: 6,
     sortable: true,
     draggable: true
