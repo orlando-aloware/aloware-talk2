@@ -1,31 +1,37 @@
 <template>
   <div class="wallboard__body">
     <div :class="['overview', `overview--${viewMode}`]">
-      <wallboard-overview-card :value="item.value"
-                               :description="item.name"
-                               :icon="item.icon"
-                               :filter="item.filter"
-                               :loading="isSummaryLoading"
-                               :key="index"
-                               v-for="(item, index) in items"/>
+      <wallboard-overview-header />
+      <div class="overview__body">
+        <wallboard-overview-card :value="item.value"
+                                 :description="item.name"
+                                 :icon="item.icon"
+                                 :filter="item.filter"
+                                 :loading="isSummaryLoading"
+                                 :key="index"
+                                 v-for="(item, index) in items"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex'
+import WallboardOverviewHeader from 'src/components/wallboard/wallboard-overview-header.vue'
 import WallboardOverviewCard from 'src/components/wallboard/wallboard-overview-card.vue'
 
 export default {
   name: 'WallboardOverview',
 
   components: {
-    WallboardOverviewCard
+    WallboardOverviewCard,
+    WallboardOverviewHeader
   },
 
   computed: {
     ...mapState('wallboard', [
-      'isSummaryLoading'
+      'isSummaryLoading',
+      'isOverviewDetailed'
     ]),
 
     ...mapGetters('wallboard', {
@@ -86,12 +92,14 @@ export default {
         {
           name: 'Emails Sent',
           value: this.summary.emailsSent,
-          icon: 'wallboard-overview-emails-sent-icon'
+          icon: 'wallboard-overview-emails-sent-icon',
+          enabled: this.isOverviewDetailed
         },
         {
           name: 'Emails Received',
           value: this.summary.emailsReceived,
-          icon: 'wallboard-overview-emails-received-icon'
+          icon: 'wallboard-overview-emails-received-icon',
+          enabled: this.isOverviewDetailed
         },
         {
           name: 'Texts Received',
@@ -101,19 +109,21 @@ export default {
         {
           name: 'Faxes Sent',
           value: this.summary.faxesSent,
-          icon: 'wallboard-overview-faxes-sent-icon'
+          icon: 'wallboard-overview-faxes-sent-icon',
+          enabled: this.isOverviewDetailed
         },
         {
           name: 'Faxes Received',
           value: this.summary.faxesReceived,
-          icon: 'wallboard-overview-faxes-received-icon'
+          icon: 'wallboard-overview-faxes-received-icon',
+          enabled: this.isOverviewDetailed
         },
         {
           name: 'Texts Sent',
           value: this.summary.textsSent,
           icon: 'wallboard-overview-texts-sent-icon'
         }
-      ]
+      ].filter(item => item.enabled || item.enabled === undefined)
     }
   }
 }

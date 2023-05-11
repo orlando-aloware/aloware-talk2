@@ -27,6 +27,7 @@ export default function () {
     },
     isAgentsLoading: false,
     isLiveCallsLoading: false,
+    isOverviewDetailed: false,
     isParkedCallsLoading: false,
     isQueuedCallsLoading: false,
     isSummaryLoading: false,

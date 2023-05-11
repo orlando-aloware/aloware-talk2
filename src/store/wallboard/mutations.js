@@ -78,6 +78,10 @@ export default {
     state.isLiveCallsLoading = data
   },
 
+  SET_OVERVIEW_DETAILED: (state, payload) => {
+    state.isOverviewDetailed = payload
+  },
+
   SET_PARKED_CALL: (state, communication) => {
     const index = state.calls.parked.findIndex(comm => comm.id === communication.id)
 

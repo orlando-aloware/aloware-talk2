@@ -1,11 +1,11 @@
 <template>
-  <div class="overview__card">
-    <div class="overview__card__container">
-      <div class="overview__card__container__icon">
+  <div class="overview__body__card">
+    <div class="overview__body__card__container">
+      <div class="overview__body__card__container__icon">
         <component :is="icon"/>
       </div>
-      <div class="overview__card__container__body">
-        <div class="overview__card__container__body__value">
+      <div class="overview__body__card__container__body">
+        <div class="overview__body__card__container__body__value">
           <q-skeleton type="text"
                       animation="fade"
                       height="26px"
@@ -20,7 +20,7 @@
             {{ getValue }}
           </span>
         </div>
-        <div class="overview__card__container__body__description">
+        <div class="overview__body__card__container__body__description">
           {{ description }}
         </div>
       </div>

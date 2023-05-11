@@ -12527,19 +12527,15 @@ h1.contact-list-name-label {
     flex-wrap: wrap;
 
     .overview {
-      width: calc(100% - 40px);
-      margin: 20px;
-      padding: 20px;
-      border-radius: 15px;
-      border: 1px solid $grey-60;
+      width: 100%;
       display: flex;
-      flex-wrap: wrap;
-
+      flex-direction: column;
+      
       // taller
       &--comfort {
         height: 550px;
 
-        .overview__card {
+        .overview__body__card {
           width: 20%;
           height: calc(100% / 3);
           
@@ -12554,7 +12550,7 @@ h1.contact-list-name-label {
       &--compact {
         height: 600px;
 
-        .overview__card {
+        .overview__body__card {
           width: calc(100% / 3);
           height: 20%;
           
@@ -12573,23 +12569,39 @@ h1.contact-list-name-label {
         }
       }
 
-      &__card {
+      &__header {
         display: flex;
-        padding: 10px;
-        transition: all .5s;
+        justify-content: flex-end;
+        padding: 10px 20px;
+      }
 
-        &__container {
+      &__body {
+        flex-grow: 1;
+        border-radius: 15px;
+        border: 1px solid $grey-60;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0px 20px;
+        padding: 20px;
+
+        &__card {
           display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          border: 1px solid $grey-60;
-          border-radius: 10px;
           padding: 10px;
+          transition: all .5s;
 
-          &__body {
-            &__value {
-              font-size: 22px;
-              font-weight: bold;
+          &__container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            border: 1px solid $grey-60;
+            border-radius: 10px;
+            padding: 10px;
+
+            &__body {
+              &__value {
+                font-size: 22px;
+                font-weight: bold;
+              }
             }
           }
         }
