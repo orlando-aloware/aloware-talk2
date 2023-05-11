@@ -162,7 +162,7 @@ export default {
         .then(confirm => {
           if (!confirm) {
             this.loading = false
-            this.closeModal()
+            return
           }
 
           let data = {

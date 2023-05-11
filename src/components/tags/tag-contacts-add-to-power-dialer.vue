@@ -32,7 +32,7 @@
                      @change="setUserId"/>
     </div>
 
-    <div class="py-4">
+    <div class="py-3">
       <label class="label mt-2 mb-1 font-weight-bold">
         Push Contacts To
       </label>
@@ -203,7 +203,7 @@ export default {
     addTasksToPowerDialer () {
       this.loading = true
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabName}?`, {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to add the contacts under this tag to this user's PowerDialer?`, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
         cancelTitle: 'No',
@@ -213,7 +213,7 @@ export default {
         .then(confirm => {
           if (!confirm) {
             this.loading = false
-            this.closeModal()
+            return
           }
 
           let params = {

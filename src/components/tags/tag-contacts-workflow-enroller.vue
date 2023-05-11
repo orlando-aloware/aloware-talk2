@@ -23,7 +23,8 @@
 
     <div>
       <label class="label mt-2 mb-1">Choose the sequence you want this tagged contacts to enroll</label>
-      <workflow-selector />
+      <sequence-selector :generic-styling="false"
+                         @change="setWorkflowId" />
     </div>
 
     <ul class="list-unstyled py-4 mb-0">
@@ -76,13 +77,14 @@
 </template>
 
 <script>
-import WorkflowSelector from 'components/integrations/workflow-selector.vue'
+import SequenceSelector from 'components/generic-selectors/sequence-selector'
+import axios from 'axios'
 
 export default {
   name: 'tag-contacts-workflow-enroller',
 
   components: {
-    WorkflowSelector
+    SequenceSelector
   },
 
   props: {
@@ -99,7 +101,8 @@ export default {
 
   data () {
     return {
-      loading: false
+      loading: false,
+      selectedWorkflowId: null
     }
   },
 
@@ -125,11 +128,35 @@ export default {
 
   methods: {
     closeModal () {
+      this.reset()
       this.$emit('closeEnrollTagContactsToSequenceDialog')
     },
 
+    reset () {
+      this.selectedWorkflowId = null
+    },
+
+    setWorkflowId (id) {
+      this.selectedWorkflowId = id
+    },
+
     enrollContacts () {
-      console.log('enroll to sequence')
+      this.loading = true
+
+      axios.post(`/api/v1/automations/workflows/${this.selectedWorkflowId}/sequence-contacts`, {
+        model: 'tag',
+        id: this.tag.id
+      }).then(res => {
+        this.reset()
+        this.$generalNotification(res.data.message)
+      }).catch(err => {
+        const msg = err.status_code !== 500 ? err.response.data.message : 'Encountered error while enrolling contacts'
+        this.$handleErrors(msg)
+        console.log(err)
+      }).finally(() => {
+        this.loading = false
+        this.closeModal()
+      })
     }
   }
 }

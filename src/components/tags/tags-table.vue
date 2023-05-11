@@ -133,7 +133,7 @@
                   </div>
                   <b-dropdown-item v-if="hasPermissionTo('delete tag')"
                                    @click="openDeleteTagDialog(tag)">
-                    <span class="text-danger"><delete-red-icon></delete-red-icon> Delete</span>
+                    <span class="text-danger"><delete-red-icon /> Delete</span>
                   </b-dropdown-item>
                 </b-dropdown>
               </div>

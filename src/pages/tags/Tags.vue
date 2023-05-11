@@ -158,6 +158,13 @@ export default {
     this.$VueEvent.listen('tag_deleting', () => {
       this.getTags()
     })
+
+    this.$VueEvent.listen('contact_list_bulk_created', (data) => {
+      if (data.items_count > 0) {
+        const verb = data.items_count > 1 ? 'tasks have' : 'task has'
+        this.$generalNotification(`${data.items_count} ${verb} been added`)
+      }
+    })
   },
 
   methods: {
