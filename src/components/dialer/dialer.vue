@@ -1103,10 +1103,6 @@ export default {
       })
     },
 
-    getRingGroup (id) {
-      return id ? this.ringGroups.find(item => item.id === id) : null
-    },
-
     addParticipant (add) {
       if (this.isNotInProgressCall) {
         return
