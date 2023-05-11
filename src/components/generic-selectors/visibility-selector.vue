@@ -112,7 +112,7 @@ export default {
         },
         {
           value: ContactAccessTypes.CONTACTS_ACCESS_TEAM,
-          label: 'Team Only',
+          label: 'Team Only (Beta)',
           description: 'Can only see contacts owned by users in any ring groups that this user belongs to.'
         },
         {
