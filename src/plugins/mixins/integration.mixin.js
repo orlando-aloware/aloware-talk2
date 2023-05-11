@@ -27,9 +27,11 @@ export default {
       if (this.currentCompany.hubspot_integration_enabled) {
         integrations.push('HubSpot')
       }
+
       if (this.currentCompany.zoho_integration_enabled) {
         integrations.push('Zoho')
       }
+
       if (this.currentCompany.pipedrive_integration_enabled) {
         integrations.push('Pipedrive')
       }

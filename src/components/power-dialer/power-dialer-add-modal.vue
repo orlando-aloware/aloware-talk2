@@ -485,6 +485,7 @@ export default {
 
       this.loading--
     },
+
     async checkPipedriveFilter () {
       this.loading++
 
