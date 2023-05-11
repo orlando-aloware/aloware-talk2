@@ -16,21 +16,21 @@
 </template>
 
 <script>
+import WallboardAgentsIcon from 'src/components/icons/wallboard/agents-icon.vue'
 import WallboardOverviewIcon from 'src/components/icons/wallboard/overview-icon.vue'
-import WallboardUsersIcon from 'src/components/icons/wallboard/users-icon.vue'
 import WallboardLiveCallIcon from 'src/components/icons/wallboard/live-call-icon.vue'
 import WallboardParkedCallIcon from 'src/components/icons/wallboard/parked-call-icon.vue'
 import WallboardQueuedCallIcon from 'src/components/icons/wallboard/queued-call-icon.vue'
 
 export default {
-  name: 'WallboardSidebarItem',
+  name: 'wallboard-sidebar-item',
 
   components: {
+    WallboardAgentsIcon,
     WallboardOverviewIcon,
     WallboardLiveCallIcon,
     WallboardParkedCallIcon,
-    WallboardQueuedCallIcon,
-    WallboardUsersIcon
+    WallboardQueuedCallIcon
   },
 
   props: {

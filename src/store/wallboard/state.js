@@ -1,5 +1,6 @@
 export default function () {
   return {
+    agents: [],
     calls: {
       live: [],
       parked: [],
@@ -24,11 +25,11 @@ export default function () {
       agent: null,
       agentStatus: 'all'
     },
+    isAgentsLoading: false,
     isLiveCallsLoading: false,
     isParkedCallsLoading: false,
     isQueuedCallsLoading: false,
     isSummaryLoading: false,
-    isUsersLoading: false,
     summary: {
       abandonedCalls: 0,
       answeredCalls: 0,
@@ -48,7 +49,6 @@ export default function () {
       totalCalls: 0,
       totalOccupancy: 0
     },
-    users: [],
     viewMode: 'comfort' // comfort, compact
   }
 }

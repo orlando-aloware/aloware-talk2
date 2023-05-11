@@ -42,17 +42,17 @@ export default {
   }),
 
   created () {
+    this.fetchAgents()
     this.fetchLiveCalls()
     this.fetchParkedCalls()
     this.fetchQueuedCalls()
     this.fetchSummary()
-    this.fetchUsers()
   },
 
   mounted () {
-    // user updated event
-    this.$VueEvent.listen('user_updated', (user) => {
-      this.setUser(user)
+    // agent updated event
+    this.$VueEvent.listen('user_updated', (agent) => {
+      this.setAgent(agent)
     })
 
     // agent status updated event
@@ -88,20 +88,20 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
+      'fetchAgents',
       'fetchLiveCalls',
       'fetchParkedCalls',
       'fetchQueuedCalls',
-      'fetchSummary',
-      'fetchUsers'
+      'fetchSummary'
     ]),
 
     ...mapMutations('wallboard', {
       deleteCall: 'DELETE_CALL',
+      setAgent: 'SET_AGENT',
       setAgentStatus: 'SET_AGENT_STATUS',
       setLiveCall: 'SET_LIVE_CALL',
       setParkedCall: 'SET_PARKED_CALL',
-      setQueuedCall: 'SET_QUEUED_CALL',
-      setUser: 'SET_USER'
+      setQueuedCall: 'SET_QUEUED_CALL'
     })
   }
 }

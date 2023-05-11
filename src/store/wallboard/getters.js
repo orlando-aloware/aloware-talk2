@@ -1,6 +1,33 @@
 import { filterCalls } from 'src/plugins/helpers/functions'
 
 export default {
+  getAgents: (state) => {
+    return state.agents
+      .filter(agent => {
+        // only valid agents
+        if (agent.is_destination || agent.read_only_access || !agent.enabled || !agent.active) {
+          return false
+        }
+
+        // agent name filter
+        const name = !state.filters.agent
+          ? true
+          : agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())
+
+        // status filter
+        const status = state.filters.agentStatus === 'all'
+          ? true
+          : agent.agent_status === state.filters.agentStatus
+
+        // ring group filter
+        const ringGroup = !state.filters.ringGroup
+          ? true
+          : agent.ring_group_ids.includes(state.filters.ringGroup)
+
+        return name && status && ringGroup
+      })
+  },
+
   getCallsEnabledColumns: (state) => {
     return state.callsEnabledColumns
   },
@@ -27,32 +54,5 @@ export default {
 
   getViewMode: (state) => {
     return state.viewMode
-  },
-
-  getUsers: (state) => {
-    return state.users
-      .filter(user => {
-        // only valid users
-        if (user.is_destination || user.read_only_access || !user.enabled || !user.active) {
-          return false
-        }
-
-        // agent name filter
-        const name = !state.filters.agent
-          ? true
-          : user.name.toUpperCase().includes(state.filters.agent.toUpperCase())
-
-        // status filter
-        const status = state.filters.agentStatus === 'all'
-          ? true
-          : user.agent_status === state.filters.agentStatus
-
-        // ring group filter
-        const ringGroup = !state.filters.ringGroup
-          ? true
-          : user.ring_group_ids.includes(state.filters.ringGroup)
-
-        return name && status && ringGroup
-      })
   }
 }

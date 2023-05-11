@@ -16,7 +16,7 @@ import AgentStatusSelector from '../generic-selectors/agent-status-selector.vue'
 import { mapMutations } from 'vuex'
 
 export default {
-  name: 'wallboard-users-header',
+  name: 'wallboard-agents-header',
 
   components: {
     AgentStatusSelector,

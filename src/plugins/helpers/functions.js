@@ -19,10 +19,15 @@ export function filterCalls (calls, state) {
     // agent name filter
     let agentName = true
     if (state.filters.agent) {
-      const user = state.users.find(user => user.id === call.user_id)
+      // skip this call if agent name filter is filled, but the call doesnt contain a user
+      if (!call.user_id) {
+        return false
+      }
 
-      // checks if user name contains the term searched
-      agentName = user.name.toUpperCase().includes(state.filters.agent.toUpperCase())
+      const agent = state.agents.find(agent => agent.id === call.user_id)
+
+      // checks if agent name contains the term searched
+      agentName = agent.name.toUpperCase().includes(state.filters.agent.toUpperCase())
     }
 
     return ringGroup && agentName

@@ -13,7 +13,7 @@ const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddVi
 const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
 const Wallboard = () => import('pages/wallboard/Wallboard.vue')
 const WallboardOverview = () => import('pages/wallboard/WallboardOverview.vue')
-const WallboardUsers = () => import('pages/wallboard/WallboardUsers.vue')
+const WallboardAgents = () => import('pages/wallboard/WallboardAgents.vue')
 const WallboardCalls = () => import('pages/wallboard/WallboardCalls.vue')
 const Calendar = () => import('src/pages/calendar/Calendar.vue')
 const Stats = () => import('pages/stats/Stats.vue')
@@ -279,13 +279,13 @@ const routes = [
             component: WallboardOverview
           },
           {
-            name: 'Wallboard Users',
+            name: 'Wallboard Agents',
             meta: {
               title: 'Wallboard',
-              id: 'wallboard-users'
+              id: 'wallboard-agents'
             },
-            path: 'users',
-            component: WallboardUsers
+            path: 'agents',
+            component: WallboardAgents
           },
           {
             name: 'Wallboard Calls',

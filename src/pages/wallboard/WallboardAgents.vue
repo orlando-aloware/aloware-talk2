@@ -1,10 +1,10 @@
 <template>
   <div class="wallboard__body">
     <div :class="['users', `users--${viewMode}`]">
-      <b-overlay :show="isUsersLoading"
+      <b-overlay :show="isAgentsLoading"
                  rounded="sm">
-        <wallboard-users-header />
-        <wallboard-users-table />
+        <wallboard-agents-header />
+        <wallboard-agents-table />
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px"/>
@@ -15,21 +15,21 @@
 </template>
 
 <script>
-import WallboardUsersHeader from 'src/components/wallboard/wallboard-users-header.vue'
-import WallboardUsersTable from 'src/components/wallboard/wallboard-users-table.vue'
+import WallboardAgentsHeader from 'src/components/wallboard/wallboard-agents-header.vue'
+import WallboardAgentsTable from 'src/components/wallboard/wallboard-agents-table.vue'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
-  name: 'WallboardUsers',
+  name: 'WallboardAgents',
 
   components: {
-    WallboardUsersHeader,
-    WallboardUsersTable
+    WallboardAgentsHeader,
+    WallboardAgentsTable
   },
 
   computed: {
     ...mapState('wallboard', [
-      'isUsersLoading'
+      'isAgentsLoading'
     ]),
 
     ...mapGetters('wallboard', {

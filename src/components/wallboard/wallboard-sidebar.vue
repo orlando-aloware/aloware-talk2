@@ -52,28 +52,28 @@ export default {
 
   computed: {
     ...mapGetters('wallboard', {
-      users: 'getUsers',
+      agents: 'getAgents',
       queuedCalls: 'getQueuedCalls',
       liveCalls: 'getLiveCalls',
       parkedCalls: 'getParkedCalls'
     }),
 
     ...mapState('wallboard', [
+      'isAgentsLoading',
       'isLiveCallsLoading',
       'isParkedCallsLoading',
       'isQueuedCallsLoading',
-      'isSummaryLoading',
-      'isUsersLoading'
+      'isSummaryLoading'
     ]),
 
     items () {
       return [
         {
-          name: 'Users',
-          route: '/wallboard/users',
-          icon: 'wallboard-users-icon',
-          counter: this.users.length,
-          loading: this.isUsersLoading
+          name: 'Agents',
+          route: '/wallboard/agents',
+          icon: 'wallboard-agents-icon',
+          counter: this.agents.length,
+          loading: this.isAgentsLoading
         }, {
           name: 'Queued Calls',
           route: '/wallboard/queued-calls',
@@ -97,25 +97,25 @@ export default {
     },
 
     isLoading () {
-      return this.isLiveCallsLoading || this.isParkedCallsLoading || this.isQueuedCallsLoading || this.isSummaryLoading || this.isUsersLoading
+      return this.isAgentsLoading || this.isLiveCallsLoading || this.isParkedCallsLoading || this.isQueuedCallsLoading || this.isSummaryLoading
     }
   },
 
   methods: {
     ...mapActions('wallboard', [
+      'fetchAgents',
       'fetchLiveCalls',
       'fetchParkedCalls',
       'fetchQueuedCalls',
-      'fetchSummary',
-      'fetchUsers'
+      'fetchSummary'
     ]),
 
     fetchAll () {
+      this.fetchAgents()
       this.fetchLiveCalls()
       this.fetchParkedCalls()
       this.fetchQueuedCalls()
       this.fetchSummary()
-      this.fetchUsers()
     },
 
     isActive (route) {

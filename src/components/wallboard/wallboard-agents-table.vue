@@ -7,8 +7,8 @@
                custom-class="pr-3"
                scroll-area-class="scroll-type-2"
                :columns="columns"
-               :is-empty="users.length === 0"
-               :total-rows="users.length"
+               :is-empty="agents.length === 0"
+               :total-rows="agents.length"
                :current-page="pagination.page"
                :last-page="lastPage"
                @paginated="onPaginated"
@@ -17,59 +17,59 @@
       <template #tbody>
         <tr class="datatable-row"
             :key="`${index}`"
-            v-for="(user, index) in paginatedUsers">
+            v-for="(agent, index) in paginatedAgents">
           <template v-for="(column, colIndex) in columns">
             <!-- id -->
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'id'">
-              {{ user.id }}
+              {{ agent.id }}
             </td>
 
             <!-- agent name -->
             <td class="users__table__agent-name"
                 :key="`col-${colIndex}`"
                 v-if="column.name === 'name'">
-              <a :href="apiUrl + `/users/dialog/${user.id}`"
+              <a :href="apiUrl + `/users/dialog/${agent.id}`"
                   target="_blank"
                   v-if="hasPermissionTo('list user')">
-                {{ user.name }}
+                {{ agent.name }}
               </a>
               <span v-else>
-                {{ user.name }}
+                {{ agent.name }}
               </span>
             </td>
 
             <!-- status -->
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'status'">
-              <wallboard-agent-status :value="user.agent_status"
-                                      @status-change="onStatusChanged(user, $event)"/>
+              <wallboard-agent-status :value="agent.agent_status"
+                                      @status-change="onStatusChanged(agent, $event)"/>
             </td>
 
             <!-- status duration -->
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'status-duration'">
-              <time-ago :from="convertTimeToUTC(user.last_agent_status_change)"
-                        v-if="user.last_agent_status_change"/>
+              <time-ago :from="convertTimeToUTC(agent.last_agent_status_change)"
+                        v-if="agent.last_agent_status_change"/>
               <span v-else>--</span>
             </td>
 
             <!-- ring groups -->
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'ring-groups'">
-              <wallboard-agent-ring-groups :ring-groups="user.ring_group_ids" />
+              <wallboard-agent-ring-groups :ring-groups="agent.ring_group_ids" />
             </td>
 
             <!-- last login -->
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'last-login'">
-              {{ user.last_login | fixFullDateUTCRelative }}
+              {{ agent.last_login | fixFullDateUTCRelative }}
             </td>
 
             <!-- last updated -->
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'last-updated'">
-              {{ user.updated_at | fixFullDateUTCRelative }}
+              {{ agent.updated_at | fixFullDateUTCRelative }}
             </td>
           </template>
         </tr>
@@ -77,7 +77,7 @@
 
       <template #empty>
         <div class="empty-state"
-             v-if="users.length === 0">
+             v-if="agents.length === 0">
           <div class="h5">
             No agents found based on the current filters
           </div>
@@ -92,13 +92,13 @@ import Datatable from 'src/components/datatable.vue'
 import TimeAgo from 'src/components/time-ago.vue'
 import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-ring-groups.vue'
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
-import { COLUMNS } from 'src/constants/wallboard/users-columns'
+import { COLUMNS } from 'src/constants/wallboard/agents-columns'
 import { mapActions, mapGetters } from 'vuex'
 import { LABELS } from 'src/constants/agent-status-labels'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'wallboard-users-table',
+  name: 'wallboard-agents-table',
 
   mixins: [
     aclMixin
@@ -113,26 +113,26 @@ export default {
 
   computed: {
     ...mapGetters('wallboard', {
-      users: 'getUsers'
+      agents: 'getAgents'
     }),
 
-    paginatedUsers () {
+    paginatedAgents () {
       let from = this.pagination.perPage * (this.pagination.page - 1)
       let to = from + this.pagination.perPage
-      let users = this.orderedUsers
+      let agents = this.orderedAgents
 
       // use reversed list if order is desc
       if (this.sort.order === 'desc') {
-        users.slice().reverse()
+        agents.slice().reverse()
       }
 
-      return users.filter((user, index) => index >= from && index < to)
+      return agents.filter((agent, index) => index >= from && index < to)
     },
 
-    orderedUsers () {
-      let users = this.users
+    orderedAgents () {
+      let agents = this.agents
 
-      return users.sort((a, b) => {
+      return agents.sort((a, b) => {
         let condition = null
 
         // use a different rule based on order field
@@ -175,7 +175,7 @@ export default {
     },
 
     lastPage () {
-      return Math.ceil(this.users.length / this.pagination.perPage)
+      return Math.ceil(this.agents.length / this.pagination.perPage)
     },
 
     apiUrl () {
@@ -215,9 +215,9 @@ export default {
       this.columns = columns
     },
 
-    onStatusChanged (user, status) {
+    onStatusChanged (agent, status) {
       this.setAgentStatus({
-        userId: user.id,
+        userId: agent.id,
         status
       })
     },
