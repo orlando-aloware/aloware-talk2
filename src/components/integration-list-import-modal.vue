@@ -37,8 +37,8 @@
                           map-options
                           dense
                           hide-bottom-space
-                          v-model="selectedIntegration"
-                          :options="integrationsEnabled">
+                          :options="integrationsEnabled"
+                          v-model="selectedIntegration">
                 </q-select>
               </div>
             </div>
