@@ -654,7 +654,8 @@ export default {
       'setSearch',
       'resetSearch',
       'setShowMyContacts',
-      'setAddViewShowMyContacts'
+      'setAddViewShowMyContacts',
+      'setCurrentListFilters'
     ]),
 
     loadList (id) {

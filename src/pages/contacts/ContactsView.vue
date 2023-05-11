@@ -1,6 +1,6 @@
 <template>
-  <contacts-screen v-if="list"
-                   :loading="isLoadingDisabled">
+  <contacts-screen :loading="isLoadingDisabled"
+                   v-if="list">
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="pr-2 contacts__title d-flex align-items-center">
@@ -22,16 +22,14 @@
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>
           <div class="d-flex align-items-center">
-            <span
-              :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
+            <span :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
               {{ list.name || (isUnsavedList ? unsavedList.name : '') }}
-              <q-chip
-                class="m-0 p-0"
-                text-color="white"
-                color="grey-80"
-                style="margin-left:10px !important;"
-                size="sm"
-                v-if="isUnsavedList">
+              <q-chip class="m-0 p-0"
+                      text-color="white"
+                      color="grey-80"
+                      style="margin-left:10px !important;"
+                      size="sm"
+                      v-if="isUnsavedList">
                 Unsaved
               </q-chip>
             </span>
@@ -39,33 +37,33 @@
         </div>
       </div>
     </template>
-    <template slot="options" v-if="!isStartState">
-      <compact-btn
-        :class="`${isUnsavedList ? 'hidden' : ''}`"
-        variant="primary"
-        v-if="list.type === ContactListTypes.DYNAMIC && isEditable"
-        :disabled="isFiltersOpen"
-        @clicked="onFiltersClicked"
-      >
-        <i class="fa fa-plus mr-2"></i> Add Filters
+    <template slot="options"
+              v-if="!isStartState">
+      <compact-btn variant="primary"
+                   :class="`${isUnsavedList ? 'hidden' : ''}`"
+                   :disabled="isDisabledAddFiltersButton"
+                   v-if="list.type === ContactListTypes.DYNAMIC && isEditable"
+                   @clicked="onFiltersClicked">
+        <i class="fa fa-plus mr-2" /> Add Filters
       </compact-btn>
     </template>
 
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
-          <search
-            class="width-260"
-            limitSearchCharacters
-            :search="search"
-            :disabled="isLoadingDisabled"
-            @search="onSearch">
+          <search class="width-260"
+                  limitSearchCharacters
+                  :search="search"
+                  :disabled="isLoadingDisabled"
+                  @search="onSearch">
           </search>
           <div class="contacts-total mobile">
-            <div class="small text-muted fs-13 text-right" v-if="selectedList.type === ContactListTypes.DYNAMIC">
+            <div class="small text-muted fs-13 text-right"
+                 v-if="selectedList.type === ContactListTypes.DYNAMIC">
               {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
             </div>
-            <div class="small text-muted fs-13 text-right" v-else>
+            <div class="small text-muted fs-13 text-right"
+                 v-else>
               {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
             </div>
           </div>
@@ -78,17 +76,15 @@
                    :class="{ disabled: isLoading }">
               My Contacts
             </label>
-            <b-form-checkbox
-              id="my-contacts"
-              class="mt-2 cursor-pointer"
-              name="check-button"
-              size="sm"
-              switch
-              :class="{ disabled: isLoading }"
-              :disabled="isLoading"
-              v-model="myContacts"
-              @change="onFetchMyContacts"
-            >
+            <b-form-checkbox id="my-contacts"
+                             class="mt-2 cursor-pointer"
+                             name="check-button"
+                             size="sm"
+                             switch
+                             :class="{ disabled: isLoading }"
+                             :disabled="isLoading"
+                             v-model="myContacts"
+                             @change="onFetchMyContacts">
             </b-form-checkbox>
           </div>
           <div>
@@ -112,96 +108,92 @@
              v-if="!isMyContactsView && isTabletOrMobile && $route.params.id !== 'unassigned'">
           <label class="text-primary mr-2 mt-2 cursor-pointer"
                  :class="{ disabled: isLoading }">My Contacts</label>
-          <b-form-checkbox
-            id="my-contacts"
-            class="mt-2 cursor-pointer"
-            name="check-button"
-            size="sm"
-            switch
-            :class="{ disabled: isLoading }"
-            :disabled="isLoading"
-            v-model="myContacts"
-            @change="onFetchMyContacts"
-          >
+          <b-form-checkbox id="my-contacts"
+                           class="mt-2 cursor-pointer"
+                           name="check-button"
+                           size="sm"
+                           switch
+                           :class="{ disabled: isLoading }"
+                           :disabled="isLoading"
+                           v-model="myContacts"
+                           @change="onFetchMyContacts">
           </b-form-checkbox>
         </div>
         <div class="contacts-total desktop">
-          <div
-            class="small text-muted fs-13 text-right"
-            v-if="selectedList.type === ContactListTypes.DYNAMIC">
+          <div class="small text-muted fs-13 text-right"
+               v-if="selectedList.type === ContactListTypes.DYNAMIC">
             {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
-          <div
-            class="small text-muted fs-13 text-right"
-            v-else>
+          <div class="small text-muted fs-13 text-right"
+               v-else>
             {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
         <div class="d-flex align-items-center pr-2 pl-2"
              :class="['btn-filter-wrapper mr-2', isFiltersOpen ? 'background' : '' ]">
-          <compact-btn borderless
-                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+          <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        variant="outlined-light"
-                       v-if="hasAppliedFilters && !isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
-                       :disabled="defaultIds.includes(id)"
                        tooltip-text="Clear"
+                       borderless
+                       :disabled="defaultIds.includes(id)"
+                       v-if="hasAppliedFilters && !isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
                        @clicked="clearFilters">
             <close-icon width="14px"
                         height="14px"
                         icon-color="#62666E">
             </close-icon>
           </compact-btn>
-          <compact-btn borderless
-                       customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+          <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                        variant="outlined-light"
-                       v-if="isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
                        tooltip-text="Reset"
-                       @clicked="resetFilters">
+                       borderless
+                       v-if="isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
+                       @clicked="resetFilters(false, false)">
             <refresh-icon width="14px"
                           height="14px"
                           icon-color="grey-90">
             </refresh-icon>
           </compact-btn>
-          <compact-btn borderless
-                       variant="outlined-light"
+          <compact-btn variant="outlined-light"
                        customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                       :disabled="isStartState"
+                       borderless
+                       :disabled="isDisabledFiltersButton"
                        @clicked="onFiltersClicked">
             <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
-            <b-badge v-if="hasAppliedFilters"
-                     class="d-flex align-items-center contact-filter-count"
+            <b-badge class="d-flex align-items-center contact-filter-count"
+                     variant="primary"
                      pill
-                     variant="primary">
+                     v-if="hasAppliedFilters">
               {{ filtersCount }}
             </b-badge>
           </compact-btn>
         </div>
 
-        <compact-btn
-          variant="primary"
-          v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
-          :disabled="isDisabledSaveFilter"
-          :customClass="saveFilterButtonCustomClass"
-          @clicked="onUpdateContactList">
-          <q-spinner-bars v-if="isUpdatingList"
-                          color="white"
-                          class="mr-1"/>
+        <compact-btn variant="primary"
+                     :disabled="isDisabledSaveFilter"
+                     :customClass="saveFilterButtonCustomClass"
+                     v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
+                     @clicked="onUpdateContactList">
+          <q-spinner-bars color="white"
+                          class="mr-1"
+                          v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
         <b-dropdown text="Add Contacts"
-                    right
-                    no-caret
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
+                    right
+                    no-caret
                     v-if="canSeeAddContacts">
-          <template #button-content class="filter-toggle-button">
+          <template class="filter-toggle-button"
+                    #button-content>
             <div class="filter-toggle-button d-flex align-items-center">
               Add Contacts
             </div>
             <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
-               style="margin-top: 2px;"></i>
+               style="margin-top: 2px;" />
           </template>
           <b-dropdown-item href="#"
                            :disabled="!canAddContacts"
@@ -221,34 +213,37 @@
         <contact-create-modal :id="createContactModalId"
                               @created="onContactCreated"></contact-create-modal>
 
-        <b-dropdown text="..."
-                    no-caret
-                    right
+        <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+                    text="..."
                     variant="light"
-                    class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown">
+                    no-caret
+                    right>
           <template #button-content>
-            <ellipse-icon></ellipse-icon>
+            <ellipse-icon />
           </template>
-          <b-dropdown-item href="" @click="onEditColumnsClicked">
-            <edit-hamburger-icon></edit-hamburger-icon>
+          <b-dropdown-item href=""
+                           @click="onEditColumnsClicked">
+            <edit-hamburger-icon />
             Edit Columns
           </b-dropdown-item>
-          <b-dropdown-item href="#" :disabled="true">
-            <power-dialer-mobile-icon width="14" height="14" color="#62666E"></power-dialer-mobile-icon>
+          <b-dropdown-item href="#"
+                           :disabled="true">
+            <power-dialer-mobile-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
             Power Dialer
           </b-dropdown-item>
-          <b-dropdown-item
-            @click="exportAsCsv"
-            href="#"
-            v-if="isAdmin">
-            <export-icon></export-icon>
+          <b-dropdown-item href="#"
+                           v-if="isAdmin"
+                           @click="exportAsCsv">
+            <export-icon />
             Export as CSV
           </b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
                            v-b-tooltip.hover="{ placement: 'top', title: (isListDeletable ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onRemoveList">
-            <delete-red-icon></delete-red-icon>
+            <delete-red-icon />
             <span class="text-danger">
               {{ unsavedList ? 'Discard' : 'Delete' }}
             </span>
@@ -259,67 +254,58 @@
     <template slot="actions">
       <bulk-action-menu :id="id"
                         v-if="checked.length > 0"
-                        @onSetAllContactsSelected="onCheckAllItemsFromTheList"></bulk-action-menu>
+                        @onSetAllContactsSelected="onCheckAllItemsFromTheList" />
     </template>
 
     <template slot="table">
-      <datatable
-        ref="contactsTable"
-        :stickyHeaders="true"
-        :columns="columns"
-        :isEmpty="isEmpty || isStartState"
-        :isLoadingMore="isLoadingMore"
-        :is-loading="isLoading"
-        :contact-list-id="id"
-        :paginated="false"
-        :show-pagination="!isStartState"
-        :total-rows="fixedContactsData.total"
-        :current-page="fixedContactsData.current_page"
-        :last-page="fixedContactsData.last_page"
-        :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
-        v-if="listItemsHasData"
-        @onMouseMove="datatableOnMouseMove"
-        @onMouseLeave="datatableOnMouseMove"
-        @reordered="onColumnsReordered"
-        @checked="onCheckAllItems"
-        @sort="onSortByField"
-        @paginated="onPaginate"
-        @more="onLoadMore">
+      <datatable ref="contactsTable"
+                 :stickyHeaders="true"
+                 :columns="columns"
+                 :isEmpty="isEmpty || isStartState"
+                 :isLoadingMore="isLoadingMore"
+                 :is-loading="isLoading"
+                 :contact-list-id="id"
+                 :paginated="false"
+                 :show-pagination="!isStartState"
+                 :total-rows="fixedContactsData.total"
+                 :current-page="fixedContactsData.current_page"
+                 :last-page="fixedContactsData.last_page"
+                 :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
+                 v-if="listItemsHasData"
+                 @onMouseMove="datatableOnMouseMove"
+                 @onMouseLeave="datatableOnMouseMove"
+                 @reordered="onColumnsReordered"
+                 @checked="onCheckAllItems"
+                 @sort="onSortByField"
+                 @paginated="onPaginate"
+                 @more="onLoadMore">
         <template slot="tbody">
-          <tr v-for="(contact, index) in fixedContactsData.data"
+          <tr class="datatable-row"
               :key="`${index}`"
-              class="datatable-row">
-            <template
-              v-for="(column, colIndx) in fixedColumns">
-              <td
-                v-if="column.name === 'checkbox'"
-                :key="`c-${colIndx}`"
-                class="text-left pull-left datatable-row__checkbox">
-
+              v-for="(contact, index) in fixedContactsData.data">
+            <template v-for="(column, colIndx) in fixedColumns">
+              <td class="text-left pull-left datatable-row__checkbox"
+                  :key="`c-${colIndx}`"
+                  v-if="column.name === 'checkbox'">
                 <label class="custom-checkbox-container">
-                  <input
-                    type="checkbox"
-                    class="checker"
-                    :value="contact.id"
-                    :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
-                    @change="onCheckerClicked(contact)" />
-                  <span class="checkmark"></span>
+                  <input type="checkbox"
+                         class="checker"
+                         :value="contact.id"
+                         :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
+                         @change="onCheckerClicked(contact)" />
+                  <span class="checkmark" />
                 </label>
               </td>
-
-              <td
-                v-else-if="column.name === 'name'"
-                class="datatable-row__name"
-                :key="`c-${colIndx}`">
+              <td class="datatable-row__name"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'name'">
                 <div class="d-flex align-items-center">
                   <div class="pr-2">
-                    <div
-                      class="avatar"
-                      :style="computedStyle">
-                      <div
-                        class="avatar__inner">
+                    <div class="avatar"
+                         :style="computedStyle">
+                      <div class="avatar__inner">
                         <span v-if="!contact.name || !contact.name.length">
-                          <i class="fa fa-user"></i>
+                          <i class="fa fa-user" />
                         </span>
                         <span v-else>
                           {{ getInitials(contact.name || 'No Name') }}
@@ -329,7 +315,8 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <router-link :to="generateRoute(contact.id)" class="d-flex align-items-center item contact-name">
+                    <router-link class="d-flex align-items-center item contact-name"
+                                 :to="generateRoute(contact.id)">
                       <template v-if="contact.name">
                         <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                           {{ contact.name | ucwords }}
@@ -342,18 +329,17 @@
                       </template>
                     </router-link>
 
-                    <b-badge v-if="contact.is_dnc"
-                                 variant="danger"
-                                 class="badge-phone-info">
+                    <b-badge variant="danger"
+                             class="badge-phone-info"
+                             v-if="contact.is_dnc">
                     DNC
                   </b-badge>
                   </div>
                 </div>
               </td>
-              <td
-                v-else-if="column.name === 'contact_owner'"
-                class="datatable-row__name"
-                :key="`c-${colIndx}`">
+              <td class="datatable-row__name"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'contact_owner'">
                 <div class="d-flex align-items-center">
                   <div class="flex-grow-1">
                     <div v-if="contact.user_id">
@@ -370,26 +356,22 @@
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'phone_number'"
-                class="datatable-row__phone"
-                :key="`c-${colIndx}`">
-                <div
-                  v-if="contact.phone_number"
-                  :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+              <td class="datatable-row__phone"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'phone_number'">
+                <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
+                     v-if="contact.phone_number">
                   {{ contact.phone_number | fixPhone('NATIONAL', true) }}
                 </div>
-                <div
-                  v-else
-                  class="ml-1 text-grey-7 text-center "
-                  :class="`${column.draggable ? 'col-indented' : ''}`">
+                <div class="ml-1 text-grey-7 text-center "
+                     :class="`${column.draggable ? 'col-indented' : ''}`"
+                     v-else>
                   -
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'last_engagement_text'"
-                :key="`c-${colIndx}`">
+              <td :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'last_engagement_text'">
                 <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                   <div>{{ contact.last_engagement_text }}</div>
                   <div class="small text-muted">
@@ -398,109 +380,92 @@
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'tags'"
-                :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
-                :key="`c-${colIndx}`"
-                @mouseleave="onMouseLeavePopover($event)">
+              <td :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'tags'"
+                  @mouseleave="onMouseLeavePopover($event)">
 
-                <template
-                  v-if="!contact.tags || (contact.tags && !contact.tags.length)">
+                <template v-if="!contact.tags || (contact.tags && !contact.tags.length)">
                   -
                 </template>
 
-                <template
-                  v-if="Array.isArray(contact.tags) && contact.tags.length">
-                  <div
-                    class="d-flex align-items-center contact-tags-item popover-items"
-                    :id="`pt-${index}-${colIndx}`"
-                    v-if="contact.id"
-                    @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
+                <template v-if="Array.isArray(contact.tags) && contact.tags.length">
+                  <div class="d-flex align-items-center contact-tags-item popover-items"
+                       :id="`pt-${index}-${colIndx}`"
+                       v-if="contact.id"
+                       @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
                     <span>
-                      <i
-                        class="fa fa-circle"
-                        :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`"></i>
+                      <i class="fa fa-circle"
+                         :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`" />
                       <span v-if="contact.tags.length > 1">
                         {{ contact.tags[0].name | truncate(17) }}
                       </span>
-                      <span
-                        v-else>
+                      <span v-else>
                         {{ contact.tags[0].name | truncate(27) }}
                       </span>
                     </span>
-                    <span
-                      v-if="contact.tags.length > 1"
-                      class="ml-1 text-grey-7">
+                    <span class="ml-1 text-grey-7"
+                          v-if="contact.tags.length > 1">
                       +{{ (contact.tags.length - 1) }} more
                     </span>
                   </div>
                 </template>
               </td>
 
-              <td
-                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
-                :key="`c-${colIndx}`"
-                v-else-if="column.name === 'unread_texts_count'">
-                <span
-                  class="badge badge-danger unread-text bg-red-80"
-                  v-if="contact.unread_texts_count > 0">
+              <td :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'unread_texts_count'">
+                <span class="badge badge-danger unread-text bg-red-80"
+                      v-if="contact.unread_texts_count > 0">
                   {{ contact.unread_texts_count }}
                 </span>
               </td>
 
-              <td
-                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
-                :key="`c-${colIndx}`"
-                v-else-if="column.name === 'unread_missed_calls_count'">
-                <span
-                  class="badge badge-danger unread-text bg-red-80"
-                  v-if="contact.unread_missed_calls_count > 0">
+              <td :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'unread_missed_calls_count'">
+                <span class="badge badge-danger unread-text bg-red-80"
+                      v-if="contact.unread_missed_calls_count > 0">
                   {{ contact.unread_missed_calls_count }}
                 </span>
               </td>
 
-              <td
-                :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
-                :key="`c-${colIndx}`"
-                v-else-if="column.name === 'unread_voicemails_count'">
-                <span
-                  class="badge badge-danger unread-text bg-red-80"
-                  v-if="contact.unread_voicemails_count > 0">
+              <td :class="`text-left ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'unread_voicemails_count'">
+                <span class="badge badge-danger unread-text bg-red-80"
+                      v-if="contact.unread_voicemails_count > 0">
                   {{ contact.unread_voicemails_count }}
                 </span>
               </td>
 
-              <td
-                v-else-if="column.name === 'text_authorized_at'"
-                class="text-left"
-                :key="`c-${colIndx}`">
+              <td class="text-left"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'text_authorized_at'">
                 <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                   {{ contact.text_authorized_at ? 'Yes' : 'No' }}
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'initial_campaign_id'"
-                class="text-left"
-                :key="`c-${colIndx}`">
+              <td class="text-left"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'initial_campaign_id'">
                 <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
                   {{ getLineName(contact.initial_campaign_id) }}
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'created_at'"
-                class="text-left"
-                :key="`c-${colIndx}`">
+              <td class="text-left"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'created_at'">
                 <div :class="`ellipse ${column.draggable === true ? 'col-indented' : ''}`">
                   {{ contact.created_at | fixFullDateTime }}
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'actions'"
-                class="text-left datatable-row__actions"
-                :key="`c-${colIndx}`">
+              <td class="text-left datatable-row__actions"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'actions'">
                 <div>
                   <button class="btn btn-sm datatable-row__actions__action--call"
                           @click="onCall(contact)">
@@ -512,98 +477,82 @@
                     <!--message-o-icon></message-o-icon-->
                     <span class="aloicons action-icons">A</span>
                   </button>
-                  <button v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
-                          class="btn btn-sm datatable-row__actions__action--trash"
+                  <button class="btn btn-sm datatable-row__actions__action--trash"
+                          v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
                           @click="onRemove(contact, id)">
                     <span class="aloicons action-icons">B</span>
                   </button>
                 </div>
               </td>
 
-              <td
-                v-else-if="column.name === 'task_status_name' || column.name === 'task_status'"
-                :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
-                :key="`c-${colIndx}`">
-                <q-chip
-                  :outline="true"
-                  :color="getStatusColor(getStatusName(contact.task_status, 'contacts'), 'contacts')"
-                  text-color="red"
-                  size="12px"
-                  class="p-0 m-0">
+              <td :class="`tags-cell ${column.draggable ? 'col-indented-2' : ''}`"
+                  :key="`c-${colIndx}`"
+                  v-else-if="column.name === 'task_status_name' || column.name === 'task_status'">
+                <q-chip text-color="red"
+                        size="12px"
+                        class="p-0 m-0"
+                        :outline="true"
+                        :color="getStatusColor(getStatusName(contact.task_status, 'contacts'), 'contacts')">
                   {{ getStatusName(contact.task_status, 'contacts') }}
                 </q-chip>
               </td>
 
-              <td
-                v-else
-                :key="`c-${colIndx}`"
-                @mouseleave="onMouseLeavePopover($event)">
+              <td :key="`c-${colIndx}`"
+                  v-else
+                  @mouseleave="onMouseLeavePopover($event)">
 
-                <div
-                  v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)"
-                  class="text-left">
+                <div class="text-left"
+                     v-if="isColumnValueEmpty(contact[column.name])">
                   <div :class="`${column.draggable ? 'col-indented' : ''}`">
                     -
                   </div>
                 </div>
 
-                <div
-                  v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length"
-                  class="text-left">
-                  <div
-                    v-if="contact[column.name].length > 0"
-                    :id="`ot-${index}-${colIndx}`"
-                    class="d-flex align-items-center popover-items"
-                    @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${colIndx}`, index, column.name, $event)">
-                    <div
-                      v-if="typeof contact[column.name][0].phone_number !== 'undefined'"
-                      :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                <div class="text-left"
+                     v-else-if="isColumnValueNotEmpty(contact[column.name])">
+                  <div class="d-flex align-items-center popover-items"
+                       :id="`ot-${index}-${colIndx}`"
+                       v-if="contact[column.name].length > 0"
+                       @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${colIndx}`, index, column.name, $event)">
+                    <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
+                         v-if="typeof contact[column.name][0].phone_number !== 'undefined'">
                       {{ contact[column.name][0].phone_number | fixPhone('NATIONAL', true) }}
                     </div>
-                    <div
-                      v-else
-                      :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                    <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
+                         v-else>
                       {{ contact[column.name][0].name }}
                     </div>
-                    <span
-                      v-if="contact[column.name].length > 1"
-                      class="ml-1 text-grey-7">
+                    <span class="ml-1 text-grey-7"
+                          v-if="contact[column.name].length > 1">
                       +{{ (contact[column.name].length - 1) }} more
                     </span>
                   </div>
-                  <span
-                    v-if="contact[column.name].length === 0">
+                  <span v-if="contact[column.name].length === 0">
                     -
                   </span>
                 </div>
-                <div
-                  v-else-if="contact[column.name] && contact[column.name] instanceof Object && Object.keys(contact[column.name]).length"
-                  class="text-left">
-                  <div
-                    v-if="contact[column.name].id && typeof contact[column.name].name !== 'undefined'"
-                    :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
+                <div class="text-left"
+                     v-else-if="isColumnObjectValueNotEmpty(contact[column.name])">
+                  <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
+                       v-if="contact[column.name].id && typeof contact[column.name].name !== 'undefined'">
                     {{ contact[column.name].name }}
                   </div>
                 </div>
-                <span
-                  v-else-if="contact[column.name] && contact[column.name] instanceof Object && !Object.keys(contact[column.name]).length"
-                  class="text-left">
+                <span class="text-left"
+                      v-else-if="isColumnObjectValueEmpty(contact[column.name])">
                   - {{ contact[column.name] }}
                 </span>
-                <div
-                  v-else-if="column.name.includes('_at')"
-                  class="text-left ellipse col-indented">
+                <div class="text-left ellipse col-indented"
+                     v-else-if="column.name.includes('_at')">
                   {{ contact[column.name] | fixFullDateTime }}
                 </div>
-                <div
-                  v-else-if="column.name.includes('date_of_birth')"
-                  class="text-left ellipse col-indented" >
+                <div class="text-left ellipse col-indented"
+                     v-else-if="column.name.includes('date_of_birth')">
                   {{ contact[column.name] | fixFullDate }}
                 </div>
-                <div
-                  v-else
-                  class="ellipse"
-                  :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`">
+                <div class="ellipse"
+                     :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`"
+                     v-else>
                   {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
                   (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : ( contact[column.name] === null ? '-' : contact[column.name] ) ) }}
                 </div>
@@ -627,15 +576,14 @@
         </template>
       </datatable>
 
-      <b-popover
-        v-if="hoverPopover.target"
-        triggers="hover"
-        placement="topright"
-        boundary="window"
-        ref="popover"
-        :key="hoverPopover.key"
-        :show.sync="hoverPopover.show"
-        :target="hoverPopover.target">
+      <b-popover triggers="hover"
+                 placement="topright"
+                 boundary="window"
+                 ref="popover"
+                 :key="hoverPopover.key"
+                 :show.sync="hoverPopover.show"
+                 :target="hoverPopover.target"
+                 v-if="hoverPopover.target">
         <template #title>
           <div class="contact-tags-title">{{ hoverPopover.title }}</div>
         </template>
@@ -644,19 +592,18 @@
                 v-for="(item, index) in hoverPopover.data"
                 :key="`t-${index}`">
             <span>
-              <i class="fa fa-circle" :style="`color: ${item.color};font-size:50%;position: relative; top: -2px;`"></i>
+              <i class="fa fa-circle"
+                 :style="`color: ${item.color};font-size:50%;position: relative; top: -2px;`" />
               {{ item.name }}
             </span>
           </span>
         </template>
         <template v-if="hoverPopover.title !== 'Tags'">
-          <div
-            class="ml-1 w-100"
-            v-for="(item, index) in hoverPopover.data"
-            :key="`ct-${index}`">
-            <i
-              class="fa fa-circle text-black"
-              :style="`font-size:36%;position: relative; top: -3px;`"></i>
+          <div class="ml-1 w-100"
+               :key="`ct-${index}`"
+               v-for="(item, index) in hoverPopover.data">
+            <i class="fa fa-circle text-black"
+               :style="`font-size:36%;position: relative; top: -3px;`" />
             <span v-if="typeof item.phone_number !== 'undefined'">
               {{ item.phone_number | fixPhone('NATIONAL', true) }}
             </span>
@@ -665,9 +612,8 @@
             </span>
           </div>
         </template>
-        <span
-          v-if="hoverPopover.dataLength > 11"
-          class="ml-1 text-grey-7">
+        <span class="ml-1 text-grey-7"
+              v-if="hoverPopover.dataLength > 11">
           +{{ (hoverPopover.dataLength - 11) }} more
         </span>
       </b-popover>
@@ -719,6 +665,7 @@ import {
   simpsocialMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   name: 'contacts-view',
@@ -835,6 +782,271 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+
+    ...mapState('contacts', [
+      'folders',
+      'showContactsListSidebar',
+      'shouldUpdateSelectedListContactCount',
+      'showMyContacts',
+      'pinnedCounts',
+      'previousListFilters',
+      'previouslySavedListId',
+      'previousListId',
+      'listContactsLoaded'
+    ]),
+
+    ...mapGetters('contacts', [
+      'lists',
+      'listItems',
+      'selectedContacts',
+      'isFiltersOpen',
+      'selectedList',
+      'currentListFilters',
+      'unsavedList'
+    ]),
+
+    ...mapState([
+      'isTabletOrMobile',
+      'campaigns',
+      'users'
+    ]),
+
+    ...mapState('auth', [
+      'profile'
+    ]),
+
+    fixedContactsData () {
+      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
+        return this.$parent.$data.contactsData
+      }
+
+      return this.contactsData
+    },
+
+    id () {
+      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        return this.$route.params.id
+      }
+
+      return 'all'
+    },
+
+    defaultIds () {
+      return Object.keys(DEFAULT_PINNED_LIST)
+        .map((k) => DEFAULT_PINNED_LIST[k].id)
+        .concat(['static'])
+    },
+
+    contactList () {
+      return this.lists[this.id]
+    },
+
+    isLoaded () {
+      if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+        return true
+      }
+
+      return !!(this.listItems[String(this.id)] &&
+        this.lists[String(this.id)])
+    },
+
+    checked () {
+      return this.selectedContacts[this.id] || []
+    },
+
+    saveFilterButtonClass () {
+      return {
+        'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
+          (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
+            !this.isFilterHasChanges) ||
+          this.defaultIds.includes(this.id)
+      }
+    },
+
+    listItemsHasData () {
+      return !_.isEmpty(this.fixedContactsData)
+    },
+
+    listItemsDataCount () {
+      const total = _.get(this.fixedContactsData, 'data.length', null)
+      return total !== null ? total : 0
+    },
+
+    listItemsTotalContacts () {
+      const data = _.get(this.fixedContactsData, `data`, null)
+      return data.length || 0
+    },
+
+    filterButtonVariant () {
+      return this.isFiltersOpen ? 'primary' : 'outlined-light'
+    },
+
+    filterBadgeVariant () {
+      return this.isFiltersOpen ? 'light' : 'primary'
+    },
+
+    resetButtonVariant () {
+      return this.isFilterHasChanges ? 'primary' : 'outlined-light'
+    },
+
+    saveFilterButtonVariant () {
+      return this.isFilterHasChanges ? 'primary' : 'secondary'
+    },
+
+    saveFilterButtonCustomClass () {
+      return this.isDisabledSaveFilter ? 'button-disabled' : ''
+    },
+
+    isResetDisabled () {
+      return !this.isFilterHasChanges
+    },
+
+    isListDeletable () {
+      // eslint-disable-next-line no-unused-vars
+      for (const [key, list] of Object.entries(this.defaultContactLists)) {
+        if (list.id === this.selectedList.id) {
+          return true
+        }
+      }
+
+      return false
+    },
+
+    hasAppliedFilters () {
+      return this.filtersCount > 0
+    },
+
+    isUnsavedList () {
+      return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
+    },
+
+    canSeeAddContacts () {
+      return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
+    },
+
+    canAddContacts () {
+      return this.list.type === ContactListTypes.STATIC && this.isEditable
+    },
+
+    fixedColumns () {
+      const newItems = this.$jsonClone(this.columns)
+
+      // now, check if columns have order, label, maxWidth or minWidth property, or
+      // check if column is required then update sortable.
+      for (let index in newItems) {
+        let column = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+
+        if (column && column.required) {
+          newItems[index].sortable = column.sortable
+        }
+
+        if (column) {
+          newItems[index].label = column.label
+          newItems[index].maxWidth = column.maxWidth
+          newItems[index].minWidth = column.minWidth
+        }
+      }
+
+      return newItems
+    },
+
+    isCurrentAndPreviousFiltersMismatch () {
+      if (_.isEmpty(this.previousListFilters)) {
+        return false
+      }
+
+      const previousListFilters = this.$jsonClone(this.previousListFilters)
+
+      if (this.cleanedCurrentListFilters?.search && !previousListFilters?.search) {
+        previousListFilters.search = this.cleanedCurrentListFilters.search
+      }
+
+      return JSON.stringify(this.cleanedCurrentListFilters) !== JSON.stringify(previousListFilters)
+    },
+
+    isFilterHasChanges () {
+      return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
+    },
+
+    isDisabledAddFiltersButton () {
+      return this.isFiltersOpen || !this.listContactsLoaded
+    },
+
+    isDisabledFiltersButton () {
+      return this.isStartState || !this.listContactsLoaded
+    },
+
+    isDisabledSaveFilter () {
+      return !this.isFilterHasChanges ||
+        this.defaultIds.includes(this.id) ||
+        this.isUpdatingList ||
+        !this.listContactsLoaded ||
+        this.list.show_in_public_folder
+    },
+
+    simpsocialMessengerIframeLink () {
+      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
+    },
+
+    cleanedCurrentListFilters () {
+      const currentFilters = _.isEmpty(this.currentListFilters)
+        ? {}
+        : this.currentListFilters
+
+      return currentFilters
+    }
+  },
+
+  mounted () {
+    if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
+      this.loadList(this.$route.params.id)
+    }
+
+    if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
+      this.setData(this.id)
+      this.setSelectedList({ id: this.id, name: this.name, type: this.type })
+    }
+
+    this.reRouteToBase()
+    this.setShouldUpdateSelectedListContactCount(true)
+    // this.$VueEvent.fire('fetchContacts')
+    // force close filter
+    this.closeFilters()
+    this.folderPath = this.generateFolderPath(this.folders)
+
+    this.myContacts = this.showMyContacts
+
+    this.$VueEvent.listen('shouldUpdateListCount', () => {
+      if (this.list.type === this.ContactListTypes.DYNAMIC) {
+        this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
+        return
+      }
+
+      this.setDataCount({
+        filters: {
+          contact_lists: {
+            operator: OPERATORS.IS_ANY_OF,
+            value: [this.list.id]
+          }
+        },
+        is_conjunction: true
+      })
+    })
+
+    this.viewListeners.setDataCount = _.debounce((filters) => {
+      this.setDataCount(filters)
+    }, 100)
+
+    this.viewListeners.updateHasFilterChanges = () => {
+      this.filterHasChanges = false
+    }
+
+    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
+    this.$VueEvent.listen('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
+  },
+
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
@@ -860,7 +1072,8 @@ export default {
       'setMessageComposerMode',
       'updateContactsList',
       'updateContactsListFilter',
-      'setListContactsLoaded'
+      'setListContactsLoaded',
+      'setPreviouslySavedListId'
     ]),
 
     onSearch (searchText) {
@@ -913,7 +1126,7 @@ export default {
 
       const filters = this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
         contact_lists: {
-          operator: 1,
+          operator: OPERATORS.IS_ANY_OF,
           value: [stringId]
         }
       }
@@ -1013,6 +1226,7 @@ export default {
 
       // don't allow filters to be saved empty for dynamic list
       const hasGroupFilters = Object.keys(this.currentListFilters).filter(key => this.currentListFilters[key]?.filters)
+
       if (_.isEmpty(hasGroupFilters) && this.selectedList.type === this.ContactListTypes.DYNAMIC) {
         this.$generalNotification('Filters not saved. Dynamic list must have filters.', 'error')
         return
@@ -1026,7 +1240,8 @@ export default {
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
           .then((res) => {
-            this.updateContactsList(res.data)
+            this.setPreviouslySavedListId(this.selectedList.id)
+            this.updateContactsList(res.data.data)
             this.initialListFilters = this.currentListFilters
             this.updateFilterHasChanges()
             this.isUpdatingList = false
@@ -1042,18 +1257,26 @@ export default {
             }
 
             if (this.list.type === this.ContactListTypes.DYNAMIC) {
-              this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters, true)
+              this.setDataCount({
+                filter_groups: this.currentListFilters
+              }, true)
               return
             }
 
             this.setDataCount({
-              filters: {
-                contact_lists: {
-                  operator: 1,
-                  value: [this.list.id]
+              filter_groups: [
+                {
+                  filters: {
+                    contact_lists: [
+                      {
+                        operator: OPERATORS.IS_ANY_OF,
+                        value: [this.list.id]
+                      }
+                    ]
+                  },
+                  is_conjunction: true
                 }
-              },
-              is_conjunction: true
+              ]
             }, true)
           })
           .catch((_err) => {
@@ -1136,7 +1359,11 @@ export default {
     },
 
     hasFilterChanges () {
-      return JSON.stringify(this.initialListFilters) !== JSON.stringify(this.currentListFilters)
+      const initialFilters = _.isEmpty(this.initialListFilters)
+        ? {}
+        : this.initialListFilters
+
+      return JSON.stringify(initialFilters) !== JSON.stringify(this.cleanedCurrentListFilters)
     },
 
     updateFilterHasChanges () {
@@ -1155,7 +1382,15 @@ export default {
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
     },
 
-    resetFilters (resetSearch = false) {
+    resetFilters (resetSearch = false, skipPreviouslySavedListId = true) {
+      // don't reset currently selected list's filter to
+      // its previous filter if list's id is equal to
+      // previously saved list id.
+      if (skipPreviouslySavedListId &&
+        this.selectedList.id === this.previouslySavedListId) {
+        return
+      }
+
       this.setListContactsLoaded(false)
 
       if (this.selectedList.id === this.previousListId) {
@@ -1165,38 +1400,46 @@ export default {
           filters: this.previousListFilters
         })
       } else {
-        this.setCurrentListFilters(this.fixDefaultFilters())
-        this.updateContactsListFilter({
-          id: this.selectedList.id,
-          filters: this.fixDefaultFilters()
-        })
+        const list = this.getfixedDefaultList()
+        this.setCurrentListFilters(list.filters)
+        this.updateContactsListFilter(list)
       }
 
       if (resetSearch) {
         this.resetSearch()
       }
+
       this.$VueEvent.fire('filters-reset')
 
       this.$VueEvent.fire('filteredFetchContacts', { clear: true })
       this.filterHasChanges = false
     },
 
-    fixDefaultFilters () {
+    getfixedDefaultList () {
       if (_.isEmpty(this.list)) {
         return []
       }
 
-      const defaultFilters = !_.isEmpty(this.list.filters) ? JSON.parse(JSON.stringify(this.list.filters)) : {}
+      let id = this.list.id
+      let defaultFilters = !_.isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
 
       if (this.$route.params.id === 'my-contacts') {
         const filter = _.get(defaultFilters, '[0].filters.contact_owner', null)
         const profileId = _.get(this.profile, 'id', null)
+
         if (filter && profileId) {
-          defaultFilters[0].filters.contact_owner.value = [profileId]
+          defaultFilters[0].filters.contact_owner[0].value = [profileId]
         }
       }
 
-      return typeof defaultFilters === 'string' ? JSON.parse(defaultFilters) : defaultFilters
+      if (typeof defaultFilters === 'string') {
+        defaultFilters = JSON.parse(defaultFilters)
+      }
+
+      return {
+        id: id,
+        filters: defaultFilters
+      }
     },
 
     onContactCreated (contact) {
@@ -1394,250 +1637,32 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    isColumnValueEmpty (columnValue) {
+      const isEmptyArray = columnValue instanceof Array && !columnValue.length
+
+      return columnValue === '' ||
+        columnValue === null ||
+        columnValue === 'NULL' ||
+        isEmptyArray
+    },
+
+    isColumnValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Array &&
+        columnValue.length
+    },
+
+    isColumnObjectValueEmpty (columnValue) {
+      return columnValue && columnValue instanceof Object && !Object.keys(columnValue).length
+    },
+
+    isColumnObjectValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Object &&
+        Object.keys(columnValue).length
     }
-  },
-
-  computed: {
-    ...mapState('cache', ['currentCompany']),
-
-    ...mapState('contacts', [
-      'folders',
-      'showContactsListSidebar',
-      'shouldUpdateSelectedListContactCount',
-      'showMyContacts',
-      'pinnedCounts',
-      'previousListFilters',
-      'previousListId',
-      'listContactsLoaded'
-    ]),
-
-    ...mapGetters('contacts', [
-      'lists',
-      'listItems',
-      'selectedContacts',
-      'isFiltersOpen',
-      'selectedList',
-      'currentListFilters',
-      'unsavedList'
-    ]),
-
-    ...mapState([
-      'isTabletOrMobile',
-      'campaigns',
-      'users'
-    ]),
-
-    ...mapState('auth', [
-      'profile'
-    ]),
-
-    fixedContactsData () {
-      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
-        return this.$parent.$data.contactsData
-      }
-
-      return this.contactsData
-    },
-
-    id () {
-      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
-        return this.$route.params.id
-      }
-
-      return 'all'
-    },
-
-    defaultIds () {
-      return Object.keys(DEFAULT_PINNED_LIST)
-        .map((k) => DEFAULT_PINNED_LIST[k].id)
-        .concat(['static'])
-    },
-
-    contactList () {
-      return this.lists[this.id]
-    },
-
-    isLoaded () {
-      if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
-        return true
-      }
-
-      return !!(this.listItems[String(this.id)] &&
-        this.lists[String(this.id)])
-    },
-
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
-
-    saveFilterButtonClass () {
-      return {
-        'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
-          (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
-            !this.isFilterHasChanges) ||
-          this.defaultIds.includes(this.id)
-      }
-    },
-
-    listItemsHasData () {
-      return !_.isEmpty(this.fixedContactsData)
-    },
-
-    listItemsDataCount () {
-      const total = _.get(this.fixedContactsData, 'data.length', null)
-      return total !== null ? total : 0
-    },
-
-    listItemsTotalContacts () {
-      const data = _.get(this.fixedContactsData, `data`, null)
-      return data.length || 0
-    },
-
-    filterButtonVariant () {
-      return this.isFiltersOpen ? 'primary' : 'outlined-light'
-    },
-
-    filterBadgeVariant () {
-      return this.isFiltersOpen ? 'light' : 'primary'
-    },
-
-    resetButtonVariant () {
-      return this.isFilterHasChanges ? 'primary' : 'outlined-light'
-    },
-
-    saveFilterButtonVariant () {
-      return this.isFilterHasChanges ? 'primary' : 'secondary'
-    },
-
-    saveFilterButtonCustomClass () {
-      return this.isDisabledSaveFilter ? 'button-disabled' : ''
-    },
-
-    isResetDisabled () {
-      return !this.isFilterHasChanges
-    },
-
-    isListDeletable () {
-      // eslint-disable-next-line no-unused-vars
-      for (const [key, list] of Object.entries(this.defaultContactLists)) {
-        if (list.id === this.selectedList.id) {
-          return true
-        }
-      }
-
-      return false
-    },
-
-    hasAppliedFilters () {
-      return this.filtersCount > 0
-    },
-
-    isUnsavedList () {
-      return this.id === 'unsaved' && !_.isEmpty(this.unsavedList)
-    },
-
-    canSeeAddContacts () {
-      return ((this.list.type === ContactListTypes.STATIC && this.isEditable) || this.id === 'all') && !this.list.show_in_public_folder
-    },
-
-    canAddContacts () {
-      return this.list.type === ContactListTypes.STATIC && this.isEditable
-    },
-
-    fixedColumns () {
-      const newItems = JSON.parse(JSON.stringify(this.columns))
-      // now, check if columns have order, label, maxWidth or minWidth property, or
-      // check if column is required then update sortable.
-      const index = { data: null }
-      const found = { data: null }
-      for (index.data in newItems) {
-        found.data = ALL_COLUMNS.find(col => col.name === newItems[index.data].name)
-        if (found.data && found.required) {
-          newItems[index.data].sortable = found.sortable
-        }
-        if (found.data) {
-          newItems[index.data].label = found.data.label
-          newItems[index.data].maxWidth = found.data.maxWidth
-          newItems[index.data].minWidth = found.data.minWidth
-        }
-      }
-      return newItems
-    },
-
-    hasMore () {
-      return (this.hasNextPage &&
-          !this.isLoadingMore &&
-          !this.isLoading) ||
-        false
-    },
-
-    isCurrentAndPreviousFiltersMismatch () {
-      const previousListFilters = JSON.parse(JSON.stringify(this.previousListFilters))
-
-      if (!this.currentListFilters.search && !previousListFilters.search) {
-        previousListFilters.search = this.currentListFilters.search
-      }
-
-      return !_.isEqual(this.currentListFilters, previousListFilters)
-    },
-
-    isFilterHasChanges () {
-      return this.filterHasChanges || this.isCurrentAndPreviousFiltersMismatch
-    },
-
-    isDisabledSaveFilter () {
-      return !this.isFilterHasChanges ||
-        this.defaultIds.includes(this.id) ||
-        this.isUpdatingList ||
-        this.list.show_in_public_folder
-    },
-
-    simpsocialMessengerIframeLink () {
-      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
-    }
-  },
-
-  mounted () {
-    if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
-      this.loadList(this.$route.params.id)
-    }
-
-    if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
-      this.setData(this.id)
-      this.setSelectedList({ id: this.id, name: this.name, type: this.type })
-    }
-
-    this.reRouteToBase()
-    this.setShouldUpdateSelectedListContactCount(true)
-    // this.$VueEvent.fire('fetchContacts')
-    // force close filter
-    this.closeFilters()
-    this.folderPath = this.generateFolderPath(this.folders)
-
-    this.myContacts = this.showMyContacts
-
-    this.$VueEvent.listen('shouldUpdateListCount', () => {
-      if (this.list.type === this.ContactListTypes.DYNAMIC) {
-        this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
-        return
-      }
-
-      this.setDataCount({
-        filters: {
-          contact_lists: {
-            operator: 1,
-            value: [this.list.id]
-          }
-        },
-        is_conjunction: true
-      })
-    })
-
-    this.viewListeners.setDataCount = _.debounce((filters) => {
-      this.setDataCount(filters)
-    }, 100)
-
-    this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
   },
 
   watch: {
@@ -1681,6 +1706,7 @@ export default {
     },
 
     id (value) {
+      this.updateFilterHasChanges()
       this.reRouteToBase()
       if (this.pinnedCounts.hasOwnProperty(value)) {
         this.setSelectedListContactCount(this.pinnedCounts[value])
@@ -1717,6 +1743,7 @@ export default {
   beforeDestroy () {
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
+    this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
   }
 }
 </script>

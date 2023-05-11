@@ -706,7 +706,8 @@ export default {
       'listLoaded',
       'setShowMyContacts',
       'setAddViewShowMyContacts',
-      'addPowerDialerOpen'
+      'addPowerDialerOpen',
+      'setCurrentListFilters'
     ]),
 
     loadList (id) {

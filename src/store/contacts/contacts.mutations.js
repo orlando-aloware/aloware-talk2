@@ -3,6 +3,7 @@ import _ from 'lodash'
 import * as ContactsListDefaultList from 'src/constants/default-lists'
 import * as ContactsDefault from 'src/constants/contacts-default'
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   TOGGLE_FOLDER: (state, id) => {
@@ -489,10 +490,12 @@ export default {
     Vue.set(state.lists, `my-contacts`, Object.assign(state.lists['my-contacts'], { filters: {
       0: {
         filters: {
-          contact_owner: {
-            operator: 1,
-            value: [ownerId]
-          }
+          contact_owner: [
+            {
+              operator: OPERATORS.IS_ANY_OF,
+              value: [ownerId]
+            }
+          ]
         },
         is_conjunction: true
       }
@@ -500,6 +503,9 @@ export default {
   },
   SET_PREVIOUS_LIST_FILTERS (state, payload) {
     state.previousListFilters = payload
+  },
+  SET_PREVIOUSLY_SAVED_LIST_ID (state, id) {
+    state.previouslySavedListId = id
   },
   SET_PREVIOUS_LIST_ID (state, id) {
     state.previousListId = id
