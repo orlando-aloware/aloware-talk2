@@ -5,12 +5,12 @@
            @hidden="onHidden"
            @show="onShow">
     <b-form @submit.prevent="onSubmit">
-      <b-form-group
-        id="input-group-1"
-        label="Date"
-        label-for="input-1">
-        <date-selector v-model="reminder.date"
-                       :min-date="minDate"
+      <b-form-group id="input-group-1"
+                    label="Date"
+                    label-for="input-1">
+        <date-selector :min-date="minDate"
+                       :no-clear-button="true"
+                       v-model="reminder.date"
                        @dateSelected="dateSelected">
         </date-selector>
       </b-form-group>
@@ -19,36 +19,31 @@
                     label="Time"
                     label-for="input-2">
         <predefined-time-selector v-model="reminder.time"
-                                  @select="onTimeSelected">
-        </predefined-time-selector>
+                                  @select="onTimeSelected"/>
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Timezone"
                     label-for="input-2">
-        <timezone-selector @select="timezoneSelected"></timezone-selector>
+        <timezone-selector @select="timezoneSelected"/>
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Notes"
                     label-for="input-2">
-        <b-form-textarea
-          id="textarea-no-auto-shrink"
-          placeholder="Reminder notes"
-          rows="3"
-          max-rows="8"
-          no-auto-shrink
-          v-model="reminder.note"
-        ></b-form-textarea>
+        <b-form-textarea id="textarea-no-auto-shrink"
+                         placeholder="Reminder notes"
+                         rows="3"
+                         max-rows="8"
+                         no-auto-shrink
+                         v-model="reminder.note"/>
       </b-form-group>
     </b-form>
     <template slot="modal-footer">
-      <b-button
-        variant="success"
-        class="custom-btn"
-        size="sm"
-        @click="onHidden"
-      >
+      <b-button variant="success"
+                class="custom-btn"
+                size="sm"
+                @click="onHidden">
         Close
       </b-button>
       <b-button type="button"
@@ -56,7 +51,8 @@
                 variant="primary"
                 :disabled="isAdding || !isValid"
                 @click="onSubmit">
-        <q-spinner-bars v-if="isAdding" color="white" />
+        <q-spinner-bars color="white"
+                        v-if="isAdding"/>
         {{ isAdding ? 'Adding Reminder...' : 'Add Reminder' }}
       </b-button>
     </template>
@@ -138,8 +134,8 @@ export default {
       }
     },
     onHidden () {
-      this.resetForm()
       this.addReminderOpen(false)
+      this.resetForm()
     },
     onShow () {
       this.reminder.date = window.moment().format('MM/DD/YYYY')
@@ -151,7 +147,7 @@ export default {
     },
     resetForm () {
       this.reminder = {
-        date: window.moment('MM/DD/YYYY').format(),
+        date: window.moment().format('MM/DD/YYYY'),
         time: '',
         note: '',
         timezone: this.profile.timezone

@@ -260,7 +260,7 @@ export default {
     state.messageComposer.sms = { ...state.messageComposer.sms, phone_number: phoneNumber }
   },
   SET_MESSAGE_COMPOSER_SMS_BODY: (state, body) => {
-    state.messageComposer.sms = { ...state.messageComposer.sms, body: body }
+    state.messageComposer.sms = { ...state.messageComposer.sms, body: body.trim() }
   },
   SET_MESSAGE_COMPOSER_SMS_GIF: (state, gif) => {
     state.messageComposer.sms = { ...state.messageComposer.sms, gif_url: gif }
@@ -381,6 +381,11 @@ export default {
     state.changedContactAttributes = []
   },
   UPDATE_CONTACTS: (state, payload) => {
+    // sanity check
+    if (!state.listItems[state.selectedList.id]?.data) {
+      return
+    }
+
     const found = { data: state.listItems[state.selectedList.id].data.find(contact => contact.id === payload.id) }
     found.data = found.data ? state.listItems[state.selectedList.id].data.indexOf(found.data) : null
 

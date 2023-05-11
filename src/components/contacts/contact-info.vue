@@ -211,7 +211,11 @@ import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  simpsocialMixin,
+  timezoneCheckMixin
+} from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import * as CompanyImportance from 'src/constants/importance-label'
@@ -230,7 +234,8 @@ export default {
 
   mixins: [
     aclMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    timezoneCheckMixin
   ],
 
   components: {
@@ -347,7 +352,7 @@ export default {
       return this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
     },
 
-    callContact () {
+    initiateCall () {
       const data = {
         currentNumber: this.contact.phone_number,
         contactName: this.contact.name,
@@ -367,6 +372,15 @@ export default {
       }
 
       this.$VueEvent.fire('callContact', data)
+    },
+
+    callContact () {
+      let contact = {
+        timezone: this.contact.timezone,
+        name: this.contact.name
+      }
+
+      this.checkContactTimezone(contact, this.initiateCall)
     },
 
     blockContact () {
