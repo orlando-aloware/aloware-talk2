@@ -5,6 +5,7 @@
                           :options="combinedTags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           :optionsIsGrouped="true"
+                          :height="height"
                           @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14" width="14" color="#256EFF"/>
@@ -42,14 +43,21 @@ export default {
     communication: {
       required: true
     },
+
     buttonText: {
       required: false,
       type: String,
       default: 'Add Tags'
     },
+
     exclude: {
       required: false,
       default: null
+    },
+
+    height: {
+      required: false,
+      type: Number
     }
   },
 
