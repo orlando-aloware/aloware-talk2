@@ -269,13 +269,19 @@ export default {
       }
     },
 
-    dispositionTooltipData (dispositionStatus, type, direction = null) {
+    dispositionTooltipData (dispositionStatus, type, direction = null, callbackStatus = null) {
       if (dispositionStatus === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW && direction === CommunicationDirections.INBOUND) {
         return 'Voicemail'
       }
+
       if (type === CommunicationTypes.RVM && direction === CommunicationDirections.OUTBOUND) {
         return 'RVM'
       }
+
+      if (direction === CommunicationDirections.INBOUND && [CallbackStatus.CALLBACK_STATUS_INITIATED, CallbackStatus.CALLBACK_STATUS_REQUESTED].includes(callbackStatus)) {
+        return 'Callback ' + this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateCallbackStatusText(callbackStatus)))
+      }
+
       return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateDispositionStatusText(dispositionStatus))) + ' ' + this.$options.filters.fixCommDirection(direction) + ' ' + this.$options.filters.fixCommType(type)
     },
 

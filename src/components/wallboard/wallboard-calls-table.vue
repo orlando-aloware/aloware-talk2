@@ -41,7 +41,7 @@
                                v-if="call.disposition_status2">
                     </component>
                     <q-tooltip>
-                      {{ dispositionTooltipData(call.disposition_status2, call.type, call.direction) }}
+                      {{ dispositionTooltipData(call.disposition_status2, call.type, call.direction, call.callback_status) }}
                     </q-tooltip>
                 </router-link>
               </td>
