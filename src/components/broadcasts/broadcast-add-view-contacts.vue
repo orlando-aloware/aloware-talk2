@@ -47,6 +47,12 @@
       <template v-else-if="optionSelected === 'integration'">
         <small>Select a list</small>
         <!-- shows the selector based on which integration is enabled  -->
+        <integration-list-selector ref="list-selector"
+                                     :use-chips="false"
+                                     :multiple="false"
+                                     :clearable="true"
+                                     :generic-styling="false"
+                                     @change="onListSelectorChange"/>
       </template>
     </div>
   </div>
@@ -55,13 +61,15 @@
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import LineSelector from 'components/generic-selectors/line-selector'
+import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 
 export default {
   name: 'broadcast-add-view-contacts',
 
   components: {
     CheckOIcon,
-    LineSelector
+    LineSelector,
+    IntegrationListSelector
   },
 
   computed: {
@@ -99,8 +107,13 @@ export default {
 
       this.$emit('optionSelectedChanged')
     },
+
     onLineChange (line) {
       this.selectedLine = line
+    },
+
+    onListSelectorChange (list) {
+      console.log({ list })
     }
   },
 
