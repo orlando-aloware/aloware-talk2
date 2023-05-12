@@ -46,13 +46,7 @@ export default {
       ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
       ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
       filters: {
-        // contact_task_status: {
-        //   value: [ContactTaskStatus.STATUS_OPEN],
-        //   operator: 1
-        // },
-
-        search: {
-        }
+        search: []
       },
       sorting: {
         sort: 'last_engagement_at',
@@ -236,7 +230,11 @@ export default {
       query.filter_groups = []
 
       if (this.searchText && this.searchText.trim() && this.searchText.length >= 3) {
-        this.filters.search.value = this.searchText
+        this.filters.search = [
+          {
+            value: this.searchText
+          }
+        ]
         delete this.filters.contact_task_status
       } else {
         this.filters.contact_task_status[0].value = [taskId]
@@ -324,8 +322,7 @@ export default {
             operator: OPERATORS.IS_ANY_OF
           }
         ],
-        search: {
-        }
+        search: []
       }
     },
 
