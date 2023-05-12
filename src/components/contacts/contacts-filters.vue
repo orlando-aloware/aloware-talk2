@@ -348,7 +348,8 @@ export default {
         this.filterGroupIndex = parseInt(index)
       }
 
-      this.filterGroupItemIndex = itemIndex || null
+      // assign a numeric value to filterGroupItemIndex, else null
+      this.filterGroupItemIndex = !itemIndex && itemIndex !== 0 ? null : itemIndex
       this.filterConjunction = conjunction
       this.$VueEvent.stop('filters-back')
 
