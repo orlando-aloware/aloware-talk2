@@ -1,5 +1,7 @@
 <template>
-  <div class="overview__body__card">
+  <component class="overview__body__card"
+             :is="getComponent"
+             v-bind="getComponentProps">
     <div class="overview__body__card__container">
       <div class="overview__body__card__container__icon">
         <component :is="icon"/>
@@ -25,7 +27,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </component>
 </template>
 
 <script>
@@ -92,10 +94,37 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+
+    route: {
+      type: String,
+      required: false
     }
   },
 
   computed: {
+    getComponent () {
+      switch (true) {
+        case !!this.route:
+          return 'router-link'
+        default:
+          return 'div'
+      }
+    },
+
+    getComponentProps () {
+      switch (true) {
+        case !!this.route:
+          return {
+            to: {
+              path: this.route
+            }
+          }
+        default:
+          return null
+      }
+    },
+
     getValue () {
       return this.filter
         ? this.$options.filters[this.filter](this.value)

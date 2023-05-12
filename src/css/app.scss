@@ -12586,6 +12586,7 @@ h1.contact-list-name-label {
           display: flex;
           padding: 10px;
           transition: all .5s;
+          color: $grey-100;
 
           &__container {
             display: flex;
@@ -12601,6 +12602,10 @@ h1.contact-list-name-label {
                 font-weight: bold;
               }
             }
+          }
+
+          &:hover  {
+            text-decoration: none;
           }
         }
       }

@@ -8,6 +8,7 @@
                                  :icon="item.icon"
                                  :filter="item.filter"
                                  :loading="isSummaryLoading"
+                                 :route="item.route"
                                  :key="index"
                                  v-for="(item, index) in items"/>
       </div>
@@ -82,12 +83,14 @@ export default {
         {
           name: 'Appointments Set',
           value: this.summary.appointmentsSet,
-          icon: 'wallboard-overview-appointments-set-icon'
+          icon: 'wallboard-overview-appointments-set-icon',
+          route: '/calendar'
         },
         {
           name: 'Reminders Set',
           value: this.summary.remindersSet,
-          icon: 'wallboard-overview-reminders-set-icon'
+          icon: 'wallboard-overview-reminders-set-icon',
+          route: '/calendar'
         },
         {
           name: 'Emails Sent',
