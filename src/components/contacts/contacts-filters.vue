@@ -1,6 +1,6 @@
 <template>
   <div class="contacts-filter-sidebar"
-       v-if="show">
+       v-if="show || keepOpen">
     <b-overlay class="full-width"
                spinner-variant="success"
                spinner-type="grow"
@@ -185,6 +185,13 @@ export default {
     Search,
     CompactBtn,
     ContactsFilterTypes
+  },
+
+  props: {
+    keepOpen: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data () {

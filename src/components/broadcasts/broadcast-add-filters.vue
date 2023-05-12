@@ -1,7 +1,8 @@
 <template>
   <div class="broadcasts__add__filters">
     <contacts-filters @filtersUpdated="updateFilterHasChanges"
-                      v-if="contactGroup == 'filter'"/>
+                      :keep-open="true"
+                      v-if="shouldShowFilters"/>
   </div>
 </template>
 
@@ -20,6 +21,12 @@ export default {
     contactGroup: {
       type: String,
       required: true
+    }
+  },
+
+  computed: {
+    shouldShowFilters () {
+      return this.contactGroup === 'filter'
     }
   },
 
