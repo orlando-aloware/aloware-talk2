@@ -83,7 +83,7 @@ export default {
   },
 
   data: () => ({
-    optionSelected: null,
+    optionSelected: 'list',
     options: [
       {
         value: 'list',

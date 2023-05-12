@@ -253,7 +253,7 @@ export default {
     LAST_STEP,
     CONTACTS_COLUMNS,
     formData: {
-      contactGroup: null
+      contactGroup: 'list'
     }
   }),
 

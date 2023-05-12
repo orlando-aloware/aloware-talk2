@@ -62,7 +62,7 @@ export default {
         name: 'Preview & Send'
       }
     ],
-    contactGroup: null
+    contactGroup: 'list'
   }),
 
   methods: {
