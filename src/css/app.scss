@@ -12791,6 +12791,12 @@ h1.contact-list-name-label {
         &__tags {
           white-space: normal !important;
         }
+
+        &__notes {
+          textarea {
+            word-break: break-word !important;
+          }
+        }
         
         .relative-time {
           font-size: 13px !important;

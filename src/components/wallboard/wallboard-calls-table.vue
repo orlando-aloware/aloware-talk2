@@ -288,7 +288,8 @@
               </td>
 
               <!-- notes -->
-              <td :key="`col-${colIndex}`"
+              <td class="calls__table__notes"
+                  :key="`col-${colIndex}`"
                   v-if="column.name === 'notes'">
                 <wallboard-calls-note :communication="call" />
               </td>
