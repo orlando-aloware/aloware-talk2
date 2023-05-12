@@ -1,6 +1,6 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled"
-                   :no-header="true"
+                   :no-header="simpleTable"
                    v-if="list">
     <template slot="title"
               v-if="!simpleTable">
