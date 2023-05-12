@@ -14,9 +14,10 @@
                            :steps="steps"/>
 
     <broadcast-add-view :current-step="currentStep"
-                        :steps="steps"/>
+                        :steps="steps"
+                        @contactGroupChanged="onContactGroupChanged"/>
 
-    <broadcast-add-filters />
+    <broadcast-add-filters :contact-group="contactGroup"/>
   </div>
 </template>
 
@@ -60,7 +61,14 @@ export default {
         id: 4,
         name: 'Preview & Send'
       }
-    ]
-  })
+    ],
+    contactGroup: null
+  }),
+
+  methods: {
+    onContactGroupChanged (contactGroup) {
+      this.contactGroup = contactGroup
+    }
+  }
 }
 </script>

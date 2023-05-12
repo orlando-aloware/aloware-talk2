@@ -263,6 +263,7 @@ export default {
     },
     onContactGroupChanged (contactGroup) {
       this.formData.contactGroup = contactGroup
+      this.$emit('contactGroupChanged', contactGroup)
     }
   },
 
