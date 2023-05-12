@@ -7,20 +7,29 @@
                              selectWidth="200"
                              @select="onStatus"/>
     </span>
+    <agents-status-pills :agents="agents" />
   </div>
 </template>
 
 <script>
+import AgentsStatusPills from 'src/components/agents-status-pills'
+import AgentStatusSelector from 'src/components/generic-selectors/agent-status-selector.vue'
 import WallboardAgentName from 'src/components/wallboard/wallboard-agent-name.vue'
-import AgentStatusSelector from '../generic-selectors/agent-status-selector.vue'
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'wallboard-agents-header',
 
   components: {
+    AgentsStatusPills,
     AgentStatusSelector,
     WallboardAgentName
+  },
+
+  computed: {
+    ...mapGetters('wallboard', {
+      agents: 'getAgents'
+    })
   },
 
   methods: {
