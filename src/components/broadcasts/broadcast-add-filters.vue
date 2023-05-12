@@ -1,6 +1,7 @@
 <template>
   <div class="broadcasts__add__filters">
-    <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
+    <contacts-filters @filtersUpdated="updateFilterHasChanges"
+                      v-if="contactGroup == 'filter'"/>
   </div>
 </template>
 
@@ -34,12 +35,8 @@ export default {
   },
 
   watch: {
-    contactGroup (group) {
-      if (group === 'filter') {
-        return this.openFilters()
-      }
-
-      return this.closeFilters()
+    contactGroup () {
+      return this.openFilters()
     }
   }
 }
