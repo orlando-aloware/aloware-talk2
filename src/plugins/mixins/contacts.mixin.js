@@ -11,6 +11,7 @@ import { RELATIONS } from 'src/constants/contacts-list-relations'
 import moment from 'moment'
 import { DEFAULT_STATE } from 'src/constants/contacts-default'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   data () {
@@ -44,6 +45,7 @@ export default {
         'power-dialer-add-queue-list',
         'power-dialer-add-list'
       ],
+      appliedFiltersPreviousFilters: null,
       ALL_COLUMNS
     }
   },
@@ -76,6 +78,7 @@ export default {
       'setContact',
       'listLoaded',
       'setPreviousListFilters',
+      'setPreviouslySavedListId',
       'setPreviousListId',
       'updateContactsListFilter'
     ]),
@@ -130,25 +133,28 @@ export default {
         this.isLoadingMore = true
         const nextPage = this.contactsData.current_page + 1
         const isAddList = this.addListMetaIds.includes(this.$route.meta.id)
+        let sort = ''
+        let order = ''
+
+        // - if there's a selected column to sort, use the selected column or
         // - use 'order' for sort only if in power dialer list and view is not
-        //   in the add contacts or
-        // - if there's no selected column to sort, use the default contact
-        //   date filter (last engagement at or created at), else use the
-        //   selected column.
-        const sort = !isAddList && this.isPowerDialer
-          ? 'order'
-          : ((this.sorts)
-            ? this.sorts.orderBy
-            : this.defaultContactDateFilter)
+        //   in the add contacts
+        // - else, use default contact date filter (last engagement at or created at)
+
+        // - if there's a selected column to order by, use the selected column's order
+        //   (asc or desc) or
         // - use 'asc' for order only if in power dialer list and view is not
-        //   in the add contacts or
-        // - if there's no selected column to order by, use 'desc', else use the
-        //   selected column's order (asc or desc).
-        const order = !isAddList && this.isPowerDialer
-          ? 'asc'
-          : ((this.sorts)
-            ? this.sorts.order
-            : 'desc')
+        //   in the add contacts or else, use 'desc'
+        if (this.sorts) {
+          sort = this.sorts.orderBy
+          order = this.sorts.order
+        } else if (!isAddList && this.isPowerDialer) {
+          sort = 'order'
+          order = 'asc'
+        } else {
+          sort = this.defaultContactDateFilter
+          order = 'desc'
+        }
 
         if (list) {
           path = this.apiEndpoint(this.myQueueId !== null)
@@ -281,6 +287,38 @@ export default {
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
 
+      const listData = {
+        id: this.id,
+        isMyQueuePaths: [
+          'power-dialer/in-queue',
+          'power-dialer/called',
+          'power-dialer/failed',
+          'power-dialer/scheduled',
+          'power-dialer/all'
+        ],
+        isInMyQueuePaths: false
+      }
+
+      listData.isInMyQueuePaths = listData.isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
+      const isInMyQueue = listData.isInMyQueuePaths ||
+        this.id === 'my-queue'
+
+      if (this.$route.name.includes('Power Dialer') && isInMyQueue) {
+        listData.id = this.myQueue?.id
+      }
+
+      if (listData.id === null) {
+        listData.id = 'all'
+      }
+
+      const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
+
+      this.setSelectedList({
+        id: listData.id,
+        name: list.name,
+        type: list.type
+      })
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: queryString,
@@ -305,38 +343,6 @@ export default {
             this.updateMyQueueListData(data)
           }
 
-          const listData = {
-            id: this.id,
-            isMyQueuePaths: [
-              'power-dialer/in-queue',
-              'power-dialer/called',
-              'power-dialer/failed',
-              'power-dialer/scheduled',
-              'power-dialer/all'
-            ],
-            isInMyQueuePaths: false
-          }
-
-          listData.isInMyQueuePaths = listData.isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
-
-          if (this.$route.name.includes('Power Dialer') &&
-            (listData.isInMyQueuePaths ||
-              this.id === 'my-queue')) {
-            listData.id = this.myQueue?.id
-          }
-
-          if (listData.id === null) {
-            listData.id = 'all'
-          }
-
-          const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
-
-          this.setSelectedList({
-            id: listData.id,
-            name: list.name,
-            type: list.type
-          })
-
           this.markCheckedAll()
         })
         .finally(() => {
@@ -345,6 +351,12 @@ export default {
           this.isLoadingMore = false
         })
         .catch((err) => {
+          // revert  list's filters to previous
+          if (!_.isEmpty(this.appliedFiltersPreviousFilters)) {
+            this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
+            this.$VueEvent.fire('updateHasFilterChanges')
+          }
+
           this.isLoading = false
           this.isLoaded = true
           this.isLoadingMore = false
@@ -481,8 +493,10 @@ export default {
               continue
             }
 
-            // if filter type is 'date', add the browser's timezone
-            listFilters[filterIndex].filters[filterKey].timezone = moment.tz.guess()
+            for (const filterItemKey in filters[filterKey]) {
+              // if filter type is 'date', add the browser's timezone
+              listFilters[filterIndex].filters[filterKey][filterItemKey].timezone = moment.tz.guess()
+            }
           }
 
           // first index of list's filter groups must be joined/associated with the list's initial filter
@@ -533,24 +547,17 @@ export default {
     },
 
     getFiltersCount (filters) {
-      const filtersCount = { data: 0 }
-      if (filters && filters.constructor.name === 'Object' && Object.keys(filters).length) {
-        const index = { data: null }
+      let groupAllFiltersSize = 0
+      const keys = Object.keys(filters)
 
-        for (index.data of Object.keys(filters)) {
-          const filter = _.get(filters[index.data], 'filters', null)
-          filtersCount.data += filter ? Object.keys(filter).length : 0
+      keys.forEach((key) => {
+        // only proceed if key is numeric
+        if (this.$isNumeric(key)) {
+          groupAllFiltersSize += Object.values(filters[key].filters).flat().length
         }
-      } else if (filters.constructor.name === 'Array' && filters.length) {
-        const group = { data: null }
+      })
 
-        for (group.data of filters) {
-          const filter = _.get(group.data, 'filters', null)
-          filtersCount.data += filter ? Object.keys(filter).length : 0
-        }
-      }
-
-      return filtersCount.data
+      return groupAllFiltersSize
     },
 
     markCheckedAll () {
@@ -575,8 +582,8 @@ export default {
         const profileId = _.get(this.profile, 'id', null)
 
         if (filter && profileId) {
-          defaultFilters[0].filters.contact_owner.value = [profileId]
-          defaultFilters[0].filters.contact_owner.default = 1
+          defaultFilters[0].filters.contact_owner[0].value = [profileId]
+          defaultFilters[0].filters.contact_owner[0].default = 1
         }
       }
 
@@ -596,15 +603,15 @@ export default {
       }
 
       if (['unassigned'].includes(this.$route.params.id)) {
-        defaultFilters[0].filters.is_unassigned.default = 1
+        defaultFilters[0].filters.is_unassigned[0].default = 1
       }
 
       if (['unanswered'].includes(this.$route.params.id)) {
-        defaultFilters[0].filters.is_unanswered_contact.default = 1
+        defaultFilters[0].filters.is_unanswered_contact[0].default = 1
       }
 
       if (['new-leads'].includes(this.$route.params.id)) {
-        defaultFilters[0].filters.contact_task_status.default = 1
+        defaultFilters[0].filters.contact_task_status[0].default = 1
       }
 
       // load filters from URL
@@ -698,6 +705,7 @@ export default {
     },
 
     initiateFetch (data, fromRefresh = false) {
+      this.appliedFiltersPreviousFilters = _.get(data, 'previousFilters', null)
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
       fetchData.params = _.get(data, 'params', {})
       fetchData.hasOrder = _.get(data, 'hasOrder', true)
@@ -836,10 +844,12 @@ export default {
         const tag = params.has('tag_id') ? _.parseInt(params.get('tag_id')) : false
 
         if (tag) {
-          filters[0].filters.tags = {
-            operator: 1,
-            value: [ tag ]
-          }
+          filters[0].filters.tags = [
+            {
+              operator: OPERATORS.IS_ANY_OF,
+              value: [ tag ]
+            }
+          ]
         }
 
         filters[0].is_conjunction = true
@@ -868,6 +878,7 @@ export default {
       'showMyContacts',
       'showAddViewMyContacts',
       'previousListId',
+      'previouslySavedListId',
       'previousListFilters',
       'isAllContactsSelected'
     ]),
@@ -1153,10 +1164,16 @@ export default {
     },
 
     id: function (newValue, oldValue) {
-      if (this.initiateUpdateContactsListFilter !== undefined) {
+      // we only revert back the previous filter of the previous list
+      // only if the changes in the list's filter was not saved.
+      if (this.previouslySavedListId !== oldValue &&
+        this.initiateUpdateContactsListFilter !== undefined) {
         this.initiateUpdateContactsListFilter({
           oldIdValue: oldValue
         })
+        this.setPreviousListFilters({})
+        this.setPreviouslySavedListId(null)
+        this.setPreviousListId(null)
       }
     }
   },

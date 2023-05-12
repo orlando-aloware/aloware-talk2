@@ -2,6 +2,7 @@ import { mapActions, mapMutations } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 // import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   computed: {
@@ -42,7 +43,7 @@ export default {
             this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
             let filters = {
               contact_lists: {
-                operator: 1,
+                operator: OPERATORS.IS_ANY_OF,
                 value: [stringId]
               }
             }

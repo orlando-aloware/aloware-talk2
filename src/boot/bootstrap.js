@@ -580,3 +580,9 @@ Vue.prototype.$alphabeticalSort = (items, property = 'name') => {
     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
   })
 }
+
+Vue.prototype.$isNumeric = (value) => {
+  let regex = /^-{0,1}\d*\.{0,1}\d+$/
+
+  return regex.test(value)
+}

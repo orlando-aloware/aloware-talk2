@@ -84,66 +84,79 @@
 
 <script>
 import { mapState } from 'vuex'
+import { selectorMixin, integrationMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import { selectorMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
-  name: 'hubspot-list-selector',
+  name: 'integration-list-selector',
 
-  mixins: [
-    selectorMixin
-  ],
+  mixins: [selectorMixin, integrationMixin],
 
   components: {
     RemoveTagIcon
   },
 
   props: {
+    integration: {
+      type: String,
+      required: true
+    },
+
     value: {
       required: false
     },
+
     exclude: {
       required: false,
       default: null
     },
+
     blockBroadcast: {
       type: Boolean,
       required: false,
       default: false
     },
+
     multiple: {
       type: Boolean,
       default: false,
       required: false
     },
+
     clearable: {
       type: Boolean,
       default: false,
       required: false
     },
+
     useChips: {
       type: Boolean,
       default: false,
       required: false
     },
+
     disable: {
       type: Boolean,
       default: false,
       required: false
     },
+
     prepend: {
       type: String,
       required: false
     },
+
     genericStyling: {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
@@ -187,26 +200,30 @@ export default {
       options: [],
       reference: 'hubspotListSelector',
       fullOptionsProperty: 'sorted',
-      lists: []
+      lists: [],
+      disableAddView: false
     }
   },
 
   methods: {
-    filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.options = this.sorted
-        })
-        return
-      }
+    getListsOfEnabledIntegration () {
+      this.lists = []
 
-      update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.sorted.filter((item) => item.name && item.name.toLowerCase().indexOf(needle) > -1)
-      })
+      switch (this.integration.toLowerCase()) {
+        case 'hubspot':
+          return this.getHubspotLists()
+
+        case 'zoho':
+          return this.getZohoViews()
+
+        case 'pipedrive':
+          return this.getPipedriveFilters()
+      }
     },
-    getLists (offset = 0) {
+
+    getHubspotLists (offset = 0) {
       this.isLoading = true
+
       talk2Api.V1.integrations.hubspot.getList({
         params: {
           offset: offset
@@ -215,29 +232,85 @@ export default {
         const result = response.data
         this.lists.push(...result.lists)
         if (result.has_more) {
-          return this.getLists(result.offset)
-        } else {
-          this.isLoading = false
+          return this.getHubspotLists(result.offset)
         }
+
+        this.isLoading = false
       }).catch((err) => {
         this.isLoading = false
         this.$handleErrors(err.response)
         console.log(err)
       })
+    },
+
+    getZohoViews () {
+      this.isLoading = true
+
+      talk2Api.V1.integrations.zoho.getViews().then(response => {
+        this.isLoading = false
+        this.lists.push(...response.data)
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
+    },
+
+    getPipedriveFilters () {
+      this.isLoading = true
+
+      talk2Api.V1.integrations.pipedrive.getFilters().then(response => {
+        this.isLoading = false
+        this.lists.push(...response.data)
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
+    },
+
+    filterFn (val, update) {
+      if (val === '') {
+        update(() => {
+          this.options = this.sorted
+        })
+
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.options = this.sorted.filter((item) => item.name && item.name.toLowerCase().indexOf(needle) > -1)
+      })
     }
   },
 
   mounted () {
-    this.getLists()
+    this.getListsOfEnabledIntegration()
   },
 
   watch: {
     value () {
       this.selectedId = this.value
     },
+
     selectedId: function (value) {
-      this.$emit('change', value)
+      let payload = {
+        list: value,
+        integration: this.integration
+      }
+
+      // When the payload is an array, instead of a single value
+      if (typeof value !== 'object') {
+        payload.list = this.options.filter(option => option.id === value)[0]
+      }
+
+      this.$emit('change', payload)
       this.showInputPlaceholder()
+    },
+
+    integration (val) {
+      this.getListsOfEnabledIntegration()
     }
   }
 }

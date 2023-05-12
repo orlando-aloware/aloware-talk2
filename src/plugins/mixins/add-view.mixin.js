@@ -1,3 +1,5 @@
+import { isEmpty, get } from 'lodash'
+
 export default {
   data () {
     return {
@@ -107,6 +109,29 @@ export default {
       return columnValue &&
         columnValue instanceof Object &&
         Object.keys(columnValue).length
+    },
+
+    fixDefaultFilters () {
+      if (isEmpty(this.list)) {
+        return []
+      }
+
+      let defaultFilters = !isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
+
+      if (this.$route.params.id === 'my-contacts') {
+        const filter = get(defaultFilters, '[0].filters.contact_owner', null)
+        const profileId = get(this.profile, 'id', null)
+
+        if (filter && profileId) {
+          defaultFilters[0].filters.contact_owner[0].value = [profileId]
+        }
+      }
+
+      if (typeof defaultFilters === 'string') {
+        defaultFilters = JSON.parse(defaultFilters)
+      }
+
+      return defaultFilters
     }
   },
 

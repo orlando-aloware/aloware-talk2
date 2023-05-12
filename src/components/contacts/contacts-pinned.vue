@@ -170,10 +170,12 @@ export default {
         params: {
           filter_groups: [{
             filters: {
-              contact_owner: {
-                operator: OPERATORS.IS_ANY_OF,
-                value: [this.profile.id]
-              }
+              contact_owner: [
+                {
+                  operator: OPERATORS.IS_ANY_OF,
+                  value: [this.profile.id]
+                }
+              ]
             },
             is_conjunction: true
           }]
