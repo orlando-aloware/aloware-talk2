@@ -67,8 +67,14 @@
             </span>
           </div>
           <div class="row">
-            <div class="col">
+            <div class="col h-20 px-0">
               <!-- Contact basic table -->
+              <contacts-view :simpleTable="true"
+                             :columns="CONTACTS_COLUMNS"
+                             :list="{
+                                name: 'All contacts',
+                                type: '2',
+                              }"/>
             </div>
           </div>
         </q-card>
