@@ -11,6 +11,7 @@
                :total-rows="agents.length"
                :current-page="pagination.page"
                :last-page="lastPage"
+               :start-order="sort"
                @paginated="onPaginated"
                @reordered="onColumnsReordered"
                @sort="onSort">
@@ -134,14 +135,19 @@ export default {
 
       return agents.sort((a, b) => {
         let condition = null
+        let equals = false
 
         // use a different rule based on order field
         switch (this.sort.orderBy) {
           case 'id':
             condition = a.id > b.id
+            equals = a.id === b.id
+
             break
           case 'name':
-            condition = a.name > b.name
+            condition = a.name.toLowerCase() > b.name.toLowerCase()
+            equals = a.name === b.name
+
             break
           case 'status':
             // use status names
@@ -149,11 +155,15 @@ export default {
             let nameB = LABELS.find(status => status.value === b.agent_status) || {}
 
             condition = nameA.label > nameB.label
+            equals = nameA.label === nameB.label
+
             break
           case 'status-duration':
             condition = a.last_agent_status_change && b.last_agent_status_change
               ? a.last_agent_status_change < b.last_agent_status_change // compare values if both are present
               : !a.last_agent_status_change // use inverted logic otherwise
+
+            equals = a.last_agent_status_change === b.last_agent_status_change
 
             break
           case 'last-login':
@@ -161,16 +171,26 @@ export default {
               ? a.last_login < b.last_login // compare values if both are present
               : !a.last_login // use inverted logic otherwise
 
+            equals = a.last_login === b.last_login
+
             break
           case 'last-updated':
             condition = a.updated_at < b.updated_at
+            equals = a.updated_at === b.updated_at
 
             break
         }
 
+        // the 2nd order condition must always be id, respecting asc / desc
+        if (equals) {
+          return this.sort.order === 'asc'
+            ? (a.id > b.id ? 1 : -1)
+            : (a.id > b.id ? -1 : 1)
+        }
+
         return this.sort.order === 'asc'
-          ? condition > 0 ? 1 : -1
-          : condition > 0 ? -1 : 1
+          ? condition ? 1 : -1
+          : condition ? -1 : 1
       })
     },
 
@@ -189,7 +209,7 @@ export default {
       perPage: 25
     },
     sort: {
-      orderBy: 'id',
+      orderBy: 'status',
       order: 'asc'
     },
     columns: COLUMNS
