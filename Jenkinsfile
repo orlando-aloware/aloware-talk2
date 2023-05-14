@@ -28,7 +28,7 @@ pipeline {
             }
         }
 
-        stage('Setup Dev Env File') {          
+        stage('Setup Dev Env File') {
             when { not { branch 'master' } }
             steps {
               script {

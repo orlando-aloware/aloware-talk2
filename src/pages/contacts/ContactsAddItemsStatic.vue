@@ -32,8 +32,7 @@
             @input="updateListName" />
         </div>
         <div class="text-muted small action-desc">
-          {{ openEdit ? 'Add contacts by creating a filter or manually selecting' : 'Manually select contacts or create a filter'}}
-          Manually select contacts or create a filter
+          {{ addContactsGuideText }}
         </div>
       </div>
     </template>

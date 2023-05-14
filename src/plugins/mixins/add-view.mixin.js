@@ -1,16 +1,23 @@
+import { isEmpty, get } from 'lodash'
+
 export default {
   data () {
     return {
       addViewListeners: {}
     }
   },
+
   computed: {
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return this.$route.params.id
-      } else if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
+      }
+
+      if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
         return this.$route.params.id
-      } else if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
+      }
+
+      if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
         return this.$route.params.id
       }
 
@@ -19,8 +26,15 @@ export default {
       }
 
       return 'all'
+    },
+
+    addContactsGuideText () {
+      return this.openEdit
+        ? 'You can add contacts either by manually selecting them or by creating a filter'
+        : 'Manually select contacts or create a filter'
     }
   },
+
   mounted () {
     this.setDataCount([], true)
     this.addViewListeners.shouldUpdateListCountOnSearch = (data) => {
@@ -32,6 +46,7 @@ export default {
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.addViewListeners.shouldUpdateListCountOnSearch)
     this.$VueEvent.listen('addViewSetCount', this.addViewListeners.addViewSetCount)
   },
+
   methods: {
     setDataCount (data, skipCancelToken) {
       if (!data) {
@@ -46,8 +61,80 @@ export default {
           addViewSetCount: 'response.data.count'
         }
       })
+    },
+
+    getColumnValue (value) {
+      if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No'
+      }
+
+      if (typeof value !== 'undefined' && value !== 0) {
+        return value.toString()
+      }
+
+      return value === null
+        ? '-'
+        : value
+    },
+
+    getColumnClass (name, draggable) {
+      const textAlignmentClass = this.isCountField(name) ? 'text-center' : 'text-left'
+      const draggableClass = draggable ? 'col-indented' : ''
+
+      return [
+        textAlignmentClass,
+        draggableClass
+      ]
+    },
+
+    isColumnArrayValueEmpty (columnValue) {
+      const isEmptyArray = columnValue instanceof Array && !columnValue.length
+      return columnValue === '' ||
+        columnValue === null ||
+        columnValue === 'NULL' ||
+        isEmptyArray
+    },
+
+    isColumnArrayValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Array &&
+        columnValue.length
+    },
+
+    isColumnObjectValueEmpty (columnValue) {
+      return columnValue && columnValue instanceof Object && !Object.keys(columnValue).length
+    },
+
+    isColumnObjectValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Object &&
+        Object.keys(columnValue).length
+    },
+
+    fixDefaultFilters () {
+      if (isEmpty(this.list)) {
+        return []
+      }
+
+      let defaultFilters = !isEmpty(this.list.filters) ? this.$jsonClone(this.list.filters) : {}
+
+      if (this.$route.params.id === 'my-contacts') {
+        const filter = get(defaultFilters, '[0].filters.contact_owner', null)
+        const profileId = get(this.profile, 'id', null)
+
+        if (filter && profileId) {
+          defaultFilters[0].filters.contact_owner[0].value = [profileId]
+        }
+      }
+
+      if (typeof defaultFilters === 'string') {
+        defaultFilters = JSON.parse(defaultFilters)
+      }
+
+      return defaultFilters
     }
   },
+
   beforeDestroy () {
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.addViewListeners.shouldUpdateListCountOnSearch)
     this.$VueEvent.stop('addViewSetCount', this.addViewListeners.addViewSetCount)

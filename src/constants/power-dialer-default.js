@@ -43,10 +43,12 @@ export const DEFAULT_STATE = {
       filters: [
         {
           filters: {
-            contact_owner: {
-              value: null,
-              operator: OPERATORS.IS_ANY_OF
-            }
+            contact_owner: [
+              {
+                value: null,
+                operator: OPERATORS.IS_ANY_OF
+              }
+            ]
           },
           is_conjunction: true
         }

@@ -2272,20 +2272,6 @@ export default {
       })
     },
 
-    getRingGroup (id) {
-      if (!id) {
-        return null
-      }
-
-      const found = this.ringGroups.find(ringGroup => ringGroup.id === id)
-
-      if (found) {
-        return found
-      }
-
-      return null
-    },
-
     resizeHandler () {
       const width = document.documentElement.clientWidth
       // less than 991 pixels, screen width is tablet or mobile

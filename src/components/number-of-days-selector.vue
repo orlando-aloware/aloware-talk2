@@ -23,13 +23,24 @@
 import VueMultiselect from 'vue-multiselect'
 export default {
   name: 'number-of-days-selector',
-  components: { VueMultiselect },
+
+  components: {
+    VueMultiselect
+  },
+
   props: {
     multiple: {
       type: Boolean,
       required: false,
       default: true
     },
+
+    value: {
+      type: [Array, Number],
+      required: false,
+      default: null
+    },
+
     durations: {
       type: Array,
       required: false,
@@ -71,11 +82,13 @@ export default {
       }
     }
   },
+
   data () {
     return {
       frequencies: this.multiple ? [] : null
     }
   },
+
   computed: {
     frequenciesValues () {
       return this.frequencies.map((item) => {
@@ -83,6 +96,13 @@ export default {
       })
     }
   },
+
+  mounted () {
+    if (this.value && this.multiple) {
+      this.frequencies = this.durations.filter(frequency => this.value.includes(frequency.value))
+    }
+  },
+
   methods: {
     onSelect () {
       this.$emit('select', this.frequenciesValues)

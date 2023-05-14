@@ -2,6 +2,7 @@ import * as CommunicationCurrentStatus from '../../constants/communication-curre
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CallbackStatus from '../../constants/callback-status'
 import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
+import { ALL_CREATOR_TYPES } from 'src/constants/creator-types'
 
 /**
  * Fix comm direction
@@ -196,6 +197,21 @@ const fixLrnTypeBadge = (type) => {
   }
 }
 
+/**
+ * Translate creator type
+ * @param {int} creatorTypeId
+ * @returns {string}
+ */
+const translateCreatorType = (creatorTypeId) => {
+  const type = ALL_CREATOR_TYPES.find(creatorType => creatorType.id === creatorTypeId)
+
+  if (!type) {
+    return creatorTypeId
+  }
+
+  return type.label
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixCommDirection,
@@ -203,7 +219,8 @@ export default ({ Vue }) => {
     areaCode: areaCode({ Vue }),
     translateCurrentStatusText,
     translateDispositionStatusText,
-    fixLrnTypeBadge
+    fixLrnTypeBadge,
+    translateCreatorType
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

@@ -88,11 +88,11 @@
                       </span>
                     </template>
                   </contact-menu-item>
-                  <contact-menu-item v-if="isHubspotEnabled"
-                                     @click="onCreateFromHubspot">
+                  <contact-menu-item v-if="isIntegrationEnabled"
+                                     @click="onCreateFromIntegration">
                     <template slot="title">
                       <span class="create-item">
-                        Import from Hubspot
+                        Import from Integration
                       </span>
                     </template>
                   </contact-menu-item>
@@ -242,8 +242,12 @@ export default {
     isContact () {
       return this.routeName === 'Contacts' && this.isContactModuleType
     },
-    isHubspotEnabled () {
-      return this.currentCompany && this.currentCompany.hubspot_integration_enabled
+
+    isIntegrationEnabled () {
+      return this.currentCompany &&
+          (this.currentCompany.hubspot_integration_enabled ||
+           this.currentCompany.zoho_integration_enabled ||
+           this.currentCompany.pipedrive_integration_enabled)
     }
   },
   mounted () {
@@ -333,10 +337,12 @@ export default {
         contact_folder_id: null
       })
     },
-    onCreateFromHubspot () {
+
+    onCreateFromIntegration () {
       this.destroySubmenu()
-      this.$emit('openHubspotListImportDialog')
+      this.$emit('openIntegrationListsImportDialog')
     },
+
     onCreateFolderCancel () {
       this.isCreatingFolder = false
     },

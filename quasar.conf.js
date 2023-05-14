@@ -12,9 +12,9 @@ module.exports = function (/* ctx */) {
   const parsedEnv = DotEnv.config().parsed
 
   if (typeof parsedEnv === 'object' &&
-      !Array.isArray(parsedEnv) &&
-      parsedEnv !== undefined &&
-      parsedEnv !== null) {
+    !Array.isArray(parsedEnv) &&
+    parsedEnv !== undefined &&
+    parsedEnv !== null) {
     process.env = { ...process.env, ...parsedEnv }
   }
 
