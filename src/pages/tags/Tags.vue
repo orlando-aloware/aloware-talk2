@@ -88,6 +88,7 @@ import TagsTable from 'components/tags/tags-table.vue'
 import { debounce } from 'lodash'
 import TagForm from 'components/tags/tag-form.vue'
 import { tagsMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Tags',
@@ -155,16 +156,21 @@ export default {
       }
     })
 
-    this.$VueEvent.listen('tag_deleting', () => {
+    this.$VueEvent.listen('tag_deleting', (data) => {
+      this.getTagCategoriesCount(data.category)
       this.getTags()
     })
 
     this.$VueEvent.listen('contact_list_bulk_created', (data) => {
-      if (data.items_count > 0) {
+      if (data.user_id === this.profile.id && data.items_count > 0) {
         const verb = data.items_count > 1 ? 'tasks have' : 'task has'
         this.$generalNotification(`${data.items_count} ${verb} been added`)
       }
     })
+  },
+
+  computed: {
+    ...mapState('auth', ['profile'])
   },
 
   methods: {
@@ -195,7 +201,6 @@ export default {
           break
 
         default:
-          console.log(this.getCommunicationTagsCount())
           this.tagCategoriesCount.communications = this.getCommunicationTagsCount() ?? 0
           this.tagCategoriesCount.contacts = this.getContactTagsCount() ?? 0
       }

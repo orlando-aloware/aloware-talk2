@@ -313,8 +313,12 @@ export default {
     },
 
     closeDeleteTagDialog () {
-      this.selectedTag = null
       this.isOpenDeleteTagDialog = false
+
+      // fix slight glitch when closing modal
+      setTimeout(() => {
+        this.selectedTag = null
+      }, 200)
     },
 
     refreshCount (tagId) {
