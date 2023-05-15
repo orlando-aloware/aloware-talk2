@@ -12557,6 +12557,7 @@ h1.contact-list-name-label {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+    transition: all 1s;
 
     .overview {
       width: 100%;
@@ -12617,7 +12618,7 @@ h1.contact-list-name-label {
         &__card {
           display: flex;
           padding: 10px;
-          transition: all .5s;
+          transition: all 1s;
           color: $grey-100;
 
           &__container {

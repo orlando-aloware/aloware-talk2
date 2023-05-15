@@ -2,16 +2,18 @@
   <div class="wallboard__body">
     <div :class="['overview', `overview--${viewMode}`]">
       <wallboard-overview-header />
-      <div class="overview__body">
+      <transition-group name="list-fade"
+                        class="overview__body"
+                        tag="div">
         <wallboard-overview-card :value="item.value"
-                                 :description="item.name"
-                                 :icon="item.icon"
-                                 :filter="item.filter"
-                                 :loading="isSummaryLoading"
-                                 :route="item.route"
-                                 :key="index"
-                                 v-for="(item, index) in items"/>
-      </div>
+                                :description="item.name"
+                                :icon="item.icon"
+                                :filter="item.filter"
+                                :loading="isSummaryLoading"
+                                :route="item.route"
+                                :key="item.name"
+                                v-for="item in items"/>
+      </transition-group>
     </div>
   </div>
 </template>

@@ -8,3 +8,12 @@
 .vertical-collapse-leave-to {
   max-height: 0px;
 }
+
+.list-fade-enter,
+.list-fade-leave-to {
+  opacity: 0;
+}
+
+.list-fade-leave-active {
+  position: absolute;
+}
