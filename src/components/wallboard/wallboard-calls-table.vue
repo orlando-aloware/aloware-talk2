@@ -83,9 +83,9 @@
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'workflow'">
                 <a :href="getWorkflowURL(call.workflow_id)"
-                    target="_blank"
-                    v-if="hasRole('Company Admin') && getWorkflow(call.workflow_id)">
-                    {{ getWorkflow(call.workflow_id) }}
+                   target="_blank"
+                   v-if="hasRole('Company Admin') && getWorkflow(call.workflow_id)">
+                  {{ getWorkflow(call.workflow_id) }}
                 </a>
                 <span v-else>
                   {{ getWorkflow(call.workflow_id) || '--' }}
