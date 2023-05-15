@@ -1,27 +1,26 @@
 <template>
   <div class="power-dialer-list t-menu border-top"
        data-popper-target="power-dialer-list">
-    <contacts-folders
-      :is-contact-module-type="false"
-      @openHubspotListImportDialog="onHubspotImportDialogOpen">
+    <contacts-folders :is-contact-module-type="false"
+                      @openIntegrationListsImportDialog="onOpenIntegrationImportDialog">
     </contacts-folders>
-    <hubspot-list-import-modal :is-open="isHubspotImportDialogOpen"
-                               v-if="isHubspotImportDialogOpen"
-                               @close="onHubspotImportDialogClose">
-    </hubspot-list-import-modal>
+    <integration-list-import-modal :is-open="isIntegrationImportDialogOpen"
+                                   v-if="isIntegrationImportDialogOpen"
+                                   @close="onCloseIntegrationImportDialog">
+    </integration-list-import-modal>
   </div>
 </template>
 
 <script>
 import ContactsFolders from '../contacts/contacts-folders'
-import HubspotListImportModal from 'components/hubspot-list-import-modal'
+import IntegrationListImportModal from 'components/integration-list-import-modal'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'power-dialer-list',
 
   components: {
-    HubspotListImportModal,
+    IntegrationListImportModal,
     ContactsFolders
   },
 
@@ -30,7 +29,7 @@ export default {
       isCreatingFolder: false,
       active: '',
       toggleFolders: true,
-      isHubspotImportDialogOpen: false,
+      isIntegrationImportDialogOpen: false,
       notification: null
     }
   },
@@ -41,7 +40,43 @@ export default {
 
   mounted () {
     this.$VueEvent.stop('contact_list_import_hubspot')
-    this.$VueEvent.listen('contact_list_import_hubspot', event => {
+    this.$VueEvent.stop('contact_list_import_zoho')
+    this.$VueEvent.stop('contact_list_import_pipedrive')
+    this.$VueEvent.stop('contact_list_import_failed')
+
+    // Handle import successfull
+    this.$VueEvent.listen('contact_list_import_hubspot', event => this.handleImportFinishedEvent(event))
+    this.$VueEvent.listen('contact_list_import_zoho', event => this.handleImportFinishedEvent(event))
+    this.$VueEvent.listen('contact_list_import_pipedrive', event => this.handleImportFinishedEvent(event))
+    this.$VueEvent.listen('contact_list_import_failed', event => this.handleImportFailedEvent(event))
+  },
+
+  methods: {
+    ...mapActions('contacts', ['foldersLoaded']),
+
+    onCloseIntegrationImportDialog (data = {}) {
+      this.isIntegrationImportDialogOpen = false
+
+      if (data.notification) {
+        this.notification = data.notification
+      }
+    },
+
+    onOpenIntegrationImportDialog () {
+      this.isIntegrationImportDialogOpen = true
+    },
+
+    reloadFolders () {
+      return this.$axios
+        .get('/api/v2/power-dialer-folders')
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch(() => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+    },
+
+    handleImportFailedEvent (event) {
       // return if event is for another user
       if (event.user_id !== this.profile.id) {
         return
@@ -54,32 +89,25 @@ export default {
       }
 
       this.reloadFolders()
-      this.$generalNotification('Success! HubSpot list imported to Power Dialer.', 'redirect', 0, false, {
+      this.$generalNotification('An error prevented the list from being imported. Please, try again later.', 'error')
+    },
+
+    handleImportFinishedEvent (event) {
+      // return if event is for another user
+      if (event.user_id !== this.profile.id) {
+        return
+      }
+
+      // dismiss the previous notification
+      if (this.notification) {
+        this.notification()
+        this.notification = null
+      }
+
+      this.reloadFolders()
+      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
         path: `/power-dialer/list/${event.contact_list.id}/in-queue`
       })
-    })
-  },
-
-  methods: {
-    ...mapActions('contacts', ['foldersLoaded']),
-    onHubspotImportDialogClose (data = {}) {
-      this.isHubspotImportDialogOpen = false
-
-      if (data.notification) {
-        this.notification = data.notification
-      }
-    },
-    onHubspotImportDialogOpen () {
-      this.isHubspotImportDialogOpen = true
-    },
-    reloadFolders () {
-      return this.$axios
-        .get('/api/v2/power-dialer-folders')
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch(() => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
     }
   },
 

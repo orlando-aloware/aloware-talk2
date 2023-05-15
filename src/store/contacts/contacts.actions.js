@@ -338,6 +338,9 @@ export default {
   setPreviousListFilters: ({ commit }, payload) => {
     commit('SET_PREVIOUS_LIST_FILTERS', payload)
   },
+  setPreviouslySavedListId: ({ commit }, id) => {
+    commit('SET_PREVIOUSLY_SAVED_LIST_ID', id)
+  },
   setPreviousListId: ({ commit }, id) => {
     commit('SET_PREVIOUS_LIST_ID', id)
   },

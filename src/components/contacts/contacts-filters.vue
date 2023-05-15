@@ -12,8 +12,8 @@
               <b-button variant="light"
                         class="header-buttons border-0 grey-90"
                         size="sm"
-                        @click="backToStep"
-                        v-if="step !== 1">
+                        v-if="step !== 1"
+                        @click="backToStep">
                 <i class="fa fa-arrow-left"></i>
               </b-button>
               <h6 class="mb-0 ml-1 d-flex align-items-center">Filters</h6>
@@ -32,9 +32,9 @@
             <!-- Using slots -->
             <div class="filter-contents step-1 pt-2 pr-1"
                  v-if="step === 1">
-              <compact-btn v-if="isEmptyListFilters"
-                           variant="primary"
+              <compact-btn variant="primary"
                            customClass="px-4 add-filters m-2"
+                           v-if="isEmptyListFilters"
                            @clicked="toAddFiltersStep">
                 <i class="material-icons mr-1 add-icon">add</i> Add a Filter
               </compact-btn>
@@ -43,8 +43,8 @@
                 <template v-for="(group, groupIndex) in visibleListFilters">
                   <div class="d-flex full-width mb-2"
                        :key="`group-remove-${groupIndex}`">
-                    <div v-if="visibleListFilters.length >= 2 && groupIndex >= 1"
-                         class="font-weight-bold group-conjunction">
+                    <div class="font-weight-bold group-conjunction"
+                         v-if="visibleListFilters.length >= 2 && groupIndex >= 1">
                       {{ group.is_conjunction ? 'AND' : 'OR' }}
                     </div>
                     <compact-btn class="py-0 delete-group-filter ml-auto"
@@ -55,40 +55,42 @@
                   </div>
                   <b-card class="p-1 mb-2"
                           :key="groupIndex">
-                    <template v-for="(filter, key, index) in group.filters">
-                      <b-card class="mb-2 filter-item"
-                              role="button"
-                              :class="[isDefault(filter) ? 'cursor-default' : '']"
-                              :key="key"
-                              @click="selectFilterByKey(filter, groupIndex, group.is_conjunction)">
-                        <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
-                          Not
-                        </span>
-                        <span class="filter-name">{{ filter.label }}</span>
-                        <span class="text-lowercase"
-                              v-if="filter.operator">
-                          &nbsp;{{ filter.operator }}
-                        </span>
-                        <span class="font-weight-bold">
-                          {{ getFormattedFilterSummary(filter, key) }}
-                        </span>
-                        <compact-btn v-if="!isDefault(filter)"
-                                     class="py-0 delete-filter"
-                                     @clicked="onDeleteFilter(groupIndex, filter.key)">
-                          <i class="fa fa-trash"></i>
-                          <q-tooltip>
-                            Remove this condition
+                    <template v-for="(filterItems, key, index) in group.filters">
+                      <template v-for="(filter, filterItemIndex) in filterItems">
+                        <b-card class="mb-2 filter-item"
+                                role="button"
+                                :class="[isDefault(filter) ? 'cursor-default' : '']"
+                                :key="`filter-item-${key}-${filterItemIndex}`"
+                                @click="selectFilterByKey(filter, groupIndex, filterItemIndex, group.is_conjunction)">
+                          <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
+                            Not
+                          </span>
+                          <span class="filter-name">{{ filter.label }}</span>
+                          <span class="text-lowercase"
+                                v-if="filter.operator">
+                            &nbsp;{{ filter.operator }}
+                          </span>
+                          <span class="font-weight-bold">
+                            {{ getFormattedFilterSummary(filter, key) }}
+                          </span>
+                          <compact-btn class="py-0 delete-filter"
+                                       v-if="!isDefault(filter)"
+                                       @clicked="onDeleteFilter(groupIndex, key, filterItemIndex)">
+                            <i class="fa fa-trash"></i>
+                            <q-tooltip>
+                              Remove this condition
+                            </q-tooltip>
+                          </compact-btn>
+                          <q-tooltip v-if="isDefault(filter)">
+                            This is a default filter for this list and cannot be modified.
                           </q-tooltip>
-                        </compact-btn>
-                        <q-tooltip v-if="isDefault(filter)">
-                          This is a default filter for this list and cannot be modified.
-                        </q-tooltip>
-                      </b-card>
-                      <div v-if="getFilterLength(group.filters) >= 2 && index < (getFilterLength(group.filters) - 1)"
-                           class="mb-2 font-weight-bold"
-                           :key="`filter-${filter.key}`">
-                        AND
-                      </div>
+                        </b-card>
+                        <div class="mb-2 font-weight-bold"
+                             :key="`filter-${filter.key}-${filterItemIndex}`"
+                             v-if="isShowAndLabel(groupIndex, index, filter.key, filterItemIndex)">
+                          AND
+                        </div>
+                      </template>
                     </template>
                     <compact-btn variant="outlined-light"
                                  customClass="add-filters with-border conjunction-button"
@@ -99,13 +101,12 @@
                 </template>
                 <compact-btn variant="outlined-light"
                              customClass="mb-2 add-filters with-border conjunction-button"
-                             @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, false)">
+                             @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, null, false)">
                   OR
                 </compact-btn>
               </div>
-              <p
-                class="px-2 pt-2"
-                v-if="unsavedList && isEmptyListFilters">
+              <p class="px-2 pt-2"
+                 v-if="unsavedList && isEmptyListFilters">
                 To save list, add at least 1 filter
               </p>
             </div>
@@ -134,7 +135,8 @@
                   </b-list-group-item>
                 </div>
                 <div>
-                  <b-list-group-item class="filter-divider pt-3" v-if="filterByGroup().filters.length > 0">
+                  <b-list-group-item class="filter-divider pt-3"
+                                     v-if="filterByGroup().filters.length > 0">
                     Custom
                   </b-list-group-item>
                   <b-list-group-item class="filter-list-item"
@@ -153,6 +155,7 @@
               <contacts-filter-types ref="contact-filter-types"
                                      :filter="selectedFilter"
                                      :filterGroupIndex="filterGroupIndex"
+                                     :filterGroupItemIndex="filterGroupItemIndex"
                                      :filterConjunction="filterConjunction"
                                      @filtersApplied="filtersApplied">
               </contacts-filter-types>
@@ -194,6 +197,7 @@ export default {
       selectedFilter: null,
       visibleListFilters: '',
       filterGroupIndex: 0,
+      filterGroupItemIndex: 0,
       filterConjunction: true,
       relationTypes: [
         'relation',
@@ -338,12 +342,14 @@ export default {
       this.filterSearch = filterName
     },
 
-    toAddFiltersStep (index, conjunction = true, skipStep = false) {
+    toAddFiltersStep (index, itemIndex, conjunction = true, skipStep = false) {
       // check if index is a number
       if (!isNaN(index / 1)) {
         this.filterGroupIndex = parseInt(index)
       }
 
+      // assign a numeric value to filterGroupItemIndex, else null
+      this.filterGroupItemIndex = !itemIndex && itemIndex !== 0 ? null : itemIndex
       this.filterConjunction = conjunction
       this.$VueEvent.stop('filters-back')
 
@@ -375,7 +381,7 @@ export default {
       })
     },
 
-    selectFilterByKey (filter, index, conjunction) {
+    selectFilterByKey (filter, groupIndex, itemIndex, conjunction) {
       if (typeof filter.default !== 'undefined' && filter.default === 1) {
         return
       }
@@ -384,7 +390,7 @@ export default {
 
       if (found) {
         this.selectedFilter = found
-        this.toAddFiltersStep(index, conjunction, true)
+        this.toAddFiltersStep(groupIndex, itemIndex, conjunction, true)
         this.step = 3
       }
     },
@@ -442,55 +448,66 @@ export default {
             continue
           }
 
-          let filterData = null
+          const filterItems = filterGroups[groupIndex].filters[filterKey]
+          let newFilterItems = []
 
           // evaluate list filter's operator against its actual respective filter's operators
           if (get(filterExists, 'operators', null)) {
-            filterData = filterGroups[groupIndex].filters[filterKey]
+            filterItems.forEach((filterItem) => {
+              // try to search for the selected option
+              const operatorData = filterExists.operators.find(item => item.value === filterItem.operator)
+              const options = operatorData ? get(operatorData, 'options', null) : null
+              const option = options ? options.find(item => item.value === filterItem.value) : null
 
-            // try to search for the selected option
-            const operatorData = filterExists.operators.find(item => item.value === filterData.operator)
-            const options = operatorData ? get(operatorData, 'options', null) : null
-            const option = options ? options.find(item => item.value === filterData.value) : null
-
-            // set values into an array
-            let trueValue = filterData.value
-            trueValue = option ? [option.label] : trueValue
-            trueValue = typeof filterData.value === 'string' ? filterData.value.split(',') : [trueValue]
-
-            // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
-            // the content in 'field' will be concatenated at the end of the string
-            let field = null
-
-            if ('field' in filterData) {
-              field = Array.isArray(trueValue) ? trueValue[0] : trueValue
-
-              // set values into an array (but using 'field' this time)
-              trueValue = filterData.field
+              // set values into an array
+              let trueValue = filterItem.value
               trueValue = option ? [option.label] : trueValue
-              trueValue = typeof filterData.field === 'string' ? filterData.field.split(',') : [trueValue]
-            }
+              trueValue = typeof filterItem.value === 'string'
+                ? filterItem.value.split(',')
+                : [trueValue]
 
-            filterGroups[groupIndex].filters[filterKey] = {
-              field,
-              key: filterKey,
-              label: filterExists.label,
-              operator: operatorData ? get(operatorData, 'label', null) : null,
-              trueValue: trueValue,
-              value: JSON.stringify((trueValue ? [trueValue.join(' and ')] : trueValue)),
-              default: filterData.default || 0
-            }
+              // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+              // the content in 'field' will be concatenated at the end of the string
+              let field = null
+
+              if ('field' in filterItem) {
+                field = Array.isArray(trueValue) ? trueValue[0] : trueValue
+
+                // set values into an array (but using 'field' this time)
+                trueValue = filterItem.field
+                trueValue = option ? [option.label] : trueValue
+                trueValue = typeof filterItem.field === 'string'
+                  ? filterItem.field.split(',')
+                  : [trueValue]
+              }
+
+              newFilterItems.push({
+                field,
+                key: filterKey,
+                label: filterExists.label,
+                operator: operatorData ? get(operatorData, 'label', null) : null,
+                trueValue: trueValue,
+                value: JSON.stringify((trueValue ? [trueValue.join(' and ')] : trueValue)),
+                default: filterItem.default || 0
+              })
+            })
+
+            filterGroups[groupIndex].filters[filterKey] = newFilterItems
 
             continue
           }
 
-          filterGroups[groupIndex].filters[filterKey] = {
-            key: filterKey,
-            label: filterExists.label,
-            trueValue: filterData.value,
-            value: JSON.stringify(filterData.value),
-            default: filterData.default || 0
-          }
+          filterItems.forEach((filterItem) => {
+            newFilterItems.push({
+              key: filterKey,
+              label: filterExists.label,
+              trueValue: filterItem.value,
+              value: JSON.stringify(filterItem.value),
+              default: filterItem.default || 0
+            })
+          })
+
+          filterGroups[groupIndex].filters[filterKey] = newFilterItems
         }
       }
 
@@ -561,26 +578,26 @@ export default {
       return !isSimpleType ? filter.trueValue : ''
     },
 
-    getFilterLength (filter) {
+    getGroupFiltersLength (filter) {
       return Object.keys(filter).length
     },
 
-    onDeleteFilter (index, key) {
+    onDeleteFilter (index, key, itemIndex) {
       this.setListContactsLoaded(false)
 
-      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
-      const initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
-      delete updatedFilter[index].filters[key]
+      let updatedFilter = this.$jsonClone(this.currentListFilters)
+      const initialListFilters = this.$jsonClone(this.currentListFilters)
+      updatedFilter[index].filters[key].splice(itemIndex, 1)
 
-      if (typeof updatedFilter[index] !== 'undefined' &&
-        isEmpty(updatedFilter[index].filters) &&
-        updatedFilter.constructor.name === 'Array') {
-        updatedFilter.splice(index, 1)
+      // check if filter key has no items, then remove it
+      if (updatedFilter?.[index]?.filters?.[key] &&
+        isEmpty(updatedFilter[index].filters[key])) {
+        delete updatedFilter[index].filters[key]
       }
 
-      if (typeof updatedFilter[index] !== 'undefined' &&
-        isEmpty(updatedFilter[index].filters) &&
-        updatedFilter.constructor.name === 'Object') {
+      // check if filters is empty, remove index
+      if (updatedFilter?.[index]?.filters &&
+        isEmpty(updatedFilter[index].filters)) {
         delete updatedFilter[index]
 
         // filter group was deleted, so we decrement the index by 1
@@ -605,7 +622,7 @@ export default {
 
     onDeleteGroupFilter (index) {
       this.setListContactsLoaded(false)
-      let updatedFilter = JSON.parse(JSON.stringify(this.currentListFilters))
+      let updatedFilter = this.$jsonClone(this.currentListFilters)
 
       if (updatedFilter.constructor.name === 'Array') {
         updatedFilter.splice(index, 1)
@@ -628,7 +645,7 @@ export default {
       })
 
       // decrement the filter group index by 1 only if
-      // filter group index is more than 0
+      // filter group index item is 0
       this.filterGroupIndex -= this.filterGroupIndex > 0 ? 1 : 0
 
       this.$emit('filtersUpdated')
@@ -674,6 +691,23 @@ export default {
       return newFilter
     },
 
+    isShowAndLabel (groupIndex, filterIndex, key, itemIndex) {
+      const groupFilters = this.visibleListFilters[groupIndex].filters
+      const groupAllFiltersSize = Object.values(groupFilters).flat().length
+      const groupFiltersSize = Object.keys(groupFilters).length
+      const filtersSize = groupFilters[key] ? groupFilters[key].length : 0
+      const isLastItemInGroup = filterIndex === (groupFiltersSize - 1) && itemIndex === (filtersSize - 1)
+
+      // don't show "AND" label if there's only 1 filter in the group or
+      // if there are more than 1 filters in the group and the filter is the last
+      if (groupAllFiltersSize === 1 ||
+        (isLastItemInGroup && groupAllFiltersSize > 1)) {
+        return false
+      }
+
+      return true
+    },
+
     ...mapActions('contacts', [
       'openFilters',
       'closeFilters',
@@ -694,17 +728,20 @@ export default {
       }
     },
 
-    currentListFilters () {
-      this.visibleListFilters = this.generateListFilters()
+    currentListFilters: {
+      deep: true,
+      handler: function () {
+        this.visibleListFilters = this.generateListFilters()
 
-      // if there's any change in the current list's filters,
-      // we need to update the filter group index value to
-      // how many filters are currently active
-      let keys = Object.keys(this.currentListFilters)
-      keys = keys.filter(item => !isNaN(parseInt(item)))
+        // if there's any change in the current list's filters,
+        // we need to update the filter group index value to
+        // how many filters are currently active
+        let keys = Object.keys(this.currentListFilters)
+        keys = keys.filter(item => !isNaN(parseInt(item)))
 
-      if (keys.length) {
-        this.filterGroupIndex = keys.length
+        if (keys.length) {
+          this.filterGroupIndex = keys.length
+        }
       }
     },
 
