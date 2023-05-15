@@ -15,7 +15,10 @@
 
     <broadcast-add-view :current-step="currentStep"
                         :steps="steps"
-                        @contactGroupChanged="onContactGroupChanged"/>
+                        @contactGroupChanged="onContactGroupChanged"
+                        @nextStep="onGoToNextStep"
+                        @previousStep="onGoToPreviousStep"
+                        @submit="onSubmit"/>
 
     <broadcast-add-filters :contact-group="contactGroup"/>
   </div>
@@ -68,6 +71,18 @@ export default {
   methods: {
     onContactGroupChanged (contactGroup) {
       this.contactGroup = contactGroup
+    },
+
+    onGoToNextStep () {
+      this.step++
+    },
+
+    onGoToPreviousStep () {
+      this.step--
+    },
+
+    onSubmit () {
+      console.log('SUBMITTING!')
     }
   }
 }

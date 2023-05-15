@@ -23,12 +23,14 @@
         <b-button class="mr-2"
                   size="sm"
                   variant="light"
+                  @click="onGoToPreviousStep"
                   v-if="currentStep.id > FIRST_STEP">
           Back
         </b-button>
 
         <b-button size="sm"
                   variant="primary"
+                  @click="onSubmitBroadcast"
                   v-if="currentStep.id === LAST_STEP">
           Send
         </b-button>
@@ -36,6 +38,7 @@
         <b-button size="sm"
                   variant="primary"
                   :disabled="!isMainComponentValid"
+                  @click="onGoToNextStep"
                   v-else>
           Next
         </b-button>
@@ -248,7 +251,7 @@ export default {
   },
 
   data: () => ({
-    isMainComponentValid: false,
+    isMainComponentValid: true,
     FIRST_STEP,
     LAST_STEP,
     CONTACTS_COLUMNS,
@@ -259,11 +262,24 @@ export default {
 
   methods: {
     mainComponentChanged (state) {
-      this.isMainComponentValid = state
+      // this.isMainComponentValid = state
     },
+
     onContactGroupChanged (contactGroup) {
       this.formData.contactGroup = contactGroup
       this.$emit('contactGroupChanged', contactGroup)
+    },
+
+    onGoToNextStep () {
+      this.$emit('nextStep')
+    },
+
+    onGoToPreviousStep () {
+      this.$emit('previousStep')
+    },
+
+    onSubmitBroadcast () {
+      this.$emit('submit')
     }
   },
 
