@@ -12504,6 +12504,18 @@ h1.contact-list-name-label {
                 margin-top: 25px;
               }
             }
+
+            &__message {
+              &__voicemail {
+                height: 70%;
+
+                div {
+                  border-color: grey;
+                  border-width: 1px;
+                  border-style: dotted;
+                }
+              }
+            }
           }
         }
 

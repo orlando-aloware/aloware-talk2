@@ -668,6 +668,10 @@ export default {
           }
         })
       this.urlShortenerDialog = false
+    },
+
+    onInput (input) {
+      this.$emit('messageChanged', input)
     }
   },
 
@@ -681,6 +685,7 @@ export default {
 
   watch: {
     'messageComposer.sms.body': function (value) {
+      this.$emit('messageChanged', value)
       this.setMessageComposerSmsBody(value)
     }
   },
