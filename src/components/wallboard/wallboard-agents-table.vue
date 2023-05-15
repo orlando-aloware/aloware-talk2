@@ -93,9 +93,9 @@ import Datatable from 'src/components/datatable.vue'
 import TimeAgo from 'src/components/time-ago.vue'
 import WallboardAgentRingGroups from 'src/components/wallboard/wallboard-agent-ring-groups.vue'
 import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-status.vue'
+import * as AgentStatus from 'src/constants/agent-status'
 import { COLUMNS } from 'src/constants/wallboard/agents-columns'
 import { mapActions, mapGetters } from 'vuex'
-import { LABELS } from 'src/constants/agent-status-labels'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -150,12 +150,9 @@ export default {
 
             break
           case 'status':
-            // use status names
-            let nameA = LABELS.find(status => status.value === a.agent_status) || {}
-            let nameB = LABELS.find(status => status.value === b.agent_status) || {}
-
-            condition = nameA.label > nameB.label
-            equals = nameA.label === nameB.label
+            // use a custom order
+            condition = this.customStatusOrder[a.agent_status] > this.customStatusOrder[b.agent_status]
+            equals = this.customStatusOrder[a.agent_status] === this.customStatusOrder[b.agent_status]
 
             break
           case 'status-duration':
@@ -200,6 +197,18 @@ export default {
 
     apiUrl () {
       return process.env.API_URL
+    },
+
+    customStatusOrder () {
+      return {
+        [AgentStatus.AGENT_STATUS_ACCEPTING_CALLS]: 1,
+        [AgentStatus.AGENT_STATUS_ON_CALL]: 2,
+        [AgentStatus.AGENT_STATUS_RINGING]: 3,
+        [AgentStatus.AGENT_STATUS_ON_WRAP_UP]: 4,
+        [AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS]: 5,
+        [AgentStatus.AGENT_STATUS_ON_BREAK]: 6,
+        [AgentStatus.AGENT_STATUS_OFFLINE]: 7
+      }
     }
   },
 
