@@ -47,16 +47,36 @@
 
     <div class="broadcasts__add__view__info row mr-0">
       <template v-if="formData.contactGroup === 'list'">
-        <q-card class="col-3 py-3 mr-2"
-                flat>
-          <span class="d-block text-h5 text-weight-medium">100</span>
-          <span class="text-h6 text-weight-light">Contacts</span>
-        </q-card>
-        <q-card class="col-3 py-3 mx-2"
-                flat>
-          <span class="d-block text-h5 text-weight-medium">$0.00</span>
-          <span class="text-h6 text-weight-light">Estimated Cost</span>
-        </q-card>
+        <div class="col-3 pr-2 pl-0">
+          <q-card class="p-3"
+                  flat>
+            <span class="d-block text-h5 text-weight-medium">100</span>
+            <span class="text-h6 text-weight-light">Contacts</span>
+          </q-card>
+        </div>
+        <div class="col-3 px-2">
+          <q-card class="p-3"
+                  flat>
+            <span class="d-block text-h5 text-weight-medium">$0.00</span>
+            <span class="text-h6 text-weight-light">Estimated Cost</span>
+          </q-card>
+        </div>
+      </template>
+      <template v-if="currentStep.id >= 2">
+        <div class="col-3 px-2">
+          <q-card class="p-3"
+                  flat>
+            <span class="d-block text-h5 text-weight-medium">100/160</span>
+            <span class="text-h6 text-weight-light">Characters</span>
+          </q-card>
+        </div>
+        <div class="col-3 pl-2 pr-0">
+          <q-card class="p-3"
+                  flat>
+            <span class="d-block text-h5 text-weight-medium">1/4</span>
+            <span class="text-h6 text-weight-light">SMS Parts</span>
+          </q-card>
+        </div>
       </template>
       <template v-if="formData.contactGroup === 'filter'">
         <q-card class="col py-3"
