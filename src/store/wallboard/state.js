@@ -6,20 +6,47 @@ export default function () {
       parked: [],
       queued: []
     },
-    callsEnabledColumns: [
+    defaultLiveCallsColumns: [
       'details',
       'disposition',
       'incoming_number',
       'ring_group',
-      'workflow',
-      'created_at',
+      'start',
+      'talk_time',
       'lead_number',
       'location',
-      'callback_status',
+      'user',
+      'tags',
+      'operations'
+    ],
+    defaultParkedCallsColumns: [
+      'details',
+      'disposition',
+      'incoming_number',
+      'ring_group',
+      'start',
+      'talk_time',
+      'lead_number',
+      'location',
+      'user',
+      'tags',
+      'operations'
+    ],
+    defaultQueuedCallsColumns: [
+      'details',
+      'disposition',
+      'incoming_number',
+      'ring_group',
+      'start',
+      'talk_time',
+      'lead_number',
+      'location',
+      'attempting_users',
       'tags',
       'notes',
       'operations'
     ],
+    callsEnabledColumns: [],
     filters: {
       ringGroup: null,
       agent: null,

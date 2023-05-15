@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { isLiveCall, isParkedCall, isQueuedCall } from 'src/plugins/helpers/functions'
 
 export default {
@@ -44,6 +45,13 @@ export default {
         state.agents[agentIndex].last_agent_status_change = data.last_agent_status_change
       }
     }
+  },
+
+  SET_CALLS_COLUMNS: (state, id) => {
+    // id = live, queued or parked
+    const prop = `default${id.capitalize()}CallsColumns`
+
+    Vue.set(state, 'callsEnabledColumns', state[prop])
   },
 
   SET_FILTER: (state, { filter, value }) => {

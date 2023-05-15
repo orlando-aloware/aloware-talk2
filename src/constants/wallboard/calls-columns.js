@@ -54,9 +54,8 @@ export const COLUMNS = [
     label: 'Talk Time',
     order: 5,
     sortable: true,
-    selectable: true,
-    draggable: true,
-    exclude: ['parked', 'queued']
+    selectable: false,
+    draggable: true
   },
   {
     name: 'lead_number',

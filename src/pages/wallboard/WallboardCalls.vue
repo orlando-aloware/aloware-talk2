@@ -17,7 +17,7 @@
 <script>
 import WallboardCallsHeader from 'src/components/wallboard/wallboard-calls-header.vue'
 import WallboardCallsTable from 'src/components/wallboard/wallboard-calls-table.vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'WallboardCalls',
@@ -65,6 +65,21 @@ export default {
           return this.queuedCalls
         default:
           return []
+      }
+    }
+  },
+
+  methods: {
+    ...mapMutations('wallboard', {
+      setCallsColumns: 'SET_CALLS_COLUMNS'
+    })
+  },
+
+  watch: {
+    '$route': {
+      immediate: true,
+      handler (route) {
+        this.setCallsColumns(route.params.id)
       }
     }
   }
