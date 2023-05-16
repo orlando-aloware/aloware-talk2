@@ -155,7 +155,6 @@ import NumberOfDaysSelector from 'components/number-of-days-selector'
 import talk2Api from 'src/plugins/api/api'
 import DateSelector from 'components/date-selector'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import { PERSONAL_LINE_ID } from 'src/constants/personal-line'
 
 export default {
   name: 'appointment-form-modal',
@@ -351,10 +350,10 @@ export default {
     setSmsReminderFields () {
       this.appointment.smsReminder.body = this.currentCompany?.sms_reminder_default_text || ''
 
-      // use real user's campaign_id
-      this.appointment.smsReminder.campaign_id = this.currentCompany?.sms_reminder_default_campaign_id === PERSONAL_LINE_ID
-        ? this.profile.campaign_id
-        : this.currentCompany?.sms_reminder_default_campaign_id
+      // use personal line or default campaign_id
+      this.appointment.smsReminder.campaign_id = !this.currentCompany?.sms_reminder_use_personal_line
+        ? this.currentCompany?.sms_reminder_default_campaign_id
+        : this.profile.campaign_id
 
       // update time if its set in account config
       if (this.currentCompany?.sms_reminder_default_time) {

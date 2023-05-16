@@ -100,9 +100,9 @@ export default {
 
   mounted () {
     // if component value is set, search for that specific line to fill as the option
-    // if (this.value) {
-    //   this.line = this.formattedLineOptions.find(line => line.id === this.value)
-    // }
+    if (this.value) {
+      this.line = this.formattedLineOptions.find(line => line.id === this.value)
+    }
   },
 
   methods: {

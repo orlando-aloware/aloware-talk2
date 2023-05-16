@@ -294,7 +294,6 @@ import { aclMixin, dateMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
-import { PERSONAL_LINE_ID } from 'src/constants/personal-line'
 import CommunicationTypeSelector from '../generic-selectors/communication-type-selector'
 import ContactLineSelector from 'components/contact-line-selector'
 import ContactSelector from 'components/generic-selectors/contact-selector'
@@ -743,10 +742,10 @@ export default {
     setSmsReminderFields () {
       this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text || ''
 
-      // use real user's campaign_id
-      this.sms_reminder_fields.campaign_id = this.profile.company.sms_reminder_default_campaign_id === PERSONAL_LINE_ID
-        ? this.profile.campaign_id
-        : this.profile.company.sms_reminder_default_campaign_id
+      // use personal line or default campaign_id
+      this.sms_reminder_fields.campaign_id = !this.profile.company.sms_reminder_use_personal_line
+        ? this.profile.company.sms_reminder_default_campaign_id
+        : this.profile.campaign_id
 
       // update time if its set in account config
       if (this.profile.company.sms_reminder_default_time) {
