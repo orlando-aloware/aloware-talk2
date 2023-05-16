@@ -27,7 +27,8 @@ export default {
     ...mapState('contacts', ['isAllContactsSelected']),
     ...mapState([
       'users',
-      'campaigns'
+      'campaigns',
+      'showMyContacts'
     ]),
 
     checked () {
@@ -246,7 +247,8 @@ export default {
         .filter(item => !['checkbox', 'actions'].includes(item.name))
 
       talk2Api.V2[module].listExport(id, {
-        headers: JSON.stringify(headers)
+        headers: JSON.stringify(headers),
+        my_contacts: +this.showMyContacts
       })
         .catch(() => {
           this.$generalNotification('Unable to process export request! Please try again later.', 'error')

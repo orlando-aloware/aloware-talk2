@@ -120,6 +120,8 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
+import { integrationMixin } from 'src/plugins/mixins'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -129,7 +131,13 @@ export default {
     InformationCircleIcon
   },
 
+  mixins: [integrationMixin],
+
   props: {
+    integration: {
+      type: String,
+      required: true
+    },
     redirect: {
       type: Boolean,
       default: true
@@ -191,7 +199,14 @@ export default {
       return params
     },
     contactsDescription () {
-      return this.count + (this.count === 1 ? ' contact' : ' contacts')
+      let description = ''
+
+      if (this.count !== null) {
+        description += this.count
+      }
+
+      description += (this.count === 1 ? ' contact' : ' contacts')
+      return description
     },
     isAllowedInternationalNumbers () {
       return this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
@@ -252,9 +267,9 @@ export default {
   mounted () {
     this.loading++
 
-    if (this.mode === 'hubspot') {
-      // check if Hubspot list already exists
-      this.checkHubspotList()
+    if (this.mode === 'integration') {
+      // check if a list from integration already exists
+      this.checkIntegrationImport()
     }
 
     this.setCount()
@@ -272,16 +287,22 @@ export default {
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
         this.loading--
-      } else if (this.params.target) {
-        if (this.mode === 'hubspot') {
-          this.count = this.params.size
+
+        return
+      }
+
+      if (this.params.target && this.mode === 'integration') {
+        this.count = this.params.size
+        this.loading--
+
+        return
+      }
+
+      if (this.params.target) {
+        this.getListCount(this.params.target).then(res => {
+          this.count = res.data.count
           this.loading--
-        } else {
-          this.getListCount(this.params.target).then(res => {
-            this.count = res.data.count
-            this.loading--
-          })
-        }
+        })
       }
     },
     onHidden () {
@@ -310,8 +331,8 @@ export default {
           return this.addContacts()
         case 'duplicate':
           return this.duplicateList()
-        case 'hubspot':
-          return this.importFromHubspot()
+        case 'integration':
+          return this.importFromIntegration()
       }
 
       return Promise.reject()
@@ -352,6 +373,18 @@ export default {
           }
         })
     },
+
+    importFromIntegration () {
+      switch (this.integration.toLowerCase()) {
+        case 'hubspot':
+          return this.importFromHubspot()
+        case 'pipedrive':
+          return this.addPipedriveFilter()
+        case 'zoho':
+          return this.addZohoView()
+      }
+    },
+
     importFromHubspot () {
       // remove target and size from params
       let target = this.params.target
@@ -359,8 +392,7 @@ export default {
       delete params.target
       delete params.size
 
-      return this.$axios
-        .post('/api/v2/power-dialer-lists/import-hubspot-list/' + target, params)
+      return talk2Api.V2.integrations.hubspot.importList(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
@@ -372,6 +404,47 @@ export default {
           this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
         })
     },
+
+    addZohoView () {
+      // remove target and size from params
+      let target = this.params.target
+      let params = this.requestParams
+      delete params.target
+      delete params.size
+
+      return talk2Api.V2.integrations.zoho.importView(target, params)
+        .then(response => response.data)
+        .then(data => {
+          const notification = this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
+          })
+        })
+        .catch(_err => {
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
+    addPipedriveFilter () {
+      // remove target and size from params
+      let target = this.params.target
+      let params = this.requestParams
+      delete params.target
+      delete params.size
+
+      return talk2Api.V2.integrations.pipedrive.importFilter(target, params)
+        .then(response => response.data)
+        .then(data => {
+          const notification = this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')
+          this.$emit('submit', {
+            notification: notification
+          })
+        })
+        .catch(_err => {
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
     reloadFolders () {
       return this.$axios
         .get('/api/v2/power-dialer-folders')
@@ -385,6 +458,50 @@ export default {
       return this.$axios
         .get(`${process.env.API_REPORTING_URL}/api/v2/power-dialer-lists/${id}/count`)
     },
+
+    checkIntegrationImport () {
+      switch (this.integration.toLowerCase()) {
+        case 'hubspot':
+          return this.checkHubspotList()
+        case 'pipedrive':
+          return this.checkPipedriveFilter()
+        case 'zoho':
+          return this.checkZohoView()
+      }
+    },
+
+    async checkZohoView () {
+      this.loading++
+
+      const res = await this.$axios
+        .get('/api/v2/power-dialer-lists/zoho-view-exists/' + this.params.target)
+
+      if (res.data.exists) {
+        this.confirm_message = 'The Zoho view you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.confirm = true
+
+        return
+      }
+
+      this.loading--
+    },
+
+    async checkPipedriveFilter () {
+      this.loading++
+
+      const res = await this.$axios
+        .get('/api/v2/power-dialer-lists/pipedrive-filter-exists/' + this.params.target)
+
+      if (res.data.exists) {
+        this.confirm_message = 'The Pipedrive filter you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.confirm = true
+
+        return
+      }
+
+      this.loading--
+    },
+
     async checkHubspotList () {
       this.loading++
 
@@ -394,10 +511,13 @@ export default {
       if (res.data.exists) {
         this.confirm_message = 'The HubSpot list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
         this.confirm = true
-      } else {
-        this.loading--
+
+        return
       }
+
+      this.loading--
     },
+
     closeConfirmDialog () {
       this.confirm = false
       this.loading--

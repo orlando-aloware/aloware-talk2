@@ -99,11 +99,27 @@ export default {
 
       if (keys.length > 0) {
         query.filter_groups = []
+        const isNumeric = this.$isNumeric
 
-        keys.forEach(function (key, i) {
-          // defined and not empty filter groups
-          if (key === 'filter_groups' && filters[key] && filters[key].length > 0) {
+        keys.forEach(function (key) {
+          const isArrayValue = filters[key] && filters[key].constructor.name === 'Array'
+          const isObjectValue = filters[key] && filters[key].constructor.name === 'Object'
+          // get length or count according to value's type
+          const groupLengthOrPropertyCount = isArrayValue
+            ? filters[key].length
+            : (isObjectValue
+              ? Object.keys(filters[key]).filter(key => isNumeric(key)).length
+              : 0)
+
+          // assign filter_groups according to value's type
+          if (isArrayValue && key === 'filter_groups' && groupLengthOrPropertyCount > 0) {
             query.filter_groups.push(...filters[key])
+          } else if (isObjectValue && key === 'filter_groups' && groupLengthOrPropertyCount > 0) {
+            // remove unnecessary props
+            delete filters[key].sort
+            delete filters[key].order
+            delete filters[key].relations
+            query.filter_groups = filters[key]
           }
 
           // search becomes a separate filter

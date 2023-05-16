@@ -1,82 +1,75 @@
 <template>
   <div>
     <div class="filter-types"
-         v-for="operator in filter.operators"
-         :key="(filter.key + '-' + operator.value)"
-    >
+         :key="`${filter.key}-${operator.value}`"
+         v-for="operator in filter.operators">
       <q-radio class="my-2 flex-nowrap"
                dense
                :val="operator.value"
                :label="operator.label"
-               v-model="filterOperator"
-      >
+               v-model="filterOperator">
       </q-radio>
       <template v-if="filter.type === 'string'">
-        <q-select
-          ref="filterOperation"
-          class="filter-operation border"
-          borderless
-          dense
-          use-input
-          use-chips
-          multiple
-          :emit-value="isSpecialStringTypeFilterKey"
-          input-debounce="0"
-          v-if="operator.value === filterOperator && hasValue"
-          v-model="filterOperatorValue"
-          :options="filterOptions"
-          option-value="originalLabel"
-          option-label="label"
-          option-disable="disabled"
-          v-on="specialStringTypeEvents"
-        >
+        <q-select ref="filterOperation"
+                  class="filter-operation border"
+                  input-debounce="0"
+                  option-value="originalLabel"
+                  option-label="label"
+                  option-disable="disabled"
+                  borderless
+                  dense
+                  use-input
+                  use-chips
+                  multiple
+                  :emit-value="isSpecialStringTypeFilterKey"
+                  :options="filterOptions"
+                  v-model="filterOperatorValue"
+                  v-if="operator.value === filterOperator && hasValue"
+                  v-on="specialStringTypeEvents">
         </q-select>
       </template>
       <template v-if="filter.type === 'number'">
         <q-input outlined
                  dense
                  v-model="filterOperatorValue"
-                 v-if="operator.value === filterOperator && hasValue"
-        />
+                 v-if="operator.value === filterOperator && hasValue" />
         <span v-if="operator.value === filterOperator && hasSecondaryOperator">and</span>
         <q-input outlined
                  dense
                  class="pt-2"
                  v-model="secondaryFilterOperatorValue"
-                 v-if="operator.value === filterOperator && hasSecondaryOperator"
-        />
+                 v-if="operator.value === filterOperator && hasSecondaryOperator" />
       </template>
       <template v-if="filter.type === 'date'">
-        <q-select dense
+        <q-select option-value="value"
+                  dense
                   outlined
-                  option-value="value"
                   emit-value
                   map-options
-                  v-model="filterOperatorValue"
                   :options="operator.options"
-                  v-if="operator.value === filterOperator && hasValue"
-        />
-        <b-form-datepicker
-          label-today="Today"
-          today-button
-          reset-button
-          :date-format-options="format"
-          v-model="filterOperatorValue"
-          v-if="operator.value === filterOperator && expectsDatepicker"
-        ></b-form-datepicker>
+                  v-model="filterOperatorValue"
+                  v-if="operator.value === filterOperator && hasValue" />
+        <b-form-datepicker label-today="Today"
+                           today-button
+                           reset-button
+                           :date-format-options="format"
+                           v-model="filterOperatorValue"
+                           v-if="operator.value === filterOperator && expectsDatepicker">
+        </b-form-datepicker>
         <span v-if="operator.value === filterOperator && hasSecondaryOperator">and</span>
-        <b-form-datepicker
-          label-today="Today"
-          today-button
-          reset-button
-          :date-format-options="format"
-          v-model="secondaryFilterOperatorValue"
-          v-if="operator.value === filterOperator && hasSecondaryOperator"
-        ></b-form-datepicker>
+        <b-form-datepicker label-today="Today"
+                           today-button
+                           reset-button
+                           :date-format-options="format"
+                           v-model="secondaryFilterOperatorValue"
+                           v-if="operator.value === filterOperator && hasSecondaryOperator">
+        </b-form-datepicker>
       </template>
       <template v-if="['relation', 'multi_relation'].includes(filter.type)">
         <q-select ref="filterOperation"
                   class="filter-operation border"
+                  input-debounce="0"
+                  option-disable="disabled"
                   borderless
                   dense
                   use-chips
@@ -84,11 +77,9 @@
                   map-options
                   emit-value
                   use-input
-                  input-debounce="0"
-                  v-if="operator.value === filterOperator && hasValue"
-                  v-model="filterOperatorValue"
                   :options="options"
-                  option-disable="disabled"
+                  v-model="filterOperatorValue"
+                  v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
                   @filter="filterFn"/>
         <label v-if="operator.value === filterOperator && hasSecondaryOperator">
@@ -96,17 +87,17 @@
         </label>
         <q-select ref="secondaryFilterOperation"
                   class="filter-operation border"
+                  input-debounce="0"
+                  option-value="originalLabel"
+                  option-label="label"
+                  option-disable="disabled"
                   borderless
                   dense
                   use-input
                   use-chips
                   multiple
-                  input-debounce="0"
-                  v-model="secondaryFilterOperatorValue"
                   :options="filterOptions"
-                  option-value="originalLabel"
-                  option-label="label"
-                  option-disable="disabled"
+                  v-model="secondaryFilterOperatorValue"
                   v-if="operator.value === filterOperator && hasSecondaryOperator"
                   @input-value="showSecondaryFilterOperationOptions"
                   @input="addSecondaryValue"/>
@@ -122,27 +113,24 @@
       <template v-if="filter.type === 'selection'">
         <q-select class="filter-operation border"
                   ref="filterOperation"
-                  :options="options"
                   option-disable="disabled"
                   input-debounce="0"
                   borderless
                   dense
                   map-options
                   emit-value
+                  :options="options"
                   v-model="filterOperatorValue"
                   v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
-                  @filter="filterFn"
-        />
+                  @filter="filterFn" />
       </template>
     </div>
-    <compact-btn
-      class="mr-2 mt-3 p-3"
-      variant="success"
-      @clicked="applyFilter"
-      :disabled="!isValidated"
-    >
-      Apply filter
+    <compact-btn class="mr-2 mt-3 p-3"
+                 variant="success"
+                 :disabled="!isValidated || appliedFiltersInProgress"
+                 @clicked="applyFilter">
+      {{ applyFilterText }}
     </compact-btn>
   </div>
 </template>
@@ -150,9 +138,16 @@
 <script>
 import CompactBtn from 'components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import _ from 'lodash'
+import {
+  get,
+  isEmpty,
+  isEqual,
+  debounce,
+  uniqBy
+} from 'lodash'
 import * as Countries from 'src/constants/countries'
 import { State } from 'country-state-city'
+import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
 export default {
   name: 'contacts-filter-types',
@@ -171,6 +166,11 @@ export default {
       default: 0
     },
 
+    filterGroupItemIndex: {
+      required: false,
+      default: null
+    },
+
     filterConjunction: {
       required: false,
       type: Boolean,
@@ -180,7 +180,7 @@ export default {
 
   data () {
     return {
-      filterOperator: 1,
+      filterOperator: OPERATORS.IS_ANY_OF,
       filterOperatorValue: null,
       secondaryFilterOperatorValue: null,
       filterOptions: [
@@ -196,7 +196,11 @@ export default {
       debounceDelay: 0,
       format: { 'year': 'numeric', 'month': '2-digit', 'day': 'numeric' },
       allFilters: [],
-      options: []
+      options: [],
+      filterOperatorDebounceInProgress: false,
+      filterOperatorValueDebounceInProgress: false,
+      secondaryFilterOperatorValueDebounceInProgress: false,
+      appliedFiltersInProgress: false
     }
   },
 
@@ -267,6 +271,32 @@ export default {
         'input': this.addValue,
         'input-value': this.showFilterOperationOptions
       }
+    },
+
+    groupItemIndex () {
+      const keyFilters = get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+
+      if (this.filterGroupItemIndex === null && !isEmpty(keyFilters)) {
+        return keyFilters.length
+      }
+
+      if (this.filterGroupItemIndex !== null) {
+        return this.filterGroupItemIndex
+      }
+
+      return 0
+    },
+
+    applyFilterText () {
+      return this.appliedFiltersInProgress
+        ? 'Applying filter...'
+        : 'Apply filter'
+    },
+
+    isDebounceInProgress () {
+      return this.filterOperatorDebounceInProgress ||
+        this.filterOperatorValueDebounceInProgress ||
+        this.secondaryFilterOperatorValueDebounceInProgress
     }
   },
 
@@ -314,8 +344,9 @@ export default {
 
   mounted () {
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
-    this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
-    this.filterOperator = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
+    this.initialListFilters = this.$jsonClone(this.currentListFilters)
+    const path = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}].operator`
+    this.filterOperator = get(this.initialListFilters, path, 1)
 
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
@@ -329,8 +360,9 @@ export default {
 
   methods: {
     setValue () {
-      const filter = _.get(this.initialListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
-      const value = _.get(filter, 'value', null)
+      const path = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}]`
+      const filter = get(this.initialListFilters, path, null)
+      const value = get(filter, 'value', null)
 
       switch (this.filter.type) {
         case 'number':
@@ -361,18 +393,19 @@ export default {
 
       this.allFilters = []
 
-      if (!_.isEmpty(this.initialListFilters)) {
-        this.allFilters = JSON.parse(JSON.stringify(this.initialListFilters))
+      if (!isEmpty(this.initialListFilters)) {
+        this.allFilters = this.$jsonClone(this.initialListFilters)
       }
 
       this.allFilters[this.filterGroupIndex] = {
         filters: {},
         is_conjunction: this.filterConjunction
       }
-      const filterGroup = _.get(this.initialListFilters, this.filterGroupIndex, null)
+
+      const filterGroup = get(this.initialListFilters, this.filterGroupIndex, null)
 
       if (filterGroup) {
-        this.allFilters[this.filterGroupIndex].filters = JSON.parse(JSON.stringify(filterGroup.filters))
+        this.allFilters[this.filterGroupIndex].filters = this.$jsonClone(filterGroup.filters)
       }
 
       let value = { data: null }
@@ -400,26 +433,43 @@ export default {
           value.data = this.filterOperatorValue
       }
 
-      const currentFilter = _.get(this.allFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}]`, null)
+      let currentFilter = this.$jsonClone(this.allFilters[this.filterGroupIndex].filters[this.filter.key])
+      let currentFilterItem = null
+
+      if (currentFilter) {
+        currentFilterItem = currentFilter[this.groupItemIndex]
+      }
 
       // remove an invalid filter
       if (!value.data &&
-        currentFilter &&
+        !isEmpty(currentFilterItem) &&
         !this.isValidated) {
-        delete this.allFilters[this.filterGroupIndex].filters[this.filter.key]
+        delete currentFilter[this.groupItemIndex]
       } else { // add the valid filter
         const data = {
-          value: JSON.parse(JSON.stringify(value.data)),
+          value: this.$jsonClone(value.data),
           operator: this.filterOperator
         }
 
         // only add field in request if 'value' is present
         if (value.field) {
-          data.field = JSON.parse(JSON.stringify(value.field))
+          data.field = this.$jsonClone(value.field)
         }
 
-        this.allFilters[this.filterGroupIndex].filters[this.filter.key] = data
+        // initialize the certain key's filters if it doesn't exists
+        if (!currentFilter) {
+          currentFilter = []
+        }
+
+        // we assign the filter data
+        if (!isEmpty(currentFilter[this.groupItemIndex])) {
+          currentFilter[this.groupItemIndex] = data
+        } else {
+          currentFilter.push(data)
+        }
       }
+
+      this.allFilters[this.filterGroupIndex].filters[this.filter.key] = currentFilter
 
       this.$VueEvent.stop('filters-back')
       this.$VueEvent.listen('filters-back', () => {
@@ -503,27 +553,58 @@ export default {
       })
     },
 
-    applyFilter () {
+    processFilters () {
       this.setListContactsLoaded(false)
 
-      const currentListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+      const currentListFilters = this.$jsonClone(this.currentListFilters)
+      let allFilters = this.$jsonClone(this.allFilters)
+      let filters = allFilters[this.filterGroupIndex].filters[this.filter.key]
 
-      this.setCurrentListFilters(this.allFilters)
+      // remove duplicate filter(s)
+      filters = uniqBy(filters, (item) => {
+        return JSON.stringify(item)
+      })
 
+      allFilters[this.filterGroupIndex].filters[this.filter.key] = filters
+
+      this.setCurrentListFilters(allFilters)
+
+      const previousFilters = this.$jsonClone(this.initialListFilters)
       // update initial list filters with new set of currently selected filters
-      this.initialListFilters = JSON.parse(JSON.stringify(this.currentListFilters))
+      this.initialListFilters = this.$jsonClone(this.currentListFilters)
 
       this.$emit('filtersApplied')
 
       // update the results with new query
-      if (!_.isEqual(this.initialListFilters, currentListFilters)) {
+      if (!isEqual(this.initialListFilters, currentListFilters)) {
         this.setShowMyContacts(false)
-        this.$VueEvent.fire('filteredFetchContacts', { clear: true })
+        this.$VueEvent.fire('filteredFetchContacts', {
+          clear: true,
+          // added the previous filter so that if the fetch fails,
+          // we revert the filters to its previous state
+          previousFilters: this.$jsonClone(previousFilters)
+        })
       }
     },
 
+    applyFilter () {
+      this.appliedFiltersInProgress = true
+      let debounceDelay = this.isDebounceInProgress
+        ? this.debounceDelay
+        : 0
+      let applyFilterInterval = null
+
+      applyFilterInterval = setInterval(() => {
+        if (!this.isDebounceInProgress) {
+          this.processFilters()
+          this.appliedFiltersInProgress = false
+          clearInterval(applyFilterInterval)
+        }
+      }, debounceDelay)
+    },
+
     getStringValue () {
-      return JSON.parse(JSON.stringify(this.filterOperatorValue))
+      return this.$jsonClone(this.filterOperatorValue)
     },
 
     getNumberValue () {
@@ -597,11 +678,11 @@ export default {
     setRelationValue (filter) {
       switch (this.filter.key) {
         case 'custom_attribute':
-          this.filterOperatorValue = _.get(filter, 'field', null)
-          this.secondaryFilterOperatorValue = _.get(filter, 'value', null)
+          this.filterOperatorValue = get(filter, 'field', null)
+          this.secondaryFilterOperatorValue = get(filter, 'value', null)
           break
         default:
-          this.filterOperatorValue = _.get(filter, 'value', null)
+          this.filterOperatorValue = get(filter, 'value', null)
           break
       }
     },
@@ -611,8 +692,9 @@ export default {
         case 'string':
         case 'relation':
         case 'multi_relation':
-          const filterOperator = this.filterOperator && (!this.hasValue || (this.hasValue && !_.isEmpty(this.filterOperatorValue)))
-          const secondaryFilterOperator = this.hasSecondaryOperator ? !_.isEmpty(this.secondaryFilterOperatorValue) : true
+          const isValidFilterOperator = (!this.hasValue || (this.hasValue && !isEmpty(this.filterOperatorValue)))
+          const filterOperator = this.filterOperator && isValidFilterOperator
+          const secondaryFilterOperator = this.hasSecondaryOperator ? !isEmpty(this.secondaryFilterOperatorValue) : true
 
           this.isValidated = filterOperator && secondaryFilterOperator
           break
@@ -638,7 +720,7 @@ export default {
           // if there's only 1 operator in a date filter, check if
           // non numeric operator value is not empty
           const isOperatorValidNonNumericValue = typeof this.filterOperatorValue !== 'number' &&
-            !_.isEmpty(this.filterOperatorValue)
+            !isEmpty(this.filterOperatorValue)
           // if non or numeric filter operator value has a value,
           // then it is valid for single operator
           const isOperatorValidValue = (isOperatorValidNumericValue ||
@@ -659,9 +741,12 @@ export default {
     },
 
     resetForm () {
-      this.filterOperator = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].operator`, 1)
+      const filterPath = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}]`
+      const operatorPath = `${filterPath}.operator`
+      const valuePath = `${filterPath}.value`
+      this.filterOperator = get(this.currentListFilters, operatorPath, 1)
       this.$nextTick(() => {
-        this.filterOperatorValue = _.get(this.currentListFilters, `[${this.filterGroupIndex}].filters[${this.filter.key}].value`, [])
+        this.filterOperatorValue = get(this.currentListFilters, valuePath, [])
       })
     },
 
@@ -708,28 +793,34 @@ export default {
       this.secondaryFilterOperatorValue = null
 
       if (!this.hasValue) {
-        const debounce = _.debounce(() => {
+        this.filterOperatorDebounceInProgress = true
+        const debounceFunction = debounce(() => {
           this.addValue()
+          this.filterOperatorDebounceInProgress = false
         }, this.debounceDelay)
-        debounce()
+        debounceFunction()
       }
 
       this.validateValue()
     },
 
     filterOperatorValue () {
-      const debounce = _.debounce(() => {
+      this.filterOperatorValueDebounceInProgress = true
+      const debounceFunction = debounce(() => {
         this.addValue()
+        this.filterOperatorValueDebounceInProgress = false
       }, this.debounceDelay)
-      debounce()
+      debounceFunction()
       this.validateValue()
     },
 
     secondaryFilterOperatorValue () {
-      const debounce = _.debounce(() => {
+      this.secondaryFilterOperatorValueDebounceInProgress = true
+      const debounceFunction = debounce(() => {
         this.addValue()
+        this.secondaryFilterOperatorValueDebounceInProgress = false
       }, this.debounceDelay)
-      debounce()
+      debounceFunction()
       this.validateValue()
     },
 
