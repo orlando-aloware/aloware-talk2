@@ -109,6 +109,7 @@
 <script>
 import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
 import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
+import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import ContactsView from '../../pages/contacts/ContactsView.vue'
 import {
   contactsMixins,
@@ -229,6 +230,7 @@ export default {
   components: {
     BroadcastAddViewContacts,
     BroadcastAddViewMessage,
+    BroadcastAddViewSchedule,
     ContactsView
   },
 

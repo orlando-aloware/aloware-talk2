@@ -1,17 +1,5 @@
 <template>
   <div class="broadcast-add broadcast-add__contacts">
-    <div class="w-50"
-         v-show="optionSelected == 'list'">
-      <p>From</p>
-      <line-selector v-model="selectedLine"
-                     :multiple="false"
-                     :use-chips="false"
-                     :generic-styling="false"
-                     :generic-multiselect="false"
-                     :clearable="true"
-                     @change="onLineChange">
-      </line-selector>
-    </div>
     <div>
       <p>Select a group of contacts</p>
       <div class="broadcast-add__contacts__options">
@@ -60,7 +48,6 @@
 
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
-import LineSelector from 'components/generic-selectors/line-selector'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 
 export default {
@@ -68,7 +55,6 @@ export default {
 
   components: {
     CheckOIcon,
-    LineSelector,
     IntegrationListSelector
   },
 
