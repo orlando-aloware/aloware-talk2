@@ -14,11 +14,27 @@
           <q-radio v-model="scheduleOption" val="pick" label="Pick a time" />
         </div>
         <div v-if="scheduleOption === 'pick'">
-          <div>
-            Date
+          <div class="row">
+            <div class="col-4">
+              Date
+            </div>
+            <div class="col-8">
+              <date-picker-selector v-model="selectedDate"
+                                    :canEdit="true"
+                                    wrapperClass="date-of-birth-field"
+                                    contentClass="inline-input contact-info-editable"
+                                    popoverClass="contact-info-popover"
+                                    popoverId="popover-date-picker-sync">
+              </date-picker-selector>
+            </div>
           </div>
           <div>
-            Time
+            <div class="col-4">
+              Time
+            </div>
+            <div class="col-8">
+              Time selectors
+            </div>
           </div>
         </div>
       </div>
@@ -60,6 +76,7 @@
 </template>
 <script>
 import LineSelector from 'components/generic-selectors/line-selector'
+import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 
 const THROTTLING_OPTIONS = [
   {
@@ -70,14 +87,16 @@ const THROTTLING_OPTIONS = [
 
 export default {
   components: {
-    LineSelector
+    LineSelector,
+    DatePickerSelector
   },
 
   data: () => ({
     scheduleOption: 'now',
     THROTTLING_OPTIONS,
     selectedThrottling: null,
-    selectedLine: null
+    selectedLine: null,
+    selectedDate: null
   }),
 
   methods: {
