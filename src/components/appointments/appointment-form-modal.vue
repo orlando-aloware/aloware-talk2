@@ -12,13 +12,13 @@
             @reset="resetForm">
       <b-form-row>
         <b-col sm="12">
-          <b-form-group
-            id="input-group-1"
-            label="Select date"
-            label-for="input-1"
-            description="">
-            <date-selector v-model="appointment.date"
-                           :min-date="minDate"
+          <b-form-group id="input-group-1"
+                        label="Select date"
+                        label-for="input-1"
+                        description="">
+            <date-selector :min-date="minDate"
+                           :no-clear-button="true"
+                           v-model="appointment.date"
                            @dateSelected="dateSelected">
             </date-selector>
           </b-form-group>
@@ -51,14 +51,12 @@
           <b-form-group id="input-group-2"
                         label="Note"
                         label-for="input-2">
-            <b-form-textarea
-              class="textarea-no-auto-shrink"
-              placeholder="Write a note for this event.."
-              rows="3"
-              max-rows="8"
-              no-auto-shrink
-              v-model="appointment.body">
-            </b-form-textarea>
+            <b-form-textarea class="textarea-no-auto-shrink"
+                             placeholder="Write a note for this event.."
+                             rows="3"
+                             max-rows="8"
+                             no-auto-shrink
+                             v-model="appointment.body"/>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -71,19 +69,20 @@
           <b-form-group id="input-group-2"
                         label=""
                         class="checkbox-wrapper">
-            <b-form-checkbox
-              v-model="appointment.smsReminder.enabled"
-              :value="true"
-              :unchecked-value="false">
+            <b-form-checkbox :value="true"
+                             :unchecked-value="false"
+                             v-model="appointment.smsReminder.enabled">
               <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
           </b-form-group>
         </b-col>
-        <b-col v-show="appointment.smsReminder.enabled" cols="12">
+        <b-col cols="12"
+               v-show="appointment.smsReminder.enabled">
           <b-form-group id="input-group-2"
                         label="Send From"
                         label-for="input-2">
             <contact-line-selector :showPaused="false"
+                                   v-model="appointment.smsReminder.campaign_id"
                                    @select="lineSelected">
             </contact-line-selector>
           </b-form-group>
@@ -91,13 +90,15 @@
           <b-form-group id="input-group-2"
                         label="Time"
                         label-for="input-2">
-            <predefined-time-selector @select="smsReminderTimeSelected"></predefined-time-selector>
+            <predefined-time-selector v-model="appointment.smsReminder.time"
+                                      @select="smsReminderTimeSelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
                         label="Send (n) days before"
                         label-for="input-2">
-            <number-of-days-selector @select="smsReminderFrequencySelected"></number-of-days-selector>
+            <number-of-days-selector v-model="appointment.smsReminder.frequencies"
+                                     @select="smsReminderFrequencySelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -105,46 +106,40 @@
                         label-for="input-2">
             <div class="mb-1">
               <span class="text-danger sms-reminder-template-variables"
-                    v-for="item in appointment.smsReminder.template_variables"
                     :key="item"
+                    v-for="item in appointment.smsReminder.template_variables"
                     @click="appendSmsReminderTemplateVariable(item)">
                 {{ item }}
             </span>
             </div>
-            <b-form-textarea
-              class="textarea-no-auto-shrink"
-              placeholder=""
-              rows="3"
-              max-rows="8"
-              no-auto-shrink
-              v-model="appointment.smsReminder.body">
-            </b-form-textarea>
+            <b-form-textarea class="textarea-no-auto-shrink"
+                             placeholder=""
+                             rows="3"
+                             max-rows="8"
+                             no-auto-shrink
+                             v-model="appointment.smsReminder.body"/>
           </b-form-group>
         </b-col>
       </b-form-row>
     </b-form>
 
     <template slot="modal-footer">
-      <b-button
-        variant="success"
-        class="custom-btn"
-        size="sm"
-        @click="onHidden"
-      >
+      <b-button variant="success"
+                class="custom-btn"
+                size="sm"
+                @click="onHidden">
         Close
       </b-button>
-      <b-button
-        variant="primary"
-        class="custom-btn"
-        size="sm"
-        :disabled="isSaving || !isValid"
-        @click="onSubmit"
-      >
-        <q-spinner-bars v-if="isSaving" color="white"/>
+      <b-button variant="primary"
+                class="custom-btn"
+                size="sm"
+                :disabled="isSaving || !isValid"
+                @click="onSubmit">
+        <q-spinner-bars color="white"
+                        v-if="isSaving"/>
         {{ isSaving ? 'Adding Event...' : 'Add Event' }}
       </b-button>
     </template>
-
   </b-modal>
 </template>
 
@@ -258,7 +253,7 @@ export default {
     onHidden () {
       this.addAppointmentOpen(false)
       this.appointment.smsReminder.enabled = false
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
       this.resetForm()
     },
     onSubmit () {
@@ -322,7 +317,7 @@ export default {
         contact: null,
         user: null
       }
-      this.setSmsReminderBody()
+      this.setSmsReminderFields()
     },
     durationSelected (duration) {
       this.appointment.duration = duration.value
@@ -350,8 +345,19 @@ export default {
     appendSmsReminderTemplateVariable (variable) {
       this.appointment.smsReminder.body = `${(this.appointment.smsReminder.body ?? '')} ${variable}`
     },
-    setSmsReminderBody () {
-      this.appointment.smsReminder.body = this.currentCompany ? this.currentCompany.sms_reminder_default_text : ''
+    setSmsReminderFields () {
+      this.appointment.smsReminder.campaign_id = this.currentCompany?.sms_reminder_default_campaign_id
+      this.appointment.smsReminder.body = this.currentCompany?.sms_reminder_default_text || ''
+
+      // update time if its set in account config
+      if (this.currentCompany?.sms_reminder_default_time) {
+        this.appointment.smsReminder.time = this.currentCompany.sms_reminder_default_time
+      }
+
+      // update frequency if its set in account config
+      if (this.currentCompany?.sms_reminder_default_send_before_days) {
+        this.appointment.smsReminder.frequencies = this.currentCompany.sms_reminder_default_send_before_days.split(',').map(v => +v)
+      }
     }
   },
   watch: {
@@ -360,7 +366,7 @@ export default {
     }
   },
   mounted () {
-    this.setSmsReminderBody()
+    this.setSmsReminderFields()
   }
 }
 </script>

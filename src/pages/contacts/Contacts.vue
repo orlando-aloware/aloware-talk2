@@ -153,7 +153,10 @@ export default {
       'setShowContactsHeader',
       'setUnsavedList',
       'setListContactOwner',
-      'setAllContactsSelected'
+      'setAllContactsSelected',
+      'setPreviousListFilters',
+      'setPreviouslySavedListId',
+      'setPreviousListId'
     ]),
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
@@ -182,6 +185,13 @@ export default {
 
   watch: {
     $route (to, from) {
+      // clear previous list state when moving out from Contacts page
+      if (to.name !== 'Contacts' && from?.name === 'Contacts') {
+        this.setPreviousListFilters({})
+        this.setPreviouslySavedListId(null)
+        this.setPreviousListId(null)
+      }
+
       if (to.name.includes('Contacts')) {
         if (from.name !== 'Contacts') {
           this.setUnsavedList(null)
