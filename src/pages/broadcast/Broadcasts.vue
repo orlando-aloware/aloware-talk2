@@ -19,50 +19,67 @@
                       spread
                       unelevated
                       dense
-                      v-model="broadcasts"
-                      :options="broadcastOptions">
+                      v-model="broadcastFilter"
+                      :options="broadcastFilterOptions">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                    :class="[broadcasts === 1 ? 'active' : 'text-grey-90']">
-                    <span class="text-white text-left task-status">
-                      New
-                    </span>
-                    <div class="text-center task-count">
-                      <span>1</span>
-                    </div>
+                :class="[broadcastFilter === 1 ? 'active' : 'text-grey-90']">
+                <span class="text-white text-left task-status">
+                  New
+                </span>
+                <div class="text-center task-count"
+                      v-if="broadcastCounts[0] > 0">
+                  {{ broadcastCounts[0] }}
                 </div>
+            </div>
           </template>
           <template v-slot:two>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                    :class="[broadcasts === 2 ? 'text-white' : 'text-grey-90']">
-                    <span class="text-left">
-                      Enrolling
-                    </span>
+                :class="[broadcastFilter === 2 ? 'text-white' : 'text-grey-90']">
+                <span class="text-left">
+                  Enrolling
+                </span>
+                <div class="text-center task-count"
+                      v-if="broadcastCounts[1] > 0">
+                  {{ broadcastCounts[1] }}
                 </div>
+            </div>
           </template>
           <template v-slot:three>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                    :class="[broadcasts === 3 ? 'text-white' : 'text-grey-90']">
-                    <span class="text-left">
-                      Sent
-                    </span>
+                :class="[broadcastFilter === 3 ? 'text-white' : 'text-grey-90']">
+                <span class="text-left">
+                  Sent
+                </span>
+                <div class="text-center task-count"
+                      v-if="broadcastCounts[2] > 0">
+                  {{ broadcastCounts[2] }}
                 </div>
+            </div>
           </template>
           <template v-slot:four>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                    :class="[broadcasts === 4 ? 'text-white' : 'text-grey-90']">
-                    <span class="text-left">
-                      Paused
-                    </span>
+                :class="[broadcastFilter === 4 ? 'text-white' : 'text-grey-90']">
+                <span class="text-left">
+                  Paused
+                </span>
+                <div class="text-center task-count"
+                      v-if="broadcastCounts[3] > 0">
+                  {{ broadcastCounts[3] }}
                 </div>
+            </div>
           </template>
           <template v-slot:five>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                    :class="[broadcasts === 5 ? 'text-white' : 'text-grey-90']">
-                    <span class="text-left">
-                      All
-                    </span>
+                :class="[broadcastFilter === 5 ? 'text-white' : 'text-grey-90']">
+                <span class="text-left">
+                  All
+                </span>
+                <div class="text-center task-count"
+                      v-if="broadcastCounts[4] > 0">
+                  {{ broadcastCounts[4] }}
                 </div>
+            </div>
           </template>
         </q-btn-toggle>
       </div>
@@ -91,10 +108,10 @@
                  :columns="broadcastsColumns"
                  :isEmpty="isBroadcastsTableEmpty"
                  :paginated="false"
-                 :total-rows="broadcastData.length ?? 0"
+                 :total-rows="visibleBroadcasts?.length ?? 0"
                  @checked="onCheckerClicked()">
         <template slot="tbody">
-          <tr v-for="(row, rowIndex) in broadcastData"
+          <tr v-for="(row, rowIndex) in visibleBroadcasts"
               v-bind:key="rowIndex">
             <template v-for="(col, colIndex) in broadcastsColumns">
               <td :key="`c-${colIndex}`"
@@ -127,6 +144,7 @@ import Search from 'src/components/search.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
+import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 
 const broadcastsColumns = [
   {
@@ -192,33 +210,39 @@ export default {
 
   data: () => ({
     loading: false,
-    broadcasts: 5,
-    broadcastOptions: [
+    broadcastFilter: 5,
+    broadcastFilterOptions: [
       {
         value: 1,
-        slot: 'one'
+        slot: 'one',
+        filter: BroadcastStatuses.STATUS_NEW
       },
       {
         value: 2,
-        slot: 'two'
+        slot: 'two',
+        filter: BroadcastStatuses.STATUS_ENROLLING
       },
       {
         value: 3,
-        slot: 'three'
+        slot: 'three',
+        filter: BroadcastStatuses.STATUS_DONE
       },
       {
         value: 4,
-        slot: 'four'
+        slot: 'four',
+        filter: BroadcastStatuses.STATUS_PAUSED
       },
       {
         value: 5,
-        slot: 'five'
+        slot: 'five',
+        filter: null
       }
     ],
     broadcastData: [],
     broadcastsColumns,
     checked: [],
-    isAllChecked: false
+    isAllChecked: false,
+    BroadcastStatuses
   }),
 
   mounted () {
@@ -228,6 +252,26 @@ export default {
   computed: {
     isBroadcastsTableEmpty () {
       return this.broadcastData.length === 0
+    },
+
+    visibleBroadcasts () {
+      let filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
+
+      if (!filter) {
+        return this.broadcastData
+      }
+
+      return this.broadcastData.filter(broadcast => broadcast.status === filter)
+    },
+
+    broadcastCounts () {
+      return [
+        this.getCount(BroadcastStatuses.STATUS_NEW),
+        this.getCount(BroadcastStatuses.STATUS_ENROLLING),
+        this.getCount(BroadcastStatuses.STATUS_DONE),
+        this.getCount(BroadcastStatuses.STATUS_PAUSED),
+        this.broadcastData.length
+      ]
     }
   },
 
@@ -252,6 +296,10 @@ export default {
       talk2Api.V1.broadcasts.get().then(res => {
         this.broadcastData = res.data
       })
+    },
+
+    getCount (filter) {
+      return this.broadcastData.filter(broadcast => broadcast.status === filter).length
     }
   },
 
