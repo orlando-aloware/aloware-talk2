@@ -222,9 +222,7 @@ export default {
   }),
 
   mounted () {
-    talk2Api.V1.broadcasts.get().then(res => {
-      this.broadcastData = res.data
-    })
+    this.getBroadcasts()
   },
 
   computed: {
@@ -248,6 +246,18 @@ export default {
       }
 
       this.checked.push(row)
+    },
+
+    getBroadcasts () {
+      talk2Api.V1.broadcasts.get().then(res => {
+        this.broadcastData = res.data
+      })
+    }
+  },
+
+  watch: {
+    broadcasts (broadcasts) {
+      this.getBroadcasts()
     }
   }
 }
