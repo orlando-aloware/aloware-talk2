@@ -53,7 +53,7 @@ export default {
 
   computed: {
     notes () {
-      return this.contact.notes.replace(/\n/g, '<br />')
+      return this.contact.notes?.replace(/\n/g, '<br />')
     }
   },
 
