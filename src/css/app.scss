@@ -8096,14 +8096,14 @@ span.mention {
     border: none !important;
     height: 24px;
 
-    &.active:hover {
+    &[aria-pressed="true"]:hover {
       background: lighten($primary, 10%) !important;
     }
 
-    &:not(.active) {
+    &[aria-pressed="false"] {
       color: transparent !important;
 
-      .task-count {
+      .task-count, .broadcast-count {
         background: $grey-70 !important;
         color: $grey-90 !important;
       }
@@ -8116,11 +8116,11 @@ span.mention {
       text-align: center;
       font-family: 'Inter', sans-serif !important;
 
-      .task-status-name {
+      .task-status-name, .broadcast-filter-name {
         margin-top: -2px;
       }
 
-      .task-count {
+      .task-count, .broadcast-count {
         background: rgba(255, 255, 255, 0.22);
         border-radius: 5px;
         font-size: 10px;

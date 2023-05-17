@@ -21,63 +21,73 @@
                       dense
                       v-model="broadcastFilter"
                       :options="broadcastFilterOptions">
-          <template v-slot:one>
+          <template v-slot:one class="test">
             <div class="d-flex justify-content-center w-100 px-1 options"
-                :class="[broadcastFilter === 1 ? 'active' : 'text-grey-90']">
-                <span class="text-white text-left task-status">
+                :class="[broadcastFilter === 1 ? 'text-white' : 'text-grey-90']">
+                <span class="text-left broadcast-filter-name">
                   New
                 </span>
-                <div class="text-center task-count"
+                <div class="text-center broadcast-count ml-1"
                       v-if="broadcastCounts[0] > 0">
-                  {{ broadcastCounts[0] }}
+                  <span>
+                    {{ broadcastCounts[0] | numberPlusFormatter(99) }}
+                  </span>
                 </div>
             </div>
           </template>
           <template v-slot:two>
             <div class="d-flex justify-content-center w-100 px-1 options"
                 :class="[broadcastFilter === 2 ? 'text-white' : 'text-grey-90']">
-                <span class="text-left">
+                <span class="text-left broadcast-filter-name">
                   Enrolling
                 </span>
-                <div class="text-center task-count"
+                <div class="text-center broadcast-count ml-1"
                       v-if="broadcastCounts[1] > 0">
-                  {{ broadcastCounts[1] }}
+                  <span>
+                    {{ broadcastCounts[1] | numberPlusFormatter(99) }}
+                  </span>
                 </div>
             </div>
           </template>
           <template v-slot:three>
             <div class="d-flex justify-content-center w-100 px-1 options"
                 :class="[broadcastFilter === 3 ? 'text-white' : 'text-grey-90']">
-                <span class="text-left">
+                <span class="text-left broadcast-filter-name">
                   Sent
                 </span>
-                <div class="text-center task-count"
-                      v-if="broadcastCounts[2] > 0">
-                  {{ broadcastCounts[2] }}
+                <div class="text-center broadcast-count ml-1"
+                     v-if="broadcastCounts[2] > 0">
+                  <span>
+                    {{ broadcastCounts[2] | numberPlusFormatter(99) }}
+                  </span>
                 </div>
             </div>
           </template>
           <template v-slot:four>
             <div class="d-flex justify-content-center w-100 px-1 options"
                 :class="[broadcastFilter === 4 ? 'text-white' : 'text-grey-90']">
-                <span class="text-left">
+                <span class="text-left broadcast-filter-name">
                   Paused
                 </span>
-                <div class="text-center task-count"
-                      v-if="broadcastCounts[3] > 0">
-                  {{ broadcastCounts[3] }}
+                <div class="text-center broadcast-count ml-1"
+                     v-if="broadcastCounts[3] > 0">
+                  <span>
+                    {{ broadcastCounts[3] | numberPlusFormatter(99) }}
+                  </span>
                 </div>
             </div>
           </template>
           <template v-slot:five>
             <div class="d-flex justify-content-center w-100 px-1 options"
                 :class="[broadcastFilter === 5 ? 'text-white' : 'text-grey-90']">
-                <span class="text-left">
+                <span class="text-left broadcast-filter-name">
                   All
                 </span>
-                <div class="text-center task-count"
+                <div class="text-center broadcast-count ml-1"
                       v-if="broadcastCounts[4] > 0">
-                  {{ broadcastCounts[4] }}
+                  <span>
+                    {{ broadcastCounts[4] | numberPlusFormatter(99) }}
+                  </span>
                 </div>
             </div>
           </template>
@@ -272,6 +282,10 @@ export default {
         this.getCount(BroadcastStatuses.STATUS_PAUSED),
         this.broadcastData.length
       ]
+    },
+
+    statusToggleColor () {
+      return 'active'
     }
   },
 
