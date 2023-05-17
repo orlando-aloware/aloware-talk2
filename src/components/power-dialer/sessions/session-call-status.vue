@@ -217,7 +217,7 @@
                  no-wrap
                  outline
                  no-caps
-                 :disable="toggleEnd"
+                 :disable="isEndSessionDisabled"
                  :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
                  :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
                  @click="onToggleEnd">
@@ -628,6 +628,10 @@ export default {
 
     endSessionText () {
       return this.toggleEnd ? 'Ending Session...' : 'End Session'
+    },
+
+    isEndSessionDisabled () {
+      return this.toggleEnd || this.wrapUpPaused
     }
   },
 
