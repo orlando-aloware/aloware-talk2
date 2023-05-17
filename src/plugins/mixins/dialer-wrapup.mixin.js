@@ -9,7 +9,20 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer'])
+    ...mapState([
+      'dialer',
+      'isCallDisposed',
+      'isContactDisposed'
+    ]),
+
+    ...mapState('cache', ['currentCompany']),
+
+    isContactNotDisposed () {
+      const hasContactDisposition = this.isContactDisposed || this.dialer.contact?.disposition_status_id
+
+      return this.currentCompany && this.currentCompany.force_contact_disposition &&
+        !hasContactDisposition
+    }
   },
 
   created () {
@@ -32,7 +45,9 @@ export default {
 
   watch: {
     'dialer.contact.id': function () {
-      this.wrapUpPaused = false
+      if (!this.isContactNotDisposed) {
+        this.wrapUpPaused = false
+      }
     }
   },
 
