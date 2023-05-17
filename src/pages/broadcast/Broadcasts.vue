@@ -285,7 +285,7 @@ export default {
 
   computed: {
     isBroadcastsTableEmpty () {
-      return this.broadcastData.length === 0
+      return this.broadcastCounts[this.broadcastFilter - 1] === 0
     },
 
     visibleBroadcasts () {
