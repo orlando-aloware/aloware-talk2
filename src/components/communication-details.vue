@@ -119,7 +119,8 @@
 
           </q-card-section>
 
-          <q-card-section class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0"
+                          v-if="communication?.contact">
             <!--CONTACT-->
             <b-form-row>
               <b-col class="pl-0 pr-0">

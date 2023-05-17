@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid mt-2 mb-2">
-    <communication-details v-if="!hasError" :communication="communication"
+    <communication-details v-if="!hasError && communication" :communication="communication"
                            :verbose="true">
     </communication-details>
     <b-row v-else>
