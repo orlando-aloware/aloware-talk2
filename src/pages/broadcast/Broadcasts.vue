@@ -142,6 +142,14 @@
                 <broadcast-status-pill :status="row[col.field]" />
               </td>
               <td :key="`c-${colIndex}`"
+                  v-else-if="col.name == 'throttle_limit'">
+                  {{ getThrottling(row[col.field]) }}
+              </td>
+              <td :key="`c-${colIndex}`"
+                  v-else-if="col.name == 'campaign_id'">
+                {{ row[col.field] }}
+              </td>
+              <td :key="`c-${colIndex}`"
                   v-else>
                 {{ row[col.field] }}
               </td>
@@ -188,14 +196,24 @@ const broadcastsColumns = [
     field: 'pending_tasks'
   },
   {
-    name: 'engagement',
-    label: 'Engagement',
-    field: 'engagement'
+    name: 'total_failed',
+    label: 'Failed Tasks',
+    field: 'total_failed'
   },
   {
-    name: 'unsubscribed',
+    name: 'total_enrolled',
+    label: 'Total Tasks',
+    field: 'total_enrolled'
+  },
+  {
+    name: 'engagement_rate',
+    label: 'Engagement',
+    field: 'engagement_rate'
+  },
+  {
+    name: 'total_unsubscribed',
     label: 'Unsubscribed',
-    field: 'unsubscribed'
+    field: 'total_unsubscribed'
   },
   {
     name: 'target_group',
@@ -203,14 +221,14 @@ const broadcastsColumns = [
     field: 'target_group'
   },
   {
-    name: 'line_used',
+    name: 'campaign_id',
     label: 'Line Used',
-    field: 'line_used'
+    field: 'campaign_id'
   },
   {
-    name: 'throttling',
+    name: 'throttle_limit',
     label: 'Throttling',
-    field: 'throttling'
+    field: 'throttle_limit'
   }
 ]
 
@@ -320,6 +338,10 @@ export default {
 
     getCount (filter) {
       return this.broadcastData.filter(broadcast => broadcast.status === filter).length
+    },
+
+    getThrottling (messagePerMinute) {
+      return (messagePerMinute * 60) + ' per hour'
     }
   },
 
