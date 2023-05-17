@@ -5,8 +5,13 @@
              :show="isShowContact"
              :opacity="0.85"
              v-if="authenticated">
+    <div class="mx-0 centered-contact-deleted"
+         v-if="!leaving && isEmptyContact">
+      <h2>Contact is deleted</h2>
+    </div>
+
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
-         v-if="!leaving">
+         v-if="!leaving && !isEmptyContact">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
            v-if="isShowContactActivities">
@@ -141,6 +146,10 @@ export default {
     },
 
     isShowContact () {
+      if (this.isEmptyContact) {
+        return false
+      }
+
       return this.changingSelectedContact || this.campaignsIsLoading ||
         this.usersIsLoading || !this.tagsFullyLoaded || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact

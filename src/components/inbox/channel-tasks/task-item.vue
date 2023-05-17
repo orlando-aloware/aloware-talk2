@@ -386,6 +386,16 @@ export default {
       }
 
       this.setSelectedCommunication(communication)
+
+      // comm with non-existing contact
+      if (!this.communication.contact) {
+        const communicationInfo = this.$router.resolve({
+          path: `/communication/${communication.id}`
+        })
+
+        window.open(communicationInfo.href, '_blank')
+      }
+
       this.$router.push({
         name: 'Inbox Contact',
         params: {
