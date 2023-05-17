@@ -12457,8 +12457,6 @@ h1.contact-list-name-label {
         }
 
         &__content {
-          flex-grow: 1; // FIXME: remove this
-
           .broadcast-add {
             padding: 15px 30px;
             height: 100%;
@@ -12516,12 +12514,27 @@ h1.contact-list-name-label {
       }
 
       &__details {
+        .contacts-preview {
+          position: relative;
+          background-color: $white;
+          border-radius: 8px;
 
-      }
+          &__header {
+            height: 50px;
+            border-bottom: 1px solid $grey-60;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            padding: 0px 30px;
 
-      &__form,
-      &__details {
-        flex-grow: 1;
+            &__counter {
+              margin-left: 20px;
+              color: $grey-90;
+            }
+          }
+
+
+        }
       }
     }
 

@@ -13,6 +13,7 @@ import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
 import broadcast from './broadcast'
+import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
 
@@ -253,6 +254,7 @@ export default function (/* { ssrContext } */) {
       suspended: false,
       showProFeatureDialog: false,
       leadSources: [],
+      contactsLists: [],
       statics: {
         domain: null,
         favicon: null,
@@ -274,6 +276,7 @@ export default function (/* { ssrContext } */) {
     getters: {
       notifications: (state) => state.notifications,
       breadcrumbs: (state) => state.breadcrumbs,
+      contactsLists: (state) => state.contactsLists,
       getField
     },
 
@@ -780,6 +783,21 @@ export default function (/* { ssrContext } */) {
 
       setIsContactDisposed ({ commit }, value) {
         commit('SET_IS_CONTACT_DISPOSED', value)
+      },
+
+      async fetchContactsLists ({ commit }) {
+        const lists = []
+        let res = null
+
+        do {
+          res = await API.V2.contactList.get({ visible_only: true, size: 100 })
+
+          lists.push(...res.data.data)
+        } while (res.data.next_page_url)
+
+        commit('SET_CONTACTS_LISTS', lists)
+
+        return Promise.resolve()
       }
     },
 
@@ -1483,6 +1501,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_CONTACT_DISPOSED (state, value) {
         state.isContactDisposed = value
+      },
+
+      SET_CONTACTS_LISTS (state, lists) {
+        state.contactsLists = lists
       },
 
       updateField

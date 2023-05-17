@@ -26,12 +26,14 @@
     <div class="broadcast-add__contacts__selection">
       <!-- List option -->
       <template v-if="optionSelected === 'list'">
-        <small>Select a contact list</small>
+        <p>Select a contact list</p>
+        <contacts-list-selector :value="list.id"
+                                @select="onContactListSelected"/>
       </template>
 
       <!-- Integration option -->
       <template v-else-if="optionSelected === 'integration'">
-        <small>Select a contact list</small>
+        <p>Select a contact list</p>
         <!-- shows the selector based on which integration is enabled  -->
       </template>
     </div>
@@ -40,12 +42,14 @@
 
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
+import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
 
 export default {
   name: 'broadcast-add-view-contacts',
 
   components: {
-    CheckOIcon
+    CheckOIcon,
+    ContactsListSelector
   },
 
   computed: {
@@ -73,18 +77,30 @@ export default {
         value: 'integration',
         text: 'Integrations'
       }
-    ]
+    ],
+    list: {}
   }),
 
   methods: {
     onOptionSelected (option) {
       this.optionSelected = option.value
+    },
+
+    onContactListSelected (list) {
+      this.list = {
+        type: 'contacts-list',
+        id: list.id
+      }
     }
   },
 
   watch: {
     isValid (state) {
       this.$emit('input', state)
+    },
+
+    list (value) {
+      this.$emit('list-updated', value)
     }
   }
 }

@@ -8,7 +8,8 @@
       <div class="broadcasts__add__view__form__content">
         <component :is="mainComponent"
                    ref="mainComponent"
-                   @input="mainComponentChanged"/>
+                   @input="mainComponentChanged"
+                   @list-updated="onListUpdated"/>
         <!-- broadcast-add-contact -->
         <!-- broadcast-add-message -->
         <!-- broadcast-add-schedule -->
@@ -41,14 +42,18 @@
       </div>
     </div>
 
-    <div class="broadcasts__add__view__details">
-
+    <div class="broadcasts__add__view__details"
+         v-if="footerComponent">
+      <component :is="footerComponent"
+                 ref="footerComponent"
+                 v-bind="footerComponentProps"/>
     </div>
   </div>
 </template>
 
 <script>
 import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
+import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
 
 const FIRST_STEP = 1
 const LAST_STEP = 4
@@ -57,7 +62,8 @@ export default {
   name: 'broadcast-add-view',
 
   components: {
-    BroadcastAddViewContacts
+    BroadcastAddViewContacts,
+    BroadcastContactsPreview
   },
 
   props: {
@@ -86,11 +92,30 @@ export default {
         default:
           throw new Error('Invalid step ' + this.currentStep.id)
       }
+    },
+
+    footerComponent () {
+      switch (true) {
+        case !!this.list.id:
+          return 'broadcast-contacts-preview'
+        default:
+          return null
+      }
+    },
+
+    footerComponentProps () {
+      switch (true) {
+        case !!this.list.id:
+          return { list: this.list }
+        default:
+          return null
+      }
     }
   },
 
   data: () => ({
     isMainComponentValid: false,
+    list: {},
     FIRST_STEP,
     LAST_STEP
   }),
@@ -98,6 +123,10 @@ export default {
   methods: {
     mainComponentChanged (state) {
       this.isMainComponentValid = state
+    },
+
+    onListUpdated (list) {
+      this.list = list
     }
   }
 }

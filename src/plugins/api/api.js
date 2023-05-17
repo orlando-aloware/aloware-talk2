@@ -543,7 +543,9 @@ export default {
 
     },
     contactList: {
-      get () {},
+      get (params) {
+        return window.axios.get(`${suffixV2}contacts-list`, { params })
+      },
       public () {
         return window.axios.get(`${suffixV2}contacts-list/public`)
       }
