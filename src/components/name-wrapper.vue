@@ -1,19 +1,18 @@
 <template>
   <div class="d-flex align-items-center">
     <div class="pr-2">
-      <Avatar :name="name"/>
+      <avatar :name="name"/>
     </div>
     <div class="flex-grow-1">
-      <router-link
-        :to="`${linkPath}${computedResource.id}${urlParams}`"
-        v-slot="{ href, route, navigate }">
-        <a :href="href"
-          @click="navigate"
-          class="d-flex align-items-center item contact-name">
+      <router-link :to="`${linkPath}${resource.id}`"
+                   v-slot="{ href, route, navigate }">
+        <a class="d-flex align-items-center item contact-name text-bold"
+           :href="href"
+           @click="navigate">
           <template v-if="name">
             <div class="ellipse">{{ name | ucwords }}</div>
           </template>
-          <template v-if="!name">No Name</template>
+          <template v-else>No Name</template>
         </a>
       </router-link>
     </div>
@@ -25,44 +24,38 @@
 import Avatar from 'components/avatar'
 
 export default {
-  name: 'NameWrapper',
+  name: 'name-wrapper',
+
   props: {
     resource: {
       type: Object,
-      default: () => {}
+      required: false,
+      default: () => ({})
     },
     linkPath: {
       type: String,
+      required: false,
       default: '/'
-    },
-    list: {
-      type: Object,
-      default: () => {}
     }
   },
+
   components: {
     Avatar
   },
+
   computed: {
-    computedResource () {
-      return this.resource || {}
-    },
     name () {
-      const { computedResource } = this
-      if (computedResource.first_name && computedResource.last_name) {
-        return `${computedResource.first_name} ${computedResource.last_name}`.trim()
-      } else if (!computedResource.first_name && computedResource.last_name) {
-        return `${computedResource.last_name}`.trim()
-      } else if (computedResource.first_name && !computedResource.last_name) {
-        return `${computedResource.first_name}`.trim()
+      if (this.resource.first_name && this.resource.last_name) {
+        return `${this.resource.first_name} ${this.resource.last_name}`.trim()
+      } else if (!this.resource.first_name && this.resource.last_name) {
+        return `${this.resource.last_name}`.trim()
+      } else if (this.resource.first_name && !this.resource.last_name) {
+        return `${this.rResource.first_name}`.trim()
       }
       return ''
-    },
-    urlParams () {
-      const pathKey = this.list.name ? this.list.id : null
-      return pathKey ? `?previousPage=PowerDialer&list=${pathKey}` : `?previousPage=PowerDialer`
     }
   },
+
   methods: {
     onNavigate (navigate) {
       navigate()
