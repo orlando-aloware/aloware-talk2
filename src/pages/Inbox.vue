@@ -9,7 +9,7 @@
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
            v-if="isContactShow">
-        <Contact></Contact>
+        <Contact />
       </div>
     </div>
   </div>
@@ -45,11 +45,11 @@ export default {
     ...mapState('inbox', ['items', 'activeChannel']),
 
     isMobileContactActive () {
-      return ['Inbox Contact', 'Inbox Contact Task'].includes(this.$route.name)
+      return this.mobileContactScreenRoutes.includes(this.$route.name)
     },
 
     isContactShow () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)
+      return this.mobileContactScreenRoutes.includes(this.$route.name)
     },
 
     inboxSideClasses () {
@@ -65,7 +65,19 @@ export default {
       contactInfoOpen: false,
       title: 'Inbox',
       contactId: null,
-      miniState: true
+      miniState: true,
+      mobileContactScreenRoutes: [
+        'Inbox Contact',
+        'Inbox Contact Task',
+        'Inbox Contact Communication'
+      ],
+      channelRoutes: [
+        'Inbox Channel',
+        'Inbox Contact',
+        'Inbox Contact Task',
+        'Inbox Channel Task Status',
+        'Inbox Contact Communication'
+      ]
     }
   },
 
@@ -73,12 +85,10 @@ export default {
     ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
 
     setChannel (routeChanged = false) {
-      if (['Inbox Channel', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name)) {
+      if (this.channelRoutes.includes(this.$route.name)) {
         const channel = this.items.find(item => item.value === this.$route.params.channel)
         this.setActiveChannel(channel)
-      }
-
-      if (['Inbox'].includes(this.$route.name) && !this.activeChannel) {
+      } else if (this.$route.name === 'Inbox' && !this.activeChannel) {
         const channel = this.items.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
@@ -87,6 +97,7 @@ export default {
         this.$refs['inbox-side'].navigateToInbox()
       }
     },
+
     onItemSelected (routeData) {
       this.contactId = routeData.params.id
       this.$router.push(routeData)
@@ -112,7 +123,8 @@ export default {
 
   watch: {
     '$route.name': function (value) {
-      this.setChannel(!value.includes('Inbox'))
+      const isNotInboxRouteName = !value.includes('Inbox')
+      this.setChannel(isNotInboxRouteName)
     }
   }
 }

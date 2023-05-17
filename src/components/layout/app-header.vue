@@ -5,19 +5,11 @@
       <back-button class="mobile-back-btn-global-header"
                    v-if="['Contact', 'Settings Tab'].includes($route.name)"
                    @click="navigateBack"/>
-      <!--b-link v-if="['Contact', 'Settings Tab'].includes($route.name)"
-              class="btn-header-nav-back mr-3"
-              href="#"
-              @click="navigateBack">
-        <i class="fa fa-chevron-left"></i>
-      </b-link-->
-
-      <router-link
-        class="btn-header-nav-back"
-        v-if="['Communication'].includes($route.name)"
-        :to="backRoute">
+      <router-link class="btn-header-nav-back"
+                   :to="backRoute"
+                   v-if="['Communication'].includes($route.name)">
         <button class="more-details font-weight-light-bold btn btn-sm">
-          <i class="fa fa-chevron-left"></i>
+          <i class="fa fa-chevron-left" />
         </button>
       </router-link>
       <h1 v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
@@ -28,32 +20,18 @@
       <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
       <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
-      <div class="px-3 d-inline-flex"
-           v-if="$route.name === 'Inbox' || ($route.meta && $route.meta.title && $route.meta.title === 'Communications' && $route.params.channel !== 'mentions')">
-        <b-form-checkbox
-          class="mt-2 cursor-pointer"
-          :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
-          size="sm"
-          switch
-          :disabled="!isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts"
-          v-model="inboxShowMyContactsFilter"
-        >
-        </b-form-checkbox>
-        <label class="text-primary mr-2 mt-2 cursor-pointer"
-               :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
-               @click="myContactsFilterChange">My Contacts</label>
-      </div>
+      <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   v-if="$route.name === 'Stats' && !titleOnly"
                    :disabled="loading"
+                   v-if="$route.name === 'Stats' && !titleOnly"
                    @clicked="refreshMetricGroup">
         <refresh-icon />
         Refresh
       </compact-btn>
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   v-if="$route.name === 'Contacts'"
                    :disabled="loading || contactsRefreshIsDisabled"
+                   v-if="$route.name === 'Contacts'"
                    @clicked="refreshContacts">
         <refresh-icon />
         Refresh
@@ -63,9 +41,9 @@
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center">
 
-        <shared-login-menu v-if="!isElectron"></shared-login-menu>
+        <shared-login-menu v-if="!isElectron" />
 
-        <header-help></header-help>
+        <header-help />
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
@@ -79,26 +57,26 @@
           </q-item-section>
         </q-item>
 
-        <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'"></profile>
+        <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'" />
 
-        <phone v-if="!titleOnly"></phone>
+        <phone v-if="!titleOnly" />
 
         <q-separator class="height-28 ml-3 mr-3 margin-auto position-relative"
                      vertical>
         </q-separator>
 
-        <parked-call v-if="!isMobile"></parked-call>
+        <parked-call v-if="!isMobile" />
 
-        <active-call v-if="!isMobile"></active-call>
+        <active-call v-if="!isMobile" />
 
         <q-item v-if="!titleOnly">
           <q-btn id="dialer-form-button"
-                 :ripple="false"
-                 :disable="isDialerDisabled"
                  size="40px"
                  padding="none"
                  align="center"
                  flat
+                 :ripple="false"
+                 :disable="isDialerDisabled"
                  @click="onDialerErrorStatus">
             <dialer-error-icon v-if="dialer.error.code">
             </dialer-error-icon>
@@ -106,10 +84,10 @@
                          :text-color="dialerIconTextColor"
                          v-if="!dialer.error.code">
             </dialer-icon>
-            <q-menu :offset="[0, 10]"
-                    anchor="bottom end"
+            <q-menu anchor="bottom end"
                     self="top right"
                     persistent
+                    :offset="[0, 10]"
                     v-model="dialerStatus"
                     v-if="!dialer.error.code"
                     @before-show="showDialer"
@@ -128,10 +106,10 @@
             <p>Click here to reconnect or please check the <a href="https://support.aloware.com/en/articles/6958138-common-dialer-errors" target="_blank">troubleshooting guide here</a>.</p>
             <p>Error Code: [{{ dialer.error.code }}]</p>
             <q-btn class="start-dial-button p-0"
-                   v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
                    color="success"
                    no-caps
                    unelevated
+                   v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
                    @click="reconnectDialer">
               <div class="button-label">
                 Reconnect
@@ -178,6 +156,7 @@ import RefreshIcon from 'components/icons/refresh-icon'
 import SharedLoginMenu from 'components/shared-login-menu'
 import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
+import InboxMyContactsFilter from 'components/inbox/inbox-my-contacts-filter'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import * as Roles from 'src/constants/roles'
@@ -208,7 +187,8 @@ export default {
     Profile,
     CompactBtn,
     RefreshIcon,
-    HeaderHelp
+    HeaderHelp,
+    InboxMyContactsFilter
   },
 
   props: {
@@ -233,7 +213,6 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      inboxShowMyContactsFilter: false,
       updatesLink: 'https://news.intercom.com/aloware'
     }
   },
@@ -252,13 +231,6 @@ export default {
       'listContactsLoaded',
       'previousListFilters',
       'previousListId'
-    ]),
-
-    ...mapState('inbox', [
-      'inboxShowMyContacts',
-      'isInboxFiltersLoaded',
-      'isGettingTasksList',
-      'isFetchingContacts'
     ]),
 
     ...mapState('stats', [
@@ -345,7 +317,6 @@ export default {
   },
 
   created () {
-    this.inboxShowMyContactsFilter = this.inboxShowMyContacts
     this.$VueEvent.listen('callContact', (data) => {
       this.showDialer()
       setTimeout(() => {
@@ -440,26 +411,6 @@ export default {
       }
     },
 
-    myContactsFilterChange () {
-      if (!this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts) {
-        return
-      }
-
-      this.inboxShowMyContactsFilter = !this.inboxShowMyContactsFilter
-    },
-
-    onMyContactsChange () {
-      this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
-
-      if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
-        this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter)
-        return
-      }
-
-      // for inbox channels
-      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
-    },
-
     ...mapActions('stats', [
       'setMetricGroups',
       'setMetricLoader'
@@ -467,10 +418,6 @@ export default {
 
     ...mapActions('contacts', [
       'updateContactsListFilter'
-    ]),
-
-    ...mapActions('inbox', [
-      'setInboxShowMyContacts'
     ]),
 
     ...mapActions(['setDialerFormStatus'])
@@ -518,16 +465,6 @@ export default {
 
     $route (to, from) {
       this.prevRoute = from.path
-    },
-
-    inboxShowMyContacts (value) {
-      if (value !== this.inboxShowMyContactsFilter) {
-        this.inboxShowMyContactsFilter = value
-      }
-    },
-
-    inboxShowMyContactsFilter () {
-      this.onMyContactsChange()
     }
   }
 }

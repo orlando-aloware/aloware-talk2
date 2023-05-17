@@ -5,6 +5,7 @@
       <div class="d-flex h-100 align-items-center justify-content-center">
         <back-button @click="back"/>
         <span v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
+        <inbox-my-contacts-filter />
       </div>
       <profile class="p-0"></profile>
     </div>
@@ -26,16 +27,16 @@
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <inbox-tab v-if="!activeChannel || activeChannel.value === 'inbox'"
-                   :search-text="searchText"
+        <inbox-tab :search-text="searchText"
+                   v-if="!activeChannel || activeChannel.value === 'inbox'"
                    @itemSelected="onItemSelected"/>
-        <inbox-channels v-if="activeChannel && !['inbox'].includes(activeChannel.value)"
-                        class="h-100 w-100 flex-grow-1 scroll-y"
+        <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
                         :filter-type="activeChannel.type"
                         :answer-status="activeChannel.answerStatus"
                         :channel="activeChannel.value"
                         :search-text="searchText"
-                        :sort="sort">
+                        :sort="sort"
+                        v-if="activeChannel && !['inbox'].includes(activeChannel.value)">
         </inbox-channels>
       </div>
     </div>
@@ -49,6 +50,7 @@ import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
 import BackButton from 'components/back-button'
+import InboxMyContactsFilter from 'components/inbox/inbox-my-contacts-filter'
 import Profile from 'components/profile'
 
 export default {
@@ -59,7 +61,8 @@ export default {
     InboxTab,
     InboxChannels,
     InboxNavList,
-    Profile
+    Profile,
+    InboxMyContactsFilter
   },
 
   data () {
@@ -79,6 +82,7 @@ export default {
 
   computed: {
     ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts', 'items']),
+
     ...mapState(['isMobile']),
 
     nextPage () {
@@ -86,12 +90,36 @@ export default {
     },
 
     isInboxTaskOpened () {
-      return !this.$q.screen.lt.md || this.onLoadShowTasks || (this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('inbox') && this.$q.screen.lt.md)
+      const isInboxChildRoutesMobileScreen = this.$route.name !== 'Inbox' &&
+        this.$route.name.toLowerCase().includes('inbox') &&
+        this.$q.screen.lt.md
+
+      return !this.$q.screen.lt.md || this.onLoadShowTasks || isInboxChildRoutesMobileScreen
     },
 
     channelName () {
       const path = this.$route.path.split('/')
-      return _.get(path, '[2]', 'Inbox')
+      const name = _.get(path, '[2]', 'Inbox').replace('-', ' ')
+
+      if (this.isMobile && this.$q.screen.lt.md && name === 'all communications') {
+        return 'All comms'
+      }
+
+      return name
+    },
+
+    isShowPageHeader () {
+      const inRoutesWithoutHeader = [
+        'Inbox Channel Task Status',
+        'Inbox Contact',
+        'Inbox Contact Task'
+      ]
+
+      const isShowPageHeaderMobileScreen = this.isMobile &&
+        !inRoutesWithoutHeader.includes(this.$route.name) &&
+        (!this.isInboxTaskOpened || !this.$q.screen.lt.md)
+
+      return !this.isMobile || isShowPageHeaderMobileScreen
     }
   },
 
@@ -124,7 +152,9 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
+
     ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'setCommunications']),
+
     ...mapActions(['resetVuex']),
 
     toggle () {
@@ -162,6 +192,15 @@ export default {
 
     onItemSelected (routeData) {
       this.$emit('itemSelected', routeData)
+    },
+
+    togglePageHeader () {
+      if (this.isShowPageHeader) {
+        this.setShowContactsHeader(true)
+        return
+      }
+
+      this.setShowContactsHeader(false)
     }
   },
 
@@ -170,29 +209,25 @@ export default {
       if (to.name.includes('Inbox') && to.name !== 'Inbox') {
         this.onLoadShowTasks = true
       }
-    },
-    isInboxTaskOpened () {
-      if (this.isInboxTaskOpened && this.$q.screen.lt.md) {
-        this.setShowContactsHeader(false)
-      }
-    },
-    '$q.screen.lt.md': function () {
-      if (this.isInboxTaskOpened && this.$q.screen.lt.md) {
-        this.setShowContactsHeader(false)
-        return
-      }
-      this.setShowContactsHeader(true)
-    },
-    isMobile () {
-      if (this.isMobile && !this.$q.screen.lt.md) {
-        this.setShowContactsHeader(true)
-      }
-    },
-    '$route.name': function (value) {
-      if (value === 'Inbox') {
+
+      if (to.name === 'Inbox') {
         const channel = this.items.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
+
+      this.togglePageHeader()
+    },
+
+    isInboxTaskOpened () {
+      this.togglePageHeader()
+    },
+
+    '$q.screen.lt.md': function () {
+      this.togglePageHeader()
+    },
+
+    isMobile () {
+      this.togglePageHeader()
     }
   }
 }

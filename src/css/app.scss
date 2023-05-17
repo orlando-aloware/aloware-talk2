@@ -7472,6 +7472,8 @@ table.datatable {
     font-size: 14px;
     font-weight: 600;
     color: $grey-100;
+    display: block;
+    width: 83px;
   }
 
   .left-column-wrapper {
@@ -7503,6 +7505,11 @@ table.datatable {
         overflow: hidden;
         white-space: nowrap;
         display: inline-block;
+      }
+
+      span.position-absolute.check-icon {
+        right: 20px;
+        top: 5px;
       }
 
       .b-dropdown {
