@@ -6,7 +6,7 @@
              :opacity="0.85"
              v-if="authenticated">
     <div class="mx-0 centered-contact-deleted"
-         v-if="!leaving && isEmptyContact">
+         v-if="isEmptyContact">
       <h2>Contact is deleted</h2>
     </div>
 
@@ -146,10 +146,6 @@ export default {
     },
 
     isShowContact () {
-      if (this.isEmptyContact) {
-        return false
-      }
-
       return this.changingSelectedContact || this.campaignsIsLoading ||
         this.usersIsLoading || !this.tagsFullyLoaded || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
