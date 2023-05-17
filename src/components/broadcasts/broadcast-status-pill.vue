@@ -1,6 +1,6 @@
 <template>
   <span>
-    <span class="broadcast-status-pill px-2 py-1 rounded-borders"
+    <span class="broadcast-status-pill mt-2 px-2 py-1 rounded-borders"
          :class="classes">
       {{ label }}
     </span>
