@@ -1,5 +1,5 @@
 <template>
-  <div class="broadcast position-relative">
+  <div class="broadcasts__home position-relative">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -112,7 +112,7 @@
       Chart goes here
     </div>
     <q-separator/>
-    <div class="px-2">
+    <div class="px-2 broadcasts__home__table">
       <datatable ref="broadcastsTable"
                  :stickyHeaders="true"
                  :columns="broadcastsColumns"
@@ -138,6 +138,10 @@
                 </label>
               </td>
               <td :key="`c-${colIndex}`"
+                  v-else-if="col.name == 'status'">
+                <broadcast-status-pill :status="row[col.field]" />
+              </td>
+              <td :key="`c-${colIndex}`"
                   v-else>
                 {{ row[col.field] }}
               </td>
@@ -154,6 +158,7 @@ import Search from 'src/components/search.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
+import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 
 const broadcastsColumns = [
@@ -215,7 +220,8 @@ export default {
   components: {
     Search,
     PlusIcon,
-    Datatable
+    Datatable,
+    BroadcastStatusPill
   },
 
   data: () => ({

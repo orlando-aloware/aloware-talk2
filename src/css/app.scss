@@ -12417,7 +12417,11 @@ h1.contact-list-name-label {
 
 .broadcasts {
   &__home {
-
+    &__table {
+      .broadcast-status-pill {
+        border: solid black 1px;
+      }
+    }
   }
 
   &__add {
