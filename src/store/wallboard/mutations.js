@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { isLiveCall, isParkedCall, isQueuedCall } from 'src/plugins/helpers/functions'
+import { clone } from 'lodash'
 
 export default {
   DELETE_CALL: (state, communication) => {
@@ -51,7 +52,7 @@ export default {
     // id = live, queued or parked
     const prop = `default${id.capitalize()}CallsColumns`
 
-    Vue.set(state, 'callsEnabledColumns', state[prop])
+    Vue.set(state, 'callsEnabledColumns', clone(state[prop]))
   },
 
   SET_FILTER: (state, { filter, value }) => {
