@@ -102,7 +102,9 @@ export default {
     },
 
     'dialer.currentStatus': function (value) {
-      if (value === 'WRAP_UP' && this.isNotDisposed) {
+      const isCallInprogress = ['CALL_CONNECTED', 'WRAP_UP']
+
+      if (isCallInprogress.includes(value) && this.isNotDisposed) {
         this.$VueEvent.fire('pauseWrapUp', true)
       }
     },

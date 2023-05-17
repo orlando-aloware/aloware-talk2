@@ -23,14 +23,17 @@ export default {
       skipWrapUp: false
     }
   },
+
   computed: {
     ...mapState('powerDialer', [
       'powerDialerTasks',
       'redialed'
     ]),
+
     ...mapState([
       'dialer'
     ]),
+
     ...mapFields('powerDialer', [
       'sessionCallStatuses',
       'sessionPaused',
@@ -41,17 +44,21 @@ export default {
       'taskToCall',
       'hasActiveTask'
     ]),
+
     ...mapGetters('contacts', [
       'selectedList'
     ]),
+
     ...mapGetters('powerDialer', [
       'sessionLoader',
       'sessionSettings'
     ]),
+
     status () {
       return AutoDialTaskStatus.STATUSES
     },
-    statusDisplayButton () {
+
+    statusDisplayText () {
       if (!this.dialer.isReady) {
         return 'Offline'
       }
@@ -101,12 +108,15 @@ export default {
           return 'Offline'
       }
     },
+
     moveDirection () {
       return DIRECTION
     },
+
     shouldSkip () {
       return this.sessionSettings.skip_outside_daytime_hours === 1
     },
+
     togglePause: {
       get () {
         return this.sessionCallStatuses.pause
@@ -115,6 +125,7 @@ export default {
         this.sessionCallStatuses.pause = val
       }
     },
+
     toggleEnd: {
       get () {
         return this.sessionCallStatuses.end
@@ -123,11 +134,14 @@ export default {
         this.sessionCallStatuses.end = val
       }
     },
+
     timerIsOver () {
       return this.countdownTimer === -1
     },
+
     powerDialerSettings () {
       const settings = this.profile.company.power_dialer_settings
+
       if (settings !== null && settings.open_time && settings.close_time) {
         return settings
       }
@@ -138,18 +152,23 @@ export default {
       }
     }
   },
+
   methods: {
     ...mapActions('contacts', ['setContact']),
+
     ...mapActions(['setShowPhone', 'setDialerContact']),
+
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
       'addRedialedTask',
       'clearRedialedTasks'
     ]),
+
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
     ]),
+
     ...mapActions('powerDialer', [
       'getContact'
     ]),
@@ -162,6 +181,7 @@ export default {
 
       this.TOGGLE_SESSION_LOADER(true)
       await this.getContact({ id: taskId })
+
       if (!this.isSessionRunning) {
         this.isSessionRunning = true
       }
@@ -182,6 +202,7 @@ export default {
         // this.moveTask(this.taskToCall, this.moveDirection.bottom)
         return
       }
+
       // Check if it's outside working hours or not
       if (this.shouldSkip && timezone && !contactLocalTime.isBetween(startDay, endDay)) {
         // Implement: Should skip single task
@@ -201,6 +222,7 @@ export default {
 
       this.hasActiveTask = true
       this.skipWrapUp = false
+
       // Fires an event to make a call
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
@@ -209,6 +231,7 @@ export default {
         companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
         contactId: this.taskToCall?.id // this.contactListItem.contact_id // the ID of the contact (Optional but it's best to have it)
       })
+
       this.setDialerContact(this.activeTask)
       this.callInProgress = true
     },
@@ -261,6 +284,7 @@ export default {
     clearWarmUpCountDown () {
       this.countdownTimer = -1
       clearInterval(this.countdownInterval)
+
       setTimeout(() => {
         this.countdownStarted = false
       }, 1000)
@@ -270,6 +294,7 @@ export default {
       if (!this.activeTask) {
         return
       }
+
       if (this.callInProgress) {
         this.$VueEvent.fire('hangupCall')
       }

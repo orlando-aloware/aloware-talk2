@@ -101,8 +101,13 @@
   &.free-width {
     width: auto !important;
   }
-  .q-btn__wrapper {
-    top: -2px;
+  .q-btn {
+    &__wrapper {
+      top: -2px;
+    }
+    &__content {
+      flex-wrap: nowrap;
+    }
   }
 }
 
