@@ -54,7 +54,7 @@ export const COLUMNS = [
     label: 'Talk Time',
     order: 5,
     sortable: true,
-    selectable: false,
+    selectable: true,
     draggable: true
   },
   {
