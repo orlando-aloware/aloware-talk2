@@ -132,8 +132,8 @@
         </div>
       </div>
 
-      <div class="d-flex align-items-center p-0">
-        <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize pl-3 py-0"
+      <div class="d-flex align-items-center p-0 justify-content-between flex-wrap pl-3">
+        <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
              v-if="timezone">
           <DropIcon width="18px"
                     height="18px"
@@ -165,8 +165,8 @@
         </q-btn>
       </div>
 
-      <div class="d-flex align-items-center p-0 pt-2 pb-2">
-        <div class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
+      <div class="d-flex align-items-center p-0 pt-2 pb-2 justify-content-between flex-wrap px-3">
+        <div class="flex-grow-1 text-16 text-capitalize text-weight-normal m-1">
 
           <div id="session-list-name">
             {{ selectedListName }}
@@ -192,40 +192,44 @@
 
         </div>
 
-        <q-btn size="sm"
-               unelevated
-               no-wrap
-               no-caps
-               :outline="!sessionPaused"
-               :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
-               :disabled="toggleEnd"
-               :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`"
-               @click="onTogglePause">
+        <div>
+          <q-btn class="my-1"
+                 size="sm"
+                 unelevated
+                 no-wrap
+                 no-caps
+                 :outline="!sessionPaused"
+                 :color="pauseButtonColor"
+                 :disabled="toggleEnd"
+                 :class="pauseButtonClass"
+                 @click="onTogglePause">
 
-          <PauseIcon class="mr-2"
-                     :color="pauseIconColor" />
+            <PauseIcon class="mr-2"
+                       :color="pauseIconColor" />
 
-          <div :class="pauseButtonClass">
-            {{ pauseButtonText }}
-          </div>
-        </q-btn>
+            <div :class="pauseButtonTextClass">
+              {{ pauseButtonText }}
+            </div>
+          </q-btn>
 
-        <q-btn size="sm"
-               no-wrap
-               outline
-               no-caps
-               :disable="toggleEnd"
-               :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
-               :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
-               @click="onToggleEnd">
+          <q-btn class="my-1"
+                 size="sm"
+                 no-wrap
+                 outline
+                 no-caps
+                 :disable="toggleEnd"
+                 :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
+                 :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
+                 @click="onToggleEnd">
 
-          <EndCallIcon class="mr-2"
-                       color="#62666E" />
+            <EndCallIcon class="mr-2"
+                         color="#62666E" />
 
-          <div class="text-body2 text-black">
-            {{ endSessionText }}
-          </div>
-        </q-btn>
+            <div class="text-body2 text-black">
+              {{ endSessionText }}
+            </div>
+          </q-btn>
+        </div>
       </div>
     </div>
 
@@ -591,11 +595,29 @@ export default {
       return this.toggleRecording ? 'Stop Rec.' : 'Record'
     },
 
+    pauseButtonColor () {
+      const sessionPausedClass = this.sessionPaused ? 'primary' : 'red-3'
+
+      return this.togglePause ? sessionPausedClass : 'grey-4'
+    },
+
+    pauseButtonClass () {
+      const sessionPausedClass = this.sessionPaused ? 'btn-btn-primary' : 'bg-btn-red'
+      const pauseClass = this.togglePause ? sessionPausedClass : ''
+
+      return [
+        pauseClass,
+        'sessions-button',
+        'free-width',
+        'mx-1'
+      ]
+    },
+
     pauseIconColor () {
       return this.sessionPaused ? '#fff' : '#62666E'
     },
 
-    pauseButtonClass () {
+    pauseButtonTextClass () {
       const textClass = this.sessionPaused ? 'text-white' : 'text-black'
 
       return [
