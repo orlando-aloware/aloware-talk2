@@ -192,7 +192,7 @@ export default {
 
   data: () => ({
     loading: false,
-    broadcasts: 1,
+    broadcasts: 5,
     broadcastOptions: [
       {
         value: 1,
