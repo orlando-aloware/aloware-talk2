@@ -27,7 +27,7 @@
       <!-- List option -->
       <template v-if="optionSelected === 'list'">
         <p>Select a contact list</p>
-        <contacts-list-selector :value="list.id"
+        <contacts-list-selector :value="source.list.id"
                                 @select="onContactListSelected"/>
       </template>
 
@@ -43,6 +43,7 @@
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-contacts',
@@ -52,13 +53,25 @@ export default {
     ContactsListSelector
   },
 
+  props: {
+    defaultSource: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    }
+  },
+
   computed: {
     isValid () {
-      return !!this.optionSelected
-      // [x] option is selected
-      // [ ] if is list, list must have contacts
-      // [ ] if is filter, there must be contacts under the filter
-      // [ ] no validation for integration for now
+      switch (this.optionSelected) {
+        case 'list':
+        case 'integration':
+          return !!this.source.list.id
+        case 'filter':
+          return true // FIXME: change this condition
+        default:
+          return false
+      }
     }
   },
 
@@ -78,18 +91,41 @@ export default {
         text: 'Integrations'
       }
     ],
-    list: {}
+    source: {
+      list: {},
+      filters: {},
+      integration: {}
+    }
   }),
+
+  mounted () {
+    if (!isEmpty(this.defaultSource.list)) {
+      this.optionSelected = 'list'
+    }
+
+    this.source = this.defaultSource
+  },
 
   methods: {
     onOptionSelected (option) {
       this.optionSelected = option.value
+
+      // reset to default values when option changes
+      this.reset()
     },
 
     onContactListSelected (list) {
-      this.list = {
+      this.source.list = {
         type: 'contacts-list',
         id: list.id
+      }
+    },
+
+    reset () {
+      this.source = {
+        list: {},
+        filters: {},
+        integration: {}
       }
     }
   },
@@ -99,8 +135,8 @@ export default {
       this.$emit('input', state)
     },
 
-    list (value) {
-      this.$emit('list-updated', value)
+    source (value) {
+      this.$emit('source-updated', value)
     }
   }
 }

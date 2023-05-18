@@ -12,18 +12,18 @@
 
     <div class="contacts-preview__header">
       Contacts Preview
-      <span class="contacts-preview__header__counter"
-            v-if="contactsLength > 0">
-        {{ contactsLength }} {{ contactsLength > 1 ? 'Contacts' : 'Contact' }}
+      <span class="contacts-preview__header__counter">
+        {{ contactsLength }} {{ contactsLength === 1 ? 'Contact' : 'Contacts' }}
       </span>
     </div>
 
     <datatable :columns="columns"
-               :is-scrollable="false">
+               :is-scrollable="false"
+               v-if="contacts.length">
       <template slot="tbody">
         <tr class="datatable-row"
-            :key="contact.name"
-            v-for="contact in contacts">
+            :key="index"
+            v-for="(contact, index) in contacts">
           <template v-for="column in columns">
             <td :key="column.name"
                 v-if="column.name === 'name'">
@@ -33,17 +33,33 @@
 
             <td :key="column.name"
                 v-else-if="column.name === 'phone_number'">
-              {{ contact.phone_number }}
+              {{ contact.phone_number | fixPhone('NATIONAL', true) }}
             </td>
 
             <td :key="column.name"
                 v-else-if="column.name === 'created_at'">
-              {{ contact.created_at }}
+              {{ contact.created_at | fixFullDateTime }}
             </td>
 
             <td :key="column.name"
-                v-else-if="column.name === 'action'">
-              {{ contact.tags }}
+                v-else-if="column.name === 'tags'">
+              <template v-if="Array.isArray(contact.tags) && contact.tags.length">
+                <span>
+                  <i class="fa fa-circle"
+                     :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`" />
+                  <span v-if="contact.tags.length > 1">
+                    {{ contact.tags[0].name | truncate(17) }}
+                  </span>
+                  <span v-else>
+                    {{ contact.tags[0].name | truncate(27) }}
+                  </span>
+                </span>
+                <span class="ml-1 text-grey-7"
+                      v-if="contact.tags.length > 1">
+                  +{{ (contact.tags.length - 1) }} more
+                </span>
+              </template>
+              <span v-else>-</span>
             </td>
           </template>
         </tr>
@@ -56,7 +72,7 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
-import { set } from 'lodash'
+// import { set } from 'lodash'
 
 export default {
   name: 'broadcast-contacts-preview',
@@ -105,6 +121,10 @@ export default {
           minWidth: 200
         }
       ]
+    },
+
+    isValid () {
+      return this.contactsLength > 0
     }
   },
 
@@ -178,9 +198,13 @@ export default {
     },
 
     setContactsListFilter () {
-      set(this.defaultFilters, 'filter_groups[0][is_conjunction]', true)
-      set(this.defaultFilters, 'filter_groups[0].filters.contact_lists[0].value[0]', this.list.id)
-      set(this.defaultFilters, 'filter_groups[0].filters.contact_lists[0].operator', 1) // FIXME: use a constant
+      this.defaultFilters.list_id = this.list.id
+    },
+
+    setContactsFilters () {
+      // set(this.defaultFilters, 'filter_groups[0][is_conjunction]', true)
+      // set(this.defaultFilters, 'filter_groups[0].filters.contact_lists[0].value[0]', this.list.id)
+      // set(this.defaultFilters, 'filter_groups[0].filters.contact_lists[0].operator', 1) // FIXME: use a constant
     }
   },
 
@@ -197,7 +221,16 @@ export default {
       handler () {
         this.init()
       }
+    },
+
+    isValid (state) {
+      this.$emit('input', state)
     }
+  },
+
+  beforeDestroy () {
+    // force invalid state if component is destroyed
+    this.$emit('input', false)
   }
 }
 </script>

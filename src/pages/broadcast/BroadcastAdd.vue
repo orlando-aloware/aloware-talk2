@@ -14,7 +14,11 @@
                            :steps="steps"/>
 
     <broadcast-add-view :current-step="currentStep"
-                        :steps="steps"/>
+                        :steps="steps"
+                        :first-step="steps[0].id"
+                        :last-step="steps[steps.length - 1].id"
+                        @next="onNext"
+                        @back="onBack"/>
 
     <broadcast-add-filters />
   </div>
@@ -61,6 +65,16 @@ export default {
         name: 'Preview & Send'
       }
     ]
-  })
+  }),
+
+  methods: {
+    onBack () {
+      this.step--
+    },
+
+    onNext () {
+      this.step++
+    }
+  }
 }
 </script>

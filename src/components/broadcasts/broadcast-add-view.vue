@@ -6,11 +6,12 @@
       </div>
 
       <div class="broadcasts__add__view__form__content">
+        <!-- broadcast-add-contact -->
         <component :is="mainComponent"
                    ref="mainComponent"
+                   v-bind="mainComponentProps"
                    @input="mainComponentChanged"
-                   @list-updated="onListUpdated"/>
-        <!-- broadcast-add-contact -->
+                   @source-updated="onSourceUpdated"/>
         <!-- broadcast-add-message -->
         <!-- broadcast-add-schedule -->
         <!-- broadcast-add-preview -->
@@ -23,20 +24,22 @@
         <b-button class="mr-2"
                   size="sm"
                   variant="light"
-                  v-if="currentStep.id > FIRST_STEP">
+                  v-if="currentStep.id > firstStep"
+                  @click="back">
           Back
         </b-button>
 
         <b-button size="sm"
                   variant="primary"
-                  v-if="currentStep.id === LAST_STEP">
+                  v-if="currentStep.id === lastStep">
           Send
         </b-button>
 
         <b-button size="sm"
                   variant="primary"
-                  :disabled="!isMainComponentValid"
-                  v-else>
+                  :disabled="!isStepValid"
+                  v-else
+                  @click="next">
           Next
         </b-button>
       </div>
@@ -46,23 +49,23 @@
          v-if="footerComponent">
       <component :is="footerComponent"
                  ref="footerComponent"
-                 v-bind="footerComponentProps"/>
+                 v-bind="footerComponentProps"
+                 @input="footerComponentChanged"/>
     </div>
   </div>
 </template>
 
 <script>
 import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
+import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
-
-const FIRST_STEP = 1
-const LAST_STEP = 4
 
 export default {
   name: 'broadcast-add-view',
 
   components: {
     BroadcastAddViewContacts,
+    BroadcastAddViewMessage,
     BroadcastContactsPreview
   },
 
@@ -74,6 +77,16 @@ export default {
 
     steps: {
       type: Array,
+      required: true
+    },
+
+    firstStep: {
+      type: Number,
+      required: true
+    },
+
+    lastStep: {
+      type: Number,
       required: true
     }
   },
@@ -94,9 +107,18 @@ export default {
       }
     },
 
+    mainComponentProps () {
+      switch (this.currentStep.id) {
+        case 1:
+          return { defaultSource: this.source }
+        default:
+          return {}
+      }
+    },
+
     footerComponent () {
       switch (true) {
-        case !!this.list.id:
+        case this.currentStep.id === 1 && !!this.source.list?.id:
           return 'broadcast-contacts-preview'
         default:
           return null
@@ -105,19 +127,33 @@ export default {
 
     footerComponentProps () {
       switch (true) {
-        case !!this.list.id:
-          return { list: this.list }
+        case this.currentStep.id === 1 && !!this.source.list?.id:
+          return { list: this.source.list }
         default:
           return null
+      }
+    },
+
+    isStepValid () {
+      switch (this.currentStep.id) {
+        case 1:
+          return this.isMainComponentValid && this.isFooterComponentValid
+        case 2:
+          return this.isMainComponentValid
+        // case 3:
+        //   return 'broadcast-add-view-schedule'
+        // case 4:
+        //   return 'broadcast-add-view-preview'
+        default:
+          throw new Error('Invalid step ' + this.currentStep.id)
       }
     }
   },
 
   data: () => ({
     isMainComponentValid: false,
-    list: {},
-    FIRST_STEP,
-    LAST_STEP
+    isFooterComponentValid: false,
+    source: {}
   }),
 
   methods: {
@@ -125,8 +161,23 @@ export default {
       this.isMainComponentValid = state
     },
 
-    onListUpdated (list) {
-      this.list = list
+    footerComponentChanged (state) {
+      this.isFooterComponentValid = state
+    },
+
+    onSourceUpdated (source) {
+      this.source = source
+    },
+
+    next () {
+      this.isMainComponentValid = false
+      this.isFooterComponentValid = false
+
+      this.$emit('next')
+    },
+
+    back () {
+      this.$emit('back')
     }
   }
 }
