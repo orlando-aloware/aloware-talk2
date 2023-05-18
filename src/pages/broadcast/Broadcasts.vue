@@ -1,5 +1,5 @@
 <template>
-  <div class="broadcasts__home position-relative">
+  <div class="broadcasts__home position-relative d-flex flex-column h-100">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -112,8 +112,9 @@
       Chart goes here
     </div>
     <q-separator/>
-    <div class="px-2 broadcasts__home__table">
-      <datatable ref="broadcastsTable"
+    <div class="px-2 broadcasts__home__table flex-grow-1">
+      <datatable class="h-100"
+                 ref="broadcastsTable"
                  :stickyHeaders="true"
                  :columns="broadcastsColumns"
                  :isEmpty="isBroadcastsTableEmpty"
