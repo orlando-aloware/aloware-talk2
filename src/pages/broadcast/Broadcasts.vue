@@ -109,7 +109,12 @@
     </div>
     <q-separator/>
     <div>
-      Chart goes here
+      <highstock :options="options"
+                 :style="getStyle"
+                 ref="highchart"
+                 v-bind:id="graph_id"
+                 v-show="is_done && options.series.length > 0">
+      </highstock>
     </div>
     <q-separator/>
     <div class="px-2 broadcasts__home__table flex-grow-1">
