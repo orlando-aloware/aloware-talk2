@@ -147,7 +147,13 @@
               </td>
               <td :key="`c-${colIndex}`"
                   v-else-if="col.name == 'campaign_id'">
-                {{ row[col.field] }}
+                <span v-if="getCampaign(row[col.field])">
+                  {{ getCampaign(row[col.field]).name }}
+                </span>
+                <span class="text-warning"
+                      v-else>
+                  -
+                </span>
               </td>
               <td :key="`c-${colIndex}`"
                   v-else-if="col.name == 'target_group'">
@@ -182,6 +188,7 @@ import talk2Api from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
 import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
+import { mapState } from 'vuex'
 
 const broadcastsColumns = [
   {
@@ -298,6 +305,8 @@ export default {
   },
 
   computed: {
+    ...mapState(['campaigns']),
+
     isBroadcastsTableEmpty () {
       return this.broadcastCounts[this.broadcastFilter - 1] === 0
     },
@@ -356,6 +365,20 @@ export default {
 
     getThrottling (messagePerMinute) {
       return (messagePerMinute * 60) + ' per hour'
+    },
+
+    getCampaign (campaignId) {
+      if (!campaignId) {
+        return null
+      }
+
+      let found = this.campaigns.find(campaign => campaign.id === campaignId)
+
+      if (!found) {
+        return null
+      }
+
+      return found
     }
   },
 
