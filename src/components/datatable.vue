@@ -40,7 +40,7 @@
               @mouseout="onInitReorder(false, null)">
 
               <label
-                v-if="column.name === 'checkbox'"
+                v-if="column.name === 'checkbox' && showSelectAll"
                 class="custom-checkbox-container check-all">
                 <input
                   type="checkbox"
@@ -204,6 +204,11 @@ export default {
     },
 
     showPagination: {
+      type: Boolean,
+      default: true
+    },
+
+    showSelectAll: {
       type: Boolean,
       default: true
     },

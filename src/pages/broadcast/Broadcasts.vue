@@ -117,6 +117,7 @@
                  :stickyHeaders="true"
                  :columns="broadcastsColumns"
                  :isEmpty="isBroadcastsTableEmpty"
+                 :showSelectAll="false"
                  :paginated="false"
                  :total-rows="visibleBroadcasts?.length ?? 0"
                  @checked="onCheckerClicked()">
