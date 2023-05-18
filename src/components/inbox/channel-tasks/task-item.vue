@@ -277,6 +277,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer']),
+
     ...mapState('inbox', [
       'selectedCommunication',
       'activeChannel',
@@ -363,6 +364,12 @@ export default {
   },
 
   methods: {
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel']),
+
+    ...mapActions(['setShowPhone']),
+
+    ...mapActions('contacts', ['setShowContactResourceUnavailable']),
+
     markable (communication) {
       // Markable if communication is SMS and the comm direction is INBOUND
       const smsRule = communication.type === CommunicationTypes.SMS &&
@@ -380,6 +387,8 @@ export default {
     },
 
     onItemClick (communication) {
+      this.setShowContactResourceUnavailable(false)
+
       if (!communication.contact_id) {
         this.$generalNotification(`Unable to find contact associated with this communication.`, 'error')
         return
@@ -406,10 +415,7 @@ export default {
       }).catch(err => {
         console.log(err)
       })
-    },
-
-    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel']),
-    ...mapActions(['setShowPhone'])
+    }
   }
 }
 </script>
