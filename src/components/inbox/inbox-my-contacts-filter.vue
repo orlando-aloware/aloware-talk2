@@ -8,7 +8,7 @@
                      :disabled="!isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts"
                      v-model="inboxShowMyContactsFilter">
     </b-form-checkbox>
-    <label class="text-primary mr-2 mt-2 cursor-pointer"
+    <label class="text-primary mt-2 cursor-pointer"
            :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
            @click="myContactsFilterChange">My Contacts</label>
   </div>
