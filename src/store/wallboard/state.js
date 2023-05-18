@@ -14,7 +14,7 @@ export default function () {
       'start',
       'talk_time',
       'lead_number',
-      'location',
+      'lead_location',
       'user',
       'tags',
       'operations'
@@ -27,7 +27,7 @@ export default function () {
       'start',
       'talk_time',
       'lead_number',
-      'location',
+      'lead_location',
       'user',
       'tags',
       'operations'
@@ -40,7 +40,7 @@ export default function () {
       'start',
       'talk_time',
       'lead_number',
-      'location',
+      'lead_location',
       'attempting_users',
       'tags',
       'notes',
