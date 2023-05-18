@@ -150,6 +150,20 @@
                 {{ row[col.field] }}
               </td>
               <td :key="`c-${colIndex}`"
+                  v-else-if="col.name == 'target_group'">
+                <template v-if="row['tag']">
+                  <i class="fa fa-circle"
+                        :style="{ color: row['tag']?.color }">
+                  </i>
+                  <span class="tag_name">
+                    {{ row['tag']?.name }}
+                  </span>
+                </template>
+                <template v-else-if="row['list']">
+                  List
+                </template>
+              </td>
+              <td :key="`c-${colIndex}`"
                   v-else>
                 {{ row[col.field] }}
               </td>
