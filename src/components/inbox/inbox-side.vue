@@ -7,7 +7,8 @@
         <span v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
         <inbox-my-contacts-filter />
       </div>
-      <profile class="p-0"></profile>
+      <profile class="p-0"
+               :hide-profile-info="true"/>
     </div>
     <div class="inbox-side border-top-0 flex-shrink-0 h-100">
       <div class="inbox-side__left"

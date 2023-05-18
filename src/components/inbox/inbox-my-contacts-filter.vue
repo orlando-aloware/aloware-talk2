@@ -1,5 +1,5 @@
 <template>
-  <div class="px-3 d-inline-flex"
+  <div class="pl-3 d-inline-flex"
        v-if="isShown">
     <b-form-checkbox class="mt-2 cursor-pointer"
                      size="sm"

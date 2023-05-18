@@ -1,10 +1,10 @@
 <template>
   <q-card flat>
     <div class="t-menu-2 no-border">
-      <div class="d-flex align-items-center pt-3 px-3 pb-0 justify-content-between">
+      <div class="d-flex align-items-center pt-3 px-3 pb-0 flex-wrap justify-content-between">
 
-        <div class="font-weight-bold flex-grow-1 session-call-status"
-             style="max-width: 186px;">
+        <div class="font-weight-bold flex-grow-1 session-call-status w-100"
+             style="max-width: 176px;">
           <q-chip color="grey-50"
                   class="p-0">
             <div :class="`text-15 text-lowercase text-capitalize px-2`"
@@ -13,20 +13,24 @@
           </q-chip>
         </div>
 
-        <div>
-          <q-btn class="sessions-button free-width m-1"
-                 no-wrap no-caps size="sm"
+        <div class="w-100"
+             style="max-width: 340px;">
+          <q-btn class="sessions-button my-1 ml-1"
+                 size="sm"
+                 style="width: 79.55px;"
+                 no-wrap
+                 no-caps
                  unelevated
                  outline
                  :color="statusCallConnected ? 'grey-4' : 'grey-8'"
                  :disabled="!statusCallConnected"
                  @click="onToggleMute">
-            <mute-icon class="mr-2"
+            <mute-icon class="mr-1"
                        :width="12"
                        :height="12"
                        v-show="!toggleMute">
             </mute-icon>
-            <unmute-icon class="mr-2"
+            <unmute-icon class="mr-1"
                          :width="12"
                          :height="12"
                          v-show="toggleMute">
@@ -36,8 +40,9 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width m-1"
+          <q-btn class="sessions-button my-1 ml-1"
                  size="sm"
+                 style="width: 75.72px;"
                  no-wrap
                  no-caps
                  unelevated
@@ -45,10 +50,10 @@
                  :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
                  :disabled="isHoldDisabled"
                  @click="onToggleHold">
-            <UnHoldIcon class="mr-2"
+            <UnHoldIcon class="mr-1"
                         color="#F2997A"
                         v-if="toggleHold"/>
-            <PauseIcon class="mr-2"
+            <PauseIcon class="mr-1"
                        color="#62666E"
                        v-else/>
             <div class="text-body2 text-black">
@@ -56,7 +61,7 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width m-1"
+          <q-btn class="sessions-button free-width my-1 ml-1"
                  size="sm"
                  no-wrap
                  unelevated
@@ -64,7 +69,7 @@
                  :disabled="!canRedial"
                  :color="canRedial  ? 'blue-7' : 'grey-8'"
                  @click="onRedial">
-            <RefreshIcon class="mr-2"
+            <RefreshIcon class="mr-1"
                          color="white" />
             <div class="text-body2">
               <q-tooltip content-class="bg-grey-light11"
@@ -77,7 +82,7 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width m-1"
+          <q-btn class="sessions-button free-width my-1 ml-1"
                  size="sm"
                  no-wrap
                  unelevated
@@ -85,12 +90,12 @@
                  :disabled="!canNextTask "
                  :color="canNextTask  ? 'red-7' : 'grey-8'"
                  @click="onNextTask(false, true)">
-            <CallDropIcon class="mr-2"
+            <CallDropIcon class="mr-1"
                           color="white"/>
             <div class="text-body2">Next</div>
           </q-btn>
 
-          <b-dropdown class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+          <b-dropdown class="my-1 ml-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                       text="..."
                       right size="sm"
                       variant="white"
