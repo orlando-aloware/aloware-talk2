@@ -387,8 +387,6 @@ export default {
     },
 
     onItemClick (communication) {
-      this.setShowContactResourceUnavailable(false)
-
       if (!communication.contact_id) {
         this.$generalNotification(`Unable to find contact associated with this communication.`, 'error')
         return

@@ -286,6 +286,8 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
+      this.setShowContactResourceUnavailable(false)
+
       // Show loading overlay as soon as id changes
       this.selectedContactChanging(true)
 
@@ -306,6 +308,11 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
+      // don't attempt to fetch communications, there's nothing to fetch
+      if (!this.changingSelectedContact && this.showContactResourceUnavailable) {
+        return
+      }
+
       if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
