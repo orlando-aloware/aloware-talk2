@@ -10,8 +10,10 @@
       </template>
     </b-overlay>
 
-    <broadcast-add-sidebar :current-step="currentStep"
-                           :steps="steps"/>
+    <div class="broadcasts__add__sidebar">
+      <steps-wrapper :current-step="currentStep"
+                     :steps="steps"/>
+    </div>
 
     <broadcast-add-view :current-step="currentStep"
                         :steps="steps"
@@ -23,15 +25,15 @@
 </template>
 
 <script>
-import BroadcastAddSidebar from 'src/components/broadcasts/broadcast-add-sidebar.vue'
 import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
+import StepsWrapper from 'src/components/generic-wrappers/steps-wrapper.vue'
 
 export default {
   name: 'broadcast-add',
 
   components: {
-    BroadcastAddSidebar,
-    BroadcastAddView
+    BroadcastAddView,
+    StepsWrapper
   },
 
   computed: {

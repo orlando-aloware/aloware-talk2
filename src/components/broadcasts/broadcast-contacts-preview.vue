@@ -17,7 +17,8 @@
       </span>
     </div>
 
-    <datatable :columns="columns"
+    <datatable class="contacts-preview__body"
+               :columns="columns"
                :is-scrollable="false"
                v-if="contacts.length">
       <template slot="tbody">
@@ -72,7 +73,6 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
-// import { set } from 'lodash'
 
 export default {
   name: 'broadcast-contacts-preview',
@@ -85,11 +85,12 @@ export default {
   props: {
     list: {
       type: Object,
-      required: false
+      required: false,
+      default: () => ({})
     },
 
     filters: {
-      type: Object,
+      type: [Array, Object],
       required: false
     }
   },
@@ -124,7 +125,7 @@ export default {
     },
 
     isValid () {
-      return this.contactsLength > 0
+      return this.contactsLength > 0 && !this.loading
     }
   },
 
@@ -155,8 +156,11 @@ export default {
           this.setContactsListFilter()
           this.loadContacts()
           break
+        case !!this.filters:
+          this.setContactsFilters()
+          this.loadContacts()
+          break
         // FIXME: integrations
-        // FIXME: filters
       }
     },
 
@@ -202,9 +206,7 @@ export default {
     },
 
     setContactsFilters () {
-      // set(this.defaultFilters, 'filter_groups[0][is_conjunction]', true)
-      // set(this.defaultFilters, 'filter_groups[0].filters.contact_lists[0].value[0]', this.list.id)
-      // set(this.defaultFilters, 'filter_groups[0].filters.contact_lists[0].operator', 1) // FIXME: use a constant
+      this.defaultFilters.filter_groups = this.filters
     }
   },
 

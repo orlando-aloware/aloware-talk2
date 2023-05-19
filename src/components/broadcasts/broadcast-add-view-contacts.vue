@@ -39,7 +39,8 @@
 
       <transition name="slide-left">
         <contacts-filters class="broadcast-add__contacts__filters"
-                          v-if="optionSelected === 'filter'"/>
+                          v-if="optionSelected === 'filter'"
+                          @filtersUpdated="onFiltersUpdated"/>
       </transition>
     </div>
   </div>
@@ -49,7 +50,7 @@
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -70,13 +71,17 @@ export default {
   },
 
   computed: {
+    ...mapGetters('contacts', [
+      'currentListFilters'
+    ]),
+
     isValid () {
       switch (this.optionSelected) {
         case 'list':
         case 'integration':
           return !!this.source.list.id
         case 'filter':
-          return true // FIXME: change this condition
+          return !isEmpty(this.source.filters)
         default:
           return false
       }
@@ -117,7 +122,8 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'closeFilters',
-      'openFilters'
+      'openFilters',
+      'setCurrentListFilters'
     ]),
 
     onOptionSelected (option) {
@@ -134,6 +140,10 @@ export default {
       }
     },
 
+    onFiltersUpdated () {
+      this.source.filters = this.currentListFilters
+    },
+
     reset () {
       this.source = {
         list: {},
@@ -145,6 +155,7 @@ export default {
         this.openFilters()
       } else {
         this.closeFilters()
+        this.setCurrentListFilters({})
       }
     }
   },
@@ -162,6 +173,7 @@ export default {
 </script>
 
 <style>
+/* FIXME: move this to a animations file */
 .slide-left-enter {
   transform: translateX(100%);
 }

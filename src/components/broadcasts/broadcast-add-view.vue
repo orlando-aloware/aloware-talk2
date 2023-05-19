@@ -59,6 +59,7 @@
 import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
 import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view',
@@ -118,7 +119,8 @@ export default {
 
     footerComponent () {
       switch (true) {
-        case this.currentStep.id === 1 && !!this.source.list?.id:
+        // FIXME: use only source?
+        case this.currentStep.id === 1 && (!!this.source.list?.id || !isEmpty(this.source.filters)):
           return 'broadcast-contacts-preview'
         default:
           return null
@@ -129,6 +131,8 @@ export default {
       switch (true) {
         case this.currentStep.id === 1 && !!this.source.list?.id:
           return { list: this.source.list }
+        case this.currentStep.id === 1 && !isEmpty(this.source.filters):
+          return { filters: this.source.filters }
         default:
           return null
       }

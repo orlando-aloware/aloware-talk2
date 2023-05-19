@@ -12431,6 +12431,7 @@ h1.contact-list-name-label {
       margin-right: 15px;
       background-color: $white;
       border-radius: 8px;
+      padding: 20px;
     }
 
     &__view {
@@ -12521,7 +12522,12 @@ h1.contact-list-name-label {
       }
 
       &__details {
+        flex-grow: 1;
+        overflow: hidden;
+        border-radius: 8px;
+
         .contacts-preview {
+          height: 100%;
           position: relative;
           background-color: $white;
           border-radius: 8px;
@@ -12540,7 +12546,11 @@ h1.contact-list-name-label {
             }
           }
 
-
+          &__body {
+            .b-overlay-wrap {
+              display: none;
+            }
+          }
         }
       }
     }
@@ -12548,5 +12558,63 @@ h1.contact-list-name-label {
     &__filters {
       width: 300px;
     }
+  }
+}
+
+.steps-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  &__step {
+    color: $grey-90;
+    display: flex;
+    align-items: center;
+
+    &__icon {
+      border: solid 1px $grey-70;
+      margin-right: 15px;
+      border-radius: 50%;
+      height: 26px;
+      width: 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &__separator {
+
+    }
+
+
+    &--active {
+      .steps-wrapper__step {
+        &__icon {
+
+        }
+
+        &__name {
+
+        }
+      }
+    }
+
+    &--completed {
+      .steps-wrapper__step {
+        &__icon {
+
+        }
+
+        &__name {
+
+        }
+      }
+    }
+
+    // &::after {
+    //   content: "";
+    //   height: 24px;
+    //   width: 2px;
+    //   background-color: $grey-70;
+    // }
   }
 }
