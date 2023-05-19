@@ -136,7 +136,7 @@ export default {
   props: {
     integration: {
       type: String,
-      required: true
+      required: false
     },
     redirect: {
       type: Boolean,
@@ -375,7 +375,7 @@ export default {
     },
 
     importFromIntegration () {
-      switch (this.integration.toLowerCase()) {
+      switch (this.getIntegration()?.toLowerCase()) {
         case 'hubspot':
           return this.importFromHubspot()
         case 'pipedrive':
@@ -460,7 +460,7 @@ export default {
     },
 
     checkIntegrationImport () {
-      switch (this.integration.toLowerCase()) {
+      switch (this.getIntegration()?.toLowerCase()) {
         case 'hubspot':
           return this.checkHubspotList()
         case 'pipedrive':
@@ -521,6 +521,14 @@ export default {
     closeConfirmDialog () {
       this.confirm = false
       this.loading--
+    },
+
+    getIntegration () {
+      if (this.integration) {
+        return this.integration
+      }
+
+      return this.integrationsEnabled[0]
     }
   },
 
