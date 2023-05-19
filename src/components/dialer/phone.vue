@@ -66,14 +66,14 @@
 
           <div class="phone-settings">
             <q-item-label class="mb-1">Input device</q-item-label>
-            <device-selector :options="inputDevices"
-                             v-model="inputDevice"
-                             @input="setInputDevice">
+            <device-selector :devices="inputDevices"
+                             v-model="currentInputDevice"
+                             @change="setInputDevice">
             </device-selector>
             <q-item-label class="mt-3 mb-1">Output device</q-item-label>
-            <device-selector :options="outputDevices"
-                             v-model="outputDevice"
-                             @input="setOutputDevice">
+            <device-selector :devices="outputDevices"
+                             v-model="currentOutputDevice"
+                             @change="setOutputDevice">
             </device-selector>
 
             <q-btn color="primary"
@@ -81,7 +81,6 @@
                    label="Speaker Test"
                    no-caps
                    unelevated
-                   dense
                    @click="testOutputDevice">
             </q-btn>
 
@@ -1371,8 +1370,6 @@ export default {
       isVisible: true,
       currentLocalTime: null,
       showLocalTime: true,
-      inputDevice: 'default',
-      outputDevice: 'default',
       loadingCommunication: false,
       loadingDropThirdParty: false,
       loadingToggleRecordingStatus: false,
@@ -2196,19 +2193,22 @@ export default {
       document.onmousemove = null
     },
 
-    setInputDevice () {
-      this.$VueEvent.fire('setInputDevice', this.inputDevice)
+    setInputDevice (inputDevice) {
+      console.log('device', inputDevice)
+      this.$VueEvent.fire('setInputDevice', inputDevice)
     },
 
-    setOutputDevice () {
-      this.$VueEvent.fire('setOutputDevice', this.outputDevice)
+    setOutputDevice (outputDevice) {
+      console.log('device', outputDevice)
+      this.$VueEvent.fire('setOutputDevice', outputDevice)
     },
 
     testOutputDevice () {
-      this.$VueEvent.fire('testOutputDevice', this.outputDevice)
+      this.$VueEvent.fire('testOutputDevice', this.currentOutputDevice)
     },
 
     forceRefreshCommunication ($event) {
+      this.$VueEvent.fire('initializeSettings')
       $event.target.blur()
       this.loadingCommunication = true
       this.$VueEvent.fire('forceRefreshCommunication')

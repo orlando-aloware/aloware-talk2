@@ -4497,19 +4497,9 @@ i.option-separator {
   @extend .q-pa-md;
 
   .q-field__native {
-    min-height: 32px !important;
-    height: 32px !important;
     padding: 2px 0;
     font-size: $f-size-body;
-  }
-
-  .q-field__control {
-    min-height: 32px !important;
-    height: 32px !important;
-  }
-
-  .q-field__marginal {
-    height: 32px !important;
+    overflow: hidden;
   }
 
   .btn:focus, .btn.focus {

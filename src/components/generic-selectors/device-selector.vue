@@ -2,10 +2,10 @@
   <q-select ref="device-selector"
             :options="options"
             v-model="selectedId"
+            behavior="menu"
             class="has-margin-top-5 q-basic-selector"
             option-value="id"
             option-label="label"
-            use-input
             emit-value
             map-options
             outlined
@@ -28,7 +28,7 @@ export default {
     value: {
       required: false
     },
-    options: {
+    devices: {
       type: Array,
       default: () => {
         return []
@@ -38,10 +38,16 @@ export default {
   data () {
     return {
       selectedId: this.value,
+      options: [],
       emitChange: true,
       reference: 'device-selector',
-      fullOptionsProperty: 'options'
+      fullOptionsProperty: 'options',
+      compareProperty: 'id',
+      textProperty: 'label'
     }
+  },
+  mounted () {
+    this.options = this.devices
   },
   watch: {
     value: function (value) {

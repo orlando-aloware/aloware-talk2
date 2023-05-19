@@ -8,7 +8,7 @@ export default {
       'currentCompany'
     ]),
 
-    integrationName () {
+    integrationNameHumanReadable () {
       switch (true) {
         case this.currentCompany.hubspot_integration_enabled:
           return 'HubSpot'
