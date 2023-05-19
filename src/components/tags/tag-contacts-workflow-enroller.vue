@@ -65,6 +65,7 @@
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
+                  :disabled="!selectedWorkflowId"
                   @click.prevent="enrollContacts">
             Enroll Contacts
           </button>

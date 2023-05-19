@@ -59,6 +59,7 @@
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
+                  :disabled="!userId && !ringGroupId"
                   @click.prevent="assignContacts">
             Assign
           </button>
@@ -121,6 +122,10 @@ export default {
 
     tabName () {
       return this.selectedTabIndex === 1 ? 'ring_group' : 'user'
+    },
+
+    tabNameLabel () {
+      return this.tabName.replace('_', ' ')
     }
   },
 
@@ -139,16 +144,18 @@ export default {
 
     setUserId (userId) {
       this.userId = userId
+      this.ringGroupId = null
     },
 
     setRingGroupId (ringGroupId) {
       this.ringGroupId = ringGroupId
+      this.userId = null
     },
 
     assignContacts () {
       this.loading = true
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabName}?`, {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${ this.tabNameLabel }?`, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
         cancelTitle: 'No',

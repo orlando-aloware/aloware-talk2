@@ -18,7 +18,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Add Tasks to User's PowerDialer</h6>
+      <h6>Add Tasks to a User's Power Dialer List</h6>
     </template>
 
     <p class="text-13 text-amber-10">
@@ -26,7 +26,7 @@
     </p>
 
     <div class="pt-2">
-      <label class="label mt-2 mb-1">Add Tasks to this User's PowerDialer (My Queue)</label>
+      <label class="label mt-2 mb-1">Add Tasks to this User's Power Dialer (My Queue)</label>
       <user-selector :generic-styling="false"
                      v-model="userId"
                      @change="setUserId"/>
@@ -71,6 +71,7 @@
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
+                  :disabled="!userId"
                   @click.prevent="addTasksToPowerDialer">
             Add Tasks
           </button>
@@ -199,7 +200,7 @@ export default {
     addTasksToPowerDialer () {
       this.loading = true
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want to add the contacts under this tag to this user's PowerDialer?`, {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to add the contacts under this tag to this user's Power Dialer?`, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
         cancelTitle: 'No',

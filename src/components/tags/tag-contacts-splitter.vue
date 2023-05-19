@@ -36,7 +36,7 @@
                      :options="options"
                      :show-labels="false"
                      :allow-empty="false"
-                     v-model="selectetdPageSize"
+                     v-model="selectedPageSize"
                      @select="setSplitPageSize"/>
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
@@ -46,7 +46,7 @@
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
-                  :disabled="!allowSplit"
+                  :disabled="!splitPageSize || !selectedPageSize || !allowSplit"
                   @click.prevent="splitTag">
             Split
           </button>
@@ -110,7 +110,7 @@ export default {
         }
       ],
       splitPageSize: null,
-      selectetdPageSize: null
+      selectedPageSize: null
     }
   },
 
@@ -137,12 +137,12 @@ export default {
   methods: {
     closeModal () {
       this.splitPageSize = null
-      this.selectetdPageSize = null
+      this.selectedPageSize = null
       this.$emit('closeAssignContactsTagModal')
     },
 
     setSplitPageSize () {
-      this.splitPageSize = this.selectetdPageSize.value
+      this.splitPageSize = this.selectedPageSize.value
     },
 
     splitTag () {
