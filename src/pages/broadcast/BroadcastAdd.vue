@@ -19,13 +19,10 @@
                         :last-step="steps[steps.length - 1].id"
                         @next="onNext"
                         @back="onBack"/>
-
-    <broadcast-add-filters />
   </div>
 </template>
 
 <script>
-import BroadcastAddFilters from 'src/components/broadcasts/broadcast-add-filters.vue'
 import BroadcastAddSidebar from 'src/components/broadcasts/broadcast-add-sidebar.vue'
 import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
 
@@ -33,7 +30,6 @@ export default {
   name: 'broadcast-add',
 
   components: {
-    BroadcastAddFilters,
     BroadcastAddSidebar,
     BroadcastAddView
   },

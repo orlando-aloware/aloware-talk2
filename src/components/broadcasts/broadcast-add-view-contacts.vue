@@ -36,13 +36,20 @@
         <p>Select a contact list</p>
         <!-- shows the selector based on which integration is enabled  -->
       </template>
+
+      <transition name="slide-left">
+        <contacts-filters class="broadcast-add__contacts__filters"
+                          v-if="optionSelected === 'filter'"/>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
+import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
+import { mapActions } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -50,6 +57,7 @@ export default {
 
   components: {
     CheckOIcon,
+    ContactsFilters,
     ContactsListSelector
   },
 
@@ -107,6 +115,11 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'closeFilters',
+      'openFilters'
+    ]),
+
     onOptionSelected (option) {
       this.optionSelected = option.value
 
@@ -127,6 +140,12 @@ export default {
         filters: {},
         integration: {}
       }
+
+      if (this.optionSelected === 'filter') {
+        this.openFilters()
+      } else {
+        this.closeFilters()
+      }
     }
   },
 
@@ -141,3 +160,13 @@ export default {
   }
 }
 </script>
+
+<style>
+.slide-left-enter {
+  transform: translateX(100%);
+}
+
+.slide-left-leave-active {
+  transform: translateX(100%);
+}
+</style>

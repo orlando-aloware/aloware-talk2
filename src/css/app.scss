@@ -12501,6 +12501,13 @@ h1.contact-list-name-label {
               &__selection {
                 margin-top: 25px;
               }
+
+              &__filters {
+                transition: all 0.5s;
+                position: fixed;
+                right: 0px;
+                top: 62px;
+              }
             }
           }
         }
