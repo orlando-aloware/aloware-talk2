@@ -1008,7 +1008,9 @@ export default {
       this.reRouteModal = true
       this.isSessionRunning = false
 
-      if (this.dialer.currentStatus !== 'READY') {
+      // we force the wrap-up to end once the power dialer session has ended
+      // and that call/contact dispositions are not forced
+      if (this.dialer.currentStatus !== 'READY' && !this.isNotDisposed) {
         this.hangUpIntervalCounter = 0
 
         this.hangUpInterval = setInterval(() => {

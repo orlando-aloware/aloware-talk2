@@ -24,12 +24,19 @@ export default {
     isContactNotDisposed () {
       const hasContactDisposition = this.isContactDisposed || this.dialer.contact?.disposition_status_id
 
-      return this.currentCompany && this.currentCompany.force_contact_disposition &&
+      return this.isForcedContactDisposition &&
         !hasContactDisposition
     },
 
     isForcedCallDisposition () {
       return this.currentCompany && this.currentCompany.force_call_disposition
+    },
+
+    isNotDisposed () {
+      const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
+      const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
+
+      return isForceCallDisposition || isForceContactDisposition
     }
   },
 
