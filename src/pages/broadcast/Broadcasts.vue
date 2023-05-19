@@ -109,12 +109,7 @@
     </div>
     <q-separator/>
     <div>
-      <highstock :options="options"
-                 :style="getStyle"
-                 ref="highchart"
-                 v-bind:id="graph_id"
-                 v-show="is_done && options.series.length > 0">
-      </highstock>
+      <communication-activity-graph base="broadcast" />
     </div>
     <q-separator/>
     <div class="px-2 broadcasts__home__table flex-grow-1">
@@ -194,6 +189,7 @@ import PlusIcon from 'components/icons/plus-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
 import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
+import CommunicationActivityGraph from 'src/components/communication-activity-graph.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { mapState } from 'vuex'
 
@@ -267,7 +263,8 @@ export default {
     Search,
     PlusIcon,
     Datatable,
-    BroadcastStatusPill
+    BroadcastStatusPill,
+    CommunicationActivityGraph
   },
 
   data: () => ({
@@ -340,6 +337,73 @@ export default {
 
     statusToggleColor () {
       return 'active'
+    },
+
+    chartOptions () {
+      return {
+        loading: false,
+        graph_can_load: true,
+        aggregated_counts: [],
+        graph_id: 'activity-graph',
+        report_type: 'date_v_campaign', // changes to date_v_user
+        chart_period: 'day',
+        chart_type: 'spline',
+        time: {
+          useUTC: false,
+          timezone: window.timezone
+        },
+        // force the plot to show all ticks daily
+        xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: {
+            millisecond: '%e %b', // always use day as highest resolution.
+            second: '%e %b', // always use day as highest resolution.
+            minute: '%e %b', // always use day as highest resolution.
+            hour: '%H:%M',
+            day: '%e %b', // always use day as highest resolution.
+            week: '%e %b', // always use day as highest resolution.
+            month: '%b \'%y',
+            year: '%Y'
+          },
+          // minRange: 1 * 24 * 3600000, // 1 day
+          labels: {
+            rotation: 45,
+            // step: 1,
+            style: {
+              fontSize: '14px'
+            }
+          }
+        },
+
+        yAxis: {
+          allowDecimals: false,
+          offset: 20,
+          title: {
+            text: 'Number Of Calls & Texts',
+            style: {
+              'font-size': '14px',
+              'color': '#090A0D'
+            }
+          }
+        },
+        legend: {
+          layout: 'horizontal',
+          enabled: true,
+          verticalAlign: 'bottom',
+          floating: false
+        },
+
+        credits: {
+          enabled: false
+        },
+
+        exporting: {
+          sourceWidth: 0,
+          sourceHeight: 0
+        },
+
+        series: []
+      }
     }
   },
 
