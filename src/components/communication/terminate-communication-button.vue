@@ -73,7 +73,11 @@ export default {
     terminate () {
       this.loading = true
 
-      API.V1.communication.forceTerminate(this.communication.id)
+      const action = isLiveCall(this.communication) || isParkedCall(this.communication)
+        ? API.V1.communication.forceTerminate(this.communication.id)
+        : API.V1.communication.forceDequeue(this.communication.id)
+
+      action
         .then(() => {
           this.$generalNotification('Communication terminated successfully.', 'success')
           this.loading = false

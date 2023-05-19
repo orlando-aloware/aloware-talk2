@@ -370,6 +370,9 @@ export default {
       forceTerminate (id) {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
+      forceDequeue (id) {
+        return window.axios.post(`${suffixV1}communication/${id}/force-dequeue`)
+      },
       get (id) {
         return window.axios.get(`${suffixV1}communication/${id}`)
       },
