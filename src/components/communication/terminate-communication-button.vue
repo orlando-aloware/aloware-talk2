@@ -16,6 +16,7 @@ import API from 'src/plugins/api/api'
 import PowerIcon from 'src/components/icons/power-icon.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import { DISPOSITION_STATUS_INPROGRESS_NEW } from 'src/constants/communication-disposition-status'
+import { isLiveCall, isParkedCall } from 'src/plugins/helpers/functions'
 
 export default {
   name: 'terminate-communication-button',
@@ -37,7 +38,12 @@ export default {
 
   computed: {
     show () {
-      return this.hasRole('Company Admin') && this.communication.disposition_status2 === DISPOSITION_STATUS_INPROGRESS_NEW
+      // live and parked calls must be DISPOSITION_STATUS_INPROGRESS_NEW
+      if (isLiveCall(this.communication) || isParkedCall(this.communication)) {
+        return this.hasRole('Company Admin') && this.communication.disposition_status2 === DISPOSITION_STATUS_INPROGRESS_NEW
+      }
+
+      return this.hasRole('Company Admin')
     }
   },
 
