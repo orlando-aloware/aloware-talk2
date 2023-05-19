@@ -7462,6 +7462,8 @@ table.datatable {
     font-size: 14px;
     font-weight: 600;
     color: $grey-100;
+    display: block;
+    width: 83px;
   }
 
   .left-column-wrapper {
@@ -7493,6 +7495,11 @@ table.datatable {
         overflow: hidden;
         white-space: nowrap;
         display: inline-block;
+      }
+
+      span.position-absolute.check-icon {
+        right: 20px;
+        top: 5px;
       }
 
       .b-dropdown {
@@ -9521,12 +9528,18 @@ screen and (max-width: 956px) {
       left: 0 !important;
     }
 
-    & > div > h1 {
-      font-size: 18px;
-      font-family: $font-family-body;
-      height: 27px;
-      display: flex;
-      align-items: center;
+    & > div {
+      flex: 1;
+      min-width: 0;
+      & > h1 {
+        font-size: 18px;
+        font-family: $font-family-body;
+        height: 27px;
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     &.q-toolbar {

@@ -1,14 +1,14 @@
 <template>
   <div class="contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative"
-       :class="[activeClass, isParkedCall ? 'item-call-parked' : '', isConnectedCall ? 'item-call-connected' : '', isLiveCall ? 'item-live-call' : '']"
-       @click="onItemClick(contact)">
+       :class="inboxItemClass"
+       @click="onItemClick()">
     <div class="d-flex justify-content-center avatar-wrapper">
       <div class="avatar d-flex justify-content-center pb-1 position-relative"
            role="button">
-        <b-badge v-if="totalUnreads > 0"
-                 class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
+        <b-badge class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
                  variant="danger"
-                 pill>
+                 pill
+                 v-if="totalUnreads > 0">
           <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
           <span v-else>99<sup>+</sup></span>
         </b-badge>
@@ -30,17 +30,17 @@
           {{ contactName }}
         </q-tooltip>
       </div>
-      <div v-if="contact.last_communication"
-           class="d-grid grid-2-col task-item-body">
+      <div class="d-grid grid-2-col task-item-body"
+           v-if="contact.last_communication">
         <div class="pr-2">
-          <component :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction, contact.last_communication.callback_status)"
-                     height="18px"
-                     width="18px">
+          <component height="18px"
+                     width="18px"
+                     :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction, contact.last_communication.callback_status)">
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               v-if="![CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(contact.last_communication.type) && !isParkedCall && !isConnectedCall">
+               v-if="!isNotInprogressCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </div>
           <div class="truncated-text call-parked-label"
@@ -53,26 +53,24 @@
           </div>
 
           <div class="truncated-text"
-               v-if="contact.last_communication.type === CommunicationTypes.SMS &&
-               (contact.last_communication.body === null ||
-               !contact.last_communication.body ||contact.last_communication.body.length < 1)">
+               v-if="hasSmsBody">
             {{ smsEmptyBodyAlternativeText }}
           </div>
           <div class="truncated-text"
-               :class="{ 'pt-1': [CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(contact.last_communication.type) }"
+               :class="appointmentReminderTextClass"
                v-if="contact.last_communication.body !== null">
             {{ contact.last_communication.body }}
           </div>
 
         </div>
       </div>
-      <div v-if="contact.last_communication"
-           class="campaign-name text-grey-10 truncated-text">
+      <div class="campaign-name text-grey-10 truncated-text"
+           v-if="contact.last_communication">
         {{ campaignName }}
       </div>
     </div>
-    <div v-if="contact.last_communication || lastEngagement"
-         class="actions text-right pb-1">
+    <div class="actions text-right pb-1"
+         v-if="contact.last_communication || lastEngagement">
       <span class="time-passed text-grey-90 mr-2"
             role="button"
             v-if="hasRelativeTime && !isLive">
@@ -96,9 +94,9 @@
                       v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
                       @click="onRejectCall">
               <!-- show remove icon for call fishing mode -->
-              <ignore-call-icon v-if="isShowIgnoreCallIcon"
-                                height="24"
-                                width="24" />
+              <ignore-call-icon height="24"
+                                width="24"
+                                v-if="isShowIgnoreCallIcon"/>
               <q-tooltip anchor="top middle"
                          self="center middle">
                 {{ isShowIgnoreCallIcon ? 'Ignore' : 'Decline' }}
@@ -107,7 +105,7 @@
               <cancel-call-icon v-if="isShowCancelCallIcon"/>
             </b-button>
           </div>
-          <div v-if="(isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW) || (!isCallFishingMode && isIncomingLiveCall)"
+          <div v-if="isIncomingCall"
                class="pl-1 pr-0" >
             <b-button variant="light"
                       size="sm"
@@ -119,13 +117,13 @@
                 Answer
               </q-tooltip>
               <accept-call-icon/>
-              <q-menu v-if="isDialerConnected"
-                      fit
-                      content-class="live-call-options"
+              <q-menu content-class="live-call-options"
                       anchor="top right"
                       self="top left"
-                      v-model="showIncomingCallMenu"
+                      fit
                       :offset="[5, 9]"
+                      v-model="showIncomingCallMenu"
+                      v-if="isDialerConnected"
                       @hide="showIncomingCallMenu = false">
                 <q-list>
                   <q-item clickable
@@ -135,8 +133,7 @@
                       <park-call-icon color="#9B51E0"
                                       class="park-call-icon"
                                       width="11.7"
-                                      height="12.35">
-                      </park-call-icon>
+                                      height="12.35"/>
                       <span>Park Current Call &amp; Answer</span>
                     </q-item-section>
                   </q-item>
@@ -146,7 +143,7 @@
                     <q-item-section>
                       <hangup-icon  width="16"
                                     height="16"
-                                    class="hangup-icon"></hangup-icon>
+                                    class="hangup-icon"/>
                       <span>Hang up Current Call &amp; Answer</span>
                     </q-item-section>
                   </q-item>
@@ -187,13 +184,13 @@
                          v-if="!showParkedCallMenu">
                 Unpark
               </q-tooltip>
-              <q-menu v-if="isDialerConnected"
-                      fit
-                      content-class="live-call-options"
+              <q-menu content-class="live-call-options"
                       anchor="top right"
                       self="top left"
-                      v-model="showParkedCallMenu"
+                      fit
                       :offset="[5, 9]"
+                      v-model="showParkedCallMenu"
+                      v-if="isDialerConnected"
                       @hide="showParkedCallMenu = false">
                 <q-list>
                   <q-item clickable
@@ -203,8 +200,7 @@
                       <park-call-icon color="#9B51E0"
                                       class="park-call-icon"
                                       width="11.7"
-                                      height="12.35">
-                      </park-call-icon>
+                                      height="12.35"/>
                       <span>Park Current Call &amp; Connect</span>
                     </q-item-section>
                   </q-item>
@@ -214,7 +210,7 @@
                     <q-item-section>
                       <hangup-icon  width="16"
                                     height="16"
-                                    class="hangup-icon"></hangup-icon>
+                                    class="hangup-icon"/>
                       <span>Hang up Current Call &amp; Connect</span>
                     </q-item-section>
                   </q-item>
@@ -226,8 +222,8 @@
       </div>
     </div>
 
-    <div v-if="isReopened && !isSearch"
-         class="overlay position-absolute opacity-1 text-center pt-2">
+    <div class="overlay position-absolute opacity-1 text-center pt-2"
+         v-if="isReopened && !isSearch">
       <avatar width="34"
               height="34"
               :style="avatarStyle(false)"
@@ -272,16 +268,27 @@ export default {
     unownedContactTaskMixin
   ],
 
-  components: { IgnoreCallIcon, ParkCallIcon, HangupIcon, ParkedCallIcon, AcceptCallIcon, CancelCallIcon, TaskItemTime, Avatar },
+  components: {
+    IgnoreCallIcon,
+    ParkCallIcon,
+    HangupIcon,
+    ParkedCallIcon,
+    AcceptCallIcon,
+    CancelCallIcon,
+    TaskItemTime,
+    Avatar
+  },
 
   props: {
     contact: {
       required: true
     },
+
     loadingContact: {
       type: Boolean,
       default: false
     },
+
     isSearch: {
       type: Boolean,
       required: false,
@@ -291,12 +298,15 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer', 'ringGroups', 'notifications']),
+
     ...mapState('contacts', { contactData: 'contact' }),
+
     ...mapState('inbox', [
       'selectedContact',
       'liveContacts',
       'channelChangedFilterFields'
     ]),
+
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
@@ -308,6 +318,7 @@ export default {
 
       return 'No Name'
     },
+
     contactAvatar () {
       if (this.contact && this.contact.first_name && this.contact.last_name) {
         return `${this.contact.first_name} ${this.contact.last_name}`
@@ -315,22 +326,35 @@ export default {
 
       return ''
     },
-    activeClass () {
-      return this.selectedContact && this.selectedContact.id === this.contact.id ? 'active' : ''
+
+    isActiveItem () {
+      return this.selectedContact &&
+        this.selectedContact.id === this.contact.id &&
+        this.$route.name === 'Inbox Contact Task'
     },
+
+    activeClass () {
+      return this.isActiveItem ? 'active' : ''
+    },
+
     totalUnreads () {
       return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     },
+
     campaignName () {
       if (_.isEmpty(this.campaigns) || !this.contact.last_communication.campaign_id) {
         return '-'
       }
+
       const campaign = this.campaigns.find(campaign => campaign.id === this.contact.last_communication.campaign_id)
+
       if (campaign) {
         return campaign.name
       }
+
       return '-'
     },
+
     isReopened () {
       return this.$route.params.status &&
         ['pending', 'closed'].includes(this.$route.params.status) &&
@@ -338,8 +362,9 @@ export default {
         !this.loadingContact &&
         !this.isLive
     },
+
     isLive () {
-      return this.contact.last_communication && [
+      const inprogressStatuses = [
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
@@ -347,42 +372,109 @@ export default {
         CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
-      ].includes(this.contact.last_communication.current_status2)
-    },
-    smsEmptyBodyAlternativeText () {
-      const directionText = (this.contact.last_communication.direction === CommunicationDirection.INBOUND ? 'Received' : 'Sent')
-      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      const lastAttachment = !_.isEmpty(this.contact.last_communication.attachments) ? this.contact.last_communication.attachments.pop() : null
+      ]
 
-      switch (true) {
-        case lastAttachment && ['text'].includes(lastAttachment.mime_type):
-          return directionText + ' a text file'
-        case lastAttachment && ['audio'].includes(lastAttachment.mime_type):
-          return directionText + ' an audio file'
-        case lastAttachment && ['image'].includes(lastAttachment.mime_type):
-          return directionText + ' an image'
-        case lastAttachment && ['video'].includes(lastAttachment.mime_type):
-          return directionText + ' a video file'
-        case lastAttachment && ['application'].includes(lastAttachment.mime_type):
-        default:
-          return directionText + ' a file'
-      }
+      return this.contact.last_communication &&
+        inprogressStatuses.includes(this.contact.last_communication.current_status2)
     },
+
+    smsEmptyBodyAlternativeText () {
+      const lastCommunication = this.contact.last_communication
+      const directionText = lastCommunication.direction === CommunicationDirection.INBOUND
+        ? 'Received'
+        : 'Sent'
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      const lastAttachment = !_.isEmpty(lastCommunication.attachments)
+        ? lastCommunication.attachments.pop()
+        : null
+
+      if (lastAttachment && ['text'].includes(lastAttachment.mime_type)) {
+        return directionText + ' a text file'
+      }
+
+      if (lastAttachment && ['audio'].includes(lastAttachment.mime_type)) {
+        return directionText + ' an audio file'
+      }
+
+      if (lastAttachment && ['image'].includes(lastAttachment.mime_type)) {
+        return directionText + ' an image'
+      }
+
+      if (lastAttachment && ['video'].includes(lastAttachment.mime_type)) {
+        return directionText + ' a video file'
+      }
+
+      return directionText + ' a file'
+    },
+
     communication () {
       return this.contact.last_communication
     },
+
     lastEngagement () {
       if (this.communication) {
-        return window.moment(this.contact.last_engagement_at).isAfter(this.communication.created_at) ? this.contact.last_engagement_at : this.communication.created_at
+        return window.moment(this.contact.last_engagement_at).isAfter(this.communication.created_at)
+          ? this.contact.last_engagement_at
+          : this.communication.created_at
       }
 
       return this.contact.last_engagement_at
     },
+
     hasRelativeTime () {
-      return (this.contact.last_communication && this.contact.last_communication.type === CommunicationTypes.CALL &&
-          this.contact.last_communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) ||
-        (this.contact.last_communication && this.contact.last_communication.type !== CommunicationTypes.CALL) ||
-        this.lastEngagement
+      const isCallCompleted = this.contact?.last_communication?.type === CommunicationTypes.CALL &&
+        this.contact?.last_communication?.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
+      const isNotCall = this.contact?.last_communication?.type !== CommunicationTypes.CALL
+
+      return isCallCompleted || isNotCall || this.lastEngagement
+    },
+
+    inboxItemClass () {
+      const parkedCallClass = this.isParkedCall ? 'item-call-parked' : ''
+      const callConnectedClass = this.isConnectedCall ? 'item-call-connected' : ''
+      const liveCallClass = this.isLiveCall ? 'item-live-call' : ''
+
+      return [
+        this.activeClass,
+        parkedCallClass,
+        callConnectedClass,
+        liveCallClass
+      ]
+    },
+
+    isNotInprogressCall () {
+      const notCallCommunicationType = [
+        CommunicationTypes.SMS,
+        CommunicationTypes.EMAIL,
+        CommunicationTypes.APPOINTMENT,
+        CommunicationTypes.REMINDER
+      ]
+
+      return notCallCommunicationType.includes(this.contact.last_communication.type) &&
+        !this.isParkedCall && !this.isConnectedCall
+    },
+
+    hasSmsBody () {
+      const hasBody = this.contact.last_communication.body === null ||
+        !this.contact.last_communication.body || this.contact.last_communication.body.length < 1
+
+      return this.contact.last_communication.type === CommunicationTypes.SMS && hasBody
+    },
+
+    appointmentReminderTextClass () {
+      const appointmentReminderType = [CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER]
+      const textClass = appointmentReminderType.includes(this.contact.last_communication.type)
+        ? 'pt-1'
+        : ''
+
+      return [textClass]
+    },
+
+    isIncomingCall () {
+      const isCallFishing = this.isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
+      const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
+
+      return isCallFishing || isIncomingCall
     }
   },
 
@@ -399,22 +491,25 @@ export default {
 
   methods: {
     ...mapActions(['setShowPhone']),
+
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
-    onItemClick (contact) {
-      if (this.selectedContact && this.selectedContact.id === contact.id && !this.isReopened) {
+
+    onItemClick () {
+      if (this.isActiveItem && !this.isReopened) {
         return
       }
 
-      if (this.isNotOwned(contact.user_id)) {
+      if (this.isNotOwned(this.contact.user_id)) {
         this.$generalNotification(`Contact is inaccessible.`, 'error')
         return
       }
 
-      this.$emit('onItemSelected', contact)
+      this.$emit('onItemSelected', this.contact)
     }
   },
+
   watch: {
     $route (to, from) {
       this.previousRoute = from
@@ -426,6 +521,7 @@ export default {
         this.$emit('onItemRemoved', this.contact)
       }, 3000)
     },
+
     'contact.last_engagement_at': function () {
       this.taskItemKey++
     }
