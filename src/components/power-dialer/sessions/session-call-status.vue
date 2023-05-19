@@ -137,7 +137,7 @@
         </div>
       </div>
 
-      <div class="d-flex align-items-center p-0 justify-content-between flex-wrap pl-3">
+      <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
         <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
              v-if="timezone">
           <DropIcon width="18px"
@@ -147,7 +147,7 @@
           {{ timezone }} - {{ getTimeZone }}
         </div>
 
-        <q-btn class="sessions-button free-width mx-1"
+        <q-btn class="sessions-button free-width ml-1"
                size="sm"
                color="grey-4"
                no-wrap
@@ -217,14 +217,14 @@
             </div>
           </q-btn>
 
-          <q-btn class="my-1"
+          <q-btn class="my-1 sessions-button free-width ml-1"
                  size="sm"
                  no-wrap
                  outline
                  no-caps
                  :disable="isEndSessionDisabled"
-                 :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
-                 :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
+                 :color="endSessionButtonColor"
+                 :class="endSessionButtonClass"
                  @click="onToggleEnd">
 
             <EndCallIcon class="mr-2"
@@ -637,6 +637,16 @@ export default {
 
     isEndSessionDisabled () {
       return this.toggleEnd || this.wrapUpPaused
+    },
+
+    endSessionButtonColor () {
+      return this.toggleEnd ? 'red-3' : 'grey-4'
+    },
+
+    endSessionButtonClass () {
+      const backgroundClass = this.toggleEnd ? 'bg-btn-red' : ''
+
+      return [backgroundClass]
     }
   },
 

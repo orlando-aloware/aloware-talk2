@@ -109,12 +109,12 @@ export default {
       }
     },
 
-    'dialer.contact': function () {
-      this.setIsContactDisposed(this.hasContactDisposition)
+    hasContactDisposition (value) {
+      this.setIsContactDisposed(value)
     },
 
-    'dialer.communication': function () {
-      this.setIsCallDisposed(this.hasCallDisposition)
+    hasCallDisposition (value) {
+      this.setIsCallDisposed(value)
     }
   }
 }
