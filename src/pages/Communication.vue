@@ -5,14 +5,15 @@
                rounded="sm"
                :show="isLoadingCommunication"
                :opacity="0.85">
-      <communication-details v-if="!hasError && communication" :communication="communication"
-                             :verbose="true">
-      </communication-details>
+      <communication-details :verbose="true"
+                             v-if="!hasError && communication" :communication="communication" />
       <b-row v-else-if="hasError && !isLoadingCommunication">
         <b-col md="4"
                sm="12"
                class="pl-0 pr-0">
-            <q-card flat bordered class="my-card">
+            <q-card flat
+                    bordered
+                    class="my-card">
               <q-card-section class="text-center">
                  <span class="material-icons fs-45">
                   error_outline
