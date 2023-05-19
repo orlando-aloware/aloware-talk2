@@ -9529,7 +9529,9 @@ screen and (max-width: 956px) {
     }
 
     & > div {
-      flex: 1;
+      &:first-child {
+        flex: 1;
+      }
       min-width: 0;
       & > h1 {
         font-size: 18px;
