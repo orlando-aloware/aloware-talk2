@@ -109,7 +109,7 @@
                    color="success"
                    no-caps
                    unelevated
-                   v-if="[31000, 31003, 31009, 31201, 53405, 31402].includes(dialer.error.code)"
+                   v-if="PHONE_USAGE_ERRORS.includes(dialer.error.code)"
                    @click="reconnectDialer">
               <div class="button-label">
                 Reconnect
@@ -160,6 +160,7 @@ import InboxMyContactsFilter from 'components/inbox/inbox-my-contacts-filter'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import * as Roles from 'src/constants/roles'
+import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 
 export default {
   name: 'app-header',
@@ -213,7 +214,8 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      updatesLink: 'https://news.intercom.com/aloware'
+      updatesLink: 'https://news.intercom.com/aloware',
+      PHONE_USAGE_ERRORS
     }
   },
 

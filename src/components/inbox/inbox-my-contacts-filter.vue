@@ -16,9 +16,14 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { inboxRoutesMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'inbox-my-contacts-filter',
+
+  mixins: [
+    inboxRoutesMixin
+  ],
 
   computed: {
     ...mapState('inbox', [
@@ -57,7 +62,7 @@ export default {
     onMyContactsChange () {
       this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
 
-      if (['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)) {
+      if (this.inboxTaskRoutes.includes(this.$route.name)) {
         this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter)
         return
       }
