@@ -33,6 +33,14 @@ export default {
 
     isContactTagsSelected () {
       return this.selectedTagCategory === this.ContactTags
+    },
+
+    tagName () {
+      if (!this.tag) {
+        return ''
+      }
+
+      return `#${this.tag.id} - <i class="fa fa-square" style="color: ${this.tag.color}"></i> ${this.tag.name}`
     }
   },
 

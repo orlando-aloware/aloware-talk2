@@ -18,12 +18,10 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Spit Tag</h6>
+      <h6>Split Tag</h6>
     </template>
 
-    <p>
-      Split <span class="font-italic font-weight-bold">{{ tagName }}</span> tag into smaller tags.
-    </p>
+    <p v-html="`Split <span class='font-italic font-weight-bold'>${ tagName }</span> tag into smaller tags.`">
     <p v-show="!allowSplit"
        class="text-red text-11 mb-0">
       Contact count is less than or equal to page size.
@@ -59,20 +57,20 @@
 </template>
 
 <script>
-import { tagsMixin } from 'src/plugins/mixins'
 import VueMultiselect from 'vue-multiselect'
+import { tagsMixin } from 'src/plugins/mixins'
 import axios from 'axios'
 
 export default {
   name: 'tag-contacts-splitter',
 
-  components: {
-    VueMultiselect
-  },
-
   mixins: [
     tagsMixin
   ],
+
+  components: {
+    VueMultiselect
+  },
 
   props: {
     tag: {
@@ -125,14 +123,6 @@ export default {
       set (isShow) {
         return isShow
       }
-    },
-
-    tagName () {
-      if (!this.tag) {
-        return ''
-      }
-
-      return `#${this.tag.id} - ${this.tag.name}`
     },
 
     allowSplit () {

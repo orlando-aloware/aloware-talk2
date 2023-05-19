@@ -21,7 +21,7 @@
       <h6>Add Tasks to User's PowerDialer</h6>
     </template>
 
-    <p class="text-11">
+    <p class="text-13 text-amber-10">
       <span class="font-weight-bold">Note:</span>  This tool will respect user's visibility limits
     </p>
 
@@ -60,9 +60,8 @@
       </b-form-checkbox>
     </div>
 
-    <p class="text-11 mt-2 mb-0">
-      <span class="font-weight-bold">Tag:</span> {{ tagName }}
-    </p>
+    <p class="text-13 mt-2 mb-0"
+       v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
@@ -86,11 +85,16 @@ import UserSelector from 'components/generic-selectors/user-selector.vue'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import { tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import axios from 'axios'
 
 export default {
   name: 'tag-contacts-add-to-power-dialer',
+
+  mixins: [
+    tagsMixin
+  ],
 
   components: {
     UserSelector,
@@ -131,14 +135,6 @@ export default {
       set (isShow) {
         return isShow
       }
-    },
-
-    tagName () {
-      if (!this.tag) {
-        return ''
-      }
-
-      return `#${this.tag.id} - ${this.tag.name}`
     },
 
     directionOptions () {

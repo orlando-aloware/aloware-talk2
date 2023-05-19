@@ -48,9 +48,8 @@
       </b-form-checkbox>
     </div>
 
-    <p class="text-11 mt-2 mb-0">
-      <span class="font-weight-bold">Tag:</span> {{ tagName }}
-    </p>
+     <p class="text-13 mt-2 mb-0"
+       v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
@@ -72,10 +71,15 @@
 <script>
 import UserSelector from 'components/generic-selectors/user-selector.vue'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector.vue'
+import { tagsMixin } from 'src/plugins/mixins'
 import axios from 'axios'
 
 export default {
   name: 'assign-contacts-by-tag',
+
+  mixins: [
+    tagsMixin
+  ],
 
   components: {
     RingGroupSelector,
@@ -113,14 +117,6 @@ export default {
       set (isShow) {
         return isShow
       }
-    },
-
-    tagName () {
-      if (!this.tag) {
-        return ''
-      }
-
-      return `#${this.tag.id} - ${this.tag.name}`
     },
 
     tabName () {

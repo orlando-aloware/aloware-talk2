@@ -21,9 +21,7 @@
       <h6>Delete {{ tagCategoryName }} Tag</h6>
     </template>
 
-    <span>
-      Deleting <span class="font-italic font-weight-bold">{{ tagName }}</span> tag will remove it from all contacts and communications. Continue?
-    </span>
+    <span v-html="`Deleting <span class='font-italic font-weight-bold'>${ tagName }</span> tag will remove it from all contacts and communications. Continue?`" />
 
     <b-form-checkbox v-show="showDeleteContactsQuestion"
                      v-model="isDeleteContacts"
@@ -41,7 +39,7 @@
       </p>
      <b-form-group invalid-feedback="Number of contacts does not match"
                    :state="validateState('confirmDeleteContactsCount')">
-        <b-form-input placeholder="Confirm number of contacts here"
+        <b-form-input :placeholder="`${tag?.contacts_count}`"
                       v-model.trim="$v.confirmDeleteContactsCount.$model" />
        </b-form-group>
     </div>
@@ -65,8 +63,8 @@
 </template>
 
 <script>
-import { tagsMixin } from 'src/plugins/mixins'
 import { numeric, requiredIf } from 'vuelidate/lib/validators'
+import { tagsMixin } from 'src/plugins/mixins'
 import axios from 'axios'
 
 export default {
@@ -116,14 +114,6 @@ export default {
       set (isShow) {
         return isShow
       }
-    },
-
-    tagName () {
-      if (!this.tag) {
-        return ''
-      }
-
-      return `#${this.tag.id} - ${this.tag.name}`
     },
 
     showDeleteContactsQuestion () {

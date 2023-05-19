@@ -44,7 +44,7 @@
           </div>
         </div>
       </li>
-      <li class="mb-2">
+      <li>
         <div class="d-flex flex-row">
           <div class="mr-2"><i class="fa fa-info-circle text-warning" aria-hidden="true"></i></div>
           <div>
@@ -54,9 +54,8 @@
       </li>
     </ul>
 
-    <p class="text-11 mt-2 mb-0">
-      <span class="font-weight-bold">Tag:</span> {{ tagName }}
-    </p>
+    <p class="text-13 mt-2 mb-0"
+       v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
@@ -78,10 +77,15 @@
 
 <script>
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
+import { tagsMixin } from 'src/plugins/mixins'
 import axios from 'axios'
 
 export default {
   name: 'tag-contacts-workflow-enroller',
+
+  mixins: [
+    tagsMixin
+  ],
 
   components: {
     SequenceSelector
@@ -115,14 +119,6 @@ export default {
       set (isShow) {
         return isShow
       }
-    },
-
-    tagName () {
-      if (!this.tag) {
-        return ''
-      }
-
-      return `#${this.tag.id} - ${this.tag.name}`
     }
   },
 
