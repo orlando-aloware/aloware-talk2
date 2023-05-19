@@ -1009,7 +1009,7 @@ export default {
       this.isSessionRunning = false
 
       // we force the wrap-up to end once the power dialer session has ended
-      // and that call/contact dispositions are not forced
+      // and that call/contact disposition is not forced
       if (this.dialer.currentStatus !== 'READY' && !this.isNotDisposed) {
         this.hangUpIntervalCounter = 0
 
