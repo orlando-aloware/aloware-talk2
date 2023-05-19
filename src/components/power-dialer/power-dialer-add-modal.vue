@@ -375,7 +375,7 @@ export default {
     },
 
     importFromIntegration () {
-      switch (this.getIntegration().toLowerCase()) {
+      switch (this.getIntegration()?.toLowerCase()) {
         case 'hubspot':
           return this.importFromHubspot()
         case 'pipedrive':
@@ -460,7 +460,7 @@ export default {
     },
 
     checkIntegrationImport () {
-      switch (this.getIntegration().toLowerCase()) {
+      switch (this.getIntegration()?.toLowerCase()) {
         case 'hubspot':
           return this.checkHubspotList()
         case 'pipedrive':
