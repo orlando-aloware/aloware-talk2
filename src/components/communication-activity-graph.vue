@@ -16,11 +16,11 @@
 
         <div class="pull-right no-select">
           <strong>Chart type:</strong>
-          <el-radio-group :disabled="loading" @change="changeChartType" size="mini" v-model="chartType">
+          <!-- <el-radio-group :disabled="loading" @change="changeChartType" size="mini" v-model="chartType">
             <el-radio-button label="spline">Line</el-radio-button>
             <el-radio-button label="areaspline">Area</el-radio-button>
             <el-radio-button label="column">Bar</el-radio-button>
-          </el-radio-group>
+          </el-radio-group> -->
         </div>
       </div>
     </div>
@@ -224,6 +224,10 @@ export default {
         ]
       }
     }
+  },
+
+  mounted () {
+    this.getCommunications()
   },
 
   computed: {
