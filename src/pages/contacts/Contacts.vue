@@ -108,11 +108,14 @@ export default {
       'authenticated',
       'profile'
     ]),
+
     ...mapState('contacts', [
       'showContactsListSidebar',
       'unsavedList'
     ]),
+
     ...mapState(['isMobile']),
+
     mainClass () {
       if (this.$route.name === 'Contact') {
         return 'w-100'
@@ -124,12 +127,14 @@ export default {
 
       return !this.showContactsListSidebar ? 'w-100 no-min-max-width' : 'w-0'
     },
+
     sidebarClass () {
       if (!this.$q.screen.lt.md) {
         return ''
       }
       return !this.showContactsListSidebar ? 'w-0' : 'w-100 no-min-max-width'
     },
+
     isActive () {
       return this.$route.name === 'Contacts'
     }
@@ -141,9 +146,11 @@ export default {
 
   mounted () {
     this.setShowContactsHeader(true)
+
     if (this.isMobile) {
       this.toggleSidebar()
     }
+
     this.setAllContactsSelected(false)
   },
 
@@ -158,15 +165,19 @@ export default {
       'setPreviouslySavedListId',
       'setPreviousListId'
     ]),
+
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
     },
+
     toggleContactListSidebar (isOpen) {
       this.contactListSidebarOpen = isOpen
+
       if (typeof this.$refs.contactListSidebar !== 'undefined' && isOpen) {
         this.$refs.contactListSidebar.onSidebarToggle()
       }
     },
+
     onContactSelected (contact) {
       this.$router.push({
         name: 'Contact',
@@ -177,6 +188,7 @@ export default {
         console.log(err)
       })
     },
+
     onRemoveContacts () {
       this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$VueEvent.fire('shouldUpdateListCount')
@@ -215,6 +227,7 @@ export default {
   beforeDestroy () {
     this.$VueEvent.stop('fetchContactsLists')
   },
+
   beforeRouteLeave (to, from, next) {
     if (this.unsavedList) {
       this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may cause your unsaved contact list to be lost. Do you wish to continue?', {

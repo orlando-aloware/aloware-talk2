@@ -300,7 +300,7 @@ export default {
     },
 
     openTagContacts (tagId) {
-      console.log('placeholder for contacts tag: ' + tagId)
+      window.open(`/contacts?tag_id=${tagId}`, '_blank')
     },
 
     editTag (tag) {

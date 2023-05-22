@@ -815,7 +815,11 @@ export default {
     },
 
     loadData (skipCancelToken = true, clear = false) {
-      if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all' && this.$route.name === 'Contacts') {
+      const invalidList = !this.list ||
+        typeof this.list === 'undefined' ||
+        this.list.id !== this.$route.params.id
+
+      if (invalidList && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
           this.init(clear)
         }).catch(err => {
