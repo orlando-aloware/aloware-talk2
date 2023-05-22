@@ -251,6 +251,11 @@ body,
   }
 }
 
+.blink {
+  animation: fade 1500ms infinite;
+  -webkit-animation: fade 1500ms infinite;
+}
+
 .guest {
   .page-container {
     padding: 0 0 0 0 !important;

@@ -1,8 +1,8 @@
 <template>
   <div id="activity-graph" v-if="graph_can_load">
     <div class="row">
-      <div class="col-12">
-        <div class="vertical-center text-left pull-left">
+      <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
           <span v-if="filter.from_date" class="call-log-head">
             Communications
             from <strong>{{ filter.from_date | fixFullDateLocal }}</strong>
@@ -14,18 +14,26 @@
           </span>
         </div>
 
-        <div class="pull-right no-select">
+        <div class="d-flex align-items-center">
           <strong>Chart type:</strong>
-          <!-- <el-radio-group :disabled="loading" @change="changeChartType" size="mini" v-model="chartType">
-            <el-radio-button label="spline">Line</el-radio-button>
-            <el-radio-button label="areaspline">Area</el-radio-button>
-            <el-radio-button label="column">Bar</el-radio-button>
-          </el-radio-group> -->
+          <q-radio v-model="chartType"
+                   label="Line"
+                   val="spline"/>
+          <q-radio v-model="chartType"
+                   label="Area"
+                   val="areaspline"/>
+          <q-radio v-model="chartType"
+                   label="Bar"
+                   val="column"/>
         </div>
       </div>
     </div>
-    <div class="placeholder" :class="{ blink: loading }" v-if="loading" style="height: 450px">
-      <img src="/assets/images/placeholders/placeholder-number-of-communications.png" class="img-responsive" />
+    <div class="placeholder w-100 d-flex justify-content-center"
+         :class="{ blink: loading }"
+         v-if="loading"
+         style="height: 450px">
+      <img src="images/placeholder-number-of-communications.png"
+           class="img-responsive"/>
     </div>
     <div v-else>
       <highstock :options="options"
@@ -34,8 +42,11 @@
                  v-bind:id="graph_id"
                  v-show="is_done && options.series.length > 0">
       </highstock>
-      <div class="el-table__empty-block" v-show="is_done && !options.series.length">
-        <span class="el-table__empty-text" style="color: #606266;">
+      <div class="d-flex justify-content-center align-items-center"
+           :style="{ height: '450px' }"
+           v-show="is_done && !options.series.length">
+        <span class="text-h3 text-weight-medium"
+              :style="{color: '#606266'}">
           No Data
         </span>
       </div>
@@ -439,14 +450,14 @@ export default {
           return Promise.reject(err)
         }
       })
-    },
+    }
+  },
 
-    changeChartType (chartType) {
-      this.chartType = chartType
-
+  watch: {
+    chartType (chartType) {
       let newSeries = []
       for (let series of this.options.series) {
-        series.type = this.chartType
+        series.type = chartType
         newSeries.push(series)
       }
       this.options.series = newSeries
