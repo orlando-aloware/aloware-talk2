@@ -28,8 +28,11 @@
       <img src="/assets/images/placeholders/placeholder-number-of-communications.png" class="img-responsive" />
     </div>
     <div v-else>
-      <highstock :options="options" :style="getStyle" ref="highchart" v-bind:id="graph_id"
-        v-show="is_done && options.series.length > 0">
+      <highstock :options="options"
+                 :style="getStyle"
+                 ref="highchart"
+                 v-bind:id="graph_id"
+                 v-show="is_done && options.series.length > 0">
       </highstock>
       <div class="el-table__empty-block" v-show="is_done && !options.series.length">
         <span class="el-table__empty-text" style="color: #606266;">
@@ -42,8 +45,11 @@
 
 <script>
 import moment from 'moment'
+import ReportMixin from 'src/plugins/mixins/report.mixin'
 
 export default {
+  mixins: [ReportMixin],
+
   // we load this graph from other places
   props: {
     base: { required: true },
