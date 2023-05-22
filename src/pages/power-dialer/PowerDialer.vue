@@ -243,16 +243,6 @@ export default {
       }
     }
 
-    this.powerDialerListeners.contactListItemDeleting = (task) => {
-      // console.log(` %c PUSHER caught: contact_list_item_deleting `, 'background:black;color:yellow;', task)
-      // console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
-    }
-
-    this.powerDialerListeners.contactListBulkCreated = (task) => {
-      // console.log(` %c PUSHER caught: contact_list_bulk_created `, 'background:black;color:yellow;', task)
-      // console.log(' %c BULK TASK was CREATED : ', 'background: green; color: #000;', task)
-    }
-
     this.powerDialerListeners.callSessionsEnded = () => {
       this.resetSelectedTaskAndContact()
     }
@@ -260,8 +250,6 @@ export default {
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
     this.$VueEvent.listen('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
     this.$VueEvent.listen('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
-    this.$VueEvent.listen('contact_list_item_deleting', this.powerDialerListeners.contactListItemDeleting)
-    this.$VueEvent.listen('contact_list_bulk_created', this.powerDialerListeners.contactListBulkCreated)
     this.$VueEvent.listen('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
   },
   methods: {
@@ -287,6 +275,7 @@ export default {
 
       if (response.status === 200) {
         this.listLoaded({ ...response.data, id: 'my-queue' })
+
         return
       }
 
@@ -324,7 +313,9 @@ export default {
     },
 
     onRemove () {
-      if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
+      if (Object.keys(this.selectedContacts).length !== 0 &&
+        this.selectedContacts[this.selectedList.id].constructor !== Object &&
+        this.isBulkDelete) {
         this.handleBulkDeletion()
       }
     },
@@ -422,8 +413,6 @@ export default {
       this.$VueEvent.stop('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
       this.$VueEvent.stop('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
       this.$VueEvent.stop('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
-      this.$VueEvent.stop('contact_list_item_deleting', this.powerDialerListeners.contactListItemDeleting)
-      this.$VueEvent.stop('contact_list_bulk_created', this.powerDialerListeners.contactListBulkCreated)
       this.$VueEvent.stop('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
     }
   },

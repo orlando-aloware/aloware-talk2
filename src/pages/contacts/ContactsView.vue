@@ -502,14 +502,14 @@
                   @mouseleave="onMouseLeavePopover($event)">
 
                 <div class="text-left"
-                     v-if="isColumnValueEmpty(contact[column.name])">
+                     v-if="isColumnArrayValueEmpty(contact[column.name])">
                   <div :class="`${column.draggable ? 'col-indented' : ''}`">
                     -
                   </div>
                 </div>
 
                 <div class="text-left"
-                     v-else-if="isColumnValueNotEmpty(contact[column.name])">
+                     v-else-if="isColumnArrayValueNotEmpty(contact[column.name])">
                   <div class="d-flex align-items-center popover-items"
                        :id="`ot-${index}-${colIndx}`"
                        v-if="contact[column.name].length > 0"
@@ -551,10 +551,9 @@
                   {{ contact[column.name] | fixFullDate }}
                 </div>
                 <div class="ellipse"
-                     :class="`${[isCountField(column.name) ? 'text-center' : 'text-left']} ${column.draggable ? 'col-indented' : ''}`"
+                     :class="getColumnClass(column.name, column.draggable)"
                      v-else>
-                  {{ typeof contact[column.name] === 'boolean' ? (contact[column.name] ? 'Yes' : 'No') :
-                  (typeof contact[column.name] !== 'undefined' && contact[column.name] !== 0 ? contact[column.name].toString() : ( contact[column.name] === null ? '-' : contact[column.name] ) ) }}
+                  {{ getColumnValue(contact[column.name]) }}
                 </div>
               </td>
             </template>
@@ -1637,31 +1636,6 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
-    },
-
-    isColumnValueEmpty (columnValue) {
-      const isEmptyArray = columnValue instanceof Array && !columnValue.length
-
-      return columnValue === '' ||
-        columnValue === null ||
-        columnValue === 'NULL' ||
-        isEmptyArray
-    },
-
-    isColumnValueNotEmpty (columnValue) {
-      return columnValue &&
-        columnValue instanceof Array &&
-        columnValue.length
-    },
-
-    isColumnObjectValueEmpty (columnValue) {
-      return columnValue && columnValue instanceof Object && !Object.keys(columnValue).length
-    },
-
-    isColumnObjectValueNotEmpty (columnValue) {
-      return columnValue &&
-        columnValue instanceof Object &&
-        Object.keys(columnValue).length
     }
   },
 

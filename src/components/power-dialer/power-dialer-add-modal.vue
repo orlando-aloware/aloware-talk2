@@ -138,14 +138,17 @@ export default {
       type: String,
       required: false
     },
+
     redirect: {
       type: Boolean,
       default: true
     },
+
     params: {
       type: Object,
       required: true
     },
+
     mode: {
       type: String,
       default: 'add' // add, duplicate, hubspot
@@ -173,7 +176,9 @@ export default {
 
   computed: {
     ...mapState('contacts', ['isAddPowerDialerOpen']),
+
     ...mapState('cache', ['currentCompany']),
+
     isOpen: {
       get () {
         return this.isAddPowerDialerOpen
@@ -182,6 +187,7 @@ export default {
         return isOpen
       }
     },
+
     requestParams () {
       let params = {
         ...this.params,
@@ -198,6 +204,7 @@ export default {
 
       return params
     },
+
     contactsDescription () {
       let description = ''
 
@@ -206,11 +213,14 @@ export default {
       }
 
       description += (this.count === 1 ? ' contact' : ' contacts')
+
       return description
     },
+
     isAllowedInternationalNumbers () {
       return this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
     },
+
     conversionOptions () {
       const options = [
         {
@@ -238,6 +248,7 @@ export default {
 
       return options
     },
+
     whereOptions () {
       return [
         {
@@ -251,6 +262,7 @@ export default {
         }
       ]
     },
+
     directionOptions () {
       return [
         {
@@ -283,6 +295,7 @@ export default {
       'addPowerDialerOpen',
       'createPdListClose'
     ]),
+
     setCount () {
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
@@ -305,10 +318,12 @@ export default {
         })
       }
     },
+
     onHidden () {
       this.addPowerDialerOpen(false)
       this.$emit('hidden')
     },
+
     save () {
       this.loading++
 
@@ -324,6 +339,7 @@ export default {
           this.createPdListClose()
         })
     },
+
     getRequest () {
       // In case of new types of requests, you just need to setup a new mode and its own import method, like above
       switch (this.mode) {
@@ -337,24 +353,28 @@ export default {
 
       return Promise.reject()
     },
+
     addContacts () {
       return this.$axios
         .post('api/v2/power-dialer-list-items', this.requestParams)
-        .then(() => {
+        .then((res) => {
           this.setShouldUpdateSelectedListContactCount(true)
           this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added.')
+          this.$generalNotification(res.data.message)
           this.$emit('submit')
 
           if (this.redirect) {
             if (this.params.contact_list_id) {
               this.$router.push(`/power-dialer/list/${this.params.contact_list_id}`)
-            } else {
-              this.$router.push(`/power-dialer`)
+
+              return
             }
+
+            this.$router.push(`/power-dialer`)
           }
         })
     },
+
     duplicateList () {
       // remove target from params
       let target = this.params.target
@@ -454,6 +474,7 @@ export default {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
     },
+
     getListCount (id) {
       return this.$axios
         .get(`${process.env.API_REPORTING_URL}/api/v2/power-dialer-lists/${id}/count`)
@@ -536,6 +557,7 @@ export default {
     'isAddPowerDialerOpen': function (value) {
       this.isOpen = value
     },
+
     'params.contact_ids': function (contacts) {
       this.count = contacts.length
     }
