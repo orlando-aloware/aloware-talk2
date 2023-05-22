@@ -155,7 +155,7 @@ export default {
     assignContacts () {
       this.loading = true
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${ this.tabNameLabel }?`, {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabNameLabel}?`, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
         cancelTitle: 'No',
