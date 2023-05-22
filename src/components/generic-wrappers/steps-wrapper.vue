@@ -9,7 +9,7 @@
       <span class="steps-wrapper__step__name">
         {{ step.name }}
       </span>
-      <!-- <span class="steps-wrapper__step__separator" /> -->
+      <span class="steps-wrapper__step__separator" />
     </div>
   </div>
 </template>
