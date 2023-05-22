@@ -58,7 +58,7 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm('Terminating communication will forcefully dispose it. Continue?', {
+      this.$bvModal.msgBoxConfirm('Terminating will end this call and assign it a Failed call disposition. Continue?', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
