@@ -12426,6 +12426,10 @@ h1.contact-list-name-label {
       .broadcast-status-pill {
         border: solid black 1px;
       }
+
+      tr:hover, tr:hover td {
+        background-color: #F4F4F6 !important;
+      }
     }
   }
 
