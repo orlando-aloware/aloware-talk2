@@ -18,8 +18,6 @@
       </div>
 
       <div class="broadcasts__add__view__form__footer">
-        <!-- footer components -->
-
         <!-- buttons -->
         <b-button class="mr-2"
                   size="sm"

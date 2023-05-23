@@ -12569,6 +12569,9 @@ h1.contact-list-name-label {
     color: $grey-90;
     display: flex;
     align-items: center;
+    position: relative;
+    margin-bottom: 36px;
+    font-weight: bold;
 
     &__icon {
       border: solid 1px $grey-70;
@@ -12582,18 +12585,24 @@ h1.contact-list-name-label {
     }
 
     &__separator {
-
+      position: absolute;
+      background-color: $grey-70;
+      height: 24px;
+      width: 2px;
+      left: 12px;
+      top: 32px;
     }
 
 
     &--active {
       .steps-wrapper__step {
         &__icon {
-
+          background-color: $success;
+          color: $white;
         }
 
         &__name {
-
+          color: $black;
         }
       }
     }
@@ -12601,20 +12610,18 @@ h1.contact-list-name-label {
     &--completed {
       .steps-wrapper__step {
         &__icon {
-
+          background-color: $success;
+          color: $white;
         }
 
         &__name {
+          color: $black;
+        }
 
+        &__separator {
+          background-color: $success;
         }
       }
     }
-
-    // &::after {
-    //   content: "";
-    //   height: 24px;
-    //   width: 2px;
-    //   background-color: $grey-70;
-    // }
   }
 }
