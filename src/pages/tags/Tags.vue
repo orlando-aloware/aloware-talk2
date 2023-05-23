@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <!-- loading spinner -->
+  <!-- loading spinner -->
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -57,6 +57,11 @@
                         size="40px" />
       </template>
     </b-overlay>
+
+    <!-- bulk actions -->
+    <div class="row mx-0 relative-position">
+      <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length" />
+    </div>
 
     <!-- table -->
     <tags-table :tags="tags"
@@ -72,11 +77,6 @@
               :tag-category="selectedTagCategory"
               :editable-tag="tag"
               @closeTagForm="closeTagForm"/>
-
-    <!--<delete-tag-dialog :is-show="isOpenDeleteTagDialog"-->
-    <!--                   :tag="toDeleteTag"-->
-    <!--                   @closeDeleteTagDialog="closeDeleteTagDialog"-->
-    <!--                   @deleteTagFinal="deleteTag"/>-->
   </div>
 </template>
 
@@ -89,11 +89,13 @@ import { debounce } from 'lodash'
 import TagForm from 'components/tags/tag-form.vue'
 import { tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import TagsBulkActionMenu from 'components/tags-bulk-action-menu.vue'
 
 export default {
   name: 'Tags',
 
   components: {
+    TagsBulkActionMenu,
     TagForm,
     TagsTable,
     TagsTabs,
@@ -170,7 +172,15 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', [
+      'authenticated',
+      'profile'
+    ]),
+
+    ...mapState('tagsModule', [
+      'selectedTagCategory',
+      'selectedTagIds'
+    ])
   },
 
   methods: {

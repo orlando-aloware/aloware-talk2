@@ -13,8 +13,10 @@
                :total-rows="pagination.total"
                :current-page="pagination.currentPage"
                :last-page="pagination.lastPage"
+               :is-selected-all="isSelectedAll"
                @paginated="paginated"
-               @sort="sort">
+               @sort="sort"
+               @checked="selectAllCheckboxChange">
 
       <template #tbody>
         <tr class="datatable-row"
@@ -27,8 +29,10 @@
 
                 <label class="custom-checkbox-container">
                   <input type="checkbox"
-                          class="checker"
-                          :value="tag.id" />
+                         class="checker"
+                         :value="tag.id"
+                         :checked="isSelected(tag.id)"
+                         @change="rowCheckboxChange($event, tag.id)" />
                   <span class="checkmark"></span>
                 </label>
               </td>
@@ -198,6 +202,7 @@ import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'tags-table',
@@ -258,6 +263,11 @@ export default {
   },
 
   computed: {
+    ...mapState('tagsModule', [
+      'selectedTagIds',
+      'selectAllPerPage'
+    ]),
+
     columns () {
       let cols = [
         { name: 'id', label: 'ID', sortable: true },
@@ -283,10 +293,26 @@ export default {
       cols.push({ name: 'actions', label: 'Actions', maxWidth: 50 })
 
       return cols
+    },
+
+    isSelectedAll () {
+      if (this.tags.length < 1) {
+        return false
+      }
+
+      // check if all tag ids present on the page is in selected tags
+      const tagIds = [...this.tags].map(tag => tag.id)
+      const inSelectedTags = tagIds.filter(tagId => [...this.selectedTagIds].includes(tagId))
+
+      return tagIds.length === inSelectedTags.length
     }
   },
 
   methods: {
+    ...mapActions('tagsModule', [
+      'setSelectedTagIds'
+    ]),
+
     paginated (pagination) {
       this.$emit('paginated', pagination)
     },
@@ -355,6 +381,48 @@ export default {
       setTimeout(() => {
         this.selectedTag = null
       }, 200)
+    },
+
+    isSelected (tagId) {
+      return [...this.selectedTagIds].indexOf(tagId) > -1
+    },
+
+    rowCheckboxChange (event, tagId) {
+      const isChecked = event.currentTarget.checked
+
+      // add to the selected tags array
+      if (isChecked) {
+        // add tag id then keep values unique
+        const tagIds = [...new Set([...this.selectedTagIds, tagId])]
+        this.setSelectedTagIds(tagIds)
+        return
+      }
+
+      // remove tag id from the array
+      let tagIds = [...this.selectedTagIds]
+      const index = tagIds.indexOf(tagId)
+      tagIds.splice(index, 1)
+      this.setSelectedTagIds(tagIds)
+    },
+
+    selectAllCheckboxChange (isChecked) {
+      if (this.tags.length < 0) {
+        return
+      }
+
+      // check all present in the current page
+      const tagIds = [...this.tags].map(tag => tag.id)
+      let updatedTagIds = []
+
+      if (isChecked) {
+        // add this current page's tag ids
+        updatedTagIds = [...new Set([...this.selectedTagIds, ...tagIds])]
+      } else {
+        // remove selected tag ids in current page
+        updatedTagIds = [...this.selectedTagIds].filter(tagId => tagIds.indexOf(tagId) === -1)
+      }
+
+      this.setSelectedTagIds(updatedTagIds)
     }
   },
 

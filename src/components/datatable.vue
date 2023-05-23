@@ -40,6 +40,7 @@
                 <input type="checkbox"
                        class="data-table-check-all"
                        ref="dataTableCheckAll"
+                       :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
                 <span class="checkmark"></span>
               </label>
@@ -220,6 +221,11 @@ export default {
     },
 
     useEmptySlot: {
+      type: Boolean,
+      default: false
+    },
+
+    isSelectedAll: {
       type: Boolean,
       default: false
     }

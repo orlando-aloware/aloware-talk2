@@ -20,7 +20,8 @@ export default {
 
   computed: {
     ...mapState('tagsModule', [
-      'selectedTagCategory'
+      'selectedTagCategory',
+      'selectedTagIds'
     ]),
 
     tagCategoryName () {
@@ -41,6 +42,10 @@ export default {
       }
 
       return `#${this.tag.id} - <i class="fa fa-square" style="color: ${this.tag.color}"></i> ${this.tag.name}`
+    },
+
+    hasSelectedTagIds () {
+      return [...this.selectedTagIds].length > 0
     }
   },
 
