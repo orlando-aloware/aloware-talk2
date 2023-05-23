@@ -35,11 +35,45 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
-    timezones () {
+    ...mapState('cache', ['currentCompany'])
+  },
+
+  data () {
+    return {
+      timezone: null,
+      timezones: []
+    }
+  },
+
+  mounted () {
+    this.setTimezones()
+
+    if (this.value) {
+      let timezone = this.timezones.find(tz => tz.value === this.value)
+
+      // this might happen when the contact's timezone isnt present in the timezones list
+      if (!timezone) {
+        timezone = {
+          name: this.value,
+          value: this.value
+        }
+
+        this.timezones.unshift(timezone)
+      }
+
+      this.timezone = timezone
+    }
+  },
+
+  methods: {
+    onSelect (selected) {
+      this.$emit('select', selected)
+    },
+
+    setTimezones () {
       if (this.currentCompany && this.currentCompany.country) {
         if (!['US', 'CA'].includes(this.currentCompany.country)) {
-          return window.CountriesAndTimezones.getTimezonesForCountry(this.currentCompany.country)
+          this.timezones = window.CountriesAndTimezones.getTimezonesForCountry(this.currentCompany.country)
             .map((timezone) => {
               return {
                 name: timezone.name + ' GMT ' + timezone.utcOffsetStr,
@@ -48,7 +82,7 @@ export default {
             })
         }
         if (['US', 'CA'].includes(this.currentCompany.country)) {
-          return [
+          this.timezones = [
             {
               value: 'America/New_York',
               name: 'New York (Eastern)'
@@ -76,25 +110,6 @@ export default {
           ]
         }
       }
-      return []
-    }
-  },
-
-  data () {
-    return {
-      timezone: null
-    }
-  },
-
-  mounted () {
-    if (this.value) {
-      this.timezone = this.timezones.find(tz => tz.value === this.value)
-    }
-  },
-
-  methods: {
-    onSelect (selected) {
-      this.$emit('select', selected)
     }
   }
 }
