@@ -355,6 +355,11 @@ export default {
     },
 
     addContacts () {
+      this.$VueEvent.fire('add_contacts_progress', {
+        id: this.requestParams.contact_list_id,
+        loading: true
+      })
+
       return this.$axios
         .post('api/v2/power-dialer-list-items', this.requestParams)
         .then((res) => {
@@ -372,6 +377,15 @@ export default {
 
             this.$router.push(`/power-dialer`)
           }
+        }).catch(error => {
+          this.$VueEvent.fire('add_contacts_progress', {
+            id: null,
+            loading: false
+          })
+
+          const { message, html } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
     },
 

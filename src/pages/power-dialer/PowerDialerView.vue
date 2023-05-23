@@ -539,15 +539,15 @@ import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/power-dialer-bulk-action-menu'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
-import pdMixin from 'src/plugins/mixins/power-dialer'
-import pdInitMixin from 'src/plugins/mixins/power-dialer-init.mixin'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEqual, get, isEmpty } from 'lodash'
 import {
   aclMixin,
   viewMixin,
-  avatarMixin
+  avatarMixin,
+  powerDialerMixin,
+  powerDialerInitMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -619,12 +619,17 @@ export default {
     selectedListId: {
       type: [String, Number],
       default: null
+    },
+
+    addContactsInProgressData: {
+      type: Object,
+      default: () => {}
     }
   },
 
   mixins: [
-    pdMixin,
-    pdInitMixin,
+    powerDialerMixin,
+    powerDialerInitMixin,
     aclMixin,
     viewMixin,
     avatarMixin
@@ -875,15 +880,18 @@ export default {
     }
 
     this.pdViewListeners.contactListBulkCreated = (event) => {
-      const listId = this.$isNumeric(this.$route?.params?.id)
-        ? parseInt(this.$route?.params?.id)
-        : null
-      const eventListId = this.$isNumeric(event.contact_list_id)
-        ? parseInt(event.contact_list_id)
-        : null
+      const listId = this.getCleanedListId(this.$route?.params?.id)
+      const eventListId = this.getCleanedListId(event.contact_list_id)
 
       if (this.isInPowerDialerList && listId && eventListId && listId === eventListId) {
-        this.init()
+        this.$VueEvent.fire('add_contacts_progress', {
+          id: null,
+          loading: false
+        })
+
+        let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+        this.onFetch(params, this.hasFilters, true)
+        this.$emit('onFiltersCount', this.currentListFilters)
       }
     }
 

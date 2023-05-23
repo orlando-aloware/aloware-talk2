@@ -14,12 +14,13 @@
                    :is-editable="isEditable"
                    :search="search"
                    :is-my-contacts-view="isMyContactsView"
-                   :is-loading="isLoading"
+                   :is-loading="isComponentLoading"
                    :columns="columns"
                    :is-empty="isEmpty"
                    :is-loading-more="isLoadingMore"
                    :filters-count="filtersCount"
                    :selected-list-id="filteredId"
+                   :add-contacts-in-progress-data="powerDialerListAddContactsProgress"
                    :onFetch="fetch"
                    v-if="!isPowerDialerSession"
                    @search="onSearch"
@@ -116,6 +117,17 @@ export default {
     }
   },
 
+  data () {
+    return {
+      powerDialerListeners: {},
+      powerDialerListAddContactsProgress: {
+        id: null,
+        loading: false
+      },
+      ContactsListRemoveFromTypes
+    }
+  },
+
   computed: {
     ...mapState(['isMobile']),
 
@@ -205,6 +217,15 @@ export default {
       const routeMetaTitle = get(this.$route, 'meta.title', '')
 
       return routeMetaTitle === 'Power Dialer Sessions'
+    },
+
+    isComponentLoading () {
+      const listId = this.getCleanedListId(this.$route?.params?.id)
+      const eventListId = this.getCleanedListId(this.powerDialerListAddContactsProgress.id)
+      const isListLoading = this.isInPowerDialerList && listId === eventListId &&
+        this.powerDialerListAddContactsProgress.loading
+
+      return this.isLoading || isListLoading
     }
   },
 
@@ -247,11 +268,17 @@ export default {
       this.resetSelectedTaskAndContact()
     }
 
+    this.powerDialerListeners.addContactsProgress = (data) => {
+      this.powerDialerListAddContactsProgress = data
+    }
+
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
     this.$VueEvent.listen('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
     this.$VueEvent.listen('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
     this.$VueEvent.listen('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
+    this.$VueEvent.listen('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
   },
+
   methods: {
     ...mapActions('powerDialer', [
       'getMyQueueList',
@@ -414,13 +441,7 @@ export default {
       this.$VueEvent.stop('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
       this.$VueEvent.stop('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
       this.$VueEvent.stop('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
-    }
-  },
-
-  data () {
-    return {
-      powerDialerListeners: {},
-      ContactsListRemoveFromTypes
+      this.$VueEvent.stop('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
     }
   },
 
