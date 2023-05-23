@@ -1,126 +1,135 @@
 <template>
   <q-card flat>
     <div class="t-menu-2 no-border">
-      <div class="d-flex align-items-center pt-3 pb-0">
+      <div class="d-flex align-items-center pt-3 px-3 pb-0 flex-wrap justify-content-between">
 
-        <div class="font-weight-bold pl-3 flex-grow-1">
-          <q-chip color="grey-50" class="p-0">
+        <div class="font-weight-bold flex-grow-1 session-call-status w-100"
+             style="max-width: 176px;">
+          <q-chip color="grey-50"
+                  class="p-0">
             <div :class="`text-15 text-lowercase text-capitalize px-2`"
-                 v-html="statusDisplayButton">
+                 v-html="statusDisplayText">
             </div>
           </q-chip>
         </div>
 
-        <q-btn class="sessions-button free-width mx-1"
-               no-wrap no-caps size="sm"
-               unelevated
-               outline
-               :color="statusCallConnected ? 'grey-4' : 'grey-8'"
-               :disabled="!statusCallConnected"
-               @click="onToggleMute">
-          <mute-icon v-show="!toggleMute"
-                     class="mr-2"
-                     :width="12"
-                     :height="12">
-          </mute-icon>
-          <unmute-icon v-show="toggleMute"
-                       class="mr-2"
+        <div class="w-100"
+             style="max-width: 340px;">
+          <q-btn class="sessions-button my-1 ml-1"
+                 size="sm"
+                 style="width: 79.55px;"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :color="statusCallConnected ? 'grey-4' : 'grey-8'"
+                 :disabled="!statusCallConnected"
+                 @click="onToggleMute">
+            <mute-icon class="mr-1"
                        :width="12"
-                       :height="12">
-          </unmute-icon>
-          <div class="text-body2 text-black">
-            {{ toggleMute ? 'Unmute' : 'Mute' }}
-          </div>
-        </q-btn>
+                       :height="12"
+                       v-show="!toggleMute">
+            </mute-icon>
+            <unmute-icon class="mr-1"
+                         :width="12"
+                         :height="12"
+                         v-show="toggleMute">
+            </unmute-icon>
+            <div class="text-body2 text-black">
+              {{ muteText }}
+            </div>
+          </q-btn>
 
-        <q-btn class="sessions-button free-width mx-1"
-               no-wrap
-               no-caps
-               size="sm"
-               unelevated
-               outline
-               :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
-               :disabled="isHoldDisabled"
-               @click="onToggleHold">
-          <UnHoldIcon v-if="toggleHold"
-                      class="mr-2"
-                      color="#F2997A" />
-          <PauseIcon v-else
-                     class="mr-2"
-                     color="#62666E" />
-          <div class="text-body2 text-black">
-            {{ toggleHold ? 'Unhold' : 'Hold' }}
-          </div>
-        </q-btn>
+          <q-btn class="sessions-button my-1 ml-1"
+                 size="sm"
+                 style="width: 75.72px;"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
+                 :disabled="isHoldDisabled"
+                 @click="onToggleHold">
+            <UnHoldIcon class="mr-1"
+                        color="#F2997A"
+                        v-if="toggleHold"/>
+            <PauseIcon class="mr-1"
+                       color="#62666E"
+                       v-else/>
+            <div class="text-body2 text-black">
+              {{ holdText }}
+            </div>
+          </q-btn>
 
-        <q-btn class="sessions-button free-width mx-1"
-               size="sm"
-               no-wrap
-               unelevated
-               no-caps
-               :disabled="!canRedial"
-               :color="canRedial  ? 'blue-7' : 'grey-8'"
-               @click="onRedial">
-          <RefreshIcon class="mr-2"
-                       color="white" />
-          <div class="text-body2">
-            <q-tooltip content-class="bg-grey-light11"
-                       anchor="bottom middle"
-                       self="center middle"
-                       v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
-                {{ redialTooltip }}
-            </q-tooltip>
-            Redial
-          </div>
-        </q-btn>
+          <q-btn class="sessions-button free-width my-1 ml-1"
+                 size="sm"
+                 no-wrap
+                 unelevated
+                 no-caps
+                 :disabled="!canRedial"
+                 :color="canRedial  ? 'blue-7' : 'grey-8'"
+                 @click="onRedial">
+            <RefreshIcon class="mr-1"
+                         color="white" />
+            <div class="text-body2">
+              <q-tooltip content-class="bg-grey-light11"
+                         anchor="bottom middle"
+                         self="center middle"
+                         v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
+                  {{ redialTooltip }}
+              </q-tooltip>
+              Redial
+            </div>
+          </q-btn>
 
-        <q-btn class="sessions-button free-width mx-1"
-               size="sm"
-               no-wrap
-               unelevated
-               no-caps
-               :disabled="!canNextTask "
-               :color="canNextTask  ? 'red-7' : 'grey-8'"
-               @click="onNextTask(false, true)">
-          <CallDropIcon class="mr-2"
-                        color="white" />
-          <div class="text-body2">Next</div>
-        </q-btn>
+          <q-btn class="sessions-button free-width my-1 ml-1"
+                 size="sm"
+                 no-wrap
+                 unelevated
+                 no-caps
+                 :disabled="!canNextTask "
+                 :color="canNextTask  ? 'red-7' : 'grey-8'"
+                 @click="onNextTask(false, true)">
+            <CallDropIcon class="mr-1"
+                          color="white"/>
+            <div class="text-body2">Next</div>
+          </q-btn>
 
-        <b-dropdown class="m-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
-                    text="..."
-                    no-caret
-                    right size="sm"
-                    variant="white"
-                    :disabled="!statusCallConnected">
-          <template #button-content>
-            <i class="fa fa-ellipsis-h"></i>
-          </template>
-          <b-dropdown-item href="#"
-                           @click="openDialPad">
-            <DialPadIcon />
-            Dial Pad
-          </b-dropdown-item>
-          <b-dropdown-item href="#"
-                           @click="openAdd">
-            <AddUserIcon color="#62666E" />
-            Add
-          </b-dropdown-item>
-          <b-dropdown-item href="#"
-                           @click="openTransfer">
-            <TransferIcon color="#62666E" />
-            Transfer
-          </b-dropdown-item>
-          <b-dropdown-item disabled href="#">
-            <CalendarIcon />
-            Schedule Callback
-          </b-dropdown-item>
-        </b-dropdown>
+          <b-dropdown class="my-1 ml-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+                      text="..."
+                      right size="sm"
+                      variant="white"
+                      no-caret
+                      :disabled="!statusCallConnected">
+            <template #button-content>
+              <i class="fa fa-ellipsis-h"/>
+            </template>
+            <b-dropdown-item href="#"
+                             @click="openDialPad">
+              <DialPadIcon />
+              Dial Pad
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                             @click="openAdd">
+              <AddUserIcon color="#62666E" />
+              Add
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                             @click="openTransfer">
+              <TransferIcon color="#62666E" />
+              Transfer
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                             disabled>
+              <CalendarIcon />
+              Schedule Callback
+            </b-dropdown-item>
+          </b-dropdown>
+        </div>
       </div>
 
       <div class="d-flex align-items-center p-0">
-        <div
-          class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
+        <div class="text-18 font-weight-bold pl-3 pt-2 flex-grow-1">
           {{ fullName }}
           <span class="text-15 text-subtitle1">
             {{ phoneNumber }}
@@ -128,9 +137,9 @@
         </div>
       </div>
 
-      <div class="d-flex align-items-center p-0">
-        <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize pl-3 py-0"
-          v-if="timezone">
+      <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
+        <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
+             v-if="timezone">
           <DropIcon width="18px"
                     height="18px"
                     class="mr-0 py-0"
@@ -138,12 +147,12 @@
           {{ timezone }} - {{ getTimeZone }}
         </div>
 
-        <q-btn class="sessions-button free-width mx-1"
+        <q-btn class="sessions-button free-width ml-1"
+               size="sm"
+               color="grey-4"
                no-wrap
                outline
                no-caps
-               size="sm"
-               color="grey-4"
                :disabled="!statusCallConnected"
                @click="onToggleRecording">
 
@@ -156,13 +165,13 @@
                       v-else/>
 
           <div class="text-body2 text-black">
-            {{ toggleRecording ? 'Stop Rec.' : 'Record' }}
+            {{ recordText }}
           </div>
         </q-btn>
       </div>
 
-      <div class="d-flex align-items-center p-0 pt-2 pb-2">
-        <div class="flex-grow-1 text-16 text-capitalize pl-3 text-weight-normal">
+      <div class="d-flex align-items-center p-0 pt-2 pb-2 justify-content-between flex-wrap px-3">
+        <div class="flex-grow-1 text-16 text-capitalize text-weight-normal m-1">
 
           <div id="session-list-name">
             {{ selectedListName }}
@@ -177,7 +186,7 @@
             {{ selectedListName }}
           </b-popover>
 
-          <span class="text-subtitle2 text-grey"></span>
+          <span class="text-subtitle2 text-grey"/>
           <div class="text-10 pt-1">
             <HeadphoneIcon width="12px"
                            height="12px"
@@ -188,40 +197,44 @@
 
         </div>
 
-        <q-btn unelevated
-               no-wrap
-               no-caps
-               size="sm"
-               :outline="!sessionPaused"
-               :color="`${togglePause ? sessionPaused ? 'primary' : 'red-3' : 'grey-4'}`"
-               :disabled="toggleEnd"
-               :class="`${togglePause ? sessionPaused ? 'btn-btn-primary' : 'bg-btn-red' : ''} sessions-button free-width mx-1`"
-               @click="onTogglePause">
+        <div>
+          <q-btn class="my-1"
+                 size="sm"
+                 unelevated
+                 no-wrap
+                 no-caps
+                 :outline="!sessionPaused"
+                 :color="pauseButtonColor"
+                 :disabled="toggleEnd"
+                 :class="pauseButtonClass"
+                 @click="onTogglePause">
 
-          <PauseIcon class="mr-2"
-                     :color="`${sessionPaused ? '#fff' : '#62666E'}`" />
+            <PauseIcon class="mr-2"
+                       :color="pauseIconColor" />
 
-          <div :class="`text-body2 ${sessionPaused ? 'text-white' : 'text-black'}`">
-            {{ pauseButtonText }}
-          </div>
-        </q-btn>
+            <div :class="pauseButtonTextClass">
+              {{ pauseButtonText }}
+            </div>
+          </q-btn>
 
-        <q-btn no-wrap
-               outline
-               no-caps
-               size="sm"
-               :disable="toggleEnd"
-               :color="`${toggleEnd ? 'red-3' : 'grey-4'}`"
-               :class="`${toggleEnd ? 'bg-btn-red' : ''} sessions-button free-width mx-1`"
-               @click="onToggleEnd">
+          <q-btn class="my-1 sessions-button free-width ml-1"
+                 size="sm"
+                 no-wrap
+                 outline
+                 no-caps
+                 :disable="isEndSessionDisabled"
+                 :color="endSessionButtonColor"
+                 :class="endSessionButtonClass"
+                 @click="onToggleEnd">
 
-          <EndCallIcon class="mr-2"
-                       color="#62666E" />
+            <EndCallIcon class="mr-2"
+                         color="#62666E" />
 
-          <div class="text-body2 text-black">
-            {{ toggleEnd ? 'Ending Session...' : 'End Session'}}
-          </div>
-        </q-btn>
+            <div class="text-body2 text-black">
+              {{ endSessionText }}
+            </div>
+          </q-btn>
+        </div>
       </div>
     </div>
 
@@ -229,7 +242,7 @@
               v-model="reRouteModal">
       <q-card class="px-4">
         <q-card-section>
-          <div class="text-h6"></div>
+          <div class="text-h6"/>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -377,15 +390,18 @@ export default {
 
       if (this.taskToCall?.cnam_city &&
         !this.taskToCall?.cnam_state) {
-        return `${this.taskToCall?.cnam_city || ''}`
+        return this.taskToCall?.cnam_city || ''
       }
 
       if (!this.taskToCall?.cnam_city &&
         this.taskToCall?.cnam_state) {
-        return `${this.taskToCall?.cnam_state || ''}`
+        return this.taskToCall?.cnam_state || ''
       }
 
-      return `${this.taskToCall?.cnam_city || ''} ${this.taskToCall?.cnam_state || ''}`
+      const cityName = this.taskToCall?.cnam_city || ''
+      const stateName = this.taskToCall?.cnam_state || ''
+
+      return `${cityName} ${stateName}`
     },
 
     companyName () {
@@ -393,14 +409,19 @@ export default {
     },
 
     fullName () {
-      if ((this.taskToCall?.first_name === null ||
-        this.taskToCall?.first_name === '') &&
-        (this.taskToCall?.last_name === null ||
-          this.taskToCall?.last_name === '')) {
+      const isEmptyFirstName = this.taskToCall?.first_name === null ||
+        this.taskToCall?.first_name === ''
+      const isEmptyLastName = this.taskToCall?.last_name === null ||
+        this.taskToCall?.last_name === ''
+
+      if (isEmptyFirstName && isEmptyLastName) {
         return `No Name`
       }
 
-      return `${this.taskToCall?.first_name || ''} ${this.taskToCall?.last_name || ''}`
+      const firstName = this.taskToCall?.first_name || ''
+      const lastName = this.taskToCall?.last_name || ''
+
+      return `${firstName} ${lastName}`
     },
 
     getLine () {
@@ -467,20 +488,32 @@ export default {
     },
 
     isCallCompleted () {
-      return (
-        (this.dialer.communication &&
-          this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) ||
-        ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+      const dispositionNotInprogress = this.dialer.communication &&
+        this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW
+      const disconnectedCallStatuses = ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP']
+
+      return dispositionNotInprogress || disconnectedCallStatuses.includes(this.dialer.currentStatus)
     },
 
     isHoldDisabled () {
+      const inprogressStatuses = [
+        CommunicationStatus.STATUS_INPROGRESS_NEW,
+        CommunicationStatus.STATUS_RINGING_NEW
+      ]
+      const conferencingDisabled = this.currentCompany &&
+        !this.currentCompany.conferencing_enabled
+      const inprogressCommunication = this.dialer.communication?.legc_uuid &&
+        inprogressStatuses.includes(this.dialer.communication?.legc_status)
+      const isSameSid = this.dialer.communication?.legz_uuid &&
+        this.dialer.call.callSid === this.dialer.communication.legz_uuid
+
       return !this.dialer.communication ||
         this.loadingHold ||
         this.loadingUnhold ||
         this.isCallCompleted ||
-        (this.currentCompany && !this.currentCompany.conferencing_enabled) ||
-        (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
-        (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid)
+        conferencingDisabled ||
+        inprogressCommunication ||
+        isSameSid
     },
 
     statusReady () {
@@ -516,15 +549,18 @@ export default {
       if (this.powerDialerTasks.in_queue.length > 0) {
         return this.skippedTasks.length === this.powerDialerTasks.in_queue.length
       }
+
       return false
     },
 
     canNextTask () {
       // should be able to next task even if wrap-up is not paused and
       // status is on warm up period and no manual skip (clicked next task) is in-progress
-      return !this.wrapUpPaused && !this.loadingNext &&
-        (this.statusCallConnected ||
-        ['WRAP_UP', 'READY'].includes(this.dialer.currentStatus))
+      const canNextStatuses = ['WRAP_UP', 'READY']
+      const canNext = this.statusCallConnected ||
+        canNextStatuses.includes(this.dialer.currentStatus)
+
+      return !this.wrapUpPaused && !this.loadingNext && canNext
     },
 
     canRedial () {
@@ -535,18 +571,82 @@ export default {
     },
 
     redialTooltip () {
-      return this.canRedial ? 'This contact will go to the bottom of the current session list' : 'This contact has already been redialed once'
+      return this.canRedial
+        ? 'This contact will go to the bottom of the current session list'
+        : 'This contact has already been redialed once'
     },
 
     pauseButtonText () {
-      switch (true) {
-        case this.togglePause:
-          return 'Unpause Session'
-        case this.togglePause && this.sessionPaused:
-          return 'Resume Session'
-        default:
-          return 'Pause Session'
+      if (this.togglePause) {
+        return 'Unpause Session'
       }
+
+      if (this.togglePause && this.sessionPaused) {
+        return 'Resume Session'
+      }
+
+      return 'Pause Session'
+    },
+
+    muteText () {
+      return this.toggleMute ? 'Unmute' : 'Mute'
+    },
+
+    holdText () {
+      return this.toggleHold ? 'Unhold' : 'Hold'
+    },
+
+    recordText () {
+      return this.toggleRecording ? 'Stop Rec.' : 'Record'
+    },
+
+    pauseButtonColor () {
+      const sessionPausedClass = this.sessionPaused ? 'primary' : 'red-3'
+
+      return this.togglePause ? sessionPausedClass : 'grey-4'
+    },
+
+    pauseButtonClass () {
+      const sessionPausedClass = this.sessionPaused ? 'btn-btn-primary' : 'bg-btn-red'
+      const pauseClass = this.togglePause ? sessionPausedClass : ''
+
+      return [
+        pauseClass,
+        'sessions-button',
+        'free-width',
+        'mx-1'
+      ]
+    },
+
+    pauseIconColor () {
+      return this.sessionPaused ? '#fff' : '#62666E'
+    },
+
+    pauseButtonTextClass () {
+      const textClass = this.sessionPaused ? 'text-white' : 'text-black'
+
+      return [
+        'text-body2',
+        textClass
+      ]
+    },
+
+    endSessionText () {
+      return this.toggleEnd ? 'Ending Session...' : 'End Session'
+    },
+
+    isEndSessionDisabled () {
+      return this.toggleEnd || this.wrapUpPaused
+    },
+
+    endSessionButtonColor () {
+      return this.toggleEnd ? 'red-3' : 'grey-4'
+    },
+
+    endSessionButtonClass () {
+      const backgroundClass = this.toggleEnd ? 'bg-btn-red' : ''
+
+      return [backgroundClass]
     }
   },
 
@@ -678,17 +778,15 @@ export default {
       if (this.timerIsOver) {
         this.clearWarmUpCountDown()
 
-        if (
-          (this.toggleEnd ||
-            !this.hasQueuedTaskLists) &&
-          (!this.hasActiveTask ||
-              !this.activeTask)) {
+        const hasEnded = this.toggleEnd || !this.hasQueuedTaskLists
+        const noActiveTask = !this.hasActiveTask || !this.activeTask
+
+        if (hasEnded && noActiveTask) {
           this.reRoute()
           return
         }
 
-        if (!this.togglePause &&
-          !this.wrapUp) {
+        if (!this.togglePause && !this.wrapUp) {
           this.runTask()
         }
 
@@ -698,8 +796,7 @@ export default {
 
         // end wrap-up if wrap-up seconds
         // is not indefinite
-        if (this.wrapUp &&
-          this.wrapUpSeconds !== 0) {
+        if (this.wrapUp && this.wrapUpSeconds !== 0) {
           this.wrapUp = false
           this.isSessionRunning = false
         }
@@ -734,8 +831,7 @@ export default {
         this.TOGGLE_SESSION_LOADER(true)
       }
 
-      if (this.toggleEnd &&
-        this.timerIsOver) {
+      if (this.toggleEnd && this.timerIsOver) {
         this.reRoute()
         return
       }
@@ -743,6 +839,7 @@ export default {
       if (this.allTasksAreSkipped) {
         this.clearWarmUpCountDown()
         this.$emit('on-all-tasks-are-skipped')
+
         setTimeout(() => {
           this.reRoute()
         }, 1000)
@@ -750,50 +847,45 @@ export default {
       }
 
       const task = get(this.powerDialerTasks.in_queue, '0', null)
+
       // skip assigning the next task if
       // there is still an active task and
       // wrap up seconds is indefinite
-      if (!isEmpty(this.activeTask) &&
-        this.wrapUpSeconds === 0) {
+      if (!isEmpty(this.activeTask) && this.wrapUpSeconds === 0) {
         return
       }
 
       // end session if no more active call,
       // no tasks in queue, no active task,
       // and wrap up seconds is not indefinite
-      if (!this.statusCallConnected &&
-        !this.hasQueuedTaskLists &&
-        !task &&
-        this.wrapUpSeconds !== 0) {
+      if (!this.statusCallConnected && !this.hasQueuedTaskLists &&
+        !task && this.wrapUpSeconds !== 0) {
         this.reRoute()
         return
       }
 
-      // TEMPORARY IMPLEMENTATION
-      // if ((!this.statusCallConnected && this.hasQueuedTaskLists) && (!this.togglePause && !this.toggleEnd)) {
-      if (!this.statusOnACall) {
-        if (!this.wrapUp) {
-          this.loadingNext = true
-          this.taskToCall = cloneDeep(task)
+      // process the next task if no in-progress call
+      if (!this.statusOnACall && !this.wrapUp) {
+        this.loadingNext = true
+        this.taskToCall = cloneDeep(task)
 
-          if (this.taskToCall) {
-            this.removeFirstInQueueTask()
-          }
-
-          this.activeTask = this.taskToCall
-          this.hasActiveTask = true
-          this.setContact(this.taskToCall)
-          this.TOGGLE_SESSION_LOADER(true)
-          this.resetTimer()
-
-          if (!this.isSessionRunning) {
-            this.isSessionRunning = true
-          }
-
-          setTimeout(() => {
-            this.startWarmUpCountDown()
-          }, 1000)
+        if (this.taskToCall) {
+          this.removeFirstInQueueTask()
         }
+
+        this.activeTask = this.taskToCall
+        this.hasActiveTask = true
+        this.setContact(this.taskToCall)
+        this.TOGGLE_SESSION_LOADER(true)
+        this.resetTimer()
+
+        if (!this.isSessionRunning) {
+          this.isSessionRunning = true
+        }
+
+        setTimeout(() => {
+          this.startWarmUpCountDown()
+        }, 1000)
       }
 
       // end power dialer session if:
@@ -839,6 +931,7 @@ export default {
 
       this.$VueEvent.fire('toggleHold')
       this.$options.holdIntervalCount = 0
+
       this.$options.holdInterval = setInterval(() => {
         if (this.loadingHold && this.dialer.isHeld) {
           this.loadingHold = false
@@ -895,10 +988,10 @@ export default {
     },
 
     resetTimer () {
-      if (this.ongoingSession.finishedPdSession ||
-        this.countdownTimer <= -1) {
+      if (this.ongoingSession.finishedPdSession || this.countdownTimer <= -1) {
         const warmUpPeriod = get(this.sessionSettings, 'warmup_period_in_seconds', 0)
         this.countdownTimer = this.wrapUp ? this.wrapUpSeconds : warmUpPeriod
+
         return
       }
 
@@ -915,8 +1008,11 @@ export default {
       this.reRouteModal = true
       this.isSessionRunning = false
 
-      if (this.dialer.currentStatus !== 'READY') {
+      // we force the wrap-up to end once the power dialer session has ended
+      // and that call/contact disposition is not forced
+      if (this.dialer.currentStatus !== 'READY' && !this.isNotDisposed) {
         this.hangUpIntervalCounter = 0
+
         this.hangUpInterval = setInterval(() => {
           if (this.dialer.currentStatus === 'WRAP_UP') {
             this.$VueEvent.fire('forceEndWrapUp')
@@ -942,10 +1038,6 @@ export default {
       switch (status) {
         // If Status is READY
         case 'READY':
-          // if (this.toggleEnd) {
-          //   this.reRoute()
-          // }
-
           if (!this.statusCallConnected &&
             this.timerIsOver &&
             this.isSessionRunning) {
@@ -985,29 +1077,16 @@ export default {
           // if status is wrap-up and wrap-up seconds
           // is "no wrap-up", then skip wrap-up countdown timer
           // and proceed immediately to the next task
-          if (this.isSessionRunning &&
-            this.wrapUpSeconds === -1) {
+          if (this.isSessionRunning && this.wrapUpSeconds === -1) {
             this.onNextTask(true)
           }
 
-          break
-        case 'MAKING_CALL':
-          break
-        case 'ANSWERING_CALL':
-          break
-        case 'REJECTING_CALL':
-          break
-        case 'CALL_CONNECTED':
           break
         case 'HANGING_UP_CALL':
           if (!this.togglePause) {
             this.resetTimer()
           }
 
-          break
-        case 'CALL_DISCONNECTED':
-          break
-        default:
           break
       }
     },
@@ -1043,6 +1122,7 @@ export default {
       }
 
       this.resetTimer()
+
       setTimeout(() => {
         this.startWarmUpCountDown()
       }, 1000)
@@ -1066,13 +1146,11 @@ export default {
       }
 
       // hangup in-progress call
-      if (this.callInProgress &&
-        this.dialer.currentStatus !== 'WRAP_UP') {
+      if (this.callInProgress && this.dialer.currentStatus !== 'WRAP_UP') {
         this.processHangup()
       }
 
-      if (this.dialer.currentStatus !== 'CALL_CONNECTED' ||
-        forceSkip) {
+      if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
         const task = get(this.powerDialerTasks.in_queue, '0', null)
@@ -1122,7 +1200,10 @@ export default {
         return
       }
 
-      this.dialer.currentStatus === 'WRAP_UP' && this.$VueEvent.fire('endWrapUp')
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
       this.hasActiveTask = false
       this.reRoute()
     },
@@ -1147,6 +1228,7 @@ export default {
           this.removeFirstInQueueTask()
           this.processSession(true)
         }, 200)
+
         return
       }
 
@@ -1170,6 +1252,7 @@ export default {
       if (isEmpty(task)) {
         this.hasActiveTask = false
         this.reRoute()
+
         return
       }
 
@@ -1189,6 +1272,7 @@ export default {
             this.skipWrapUp = false
             this.processSession()
           }, 1000)
+
           return
         }
 
@@ -1202,6 +1286,7 @@ export default {
           this.redialedTask = {}
           this.isRedialClicked = false
         }, 1000)
+
         console.log(err)
         this.$generalNotification('Failed to process the redial.', 'error')
       })
@@ -1213,10 +1298,12 @@ export default {
       }
 
       const task = this.$jsonClone(this.redialedTask)
+
       this.reQueuePowerDialerTask({
         task: task,
         id: task.contact_list_item_id
       })
+
       this.redialedTask = {}
     },
 
@@ -1239,7 +1326,9 @@ export default {
     },
 
     toggleEnd (value) {
-      if ((value && this.timerIsOver) && !this.statusCallConnected) {
+      const timerStopped = (value && this.timerIsOver)
+
+      if (timerStopped && !this.statusCallConnected) {
         setTimeout(() => {
           this.reRoute()
         }, 2000)
@@ -1251,8 +1340,7 @@ export default {
         // end the session if:
         // there's no tasks in queue
         // and there's no active task
-        if (tasks.length === 0 &&
-          !this.hasActiveTask) {
+        if (tasks.length === 0 && !this.hasActiveTask) {
           this.shouldRedirect = true
           return
         }

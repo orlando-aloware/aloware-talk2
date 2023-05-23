@@ -2,20 +2,19 @@
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100"
        v-if="authenticated">
     <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar"
-         v-show="$route.name === 'Contacts'"
-         :class="sidebarClass">
-      <contacts-sidebar v-if="$route.name === 'Contacts'"></contacts-sidebar>
+         :class="sidebarClass"
+         v-show="$route.name === 'Contacts'">
+      <contacts-sidebar v-if="$route.name === 'Contacts'"/>
     </div>
     <contact-list-sidebar ref="contactListSidebar"
-                          v-if="$route.name === 'Contact'"
                           :isLoadingMore="isLoadingMore"
+                          v-if="$route.name === 'Contact'"
                           @toggleContactActivities="toggleContactListSidebar"
                           @contactSelected="onContactSelected"/>
     <div class="px-0 mb-0 main flex-1"
          :class="mainClass">
-      <Contact v-if="$route.name === 'Contact'"></Contact>
-      <router-view v-if="$route.name === 'Contacts' && list"
-                   :list="list"
+      <Contact v-if="$route.name === 'Contact'"/>
+      <router-view :list="list"
                    :is-loading-disabled="isLoadingDisabled"
                    :is-start-state="isStartState"
                    :is-editable="isEditable"
@@ -26,6 +25,7 @@
                    :is-empty="isEmpty"
                    :is-loading-more="isLoadingMore"
                    :filters-count="filtersCount"
+                   v-if="$route.name === 'Contacts' && list"
                    @search="onSearch"
                    @checkboxChanged="onFetchMyContacts"
                    @sort="onSortByField"
@@ -33,17 +33,17 @@
                    @loadMore="onLoadMore">
       </router-view>
     </div>
-    <remove-folder-dialog v-if="isActive" />
-    <column-headers v-if="isActive"
-                    :previousRelations="previousRelations" />
-    <remove-contact v-if="isActive" />
+    <remove-folder-dialog v-if="isActive"/>
+    <column-headers :previousRelations="previousRelations"
+                    v-if="isActive"/>
+    <remove-contact v-if="isActive"/>
     <remove-contact-confirmation v-if="isActive"
-                                 @contactsRemoved="onRemoveContacts" />
-    <move-dialog v-if="isActive" />
-    <create-list-modal v-if="isActive" />
-    <select-list-modal v-if="isActive" />
-    <remove-list-modal v-if="isActive" />
-    <remove-list-confirmation v-if="isActive" />
+                                 @contactsRemoved="onRemoveContacts"/>
+    <move-dialog v-if="isActive"/>
+    <create-list-modal v-if="isActive"/>
+    <select-list-modal v-if="isActive"/>
+    <remove-list-modal v-if="isActive"/>
+    <remove-list-confirmation v-if="isActive"/>
   </div>
 </template>
 
@@ -132,6 +132,7 @@ export default {
       if (!this.$q.screen.lt.md) {
         return ''
       }
+
       return !this.showContactsListSidebar ? 'w-0' : 'w-100 no-min-max-width'
     },
 
@@ -145,7 +146,9 @@ export default {
   },
 
   mounted () {
-    this.setShowContactsHeader(true)
+    if (this.$route.name === 'Contacts') {
+      this.setShowContactsHeader(true)
+    }
 
     if (this.isMobile) {
       this.toggleSidebar()
@@ -208,6 +211,7 @@ export default {
         if (from.name !== 'Contacts') {
           this.setUnsavedList(null)
         }
+
         this.setShowContactsHeader(true)
         this.setShowContactsListSidebar(false)
       }
@@ -230,7 +234,7 @@ export default {
 
   beforeRouteLeave (to, from, next) {
     if (this.unsavedList) {
-      this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may cause your unsaved contact list to be lost. Do you wish to continue?', {
+      this.$bvModal.msgBoxConfirm('You have an unsaved contacts list. This action may cause your unsaved contact list to be lost. Do you wish to continue?', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'No',
@@ -242,6 +246,7 @@ export default {
 
           // set the contacts list to 'All Contacts'
           const list = { data: null, found: null }
+
           for (list.data in this.lists) {
             if (this.lists[list.data].id.toString() === 'all') {
               list.found = this.lists[list.data]
@@ -260,20 +265,23 @@ export default {
           this.$VueEvent.fire('shouldUpdateListCount')
 
           next()
-        } else {
-          next(false)
+          return
         }
-      })
-    } else {
-      if (to.name !== 'Contact') {
-        this.stopEvents()
-      }
 
-      setTimeout(() => {
-        this.setAllContactsSelected(false)
-        next()
-      }, 100)
+        next(false)
+      })
+
+      return
     }
+
+    if (to.name !== 'Contact') {
+      this.stopEvents()
+    }
+
+    setTimeout(() => {
+      this.setAllContactsSelected(false)
+      next()
+    }, 100)
   }
 }
 </script>

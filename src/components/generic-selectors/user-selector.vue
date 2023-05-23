@@ -6,12 +6,11 @@
             option-value="id"
             option-label="name"
             input-debounce="0"
-            style="word-break: break-all;"
+            style="word-break: break-all; min-width: 154px;"
             use-input
             emit-value
             map-options
             dense
-            v-model="selectedId"
             :hide-dropdown-icon="hideDropdownIcon"
             :clearable="clearable"
             :outlined="outlined"
@@ -21,9 +20,10 @@
             :placeholder="placeholder"
             :loading="usersIsLoading"
             :disable="disable || usersIsLoading"
-            :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '', customClass]"
+            :class="userSelectorClass"
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+            v-model="selectedId"
             @popup-show="onShowMenu"
             @focus="onFocus"
             @blur="onBlur"
@@ -43,19 +43,19 @@
     </template>
 
     <template v-slot:option="scope">
-      <q-item v-if="!scope.opt.group"
-              v-bind="scope.itemProps"
-              v-on="scope.itemEvents">
+      <q-item v-bind="scope.itemProps"
+              v-on="scope.itemEvents"
+              v-if="!scope.opt.group">
         <q-item-section>
           <q-item-label>
             <div class="break-all">{{ scope.opt.name }}</div>
           </q-item-label>
-          <q-item-label v-if="!scope.opt.is_destination"
-                        caption>
+          <q-item-label caption
+                        v-if="!scope.opt.is_destination">
             <div class="break-all">{{ scope.opt.email }} - {{ getLabel(scope.opt) }}</div>
           </q-item-label>
-          <q-item-label v-else
-                        caption>
+          <q-item-label caption
+                        v-else>
             <div>{{ getLabel(scope.opt) }}</div>
           </q-item-label>
         </q-item-section>
@@ -69,20 +69,17 @@
 
     <template v-slot:selected-item="scope"
               v-if="useChips">
-      <q-chip
-        dense
-        :tabindex="scope.tabindex"
-        color="white"
-        class="tag-selected-chip"
-        text-color="secondary"
-      >
+      <q-chip color="white"
+              class="tag-selected-chip"
+              text-color="secondary"
+              dense
+              :tabindex="scope.tabindex">
         <i class="fa fa-circle position-absolute"
-           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
+           :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"/>
         <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
         <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
              @click="scope.removeAtIndex(scope.index)">
-          <remove-tag-icon class="ml-1 remove-tag-icon">
-          </remove-tag-icon>
+          <remove-tag-icon class="ml-1 remove-tag-icon"/>
         </div>
       </q-chip>
     </template>
@@ -98,10 +95,13 @@ import { selectorMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'user-selector',
+
   mixins: [
     selectorMixin
   ],
+
   components: { RemoveTagIcon },
+
   props: {
     value: {
       required: false
@@ -140,38 +140,47 @@ export default {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     customClass: {
       type: String,
       default: ''
     },
+
     outlined: {
       type: Boolean,
       default: true
     },
+
     borderless: {
       type: Boolean,
       default: false
     },
+
     showPlaceholder: {
       type: Boolean,
       default: true
     },
+
     clearable: {
       type: Boolean,
       default: false
     },
+
     hideDropdownIcon: {
       type: Boolean,
       default: false
     },
+
     customPlaceholder: {
       type: String,
       default: ''
@@ -200,16 +209,15 @@ export default {
         return ''
       }
 
-      switch (true) {
-        case this.multiple && this.selectedId && this.selectedId.length < 1:
-          return this.customPlaceholder || 'Select Users'
-        case !this.multiple && !this.selectedId:
-          return this.customPlaceholder || 'Select User'
-        case this.multiple && this.selectedId && this.selectedId.length > 0:
-        case !this.multiple && this.selectedId:
-        default:
-          return ''
+      if (this.multiple && this.selectedId && this.selectedId.length < 1) {
+        return this.customPlaceholder || 'Select Users'
       }
+
+      if (!this.multiple && !this.selectedId) {
+        return this.customPlaceholder || 'Select User'
+      }
+
+      return ''
     },
 
     availableUsers () {
@@ -265,6 +273,19 @@ export default {
       }
 
       return this.formattedOptions.find(item => item.id === this.selectedId)
+    },
+
+    userSelectorClass () {
+      const prependClass = this.prepend ? 'with-prepend' : ''
+      const genericClass = this.genericStyling ? 'generic-selector' : ''
+      const highlightedClass = this.highlighted ? this.highlightedClass : ''
+
+      return [
+        prependClass,
+        genericClass,
+        highlightedClass,
+        this.customClass
+      ]
     }
   },
 
@@ -334,6 +355,7 @@ export default {
       }
 
       this.userOptions = this.formattedOptions
+
       if (typeof this.$refs.userSelect !== 'undefined') {
         this.$refs.userSelect.refresh()
       }

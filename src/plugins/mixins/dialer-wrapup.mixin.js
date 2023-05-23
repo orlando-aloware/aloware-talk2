@@ -9,10 +9,42 @@ export default {
   },
 
   computed: {
-    ...mapState(['dialer'])
+    ...mapState([
+      'dialer',
+      'isCallDisposed',
+      'isContactDisposed'
+    ]),
+
+    ...mapState('cache', ['currentCompany']),
+
+    isForcedContactDisposition () {
+      return this.currentCompany && this.currentCompany.force_contact_disposition
+    },
+
+    isContactNotDisposed () {
+      const hasContactDisposition = this.isContactDisposed || this.dialer.contact?.disposition_status_id
+
+      return this.isForcedContactDisposition &&
+        !hasContactDisposition
+    },
+
+    isForcedCallDisposition () {
+      return this.currentCompany && this.currentCompany.force_call_disposition
+    },
+
+    isNotDisposed () {
+      const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
+      const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
+
+      return isForceCallDisposition || isForceContactDisposition
+    }
   },
 
   created () {
+    if (this.isForcedContactDisposition || this.isForcedCallDisposition) {
+      this.wrapUpPaused = true
+    }
+
     this.wrapUpListeners.pauseWrapUp = (pauseWrapUp) => {
       this.wrapUpPaused = pauseWrapUp
     }
@@ -31,8 +63,10 @@ export default {
   },
 
   watch: {
-    'dialer.contact.id': function () {
-      this.wrapUpPaused = false
+    isContactNotDisposed (value) {
+      if (!value && !this.isForcedCallDisposition) {
+        this.wrapUpPaused = false
+      }
     }
   },
 

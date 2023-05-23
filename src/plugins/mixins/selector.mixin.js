@@ -186,6 +186,25 @@ export default {
         this.$emit(this.emitEvent, val)
       }
     },
+
+    onInputNew (val) {
+      const element = this.element.querySelector('.q-basic-selector .q-field__input')
+      const isGenericMultiSelect = _.get(this, 'genericMultiselect', null)
+
+      if (element && !isGenericMultiSelect) {
+        element.blur()
+      }
+
+      if (this.isCheckEmit && this.emitChange && val) {
+        this.$emit(this.emitEvent, this.emitChangeProperty ? val[this.emitChangeProperty] : val)
+        return
+      }
+
+      if (this.emitChange) {
+        this.$emit(this.emitEvent, val)
+      }
+    },
+
     toggleInputValue (toggle) {
       if ((typeof this.useChips !== 'undefined' && this.useChips) ||
         (typeof this.multiple !== 'undefined' && this.multiple)) {
