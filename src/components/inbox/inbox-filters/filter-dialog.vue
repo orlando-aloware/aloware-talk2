@@ -16,11 +16,11 @@
 
         <div class="mt-3">
           <div class="mb-4">
-            <div class="filter-items cursor-pointer"
+            <div class="filter-items cursor-pointer position-relative"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
               <span>New (Untitled)
-                <span class="float-right check-icon"
+                <span class="position-absolute check-icon"
                       v-if="!selectedFilter">
                   <check-o-icon color="#040404" />
                 </span>
@@ -36,9 +36,9 @@
                v-if="personalFilters.length < 1">
               None
             </p>
-            <filter-list-items v-for="item in personalFilters"
-                               :key="item.id"
+            <filter-list-items :key="item.id"
                                :filter="item"
+                               v-for="item in personalFilters"
                                @filterSelected="onSelectFilter"
                                @filterRename="onRenameFilter"
                                @filterDelete="(e) => onDeleteFilter(e, item)">
@@ -54,9 +54,9 @@
               None
             </p>
             <div class="filter-items cursor-pointer"
-                 v-for="item in companyFilters"
-                 :class="{ 'active' : selectedFilter && selectedFilter.id === item.id }"
+                 :class="getFilterItemClass(item)"
                  :key="item.id"
+                 v-for="item in companyFilters"
                  @click="onSelectFilter(item)">
               <span>
                 <q-tooltip anchor="top middle"
@@ -76,7 +76,7 @@
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
                        @clicked="onHide">
-            <close-icon iconColor="#000000"></close-icon>
+            <close-icon iconColor="#000000" />
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
@@ -91,13 +91,13 @@
               Reset
             </compact-btn>
             <compact-btn class="btn-secondary"
-                         :disabled="!(filterHasChanges) || [ChannelType.CHANNEL_MENTIONS].includes(defaultFilterModel.type)"
+                         :disabled="isSaveAsNewDisabled"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
             <compact-btn variant="primary"
                          class="ml-3"
-                         :disabled="false"
+                         :disabled="isUpdatingFilter"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
@@ -129,11 +129,18 @@ import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
 import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
   name: 'filter-dialog',
 
-  components: { CloseIcon, CompactBtn, FilterForm, FilterListItems, CheckOIcon },
+  components: {
+    CloseIcon,
+    CompactBtn,
+    FilterForm,
+    FilterListItems,
+    CheckOIcon
+  },
 
   props: {
     value: {
@@ -169,22 +176,29 @@ export default {
     },
 
     channelFilterName () {
-      switch (true) {
-        case !this.$route.params.channel && this.$route.name === 'Inbox':
-        case ['inbox'].includes(this.$route.params.channel):
-          return 'Inbox'
-        case ['messages'].includes(this.$route.params.channel):
-          return 'Messages'
-        case ['voicemails'].includes(this.$route.params.channel):
-          return 'Voice Messages'
-        case ['mentions'].includes(this.$route.params.channel):
-          return 'Mentions'
-        case ['all-communications'].includes(this.$route.params.channel):
-          return 'All Comms.'
-        case ['calls', 'recordings'].includes(this.$route.params.channel):
-        default:
-          return 'Calls & Recordings'
+      const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
+
+      if (isInbox || this.$route.params.channel === 'inbox') {
+        return 'Inbox'
       }
+
+      if (this.$route.params.channel === 'messages') {
+        return 'Messages'
+      }
+
+      if (this.$route.params.channel === 'voicemails') {
+        return 'Voice Messages'
+      }
+
+      if (this.$route.params.channel === 'mentions') {
+        return 'Mentions'
+      }
+
+      if (this.$route.params.channel === 'all-communications') {
+        return 'All Comms.'
+      }
+
+      return 'Calls & Recordings'
     },
 
     selectedFilterHasChanges () {
@@ -199,18 +213,15 @@ export default {
     },
 
     filterHasChanges () {
-      const hasChanges = { data: false }
-
       const filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
-          hasChanges.data = true
-          break
+          return true
         }
       }
 
-      return hasChanges.data
+      return false
     },
 
     toggleApplyButtonEnabled () {
@@ -235,6 +246,11 @@ export default {
       }
 
       return 'Apply'
+    },
+
+    isSaveAsNewDisabled () {
+      return !this.filterHasChanges ||
+        this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS
     }
   },
 
@@ -273,6 +289,12 @@ export default {
         'creator_type'
       ],
       inputTimeout: null,
+      booleanFields: [
+        'first_time_only',
+        'exclude_automated_communications',
+        'untagged_only',
+        'my_contact'
+      ],
       ChannelType
     }
   },
@@ -359,7 +381,8 @@ export default {
       const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const item in useFilter) {
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item)) {
+        if (this.booleanFields.includes(item)) {
+          // convert boolean to numeric
           this.filter[item] = +useFilter[item]
           continue
         }
@@ -376,14 +399,22 @@ export default {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
       }
 
+      const props = [
+        'first_time_only',
+        'exclude_automated_communications',
+        'untagged_only'
+      ]
+
       for (const item in this.filter) {
         if (item === 'answer_status' && this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
           continue
         }
 
-        if (['first_time_only', 'exclude_automated_communications', 'untagged_only'].includes(item) &&
+        const hasField = (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))
+
+        if (props.includes(item) &&
           +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
-          (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
+          hasField) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: +this.filter[item]
@@ -392,9 +423,9 @@ export default {
           continue
         }
 
-        if (!['first_time_only', 'exclude_automated_communications', 'untagged_only', 'my_contact'].includes(item) &&
+        if (!this.booleanFields.includes(item) &&
           JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) &&
-          (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))) {
+          hasField) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: this.filter[item]
@@ -411,6 +442,13 @@ export default {
           name: this.selectedFilter.name,
           scope: this.selectedFilter.scope }).then(res => {
           this.isUpdatingFilter = false
+        }).catch(error => {
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
         })
       }
 
@@ -443,8 +481,19 @@ export default {
       }
 
       this.isUpdatingFilter = true
-      this.updateFilter(this.selectedFilter, { ...this.filter, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
+      this.updateFilter(this.selectedFilter, {
+        ...this.filter,
+        name: this.selectedFilter.name,
+        scope: this.selectedFilter.scope
+      }).then(() => {
         this.isUpdatingFilter = false
+      }).catch(error => {
+        const {
+          message,
+          html
+        } = extractErrorMessage(error)
+        console.log(html)
+        this.$generalNotification(message, 'error')
       })
     },
 
@@ -460,20 +509,26 @@ export default {
       } else {
         // combine default filter values with the selected one
         const personalFilterObject = personalFilter.filter
-        this.filter = { ...this.defaultFilterModel.filter, ..._.pick(personalFilterObject, this.filterFields) }
+        this.filter = {
+          ...this.defaultFilterModel.filter,
+          ..._.pick(personalFilterObject, this.filterFields)
+        }
       }
 
       this.applyFilter()
     },
 
     getFilters () {
-      if ([ChannelType.CHANNEL_MENTIONS].includes(this.defaultFilterModel.type)) {
+      if (this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS) {
         return
       }
 
       this.isGettingFilters = true
+      const type = this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS
+        ? ChannelType.CHANNEL_CALLS
+        : this.defaultFilterModel.type
 
-      return talk2Api.V2.inbox.filters.get({ type: this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.defaultFilterModel.type }).then(response => {
+      return talk2Api.V2.inbox.filters.get({ type: type }).then(response => {
         this.personalFilters = response.data.data.user || []
         this.companyFilters = response.data.data.company || []
         this.isGettingFilters = false
@@ -560,6 +615,14 @@ export default {
       setTimeout(() => {
         this.refreshTagSelector()
       }, 1000)
+    },
+
+    getFilterItemClass (item) {
+      const selectedFilterClass = this.selectedFilter?.id === item.id
+        ? 'active'
+        : ''
+
+      return [selectedFilterClass]
     }
   },
 
@@ -568,7 +631,7 @@ export default {
       this.setSelectedFilter(null)
     },
 
-    inboxShowMyContacts: function (newValue) {
+    inboxShowMyContacts (newValue) {
       this.filter.my_contact = +newValue // convert boolean to numeric
     }
   },

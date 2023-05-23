@@ -1,41 +1,45 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column">
-      <div class="header w-100" v-if="$route.params.channel !== 'mentions'"
-           :class="{ 'border-bottom-transparent': isSearch }">
+      <div class="header w-100"
+           :class="{ 'border-bottom-transparent': isSearch }"
+           v-if="$route.params.channel !== 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
-                            :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
+                            :search-icon-color="searchIconColor"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
-            <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
-            <div class="filter-wrapper" :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
-              <compact-btn v-if="hasChannelFilterChanges"
+            <hr role="separator"
+                aria-orientation="vertical"
+                class="q-separator height-24 margin-auto q-separator q-separator--vertical">
+            <div class="filter-wrapper"
+                 :class="filterWrapperClass">
+              <compact-btn customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            borderless
-                           customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"
+                           v-if="hasChannelFilterChanges"
                            @clicked="onResetFilters">
                 <i class="fa fa-times"></i>
               </compact-btn>
-              <compact-btn borderless
-                           customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
+              <compact-btn customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
+                           borderless
                            @clicked="toggleFilterDialog(true)">
-                <q-tooltip v-if="appliedFilter"
-                           anchor="top middle"
-                           self="center middle">
+                <q-tooltip anchor="top middle"
+                           self="center middle"
+                           v-if="appliedFilter">
                   {{ appliedFilter.name }}
                 </q-tooltip>
-                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
-                             color="#62666E"
-                             class="filter-icon">
-                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
-                {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
+                <filter-icon color="#62666E"
+                             class="filter-icon"
+                             v-if="!appliedFilter && channelChangedFilterFields.length < 1">
+                </filter-icon> {{ appliedFilterName }}
+                {{ filtersText }}
               </compact-btn>
-              <b-badge v-if="hasChannelFilterChanges"
-                       class="ml-1 fs-12"
+              <b-badge class="ml-1 fs-12"
                        variant="primary"
+                       v-if="hasChannelFilterChanges"
                        v-b-modal:inbox-channel-filter-modal>
                 {{ changedFilterFieldCount }}
               </b-badge>
@@ -46,19 +50,20 @@
                     borderless
                     emit-value
                     map-options
-                    v-model="filterRight"
                     :options="optionsRight"
                     :append="[{icon: 'ion-ios-arrow-down'}]"
+                    v-model="filterRight"
                     @input="sortFilter">
           </q-select>
         </div>
       </div>
-      <div class="header w-100" v-if="$route.params.channel === 'mentions'">
+      <div class="header w-100"
+           v-if="$route.params.channel === 'mentions'">
         <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
           <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 d-inline-flex">
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
-                <filter-icon></filter-icon>
+                <filter-icon />
               </div>
               <user-selector custom-placeholder="Filter by User"
                              :clearable="true"
@@ -75,29 +80,29 @@
                     borderless
                     emit-value
                     map-options
-                    v-model="filterRight"
                     :options="optionsRight"
                     :append="[{icon: 'ion-ios-arrow-down'}]"
+                    v-model="filterRight"
                     @input="sortFilter">
           </q-select>
         </div>
       </div>
-      <div class="w-100" v-if="$route.params.channel === 'mentions' && !isSearch">
-        <q-btn-toggle
-          class="custom-toggle-button mx-2 mt-2 mb-1"
-          no-caps
-          spread
-          unelevated
-          dense
-          toggle-color="primary active"
-          color="transparent"
-          text-color="primary"
-          :options="mentionTypeOptions"
-          v-model="mentionType"
-          @click="toggleMentionType">
+      <div class="w-100"
+           v-if="$route.params.channel === 'mentions' && !isSearch">
+        <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
+                      toggle-color="primary active"
+                      color="transparent"
+                      text-color="primary"
+                      no-caps
+                      spread
+                      unelevated
+                      dense
+                      :options="mentionTypeOptions"
+                      v-model="mentionType"
+                      @click="toggleMentionType">
           <template v-slot:one>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
-                 :class="[mentionType === 'received' ? 'active' : 'text-grey-90']">
+                 :class="receivedTabClass">
                 <span class="text-left">
                   Received
                 </span>
@@ -106,7 +111,7 @@
 
           <template v-slot:two>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
-                 :class="[mentionType === 'sent' ? 'active' : 'text-grey-90']">
+                 :class="sentTabClass">
                 <span class="text-left">
                   Sent
                 </span>
@@ -132,21 +137,21 @@
                            :search-text="searchText"
                            v-if="!isGettingTasksList && $route.params.channel === 'mentions' && communications.length">
         </task-mention-list>
-        <div :class="[isGettingTasksList ? 'py-5' : 'py-4', 'relative']">
-          <b-overlay :show="isLoadingMore || isGettingTasksList"
-                     rounded="sm">
+        <div :class="spinnerClass">
+          <b-overlay rounded="sm"
+                     :show="isLoadingMore || isGettingTasksList">
             <template #overlay>
               <q-spinner-bars color="primary"
                               size="2em"/>
             </template>
           </b-overlay>
         </div>
-        <div v-if="!communications.length && !isGettingTasksList && !isLoadingMore && !isSearch && !communicationsListHasError"
-             class="text-center mt-3">
+        <div class="text-center mt-3"
+             v-if="hasNoData">
           No data found based on the given filter criteria
         </div>
-        <div v-if="communicationsListHasError"
-             class="text-center mt-3">
+        <div class="text-center mt-3"
+             v-if="communicationsListHasError">
           Unable to fetch {{ $route.params.channel !== 'mentions' ? 'communications' : 'mentions' }}.
           <br/>
           <b-btn variant="primary"
@@ -155,14 +160,13 @@
                  @click="getCommunications(filter)">Retry</b-btn>
         </div>
       </div>
-      <filter-dialog v-model="filter"
-                     :default-filter-model="channelDefaultFilterModel"
+      <filter-dialog :default-filter-model="channelDefaultFilterModel"
+                     v-model="filter"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
                      @onResetFilter="resetFilters">
       </filter-dialog>
-      <create-filter-dialog :filter-model="newFilterModel">
-      </create-filter-dialog>
+      <create-filter-dialog :filter-model="newFilterModel" />
     </div>
 </template>
 
@@ -328,6 +332,7 @@ export default {
 
       // using cursor parameter from next_page_url
       const nextUrl = new URL(this.pagination.next_page_url)
+
       return nextUrl.searchParams.get('cursor')
     },
 
@@ -340,120 +345,123 @@ export default {
     },
 
     channelDefaultFilterModel () {
-      const defaultFilterModel = {
+      let defaultFilterModel = {
         name: '',
         type: ChannelType.CHANNEL_MESSAGES,
         filter: [],
         scope: 'user'
       }
 
-      switch (true) {
-        case ['voicemails'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact
-          }
-          break
+      if (this.$route.params.channel === 'voicemails') {
+        defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
+        defaultFilterModel.filter = {
+          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+          direction: Filters.DEFAULT_STATE.filter.direction,
+          tags: Filters.DEFAULT_STATE.filter.tags,
+          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+          users: Filters.DEFAULT_STATE.filter.users,
+          workflows: Filters.DEFAULT_STATE.filter.workflows,
+          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+          from_date: Filters.DEFAULT_STATE.filter.from_date,
+          to_date: Filters.DEFAULT_STATE.filter.to_date,
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact
+        }
+        return defaultFilterModel
+      }
 
-        case ['calls', 'recordings'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_CALLS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact
-          }
+      if (['calls', 'recordings'].includes(this.$route.params.channel)) {
+        defaultFilterModel.type = ChannelType.CHANNEL_CALLS
+        defaultFilterModel.filter = {
+          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+          direction: Filters.DEFAULT_STATE.filter.direction,
+          answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+          min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+          transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+          callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+          tags: Filters.DEFAULT_STATE.filter.tags,
+          call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+          users: Filters.DEFAULT_STATE.filter.users,
+          workflows: Filters.DEFAULT_STATE.filter.workflows,
+          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+          from_date: Filters.DEFAULT_STATE.filter.from_date,
+          to_date: Filters.DEFAULT_STATE.filter.to_date,
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact
+        }
 
-          if (['recordings'].includes(this.$route.params.channel)) {
-            defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-            defaultFilterModel.filter.answer_status = 'recorded'
-          }
-          break
+        if (['recordings'].includes(this.$route.params.channel)) {
+          defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
+          defaultFilterModel.filter.answer_status = 'recorded'
+        }
 
-        case ['mentions'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_MENTIONS
-          defaultFilterModel.filter = {
-            users: Filters.DEFAULT_STATE.filter.users,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
-          }
-          break
+        return defaultFilterModel
+      }
 
-        case ['all-communications'].includes(this.$route.params.channel):
-          defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-            transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-            callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-            creator_type: Filters.DEFAULT_STATE.filter.creator_type
-          }
-          break
+      if (this.$route.params.channel === 'mentions') {
+        defaultFilterModel.type = ChannelType.CHANNEL_MENTIONS
+        defaultFilterModel.filter = {
+          users: Filters.DEFAULT_STATE.filter.users,
+          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
+        }
 
-        case ['messages'].includes(this.$route.params.channel):
-        default:
-          defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
-          defaultFilterModel.filter = {
-            campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-            direction: Filters.DEFAULT_STATE.filter.direction,
-            answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-            tags: Filters.DEFAULT_STATE.filter.tags,
-            first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-            untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-            exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-            incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-            users: Filters.DEFAULT_STATE.filter.users,
-            workflows: Filters.DEFAULT_STATE.filter.workflows,
-            broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-            contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-            from_date: Filters.DEFAULT_STATE.filter.from_date,
-            to_date: Filters.DEFAULT_STATE.filter.to_date,
-            my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-            creator_type: Filters.DEFAULT_STATE.filter.creator_type
-          }
+        return defaultFilterModel
+      }
+
+      if (this.$route.params.channel === 'all-communications') {
+        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
+        defaultFilterModel.filter = {
+          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
+          direction: Filters.DEFAULT_STATE.filter.direction,
+          answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+          min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
+          transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
+          callback_status: Filters.DEFAULT_STATE.filter.callback_status,
+          tags: Filters.DEFAULT_STATE.filter.tags,
+          call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
+          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+          users: Filters.DEFAULT_STATE.filter.users,
+          workflows: Filters.DEFAULT_STATE.filter.workflows,
+          broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+          from_date: Filters.DEFAULT_STATE.filter.from_date,
+          to_date: Filters.DEFAULT_STATE.filter.to_date,
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+          creator_type: Filters.DEFAULT_STATE.filter.creator_type
+        }
+
+        return defaultFilterModel
+      }
+
+      defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
+      defaultFilterModel.filter = {
+        campaigns: Filters.DEFAULT_STATE.filter.campaigns,
+        direction: Filters.DEFAULT_STATE.filter.direction,
+        answer_status: Filters.DEFAULT_STATE.filter.answer_status,
+        tags: Filters.DEFAULT_STATE.filter.tags,
+        first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
+        untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
+        exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
+        incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
+        users: Filters.DEFAULT_STATE.filter.users,
+        workflows: Filters.DEFAULT_STATE.filter.workflows,
+        broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+        contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
+        from_date: Filters.DEFAULT_STATE.filter.from_date,
+        to_date: Filters.DEFAULT_STATE.filter.to_date,
+        my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+        creator_type: Filters.DEFAULT_STATE.filter.creator_type
       }
 
       return defaultFilterModel
@@ -467,6 +475,61 @@ export default {
       }
 
       return this.channelChangedFilterFields.length
+    },
+
+    searchIconColor () {
+      return this.isSearch ? '#256EFF' : '#62666E'
+    },
+
+    filterWrapperClass () {
+      const highlightedClass = this.hasChannelFilterChanges || this.appliedFilter
+        ? '--highlighted'
+        : ''
+
+      return [
+        highlightedClass
+      ]
+    },
+
+    appliedFilterName () {
+      return !this.appliedFilter
+        ? ''
+        : this.appliedFilter.name
+    },
+
+    filtersText () {
+      return !this.appliedFilter && this.channelChangedFilterFields.length
+        ? 'Filters'
+        : ''
+    },
+
+    receivedTabClass () {
+      const tabClass = this.mentionType === 'received' ? 'active' : 'text-grey-90'
+
+      return [tabClass]
+    },
+
+    sentTabClass () {
+      const tabClass = this.mentionType === 'sent' ? 'active' : 'text-grey-90'
+
+      return [tabClass]
+    },
+
+    spinnerClass () {
+      const loadingClass = this.isGettingTasksList ? 'py-5' : 'py-4'
+
+      return [
+        loadingClass,
+        'relative'
+      ]
+    },
+
+    hasNoData () {
+      return !this.communications.length &&
+        !this.isGettingTasksList &&
+        !this.isLoadingMore &&
+        !this.isSearch &&
+        !this.communicationsListHasError
     }
   },
 
@@ -679,7 +742,15 @@ export default {
 
     this.$VueEvent.listen('contact_updated', (data) => {
       const communications = [...this.communications]
-      if (['calls', 'messages', 'mentions', 'voicemails', 'recordings'].includes(this.$route.params.channel)) {
+      const channels = [
+        'calls',
+        'messages',
+        'mentions',
+        'voicemails',
+        'recordings'
+      ]
+
+      if (channels.includes(this.$route.params.channel)) {
         if (this.$route.params.channel === 'mentions') {
           communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
             value.mention_subject.contact = data
@@ -694,21 +765,31 @@ export default {
       }
     })
 
-    if (['Inbox Channel', 'Inbox Contact Communication', 'Inbox Contact', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
+    const inboxChannelRoutes = [
+      'Inbox Channel',
+      'Inbox Contact Communication',
+      'Inbox Contact',
+      'Inbox Channel Task Status', 'Inbox Contact Task'
+    ]
+    const generalChannelRoutes = ['Inbox Channel', 'Inbox Contact']
+    const communicationsChannelRoutes = ['Inbox Contact', 'Inbox Contact Communication']
+
+    if (inboxChannelRoutes.includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
       this.getCommunications(this.filter, () => {
-        if (['Inbox Channel', 'Inbox Contact'].includes(this.$route.name) || ['mentions'].includes(this.$route.params.channel)) {
-          if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
-            const communication = { data: null }
+        const isGeneralChannelRoutesOrMentions = generalChannelRoutes.includes(this.$route.name) ||
+          ['mentions'].includes(this.$route.params.channel)
 
-            if (this.$route.name === 'Inbox Contact Communication') {
-              communication.data = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
-            } else {
-              communication.data = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
-            }
+        if (isGeneralChannelRoutesOrMentions && communicationsChannelRoutes.includes(this.$route.name)) {
+          let communication = null
 
-            if (communication.data) {
-              this.setSelectedCommunication(communication.data)
-            }
+          if (this.$route.name === 'Inbox Contact Communication') {
+            communication = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
+          } else {
+            communication = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
+          }
+
+          if (communication) {
+            this.setSelectedCommunication(communication)
           }
         }
       })
@@ -819,16 +900,16 @@ export default {
       }
     },
 
-    getCommunications (params, callback) {
+    getCommunications (filters, callback) {
+      let params = this.$jsonClone(filters)
+      let api = talk2Api.V1.reports.communications
       this.setIsInboxFiltersLoaded(true)
       this.gettingTasksList(true)
       this.communicationsListHasError = false
 
-      const api = { data: talk2Api.V1.reports.communications }
-
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
-        api.data = talk2Api.V2.mentions
+        api = talk2Api.V2.mentions
         params = {
           ...{
             direction: this.mentionType,
@@ -854,7 +935,7 @@ export default {
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
 
-      return api.data.get({ params: params, cancelToken: this.source.token })
+      return api.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
@@ -877,11 +958,15 @@ export default {
 
           this.gettingTasksList(false)
           this.communicationsListHasError = true
-          this.$generalNotification(`An exception was encountered while fetching ${this.$route.params.channel !== 'mentions' ? 'communications' : 'mentions'}.`, 'error')
+          const channelName = this.$route.params.channel !== 'mentions'
+            ? 'communications'
+            : 'mentions'
+          this.$generalNotification(`An exception was encountered while fetching ${channelName}.`, 'error')
         })
     },
 
-    loadMoreCommunications (params) {
+    loadMoreCommunications (filters) {
+      let params = this.$jsonClone(filters)
       this.isLoadingMore = true
       this.isLoaded = false
 
@@ -889,18 +974,37 @@ export default {
         params.my_contact = 1
       }
 
-      const api = { data: talk2Api.V1.reports.communications }
+      let api = talk2Api.V1.reports.communications
 
       if (this.$route.params.channel === 'mentions') {
-        api.data = talk2Api.V2.mentions
-        params = { ...{ direction: this.mentionType, page: params.page, per_page: params.per_page, order_by: this.sorting.order } }
+        api = talk2Api.V2.mentions
+        params = {
+          ...{
+            direction: this.mentionType,
+            page: params.page,
+            per_page: params.per_page,
+            order_by: this.sorting.order
+          }
+        }
 
         if (this.mentionType === 'sent' && this.filter.mentioned_user_id) {
-          params = { ...params, ...{ mentioned_user_id: this.filter.mentioned_user_id } }
+          params = {
+            ...params,
+            ...{
+              mentioned_user_id:
+              this.filter.mentioned_user_id
+            }
+          }
         }
 
         if (this.mentionType === 'received' && this.filter.mentioner_user_id) {
-          params = { ...params, ...{ mentioner_user_id: this.filter.mentioner_user_id } }
+          params = {
+            ...params,
+            ...{
+              mentioner_user_id:
+              this.filter.mentioner_user_id
+            }
+          }
         }
       }
 
@@ -912,7 +1016,7 @@ export default {
 
       params = this.removeUnnecessaryParameters(params)
 
-      return api.data.get({ params: params })
+      return api.get({ params: params })
         .then(response => {
           this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
@@ -920,8 +1024,8 @@ export default {
           this.isLoadingMore = false
           this.isLoaded = true
           this.pagination = _.clone(response.data)
-          this.isScrolled = false
           delete this.pagination.data
+          this.isScrolled = false
         })
     },
 
@@ -934,7 +1038,9 @@ export default {
         delete params.changed
       }
 
-      if (['calls', 'recordings', 'voicemails'].includes(this.$route.params.channel)) {
+      const callsChannels = ['calls', 'recordings', 'voicemails']
+
+      if (callsChannels.includes(this.$route.params.channel)) {
         delete params.report_type
         delete params.chart_period
         delete params.has_unread
@@ -976,10 +1082,6 @@ export default {
     },
 
     toggleMentionType () {
-      this.$nextTick(() => {
-        // this.$refs.taskListScroller.scrollTop = 0
-      })
-
       this.$router.push({
         name: 'Inbox Channel Task Status',
         params: {
@@ -1071,6 +1173,7 @@ export default {
       this.setHasMoreCommunications(null)
       this.setCommunications([])
       this.isSearch = true
+
       this.$nextTick(function () {
         this.$refs.searchToggle.inputFocus()
       }.bind(this))
@@ -1107,15 +1210,28 @@ export default {
 
     handleNewMention (communication) {
       const api = talk2Api.V2.mentions
+      let params = this.$jsonClone(this.filter)
 
-      const params = { data: _.cloneDeep(this.filter) }
+      params = {
+        ...{
+          direction:
+          this.mentionType,
+          page: params.page,
+          per_page: params.per_page,
+          mentioner_user_id: params.mentioner_user_id,
+          mentioned_user_id: params.mentioned_user_id
+        }
+      }
 
-      params.data = { ...{ direction: this.mentionType, page: params.data.page, per_page: params.data.per_page, mentioner_user_id: params.data.mentioner_user_id, mentioned_user_id: params.data.mentioned_user_id } }
-      params.data = { ...params.data, order_by: this.sorting.order }
+      params = {
+        ...params,
+        order_by: this.sorting.order
+      }
 
-      api.get({ params: params.data })
+      api.get({ params: params })
         .then(response => {
           const mention = response.data.data.find(item => item.mention_subject_id === communication.id)
+
           if (mention) {
             this.pagination.total += 1
             // push new data to top of array
@@ -1147,21 +1263,24 @@ export default {
   watch: {
     $route (to, from) {
       this.previousRoute = from
+      const inboxRoutes = ['Inbox Channel', 'Inbox', 'Inbox Channel Task Status']
 
-      if (['Inbox Channel', 'Inbox', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+      if (inboxRoutes.includes(this.$route.name)) {
         this.isLoaded = false
       }
     },
 
-    'activeChannel': function (value) {
-      if (this.$route.name === 'Inbox Channel') {
+    activeChannel (newValue, oldValue) {
+      const isDifferent = JSON.stringify(newValue) !== JSON.stringify(oldValue)
+
+      if (isDifferent && this.$route.name === 'Inbox Channel') {
         this.searchText = null
         this.resetFilters()
         this.isSearch = false
       }
     },
 
-    'searchText': function (value) {
+    searchText (value) {
       value = value.trim()
 
       // sanity check: minimum of 3 character required
@@ -1186,7 +1305,8 @@ export default {
     },
 
     '$route.name': function (value) {
-      if (['Inbox Contact', 'Inbox Contact Communication'].includes(value)) {
+      const inboxContactRoutes = ['Inbox Contact', 'Inbox Contact Communication']
+      if (inboxContactRoutes.includes(value)) {
         // since mention has different data structure to other channels, need to set property to compare as comm id
         const identifierProp = value === 'Inbox Contact Communication' ? 'mention_subject_id' : 'id'
         const communication = this.communications.find(item => item[identifierProp] === this.$route.params.communicationId)
@@ -1195,7 +1315,9 @@ export default {
     },
 
     '$route.params.status': function (value) {
-      if ([MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT].includes(value) && !this.$route.params.id) {
+      const mentionTypes = [MentionType.TYPE_RECEIVED, MentionType.TYPE_SENT]
+
+      if (mentionTypes.includes(value) && !this.$route.params.id) {
         this.resetFilters()
         this.isScrolled = false
 
@@ -1214,7 +1336,16 @@ export default {
     },
 
     '$route.params.channel': function (value) {
-      if (['mentions', 'calls', 'messages', 'voicemails', 'recordings', 'all-communications'].includes(value)) {
+      const communicationChannels = [
+        'mentions',
+        'calls',
+        'messages',
+        'voicemails',
+        'recordings',
+        'all-communications'
+      ]
+
+      if (communicationChannels.includes(value)) {
         this.getCommunications(this.filter)
       }
     }

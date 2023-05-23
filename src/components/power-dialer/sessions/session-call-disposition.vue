@@ -90,7 +90,14 @@ export default {
 
     ...mapGetters('powerDialer', [
       'sessionLoader'
-    ])
+    ]),
+
+    isContactNotDisposed () {
+      const hasContactDisposition = this.isContactDisposed || this.contact?.disposition_status_id
+
+      return this.currentCompany && this.currentCompany.force_contact_disposition &&
+        !hasContactDisposition
+    }
   },
 
   mounted () {
@@ -133,6 +140,7 @@ export default {
           this.setDialerCommunication(dialerCommunication)
         }
 
+        this.$VueEvent.fire('pauseWrapUp', this.isNotDisposed)
         this.onCallDisposed(data.id)
         this.$refs.callDispositionSelector.hideLoading()
       }).catch((err) => {
@@ -170,6 +178,7 @@ export default {
           this.setDialerContact(dialerContact)
         }
 
+        this.$VueEvent.fire('pauseWrapUp', this.isNotDisposed)
         this.onContactDisposed(data.id)
         this.$refs.contactDispositionSelector.hideLoading()
       }).catch((err) => {
@@ -195,6 +204,10 @@ export default {
       this.selectedContactDisposition = null
       this.selectedCallDisposition = null
       this.initCallDisposition()
+
+      if (this.isContactNotDisposed) {
+        this.$VueEvent.fire('pauseWrapUp', true)
+      }
     },
 
     sessionPaused () {
