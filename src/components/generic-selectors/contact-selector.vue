@@ -18,6 +18,9 @@
                      v-model="contact"
                      @select="onSelect"
                      @search-change="onSearch">
+      <template #singleLabel>
+        {{ contact.name | removePhones }}
+      </template>
       <template #option="props">
         <div class="option__desc">
           <span class="option__title">
