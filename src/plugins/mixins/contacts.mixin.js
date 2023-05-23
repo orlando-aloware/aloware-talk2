@@ -1160,13 +1160,14 @@ export default {
         return
       }
 
+      const contactRoutes = ['Contacts', 'Contact']
       const contactsToOtherRoutes = from.name === 'Contacts' &&
-        !['Contacts', 'Contact'].includes(to.name)
-      const otherRoutesToContacts = !['Contacts', 'Contact'].includes(from.name) &&
+        !contactRoutes.includes(to.name)
+      const otherRoutesToContacts = !contactRoutes.includes(from.name) &&
         to.name === 'Contacts'
-      const inOrOutOfContactsOrToPD = (contactsToOtherRoutes || otherRoutesToContacts || to.name === 'Power Dialer')
+      const inOrOutOfContactsOrToPD = contactsToOtherRoutes || otherRoutesToContacts || to.name === 'Power Dialer'
 
-      if (inOrOutOfContactsOrToPD || this.$route.name === 'Contacts') {
+      if (inOrOutOfContactsOrToPD && this.$route.name === 'Contacts') {
         this.isNavigated = true
 
         setTimeout(() => {
@@ -1174,8 +1175,8 @@ export default {
         }, 500)
       }
 
-      const pdToPD = from.name === 'Power Dialer' && !['Power Dialer'].includes(to.name)
-      const otherRoutesToPD = !['Power Dialer'].includes(from.name) && to.name === 'Power Dialer'
+      const pdToPD = from.name === 'Power Dialer' && to.name !== 'Power Dialer'
+      const otherRoutesToPD = from.name !== 'Power Dialer' && to.name === 'Power Dialer'
       const pdToPdOrToContacts = pdToPD || otherRoutesToPD || to.name === 'Contacts'
 
       if (this.isPowerDialer && pdToPdOrToContacts) {
