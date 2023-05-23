@@ -875,7 +875,14 @@ export default {
     }
 
     this.pdViewListeners.contactListBulkCreated = (event) => {
-      if (this.isInPowerDialerList && this.$route?.params?.id === event.contact_list_id) {
+      const listId = this.$isNumeric(this.$route?.params?.id)
+        ? parseInt(this.$route?.params?.id)
+        : null
+      const eventListId = this.$isNumeric(event.contact_list_id)
+        ? parseInt(event.contact_list_id)
+        : null
+
+      if (this.isInPowerDialerList && listId && eventListId && listId === eventListId) {
         this.init()
       }
     }
