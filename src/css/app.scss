@@ -12427,8 +12427,33 @@ h1.contact-list-name-label {
         border: solid black 1px;
       }
 
-      tr:hover, tr:hover td {
-        background-color: #F4F4F6 !important;
+      .datatable {
+        padding-left: 0 !important;
+
+        tr {
+          .context-menu {
+            position: absolute;
+            right: 8px;
+            visibility: hidden;
+          }
+
+          &:hover .context-menu {
+            visibility: visible;
+          }
+        }
+
+        tr:hover, tr:hover td {
+          background-color: #F4F4F6 !important;
+        }
+
+        td.datatable-row__checkbox {
+          padding-right: 0 !important;
+
+          .custom-checkbox-container {
+            position: relative;
+            padding-left: 10px;
+          }
+        }
       }
     }
   }

@@ -112,7 +112,7 @@
       <communication-activity-graph base="broadcast" />
     </div>
     <q-separator/>
-    <div class="px-2 broadcasts__home__table flex-grow-1">
+    <div class="broadcasts__home__table flex-grow-1">
       <datatable class="h-100"
                  ref="broadcastsTable"
                  :stickyHeaders="true"
@@ -128,14 +128,13 @@
             <template v-for="(col, colIndex) in broadcastsColumns">
               <td :key="`c-${colIndex}`"
                   v-if="col.name == 'checkbox'"
-                  class="text-left pull-left datatable-row__checkbox">
-                  <label class="custom-checkbox-container">
-                  <input
-                    type="checkbox"
-                    class="checker"
-                    :value="row.id"
-                    :checked="checked.find(item => item.id === row.id) || isAllChecked"
-                    @change="onCheckerClicked(row)" />
+                  class="datatable-row__checkbox">
+                <label class="custom-checkbox-container">
+                  <input type="checkbox"
+                         class="checker"
+                         :value="row.id"
+                         :checked="checked.find(item => item.id === row.id) || isAllChecked"
+                         @change="onCheckerClicked(row)"/>
                   <span class="checkmark"></span>
                 </label>
               </td>
@@ -176,9 +175,32 @@
                 {{ row[col.field] }}
               </td>
             </template>
+            <div class="context-menu">
+              <q-btn :id="getContextMenuTargetElementId(row)"
+                     class="px-1"
+                     color="primary"
+                     size="sm"
+                     label="..."
+                     @click="onContextMenuClicked(row)"/>
+            </div>
           </tr>
         </template>
       </datatable>
+      <q-menu v-model="contextMenuOpen"
+              self="top right"
+              :target="contextMenuTarget">
+        <q-list>
+          <q-item v-for="(item, id) in contextMenuListItems"
+                  :key="id"
+                  :disabled="!shouldAllowContextMenuButton(item)"
+                  clickable
+                  @click="onContextMenuButtonClicked(item)">
+            <q-item-section>
+              <span>{{ item.label }}</span>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
     </div>
   </div>
 </template>
@@ -256,6 +278,24 @@ const broadcastsColumns = [
   }
 ]
 
+const contextMenuListItems = [
+  {
+    name: 'activity',
+    label: 'Activity',
+    icon: ''
+  },
+  {
+    name: 'rename',
+    label: 'Rename',
+    icon: ''
+  },
+  {
+    name: 'delete',
+    label: 'Delete',
+    icon: ''
+  }
+]
+
 export default {
   name: 'broadcasts',
 
@@ -301,7 +341,10 @@ export default {
     broadcastsColumns,
     checked: [],
     isAllChecked: false,
-    BroadcastStatuses
+    BroadcastStatuses,
+    contextMenuListItems,
+    contextMenuTargetId: null,
+    contextMenuOpen: false
   }),
 
   mounted () {
@@ -404,6 +447,14 @@ export default {
 
         series: []
       }
+    },
+
+    isAdmin () {
+      return true
+    },
+
+    contextMenuTarget () {
+      return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : true
     }
   },
 
@@ -422,6 +473,26 @@ export default {
       }
 
       this.checked.push(row)
+    },
+
+    onContextMenuClicked (row) {
+      this.contextMenuTargetId = row.id
+      this.contextMenuOpen = !this.contextMenuOpen
+    },
+
+    onContextMenuButtonClicked (item) {
+      switch (item.name) {
+        case 'rename':
+          return this.renameBroadcast()
+        case 'delete':
+          return this.deleteBroadcast()
+        case 'activity':
+          return this.showBroadcastActivity()
+      }
+    },
+
+    getContextMenuTargetElementId (row) {
+      return `context-menu-btn-${row.id}`
     },
 
     getBroadcasts () {
@@ -450,6 +521,30 @@ export default {
       }
 
       return found
+    },
+
+    deleteBroadcast () {
+
+    },
+
+    renameBroadcast () {
+
+    },
+
+    showBroadcastActivity () {
+
+    },
+
+    shouldAllowContextMenuButton (item) {
+      if (item.name === 'rename') {
+        return this.checked.length === 0
+      }
+
+      if (item.name === 'delete') {
+        return this.isAdmin
+      }
+
+      return true
     }
   },
 
