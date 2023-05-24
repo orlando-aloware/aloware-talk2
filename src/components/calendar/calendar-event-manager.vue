@@ -51,8 +51,8 @@
             <q-tooltip anchor="top middle">
               Type at least 3 characters to search in contacts
             </q-tooltip>
-            <contact-selector v-model="$v.schedule.contact.$model.id">
-            </contact-selector>
+            <contact-selector v-model="$v.schedule.contact.$model.id"
+                              @change="onContactChange"/>
           </b-form-group>
         </b-col>
       </b-row>
@@ -816,6 +816,13 @@ export default {
 
     onContactsLoaded () {
       this.loading = false
+    },
+
+    onContactChange (contact) {
+      // use contact's timezone if defined
+      if (contact?.timezone) {
+        this.schedule.timezone = contact.timezone
+      }
     }
   }
 }

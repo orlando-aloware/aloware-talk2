@@ -124,6 +124,7 @@ export default {
 
     onSelect (contact) {
       this.$emit('input', contact.id)
+      this.$emit('change', contact)
     },
 
     formatContact (contact) {
@@ -136,7 +137,8 @@ export default {
 
       return {
         id: contact.id,
-        name: `${name} ${this.showNumber ? '(' + contact.phone_number + ')' : ''}`
+        name: `${name} ${this.showNumber ? '(' + contact.phone_number + ')' : ''}`,
+        timezone: contact.timezone
       }
     },
 
