@@ -375,18 +375,16 @@ export default {
     },
 
     fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
-      let listId = null
       let eventListId = null
 
       if (typeof this.getCleanedListId !== 'undefined') {
-        listId = this.getCleanedListId(this.$route?.params?.id)
-        eventListId = this.getCleanedListId(this.powerDialerListAddContactsProgress?.id)
+        eventListId = this.getCleanedListId(this.powerDialerListAddRemoveContactsProgress?.id)
       }
 
       // prevent fetching contacts when PD is still in-progress
       // in adding contacts if current list is the affected list
-      if (this.isInPowerDialerList && this.powerDialerListAddContactsProgress?.loading &&
-        listId === eventListId) {
+      if (this.isInPowerDialerList && this.powerDialerListAddRemoveContactsProgress?.loading &&
+        this.cleanedListId === eventListId) {
         return
       }
 

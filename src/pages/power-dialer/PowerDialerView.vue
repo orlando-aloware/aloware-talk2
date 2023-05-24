@@ -1,8 +1,8 @@
 <template>
-  <PowerDialerViewScreen :loading="isLoading"
+  <power-dialer-view-screen :loading="isLoading"
                          v-if="list">
     <template slot="title">
-      <Breadcrumbs :directory-list="folders" />
+      <breadcrumbs :directory-list="folders" />
     </template>
 
     <template slot="options">
@@ -17,13 +17,13 @@
 
     <template slot="actions">
       <div>
-        <SummaryInfoLabels />
+        <summary-info-labels />
         <b-container fluid class="bv-example-row m-0 p-0 pb-0 border-bottom">
           <b-row class="pr-2 pt-4 pb-3"
                  v-if="$q.screen.lt.lg">
             <b-col cols="12">
               <div class="d-flex">
-                <PowerDialerFilter :list-data="fixedContactsData"
+                <power-dialer-filter :list-data="fixedContactsData"
                                    :id="selectedListId"
                                    :filter="filter"
                                    :active-route="activeRoute" />
@@ -34,7 +34,7 @@
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
 
-                <SearchList class="width-260"
+                <search-list class="width-260"
                             limitSearchCharacters
                             :search="search"
                             @search="onSearch" />
@@ -44,7 +44,7 @@
             <b-col cols="8"
                    v-if="$q.screen.gt.md">
               <div class="d-flex">
-                <PowerDialerFilter :list-data="fixedContactsData"
+                <power-dialer-filter :list-data="fixedContactsData"
                                    :id="selectedListId"
                                    :filter="filter"
                                    :active-route="activeRoute" />
@@ -89,8 +89,7 @@
                   </b-dropdown-item>
                 </b-dropdown>
 
-                <ContactCreateModal @created="onContactCreated">
-                </ContactCreateModal>
+                <contact-create-modal @created="onContactCreated"/>
 
                 <b-dropdown text="..."
                             right size="sm"
@@ -139,14 +138,14 @@
     </template>
 
     <template slot="actions">
-      <BulkActionMenu :id="filteredSelectedListId"
-                      :disabledDelete="taskAddAndClearingDisabled"
-                      v-if="checked.length > 0"
-                      @moved-contacts="onFetch({}, false)" />
+      <power-dialer-bulk-action-menu :id="filteredSelectedListId"
+                                     :disabledDelete="taskAddAndClearingDisabled"
+                                     v-if="checked.length > 0"
+                                     @moved-contacts="onFetch({}, false)" />
     </template>
 
     <template slot="table">
-      <Datatable :stickyHeaders="true"
+      <datatable :stickyHeaders="true"
                  :columns="columns"
                  :is-empty="isEmpty || isStartState"
                  :is-loading-more="isLoadingMore"
@@ -308,7 +307,7 @@
                 <button class="btn btn-sm btn-link datatable-row__actions__action--trash"
                         :disabled="taskAddAndClearingDisabled"
                         @click="onRemove(contact)">
-                  <TrashOIcon />
+                  <trash-o-icon />
                   <q-tooltip content-class="bg-grey-light11"
                              anchor="top middle" self="center middle"
                              v-if="taskAddAndClearingDisabled">
@@ -434,7 +433,7 @@
             </template>
           </tr>
         </template>
-      </Datatable>
+      </datatable>
 
       <b-popover triggers="hover"
                  placement="topright"
@@ -478,7 +477,7 @@
         </span>
       </b-popover>
 
-      <ConfirmDialog title="Are you really really sure?"
+      <confirm-dialog title="Are you really really sure?"
                      size="sm"
                      :id="dialogName"
                      :is-open="isOpen"
@@ -489,7 +488,7 @@
                      @close="closeModal">
         <div slot="content">
           <div class="text-center text-h6 pb-4">
-            <TrashOIcon height="20"
+            <trash-o-icon height="20"
                         width="20" />
             Remove Contact?
           </div>
@@ -518,10 +517,10 @@
             </div>
           </div>
         </div>
-      </ConfirmDialog>
+      </confirm-dialog>
 
     </template>
-  </PowerDialerViewScreen>
+  </power-dialer-view-screen>
 </template>
 
 <script>
@@ -537,7 +536,7 @@ import StartDialSessionSettings from 'src/components/power-dialer/session-settin
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
-import BulkActionMenu from 'src/components/power-dialer-bulk-action-menu'
+import PowerDialerBulkActionMenu from 'src/components/power-dialer-bulk-action-menu'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
@@ -650,7 +649,7 @@ export default {
     ConfirmDialog,
     Breadcrumbs,
     ContactCreateModal,
-    BulkActionMenu
+    PowerDialerBulkActionMenu
   },
 
   filters: {
@@ -685,7 +684,8 @@ export default {
     ...mapState('powerDialer', [
       'metrics',
       'pdViewCancelToken',
-      'pdViewSource'
+      'pdViewSource',
+      'myQueue'
     ]),
 
     ...mapGetters('powerDialer', [
@@ -693,7 +693,6 @@ export default {
       'powerDialerLists',
       'powerDialerDirectoryList',
       'datatableLoader',
-      'myQueue',
       'activeFilter'
     ]),
 
@@ -709,7 +708,8 @@ export default {
     ]),
 
     taskAddAndClearingDisabled () {
-      return !this.isAdmin && this.currentCompany.disable_power_dialer_add
+      const isAddDisabled = !this.isAdmin && this.currentCompany.disable_power_dialer_add
+      return isAddDisabled || this.isLoading
     },
 
     filter () {
@@ -880,10 +880,10 @@ export default {
     }
 
     this.pdViewListeners.contactListBulkCreated = (event) => {
-      const listId = this.getCleanedListId(this.$route?.params?.id)
       const eventListId = this.getCleanedListId(event.contact_list_id)
 
-      if (this.isInPowerDialerList && listId && eventListId && listId === eventListId) {
+      if (this.isInPowerDialerList && this.cleanedListId && eventListId &&
+        this.cleanedListId === eventListId) {
         this.$VueEvent.fire('add_contacts_progress', {
           id: null,
           loading: false

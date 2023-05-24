@@ -20,7 +20,8 @@ export default {
     ...mapGetters('powerDialer', [
       'listItems',
       'currentListFilters',
-      'search'
+      'search',
+      'myQueueId'
     ]),
 
     tempId () {
@@ -45,6 +46,10 @@ export default {
 
     dialogName () {
       return `remove-power-dialer-item-dialog`
+    },
+
+    cleanedListId () {
+      return this.getCleanedListId(this.$route?.params?.id)
     }
   },
 
@@ -69,9 +74,9 @@ export default {
     },
 
     getCleanedListId (id) {
-      return this.$isNumeric(id)
-        ? parseInt(id)
-        : id
+      let cleanedId = this.$isNumeric(id) ? parseInt(id) : id
+
+      return cleanedId === 'in-queue' ? this.myQueueId : cleanedId
     }
   }
 }

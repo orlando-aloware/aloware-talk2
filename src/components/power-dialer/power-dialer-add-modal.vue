@@ -117,11 +117,12 @@
 import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import { integrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import { get } from 'lodash'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -178,6 +179,8 @@ export default {
     ...mapState('contacts', ['isAddPowerDialerOpen']),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('powerDialer', ['myQueueId']),
 
     isOpen: {
       get () {
@@ -355,8 +358,10 @@ export default {
     },
 
     addContacts () {
+      const listId = get(this.requestParams, 'contact_list_id', this.myQueueId)
+
       this.$VueEvent.fire('add_contacts_progress', {
-        id: this.requestParams.contact_list_id,
+        id: listId,
         loading: true
       })
 

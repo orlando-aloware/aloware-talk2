@@ -3,7 +3,7 @@
        class="contacts mx-0 content-row d-flex overflow-hidden h-100">
     <div v-show="!hasSessions"
          class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
-      <PowerDialerSidebar @fetchMyQueueData="onFetchMyQueueData" />
+      <power-dialer-sidebar @fetchMyQueueData="onFetchMyQueueData" />
     </div>
     <div class="px-0 mb-0 main flex-1 h-100"
          :class="mainClass">
@@ -20,7 +20,7 @@
                    :is-loading-more="isLoadingMore"
                    :filters-count="filtersCount"
                    :selected-list-id="filteredId"
-                   :add-contacts-in-progress-data="powerDialerListAddContactsProgress"
+                   :add-contacts-in-progress-data="powerDialerListAddRemoveContactsProgress"
                    :onFetch="fetch"
                    v-if="!isPowerDialerSession"
                    @search="onSearch"
@@ -37,20 +37,20 @@
     </div>
 
     <template v-if="!hasSessions">
-      <MoveDialog :is-contact-module-type="false" />
-      <CreateDialog />
-      <ColumnHeaders :predefined-id="myQueueId"
+      <move-dialog :is-contact-module-type="false" />
+      <create-dialog />
+      <column-headers :predefined-id="myQueueId"
                      :previousRelations="previousRelations"
                      v-if="isActive" />
-      <RemoveListModal v-if="isActive"
+      <remove-list-modal v-if="isActive"
                        @on-clear-list="onClear" />
-      <RemoveListConfirmation v-if="isActive" />
-      <RemoveContact :is-contact-module-type="false"
+      <remove-list-confirmation v-if="isActive" />
+      <remove-contact :is-contact-module-type="false"
                      v-if="isActive"
                      @on-remove="onRemove"/>
-      <RemoveContactConfirmation v-if="isActive"
+      <remove-contact-confirmation v-if="isActive"
                                  @contactsRemoved="updateList" />
-      <RemoveFolderDialog :is-contact-module-type="false" />
+      <remove-folder-dialog :is-contact-module-type="false" />
       <create-list-modal :is-default="false" />
     </template>
   </div>
@@ -120,7 +120,7 @@ export default {
   data () {
     return {
       powerDialerListeners: {},
-      powerDialerListAddContactsProgress: {
+      powerDialerListAddRemoveContactsProgress: {
         id: null,
         loading: false
       },
@@ -152,7 +152,8 @@ export default {
       'contactToRemove',
       'isBulkDelete',
       'selectedContacts',
-      'removeContactActionType'
+      'removeContactActionType',
+      'currentListFilters'
     ]),
 
     ...mapState(['currentRoute']),
@@ -220,10 +221,9 @@ export default {
     },
 
     isComponentLoading () {
-      const listId = this.getCleanedListId(this.$route?.params?.id)
-      const eventListId = this.getCleanedListId(this.powerDialerListAddContactsProgress.id)
-      const isListLoading = this.isInPowerDialerList && listId === eventListId &&
-        this.powerDialerListAddContactsProgress.loading
+      const eventListId = this.getCleanedListId(this.powerDialerListAddRemoveContactsProgress.id)
+      const isListLoading = this.isInPowerDialerList && this.cleanedListId === eventListId &&
+        this.powerDialerListAddRemoveContactsProgress.loading
 
       return this.isLoading || isListLoading
     }
@@ -269,7 +269,7 @@ export default {
     }
 
     this.powerDialerListeners.addContactsProgress = (data) => {
-      this.powerDialerListAddContactsProgress = data
+      this.powerDialerListAddRemoveContactsProgress = data
     }
 
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
@@ -328,7 +328,13 @@ export default {
       return this.$axios
         .delete(url.data, { params: params })
         .then(() => {
-          this.updateList(this.selectedList)
+          this.powerDialerListAddRemoveContactsProgress = {
+            id: null,
+            loading: false
+          }
+
+          const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          this.fetch(params, false, true)
           this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {
@@ -343,6 +349,11 @@ export default {
       if (Object.keys(this.selectedContacts).length !== 0 &&
         this.selectedContacts[this.selectedList.id].constructor !== Object &&
         this.isBulkDelete) {
+        this.powerDialerListAddRemoveContactsProgress = {
+          id: this.cleanedListId,
+          loading: true
+        }
+
         this.handleBulkDeletion()
       }
     },
