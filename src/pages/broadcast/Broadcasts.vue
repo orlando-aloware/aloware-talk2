@@ -21,7 +21,7 @@
                       dense
                       v-model="broadcastFilter"
                       :options="broadcastFilterOptions">
-          <template v-slot:one class="test">
+          <template v-slot:one>
             <div class="d-flex justify-content-center w-100 px-1 options"
                 :class="[broadcastFilter === 1 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
