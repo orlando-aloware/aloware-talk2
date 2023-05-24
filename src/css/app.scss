@@ -12422,6 +12422,14 @@ h1.contact-list-name-label {
 
 .broadcasts {
   &__home {
+    &__graph {
+      .custom-toggle-button {
+        button[aria-pressed="true"]:hover {
+          background: lighten(#4caf50, 10%) !important;
+        }
+      }
+    }
+
     &__table {
       .broadcast-status-pill {
         border: solid black 1px;

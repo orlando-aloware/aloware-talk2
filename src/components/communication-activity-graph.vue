@@ -16,15 +16,33 @@
 
         <div class="d-flex align-items-center">
           <strong>Chart type:</strong>
-          <q-radio v-model="chartType"
-                   label="Line"
-                   val="spline"/>
-          <q-radio v-model="chartType"
-                   label="Area"
-                   val="areaspline"/>
-          <q-radio v-model="chartType"
-                   label="Bar"
-                   val="column"/>
+          <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
+                        v-model="chartType"
+                        :options="chartOptions"
+                        toggle-color="green"
+                        no-caps
+                        spread
+                        unelevated
+                        dense>
+            <template v-slot:one>
+              <span class="text-grey-90 px-3"
+                    :class="[chartType === 1 ? 'text-white' : 'text-grey-90']">
+                {{ chartOptions[0].labelValue }}
+              </span>
+            </template>
+            <template v-slot:two>
+              <span class="text-grey-90 px-3"
+                    :class="[chartType === 2 ? 'text-white' : 'text-grey-90']">
+                {{ chartOptions[1].labelValue }}
+              </span>
+            </template>
+            <template v-slot:three>
+              <span class="text-grey-90 px-3"
+                    :class="[chartType === 3 ? 'text-white' : 'text-grey-90']">
+                {{ chartOptions[2].labelValue }}
+              </span>
+            </template>
+          </q-btn-toggle>
         </div>
       </div>
     </div>
@@ -58,6 +76,27 @@
 import moment from 'moment'
 import ReportMixin from 'src/plugins/mixins/report.mixin'
 
+const chartOptions = [
+  {
+    value: 1,
+    slot: 'one',
+    type: 'spline',
+    labelValue: 'Line'
+  },
+  {
+    value: 2,
+    slot: 'two',
+    type: 'areaspline',
+    labelValue: 'Area'
+  },
+  {
+    value: 3,
+    slot: 'three',
+    type: 'column',
+    labelValue: 'Bar'
+  }
+]
+
 export default {
   mixins: [ReportMixin],
 
@@ -86,7 +125,8 @@ export default {
       graph_id: 'activity-graph',
       report_type: 'date_v_campaign', // changes to date_v_user
       chart_period: 'day',
-      chartType: 'spline',
+      chartType: 1,
+      chartOptions,
       options: {
         rangeSelector: {
           enabled: false

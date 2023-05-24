@@ -108,7 +108,7 @@
       </div>
     </div>
     <q-separator/>
-    <div>
+    <div class="broadcasts__home__graph">
       <communication-activity-graph base="broadcast" />
     </div>
     <q-separator/>
