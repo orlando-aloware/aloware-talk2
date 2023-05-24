@@ -8,44 +8,59 @@
 
       <div class="items">
         <a href="#"
-           disabled
-           @click.prevent>
+           @click.prevent="clearAllSelectedTags">
           <i class="fa fa-minus-square"></i>
-          Unselect All
+          Clear All
         </a>
+      </div>
+
+      <div class="items"
+           v-if="selectedTagCategory === ContactTags">
+        <span class="d-inline-block"
+              tabindex="0"
+              :title="disabledBulkActionsTitle">
+          <a id="btn-assign-contacts"
+             href="#"
+             :disabled="!selectedTagsHasContactsCount"
+             @click.prevent="bulkAssignContacts">
+            <i class="fa fa-layer-group"></i>
+            Assign Contacts
+          </a>
+        </span>
+      </div>
+
+      <div class="items"
+           v-if="selectedTagCategory === ContactTags">
+        <span class="d-inline-block"
+              tabindex="0"
+              :title="disabledBulkActionsTitle">
+          <a href="#"
+             :disabled="!selectedTagsHasContactsCount"
+             @click.prevent="bulkAddtoPowerDialer">
+            <i class="fa fa-layer-group"></i>
+            Add to Power Dialer
+          </a>
+        </span>
+      </div>
+
+      <div class="items"
+           v-if="selectedTagCategory === ContactTags">
+        <span class="d-inline-block"
+              tabindex="0"
+              :title="disabledBulkActionsTitle">
+          <a href="#"
+             :disabled="!selectedTagsHasContactsCount"
+             @click.prevent="bulkEnrollContacts">
+            <i class="fa fa-layer-group"></i>
+            Enroll Contacts
+          </a>
+        </span>
       </div>
 
       <div class="items">
         <a href="#"
-           disabled
-           @click.prevent>
-          <i class="fa fa-layer-group"></i>
-          Assign Contacts
-        </a>
-      </div>
-
-      <div class="items">
-        <a href="#"
-           disabled
-           @click.prevent>
-          <i class="fa fa-layer-group"></i>
-          Add to Power Dialer
-        </a>
-      </div>
-
-      <div class="items">
-        <a href="#"
-           disabled
-           @click.prevent>
-          <i class="fa fa-layer-group"></i>
-          Enroll Contacts
-        </a>
-      </div>
-
-      <div class="items">
-        <a href="#"
-           disabled
-           @click.prevent>
+           class="text-danger"
+           @click.prevent="bulkDelete">
           <i class="fa fa-trash text-danger"></i>
           Delete
         </a>
@@ -67,10 +82,40 @@ export default {
   ],
 
   computed: {
-    ...mapState('tagsModule', ['selectedTagIds']),
+    ...mapState('tagsModule', [
+      'selectedTagCategory',
+      'selectedTagIds',
+      'selectedTagsContactsCount'
+    ]),
 
     getSelectedCount () {
       return [...this.selectedTagIds].length
+    },
+
+    selectedTagsHasContactsCount () {
+      return this.selectedTagCategory === this.ContactTags && this.selectedTagsContactsCount > 0
+    },
+
+    disabledBulkActionsTitle () {
+      return !this.selectedTagsHasContactsCount ? 'Contacts Count is Empty' : false
+    }
+  },
+
+  methods: {
+    bulkAssignContacts () {
+
+    },
+
+    bulkAddToPowerDialer () {
+
+    },
+
+    bulkEnrollContacts () {
+
+    },
+
+    bulkDelete () {
+
     }
   }
 }

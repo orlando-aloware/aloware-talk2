@@ -14,10 +14,6 @@ export default {
     }
   },
 
-  created () {
-    this.setSelectedTagCategory(this.ContactTags)
-  },
-
   computed: {
     ...mapState('tagsModule', [
       'selectedTagCategory',
@@ -51,7 +47,9 @@ export default {
 
   methods: {
     ...mapActions('tagsModule', [
-      'setSelectedTagCategory'
+      'setSelectedTagCategory',
+      'setSelectedTagIds',
+      'setSelectedTagsContactsCount'
     ]),
 
     getTagCategoryName (category) {
@@ -86,6 +84,11 @@ export default {
           console.log(err)
           this.$handleErrors(err.response)
         })
+    },
+
+    clearAllSelectedTags () {
+      this.setSelectedTagIds([])
+      this.setSelectedTagsContactsCount(0)
     }
   }
 }

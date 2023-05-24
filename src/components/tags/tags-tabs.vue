@@ -80,8 +80,9 @@ export default {
   },
 
   watch: {
-    currentTab: function () {
-      this.setSelectedTagCategory(this.currentTab)
+    currentTab: function (value) {
+      this.setSelectedTagCategory(value)
+      this.clearAllSelectedTags()
       this.$emit('loadTags')
     }
   }

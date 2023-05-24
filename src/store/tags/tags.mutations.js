@@ -12,5 +12,17 @@ export default {
 
     // keep it unique at all times
     state.selectedTagIds = [...new Set([...tagIds])]
+  },
+
+  SET_SELECTED_TAGS_CONTACTS_COUNT: (state, count) => {
+    state.selectedTagsContactsCount = +count
+  },
+
+  ADD_SELECTED_TAGS_CONTACTS_COUNT: (state, count) => {
+    state.selectedTagsContactsCount += +count
+  },
+
+  SUBTRACT_SELECTED_TAGS_CONTACTS_COUNT: (state, count) => {
+    state.selectedTagsContactsCount -= +count
   }
 }

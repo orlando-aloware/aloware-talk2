@@ -32,7 +32,7 @@
                          class="checker"
                          :value="tag.id"
                          :checked="isSelected(tag.id)"
-                         @change="rowCheckboxChange($event, tag.id)" />
+                         @change="rowCheckboxChange($event, tag)" />
                   <span class="checkmark"></span>
                 </label>
               </td>
@@ -310,7 +310,9 @@ export default {
 
   methods: {
     ...mapActions('tagsModule', [
-      'setSelectedTagIds'
+      'setSelectedTagIds',
+      'addSelectedTagsContactsCount',
+      'subtractSelectedTagsContactsCount'
     ]),
 
     paginated (pagination) {
@@ -387,14 +389,20 @@ export default {
       return [...this.selectedTagIds].indexOf(tagId) > -1
     },
 
-    rowCheckboxChange (event, tagId) {
+    rowCheckboxChange (event, tag) {
       const isChecked = event.currentTarget.checked
+      const tagId = tag.id
 
       // add to the selected tags array
       if (isChecked) {
         // add tag id then keep values unique
         const tagIds = [...new Set([...this.selectedTagIds, tagId])]
         this.setSelectedTagIds(tagIds)
+
+        // add to counting
+        if (this.selectedTagCategory === this.ContactTags && tag.contacts_count > 0) {
+          this.addSelectedTagsContactsCount(tag.contacts_count)
+        }
         return
       }
 
@@ -403,6 +411,11 @@ export default {
       const index = tagIds.indexOf(tagId)
       tagIds.splice(index, 1)
       this.setSelectedTagIds(tagIds)
+
+      // subtract from counting
+      if (this.selectedTagCategory === this.ContactTags && tag.contacts_count > 0) {
+        this.subtractSelectedTagsContactsCount(tag.contacts_count)
+      }
     },
 
     selectAllCheckboxChange (isChecked) {
@@ -411,18 +424,42 @@ export default {
       }
 
       // check all present in the current page
-      const tagIds = [...this.tags].map(tag => tag.id)
+      let tagIds = []
+      let tagContactsCount = 0
       let updatedTagIds = []
+
+      this.tags.forEach(tag => {
+        tagIds.push(tag.id)
+
+        if (this.selectedTagCategory === this.ContactTags) {
+          tagContactsCount += +tag.contacts_count
+        }
+      })
 
       if (isChecked) {
         // add this current page's tag ids
         updatedTagIds = [...new Set([...this.selectedTagIds, ...tagIds])]
+
+        // update contacts count info
+        if (this.selectedTagCategory === this.ContactTags) {
+          this.addSelectedTagsContactsCount(tagContactsCount)
+        }
       } else {
         // remove selected tag ids in current page
         updatedTagIds = [...this.selectedTagIds].filter(tagId => tagIds.indexOf(tagId) === -1)
+
+        // update contacts count info
+        if (this.selectedTagCategory === this.ContactTags) {
+          this.subtractSelectedTagsContactsCount(tagContactsCount)
+        }
       }
 
       this.setSelectedTagIds(updatedTagIds)
+
+      // clear contacts count info when in Communication Tags tab
+      if (this.selectedTagCategory === this.CommunicationTags) {
+        this.setSelectedTagsContactsCount(0)
+      }
     }
   },
 
