@@ -1824,10 +1824,6 @@ export default {
     isPhoneExpansionAvailable () {
       return (this.devMode || !this.isCallCompleted) &&
         (this.contact || this.hasCallFishingCommunication) && this.expansionEnabled
-    },
-
-    isBargingOrWhispering () {
-      return AgentStatus.AGENT_STATUS_SENTRY === this.agentStatus
     }
   },
 

@@ -1251,7 +1251,7 @@ export default {
         : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
 
-      if (wrapUpTimer < 0) {
+      if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
         this.backToDial()
         return
       }
