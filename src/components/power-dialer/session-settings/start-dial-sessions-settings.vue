@@ -174,45 +174,41 @@
                 <q-card flat>
                   <div class="row">
                     <div class="col px-0 d-flex justify-content-end t-session-settings__actions">
-                      <q-btn
-                        unelevated
-                        no-caps
-                        size="sm"
-                        class="px-3 py-0 ml-2"
-                        color="grey-5"
-                        @click="resetDefaults">
+                      <q-btn class="px-3 py-0 ml-2"
+                             unelevated
+                             no-caps
+                             size="sm"
+                             color="grey-5"
+                             @click="resetDefaults">
                         Reset
                       </q-btn>
-                      <q-btn
-                        v-if="!hasSelectedTemporarySetting"
-                        unelevated
-                        no-caps
-                        size="sm"
-                        class="px-3 py-0 ml-2"
-                        color="primary"
-                        :disabled="saveDisabled"
-                        @click="updateSelectedSetting">
+                      <q-btn class="px-3 py-0 ml-2"
+                             unelevated
+                             no-caps
+                             size="sm"
+                             color="primary"
+                             :disabled="saveDisabled"
+                             v-if="!hasSelectedTemporarySetting"
+                             @click="updateSelectedSetting">
                         Save
                       </q-btn>
-                      <q-btn
-                        v-if="hasSelectedTemporarySetting"
-                        unelevated
-                        no-caps
-                        size="sm"
-                        class="px-3 py-0 ml-2"
-                        color="primary"
-                        :disabled="disabled"
-                        @click="newSetting = true">
+                      <q-btn class="px-3 py-0 ml-2"
+                             v-if="hasSelectedTemporarySetting"
+                             unelevated
+                             no-caps
+                             size="sm"
+                             color="primary"
+                             :disabled="disabled"
+                             @click="newSetting = true">
                         Save As New
                       </q-btn>
-                      <q-btn
-                        unelevated
-                        no-caps
-                        size="sm"
-                        class="px-3 py-0 ml-2"
-                        color="success"
-                        :disabled="disabled"
-                        @click="beginDial">
+                      <q-btn class="px-3 py-0 ml-2"
+                             unelevated
+                             no-caps
+                             size="sm"
+                             color="success"
+                             :disabled="disabled"
+                             @click="beginDial">
                         {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
                       </q-btn>
                     </div>
