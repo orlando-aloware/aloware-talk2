@@ -36,7 +36,8 @@
           <b-form-group id="input-group-2"
                         label="Duration"
                         label-for="input-2">
-            <predefined-time-duration-selector @select="durationSelected"/>
+            <predefined-time-duration-selector v-model="appointment.duration"
+                                               @select="durationSelected"/>
           </b-form-group>
         </b-col>
         <b-col>
@@ -203,8 +204,8 @@ export default {
       isSaving: false,
       appointment: {
         date: window.moment().format('MM/DD/YYYY'),
-        time: '',
-        duration: '',
+        time: '06:00',
+        duration: 15,
         timezone: this.contact.timezone || '',
         body: '',
         type: 12,
@@ -302,8 +303,8 @@ export default {
     resetForm () {
       this.appointment = {
         date: window.moment().format('MM/DD/YYYY'),
-        time: '',
-        duration: '',
+        time: '06:00',
+        duration: 15,
         timezone: this.contact.timezone || '',
         body: '',
         type: 12,
