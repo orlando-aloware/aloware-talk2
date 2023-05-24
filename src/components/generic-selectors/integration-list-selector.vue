@@ -209,7 +209,7 @@ export default {
     getListsOfEnabledIntegration () {
       this.lists = []
 
-      switch (this.integration.toLowerCase()) {
+      switch (this.integration?.toLowerCase()) {
         case 'hubspot':
           return this.getHubspotLists()
 

@@ -1,18 +1,18 @@
 <template>
-  <q-select ref="device-selector"
-            :options="options"
+  <q-select ref="deviceSelector"
             v-model="selectedId"
-            class="has-margin-top-5 q-basic-selector"
+            behavior="menu"
+            class="has-margin-top-5 q-basic-selector break-all"
             option-value="id"
             option-label="label"
-            use-input
+            :options="options"
+            :popup-content-style="`width: ${width}px; word-break: break-all;`"
             emit-value
             map-options
             outlined
             dense
-            @focus="onFocus"
-            @blur="onBlur"
-            @input="onInput">
+            @popup-show="width = $refs.deviceSelector.$el.offsetWidth"
+            @input="onInputNew">
   </q-select>
 </template>
 
@@ -28,7 +28,7 @@ export default {
     value: {
       required: false
     },
-    options: {
+    devices: {
       type: Array,
       default: () => {
         return []
@@ -38,17 +38,21 @@ export default {
   data () {
     return {
       selectedId: this.value,
+      options: [],
       emitChange: true,
-      reference: 'device-selector',
-      fullOptionsProperty: 'options'
+      reference: 'deviceSelector',
+      fullOptionsProperty: 'options',
+      compareProperty: 'id',
+      textProperty: 'label',
+      width: 0
     }
+  },
+  mounted () {
+    this.options = this.devices
   },
   watch: {
     value: function (value) {
       this.selectedId = value
-    },
-    selectedId () {
-      this.showInputPlaceholder()
     }
   }
 }

@@ -4496,19 +4496,9 @@ i.option-separator {
   @extend .q-pa-md;
 
   .q-field__native {
-    min-height: 32px !important;
-    height: 32px !important;
     padding: 2px 0;
     font-size: $f-size-body;
-  }
-
-  .q-field__control {
-    min-height: 32px !important;
-    height: 32px !important;
-  }
-
-  .q-field__marginal {
-    height: 32px !important;
+    overflow: hidden;
   }
 
   .btn:focus, .btn.focus {
@@ -7492,6 +7482,8 @@ table.datatable {
     font-size: 14px;
     font-weight: 600;
     color: $grey-100;
+    display: block;
+    width: 83px;
   }
 
   .left-column-wrapper {
@@ -7523,6 +7515,11 @@ table.datatable {
         overflow: hidden;
         white-space: nowrap;
         display: inline-block;
+      }
+
+      span.position-absolute.check-icon {
+        right: 20px;
+        top: 5px;
       }
 
       .b-dropdown {
@@ -9551,12 +9548,20 @@ screen and (max-width: 956px) {
       left: 0 !important;
     }
 
-    & > div > h1 {
-      font-size: 18px;
-      font-family: $font-family-body;
-      height: 27px;
-      display: flex;
-      align-items: center;
+    & > div {
+      &:first-child {
+        flex: 1;
+      }
+      min-width: 0;
+      & > h1 {
+        font-size: 18px;
+        font-family: $font-family-body;
+        height: 27px;
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     &.q-toolbar {
@@ -9602,7 +9607,7 @@ screen and (max-width: 956px) {
       .page-header {
         & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
         & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
-        div:nth-child(3) {
+        & > div:nth-child(3) {
           display: none !important;
         }
       }
@@ -10434,7 +10439,7 @@ screen and (max-width: 956px) {
     .page-header {
       & > div:nth-child(2) > div > div:not(.menu-avatar-wrapper),
       & > div:nth-child(2) > div > hr:not(.menu-avatar-wrapper),
-      div:nth-child(3) {
+      & > div:nth-child(3) {
         display: none !important;
       }
     }
