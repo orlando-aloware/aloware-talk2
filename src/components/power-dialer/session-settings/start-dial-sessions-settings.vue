@@ -127,7 +127,7 @@
                           <q-menu
                             anchor="top right"
                             self="top left">
-                            <q-list style="min-wRidth: 100px">
+                            <q-list style="min-width: 100px">
                               <q-item
                                 dense
                                 clickable
