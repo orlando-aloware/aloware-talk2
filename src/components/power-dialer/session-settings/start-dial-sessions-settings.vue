@@ -127,7 +127,7 @@
                           <q-menu
                             anchor="top right"
                             self="top left">
-                            <q-list style="min-width: 100px">
+                            <q-list style="min-wRidth: 100px">
                               <q-item
                                 dense
                                 clickable
@@ -173,60 +173,58 @@
                 :disabled="loading">
                 <q-card flat>
                   <div class="row">
-                    <div class="col-12">
-                      <q-card flat
-                              class="p-0">
-                        <q-card-actions class="px-0">
-                          <div class="session-settings-title">
-                            {{ selectedItemName }}
-                            <q-tooltip anchor="center right">
-                              {{ selectedItemName }}
-                            </q-tooltip>
-                          </div>
-                          <q-space />
-                          <q-btn
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="grey-5"
-                            @click="resetDefaults">
-                            Reset
-                          </q-btn>
-                          <q-btn
-                            v-if="!hasSelectedTemporarySetting"
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="primary"
-                            :disabled="saveDisabled"
-                            @click="updateSelectedSetting">
-                            Save
-                          </q-btn>
-                          <q-btn
-                            v-if="hasSelectedTemporarySetting"
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="primary"
-                            :disabled="disabled"
-                            @click="newSetting = true">
-                            Save As New
-                          </q-btn>
-                          <q-btn
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="success"
-                            :disabled="disabled"
-                            @click="beginDial">
-                            {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
-                          </q-btn>
-                        </q-card-actions>
-                      </q-card>
+                    <div class="col px-0 d-flex justify-content-end">
+                      <q-btn
+                        unelevated
+                        no-caps
+                        size="sm"
+                        class="px-3 py-0 ml-2"
+                        color="grey-5"
+                        @click="resetDefaults">
+                        Reset
+                      </q-btn>
+                      <q-btn
+                        v-if="!hasSelectedTemporarySetting"
+                        unelevated
+                        no-caps
+                        size="sm"
+                        class="px-3 py-0 ml-2"
+                        color="primary"
+                        :disabled="saveDisabled"
+                        @click="updateSelectedSetting">
+                        Save
+                      </q-btn>
+                      <q-btn
+                        v-if="hasSelectedTemporarySetting"
+                        unelevated
+                        no-caps
+                        size="sm"
+                        class="px-3 py-0 ml-2"
+                        color="primary"
+                        :disabled="disabled"
+                        @click="newSetting = true">
+                        Save As New
+                      </q-btn>
+                      <q-btn
+                        unelevated
+                        no-caps
+                        size="sm"
+                        class="px-3 py-0 ml-2"
+                        color="success"
+                        :disabled="disabled"
+                        @click="beginDial">
+                        {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                      </q-btn>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div class="session-settings-title text-h5 font-weight-bold">
+                        {{ selectedItemName }}
+                        <q-tooltip anchor="center right">
+                          {{ selectedItemName }}
+                        </q-tooltip>
+                      </div>
                     </div>
                   </div>
 
