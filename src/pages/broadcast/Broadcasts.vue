@@ -187,16 +187,23 @@
         </template>
       </datatable>
       <q-menu v-model="contextMenuOpen"
+              ref="contextMenu"
               self="top right"
-              :target="contextMenuTarget">
+              :target="contextMenuTarget"
+              @input="onContextMenuInput">
         <q-list>
           <q-item v-for="(item, id) in contextMenuListItems"
                   :key="id"
                   :disabled="!shouldAllowContextMenuButton(item)"
+                  dense
                   clickable
                   @click="onContextMenuButtonClicked(item)">
-            <q-item-section>
-              <span>{{ item.label }}</span>
+            <q-item-section class="px-2">
+              <div class="d-flex align-items-center">
+                <img class="mr-2"
+                     :src="`app-icons/menu/${item.icon}`" />
+                <span>{{ item.label }}</span>
+              </div>
             </q-item-section>
           </q-item>
         </q-list>
@@ -282,17 +289,17 @@ const contextMenuListItems = [
   {
     name: 'activity',
     label: 'Activity',
-    icon: ''
+    icon: 'context-menu-activity.svg'
   },
   {
     name: 'rename',
     label: 'Rename',
-    icon: ''
+    icon: 'context-menu-rename.svg'
   },
   {
     name: 'delete',
     label: 'Delete',
-    icon: ''
+    icon: 'context-menu-delete.svg'
   }
 ]
 
@@ -477,7 +484,6 @@ export default {
 
     onContextMenuClicked (row) {
       this.contextMenuTargetId = row.id
-      this.contextMenuOpen = !this.contextMenuOpen
     },
 
     onContextMenuButtonClicked (item) {
@@ -545,12 +551,30 @@ export default {
       }
 
       return true
+    },
+
+    onContextMenuInput (val) {
+      // if (!val) {
+      //   this.contextMenuOpen = val
+      // }
     }
   },
 
   watch: {
     broadcasts (broadcasts) {
       this.getBroadcasts()
+    },
+
+    contextMenuOpen (val) {
+      if (!val) {
+        this.contextMenuTargetId = null
+      }
+    },
+
+    contextMenuTarget (val) {
+      if (val !== true) {
+        this.$refs['contextMenu'].show()
+      }
     }
   }
 }
