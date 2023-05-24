@@ -12426,3 +12426,11 @@ h1.contact-list-name-label {
 #daytime-hours-confirmation___BV_modal_outer_ {
   z-index: 9999 !important;
 }
+
+.chip-ellipsis {
+  .b-overlay {
+    & > div {
+      border-radius: 10px;
+    }
+  }
+}
