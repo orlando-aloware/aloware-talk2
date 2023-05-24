@@ -171,42 +171,40 @@
                 </template>
               </td>
               <td :key="`c-${colIndex}`"
+                  v-else-if="col.field == 'actions'">
+                <div class="context-menu">
+                  <b-dropdown class="position-absolute"
+                              :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
+                              :id="getContextMenuTargetElementId(row)"
+                              size="sm"
+                              right
+                              @click="onContextMenuClicked(row)">
+                    <template #button-content>
+                      <ellipse-icon/>
+                    </template>
+                    <b-dropdown-item v-for="(item, id) in contextMenuListItems"
+                            :key="id"
+                            :disabled="!shouldAllowContextMenuButton(item)"
+                            dense
+                            clickable
+                            @click="onContextMenuButtonClicked(item)">
+                      <div class="d-flex align-items-center">
+                        <img class="mr-2"
+                            :src="`app-icons/menu/${item.icon}`" />
+                        <span>{{ item.label }}</span>
+                      </div>
+                    </b-dropdown-item>
+                  </b-dropdown>
+                </div>
+              </td>
+              <td :key="`c-${colIndex}`"
                   v-else>
                 {{ row[col.field] }}
               </td>
             </template>
-            <div class="context-menu">
-              <q-btn class="shadow-1"
-                     :id="getContextMenuTargetElementId(row)"
-                     size="sm"
-                     label="..."
-                     @click="onContextMenuClicked(row)"/>
-            </div>
           </tr>
         </template>
       </datatable>
-      <q-menu v-model="contextMenuOpen"
-              ref="contextMenu"
-              self="top right"
-              :target="contextMenuTarget"
-              @input="onContextMenuInput">
-        <q-list>
-          <q-item v-for="(item, id) in contextMenuListItems"
-                  :key="id"
-                  :disabled="!shouldAllowContextMenuButton(item)"
-                  dense
-                  clickable
-                  @click="onContextMenuButtonClicked(item)">
-            <q-item-section class="px-2">
-              <div class="d-flex align-items-center">
-                <img class="mr-2"
-                     :src="`app-icons/menu/${item.icon}`" />
-                <span>{{ item.label }}</span>
-              </div>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
     </div>
   </div>
 </template>
@@ -216,6 +214,7 @@ import Search from 'src/components/search.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
+import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
 import CommunicationActivityGraph from 'src/components/communication-activity-graph.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
@@ -281,6 +280,12 @@ const broadcastsColumns = [
     name: 'throttle_limit',
     label: 'Throttling',
     field: 'throttle_limit'
+  },
+  {
+    name: '',
+    label: '',
+    field: 'actions',
+    maxWidth: 50
   }
 ]
 
@@ -310,7 +315,8 @@ export default {
     PlusIcon,
     Datatable,
     BroadcastStatusPill,
-    CommunicationActivityGraph
+    CommunicationActivityGraph,
+    EllipseIcon
   },
 
   data: () => ({

@@ -12432,17 +12432,15 @@ h1.contact-list-name-label {
 
         tr {
           .context-menu {
-            position: absolute;
-            right: 8px;
             visibility: hidden;
-          }
 
-          .context-menu button {
-            background: $white;
+            .dropdown-toggle::after {
+              display: none;
+            }
 
-            .block {
-              display: flex;
-              align-items: center;
+            button, .show button {
+              background-color: $grey-light2;
+              border: $grey-mid solid 1px !important;
             }
           }
 
