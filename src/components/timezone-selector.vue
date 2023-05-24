@@ -47,25 +47,23 @@ export default {
 
   mounted () {
     this.setTimezones()
-
-    if (this.value) {
-      let timezone = this.timezones.find(tz => tz.value === this.value)
-
-      // this might happen when the contact's timezone isnt present in the timezones list
-      if (!timezone) {
-        timezone = {
-          name: this.value,
-          value: this.value
-        }
-
-        this.timezones.unshift(timezone)
-      }
-
-      this.timezone = timezone
-    }
+    this.setValue()
   },
 
   methods: {
+    setValue () {
+      if (this.value) {
+        let timezone = this.timezones.find(tz => tz.value === this.value)
+
+        // this might happen when the contact's timezone isnt present in the timezones list
+        if (!timezone) {
+          timezone = this.addTimezone(this.value)
+        }
+
+        this.timezone = timezone
+      }
+    },
+
     onSelect (selected) {
       this.$emit('select', selected)
     },
@@ -110,6 +108,25 @@ export default {
           ]
         }
       }
+    },
+
+    addTimezone (timezone) {
+      const tz = {
+        name: timezone,
+        value: timezone
+      }
+
+      // add the custom timezone as the first option in the list
+      this.timezones.unshift(tz)
+
+      return tz
+    }
+  },
+
+  watch: {
+    value () {
+      // configure timezone object when value changes
+      this.setValue()
     }
   }
 }
