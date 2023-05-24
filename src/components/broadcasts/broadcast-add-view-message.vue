@@ -6,30 +6,47 @@
                         text-field="label"
                         v-model="type"/>
     <!-- sms -->
-    <template v-if="type === 'sms'">
-      <!-- composer -->
-      <!-- preview -->
-    </template>
-    <!-- voicemail -->
+    <div class="broadcast-add__message__sms"
+         v-if="type === 'sms'">
+      <div class="broadcast-add__message__sms__composer">
+        <message-composer-sms :use-send-button="false"/>
+      </div>
+
+      <div class="broadcast-add__message__sms__preview">
+        <!-- <message-composer-sms-preview /> -->
+      </div>
+    </div>
+    <!-- voicemail TBD -->
   </div>
 </template>
 
 <script>
+import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'broadcast-add-view-message',
 
+  components: {
+    MessageComposerSms
+  },
+
   props: {
-    contactPreview: {
+    contact: {
       type: Object,
       required: false
     }
   },
 
   computed: {
+    ...mapGetters('contacts', [
+      'messageComposer'
+    ]),
+
     isValid () {
       switch (this.type) {
         case 'sms':
-          return !!this.message
+          return (this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
         default:
           return false
       }
@@ -41,7 +58,6 @@ export default {
   },
 
   data: () => ({
-    message: null,
     type: 'sms',
     types: [
       {

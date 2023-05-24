@@ -12510,6 +12510,23 @@ h1.contact-list-name-label {
                 top: 62px;
               }
             }
+
+            &__message {
+              &__sms {
+                margin: 20px 0px;
+
+                &__composer {
+                  position: relative;
+                  border: 1px solid $grey-70;
+                  border-radius: 8px;
+                  padding: 10px 12px;
+                }
+
+                &__preview {
+
+                }
+              }
+            }
           }
         }
 
