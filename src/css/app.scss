@@ -12437,6 +12437,15 @@ h1.contact-list-name-label {
             visibility: hidden;
           }
 
+          .context-menu button {
+            background: $white;
+
+            .block {
+              display: flex;
+              align-items: center;
+            }
+          }
+
           &:hover .context-menu {
             visibility: visible;
           }

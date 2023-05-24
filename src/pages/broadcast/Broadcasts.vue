@@ -176,9 +176,8 @@
               </td>
             </template>
             <div class="context-menu">
-              <q-btn :id="getContextMenuTargetElementId(row)"
-                     class="px-1"
-                     color="primary"
+              <q-btn class="shadow-1"
+                     :id="getContextMenuTargetElementId(row)"
                      size="sm"
                      label="..."
                      @click="onContextMenuClicked(row)"/>
