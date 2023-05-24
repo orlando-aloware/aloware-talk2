@@ -217,7 +217,7 @@
                       </q-btn>
                     </div>
                   </div>
-                  <div class="row">
+                  <div class="row mt-3 mb-2">
                     <div class="col">
                       <div class="session-settings-title text-h5 font-weight-bold">
                         {{ selectedItemName }}
