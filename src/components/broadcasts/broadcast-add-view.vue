@@ -48,7 +48,8 @@
       <component :is="footerComponent"
                  ref="footerComponent"
                  v-bind="footerComponentProps"
-                 @input="footerComponentChanged"/>
+                 @input="footerComponentChanged"
+                 @contact-preview="onContactPreview"/>
     </div>
   </div>
 </template>
@@ -111,7 +112,7 @@ export default {
         case 1:
           return { defaultSource: this.source }
         default:
-          return {}
+          return { contact: this.contactPreview }
       }
     },
 
@@ -155,7 +156,8 @@ export default {
   data: () => ({
     isMainComponentValid: false,
     isFooterComponentValid: false,
-    source: {}
+    source: {},
+    contactPreview: {}
   }),
 
   methods: {
@@ -180,6 +182,10 @@ export default {
 
     back () {
       this.$emit('back')
+    },
+
+    onContactPreview (contact) {
+      this.contactPreview = contact
     }
   }
 }

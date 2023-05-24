@@ -13,16 +13,17 @@
       </div>
 
       <div class="broadcast-add__message__sms__preview">
-        <!-- <message-composer-sms-preview /> -->
+        <!-- <message-composer-sms-preview :contact="contact"/> -->
       </div>
     </div>
-    <!-- voicemail TBD -->
+    <!-- voicemail (TBD) -->
   </div>
 </template>
 
 <script>
 import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
-import { mapGetters } from 'vuex'
+// import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'broadcast-add-view-message',
@@ -41,6 +42,10 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'messageComposer'
+    ]),
+
+    ...mapState([
+      'campaigns'
     ]),
 
     isValid () {
@@ -72,6 +77,17 @@ export default {
       }
     ]
   }),
+
+  created () {
+    // FIXME?: check implemented logic in contact.mixin::showContactInfo to select a campaign properly
+    this.setSelectedLine(this.campaigns[0])
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'setSelectedLine'
+    ])
+  },
 
   watch: {
     isValid (state) {
