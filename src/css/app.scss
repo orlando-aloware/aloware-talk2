@@ -12419,3 +12419,9 @@ h1.contact-list-name-label {
 #daytime-hours-confirmation___BV_modal_outer_ {
   z-index: 9999 !important;
 }
+
+.t-session-settings {
+  &__actions button {
+    font-size: 1em !important;
+  }
+}

@@ -173,7 +173,7 @@
                 :disabled="loading">
                 <q-card flat>
                   <div class="row">
-                    <div class="col px-0 d-flex justify-content-end">
+                    <div class="col px-0 d-flex justify-content-end t-session-settings__actions">
                       <q-btn
                         unelevated
                         no-caps
