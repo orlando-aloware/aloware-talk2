@@ -1269,7 +1269,6 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
-import * as AgentStatus from 'src/constants/agent-status'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
@@ -1419,8 +1418,7 @@ export default {
       CommunicationStatus,
       CommunicationCurrentStatus,
       CommunicationTypes,
-      UploadedFileTypes,
-      AgentStatus
+      UploadedFileTypes
     }
   },
 
