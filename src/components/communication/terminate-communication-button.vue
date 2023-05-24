@@ -58,7 +58,11 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm('Terminating will end this call and assign it a Failed call disposition. Continue?', {
+      const message = isLiveCall(this.communication) || isParkedCall(this.communication)
+        ? 'Terminating communication will forcefully dispose it'
+        : 'Terminating will end this call and assign it a Failed call disposition'
+
+      this.$bvModal.msgBoxConfirm(`${message}. Continue?`, {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
