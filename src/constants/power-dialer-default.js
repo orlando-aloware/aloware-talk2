@@ -181,5 +181,7 @@ export const DEFAULT_STATE = {
     currentTime: null,
     listId: null
   },
-  redialed: []
+  redialed: [],
+  pdViewSource: null,
+  pdViewCancelToken: null
 }
