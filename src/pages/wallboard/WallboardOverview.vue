@@ -6,13 +6,13 @@
                         class="overview__body"
                         tag="div">
         <wallboard-overview-card :value="item.value"
-                                :description="item.name"
-                                :icon="item.icon"
-                                :filter="item.filter"
-                                :loading="isSummaryLoading"
-                                :route="item.route"
-                                :key="item.name"
-                                v-for="item in items"/>
+                                 :description="item.name"
+                                 :icon="item.icon"
+                                 :filter="item.filter"
+                                 :loading="isSummaryLoading"
+                                 :route="item.route"
+                                 :key="item.name"
+                                 v-for="item in items"/>
       </transition-group>
     </div>
   </div>
