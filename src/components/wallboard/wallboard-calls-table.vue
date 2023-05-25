@@ -175,7 +175,7 @@
                          :key="tag.id"
                          v-for="tag in getLastTags(call.contact.tags)">
                       <i class="fa fa-circle"
-                        :style="{ color: tag.color }"/>
+                         :style="{ color: tag.color }"/>
                       <span class="ml-1">{{ tag.name }}</span>
                     </div>
                     <div class="d-flex justify-center"
