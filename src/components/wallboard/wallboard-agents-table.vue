@@ -31,8 +31,8 @@
                 :key="`col-${colIndex}`"
                 v-if="column.name === 'name'">
               <a :href="apiUrl + `/users/dialog/${agent.id}`"
-                  target="_blank"
-                  v-if="hasPermissionTo('list user')">
+                 target="_blank"
+                 v-if="hasPermissionTo('list user')">
                 {{ agent.name }}
               </a>
               <span v-else>
