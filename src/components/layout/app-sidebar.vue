@@ -122,13 +122,13 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :to="{ name: 'Wallboard' }"
-           :ripple="false"
-           icon="img:app-icons/menu/wallboard_active.svg"
+    <q-btn icon="img:app-icons/menu/wallboard_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
            flat
+           :to="{ name: 'Wallboard' }"
+           :ripple="false"
            v-show="isActive('Wallboard')">
       <q-tooltip anchor="center right"
                  self="center left"
@@ -136,13 +136,13 @@
         <span class="font-weight-bold text-sm">Wallboard</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ name: 'Wallboard' }"
-           :ripple="false"
-           icon="img:app-icons/menu/wallboard_grey.svg"
+    <q-btn icon="img:app-icons/menu/wallboard_grey.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
            flat
+           :to="{ name: 'Wallboard' }"
+           :ripple="false"
            v-show="!isActive('Wallboard')">
       <q-tooltip anchor="center right"
                  self="center left"

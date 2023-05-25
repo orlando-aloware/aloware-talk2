@@ -221,8 +221,8 @@
                       <li class="pb-1"
                           :key="attemptingUser"
                           v-for="attemptingUser in getAttemptingUsers(call)">
-                        <a :href="getUserActivityURL(attemptingUser)"
-                           target="_blank"
+                        <a target="_blank"
+                           :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">

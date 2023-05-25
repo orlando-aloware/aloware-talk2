@@ -30,8 +30,8 @@
             <td class="users__table__agent-name"
                 :key="`col-${colIndex}`"
                 v-if="column.name === 'name'">
-              <a :href="apiUrl + `/users/dialog/${agent.id}`"
-                 target="_blank"
+              <a target="_blank"
+                 :href="apiUrl + `/users/dialog/${agent.id}`"
                  v-if="hasPermissionTo('list user')">
                 {{ agent.name }}
               </a>

@@ -1,8 +1,8 @@
 <template>
   <div class="agents-status-pills">
-    <b-button :class="classes(status.name)"
-              pill
+    <b-button pill
               size="sm"
+              :class="classes(status.name)"
               :key="status.value"
               v-for="status in statuses">
       <span class="agents-status-pills__pill__counter">
