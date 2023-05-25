@@ -675,6 +675,8 @@ export default {
         this.$generalNotification(`Dialer session setting has been renamed to ${res.data.name}.`)
         this.isBusy = false
       }
+
+      this.newSettingName = ''
     },
 
     async onDeleteSetting () {
