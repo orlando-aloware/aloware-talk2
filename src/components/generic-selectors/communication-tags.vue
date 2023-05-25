@@ -8,7 +8,9 @@
                           :height="height"
                           @valuesUpdated="saveTags">
       <template v-slot:button>
-        <add-icon-circle height="14" width="14" color="#256EFF"/>
+        <add-icon-circle height="14"
+                         width="14"
+                         color="#256EFF"/>
         <span class="ml-1">
           {{ buttonText }}
         </span>
