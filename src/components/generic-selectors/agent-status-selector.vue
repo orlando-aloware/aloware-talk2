@@ -89,16 +89,15 @@ export default {
 
   computed: {
     placeholder () {
-      switch (true) {
-        case this.multiple && this.status.length < 1:
-          return 'Select Agent Statuses'
-        case !this.multiple && !this.status:
-          return 'Select Agent Status'
-        case this.multiple && this.status.length > 0:
-        case !this.multiple && this.status:
-        default:
-          return ''
+      if (this.multiple && this.status.length < 1) {
+        return 'Select Agent Statuses'  
       }
+
+      if (!this.multiple && !this.status) {
+        return 'Select Agent Status'  
+      }
+
+      return ''
     },
     optionsArray () {
       return [
