@@ -573,38 +573,6 @@ const fullDuration = (duration, shouldDisplaySeconds = true) => {
 }
 
 /**
- * Converts datetime to string format, considering timezone
- * @param {String} dt datetime
- * @returns String
- */
-const fixFullDateUTCRelative = (dt) => {
-  if (!dt) {
-    return '--'
-  }
-
-  let now = window.moment.utc()
-  let datetime = window.moment.utc(dt)
-
-  if (now.diff(datetime) < 24 * 60 * 60 * 1000) {
-    if (window.timezone) {
-      return datetime.tz(window.timezone).fromNow()
-    }
-
-    return datetime.local().fromNow()
-  }
-
-  if (!window.timezone) {
-    return datetime.local().format('MMM D, YYYY h:mma z')
-  }
-
-  if (window.timezone === 'Asia/Manila') {
-    return window.moment.utc(dt).tz(window.timezone).format('MMM D, YYYY h:mma') + ' MNL'
-  }
-
-  return datetime.tz(window.timezone).format('MMM D, YYYY h:mma z')
-}
-
-/**
  * Converts date to short text ("8 Jan 2023")
  *
  * @param {Date} date
@@ -612,21 +580,6 @@ const fixFullDateUTCRelative = (dt) => {
  */
 const fullShortDate = (date) => {
   return window.moment(date).format('MMM D, YYYY')
-}
-
-/**
- * Converts duration (seconds) in time format
- * @param {duration} duration
- * @returns String
- */
-const fixDuration = (duration) => {
-  if (duration) {
-    return window.moment.duration(duration, 'seconds').format('m:ss', {
-      trim: false
-    })
-  }
-
-  return '-'
 }
 
 export default ({ Vue }) => {
@@ -664,8 +617,6 @@ export default ({ Vue }) => {
     sortObjectByKey,
     objAlphabeticalOrder,
     fullDuration,
-    fixFullDateUTCRelative,
-    fixDuration,
     fullShortDate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
