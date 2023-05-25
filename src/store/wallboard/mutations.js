@@ -21,9 +21,11 @@ export default {
     // update agent status in store if found
     if (agentIndex >= 0) {
       state.agents.splice(agentIndex, 1, agent)
-    } else {
-      state.agents.push(agent)
+
+      return
     }
+
+    state.agents.push(agent)
   },
 
   SET_AGENTS: (state, data) => {
@@ -74,9 +76,11 @@ export default {
     // add or update the state otherwise
     if (index >= 0) {
       state.calls.live.splice(index, 1, communication)
-    } else {
-      state.calls.live.unshift(communication)
+
+      return
     }
+
+    state.calls.live.unshift(communication)
   },
 
   SET_LIVE_CALLS: (state, data) => {
@@ -106,9 +110,11 @@ export default {
     // add or update the state otherwise
     if (index >= 0) {
       state.calls.parked.splice(index, 1, communication)
-    } else {
-      state.calls.parked.unshift(communication)
+
+      return
     }
+
+    state.calls.parked.unshift(communication)
   },
 
   SET_PARKED_CALLS: (state, data) => {
@@ -134,9 +140,11 @@ export default {
     // add or update the state otherwise
     if (index >= 0) {
       state.calls.queued.splice(index, 1, communication)
-    } else {
-      state.calls.queued.unshift(communication)
+
+      return
     }
+
+    state.calls.queued.unshift(communication)
   },
 
   SET_QUEUED_CALLS: (state, data) => {
@@ -168,8 +176,10 @@ export default {
 
     if (index >= 0) {
       state.callsEnabledColumns.splice(index, 1)
-    } else {
-      state.callsEnabledColumns.push(column)
+
+      return
     }
+
+    state.callsEnabledColumns.push(column)
   }
 }
