@@ -60,7 +60,8 @@
 
     <!-- bulk actions -->
     <div class="row mx-0 relative-position">
-      <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length" />
+      <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
+                             @reloadTags="loadTags" />
     </div>
 
     <!-- table -->
@@ -71,12 +72,12 @@
                 @paginated="paginate"
                 @sort="sort"
                 @editTag="editTag"
-                @updateTagCount="updateTagCount"/>
+                @updateTagCount="updateTagCount" />
 
     <tag-form :is-show="isOpenTagForm"
               :tag-category="selectedTagCategory"
               :editable-tag="tag"
-              @closeTagForm="closeTagForm"/>
+              @closeTagForm="closeTagForm" />
   </div>
 </template>
 

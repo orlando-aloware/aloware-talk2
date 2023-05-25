@@ -18,20 +18,22 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Delete {{ tagCategoryName }} Tag</h6>
+      <h6>Delete {{ tagCategoryName }} Tag<span v-if="isBulk">(s)</span></h6>
     </template>
 
-    <span v-html="`Deleting <span class='font-italic font-weight-bold'>${ tagName }</span> tag will remove it from all contacts and communications. Continue?`" />
+    <span v-html="promptMessage" />
 
-    <b-form-checkbox v-show="showDeleteContactsQuestion"
-                     v-model="isDeleteContacts"
-                     value="yes"
+    <b-form-checkbox value="yes"
                      unchecked-value="no"
-                     class="mt-4">
+                     class="mt-4"
+                     v-if="!isBulk"
+                     v-show="!isBulk && showDeleteContactsQuestion"
+                     v-model="isDeleteContacts">
       Do you also want to delete the tagged contacts of this tag?
     </b-form-checkbox>
 
     <div class="text-left break-word mt-4 mb-0"
+         v-if="!isBulk"
          v-show="showConfirmDeleteInfo">
       <p>
           You're about to delete <span class="font-weight-bold">{{ (tag?.contacts_count || 0) | numFormat }} contacts</span>.
@@ -52,7 +54,7 @@
               Cancel
             </button>
             <button class="btn btn-sm btn-danger text-white"
-                    :disabled="$v.$invalid"
+                    :disabled="disabled"
                     @click.prevent="deleteTag">
               Delete
             </button>
@@ -83,6 +85,11 @@ export default {
     isShow: {
       type: Boolean,
       required: true
+    },
+
+    isBulk: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -116,6 +123,17 @@ export default {
       }
     },
 
+    disabled () {
+      if (this.isBulk) {
+        return false
+      }
+
+      // for contacts tag with delete contacts
+      return this?.tag?.category === this.ContactTags &&
+        this.isDeleteContacts === 'yes' &&
+        this.$v.$invalid
+    },
+
     showDeleteContactsQuestion () {
       if (!this.tag) {
         return false
@@ -138,6 +156,18 @@ export default {
 
     equalsTagContactsCount () {
       return this.confirmDeleteContactsCount === this.tag.contacts_count
+    },
+
+    promptMessage () {
+      let msg = 'Deleting '
+
+      if (!this.isBulk) {
+        msg += `<span class='font-italic font-weight-bold'>${this.tagName}</span> `
+      }
+
+      msg += `tag<span v-if='isBulk'>(s)</span> will remove it from all contacts and communications. Continue?`
+
+      return msg
     }
   },
 
@@ -163,16 +193,25 @@ export default {
     },
 
     deleteTag () {
-      // sanity check
-      if (this.confirmDeleteWithContacts && +this.confirmDeleteContactsCount !== this.tag.contacts_count) {
+      // sanity check: contact tags with delete contacts
+      if (!this.isBulk &&
+        this.confirmDeleteWithContacts &&
+        +this.confirmDeleteContactsCount !== this.tag.contacts_count) {
         this.validateState('confirmDeleteContactsCount')
         return
       }
 
       this.loading = true
 
+      if (this.isBulk) {
+        this.bulkDelete()
+        return
+      }
+
       axios.delete(`/api/v1/tag/${this.tag.id}`, {
-        data: { should_delete_contacts: this.confirmDeleteWithContacts }
+        data: {
+          should_delete_contacts: this.confirmDeleteWithContacts
+        }
       })
         .then(res => {
           this.$generalNotification(res.data.message)
@@ -180,7 +219,30 @@ export default {
         .catch(err => {
           console.log(err)
           this.$handleErrors(err.response)
-        }).finally(() => {
+        })
+        .finally(() => {
+          this.loading = false
+          this.closeModal()
+        })
+    },
+
+    bulkDelete () {
+      axios.delete('/api/v1/tags/bulk-delete', {
+        data: {
+          category: this.selectedTagCategory,
+          ids: this.selectedTagIds
+        }
+      })
+        .then(res => {
+          this.clearAllSelectedTags()
+          this.$generalNotification(res.data.message)
+          this.$emit('reloadTags')
+        })
+        .catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+        .finally(() => {
           this.loading = false
           this.closeModal()
         })

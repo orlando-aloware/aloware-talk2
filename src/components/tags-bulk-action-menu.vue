@@ -60,26 +60,44 @@
       <div class="items">
         <a href="#"
            class="text-danger"
-           @click.prevent="bulkDelete">
+           @click.prevent="isOpenDeleteTagDialog = true">
           <i class="fa fa-trash text-danger"></i>
           Delete
         </a>
       </div>
 
     </div>
+
+    <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
+                       :is-bulk="true"
+                       :tag="{}"
+                       v-if="hasSelectedTagIds"
+                       @closeDeleteTagDialog="isOpenDeleteTagDialog = false"
+                       @reloadTags="reloadTags"/>
   </div>
 </template>
 
 <script>
 import { tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 
 export default {
   name: 'tags-bulk-action-menu',
 
+  components: {
+    DeleteTagDialog
+  },
+
   mixins: [
     tagsMixin
   ],
+
+  data () {
+    return {
+      isOpenDeleteTagDialog: false
+    }
+  },
 
   computed: {
     ...mapState('tagsModule', [
@@ -114,8 +132,8 @@ export default {
 
     },
 
-    bulkDelete () {
-
+    reloadTags () {
+      this.$emit('reloadTags')
     }
   }
 }
