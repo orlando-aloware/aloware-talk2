@@ -18,6 +18,21 @@
                      v-model="contact"
                      @select="onSelect"
                      @search-change="onSearch">
+      <template #singleLabel>
+        {{ contact.name | removePhones }}
+      </template>
+      <template #option="props">
+        <div class="option__desc">
+          <span class="option__title">
+            {{ props.option.name | removePhones }}
+          </span>
+          <br>
+          <span class="option__small"
+                v-if="props.option.phone_number">
+            {{ props.option.phone_number | fixPhone }}
+          </span>
+        </div>
+      </template>
     </vue-multiselect>
     <q-tooltip v-if="redirectWhenDisabled">
       Click to go to contacts page
@@ -136,7 +151,8 @@ export default {
 
       return {
         id: contact.id,
-        name: `${name} ${this.showNumber ? '(' + contact.phone_number + ')' : ''}`
+        name: `${name} --- ${contact.phone_number} ${this.$options.filters.fixPhone(contact.phone_number)}`,
+        phone_number: contact.phone_number
       }
     },
 
@@ -157,6 +173,12 @@ export default {
 
       this.forceLoading = false
       this.$emit('loaded')
+    }
+  },
+
+  filters: {
+    removePhones (contactDescription) {
+      return contactDescription.replace(/---.*$/, '').trim()
     }
   }
 }

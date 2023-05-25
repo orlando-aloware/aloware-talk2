@@ -335,6 +335,14 @@ const routes = [
         }
       },
       {
+        name: 'Communication',
+        path: 'communication/:communicationId',
+        meta: {
+          title: 'Communication'
+        },
+        component: Communication
+      },
+      {
         path: 'phone',
         name: 'Phone',
         component: Phone
