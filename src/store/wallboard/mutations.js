@@ -39,11 +39,11 @@ export default {
   SET_AGENT_STATUS: (state, data) => {
     const agentIndex = state.agents.findIndex(agent => agent.id === data.user_id)
 
-    // update agent status in store if found
     if (agentIndex === -1) {
       return
     }
 
+    // update agent status in store if found
     state.agents[agentIndex].agent_status = data.agent_status
 
     // update last status date field if present
