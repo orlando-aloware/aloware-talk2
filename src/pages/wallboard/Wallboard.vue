@@ -38,6 +38,11 @@ export default {
   },
 
   data: () => ({
+    listeners: {
+      agentUpdated: null,
+      agentStatusUpdated: null,
+      callUpdated: null
+    },
     CALL
   }),
 
@@ -50,17 +55,15 @@ export default {
   },
 
   mounted () {
-    // agent updated event
-    this.$VueEvent.listen('user_updated', (agent) => {
+    this.listeners.agentUpdated = (agent) => {
       this.setAgent(agent)
-    })
+    }
 
-    // agent status updated event
-    this.$VueEvent.listen('agent_status_updated', (event) => {
+    this.listeners.agentStatusUpdated = (event) => {
       this.setAgentStatus(event)
-    })
+    }
 
-    const setCall = (communication) => {
+    this.listeners.callUpdated = (communication) => {
       if (![CALL].includes(communication.type)) {
         return
       }
@@ -76,11 +79,17 @@ export default {
       this.setQueuedCall(communication)
     }
 
+    // agent updated event
+    this.$VueEvent.listen('user_updated', this.listeners.agentUpdated)
+
+    // agent status updated event
+    this.$VueEvent.listen('agent_status_updated', this.listeners.agentStatusUpdated)
+
     // new communication event
-    this.$VueEvent.listen('new_communication', setCall)
+    this.$VueEvent.listen('new_communication', this.listeners.callUpdated)
 
     // updated communication event
-    this.$VueEvent.listen('update_communication', setCall)
+    this.$VueEvent.listen('update_communication', this.listeners.callUpdated)
 
     // deleted communication event
     this.$VueEvent.listen('delete_communication', this.deleteCall)
@@ -103,6 +112,14 @@ export default {
       setParkedCall: 'SET_PARKED_CALL',
       setQueuedCall: 'SET_QUEUED_CALL'
     })
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('user_updated', this.listeners.agentUpdated)
+    this.$VueEvent.stop('agent_status_updated', this.listeners.agentStatusUpdated)
+    this.$VueEvent.stop('new_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('update_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('delete_communication', this.deleteCall)
   }
 }
 </script>
