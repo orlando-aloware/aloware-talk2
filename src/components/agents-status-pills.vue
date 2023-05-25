@@ -1,6 +1,6 @@
 <template>
   <div class="agents-status-pills">
-    <b-button :class="['agents-status-pills__pill', `bg-agent-status-${status.name}`]"
+    <b-button :class="classes(status.name)"
               pill
               size="sm"
               :key="status.value"
@@ -47,6 +47,15 @@ export default {
 
       return Object.values(status)
         .sort((a, b) => a.agents < b.agents ? 1 : -1)
+    }
+  },
+
+  methods: {
+    classes (status) {
+      return [
+        'agents-status-pills__pill',
+        `bg-agent-status-${status}`
+      ]
     }
   }
 }

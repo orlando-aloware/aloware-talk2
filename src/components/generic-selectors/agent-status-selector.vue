@@ -30,7 +30,7 @@
 
       <template v-slot:selected-item="scope">
         <div class="d-flex align-items-center">
-          <q-badge :class="['rounded-badge bordered-grey mr-1', `bg-agent-status-${scope.opt.name}`]"/>
+          <q-badge :class="classes(scope.opt.name)"/>
           <span>{{ scope.opt.label }}</span>
       </div>
       </template>
@@ -40,7 +40,7 @@
                 v-on="scope.itemEvents">
           <q-item-section>
             <div class="d-flex align-items-center">
-              <q-badge :class="['rounded-badge bordered-grey mr-1', `bg-agent-status-${scope.opt.name}`]"/>
+              <q-badge :class="classes(scope.opt.name)"/>
               <span>{{ scope.opt.label }}</span>
             </div>
           </q-item-section>
@@ -125,6 +125,13 @@ export default {
   }),
 
   methods: {
+    classes (status) {
+      return [
+        'rounded-badge bordered-grey mr-1',
+        `bg-agent-status-${status}`
+      ]
+    },
+
     filterFn (val, update) {
       if (val === '') {
         update(() => {
