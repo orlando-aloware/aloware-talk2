@@ -277,12 +277,16 @@
             v-else-if="updateObj"
             outlined
             v-model="newSettingName"
-            :placeholder="updateObj.name" />
+            :placeholder="updateObj.name"
+            :error="errorMessage != null"
+            :error-message="errorMessage" />
           <q-input
             v-else
             outlined
             v-model="newSettingName"
-            placeholder="New Settings Name" />
+            placeholder="New Settings Name"
+            :error="errorMessage != null"
+            :error-message="errorMessage" />
         </q-card-section>
 
         <q-card-actions
@@ -324,7 +328,7 @@
             v-else
             variant="success"
             size="sm"
-            :disabled="isBusy"
+            :disabled="isBusy || !canSaveSettings"
             @click="saveAsNew">
             <q-spinner-bars v-if="isBusy"
                             class="mr-1"
@@ -437,6 +441,22 @@ export default {
         warmup_period_in_seconds: 0,
         order: POWER_DIALER_ORDER.default
       }
+    },
+
+    settingNameLength () {
+      return this.newSettingName?.length ?? 0
+    },
+
+    errorMessage () {
+      if (this.settingNameLength > 191) {
+        return 'Max length is 191 characters'
+      }
+
+      return null
+    },
+
+    canSaveSettings () {
+      return this.settingNameLength > 0 && this.settingNameLength <= 191
     }
   },
 
@@ -591,6 +611,16 @@ export default {
       this.isBusy = true
       const collection = this.removeEmptyParams(newSettings)
       const res = await this.createDialerSessionSetting(collection)
+
+      if (res.isAxiosError) {
+        console.log({ res })
+        this.$generalNotification(res.response.data.message ?? 'Dialer session setting could not be saved', 'error')
+
+        this.loading = false
+        this.isBusy = false
+        return
+      }
+
       if (res?.id) {
         await this.getDialerSessionSettings()
         this.$generalNotification('Dialer session setting has been saved.')
