@@ -151,57 +151,54 @@
                               :disabled="loading">
                 <q-card flat>
                   <div class="row">
-                    <div class="col-12">
-                      <q-card class="p-0"
-                              flat>
-                        <q-card-actions class="px-0 justify-content-between flex-wrap">
-                          <div class="session-settings-title pr-1">
-                            {{ selectedItemName }}
-                            <q-tooltip anchor="center right">
-                              {{ selectedItemName }}
-                            </q-tooltip>
-                          </div>
-                          <div class="d-flex flex-wrap">
-                            <q-btn size="sm"
-                                   class="px-3 py-0 mr-1"
-                                   color="grey-5"
-                                   unelevated
-                                   no-caps
-                                   @click="resetDefaults">
-                              Reset
-                            </q-btn>
-                            <q-btn size="sm"
-                                   class="px-3 py-0 mr-1"
-                                   color="primary"
-                                   unelevated
-                                   no-caps
-                                   :disabled="saveDisabled"
-                                   v-if="!hasSelectedTemporarySetting"
-                                   @click="updateSelectedSetting">
-                              Save
-                            </q-btn>
-                            <q-btn size="sm"
-                                   class="px-3 py-0 mr-1"
-                                   color="primary"
-                                   unelevated
-                                   no-caps
-                                   :disabled="disabled"
-                                   v-if="hasSelectedTemporarySetting"
-                                   @click="newSetting = true">
-                              Save As New
-                            </q-btn>
-                            <q-btn size="sm"
-                                   class="px-3 py-0"
-                                   color="success"
-                                   unelevated
-                                   no-caps
-                                   :disabled="disabled"
-                                   @click="beginDial">
-                              {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
-                            </q-btn>
-                          </div>
-                        </q-card-actions>
-                      </q-card>
+                    <div class="col px-0 d-flex justify-content-end t-session-settings__actions">
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="grey-5"
+                             unelevated
+                             no-caps
+                             @click="resetDefaults">
+                        Reset
+                      </q-btn>
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="primary"
+                             unelevated
+                             no-caps
+                             :disabled="saveDisabled"
+                             v-if="!hasSelectedTemporarySetting"
+                             @click="updateSelectedSetting">
+                        Save
+                      </q-btn>
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="primary"
+                             unelevated
+                             no-caps
+                             :disabled="disabled"
+                             v-if="hasSelectedTemporarySetting"
+                             @click="newSetting = true">
+                        Save As New
+                      </q-btn>
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="success"
+                             unelevated
+                             no-caps
+                             :disabled="disabled"
+                             @click="beginDial">
+                        {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                      </q-btn>
+                    </div>
+                  </div>
+                  <div class="row mt-3 mb-2">
+                    <div class="col">
+                      <div class="session-settings-title text-h6 font-weight-bold">
+                        {{ selectedItemName }}
+                        <q-tooltip anchor="center right">
+                          {{ selectedItemName }}
+                        </q-tooltip>
+                      </div>
                     </div>
                   </div>
 
@@ -252,11 +249,15 @@
           <q-input outlined
                    :placeholder="updateObj.name"
                    v-model="newSettingName"
-                   v-else-if="updateObj"/>
+                   v-else-if="updateObj"
+                   :error="errorMessage != null"
+                   :error-message="errorMessage"/>
           <q-input placeholder="New Settings Name"
                    outlined
                    v-model="newSettingName"
-                   v-else/>
+                   v-else
+                   :error="errorMessage != null"
+                   :error-message="errorMessage"/>
         </q-card-section>
 
         <q-card-actions class="px-3 pb-3"
@@ -292,7 +293,7 @@
           </b-button>
           <b-button variant="success"
                     size="sm"
-                    :disabled="isBusy"
+                    :disabled="isBusy || !canSaveSettings"
                     v-else
                     @click="saveAsNew">
             <q-spinner-bars class="mr-1"
@@ -415,6 +416,22 @@ export default {
     isSaveButtonDisabled () {
       return this.updateObj.name === this.newSettingName ||
         this.newSettingName.length === 0 || this.isBusy
+    },
+
+    settingNameLength () {
+      return this.newSettingName?.length ?? 0
+    },
+
+    errorMessage () {
+      if (this.settingNameLength > 191) {
+        return 'Max length is 191 characters'
+      }
+
+      return null
+    },
+
+    canSaveSettings () {
+      return this.settingNameLength > 0 && this.settingNameLength <= 191
     }
   },
 
@@ -579,6 +596,15 @@ export default {
       const collection = this.removeEmptyParams(newSettings)
       const res = await this.createDialerSessionSetting(collection)
 
+      if (res.isAxiosError) {
+        console.log({ res })
+        this.$generalNotification(res.response.data.message ?? 'Dialer session setting could not be saved', 'error')
+
+        this.loading = false
+        this.isBusy = false
+        return
+      }
+
       if (res?.id) {
         await this.getDialerSessionSettings()
 
@@ -642,6 +668,8 @@ export default {
         this.$generalNotification(`Dialer session setting has been renamed to ${res.data.name}.`)
         this.isBusy = false
       }
+
+      this.newSettingName = ''
     },
 
     async onDeleteSetting () {

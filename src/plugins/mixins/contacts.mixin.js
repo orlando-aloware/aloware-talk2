@@ -117,17 +117,20 @@ export default {
     onSortByField (sorts) {
       this.isLoaded = false
       this.sorts = sorts
+
       this.fetch({
         search: this.search,
         page: 1,
         sort: sorts.orderBy,
         order: sorts.order
       }, true, true)
+
       document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
     },
 
     onLoadMore (list = null) {
       let path = 'api/v2/contacts'
+
       if (this.hasMore) {
         this.setListContactsLoaded(false)
         this.isLoadingMore = true
@@ -184,6 +187,7 @@ export default {
             // Load contacts and force concatenation
             this.contactsLoaded(data, true)
             this.markCheckedAll()
+
             if (this.isPowerDialer) {
               this.forcedCheckAllItems()
             }
@@ -205,6 +209,7 @@ export default {
 
     onFetchMyContacts (checked) {
       this.isLoading = true
+
       this.fetch({
         my_contacts: checked,
         search: this.search,
@@ -227,6 +232,7 @@ export default {
       this.previousSearch = searchText
       this.isLoaded = false
       this.setSearch(searchText)
+
       this.fetch({
         my_contacts: this.showMyContactsViewBased,
         search: this.search,
@@ -287,34 +293,29 @@ export default {
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
 
-      const listData = {
-        id: this.id,
-        isMyQueuePaths: [
-          'power-dialer/in-queue',
-          'power-dialer/called',
-          'power-dialer/failed',
-          'power-dialer/scheduled',
-          'power-dialer/all'
-        ],
-        isInMyQueuePaths: false
-      }
-
-      listData.isInMyQueuePaths = listData.isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
-      const isInMyQueue = listData.isInMyQueuePaths ||
-        this.id === 'my-queue'
+      let listDataId = this.id
+      const isMyQueuePaths = [
+        'power-dialer/in-queue',
+        'power-dialer/called',
+        'power-dialer/failed',
+        'power-dialer/scheduled',
+        'power-dialer/all'
+      ]
+      const isInMyQueuePaths = isMyQueuePaths.find(path => this.$route.path.includes(path)) !== undefined
+      const isInMyQueue = isInMyQueuePaths || this.id === 'my-queue'
 
       if (this.$route.name.includes('Power Dialer') && isInMyQueue) {
-        listData.id = this.myQueue?.id
+        listDataId = this.myQueue?.id
       }
 
-      if (listData.id === null) {
-        listData.id = 'all'
+      if (listDataId === null) {
+        listDataId = 'all'
       }
 
-      const list = _.get(this.lists, listData.id, { id: null, name: '', type: null })
+      const list = _.get(this.lists, listDataId, { id: null, name: '', type: null })
 
       this.setSelectedList({
-        id: listData.id,
+        id: listDataId,
         name: list.name,
         type: list.type
       })
@@ -327,6 +328,14 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          if (this.isInPowerDialerList) {
+            // clear add contacts loading screen in PD list
+            this.$VueEvent.fire('add_contacts_progress', {
+              id: null,
+              loading: false
+            })
+          }
+
           if (clear) {
             this.clearContacts()
           }
@@ -366,6 +375,19 @@ export default {
     },
 
     fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+      let eventListId = null
+
+      if (typeof this.getCleanedListId !== 'undefined') {
+        eventListId = this.getCleanedListId(this.powerDialerListAddRemoveContactsProgress?.id)
+      }
+
+      // prevent fetching contacts when PD is still in-progress
+      // in adding contacts if current list is the affected list
+      if (this.isInPowerDialerList && this.powerDialerListAddRemoveContactsProgress?.loading &&
+        this.cleanedListId === eventListId) {
+        return
+      }
+
       const isSearch = _.get(params, 'isSearch', false)
 
       if (isSearch) {
@@ -561,8 +583,12 @@ export default {
     },
 
     markCheckedAll () {
-      if (this.selectedContacts[this.id] && !_.isEmpty(this.contactsData) && document.querySelector('.data-table-check-all')) {
-        document.querySelector('.data-table-check-all').checked = (this.contactsData.data.length > 0 && this.selectedContacts[this.id].length >= this.contactsData.data.length) || this.isAllContactsSelected
+      if (this.selectedContacts[this.id] && !_.isEmpty(this.contactsData) &&
+        document.querySelector('.data-table-check-all')) {
+        const hasMoreContacts = this.contactsData.data.length > 0 &&
+          this.selectedContacts[this.id].length >= this.contactsData.data.length
+        document.querySelector('.data-table-check-all').checked = hasMoreContacts ||
+          this.isAllContactsSelected
       }
     },
 
@@ -626,33 +652,29 @@ export default {
 
     contactsLoaded (listData, isConcatenated = false) {
       const dataLength = listData.data.length
-      const found = { data: null }
-      const item = { data: null }
-      const childItem = { data: null }
+      let contactIndex = null
       const currentPage = _.get(listData, 'current_page', 0)
 
       if (!_.isEmpty(this.contactsData.data)) {
-        for (item.data in this.contactsData.data) {
+        for (const item in this.contactsData.data) {
           if (this.isPowerDialer) {
-            found.data = listData.data.find(contact => contact.contact_list_item_id === this.contactsData.data[item.data].contact_list_item_id)
-            found.data = found.data ? listData.data.indexOf(found.data) : null
+            contactIndex = listData.data.find(contact => contact.contact_list_item_id === this.contactsData.data[item].contact_list_item_id)
+            contactIndex = contactIndex ? listData.data.indexOf(contactIndex) : null
           } else {
-            found.data = listData.data.find(contact => contact.id === this.contactsData.data[item.data].id)
-            found.data = found.data ? listData.data.indexOf(found.data) : null
+            contactIndex = listData.data.find(contact => contact.id === this.contactsData.data[item].id)
+            contactIndex = contactIndex ? listData.data.indexOf(contactIndex) : null
           }
 
-          if (currentPage === 1 && found.data !== -1 && found.data !== null) {
-            for (childItem.data in listData.data[found.data]) {
-              if (typeof this.contactsData.data[item.data][childItem.data] !== 'undefined') {
-                this.contactsData.data[item.data][childItem.data] = listData.data[found.data][childItem.data]
+          if (currentPage === 1 && contactIndex !== -1 && contactIndex !== null) {
+            for (const childItem in listData.data[contactIndex]) {
+              if (typeof this.contactsData.data[item][childItem] !== 'undefined') {
+                this.contactsData.data[item][childItem] = listData.data[contactIndex][childItem]
               }
             }
           }
 
-          if (!this.isPowerDialer) {
-            if (found.data !== -1 && found.data !== null) {
-              listData.data.splice(found.data, 1)
-            }
+          if (!this.isPowerDialer && contactIndex !== -1 && contactIndex !== null) {
+            listData.data.splice(contactIndex, 1)
           }
         }
       }
@@ -660,29 +682,32 @@ export default {
       // we have to skip the pagination data from api
       // if we navigated from Contact to Contacts page
       if (!this.isNavigated) {
-        for (item.data in listData) {
-          if (item.data === 'data') {
+        for (const item in listData) {
+          if (item === 'data') {
             continue
           }
 
-          if (this.contactsData[item.data] !== 'undefined') {
-            this.contactsData[item.data] = listData[item.data]
+          if (this.contactsData[item] !== 'undefined') {
+            this.contactsData[item] = listData[item]
           }
         }
       }
 
       this.isNavigated = false
 
-      for (item.data of listData.data) {
-        this.contactsData.data.push(item.data)
+      for (const item of listData.data) {
+        this.contactsData.data.push(item)
       }
 
       if (currentPage === 1 && this.contactsData.data.length > dataLength) {
-        this.contactsData.data.sort((a, b) => { return moment(b.last_engagement_at).unix() - moment(a.last_engagement_at).unix() })
+        this.contactsData.data.sort((a, b) => {
+          return moment(b.last_engagement_at).unix() - moment(a.last_engagement_at).unix()
+        })
       }
 
       if (this.isPowerDialer) {
         this.powerDialerActiveList = { ...listData }
+
         if (isConcatenated) {
           this.powerDialerActiveList.data = this.contactsData.data
         }
@@ -815,7 +840,10 @@ export default {
     },
 
     loadData (skipCancelToken = true, clear = false) {
-      if ((!this.list || typeof this.list === 'undefined' || this.list.id !== this.$route.params.id) && this.id !== 'all' && this.$route.name === 'Contacts') {
+      const isIneligibleList = !this.list || typeof this.list === 'undefined' ||
+        this.list.id !== this.$route.params.id
+
+      if (isIneligibleList && this.id !== 'all' && this.$route.name === 'Contacts') {
         this.getListData().then(() => {
           this.init(clear)
         }).catch(err => {
@@ -917,9 +945,13 @@ export default {
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
         return this.$route.params.id
-      } else if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
+      }
+
+      if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
         return this.$route.params.id
-      } else if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
+      }
+
+      if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
         return this.$route.params.id
       }
 
@@ -947,20 +979,17 @@ export default {
     },
 
     hasMore () {
-      return (this.contactsData?.next_page_url &&
+      return this.contactsData?.next_page_url &&
         !this.isLoadingMore &&
-        !this.isLoading) ||
-        false
+        !this.isLoading
     },
 
     isPowerDialer () {
       const routeMetaId = _.get(this.$route, 'meta.id', null)
-      return (this.$route.name === 'Power Dialer' &&
-        (
-          routeMetaId !== 'power-dialer-add-list' &&
-          routeMetaId !== 'power-dialer-add-queue-list'
-        )
-      )
+      const notInAddContactsRoute = routeMetaId !== 'power-dialer-add-list' &&
+        routeMetaId !== 'power-dialer-add-queue-list'
+
+      return this.$route.name === 'Power Dialer' && notInAddContactsRoute
     },
 
     isLoadingDisabled () {
@@ -969,11 +998,13 @@ export default {
 
     isStartState () {
       const start = _.get(this.$route, 'query.start', null)
+
       return start !== null
     },
 
     isEmpty () {
       const data = _.get(this.contactsData, 'data', [])
+
       return this.isLoaded && !data.length
     },
 
@@ -983,6 +1014,7 @@ export default {
 
     isEditable () {
       const listId = _.get(this.list, 'id', null)
+
       return !listId || (listId && !this.defaultIds.includes(listId))
     },
 
@@ -1111,42 +1143,54 @@ export default {
     $route (to, from) {
       this.previousSearch = null
       this.isNavigated = false
+      const backToContacts = from.name === 'Contact' && to.name === 'Contacts'
+      const movedToContacts = from.name === 'Contacts' && to.name === 'Contact'
+      const contactToContact = from.name === 'Contact' && to.name === 'Contact'
+      const listHasNoUpdate = backToContacts && !this.hasContactsListChanges
 
-      if ((from.name === 'Contact' && to.name === 'Contacts' && !this.hasContactsListChanges) ||
-        (from.name === 'Contacts' && to.name === 'Contact') ||
-        (from.name === 'Contact' && to.name === 'Contact')) {
+      if (listHasNoUpdate || movedToContacts || contactToContact) {
         if (this.$route.name === 'Contacts') {
           setTimeout(() => {
             this.startEvents()
           }, 500)
         }
+
         return
       }
 
-      if ((from.name === 'Contacts' && !['Contacts', 'Contact'].includes(to.name)) ||
-        (to.name === 'Contacts' && !['Contacts', 'Contact'].includes(from.name)) ||
-        to.name === 'Power Dialer') {
-        if (this.$route.name === 'Contacts') {
-          this.isNavigated = true
-          setTimeout(() => {
-            this.startEvents()
-          }, 500)
-        }
+      const contactRoutes = ['Contacts', 'Contact']
+      const contactsToOtherRoutes = from.name === 'Contacts' &&
+        !contactRoutes.includes(to.name)
+      const otherRoutesToContacts = !contactRoutes.includes(from.name) &&
+        to.name === 'Contacts'
+      const inOrOutOfContactsOrToPD = contactsToOtherRoutes || otherRoutesToContacts || to.name === 'Power Dialer'
+
+      if (inOrOutOfContactsOrToPD && this.$route.name === 'Contacts') {
+        this.isNavigated = true
+
+        setTimeout(() => {
+          this.startEvents()
+        }, 500)
       }
 
-      if (this.isPowerDialer) {
-        if ((from.name === 'Power Dialer' && !['Power Dialer'].includes(to.name)) ||
-          (to.name === 'Power Dialer' && !['Power Dialer'].includes(from.name)) ||
-          to.name === 'Contacts') {
-          this.isNavigated = true
-          setTimeout(() => {
-            this.startEvents()
-          }, 500)
-        }
+      const pdToPD = from.name === 'Power Dialer' && to.name !== 'Power Dialer'
+      const otherRoutesToPD = from.name !== 'Power Dialer' && to.name === 'Power Dialer'
+      const pdToPdOrToContacts = pdToPD || otherRoutesToPD || to.name === 'Contacts'
+
+      if (this.isPowerDialer && pdToPdOrToContacts) {
+        this.isNavigated = true
+
+        setTimeout(() => {
+          this.startEvents()
+        }, 500)
       }
 
-      if ((from.name === 'Contact' && to.name === 'Contacts' && this.hasContactsListChanges) ||
-        (from.name === 'Contacts' && to.name === 'Contacts' && from.path !== to.path)) {
+      const listHasUpdated = from.name === 'Contact' && to.name === 'Contacts' &&
+        this.hasContactsListChanges
+      const contactsListToOtherContactsList = from.name === 'Contacts' && to.name === 'Contacts' &&
+        from.path !== to.path
+
+      if (listHasUpdated || contactsListToOtherContactsList) {
         this.hasContactsListChanges = false
         this.clearContacts()
       }
@@ -1155,7 +1199,6 @@ export default {
         return
       }
 
-      // this.loadData()
       if (!this.isPowerDialer) {
         const isFromAddContacts = _.get(from, 'params.id', false) !== false &&
           from.path.includes('/add')

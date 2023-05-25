@@ -1,6 +1,5 @@
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-// import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 
@@ -8,8 +7,21 @@ export default {
   computed: {
     ...mapFields('powerDialer', [
       'activeMetrics'
-    ])
+    ]),
+
+    ...mapState('powerDialer', [
+      'pdViewCancelToken',
+      'pdViewSource'
+    ]),
+
+    isInPowerDialerList () {
+      const routeTitle = this.$route?.meta?.title
+      const routeName = this.$route.name
+
+      return routeTitle === 'Power Dialer' && routeName === routeTitle
+    }
   },
+
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
@@ -17,16 +29,21 @@ export default {
       'setCurrentListFilters',
       'resetSearch'
     ]),
+
     ...mapActions('powerDialer', [
-      'setSelectedPDList'
+      'setSelectedPDList',
+      'setPDListSource'
     ]),
+
     ...mapMutations('powerDialer', [
       'SET_MY_QUEUE_LIST'
     ]),
+
     async loadList (id) {
       if (!id) {
         id = 'my-queue'
       }
+
       let route = this.$route.meta.id
       let stringId = String(id)
 
@@ -35,25 +52,41 @@ export default {
       }
 
       if (route) {
+        let config = {}
+
+        if (this.isInPowerDialerList) {
+          this.pdViewSource.cancel('Loading of task list operation is canceled by the user.')
+          this.setPDListSource(this.pdViewCancelToken.source())
+          config.cancelToken = this.pdViewSource.token
+        }
+
         this.$axios
-          .get('/api/v2/power-dialer-lists/' + stringId)
+          .get(`/api/v2/power-dialer-lists/${stringId}`, config)
           .then((response) => response.data)
           .then((response) => {
             this.listLoaded({ ...response, id: stringId })
             this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
+
             let filters = {
               contact_lists: {
                 operator: OPERATORS.IS_ANY_OF,
                 value: [stringId]
               }
             }
+
             this.setCurrentListFilters(filters)
             this.activeMetrics = response.session_metrics
+
             if (this.isMyQueue) {
               this.SET_MY_QUEUE_LIST(response)
             }
           })
           .catch((error) => {
+            if (window.axios.isCancel(error) && error) {
+              console.log('Request canceled', error.message)
+              return
+            }
+
             const { message, html } = extractErrorMessage(error)
             console.log(html)
             this.$generalNotification(message, 'error')

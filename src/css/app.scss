@@ -12427,6 +12427,31 @@ h1.contact-list-name-label {
   z-index: 9999 !important;
 }
 
+.t-session-settings {
+  &__actions button {
+    font-size: 1em !important;
+  }
+}
+
+.dial-sessions__form {
+  &__script-selector.populated:not(.q-field--highlighted) input {
+    display: none;
+  }
+}
+
+.centered-contact-deleted {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.communication-overlay {
+  position: inherit !important;
+}
+
 .chip-ellipsis {
   .b-overlay {
     & > div {

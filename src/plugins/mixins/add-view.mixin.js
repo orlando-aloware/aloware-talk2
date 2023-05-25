@@ -63,30 +63,6 @@ export default {
       })
     },
 
-    getColumnValue (value) {
-      if (typeof value === 'boolean') {
-        return value ? 'Yes' : 'No'
-      }
-
-      if (typeof value !== 'undefined' && value !== 0) {
-        return value.toString()
-      }
-
-      return value === null
-        ? '-'
-        : value
-    },
-
-    getColumnClass (name, draggable) {
-      const textAlignmentClass = this.isCountField(name) ? 'text-center' : 'text-left'
-      const draggableClass = draggable ? 'col-indented' : ''
-
-      return [
-        textAlignmentClass,
-        draggableClass
-      ]
-    },
-
     isColumnArrayValueEmpty (columnValue) {
       const isEmptyArray = columnValue instanceof Array && !columnValue.length
       return columnValue === '' ||
