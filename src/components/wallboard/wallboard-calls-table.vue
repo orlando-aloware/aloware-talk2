@@ -149,7 +149,8 @@
                     </div>
 
                     <!-- disposition -->
-                    <div class="d-flex align-items-center mb-1">
+                    <div class="d-flex align-items-center mb-1"
+                         v-if="call.contact && call.contact.disposition_status_id">
                       <i class="material-icons"
                          :style="{ color: dispositionStatusColor(call.contact.disposition_status_id) }">
                         label
@@ -160,7 +161,8 @@
                     </div>
 
                     <!-- company -->
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center"
+                         v-if="call.contact && call.contact.company_name">
                       <i class="material-icons">business_center</i>
                       <span class="ml-1">
                         {{ call.contact.company_name }}
