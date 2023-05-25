@@ -1,5 +1,5 @@
 <template>
-  <span :class="['cursor-pointer', { 'opacity-05 cursor-blocked': loading }]"
+  <span :class="classes"
         :disabled="loading"
         v-if="show"
         @click="dialog">
@@ -37,6 +37,13 @@ export default {
   },
 
   computed: {
+    classes () {
+      return [
+        'cursor-pointer',
+        { 'opacity-05 cursor-blocked': this.loading }
+      ]
+    },
+
     show () {
       // live and parked calls must be DISPOSITION_STATUS_INPROGRESS_NEW
       if (isLiveCall(this.communication) || isParkedCall(this.communication)) {
