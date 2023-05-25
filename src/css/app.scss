@@ -12419,3 +12419,16 @@ h1.contact-list-name-label {
 #daytime-hours-confirmation___BV_modal_outer_ {
   z-index: 9999 !important;
 }
+
+.centered-contact-deleted {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.communication-overlay {
+  position: inherit !important;
+}

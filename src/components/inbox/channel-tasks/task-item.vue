@@ -277,6 +277,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'dialer']),
+
     ...mapState('inbox', [
       'selectedCommunication',
       'activeChannel',
@@ -363,6 +364,12 @@ export default {
   },
 
   methods: {
+    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel']),
+
+    ...mapActions(['setShowPhone']),
+
+    ...mapActions('contacts', ['setShowContactResourceUnavailable']),
+
     markable (communication) {
       // Markable if communication is SMS and the comm direction is INBOUND
       const smsRule = communication.type === CommunicationTypes.SMS &&
@@ -386,6 +393,16 @@ export default {
       }
 
       this.setSelectedCommunication(communication)
+
+      // comm with non-existing contact
+      if (!this.communication.contact) {
+        const communicationInfo = this.$router.resolve({
+          path: `/communication/${communication.id}`
+        })
+
+        window.open(communicationInfo.href, '_blank')
+      }
+
       this.$router.push({
         name: 'Inbox Contact',
         params: {
@@ -396,10 +413,7 @@ export default {
       }).catch(err => {
         console.log(err)
       })
-    },
-
-    ...mapActions('inbox', ['setContactId', 'setSelectedCommunication', 'setActiveChannel']),
-    ...mapActions(['setShowPhone'])
+    }
   }
 }
 </script>
