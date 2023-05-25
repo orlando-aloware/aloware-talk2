@@ -19,7 +19,7 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 300
+    minWidth: 200
   },
   {
     name: 'ring_group',
@@ -64,7 +64,7 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 300
+    minWidth: 200
   },
   {
     name: 'lead_location',
@@ -73,7 +73,7 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 300
+    minWidth: 200
   },
   {
     name: 'attempting_users',
