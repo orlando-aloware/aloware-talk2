@@ -54,7 +54,7 @@
                     <a :href="getCampaignURL(call.campaign_id)"
                        target="_blank"
                        v-if="hasRole('Company Admin') && getCampaign(call.campaign_id)">
-                       {{ getCampaign(call.campaign_id) }}
+                      {{ getCampaign(call.campaign_id) }}
                     </a>
                     <span v-else>
                       {{ getCampaign(call.campaign_id) || '--' }}
@@ -70,9 +70,9 @@
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'ring_group'">
                 <a :href="getRingGroupURL(call.ring_group_id)"
-                    target="_blank"
-                    v-if="hasRole('Company Admin') && getRingGroup(call.ring_group_id)">
-                    {{ getRingGroup(call.ring_group_id) }}
+                   target="_blank"
+                   v-if="hasRole('Company Admin') && getRingGroup(call.ring_group_id)">
+                  {{ getRingGroup(call.ring_group_id) }}
                 </a>
                 <span v-else>
                   {{ getRingGroup(call.ring_group_id) || '--' }}
