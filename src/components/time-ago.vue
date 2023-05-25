@@ -52,6 +52,10 @@ export default {
 
       this.timeAgo = `${hoursLabel}:${minutesLabel}:${secondsLabel}`
     }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.computeDuration)
   }
 }
 </script>
