@@ -224,8 +224,8 @@
                         <a :href="getUserActivityURL(attemptingUser)"
                            target="_blank"
                            v-if="hasRole('Company Admin')">
-                            <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
-                                  :title="getUserName(getUser(attemptingUser))">
+                          <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
+                                :title="getUserName(getUser(attemptingUser))">
                             {{ getUserName(getUser(attemptingUser)) }}
                           </span>
                         </a>
@@ -351,7 +351,7 @@
                       {{ call.lead_number | fixPhone }}
                     </span>
                     <span v-if="call.state">
-                      {{ call.city || '' }}{{ (call.city && call.state) ? ', ' : '' }}{{ call.state }}
+                      {{ getLocation(call) }}
                     </span>
                   </div>
                   <div class="flex-grow-1"
