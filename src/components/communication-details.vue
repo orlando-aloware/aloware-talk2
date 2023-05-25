@@ -119,7 +119,8 @@
 
           </q-card-section>
 
-          <q-card-section class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0"
+                          v-if="communication?.contact">
             <!--CONTACT-->
             <b-form-row>
               <b-col class="pl-0 pr-0">
@@ -426,7 +427,7 @@
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Ring Group Activity', params: { ringGroupId: communication.ring_group_id }}"
-                    v-if="usedRingGroup && !usedRingGroup.call_waiting">
+                    v-if="usedRingGroup && !usedRingGroup?.call_waiting">
                     <q-tooltip
                       anchor="top middle"
                       self="bottom middle"
@@ -436,7 +437,7 @@
                     {{ usedRingGroup.name }}
                   </router-link>
                   <template v-else>
-                    <span v-if="usedRingGroup.call_waiting">
+                    <span v-if="usedRingGroup?.call_waiting">
                       Call waiting Queue
                     </span>
                     <span v-else>

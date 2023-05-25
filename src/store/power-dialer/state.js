@@ -195,6 +195,8 @@ export default function () {
       currentTime: null,
       listId: null
     },
-    redialed: []
+    redialed: [],
+    pdViewSource: null,
+    pdViewCancelToken: null
   }
 }

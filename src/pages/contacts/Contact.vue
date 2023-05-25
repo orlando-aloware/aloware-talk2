@@ -5,8 +5,13 @@
              :show="isShowContact"
              :opacity="0.85"
              v-if="authenticated">
+    <div class="mx-0 centered-contact-deleted"
+         v-if="!leaving && !loadingContact && showContactResourceUnavailable">
+      <h2>Contact resource is unavailable/deleted</h2>
+    </div>
+
     <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
-         v-if="!leaving">
+         v-if="!leaving && !showContactResourceUnavailable">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
            v-if="isShowContactActivities">
@@ -120,6 +125,10 @@ export default {
       'changingSelectedContact'
     ]),
 
+    ...mapState('contacts', [
+      'showContactResourceUnavailable'
+    ]),
+
     ...mapGetters('auth', ['authenticated']),
 
     ...mapState([
@@ -141,6 +150,10 @@ export default {
     },
 
     isShowContact () {
+      if (this.showContactResourceUnavailable) {
+        return false
+      }
+
       return this.changingSelectedContact || this.campaignsIsLoading ||
         this.usersIsLoading || !this.tagsFullyLoaded || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
@@ -171,7 +184,8 @@ export default {
       'resetChangedContactProperties',
       'selectedContactChanging',
       'setContact',
-      'setContactClone'
+      'setContactClone',
+      'setShowContactResourceUnavailable'
     ]),
 
     ...mapActions(['setContactDetailsDrawer']),
@@ -272,6 +286,8 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
+      this.setShowContactResourceUnavailable(false)
+
       // Show loading overlay as soon as id changes
       this.selectedContactChanging(true)
 
@@ -292,7 +308,12 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
+      // don't attempt to fetch communications, there's nothing to fetch
+      if (!this.changingSelectedContact && this.showContactResourceUnavailable) {
+        return
+      }
+
+      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
     },
