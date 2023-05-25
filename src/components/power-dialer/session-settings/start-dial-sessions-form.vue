@@ -29,7 +29,7 @@
                     :options="metrics"
                     :disable="disabled"
                     :max-values="4"
-                    placeholder="Select session metrics"
+                    :placeholder="resources[cform.name]?.length > 0 ? '' : 'Select session metrics'"
                     v-if="cform.name === 'metric_options'"
                     v-model="resources[cform.name]">
             <template v-slot:option="scope">
@@ -58,6 +58,7 @@
                         @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
 
           <ScriptSelector class="w-100 dial-sessions__form__script-selector"
+                          :class="[resources[cform.name] ? 'populated': '']"
                           :disable="disabled"
                           :clearable="true"
                           v-else-if="cform.name === 'script_id'"

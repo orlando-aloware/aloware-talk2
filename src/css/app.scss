@@ -12425,3 +12425,9 @@ h1.contact-list-name-label {
     font-size: 1em !important;
   }
 }
+
+.dial-sessions__form {
+  &__script-selector.populated:not(.q-field--highlighted) input {
+    display: none;
+  }
+}
