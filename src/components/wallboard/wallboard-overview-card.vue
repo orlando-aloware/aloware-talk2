@@ -113,16 +113,15 @@ export default {
     },
 
     getComponentProps () {
-      switch (true) {
-        case !!this.route:
-          return {
-            to: {
-              path: this.route
-            }
+      if (this.route) {
+        return {
+          to: {
+            path: this.route
           }
-        default:
-          return null
+        }
       }
+
+      return null
     },
 
     getValue () {
