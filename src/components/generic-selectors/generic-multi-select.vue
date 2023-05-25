@@ -154,36 +154,43 @@ export default {
       type: String,
       default: ''
     },
+
     buttonText: {
       required: false,
       type: String,
       default: ''
     },
+
     values: {
       required: false,
       type: Array,
       default: () => []
     },
+
     options: {
       required: true,
       type: Array,
       default: () => []
     },
+
     canEdit: {
       required: false,
       type: Boolean,
       default: true
     },
+
     optionsIsGrouped: {
       required: false,
       type: Boolean,
       default: false
     },
+
     height: {
       required: false,
       type: Number
     }
   },
+
   data () {
     return {
       search: '',
@@ -191,6 +198,7 @@ export default {
       selectedValues: []
     }
   },
+
   computed: {
     allOptions () {
       if (!this.optionsIsGrouped) {
@@ -203,6 +211,7 @@ export default {
       }
       return newOptions.data
     },
+
     formattedValues () {
       if (_.isEmpty(this.selectedValues)) {
         return []
@@ -218,6 +227,7 @@ export default {
       }
       return newValues
     },
+
     filteredOptions () {
       if (!this.optionsIsGrouped) {
         return this.options.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
@@ -233,9 +243,11 @@ export default {
       return newOptions
     }
   },
+
   mounted () {
     this.selectedValues = this.values
   },
+
   methods: {
     isSelected (id) {
       if (_.isEmpty(this.selectedValues)) {
@@ -244,6 +256,7 @@ export default {
 
       return this.selectedValues.includes(id)
     },
+
     onSelectOption (id) {
       if (this.isSelected(id)) {
         this.remove(id)
@@ -258,16 +271,19 @@ export default {
       })
       this.search = ''
     },
+
     handleBlur () {
       this.search = ''
       this.isEdit = false
     },
+
     onEdit () {
       this.isEdit = true
       this.$nextTick(() => {
         this.$refs.search.focus()
       })
     },
+
     remove (id) {
       const found = { data: this.selectedValues.find(value => value === id) }
       found.data = found.data ? this.selectedValues.indexOf(found.data) : null
@@ -277,6 +293,7 @@ export default {
       this.$emit('valuesUpdated', this.selectedValues)
     }
   },
+
   watch: {
     values: {
       deep: true,
