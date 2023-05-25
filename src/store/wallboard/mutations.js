@@ -40,13 +40,15 @@ export default {
     const agentIndex = state.agents.findIndex(agent => agent.id === data.user_id)
 
     // update agent status in store if found
-    if (agentIndex >= 0) {
-      state.agents[agentIndex].agent_status = data.agent_status
+    if (agentIndex === -1) {
+      return
+    }
 
-      // update last status date field if present
-      if ('last_agent_status_change' in data) {
-        state.agents[agentIndex].last_agent_status_change = data.last_agent_status_change
-      }
+    state.agents[agentIndex].agent_status = data.agent_status
+
+    // update last status date field if present
+    if ('last_agent_status_change' in data) {
+      state.agents[agentIndex].last_agent_status_change = data.last_agent_status_change
     }
   },
 
