@@ -113,15 +113,15 @@ export default {
     },
 
     getComponentProps () {
-      if (this.route) {
-        return {
-          to: {
-            path: this.route
-          }
-        }
+      if (!this.route) {
+        return null
       }
 
-      return null
+      return {
+        to: {
+          path: this.route
+        }
+      }
     },
 
     getValue () {
