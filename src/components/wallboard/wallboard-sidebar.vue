@@ -97,7 +97,11 @@ export default {
     },
 
     isLoading () {
-      return this.isAgentsLoading || this.isLiveCallsLoading || this.isParkedCallsLoading || this.isQueuedCallsLoading || this.isSummaryLoading
+      return this.isAgentsLoading ||
+        this.isLiveCallsLoading ||
+        this.isParkedCallsLoading ||
+        this.isQueuedCallsLoading ||
+        this.isSummaryLoading
     }
   },
 
