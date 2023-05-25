@@ -409,8 +409,8 @@ iframe > html {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: normal;
-  -webkit-line-clamp: 2; /* number of lines to show */
-          line-clamp: 2; 
+  -webkit-line-clamp: 1; /* number of lines to show */
+          line-clamp: 1; 
   -webkit-box-orient: vertical;
   display: -webkit-box;
 }
