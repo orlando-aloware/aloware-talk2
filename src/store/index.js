@@ -536,6 +536,7 @@ export default function (/* { ssrContext } */) {
         if (value.includes('all')) {
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
+          commit('wallboard/RESET_VUEX', null, { root: true })
         }
       },
 

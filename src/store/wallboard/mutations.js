@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { isLiveCall, isParkedCall, isQueuedCall } from 'src/plugins/helpers/functions'
 import { clone } from 'lodash'
+import * as WallboardDefault from 'src/constants/wallboard-default'
 
 export default {
   DELETE_CALL: (state, communication) => {
@@ -183,5 +184,9 @@ export default {
     }
 
     state.callsEnabledColumns.push(column)
+  },
+
+  RESET_VUEX (state) {
+    state = Object.assign({}, WallboardDefault.DEFAULT_STATE)
   }
 }
