@@ -9,7 +9,7 @@
          @click.prevent="onEditNote(true)">
         <slot name="button">
           <span>
-            {{ (!communication.notes || !communication.notes.trim().length) ? 'Add' : 'Edit' }} Note
+            {{ buttonLabel }}
           </span>
         </slot>
       </a>
@@ -39,6 +39,12 @@ export default {
     communication: {
       type: Object,
       required: true
+    }
+  },
+
+  computed: {
+    buttonLabel () {
+      return (this.communication.notes?.trim().length ? 'Edit' : 'Add') + ' Note'
     }
   },
 
