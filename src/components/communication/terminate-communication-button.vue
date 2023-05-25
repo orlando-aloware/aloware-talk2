@@ -46,11 +46,15 @@ export default {
 
     show () {
       // live and parked calls must be DISPOSITION_STATUS_INPROGRESS_NEW
-      if (isLiveCall(this.communication) || isParkedCall(this.communication)) {
+      if (this.isLiveOrParkedCall) {
         return this.hasRole('Company Admin') && this.communication.disposition_status2 === DISPOSITION_STATUS_INPROGRESS_NEW
       }
 
       return this.hasRole('Company Admin')
+    },
+
+    isLiveOrParkedCall () {
+      return isLiveCall(this.communication) || isParkedCall(this.communication)
     }
   },
 
@@ -65,7 +69,7 @@ export default {
         return
       }
 
-      const message = isLiveCall(this.communication) || isParkedCall(this.communication)
+      const message = this.isLiveOrParkedCall
         ? 'Terminating communication will forcefully dispose it'
         : 'Terminating will end this call and assign it a Failed call disposition'
 
@@ -84,7 +88,7 @@ export default {
     terminate () {
       this.loading = true
 
-      const action = isLiveCall(this.communication) || isParkedCall(this.communication)
+      const action = this.isLiveOrParkedCall
         ? API.V1.communication.forceTerminate(this.communication.id)
         : API.V1.communication.forceDequeue(this.communication.id)
 
