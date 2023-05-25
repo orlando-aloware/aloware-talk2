@@ -16,10 +16,12 @@ export default {
       type: [Number, String],
       default: 40
     },
+
     height: {
       type: [Number, String],
       default: 40
     },
+
     color: {
       type: String,
       default: '#62666E'
