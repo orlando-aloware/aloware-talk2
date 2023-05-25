@@ -7,10 +7,10 @@
               option-label="label"
               input-debounce="0"
               style="word-break: break-all;"
-              :use-input="useInput"
               emit-value
               map-options
               dense
+              :use-input="useInput"
               :options="options"
               :multiple="multiple"
               :placeholder="placeholder"
