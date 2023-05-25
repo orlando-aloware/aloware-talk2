@@ -128,8 +128,8 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Wallboard')"
-           flat>
+           flat
+           v-show="isActive('Wallboard')">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -142,8 +142,8 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Wallboard')"
-           flat>
+           flat
+           v-show="!isActive('Wallboard')">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
