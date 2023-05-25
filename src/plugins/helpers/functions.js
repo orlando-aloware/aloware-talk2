@@ -18,6 +18,7 @@ export function filterCalls (calls, state) {
 
     // agent name filter
     let agentName = true
+
     if (state.filters.agent) {
       // skip this call if agent name filter is filled, but the call doesnt contain a user
       if (!call.user_id) {
