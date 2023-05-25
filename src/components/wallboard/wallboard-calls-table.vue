@@ -190,7 +190,7 @@
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'lead_location'">
                 <span v-if="call.state">
-                  {{ call.city || '' }}{{ (call.city && call.state) ? ', ' : '' }}{{ call.state }}
+                  {{ getLocation(call) }}
                 </span>
                 <span v-else>--</span>
               </td>
@@ -597,6 +597,10 @@ export default {
       }
 
       return tags.slice(-1 * count)
+    },
+
+    getLocation (communication) {
+      return communication.city + ((communication.city && communication.state) ? ', ' : '') + communication.state
     },
 
     setExpandedItem (index) {
