@@ -3,8 +3,8 @@
     <wallboard-agent-name />
     <span class="users__header__status">
       <agent-status-selector class="bottom-border__none highlighted-primary"
-                             :use-input="false"
                              selectWidth="200"
+                             :use-input="false"
                              @select="onStatus"/>
     </span>
     <agents-status-pills :agents="agents" />

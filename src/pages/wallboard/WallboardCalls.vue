@@ -1,8 +1,8 @@
 <template>
   <div class="wallboard__body">
     <div :class="['calls', `calls--${viewMode}`]">
-      <b-overlay :show="isLoading"
-                 rounded="sm">
+      <b-overlay rounded="sm"
+                 :show="isLoading">
         <wallboard-calls-header/>
         <wallboard-calls-table :calls="calls"/>
         <template #overlay>

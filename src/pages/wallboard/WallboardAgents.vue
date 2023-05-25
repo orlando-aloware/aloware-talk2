@@ -1,8 +1,8 @@
 <template>
   <div class="wallboard__body">
     <div :class="['users', `users--${viewMode}`]">
-      <b-overlay :show="isAgentsLoading"
-                 rounded="sm">
+      <b-overlay rounded="sm"
+                 :show="isAgentsLoading">
         <wallboard-agents-header />
         <wallboard-agents-table />
         <template #overlay>

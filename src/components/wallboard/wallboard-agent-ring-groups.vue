@@ -10,9 +10,9 @@
             v-if="ringGroups.length > 1">
         + {{ ringGroups.length - 1 }} more
       </span>
-      <b-popover :container="`rg-container-${_uid}`"
+      <b-popover triggers="hover"
+                 :container="`rg-container-${_uid}`"
                  :target="`rg-more-${_uid}`"
-                 triggers="hover"
                  v-if="ringGroups.length > 1">
         <span class="d-block mb-1"
               :key="ringGroup.id"

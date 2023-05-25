@@ -51,8 +51,8 @@
                   v-if="column.name === 'incoming_number'">
                 <div class="d-flex flex-column">
                   <div class="mb-1">
-                    <a :href="getCampaignURL(call.campaign_id)"
-                       target="_blank"
+                    <a target="_blank"
+                       :href="getCampaignURL(call.campaign_id)"
                        v-if="hasRole('Company Admin') && getCampaign(call.campaign_id)">
                       {{ getCampaign(call.campaign_id) }}
                     </a>
@@ -69,8 +69,8 @@
               <!-- ring group -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'ring_group'">
-                <a :href="getRingGroupURL(call.ring_group_id)"
-                   target="_blank"
+                <a target="_blank"
+                   :href="getRingGroupURL(call.ring_group_id)"
                    v-if="hasRole('Company Admin') && getRingGroup(call.ring_group_id)">
                   {{ getRingGroup(call.ring_group_id) }}
                 </a>
@@ -82,8 +82,8 @@
               <!-- workflow -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'workflow'">
-                <a :href="getWorkflowURL(call.workflow_id)"
-                   target="_blank"
+                <a target="_blank"
+                   :href="getWorkflowURL(call.workflow_id)"
                    v-if="hasRole('Company Admin') && getWorkflow(call.workflow_id)">
                   {{ getWorkflow(call.workflow_id) }}
                 </a>
@@ -130,8 +130,8 @@
                 <div class="d-flex">
                   <div class="d-flex flex-column justify-center flex-grow-1">
                     <!-- contact with link -->
-                    <router-link :to="{ path: `/contacts/${call.contact_id}` }"
-                                 class="mb-1"
+                    <router-link class="mb-1"
+                                 :to="{ path: `/contacts/${call.contact_id}` }"
                                  v-if="call.contact">
                       {{ call.contact.name | capitalize }}
                     </router-link>
@@ -204,8 +204,8 @@
                       <li class="pb-1"
                           :key="attemptingUser"
                           v-for="attemptingUser in getAttemptingUsers(call, 3)">
-                        <a :href="getUserActivityURL(attemptingUser)"
-                           target="_blank"
+                        <a target="_blank"
+                           :href="getUserActivityURL(attemptingUser)"
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
@@ -261,9 +261,9 @@
                   </q-icon>
                 </router-link>
                 <div v-else-if="call.user_id && getUser(call.user_id)">
-                  <a :href="getUserURL(call.user_id)"
-                      target="_blank"
-                      v-if="hasRole('Company Admin')">{{ getUserName(getUser(call.user_id)) }}</a>
+                  <a target="_blank"
+                     :href="getUserURL(call.user_id)"
+                     v-if="hasRole('Company Admin')">{{ getUserName(getUser(call.user_id)) }}</a>
                   <span v-else>{{ getUserName(getUser(call.user_id)) }}</span>
                 </div>
                 <div v-else>
