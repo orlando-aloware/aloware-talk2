@@ -11,13 +11,13 @@
               emit-value
               map-options
               dense
-              v-model="status"
               :options="options"
               :multiple="multiple"
               :placeholder="placeholder"
               :disable="disable"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               :class="[ highlighted ? highlightedClass : '', customClass]"
+              v-model="status"
               @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:no-option>
