@@ -61,26 +61,32 @@ export default {
       type: String,
       default: 'all'
     },
+
     multiple: {
       type: Boolean,
       default: false
     },
+
     disable: {
       type: Boolean,
       default: false
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     customClass: {
       type: String,
       default: ''
     },
+
     useInput: {
       type: Boolean,
       default: true
@@ -99,6 +105,7 @@ export default {
 
       return ''
     },
+
     optionsArray () {
       return [
         {
@@ -133,6 +140,7 @@ export default {
         this.options = this.optionsArray.filter(item => item.value.toLowerCase().indexOf(needle) > -1)
       })
     },
+
     onShowMenu () {
       this.selectWidth = this.$refs.agentStatusSelect.$el.offsetWidth
     }
