@@ -96,11 +96,11 @@ export default {
   computed: {
     placeholder () {
       if (this.multiple && this.status.length < 1) {
-        return 'Select Agent Statuses'  
+        return 'Select Agent Statuses'
       }
 
       if (!this.multiple && !this.status) {
-        return 'Select Agent Status'  
+        return 'Select Agent Status'
       }
 
       return ''
@@ -118,13 +118,11 @@ export default {
     }
   },
 
-  data () {
-    return {
-      status: this.value,
-      options: [],
-      selectWidth: 0
-    }
-  },
+  data: () => ({
+    status: null,
+    options: [],
+    selectWidth: 0
+  }),
 
   methods: {
     filterFn (val, update) {
@@ -148,6 +146,7 @@ export default {
 
   mounted () {
     this.options = this.optionsArray
+    this.status = this.value
   },
 
   watch: {
