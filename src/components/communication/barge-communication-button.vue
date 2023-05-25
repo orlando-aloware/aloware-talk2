@@ -50,7 +50,7 @@ export default {
 
     barge () {
       this.$VueEvent.fire('make_new_call', {
-        phone_number: 'barge:' + this.communication.id
+        phone_number: `barge:${this.communication.id}`
       })
     }
   }

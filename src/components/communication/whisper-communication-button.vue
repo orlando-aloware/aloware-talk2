@@ -50,7 +50,7 @@ export default {
 
     whisper () {
       this.$VueEvent.fire('make_new_call', {
-        phone_number: 'whisper:' + this.communication.id
+        phone_number: `whisper:${this.communication.id}`
       })
     }
   }
