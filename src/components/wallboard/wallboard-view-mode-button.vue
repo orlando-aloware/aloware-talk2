@@ -2,8 +2,8 @@
   <q-btn-toggle class="mx-2 mt-2 mb-1 custom-toggle-button"
                 dense
                 no-caps
-                :options="options"
                 unelevated
+                :options="options"
                 v-model="mode">
     <template v-for="option in options"
               v-slot:[option.slot]>
