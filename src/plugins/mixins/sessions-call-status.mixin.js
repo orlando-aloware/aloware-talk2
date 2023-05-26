@@ -211,6 +211,12 @@ export default {
         return
       }
 
+      // Check if the contact is DNC'ed
+      if (this.taskToCall?.is_dnc) {
+        this.cancelSingleTask(this.taskToCall, 'Task is removed because the contact is on DNC.')
+        return
+      }
+
       this.callInProgress = false
 
       // only proceed if task has a contact list item id and
@@ -256,6 +262,24 @@ export default {
           // this.skipped_list.push(autoDialTask.id)
           this.$generalNotification(message, 'warning')
           this.onNextTask()
+          return Promise.resolve(res)
+        }).catch(err => {
+          // this.$handleErrors(err.response)
+          return Promise.reject(err)
+        })
+    },
+
+    cancelSingleTask (autoDialTask, message) {
+      const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
+        return
+      }
+
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/cancel`, { reason: message })
+        .then(res => {
+          this.$generalNotification(message, 'warning')
+          this.onNextTask(true, true)
           return Promise.resolve(res)
         }).catch(err => {
           // this.$handleErrors(err.response)

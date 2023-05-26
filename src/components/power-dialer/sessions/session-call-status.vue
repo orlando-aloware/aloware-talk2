@@ -1430,7 +1430,7 @@ export default {
 
     'dialer.isReady': function () {
       // session is not ready if session failed to call the contact
-      // because dialer is not reaady. If dialer reconnects and status
+      // because dialer is not ready. If dialer reconnects and status
       // goes to ready, then we can continue running the task
       if (!this.sessionNotReady) {
         this.runTask()
