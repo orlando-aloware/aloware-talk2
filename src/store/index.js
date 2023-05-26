@@ -12,6 +12,7 @@ import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
+import wallboard from './wallboard'
 import broadcast from './broadcast'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
@@ -37,6 +38,7 @@ export default function (/* { ssrContext } */) {
       stats,
       powerDialer,
       settings,
+      wallboard,
       broadcast,
       cache
     },
@@ -534,6 +536,7 @@ export default function (/* { ssrContext } */) {
         if (value.includes('all')) {
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
+          commit('wallboard/RESET_VUEX', null, { root: true })
         }
       },
 

@@ -12,9 +12,9 @@
                outlined
                stack-label>
         <template v-slot:control>
-          <div v-for="item in formattedValues"
+          <div class="w-100 text-break"
                :key="item.id"
-               class="w-100 text-break">
+               v-for="item in formattedValues">
             <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
               <div class="dot-wrapper d-flex align-items-center position-absolute">
                 <q-badge class="is-dot"
@@ -26,9 +26,8 @@
               <div class="tag-text"
                    :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</div>
               <div role="button" class="custom__remove d-flex align-items-center"
-                    @click="remove(item.id)">
-                <remove-tag-icon class="ml-1 remove-tag-icon">
-                </remove-tag-icon>
+                   @click="remove(item.id)">
+                <remove-tag-icon class="ml-1 remove-tag-icon"/>
               </div>
             </div>
           </div>
@@ -36,19 +35,21 @@
                    ref="search"
                    borderless
                    dense
-                   v-model="search"
                    input-class="input-text-sm"
-                   placeholder="Type to search">
+                   placeholder="Type to search"
+                   v-model="search">
           </q-input>
         </template>
       </q-field>
-      <div class="dropdown-select scrollableArea mt-2 ml-2 mx-0 w-100" v-if="options.length">
+      <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
+           :style="height ? `height: ${height}px !important` : ''"
+           v-if="options.length">
         <template v-if="!optionsIsGrouped">
           <div class="mr-1">
             <div role="button"
                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                 v-for="item in filteredOptions"
                  :key="item.id"
+                 v-for="item in filteredOptions"
                  @click="onSelectOption(item.id)">
               <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
                     class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
@@ -69,9 +70,9 @@
           </div>
         </template>
         <template v-else>
-          <div v-for="(item, index) in filteredOptions"
+          <div class="mr-1"
                :key="`title-${index}`"
-               class="mr-1">
+               v-for="(item, index) in filteredOptions">
             <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
                  :class="[index !== 0 ? 'border-top' : '']">
               <span class="d-inline-flex align-items-center text-grey-100 w-100">
@@ -80,8 +81,8 @@
             </div>
             <div role="button"
                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                 v-for="child in item.children"
                  :key="`child-${child.id}`"
+                 v-for="child in item.children"
                  @click="onSelectOption(child.id)">
               <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
                     v-if="typeof child.color !== 'undefined'">
@@ -109,8 +110,8 @@
          v-else>
       <div class="selected-items-wrapper">
         <div class="d-inline-block"
-             v-for="item in formattedValues"
-             :key="item.id">
+             :key="item.id"
+             v-for="item in formattedValues">
         <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
           <q-badge class="is-dot"
                    rounded
@@ -153,32 +154,43 @@ export default {
       type: String,
       default: ''
     },
+
     buttonText: {
       required: false,
       type: String,
       default: ''
     },
+
     values: {
       required: false,
       type: Array,
       default: () => []
     },
+
     options: {
       required: true,
       type: Array,
       default: () => []
     },
+
     canEdit: {
       required: false,
       type: Boolean,
       default: true
     },
+
     optionsIsGrouped: {
       required: false,
       type: Boolean,
       default: false
+    },
+
+    height: {
+      required: false,
+      type: Number
     }
   },
+
   data () {
     return {
       search: '',
@@ -186,6 +198,7 @@ export default {
       selectedValues: []
     }
   },
+
   computed: {
     allOptions () {
       if (!this.optionsIsGrouped) {
@@ -198,6 +211,7 @@ export default {
       }
       return newOptions.data
     },
+
     formattedValues () {
       if (_.isEmpty(this.selectedValues)) {
         return []
@@ -213,6 +227,7 @@ export default {
       }
       return newValues
     },
+
     filteredOptions () {
       if (!this.optionsIsGrouped) {
         return this.options.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
@@ -228,9 +243,11 @@ export default {
       return newOptions
     }
   },
+
   mounted () {
     this.selectedValues = this.values
   },
+
   methods: {
     isSelected (id) {
       if (_.isEmpty(this.selectedValues)) {
@@ -239,6 +256,7 @@ export default {
 
       return this.selectedValues.includes(id)
     },
+
     onSelectOption (id) {
       if (this.isSelected(id)) {
         this.remove(id)
@@ -253,16 +271,19 @@ export default {
       })
       this.search = ''
     },
+
     handleBlur () {
       this.search = ''
       this.isEdit = false
     },
+
     onEdit () {
       this.isEdit = true
       this.$nextTick(() => {
         this.$refs.search.focus()
       })
     },
+
     remove (id) {
       const found = { data: this.selectedValues.find(value => value === id) }
       found.data = found.data ? this.selectedValues.indexOf(found.data) : null
@@ -272,6 +293,7 @@ export default {
       this.$emit('valuesUpdated', this.selectedValues)
     }
   },
+
   watch: {
     values: {
       deep: true,

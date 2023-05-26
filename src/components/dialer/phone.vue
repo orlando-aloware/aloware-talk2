@@ -66,14 +66,14 @@
 
           <div class="phone-settings">
             <q-item-label class="mb-1">Input device</q-item-label>
-            <device-selector :options="inputDevices"
-                             v-model="inputDevice"
-                             @input="setInputDevice">
+            <device-selector :devices="inputDevices"
+                             v-model="currentInputDevice"
+                             @change="setInputDevice">
             </device-selector>
             <q-item-label class="mt-3 mb-1">Output device</q-item-label>
-            <device-selector :options="outputDevices"
-                             v-model="outputDevice"
-                             @input="setOutputDevice">
+            <device-selector :devices="outputDevices"
+                             v-model="currentOutputDevice"
+                             @change="setOutputDevice">
             </device-selector>
 
             <q-btn color="primary"
@@ -81,7 +81,6 @@
                    label="Speaker Test"
                    no-caps
                    unelevated
-                   dense
                    @click="testOutputDevice">
             </q-btn>
 
@@ -1223,7 +1222,8 @@ import { mapActions, mapState } from 'vuex'
 import {
   communicationInfoMixin,
   notificationMixin,
-  dispositionsMixin
+  dispositionsMixin,
+  agentMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1326,7 +1326,8 @@ export default {
   mixins: [
     communicationInfoMixin,
     notificationMixin,
-    dispositionsMixin
+    dispositionsMixin,
+    agentMixin
   ],
 
   props: {
@@ -1371,8 +1372,6 @@ export default {
       isVisible: true,
       currentLocalTime: null,
       showLocalTime: true,
-      inputDevice: 'default',
-      outputDevice: 'default',
       loadingCommunication: false,
       loadingDropThirdParty: false,
       loadingToggleRecordingStatus: false,
@@ -1452,11 +1451,31 @@ export default {
     },
 
     isAddDisabled () {
-      return !this.devMode && (!this.dialer.communication || this.isCallCompleted || this.dialer.communication.in_cold_transfer || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (
+        !this.devMode &&
+        (
+          !this.dialer.communication ||
+          this.isCallCompleted ||
+          this.dialer.communication.in_cold_transfer ||
+          (this.currentCompany && !this.currentCompany.conferencing_enabled) ||
+          (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
+          (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid)
+        )
+      ) || this.isBargingOrWhispering
     },
 
     isTransferDisabled () {
-      return !this.devMode && (!this.dialer.communication || this.isCallCompleted || (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) || (this.currentCompany && !this.currentCompany.conferencing_enabled) || (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (
+        !this.devMode &&
+        (
+          !this.dialer.communication ||
+          this.isCallCompleted ||
+          (this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW) ||
+          (this.currentCompany && !this.currentCompany.conferencing_enabled) ||
+          (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
+          (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid)
+        )
+      ) || this.isBargingOrWhispering
     },
 
     isMoreDisabled () {
@@ -1478,7 +1497,14 @@ export default {
     },
 
     isParkDisabled () {
-      return (_.isEmpty(this.dialer.communication) || this.loadingPark || this.isCallCompleted || (!_.isEmpty(this.currentCompany) && !this.currentCompany.conferencing_enabled) || (!_.isEmpty(this.dialer.communication.legc_uuid) && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) || (!_.isEmpty(this.dialer.communication.legz_uuid) && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
+      return (
+        _.isEmpty(this.dialer.communication) ||
+        this.loadingPark ||
+        this.isCallCompleted ||
+        (!_.isEmpty(this.currentCompany) && !this.currentCompany.conferencing_enabled) ||
+        (!_.isEmpty(this.dialer.communication.legc_uuid) && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
+        (!_.isEmpty(this.dialer.communication.legz_uuid) && this.dialer.call.callSid === this.dialer.communication.legz_uuid)
+      ) || this.isBargingOrWhispering
     },
 
     isMuteDisabled () {
@@ -1486,7 +1512,7 @@ export default {
     },
 
     isRecordingDisabled () {
-      return this.isCallCompleted
+      return this.isCallCompleted || this.isBargingOrWhispering
     },
 
     isCallAdded () {
@@ -2196,19 +2222,22 @@ export default {
       document.onmousemove = null
     },
 
-    setInputDevice () {
-      this.$VueEvent.fire('setInputDevice', this.inputDevice)
+    setInputDevice (inputDevice) {
+      console.log('device', inputDevice)
+      this.$VueEvent.fire('setInputDevice', inputDevice)
     },
 
-    setOutputDevice () {
-      this.$VueEvent.fire('setOutputDevice', this.outputDevice)
+    setOutputDevice (outputDevice) {
+      console.log('device', outputDevice)
+      this.$VueEvent.fire('setOutputDevice', outputDevice)
     },
 
     testOutputDevice () {
-      this.$VueEvent.fire('testOutputDevice', this.outputDevice)
+      this.$VueEvent.fire('testOutputDevice', this.currentOutputDevice)
     },
 
     forceRefreshCommunication ($event) {
+      this.$VueEvent.fire('initializeSettings')
       $event.target.blur()
       this.loadingCommunication = true
       this.$VueEvent.fire('forceRefreshCommunication')

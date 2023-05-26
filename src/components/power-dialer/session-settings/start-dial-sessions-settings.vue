@@ -1,18 +1,16 @@
 <template>
   <div class="t-session-settings">
-    <q-btn
-      v-if="defaultTrigger"
-      class="start-dial-button p-0"
-      color="success"
-      no-caps
-      unelevated
-      :disabled="disabledTrigger"
-      @click="dialPreparation">
-      <PhoneIcon
-        class="mr-2"
-        color="white"
-        height="12"
-        width="12" />
+    <q-btn class="start-dial-button p-0"
+           color="success"
+           no-caps
+           unelevated
+           :disabled="disabledTrigger"
+           v-if="defaultTrigger"
+           @click="dialPreparation">
+      <PhoneIcon class="mr-2"
+                 color="white"
+                 height="12"
+                 width="12" />
       <div class="button-label">
         Start Dialing
         <q-tooltip v-if="disabledTrigger">
@@ -20,47 +18,38 @@
         </q-tooltip>
       </div>
     </q-btn>
-    <q-btn
-      v-else
-      no-caps
-      unelevated
-      @click="dialPreparation">
-      <SettingIcon
-        width="15px"
-        height="15px"
-        class="mx-1" />
+    <q-btn no-caps
+           unelevated
+           @click="dialPreparation"
+           v-else>
+      <SettingIcon width="15px"
+                   height="15px"
+                   class="mx-1" />
     </q-btn>
-    <q-dialog
-      transition-show="jump-down"
-      v-model="dialog">
-        <q-card
-          flat
-          style="width: 800px; max-width: 90vw; min-height: 500px;"
-          class="my-card py-2 px-2">
+    <q-dialog transition-show="jump-down"
+              v-model="dialog">
+        <q-card class="my-card py-2 px-2"
+                style="width: 800px; max-width: 90vw; min-height: 500px;"
+                flat>
           <b-overlay :show="loading">
-            <q-card-section
-              class="p-0"
-              horizontal>
-              <q-card-section
-                style="width: 26% !important"
-                class="p-0 pt-2 pr-2 border-right">
+            <q-card-section class="p-0"
+                            horizontal>
+              <q-card-section class="p-0 pt-2 pr-2 border-right"
+                              style="width: 26% !important">
 
                 <p class="text-weight-bold px-2">
                   Session Settings
                 </p>
 
-                <q-list
-                  dense
-                  bordered
-                  padding
-                  style="display:contents;"
-                  class="mt-3">
-                  <q-item
-                    clickable
-                    :class="`px-2 border-radius-1 ${hasSelectedTemporarySetting ? 'bg-grey-70' : ''}`"
-                    :disable="loading">
-                    <q-item-section
-                      @click="loadSettings('Untitled')">
+                <q-list class="mt-3"
+                        style="display:contents;"
+                        dense
+                        bordered
+                        padding>
+                  <q-item clickable
+                          :class="`px-2 border-radius-1 ${hasSelectedTemporarySetting ? 'bg-grey-70' : ''}`"
+                          :disable="loading">
+                    <q-item-section @click="loadSettings('Untitled')">
                       <div class="text-bold">
                         New <span class="text-weight-regular text-grey-80">(Untitled)</span>
                       </div>
@@ -71,83 +60,73 @@
                   </q-item>
                 </q-list>
 
-                <q-list
-                  dense
-                  bordered
-                  padding
-                  style="display:contents;"
-                  class="mt-3">
-                  <template
-                    v-for="settingCategory in groupedSettings">
-                    <q-item
-                      :key="settingCategory.value">
+                <q-list class="mt-3 session-settings-sidebar"
+                        style="display:contents;"
+                        dense
+                        bordered
+                        padding>
+                  <template v-for="settingCategory in groupedSettings">
+                    <q-item :key="settingCategory.value">
                       <q-item-section class="p-0">
                         <div class="text-grey px-2 pt-3 text-uppercase text-caption">
                           {{ settingCategory.label }}
                         </div>
                       </q-item-section>
                     </q-item>
-                    <template
-                      v-if="fetchedGroupSettings(settingCategory.name).length > 0">
-                      <q-item
-                        clickable
-                        v-ripple
-                        v-for="(setting, settingKey) in fetchedGroupSettings(settingCategory.name)"
-                        :key="`${settingCategory.name}-${settingKey}`"
-                        :class="`px-2 py-0 border-radius-1 ${isSessionValid(setting) ? 'bg-grey-70' : ''}`"
-                        :disable="loading"
-                        @click.native.prevent="loadSettings(setting)"
-                        @mouseenter="hovered = setting.id"
-                        @mouseleave="toggleSelected">
+                    <template v-if="fetchedGroupSettings(settingCategory.name).length > 0">
+                      <q-item class="px-2 py-0 border-radius-1"
+                              clickable
+                              v-ripple
+                              :key="`${settingCategory.name}-${settingKey}`"
+                              :class="getSettingsItemClass(setting)"
+                              :disable="loading"
+                              v-for="(setting, settingKey) in fetchedGroupSettings(settingCategory.name)"
+                              @click.native.prevent="loadSettings(setting)"
+                              @mouseenter="hovered = setting.id"
+                              @mouseleave="toggleSelected">
                         <q-item-section class="mr-2">
                           {{ setting.name }}
                         </q-item-section>
-                        <q-item-section
-                          v-if="hovered !== setting.id || settingCategory.name === 'company'"
-                          side>
-                          <CheckIcon
-                            v-if="isSessionValid(setting)"
-                            class="mr-2" />
+                        <q-item-section side
+                                        v-if="hovered !== setting.id || settingCategory.name === 'company'">
+                          <CheckIcon v-if="isSessionValid(setting)"
+                                     class="mr-2" />
                         </q-item-section>
-                        <q-item-section
-                          side
-                          @click.native.stop="{}"
-                          v-if="hovered === setting.id && settingCategory.name !== 'company'">
-                          <q-btn
-                            size="md"
-                            class="m-0"
-                            round
-                            flat
-                            outline
-                            dense
-                            color="grey"
-                            @click="hoveredMenu = setting.id">
-                            <i class="fa fa-ellipsis-h"></i>
+                        <q-item-section class="pl-0"
+                                        side
+                                        v-if="hovered === setting.id && settingCategory.name !== 'company'"
+                                        @click.native.stop="{}">
+                          <q-btn size="md"
+                                 class="m-0"
+                                 color="grey"
+                                 round
+                                 flat
+                                 outline
+                                 dense
+                                 @click="hoveredMenu = setting.id">
+                            <i class="fa fa-ellipsis-h"/>
                           </q-btn>
-                          <q-menu
-                            anchor="top right"
-                            self="top left">
+                          <q-menu anchor="top right"
+                                  self="top left">
                             <q-list style="min-width: 100px">
-                              <q-item
-                                dense
-                                clickable
-                                v-close-popup
-                                @click="onRename(setting)">
+                              <q-item dense
+                                      clickable
+                                      v-close-popup
+                                      @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
-                                    <i class="fa fa-pencil-alt mr-2"></i>
+                                    <i class="fa fa-pencil-alt mr-2"/>
                                     Rename
                                   </div>
                                 </q-item-section>
                               </q-item>
-                              <q-item
-                                dense
-                                clickable
-                                v-close-popup
-                                @click="onDeleteRequest(setting.id)">
+                              <q-item dense
+                                      clickable
+                                      v-close-popup
+                                      @click="onDeleteRequest(setting.id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
-                                    <i class="fa fa-trash-alt mr-2"></i>
+                                    <i class="fa fa-trash-alt mr-2"/>
                                     Delete
                                   </div>
                                 </q-item-section>
@@ -157,9 +136,9 @@
                         </q-item-section>
                       </q-item>
                     </template>
-                    <div v-else :key="settingCategory.name">
-                      <span
-                        class="px-2 text-grey text-caption text-italic">
+                    <div :key="settingCategory.name"
+                         v-else>
+                      <span class="px-2 text-grey text-caption text-italic">
                         No saved settings
                       </span>
                     </div>
@@ -167,84 +146,74 @@
                 </q-list>
               </q-card-section>
 
-              <q-card-section
-                class="px-0 py-0"
-                style="width: 74% !important"
-                :disabled="loading">
+              <q-card-section class="px-0 py-0"
+                              style="width: 74% !important"
+                              :disabled="loading">
                 <q-card flat>
                   <div class="row">
-                    <div class="col-12">
-                      <q-card flat
-                              class="p-0">
-                        <q-card-actions class="px-0">
-                          <div class="session-settings-title">
-                            {{ selectedItemName }}
-                            <q-tooltip anchor="center right">
-                              {{ selectedItemName }}
-                            </q-tooltip>
-                          </div>
-                          <q-space />
-                          <q-btn
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="grey-5"
-                            @click="resetDefaults">
-                            Reset
-                          </q-btn>
-                          <q-btn
-                            v-if="!hasSelectedTemporarySetting"
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="primary"
-                            :disabled="saveDisabled"
-                            @click="updateSelectedSetting">
-                            Save
-                          </q-btn>
-                          <q-btn
-                            v-if="hasSelectedTemporarySetting"
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="primary"
-                            :disabled="disabled"
-                            @click="newSetting = true">
-                            Save As New
-                          </q-btn>
-                          <q-btn
-                            unelevated
-                            no-caps
-                            size="sm"
-                            class="px-3 py-0"
-                            color="success"
-                            :disabled="disabled"
-                            @click="beginDial">
-                            {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
-                          </q-btn>
-                        </q-card-actions>
-                      </q-card>
+                    <div class="col px-0 d-flex justify-content-end t-session-settings__actions">
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="grey-5"
+                             unelevated
+                             no-caps
+                             @click="resetDefaults">
+                        Reset
+                      </q-btn>
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="primary"
+                             unelevated
+                             no-caps
+                             :disabled="saveDisabled"
+                             v-if="!hasSelectedTemporarySetting"
+                             @click="updateSelectedSetting">
+                        Save
+                      </q-btn>
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="primary"
+                             unelevated
+                             no-caps
+                             :disabled="disabled"
+                             v-if="hasSelectedTemporarySetting"
+                             @click="newSetting = true">
+                        Save As New
+                      </q-btn>
+                      <q-btn class="px-3 py-0 ml-2"
+                             size="sm"
+                             color="success"
+                             unelevated
+                             no-caps
+                             :disabled="disabled"
+                             @click="beginDial">
+                        {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                      </q-btn>
+                    </div>
+                  </div>
+                  <div class="row mt-3 mb-2">
+                    <div class="col">
+                      <div class="session-settings-title text-h6 font-weight-bold">
+                        {{ selectedItemName }}
+                        <q-tooltip anchor="center right">
+                          {{ selectedItemName }}
+                        </q-tooltip>
+                      </div>
                     </div>
                   </div>
 
-                  <SessionsForm
-                    v-model="filterSelectedItem"
-                    :disabled="isCompanyScope"
-                    :flagged="dialog"
-                    @valid-form="disabled = false"
-                    @invalid-form="disabled = true"/>
-
+                  <SessionsForm :disabled="isCompanyScope"
+                                :flagged="dialog"
+                                v-model="filterSelectedItem"
+                                @valid-form="disabled = false"
+                                @invalid-form="disabled = true"/>
                 </q-card>
               </q-card-section>
             </q-card-section>
             <template #overlay>
               <div class="text-center">
-                <q-spinner-bars
-                  color="primary"
-                  size="2em"
+                <q-spinner-bars color="primary"
+                                size="2em"
                 />
                 <p id="cancel-label">
                   {{ loadingText }}
@@ -256,13 +225,11 @@
     </q-dialog>
 
     <!-- DIALOG used for confirmation -->
-    <q-dialog
-      v-model="newSetting"
-      persistent>
+    <q-dialog persistent
+              v-model="newSetting">
       <q-card style="width: 350px">
         <q-card-section>
-          <div
-            class="text-subtitle1 text-bold text-grey-8">
+          <div class="text-subtitle1 text-bold text-grey-8">
             <span v-if="deleteId">
               Delete Session Settings
             </span>
@@ -279,62 +246,59 @@
           <div v-if="deleteId">
             Are you sure you want to remove the selected session settings?
           </div>
-          <q-input
-            v-else-if="updateObj"
-            outlined
-            v-model="newSettingName"
-            :placeholder="updateObj.name" />
-          <q-input
-            v-else
-            outlined
-            v-model="newSettingName"
-            placeholder="New Settings Name" />
+          <q-input outlined
+                   :placeholder="updateObj.name"
+                   v-model="newSettingName"
+                   v-else-if="updateObj"
+                   :error="errorMessage != null"
+                   :error-message="errorMessage"/>
+          <q-input placeholder="New Settings Name"
+                   outlined
+                   v-model="newSettingName"
+                   v-else
+                   :error="errorMessage != null"
+                   :error-message="errorMessage"/>
         </q-card-section>
 
-        <q-card-actions
-          class="px-3 pb-3"
-          align="right">
-          <b-button
-            variant="dark-grey"
-            class="f-btn--cancel mr-2"
-            color="grey-80"
-            size="sm"
-            v-close-popup
-            :disabled="isBusy || isBusy"
-            @click="newSetting = false">
+        <q-card-actions class="px-3 pb-3"
+                        align="right">
+          <b-button variant="dark-grey"
+                    class="f-btn--cancel mr-2"
+                    color="grey-80"
+                    size="sm"
+                    :disabled="isBusy || isBusy"
+                    v-close-popup
+                    @click="newSetting = false">
             Cancel
           </b-button>
-          <b-button
-            v-if="deleteId"
-            variant="danger"
-            size="sm"
-            :disabled="isBusy"
-            @click="onDeleteSetting">
-            <q-spinner-bars v-if="isBusy"
-                            class="mr-1"
-                            color="white" />
+          <b-button variant="danger"
+                    size="sm"
+                    :disabled="isBusy"
+                    v-if="deleteId"
+                    @click="onDeleteSetting">
+            <q-spinner-bars class="mr-1"
+                            color="white"
+                            v-if="isBusy"/>
             {{ isBusy ? ' Removing...' : 'Remove' }}
           </b-button>
-          <b-button
-            v-else-if="updateObj"
-            variant="success"
-            size="sm"
-            :disabled="updateObj.name === newSettingName || newSettingName.length === 0 || isBusy"
-            @click="renameSetting">
-            <q-spinner-bars v-if="isBusy"
-                            class="mr-1"
-                            color="white" />
+          <b-button variant="success"
+                    size="sm"
+                    :disabled="isSaveButtonDisabled"
+                    v-else-if="updateObj"
+                    @click="renameSetting">
+            <q-spinner-bars class="mr-1"
+                            color="white"
+                            v-if="isBusy"/>
             {{ isBusy ? ' Saving...' : 'Save' }}
           </b-button>
-          <b-button
-            v-else
-            variant="success"
-            size="sm"
-            :disabled="isBusy"
-            @click="saveAsNew">
-            <q-spinner-bars v-if="isBusy"
-                            class="mr-1"
-                            color="white" />
+          <b-button variant="success"
+                    size="sm"
+                    :disabled="isBusy || !canSaveSettings"
+                    v-else
+                    @click="saveAsNew">
+            <q-spinner-bars class="mr-1"
+                            color="white"
+                            v-if="isBusy"/>
             {{ isBusy ? ' Saving...' : 'Save' }}
           </b-button>
         </q-card-actions>
@@ -408,9 +372,11 @@ export default {
       if (!this.selectedItem?.id) {
         return true
       }
+
       if (this.temporarySetting?.id) {
         return this.selectedItem.id === this.temporarySetting?.id
       }
+
       return false
     },
 
@@ -422,6 +388,7 @@ export default {
       if (this.list.id === 'my-queue') {
         return this.myQueue.id
       }
+
       return this.list.id
     },
 
@@ -429,6 +396,7 @@ export default {
       if (this.selectedItem?.id) {
         return this.selectedItem
       }
+
       return {
         call_disposition_ids: [],
         campaign_id: null,
@@ -443,6 +411,27 @@ export default {
         warmup_period_in_seconds: 0,
         order: POWER_DIALER_ORDER.default
       }
+    },
+
+    isSaveButtonDisabled () {
+      return this.updateObj.name === this.newSettingName ||
+        this.newSettingName.length === 0 || this.isBusy
+    },
+
+    settingNameLength () {
+      return this.newSettingName?.length ?? 0
+    },
+
+    errorMessage () {
+      if (this.settingNameLength > 191) {
+        return 'Max length is 191 characters'
+      }
+
+      return null
+    },
+
+    canSaveSettings () {
+      return this.settingNameLength > 0 && this.settingNameLength <= 191
     }
   },
 
@@ -528,17 +517,19 @@ export default {
 
       if (this.temporarySetting.id === this.selectedItem.id) {
         const newSettings = { ...this.filterSelectedItem }
+
         requests.res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
           contact_list_id: this.listId,
           name: `${this.list.name}-${new Date().valueOf()}`
         })
+
         if (requests.res?.id) {
-          // await this.getDialerSessionSettings()
           requests.newList = await this.updateContactsList({
             id: this.listId,
             dialer_session_id: null
           })
+
           this.SET_SESSION_SETTINGS(this.selectedItem)
         }
       } else {
@@ -546,6 +537,7 @@ export default {
           id: this.listId,
           dialer_session_id: this.selectedItem.id
         })
+
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
 
@@ -553,19 +545,24 @@ export default {
         if (!this.dialer.isReady) {
           this.loading = false
           this.$generalNotification('Unable to start session. Dialer is offline.', 'error')
+
           return
         }
+
         this.$emit('start')
       } else {
         this.$emit('update', requests.newList)
       }
+
       this.sessionSettings = requests.res?.id ? requests.res : this.selectedItem
 
       if (this.sessionSettings?.id) {
         this.dialog = false
-      } else {
-        this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
+
+        return
       }
+
+      this.$generalNotification('Request failed! Error on saving user session settings.', 'warning')
     },
 
     async loadSettings (data) {
@@ -573,15 +570,15 @@ export default {
       const request = {
         res: null
       }
+
       if (data?.id) {
         this.loadingText = 'Fetching session settings data..'
         request.res = await this.getSessionSetting(data.id)
       } else {
         this.loadingText = 'Fetching temporary session settings data..'
         request.res = await this.getTemporarySessionSetting(this.listId)
-        // this.resetDefaults(false)
       }
-      // this.sessionSettings = request.res
+
       this.selectedItemId = request.res.id || ''
       this.selectedItem = request.res?.id ? request.res : this.defaultValues
       this.loading = false
@@ -595,12 +592,25 @@ export default {
       newSettings.id = null
       newSettings.contact_list_id = null
       this.isBusy = true
+
       const collection = this.removeEmptyParams(newSettings)
       const res = await this.createDialerSessionSetting(collection)
+
+      if (res.isAxiosError) {
+        console.log({ res })
+        this.$generalNotification(res.response.data.message ?? 'Dialer session setting could not be saved', 'error')
+
+        this.loading = false
+        this.isBusy = false
+        return
+      }
+
       if (res?.id) {
         await this.getDialerSessionSettings()
+
         this.$generalNotification('Dialer session setting has been saved.')
       }
+
       this.newSetting = false
       this.loading = false
       this.isBusy = false
@@ -608,15 +618,19 @@ export default {
 
     async updateSelectedSetting () {
       this.saveDisabled = true
+
       const res = await this.updateDialerSessionSetting(
         this.removeEmptyParams(this.selectedItem)
       )
+
       if (res?.data) {
         if (this.sessionSettings.id === res.data.id) {
           await this.getPowerDialerList(this.listId)
         }
+
         this.$generalNotification(`Dialer session setting has been updated!`)
       }
+
       this.onUpdatedSessionMetrics()
       this.saveDisabled = false
     },
@@ -625,6 +639,7 @@ export default {
       if (isEqual(this.filterSelectedItem, this.sessionSettings)) {
         return
       }
+
       this.$emit('on-update-session-metrics')
     },
 
@@ -641,21 +656,26 @@ export default {
     async renameSetting () {
       this.updateObj.name = this.newSettingName
       this.isBusy = true
+
       const res = await this.updateDialerSessionSetting({
         id: this.updateObj.id,
         name: this.updateObj.name
       })
+
       if (res.data) {
         this.newSetting = false
         this.updateObj = ''
         this.$generalNotification(`Dialer session setting has been renamed to ${res.data.name}.`)
         this.isBusy = false
       }
+
+      this.newSettingName = ''
     },
 
     async onDeleteSetting () {
       this.isBusy = true
       const res = await this.deleteDialerSessionSetting(this.deleteId)
+
       if (res.data) {
         await this.getDialerSessionSettings()
         this.newSetting = false
@@ -670,9 +690,7 @@ export default {
     },
 
     toggleSelected () {
-      if (this.hoveredMenu) {
-        // If hovered, trigger actions
-      } else {
+      if (!this.hoveredMenu) {
         this.hovered = ''
       }
     },
@@ -692,9 +710,11 @@ export default {
         warmup_period_in_seconds: 0,
         order: POWER_DIALER_ORDER.default
       }
+
       if (this.sessionSettings?.id && isExistingList) {
         params.id = this.sessionSettings.id
       }
+
       this.selectedItemId = this.list?.dialer_session_id
       this.setDefaultSettings(params)
     },
@@ -711,6 +731,14 @@ export default {
       if (this.dialer.isReady && this.dialer.currentStatus === 'READY') {
         this.setDialerCommunication()
       }
+    },
+
+    getSettingsItemClass (setting) {
+      const backgroundClass = this.isSessionValid(setting) ? 'bg-grey-70' : ''
+
+      return [
+        backgroundClass
+      ]
     }
   },
 
@@ -726,9 +754,11 @@ export default {
         const temporarySetting = await this.getTemporarySessionSetting(this.listId)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list?.dialer_session_id
+
         const fetchedSettings = this.dialerSessionSettings.find((setting) => {
           return setting.id === this.selectedItemId
         })
+
         if (fetchedSettings?.id) {
           this.selectedItem = fetchedSettings
         } else if (this.temporarySetting?.id) {
@@ -736,11 +766,14 @@ export default {
         } else {
           this.selectedItem = this.filterSelectedItem
         }
+
         this.activeList = this.list
         this.loading = false
-      } else {
-        this.selectedItem = {}
+
+        return
       }
+
+      this.selectedItem = {}
     },
 
     newSetting (val) {

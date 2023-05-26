@@ -242,5 +242,6 @@ export const DEFAULT_STATE = {
   },
   isContactMixinUsed: false,
   isShortenedUrlRemembered: false,
-  newCommunicationInprogressContactFetch: []
+  newCommunicationInprogressContactFetch: [],
+  showContactResourceUnavailable: false
 }

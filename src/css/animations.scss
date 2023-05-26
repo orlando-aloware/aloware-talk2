@@ -1,0 +1,19 @@
+.vertical-collapse-enter-active, 
+.vertical-collapse-leave-active {
+  transition: all .3s;
+  max-height: 1500px;
+}
+
+.vertical-collapse-enter,
+.vertical-collapse-leave-to {
+  max-height: 0px;
+}
+
+.list-fade-enter,
+.list-fade-leave-to {
+  opacity: 0;
+}
+
+.list-fade-leave-active {
+  position: absolute;
+}

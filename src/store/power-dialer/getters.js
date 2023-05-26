@@ -3,6 +3,7 @@ import { getField } from 'vuex-map-fields'
 export default {
   getField,
   myQueue: (state) => state.myQueue,
+  myQueueId: (state) => state.myQueue?.id,
   flaggedCreateExisting: (state) => state.flaggedCreateExisting,
   opened: (state) => new Set(state.opened),
   filters: (state) => state.filters,

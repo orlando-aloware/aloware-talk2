@@ -1,136 +1,122 @@
 <template>
-  <q-card v-if="resources" class="row">
-    <div
-      class="col-12 px-0"
-      v-for="form in forms"
-      :key="form.name" >
-      <label
-        class="label mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
+  <q-card class="row"
+          v-if="resources">
+    <div class="col-12 px-0"
+         :key="form.name"
+         v-for="form in forms">
+      <label class="label mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
         {{ form.label }}
       </label>
-      <div
-        class="row pb-4">
-        <div
-          v-for="cform in form.children"
-          :key="cform.name"
-          class="col-6 pl-3">
+      <div class="row pb-4 dial-sessions__form">
+        <div class="col-6 pl-3"
+             :key="cform.name"
+             v-for="cform in form.children">
           <label
             class="label mb-1">
             {{ cform.label }}
             </label>
 
-          <q-select
-            v-if="cform.name === 'metric_options'"
-            option-value="value"
-            option-label="label"
-            multiple
-            use-chips
-            use-input
-            emit-value
-            map-options
-            class="generic-selector-2"
-            outlined
-            dense
-            placeholder="Select session metrics"
-            v-model="resources[cform.name]"
-            :options="metrics"
-            :disable="disabled"
-            :max-values="4">
+          <q-select class="generic-selector-2 dial-sessions__form__metric-options"
+                    option-value="value"
+                    option-label="label"
+                    multiple
+                    use-chips
+                    use-input
+                    emit-value
+                    map-options
+                    outlined
+                    dense
+                    :options="metrics"
+                    :disable="disabled"
+                    :max-values="4"
+                    :placeholder="resources[cform.name]?.length > 0 ? '' : 'Select session metrics'"
+                    v-if="cform.name === 'metric_options'"
+                    v-model="resources[cform.name]">
             <template v-slot:option="scope">
-              <q-item
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
+              <q-item v-bind="scope.itemProps"
+                      v-on="scope.itemEvents">
                 <q-item-section>
-                  <q-item-label
-                    v-if="!scope.opt.value"
-                    class="text-subtitle2 font-weight-bold"
-                    disabled
-                    v-html="`${scope.opt.label}`" />
-                  <q-item-label
-                    v-else
-                    v-html="`&nbsp;&nbsp;  ${scope.opt.label}`" />
+                  <q-item-label class="text-subtitle2 font-weight-bold"
+                                disabled
+                                v-if="!scope.opt.value"
+                                v-html="`${scope.opt.label}`" />
+                  <q-item-label v-else
+                                v-html="`&nbsp;&nbsp;  ${scope.opt.label}`" />
                 </q-item-section>
               </q-item>
             </template>
           </q-select>
 
-          <LineSelector
-            v-else-if="cform.name === 'campaign_id'"
-            v-model="resources[cform.name]"
-            :multiple="false"
-            :use-chips="true"
-            :disable="disabled"
-            :generic-styling="false"
-            :generic-multiselect="false"
-            :force-remove-missing-values="true"
-            @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
+          <LineSelector :multiple="false"
+                        :use-chips="true"
+                        :disable="disabled"
+                        :generic-styling="false"
+                        :generic-multiselect="false"
+                        :force-remove-missing-values="true"
+                        v-model="resources[cform.name]"
+                        v-else-if="cform.name === 'campaign_id'"
+                        @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
 
-          <ScriptSelector
-            v-else-if="cform.name === 'script_id'"
-            class="w-100"
-            v-model="resources[cform.name]"
-            :disable="disabled"
-            :clearable="true" />
+          <ScriptSelector class="w-100 dial-sessions__form__script-selector"
+                          :class="[resources[cform.name] ? 'populated': '']"
+                          :disable="disabled"
+                          :clearable="true"
+                          v-else-if="cform.name === 'script_id'"
+                          v-model="resources[cform.name]"/>
 
-          <OrderSelector
-            v-else-if="cform.name === 'order'"
-            class="generic-selector-2"
-            v-model="resources[cform.name]" />
+          <OrderSelector class="generic-selector-2 dial-sessions__form__order-selector"
+                         v-else-if="cform.name === 'order'"
+                         v-model="resources[cform.name]" />
 
-          <CallDispositionSelector
-            v-else-if="cform.name === 'call_disposition_ids'"
-            class="pb-3"
-            v-model="resources[cform.name]"
-            :multiple="true"
-            :highlighted="isChanged('call_dispositions')"
-            :disable="disabled"
-            @change="{}">
+          <CallDispositionSelector class="pb-3 dial-sessions__form__call-disposition-selector"
+                                   :multiple="true"
+                                   :highlighted="isChanged('call_dispositions')"
+                                   :disable="disabled"
+                                   v-else-if="cform.name === 'call_disposition_ids'"
+                                   v-model="resources[cform.name]"
+                                   @change="{}">
           </CallDispositionSelector>
 
-          <ContactDispositionSelector
-            v-else-if="cform.name === 'contact_disposition_ids'"
-            custom-class="padded-container-1 generic-selector-1"
-            class="pb-3"
-            v-model="resources[cform.name]"
-            :generic-styling="false"
-            :multiple="true"
-            :use-chips="true"
-            :outlined="true"
-            :disable="disabled"
-            :show-placeholder="true"
-            @change="{}">
+          <ContactDispositionSelector class="pb-3 dial-sessions__form__contact-disposition-selector"
+                                      custom-class="padded-container-1 generic-selector-1"
+                                      :generic-styling="false"
+                                      :multiple="true"
+                                      :use-chips="true"
+                                      :outlined="true"
+                                      :disable="disabled"
+                                      :show-placeholder="true"
+                                      v-else-if="cform.name === 'contact_disposition_ids'"
+                                      v-model="resources[cform.name]"
+                                      @change="{}">
           </ContactDispositionSelector>
 
-          <VmDropSelector
-            v-else-if="cform.name === 'setVmDropShortcuts'"
-            class="w-100"
-            v-model="resources[cform.name]"
-            :disable="disabled"
-            @change="{}">
+          <VmDropSelector class="w-100 dial-sessions__form__vm-drop-selector"
+                          :disable="disabled"
+                          v-model="resources[cform.name]"
+                          v-else-if="cform.name === 'setVmDropShortcuts'"
+                          @change="{}">
           </VmDropSelector>
 
           <p v-else-if="cform.name === 'skip_outside_daytime_hours'">
-            <q-toggle
-              size="md"
-              val="md"
-              v-model="resources[cform.name]"
-              :true-value="1"
-              :false-value="0"
-              :disable="disabled" />
+            <q-toggle size="md"
+                      val="md"
+                      :true-value="1"
+                      :false-value="0"
+                      :disable="disabled"
+                      v-model="resources[cform.name]" />
           </p>
 
-          <WarmupPeriodSelector
-            v-else-if="cform.name === 'warmup_period_in_seconds'"
-            v-model="resources[cform.name]"
-            :disable="disabled" />
+          <WarmupPeriodSelector class="dial-sessions__form__warmup-period-selector"
+                                :disable="disabled"
+                                v-else-if="cform.name === 'warmup_period_in_seconds'"
+                                v-model="resources[cform.name]"/>
 
-          <q-select
-            v-else
-            class="generic-selector-2"
-            outlined
-            dense
-            :options="[]"
-            v-model="resources[cform.name]" />
+          <q-select class="generic-selector-2"
+                    outlined
+                    dense
+                    :options="[]"
+                    v-else
+                    v-model="resources[cform.name]" />
 
         </div>
       </div>

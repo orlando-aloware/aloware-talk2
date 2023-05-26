@@ -11,8 +11,7 @@
                             :label="dateRangeLabel">
                 <div class="last-engagement-tooltip-wrapper"
                      v-if="isInboxOrAllComms">
-                  <information-circle-icon color="#2F80ED">
-                  </information-circle-icon>
+                  <information-circle-icon color="#2F80ED"/>
                   <q-tooltip  anchor="top middle"
                               self="center middle">
                     Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)
@@ -32,23 +31,6 @@
                 </date-range-picker>
               </b-form-group>
             </b-col>
-            <!--b-col sm="12"
-                   md="6">
-              <b-form-group label="My Contacts"
-                            class="form-label">
-                <b-form-checkbox
-                  class="mt-1"
-                  switch
-                  v-model="filter.my_contact"
-                  :value="1"
-                  :unchecked-value="0"
-                  @change="(eventPayload) => onFilterChange(eventPayload, 'my_contact')"
-                >
-                </b-form-checkbox>
-              </b-form-group>
-            </b-col>
-          </b-form-row>
-          <b-form-row class="mt-2"-->
             <b-col sm="12"
                    md="6">
               <b-form-group label="Lines"
@@ -98,9 +80,9 @@
                 </communication-direction-selector>
               </b-form-group>
             </b-col>
-            <b-col v-if="isCallsOnlyChannel"
-                   sm="12"
-                   md="6">
+            <b-col sm="12"
+                   md="6"
+                   v-if="isCallsOnlyChannel">
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -272,8 +254,7 @@
               <b-form-group class="form-label"
                             label="Communication Owners">
                 <div class="comm-owner-filter-tooltip-wrapper">
-                  <information-circle-icon color="#2F80ED">
-                  </information-circle-icon>
+                  <information-circle-icon color="#2F80ED"/>
                   <q-tooltip  anchor="top middle"
                               self="center middle">
                     <p class="font-weight-bold">Who is the communication owner?</p>
@@ -374,9 +355,14 @@ import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
+import { inboxRoutesMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'filter-form',
+
+  mixins: [
+    inboxRoutesMixin
+  ],
 
   components: {
     InformationCircleIcon,
@@ -422,11 +408,8 @@ export default {
     ]),
 
     isInboxOrAllComms () {
-      return [
-        'Inbox Channel Task Status',
-        'Inbox',
-        'Inbox Contact Task'
-      ].includes(this.$route.name) || ['all-communications'].includes(this.$route.params.channel)
+      return this.inboxTaskRoutes.includes(this.$route.name) ||
+        ['all-communications'].includes(this.$route.params.channel)
     },
 
     dateRangeLabel () {
@@ -442,6 +425,7 @@ export default {
       if (!this.rangePicker) {
         return false
       }
+
       return this.rangePicker.$data.showCustomRangeCalendars
     },
 
@@ -454,24 +438,35 @@ export default {
     },
 
     isMentionsOrInboxChannel () {
-      return this.$route.name === 'Inbox' || ['mentions', 'inbox'].includes(this.$route.params.channel)
+      const nonCommunicationChannels = ['mentions', 'inbox']
+
+      return this.$route.name === 'Inbox' ||
+        nonCommunicationChannels.includes(this.$route.params.channel)
     },
 
     isInboxOrAllCallsChannel () {
+      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications']
+
       return this.$route.name === 'Inbox' ||
-        ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications'].includes(this.$route.params.channel)
+        nonSmsChannels.includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
-      return ['calls', 'all-communications'].includes(this.$route.params.channel)
+      const callsChannels = ['calls', 'all-communications']
+
+      return callsChannels.includes(this.$route.params.channel)
     },
 
     isCallsAndRecordingsChannel () {
-      return ['calls', 'recordings', 'all-communications'].includes(this.$route.params.channel)
+      const allCallsChannels = ['calls', 'recordings', 'all-communications']
+
+      return allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
-      return ['messages', 'all-communications'].includes(this.$route.params.channel)
+      const smsChannels = ['messages', 'all-communications']
+
+      return smsChannels.includes(this.$route.params.channel)
     },
 
     tagsFilterLabel () {
@@ -528,7 +523,7 @@ export default {
 
     getDateRangeInputLabel () {
       if (this.dateRange.startDate && this.dateRange.endDate) {
-        return this.$options.filters.date(this.dateRange.startDate) + ' - ' + this.$options.filters.date(this.dateRange.endDate)
+        return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
       }
 
       return 'All Time'
@@ -566,8 +561,12 @@ export default {
     dateRange: {
       deep: true,
       handler () {
-        this.filter.from_date = this.dateRange.startDate ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD') : null
-        this.filter.to_date = this.dateRange.endDate ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD') : null
+        this.filter.from_date = this.dateRange.startDate
+          ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD')
+          : null
+        this.filter.to_date = this.dateRange.endDate
+          ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD')
+          : null
       }
     },
 

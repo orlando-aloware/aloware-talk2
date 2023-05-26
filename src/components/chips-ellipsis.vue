@@ -14,7 +14,6 @@
       <div class="chip-ellipsis position-relative"
            :class="dispositionClass">
         <b-overlay class="h-100 w-100 position-absolute"
-                   rounded="pill"
                    :class="overlayClass"
                    :show="disabled || loading">
           <template #overlay>

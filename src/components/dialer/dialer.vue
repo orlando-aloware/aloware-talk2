@@ -264,7 +264,7 @@ export default {
 
     this.device.on(WebrtcEvents.REGISTERED, (device) => {
       // Subscribe to the event for when the list of devices changes
-      device.audio.on('deviceChange', () => this.getInputDevices())
+      device.audio.on('deviceChange', () => this.initializeSettings())
 
       // Now it's time to Call getUserMedia to get the input device names.
       // This is needed to get the labels. Otherwise, we will only have device IDs.
@@ -272,7 +272,7 @@ export default {
       // Furthermore, performing this action here, allows for capturing gUM errors early
       // before accepting/receiving a call and it's possible to create a much better user experience
       navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-        this.getInputDevices()
+        this.initializeSettings()
 
         // Calling getUserMedia will start the media track selected.
         // This is not desired as the user may get the impression the mic is in use.
@@ -1251,7 +1251,7 @@ export default {
         : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
 
-      if (wrapUpTimer < 0) {
+      if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
         this.backToDial()
         return
       }
