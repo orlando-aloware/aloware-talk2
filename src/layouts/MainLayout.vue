@@ -2432,9 +2432,12 @@ export default {
       }
     },
     $route (to, from) {
-      try {
-        this.checkDebounce()
-      } catch (err) {}
+      // logout action
+      if (to.name === 'Login' && !storage.local.getItem('api_token')) {
+        return
+      }
+
+      this.checkDebounce()
 
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
