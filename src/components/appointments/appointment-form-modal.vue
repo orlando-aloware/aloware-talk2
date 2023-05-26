@@ -2,8 +2,8 @@
   <b-modal title="Add Appointment"
            id="appointment-modal"
            size="md"
-           v-model="isOpen"
            scrollable
+           v-model="isOpen"
            @hidden="onHidden">
 
     <b-form class="appointment-form"
@@ -19,25 +19,25 @@
             <date-selector :min-date="minDate"
                            :no-clear-button="true"
                            v-model="appointment.date"
-                           @dateSelected="dateSelected">
-            </date-selector>
+                           @dateSelected="dateSelected"/>
           </b-form-group>
         </b-col>
-        <b-col md="12" lg="6">
+        <b-col md="12"
+               lg="6">
           <b-form-group id="input-group-2"
                         label="Time"
                         label-for="input-2">
             <predefined-time-selector v-model="appointment.time"
-                                      @select="timeSelected">
-            </predefined-time-selector>
+                                      @select="timeSelected"/>
           </b-form-group>
         </b-col>
-        <b-col md="12" lg="6">
+        <b-col md="12"
+               lg="6">
           <b-form-group id="input-group-2"
                         label="Duration"
                         label-for="input-2">
-            <predefined-time-duration-selector @select="durationSelected">
-            </predefined-time-duration-selector>
+            <predefined-time-duration-selector v-model="appointment.duration"
+                                               @select="durationSelected"/>
           </b-form-group>
         </b-col>
         <b-col>
@@ -45,7 +45,8 @@
           <b-form-group id="input-group-2"
                         label="Timezone"
                         label-for="input-2">
-            <timezone-selector @select="timezoneSelected"></timezone-selector>
+            <timezone-selector v-model="contact.timezone"
+                               @select="timezoneSelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -81,10 +82,11 @@
           <b-form-group id="input-group-2"
                         label="Send From"
                         label-for="input-2">
-            <contact-line-selector :showPaused="false"
+            <contact-line-selector :show-paused="false"
+                                   :use-groups="false"
+                                   preselect-first
                                    v-model="appointment.smsReminder.campaign_id"
-                                   @select="lineSelected">
-            </contact-line-selector>
+                                   @select="lineSelected"/>
           </b-form-group>
 
           <b-form-group id="input-group-2"
@@ -202,9 +204,9 @@ export default {
       isSaving: false,
       appointment: {
         date: window.moment().format('MM/DD/YYYY'),
-        time: '',
-        duration: '',
-        timezone: '',
+        time: '06:00',
+        duration: 15,
+        timezone: this.contact.timezone || '',
         body: '',
         type: 12,
         smsReminder: {
@@ -301,9 +303,9 @@ export default {
     resetForm () {
       this.appointment = {
         date: window.moment().format('MM/DD/YYYY'),
-        time: '',
-        duration: '',
-        timezone: '',
+        time: '06:00',
+        duration: 15,
+        timezone: this.contact.timezone || '',
         body: '',
         type: 12,
         smsReminder: {
@@ -346,8 +348,12 @@ export default {
       this.appointment.smsReminder.body = `${(this.appointment.smsReminder.body ?? '')} ${variable}`
     },
     setSmsReminderFields () {
-      this.appointment.smsReminder.campaign_id = this.currentCompany?.sms_reminder_default_campaign_id
       this.appointment.smsReminder.body = this.currentCompany?.sms_reminder_default_text || ''
+
+      // use personal line or default campaign_id
+      this.appointment.smsReminder.campaign_id = !this.currentCompany?.sms_reminder_use_personal_line
+        ? this.currentCompany?.sms_reminder_default_campaign_id
+        : this.profile.campaign_id
 
       // update time if its set in account config
       if (this.currentCompany?.sms_reminder_default_time) {
@@ -367,6 +373,8 @@ export default {
   },
   mounted () {
     this.setSmsReminderFields()
+
+    this.appointment.smsReminder.enabled = this.currentCompany?.sms_reminder_enabled
   }
 }
 </script>
