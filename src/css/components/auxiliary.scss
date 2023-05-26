@@ -410,7 +410,7 @@ iframe > html {
   overflow: hidden;
   white-space: normal;
   -webkit-line-clamp: 1; /* number of lines to show */
-          line-clamp: 1; 
+          line-clamp: 1;
   -webkit-box-orient: vertical;
   display: -webkit-box;
 }
@@ -436,5 +436,15 @@ iframe > html {
   #referrizer-crm {
     width: calc(100% + 0px);
     height: 100%;
+  }
+}
+
+.session-settings-sidebar {
+  .q-item__section {
+    max-width: 135px;
+
+    button {
+      max-height: 32px;
+    }
   }
 }

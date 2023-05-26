@@ -682,6 +682,17 @@ body,
     width: auto;
     height: auto;
   }
+
+  & > div:first-child {
+    min-width: 0;
+    flex: 1;
+    & > h1 {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 .page-sidebar {
@@ -9537,10 +9548,6 @@ screen and (max-width: 956px) {
         font-size: 18px;
         font-family: $font-family-body;
         height: 27px;
-        display: inline-block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
     }
 
@@ -12443,4 +12450,12 @@ h1.contact-list-name-label {
 
 .communication-overlay {
   position: inherit !important;
+}
+
+.chip-ellipsis {
+  .b-overlay {
+    & > div {
+      border-radius: 10px;
+    }
+  }
 }
