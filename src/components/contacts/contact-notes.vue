@@ -5,7 +5,7 @@
     <div class="notes mt-1"
          style="min-height: 15px;"
          v-if="!isEdit"
-         v-html="contact.notes"
+         v-html="notes"
          @click="onEditNotes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
@@ -53,7 +53,7 @@ export default {
 
   computed: {
     notes () {
-      return this.contact.notes
+      return this.contact.notes?.replace(/\n/g, '<br />')
     }
   },
 
