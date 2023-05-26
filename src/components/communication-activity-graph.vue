@@ -26,19 +26,19 @@
                         dense>
             <template v-slot:one>
               <span class="text-grey-90 px-3"
-                    :class="[chartType === 1 ? 'text-white' : 'text-grey-90']">
+                    :class="[chartType === 'spline' ? 'text-white' : 'text-grey-90']">
                 {{ chartOptions[0].labelValue }}
               </span>
             </template>
             <template v-slot:two>
               <span class="text-grey-90 px-3"
-                    :class="[chartType === 2 ? 'text-white' : 'text-grey-90']">
+                    :class="[chartType === 'areaspline' ? 'text-white' : 'text-grey-90']">
                 {{ chartOptions[1].labelValue }}
               </span>
             </template>
             <template v-slot:three>
               <span class="text-grey-90 px-3"
-                    :class="[chartType === 3 ? 'text-white' : 'text-grey-90']">
+                    :class="[chartType === 'column' ? 'text-white' : 'text-grey-90']">
                 {{ chartOptions[2].labelValue }}
               </span>
             </template>
@@ -58,11 +58,11 @@
                  :style="getStyle"
                  ref="highchart"
                  v-bind:id="graph_id"
-                 v-show="is_done && options.series.length > 0">
+                 v-if="is_done && options.series.length > 0">
       </highstock>
       <div class="d-flex justify-content-center align-items-center"
            :style="{ height: '450px' }"
-           v-show="is_done && options.series.length == 0">
+           v-if="isNoData">
         <span class="text-h3 text-weight-medium"
               :style="{color: '#606266'}">
           No Data
@@ -79,19 +79,19 @@ import DateMixin from 'src/plugins/mixins/date.mixin'
 
 const chartOptions = [
   {
-    value: 1,
+    value: 'spline',
     slot: 'one',
     type: 'spline',
     labelValue: 'Line'
   },
   {
-    value: 2,
+    value: 'areaspline',
     slot: 'two',
     type: 'areaspline',
     labelValue: 'Area'
   },
   {
-    value: 3,
+    value: 'column',
     slot: 'three',
     type: 'column',
     labelValue: 'Bar'
@@ -126,7 +126,7 @@ export default {
       graph_id: 'activity-graph',
       report_type: 'date_v_campaign', // changes to date_v_user
       chart_period: 'day',
-      chartType: 1,
+      chartType: 'spline',
       chartOptions,
       options: {
         rangeSelector: {
@@ -299,6 +299,10 @@ export default {
         return true
       }
       return false
+    },
+
+    isNoData () {
+      return this.is_done && this.options.series.length === 0
     }
   },
 
