@@ -3873,6 +3873,11 @@ country-state-city@^3.1.2:
   resolved "https://registry.npmjs.org/country-state-city/-/country-state-city-3.1.2.tgz"
   integrity sha512-qpzY7GyzqgJsx5TQUak0ryhbMcn1bLN1mgQc37EWkJMOEbszrAMowjzmisnf8ybhLBnbesZ1LK3KTc7SUX1T1w==
 
+countup.js@latest:
+  version "2.6.2"
+  resolved "https://registry.npmjs.org/countup.js/-/countup.js-2.6.2.tgz"
+  integrity sha512-PRvoilkebwr1MKaRAllyJl2cD7mgunGZWXLaSFL+YqHXlJpjLX7SHTWonRfIx2xg1Xf7SPbo92bOOonSIomRYQ==
+
 crc-32@^1.2.0:
   version "1.2.2"
   resolved "https://registry.npmjs.org/crc-32/-/crc-32-1.2.2.tgz"
@@ -13047,6 +13052,11 @@ vue-bootstrap-typeahead@^0.2.6:
     uniqid "^5.2.0"
     vue-js-toggle-button "^1.3.3"
 
+vue-countup-v2@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/vue-countup-v2/-/vue-countup-v2-4.0.0.tgz"
+  integrity sha512-XjKeHo1ndRlJtXvHd6B1eWOpbrJDdNU3rdYZwVPv2YlUXbvthsBT4kms5Fc/mn9RdXPrMX2H/ktAAQtKjWFisw==
+
 vue-ctk-date-time-picker@^2.5.0:
   version "2.5.0"
   resolved "https://registry.npmjs.org/vue-ctk-date-time-picker/-/vue-ctk-date-time-picker-2.5.0.tgz"
@@ -13197,7 +13207,7 @@ vue-wave-surfer@^1.0.1:
   dependencies:
     wavesurfer.js "^3.2.0"
 
-vue@^2.0.0, vue@^2.1.6, vue@^2.5.17, vue@^2.5.18, vue@^2.6.10, vue@^2.6.11, vue@^2.6.12, vue@^2.6.9, vue@^2.7.1, vue@~2, vue@2.x, "vue@2.x || 3.x":
+vue@^2.0.0, vue@^2.1.6, vue@^2.5.17, vue@^2.5.18, vue@^2.6.10, vue@^2.6.11, vue@^2.6.12, vue@^2.6.9, vue@^2.7.1, vue@~2, vue@2.x, "vue@2.x || 3.x", vue@latest:
   version "2.7.14"
   resolved "https://registry.npmjs.org/vue/-/vue-2.7.14.tgz"
   integrity sha512-b2qkFyOM0kwqWFuQmgd4o+uHGU7T+2z3T+WQp8UBjADfEv2n4FEMffzBmCKNP0IGzOEEfYjvtcC62xaSKeQDrQ==
