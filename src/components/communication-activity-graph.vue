@@ -62,7 +62,7 @@
       </highstock>
       <div class="d-flex justify-content-center align-items-center"
            :style="{ height: '450px' }"
-           v-show="is_done && !options.series.length">
+           v-show="is_done && options.series.length == 0">
         <span class="text-h3 text-weight-medium"
               :style="{color: '#606266'}">
           No Data
@@ -271,7 +271,7 @@ export default {
         series: [
           {
             name: 'serie',
-            data: [[1, 1], [2, 1], [3, 1]]
+            data: []
           }
         ]
       }
