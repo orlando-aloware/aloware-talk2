@@ -86,7 +86,7 @@ export default {
         return
       }
 
-      if (this.selectedId.constructor === Array) {
+      if (this.selectedId?.constructor === Array) {
         const data = { id: null, found: null }
         for (data.id in this.selectedId) {
           data.found = this.getSelectedIdData(this.selectedId[data.id])

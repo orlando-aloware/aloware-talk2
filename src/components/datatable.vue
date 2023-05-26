@@ -231,6 +231,11 @@ export default {
     useEmptySlot: {
       type: Boolean,
       default: false
+    },
+
+    startOrder: {
+      type: Object,
+      required: false
     }
   },
 
@@ -301,7 +306,6 @@ export default {
       return [
         `${this.isScrollable ? optScroll : ' '}d-flex flex-column h-100 w-100 flex-grow-1`,
         this.scrollAreaClass,
-        `${this.isEmpty ? 'overflow-hidden' : ''}`,
         `${this.isMobile ? 'mobile-scrollableArea' : ''}`
       ]
     },
@@ -488,8 +492,13 @@ export default {
       this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
     }
 
-    this.sorts.orderBy = this.defaultContactDateFilter
-    this.sorts.order = this.customSortOptions ? '' : 'desc'
+    // apply a custom starting order if defined
+    if (this.startOrder) {
+      this.sorts = this.startOrder
+    } else {
+      this.sorts.orderBy = this.defaultContactDateFilter
+      this.sorts.order = this.customSortOptions ? '' : 'desc'
+    }
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },
