@@ -682,6 +682,17 @@ body,
     width: auto;
     height: auto;
   }
+
+  & > div:first-child {
+    min-width: 0;
+    flex: 1;
+    & > h1 {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 .page-sidebar {
@@ -9557,10 +9568,6 @@ screen and (max-width: 956px) {
         font-size: 18px;
         font-family: $font-family-body;
         height: 27px;
-        display: inline-block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
     }
 
@@ -12443,6 +12450,18 @@ h1.contact-list-name-label {
   z-index: 9999 !important;
 }
 
+.t-session-settings {
+  &__actions button {
+    font-size: 1em !important;
+  }
+}
+
+.dial-sessions__form {
+  &__script-selector.populated:not(.q-field--highlighted) input {
+    display: none;
+  }
+}
+
 .centered-contact-deleted {
   margin: 0;
   position: absolute;
@@ -12858,5 +12877,13 @@ h1.contact-list-name-label {
 
   .q-basic-selector {
     margin-bottom: 0px;
+  }
+}
+
+.chip-ellipsis {
+  .b-overlay {
+    & > div {
+      border-radius: 10px;
+    }
   }
 }
