@@ -75,6 +75,7 @@
 <script>
 import moment from 'moment'
 import ReportMixin from 'src/plugins/mixins/report.mixin'
+import DateMixin from 'src/plugins/mixins/date.mixin'
 
 const chartOptions = [
   {
@@ -98,7 +99,7 @@ const chartOptions = [
 ]
 
 export default {
-  mixins: [ReportMixin],
+  mixins: [ReportMixin, DateMixin],
 
   // we load this graph from other places
   props: {
