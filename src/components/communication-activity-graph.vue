@@ -193,6 +193,10 @@ export default {
           }
         },
 
+        navigator: {
+          enabled: false
+        },
+
         time: {
           useUTC: false,
           timezone: window.timezone
