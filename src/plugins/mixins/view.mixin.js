@@ -24,11 +24,10 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isAllContactsSelected']),
+    ...mapState('contacts', ['isAllContactsSelected', 'showMyContacts']),
     ...mapState([
       'users',
-      'campaigns',
-      'showMyContacts'
+      'campaigns'
     ]),
 
     checked () {
