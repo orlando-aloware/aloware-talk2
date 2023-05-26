@@ -13,13 +13,13 @@ export const DEFAULT_PINNED_LIST = {
   MY_CONTACTS: {
     id: 'my-contacts',
     name: 'My Contacts',
-    link: '/contacts/lists/my-contacts',
+    link: '/contacts/list/my-contacts',
     listType: DEFAULT_LIST_MY_CONTACTS
   },
   UNASSIGNED: {
     id: 'unassigned',
     name: 'Unassigned Contacts',
-    link: '/contacts/lists/unassigned',
+    link: '/contacts/list/unassigned',
     listType: DEFAULT_LIST_UNASSIGNED_CONTACTS
   },
   UNANSWERED: {
@@ -31,7 +31,7 @@ export const DEFAULT_PINNED_LIST = {
   NEWLEADS: {
     id: 'new-leads',
     name: 'New Leads',
-    link: '/contacts/lists/new-leads',
+    link: '/contacts/list/new-leads',
     listType: DEFAULT_LIST_NEW_LEADS
   }
 }
