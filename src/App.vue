@@ -14,8 +14,8 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <custom-scripts v-if="authenticated && profile && profile.enabled"></custom-scripts>
-    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"></intercom>
+    <custom-scripts v-if="authenticated && profile && profile.enabled"/>
+    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"/>
   </div>
 </template>
 <script>
@@ -49,6 +49,7 @@ export default {
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
+
       return Number(urlParams.get('from_classic'))
     }
   },
@@ -104,22 +105,24 @@ export default {
             contactTimezone: res.data?.contact?.timezone
           })
         })
-      } else {
-        window.axios.post('/api/v1/contact', {
-          add_phone_number: fixedPhoneNumber
-        }).then(res => {
-          const contact = res.data
-          const callData = {
-            currentNumber: fixedPhoneNumber,
-            contactName: contact.name,
-            companyName: contact.company_name,
-            contactId: contact.id,
-            contactTimezone: contact.timezone
-          }
 
-          this.$VueEvent.fire('callContact', callData)
-        })
+        return
       }
+
+      window.axios.post('/api/v1/contact', {
+        add_phone_number: fixedPhoneNumber
+      }).then(res => {
+        const contact = res.data
+        const callData = {
+          currentNumber: fixedPhoneNumber,
+          contactName: contact.name,
+          companyName: contact.company_name,
+          contactId: contact.id,
+          contactTimezone: contact.timezone
+        }
+
+        this.$VueEvent.fire('callContact', callData)
+      })
     })
 
     this.$VueEvent.listen('add_contact', (data) => {
@@ -127,8 +130,10 @@ export default {
         add_phone_number: this.$options.filters.fixPhone(data.phone_number)
       }).then(res => {
         this.$router.replace('/contacts/' + res.data.id)
+          .catch(this.$handleRouteError)
       }).catch(() => {
         this.$router.replace('/')
+          .catch(this.$handleRouteError)
       })
     })
 
@@ -136,6 +141,7 @@ export default {
       if (this.authenticated) {
         this.clearUser()
         this.$router.push({ name: 'Login' })
+          .catch(this.$handleRouteError)
       }
     })
   },
@@ -156,6 +162,7 @@ export default {
           this.logout()
         })
       }
+
       if (!this.sharedCookie) {
         this.cookieValidated = true
       }
@@ -184,9 +191,8 @@ export default {
       this.logoutUser().then((res) => {
         this.setFullStory()
         this.response = res.data
-        this.$router.push({ name: 'Login' }).catch((err) => {
-          console.log(err)
-        })
+        this.$router.push({ name: 'Login' })
+          .catch(this.$handleRouteError)
       }).catch((err) => {
         console.log(err)
       })
@@ -205,6 +211,7 @@ export default {
         })
       }).catch(() => {
         console.log('Error while retrieving fullstory metadata from server. Using local variables.')
+
         this.$FullStory.identify(profile.id, {
           displayName: profile.name,
           email: profile.email,
@@ -227,6 +234,7 @@ export default {
         this.fullStoryIdentify(this.profile)
         return
       }
+
       this.$FullStory.anonymize()
     },
 

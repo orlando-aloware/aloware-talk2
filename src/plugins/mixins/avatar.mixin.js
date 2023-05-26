@@ -21,7 +21,7 @@ export default {
       }
 
       const data = {
-        initials: this.getInitials(name),
+        initials: this.$options.filters.initials(name),
         color1: null,
         color2: null
       }
@@ -35,11 +35,6 @@ export default {
         backgroundImage: `linear-gradient(to bottom, ${data.color1}, ${data.color2})`,
         color: this.overlayColor(data.color1)
       }
-    },
-
-    getInitials (name) {
-      const initials = name.match(/\b\w/g) || []
-      return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
     },
 
     hashCode (str) {

@@ -269,6 +269,15 @@ Vue.prototype.$handleUploadErrors = function (error) {
   this.$handleErrors(err.data)
 }
 
+Vue.prototype.$handleRouteError = (error) => {
+  if (
+    error.name !== 'NavigationDuplicated' &&
+    !error.message.includes('Avoided redundant navigation to current location')
+  ) {
+    console.log(error)
+  }
+}
+
 Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') => {
   if (!uuid) {
     this.$generalNotification('Failed to download file, missing UUID', 'error')
