@@ -49,7 +49,7 @@
                   v-for="ringGroupId in profile.ring_group_ids">
                   <span class="text-grey-90 _400 fs-12"
                         v-if="ringGroups.length > 0">
-                      {{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}
+                      <span v-if="shouldDisplayRingGroup(ringGroupId)">{{ getRingGroupName(ringGroupId) || 'Ring group data not available' }}</span>
                   </span>
                   <q-skeleton type="text"
                               animation="fade"
@@ -189,6 +189,12 @@ export default {
       const ringGroup = this.getRingGroup(id)
 
       return ringGroup ? this.$options.filters.fixName(ringGroup.name) : null
+    },
+
+    shouldDisplayRingGroup (id) {
+      const ringGroup = this.getRingGroup(id)
+
+      return !ringGroup.call_waiting
     }
   }
 }
