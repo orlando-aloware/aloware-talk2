@@ -13,12 +13,12 @@ import VueWaveSurfer from 'vue-wave-surfer'
 import * as storage from 'src/plugins/helpers/storage'
 import CountriesAndTimezones from 'countries-and-timezones'
 import infiniteScroll from 'vue-infinite-scroll'
-
 import { Screen } from 'quasar'
-Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
-
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
+import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
+
+Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
 // local storage
 storage.local.setItem('api_url', process.env.API_URL)
@@ -52,26 +52,45 @@ window.phoneUtil = googlePhone.PhoneNumberUtil.getInstance()
 // Timezones for international companies (outside US and CA)
 window.CountriesAndTimezones = CountriesAndTimezones
 
-window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
+window.getLocaleIfPhoneNumberIsFromNorthAmerica = function (phoneNumber) {
   if (!phoneNumber) {
     return false
   }
 
-  const validCountries = ['US', 'CA']
-
   try {
-    const validCountry = { data: null }
-    for (validCountry.data of validCountries) {
+    for (const validCountry of VALID_NA_COUNTRIES) {
       const number = window.phoneUtil.parseAndKeepRawInput(
         phoneNumber,
-        validCountry.data
+        validCountry
       )
-      if (window.phoneUtil.isPossibleNumber(number)) {
-        if (window.phoneUtil.isValidNumberForRegion(number, validCountry.data)) {
-          return validCountry.data
-        }
+      let isPossible = window.phoneUtil.isPossibleNumber(number)
+
+      if (isPossible && window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
+        return validCountry
       }
     }
+
+    return false
+  } catch (err) {
+    return false
+  }
+}
+
+window.getLocaleIfPhoneNumberIsFromGreatBritainOrAustralia = function (phoneNumber) {
+  if (!phoneNumber) {
+    return false
+  }
+
+  try {
+    for (let validCountry of VALID_ENG_COUNTRIES) {
+      let number = window.phoneUtil.parseAndKeepRawInput(phoneNumber, validCountry)
+      let isPossible = window.phoneUtil.isPossibleNumber(number)
+
+      if (isPossible && window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
+        return validCountry
+      }
+    }
+
     return false
   } catch (err) {
     return false
@@ -83,14 +102,46 @@ window.guessLocale = function (phoneNumber) {
     return false
   }
 
+  // Use substring() and indexOf() functions to remove
+  // portion of string after certain character (w => wait)
+  let pos = phoneNumber.indexOf('w')
+  if (pos !== -1) {
+    phoneNumber = phoneNumber.substring(0, pos).trim()
+  }
+
   try {
     // handle US and CA as an special case
-    const northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(
+    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica(
       phoneNumber
     )
+
     if (northAmericaLocale) {
       return northAmericaLocale
     }
+
+    // will add + to phone number and check again
+    if (!phoneNumber.includes('+')) {
+      northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica('+' + phoneNumber)
+
+      if (northAmericaLocale) {
+        return northAmericaLocale
+      }
+    }
+
+    // will add +1 to phone number and check again
+    if (!phoneNumber.includes('+')) {
+      northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica('+1' + phoneNumber)
+      if (northAmericaLocale) {
+        return northAmericaLocale
+      }
+    }
+
+    // handle GB & AU as a special case
+    let englishLocale = window.getLocaleIfPhoneNumberIsFromGreatBritainOrAustralia(phoneNumber)
+    if (englishLocale) {
+      return englishLocale
+    }
+
     // if we reached here then it's definitely not a US or CA number according to google-libphonenumber
     // let's check for international locales
 
@@ -98,11 +149,16 @@ window.guessLocale = function (phoneNumber) {
       phoneNumber = '+' + phoneNumber
     }
 
-    const number = window.phoneUtil.parse(phoneNumber)
-    const locale = window.phoneUtil.getRegionCodeForNumber(number)
+    let number = window.phoneUtil.parse(phoneNumber)
+    let locale = window.phoneUtil.getRegionCodeForNumber(number)
+    let isValid = window.phoneUtil.isValidNumber(number)
 
     if (!locale) {
-      return false
+      number = window.phoneUtil.parse(phoneNumber, 'US')
+      locale = window.phoneUtil.getRegionCodeForNumber(number)
+      isValid = window.phoneUtil.isValidNumber(number)
+
+      return isValid
     }
 
     return locale

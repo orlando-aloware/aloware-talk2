@@ -36,7 +36,7 @@ export default {
     avatarText () {
       let name = this.name || 'No Name'
 
-      return this.$options.filters.initials(name)
+      return this.getInitials(name)
     }
   },
 

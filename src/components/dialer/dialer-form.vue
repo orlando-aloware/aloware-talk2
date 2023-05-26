@@ -1,59 +1,56 @@
 <template>
   <div class="row no-wrap pt-3 pb-3 width-380 dialer-wrapper"
-       :class="{ 'loading-cover-screen': isMakingCall, 'on-call-tab': mode === 'call', 'on-text-tab': mode === 'text' }">
+       :class="dialerFormClass">
     <div class="loading-container"
          v-if="isMakingCall">
       <div class="mobile-call-loader">
-        <q-spinner-bars
-          color="white"
-          size="5em"
-        />
+        <q-spinner-bars color="white" size="5em"/>
       </div>
     </div>
-    <div v-if="!isMakingCall"
-         class="col phone-padding dialer-tabs-wrapper"
-         :class="{'no-padding': !isMobile}">
+    <div class="col phone-padding dialer-tabs-wrapper"
+         :class="{'no-padding': !isMobile}"
+         v-if="!isMakingCall">
       <b-tabs class="dialer-tabs"
               pills
               vertical>
-        <b-tab :active="mode === 'call'"
-               title="Call"
+        <b-tab title="Call"
+               :active="mode === 'call'"
                @click="setMode('call')">
-          <b-form-group :invalid-feedback="invalidCampaign"
-                        :state="validCampaign"
-                        class="mb-1">
+          <b-form-group class="mb-1"
+                        :invalid-feedback="invalidCampaign"
+                        :state="validCampaign">
             <line-selector class="line-selector"
                            prepend="From:"
                            specificClass="dialer-line-selector"
-                           v-model="campaignId"
                            :disable="defaultOutboundCampaignId && mode === 'call'"
                            :generic-multiselect="false"
+                           v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
-            <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumberSearch"
-                          class="mb-0">
-              <contact-phone-number-search :no_prepend="true"
-                                           class="width-190"
-                                           v-model="phoneNumber"
+            <b-form-group class="mb-0"
+                          :invalid-feedback="invalidPhoneNumber"
+                          :state="validPhoneNumberSearch">
+              <contact-phone-number-search class="width-190"
                                            ref="callContactPhoneNumberSearch"
+                                           :no_prepend="true"
+                                           v-model="phoneNumber"
                                            @change="changePhoneNumber"
                                            @keyup.enter.native="onCall"
                                            @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
-            <q-btn :ripple="true"
-                   :disable="callDisabled"
-                   icon="img:app-icons/dialer/call_btn.svg"
+            <q-btn icon="img:app-icons/dialer/call_btn.svg"
                    size="32px"
                    class="icon-btn auto-size height-32"
                    align="right"
                    padding="none"
                    rounded
                    flat
+                   :ripple="true"
+                   :disable="callDisabled"
                    @click="onCall">
             </q-btn>
           </div>
@@ -77,27 +74,27 @@
             </div>
           </div>
         </b-tab>
-        <b-tab :active="mode === 'text'"
-               title="Message"
+        <b-tab title="Message"
+               :active="mode === 'text'"
                @click="setMode('text')">
-          <b-form-group :invalid-feedback="invalidCampaign"
-                        :state="validCampaign"
-                        class="mb-1">
+          <b-form-group class="mb-1"
+                        :invalid-feedback="invalidCampaign"
+                        :state="validCampaign">
             <line-selector class="line-selector"
-                           v-model="campaignId"
                            prepend="From:"
                            :generic-multiselect="false"
                            :useOnlyActives="true"
+                           v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
-            <b-form-group :invalid-feedback="invalidPhoneNumber"
-                          :state="validPhoneNumberSearch"
-                          class="mb-0 w-100">
-              <contact-phone-number-search v-model="phoneNumber"
-                                           ref="textContactPhoneNumberSearch"
+            <b-form-group class="mb-0 w-100"
+                          :invalid-feedback="invalidPhoneNumber"
+                          :state="validPhoneNumberSearch">
+              <contact-phone-number-search ref="textContactPhoneNumberSearch"
+                                           v-model="phoneNumber"
                                            @change="changePhoneNumber"
                                            @keyup.enter.native="sendText"
                                            @searchResults="onPhoneNumberSearch">
@@ -128,11 +125,11 @@
             <b-input-group>
               <template #append>
                 <b-input-group-text class="bg-white border-left-0 align-items-end">
-                  <q-btn :disable="sendDisabled || isSending"
-                         :ripple="false"
-                         class="height-16 no-q-btn-focus"
+                  <q-btn class="height-16 no-q-btn-focus"
                          padding="none"
                          flat
+                         :disable="sendDisabled || isSending"
+                         :ripple="false"
                          @click="sendText">
                     <send-text-icon :width="isMobile ? 18 : 16"
                                     :height="isMobile ? 18: 16"
@@ -161,9 +158,8 @@
       <div class="loading-container"
            v-if="loadingParkedCalls">
         <div class="mobile-call-loader">
-          <q-spinner-bars
-            color="white"
-            size="5em"
+          <q-spinner-bars color="white"
+                          size="5em"
           />
         </div>
       </div>
@@ -218,6 +214,7 @@ export default {
       type: Boolean,
       required: false
     },
+
     isMobile: {
       type: Boolean,
       required: false,
@@ -247,11 +244,13 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
     ...mapState([
       'dialer',
       'parkedCalls',
       'loadingParkedCalls'
     ]),
+
     ...mapGetters('auth', ['profile']),
 
     sendTextColor () {
@@ -284,12 +283,31 @@ export default {
 
     sendDisabled () {
       return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage
+    },
+
+    dialerFormClass () {
+      const callClass = this.isMakingCall ? 'loading-cover-screen' : ''
+      let modeClass = ''
+
+      switch (this.mode) {
+        case 'call':
+          modeClass = 'on-call-tab'
+          break
+        case 'text':
+          modeClass = 'on-text-tab'
+      }
+
+      return [
+        callClass,
+        modeClass
+      ]
     }
   },
 
   created () {
     this.$VueEvent.listen('changePhoneNumber', (data) => {
       this.setMode('call')
+
       this.changePhoneNumber(data).then(() => {
         this.makeCall()
       })
@@ -326,10 +344,12 @@ export default {
       this.companyName = ''
       this.contactId = null
       this.contactTimezone = null
+
       if (!this.isMobile) {
         this.defaultOutboundCampaignId = null
         this.campaignId = null
       }
+
       this.mode = 'call'
       this.textMessage = ''
     },
@@ -343,11 +363,12 @@ export default {
 
       if (!this.contactId) {
         this.loadingContact = true
+
         await this.getContactByPhoneNumber(this.phoneNumber).then((data) => {
-          this.contactName = data.name
-          this.companyName = data.company_name
-          this.contactId = data.id
-          this.contactTimezone = data.timezone
+          this.contactName = data?.name
+          this.companyName = data?.company_name
+          this.contactId = data?.id
+          this.contactTimezone = data?.timezone
           this.loadingContact = false
         }).catch((err) => {
           console.log(err)
@@ -395,6 +416,7 @@ export default {
       if (this.currentCompany && this.currentCompany.force_outbound_line) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
+
         return
       }
 
@@ -402,6 +424,7 @@ export default {
       if (this.currentCompany && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
+
         return
       }
 
@@ -454,6 +477,7 @@ export default {
       }
 
       this.isSending = true
+
       this.$axios.post('/api/v1/campaign/send-message-to-phone-number/' + this.campaignId, {
         phone_number: this.$options.filters.fixPhone(this.phoneNumber),
         message: this.textMessage
@@ -461,6 +485,7 @@ export default {
         this.isSending = false
         this.hideDialer()
         this.$generalNotification('Message sent')
+
         if (!this.isMobile) {
           this.$router.push({
             name: 'Contact',
@@ -494,9 +519,11 @@ export default {
     value () {
       if (this.value) {
         this.showDialer()
-      } else {
-        this.hideDialer()
+
+        return
       }
+
+      this.hideDialer()
     },
 
     'dialer.currentStatus': function () {

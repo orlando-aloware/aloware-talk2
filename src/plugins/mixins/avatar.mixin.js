@@ -37,6 +37,10 @@ export default {
       }
     },
 
+    getInitials (name) {
+      return this.$options.filters.initials(name)
+    },
+
     hashCode (str) {
       const data = { hash: 0, index: null }
       for (data.index = 0; data.index < str.length; data.index++) {
