@@ -539,6 +539,49 @@ const objAlphabeticalOrder = (object, sortProp) => {
   return object
 }
 
+/**
+ * Return duration in string format
+ * @param {Number} duration
+ * @param {Boolean} shouldDisplaySeconds
+ * @returns String
+ */
+const fullDuration = (duration, shouldDisplaySeconds = true) => {
+  if (duration === undefined) {
+    return '-'
+  }
+
+  let seconds = duration
+  let hour = Math.floor(seconds / 3600)
+  let min = Math.floor(seconds / 60 % 60)
+  let sec = Math.floor(seconds % 60)
+
+  if (hour) {
+    if (shouldDisplaySeconds) {
+      return `${hour}h ${min}m ${sec}s`
+    }
+
+    return `${hour}h ${min}m`
+  } else if (!hour && min) {
+    if (shouldDisplaySeconds) {
+      return `${min}m ${sec}s`
+    }
+
+    return `${min}m`
+  }
+
+  return `${sec}s`
+}
+
+/**
+ * Converts date to short text ("8 Jan 2023")
+ *
+ * @param {Date} date
+ * @returns String
+ */
+const fullShortDate = (date) => {
+  return window.moment(date).format('MMM D, YYYY')
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -572,7 +615,9 @@ export default ({ Vue }) => {
     textTruncate,
     numberPlusFormatter,
     sortObjectByKey,
-    objAlphabeticalOrder
+    objAlphabeticalOrder,
+    fullDuration,
+    fullShortDate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

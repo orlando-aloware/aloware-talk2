@@ -13,8 +13,13 @@ export default {
   computed: {
     ...mapState(['oldAgentStatus']),
     ...mapState('auth', ['profile', 'authenticated']),
+
     agentStatus () {
       return _.get(this.profile, 'agent_status', null)
+    },
+
+    isBargingOrWhispering () {
+      return AgentStatus.AGENT_STATUS_SENTRY === this.agentStatus
     }
   },
 

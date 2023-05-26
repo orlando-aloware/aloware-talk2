@@ -260,6 +260,7 @@ export default function () {
     },
     isContactMixinUsed: false,
     isShortenedUrlRemembered: false,
-    newCommunicationInprogressContactFetch: []
+    newCommunicationInprogressContactFetch: [],
+    showContactResourceUnavailable: false
   }
 }

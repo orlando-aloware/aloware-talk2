@@ -17,7 +17,7 @@ export const CURRENT_STATUS_INPROGRESS = 'in-progress'
 // The call was answered and has ended normally.
 export const CURRENT_STATUS_COMPLETED = 'completed'
 // call held (parked) and caller hearing piano music
-export const CURRENT_STATUS_HOLD = 'hold'
+export const CURRENT_STATUS_HOLD = 'parked'
 // A SMS is received by our system.
 export const CURRENT_STATUS_SMS_RECEIVED = 'received'
 // A SMS is sent to the system.

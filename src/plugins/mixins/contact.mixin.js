@@ -300,6 +300,7 @@ export default {
       this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.listen('update-contact-in-group', this.listeners.updateContactInGroup)
     },
+
     removeListeners () {
       this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
       this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
@@ -309,6 +310,7 @@ export default {
       this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
     },
+
     isCommOrAuditExists (communication, data) {
       // if communication and data is a communication (has type attribute),
       // check if ids match
@@ -324,6 +326,7 @@ export default {
         !('type' in data) &&
         communication.id === data.id
     },
+
     isNotSameContact (contactId) {
       const isContactIdEmpty = [null, undefined].includes(contactId)
       const isContactEmpty = _.isEmpty(this.contact)
@@ -335,6 +338,7 @@ export default {
         isContactIdEmpty ||
         isNotSameContact
     },
+
     addNewCommunication (data) {
       if (this.smsOnly &&
         data.type !== CommunicationTypes.SMS) {
@@ -440,102 +444,123 @@ export default {
       this.loadingContact = true
       this.loadingContactCommunications = true
 
-      if (this.contactId && this.contactId !== 'undefined') {
-        this.source.cancel('Fetch contact info operation canceled by the user.')
-        this.source = this.cancelToken.source()
-
-        talk2Api.V1.contact.getPhoneNumbers(this.contactId)
-          .then(response => {
-            this.setContactPhoneNumbers(response.data)
-          }).catch(err => {
-            console.log(err)
-            this.$handleErrors(err.response)
-          })
-
-        talk2Api.V1.contact.getCommunicationsSummary(this.contactId)
-          .then(response => {
-            // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
-            this.setCommunicationSummary(response.data)
-          }).catch(err => {
-            console.log(err)
-            this.$handleErrors(err.response)
-          })
-        this.setSequenceInfoLoading(true)
-
-        talk2Api.V1.contact.getSequenceInfo(this.contactId)
-          .then(response => {
-            this.setSequenceInfo(response.data)
-            this.setSequenceInfoLoading(true)
-          }).catch((err) => {
-            this.setSequenceInfoLoading(false)
-            console.log(err)
-            this.$handleErrors(err.response)
-          })
-
-        talk2Api.V1.contact.getAttributes(this.contactId)
-          .then(response => {
-            this.setContactAttributes(_.cloneDeep(response.data))
-          }).catch(err => {
-            console.log(err)
-            this.$handleErrors(err.response)
-          })
-
-        this.fetchContactCommunications(this.contactId, false)
-          .then(() => {
-            this.loadingContact = false
-            // if route has communication id
-            // until id is found
-            if (this.hasCommunication()) {
-              this.loadingContactCommunications = true
-              this.fetchContactCommunicationsUntilFound()
-            } else {
-              this.loadingContactCommunications = false
-            }
-            this.scrollMessages()
-          })
-
-        if (!isFetchContact) {
-          this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
-          return
-        }
-
-        return this.$axios.get(`/api/v2/contacts/${this.contactId}`,
-          {
-            cancelToken: this.source.token
-          })
-          .then(res => {
-            this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
-            if (res) {
-              this.$VueEvent.fire('contact_activity_update_contact_from_fetch', res.data)
-              return res
-            }
-          }).catch(err => {
-            this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
-
-            if (this.$axios.isCancel(err) && err) {
-              console.log('Request canceled', err.message)
-              this.loadingContact = false
-              return
-            }
-
-            this.loadingContact = false
-            this.loadingContactCommunications = false
-            this.$handleErrors(err.response)
-
-            if (this.$route.name.includes('Inbox')) {
-              this.$router.push({ name: 'Inbox' })
-              return
-            }
-
-            if (!this.$route.name.includes('Inbox')) {
-              this.$router.push({ path: '/contacts' })
-            }
-          })
-      } else {
+      if (!this.contactId) {
         console.log('Failed to fetch contact info: Missing contact id!')
+        this.loadingContact = false
+        this.loadingContactCommunications = false
+        this.setShowContactResourceUnavailable(true)
+        return false
       }
-      this.loadingContact = false
-      this.loadingContactCommunications = false
+
+      this.source.cancel('Fetch contact info operation canceled by the user.')
+      this.source = this.cancelToken.source()
+
+      // get contact phone numbers
+      talk2Api.V1.contact.getPhoneNumbers(this.contactId)
+        .then(response => {
+          this.setContactPhoneNumbers(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+      // get contact's communication summary
+      talk2Api.V1.contact.getCommunicationsSummary(this.contactId)
+        .then(response => {
+          // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
+          this.setCommunicationSummary(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+      this.setSequenceInfoLoading(true)
+
+      // get contact's sequence info
+      talk2Api.V1.contact.getSequenceInfo(this.contactId)
+        .then(response => {
+          this.setSequenceInfo(response.data)
+          this.setSequenceInfoLoading(true)
+        }).catch((err) => {
+          this.setSequenceInfoLoading(false)
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+      // get contact's contact attributes
+      talk2Api.V1.contact.getAttributes(this.contactId)
+        .then(response => {
+          this.setContactAttributes(_.cloneDeep(response.data))
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+      // get contact's communications
+      this.fetchContactCommunications(this.contactId, false)
+        .then(res => {
+          this.loadingContact = false
+
+          if (!res) {
+            this.loadingContactCommunications = false
+            this.setShowContactResourceUnavailable(true)
+            return
+          }
+
+          // if route has communication id
+          // until id is found
+          if (res && this.hasCommunication()) {
+            this.loadingContactCommunications = true
+            this.fetchContactCommunicationsUntilFound()
+          }
+
+          this.scrollMessages()
+        })
+
+      if (!isFetchContact) {
+        this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+        return
+      }
+
+      // get contact's info
+      return this.$axios.get(`/api/v2/contacts/${this.contactId}`,
+        {
+          cancelToken: this.source.token
+        })
+        .then(res => {
+          this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+
+          if (res) {
+            this.$VueEvent.fire('contact_activity_update_contact_from_fetch', res.data)
+            return res
+          }
+        }).catch(err => {
+          this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+
+          if (this.$axios.isCancel(err) && err) {
+            console.log('Request canceled', err.message)
+            this.loadingContact = false
+            this.setShowContactResourceUnavailable(true)
+            return
+          }
+
+          this.$handleErrors(err.response)
+
+          // inside Inbox
+          if (this.$route.name.includes('Inbox')) {
+            // instead of redirecting to inbox, show contact is delete info
+            this.setShowContactResourceUnavailable(true)
+            return
+          }
+
+          // not in Inbox
+          if (!this.$route.name.includes('Inbox')) {
+            this.$router.push({ path: '/contacts' })
+          }
+        }).finally(() => {
+          this.loadingContact = false
+          this.loadingContactCommunications = false
+        })
     },
 
     showContactInfo (contactId, forceClearLoading = false) {
@@ -611,19 +636,21 @@ export default {
     async fetchContactCommunications (contactId, skipContactInfo = true) {
       this.communicationApiSource.cancel('fetchContactCommunications operation canceled by the user.')
       this.communicationApiSource = this.communicationApiCancelToken.source()
-      const lastAuditCreatedAt = { data: null }
-      const item = { index: null }
-      for (item.index in this.communicationsAndAudits) {
-        lastAuditCreatedAt.data = _.get(this.communicationsAndAudits, `[${item.index}].created_at`, null)
-        if (lastAuditCreatedAt.data) {
+      let lastAuditCreatedAt = null
+
+      for (const item in this.communicationsAndAudits) {
+        lastAuditCreatedAt = _.get(this.communicationsAndAudits, `[${item}].created_at`, null)
+
+        if (lastAuditCreatedAt) {
           break
         }
       }
+
       return this.$axios.get(`/api/v1/contact/${contactId}/communications`, {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
-          last_audit_created_at: lastAuditCreatedAt.data
+          last_audit_created_at: lastAuditCreatedAt
         },
         cancelToken: this.communicationApiSource.token
       }).then(res => {
@@ -660,32 +687,34 @@ export default {
 
       this.loadingContactCommunications = true
 
-      // fetch communications until we found the activity id
-      if (!this.isCommunicationFound()) {
-        this.fetchContactCommunications(this.contactId).then(res => {
-          if (!res) {
-            this.scrollMessages()
-            this.loadingContactCommunications = false
-            return
-          }
-
-          if (res.data.has_more_pages) {
-            tryCount++
-            this.fetchContactCommunicationsUntilFound(tryCount)
-          } else if (this.isCommunicationFound()) {
-            this.scrollIntoActivity()
-            this.loadingContactCommunications = false
-          } else {
-            this.scrollMessages()
-            this.loadingContactCommunications = false
-          }
-        }).catch(() => {
-          this.loadingContactCommunications = false
-        })
-      } else { // we found the activity, scroll to it
+      // we found the activity, scroll to it
+      if (this.isCommunicationFound()) {
         this.scrollIntoActivity()
         this.loadingContactCommunications = false
+        return
       }
+
+      // fetch communications until we found the activity id
+      this.fetchContactCommunications(this.contactId).then(res => {
+        if (!res) {
+          this.scrollMessages()
+          this.loadingContactCommunications = false
+          return
+        }
+
+        if (res.data.has_more_pages) {
+          tryCount++
+          this.fetchContactCommunicationsUntilFound(tryCount)
+        } else if (this.isCommunicationFound()) {
+          this.scrollIntoActivity()
+          this.loadingContactCommunications = false
+        } else {
+          this.scrollMessages()
+          this.loadingContactCommunications = false
+        }
+      }).catch(() => {
+        this.loadingContactCommunications = false
+      })
     },
 
     mapCommunicationsData () {
@@ -1076,8 +1105,10 @@ export default {
       this.loadingContactInProgress()
       return this.fetchContactInfo(isFetchContact).then(res => {
         if (!res) {
+          this.selectedContactChanging(false)
           return
         }
+
         // if contact status changes then redirect to the right url
         if (this.$route.name === 'Inbox Contact Task' && this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
           this.$router.push({
@@ -1226,7 +1257,8 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed'
+      'setIsContactMixinUsed',
+      'setShowContactResourceUnavailable'
     ]),
     ...mapActions('inbox', ['setSelectedContact'])
   },
