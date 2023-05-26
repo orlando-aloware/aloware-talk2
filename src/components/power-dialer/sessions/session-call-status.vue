@@ -61,26 +61,46 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
-                 size="sm"
-                 no-wrap
-                 unelevated
-                 no-caps
-                 :disabled="!canRedial"
-                 :color="canRedial  ? 'blue-7' : 'grey-8'"
-                 @click="onRedial">
-            <RefreshIcon class="mr-1"
-                         color="white" />
-            <div class="text-body2">
-              <q-tooltip content-class="bg-grey-light11"
-                         anchor="bottom middle"
-                         self="center middle"
-                         v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
+          <q-btn-dropdown
+            class="sessions-button free-width my-1 ml-1"
+            size="sm"
+            no-wrap
+            unelevated
+            no-caps
+            left
+            dropdown-icon="none"
+            :auto-close="true"
+            :disable="!canRedial"
+            :color="canRedial ? 'blue-7' : 'grey-8'">
+
+            <template v-slot:label>
+              <RefreshIcon class="mr-2"
+                           color="white" />
+              <div class="text-body2">
+                <q-tooltip content-class="bg-grey-light11"
+                           anchor="bottom middle"
+                           self="center middle"
+                           v-if="dialer.currentStatus === 'CALL_CONNECTED'">
                   {{ redialTooltip }}
-              </q-tooltip>
-              Redial
-            </div>
-          </q-btn>
+                </q-tooltip>
+                Redial
+              </div>
+            </template>
+
+            <q-list>
+              <q-item v-for="option in redialOptions"
+                      :key="option.value"
+                      unelevated
+                      clickable
+                      v-close-popup
+                      :color="canRedial  ? 'blue-7' : 'grey-8'"
+                      @click="onRedial(option.redial)">
+                <q-item-section>
+                  <q-item-label class="ml-2"><i :class="option.icon"></i> {{ option.label }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
 
           <q-btn class="sessions-button free-width my-1 ml-1"
                  size="sm"
@@ -572,7 +592,7 @@ export default {
 
     redialTooltip () {
       return this.canRedial
-        ? 'This contact will go to the bottom of the current session list'
+        ? 'This contact will go to the top or bottom of the current session list depending on the redial type you choose'
         : 'This contact has already been redialed once'
     },
 
@@ -647,6 +667,23 @@ export default {
       const backgroundClass = this.toggleEnd ? 'bg-btn-red' : ''
 
       return [backgroundClass]
+    },
+
+    redialOptions () {
+      return [
+        {
+          label: 'Redial Now',
+          value: 'now',
+          icon: 'fas fa-bolt',
+          redial: true
+        },
+        {
+          label: 'Redial Later',
+          value: 'later',
+          icon: 'fas fa-arrow-down',
+          redial: false
+        }
+      ]
     }
   },
 
@@ -1240,12 +1277,18 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial () {
+    async onRedial (redial) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
-      // get the next task
-      const task = get(this.powerDialerTasks.in_queue, '0', null)
+      let task = null
+      if (redial) {
+        // get the current task
+        task = this.activeTask
+      } else {
+        // get the next task
+        task = get(this.powerDialerTasks.in_queue, '0', null)
+      }
       this.taskToCall = cloneDeep(task)
 
       // end session if no more tasks
@@ -1257,8 +1300,9 @@ export default {
       }
 
       this.redialedTask = this.$jsonClone(this.activeTask)
+      this.redialedTask.redialed_now = redial
 
-      this.redialTask(this.activeTask).then(() => {
+      this.redialTask(this.activeTask, redial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
@@ -1299,10 +1343,12 @@ export default {
 
       const task = this.$jsonClone(this.redialedTask)
 
-      this.reQueuePowerDialerTask({
-        task: task,
-        id: task.contact_list_item_id
-      })
+      if (!task.redialed_now) {
+        this.reQueuePowerDialerTask({
+          task: task,
+          id: task.contact_list_item_id
+        })
+      }
 
       this.redialedTask = {}
     },

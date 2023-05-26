@@ -263,18 +263,19 @@ export default {
         })
     },
 
-    redialTask (autoDialTask) {
+    redialTask (autoDialTask, redial) {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
         return
       }
 
-      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })
         .then(res => {
           this.addRedialedTask(autoDialTask.id)
 
-          this.$generalNotification('Success: contact is at the bottom of the current list')
+          const position = redial ? 'top' : 'bottom'
+          this.$generalNotification(`Success: contact is at the ${position} of the current list`)
           return Promise.resolve(res)
         }).catch(err => {
           return Promise.reject(err)
