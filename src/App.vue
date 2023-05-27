@@ -1,5 +1,13 @@
 <template>
-  <div id="q-app">
+  <div class="position-relative"
+       id="q-app">
+    <b-overlay class="h-100 w-100 position-absolute"
+               :show="isPageLoading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
     <router-view v-if="cookieValidated"/>
     <portal-target name="app"
                    multiple>
@@ -38,6 +46,7 @@ export default {
     return {
       cookieValidated: false,
       sharedCookie: null,
+      isPageLoading: false,
       fullstoryOrgId: process.env.FULLSTORY_ORG_ID
     }
   },
@@ -88,6 +97,7 @@ export default {
 
     this.$VueEvent.listen('make_new_call', (data) => {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
+      this.isPageLoading = true
 
       if (/unhold:|barge:|whisper:|call:|hs:/.test(fixedPhoneNumber)) {
         window.axios.get('/api/v1/communication/info', {
@@ -96,6 +106,8 @@ export default {
             phone_number: fixedPhoneNumber
           }
         }).then(res => {
+          this.isPageLoading = false
+
           this.$VueEvent.fire('makeCall', {
             currentNumber: fixedPhoneNumber,
             outboundCampaignId: res.data.campaign_id,
@@ -104,6 +116,8 @@ export default {
             contactId: res.data?.contact?.id,
             contactTimezone: res.data?.contact?.timezone
           })
+        }).catch(() => {
+          this.isPageLoading = false
         })
 
         return
@@ -112,6 +126,7 @@ export default {
       window.axios.post('/api/v1/contact', {
         add_phone_number: fixedPhoneNumber
       }).then(res => {
+        this.isPageLoading = false
         const contact = res.data
         const callData = {
           currentNumber: fixedPhoneNumber,
@@ -122,16 +137,22 @@ export default {
         }
 
         this.$VueEvent.fire('callContact', callData)
+      }).catch(() => {
+        this.isPageLoading = false
       })
     })
 
     this.$VueEvent.listen('add_contact', (data) => {
+      this.isPageLoading = true
+
       window.axios.post('/api/v1/contact', {
         add_phone_number: this.$options.filters.fixPhone(data.phone_number)
       }).then(res => {
+        this.isPageLoading = false
         this.$router.replace('/contacts/' + res.data.id)
           .catch(this.$handleRouteError)
       }).catch(() => {
+        this.isPageLoading = false
         this.$router.replace('/')
           .catch(this.$handleRouteError)
       })
