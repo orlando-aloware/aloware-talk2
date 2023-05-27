@@ -1,10 +1,7 @@
 <template>
   <div class="h-100"
-       :class="[
-          authenticated && !suspended ? `dashboard ${pageClass}` : 'guest',
-          lightMode ? 'light-mode' : 'night-mode'
-        ]"
-       v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
+       :class="mainLayoutClass"
+       v-if="isShowPage">
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
@@ -15,7 +12,7 @@
                 :class="pageLayoutHeightClass"
                 :height="'100%'">
         <div class="h-100"
-             :class="{ 'sidebar-active': sidebarVisible, 'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible) }">
+             :class="headerContainerClass">
           <q-header class="page-header bg-white text-black no-box-shadow"
                     v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
             <app-header @toggleSidebar="toggleSidebar"/>
@@ -62,12 +59,12 @@
             </dialer>
           </q-page-container>
         </div>
-        <q-drawer v-model="sidebarVisible"
-                  v-if="authenticated && !suspended"
+        <q-drawer class="h-100 sidebar-wrapper d-block"
+                  content-class="sidebar"
                   :breakpoint="0"
-                  class="h-100 sidebar-wrapper d-block"
                   :width="64"
-                  content-class="sidebar">
+                  v-model="sidebarVisible"
+                  v-if="authenticated && !suspended">
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
@@ -75,18 +72,17 @@
             </app-sidebar>
           </q-list>
         </q-drawer>
-        <q-drawer
-          ref="mobilePhone"
-          :overlay="false"
-          bordered
-          no-swipe-close
-          class="mobile-phone-drawer position-relative"
-          :class="mobilePhoneDrawerClass"
-          side="right"
-          :breakpoint="789"
-          v-model="mobilePhoneDrawer"
-          v-if="authenticated && !suspended"
-          @hide="onCloseMobilePhone">
+        <q-drawer class="mobile-phone-drawer position-relative"
+                  ref="mobilePhone"
+                  side="right"
+                  bordered
+                  no-swipe-close
+                  :overlay="false"
+                  :class="mobilePhoneDrawerClass"
+                  :breakpoint="789"
+                  v-model="mobilePhoneDrawer"
+                  v-if="authenticated && !suspended"
+                  @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-show="!isPhoneVisible">
             <app-header force-page-title="Phone"
@@ -102,8 +98,7 @@
                        :class="{ 'hide': isPhoneVisible }"
                        :isMobile="true"
                        v-model="mobilePhoneDrawer"
-                       v-if="mobilePhoneDrawer"
-                       @hide="onDialerFormHide">
+                       v-if="mobilePhoneDrawer">
           </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
@@ -112,10 +107,10 @@
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
-      <q-dialog v-model="showNewVersionDialog"
-                transition-show="scale"
+      <q-dialog transition-show="scale"
                 transition-hide="scale"
-                persistent>
+                persistent
+                v-model="showNewVersionDialog">
         <q-card class="bg-blue text-white"
                 style="width: 300px">
           <q-card-section>
@@ -135,10 +130,10 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <q-dialog v-model="showUpdateErrorDialog"
-                transition-show="scale"
+      <q-dialog transition-show="scale"
                 transition-hide="scale"
-                persistent>
+                persistent
+                v-model="showUpdateErrorDialog">
         <q-card class="bg-red text-white width-300">
           <q-card-section>
             <div class="text-h6">Download Failed</div>
@@ -152,20 +147,21 @@
                           class="bg-white">
             <q-btn label="Close"
                    text-color="blue"
-                   v-close-popup flat>
+                   v-close-popup
+                   flat>
             </q-btn>
             <q-btn label="Quit"
                    text-color="red"
-                   @click="quitApp"
-                   flat>
+                   flat
+                   @click="quitApp">
             </q-btn>
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <q-dialog v-model="showUpdateDownloadedDialog"
-                transition-show="scale"
+      <q-dialog transition-show="scale"
                 transition-hide="scale"
-                persistent>
+                persistent
+                v-model="showUpdateDownloadedDialog">
         <q-card class="bg-green-7 text-white"
                 style="width: 300px">
           <q-card-section>
@@ -180,21 +176,20 @@
                           class="bg-white">
             <q-btn label="Close"
                    text-color="blue"
-                   v-close-popup flat>
+                   flat
+                   v-close-popup>
             </q-btn>
             <q-btn label="Restart"
                    text-color="green-7"
-                   @click="restartApp"
-                   flat>
+                   flat
+                   @click="restartApp">
             </q-btn>
           </q-card-actions>
         </q-card>
       </q-dialog>
 
-      <Modal
-        id="missed-call-modal"
-        size="xs"
-      >
+      <Modal id="missed-call-modal"
+             size="xs">
         <template #title>
           <h2>Missed Call</h2>
         </template>
@@ -202,20 +197,16 @@
         <p>Do you want your status to be available?</p>
         <template #footer>
           <div class="w-100">
-            <b-button
-              size="sm"
-              class="float-left"
-              variant="outline-dark"
-              @click="stayBusy"
-            >
+            <b-button size="sm"
+                      class="float-left"
+                      variant="outline-dark"
+                      @click="stayBusy">
               Stay Busy
             </b-button>
-            <b-button
-              size="sm"
-              class="float-right"
-              variant="primary"
-              @click="goAvailable"
-            >
+            <b-button size="sm"
+                      class="float-right"
+                      variant="primary"
+                      @click="goAvailable">
               Go Available
             </b-button>
           </div>
@@ -250,13 +241,21 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import {
+  CURRENT_STATUS_HOLD_NEW,
+  CURRENT_STATUS_INPROGRESS_NEW,
+  CURRENT_STATUS_COMPLETED_NEW,
+  INCOMING_STATUSES,
+  ALL_INPROGRESS_STATUSES,
+  COMPLETED_STATUSES,
+  INPROGRESS_UNCONNECTED_STATUSES
+} from 'src/constants/communication-current-status'
 import _ from 'lodash'
 import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
-import * as CommunicationDirections from 'src/constants/communication-direction'
+import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import store from 'src/store'
 import {
@@ -349,6 +348,7 @@ export default {
       'currentCompany',
       'timezones'
     ]),
+
     ...mapState([
       'dialer',
       'campaigns',
@@ -360,62 +360,115 @@ export default {
       'parkedCalls',
       'leadSources'
     ]),
+
     ...mapState('auth', [
       'profile',
       'authenticated'
     ]),
+
     ...mapState('stats', [
       'availableMetrics'
     ]),
+
     ...mapState('contacts', [
       'showContactsHeader'
     ]),
+
     ...mapState('inbox', [
       'selectedContact',
       'liveContacts'
     ]),
+
     ...mapState('powerDialer', [
       'ongoingSession'
     ]),
+
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
+
     pageClass () {
       const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
+
       return pageSlug.replace(/ /g, '_') + '-page'
     },
+
+    isMobilePhoneClosed () {
+      return this.mobilePhoneDrawer && !this.isPhoneVisible
+    },
+
     pageLayoutHeightClass () {
-      if (!this.isMobile || (this.mobilePhoneDrawer && !this.isPhoneVisible) || (this.$route.name === 'Phone' && !this.isPhoneVisible)) {
+      const isPhoneVisible = (this.$route.name === 'Phone' && !this.isPhoneVisible)
+
+      if (!this.isMobile || this.isMobilePhoneClosed || isPhoneVisible) {
         return ['h-100']
       }
 
-      if (((this.dialer.call && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) && !this.dialer.parkedCall) ||
-        ((!this.dialer.call || ['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) && this.dialer.parkedCall)) {
+      const statuses = ['RECEIVED_CALL_INVITE', 'WRAP_UP']
+      const isCallInProgress = this.dialer.call && !statuses.includes(this.dialer.currentStatus)
+      const callInProgressWithoutParkedCall = isCallInProgress && !this.dialer.parkedCall
+      const noCallInProgress = !this.dialer.call || statuses.includes(this.dialer.currentStatus)
+      const noCallInProgressWithParkedCall = noCallInProgress && this.dialer.parkedCall
+
+      if (callInProgressWithoutParkedCall || noCallInProgressWithParkedCall) {
         return ['h-1-livebar']
       }
 
-      if ((this.dialer.call && !['RECEIVED_CALL_INVITE', 'WRAP_UP'].includes(this.dialer.currentStatus)) && this.dialer.parkedCall) {
+      if (this.dialer.call && !statuses.includes(this.dialer.currentStatus) && this.dialer.parkedCall) {
         return ['h-2-livebar']
       }
 
       return ['h-100']
     },
+
     pageContainerClasses () {
       return {
         'page-container h-100': true
       }
     },
+
     mobilePhoneDrawerClass () {
       return {
         'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.lg,
         'mobile-phone-visible': this.isPhoneVisible
       }
     },
+
     isSamePDListId () {
       return this.$route.params.id === this.ongoingSession.listId
     },
+
     isNotInInbox () {
-      return this.$route.path.indexOf('channels/inbox') === -1 && !['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)
+      const inboxRoutes = ['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task']
+
+      return this.$route.path.indexOf('channels/inbox') === -1 && !inboxRoutes.includes(this.$route.name)
+    },
+
+    mainLayoutClass () {
+      const pageClass = this.authenticated && !this.suspended ? `dashboard ${this.pageClass}` : 'guest'
+      const modeClass = this.lightMode ? 'light-mode' : 'night-mode'
+
+      return [
+        pageClass,
+        modeClass
+      ]
+    },
+
+    isShowPage () {
+      const isAuthenticated = !this.isGuest && this.authenticated
+      const isUnauthenticated = this.isGuest && !this.authenticated
+
+      return isAuthenticated || isUnauthenticated || this.suspended
+    },
+
+    headerContainerClass () {
+      const sidebarClass = this.sidebarVisible ? 'sidebar-active' : ''
+      const mobilePhoneClass = this.mobilePhoneDrawer ? 'hidden' : ''
+
+      return [
+        sidebarClass,
+        mobilePhoneClass
+      ]
     }
   },
 
@@ -439,71 +492,14 @@ export default {
     this.$q.iconSet.arrow.dropdown = 'o_expand_more'
 
     window.handleOpenURL = (url) => {
-      const action = url.replace(/(^\w+:|^)\/\//, '')
-
-      if (url.indexOf('callto:') > -1) {
-        const phoneNumber = url.replace('callto:', '')
-        return this.sendCall(phoneNumber)
-      }
-
-      if (url.indexOf('tel:') > -1) {
-        const phoneNumber = url.replace('tel:', '')
-        return this.sendCall(phoneNumber)
-      }
-
-      if (url.indexOf('alowaretalk:') > -1) {
-        if (url.indexOf('contact:') > -1) {
-          const phoneNumber = action.replace('contact:', '')
-          this.$VueEvent.fire('add_contact', {
-            phone_number: this.$options.filters.fixPhone(phoneNumber)
-          })
-          return
-        }
-
-        if (url.indexOf('call:') > -1) {
-          const phoneNumber = action.replace('call:', '')
-          return this.sendCall(phoneNumber)
-        }
-      }
-
-      if (action.indexOf('call:') > -1) {
-        const phoneNumber = action.replace('call:', '')
-        return this.sendCall(phoneNumber)
-      }
-
-      if (action.indexOf('hs:') > -1) {
-        const phoneNumber = action
-        this.setHubSpotDeal(phoneNumber)
-        return this.sendCall(phoneNumber)
-      }
+      this.processDeepLinkActions(url)
     }
 
     if (this.$q.platform.is.electron) {
       this.$q.electron.ipcRenderer.send('app_version')
 
       this.mainListeners.openUrl = (event, data) => {
-        const action = data.replace(/(^\w+:|^)\/\//, '')
-
-        if (data.indexOf('callto:') > -1) {
-          const phoneNumber = data.replace('callto:', '')
-          return this.sendCall(phoneNumber)
-        }
-
-        if (data.indexOf('tel:') > -1) {
-          const phoneNumber = data.replace('tel:', '')
-          return this.sendCall(phoneNumber)
-        }
-
-        if (action.indexOf('call:') > -1) {
-          const phoneNumber = action.replace('call:', '')
-          return this.sendCall(phoneNumber)
-        }
-
-        if (action.indexOf('hs:') > -1) {
-          const phoneNumber = action
-          this.setHubSpotDeal(phoneNumber)
-          return this.sendCall(phoneNumber)
-        }
+        this.processDeepLinkActions(data)
       }
 
       this.mainListeners.updateAvailable = (event, data) => {
@@ -587,7 +583,7 @@ export default {
 
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
       const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
-      const communicationType = communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW &&
+      const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
       communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         ? 'missed call'
         : 'call'
@@ -681,96 +677,64 @@ export default {
       }
 
       // remove the parked call if the caller was disconnected
-      if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW && parkedCall && parkedCall.id === communication.id) {
+      if (communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
+        parkedCall && parkedCall.id === communication.id) {
         this.setDialerParkedCall()
         this.removeParkedCall(communication.id)
       }
 
-      if (this.checkCommunicationMatchesUserAccessibility(communication) || isCommunicationHasUnownedContact) {
-        // if disposition status is not in-progress
-        // or current status is not queued / ring all, close call notification
-        if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-          ![CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW, CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW].includes(communication.current_status2)) {
-          this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+      if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
+        return
+      }
+
+      // if disposition status is not in-progress
+      // or current status is not queued / ring all, close call notification
+      if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+        !INCOMING_STATUSES.includes(communication.current_status2)) {
+        this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+      }
+
+      if (!this.isNotInInbox || !communication.contact_id) {
+        return
+      }
+
+      const newCommunication = this.$jsonClone(communication)
+
+      const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
+        ALL_INPROGRESS_STATUSES.includes(item.last_communication.current_status2))
+
+      if (isActiveInLiveContactsIndex >= 0 && this.liveContacts[isActiveInLiveContactsIndex].last_communication.id === communication.id) {
+        const liveContacts = _.cloneDeep(this.liveContacts)
+
+        const contactWithV2Attributes = this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[isActiveInLiveContactsIndex])
+
+        // add the v2 contact attributes that we need
+        Object.assign(liveContacts[isActiveInLiveContactsIndex], contactWithV2Attributes)
+
+        // if type is call and completed/voicemail then remove from live calls
+        if (ALL_DIRECTIONS.includes(communication.direction) &&
+          communication.type === CommunicationTypes.CALL &&
+          COMPLETED_STATUSES.includes(communication.current_status2)) {
+          liveContacts.splice(isActiveInLiveContactsIndex, 1)
         }
 
-        if (this.isNotInInbox) {
-          if (!communication.contact_id) {
-            return
-          }
-          const newCommunication = this.$jsonClone(communication)
+        this.processLiveContacts(liveContacts)
 
-          const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
-            [
-              CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-              CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
-            ].includes(item.last_communication.current_status2))
+        return
+      }
 
-          if (isActiveInLiveContactsIndex >= 0 && this.liveContacts[isActiveInLiveContactsIndex].last_communication.id === communication.id) {
-            const liveContacts = _.cloneDeep(this.liveContacts)
-            // add the v2 contact attributes that we need
-            Object.assign(liveContacts[isActiveInLiveContactsIndex], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[isActiveInLiveContactsIndex]))
+      if (isActiveInLiveContactsIndex >= 0) {
+        return
+      }
 
-            // if type is call and completed/voicemail then remove from live calls
-            if ([CommunicationDirections.INBOUND, CommunicationDirections.OUTBOUND].includes(communication.direction) &&
-              communication.type === CommunicationTypes.CALL &&
-              [CommunicationCurrentStatus.CURRENT_STATUS_VOICEMAIL_NEW, CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW].includes(communication.current_status2)) {
-              liveContacts.splice(isActiveInLiveContactsIndex, 1)
-            }
+      const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
 
-            this.setLiveContacts(
-              [
-                // connected calls
-                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
-                // parked calls
-                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
-                // incoming calls
-                ...liveContacts.filter(item => [
-                  CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-                ].includes(item.last_communication.current_status2))
-              ]
-            )
+      if (index >= 0) {
+        const liveContacts = _.cloneDeep(this.liveContacts)
+        // add the v2 contact attributes that we need
+        Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
 
-            return
-          }
-
-          if (isActiveInLiveContactsIndex >= 0) {
-            return
-          }
-
-          const index = this.liveContacts.findIndex(item => item.id === communication.contact_id)
-          if (index >= 0) {
-            const liveContacts = _.cloneDeep(this.liveContacts)
-            // add the v2 contact attributes that we need
-            Object.assign(liveContacts[index], this.addV2ContactAttributes(communication.contact, newCommunication, liveContacts[index]))
-
-            this.setLiveContacts(
-              [
-                // connected calls
-                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW].includes(item.last_communication.current_status2)),
-                // parked calls
-                ...liveContacts.filter(item => [CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW].includes(item.last_communication.current_status2)),
-                // incoming calls
-                ...liveContacts.filter(item => [
-                  CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-                  CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-                ].includes(item.last_communication.current_status2))
-              ]
-            )
-          }
-        }
+        this.processLiveContacts(liveContacts)
       }
     }
 
@@ -793,15 +757,15 @@ export default {
       const contact = this.$jsonClone(data)
       // add the v2 contact attributes that we need
       Object.assign(contact, this.addV2ContactAttributes(contact))
-      if (this.$route.path.indexOf('channels/inbox') === -1) {
-        // only fetch the latest contact data when updated contact is also the selected contact
-        // this is to avoid swarm of api request when numbers of contacts get updated
-        if (this.selectedContact && parseInt(this.selectedContact.id) === parseInt(data.id)) {
-          // just update the contact attributes
-          const updatedContact = this.$jsonClone(this.selectedContact)
-          Object.assign(updatedContact, contact)
-          this.setSelectedContact(updatedContact)
-        }
+
+      // only fetch the latest contact data when updated contact is also the selected contact
+      // this is to avoid swarm of api request when numbers of contacts get updated
+      if (this.$route.path.indexOf('channels/inbox') === -1 && this.selectedContact &&
+        parseInt(this.selectedContact.id) === parseInt(data.id)) {
+        // just update the contact attributes
+        const updatedContact = this.$jsonClone(this.selectedContact)
+        Object.assign(updatedContact, contact)
+        this.setSelectedContact(updatedContact)
       }
 
       // update contact in group
@@ -816,15 +780,7 @@ export default {
       if (this.isNotInInbox) {
         // Do not alter live contacts if it's in active mode
         const isActiveInLiveContactsIndex = this.liveContacts.findIndex(item => item.id === communication.contact_id &&
-          [
-            CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-            CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
-          ].includes(item.last_communication.current_status2))
+          ALL_INPROGRESS_STATUSES.includes(item.last_communication.current_status2))
 
         if (isActiveInLiveContactsIndex >= 0) {
           return
@@ -832,57 +788,23 @@ export default {
 
         const contact = this.$jsonClone(communication.contact)
         const newCommunication = this.$jsonClone(communication)
+        const contactsWithV2Attributes = this.addV2ContactAttributes(contact, newCommunication, contact)
         // add the v2 contact attributes that we need
-        Object.assign(contact, this.addV2ContactAttributes(contact, newCommunication, contact))
+        Object.assign(contact, contactsWithV2Attributes)
 
         const isInLiveContacts = this.liveContacts.find(item => item.id === contact.id)
-        const inProgressStatuses = [
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
-        ]
-        const onHoldStatuses = [
-          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
-        ]
-        const callingStatuses = [
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-        ]
-        const liveCallStatuses = [
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
-          CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
-        ]
-        const commDirections = [
-          CommunicationDirections.INBOUND,
-          CommunicationDirections.OUTBOUND
-        ]
 
         // check if communication is a live call
         if (communication.type === CommunicationTypes.CALL &&
-          commDirections.includes(communication.direction) &&
-          liveCallStatuses.includes(communication.current_status2)) {
+          ALL_DIRECTIONS.includes(communication.direction) &&
+          ALL_INPROGRESS_STATUSES.includes(communication.current_status2)) {
           const liveContacts = _.cloneDeep(this.liveContacts)
 
           if (!isInLiveContacts) {
             liveContacts.push(contact)
           }
 
-          this.setLiveContacts(
-            [
-              // connected calls
-              ...liveContacts.filter(item => inProgressStatuses.includes(item.last_communication.current_status2)),
-              // parked calls
-              ...liveContacts.filter(item => onHoldStatuses.includes(item.last_communication.current_status2)),
-              // incoming calls
-              ...liveContacts.filter(item => callingStatuses.includes(item.last_communication.current_status2))
-            ]
-          )
+          this.processLiveContacts(liveContacts)
         }
       }
     }
@@ -903,14 +825,10 @@ export default {
     }
 
     this.mainListeners.agentStatusUpdated = (event) => {
-      // store.commit('UPDATE_AGENT_STATUS', event)
       this.updateUserStatus(event)
-      if (this.currentCompany &&
-        event.company_id &&
-        event.company_id === this.currentCompany.id &&
-        this.profile &&
-        event.user_id === this.profile.id &&
-        this.profile.agent_status !== event.agent_status) {
+
+      if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
+        this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
         this.setAgentStatus(event.agent_status)
         console.log('Changed agent status [event]: ', event.agent_status)
       }
@@ -921,8 +839,7 @@ export default {
     }
 
     this.mainListeners.exportEventCreate = (task) => {
-      if (!this.allowedExports.includes(task.export.type) ||
-        task.export.user_id !== this.profile.id) {
+      if (!this.allowedExports.includes(task.export.type) || task.export.user_id !== this.profile.id) {
         return
       }
 
@@ -931,8 +848,7 @@ export default {
     }
 
     this.mainListeners.exportEventUpdate = (task) => {
-      if (!this.allowedExports.includes(task.export.type) ||
-        task.export.user_id !== this.profile.id) {
+      if (!this.allowedExports.includes(task.export.type) || task.export.user_id !== this.profile.id) {
         return
       }
 
@@ -950,8 +866,7 @@ export default {
     }
 
     this.mainListeners.exportEventDelete = (task) => {
-      if (!this.allowedExports.includes(task.export.type) ||
-        task.export.user_id !== this.profile.id) {
+      if (!this.allowedExports.includes(task.export.type) || task.export.user_id !== this.profile.id) {
         return
       }
 
@@ -1060,6 +975,7 @@ export default {
 
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
+
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         const now = new Date().getTime()
@@ -1083,17 +999,14 @@ export default {
     }
 
     console.log('Push permission: ' + window.Push.Permission.get())
-    if (
-      !window.Push.Permission.has() &&
-      window.Push.Permission.get() !== window.Push.Permission.DENIED
-    ) {
+
+    if (!window.Push.Permission.has() && window.Push.Permission.get() !== window.Push.Permission.DENIED) {
       window.Push.Permission.request()
     }
 
     this.resizeHandler()
 
     // event for listening before tab/browser close
-
     window.addEventListener('beforeunload', this.beforeUnload)
 
     // online / offline
@@ -1102,6 +1015,66 @@ export default {
   },
 
   methods: {
+    processLiveContacts (contacts) {
+      this.setLiveContacts(
+        [
+          // connected calls
+          ...contacts.filter(item => item.last_communication.current_status2 === CURRENT_STATUS_INPROGRESS_NEW),
+          // parked calls
+          ...contacts.filter(item => item.last_communication.current_status2 === CURRENT_STATUS_HOLD_NEW),
+          // incoming calls
+          ...contacts.filter(item => INPROGRESS_UNCONNECTED_STATUSES.includes(item.last_communication.current_status2))
+        ]
+      )
+    },
+
+    processDeepLinkActions (url) {
+      const action = url.replace(/(^\w+:|^)\/\//, '')
+
+      if (url.indexOf('callto:') > -1) {
+        const phoneNumber = url.replace('callto:', '')
+
+        return this.sendCall(phoneNumber)
+      }
+
+      if (url.indexOf('tel:') > -1) {
+        const phoneNumber = url.replace('tel:', '')
+
+        return this.sendCall(phoneNumber)
+      }
+
+      if (url.indexOf('alowaretalk:') > -1) {
+        if (url.indexOf('contact:') > -1) {
+          const phoneNumber = action.replace('contact:', '')
+
+          this.$VueEvent.fire('add_contact', {
+            phone_number: this.$options.filters.fixPhone(phoneNumber)
+          })
+
+          return
+        }
+
+        if (url.indexOf('call:') > -1) {
+          const phoneNumber = action.replace('call:', '')
+
+          return this.sendCall(phoneNumber)
+        }
+      }
+
+      if (action.indexOf('call:') > -1) {
+        const phoneNumber = action.replace('call:', '')
+
+        return this.sendCall(phoneNumber)
+      }
+
+      if (action.indexOf('hs:') > -1) {
+        const phoneNumber = action
+        this.setHubSpotDeal(phoneNumber)
+
+        return this.sendCall(phoneNumber)
+      }
+    },
+
     startElectronEvents () {
       if (!this.$q.platform.is.electron) {
         return
@@ -1188,43 +1161,37 @@ export default {
 
     checkSuspended (data, isUser = false) {
       const isCurrentUser = isUser ? this.profile.id === data.id : false
+      const isGuestOrAuthenticatedUser = !isUser || isCurrentUser
 
-      if (!data.enabled &&
-        (!isUser ||
-          (isUser && isCurrentUser)) &&
-        this.$route.name !== 'Suspended') {
-        isUser && isCurrentUser && (this.userSuspended = true)
+      if (!data.enabled && isGuestOrAuthenticatedUser && this.$route.name !== 'Suspended') {
+        if (isCurrentUser) {
+          this.userSuspended = true
+        }
+
         this.$router.replace('/suspended')
         this.setSuspended(true)
         this.$generalNotification('Your account has been suspended. Please contact our support for assistance.', 'error')
+
         return
       }
 
-      if (!data.enabled &&
-        isUser &&
-        isCurrentUser) {
+      if (!data.enabled && isCurrentUser) {
         this.userSuspended = true
       }
 
-      if (!data.enabled &&
-        !isUser) {
+      if (!data.enabled && !isUser) {
         this.accountSuspended = true
       }
 
-      if (data.enabled &&
-        isUser &&
-        isCurrentUser &&
-        !this.suspended &&
-        this.userSuspended) {
+      if (data.enabled && isCurrentUser && !this.suspended && this.userSuspended) {
         this.userSuspended = false
       }
 
-      if (data.enabled &&
-        (
-          (!isUser && this.accountSuspended) ||
-          (isUser && isCurrentUser && this.userSuspended)
-        ) &&
-        this.$route.name === 'Suspended') {
+      const isAccountSuspdended = !isUser && this.accountSuspended
+      const isUserSuspended = isCurrentUser && this.userSuspended
+      const isSuspended = isAccountSuspdended || isUserSuspended
+
+      if (data.enabled && isSuspended && this.$route.name === 'Suspended') {
         this.$router.replace('/')
       }
     },
@@ -1233,12 +1200,6 @@ export default {
       if (route.meta.title !== 'Power Dialer Sessions' || (route.meta.title === 'Power Dialer Sessions' && !this.isSamePDListId)) {
         this.setFinishedPowerDialerSession()
       }
-    },
-
-    onDialerFormHide () {
-      // if (typeof this.$refs.appFooter !== 'undefined') {
-      //   this.$refs.appFooter.toggleContacts()
-      // }
     },
 
     onPhoneVisible (value) {
@@ -1267,6 +1228,7 @@ export default {
     setHubSpotDeal (phoneNumber) {
       const link = phoneNumber.replace('hs:', '').replace('deal=', '')
       const parts = link.split('?')
+
       if (parts.length === 2) {
         this.setDialerDeal(parts[1])
       }
@@ -1296,6 +1258,7 @@ export default {
       if (!this.authenticated) {
         this.setDialerToken()
       }
+
       this.setDialerCall()
       this.setDialerCommunication()
       this.setDialerDeal()
@@ -1309,8 +1272,9 @@ export default {
       if (typeof str === 'undefined' || str === null) {
         return ''
       }
-      const breakTag =
-        isXhtml || typeof isXhtml === 'undefined' ? '<br />' : '<br>'
+
+      const breakTag = isXhtml || typeof isXhtml === 'undefined' ? '<br />' : '<br>'
+
       return (str + '').replace(
         /([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,
         `$1${breakTag}$2`
@@ -1318,15 +1282,9 @@ export default {
     },
 
     removeBehaviorsRestrictions () {
-      window.removeEventListener('keydown', this.removeBehaviorsRestrictions())
-      window.removeEventListener(
-        'mousedown',
-        this.removeBehaviorsRestrictions()
-      )
-      window.removeEventListener(
-        'touchstart',
-        this.removeBehaviorsRestrictions()
-      )
+      window.removeEventListener('keydown', this.removeBehaviorsRestrictions)
+      window.removeEventListener('mousedown', this.removeBehaviorsRestrictions)
+      window.removeEventListener('touchstart', this.removeBehaviorsRestrictions)
       this.setEnableAudio(true)
     },
 
@@ -1334,6 +1292,7 @@ export default {
       // test if play() is ignored when not called from an input event handler
       const audio = document.createElement('audio')
       const promise = audio.play()
+
       if (promise !== undefined) {
         promise
           .catch(() => {
@@ -1371,10 +1330,9 @@ export default {
       this.initAccount().then(() => {
         this.loading = false
 
-        if (this.profile && this.profile.live_calls === 0 && this.dialer.call) {
-          if (!this.profile.go_to_available_after_login) {
-            this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE)
-          }
+        if (this.profile && this.profile.live_calls === 0 && this.dialer.call &&
+          !this.profile.go_to_available_after_login) {
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE)
         }
 
         if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
@@ -1417,9 +1375,11 @@ export default {
         }).catch((err) => {
           console.log(err)
           authTry++
+
           // check if we are authenticated after 3 retries
           if (authTry > 3) {
             this.authCheckStatus = false
+
             setTimeout(() => {
               this.showRefreshButton = true
             }, 10000)
@@ -1428,9 +1388,11 @@ export default {
             if (this.$route.name !== 'Login') {
               this.loading = true
             }
-          } else {
-            this.checkAuth(authTry)
+
+            return
           }
+
+          this.checkAuth(authTry)
         })
       }
     },
@@ -1446,7 +1408,9 @@ export default {
       if (!id) {
         return null
       }
+
       const found = this.campaigns.find((campaign) => campaign.id === id)
+
       if (found) {
         return found
       }
@@ -1463,10 +1427,12 @@ export default {
         .then((res) => {
           this.setCurrentCompany(res.data)
           this.setDefaultDateFilter(res.data.default_contact_date_filter)
+
           return Promise.resolve()
         })
         .catch((err) => {
           console.log(err)
+
           return Promise.reject()
         })
     },
@@ -1474,6 +1440,7 @@ export default {
     getCampaigns () {
       if (this.hasPermissionTo('list campaign')) {
         this.loadingCampaigns = true
+
         return this.$axios
           .get('/api/v1/campaign', {
             mode: 'no-cors',
@@ -1485,11 +1452,13 @@ export default {
             this.setCampaigns(res.data)
             this.loadingCampaigns = false
             this.setCampaignsIsLoading(false)
+
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingCampaigns = false
+
             return Promise.reject()
           })
       }
@@ -1498,6 +1467,7 @@ export default {
     getRingGroups () {
       if (this.hasPermissionTo('list ring group')) {
         this.loadingRingGroups = true
+
         return this.$axios
           .get('/api/v1/ring-group', {
             mode: 'no-cors'
@@ -1505,11 +1475,13 @@ export default {
           .then((res) => {
             this.setRingGroups(res.data)
             this.loadingRingGroups = false
+
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingRingGroups = false
+
             return Promise.reject()
           })
       }
@@ -1519,6 +1491,7 @@ export default {
       if (this.hasPermissionTo('list user')) {
         this.loadingUsers = true
         this.setUsersIsLoading(true)
+
         return this.$axios
           .get('/api/v2/users', {
             mode: 'no-cors'
@@ -1527,11 +1500,13 @@ export default {
             this.setUsers(res.data)
             this.loadingUsers = false
             this.setUsersIsLoading(false)
+
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingUsers = false
+
             return Promise.reject()
           })
       }
@@ -1539,18 +1514,21 @@ export default {
 
     getFullTags () {
       this.loadingTags = true
+
       return this.$axios
         .get('/api/v1/tag', { params: { full_load: true } })
         .then((res) => {
           this.setTags(res.data)
           this.$VueEvent.fire('tags_loaded')
           this.loadingTags = false
+
           return Promise.resolve()
         })
         .catch((err) => {
           this.setTagsFullyLoaded(false)
           console.log(err)
           this.loadingTags = false
+
           return Promise.reject()
         })
     },
@@ -1559,31 +1537,39 @@ export default {
       if (page === 1) {
         this.loadingTags = true
       }
+
       const params = {
         page: page
       }
+
       return this.$axios
         .get('/api/v1/tag', { params })
         .then((res) => {
           this.setTagsFullyLoaded(false)
+
           if (res.data.data && res.data.data.length) {
             res.data.data.forEach((tag) => {
               this.newTag(tag)
             })
           }
+
           if (res.data.to !== res.data.total) {
             this.getTags(page + 1)
-          } else {
-            this.setTagsFullyLoaded(true)
-            this.$VueEvent.fire('tags_loaded')
-            this.loadingTags = false
+
             return Promise.resolve()
           }
+
+          this.setTagsFullyLoaded(true)
+          this.$VueEvent.fire('tags_loaded')
+          this.loadingTags = false
+
+          return Promise.resolve()
         })
         .catch((err) => {
           this.setTagsFullyLoaded(false)
           console.log(err)
           this.loadingTags = false
+
           return Promise.reject()
         })
     },
@@ -1606,14 +1592,17 @@ export default {
 
           // keep requesting until data is returned
           if (res.data.current_page !== res.data.last_page) {
-            return this.getWorkflows(++page)
-          } else {
-            this.loadingWorkflows = false
+            this.getWorkflows(++page)
+
             return Promise.resolve()
           }
+
+          this.loadingWorkflows = false
+          return Promise.resolve()
         }).catch(err => {
           this.loadingWorkflows = false
           console.log(err)
+
           return Promise.reject()
         })
       }
@@ -1622,16 +1611,19 @@ export default {
     getDispositionStatuses () {
       if (this.hasPermissionTo('list disposition status')) {
         this.loadingDispositionStatuses = true
+
         return this.$axios
           .get('/api/v1/disposition-status')
           .then((res) => {
             this.setDispositionStatuses(res.data)
             this.loadingDispositionStatuses = false
+
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingDispositionStatuses = false
+
             return Promise.reject()
           })
       }
@@ -1640,16 +1632,19 @@ export default {
     getCallDispositions () {
       if (this.hasPermissionTo('list disposition status')) {
         this.loadingCallDispositionStatuses = true
+
         return this.$axios
           .get('/api/v1/call-disposition')
           .then((res) => {
             this.setCallDispositions(res.data)
             this.loadingCallDispositionStatuses = false
+
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingCallDispositionStatuses = false
+
             return Promise.reject()
           })
       }
@@ -1658,15 +1653,18 @@ export default {
     getTemplates () {
       if (this.hasPermissionTo('list sms template')) {
         this.loadingTemplates = true
+
         return this.$axios.get('/api/v1/sms-template', {
           mode: 'no-cors'
         }).then(res => {
           this.loadingTemplates = false
           this.setTemplates(res.data)
+
           return Promise.resolve()
         }).catch(err => {
           console.log(err)
           this.loadingTemplates = false
+
           return Promise.reject()
         })
       }
@@ -1680,10 +1678,12 @@ export default {
         }).then(res => {
           this.loadingBroadcasts = false
           this.setBroadcasts(res.data)
+
           return Promise.resolve()
         }).catch(err => {
           console.log(err)
           this.loadingBroadcasts = false
+
           return Promise.reject()
         })
       }
@@ -1696,6 +1696,7 @@ export default {
 
       this.loadingAvailableMetrics = true
       this.setMetricLoader(true)
+
       return this.$axios
         .get('/api/v2/agents/metrics', {
           params: {
@@ -1704,51 +1705,55 @@ export default {
         })
         .then(response => {
           this.loadingAvailableMetrics = false
+
           if (_.isEmpty(response.data)) {
             this.setAvailableMetrics([])
+
             return
           }
 
           const structuredMetricGroups = []
-          const availableMetrics = response.data
-          const index = { data: null }
-          const option = { data: null }
-          const key = { data: null }
-          const optionGroup = { data: null }
-          const categoryLabel = { data: null }
-          for (index.data in availableMetrics) {
-            optionGroup.data = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(item => item.name === index.data)
-            categoryLabel.data = optionGroup.data ? optionGroup.data.label : this.$options.filters.ucwords(index.data.replace(/_/g, ' '))
+          let availableMetrics = response.data
+          let option = null
+          let optionGroup = null
+          let categoryLabel = null
+
+          for (const index in availableMetrics) {
+            optionGroup = this.MetricOptionGroups.METRIC_OPTION_GROUPS.find(item => item.name === index)
+            categoryLabel = optionGroup ? optionGroup.label : this.$options.filters.ucwords(index.replace(/_/g, ' '))
             structuredMetricGroups.push({
               disable: true,
               value: null,
-              label: categoryLabel.data
+              label: categoryLabel
             })
 
-            if (availableMetrics[index.data].constructor.name === 'Array') {
-              for (option.data of availableMetrics[index.data]) {
-                option.data.disable = false
-                option.data.categoryLabel = categoryLabel.data
-                structuredMetricGroups.push(option.data)
+            if (availableMetrics[index].constructor.name === 'Array') {
+              for (option of availableMetrics[index]) {
+                option.disable = false
+                option.categoryLabel = categoryLabel
+                structuredMetricGroups.push(option)
               }
             }
 
-            if (availableMetrics[index.data].constructor.name === 'Object') {
-              for (key.data of Object.keys(availableMetrics[index.data])) {
-                availableMetrics[index.data][key.data].disable = false
-                availableMetrics[index.data][key.data].categoryLabel = categoryLabel.data
-                structuredMetricGroups.push(availableMetrics[index.data][key.data])
+            if (availableMetrics[index].constructor.name === 'Object') {
+              for (const key of Object.keys(availableMetrics[index])) {
+                availableMetrics[index][key].disable = false
+                availableMetrics[index][key].categoryLabel = categoryLabel
+                structuredMetricGroups.push(availableMetrics[index][key])
               }
             }
           }
+
           this.setAvailableMetrics(structuredMetricGroups)
           this.getMetricGroups()
+
           return Promise.resolve()
         })
         .catch((err) => {
           console.error(err)
           this.loadingAvailableMetrics = false
           this.setMetricLoader(false)
+
           return Promise.reject()
         })
     },
@@ -1760,6 +1765,7 @@ export default {
 
       this.setMetricLoader(true)
       this.loadingMetricGroups = true
+
       return this.$axios
         .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
           params: {
@@ -1770,12 +1776,14 @@ export default {
           this.loadingMetricGroups = false
           this.setMetricLoader(false)
           this.setMetricGroups(response.data)
+
           return Promise.resolve()
         })
         .catch((err) => {
           console.error(err)
           this.loadingMetricGroups = false
           this.setMetricLoader(false)
+
           return Promise.reject()
         })
     },
@@ -1786,6 +1794,7 @@ export default {
       }
 
       this.loadingLeadSources = true
+
       return this.$axios
         .get('/api/v1/lead-sources', {
           mode: 'no-cors'
@@ -1793,10 +1802,12 @@ export default {
         .then(res => {
           this.setLeadSources(res.data)
           this.loadingLeadSources = false
+
           return Promise.resolve()
         }).catch(err => {
           this.loadingLeadSources = false
           console.log(err)
+
           return Promise.reject()
         })
     },
@@ -1832,16 +1843,19 @@ export default {
       if (!phoneNumber) {
         return
       }
+
       if (this.authenticated) {
         console.log('Calling phone number: ' + phoneNumber)
         this.call(phoneNumber)
-      } else {
-        console.log('Rescheduling call to phone number: ' + phoneNumber)
-        // reschedule for 1 second from now
-        setTimeout(() => {
-          this.call(phoneNumber)
-        }, 1000)
+
+        return
       }
+
+      console.log('Rescheduling call to phone number: ' + phoneNumber)
+      // reschedule for 1 second from now
+      setTimeout(() => {
+        this.call(phoneNumber)
+      }, 1000)
     },
 
     restartApp () {
@@ -1877,36 +1891,35 @@ export default {
     handleDesktopCommunicationNotification (communication) {
       const found = this.communicationNotifiedDesktop.length &&
         this.communicationNotifiedDesktop.find(item => item.id === communication.id)
+
       if (window.Push.Permission.has() && !found) {
         const self = this
-        const title = { data: '' }
-        const icon = { data: '' }
+        let title = ''
+        let icon = ''
+
         switch (communication.type) {
           case CommunicationTypes.CALL:
-            title.data = 'Incoming Call'
-            icon.data = 'call'
+            title = 'Incoming Call'
+            icon = 'call'
             break
           case CommunicationTypes.SMS:
-            title.data = 'Incoming Text Message'
-            icon.data = 'text'
+            title = 'Incoming Text Message'
+            icon = 'text'
             break
           case CommunicationTypes.FAX:
-            title.data = 'Incoming Fax'
-            icon.data = 'fax'
+            title = 'Incoming Fax'
+            icon = 'fax'
             break
-        }
-
-        // handling answered calls
-        if (
-          communication.type === CommunicationTypes.CALL &&
-          communication.user_id
-        ) {
-          title.data = 'Answered Incoming Call'
         }
 
         // handling answered calls
         if (communication.type === CommunicationTypes.CALL && communication.user_id) {
-          title.data = 'Answered Incoming Call'
+          title = 'Answered Incoming Call'
+        }
+
+        // handling answered calls
+        if (communication.type === CommunicationTypes.CALL && communication.user_id) {
+          title = 'Answered Incoming Call'
         }
 
         const onClickFunction = (res) => {
@@ -1914,22 +1927,22 @@ export default {
           self.closeDesktopNotification(communication.id, 'communication')
           self.decreaseAppBadge()
           self.restoreApp()
-          if (communication.type === CommunicationTypes.CALL) {
-            if (!this.dialer.call) {
-              self.$router
-                .push({
-                  name: 'Communication',
-                  params: {
-                    communicationObj: communication,
-                    communicationId: communication.id,
-                    contactId: _.get(communication, 'contact.id', null)
-                  }
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
-            }
+
+          if (communication.type === CommunicationTypes.CALL && !this.dialer.call) {
+            self.$router
+              .push({
+                name: 'Communication',
+                params: {
+                  communicationObj: communication,
+                  communicationId: communication.id,
+                  contactId: _.get(communication, 'contact.id', null)
+                }
+              })
+              .catch((err) => {
+                console.log(err)
+              })
           }
+
           if (communication.type === CommunicationTypes.SMS) {
             self.$router
               .push({
@@ -1942,6 +1955,7 @@ export default {
                 console.log(err)
               })
           }
+
           if (communication.type === CommunicationTypes.FAX) {
             self.$router
               .push({
@@ -1957,8 +1971,9 @@ export default {
         }
 
         const lineName = this.getCampaign(communication.campaign_id).name
+
         const options = {
-          icon: 'notification-icons/' + icon.data + '.png',
+          icon: 'notification-icons/' + icon + '.png',
           body: `From: ${this.$options.filters.fixName(
             this.sanitizeText(communication.contact.name)
           )} ${this.$options.filters.fixPhone(
@@ -1978,7 +1993,7 @@ export default {
           }
         }
 
-        window.Push.create(title.data, options).then((data) => {
+        window.Push.create(title, options).then((data) => {
           this.addCommunicationNotifiedDesktop({
             id: communication.id,
             close: data.close
@@ -1995,9 +2010,11 @@ export default {
     handleDesktopVoicemailNotification (communication) {
       const found = this.voicemailNotifiedDesktop.length &&
         this.voicemailNotifiedDesktop.find(item => item.id === communication.id)
+
       if (window.Push.Permission.has() && !found) {
         const self = this
         const title = 'New Voicemail'
+
         const onClickFunction = function (res) {
           window.focus()
           self.closeDesktopNotification(communication.id, 'voicemail')
@@ -2016,7 +2033,9 @@ export default {
               console.log(err)
             })
         }
+
         const lineName = this.getCampaign(communication.campaign_id).name
+
         const options = {
           icon: 'notification-icons/voicemail.png',
           body: `From: ${this.$options.filters.fixName(
@@ -2052,9 +2071,11 @@ export default {
     handleDesktopContactNotification (contact) {
       const found = this.contactNotifiedDesktop.length &&
         this.contactNotifiedDesktop.find(item => item.id === contact.id)
+
       if (window.Push.Permission.has() && !found) {
         const self = this
         const title = 'You have been assigned to a contact.'
+
         const onClickFunction = function (res) {
           window.focus()
           self.closeDesktopNotification(contact.id, 'contact')
@@ -2072,6 +2093,7 @@ export default {
               console.log(err)
             })
         }
+
         const options = {
           icon: 'notification-icons/contact.png',
           body: `Name: ${this.$options.filters.fixName(
@@ -2107,12 +2129,15 @@ export default {
     handleDesktopAppointmentNotification (engagement, contact, timeDiff, unit) {
       const found = this.appointmentNotifiedDesktop.length &&
         this.appointmentNotifiedDesktop.find(item => item.id === engagement.id)
+
       if (window.Push.Permission.has() && !found) {
         const self = this
-        const title = { data: 'Appointment' }
+        let title = 'Appointment'
+
         if (timeDiff !== 0) {
-          title.data += ` in ${timeDiff} ${unit}`
+          title += ` in ${timeDiff} ${unit}`
         }
+
         const onClickFunction = function (res) {
           window.focus()
           self.closeDesktopNotification(engagement.id, 'appointment')
@@ -2133,6 +2158,7 @@ export default {
               console.log(err)
             })
         }
+
         const options = {
           icon: 'notification-icons/appointment.png',
           body:
@@ -2156,7 +2182,7 @@ export default {
           }
         }
 
-        window.Push.create(title.data, options).then((data) => {
+        window.Push.create(title, options).then((data) => {
           this.addAppointmentNotifiedDesktop({
             id: engagement.id,
             close: data.close
@@ -2171,12 +2197,15 @@ export default {
     handleDesktopReminderNotification (engagement, contact, timeDiff, unit) {
       const found = this.reminderNotifiedDesktop.length &&
         this.reminderNotifiedDesktop.find(item => item.id === engagement.id)
+
       if (window.Push.Permission.has() && !found) {
         const self = this
-        const title = { data: 'Reminder' }
+        let title = 'Reminder'
+
         if (timeDiff !== 0) {
-          title.data += ` in ${timeDiff} ${unit}`
+          title += ` in ${timeDiff} ${unit}`
         }
+
         const onClickFunction = function (res) {
           window.focus()
           self.closeDesktopNotification(engagement.id, 'reminder')
@@ -2197,6 +2226,7 @@ export default {
               console.log(err)
             })
         }
+
         const options = {
           icon: 'notification-icons/reminder.png',
           body:
@@ -2220,7 +2250,7 @@ export default {
           }
         }
 
-        window.Push.create(title.data, options).then((data) => {
+        window.Push.create(title, options).then((data) => {
           this.addReminderNotifiedDesktop({
             id: engagement.id,
             close: data.close
@@ -2274,22 +2304,27 @@ export default {
 
     resizeHandler () {
       const width = document.documentElement.clientWidth
+
       // less than 991 pixels, screen width is tablet or mobile
       if (width <= 991) {
         this.setIsTabletOrMobile(true)
       }
+
       // greater than 991 pixels, screen width is not tablet or mobile
       if (width > 991) {
         this.setIsTabletOrMobile(false)
       }
+
       // less than 785 pixels, screen width is mobile
       if (width < 785) {
         this.setIsMobile(true)
       }
+
       // greater than or equal to 785 pixels, screen width is not mobile
       if (width >= 785) {
         this.setIsMobile(false)
       }
+
       // close contact details drawer when screen width reaches
       // more than 1084 or less than 605 pixels
       if (width > 1084 || width < 605) {
@@ -2306,6 +2341,7 @@ export default {
 
     getStatics (repeatTimes = 0) {
       this.setStaticsLoaded(false)
+
       talk2Api.V1.statics.get(this.currentCompany?.id)
         .then(res => {
           this.setStatics(res.data)
@@ -2439,10 +2475,9 @@ export default {
 
       if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
         !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
-        (to.name !== from.name)) {
-        if (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session') {
-          this.resetVuex(['contacts', 'non-cache'])
-        }
+        to.name !== from.name &&
+        (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session')) {
+        this.resetVuex(['contacts', 'non-cache'])
       }
 
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {
@@ -2451,7 +2486,7 @@ export default {
 
       if (!(from.name === 'Inbox' && this.$route.name === 'Inbox Contact') &&
         !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
-        (to.name !== from.name)) {
+        to.name !== from.name) {
         this.resetVuex(['inbox', 'non-cache'])
       }
 
@@ -2465,6 +2500,7 @@ export default {
       }
 
       const fromName = _.get(from, 'name', null)
+
       if (!this.isMobile && to.name === 'Phone' && !fromName) {
         this.$router.replace({ path: '/' })
         return
@@ -2479,6 +2515,7 @@ export default {
       }
 
       const inboxStatus = _.get(this.$route, 'params.status', null)
+
       if (inboxStatus) {
         setTimeout(() => {
           this.$VueEvent.fire('inbox_route_change')
@@ -2546,6 +2583,7 @@ export default {
         this.setShowContactsHeader(true)
         this.mobilePhoneDrawer = false
       }
+
       if (!val && this.$route.name === 'Phone') {
         this.$router.replace({ name: 'Inbox' })
       }
@@ -2576,18 +2614,22 @@ export default {
 
             clearInterval(this.$options.appFooterInterval)
           }
+
           this.$options.appFooterCounter++
+
           if (this.$options.appFooterCounter >= 600) {
             clearInterval(this.$options.appFooterInterval)
           }
         }, 100)
       }
     },
+
     showPhone (value) {
       if (this.isMobile) {
         this.mobilePhoneDrawer = value
       }
     },
+
     'dialer.currentStatus': function (value) {
       if (this.isMobile && this.$route.name !== 'Phone' && value === 'WRAP_UP') {
         this.$router.push({
@@ -2595,18 +2637,19 @@ export default {
         })
       }
 
-      if (this.isMobile &&
-        ['WRAP_UP', 'CALL_CONNECTED'].includes(value)) {
+      if (this.isMobile && ['WRAP_UP', 'CALL_CONNECTED'].includes(value)) {
         this.mobilePhoneDrawer = true
         this.isPhoneVisible = true
       }
     },
+
     agentStatus (toVal, fromVal) {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
         this.$VueEvent.fire('endWrapUp')
       }
     }
   },
+
   beforeRouteEnter (to, from, next) {
     if (to.name === 'Suspended') {
       store().dispatch('auth/check', { preventLogout: false, preventRedirect: true }).then((response) => {
@@ -2619,9 +2662,11 @@ export default {
       }).catch(() => {
         next()
       })
-    } else {
-      next()
+
+      return
     }
+
+    next()
   }
 }
 </script>

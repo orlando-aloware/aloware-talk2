@@ -37,7 +37,9 @@ Vue.use(Vuelidate)
 Vue.use(BusinessHours)
 
 window.Bowser = Bowser
-window.timezone = 'Intl' in window ? new Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/Los_Angeles'
+window.timezone = 'Intl' in window
+  ? new Intl.DateTimeFormat().resolvedOptions().timeZone
+  : 'America/Los_Angeles'
 
 if (process.env.APP_DEBUG) {
   Vue.config.devtools = true
@@ -105,6 +107,7 @@ window.guessLocale = function (phoneNumber) {
   // Use substring() and indexOf() functions to remove
   // portion of string after certain character (w => wait)
   let pos = phoneNumber.indexOf('w')
+
   if (pos !== -1) {
     phoneNumber = phoneNumber.substring(0, pos).trim()
   }
@@ -131,6 +134,7 @@ window.guessLocale = function (phoneNumber) {
     // will add +1 to phone number and check again
     if (!phoneNumber.includes('+')) {
       northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica('+1' + phoneNumber)
+
       if (northAmericaLocale) {
         return northAmericaLocale
       }
@@ -138,6 +142,7 @@ window.guessLocale = function (phoneNumber) {
 
     // handle GB & AU as a special case
     let englishLocale = window.getLocaleIfPhoneNumberIsFromGreatBritainOrAustralia(phoneNumber)
+
     if (englishLocale) {
       return englishLocale
     }
@@ -191,11 +196,9 @@ if (process.env.APP_ENV !== 'production') {
   storage.local.setItem('env', 'development')
 }
 
-if (
-  (process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'development') &&
-  process.env.APP_ENV !== 'local'
-) {
+const isNotLocal = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development'
+
+if (isNotLocal && process.env.APP_ENV !== 'local') {
   Sentry.init({
     Vue,
     dsn: process.env.SENTRY_DSN_PUBLIC,
@@ -255,6 +258,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
   if (response && response.status) {
     const message = { data: response.data.error }
     const error = { data: null }
+
     switch (response.status) {
       case 401:
         if (!response.data.errors.length && response.data.error) {
@@ -267,6 +271,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
 
         if (response.data.errors.length) {
           response.data.errors = ''
+
           for (error.data of response.data.errors) {
             message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
           }
@@ -275,9 +280,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         break
       case 403:
         message.data = 'You do not have enough permissions to make this request.'
+
         if (response.data && response.data.error) {
           message.data = response.data.error
         }
+
         break
       case 404:
         message.data = response?.data?.error ?? 'Requested resource not found.'
@@ -288,9 +295,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
       case 422:
         message.data = ''
         const keys = Object.keys(response.data.errors)
+
         keys.forEach((value) => {
           message.data += keys.length > 1 ? `<p class="pt-1 pb-1">- ${response.data.errors[value]}</p>` : response.data.errors[value]
         })
+
         break
       case 500:
         message.data = 'Oops! We are having some problems right now, please try again later.'
@@ -308,13 +317,15 @@ Vue.prototype.$handleUploadErrors = function (error) {
   if (typeof error === 'string') {
     error = JSON.parse(error)
   }
-  const err = { data: {} }
+
+  let err = {}
+
   if (error.message === 'This action is unauthorized.') {
-    err.data = {
+    err = {
       status: 403
     }
   } else {
-    err.data = {
+    err = {
       status: 422,
       data: {
         errors: error.errors.file
@@ -322,14 +333,12 @@ Vue.prototype.$handleUploadErrors = function (error) {
     }
   }
 
-  this.$handleErrors(err.data)
+  this.$handleErrors(err)
 }
 
 Vue.prototype.$handleRouteError = (error) => {
-  if (
-    error.name !== 'NavigationDuplicated' &&
-    !error.message.includes('Avoided redundant navigation to current location')
-  ) {
+  if (error.name !== 'NavigationDuplicated' &&
+    !error.message.includes('Avoided redundant navigation to current location')) {
     console.log(error)
   }
 }
@@ -471,9 +480,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     return
   }
 
-  if (!settings.title ||
-    (!['sms', 'incomingCall', 'callFishing'].includes(settings.type) && !settings.message) ||
-    (settings.type === 'sms' && !settings.message && !settings.attachment)) {
+  const noMessage = !['sms', 'incomingCall', 'callFishing'].includes(settings.type) && !settings.message
+  const smsNoMessage = settings.type === 'sms' && !settings.message && !settings.attachment
+
+  if (!settings.title || noMessage || smsNoMessage) {
     return
   }
 
@@ -486,22 +496,24 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   if (settings.type === 'callFishing' &&
     this.$store.state.notifications[settings.type].communicationId &&
     this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
-    this.$store.state.notifications[settings.type].contactId !== settings.contactId
-  ) {
-    const queue = { data: window._.get(this.$store.state.notifications, `${settings.type}.queue`, []) }
-    queue.data = !queue.data ? [] : JSON.parse(JSON.stringify(queue.data))
-    const found = queue.data.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
+    this.$store.state.notifications[settings.type].contactId !== settings.contactId) {
+    let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
+    queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
+    const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
       return
     }
 
-    queue.data.push(settings)
+    queue.push(settings)
 
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
-    data.data.queue = queue.data
+    data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
-    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+
+    if (settings.type === 'callFishing') {
+      this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+    }
 
     return
   }
@@ -516,22 +528,25 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     this.$store.commit('SET_NOTIFICATIONS', data)
     settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
     this.$bvToast.show(settings.type)
+
     return
   }
 
-  const counter = { data: 0 }
-  const notificationInterval = { data: null }
-  notificationInterval.data = setInterval(() => {
+  let counter = 0
+  let notificationInterval = null
+
+  notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
       settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
       this.$bvToast.show(settings.type)
-      clearInterval(notificationInterval.data)
+      clearInterval(notificationInterval)
     }
-    counter.data++
 
-    if (counter.data > 120) {
-      clearInterval(notificationInterval.data)
+    counter++
+
+    if (counter > 120) {
+      clearInterval(notificationInterval)
     }
   }, 500)
 }, 100)
@@ -583,6 +598,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
       )
     ]
   )
+
   // Pass the VNodes as an array for message and title
   this.$bvToast.toast([vNodesMsg], {
     title: null,
@@ -642,6 +658,7 @@ Vue.prototype.$alphabeticalSort = (items, property = 'name') => {
   return window._.clone(items).sort((a, b) => {
     const textA = a[property].toUpperCase()
     const textB = b[property].toUpperCase()
+
     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
   })
 }
