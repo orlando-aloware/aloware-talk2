@@ -193,14 +193,14 @@ export default {
     },
 
     assign () {
-      const data = {
+      const payload = {
         assign_contacts_to: this.tabName,
         user_id: this.userId,
         ring_group_id: this.ringGroupId,
         force: this.distributeContacts
       }
 
-      axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, data)
+      axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, payload)
         .then(res => {
           this.$generalNotification(res.data.message)
         }).catch(err => {
@@ -213,7 +213,11 @@ export default {
     },
 
     bulkAssign () {
-      const data = {
+      if (!this.isBulk || !this.hasSelectedTagIds) {
+        return
+      }
+
+      const payload = {
         assign_contacts_to: this.tabName,
         user_id: this.userId,
         ring_group_id: this.ringGroupId,
@@ -221,7 +225,7 @@ export default {
         tag_ids: this.getSelectedTagIds
       }
 
-      axios.post(`/api/v1/tags/bulk-assign-contacts`, data)
+      axios.post(`/api/v1/tags/bulk-assign-contacts`, payload)
         .then(res => {
           this.$generalNotification(res.data.message)
           this.clearAllSelectedTags()

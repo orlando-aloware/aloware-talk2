@@ -88,7 +88,7 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { tagsMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import axios from 'axios'
 
 export default {
@@ -133,6 +133,10 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('tagsModule', [
+      'getSelectedTagIds'
+    ]),
 
     openModal: {
       get () {
@@ -206,7 +210,11 @@ export default {
     addTasksToPowerDialer () {
       this.loading = true
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want to add the contacts under this tag to this user's Power Dialer?`, {
+      let msg = `Are you sure you want to add the contacts under `
+      msg += (this.isBulk ? `these tags` : 'this tag')
+      msg += ` to this user's Power Dialer?`
+
+      this.$bvModal.msgBoxConfirm(msg, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
         cancelTitle: 'No',
@@ -219,24 +227,60 @@ export default {
             return
           }
 
-          let params = {
-            user_id: this.userId,
-            direction: this.direction,
-            prevent_duplicates: this.conversion.includes('prevent_duplicates'),
-            multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
-            allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers')
+          if (this.isBulk) {
+            this.bulkAddTasks()
+            return
           }
 
-          axios.post(`/api/v1/tags/${this.tag.id}/add-to-user-power-dialer`, params)
-            .then(res => {
-              this.$generalNotification(res.data.message)
-            }).catch(err => {
-              this.$handleErrors(err.response)
-              console.log(err)
-            }).finally(() => {
-              this.loading = false
-              this.closeModal()
-            })
+          this.addTasks()
+        })
+    },
+
+    addTasks () {
+      const payload = {
+        user_id: this.userId,
+        direction: this.direction,
+        prevent_duplicates: this.conversion.includes('prevent_duplicates'),
+        multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
+        allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers')
+      }
+
+      axios.post(`/api/v1/tags/${this.tag.id}/add-to-user-power-dialer`, payload)
+        .then(res => {
+          this.$generalNotification(res.data.message)
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          console.log(err)
+        }).finally(() => {
+          this.loading = false
+          this.closeModal()
+        })
+    },
+
+    bulkAddTasks () {
+      if (!this.isBulk || !this.hasSelectedTagIds) {
+        return
+      }
+
+      const payload = {
+        user_id: this.userId,
+        direction: this.direction,
+        prevent_duplicates: this.conversion.includes('prevent_duplicates'),
+        multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
+        allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers'),
+        tag_ids: this.getSelectedTagIds
+      }
+
+      axios.post(`/api/v1/tags/bulk-add-to-user-power-dialer`, payload)
+        .then(res => {
+          this.$generalNotification(res.data.message)
+          this.clearAllSelectedTags()
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          console.log(err)
+        }).finally(() => {
+          this.loading = false
+          this.closeModal()
         })
     }
   }
