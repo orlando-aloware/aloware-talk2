@@ -1,7 +1,6 @@
 <template>
   <div class="bulk-action-menu bulk-action-menu__tags">
     <div class="menu-actions d-flex flex-row">
-
       <div class="items">
         <span>{{ getSelectedCount }} selected</span>
       </div>
@@ -18,12 +17,12 @@
            v-if="selectedTagCategory === ContactTags">
         <span class="d-inline-block"
               tabindex="0"
-              :title="disabledBulkActionsTitle">
+              :title="disabledBulkActionTitle">
           <a id="btn-assign-contacts"
              href="#"
              :disabled="!selectedTagsHasContactsCount"
-             @click.prevent="bulkAssignContacts">
-            <i class="fa fa-layer-group"></i>
+             @click.prevent="isOpenAssignContactsTagDialog = true">
+            <i class="fa fa-sign-in-alt"></i>
             Assign Contacts
           </a>
         </span>
@@ -33,11 +32,11 @@
            v-if="selectedTagCategory === ContactTags">
         <span class="d-inline-block"
               tabindex="0"
-              :title="disabledBulkActionsTitle">
+              :title="disabledBulkActionTitle">
           <a href="#"
              :disabled="!selectedTagsHasContactsCount"
-             @click.prevent="bulkAddtoPowerDialer">
-            <i class="fa fa-layer-group"></i>
+             @click.prevent="isOpenAddTagContactsToPowerDialerDialog = true">
+            <i class="fa fa-phone"></i>
             Add to Power Dialer
           </a>
         </span>
@@ -47,11 +46,11 @@
            v-if="selectedTagCategory === ContactTags">
         <span class="d-inline-block"
               tabindex="0"
-              :title="disabledBulkActionsTitle">
+              :title="disabledBulkActionTitle">
           <a href="#"
              :disabled="!selectedTagsHasContactsCount"
-             @click.prevent="bulkEnrollContacts">
-            <i class="fa fa-layer-group"></i>
+             @click.prevent="isOpenEnrollTagContactsToSequenceDialog = true">
+            <i class="fa fa-user-plus"></i>
             Enroll Contacts
           </a>
         </span>
@@ -65,8 +64,25 @@
           Delete
         </a>
       </div>
-
     </div>
+
+    <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
+                            :is-bulk="true"
+                            :tag="{}"
+                            v-if="selectedTagsHasContactsCount"
+                            @closeAssignContactsTagModal="isOpenAssignContactsTagDialog = false"/>
+
+    <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
+                                      :is-bulk="true"
+                                      :tag="{}"
+                                      v-if="selectedTagsHasContactsCount"
+                                      @closeAddTagContactsToPowerDialer="isOpenAddTagContactsToPowerDialerDialog = false"/>
+
+    <tag-contacts-workflow-enroller :is-show="isOpenEnrollTagContactsToSequenceDialog"
+                                    :is-bulk="true"
+                                    :tag="{}"
+                                    v-if="selectedTagsHasContactsCount"
+                                    @closeEnrollTagContactsToSequenceDialog="isOpenAddTagContactsToPowerDialerDialog = false"/>
 
     <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
                        :is-bulk="true"
@@ -81,11 +97,17 @@
 import { tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
+import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
+import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 
 export default {
   name: 'tags-bulk-action-menu',
 
   components: {
+    TagContactsWorkflowEnroller,
+    TagContactsAddToPowerDialer,
+    AssignContactsByTag,
     DeleteTagDialog
   },
 
@@ -95,7 +117,10 @@ export default {
 
   data () {
     return {
-      isOpenDeleteTagDialog: false
+      isOpenDeleteTagDialog: false,
+      isOpenAssignContactsTagDialog: false,
+      isOpenAddTagContactsToPowerDialerDialog: false,
+      isOpenEnrollTagContactsToSequenceDialog: false
     }
   },
 
@@ -114,24 +139,12 @@ export default {
       return this.selectedTagCategory === this.ContactTags && this.selectedTagsContactsCount > 0
     },
 
-    disabledBulkActionsTitle () {
+    disabledBulkActionTitle () {
       return !this.selectedTagsHasContactsCount ? 'Contacts Count is Empty' : false
     }
   },
 
   methods: {
-    bulkAssignContacts () {
-
-    },
-
-    bulkAddToPowerDialer () {
-
-    },
-
-    bulkEnrollContacts () {
-
-    },
-
     reloadTags () {
       this.$emit('reloadTags')
     }

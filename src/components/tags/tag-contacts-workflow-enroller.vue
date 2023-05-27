@@ -55,6 +55,7 @@
     </ul>
 
     <p class="text-13 mt-2 mb-0"
+       v-if="!isBulk"
        v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
     <template #modal-footer>
@@ -101,6 +102,11 @@ export default {
     isShow: {
       type: Boolean,
       required: true
+    },
+
+    isBulk: {
+      type: Boolean,
+      default: false
     }
   },
 

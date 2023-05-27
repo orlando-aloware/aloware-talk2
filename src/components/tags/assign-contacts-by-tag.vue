@@ -49,7 +49,8 @@
     </div>
 
      <p class="text-13 mt-2 mb-0"
-       v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
+        v-if="!isBulk"
+        v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
@@ -74,6 +75,7 @@ import UserSelector from 'components/generic-selectors/user-selector.vue'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector.vue'
 import { tagsMixin } from 'src/plugins/mixins'
 import axios from 'axios'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'assign-contacts-by-tag',
@@ -96,6 +98,11 @@ export default {
     isShow: {
       type: Boolean,
       required: true
+    },
+
+    isBulk: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -110,6 +117,10 @@ export default {
   },
 
   computed: {
+    ...mapGetters('tagsModule', [
+      'getSelectedTagIds'
+    ]),
+
     openModal: {
       get () {
         return this.isShow
@@ -155,7 +166,11 @@ export default {
     assignContacts () {
       this.loading = true
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want the contacts under this tag to be assigned to this ${this.tabNameLabel}?`, {
+      let msg = `Are you sure you want the contacts under `
+      msg += (this.isBulk ? `these tags` : 'this tag')
+      msg += ` to be assigned to this ${this.tabNameLabel}?`
+
+      this.$bvModal.msgBoxConfirm(msg, {
         title: 'Event Confirmation',
         okTitle: 'Yes',
         cancelTitle: 'No',
@@ -168,23 +183,54 @@ export default {
             return
           }
 
-          let data = {
-            assign_contacts_to: this.tabName,
-            user_id: this.userId,
-            ring_group_id: this.ringGroupId,
-            force: this.distributeContacts
+          if (this.isBulk) {
+            this.bulkAssign()
+            return
           }
 
-          axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, data)
-            .then(res => {
-              this.$generalNotification(res.data.message)
-            }).catch(err => {
-              this.$handleErrors(err.response)
-              console.log(err)
-            }).finally(() => {
-              this.loading = false
-              this.closeModal()
-            })
+          this.assign()
+        })
+    },
+
+    assign () {
+      const data = {
+        assign_contacts_to: this.tabName,
+        user_id: this.userId,
+        ring_group_id: this.ringGroupId,
+        force: this.distributeContacts
+      }
+
+      axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, data)
+        .then(res => {
+          this.$generalNotification(res.data.message)
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          console.log(err)
+        }).finally(() => {
+          this.loading = false
+          this.closeModal()
+        })
+    },
+
+    bulkAssign () {
+      const data = {
+        assign_contacts_to: this.tabName,
+        user_id: this.userId,
+        ring_group_id: this.ringGroupId,
+        force: this.distributeContacts,
+        tag_ids: this.getSelectedTagIds
+      }
+
+      axios.post(`/api/v1/tags/bulk-assign-contacts`, data)
+        .then(res => {
+          this.$generalNotification(res.data.message)
+          this.clearAllSelectedTags()
+        }).catch(err => {
+          this.$handleErrors(err.response)
+          console.log(err)
+        }).finally(() => {
+          this.loading = false
+          this.closeModal()
         })
     }
   }
