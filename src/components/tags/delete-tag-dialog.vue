@@ -67,7 +67,7 @@
 <script>
 import { numeric, requiredIf } from 'vuelidate/lib/validators'
 import { tagsMixin } from 'src/plugins/mixins'
-import axios from 'axios'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'delete-tag-dialog',
@@ -202,41 +202,31 @@ export default {
       }
 
       this.loading = true
+      let xhr = null
 
       if (this.isBulk) {
-        this.bulkDelete()
-        return
+        xhr = API.V1.tags.bulkDelete({
+          data: {
+            category: this.selectedTagCategory,
+            ids: this.getSelectedTagIds
+          }
+        })
+      } else {
+        xhr = API.V1.tags.delete(this.tag.id, {
+          data: {
+            should_delete_contacts: this.confirmDeleteWithContacts
+          }
+        })
       }
 
-      axios.delete(`/api/v1/tag/${this.tag.id}`, {
-        data: {
-          should_delete_contacts: this.confirmDeleteWithContacts
-        }
-      })
+      xhr
         .then(res => {
           this.$generalNotification(res.data.message)
-        })
-        .catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-        })
-        .finally(() => {
-          this.loading = false
-          this.closeModal()
-        })
-    },
 
-    bulkDelete () {
-      axios.delete('/api/v1/tags/bulk-delete', {
-        data: {
-          category: this.selectedTagCategory,
-          ids: this.selectedTagIds
-        }
-      })
-        .then(res => {
-          this.clearAllSelectedTags()
-          this.$generalNotification(res.data.message)
-          this.$emit('reloadTags')
+          if (this.isBulk) {
+            this.clearAllSelectedTags()
+            this.$emit('reloadTags')
+          }
         })
         .catch(err => {
           console.log(err)

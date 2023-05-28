@@ -61,7 +61,7 @@
     <!-- bulk actions -->
     <div class="row mx-0 relative-position">
       <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
-                             @reloadTags="loadTags" />
+                             @reloadTags="getTags" />
     </div>
 
     <!-- table -->

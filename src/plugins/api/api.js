@@ -187,12 +187,24 @@ export default {
         return window.axios.post(`${suffixV1}tag`, params)
       },
 
-      update (tagId, params) {
-        return window.axios.patch(`${suffixV1}tag/${tagId}`, params)
+      update (id, params) {
+        return window.axios.patch(`${suffixV1}tag/${id}`, params)
       },
 
-      assignContactsTo (tagId, params) {
-        return window.axios.post(`${suffixV1}tags/${tagId}/assign-contacts-to`, params)
+      delete (id, params) {
+        return window.axios.delete(`${suffixV1}tag/${id}`, params)
+      },
+
+      bulkDelete (params) {
+        return window.axios.delete(`${suffixV1}tags/bulk-delete`, params)
+      },
+
+      split (id, params) {
+        return window.axios.post(`${suffixV1}tags/${id}/split`, params)
+      },
+
+      assignContactsTo (id, params) {
+        return window.axios.post(`${suffixV1}tags/${id}/assign-contacts-to`, params)
       },
 
       bulkAssignContactsTo (params) {

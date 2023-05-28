@@ -73,7 +73,6 @@
 import UserSelector from 'components/generic-selectors/user-selector.vue'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector.vue'
 import { tagsMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
 import API from 'src/plugins/api/api'
 
 export default {
@@ -116,10 +115,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters('tagsModule', [
-      'getSelectedTagIds'
-    ]),
-
     openModal: {
       get () {
         return this.isShow

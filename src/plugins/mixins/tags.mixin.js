@@ -1,5 +1,5 @@
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import axios from 'axios'
 
 export default {
@@ -18,6 +18,10 @@ export default {
     ...mapState('tagsModule', [
       'selectedTagCategory',
       'selectedTagIds'
+    ]),
+
+    ...mapGetters('tagsModule', [
+      'getSelectedTagIds'
     ]),
 
     tagCategoryName () {

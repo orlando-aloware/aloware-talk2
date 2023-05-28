@@ -22,22 +22,25 @@
     </template>
 
     <p v-html="`Split <span class='font-italic font-weight-bold'>${ tagName }</span> tag into smaller tags.`">
+    <div>
+      <vue-multiselect track-by="value"
+                       label="label"
+                       class="mr-1 chip__clear-blue shrink-options"
+                       placeholder="Select page size"
+                       :searchable="true"
+                       :showNoResults="false"
+                       :close-on-select="true"
+                       :options="options"
+                       :show-labels="false"
+                       :allow-empty="false"
+                       v-model="selectedPageSize"
+                       @select="setSplitPageSize" />
+    </div>
     <p v-show="!allowSplit"
-       class="text-red text-11 mb-0">
+       class="text-red text-11 mb-0 mt-1">
       Contact count is less than or equal to page size.
     </p>
-    <vue-multiselect track-by="value"
-                     label="label"
-                     class="mr-1 chip__clear-blue shrink-options"
-                     placeholder="Select page size"
-                     :searchable="true"
-                     :showNoResults="false"
-                     :close-on-select="true"
-                     :options="options"
-                     :show-labels="false"
-                     :allow-empty="false"
-                     v-model="selectedPageSize"
-                     @select="setSplitPageSize"/>
+
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
@@ -59,7 +62,7 @@
 <script>
 import VueMultiselect from 'vue-multiselect'
 import { tagsMixin } from 'src/plugins/mixins'
-import axios from 'axios'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'tag-contacts-splitter',
@@ -152,26 +155,29 @@ export default {
 
       this.loading = true
 
-      axios.post(`/api/v1/tags/${this.tag.id}/split`, {
+      const payload = {
         page_size: this.splitPageSize
-      }).then(res => {
-        this.loading = false
+      }
 
-        switch (res.status) {
-          case 200:
-            this.$generalNotification('Currently splitting the tag into smaller tags.')
-            break
-          default:
-            this.$generalNotification(res.data.message, 'error')
-        }
-      })
+      API.V1.tags.split(this.tag.id, payload)
+        .then(res => {
+          this.loading = false
+
+          switch (res.status) {
+            case 200:
+              this.$generalNotification('Currently splitting the tag into smaller tags.')
+              break
+            default:
+              this.$generalNotification(res.data.message, 'error')
+          }
+
+          this.closeModal()
+        })
         .catch(err => {
           console.log(err)
           this.$handleErrors(err.response)
           this.loading = false
         })
-
-      this.closeModal()
     }
   }
 }
