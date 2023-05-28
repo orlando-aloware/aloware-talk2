@@ -5,24 +5,25 @@
         <span>{{ getSelectedCount }} selected</span>
       </div>
       <div class="items">
-        <div class="cursor-pointer"
+        <a href=""
              @click="onMoveToTop">
           <i class="fa fa-chevron-up"/>
           Move to Top
-        </div>
-      </div>
-      <div class="items">
-        <div class="cursor-pointer"
-             @click="onMoveToBottom">
-          <i class="fa fa-chevron-down"/>
-          Move to Bottom
-        </div>
+        </a>
       </div>
       <div class="items">
         <a href=""
+           @click="onMoveToBottom">
+          <i class="fa fa-chevron-down"/>
+          Move to Bottom
+        </a>
+      </div>
+      <div class="items">
+        <a href=""
+           class="text-danger"
            :disabled="disabledDelete"
            @click="onDelete">
-          <i class="fa fa-trash text-primary"/>
+          <i class="fa fa-trash text-danger"/>
           Delete
         </a>
       </div>

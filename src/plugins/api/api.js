@@ -209,6 +209,14 @@ export default {
 
       bulkAssignContactsTo (params) {
         return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
+      },
+
+      addTasksToUserPowerDialer (id, params) {
+        return window.axios.post(`${suffixV1}tags/${id}/add-to-user-power-dialer`, params)
+      },
+
+      bulkAddTasksToUserPowerDialer (params) {
+        return window.axios.post(`${suffixV1}tags/bulk-add-to-user-power-dialer`, params)
       }
     },
 

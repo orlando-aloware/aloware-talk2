@@ -91,8 +91,8 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { tagsMixin } from 'src/plugins/mixins'
-import { mapGetters, mapState } from 'vuex'
-import axios from 'axios'
+import { mapState } from 'vuex'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'tag-contacts-add-to-power-dialer',
@@ -136,10 +136,6 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-
-    ...mapGetters('tagsModule', [
-      'getSelectedTagIds'
-    ]),
 
     openModal: {
       get () {
@@ -223,68 +219,42 @@ export default {
         okTitle: 'Yes',
         cancelTitle: 'No',
         size: 'sm',
-        buttonSize: 'sm'
+        buttonSize: 'sm',
+        centered: true
       })
         .then(confirm => {
-          if (!confirm) {
-            this.loading = false
-            return
+          if (confirm) {
+            this.addTasks()
           }
-
-          if (this.isBulk) {
-            this.bulkAddTasks()
-            return
-          }
-
-          this.addTasks()
         })
     },
 
     addTasks () {
-      const payload = {
+      let payload = {
         user_id: this.userId,
         direction: this.direction,
         prevent_duplicates: this.conversion.includes('prevent_duplicates'),
         multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
         allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers')
       }
+      let xhr = null
 
-      axios.post(`/api/v1/tags/${this.tag.id}/add-to-user-power-dialer`, payload)
-        .then(res => {
-          this.$generalNotification(res.data.message)
-        }).catch(err => {
-          this.$handleErrors(err.response)
-          console.log(err)
-        }).finally(() => {
-          this.loading = false
-          this.closeModal()
-        })
-    },
-
-    bulkAddTasks () {
-      if (!this.isBulk || !this.hasSelectedTagIds) {
-        return
+      if (this.isBulk) {
+        payload.tag_ids = this.getSelectedTagIds
+        xhr = API.V1.tags.bulkAddTasksToUserPowerDialer(payload)
+      } else {
+        xhr = API.V1.tags.addTasksToUserPowerDialer(this.tag.id, payload)
       }
 
-      const payload = {
-        user_id: this.userId,
-        direction: this.direction,
-        prevent_duplicates: this.conversion.includes('prevent_duplicates'),
-        multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
-        allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers'),
-        tag_ids: this.getSelectedTagIds
-      }
-
-      axios.post(`/api/v1/tags/bulk-add-to-user-power-dialer`, payload)
+      xhr
         .then(res => {
+          this.loading = false
           this.$generalNotification(res.data.message)
-          this.clearAllSelectedTags()
+          this.closeModal()
         }).catch(err => {
           this.$handleErrors(err.response)
-          console.log(err)
-        }).finally(() => {
           this.loading = false
-          this.closeModal()
+          console.log(err)
         })
     }
   }

@@ -174,9 +174,9 @@ export default {
           this.closeModal()
         })
         .catch(err => {
-          console.log(err)
           this.$handleErrors(err.response)
           this.loading = false
+          console.log(err)
         })
     }
   }
