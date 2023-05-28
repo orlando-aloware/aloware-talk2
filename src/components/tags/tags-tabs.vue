@@ -9,24 +9,20 @@
                   unelevated
                   toggle-color="primary active"
                   color="transparent"
-                  text-color="primary">
+                  text-color="grey-90">
       <template v-slot:one>
-        <div class="options"
-             :class="[currentTab === CommunicationTags ?  'active' : 'text-grey-90']">
+        <div class="options">
           <span class="toggle-button-name">Communication Tags</span>
-          <span class="ml-1 align-middle badge-active-count"
-                :class="[currentTab === CommunicationTags ?  '' : 'grey-light']">
+          <span class="ml-1 align-bottom badge-active-count">
             {{ categoriesCount.communications }}
           </span>
         </div>
       </template>
 
       <template v-slot:two>
-        <div class="options"
-             :class="[currentTab === ContactTags ?  'active' : 'text-grey-90']">
+        <div class="options">
           <span class="toggle-button-name">Contact Tag</span>
-          <span class="ml-1 align-middle badge-active-count"
-                :class="[currentTab === ContactTags ?  '' : 'grey-light']">
+          <span class="ml-1 align-bottom badge-active-count">
             {{ categoriesCount.contacts }}
           </span>
         </div>

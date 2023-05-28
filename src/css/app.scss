@@ -8093,7 +8093,8 @@ span.mention {
   }
 
   button.bg-transparent:hover {
-    .task-count {
+    .task-count,
+    .badge-active-count {
       background: transparent;
     }
   }
@@ -8108,7 +8109,8 @@ span.mention {
     }
 
     &:not(.active) {
-      .task-count {
+      .task-count,
+      .badge-active-count {
         background: $grey-70 !important;
         color: $grey-90 !important;
       }
