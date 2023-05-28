@@ -36,13 +36,16 @@
       <label class="label mt-2 mb-1 font-weight-bold">
         Push Contacts To
       </label>
-      <b-form-radio-group class="w-100"
-                          button-variant="outline-primary"
-                          size="sm"
-                          buttons
-                          :options="directionOptions"
-                          v-model="direction">
-      </b-form-radio-group>
+      <q-btn-toggle v-model="direction"
+                    :options="directionOptions"
+                    class="custom-toggle-button"
+                    no-caps
+                    dense
+                    spread
+                    unelevated
+                    toggle-color="primary active"
+                    color="transparent"
+                    text-color="grey-90"/>
 
       <b-form-checkbox class="mx-2 mt-2"
                        :value="option.value"
@@ -152,16 +155,17 @@ export default {
       return [
         {
           value: ImportConstants.BOTTOM,
-          text: 'Bottom'
-        }, {
+          label: 'Bottom'
+        },
+        {
           value: ImportConstants.TOP,
-          text: 'Top'
+          label: 'Top'
         }
       ]
     },
 
     isAllowedInternationalNumbers () {
-      return this.currentCompany.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
+      return this.currentCompany?.international_tier !== CompanyTiers.INTERNATIONAL_TIER_1
     },
 
     conversionOptions () {

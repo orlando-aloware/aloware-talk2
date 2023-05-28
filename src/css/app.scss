@@ -8108,8 +8108,6 @@ span.mention {
     }
 
     &:not(.active) {
-      color: transparent !important;
-
       .task-count {
         background: $grey-70 !important;
         color: $grey-90 !important;
@@ -8123,11 +8121,13 @@ span.mention {
       text-align: center;
       font-family: 'Inter', sans-serif !important;
 
-      .task-status-name {
+      .task-status-name,
+      .toggle-button-name {
         margin-top: -2px;
       }
 
-      .task-count {
+      .task-count,
+      .badge-active-count {
         background: rgba(255, 255, 255, 0.22);
         border-radius: 5px;
         font-size: 10px;

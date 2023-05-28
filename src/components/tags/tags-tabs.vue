@@ -7,24 +7,26 @@
                   dense
                   spread
                   unelevated
-                  :toggle-color="categorySelectToggleColor"
+                  toggle-color="primary active"
                   color="transparent"
                   text-color="primary">
       <template v-slot:one>
-        <div :class="[currentTab === CommunicationTags ?  'active' : 'text-grey-90']">
-          <span>Communication Tags</span>
-          <span class="ml-1 align-middle badge"
-                :class="[currentTab === CommunicationTags ?  'badge-primary' : 'grey-light']">
+        <div class="options"
+             :class="[currentTab === CommunicationTags ?  'active' : 'text-grey-90']">
+          <span class="toggle-button-name">Communication Tags</span>
+          <span class="ml-1 align-middle badge-active-count"
+                :class="[currentTab === CommunicationTags ?  '' : 'grey-light']">
             {{ categoriesCount.communications }}
           </span>
         </div>
       </template>
 
       <template v-slot:two>
-        <div :class="[currentTab === ContactTags ?  'active' : 'text-grey-90']">
-          <span>Contact Tag</span>
-          <span class="ml-1 align-middle badge"
-                :class="[currentTab === ContactTags ?  'badge-primary' : 'grey-light']">
+        <div class="options"
+             :class="[currentTab === ContactTags ?  'active' : 'text-grey-90']">
+          <span class="toggle-button-name">Contact Tag</span>
+          <span class="ml-1 align-middle badge-active-count"
+                :class="[currentTab === ContactTags ?  '' : 'grey-light']">
             {{ categoriesCount.contacts }}
           </span>
         </div>
@@ -69,14 +71,6 @@ export default {
 
   mounted () {
     this.currentTab = this.selectedTagCategory
-  },
-
-  computed: {
-    categorySelectToggleColor () {
-      return (this.$route.params.id && this.$route.params.status !== this.statusText
-        ? 'bg-grey-80'
-        : 'primary') + ' active'
-    }
   },
 
   watch: {
