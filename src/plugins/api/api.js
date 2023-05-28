@@ -181,6 +181,14 @@ export default {
     tags: {
       get (params) {
         return window.axios.get(`${suffixV1}tag`, params)
+      },
+
+      assignContactsTo (tagId, params) {
+        return window.axios.post(`${suffixV1}tags/${tagId}/assign-contacts-to`, params)
+      },
+
+      bulkAssignContactsTo (params) {
+        return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
       }
     },
 

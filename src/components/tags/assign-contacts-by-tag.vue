@@ -34,7 +34,6 @@
         <p>Assign the leads evenly and randomly between the users on this ring group</p>
         <ring-group-selector class="text-13"
                              v-model="ringGroupId"
-                             :force-remove-missing-values="true"
                              :generic-multiselect="false"
                              @change="setRingGroupId"/>
       </b-tab>
@@ -74,8 +73,8 @@
 import UserSelector from 'components/generic-selectors/user-selector.vue'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector.vue'
 import { tagsMixin } from 'src/plugins/mixins'
-import axios from 'axios'
 import { mapGetters } from 'vuex'
+import api from 'src/plugins/api/api'
 
 export default {
   name: 'assign-contacts-by-tag',
@@ -175,66 +174,40 @@ export default {
         okTitle: 'Yes',
         cancelTitle: 'No',
         size: 'sm',
-        buttonSize: 'sm'
+        buttonSize: 'sm',
+        centered: true
       })
         .then(confirm => {
-          if (!confirm) {
-            this.loading = false
-            return
+          if (confirm) {
+            this.assign()
           }
-
-          if (this.isBulk) {
-            this.bulkAssign()
-            return
-          }
-
-          this.assign()
         })
     },
 
     assign () {
-      const payload = {
+      let payload = {
         assign_contacts_to: this.tabName,
         user_id: this.userId,
         ring_group_id: this.ringGroupId,
         force: this.distributeContacts
       }
+      let xhr = null
 
-      axios.post(`/api/v1/tags/${this.tag.id}/assign-contacts-to`, payload)
+      if (this.isBulk) {
+        payload.tag_ids = this.getSelectedTagIds
+        xhr = api.V1.tags.bulkAssignContactsTo(payload)
+      } else {
+        xhr = api.V1.tags.assignContactsTo(this.tag.id, payload)
+      }
+
+      xhr
         .then(res => {
+          this.loading = false
           this.$generalNotification(res.data.message)
+          this.closeModal()
         }).catch(err => {
           this.$handleErrors(err.response)
           console.log(err)
-        }).finally(() => {
-          this.loading = false
-          this.closeModal()
-        })
-    },
-
-    bulkAssign () {
-      if (!this.isBulk || !this.hasSelectedTagIds) {
-        return
-      }
-
-      const payload = {
-        assign_contacts_to: this.tabName,
-        user_id: this.userId,
-        ring_group_id: this.ringGroupId,
-        force: this.distributeContacts,
-        tag_ids: this.getSelectedTagIds
-      }
-
-      axios.post(`/api/v1/tags/bulk-assign-contacts`, payload)
-        .then(res => {
-          this.$generalNotification(res.data.message)
-          this.clearAllSelectedTags()
-        }).catch(err => {
-          this.$handleErrors(err.response)
-          console.log(err)
-        }).finally(() => {
-          this.loading = false
-          this.closeModal()
         })
     }
   }
