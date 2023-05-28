@@ -127,7 +127,7 @@ import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import { tagsMixin } from 'src/plugins/mixins'
 import VueMultiselect from 'vue-multiselect'
 import { required, numeric, maxLength } from 'vuelidate/lib/validators'
-import axios from 'axios'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'tag-form',
@@ -308,26 +308,24 @@ export default {
     saveTag () {
       this.$v.$touch()
       this.loading = true
-      let url = '/api/v1/tag'
       let xhr = null
-      let message = ''
+      let msg = ''
 
       if (this.editableTag) {
         // edit/update api
-        url += `/${this.editableTag.id}`
         const cloneTag = (({ category, ...o }) => o)(this.tag) // except category
-        xhr = axios.patch(url, this.$jsonClone(cloneTag))
-        message = this.tagCategoryName + ' tag updated successfully'
+        xhr = API.V1.tags.update(this.editableTag.id, this.$jsonClone(cloneTag))
+        msg = this.tagCategoryName + ' tag updated successfully'
       } else {
         // add api
-        xhr = axios.post(url, this.tag)
-        message = this.tagCategoryName + ' tag created successfully'
+        xhr = API.V1.tags.create(this.tag)
+        msg = this.tag.name + ' tag created successfully'
       }
 
       xhr
         .then(() => {
           this.loading = false
-          this.$generalNotification(message)
+          this.$generalNotification(msg)
           this.closeTagForm()
         })
         .catch(err => {

@@ -74,7 +74,7 @@ import UserSelector from 'components/generic-selectors/user-selector.vue'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector.vue'
 import { tagsMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
-import api from 'src/plugins/api/api'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'assign-contacts-by-tag',
@@ -195,9 +195,9 @@ export default {
 
       if (this.isBulk) {
         payload.tag_ids = this.getSelectedTagIds
-        xhr = api.V1.tags.bulkAssignContactsTo(payload)
+        xhr = API.V1.tags.bulkAssignContactsTo(payload)
       } else {
-        xhr = api.V1.tags.assignContactsTo(this.tag.id, payload)
+        xhr = API.V1.tags.assignContactsTo(this.tag.id, payload)
       }
 
       xhr
