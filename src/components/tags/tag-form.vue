@@ -63,7 +63,9 @@
 
         <b-col class="px-0">
           <b-form-group class="font-weight-light text-13"
-                        label="Category">
+                        label="Category"
+                        invalid-feedback="Please select a tag category"
+                        :state="validateState('category')">
             <vue-multiselect track-by="value"
                              label="name"
                              class="mr-1 chip__clear-blue shrink-options"
@@ -84,9 +86,19 @@
       </b-row>
 
       <b-form-group class="font-weight-light text-13"
-                    label="Description (Optional)">
+                    invalid-feedback="The description may not be greater than 190 characters."
+                    :state="validateState('description')">
+        <template #label>
+          <b-row>
+            <b-col class="px-0 text-left">Description (Optional)</b-col>
+            <b-col class="px-0 text-right">
+              <span :class="[tag?.description.length > 190 ? 'text-danger font-weight-bold' : '']">{{ tag.description.length }}</span>/190
+            </b-col>
+          </b-row>
+
+        </template>
         <b-form-textarea id="textarea"
-                         v-model="tag.description"
+                         v-model.trim="$v.tag.description.$model"
                          placeholder="Enter tag description"
                          rows="3"/>
       </b-form-group>
@@ -100,6 +112,7 @@
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
+                    :disabled="$v.$invalid"
                     @click.prevent="saveTag">
               {{ submitButtonLabel }}
             </button>
@@ -113,7 +126,7 @@
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import { tagsMixin } from 'src/plugins/mixins'
 import VueMultiselect from 'vue-multiselect'
-import { required, numeric } from 'vuelidate/lib/validators'
+import { required, numeric, maxLength } from 'vuelidate/lib/validators'
 import axios from 'axios'
 
 export default {
@@ -148,9 +161,9 @@ export default {
     return {
       loading: false,
       tag: {
-        name: null,
+        name: '',
         color: '#CA66D6',
-        description: null,
+        description: '',
         category: null
       },
       category: null,
@@ -198,6 +211,9 @@ export default {
         category: {
           required,
           numeric
+        },
+        description: {
+          maxLength: maxLength(190)
         }
       }
     }
@@ -277,9 +293,9 @@ export default {
 
     resetForm () {
       this.tag = {
-        name: null,
+        name: '',
         color: '#CA66D6',
-        description: null,
+        description: '',
         category: null
       }
 
@@ -308,16 +324,17 @@ export default {
         message = this.tagCategoryName + ' tag created successfully'
       }
 
-      xhr.then(() => {
-        this.loading = false
-        this.$generalNotification(message)
-      })
-        .catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
+      xhr
+        .then(() => {
+          this.loading = false
+          this.$generalNotification(message)
+          this.closeTagForm()
         })
-
-      this.closeTagForm()
+        .catch(err => {
+          this.loading = false
+          this.$handleErrors(err.response)
+          console.log(err)
+        })
     }
   }
 }
