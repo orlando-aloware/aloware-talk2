@@ -362,6 +362,10 @@ export default {
       workflows: {
         enroll (workflowId, params) {
           return window.axios.post(`${suffixV1}automations/workflows/${workflowId}/sequence-contacts`, params)
+        },
+
+        bulkEnroll (workflowId, params) {
+          return window.axios.post(`${suffixV1}automations/workflows/${workflowId}/bulk-tags-sequence-contacts`, params)
         }
       }
     },

@@ -80,8 +80,7 @@
 <script>
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import { tagsMixin } from 'src/plugins/mixins'
-import axios from 'axios'
-import { mapGetters } from 'vuex'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'tag-contacts-workflow-enroller',
@@ -119,10 +118,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters('tagsModule', [
-      'getSelectedTagIds'
-    ]),
-
     openModal: {
       get () {
         return this.isShow
@@ -151,56 +146,32 @@ export default {
     enrollContacts () {
       this.loading = true
 
+      let payload = {
+        model: 'tag'
+      }
+      let xhr = null
+
       if (this.isBulk) {
-        this.bulkEnroll()
-        return
+        payload.tag_ids = this.getSelectedTagIds
+        xhr = API.V1.automations.workflows.bulkEnroll(this.selectedWorkflowId, payload)
+      } else {
+        payload.id = this.tag.id
+        xhr = API.V1.automations.workflows.enroll(this.selectedWorkflowId, payload)
       }
 
-      this.enroll()
-    },
-
-    enroll  () {
-      const payload = {
-        model: 'tag',
-        id: this.tag.id
-      }
-
-      axios.post(`/api/v1/automations/workflows/${this.selectedWorkflowId}/sequence-contacts`, payload)
+      xhr
         .then(res => {
-          this.reset()
-          this.$generalNotification(res.data.message)
-        }).catch(err => {
-          const msg = err.status_code !== 500
-            ? err.response.data.message
-            : 'Encountered error while enrolling contacts'
-          this.$handleErrors(msg)
-          console.log(err)
-        }).finally(() => {
           this.loading = false
+          this.$generalNotification(res.data.message)
           this.closeModal()
         })
-    },
-
-    bulkEnroll () {
-      const payload = {
-        model: 'tag',
-        tag_ids: this.getSelectedTagIds
-      }
-
-      axios.post(`/api/v1/automations/workflows/${this.selectedWorkflowId}/bulk-tags-sequence-contacts`, payload)
-        .then(res => {
-          this.reset()
-          this.$generalNotification(res.data.message)
-          this.clearAllSelectedTags()
-        }).catch(err => {
+        .catch(err => {
           const msg = err.status_code !== 500
             ? err.response.data.message
             : 'Encountered error while enrolling contacts'
           this.$handleErrors(msg)
-          console.log(err)
-        }).finally(() => {
           this.loading = false
-          this.closeModal()
+          console.log(err)
         })
     }
   }

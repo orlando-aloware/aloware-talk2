@@ -82,7 +82,7 @@
                                     :is-bulk="true"
                                     :tag="{}"
                                     v-if="selectedTagsHasContactsCount"
-                                    @closeEnrollTagContactsToSequenceDialog="isOpenAddTagContactsToPowerDialerDialog = false"/>
+                                    @closeEnrollTagContactsToSequenceDialog="isOpenEnrollTagContactsToSequenceDialog = false"/>
 
     <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
                        :is-bulk="true"
