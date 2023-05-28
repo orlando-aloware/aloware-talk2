@@ -92,7 +92,7 @@
           <b-row>
             <b-col class="px-0 text-left">Description (Optional)</b-col>
             <b-col class="px-0 text-right">
-              <span :class="[tag?.description.length > 190 ? 'text-danger font-weight-bold' : '']">{{ tag.description.length }}</span>/190
+              <span :class="[tagDescriptionLength > 190 ? 'text-danger font-weight-bold' : '']">{{ tagDescriptionLength }}</span>/190
             </b-col>
           </b-row>
 
@@ -161,9 +161,9 @@ export default {
     return {
       loading: false,
       tag: {
-        name: '',
+        name: null,
         color: '#CA66D6',
-        description: '',
+        description: null,
         category: null
       },
       category: null,
@@ -247,6 +247,12 @@ export default {
 
     submitButtonLabel () {
       return this.editableTag ? 'Update' : 'Add'
+    },
+
+    tagDescriptionLength () {
+      return (this.tag && this.tag?.description)
+        ? this.tag.description.length
+        : 0
     }
   },
 
@@ -293,9 +299,9 @@ export default {
 
     resetForm () {
       this.tag = {
-        name: '',
+        name: null,
         color: '#CA66D6',
-        description: '',
+        description: null,
         category: null
       }
 
@@ -319,7 +325,7 @@ export default {
       } else {
         // add api
         xhr = API.V1.tags.create(this.tag)
-        msg = this.tag.name + ' tag created successfully'
+        msg = this.tagCategoryName + ' tag created successfully'
       }
 
       xhr
