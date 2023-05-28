@@ -715,6 +715,7 @@ export default {
         value: this.channelDefaultFilterModel.filter.tags
       })
       this.onApplyFilter(this.channelDefaultFilterModel.filter)
+      this.setInboxShowMyContacts(false)
     }
 
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
@@ -823,7 +824,8 @@ export default {
       'toggleFilterModelForm',
       'toggleFilterDialog',
       'setIsInboxFiltersLoaded',
-      'updateChannelChangedFilterFields'
+      'updateChannelChangedFilterFields',
+      'setInboxShowMyContacts'
     ]),
 
     onResetFilters () {

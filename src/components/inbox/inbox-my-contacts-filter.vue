@@ -51,6 +51,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('inbox', [
+      'setInboxShowMyContacts'
+    ]),
+
     myContactsFilterChange () {
       if (!this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts) {
         return
@@ -69,11 +73,7 @@ export default {
 
       // for inbox channels
       this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
-    },
-
-    ...mapActions('inbox', [
-      'setInboxShowMyContacts'
-    ])
+    }
   },
 
   watch: {
