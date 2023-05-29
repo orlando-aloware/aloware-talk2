@@ -703,7 +703,7 @@ export default {
 
     shouldAllowContextMenuButton (item, broadcast) {
       if (item.name === 'rename') {
-        return this.checked.length === 0 && (this.checked.length === 1 && this.checked[0]?.id === broadcast.id)
+        return this.checked.length === 0 || (this.checked.length === 1 && this.checked[0]?.id === broadcast.id) || (this.checked.length > 1 && !this.checked.map(item => item.id).includes(broadcast.id))
       }
 
       if (item.name === 'delete') {
