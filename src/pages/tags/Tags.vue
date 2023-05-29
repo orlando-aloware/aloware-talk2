@@ -12,7 +12,7 @@
       </b-col>
 
       <!-- category tabs -->
-      <b-col class="d-flex align-self-center">
+      <b-col class="d-flex align-self-center justify-around">
         <tags-tabs :categories-count="tagCategoriesCount"
                    @loadTags="loadTags">
         </tags-tabs>
