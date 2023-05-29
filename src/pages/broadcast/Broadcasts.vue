@@ -214,9 +214,33 @@
                    no-parent-event
                    @hide="onPopupHide()"
                    v-model="popupOpen">
-      <div class="p-5">
-        Hello world
-      </div>
+      <q-card>
+        <q-card-section>
+          <template v-if="popupAction === 'delete'">
+            <span class="text-h6">Delete broadcast</span>
+            <p v-if="popupActionList.length <= 1">Are you sure you want to delete this broadcast?</p>
+            <p v-else>Are you sure you want to delete <span class="text-bold">{{ popupActionList.length }}</span> broadcasts?</p>
+            <div class="d-flex">
+              <q-btn class="px-1 flex-grow-1"
+                     color="white"
+                     text-color="black"
+                     unelevated
+                     @click="onCancelPopup">
+                <span class="px-2">Cancel</span>
+              </q-btn>
+              <q-btn class="ml-3 flex-grow-1"
+                     color="danger"
+                     unelevated
+                     :loading="popupLoadingAction"
+                     @click="deleteBroadcast(popupActionList)">
+                <span class="px-2">Delete</span>
+              </q-btn>
+            </div>
+          </template>
+          <template v-if="popupAction === 'rename'">
+          </template>
+        </q-card-section>
+      </q-card>
     </q-popup-proxy>
   </div>
 </template>
@@ -370,7 +394,10 @@ export default {
     contextMenuListItems,
     contextMenuTargetId: null,
     contextMenuOpen: false,
-    popupOpen: false
+    popupOpen: false,
+    popupAction: '',
+    popupActionList: [],
+    popupLoadingAction: false
   }),
 
   mounted () {
@@ -544,19 +571,22 @@ export default {
 
       // In case there are checked items, and the context menu is from the selected list
       if (this.checked.length > 1 && isRowItemOnChecked) {
-        broadcasts = this.cheked
+        broadcasts = this.checked
       }
+
+      this.popupActionList = broadcasts
 
       switch (item.name) {
         case 'rename':
           this.popupOpen = true
-          return this.renameBroadcast(broadcasts)
+          this.popupAction = 'rename'
+          break
         case 'delete':
           this.popupOpen = true
-          return
-          // return this.deleteBroadcast(broadcasts)
+          this.popupAction = 'delete'
+          break
         case 'activity':
-          return this.showBroadcastActivity(broadcasts)
+          break
       }
     },
 
@@ -598,6 +628,7 @@ export default {
 
     // CONTEXT MENU ACTIONS
     async deleteBroadcast (broadcasts) {
+      this.popupLoadingAction = true
       let deletedCount = 0
 
       for (let broadcast of broadcasts) {
@@ -612,6 +643,11 @@ export default {
             })
           })
       }
+
+      this.popupLoadingAction = false
+      this.popupOpen = false
+      this.popupAction = ''
+      this.popupActionList = []
 
       if (deletedCount !== broadcasts.length) {
         this.$generalNotification(`Not all broadcasts were deleted. ${deletedCount} of ${broadcasts.length} were deleted.`, 'error')
