@@ -1,7 +1,7 @@
 <template>
   <div class="tags position-relative"
        v-if="authenticated">
-    <b-row class="tags__header px-1 py-3">
+    <b-row class="tags__header d-flex px-1 py-3">
       <!-- search -->
       <b-col class="d-flex align-self-center">
         <search placeholder="Search ID or name"

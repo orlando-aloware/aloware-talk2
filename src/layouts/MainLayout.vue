@@ -1405,6 +1405,7 @@ export default {
         this.getDispositionStatuses()
         this.getCallDispositions()
         this.getLeadSources()
+        this.getMyQueueList()
       })
     },
 
@@ -2357,7 +2358,10 @@ export default {
     },
 
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
-    ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
+    ...mapActions('powerDialer', [
+      'setFinishedPowerDialerSession',
+      'getMyQueueList'
+    ]),
     ...mapActions([
       'resetVuex',
       'setUsage',

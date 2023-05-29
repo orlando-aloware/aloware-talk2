@@ -26,10 +26,26 @@
     </p>
 
     <div class="pt-2">
-      <label class="label mt-2 mb-1">Add Tasks to this User's Power Dialer (My Queue)</label>
-      <user-selector :generic-styling="false"
-                     v-model="userId"
-                     @change="setUserId"/>
+      <label class="label mb-3">Add Tasks to this User's Power Dialer List</label>
+      <b-row class="no-gutters">
+        <b-col class="mr-1">
+          <b-form-group class="font-weight-light text-13 mb-0"
+                        label="User">
+            <user-selector :generic-styling="false"
+                           v-model="userId"
+                           @change="setUserId"/>
+          </b-form-group>
+        </b-col>
+
+        <b-col class="ml-1">
+          <b-form-group class="font-weight-light text-13 mb-0"
+                        label="Power Dialer List">
+            <power-dialer-list-selector v-model="powerDialerListId"
+                                        @change="setPowerDialerListId"/>
+          </b-form-group>
+        </b-col>
+      </b-row>
+
     </div>
 
     <div class="py-3">
@@ -91,8 +107,9 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { tagsMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import API from 'src/plugins/api/api'
+import PowerDialerListSelector from 'components/power-dialer/power-dialer-list-selector.vue'
 
 export default {
   name: 'tag-contacts-add-to-power-dialer',
@@ -102,6 +119,7 @@ export default {
   ],
 
   components: {
+    PowerDialerListSelector,
     UserSelector,
     InformationCircleIcon
   },
@@ -130,12 +148,17 @@ export default {
       conversion: [
         'prevent_duplicates'
       ],
-      userId: null
+      userId: null,
+      powerDialerListId: this.myQueueId
     }
   },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('powerDialer', [
+      'myQueueId'
+    ]),
 
     openModal: {
       get () {
@@ -207,6 +230,10 @@ export default {
       this.userId = userId
     },
 
+    setPowerDialerListId (listId) {
+      this.powerDialerListId = listId
+    },
+
     addTasksToPowerDialer () {
       this.loading = true
 
@@ -235,7 +262,8 @@ export default {
         direction: this.direction,
         prevent_duplicates: this.conversion.includes('prevent_duplicates'),
         multiple_phone_numbers: this.conversion.includes('multiple_phone_numbers'),
-        allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers')
+        allow_international_phone_numbers: this.conversion.includes('allow_international_phone_numbers'),
+        power_dialer_list_id: this.powerDialerListId
       }
       let xhr = null
 
