@@ -122,6 +122,35 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn icon="img:app-icons/menu/wallboard_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           flat
+           :to="{ name: 'Wallboard' }"
+           :ripple="false"
+           v-show="isActive('Wallboard')">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Wallboard</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn icon="img:app-icons/menu/wallboard_grey.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           flat
+           :to="{ name: 'Wallboard' }"
+           :ripple="false"
+           v-show="!isActive('Wallboard')">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Wallboard</span>
+      </q-tooltip>
+    </q-btn>
+
     <q-btn :ripple="false"
            icon="img:app-icons/menu/calendar_gray.svg"
            align="center"
@@ -523,6 +552,10 @@ export default {
       }
 
       if (['Settings Tab'].includes(this.$route.name) && name === 'Settings') {
+        return true
+      }
+
+      if (['Wallboard Agents', 'Wallboard Calls'].includes(this.$route.name) && name === 'Wallboard') {
         return true
       }
 

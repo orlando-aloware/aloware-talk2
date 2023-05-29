@@ -11,6 +11,10 @@ const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
 const PowerDialerSession = () => import('src/pages/power-dialer/PowerDialerSession')
+const Wallboard = () => import('pages/wallboard/Wallboard.vue')
+const WallboardOverview = () => import('pages/wallboard/WallboardOverview.vue')
+const WallboardAgents = () => import('pages/wallboard/WallboardAgents.vue')
+const WallboardCalls = () => import('pages/wallboard/WallboardCalls.vue')
 const Calendar = () => import('src/pages/calendar/Calendar.vue')
 const Tags = () => import('pages/tags/Tags.vue')
 const Stats = () => import('pages/stats/Stats.vue')
@@ -253,6 +257,47 @@ const routes = [
         },
         path: 'power-dialer/session',
         component: PowerDialerSession
+      },
+      {
+        name: 'Wallboard',
+        path: 'wallboard',
+        component: Wallboard,
+        meta: {
+          title: 'Wallboard',
+          id: 'wallboard'
+        },
+        redirect: {
+          path: 'wallboard/overview'
+        },
+        children: [
+          {
+            name: 'Wallboard',
+            meta: {
+              title: 'Wallboard',
+              id: 'wallboard-overview'
+            },
+            path: 'overview',
+            component: WallboardOverview
+          },
+          {
+            name: 'Wallboard Agents',
+            meta: {
+              title: 'Wallboard',
+              id: 'wallboard-agents'
+            },
+            path: 'agents',
+            component: WallboardAgents
+          },
+          {
+            name: 'Wallboard Calls',
+            meta: {
+              title: 'Wallboard',
+              id: 'wallboard-calls'
+            },
+            path: ':id(queued|live|parked)+-calls',
+            component: WallboardCalls
+          }
+        ]
       },
       {
         path: 'calendar',

@@ -2,9 +2,10 @@
   <div class="inbox-wrapper border-right">
     <div class="mobile-header align-items-center justify-content-between pr-3"
          v-if="isInboxTaskOpened">
-      <div class="d-flex h-100 align-items-center justify-content-center">
+      <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
         <back-button @click="back"/>
-        <span v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
+        <span class="truncated-text"
+              v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
         <inbox-my-contacts-filter />
       </div>
       <profile class="p-0"

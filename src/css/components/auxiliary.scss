@@ -404,10 +404,15 @@ iframe > html {
 }
 
 .session-settings-title {
-  overflow: hidden;
+  max-width: 100%;
+  word-break: break-word;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 250px;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-line-clamp: 1; /* number of lines to show */
+          line-clamp: 1;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
 }
 
 #session-list-name {
@@ -431,5 +436,15 @@ iframe > html {
   #referrizer-crm {
     width: calc(100% + 0px);
     height: 100%;
+  }
+}
+
+.session-settings-sidebar {
+  .q-item__section {
+    max-width: 135px;
+
+    button {
+      max-height: 32px;
+    }
   }
 }

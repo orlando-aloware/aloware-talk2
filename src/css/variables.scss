@@ -120,6 +120,7 @@ $grey-30: #A3A3A3;
 $grey-20: #6F6F6F;
 $grey-10: #828282;
 $grey-9: #767C89;
+$grey-11: #495057;
 
 // Red
 $red-100: #C4183C;
@@ -407,7 +408,9 @@ $orange-light: #FFF9F7;
 // System Colors
 $blue: $primary;
 $orange: #ff9f1c;
+$orange2: #F15A22;
 $red: $danger;
+$turquoise: #00c0cc;
 $light-green: #cff8df;
 $light-green2: #F2FBF6;
 $light-green3: #B2EBC8;
@@ -421,6 +424,7 @@ $light-blue1: #D3E2FF;
 $light-blue3: rgba(37, 110, 255, 0.06);
 $light-blue4: #EEF3FF;
 $light-orange: #fff2df;
+$light-orange2: #f2994a;
 
 $yellow-1: #F2C94C;
 $purple-2: #BB6BD9;
@@ -437,3 +441,36 @@ $upcoming-reminder: #8956F8;
 $past-reminder: rgba($upcoming-reminder, 0.6);
 $canceled-reminder: $upcoming-reminder;
 $completed-event: #00BF4A;
+
+// Wallboard colors
+$agent-status-offline: $grey-80;
+$agent-status-available: $success;
+$agent-status-busy: $orange2;
+$agent-status-on-break: $light-orange2;
+$agent-status-wrap-up: $purple-2;
+$agent-status-on-call: $light-blue1;
+$agent-status-ringing: $turquoise;
+$agent-status-auto-dial: $grey-93;
+$agent-status-sentry: $dark;
+$agent-status-all: transparent;
+
+@include bg-color('agent-status-offline', $agent-status-offline, true);
+@include bg-color('agent-status-available', $agent-status-available, true);
+@include bg-color('agent-status-busy', $agent-status-busy, true);
+@include bg-color('agent-status-on-break', $agent-status-on-break, true);
+@include bg-color('agent-status-wrap-up', $agent-status-wrap-up, true);
+@include bg-color('agent-status-on-call', $agent-status-on-call, true);
+@include bg-color('agent-status-ringing', $agent-status-ringing, true);
+@include bg-color('agent-status-auto-dial', $agent-status-auto-dial, true);
+@include bg-color('agent-status-sentry', $agent-status-sentry, true);
+@include bg-color('agent-status-all', $agent-status-all, true);
+
+@include text-color('agent-status-offline', $agent-status-offline);
+@include text-color('agent-status-available', $agent-status-available);
+@include text-color('agent-status-busy', $agent-status-busy);
+@include text-color('agent-status-on-break', $agent-status-on-break);
+@include text-color('agent-status-wrap-up', $agent-status-wrap-up);
+@include text-color('agent-status-on-call', $agent-status-on-call);
+@include text-color('agent-status-ringing', $agent-status-ringing);
+@include text-color('agent-status-auto-dial', $agent-status-auto-dial);
+@include text-color('agent-status-sentry', $agent-status-sentry);

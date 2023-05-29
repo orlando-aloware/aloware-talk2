@@ -12,7 +12,8 @@
              ref="communicationNotes"
              dense
              @input="changeNote"
-             @blur="onBlur">
+             @blur="onBlur"
+             @keyup.esc="onBlur">
     </q-input>
     <div class="comm-notes-state d-flex w-100 justify-end">
       <span class="text-muted"
@@ -52,6 +53,11 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+
+    autoFocus: {
+      required: false,
+      default: false
     }
   },
 
@@ -71,6 +77,12 @@ export default {
 
   created () {
     this.showNote()
+  },
+
+  mounted () {
+    if (this.autoFocus) {
+      this.$refs.communicationNotes.focus()
+    }
   },
 
   methods: {
