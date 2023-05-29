@@ -12465,7 +12465,9 @@ h1.contact-list-name-label {
 
         tr {
           .context-menu {
-            visibility: hidden;
+            &:not(.keep-visible) {
+              visibility: hidden;
+            }
 
             .dropdown-toggle::after {
               display: none;

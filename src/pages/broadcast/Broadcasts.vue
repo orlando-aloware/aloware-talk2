@@ -174,13 +174,15 @@
               </td>
               <td :key="`c-${colIndex}`"
                   v-else-if="col.field == 'actions'">
-                <div class="context-menu">
+                <div class="context-menu"
+                     :class="[isSelectedRow(row) ? 'keep-visible' : '']">
                   <b-dropdown class="position-absolute"
                               :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
                               :id="getContextMenuTargetElementId(row)"
                               size="sm"
                               right
-                              @click="onContextMenuClicked(row)">
+                              @show="onContextMenuShow(row)"
+                              @hide="onContextMenuHide(row)">
                     <template #button-content>
                       <ellipse-icon/>
                     </template>
@@ -189,7 +191,7 @@
                                      dense
                                      clickable
                                      v-for="(item, id) in contextMenuListItems"
-                                     @click="onContextMenuButtonClicked(item)">
+                                     @click="onContextMenuButtonClicked(item, row)">
                       <div class="d-flex align-items-center">
                         <img class="mr-2"
                             :src="`app-icons/menu/${item.icon}`" />
@@ -208,6 +210,14 @@
         </template>
       </datatable>
     </div>
+    <q-popup-proxy :target="contextMenuTarget ?? true"
+                   no-parent-event
+                   @hide="onPopupHide()"
+                   v-model="popupOpen">
+      <div class="p-5">
+        Hello world
+      </div>
+    </q-popup-proxy>
   </div>
 </template>
 
@@ -359,7 +369,8 @@ export default {
     BroadcastStatuses,
     contextMenuListItems,
     contextMenuTargetId: null,
-    contextMenuOpen: false
+    contextMenuOpen: false,
+    popupOpen: false
   }),
 
   mounted () {
@@ -509,18 +520,43 @@ export default {
       this.checked.push(row)
     },
 
-    onContextMenuClicked (row) {
+    onContextMenuShow (row) {
+      this.contextMenuOpen = true
       this.contextMenuTargetId = row.id
     },
 
-    onContextMenuButtonClicked (item) {
+    onContextMenuHide () {
+      this.contextMenuOpen = false
+
+      if (!this.popupOpen) {
+        this.contextMenuTargetId = null
+      }
+    },
+
+    onContextMenuButtonClicked (item, broadcast) {
+      let broadcasts = []
+      let isRowItemOnChecked = this.checked.find(item => item.id === broadcast.id)
+
+      // In case the list is empty, or the checked item is the same from the menu
+      if (this.checked.length === 0 || (this.checked.length === 1 && isRowItemOnChecked) || (this.checked.length > 0 && !isRowItemOnChecked)) {
+        broadcasts = [broadcast]
+      }
+
+      // In case there are checked items, and the context menu is from the selected list
+      if (this.checked.length > 1 && isRowItemOnChecked) {
+        broadcasts = this.cheked
+      }
+
       switch (item.name) {
         case 'rename':
-          return this.renameBroadcast()
+          this.popupOpen = true
+          return this.renameBroadcast(broadcasts)
         case 'delete':
-          return this.deleteBroadcast()
+          this.popupOpen = true
+          return
+          // return this.deleteBroadcast(broadcasts)
         case 'activity':
-          return this.showBroadcastActivity()
+          return this.showBroadcastActivity(broadcasts)
       }
     },
 
@@ -556,12 +592,15 @@ export default {
       return found
     },
 
+    onPopupHide () {
+      this.contextMenuTargetId = null
+    },
+
     // CONTEXT MENU ACTIONS
-    async deleteBroadcast () {
-      let selectedBroadcasts = []
+    async deleteBroadcast (broadcasts) {
       let deletedCount = 0
 
-      for (let broadcast of selectedBroadcasts) {
+      for (let broadcast of broadcasts) {
         await API.V1.broadcasts.delete(broadcast.id)
           .then(res => {
             deletedCount++
@@ -574,19 +613,22 @@ export default {
           })
       }
 
-      if (deletedCount !== selectedBroadcasts.lenghth) {
-        this.$generalNotification(`Not all broadcasts were deleted. ${deletedCount} of ${selectedBroadcasts.length} were deleted.`, 'error')
+      if (deletedCount !== broadcasts.length) {
+        this.$generalNotification(`Not all broadcasts were deleted. ${deletedCount} of ${broadcasts.length} were deleted.`, 'error')
+        return
       }
 
       this.$generalNotification('Deletion completed successfully.')
     },
 
-    renameBroadcast () {
-
+    async renameBroadcast ([broadcast]) {
+      this.contextMenuOpen = false
     },
 
-    showBroadcastActivity () {
-
+    async showBroadcastActivity (broadcast) {
+      console.log({ broadcast })
+      this.contextMenuOpen = false
+      this.popupOpen = true
     },
 
     shouldAllowContextMenuButton (item) {
@@ -599,24 +641,10 @@ export default {
       }
 
       return true
-    }
-  },
-
-  watch: {
-    broadcasts (broadcasts) {
-      this.getBroadcasts()
     },
 
-    contextMenuOpen (val) {
-      if (!val) {
-        this.contextMenuTargetId = null
-      }
-    },
-
-    contextMenuTarget (val) {
-      if (val !== true) {
-        this.$refs['contextMenu'].show()
-      }
+    isSelectedRow (row) {
+      return this.contextMenuTargetId === row.id
     }
   }
 }
