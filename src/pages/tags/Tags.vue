@@ -1,38 +1,42 @@
 <template>
   <div class="tags position-relative"
        v-if="authenticated">
-    <div class="tags__header d-flex justify-between p-3">
+    <b-row class="tags__header px-1 py-3">
       <!-- search -->
-      <div>
+      <b-col class="d-flex align-self-center">
         <search placeholder="Search ID or name"
-                class="width-260"
+                class="width-300"
                 :search="search"
                 @search="onSearch">
         </search>
-      </div>
+      </b-col>
 
       <!-- category tabs -->
-      <div>
+      <b-col class="d-flex align-self-center">
         <tags-tabs :categories-count="tagCategoriesCount"
                    @loadTags="loadTags">
         </tags-tabs>
-      </div>
+      </b-col>
 
-      <div class="d-flex">
+      <b-col class="d-flex align-self-center justify-content-end row">
         <!-- add tag -->
         <b-button class="mr-1"
                   size="sm"
                   variant="primary"
+                  :title="`Add ${ tagCategoryName } Tag`"
                   @click="openTagForm">
-          <i class="fa fa-plus"></i> Add {{ tagCategoryName }} Tag
+          <i class="fa fa-plus"></i>
+          <span v-show="!$q.screen.sm && !$q.screen.md"> Add {{ tagCategoryName }} Tag</span>
         </b-button>
 
         <!-- help -->
         <b-button id="tags-helper"
                   class="btn-light align-items-center"
                   size="sm"
+                  title="Help"
                   variant="light">
-          <i class="large material-icons mr-1">help_outline</i> Help
+          <i class="large material-icons mr-1">help_outline</i>
+          <span v-show="!$q.screen.sm && !$q.screen.md"> Help</span>
         </b-button>
         <b-popover custom-class="tags__helper__popover"
                    target="tags-helper"
@@ -45,8 +49,8 @@
             <p>The entire audience of a Tag can be enrolled in a sequence. Your contact imports show up as a new tag with the date of upload.</p>
           </div>
         </b-popover>
-      </div>
-    </div>
+      </b-col>
+    </b-row>
 
   <!-- loading spinner -->
     <b-overlay class="h-100 w-100 position-absolute"
