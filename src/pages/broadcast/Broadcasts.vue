@@ -11,7 +11,9 @@
     </b-overlay>
     <div class="row align-items-center justify-content-between px-3 my-2 w-100">
       <div class="col-3">
-        <search placeholder="Search name, id"/>
+        <search placeholder="Search name, id"
+                :search="broadcastsSearchText"
+                @search="val => broadcastsSearchText = val"/>
       </div>
       <div class="col-6">
         <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
@@ -321,6 +323,7 @@ export default {
 
   data: () => ({
     loading: false,
+    broadcastsSearchText: '',
     broadcastFilter: 5,
     broadcastFilterOptions: [
       {
@@ -372,12 +375,31 @@ export default {
 
     visibleBroadcasts () {
       let filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
+      let text = this.broadcastsSearchText.toLowerCase()
 
-      if (!filter) {
+      if (!filter && !text) {
         return this.broadcastData
       }
 
-      return this.broadcastData.filter(broadcast => broadcast.status === filter)
+      return this.broadcastData
+        .filter(broadcast => {
+          console.log({ broadcast })
+          let matchText = true
+          let matchType = true
+
+          if (text) {
+            let broadcastName = broadcast.name.toLowerCase()
+
+            console.log([(broadcast.id + ''), broadcastName, text])
+            matchText = (broadcast.id + '').includes(text) || broadcastName.includes(text)
+          }
+
+          if (filter) {
+            matchType = broadcast.status === filter
+          }
+
+          return matchText && matchType
+        })
     },
 
     broadcastCounts () {
