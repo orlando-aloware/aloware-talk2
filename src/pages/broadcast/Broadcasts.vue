@@ -238,6 +238,26 @@
             </div>
           </template>
           <template v-if="popupAction === 'rename'">
+            <div class="text-h6">Rename broadcast</div>
+            <div class="mt-2 text-muted">Name</div>
+            <q-input outlined
+                     v-model="popupRename"/>
+            <div class="d-flex">
+              <q-btn class="px-1 flex-grow-1"
+                     color="white"
+                     text-color="black"
+                     unelevated
+                     @click="onCancelPopup">
+                <span class="px-2">Cancel</span>
+              </q-btn>
+              <q-btn class="ml-3 flex-grow-1"
+                     color="primary"
+                     unelevated
+                     :loading="popupLoadingAction"
+                     @click="renameBroadcast(popupActionList)">
+                <span class="px-2">Save</span>
+              </q-btn>
+            </div>
           </template>
         </q-card-section>
       </q-card>
@@ -397,7 +417,8 @@ export default {
     popupOpen: false,
     popupAction: '',
     popupActionList: [],
-    popupLoadingAction: false
+    popupLoadingAction: false,
+    popupRename: ''
   }),
 
   mounted () {
@@ -578,6 +599,7 @@ export default {
 
       switch (item.name) {
         case 'rename':
+          this.popupRename = broadcast.name
           this.popupOpen = true
           this.popupAction = 'rename'
           break
@@ -626,6 +648,13 @@ export default {
       this.contextMenuTargetId = null
     },
 
+    onCancelPopup () {
+      this.popupLoadingAction = false
+      this.popupOpen = false
+      this.popupAction = ''
+      this.popupActionList = []
+    },
+
     // CONTEXT MENU ACTIONS
     async deleteBroadcast (broadcasts) {
       this.popupLoadingAction = true
@@ -644,10 +673,8 @@ export default {
           })
       }
 
-      this.popupLoadingAction = false
-      this.popupOpen = false
-      this.popupAction = ''
-      this.popupActionList = []
+      this.onCancelPopup()
+      this.getBroadcasts()
 
       if (deletedCount !== broadcasts.length) {
         this.$generalNotification(`Not all broadcasts were deleted. ${deletedCount} of ${broadcasts.length} were deleted.`, 'error')
@@ -659,6 +686,13 @@ export default {
 
     async renameBroadcast ([broadcast]) {
       this.contextMenuOpen = false
+
+      API.V1.broadcasts.update(broadcast.id, { name: this.popupRename })
+
+      // TODO: Update broadcast entry locally
+
+      this.popupRename = ''
+      this.onCancelPopup()
     },
 
     async showBroadcastActivity (broadcast) {

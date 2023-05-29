@@ -430,6 +430,9 @@ export default {
       },
       sendBulkMessage (params) {
         return window.axios.post(`${suffixV1}broadcasts/send-bulk-messages`, params)
+      },
+      update (id, broadcast) {
+        return window.axios.put(`${suffixV1}broadcasts/${id}`, broadcast)
       }
     }
   },
