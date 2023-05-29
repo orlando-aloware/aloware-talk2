@@ -97,12 +97,12 @@
       </div>
       <div class="col-2 d-flex justify-content-end">
         <q-btn class="px-4 border-half-rounded stats-page-btn"
-              :to="{ path: '/broadcasts/new' }"
-              color="primary"
-              padding="0rem"
-              unelevated
-              no-caps
-              dense>
+               :to="{ path: '/broadcasts/new' }"
+               color="primary"
+               padding="0rem"
+               unelevated
+               no-caps
+               dense>
             <plus-icon class="mr-1"
                       color="white"/>
           New Bulk Message
@@ -184,12 +184,12 @@
                     <template #button-content>
                       <ellipse-icon/>
                     </template>
-                    <b-dropdown-item v-for="(item, id) in contextMenuListItems"
-                            :key="id"
-                            :disabled="!shouldAllowContextMenuButton(item)"
-                            dense
-                            clickable
-                            @click="onContextMenuButtonClicked(item)">
+                    <b-dropdown-item :key="id"
+                                     :disabled="!shouldAllowContextMenuButton(item)"
+                                     dense
+                                     clickable
+                                     v-for="(item, id) in contextMenuListItems"
+                                     @click="onContextMenuButtonClicked(item)">
                       <div class="d-flex align-items-center">
                         <img class="mr-2"
                             :src="`app-icons/menu/${item.icon}`" />
