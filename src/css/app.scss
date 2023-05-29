@@ -12445,6 +12445,8 @@ h1.contact-list-name-label {
 
 .broadcasts {
   &__home {
+    overflow-y: scroll;
+
     &__graph {
       .custom-toggle-button {
         button[aria-pressed="true"]:hover {
