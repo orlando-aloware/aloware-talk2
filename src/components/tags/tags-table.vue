@@ -203,6 +203,8 @@ import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-pow
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 import { mapState, mapActions } from 'vuex'
+import { COLUMNS as COMMUNICATIONS_COLUMNS } from 'src/constants/tags/communications-columns'
+import { COLUMNS as CONTACTS_COLUMNS } from 'src/constants/tags/contacts-columns'
 
 export default {
   name: 'tags-table',
@@ -268,31 +270,23 @@ export default {
       'selectAllPerPage'
     ]),
 
+    // eslint-disable-next-line vue/return-in-computed-property
     columns () {
-      let cols = [
-        { name: 'id', label: 'ID', sortable: true },
-        { name: 'name', label: 'Name', sortable: true, resizable: true, minWidth: 150 },
-        { name: 'updated_at', label: 'Date', sortable: true },
-        { name: 'description', label: 'Description', sortable: true, resizable: true, minWidth: 150 }
-      ]
-
-      if (this.hasRole('Company Admin')) {
-        cols = [{ name: 'checkbox', label: 'Checkbox' }, ...cols]
-      }
+      let cols = []
 
       switch (this.selectedTagCategory) {
         case this.CommunicationTags:
-          cols.push({ name: 'communications_count', label: '# of Communications', sortable: true, maxWidth: 80 })
+          cols = COMMUNICATIONS_COLUMNS
           break
 
         case this.ContactTags:
-          cols.push({ name: 'contacts_count', label: '# of Contacts', sortable: true, maxWidth: 80 })
+          cols = CONTACTS_COLUMNS
           break
       }
 
-      cols.push({ name: 'actions', label: 'Actions', maxWidth: 50 })
-
-      return cols
+      return !this.hasRole('Company Admin')
+        ? cols.filter(col => col.name !== 'checkbox')
+        : cols
     },
 
     isSelectedAll () {

@@ -1,5 +1,6 @@
 <template>
-  <div class="tags position-relative">
+  <div class="tags position-relative"
+       v-if="authenticated">
     <div class="tags__header d-flex justify-between p-3">
       <!-- search -->
       <div>
@@ -59,7 +60,8 @@
     </b-overlay>
 
     <!-- bulk actions -->
-    <div class="row mx-0 relative-position">
+    <div class="row mx-0 relative-position"
+        v-if="hasRole('Company Admin')">
       <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
                              @reloadTags="getTags" />
     </div>
@@ -88,7 +90,7 @@ import axios from 'axios'
 import TagsTable from 'components/tags/tags-table.vue'
 import { debounce } from 'lodash'
 import TagForm from 'components/tags/tag-form.vue'
-import { tagsMixin } from 'src/plugins/mixins'
+import { aclMixin, tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import TagsBulkActionMenu from 'components/tags-bulk-action-menu.vue'
 
@@ -104,6 +106,7 @@ export default {
   },
 
   mixins: [
+    aclMixin,
     tagsMixin
   ],
 
@@ -123,7 +126,13 @@ export default {
         total: 0
       },
       isOpenTagForm: false,
-      tag: null
+      tag: null,
+      listeners: {
+        tagCreated: null,
+        tagUpdated: null,
+        tagDeleting: null,
+        contactListBulkCreated: null
+      }
     }
   },
 
@@ -133,12 +142,14 @@ export default {
   },
 
   mounted () {
-    this.$VueEvent.listen('tag_created', (data) => {
+    // tag created event
+    this.listeners.tagCreated = (data) => {
       this.getTagCategoriesCount(data.category)
       this.getTags()
-    })
+    }
 
-    this.$VueEvent.listen('tag_updated', (data) => {
+    // tag updated event
+    this.listeners.tagUpdated = (data) => {
       const parsedTags = this.$jsonClone(this.tags)
       const index = parsedTags.findIndex(item => item.id === data.id)
 
@@ -157,19 +168,26 @@ export default {
         parsedTags[index] = data
         this.tags = parsedTags
       }
-    })
+    }
 
-    this.$VueEvent.listen('tag_deleting', (data) => {
+    // tag delete event
+    this.listeners.tagDeleting = (data) => {
       this.getTagCategoriesCount(data.category)
       this.getTags()
-    })
+    }
 
-    this.$VueEvent.listen('contact_list_bulk_created', (data) => {
+    // contact tags - add to pd event
+    this.listeners.contactListBulkCreated = (data) => {
       if (data.user_id === this.profile.id && data.items_count > 0) {
         const verb = data.items_count > 1 ? 'tasks have' : 'task has'
         this.$generalNotification(`${data.items_count} ${verb} been added`)
       }
-    })
+    }
+
+    this.$VueEvent.listen('tag_created', this.listeners.tagCreated)
+    this.$VueEvent.listen('tag_updated', this.listeners.tagUpdated)
+    this.$VueEvent.listen('tag_deleting', this.listeners.tagDeleting)
+    this.$VueEvent.listen('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   },
 
   computed: {
@@ -305,6 +323,13 @@ export default {
         this.isLoadingRefreshCount = false
       })
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('tag_created', this.listeners.tagCreated)
+    this.$VueEvent.stop('tag_updated', this.listeners.tagUpdated)
+    this.$VueEvent.stop('tag_deleting', this.listeners.tagDeleting)
+    this.$VueEvent.stop('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   }
 }
 </script>
