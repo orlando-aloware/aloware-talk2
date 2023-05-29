@@ -187,7 +187,7 @@
                       <ellipse-icon/>
                     </template>
                     <b-dropdown-item :key="id"
-                                     :disabled="!shouldAllowContextMenuButton(item)"
+                                     :disabled="!shouldAllowContextMenuButton(item, row)"
                                      dense
                                      clickable
                                      v-for="(item, id) in contextMenuListItems"
@@ -701,9 +701,9 @@ export default {
       this.popupOpen = true
     },
 
-    shouldAllowContextMenuButton (item) {
+    shouldAllowContextMenuButton (item, broadcast) {
       if (item.name === 'rename') {
-        return this.checked.length === 0
+        return this.checked.length === 0 && (this.checked.length === 1 && this.checked[0]?.id === broadcast.id)
       }
 
       if (item.name === 'delete') {
