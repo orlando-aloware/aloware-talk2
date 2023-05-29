@@ -214,7 +214,7 @@
 <script>
 import Search from 'src/components/search.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
-import talk2Api from 'src/plugins/api/api'
+import API from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
@@ -529,7 +529,7 @@ export default {
     },
 
     getBroadcasts () {
-      talk2Api.V1.broadcasts.get().then(res => {
+      API.V1.broadcasts.get().then(res => {
         this.broadcastData = res.data
       })
     },
@@ -556,8 +556,29 @@ export default {
       return found
     },
 
-    deleteBroadcast () {
+    // CONTEXT MENU ACTIONS
+    async deleteBroadcast () {
+      let selectedBroadcasts = []
+      let deletedCount = 0
 
+      for (let broadcast of selectedBroadcasts) {
+        await API.V1.broadcasts.delete(broadcast.id)
+          .then(res => {
+            deletedCount++
+          })
+          .catch(err => {
+            console.error('Broadcast could not be deleted', {
+              broadcast,
+              err
+            })
+          })
+      }
+
+      if (deletedCount !== selectedBroadcasts.lenghth) {
+        this.$generalNotification(`Not all broadcasts were deleted. ${deletedCount} of ${selectedBroadcasts.length} were deleted.`, 'error')
+      }
+
+      this.$generalNotification('Deletion completed successfully.')
     },
 
     renameBroadcast () {
@@ -578,12 +599,6 @@ export default {
       }
 
       return true
-    },
-
-    onContextMenuInput (val) {
-      // if (!val) {
-      //   this.contextMenuOpen = val
-      // }
     }
   },
 
