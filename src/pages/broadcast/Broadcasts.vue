@@ -685,7 +685,7 @@ export default {
     },
 
     async renameBroadcast ([broadcast]) {
-      this.contextMenuOpen = false
+      this.popupLoadingAction = true
 
       let payload = {
         name: this.popupRename,
