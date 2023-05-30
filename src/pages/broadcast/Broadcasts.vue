@@ -111,7 +111,8 @@
     </div>
     <q-separator/>
     <div class="broadcasts__home__graph">
-      <communication-activity-graph base="broadcast" />
+      <communication-activity-graph base="broadcast"
+                                    :default_date_range="7"/>
     </div>
     <q-separator/>
     <div class="broadcasts__home__table flex-grow-1">
