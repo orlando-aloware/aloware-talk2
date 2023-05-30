@@ -700,6 +700,13 @@ export default {
 
           item.name = this.popupRename
         })
+
+        this.$generalNotification('Broadcast successfully renamed!')
+      }).catch(err => {
+        this.$generalNotification('Failed to rename broadcast')
+        console.error('Broadcast was not renamed', {
+          err
+        })
       })
 
       this.popupRename = ''
