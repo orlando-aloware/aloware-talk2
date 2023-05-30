@@ -687,9 +687,20 @@ export default {
     async renameBroadcast ([broadcast]) {
       this.contextMenuOpen = false
 
-      API.V1.broadcasts.update(broadcast.id, { name: this.popupRename })
+      let payload = {
+        name: this.popupRename,
+        id: broadcast.id,
+        timezone: broadcast.timezone
+      }
+      API.V1.broadcasts.update(broadcast.id, payload).then(() => {
+        this.broadcastData.map(item => {
+          if (broadcast.id !== item.id) {
+            return
+          }
 
-      // TODO: Update broadcast entry locally
+          item.name = this.popupRename
+        })
+      })
 
       this.popupRename = ''
       this.onCancelPopup()
