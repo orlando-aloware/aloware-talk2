@@ -442,14 +442,12 @@ export default {
 
       return this.broadcastData
         .filter(broadcast => {
-          console.log({ broadcast })
           let matchText = true
           let matchType = true
 
           if (text) {
             let broadcastName = broadcast.name.toLowerCase()
 
-            console.log([(broadcast.id + ''), broadcastName, text])
             matchText = (broadcast.id + '').includes(text) || broadcastName.includes(text)
           }
 
@@ -716,7 +714,6 @@ export default {
     },
 
     async showBroadcastActivity (broadcast) {
-      console.log({ broadcast })
       this.contextMenuOpen = false
       this.popupOpen = true
     },
