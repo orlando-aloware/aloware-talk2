@@ -441,10 +441,7 @@ export default {
     async fetchContactInfo (isFetchContact = true) {
       // Sanity check: if contact id is actually one of the lists, take person to the list
       if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(this.contactId)) {
-        let path = '/contacts'
-        if (this.contactId !== 'all') {
-          path += '/list/' + this.contactId
-        }
+        let path = '/contacts/list/' + this.contactId
         this.$router.push({ path })
         return
       }
