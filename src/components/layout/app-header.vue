@@ -282,10 +282,6 @@ export default {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
     },
 
-    ak_widget_url () {
-      return storage.local.getItem('ak_widget_url')
-    },
-
     currentUser () {
       if (!this.profile) {
         return {}
