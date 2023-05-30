@@ -14,7 +14,7 @@
         </div>
 
         <div class="w-100"
-             style="max-width: 340px;">
+             style="max-width: 370px;">
           <q-btn class="sessions-button my-1 ml-1"
                  size="sm"
                  style="width: 79.55px;"
@@ -68,7 +68,6 @@
             unelevated
             no-caps
             left
-            dropdown-icon="none"
             :auto-close="true"
             :disable="!canRedial"
             :color="canRedial ? 'blue-7' : 'grey-8'">
@@ -119,22 +118,34 @@
                       text="..."
                       right size="sm"
                       variant="white"
-                      no-caret
-                      :disabled="!statusCallConnected">
+                      no-caret>
             <template #button-content>
               <i class="fa fa-ellipsis-h"/>
             </template>
+            <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !taskToCall.is_dnc"
+                             href="#"
+                             :disabled="isProcessingDNC"
+                             @click="dncContact">
+              <q-spinner-bars v-if="isProcessingDNC"
+                              class="mr-1"
+                              color="blue" />
+              <i class="fa fa-ban"></i>
+              DNC
+            </b-dropdown-item>
             <b-dropdown-item href="#"
+                             :disabled="!statusCallConnected"
                              @click="openDialPad">
               <DialPadIcon />
               Dial Pad
             </b-dropdown-item>
             <b-dropdown-item href="#"
+                             :disabled="!statusCallConnected"
                              @click="openAdd">
               <AddUserIcon color="#62666E" />
               Add
             </b-dropdown-item>
             <b-dropdown-item href="#"
+                             :disabled="!statusCallConnected"
                              @click="openTransfer">
               <TransferIcon color="#62666E" />
               Transfer
@@ -302,7 +313,7 @@ import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import {
   sessionCallStatusMixin,
-  dialerWrapUpMixin
+  dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
@@ -310,6 +321,8 @@ import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CompanyImportance from 'src/constants/importance-label'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'SessionCallStatus',
@@ -333,6 +346,7 @@ export default {
   },
 
   mixins: [
+    aclMixin,
     sessionCallStatusMixin,
     dialerWrapUpMixin
   ],
@@ -353,7 +367,9 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      redialedTask: {}
+      isProcessingDNC: false,
+      redialedTask: {},
+      CompanyImportance
     }
   },
 
@@ -1131,6 +1147,25 @@ export default {
     openAdd () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'add'
+    },
+
+    dncContact () {
+      if (this.isProcessingDNC) {
+        return
+      }
+
+      this.$bvModal.msgBoxConfirm('DNC will disable all communications to a contact and is irreversible. Do you wish to continue?', {
+        okTitle: 'Yes',
+        cancelTitle: 'No'
+      }).then(value => {
+        if (value) {
+          this.isProcessingDNC = true
+          talk2Api.V1.contact.update(this.taskToCall.id, { is_dnc: 1 }).then(response => {
+            this.isProcessingDNC = false
+            this.cancelSingleTask(this.taskToCall, 'DNC')
+          })
+        }
+      })
     },
 
     openDialPad () {
