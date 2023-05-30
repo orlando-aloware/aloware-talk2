@@ -692,7 +692,7 @@ export default {
         id: broadcast.id,
         timezone: broadcast.timezone
       }
-      API.V1.broadcasts.update(broadcast.id, payload).then(() => {
+      await API.V1.broadcasts.update(broadcast.id, payload).then(() => {
         this.broadcastData.map(item => {
           if (broadcast.id !== item.id) {
             return
@@ -707,6 +707,8 @@ export default {
         console.error('Broadcast was not renamed', {
           err
         })
+      }).finally(() => {
+        this.popupLoadingAction = false
       })
 
       this.popupRename = ''
