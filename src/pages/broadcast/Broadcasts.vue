@@ -124,7 +124,8 @@
                  :showSelectAll="false"
                  :paginated="false"
                  :total-rows="visibleBroadcasts?.length ?? 0"
-                 @checked="onCheckerClicked()">
+                 :loading="loading"
+                 @sort="onSortTable">
         <template slot="tbody">
           <tr v-for="(row, rowIndex) in visibleBroadcasts"
               v-bind:key="rowIndex">
@@ -286,42 +287,50 @@ const broadcastsColumns = [
   {
     name: 'id',
     label: 'Id',
-    field: 'id'
+    field: 'id',
+    sortable: true
   },
   {
     name: 'name',
     label: 'Name',
-    field: 'name'
+    field: 'name',
+    sortable: true
   },
   {
     name: 'status',
     label: 'Status',
-    field: 'status'
+    field: 'status',
+    sortable: true
   },
   {
     name: 'pending_tasks',
     label: 'Pending Tasks',
-    field: 'pending_tasks'
+    field: 'pending_tasks',
+    sortable: true
   },
   {
     name: 'total_failed',
     label: 'Failed Tasks',
-    field: 'total_failed'
+    field: 'total_failed',
+    sortable: true
   },
   {
     name: 'total_enrolled',
     label: 'Total Tasks',
-    field: 'total_enrolled'
+    field: 'total_enrolled',
+    sortable: true
   },
   {
     name: 'engagement_rate',
     label: 'Engagement',
-    field: 'engagement_rate'
+    field: 'engagement_rate',
+    sortable: true
   },
   {
     name: 'total_unsubscribed',
     label: 'Unsubscribed',
-    field: 'total_unsubscribed'
+    field: 'total_unsubscribed',
+    sortable: true
   },
   {
     name: 'target_group',
@@ -331,12 +340,14 @@ const broadcastsColumns = [
   {
     name: 'campaign_id',
     label: 'Line Used',
-    field: 'campaign_id'
+    field: 'campaign_id',
+    sortable: true
   },
   {
     name: 'throttle_limit',
     label: 'Throttling',
-    field: 'throttle_limit'
+    field: 'throttle_limit',
+    sortable: true
   },
   {
     name: '',
@@ -409,6 +420,7 @@ export default {
     ],
     broadcastData: [],
     broadcastsColumns,
+    broadcastSort: {},
     checked: [],
     isAllChecked: false,
     BroadcastStatuses,
@@ -565,6 +577,45 @@ export default {
       }
 
       this.checked.push(row)
+    },
+
+    onSortTable (sort) {
+      let { orderBy, order } = sort
+      this.broadcastData = this.broadcastData.sort((a, b) => {
+        if (!orderBy) {
+          return 0
+        }
+
+        let aOrderBy = a[orderBy]
+        let bOrderBy = b[orderBy]
+
+        if (orderBy === 'campaign_id') {
+          aOrderBy = this.getCampaign(aOrderBy)?.name
+          bOrderBy = this.getCampaign(bOrderBy)?.name
+
+          if (aOrderBy && !bOrderBy) {
+            return -1
+          } else if (!aOrderBy && bOrderBy) {
+            return 1
+          }
+        }
+
+        if (aOrderBy === bOrderBy) {
+          return 0
+        }
+
+        let comparison = aOrderBy > bOrderBy ? 1 : -1
+
+        if (typeof aOrderBy === 'string' && typeof bOrderBy === 'string') {
+          comparison = aOrderBy.localeCompare(bOrderBy)
+        }
+
+        if (order !== 'asc') {
+          comparison = comparison * -1
+        }
+
+        return comparison
+      })
     },
 
     onContextMenuShow (row) {
