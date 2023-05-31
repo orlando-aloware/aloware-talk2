@@ -69,9 +69,8 @@
             no-caps
             left
             :auto-close="true"
-            :disable="!canRedial"
-            :color="canRedial ? 'blue-7' : 'grey-8'">
-
+            :disable="!canRedialNow && !canRedialLater"
+            :color="canRedialNow || canRedialLater ? 'blue-7' : 'grey-8'">
             <template v-slot:label>
               <RefreshIcon class="mr-2"
                            color="white" />
@@ -79,8 +78,8 @@
                 <q-tooltip content-class="bg-grey-light11"
                            anchor="bottom middle"
                            self="center middle"
-                           v-if="dialer.currentStatus === 'CALL_CONNECTED'">
-                  {{ redialTooltip }}
+                           v-if="dialer.currentStatus === 'CALL_CONNECTED' && !canRedialNow && !canRedialLater">
+                  This contact has already been redialed once
                 </q-tooltip>
                 Redial
               </div>
@@ -92,10 +91,19 @@
                       unelevated
                       clickable
                       v-close-popup
-                      :color="canRedial  ? 'blue-7' : 'grey-8'"
+                      :disable="option.value === 'now' ? !canRedialNow : !canRedialLater"
+                      :color="canRedialNow || canRedialLater  ? 'blue-7' : 'grey-8'"
                       @click="onRedial(option.redial)">
                 <q-item-section>
-                  <q-item-label class="ml-2"><i :class="option.icon"></i> {{ option.label }}</q-item-label>
+                  <q-item-label class="ml-2">
+                    <q-tooltip content-class="bg-grey-light11"
+                               anchor="bottom middle"
+                               self="center middle"
+                               v-if="dialer.currentStatus === 'CALL_CONNECTED'">
+                      {{ option.tooltip }}
+                    </q-tooltip>
+                    <i :class="option.icon"></i> {{ option.label }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -122,7 +130,7 @@
             <template #button-content>
               <i class="fa fa-ellipsis-h"/>
             </template>
-            <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !taskToCall.is_dnc"
+            <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !taskToCall?.is_dnc"
                              href="#"
                              :disabled="isProcessingDNC"
                              @click="dncContact">
@@ -599,17 +607,15 @@ export default {
       return !this.wrapUpPaused && !this.loadingNext && canNext
     },
 
-    canRedial () {
-      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.redialed.includes(this.activeTask.id) &&
-        this.powerDialerTasks.in_queue.length >= 1 &&
-        !this.isRedialClicked
+    canRedialLater () {
+      return this.canRedialNow &&
+        this.powerDialerTasks.in_queue.length >= 1
     },
 
-    redialTooltip () {
-      return this.canRedial
-        ? 'This contact will go to the top or bottom of the current session list depending on the redial type you choose'
-        : 'This contact has already been redialed once'
+    canRedialNow () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        !this.redialed.includes(this.activeTask.id) &&
+        !this.isRedialClicked
     },
 
     pauseButtonText () {
@@ -686,17 +692,26 @@ export default {
     },
 
     redialOptions () {
+      let redialLaterTooltip = 'This contact will go to the bottom of the current session list'
+
+      // if we can redial now but not later it means we reached the end of the list
+      if (this.canRedialNow && !this.canRedialLater) {
+        redialLaterTooltip = 'Can not redial later, this contact is the last one in the list'
+      }
+
       return [
         {
           label: 'Redial Now',
           value: 'now',
           icon: 'fas fa-bolt',
+          tooltip: 'This contact will stay on top of the current session list and will be redialed immediately',
           redial: true
         },
         {
           label: 'Redial Later',
           value: 'later',
           icon: 'fas fa-arrow-down',
+          tooltip: redialLaterTooltip,
           redial: false
         }
       ]
