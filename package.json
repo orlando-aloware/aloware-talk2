@@ -39,6 +39,7 @@
     "core-js": "^3.27.2",
     "countries-and-timezones": "^2.4.0",
     "country-state-city": "^3.1.2",
+    "countup.js": "^2.6.2",
     "dhtmlx-scheduler": "^6.0.2",
     "dotenv": "^16.0.3",
     "electron-notarize": "^0.3.0",
