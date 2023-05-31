@@ -416,6 +416,10 @@ export default {
       }
 
       if (this.$route.params.channel === 'all-communications') {
+        const filteredBroadcasts = this.$route.query?.broadcastIds
+          ? typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
+          : Filters.DEFAULT_STATE.filter.broadcasts
+
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
         defaultFilterModel.filter = {
           campaigns: Filters.DEFAULT_STATE.filter.campaigns,
@@ -433,7 +437,7 @@ export default {
           incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
           users: Filters.DEFAULT_STATE.filter.users,
           workflows: Filters.DEFAULT_STATE.filter.workflows,
-          broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
+          broadcasts: filteredBroadcasts,
           contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
@@ -703,6 +707,16 @@ export default {
   },
 
   mounted () {
+    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.broadcastIds) {
+      this.filter = this.channelDefaultFilterModel.filter
+      this.updateChannelChangedFilterFields({
+        name: 'broadcasts',
+        value: this.channelDefaultFilterModel.filter.broadcasts
+      })
+      this.onApplyFilter(this.channelDefaultFilterModel.filter)
+      this.setInboxShowMyContacts(false)
+    }
+
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = this.nextPage
@@ -809,7 +823,8 @@ export default {
       'toggleFilterModelForm',
       'toggleFilterDialog',
       'setIsInboxFiltersLoaded',
-      'updateChannelChangedFilterFields'
+      'updateChannelChangedFilterFields',
+      'setInboxShowMyContacts'
     ]),
 
     onResetFilters () {

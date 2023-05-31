@@ -554,7 +554,7 @@ export default {
     },
 
     isAdmin () {
-      return true
+      return true // TODO: verify if is admin
     },
 
     contextMenuTarget () {
@@ -658,6 +658,7 @@ export default {
           this.popupAction = 'delete'
           break
         case 'activity':
+          this.showBroadcastActivity(broadcasts)
           break
       }
     },
@@ -765,9 +766,19 @@ export default {
       this.onCancelPopup()
     },
 
-    async showBroadcastActivity (broadcast) {
+    async showBroadcastActivity (broadcasts) {
       this.contextMenuOpen = false
-      this.popupOpen = true
+      this.popupOpen = false
+
+      this.$router.push({
+        name: 'Inbox Channel',
+        params: {
+          channel: 'all-communications'
+        },
+        query: {
+          broadcastIds: broadcasts.map(broadcast => broadcast.id)
+        }
+      })
     },
 
     shouldAllowContextMenuButton (item, broadcast) {
