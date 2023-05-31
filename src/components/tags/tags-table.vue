@@ -68,7 +68,7 @@
               </i>
               <b-button class="badge bg-grey-12 text-size-xs"
                         v-show="refreshedTagId !== tag.id"
-                        v-b-tooltip.hover.left="'Click to Refresh'"
+                        v-b-tooltip.hover.right="'Click to Refresh'"
                         @click="refreshCount(tag.id)">
                 {{ tag.communications_count }}
               </b-button>
@@ -76,11 +76,12 @@
 
             <td :key="`col-${colIndex}`"
                 v-if="selectedTagCategory === ContactTags && column.name === 'contacts_count'">
-              <i class="fas fa-spinner"
-                 v-show="refreshedTagId === tag.id">
+              <i class="fas fa-spin fa-spinner"
+                 v-show="isLoadingRefreshCount && refreshedTagId === tag.id">
               </i>
               <b-button class="badge bg-grey-12 text-size-xs"
-                        v-b-tooltip.hover.left="'Click to Refresh'"
+                        v-show="refreshedTagId !== tag.id"
+                        v-b-tooltip.hover.right="'Click to Refresh'"
                         @click="refreshCount(tag.id)">
                 {{ tag.contacts_count }}
               </b-button>

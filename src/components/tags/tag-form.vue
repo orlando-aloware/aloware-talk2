@@ -293,8 +293,9 @@ export default {
     },
 
     closeTagForm () {
-      this.resetForm()
+      this.$bvModal.hide('tags-form-modal')
       this.$emit('closeTagForm')
+      this.resetForm()
     },
 
     resetForm () {

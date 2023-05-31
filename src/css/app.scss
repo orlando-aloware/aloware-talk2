@@ -12963,19 +12963,21 @@ h1.contact-list-name-label {
 }
 
 .tree-selector {
+  &.vue-treeselect--focused {
+    .vue-treeselect__control {
+      border-color: $primary !important;
+      border-width: 2px;
+      box-shadow: none !important;
+      transform: scale3d(1, 1, 1)
+    }
+  }
+
   .vue-treeselect__control {
     height: 40px;
     padding: 2px 5px;
     font-weight: 400;
     color: rgba(0, 0, 0, 0.64);
     border: 1px solid rgba(0, 0, 0, 0.24);
-
-    &.vue-treeselect--focused:not(.vue-treeselect--open) {
-      border-color: currentColor;
-      border-width: 2px;
-      box-shadow: none;
-      transform: scale3d(1, 1, 1)
-    }
 
     &.vue-treeselect--open {
       border-color: rgba(0, 0, 0, 0.24);
@@ -12986,7 +12988,6 @@ h1.contact-list-name-label {
       color: $black;
     }
   }
-
 
   .vue-treeselect__menu {
     font-weight: 400;
@@ -13006,9 +13007,13 @@ h1.contact-list-name-label {
           font-weight: normal;
         }
 
-        &.vue-treeselect__option--highlight {
+        &.vue-treeselect__option--highlight:not(.vue-treeselect__option--selected) {
           background: $grey-60;
           color: $grey-100;
+        }
+
+        .vue-treeselect__label {
+          white-space: inherit;
         }
       }
     }

@@ -188,8 +188,9 @@ export default {
     },
 
     closeModal () {
-      this.reset()
+      this.$bvModal.hide('tag-contacts-splitter-modal')
       this.$emit('closeDeleteTagDialog')
+      this.reset()
     },
 
     deleteTag () {

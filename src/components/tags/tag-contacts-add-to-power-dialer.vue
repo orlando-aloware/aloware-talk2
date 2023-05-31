@@ -215,8 +215,9 @@ export default {
 
   methods: {
     closeModal () {
-      this.reset()
+      this.$bvModal.hide('tag-add-tag-contacts-to-pd')
       this.$emit('closeAddTagContactsToPowerDialer')
+      this.reset()
     },
 
     reset () {

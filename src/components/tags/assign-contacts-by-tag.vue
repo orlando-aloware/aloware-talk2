@@ -136,8 +136,9 @@ export default {
 
   methods: {
     closeModal () {
-      this.reset()
+      this.$bvModal.hide('tag-assign-contact-modal')
       this.$emit('closeAssignContactsTagModal')
+      this.reset()
     },
 
     reset () {

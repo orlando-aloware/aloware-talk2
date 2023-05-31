@@ -139,9 +139,14 @@ export default {
 
   methods: {
     closeModal () {
+      this.$bvModal.hide('tags-delete-dialog')
+      this.$emit('closeAssignContactsTagModal')
+      this.reset()
+    },
+
+    reset () {
       this.splitPageSize = null
       this.selectedPageSize = null
-      this.$emit('closeAssignContactsTagModal')
     },
 
     setSplitPageSize () {

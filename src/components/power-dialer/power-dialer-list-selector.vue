@@ -11,11 +11,16 @@
               @input="updateValue">
 
       <label slot="option-label"
-           slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }"
-           :class="labelClassName">
-        <i class="far fa-folder" v-if="node.isBranch"></i>
+             slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }"
+             :class="labelClassName">
+        <i class="far fa-folder"
+           v-if="node.isBranch">
+        </i>
         {{ node.label }}
-        <span v-if="shouldShowCount" :class="countClassName">({{ count }})</span>
+        <span v-if="shouldShowCount"
+              :class="countClassName">
+          ({{ count }})
+        </span>
       </label>
   </treeselect>
 </template>
@@ -39,7 +44,7 @@ export default {
 
     userId: {
       type: Number,
-      required: true
+      required: false
     },
 
     isMultiple: {
@@ -167,7 +172,11 @@ export default {
   },
 
   watch: {
-    async userId () {
+    async userId (value) {
+      if (!value) {
+        return
+      }
+
       this.resetListOptions()
       this.getUserPowerDialerLists()
     }

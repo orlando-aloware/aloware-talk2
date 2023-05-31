@@ -14,16 +14,16 @@
         <div class="options">
           <span class="toggle-button-name">Communication Tags</span>
           <span class="ml-1 align-bottom badge-active-count">
-            {{ categoriesCount.communications }}
+            {{ categoriesCount.communications | numFormat }}
           </span>
         </div>
       </template>
 
       <template v-slot:two>
         <div class="options">
-          <span class="toggle-button-name">Contact Tag</span>
+          <span class="toggle-button-name">Contact Tags</span>
           <span class="ml-1 align-bottom badge-active-count">
-            {{ categoriesCount.contacts }}
+            {{ categoriesCount.contacts | numFormat }}
           </span>
         </div>
       </template>
