@@ -20,8 +20,7 @@
                      @change="onOrderChanged"
                      class="dragable-header">
 
-            <th v-for="(column, key) in fixedColumns"
-                :key="column.name"
+            <th :key="column.name"
                 :data-column-id="column.name"
                 :class="{
                   checkbox: column.name === 'checkbox',
@@ -33,10 +32,11 @@
                   maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
                   minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
                 }"
+                v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
 
-              <label v-if="column.name === 'checkbox'"
-                     class="custom-checkbox-container check-all">
+              <label class="custom-checkbox-container check-all"
+                     v-if="column.name === 'checkbox'">
                 <input type="checkbox"
                        class="data-table-check-all"
                        ref="dataTableCheckAll"
@@ -45,14 +45,14 @@
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
-                <div v-if="column.draggable"
-                     @mouseover="onInitReorder(true, key)"
-                     class="move-icon-drag-container"
-                     style="display:inline-block;">
-                  <MoveIcon v-if="column.draggable"
-                            class="move-icon-drag"
+                <div class="move-icon-drag-container"
+                     style="display:inline-block;"
+                     v-if="column.draggable"
+                     @mouseover="onInitReorder(true, key)">
+                  <MoveIcon class="move-icon-drag"
                             :color="moveColor"
-                            :class="{ handle: column.draggable }" />
+                            :class="{ handle: column.draggable }"
+                            v-if="column.draggable"/>
                 </div>
                 <span class="handle-label"
                       :class="{ 'pl-2': column.label === 'Actions' }">
@@ -90,8 +90,8 @@
       </table>
 
       <b-overlay class="table-more-rows-spinner"
-                 :show="isLoadingMore"
                  rounded="sm"
+                 :show="isLoadingMore"
                  v-if="!paginated">
         <template #overlay>
           <q-spinner-bars color="primary"
@@ -111,28 +111,27 @@
 
     <div v-if="paginated"
          class="d-flex justify-content-center">
-      <q-pagination boundary-links
+      <q-pagination class="table-pagination"
+                    padding="0 15px"
+                    boundary-links
                     direction-links
                     dense
-                    class="table-pagination"
-                    v-model="paginationPage"
                     :max="lastPage"
                     :max-pages="maxPaginationPages"
                     :ellipses="false"
                     :boundary-numbers="false"
-                    padding="0 15px">
+                    v-model="paginationPage">
       </q-pagination>
 
-      <q-select outlined
+      <q-select class="mt-2 q-select-pager"
+                outlined
                 dense
                 emit-value
-                class="mt-2 q-select-pager"
                 option-value="value"
                 option-label="label"
-                v-model="perPage"
                 :options="perPageOptions"
-                :display-value="`${perPage} per page`">
-      </q-select>
+                :display-value="`${perPage} per page`"
+                v-model="perPage" />
 
     </div>
   </div>
