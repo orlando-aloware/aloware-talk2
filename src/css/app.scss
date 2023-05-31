@@ -12966,3 +12966,28 @@ h1.contact-list-name-label {
     }
   }
 }
+
+.tree-selector {
+  .vue-treeselect__control {
+    height: 40px;
+    padding: 2px 5px;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.64);
+    border: 1px solid rgba(0, 0, 0, 0.24);
+
+    &.vue-treeselect--focused:not(.vue-treeselect--open) {
+      border-color: currentColor;
+      border-width: 2px;
+      box-shadow: none;
+      transform: scale3d(1, 1, 1)
+    }
+  }
+  .vue-treeselect--single .vue-treeselect__option--selected {
+    background: currentColor;
+  }
+
+  .vue-treeselect__menu {
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.80);
+  }
+}

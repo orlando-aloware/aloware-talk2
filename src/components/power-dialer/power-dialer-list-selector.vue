@@ -1,5 +1,5 @@
 <template>
-  <treeselect class="q-user-selector q-basic-selector"
+  <treeselect class="q-basic-selector tree-selector"
               placeholder="Select a Power Dialer list"
               search-nested
               :multiple="isMultiple"
@@ -13,7 +13,7 @@
       <label slot="option-label"
            slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }"
            :class="labelClassName">
-        <folder-icon v-if="node.isBranch" />
+        <i class="far fa-folder" v-if="node.isBranch"></i>
         {{ node.label }}
         <span v-if="shouldShowCount" :class="countClassName">({{ count }})</span>
       </label>
@@ -25,13 +25,11 @@ import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import API from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
-import FolderIcon from 'components/icons/folder-icon'
 
 export default {
   name: 'power-dialer-list-selector',
 
   components: {
-    FolderIcon,
     Treeselect
   },
 
