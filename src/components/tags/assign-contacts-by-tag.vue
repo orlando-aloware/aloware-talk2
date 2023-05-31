@@ -203,6 +203,7 @@ export default {
           this.closeModal()
         }).catch(err => {
           this.$handleErrors(err.response)
+          this.loading = false
           console.log(err)
         })
     }

@@ -39,16 +39,16 @@
         <label class="label mt-2 mb-1 text-weight-bold">
           Direction
         </label>
-        <q-btn-toggle v-model="direction"
-                    :options="directionOptions"
-                    class="custom-toggle-button"
-                    no-caps
-                    dense
-                    spread
-                    unelevated
-                    toggle-color="primary active"
-                    color="transparent"
-                    text-color="grey-90"/>
+        <q-btn-toggle class="custom-toggle-button"
+                      toggle-color="primary active"
+                      color="transparent"
+                      text-color="grey-90"
+                      no-caps
+                      dense
+                      spread
+                      unelevated
+                      :options="directionOptions"
+                      v-model="direction" />
 
         <hr>
 

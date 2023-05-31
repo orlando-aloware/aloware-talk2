@@ -198,14 +198,14 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :to="{ name: 'Tags' }"
-           :ripple="false"
-           icon="img:app-icons/menu/tags_active.svg"
-           align="left"
+    <q-btn class="nav-icons w-100"
            padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Tags')"
-           flat>
+           align="left"
+           icon="img:app-icons/menu/tags_active.svg"
+           flat
+           :to="{ name: 'Tags' }"
+           :ripple="false"
+           v-show="isActive('Tags')">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">

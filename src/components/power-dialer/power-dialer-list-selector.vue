@@ -17,8 +17,8 @@
            v-if="node.isBranch">
         </i>
         {{ node.label }}
-        <span v-if="shouldShowCount"
-              :class="countClassName">
+        <span :class="countClassName"
+              v-if="shouldShowCount">
           ({{ count }})
         </span>
       </label>
@@ -125,6 +125,7 @@ export default {
           // make tree selection out off nested folders
           if (data?.child_folders && data.child_folders.length > 0) {
             let nestedFolders = []
+
             const mapFolder = (folder) => {
               let lists = []
 
