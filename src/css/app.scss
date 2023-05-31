@@ -12510,8 +12510,12 @@ h1.contact-list-name-label {
             }
 
             button, .show button {
-              background-color: $grey-light2;
+              background-color: $grey-light2 !important;
               border: $grey-light4 solid 1px !important;
+            }
+
+            button:focus {
+              box-shadow: 0 0 0 0.2rem $grey-light3 !important;
             }
           }
 
