@@ -109,7 +109,10 @@ export default {
         return
       }
 
-      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
+      const params = typeof defaultFilters === 'string' ? {} : this.$jsonClone(defaultFilters)
+
+      this.fetch(params, true, clear)
+
       this.initialListFilters = defaultFilters
       this.filtersCount = this.getFiltersCount(defaultFilters)
     }, 200),
@@ -374,7 +377,8 @@ export default {
         })
     },
 
-    fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+      let params = this.$jsonClone(data)
       let eventListId = null
 
       if (typeof this.getCleanedListId !== 'undefined') {
@@ -403,28 +407,30 @@ export default {
         this.setPreviousListId(this.id)
       }
 
-      const defaultSort = {
-        data: _.get(params, 'sort', this.defaultContactDateFilter)
+      let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
+
+      if (defaultSort.constructor !== 'Function') {
+        defaultSort = this.isPowerDialer ? 'order' : this.defaultContactDateFilter
       }
 
-      if (defaultSort.data.constructor !== 'Function') {
-        defaultSort.data = this.defaultContactDateFilter
-      }
+      let order = _.get(params, 'order', 'desc')
+      const emptySortOrder = this.isPowerDialer ? 'asc' : order
 
-      // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
-      const order = (this.sorts)
+      order = this.sorts
         ? this.sorts.order
-        : _.get(params, 'order', 'desc')
+        : emptySortOrder
 
       if (hasOrder) {
-        params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
+        params.sort = _.isString(this.defaultDateFilter)
+          ? this.defaultDateFilter
+          : defaultSort
         params.order = order
       }
 
       this.isLoading = true
 
       // for power dialer list contacts fetching
-      if (typeof this.isPowerDialer !== 'undefined') {
+      if (this.isPowerDialer) {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
