@@ -130,7 +130,7 @@
             <template #button-content>
               <i class="fa fa-ellipsis-h"/>
             </template>
-            <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !taskToCall?.is_dnc"
+            <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !(taskToCall?.is_dnc)"
                              href="#"
                              :disabled="isProcessingDNC"
                              @click="dncContact">
