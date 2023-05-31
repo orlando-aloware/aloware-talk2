@@ -97,8 +97,8 @@
                 <q-item-section>
                   <q-item-label class="ml-2">
                     <q-tooltip content-class="bg-grey-light11"
-                               anchor="bottom middle"
-                               self="center middle"
+                               anchor="center left"
+                               self="center right"
                                v-if="dialer.currentStatus === 'CALL_CONNECTED'">
                       {{ option.tooltip }}
                     </q-tooltip>
