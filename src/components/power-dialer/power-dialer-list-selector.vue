@@ -24,7 +24,6 @@
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import API from 'src/plugins/api/api'
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'power-dialer-list-selector',
@@ -36,6 +35,11 @@ export default {
   props: {
     value: {
       required: false
+    },
+
+    userId: {
+      type: Number,
+      required: true
     },
 
     isMultiple: {
@@ -61,33 +65,49 @@ export default {
 
   data () {
     return {
-      selectedListId: this.value,
+      selectedListId: null,
       listOptions: []
     }
   },
 
-  created () {
-    this.getPowerDialerLists()
-  },
-
-  mounted () {
-    // initialize
-    this.selectedListId = this.myQueue.id
-    this.listOptions = [{
-      id: this.myQueue.id,
-      label: this.myQueue.name
-    }]
-  },
-
-  computed: {
-    ...mapGetters('powerDialer', [
-      'myQueue'
-    ])
+  async created () {
+    if (this.userId) {
+      this.getUserPowerDialerLists()
+    }
   },
 
   methods: {
+    getUserPowerDialerLists () {
+      const params = {
+        user_id: this.userId
+      }
+
+      API.V2.powerDialer.userMyQueue(params)
+        .then(res => {
+          this.getPowerDialerLists()
+
+          // pre-select My Queue list as default
+          this.selectedListId = res.data.id
+          this.listOptions = [{
+            id: res.data.id,
+            label: res.data.name
+          }]
+        })
+        .catch(err => {
+          this.$handleErrors(err)
+          console.log(err)
+        })
+    },
+
     getPowerDialerLists () {
-      API.V2.powerDialerFolders.list()
+      let params = {}
+      if (this.userId) {
+        params = {
+          user_id: this.userId
+        }
+      }
+
+      API.V2.powerDialerFolders.list(params)
         .then(res => {
           const data = res.data[0]
           const mapList = (list) => {
@@ -131,10 +151,25 @@ export default {
             this.listOptions = [...this.listOptions, ...options]
           }
         })
+        .catch(err => {
+          this.$handleErrors(err)
+          console.log(err)
+        })
     },
 
     updateValue (value) {
       this.$emit('change', value)
+    },
+
+    resetListOptions () {
+      this.listOptions = []
+    }
+  },
+
+  watch: {
+    async userId () {
+      this.resetListOptions()
+      this.getUserPowerDialerLists()
     }
   }
 }

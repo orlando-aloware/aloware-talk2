@@ -41,7 +41,8 @@
           <b-form-group class="font-weight-light text-13 mb-0"
                         label="Power Dialer List">
             <power-dialer-list-selector v-model="powerDialerListId"
-                                        @change="setPowerDialerListId"/>
+                                        :user-id="userId"
+                                        @change="setPowerDialerListId" />
           </b-form-group>
         </b-col>
       </b-row>
