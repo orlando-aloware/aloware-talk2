@@ -51,8 +51,8 @@
             <q-tooltip anchor="top middle">
               Type at least 3 characters to search in contacts
             </q-tooltip>
-            <contact-selector v-model="$v.schedule.contact.$model.id">
-            </contact-selector>
+            <contact-selector v-model="$v.schedule.contact.$model.id"
+                              @change="onContactChange"/>
           </b-form-group>
         </b-col>
       </b-row>
@@ -190,7 +190,9 @@
           <b-form-group label="Send From"
                         invalid-feedback="Please select a line for the SMS reminder"
                         :state="validateState('campaign_id', 'sms_reminder_fields')">
-            <contact-line-selector :showPaused="false"
+            <contact-line-selector :show-paused="false"
+                                   :use-groups="false"
+                                   preselect-first
                                    v-model="$v.sms_reminder_fields.campaign_id.$model"
                                    @select="lineSelected">
             </contact-line-selector>
@@ -497,6 +499,8 @@ export default {
   mounted () {
     // Preset sms reminder text
     this.setSmsReminderFields()
+
+    this.sms_reminder_fields.enabled = this.profile.company.sms_reminder_enabled
   },
 
   methods: {
@@ -736,8 +740,12 @@ export default {
     },
 
     setSmsReminderFields () {
-      this.sms_reminder_fields.campaign_id = this.profile.company.sms_reminder_default_campaign_id
       this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text || ''
+
+      // use personal line or default campaign_id
+      this.sms_reminder_fields.campaign_id = !this.profile.company.sms_reminder_use_personal_line
+        ? this.profile.company.sms_reminder_default_campaign_id
+        : this.profile.campaign_id
 
       // update time if its set in account config
       if (this.profile.company.sms_reminder_default_time) {
@@ -808,6 +816,13 @@ export default {
 
     onContactsLoaded () {
       this.loading = false
+    },
+
+    onContactChange (contact) {
+      // use contact's timezone if defined
+      if (contact?.timezone) {
+        this.schedule.timezone = contact.timezone
+      }
     }
   }
 }

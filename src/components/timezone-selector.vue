@@ -35,11 +35,43 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
-    timezones () {
+    ...mapState('cache', ['currentCompany'])
+  },
+
+  data () {
+    return {
+      timezone: null,
+      timezones: []
+    }
+  },
+
+  mounted () {
+    this.setTimezones()
+    this.setValue()
+  },
+
+  methods: {
+    setValue () {
+      if (this.value) {
+        let timezone = this.timezones.find(tz => tz.value === this.value)
+
+        // this might happen when the contact's timezone isnt present in the timezones list
+        if (!timezone) {
+          timezone = this.addTimezone(this.value)
+        }
+
+        this.timezone = timezone
+      }
+    },
+
+    onSelect (selected) {
+      this.$emit('select', selected)
+    },
+
+    setTimezones () {
       if (this.currentCompany && this.currentCompany.country) {
         if (!['US', 'CA'].includes(this.currentCompany.country)) {
-          return window.CountriesAndTimezones.getTimezonesForCountry(this.currentCompany.country)
+          this.timezones = window.CountriesAndTimezones.getTimezonesForCountry(this.currentCompany.country)
             .map((timezone) => {
               return {
                 name: timezone.name + ' GMT ' + timezone.utcOffsetStr,
@@ -48,7 +80,7 @@ export default {
             })
         }
         if (['US', 'CA'].includes(this.currentCompany.country)) {
-          return [
+          this.timezones = [
             {
               value: 'America/New_York',
               name: 'New York (Eastern)'
@@ -76,25 +108,25 @@ export default {
           ]
         }
       }
-      return []
+    },
+
+    addTimezone (timezone) {
+      const tz = {
+        name: timezone,
+        value: timezone
+      }
+
+      // add the custom timezone as the first option in the list
+      this.timezones.unshift(tz)
+
+      return tz
     }
   },
 
-  data () {
-    return {
-      timezone: null
-    }
-  },
-
-  mounted () {
-    if (this.value) {
-      this.timezone = this.timezones.find(tz => tz.value === this.value)
-    }
-  },
-
-  methods: {
-    onSelect (selected) {
-      this.$emit('select', selected)
+  watch: {
+    value () {
+      // configure timezone object when value changes
+      this.setValue()
     }
   }
 }

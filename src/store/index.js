@@ -13,6 +13,7 @@ import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
 import broadcast from './broadcast'
+import wallboard from './wallboard'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
 
@@ -37,6 +38,7 @@ export default function (/* { ssrContext } */) {
       powerDialer,
       settings,
       broadcast,
+      wallboard,
       cache
     },
 
@@ -531,6 +533,7 @@ export default function (/* { ssrContext } */) {
         if (value.includes('all')) {
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
+          commit('wallboard/RESET_VUEX', null, { root: true })
         }
       },
 

@@ -53,7 +53,7 @@
                                      :clearable="true"
                                      :generic-styling="false"
                                      :disable="shouldDisableListSelector"
-                                     :integration="selectedIntegration"
+                                     :integration="selectedIntegration ?? ''"
                                      @change="onListSelectorChange"/>
         </div>
 

@@ -24,11 +24,10 @@ export default {
   },
 
   computed: {
-    ...mapState('contacts', ['isAllContactsSelected']),
+    ...mapState('contacts', ['isAllContactsSelected', 'showMyContacts']),
     ...mapState([
       'users',
-      'campaigns',
-      'showMyContacts'
+      'campaigns'
     ]),
 
     checked () {
@@ -253,6 +252,54 @@ export default {
         .catch(() => {
           this.$generalNotification('Unable to process export request! Please try again later.', 'error')
         })
+    },
+
+    isColumnArrayValueEmpty (columnValue) {
+      const isEmptyArray = columnValue instanceof Array && !columnValue.length
+      return columnValue === '' ||
+        columnValue === null ||
+        columnValue === 'NULL' ||
+        isEmptyArray
+    },
+
+    isColumnArrayValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Array &&
+        columnValue.length
+    },
+
+    isColumnObjectValueEmpty (columnValue) {
+      return columnValue && columnValue instanceof Object && !Object.keys(columnValue).length
+    },
+
+    isColumnObjectValueNotEmpty (columnValue) {
+      return columnValue &&
+        columnValue instanceof Object &&
+        Object.keys(columnValue).length
+    },
+
+    getColumnValue (value) {
+      if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No'
+      }
+
+      if (typeof value !== 'undefined' && value !== 0) {
+        return value.toString()
+      }
+
+      return value === null
+        ? '-'
+        : value
+    },
+
+    getColumnClass (name, draggable) {
+      const textAlignmentClass = this.isCountField(name) ? 'text-center' : 'text-left'
+      const draggableClass = draggable ? 'col-indented' : ''
+
+      return [
+        textAlignmentClass,
+        draggableClass
+      ]
     }
   }
 }

@@ -277,7 +277,7 @@ function clearBadge () {
 }
 
 function setTray () {
-  const iconPath = path.join(__statics, '/electron-app-icon.png')
+  const iconPath = path.join(__statics, '/trayTemplate.png')
   tray = new Tray(iconPath)
   try {
     tray.setContextMenu(Menu.buildFromTemplate([
