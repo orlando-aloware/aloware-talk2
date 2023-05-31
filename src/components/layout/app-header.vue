@@ -133,7 +133,6 @@
 
 <script>
 import _ from 'lodash'
-import * as storage from 'src/plugins/helpers/storage'
 import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
