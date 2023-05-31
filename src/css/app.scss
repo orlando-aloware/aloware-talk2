@@ -12988,15 +12988,36 @@ h1.contact-list-name-label {
               &__sms {
                 margin: 20px 0px;
 
-                &__composer {
+                &__composer-header,
+                &__composer-footer {
+                  text-align: right;
+                  margin: 5px 0px;
+                }
+
+                &__composer-body {
                   position: relative;
                   border: 1px solid $grey-70;
                   border-radius: 8px;
                   padding: 10px 12px;
                 }
 
-                &__preview {
+                &__composer-header {
+                  text-align: right;
+                }
 
+                &__label-preview {
+                  color: $grey-90;
+                  margin: 20px 0px;
+                }
+
+                &__preview {
+                  background-color: $primary;
+                  border-radius: 8px;
+                  padding: 10px;
+                  
+                  textarea {
+                    color: $white;
+                  }
                 }
               }
             }

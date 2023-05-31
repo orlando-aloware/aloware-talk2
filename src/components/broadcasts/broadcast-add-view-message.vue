@@ -8,12 +8,30 @@
     <!-- sms -->
     <div class="broadcast-add__message__sms"
          v-if="type === 'sms'">
-      <div class="broadcast-add__message__sms__composer">
+      <div class="broadcast-add__message__sms__composer-header">
+        Limit: {{ smsBodyLength }} / {{ maxSmsBodyLength }}
+      </div>
+
+      <div class="broadcast-add__message__sms__composer-body">
         <message-composer-sms :use-send-button="false"/>
       </div>
 
+      <div class="broadcast-add__message__sms__composer-footer">
+        <span class="mr-4">
+          Message parts: {{ messagePartCount }} / {{ baseLine }}
+        </span>
+        <span>
+          Message(s): {{ messageCount }}
+        </span>
+      </div>
+
+      <div class="broadcast-add__message__sms__label-preview"
+           v-if="smsBodyLength > 0">
+        Preview
+      </div>
+
       <div class="broadcast-add__message__sms__preview">
-        <!-- <message-composer-sms-preview :contact="contact"/> -->
+        <message-composer-sms-preview :contact="contact"/>
       </div>
     </div>
     <!-- voicemail (TBD) -->
@@ -22,14 +40,15 @@
 
 <script>
 import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
-// import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
+import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'broadcast-add-view-message',
 
   components: {
-    MessageComposerSms
+    MessageComposerSms,
+    MessageComposerSmsPreview
   },
 
   props: {
@@ -40,12 +59,16 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', [
-      'messageComposer'
-    ]),
-
     ...mapState([
       'campaigns'
+    ]),
+
+    ...mapState('auth', [
+      'profile'
+    ]),
+
+    ...mapGetters('contacts', [
+      'messageComposer'
     ]),
 
     isValid () {
@@ -59,6 +82,32 @@ export default {
 
     enabledTypes () {
       return this.types.filter(type => type.enabled)
+    },
+
+    smsBodyLength () {
+      return this.messageComposer.sms.body.length
+    },
+
+    hasMoreThanAscii () {
+      return this.smsBodyLength > 0
+        ? [...this.messageComposer.sms.body].some(char => char.charCodeAt(0) > 127)
+        : false
+    },
+
+    baseLine () {
+      return this.hasMoreThanAscii ? 70 : 160
+    },
+
+    messagePartCount () {
+      return this.smsBodyLength > 0
+        ? this.smsBodyLength % this.baseLine
+        : 0
+    },
+
+    messageCount () {
+      return this.smsBodyLength > 0
+        ? Math.ceil(this.smsBodyLength / this.baseLine)
+        : 0
     }
   },
 
@@ -75,12 +124,17 @@ export default {
         label: 'Ringless Voicemail',
         enabled: false
       }
-    ]
+    ],
+    maxSmsBodyLength: 1600
   }),
 
   created () {
     // FIXME?: check implemented logic in contact.mixin::showContactInfo to select a campaign properly
-    this.setSelectedLine(this.campaigns[0])
+    const campaign = this.profile.campaign_id
+      ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
+      : this.campaigns[0]
+
+    this.setSelectedLine(campaign)
   },
 
   methods: {
