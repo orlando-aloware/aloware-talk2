@@ -108,7 +108,7 @@ module.exports = function (/* ctx */) {
       },
 
       https: true,
-      host: 'talk2.aloware.test',
+      host: 'localhost',
       port: 9090,
       disableHostCheck: true,
       open: true // opens browser window automatically
