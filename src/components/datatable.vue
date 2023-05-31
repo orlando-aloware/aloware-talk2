@@ -12,13 +12,13 @@
              :class="[computedClass, 'pl-3']">
 
         <thead>
-          <draggable tag="tr"
+          <draggable class="dragable-header"
+                     tag="tr"
                      ghost-class="ghost"
                      handle=".handle"
                      :list="fixedColumns"
                      :move="onCheckMove"
-                     @change="onOrderChanged"
-                     class="dragable-header">
+                     @change="onOrderChanged">
 
             <th :key="column.name"
                 :data-column-id="column.name"

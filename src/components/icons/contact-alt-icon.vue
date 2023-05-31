@@ -8,17 +8,20 @@
 <script>
 export default {
   name: 'contact-alt-icon',
+
   props: {
     color: {
       type: String,
       default: '#62666E',
       required: false
     },
+
     height: {
       type: String,
       default: '14',
       required: false
     },
+
     width: {
       type: String,
       default: '20',
