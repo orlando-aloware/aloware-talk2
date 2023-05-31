@@ -287,7 +287,7 @@
               <hr/>
             </div>
 
-            <div  v-if="communication.type === CommunicationTypes.CALL && communication.metadata && communication.metadata.reports">
+            <div v-if="communication.type === CommunicationTypes.CALL && communication.metadata && communication.metadata.reports">
               <b-form-row>
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Answered with Fishing Mode: </q-item-label>
