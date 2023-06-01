@@ -13014,9 +13014,51 @@ h1.contact-list-name-label {
                   background-color: $primary;
                   border-radius: 8px;
                   padding: 10px;
-                  
+                  transition: all .3s;
+
                   textarea {
                     color: $white;
+                  }
+
+                  &--empty {
+                    background-color: $grey-70;
+                  }
+                }
+              }
+            }
+
+            &__schedule {
+              display: flex;
+              flex-direction: column;
+
+              &__row {
+                display: flex;
+
+                &__label {
+                  width: 30%;
+                  color: $grey-90;
+                }
+
+                &__fields {
+                  flex-grow: 1;
+                  display: flex;
+                  flex-direction: column;
+
+                  .time-schedule {
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: 15px;
+                    row-gap: 15px;
+
+                    &__row {
+                      display: flex;
+                      align-items: center;
+
+                      &__label {
+                        color: $grey-90;
+                        width: 50px;
+                      }
+                    }
                   }
                 }
               }
@@ -13060,6 +13102,35 @@ h1.contact-list-name-label {
           &__body {
             .b-overlay-wrap {
               display: none;
+            }
+          }
+        }
+
+        .cards {
+          position: relative;
+
+          &__body {
+            display: flex;
+            column-gap: 10px;
+
+            &__card {
+              background-color: $white;
+              border-radius: 6px;
+              flex-grow: 1;
+              padding: 20px;
+              display: flex;
+              flex-direction: column;
+
+              &__title {
+                font-size: 18px;
+                color: $black;
+                margin-bottom: 5px;
+                font-weight: 500;
+              }
+
+              &__text {
+                color: $grey-90;
+              }
             }
           }
         }

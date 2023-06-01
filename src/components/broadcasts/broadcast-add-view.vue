@@ -11,7 +11,8 @@
                    ref="mainComponent"
                    v-bind="mainComponentProps"
                    @input="mainComponentChanged"
-                   @source-updated="onSourceUpdated"/>
+                   @source-updated="onSourceUpdated"
+                   @sms-price-updated="onSmsPriceUpdated"/>
         <!-- broadcast-add-message -->
         <!-- broadcast-add-schedule -->
         <!-- broadcast-add-preview -->
@@ -49,14 +50,17 @@
                  ref="footerComponent"
                  v-bind="footerComponentProps"
                  @input="footerComponentChanged"
-                 @contact-preview="onContactPreview"/>
+                 @contact-preview="onContactPreview"
+                 @contacts-length="onContactsLength"/>
     </div>
   </div>
 </template>
 
 <script>
+import BroadcastAddCards from './broadcast-add-cards.vue'
 import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
 import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
+import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
 import { isEmpty } from 'lodash'
 
@@ -64,8 +68,10 @@ export default {
   name: 'broadcast-add-view',
 
   components: {
+    BroadcastAddCards,
     BroadcastAddViewContacts,
     BroadcastAddViewMessage,
+    BroadcastAddViewSchedule,
     BroadcastContactsPreview
   },
 
@@ -111,8 +117,10 @@ export default {
       switch (this.currentStep.id) {
         case 1:
           return { defaultSource: this.source }
+        case 2:
+          return { contact: this.contactPreview, contactsLength: this.contactsLength }
         default:
-          return { contact: this.contactPreview }
+          return null
       }
     },
 
@@ -121,6 +129,8 @@ export default {
         // FIXME: use only source?
         case this.currentStep.id === 1 && (!!this.source.list?.id || !isEmpty(this.source.filters)):
           return 'broadcast-contacts-preview'
+        case this.currentStep.id === 2 || this.currentStep.id === 3:
+          return 'broadcast-add-cards'
         default:
           return null
       }
@@ -132,6 +142,8 @@ export default {
           return { list: this.source.list }
         case this.currentStep.id === 1 && !isEmpty(this.source.filters):
           return { filters: this.source.filters }
+        case this.currentStep.id === 2 || this.currentStep.id === 3:
+          return { contactsLength: this.contactsLength, estimatedCost: this.smsPrice }
         default:
           return null
       }
@@ -143,8 +155,8 @@ export default {
           return this.isMainComponentValid && this.isFooterComponentValid
         case 2:
           return this.isMainComponentValid
-        // case 3:
-        //   return 'broadcast-add-view-schedule'
+        case 3:
+          return this.isMainComponentValid
         // case 4:
         //   return 'broadcast-add-view-preview'
         default:
@@ -157,7 +169,10 @@ export default {
     isMainComponentValid: false,
     isFooterComponentValid: false,
     source: {},
-    contactPreview: {}
+    contactPreview: {},
+    contactsLength: 0, // FIXME: is this necessary?
+    type: null, // sms, voicemail
+    smsPrice: null
   }),
 
   methods: {
@@ -173,6 +188,10 @@ export default {
       this.source = source
     },
 
+    onSmsPriceUpdated (price) {
+      this.smsPrice = price
+    },
+
     next () {
       this.isMainComponentValid = false
       this.isFooterComponentValid = false
@@ -186,6 +205,10 @@ export default {
 
     onContactPreview (contact) {
       this.contactPreview = contact
+    },
+
+    onContactsLength (count) {
+      this.contactsLength = count
     }
   }
 }

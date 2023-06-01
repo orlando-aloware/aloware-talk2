@@ -13,7 +13,8 @@
       </div>
 
       <div class="broadcast-add__message__sms__composer-body">
-        <message-composer-sms :use-send-button="false"/>
+        <message-composer-sms :reset-on-load="false"
+                              :use-send-button="false"/>
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
@@ -25,12 +26,11 @@
         </span>
       </div>
 
-      <div class="broadcast-add__message__sms__label-preview"
-           v-if="smsBodyLength > 0">
+      <div class="broadcast-add__message__sms__label-preview">
         Preview
       </div>
 
-      <div class="broadcast-add__message__sms__preview">
+      <div :class="['broadcast-add__message__sms__preview', { 'broadcast-add__message__sms__preview--empty': smsBodyLength === 0 }]">
         <message-composer-sms-preview :contact="contact"/>
       </div>
     </div>
@@ -55,6 +55,11 @@ export default {
     contact: {
       type: Object,
       required: false
+    },
+
+    contactsLength: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -108,6 +113,16 @@ export default {
       return this.smsBodyLength > 0
         ? Math.ceil(this.smsBodyLength / this.baseLine)
         : 0
+    },
+
+    useMmsRate () {
+      return this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
+    },
+
+    smsPricing () {
+      let rate = this.useMmsRate ? this.profile.rate.local_mms : this.profile.rate.local_sms
+
+      return this.contactsLength * this.messageCount * rate
     }
   },
 
@@ -144,8 +159,15 @@ export default {
   },
 
   watch: {
-    isValid (state) {
-      this.$emit('input', state)
+    isValid: {
+      immediate: true,
+      handler (state) {
+        this.$emit('input', state)
+      }
+    },
+
+    smsPricing (price) {
+      this.$emit('sms-price-updated', price)
     }
   }
 }

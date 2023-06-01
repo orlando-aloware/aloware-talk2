@@ -73,6 +73,7 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
+import { parseInt } from 'lodash'
 
 export default {
   name: 'broadcast-contacts-preview',
@@ -188,7 +189,7 @@ export default {
       // load count
       const countsPromise = API.V2.contacts.counts(this.defaultFilters)
         .then(({ data }) => {
-          this.contactsLength = data.count
+          this.contactsLength = parseInt(data.count)
 
           return Promise.resolve()
         })
@@ -231,6 +232,13 @@ export default {
 
     isValid (state) {
       this.$emit('input', state)
+    },
+
+    contactsLength: {
+      immediate: true,
+      handler (count) {
+        this.$emit('contacts-length', count)
+      }
     }
   },
 

@@ -248,6 +248,11 @@ export default {
     useSendButton: {
       type: Boolean,
       default: true
+    },
+
+    resetOnLoad: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -679,7 +684,11 @@ export default {
 
   mounted () {
     this.getDomains()
-    this.resetMessageComposerSms()
+
+    if (this.resetOnLoad) {
+      this.resetMessageComposerSms()
+    }
+
     if (this.messageComposer.mode === 'sms') {
       this.focusInput()
     }
