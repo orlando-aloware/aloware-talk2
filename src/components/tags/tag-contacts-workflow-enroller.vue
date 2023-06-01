@@ -1,10 +1,10 @@
 <template>
   <b-modal id="tag-enroll-tag-contacts-to-sequence-modal"
            modal-class="tags__modal"
+           size="md"
            no-close-on-esc
            no-close-on-backdrop
            centered
-           size="md"
            v-model="openModal"
            @hidden="closeModal">
     <b-overlay no-wrap
@@ -30,7 +30,9 @@
     <ul class="list-unstyled py-4 mb-0">
       <li class="mb-2">
         <div class="d-flex flex-row">
-          <div class="mr-2"><i class="fa fa-info-circle text-warning" aria-hidden="true"></i></div>
+          <div class="mr-2">
+            <i class="fa fa-info-circle text-warning" aria-hidden="true"></i>
+          </div>
           <div>
             Contacts that are already enrolled in a sequence will not be enrolled.
           </div>
@@ -38,7 +40,9 @@
       </li>
       <li class="mb-2">
         <div class="d-flex flex-row">
-          <div class="mr-2"><i class="fa fa-info-circle text-warning" aria-hidden="true"></i></div>
+          <div class="mr-2">
+            <i class="fa fa-info-circle text-warning" aria-hidden="true"></i>
+          </div>
           <div>
             Contacts the has a DNC status will not be enrolled.
           </div>
@@ -46,7 +50,9 @@
       </li>
       <li>
         <div class="d-flex flex-row">
-          <div class="mr-2"><i class="fa fa-info-circle text-warning" aria-hidden="true"></i></div>
+          <div class="mr-2">
+            <i class="fa fa-info-circle text-warning" aria-hidden="true"></i>
+          </div>
           <div>
             Contact groups that has thousands of contacts will take time to enroll.
           </div>

@@ -1,11 +1,11 @@
 <template>
   <div class="tags-table position-relative">
-    <datatable paginated
+    <datatable custom-class="pr-3"
+               scroll-area-class="scroll-type-2"
+               paginated
                show-pagination
                sticky-headers
                use-empty-slot
-               custom-class="pr-3"
-               scroll-area-class="scroll-type-2"
                :columns="columns"
                :is-empty="tags.length === 0"
                :is-loading="isLoading"
@@ -22,6 +22,7 @@
         <tr class="datatable-row"
             :key="`${index}`"
             v-for="(tag, index) in tags">
+
           <template v-for="(column, colIndex) in columns">
             <td v-if="column.name === 'checkbox' && hasRole('Company Admin')"
                 :key="`col-${colIndex}`"
@@ -43,8 +44,8 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="column.name === 'name'"
-                :title="tag.name">
+                :title="tag.name"
+                v-if="column.name === 'name'">
               <i class="fa fa-square mr-1"
                  :style="{ color: tag.color }">
               </i> <span>{{ tag.name }}</span>
@@ -56,8 +57,8 @@
             </td>
 
             <td :key="`col-${colIndex}`"
-                v-if="column.name === 'description'"
-                :title="tag.description">
+                :title="tag.description"
+                v-if="column.name === 'description'">
               <span>{{ tag.description }}</span>
             </td>
 
@@ -90,20 +91,20 @@
             <td :key="`col-${colIndex}`"
                 v-if="column.name === 'actions'">
               <!-- Admins -->
-              <div v-if="hasRole('Company Admin')"
-                   class="text-right w-75"
-                  style="{ position: initial }">
-                <b-button v-if="hasPermissionTo('update tag') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
-                          title="Communications"
+              <div class="text-right w-75"
+                   style="{ position: initial }"
+                   v-if="hasRole('Company Admin')">
+                <b-button title="Communications"
                           variant="transparent"
                           size="sm"
+                          v-if="hasPermissionTo('update tag') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
                           @click="openTagCommunications(tag.id)">
                   <communication-signal-icon />
                 </b-button>
-                <b-button v-if="hasPermissionTo('update tag') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
-                          title="Contacts"
+                <b-button title="Contacts"
                           variant="transparent"
                           size="sm"
+                          v-if="hasPermissionTo('update tag') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
                           @click="openTagContacts(tag.id)">
                   <contact-alt-icon />
                 </b-button>
@@ -115,8 +116,8 @@
                 </b-button>
                 <b-dropdown class="ml-1 position-absolute"
                             size="sm"
-                            right
                             variant="light"
+                            right
                             no-caret>
                   <template #button-content>
                     <ellipse-icon />
@@ -126,16 +127,20 @@
                                      @click="openTagContactsSplitterDialog(tag)">
                       <i class="fas fa-columns"></i> Split
                     </b-dropdown-item>
+
                     <b-dropdown-item @click="openAssignContactsTagDialog(tag)">
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
+
                     <b-dropdown-item @click="openAddTagContactsToPowerDialerDialog(tag)">
                       <i class="fas fa-phone"></i> Add to PowerDialer
                     </b-dropdown-item>
+
                     <b-dropdown-item @click="openEnrollTagContactsToSequenceDialog(tag)">
                       <i class="fas fa-user-plus"></i> Enroll Contacts
                     </b-dropdown-item>
                   </div>
+
                   <b-dropdown-item v-if="hasPermissionTo('delete tag')"
                                    @click="openDeleteTagDialog(tag)">
                     <span class="text-danger"><delete-red-icon /> Delete</span>
@@ -144,19 +149,19 @@
               </div>
 
               <!-- Agent's Button: Redirect to Communications -->
-              <b-button v-if="hasRole('Company Agent') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
+              <b-button class="mb-1 w-100"
                         variant="light"
                         size="sm"
-                        class="mb-1 w-100"
+                        v-if="hasRole('Company Agent') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
                         @click="openTagCommunications(tag.id)">
                 <span v-if="hasRole('Company Agent')"><communication-signal-icon /> Communications</span>
               </b-button>
 
               <!-- Agent's Button: Redirect to Contacts -->
-              <b-button v-if="hasRole('Company Agent') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
+              <b-button class="mb-1 w-100"
                         variant="light"
                         size="sm"
-                        class="mb-1 w-100"
+                        v-if="hasRole('Company Agent') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
                         @click="openTagContacts(tag.id)">
                 <span v-if="hasRole('Company Agent')"><contact-alt-icon /> Contacts</span>
               </b-button>
@@ -170,23 +175,23 @@
     <!-- contacts tag actions -->
     <tag-contacts-splitter :is-show="isOpenTagContactsSplitterDialog"
                            :tag="selectedTag"
-                            @closeAssignContactsTagModal="closeContactTagsActionsModals"/>
+                           @closeAssignContactsTagModal="closeContactTagsActionsModals" />
 
     <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
                             :tag="selectedTag"
-                            @closeAssignContactsTagModal="closeContactTagsActionsModals"/>
+                            @closeAssignContactsTagModal="closeContactTagsActionsModals" />
 
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :tag="selectedTag"
-                                      @closeAddTagContactsToPowerDialer="closeContactTagsActionsModals"/>
+                                      @closeAddTagContactsToPowerDialer="closeContactTagsActionsModals" />
 
     <tag-contacts-workflow-enroller :is-show="isOpenEnrollTagContactsToSequenceDialog"
                                     :tag="selectedTag"
-                                    @closeEnrollTagContactsToSequenceDialog="closeContactTagsActionsModals"/>
+                                    @closeEnrollTagContactsToSequenceDialog="closeContactTagsActionsModals" />
 
     <delete-tag-dialog :is-show="isOpenDeleteTagDialog"
                        :tag="selectedTag"
-                       @closeDeleteTagDialog="closeDeleteTagDialog"/>
+                       @closeDeleteTagDialog="closeDeleteTagDialog" />
   </div>
 </template>
 
@@ -394,7 +399,7 @@ export default {
         const tagIds = [...new Set([...this.selectedTagIds, tagId])]
         this.setSelectedTagIds(tagIds)
 
-        // add to counting
+        // add to bulk counting
         if (this.selectedTagCategory === this.ContactTags && tag.contacts_count > 0) {
           this.addSelectedTagsContactsCount(tag.contacts_count)
         }
@@ -407,7 +412,7 @@ export default {
       tagIds.splice(index, 1)
       this.setSelectedTagIds(tagIds)
 
-      // subtract from counting
+      // subtract from bulk counting
       if (this.selectedTagCategory === this.ContactTags && tag.contacts_count > 0) {
         this.subtractSelectedTagsContactsCount(tag.contacts_count)
       }
@@ -435,7 +440,7 @@ export default {
         // add this current page's tag ids
         updatedTagIds = [...new Set([...this.selectedTagIds, ...tagIds])]
 
-        // update contacts count info
+        // update contacts count info: bulk counting
         if (this.selectedTagCategory === this.ContactTags) {
           this.addSelectedTagsContactsCount(tagContactsCount)
         }
@@ -443,7 +448,7 @@ export default {
         // remove selected tag ids in current page
         updatedTagIds = [...this.selectedTagIds].filter(tagId => tagIds.indexOf(tagId) === -1)
 
-        // update contacts count info
+        // update contacts count info: bulk counting
         if (this.selectedTagCategory === this.ContactTags) {
           this.subtractSelectedTagsContactsCount(tagContactsCount)
         }

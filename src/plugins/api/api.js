@@ -195,6 +195,10 @@ export default {
         return window.axios.delete(`${suffixV1}tag/${id}`, params)
       },
 
+      count (params = {}) {
+        return window.axios.get(`${suffixV1}tags/count`, { params })
+      },
+
       bulkDelete (params) {
         return window.axios.delete(`${suffixV1}tags/bulk-delete`, params)
       },

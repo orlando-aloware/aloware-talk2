@@ -18,6 +18,7 @@
         </tags-tabs>
       </b-col>
 
+      <!-- add|help buttons -->
       <b-col class="d-flex align-self-center justify-content-end row">
         <!-- add tag -->
         <b-button class="mr-1"
@@ -314,18 +315,22 @@ export default {
 
     updateTagCount (tagId) {
       this.isLoadingRefreshCount = true
-      axios.get(`/api/v1/tag/${tagId}`).then(res => {
-        const parsedTags = this.$jsonClone(this.tags)
-        const index = parsedTags.findIndex(item => item.id === res.data.id.id)
-        parsedTags[index] = res.data
-        this.tags = parsedTags
 
-        this.isLoadingRefreshCount = false
-      }).catch(err => {
-        console.log(err)
-        this.$root.handleErrors(err.response)
-        this.isLoadingRefreshCount = false
-      })
+      axios.get(`/api/v1/tag/${tagId}`)
+        .then(res => {
+          const parsedTags = this.$jsonClone(this.tags)
+          const index = parsedTags.findIndex(item => item.id === res.data.id.id)
+
+          parsedTags[index] = res.data
+          this.tags = parsedTags
+
+          this.isLoadingRefreshCount = false
+        })
+        .catch(err => {
+          this.$handleErrors(err.response)
+          this.isLoadingRefreshCount = false
+          console.log(err)
+        })
     }
   },
 

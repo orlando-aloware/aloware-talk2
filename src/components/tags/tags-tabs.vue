@@ -1,15 +1,15 @@
 <template>
   <div class="position-relative">
-    <q-btn-toggle v-model="currentTab"
-                  :options="options"
-                  class="custom-toggle-button tags__tabs"
+    <q-btn-toggle class="custom-toggle-button tags__tabs"
+                  toggle-color="primary active"
+                  color="transparent"
+                  text-color="grey-90"
                   no-caps
                   dense
                   spread
                   unelevated
-                  toggle-color="primary active"
-                  color="transparent"
-                  text-color="grey-90">
+                  :options="options"
+                  v-model="currentTab">
       <template v-slot:one>
         <div class="options">
           <span class="toggle-button-name">Communication Tags</span>

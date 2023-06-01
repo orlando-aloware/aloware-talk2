@@ -1,14 +1,14 @@
 <template>
   <b-modal id="tags-delete-dialog"
            modal-class="tags__modal"
+           size="md"
            no-close-on-esc
            no-close-on-backdrop
            centered
-           size="md"
            v-model="openModal"
            @hidden="closeModal">
-    <b-overlay no-wrap
-               rounded="sm"
+    <b-overlay rounded="sm"
+               no-wrap
                :show="true"
                v-show="loading">
       <template #overlay>
@@ -107,7 +107,7 @@ export default {
       confirmDeleteContactsCount: {
         required: requiredIf(this.isDeleteContacts === 'yes'),
         numeric,
-        equalsTagContactsCount: (value) => +value === this.tag.contacts_count
+        equalsTagContactsCount: (value) => +value === +this.tag.contacts_count
       }
     }
   },
@@ -222,20 +222,20 @@ export default {
 
       xhr
         .then(res => {
+          this.loading = false
           this.$generalNotification(res.data.message)
 
           if (this.isBulk) {
             this.clearAllSelectedTags()
             this.$emit('reloadTags')
           }
+
+          this.closeModal()
         })
         .catch(err => {
           this.$handleErrors(err.response)
-          console.log(err)
-        })
-        .finally(() => {
           this.loading = false
-          this.closeModal()
+          console.log(err)
         })
     }
   },

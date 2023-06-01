@@ -27,15 +27,15 @@
         <p>Assign the leads to this user</p>
         <user-selector :generic-styling="false"
                        v-model="userId"
-                       @change="setUserId"/>
+                       @change="setUserId" />
       </b-tab>
 
       <b-tab title="Ring Group">
         <p>Assign the leads evenly and randomly between the users on this ring group</p>
         <ring-group-selector class="text-13"
-                             v-model="ringGroupId"
                              :generic-multiselect="false"
-                             @change="setRingGroupId"/>
+                             v-model="ringGroupId"
+                             @change="setRingGroupId" />
       </b-tab>
     </b-tabs>
 
@@ -162,7 +162,7 @@ export default {
       this.loading = true
 
       let msg = `Are you sure you want the contacts under `
-      msg += (this.isBulk ? `these tags` : 'this tag')
+      msg += (this.isBulk) ? `these tags` : 'this tag'
       msg += ` to be assigned to this ${this.tabNameLabel}?`
 
       this.$bvModal.msgBoxConfirm(msg, {

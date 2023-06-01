@@ -1,10 +1,10 @@
 <template>
   <b-modal id="tag-contacts-splitter-modal"
            modal-class="tags__modal"
+           size="sm"
            no-close-on-esc
            no-close-on-backdrop
            centered
-           size="sm"
            v-model="openModal"
            @hidden="closeModal">
     <b-overlay no-wrap
@@ -50,7 +50,7 @@
           </button>
           <button class="btn btn-sm btn-primary text-white"
                   :disabled="!splitPageSize || !selectedPageSize || !allowSplit"
-                  @click.prevent="splitTag">
+                  @click.prevent="split">
             Split
           </button>
         </div>
@@ -153,7 +153,7 @@ export default {
       this.splitPageSize = this.selectedPageSize.value
     },
 
-    splitTag () {
+    split () {
       if (!this.allowSplit) {
         return
       }

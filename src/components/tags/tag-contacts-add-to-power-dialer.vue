@@ -53,16 +53,16 @@
       <label class="label mt-2 mb-1 font-weight-bold">
         Push Contacts To
       </label>
-      <q-btn-toggle v-model="direction"
-                    :options="directionOptions"
-                    class="custom-toggle-button"
+      <q-btn-toggle class="custom-toggle-button"
+                    toggle-color="primary active"
+                    text-color="grey-90"
+                    color="transparent"
                     no-caps
                     dense
                     spread
                     unelevated
-                    toggle-color="primary active"
-                    color="transparent"
-                    text-color="grey-90"/>
+                    :options="directionOptions"
+                    v-model="direction" />
 
       <b-form-checkbox class="mx-2 mt-2"
                        :value="option.value"

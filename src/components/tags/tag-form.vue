@@ -27,8 +27,8 @@
                     label="Name"
                     invalid-feedback="Please provide a tag name"
                     :state="validateState('name')">
-        <b-form-input v-model.trim="$v.tag.name.$model"
-                      placeholder="Enter tag name"
+        <b-form-input placeholder="Enter tag name"
+                      v-model.trim="$v.tag.name.$model"
                       required />
       </b-form-group>
 
@@ -47,13 +47,13 @@
                   :style="{ color: tag.color }"></i>
               </template>
 
-              <b-dropdown-item v-for="option in colorOptions"
-                               :key="`color-${option}`"
+              <b-dropdown-item :key="`color-${option}`"
+                               v-for="option in colorOptions"
                                @click="selectTagColor(option)">
                   <span class="color-pick"
                         :class="[tag.color === option ? 'selected' : '']">
                     <i class="fa fa-square fa-2x mx-1"
-                      :style="{ color: option }">
+                       :style="{ color: option }">
                     </i>
                   </span>
               </b-dropdown-item>
@@ -78,9 +78,7 @@
                              :allow-empty="false"
                              :disabled="disabled"
                              v-model="category"
-                             invalid-feedback="Please select a tag category"
-                             :state="validateState('category')"
-                             @select="selectTagCategory"/>
+                             @select="selectTagCategory" />
           </b-form-group>
         </b-col>
       </b-row>
@@ -98,9 +96,9 @@
 
         </template>
         <b-form-textarea id="textarea"
-                         v-model.trim="$v.tag.description.$model"
+                         rows="3"
                          placeholder="Enter tag description"
-                         rows="3"/>
+                         v-model.trim="$v.tag.description.$model"/>
       </b-form-group>
     </b-form>
 
@@ -320,8 +318,8 @@ export default {
 
       if (this.editableTag) {
         // edit/update api
-        const cloneTag = (({ category, ...o }) => o)(this.tag) // except category
-        xhr = API.V1.tags.update(this.editableTag.id, this.$jsonClone(cloneTag))
+        const clonedTag = (({ category, ...o }) => o)(this.tag) // except category
+        xhr = API.V1.tags.update(this.editableTag.id, this.$jsonClone(clonedTag))
         msg = this.tagCategoryName + ' tag updated successfully'
       } else {
         // add api
@@ -336,8 +334,8 @@ export default {
           this.closeTagForm()
         })
         .catch(err => {
-          this.loading = false
           this.$handleErrors(err.response)
+          this.loading = false
           console.log(err)
         })
     }

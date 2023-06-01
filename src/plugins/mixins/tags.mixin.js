@@ -1,6 +1,6 @@
 import { TAG_CATEGORIES } from 'src/constants/tag-categories'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import axios from 'axios'
+import API from 'src/plugins/api/api'
 
 export default {
   data () {
@@ -69,24 +69,24 @@ export default {
     },
 
     getCommunicationTagsCount () {
-      axios.get('/api/v1/tags/count?filter=communication')
+      API.V1.tags.count({ filter: 'communication' })
         .then(res => {
           this.tagCategoriesCount.communications = this.$options.filters.numFormat(res.data.count)
         })
         .catch(err => {
-          console.log(err)
           this.$handleErrors(err.response)
+          console.log(err)
         })
     },
 
     getContactTagsCount () {
-      axios.get('/api/v1/tags/count?filter=contact')
+      API.V1.tags.count({ filter: 'contact' })
         .then(res => {
           this.tagCategoriesCount.contacts = this.$options.filters.numFormat(res.data.count)
         })
         .catch(err => {
-          console.log(err)
           this.$handleErrors(err.response)
+          console.log(err)
         })
     },
 
