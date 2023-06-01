@@ -1,3 +1,5 @@
+import * as TagsDefault from 'src/constants/tags-default'
+
 export default {
   SET_SELECTED_TAG_CATEGORY: (state, category) => {
     state.selectedTagCategory = category
@@ -24,5 +26,9 @@ export default {
 
   SUBTRACT_SELECTED_TAGS_CONTACTS_COUNT: (state, count) => {
     state.selectedTagsContactsCount -= +count
+  },
+
+  RESET_VUEX (state) {
+    state = Object.assign({}, TagsDefault.DEFAULT_STATE)
   }
 }
