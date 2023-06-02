@@ -162,10 +162,12 @@ export default {
       let msg = 'Deleting '
 
       if (!this.isBulk) {
-        msg += `<span class='font-italic font-weight-bold'>${this.tagName}</span> `
+        msg += `<span class='font-italic font-weight-bold'>${this.tagName}</span> tag`
+      } else {
+        msg += 'tag(s)'
       }
 
-      msg += `tag<span v-if='isBulk'>(s)</span> will remove it from all contacts and communications. Continue?`
+      msg += ` will remove it from all contacts and communications. Continue?`
 
       return msg
     }
