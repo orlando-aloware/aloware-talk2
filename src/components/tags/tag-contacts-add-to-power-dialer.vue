@@ -266,7 +266,7 @@ export default {
 
       let msg = `Are you sure you want to add the contacts under `
       msg += (this.isBulk ? `these tags` : 'this tag')
-      msg += ` to this user's Power Dialer?`
+      msg += ` to this user's Power Dialer List?`
 
       this.$bvModal.msgBoxConfirm(msg, {
         title: 'Event Confirmation',
@@ -277,9 +277,12 @@ export default {
         centered: true
       })
         .then(confirm => {
-          if (confirm) {
-            this.addTasks()
+          if (!confirm) {
+            this.loading = false
+            return
           }
+
+          this.addTasks()
         })
     },
 

@@ -199,9 +199,12 @@ export default {
         centered: true
       })
         .then(confirm => {
-          if (confirm) {
-            this.assign()
+          if (!confirm) {
+            this.loading = false
+            return
           }
+
+          this.assign()
         })
     },
 

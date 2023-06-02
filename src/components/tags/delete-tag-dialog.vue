@@ -209,9 +209,12 @@ export default {
         centered: true
       })
         .then(confirm => {
-          if (confirm) {
-            this.closeModal()
+          if (!confirm) {
+            this.loading = false
+            return
           }
+
+          this.closeModal()
         })
     },
 
