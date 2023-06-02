@@ -10,13 +10,13 @@
     </div>
     <div class="page h-100">
       <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
-      <q-layout class="page-layout"
+      <q-layout class="page-layout position-relative"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
                 :height="'100%'">
-        <div class="h-100"
+        <div class="h-100 position-relative"
              :class="{ 'sidebar-active': sidebarVisible, 'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible) }">
-          <q-header class="page-header bg-white text-black no-box-shadow"
+          <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
                     v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
@@ -65,7 +65,7 @@
         <q-drawer v-model="sidebarVisible"
                   v-if="authenticated && !suspended"
                   :breakpoint="0"
-                  class="h-100 sidebar-wrapper d-block"
+                  class="h-100 sidebar-wrapper d-block position-absolute top-0"
                   :width="64"
                   content-class="sidebar">
           <q-list>

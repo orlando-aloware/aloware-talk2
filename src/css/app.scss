@@ -793,6 +793,8 @@ body,
 .sidebar-wrapper,
 .sidebar-wrapper > aside {
   max-width: 64px;
+  position: absolute !important;
+  top: 0;
 }
 
 .separator-blur {
@@ -3721,7 +3723,7 @@ i.option-separator {
   }
 
   .comm-label {
-    @include font-size(12px, 'normal');
+    @include font-size(12px, normal);
     line-height: 15px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3740,13 +3742,13 @@ i.option-separator {
   }
 
   .campaign-name {
-    @include font-size(10px, 'normal');
+    @include font-size(10px, normal);
     line-height: 12px;
     color: $grey-10 !important;
   }
 
   .time-passed {
-    @include font-size(12px, 'normal');
+    @include font-size(12px, normal);
     line-height: 15px;
   }
 }
@@ -12580,7 +12582,7 @@ h1.contact-list-name-label {
 
       .form-group {
         margin-bottom: 0px;
-        
+
         span {
           font-size: 14px;
         }
@@ -12600,12 +12602,12 @@ h1.contact-list-name-label {
       width: 100%;
       display: flex;
       flex-direction: column;
-      
+
       // taller
       &--comfort {
         .overview__body__card {
           width: 20%;
-          
+
           &__container {
             flex-direction: column;
             justify-content: space-between;
@@ -12621,7 +12623,7 @@ h1.contact-list-name-label {
       &--compact {
         .overview__body__card {
           width: calc(100% / 3);
-          
+
           &__container {
             flex-direction: row;
 
@@ -12765,7 +12767,7 @@ h1.contact-list-name-label {
                 align-items: center;
                 cursor: pointer;
                 padding: 4px;
-                
+
                 &:hover {
                   background-color: $light-grey;
                 }
@@ -12866,7 +12868,7 @@ h1.contact-list-name-label {
             word-break: break-word !important;
           }
         }
-        
+
         .relative-time {
           font-size: 13px !important;
           color: $grey-92;
@@ -12884,6 +12886,22 @@ h1.contact-list-name-label {
   .b-overlay {
     & > div {
       border-radius: 10px;
+    }
+  }
+}
+
+.top-0 {
+  top: 0;
+}
+
+.text-decoration-underline {
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+  &.text-red-130 {
+    &:hover {
+      color: $red-130;
     }
   }
 }

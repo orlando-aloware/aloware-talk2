@@ -1,5 +1,6 @@
 <template>
   <div id="q-app">
+    <header-notification/>
     <router-view v-if="cookieValidated"/>
     <portal-target name="app"
                    multiple>
@@ -24,11 +25,13 @@ import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import CustomScripts from 'components/custom-scripts'
+import HeaderNotification from 'components/header-notification'
 
 export default {
   name: 'App',
 
   components: {
+    HeaderNotification,
     Intercom,
     CustomScripts,
     ActionNotification
@@ -71,6 +74,20 @@ export default {
   },
 
   mounted () {
+    if (process.env.CHARGEBEE_SITE) {
+      storage.local.setItem('chargebee_site', process.env.CHARGEBEE_SITE)
+    }
+
+    if (process.env.ENABLE_BILLING === true) {
+      try {
+        this.chargebeeInstance = window.Chargebee.init({
+          site: process.env.CHARGEBEE_SITE
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
     // if account is not allowed to access talk, we need to logout
     if (this.profile && !this.profile.company.talk_enabled) {
       this.logout()
