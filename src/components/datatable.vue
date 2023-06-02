@@ -110,7 +110,7 @@
     </div>
 
     <div v-if="paginated"
-         class="d-flex justify-content-center">
+         class="d-flex justify-content-center bordered-top">
       <q-pagination class="table-pagination"
                     padding="0 15px"
                     boundary-links

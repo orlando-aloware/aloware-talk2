@@ -5599,14 +5599,14 @@ button#bs-folder-options {
   }
 
   &.scroll-type-1 {
-    max-height: calc(100vh - 217px);
+    max-height: calc(100vh - 190px);
 
     &:not(.mobile-scrollableArea) {
-      max-height: calc(100vh - 217px);
+      max-height: calc(100vh - 190px);
     }
 
     &.mobile-scrollableArea {
-      max-height: calc(100vh - 310);
+      max-height: calc(100vh - 300);
     }
   }
 

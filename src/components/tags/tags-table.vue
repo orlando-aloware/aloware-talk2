@@ -1,7 +1,6 @@
 <template>
   <div class="tags-table position-relative">
     <datatable custom-class="pr-3"
-               scroll-area-class="scroll-type-2"
                paginated
                show-pagination
                sticky-headers
