@@ -1363,7 +1363,7 @@ export default {
           setTimeout(() => {
             this.isRedialClicked = false
             this.wrapUp = false
-            this.skipWrapUp = false
+            this.skipWrapUp = true
             this.processSession()
           }, 1000)
 
