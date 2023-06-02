@@ -2,11 +2,9 @@
   <b-modal id="tag-enroll-tag-contacts-to-sequence-modal"
            modal-class="tags__modal"
            size="md"
-           no-close-on-esc
-           no-close-on-backdrop
            centered
            v-model="openModal"
-           @hidden="closeModal">
+           @hide="closeModalPrompt">
     <b-overlay no-wrap
                rounded="sm"
                :show="true"
@@ -18,7 +16,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Enroll to Sequence</h6>
+      <h6>{{ formName }}</h6>
     </template>
 
     <div>
@@ -68,7 +66,7 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
-                  @click.prevent="closeModal">
+                  @click.prevent="closeModalPrompt">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
@@ -132,14 +130,41 @@ export default {
       set (isShow) {
         return isShow
       }
+    },
+
+    formName () {
+      return `Enroll to Sequence`
     }
   },
 
   methods: {
+    closeModalPrompt (bvModalEvent) {
+      if (!this.selectedWorkflowId) {
+        this.closeModal()
+        return
+      }
+
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName} form?`, {
+        title: `Close ${this.formName}`,
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not',
+        size: 'sm',
+        buttonSize: 'sm',
+        centered: true
+      })
+        .then(confirm => {
+          if (confirm) {
+            this.closeModal()
+          }
+        })
+    },
+
     closeModal () {
-      this.$bvModal.hide('tag-enroll-tag-contacts-to-sequence-modal')
       this.$emit('closeEnrollTagContactsToSequenceDialog')
       this.reset()
+      this.$bvModal.hide('tag-enroll-tag-contacts-to-sequence-modal')
     },
 
     reset () {

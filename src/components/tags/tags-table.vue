@@ -43,7 +43,8 @@
               {{ tag.id }}
             </td>
 
-            <td :key="`col-${colIndex}`"
+            <td class="cursor-pointer"
+                :key="`col-${colIndex}`"
                 :title="tag.name"
                 v-if="column.name === 'name'">
               <i class="fa fa-square mr-1"
@@ -51,12 +52,14 @@
               </i> <span>{{ tag.name }}</span>
             </td>
 
-            <td :key="`col-${colIndex}`"
+            <td class="cursor-pointer"
+                :key="`col-${colIndex}`"
                 v-if="column.name === 'updated_at'">
               {{ tag.updated_at | fixDate }}
             </td>
 
-            <td :key="`col-${colIndex}`"
+            <td class="cursor-pointer"
+                :key="`col-${colIndex}`"
                 :title="tag.description"
                 v-if="column.name === 'description'">
               <span>{{ tag.description }}</span>
@@ -99,14 +102,14 @@
                           size="sm"
                           v-if="hasPermissionTo('update tag') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
                           @click="openTagCommunications(tag.id)">
-                  <communication-signal-icon />
+                  <q-icon :name="ionOpenOutline"></q-icon>
                 </b-button>
                 <b-button title="Contacts"
                           variant="transparent"
                           size="sm"
                           v-if="hasPermissionTo('update tag') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
                           @click="openTagContacts(tag.id)">
-                  <contact-alt-icon />
+                  <q-icon :name="ionOpenOutline" />
                 </b-button>
                 <b-button title="Edit"
                           variant="transparent"
@@ -154,7 +157,7 @@
                         size="sm"
                         v-if="hasRole('Company Agent') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
                         @click="openTagCommunications(tag.id)">
-                <span v-if="hasRole('Company Agent')"><communication-signal-icon /> Communications</span>
+                <span v-if="hasRole('Company Agent')"><q-icon :name="ionOpenOutline" /> Communications</span>
               </b-button>
 
               <!-- Agent's Button: Redirect to Contacts -->
@@ -163,7 +166,7 @@
                         size="sm"
                         v-if="hasRole('Company Agent') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
                         @click="openTagContacts(tag.id)">
-                <span v-if="hasRole('Company Agent')"><contact-alt-icon /> Contacts</span>
+                <span v-if="hasRole('Company Agent')"><q-icon :name="ionOpenOutline" /> Contacts</span>
               </b-button>
             </td>
           </template>
@@ -198,8 +201,6 @@
 <script>
 import Datatable from 'components/datatable.vue'
 import { aclMixin, tagsMixin } from 'src/plugins/mixins'
-import CommunicationSignalIcon from 'components/icons/communication-signal-icon.vue'
-import ContactAltIcon from 'components/icons/contact-alt-icon.vue'
 import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
@@ -211,9 +212,16 @@ import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 import { mapState, mapActions } from 'vuex'
 import { COLUMNS as COMMUNICATIONS_COLUMNS } from 'src/constants/tags/communications-columns'
 import { COLUMNS as CONTACTS_COLUMNS } from 'src/constants/tags/contacts-columns'
+import { ionOpenOutline } from '@quasar/extras/ionicons-v7'
 
 export default {
   name: 'tags-table',
+
+  setup () {
+    return {
+      ionOpenOutline
+    }
+  },
 
   components: {
     DeleteTagDialog,
@@ -222,8 +230,6 @@ export default {
     AssignContactsByTag,
     TagContactsSplitter,
     Datatable,
-    CommunicationSignalIcon,
-    ContactAltIcon,
     EditPenIcon,
     EllipseIcon,
     DeleteRedIcon

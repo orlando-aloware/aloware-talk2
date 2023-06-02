@@ -2,11 +2,9 @@
   <b-modal id="tag-contacts-splitter-modal"
            modal-class="tags__modal"
            size="sm"
-           no-close-on-esc
-           no-close-on-backdrop
            centered
            v-model="openModal"
-           @hidden="closeModal">
+           @hide="closeModalPrompt">
     <b-overlay no-wrap
                rounded="sm"
                :show="true"
@@ -18,7 +16,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Split Tag</h6>
+      <h6>{{ formName }}</h6>
     </template>
 
     <p v-html="`Split <span class='font-italic font-weight-bold'>${ tagName }</span> tag into smaller tags.`">
@@ -45,7 +43,7 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
-                  @click.prevent="closeModal">
+                  @click.prevent="closeModalPrompt">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
@@ -134,14 +132,41 @@ export default {
       }
 
       return this.tag.contacts_count > this.splitPageSize
+    },
+
+    formName () {
+      return `Split Tag`
     }
   },
 
   methods: {
+    closeModalPrompt (bvModalEvent) {
+      if (!this.selectedPageSize) {
+        this.closeModal()
+        return
+      }
+
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName}form?`, {
+        title: `Close ${this.formName}`,
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not',
+        size: 'sm',
+        buttonSize: 'sm',
+        centered: true
+      })
+        .then(confirm => {
+          if (confirm) {
+            this.closeModal()
+          }
+        })
+    },
+
     closeModal () {
-      this.$bvModal.hide('tags-delete-dialog')
       this.$emit('closeAssignContactsTagModal')
       this.reset()
+      this.$bvModal.hide('tags-delete-dialog')
     },
 
     reset () {

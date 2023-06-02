@@ -1,12 +1,10 @@
 <template>
   <b-modal id="tag-add-tag-contacts-to-pd"
            modal-class="tags__modal"
-           no-close-on-esc
-           no-close-on-backdrop
            centered
            size="md"
            v-model="openModal"
-           @hidden="closeModal">
+           @hide="closeModalPrompt">
     <b-overlay no-wrap
                rounded="sm"
                :show="true"
@@ -18,7 +16,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Add Tasks to a User's Power Dialer List</h6>
+      <h6>{{ formName }}</h6>
     </template>
 
     <p class="text-13 text-amber-10">
@@ -88,7 +86,7 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
-                  @click.prevent="closeModal">
+                  @click.prevent="closeModalPrompt">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
@@ -210,14 +208,41 @@ export default {
       }
 
       return options
+    },
+
+    formName () {
+      return `Add Tasks to a User's Power Dialer List`
     }
   },
 
   methods: {
+    closeModalPrompt (bvModalEvent) {
+      if (!this.userId) {
+        this.closeModal()
+        return
+      }
+
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName} form?`, {
+        title: `Close ${this.formName}`,
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not',
+        size: 'sm',
+        buttonSize: 'sm',
+        centered: true
+      })
+        .then(confirm => {
+          if (confirm) {
+            this.closeModal()
+          }
+        })
+    },
+
     closeModal () {
-      this.$bvModal.hide('tag-add-tag-contacts-to-pd')
       this.$emit('closeAddTagContactsToPowerDialer')
       this.reset()
+      this.$bvModal.hide('tag-add-tag-contacts-to-pd')
     },
 
     reset () {

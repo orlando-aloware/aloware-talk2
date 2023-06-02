@@ -2,11 +2,9 @@
   <b-modal id="tags-delete-dialog"
            modal-class="tags__modal"
            size="md"
-           no-close-on-esc
-           no-close-on-backdrop
            centered
            v-model="openModal"
-           @hidden="closeModal">
+           @hide="closeModalPrompt">
     <b-overlay rounded="sm"
                no-wrap
                :show="true"
@@ -18,7 +16,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>Delete {{ tagCategoryName }} Tag<span v-if="isBulk">(s)</span></h6>
+      <h6>{{ formName }}</h6>
     </template>
 
     <span v-html="promptMessage" />
@@ -50,7 +48,7 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
-                    @click.prevent="closeModal">
+                    @click.prevent="closeModalPrompt">
               Cancel
             </button>
             <button class="btn btn-sm btn-danger text-white"
@@ -170,6 +168,11 @@ export default {
       msg += ` will remove it from all contacts and communications. Continue?`
 
       return msg
+    },
+
+    formName () {
+      const noun = this.isBulk ? 'Tags' : 'Tag'
+      return `Delete ${this.tagCategoryName} ${noun}`
     }
   },
 
@@ -189,10 +192,33 @@ export default {
       this.confirmDeleteContactsCount = null
     },
 
+    closeModalPrompt (bvModalEvent) {
+      if (!this.confirmDeleteWithContacts) {
+        this.closeModal()
+        return
+      }
+
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName} form?`, {
+        title: `Close ${this.formName}`,
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not',
+        size: 'sm',
+        buttonSize: 'sm',
+        centered: true
+      })
+        .then(confirm => {
+          if (confirm) {
+            this.closeModal()
+          }
+        })
+    },
+
     closeModal () {
-      this.$bvModal.hide('tag-contacts-splitter-modal')
       this.$emit('closeDeleteTagDialog')
       this.reset()
+      this.$bvModal.hide('tag-contacts-splitter-modal')
     },
 
     deleteTag () {
