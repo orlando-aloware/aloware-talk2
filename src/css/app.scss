@@ -13033,6 +13033,7 @@ h1.contact-list-name-label {
 
               &__row {
                 display: flex;
+                margin-bottom: 30px;
 
                 &__label {
                   width: 30%;
@@ -13057,6 +13058,14 @@ h1.contact-list-name-label {
                       &__label {
                         color: $grey-90;
                         width: 50px;
+                      }
+
+                      &__field {
+                        flex-grow: 1;
+                        
+                        .multiselect__placeholder {
+                          width: 100%;
+                        }
                       }
                     }
                   }

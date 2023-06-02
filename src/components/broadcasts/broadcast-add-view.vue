@@ -12,7 +12,10 @@
                    v-bind="mainComponentProps"
                    @input="mainComponentChanged"
                    @source-updated="onSourceUpdated"
-                   @sms-price-updated="onSmsPriceUpdated"/>
+                   @sms-price-updated="onSmsPriceUpdated"
+                   @time="onTimeUpdated"
+                   @campaign="onCampaignUpdated"
+                   @throttle="onThrottleUpdated"/>
         <!-- broadcast-add-message -->
         <!-- broadcast-add-schedule -->
         <!-- broadcast-add-preview -->
@@ -172,7 +175,10 @@ export default {
     contactPreview: {},
     contactsLength: 0, // FIXME: is this necessary?
     type: null, // sms, voicemail
-    smsPrice: null
+    smsPrice: 0,
+    campaign: null,
+    throttle: null,
+    time: null
   }),
 
   methods: {
@@ -190,6 +196,18 @@ export default {
 
     onSmsPriceUpdated (price) {
       this.smsPrice = price
+    },
+
+    onTimeUpdated (time) {
+      this.time = time
+    },
+
+    onCampaignUpdated (campaign) {
+      this.campaign = campaign
+    },
+
+    onThrottleUpdated (throttle) {
+      this.throttle = throttle
     },
 
     next () {
