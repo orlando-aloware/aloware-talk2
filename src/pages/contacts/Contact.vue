@@ -184,8 +184,7 @@ export default {
       'resetChangedContactProperties',
       'selectedContactChanging',
       'setContact',
-      'setContactClone',
-      'setShowContactResourceUnavailable'
+      'setContactClone'
     ]),
 
     ...mapActions(['setContactDetailsDrawer']),
@@ -286,8 +285,6 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
-      this.setShowContactResourceUnavailable(false)
-
       // Show loading overlay as soon as id changes
       this.selectedContactChanging(true)
 
