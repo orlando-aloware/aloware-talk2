@@ -113,7 +113,8 @@ export default {
         'contact-details',
         'message-composer'
       ],
-      listeners: {}
+      listeners: {},
+      contactFetchFailed: false
     }
   },
 
@@ -437,12 +438,23 @@ export default {
       }
     },
 
+    fetchFailedNotification (response) {
+      if (response?.status === 404 && !this.fetchFailed) {
+        this.$generalNotification('Cannot find Contact.', 'error')
+      } else if (!this.fetchFailed) {
+        this.$handleErrors(response)
+      }
+
+      this.fetchFailed = true
+    },
+
     async fetchContactInfo (isFetchContact = true) {
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
+      this.fetchFailed = false
 
       if (!this.contactId) {
         console.log('Failed to fetch contact info: Missing contact id!')
@@ -461,7 +473,7 @@ export default {
           this.setContactPhoneNumbers(response.data)
         }).catch(err => {
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       // get contact's communication summary
@@ -471,7 +483,7 @@ export default {
           this.setCommunicationSummary(response.data)
         }).catch(err => {
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       this.setSequenceInfoLoading(true)
@@ -484,7 +496,7 @@ export default {
         }).catch((err) => {
           this.setSequenceInfoLoading(false)
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       // get contact's contact attributes
@@ -493,11 +505,11 @@ export default {
           this.setContactAttributes(_.cloneDeep(response.data))
         }).catch(err => {
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       // get contact's communications
-      this.fetchContactCommunications(this.contactId, false)
+      this.fetchContactCommunications(this.contactId, false, false)
         .then(res => {
           this.loadingContact = false
 
@@ -515,6 +527,14 @@ export default {
           }
 
           this.scrollMessages()
+        }).catch(err => {
+          if (window.axios.isCancel(err)) {
+            console.log('Request canceled', err.message)
+          }
+
+          this.fetchFailedNotification(err.response)
+          this.loadingContactCommunications = false
+          console.log(err)
         })
 
       if (!isFetchContact) {
@@ -544,7 +564,7 @@ export default {
             return
           }
 
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
 
           // inside Inbox
           if (this.$route.name.includes('Inbox')) {
@@ -633,7 +653,7 @@ export default {
       }
     },
 
-    async fetchContactCommunications (contactId, skipContactInfo = true) {
+    async fetchContactCommunications (contactId, skipContactInfo = true, useDefaultCatch = true) {
       this.communicationApiSource.cancel('fetchContactCommunications operation canceled by the user.')
       this.communicationApiSource = this.communicationApiCancelToken.source()
       let lastAuditCreatedAt = null
@@ -668,11 +688,16 @@ export default {
 
         return res
       }).catch(err => {
+        if (!useDefaultCatch) {
+          return
+        }
+
         if (window.axios.isCancel(err)) {
           console.log('Request canceled', err.message)
         }
 
         this.$handleErrors(err.response)
+
         this.loadingContactCommunications = false
         console.log(err)
       })
