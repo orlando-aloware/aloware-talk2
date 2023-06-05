@@ -321,6 +321,7 @@ export default {
   created () {
     this.$VueEvent.listen('callContact', (data) => {
       this.showDialer()
+
       setTimeout(() => {
         this.$VueEvent.fire('changePhoneNumber', data)
       }, 100)

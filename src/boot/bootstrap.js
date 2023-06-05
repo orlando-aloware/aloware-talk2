@@ -13,10 +13,11 @@ import VueWaveSurfer from 'vue-wave-surfer'
 import * as storage from 'src/plugins/helpers/storage'
 import CountriesAndTimezones from 'countries-and-timezones'
 import infiniteScroll from 'vue-infinite-scroll'
-import { Screen } from 'quasar'
+import { Screen, Platform } from 'quasar'
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
 import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
+import log from 'electron-log'
 
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
@@ -667,4 +668,14 @@ Vue.prototype.$isNumeric = (value) => {
   let regex = /^-{0,1}\d*\.{0,1}\d+$/
 
   return regex.test(value)
+}
+
+Vue.prototype.$electronLog = (value) => {
+  if (!value || !Platform.is.electron) {
+    return
+  }
+
+  log.transports.file.level = 'info'
+  log.transports.file.maxSize = 5 * 1024 * 1024
+  log.info(value)
 }

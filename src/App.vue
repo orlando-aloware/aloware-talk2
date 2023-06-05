@@ -136,7 +136,15 @@ export default {
           contactTimezone: contact.timezone
         }
 
-        this.$VueEvent.fire('callContact', callData)
+        this.$router.push({
+          name: 'Phone'
+        }, () => {
+          this.$VueEvent.fire('callContact', callData)
+        }, () => {
+          if (this.$route.name === 'Phone') {
+            this.$VueEvent.fire('callContact', callData)
+          }
+        })
       }).catch(() => {
         this.isPageLoading = false
       })

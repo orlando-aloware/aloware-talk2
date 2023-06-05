@@ -162,7 +162,7 @@ if (gotTheLock) {
 
       setTimeout(() => {
         openUrl(deepLinkingUrl)
-      }, 5000)
+      }, 1000)
     }
 
     if (mainWindow) {
@@ -207,6 +207,11 @@ if (gotTheLock) {
 } else {
   app.quit()
 }
+
+// remove so we can register each time as we run the app.
+app.removeAsDefaultProtocolClient('alowaretalk')
+app.removeAsDefaultProtocolClient('tel')
+app.removeAsDefaultProtocolClient('callto')
 
 if (!app.isDefaultProtocolClient('alowaretalk')) {
   // Define custom protocol handler. Deep linking works on packaged versions of the application!

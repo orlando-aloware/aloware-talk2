@@ -213,12 +213,6 @@ export default {
     value: {
       type: Boolean,
       required: false
-    },
-
-    isMobile: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
 
@@ -248,7 +242,8 @@ export default {
     ...mapState([
       'dialer',
       'parkedCalls',
-      'loadingParkedCalls'
+      'loadingParkedCalls',
+      'isMobile'
     ]),
 
     ...mapGetters('auth', ['profile']),
@@ -306,6 +301,10 @@ export default {
 
   created () {
     this.$VueEvent.listen('changePhoneNumber', (data) => {
+      if (!this.campaignId) {
+        this.findDefaultOutboundCampaign()
+      }
+
       this.setMode('call')
 
       this.changePhoneNumber(data).then(() => {
@@ -373,10 +372,14 @@ export default {
         }).catch((err) => {
           console.log(err)
           this.loadingContact = false
+
+          return Promise.reject()
         })
       }
 
       this.setupContactLocalTime()
+
+      return Promise.resolve()
     },
 
     setupContactLocalTime () {

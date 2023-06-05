@@ -14,7 +14,7 @@
         <div class="h-100"
              :class="headerContainerClass">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
+                    v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended && !isMobile">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
           <q-page-container :class="pageContainerClasses">
@@ -55,8 +55,7 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !suspended">
-            </dialer>
+            <dialer v-if="authenticated && !suspended"/>
           </q-page-container>
         </div>
         <q-drawer class="h-100 sidebar-wrapper d-block"
@@ -84,7 +83,7 @@
                   v-if="authenticated && !suspended"
                   @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
-                    v-show="!isPhoneVisible">
+                    v-if="!isPhoneVisible && isMobile">
             <app-header force-page-title="Phone"
                         :no-padding="true"
                         :title-only="true"/>
@@ -95,10 +94,9 @@
           </phone>
           <dialer-form ref="dialerForm"
                        class="dialerForm"
-                       :class="{ 'hide': isPhoneVisible }"
-                       :isMobile="true"
+                       :class="{ 'hide': (isPhoneVisible || !mobilePhoneDrawer) }"
                        v-model="mobilePhoneDrawer"
-                       v-if="mobilePhoneDrawer">
+                       v-if="isMobile">
           </dialer-form>
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
@@ -1842,6 +1840,12 @@ export default {
     sendCall (phoneNumber) {
       if (!phoneNumber) {
         return
+      }
+
+      if (!this.currentCompany) {
+        this.setTimeout(() => {
+          this.sendCall(phoneNumber)
+        }, 500)
       }
 
       if (this.authenticated) {
