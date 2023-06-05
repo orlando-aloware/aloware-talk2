@@ -166,6 +166,13 @@ export default {
       }
     },
 
+    type: {
+      immediate: true,
+      handler (type) {
+        this.$emit('type-updated', type)
+      }
+    },
+
     smsPricing (price) {
       this.$emit('sms-price-updated', price)
     }

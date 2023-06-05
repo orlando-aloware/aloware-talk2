@@ -136,7 +136,8 @@ export default {
     onContactListSelected (list) {
       this.source.list = {
         type: 'contacts-list',
-        id: list.id
+        id: list.id,
+        name: list.name
       }
     },
 

@@ -48,7 +48,7 @@ export default {
       return [
         {
           title: this.contactsLength,
-          text: 'Contacts'
+          text: (this.contactsLength === 1 ? 'Contact' : 'Contacts')
         },
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),

@@ -34,7 +34,7 @@ export default {
 
   props: {
     value: {
-      type: Number,
+      type: Object,
       required: false,
       default: null
     },
@@ -126,7 +126,7 @@ export default {
 
   data () {
     return {
-      throttle: null
+      throttle: this.value
     }
   },
 

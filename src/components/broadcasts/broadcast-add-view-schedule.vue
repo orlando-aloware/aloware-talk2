@@ -91,6 +91,7 @@ import DateSelector from 'src/components/date-selector.vue'
 import PredefinedTimeSelector from 'src/components/predefined-time-selector.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
 import { mapState } from 'vuex'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-schedule',
@@ -103,6 +104,26 @@ export default {
     ThrottleSelector
   },
 
+  props: {
+    propCampaign: {
+      type: Object,
+      required: false,
+      default: null
+    },
+
+    propTime: {
+      type: Object,
+      required: false,
+      default: null
+    },
+
+    propThrottle: {
+      type: Object,
+      required: false,
+      default: null
+    }
+  },
+
   computed: {
     ...mapState('cache', [
       'currentCompany'
@@ -113,7 +134,7 @@ export default {
         ? this.schedule.date && this.schedule.time
         : true
 
-      return time && this.campaign.id && this.throttle
+      return time && !isEmpty(this.campaign) && !isEmpty(this.throttle)
     },
 
     companyTimezone () {
@@ -136,6 +157,19 @@ export default {
     campaign: {},
     throttle: null
   }),
+
+  created () {
+    this.campaign = this.propCampaign || {}
+    this.throttle = this.propThrottle
+
+    if (this.propTime) {
+      this.time = this.propTime.time
+    }
+
+    if (this.propTime?.schedule) {
+      this.schedule = this.propTime.schedule
+    }
+  },
 
   methods: {
     onDateSelected (date) {
@@ -164,10 +198,6 @@ export default {
     time: {
       immediate: true,
       handler (time) {
-        // reset / set default schedule
-        this.schedule.date = time === 'now' ? null : window.moment().format('MM-DD-YYYY')
-        this.schedule.time = time === 'now' ? null : '06:00'
-
         this.$emit('time', {
           time: time,
           schedule: this.schedule
@@ -175,15 +205,11 @@ export default {
       }
     },
 
-    schedule: {
-      immediate: true,
-      deep: true,
-      handler () {
-        this.$emit('time', {
-          time: this.time,
-          schedule: this.schedule
-        })
-      }
+    schedule () {
+      this.$emit('time', {
+        time: this.time,
+        schedule: this.schedule
+      })
     },
 
     throttle (value) {

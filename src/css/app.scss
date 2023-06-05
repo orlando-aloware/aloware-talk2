@@ -13072,6 +13072,35 @@ h1.contact-list-name-label {
                 }
               }
             }
+
+            &__preview {
+              display: flex;
+              flex-direction: column;
+              row-gap: 30px;
+
+              &__row {
+                display: flex;
+                flex-direction: column;
+                row-gap: 10px;
+
+                &__label {
+                  color: $grey-90;
+                }
+
+                &__field {
+                  &__sms-preview {
+                    background-color: $primary;
+                    border-radius: 8px;
+                    padding: 10px;
+                    transition: all 0.3s;
+
+                    textarea {
+                      color: $white;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
 

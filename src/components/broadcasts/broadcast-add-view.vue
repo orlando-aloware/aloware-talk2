@@ -6,19 +6,16 @@
       </div>
 
       <div class="broadcasts__add__view__form__content">
-        <!-- broadcast-add-contact -->
         <component :is="mainComponent"
                    ref="mainComponent"
                    v-bind="mainComponentProps"
                    @input="mainComponentChanged"
                    @source-updated="onSourceUpdated"
+                   @type-updated="onTypeUpdated"
                    @sms-price-updated="onSmsPriceUpdated"
                    @time="onTimeUpdated"
                    @campaign="onCampaignUpdated"
                    @throttle="onThrottleUpdated"/>
-        <!-- broadcast-add-message -->
-        <!-- broadcast-add-schedule -->
-        <!-- broadcast-add-preview -->
       </div>
 
       <div class="broadcasts__add__view__form__footer">
@@ -63,6 +60,7 @@
 import BroadcastAddCards from './broadcast-add-cards.vue'
 import BroadcastAddViewContacts from './broadcast-add-view-contacts.vue'
 import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
+import BroadcastAddViewPreview from './broadcast-add-view-preview.vue'
 import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
 import { isEmpty } from 'lodash'
@@ -74,6 +72,7 @@ export default {
     BroadcastAddCards,
     BroadcastAddViewContacts,
     BroadcastAddViewMessage,
+    BroadcastAddViewPreview,
     BroadcastAddViewSchedule,
     BroadcastContactsPreview
   },
@@ -121,7 +120,26 @@ export default {
         case 1:
           return { defaultSource: this.source }
         case 2:
-          return { contact: this.contactPreview, contactsLength: this.contactsLength }
+          return {
+            contact: this.contactPreview,
+            contactsLength: this.contactsLength
+          }
+        case 3:
+          return {
+            propCampaign: this.campaign,
+            propThrottle: this.throttle,
+            propTime: this.time
+          }
+        case 4:
+          return {
+            contact: this.contactPreview,
+            campaign: this.campaign,
+            contactsLength: this.contactsLength,
+            source: this.source,
+            throttle: this.throttle.name,
+            time: this.time,
+            type: this.type
+          }
         default:
           return null
       }
@@ -132,7 +150,7 @@ export default {
         // FIXME: use only source?
         case this.currentStep.id === 1 && (!!this.source.list?.id || !isEmpty(this.source.filters)):
           return 'broadcast-contacts-preview'
-        case this.currentStep.id === 2 || this.currentStep.id === 3:
+        case this.currentStep.id === 2 || this.currentStep.id === 3 || this.currentStep.id === 4:
           return 'broadcast-add-cards'
         default:
           return null
@@ -146,7 +164,16 @@ export default {
         case this.currentStep.id === 1 && !isEmpty(this.source.filters):
           return { filters: this.source.filters }
         case this.currentStep.id === 2 || this.currentStep.id === 3:
-          return { contactsLength: this.contactsLength, estimatedCost: this.smsPrice }
+          return {
+            contactsLength: this.contactsLength,
+            estimatedCost: this.smsPrice
+          }
+        case this.currentStep.id === 4:
+          return {
+            contactsLength: this.contactsLength,
+            estimatedCost: this.smsPrice,
+            messagesLength: this.messagesLength
+          }
         default:
           return null
       }
@@ -157,11 +184,9 @@ export default {
         case 1:
           return this.isMainComponentValid && this.isFooterComponentValid
         case 2:
-          return this.isMainComponentValid
         case 3:
+        case 4:
           return this.isMainComponentValid
-        // case 4:
-        //   return 'broadcast-add-view-preview'
         default:
           throw new Error('Invalid step ' + this.currentStep.id)
       }
@@ -178,7 +203,8 @@ export default {
     smsPrice: 0,
     campaign: null,
     throttle: null,
-    time: null
+    time: null,
+    messagesLength: 0
   }),
 
   methods: {
@@ -194,11 +220,16 @@ export default {
       this.source = source
     },
 
+    onTypeUpdated (type) {
+      this.type = type
+    },
+
     onSmsPriceUpdated (price) {
       this.smsPrice = price
     },
 
     onTimeUpdated (time) {
+      console.log(time)
       this.time = time
     },
 
