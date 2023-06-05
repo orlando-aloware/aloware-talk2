@@ -2378,6 +2378,7 @@ export default {
       // Observe notification container and resize the rest of the component
       let notificationContainerSelector = '#notification-container'
 
+      // Observe changes on the document body, and returns the notification container element if found
       let notificationContainerExists = function () {
         return new Promise(resolve => {
           if (document.querySelector(notificationContainerSelector)) {
@@ -2398,6 +2399,7 @@ export default {
         })
       }
 
+      // When the observer returns something, observe the size of the element
       notificationContainerExists().then((element) => {
         new ResizeObserver(event => {
           this.notificationContainerHeight = event[0]?.target?.clientHeight ?? 0
