@@ -440,6 +440,21 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
       }]
       colorClass.data = 'bg-green-10'
       break
+    case 'error-redirect':
+      actions = [{
+        label: 'Go to page',
+        color: 'primary',
+        class: 'px-2',
+        handler: () => {
+          if (actionOptions.path) {
+            this.$router.push({
+              path: actionOptions.path
+            })
+          }
+        }
+      }]
+      colorClass.data = 'bg-red-10'
+      break
     default:
       colorClass.data = 'bg-green-10'
   }
