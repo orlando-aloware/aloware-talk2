@@ -74,20 +74,6 @@ export default {
   },
 
   mounted () {
-    if (process.env.CHARGEBEE_SITE) {
-      storage.local.setItem('chargebee_site', process.env.CHARGEBEE_SITE)
-    }
-
-    if (process.env.ENABLE_BILLING === true) {
-      try {
-        this.chargebeeInstance = window.Chargebee.init({
-          site: process.env.CHARGEBEE_SITE
-        })
-      } catch (err) {
-        console.log(err)
-      }
-    }
-
     // if account is not allowed to access talk, we need to logout
     if (this.profile && !this.profile.company.talk_enabled) {
       this.logout()

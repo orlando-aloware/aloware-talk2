@@ -37,22 +37,12 @@
 
     <portal to="diagnosisButtons">
       <strong class="mr-2"
-              v-if="!link && !issueCodes.includes(CompanyIssues.ISSUE_ACTIVE_DUNNING)">
+              v-if="!link">
         Contact Support:
         <a href="tel:(855) 256-2001">
           (855) 256-2001
         </a>
       </strong>
-
-      <div v-if="!link && issueCodes.includes(CompanyIssues.ISSUE_ACTIVE_DUNNING) && hasPermissionTo('see chargebee portal')">
-        <b-button class="mr-2 text-nowrap"
-                  variant="danger"
-                  size="sm"
-                  round
-                  @click="chargebeePortal">
-          <strong>Manage Payment</strong>
-        </b-button>
-      </div>
 
       <a :href="getLink(link)"
          v-if="link && !link.external">
@@ -178,14 +168,6 @@ export default {
           })
         }
       })
-    },
-
-    chargebeePortal () {
-      if (this.hasPermissionTo('see chargebee portal')) {
-        let cbInstance = window.Chargebee.getInstance()
-        let cbPortal = cbInstance.createChargebeePortal()
-        cbPortal.open()
-      }
     },
 
     close () {
