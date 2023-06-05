@@ -312,14 +312,14 @@
                   v-else
                   @mouseleave="onMouseLeavePopover($event)">
                 <div class="text-left"
-                     v-if="contact[column.name] === '' || contact[column.name] === null || contact[column.name] === 'NULL' || (contact[column.name] instanceof Array && !contact[column.name].length)">
+                     v-if="isColumnArrayValueEmpty(contact[column.name])">
                   <div :class="`${column.draggable ? 'col-indented' : ''}`">
                     -
                   </div>
                 </div>
 
                 <div class="text-left"
-                     v-else-if="contact[column.name] && contact[column.name] instanceof Array && contact[column.name].length">
+                     v-else-if="isColumnArrayValueNotEmpty(contact[column.name])">
                   <div class="d-flex align-items-center popover-items"
                        :id="`ot-${index}-${key}`"
                        v-if="contact[column.name].length > 0"
@@ -363,7 +363,7 @@
                 <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
                      v-else>
-                  {{ getColumnValue(column.name) }}
+                  {{ getColumnValue(contact[column.name]) }}
                 </div>
               </td>
             </template>
