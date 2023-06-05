@@ -430,7 +430,8 @@ const fixPhone = (
   phoneNumber,
   format = 'E164',
   force = false,
-  includeSuffix = false
+  includeSuffix = false,
+  formatByLocale = false
 ) => {
   if (!phoneNumber) {
     return ''
@@ -538,10 +539,16 @@ const fixPhone = (
     return force ? '-' : false
   }
 
+  const localesUS = ['US', 'CA']
   const tel = window.phoneUtil.parse(phoneNumber, locale)
+  const notFormatByUSLocale = localesUS.includes(locale) && !format && !formatByLocale
+  const formatByUSLocale = localesUS.includes(locale) && formatByLocale
+  const formayByInternationalLocale = !localesUS.includes(locale) && formatByLocale
 
-  if (['US', 'CA'].includes(locale) && !format) {
+  if (notFormatByUSLocale || formatByUSLocale) {
     format = 'NATIONAL'
+  } else if (formayByInternationalLocale) {
+    format = 'INTERNATIONAL'
   }
 
   let formattedPhoneNumber = ''
