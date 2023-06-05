@@ -165,15 +165,17 @@ if (gotTheLock) {
       }, 1000)
     }
 
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore()
-      } else if (!mainWindow.isVisible()) {
-        mainWindow.show()
-      }
-
-      mainWindow.focus()
+    if (!mainWindow) {
+      return
     }
+
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    } else if (!mainWindow.isVisible()) {
+      mainWindow.show()
+    }
+
+    mainWindow.focus()
   })
 
   app.on('activate', () => {
