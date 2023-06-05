@@ -4,7 +4,7 @@
           lightMode ? 'light-mode' : 'night-mode',
           notificationContainerHeight === 0 ? 'h-100' : ''
         ]"
-       :style="{ 'height': `${contentMaxHeight}px` }"
+       :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px` }"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
@@ -13,7 +13,7 @@
          :class="[
           notificationContainerHeight === 0 ? 'h-100' : ''
          ]"
-         :style="{ 'height': `${contentMaxHeight}px` }">
+         :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px` }">
       <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout position-relative"
                 view="lHh Lpr lff"
@@ -25,7 +25,7 @@
               'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible),
               'h-100': notificationContainerHeight === 0
             }"
-            :style="{ 'height': `${contentMaxHeight}px !important` }">
+            :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px !important` }">
           <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
                     v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
             <app-header @toggleSidebar="toggleSidebar"/>
@@ -431,6 +431,7 @@ export default {
 
     contentMaxHeight () {
       let footerHeight = document.getElementsByClassName('page-footer')[0]?.clientHeight ?? 0
+      console.log({ footerHeight })
       return window.innerHeight - this.notificationContainerHeight - footerHeight
     }
   },
