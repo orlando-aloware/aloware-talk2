@@ -287,8 +287,7 @@ export default {
 
     ...mapActions('contacts', [
       'listLoaded',
-      'clearList',
-      'setListSelectedContacts'
+      'clearList'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -414,14 +413,6 @@ export default {
 
     beforeOnLoadMore (selectedList) {
       this.onLoadMore(selectedList)
-    },
-
-    forcedCheckAllItems () {
-      const elem = document.querySelector('.data-table-check-all')
-
-      if (elem.checked) {
-        this.setListSelectedContacts({ id: this.tempId, contacts: this.contactsData.data })
-      }
     },
 
     async updateList (data) {

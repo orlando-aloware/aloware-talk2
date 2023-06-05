@@ -188,7 +188,7 @@ export default {
             this.contactsLoaded(data, true)
             this.markCheckedAll()
 
-            if (this.isPowerDialer) {
+            if (this.isPowerDialer || this.isPowerDialerAddContacts) {
               this.forcedCheckAllItems()
             }
           })
@@ -580,6 +580,14 @@ export default {
       })
 
       return groupAllFiltersSize
+    },
+
+    forcedCheckAllItems () {
+      const elem = document.querySelector('.data-table-check-all')
+
+      if (elem.checked) {
+        this.setListSelectedContacts({ id: this.tempId, contacts: this.contactsData.data })
+      }
     },
 
     markCheckedAll () {
@@ -990,6 +998,13 @@ export default {
         routeMetaId !== 'power-dialer-add-queue-list'
 
       return this.$route.name === 'Power Dialer' && notInAddContactsRoute
+    },
+
+    isPowerDialerAddContacts () {
+      const routeMetaId = _.get(this.$route, 'meta.id', null)
+      const inAddContactsRoute = routeMetaId && routeMetaId.toString().includes('power-dialer-add-')
+
+      return this.$route.name === 'Power Dialer' && inAddContactsRoute
     },
 
     isLoadingDisabled () {
