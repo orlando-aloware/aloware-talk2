@@ -1,11 +1,9 @@
 <template>
   <b-modal id="tags-form-modal"
            modal-class="tags__modal"
-           no-close-on-esc
-           no-close-on-backdrop
            centered
            v-model="openModal"
-           @hidden="closeTagForm"
+           @hide="closeModalPrompt"
            @show="openTagForm">
     <b-overlay no-wrap
                rounded="sm"
@@ -18,7 +16,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>{{ title }}</h6>
+      <h6>{{ formName }}</h6>
     </template>
 
     <b-form ref="tagForm"
@@ -106,7 +104,7 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
-                    @click.prevent="closeTagForm">
+                    @click.prevent="closeModalPrompt">
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
@@ -233,10 +231,10 @@ export default {
       }
     },
 
-    title () {
+    formName () {
       return this.editableTag
         ? `Edit ${this.getTagCategoryName(this.tag.category)} Tag`
-        : `Create a New ${this.getTagCategoryName(this.tag.category)} Tag`
+        : `Create New ${this.getTagCategoryName(this.tag.category)} Tag`
     },
 
     presetCategory () {
@@ -290,8 +288,30 @@ export default {
       this.tag.color = color
     },
 
+    closeModalPrompt (bvModalEvent) {
+      if (!this.$v.tag.$anyDirty) {
+        this.closeTagForm()
+        return
+      }
+
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName} form?`, {
+        title: `Close ${this.formName}`,
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not',
+        size: 'sm',
+        buttonSize: 'sm',
+        centered: true
+      })
+        .then(confirm => {
+          if (confirm) {
+            this.closeTagForm()
+          }
+        })
+    },
+
     closeTagForm () {
-      this.$bvModal.hide('tags-form-modal')
       this.$emit('closeTagForm')
       this.resetForm()
     },

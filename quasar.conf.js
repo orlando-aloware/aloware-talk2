@@ -46,7 +46,7 @@ module.exports = function (/* ctx */) {
       'roboto-font',
       'material-icons',
       'material-icons-outlined',
-      'fontawesome-v5'
+      'fontawesome-v6'
     ],
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
@@ -108,10 +108,10 @@ module.exports = function (/* ctx */) {
       },
 
       https: true,
-      host: 'localhost',
+      host: 'talk.aloware.test',
       port: 9090,
       disableHostCheck: true,
-      open: true // opens browser window automatically
+      open: false // opens browser window automatically
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework

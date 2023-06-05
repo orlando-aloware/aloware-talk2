@@ -166,7 +166,6 @@ export default {
     closeModal () {
       this.$emit('closeAssignContactsTagModal')
       this.reset()
-      this.$bvModal.hide('tags-delete-dialog')
     },
 
     reset () {

@@ -164,7 +164,6 @@ export default {
     closeModal () {
       this.$emit('closeEnrollTagContactsToSequenceDialog')
       this.reset()
-      this.$bvModal.hide('tag-enroll-tag-contacts-to-sequence-modal')
     },
 
     reset () {
