@@ -2401,7 +2401,6 @@ export default {
       notificationContainerExists().then((element) => {
         new ResizeObserver(event => {
           this.notificationContainerHeight = event[0]?.target?.clientHeight ?? 0
-          // this.notificationContainerHeight = event[0]?.contentRect.height ?? 0
         }).observe(element)
       })
     },
