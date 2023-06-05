@@ -126,3 +126,8 @@ jobs:
           SENTRY_ORG: ${{ secrets.sentry_org }}
           SENTRY_PROJECT: ${{ secrets.sentry_project }}
           #SENTRY_VERSION: ${{ secrets.sentry_version }}
+
+          # Variables to retrieve billing information
+          ENABLE_BILLING: ${{ secrets.enable_billing }}
+          CHARGEBEE_SITE: ${{ secrets.chargebee_site }}
+          CHARGEBEE_API_KEY: ${{ secrets.chargebee_api_key }}
