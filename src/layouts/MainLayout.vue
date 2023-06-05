@@ -1,21 +1,31 @@
 <template>
-  <div class="h-100"
-       :class="[
+  <div :class="[
           authenticated && !suspended ? `dashboard ${pageClass}` : 'guest',
-          lightMode ? 'light-mode' : 'night-mode'
+          lightMode ? 'light-mode' : 'night-mode',
+          notificationContainerHeight === 0 ? 'h-100' : ''
         ]"
+       :style="{ 'height': `${contentMaxHeight}px` }"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <div class="page h-100">
+    <div class="page"
+         :class="[
+          notificationContainerHeight === 0 ? 'h-100' : ''
+         ]"
+         :style="{ 'height': `${contentMaxHeight}px` }">
       <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout position-relative"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
                 :height="'100%'">
-        <div class="h-100 position-relative"
-             :class="{ 'sidebar-active': sidebarVisible, 'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible) }">
+        <div class="position-relative"
+             :class="{
+              'sidebar-active': sidebarVisible,
+              'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible),
+              'h-100': notificationContainerHeight === 0
+            }"
+            :style="{ 'height': `${contentMaxHeight}px !important` }">
           <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
                     v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
             <app-header @toggleSidebar="toggleSidebar"/>
@@ -340,7 +350,8 @@ export default {
       isMainEventsStarted: false,
       CommunicationTypes,
       MetricOptionGroups,
-      AppDefaultLogin
+      AppDefaultLogin,
+      notificationContainerHeight: 0
     }
   },
 
@@ -416,6 +427,11 @@ export default {
     },
     isNotInInbox () {
       return this.$route.path.indexOf('channels/inbox') === -1 && !['Inbox', 'Inbox Channel Task Status', 'Inbox Contact Task'].includes(this.$route.name)
+    },
+
+    contentMaxHeight () {
+      let footerHeight = document.getElementsByClassName('page-footer')[0]?.clientHeight ?? 0
+      return window.innerHeight - this.notificationContainerHeight - footerHeight
     }
   },
 
@@ -1099,6 +1115,8 @@ export default {
     // online / offline
     window.addEventListener('online', this.updateOnlineStatus)
     window.addEventListener('offline', this.updateOnlineStatus)
+
+    this.observeNotificationContainer()
   },
 
   methods: {
@@ -2354,6 +2372,39 @@ export default {
       window.removeEventListener('offline', this.updateOnlineStatus)
       clearInterval(window.sessionIntervalId)
       clearInterval(this.$options.appFooterInterval)
+    },
+
+    observeNotificationContainer () {
+      // Observe notification container and resize the rest of the component
+      let notificationContainerSelector = '#notification-container'
+
+      let notificationContainerExists = function () {
+        return new Promise(resolve => {
+          if (document.querySelector(notificationContainerSelector)) {
+            return resolve(document.querySelector(notificationContainerSelector))
+          }
+
+          const observer = new MutationObserver(mutations => {
+            if (document.querySelector(notificationContainerSelector)) {
+              resolve(document.querySelector(notificationContainerSelector))
+              observer.disconnect()
+            }
+          })
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          })
+        })
+      }
+
+      notificationContainerExists().then((element) => {
+        new ResizeObserver(event => {
+          console.log({ event })
+          this.notificationContainerHeight = event[0]?.target?.clientHeight ?? 0
+          // this.notificationContainerHeight = event[0]?.contentRect.height ?? 0
+        }).observe(element)
+      })
     },
 
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),

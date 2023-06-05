@@ -1,5 +1,6 @@
 <template>
   <div class="bg-red-9 px-2 text-red-130 w-100 py-2 px-3 position-relative"
+       id="notification-container"
        v-if="isShow">
     <div class="d-flex">
       <div class="pr-1 align-self-center flex-grow-1">
