@@ -431,7 +431,6 @@ export default {
 
     contentMaxHeight () {
       let footerHeight = document.getElementsByClassName('page-footer')[0]?.clientHeight ?? 0
-      console.log({ footerHeight })
       return window.innerHeight - this.notificationContainerHeight - footerHeight
     }
   },
@@ -2401,7 +2400,6 @@ export default {
 
       notificationContainerExists().then((element) => {
         new ResizeObserver(event => {
-          console.log({ event })
           this.notificationContainerHeight = event[0]?.target?.clientHeight ?? 0
           // this.notificationContainerHeight = event[0]?.contentRect.height ?? 0
         }).observe(element)
