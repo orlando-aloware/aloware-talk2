@@ -39,17 +39,17 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <div class="truncated-text m-1"
-               v-if="!isNotInprogressCall">
+          <div class="truncated-text"
+               v-if="isNotInProgressCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </div>
           <div class="truncated-text call-parked-label"
                v-if="isParkedCall && !isConnectedCall" >
-            Parked Call
+            Parked {{ contact.last_communication.direction | fixCommDirection }} Call
           </div>
           <div class="truncated-text call-connected-label"
                v-if="isConnectedCall && !isParkedCall">
-            Connected
+            Connected {{ contact.last_communication.direction | fixCommDirection }} Call
           </div>
 
           <div class="truncated-text"
@@ -442,7 +442,7 @@ export default {
       ]
     },
 
-    isNotInprogressCall () {
+    isNotInProgressCall () {
       const notCallCommunicationType = [
         CommunicationTypes.SMS,
         CommunicationTypes.EMAIL,
@@ -451,7 +451,7 @@ export default {
       ]
 
       return notCallCommunicationType.includes(this.contact.last_communication.type) &&
-        !this.isParkedCall && !this.isConnectedCall
+        (!this.isParkedCall || !this.isConnectedCall)
     },
 
     hasSmsBody () {
