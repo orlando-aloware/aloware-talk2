@@ -92,6 +92,7 @@
           no-swipe-close
           class="mobile-phone-drawer position-relative"
           :class="mobilePhoneDrawerClass"
+          :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px !important` }"
           side="right"
           :breakpoint="789"
           v-model="mobilePhoneDrawer"
