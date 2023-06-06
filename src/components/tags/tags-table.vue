@@ -211,7 +211,7 @@ import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 import { mapState, mapActions } from 'vuex'
 import { COLUMNS as COMMUNICATIONS_COLUMNS } from 'src/constants/tags/communications-columns'
 import { COLUMNS as CONTACTS_COLUMNS } from 'src/constants/tags/contacts-columns'
-import { ionOpenOutline } from '@quasar/extras/ionicons-v7'
+import { ionOpenOutline } from '@quasar/extras/ionicons-v6'
 
 export default {
   name: 'tags-table',
