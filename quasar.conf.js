@@ -108,10 +108,10 @@ module.exports = function (/* ctx */) {
       },
 
       https: true,
-      host: 'talk.aloware.test',
+      host: 'localhost',
       port: 9090,
       disableHostCheck: true,
-      open: false // opens browser window automatically
+      open: true // opens browser window automatically
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
