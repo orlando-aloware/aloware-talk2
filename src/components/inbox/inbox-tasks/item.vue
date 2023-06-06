@@ -451,7 +451,7 @@ export default {
       ]
 
       return notCallCommunicationType.includes(this.contact.last_communication.type) &&
-        (!this.isParkedCall || !this.isConnectedCall)
+        !this.isParkedCall && !this.isConnectedCall
     },
 
     hasSmsBody () {
