@@ -39,7 +39,7 @@
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
-          <div class="truncated-text"
+          <div class="truncated-text m-1"
                v-if="!isNotInprogressCall">
             {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
           </div>
