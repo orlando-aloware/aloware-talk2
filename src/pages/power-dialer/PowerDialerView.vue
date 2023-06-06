@@ -892,9 +892,6 @@ export default {
         let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
         this.onFetch(params, this.hasFilters, true)
         this.$emit('onFiltersCount', this.currentListFilters)
-      } else {
-        // If the person is not in the page of the list
-        this.$generalNotification('Contacts were added to your Power Dialer list')
       }
     }
 
