@@ -114,6 +114,10 @@ export default {
       'unsavedList'
     ]),
 
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapState(['isMobile']),
 
     mainClass () {
@@ -148,6 +152,11 @@ export default {
   mounted () {
     if (this.$route.name === 'Contacts') {
       this.setShowContactsHeader(true)
+
+      // reset the table's default date column for sort
+      if (this.currentCompany?.default_contact_date_filter) {
+        this.setDefaultDateFilter(this.currentCompany.default_contact_date_filter)
+      }
     }
 
     if (this.isMobile) {
@@ -168,6 +177,8 @@ export default {
       'setPreviouslySavedListId',
       'setPreviousListId'
     ]),
+
+    ...mapActions(['setDefaultDateFilter']),
 
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
