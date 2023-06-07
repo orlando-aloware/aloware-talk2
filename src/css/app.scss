@@ -9920,11 +9920,6 @@ screen and (max-width: 956px) {
               padding-right: 0 !important;
             }
 
-            .form-row:first-child:not(.general-settings-app-block),
-            .row:first-child {
-              display: none !important;
-            }
-
             .form-row:first-child,
             .row:first-child {
               > div > div > button {
@@ -12580,7 +12575,7 @@ h1.contact-list-name-label {
 
       .form-group {
         margin-bottom: 0px;
-        
+
         span {
           font-size: 14px;
         }
@@ -12600,12 +12595,12 @@ h1.contact-list-name-label {
       width: 100%;
       display: flex;
       flex-direction: column;
-      
+
       // taller
       &--comfort {
         .overview__body__card {
           width: 20%;
-          
+
           &__container {
             flex-direction: column;
             justify-content: space-between;
@@ -12621,7 +12616,7 @@ h1.contact-list-name-label {
       &--compact {
         .overview__body__card {
           width: calc(100% / 3);
-          
+
           &__container {
             flex-direction: row;
 
@@ -12765,7 +12760,7 @@ h1.contact-list-name-label {
                 align-items: center;
                 cursor: pointer;
                 padding: 4px;
-                
+
                 &:hover {
                   background-color: $light-grey;
                 }
@@ -12866,7 +12861,7 @@ h1.contact-list-name-label {
             word-break: break-word !important;
           }
         }
-        
+
         .relative-time {
           font-size: 13px !important;
           color: $grey-92;
