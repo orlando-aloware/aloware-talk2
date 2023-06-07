@@ -464,6 +464,20 @@ export default {
           return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
         }
       }
+    },
+    broadcasts: {
+      delete (id) {
+        return window.axios.delete(`${suffixV1}broadcasts/${id}`)
+      },
+      enable (id) {
+        return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
+      },
+      get (id = null) {
+        return window.axios.get(`${suffixV1}broadcasts` + (id ? `/${id}` : ''))
+      },
+      sendBulkMessage (params) {
+        return window.axios.post(`${suffixV1}broadcasts/send-bulk-messages`, params)
+      }
     }
   },
   V2: {
@@ -576,7 +590,9 @@ export default {
 
     },
     contactList: {
-      get () {},
+      get (params) {
+        return window.axios.get(`${suffixV2}contacts-list`, { params })
+      },
       public () {
         return window.axios.get(`${suffixV2}contacts-list/public`)
       }

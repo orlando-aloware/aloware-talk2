@@ -1,75 +1,95 @@
 <template>
   <div class="broadcast-add broadcast-add__contacts">
-    <div>
-      <p>Select a group of contacts</p>
-      <div class="broadcast-add__contacts__options">
-        <div class="flex-grow-1"
-             :key="option.id"
-             :tabindex="option.id"
-             v-for="option in options">
-          <input type="radio"
-                 class="d-none"
-                 name="broadcast-add-view-contacts-option"
-                 :id="`contacts-option-${option.value}`"
-                 :value="option.value"
-                 @input="onOptionSelected(option)">
-          <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
-                 :for="`contacts-option-${option.value}`">
-            {{ option.text }}
-            <span class="broadcast-add__contacts__options__option__icon"
-                  v-if="optionSelected === option.value">
-              <check-o-icon color="#fff"/>
-            </span>
-          </label>
-        </div>
+    <p>Select a group of contacts</p>
+    <div class="broadcast-add__contacts__options">
+      <div class="flex-grow-1"
+           :key="option.id"
+           :tabindex="option.id"
+           v-for="option in options">
+        <input type="radio"
+               class="d-none"
+               name="broadcast-add-view-contacts-option"
+               :id="`contacts-option-${option.value}`"
+               :value="option.value"
+               @input="onOptionSelected(option)">
+        <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
+               :for="`contacts-option-${option.value}`">
+          {{ option.text }}
+          <span class="broadcast-add__contacts__options__option__icon"
+                v-if="optionSelected === option.value">
+            <check-o-icon color="#fff"/>
+          </span>
+        </label>
       </div>
     </div>
 
     <div class="broadcast-add__contacts__selection">
       <!-- List option -->
       <template v-if="optionSelected === 'list'">
-        <small>Select a contact list</small>
+        <p>Select a contact list</p>
+        <contacts-list-selector :value="source.list.id"
+                                @select="onContactListSelected"/>
       </template>
 
       <!-- Integration option -->
       <template v-else-if="optionSelected === 'integration'">
-        <small>Select a list</small>
+        <p>Select a contact list</p>
         <!-- shows the selector based on which integration is enabled  -->
-        <integration-list-selector ref="list-selector"
-                                     :use-chips="false"
-                                     :multiple="false"
-                                     :clearable="true"
-                                     :generic-styling="false"
-                                     @change="onListSelectorChange"/>
       </template>
+
+      <transition name="slide-left">
+        <contacts-filters class="broadcast-add__contacts__filters"
+                          v-if="optionSelected === 'filter'"
+                          @filtersUpdated="onFiltersUpdated"/>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
-import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
+import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
+import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
+import { mapActions, mapGetters } from 'vuex'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-contacts',
 
   components: {
     CheckOIcon,
-    IntegrationListSelector
+    ContactsFilters,
+    ContactsListSelector
+  },
+
+  props: {
+    defaultSource: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    }
   },
 
   computed: {
+    ...mapGetters('contacts', [
+      'currentListFilters'
+    ]),
+
     isValid () {
-      return !!this.optionSelected
-      // [x] option is selected
-      // [ ] if is list, list must have contacts
-      // [ ] if is filter, there must be contacts under the filter
-      // [ ] no validation for integration for now
+      switch (this.optionSelected) {
+        case 'list':
+        case 'integration':
+          return !!this.source.list.id
+        case 'filter':
+          return !isEmpty(this.source.filters)
+        default:
+          return false
+      }
     }
   },
 
   data: () => ({
-    optionSelected: 'list',
+    optionSelected: null,
     options: [
       {
         value: 'list',
@@ -84,22 +104,59 @@ export default {
         text: 'Integrations'
       }
     ],
-    selectedLine: null
+    source: {
+      list: {},
+      filters: {},
+      integration: {}
+    }
   }),
 
+  mounted () {
+    if (!isEmpty(this.defaultSource.list)) {
+      this.optionSelected = 'list'
+    }
+
+    this.source = this.defaultSource
+  },
+
   methods: {
+    ...mapActions('contacts', [
+      'closeFilters',
+      'openFilters',
+      'setCurrentListFilters'
+    ]),
+
     onOptionSelected (option) {
       this.optionSelected = option.value
 
-      this.$emit('optionSelectedChanged')
+      // reset to default values when option changes
+      this.reset()
     },
 
-    onLineChange (line) {
-      this.selectedLine = line
+    onContactListSelected (list) {
+      this.source.list = {
+        type: 'contacts-list',
+        id: list.id
+      }
     },
 
-    onListSelectorChange (list) {
-      console.log({ list })
+    onFiltersUpdated () {
+      this.source.filters = this.currentListFilters
+    },
+
+    reset () {
+      this.source = {
+        list: {},
+        filters: {},
+        integration: {}
+      }
+
+      if (this.optionSelected === 'filter') {
+        this.openFilters()
+      } else {
+        this.closeFilters()
+        this.setCurrentListFilters({})
+      }
     }
   },
 
@@ -107,9 +164,21 @@ export default {
     isValid (state) {
       this.$emit('input', state)
     },
-    optionSelected (optionSelected) {
-      this.$emit('contactGroupChanged', optionSelected)
+
+    source (value) {
+      this.$emit('source-updated', value)
     }
   }
 }
 </script>
+
+<style>
+/* FIXME: move this to a animations file */
+.slide-left-enter {
+  transform: translateX(100%);
+}
+
+.slide-left-leave-active {
+  transform: translateX(100%);
+}
+</style>

@@ -10,32 +10,30 @@
       </template>
     </b-overlay>
 
-    <broadcast-add-sidebar :current-step="currentStep"
-                           :steps="steps"/>
+    <div class="broadcasts__add__sidebar">
+      <steps-wrapper :current-step="currentStep"
+                     :steps="steps"/>
+    </div>
 
     <broadcast-add-view :current-step="currentStep"
                         :steps="steps"
-                        @contactGroupChanged="onContactGroupChanged"
-                        @nextStep="onGoToNextStep"
-                        @previousStep="onGoToPreviousStep"
-                        @submit="onSubmit"/>
-
-    <broadcast-add-filters :contact-group="contactGroup"/>
+                        :first-step="steps[0].id"
+                        :last-step="steps[steps.length - 1].id"
+                        @next="onNext"
+                        @back="onBack"/>
   </div>
 </template>
 
 <script>
-import BroadcastAddFilters from 'src/components/broadcasts/broadcast-add-filters.vue'
-import BroadcastAddSidebar from 'src/components/broadcasts/broadcast-add-sidebar.vue'
 import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
+import StepsWrapper from 'src/components/generic-wrappers/steps-wrapper.vue'
 
 export default {
   name: 'broadcast-add',
 
   components: {
-    BroadcastAddFilters,
-    BroadcastAddSidebar,
-    BroadcastAddView
+    BroadcastAddView,
+    StepsWrapper
   },
 
   computed: {
@@ -64,25 +62,16 @@ export default {
         id: 4,
         name: 'Preview & Send'
       }
-    ],
-    contactGroup: 'list'
+    ]
   }),
 
   methods: {
-    onContactGroupChanged (contactGroup) {
-      this.contactGroup = contactGroup
-    },
-
-    onGoToNextStep () {
-      this.step++
-    },
-
-    onGoToPreviousStep () {
+    onBack () {
       this.step--
     },
 
-    onSubmit () {
-      console.log('SUBMITTING!')
+    onNext () {
+      this.step++
     }
   }
 }

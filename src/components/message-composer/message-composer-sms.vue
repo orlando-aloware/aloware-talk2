@@ -175,6 +175,7 @@
           :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl"
           :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl"
           :menu-offset="[0, 6]"
+          v-if="useSendButton"
           @click="onSend"
         >
           <template slot="label">
@@ -242,6 +243,11 @@ export default {
 
     campaignId: {
       required: false
+    },
+
+    useSendButton: {
+      type: Boolean,
+      default: true
     }
   },
 

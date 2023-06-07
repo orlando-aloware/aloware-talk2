@@ -413,29 +413,49 @@
       </q-tooltip>
     </q-btn-->
 
-    <q-btn :to="{ name: 'Broadcasts' }"
-           :ripple="false"
+    <q-btn :ripple="false"
            icon="img:app-icons/menu/broadcast_gray.svg"
            align="center"
            padding="none"
-           class="nav-icons w-100"
-           v-show="!isActive('Broadcasts')"
-           flat>
+           class="nav-icons w-100 disabled"
+           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled"
+           flat
+           @click="toggleProFeatureDialog(true)">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
       <q-tooltip anchor="center right"
-                 self="center left">
+                 self="center left"
+                 :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ name: 'Broadcasts' }"
+    <q-btn :to="{ path: '/broadcasts' }"
            :ripple="false"
            icon="img:app-icons/menu/broadcast_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Broadcasts')"
+           v-show="isActive('Broadcasts') && profile.bulk_sms_enabled"
            flat>
       <q-tooltip anchor="center right"
-                 self="center left">
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Broadcasts</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn :to="{ path: '/broadcasts' }"
+           :ripple="false"
+           icon="img:app-icons/menu/broadcast_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="!isActive('Broadcasts') && profile.bulk_sms_enabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
