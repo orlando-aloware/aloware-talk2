@@ -14,7 +14,6 @@ import powerDialer from './power-dialer'
 import settings from './settings'
 import broadcast from './broadcast'
 import wallboard from './wallboard'
-import broadcast from './broadcast'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -41,7 +40,6 @@ export default function (/* { ssrContext } */) {
       settings,
       broadcast,
       wallboard,
-      broadcast,
       cache
     },
 
