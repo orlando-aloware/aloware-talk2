@@ -2686,6 +2686,10 @@ export default {
         let calculatedPadding = element.getBoundingClientRect().top + height
         element.style = `height: calc(100vh - ${calculatedPadding}px) !important;`
       })
+
+      this.observeElement('.page-layout').then(element => {
+        element.style = `height: calc(100vh - ${height}px) !important;`
+      })
     }
   },
   beforeRouteEnter (to, from, next) {
