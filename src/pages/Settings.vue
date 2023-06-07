@@ -4,7 +4,7 @@
     <div class="d-flex w-100 h-100 animate__animated animate__fadeIn">
       <settings-side class="settings-side__left"
                      :class="{ 'settings-side__left--closed': isSettingsOpened }"/>
-      <div class="flex-grow-1 overflow-y-scroll settings-content-wrapper settings-side__right"
+      <div class="flex-grow-1 overflow-y-scroll settings-content-wrapper settings-side__right pb-5"
            :class="contentClass"
            v-if="user">
         <b-row>

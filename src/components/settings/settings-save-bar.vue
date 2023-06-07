@@ -1,25 +1,29 @@
 <template>
-  <div v-if="isVisible"
-       class="contact-save-bar-wrapper text-right">
+  <div class="contact-save-bar-wrapper d-flex"
+       :class="contentClass"
+       v-if="isVisible">
     <span class="label">
       You've changed {{ changedUserProperties.length }} property
     </span>
-    <b-button class="ml-2"
-              size="sm"
-              variant="outline-primary"
-              :disabled="isBusy"
-              @click="onCancel">
-      Cancel
-    </b-button>
-    <b-button class="ml-2"
-              size="sm"
-              variant="primary"
-              :disabled="isBusy || !formIsValid"
-              @click="onSave">
-      <q-spinner-bars color="white"
-                      v-if="isBusy"/>
-      {{ saveButtonLabel }}
-    </b-button>
+    <div class="w-auto"
+         :class="actionButtonsClass">
+      <b-button class="ml-2"
+                size="sm"
+                variant="outline-primary"
+                :disabled="isBusy"
+                @click="onCancel">
+        Cancel
+      </b-button>
+      <b-button class="ml-2"
+                size="sm"
+                variant="primary"
+                :disabled="isBusy || !formIsValid"
+                @click="onSave">
+        <q-spinner-bars color="white"
+                        v-if="isBusy"/>
+        {{ saveButtonLabel }}
+      </b-button>
+    </div>
   </div>
 </template>
 
@@ -51,6 +55,29 @@ export default {
       }
 
       return 'Save'
+    },
+
+    isSmallScreen () {
+      console.log('this.$q.screen.lt.md: ', this.$q.screen.lt.md)
+      return this.$q.screen.lt.md
+    },
+
+    contentClass () {
+      const contentClass = this.isSmallScreen
+        ? 'align-items-center justify-content-center h-auto flex-column'
+        : 'justify-content-end'
+
+      return [
+        contentClass
+      ]
+    },
+
+    actionButtonsClass () {
+      const paddingClass = this.isSmallScreen ? 'pt-1' : ''
+
+      return [
+        paddingClass
+      ]
     },
 
     isVisible () {
