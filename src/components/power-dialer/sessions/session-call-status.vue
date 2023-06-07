@@ -1363,7 +1363,7 @@ export default {
           setTimeout(() => {
             this.isRedialClicked = false
             // if it's redial now, we should skip wrap up
-            this.wrapUp = !redial
+            this.wrapUp = false
             this.skipWrapUp = redial
             this.processSession()
           }, 1000)
