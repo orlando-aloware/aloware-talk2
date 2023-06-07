@@ -1124,6 +1124,7 @@ export default {
     window.addEventListener('offline', this.updateOnlineStatus)
 
     this.observeNotificationContainer()
+    this.observeWindowResize()
   },
 
   methods: {
@@ -2393,6 +2394,13 @@ export default {
       })
     },
 
+    observeWindowResize () {
+      new ResizeObserver(event => {
+        console.log({ event })
+        this.updateHeights(this.contentMaxHeight)
+      }).observe(document.body)
+    },
+
     observeElement (selector) {
       return new Promise(resolve => {
         if (document.querySelector(selector)) {
@@ -2410,6 +2418,45 @@ export default {
           childList: true,
           subtree: true
         })
+      })
+    },
+
+    updateHeights (height) {
+      console.log({ height })
+      let elements = document.querySelectorAll('.h-100-notification')
+      for (let element of elements) {
+        if (element.classList.contains('calendar-page') || element.classList.contains('wallboard-page')) {
+          element.style.height = `calc(100% - ${height}px)`
+          continue
+        }
+        element.style.height = `100%`
+      }
+
+      // Fix calendar date picker location
+      this.observeElement('.calendar__header').then(element => {
+        element.style.top = (60 + height) + 'px'
+      })
+
+      // Fixes calendar view size
+      this.observeElement('.scheduler .actual-scheduler').then(element => {
+        element.style.height = `calc(100vh - ${element.getBoundingClientRect().top}px)`
+      })
+
+      // Fixes wallboard items size
+      this.observeElement('.wallboard__body .scrollableArea').then(element => {
+        let calculatedPadding = element.getBoundingClientRect().top + height
+        element.style = `height: calc(100vh - ${calculatedPadding}px) !important;`
+      })
+
+      // Fix calendar
+      this.observeElement('.page-layout').then(element => {
+        element.style = ''
+        element.style = `height: calc(100vh - ${height}px) !important;`
+      })
+
+      // Fix stats page
+      this.observeElement('.stats-container').then(element => {
+        element.style = `height: calc(100vh - ${height}px) !important`
       })
     },
 
@@ -2666,30 +2713,7 @@ export default {
 
     // When the banner is shown, some layouts need to be adjusted
     contentMaxHeight (height) {
-      let elements = document.querySelectorAll('.h-100-notification')
-      for (let element of elements) {
-        element.style.height = `calc(100% - ${height}px)`
-      }
-
-      // Fix calendar date picker location
-      this.observeElement('.calendar__header').then(element => {
-        element.style.top = (60 + height) + 'px'
-      })
-
-      // Fixes calendar view size
-      this.observeElement('.scheduler .actual-scheduler').then(element => {
-        element.style.height = `calc(100vh - ${element.getBoundingClientRect().top}px)`
-      })
-
-      // Fixes wallboard items size
-      this.observeElement('.wallboard__body .scrollableArea').then(element => {
-        let calculatedPadding = element.getBoundingClientRect().top + height
-        element.style = `height: calc(100vh - ${calculatedPadding}px) !important;`
-      })
-
-      this.observeElement('.page-layout').then(element => {
-        element.style = `height: calc(100vh - ${height}px) !important;`
-      })
+      this.updateHeights(height)
     }
   },
   beforeRouteEnter (to, from, next) {
