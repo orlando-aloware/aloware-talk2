@@ -277,6 +277,7 @@ import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill
 import CommunicationActivityGraph from 'src/components/communication-activity-graph.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 
 const broadcastsColumns = [
   {
@@ -386,6 +387,8 @@ export default {
     CommunicationActivityGraph,
     EllipseIcon
   },
+
+  mixins: [aclMixin],
 
   data: () => ({
     loading: false,
@@ -554,7 +557,7 @@ export default {
     },
 
     isAdmin () {
-      return true // TODO: verify if is admin
+      return this.hasRole('Company Admin')
     },
 
     contextMenuTarget () {
