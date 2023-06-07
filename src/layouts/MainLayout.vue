@@ -2396,20 +2396,21 @@ export default {
 
     observeWindowResize () {
       new ResizeObserver(event => {
-        console.log({ event })
         this.updateHeights(this.contentMaxHeight)
       }).observe(document.body)
     },
 
-    observeElement (selector) {
+    observeElement (selector, useAll = false) {
       return new Promise(resolve => {
-        if (document.querySelector(selector)) {
-          return resolve(document.querySelector(selector))
+        let selections = useAll ? document.querySelectorAll(selector) : document.querySelector(selector)
+        if (selections) {
+          return resolve(selections)
         }
 
         const observer = new MutationObserver(mutations => {
-          if (document.querySelector(selector)) {
-            resolve(document.querySelector(selector))
+          let selections = useAll ? document.querySelectorAll(selector) : document.querySelector(selector)
+          if (selections) {
+            resolve(selections)
             observer.disconnect()
           }
         })
@@ -2443,9 +2444,16 @@ export default {
       })
 
       // Fixes wallboard items size
-      this.observeElement('.wallboard__body .scrollableArea').then(element => {
-        let calculatedPadding = element.getBoundingClientRect().top + height
-        element.style = `height: calc(100vh - ${calculatedPadding}px) !important;`
+      this.observeElement('.scrollableArea', true).then(elements => {
+        for (let element of elements) {
+          let calculatedPadding = height + element.getBoundingClientRect().top
+          console.log({ name: this.$route.name })
+          // if (['Wallboard Agents', 'Power Dialer', 'Contacts'].includes(this.$route.name)) {
+          //   calculatedPadding += element.getBoundingClientRect().top
+          //   console.log({ calculatedPadding, element })
+          // }
+          element.style = `height: calc(100vh - ${calculatedPadding}px) !important;`
+        }
       })
 
       // Fix calendar
@@ -2615,6 +2623,7 @@ export default {
       }
 
       this.resetPowerDialerSession(to)
+      this.updateHeights(this.contentMaxHeight)
     },
 
     authenticated (newVal, oldVal) {
