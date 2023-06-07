@@ -2,18 +2,18 @@
   <div :class="[
           authenticated && !suspended ? `dashboard ${pageClass}` : 'guest',
           lightMode ? 'light-mode' : 'night-mode',
-          notificationContainerHeight === 0 ? 'h-100' : ''
+          // notificationContainerHeight === 0 ? 'h-100' : '',
+          'h-100-notification'
         ]"
-       :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px` }"
        v-if="((!this.isGuest && authenticated) || (this.isGuest && !authenticated) || suspended)">
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
     <div class="page"
          :class="[
-          notificationContainerHeight === 0 ? 'h-100' : ''
-         ]"
-         :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px` }">
+          // notificationContainerHeight === 0 ? 'h-100' : '',
+          'h-100-notification'
+         ]">
       <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout position-relative"
                 view="lHh Lpr lff"
@@ -23,9 +23,9 @@
              :class="{
               'sidebar-active': sidebarVisible,
               'hidden': mobilePhoneDrawer || (mobilePhoneDrawer && !isPhoneVisible),
-              'h-100': notificationContainerHeight === 0
-            }"
-            :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px !important` }">
+              // 'h-100': notificationContainerHeight === 0,
+              'h-100-notification': true
+            }">
           <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
                     v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended">
             <app-header @toggleSidebar="toggleSidebar"/>
@@ -90,9 +90,8 @@
           :overlay="false"
           bordered
           no-swipe-close
-          class="mobile-phone-drawer position-relative"
+          class="mobile-phone-drawer position-relative h-100-notification"
           :class="mobilePhoneDrawerClass"
-          :style="{ 'height': notificationContainerHeight === 0 ? null : `${contentMaxHeight}px !important` }"
           side="right"
           :breakpoint="789"
           v-model="mobilePhoneDrawer"
@@ -431,8 +430,15 @@ export default {
     },
 
     contentMaxHeight () {
-      let footerHeight = document.getElementsByClassName('page-footer')[0]?.clientHeight ?? 0
-      return window.innerHeight - this.notificationContainerHeight - footerHeight
+      return this.notificationContainerHeight + this.footerHeight
+    },
+
+    windowIneerHeight () {
+      return window.innerHeight
+    },
+
+    footerHeight () {
+      return document.getElementsByClassName('page-footer')[0]?.clientHeight ?? 0
     }
   },
 
@@ -2379,32 +2385,31 @@ export default {
       // Observe notification container and resize the rest of the component
       let notificationContainerSelector = '#notification-container'
 
-      // Observe changes on the document body, and returns the notification container element if found
-      let notificationContainerExists = function () {
-        return new Promise(resolve => {
-          if (document.querySelector(notificationContainerSelector)) {
-            return resolve(document.querySelector(notificationContainerSelector))
-          }
-
-          const observer = new MutationObserver(mutations => {
-            if (document.querySelector(notificationContainerSelector)) {
-              resolve(document.querySelector(notificationContainerSelector))
-              observer.disconnect()
-            }
-          })
-
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true
-          })
-        })
-      }
-
       // When the observer returns something, observe the size of the element
-      notificationContainerExists().then((element) => {
+      this.observeElement(notificationContainerSelector).then((element) => {
         new ResizeObserver(event => {
           this.notificationContainerHeight = event[0]?.target?.clientHeight ?? 0
         }).observe(element)
+      })
+    },
+
+    observeElement (selector) {
+      return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+          return resolve(document.querySelector(selector))
+        }
+
+        const observer = new MutationObserver(mutations => {
+          if (document.querySelector(selector)) {
+            resolve(document.querySelector(selector))
+            observer.disconnect()
+          }
+        })
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        })
       })
     },
 
@@ -2657,6 +2662,30 @@ export default {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
         this.$VueEvent.fire('endWrapUp')
       }
+    },
+
+    // When the banner is shown, some layouts need to be adjusted
+    contentMaxHeight (height) {
+      let elements = document.querySelectorAll('.h-100-notification')
+      for (let element of elements) {
+        element.style.height = `calc(100% - ${height}px)`
+      }
+
+      // Fix calendar date picker location
+      this.observeElement('.calendar__header').then(element => {
+        element.style.top = (60 + height) + 'px'
+      })
+
+      // Fixes calendar view size
+      this.observeElement('.scheduler .actual-scheduler').then(element => {
+        element.style.height = `calc(100vh - ${element.getBoundingClientRect().top}px)`
+      })
+
+      // Fixes wallboard items size
+      this.observeElement('.wallboard__body .scrollableArea').then(element => {
+        let calculatedPadding = element.getBoundingClientRect().top + height
+        element.style = `height: calc(100vh - ${calculatedPadding}px) !important;`
+      })
     }
   },
   beforeRouteEnter (to, from, next) {
