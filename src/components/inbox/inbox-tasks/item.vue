@@ -437,11 +437,6 @@ export default {
       ]
     },
 
-    isNotInProgressCall () {
-      return this.contact.last_communication.type !== CommunicationTypes.CALL &&
-        !this.isParkedCall && !this.isConnectedCall
-    },
-
     hasSmsBody () {
       const hasBody = this.contact.last_communication.body === null ||
         !this.contact.last_communication.body || this.contact.last_communication.body.length < 1
