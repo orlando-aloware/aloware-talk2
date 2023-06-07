@@ -4,19 +4,20 @@
     <span class="label">
       You've changed {{ changedUserProperties.length }} property
     </span>
-    <b-button size="sm"
-              class="ml-2"
+    <b-button class="ml-2"
+              size="sm"
               variant="outline-primary"
               :disabled="isBusy"
               @click="onCancel">
       Cancel
     </b-button>
-    <b-button size="sm"
-              class="ml-2"
+    <b-button class="ml-2"
+              size="sm"
               variant="primary"
-              @click="onSave"
-              :disabled="isBusy || !formIsValid">
-      <q-spinner-bars v-if="isBusy" color="white" />
+              :disabled="isBusy || !formIsValid"
+              @click="onSave">
+      <q-spinner-bars color="white"
+                      v-if="isBusy"/>
       {{ saveButtonLabel }}
     </b-button>
   </div>
@@ -43,6 +44,7 @@ export default {
     ...mapGetters('settings', ['changedUserProperties']),
     ...mapState('settings', ['userClone', 'formIsValid']),
     ...mapState('auth', ['profile']),
+
     saveButtonLabel () {
       if (this.isBusy) {
         return 'Saving changes..'
@@ -50,15 +52,18 @@ export default {
 
       return 'Save'
     },
+
     isVisible () {
       return this.changedUserProperties.length > 0
     }
   },
-  data () {
+
+  data: () => {
     return {
       isBusy: false
     }
   },
+
   methods: {
     ...mapActions('settings', [
       'resetChangedUserProperties',
@@ -66,21 +71,26 @@ export default {
       'setUser',
       'setFormValidity'
     ]),
+
     ...mapActions('contacts', [
       'setDefaultIsShortenedUrlRemembered'
     ]),
+
     async resetSetting () {
       this.setUser(_.cloneDeep(this.userClone))
       this.resetChangedUserProperties()
       this.setFormValidity(true)
     },
+
     async onCancel () {
       this.resetSetting().then(() => {
         this.$VueEvent.fire('resetSettingsForm')
       })
     },
+
     onSave () {
       this.isBusy = true
+
       return Promise.all([
         this.saveChanges()
       ]).finally(() => {
@@ -89,11 +99,12 @@ export default {
         this.$generalNotification('Your changes has been saved.')
       })
     },
+
     saveChanges () {
       const parameters = this.getParameters()
+
       if (Object.entries(parameters).length > 0) {
         const passwordIndex = this.changedUserProperties.findIndex(item => item.property === 'password')
-
         const user = _.cloneDeep(this.user)
 
         // Check if password is one of changed field
@@ -140,11 +151,14 @@ export default {
         })
       }
     },
+
     getParameters () {
       const params = {}
+
       this.changedUserProperties.filter(item => item.property !== 'disposition_status_id').forEach(function (item) {
         params[item.property] = item.value
       })
+
       return params
     }
   },
@@ -156,6 +170,10 @@ export default {
   watch: {
     contact: function () {
       this.resetChangedUserProperties()
+    },
+
+    isVisible (value) {
+      this.$VueEvent.fire('hide_mobile_footer', value)
     }
   }
 }

@@ -2,20 +2,22 @@ export const DEFAULT_STATE = {
   items: [
     {
       label: 'General',
-      value: 'general_information',
+      value: 'general-information',
       icon: 'document',
       disabled: false
     },
     {
       label: 'Profile',
-      value: 'profile_settings',
+      value: 'profile',
       icon: 'person',
       disabled: false
     },
     {
       label: 'Visibility',
-      value: 'visibility_settings',
+      value: 'visibility',
       icon: 'eye',
+      height: 16,
+      width: 16,
       disabled: false
     },
     {
@@ -26,25 +28,27 @@ export const DEFAULT_STATE = {
     },
     {
       label: 'Inbound Call',
-      value: 'inbound_call_settings',
+      value: 'inbound-call',
       icon: 'inbound',
+      height: 14,
+      width: 14,
       disabled: false
     },
     {
       label: 'Outbound Call',
-      value: 'outbound_call_settings',
+      value: 'outbound-call',
       icon: 'outbound',
       disabled: false
     },
     {
       label: 'Notification',
-      value: 'notification_settings',
+      value: 'notification',
       icon: 'notification',
       disabled: false
     },
     {
       label: 'SMS Templates',
-      value: 'sms_templates',
+      value: 'sms-templates',
       icon: 'message',
       disabled: false
     },

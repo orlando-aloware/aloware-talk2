@@ -101,7 +101,7 @@
         </q-drawer>
         <app-footer class="page-footer row d-block w-100 m-0 px-1"
                     ref="appFooter"
-                    v-if="authenticated && !isWidget && !loading && isMobile && !suspended"
+                    v-if="authenticated && !isWidget && !loading && isMobile && !suspended && showMobileFooter"
                     @toggleMobilePhone="toggleMobilePhone">
         </app-footer>
       </q-layout>
@@ -335,6 +335,7 @@ export default {
       mainListeners: {},
       isElectronEventsStarted: false,
       isMainEventsStarted: false,
+      showMobileFooter: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -471,6 +472,7 @@ export default {
   },
 
   created () {
+    this.showMobileFooter = this.isMobile
     this.checkDebounce = _.debounce(this.check, 1000)
 
     if (this.$route.name === 'Suspended') {
@@ -491,6 +493,16 @@ export default {
 
     window.handleOpenURL = (url) => {
       this.processDeepLinkActions(url)
+    }
+
+    this.mainListeners.hideMobileFooter = (shouldHide) => {
+      if (!shouldHide) {
+        this.showMobileFooter = this.isMobile
+
+        return
+      }
+
+      this.showMobileFooter = !shouldHide
     }
 
     if (this.$q.platform.is.electron) {
@@ -1129,6 +1141,7 @@ export default {
       this.$VueEvent.listen('export_event_create', this.mainListeners.exportEventCreate)
       this.$VueEvent.listen('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
+      this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
     },
 
     stopMainEvents () {
@@ -1155,6 +1168,7 @@ export default {
       this.$VueEvent.stop('export_event_create', this.mainListeners.exportEventCreate)
       this.$VueEvent.stop('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.stop('export_event_delete', this.mainListeners.exportEventDelete)
+      this.$VueEvent.stop('hide_mobile_footer', this.mainListeners.hideMobileFooter)
     },
 
     checkSuspended (data, isUser = false) {
@@ -2583,6 +2597,8 @@ export default {
     },
 
     isMobile (val) {
+      this.showMobileFooter = val
+
       if (!val) {
         this.setShowContactsHeader(true)
         this.mobilePhoneDrawer = false

@@ -1,36 +1,35 @@
 <template>
   <div class="h-100"
        v-if="authenticated">
-    <!--div class="call-active">
-    </div-->
-    <div class="d-flex w-100 h-100 animate__animated animate__fadeIn position-relative">
+    <div class="d-flex w-100 h-100 animate__animated animate__fadeIn">
       <settings-side class="settings-side__left"
-                     :class="{ 'settings-side__left--closed': isSettingsOpened }">
-      </settings-side>
+                     :class="{ 'settings-side__left--closed': isSettingsOpened }"/>
       <div class="flex-grow-1 overflow-y-scroll settings-content-wrapper settings-side__right"
-           :class="{ 'settings-side__right--opened': isSettingsOpened, 'flex' : !['diagnosis', 'sms-templates'].includes($route.params.tab)  }"
+           :class="contentClass"
            v-if="user">
         <b-row>
-          <b-col md="12" class="settings-form-wrapper">
-            <general-information :statics="statics" v-if="!$route.params.tab || $route.params.tab === 'general-information'">
-            </general-information>
-            <profile :user="user" v-if="$route.params.tab === 'profile' && !isLoading">
-            </profile>
-            <notification-settings :user="user" v-if="$route.params.tab === 'notification' && !isLoading">
-            </notification-settings>
-            <personalization :user="user" v-if="$route.params.tab === 'personalization' && !isLoading">
-            </personalization>
-            <visibility :user="user" v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading">
-            </visibility>
-            <inbound-call :user="user" :statics="statics" v-if="$route.params.tab === 'inbound-call' && !isLoading">
-            </inbound-call>
-            <outbound-call :user="user" v-if="$route.params.tab === 'outbound-call' && !isLoading">
-            </outbound-call>
-            <diagnosis :user="user" v-if="$route.params.tab === 'diagnosis' && !isLoading">
-            </diagnosis>
-            <sms-templates :user="user" v-if="$route.params.tab === 'sms-templates' && !isLoading">
-            </sms-templates>
-            <settings-save-bar  :user="user"></settings-save-bar>
+          <b-col class="settings-form-wrapper"
+                 md="12">
+            <general-information :statics="statics"
+                                 v-if="!$route.params.tab || $route.params.tab === 'general-information'"/>
+            <profile :user="user"
+                     v-if="$route.params.tab === 'profile' && !isLoading"/>
+            <notification-settings :user="user"
+                                   v-if="$route.params.tab === 'notification' && !isLoading"/>
+            <personalization :user="user"
+                             v-if="$route.params.tab === 'personalization' && !isLoading"/>
+            <visibility :user="user"
+                        v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"/>
+            <inbound-call :user="user"
+                          :statics="statics"
+                          v-if="$route.params.tab === 'inbound-call' && !isLoading"/>
+            <outbound-call :user="user"
+                           v-if="$route.params.tab === 'outbound-call' && !isLoading"/>
+            <diagnosis :user="user"
+                       v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
+            <sms-templates :user="user"
+                           v-if="$route.params.tab === 'sms-templates' && !isLoading"/>
+            <settings-save-bar :user="user"/>
           </b-col>
         </b-row>
       </div>
@@ -85,6 +84,17 @@ export default {
 
     isSettingsOpened () {
       return !this.$q.screen.lt.md || this.onLoadShowSettings
+    },
+
+    contentClass () {
+      const rightSideClass = this.isSettingsOpened ? 'settings-side__right--opened' : ''
+      const otherSettingsRoutes = ['diagnosis', 'sms-templates']
+      const flexClass = !otherSettingsRoutes.includes(this.$route.params.tab) ? 'flex' : ''
+
+      return [
+        rightSideClass,
+        flexClass
+      ]
     }
   },
 
@@ -97,7 +107,6 @@ export default {
 
   methods: {
     ...mapActions('settings', [
-      'setItems',
       'setUserClone',
       'updateChangedUserProperties',
       'resetChangedUserProperties',
@@ -106,11 +115,13 @@ export default {
 
     getUser () {
       this.isLoading = true
-      return talk2Api.V1.user.getById(this.profile.id).then(response => {
-        this.localUser = response.data
-        this.setupUser()
-        this.isLoading = false
-      })
+
+      return talk2Api.V1.user.getById(this.profile.id)
+        .then(response => {
+          this.localUser = response.data
+          this.setupUser()
+          this.isLoading = false
+        })
     },
 
     resetUserChanges () {
@@ -148,73 +159,13 @@ export default {
     if (this.$route.name !== 'Settings' && this.$route.name.toLowerCase().includes('settings')) {
       this.onLoadShowSettings = true
     }
-
-    this.setItems([
-      {
-        label: 'General',
-        value: 'general-information',
-        icon: 'document',
-        disabled: false
-      },
-      {
-        label: 'Profile',
-        value: 'profile',
-        icon: 'person',
-        disabled: false
-      },
-      {
-        label: 'Visibility',
-        value: 'visibility',
-        icon: 'eye',
-        height: 16,
-        width: 16,
-        disabled: false
-      },
-      {
-        label: 'Personalization',
-        value: 'personalization',
-        icon: 'personalization',
-        disabled: false
-      },
-      {
-        label: 'Inbound Call',
-        value: 'inbound-call',
-        icon: 'inbound',
-        height: 14,
-        width: 14,
-        disabled: false
-      },
-      {
-        label: 'Outbound Call',
-        value: 'outbound-call',
-        icon: 'outbound',
-        disabled: false
-      },
-      {
-        label: 'Notification',
-        value: 'notification',
-        icon: 'notification',
-        disabled: false
-      },
-      {
-        label: 'SMS Templates',
-        value: 'sms-templates',
-        icon: 'message',
-        disabled: false
-      },
-      {
-        label: 'Diagnosis',
-        value: 'diagnosis',
-        icon: 'diagnosis',
-        disabled: false
-      }
-    ])
   },
 
   watch: {
-    $route (to, from) {
+    $route (to) {
       if (to.name === 'Settings') {
         this.onLoadShowSettings = false
+
         return
       }
 
