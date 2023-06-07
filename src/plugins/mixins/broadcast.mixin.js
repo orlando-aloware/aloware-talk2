@@ -348,6 +348,9 @@ export default {
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
         })
+        .listen('.bulk_contacts.deleted', (event) => {
+          window.VueEvent.fire('bulk_contacts_deleted', event)
+        })
         // .listen('.export.created', (event) => {
         //   console.log('created export event :>> ', event)
         //   window.VueEvent.fire('export_event_updates', event)

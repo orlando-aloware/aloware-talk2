@@ -71,9 +71,10 @@ export default {
 
   watch: {
     currentTab: function (value) {
+      const oldTagCategory = this.selectedTagCategory
       this.setSelectedTagCategory(value)
       this.clearAllSelectedTags()
-      this.$emit('loadTags')
+      this.$emit('loadTags', oldTagCategory)
     }
   }
 }

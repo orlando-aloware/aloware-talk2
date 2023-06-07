@@ -137,11 +137,18 @@ export default {
         tagUpdated: null,
         tagDeleting: null,
         contactListBulkCreated: null
-      }
+      },
+      cancelToken: null,
+      source: null,
+      oldTagCategory: null
     }
   },
 
   created () {
+    this.oldTagCategory = this.selectedTagCategory
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
+
     this.getTagCategoriesCount()
     this.getTags()
   },
@@ -204,7 +211,11 @@ export default {
     ...mapState('tagsModule', [
       'selectedTagCategory',
       'selectedTagIds'
-    ])
+    ]),
+
+    oldCategoryName () {
+      return this.getTagCategoryName(this.oldTagCategory)
+    }
   },
 
   methods: {
@@ -218,10 +229,16 @@ export default {
       this.tags = []
     },
 
-    loadTags () {
+    loadTags (oldTagCategory) {
+      this.oldTagCategory = oldTagCategory
+      this.source.cancel(`Loading of ${this.oldCategoryName} tags operation is canceled by the user.`)
+      this.source = this.cancelToken.source()
+
       this.reloadData()
       this.resetPaginationAndSearch()
-      this.getTags()
+      this.getTags({
+        cancelToken: this.source.token
+      })
     },
 
     getTagCategoriesCount (category = null) {
@@ -252,12 +269,12 @@ export default {
       this.getTags()
     },
 
-    getTags: debounce(function () {
+    getTags: debounce(function (params = {}) {
       this.isLoading = true
       this.tags = []
       const { page, perPage, orderBy, order } = this.pagination
 
-      axios.get(`/api/v1/tag-new?category=${this.selectedTagCategory}&search_text=${this.search}&per_page=${perPage}&order_by=${orderBy}&order=${order}&page=${page}`)
+      axios.get(`/api/v1/tag-new?category=${this.selectedTagCategory}&search_text=${this.search}&per_page=${perPage}&order_by=${orderBy}&order=${order}&page=${page}`, params)
         .then(res => {
           this.isLoading = false
           this.tags = res.data.data
