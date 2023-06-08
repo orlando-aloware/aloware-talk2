@@ -80,7 +80,9 @@ export default {
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
-      'updateContactsListFilter'
+      'updateContactsListFilter',
+      'addAxiosUniqueId',
+      'removeAxiosUniqueId'
     ]),
 
     ...mapActions('powerDialer', [
@@ -267,6 +269,9 @@ export default {
     },
 
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
+      const axiosUniqueId = Date.now().toString(36) + Math.random().toString(36).substring(2)
+      this.addAxiosUniqueId(axiosUniqueId)
+
       this.setListContactsLoaded(false)
       params.search = this.search
 
@@ -331,6 +336,8 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          this.removeAxiosUniqueId(axiosUniqueId)
+
           if (this.isInPowerDialerList) {
             // clear add contacts loading screen in PD list
             this.$VueEvent.fire('add_contacts_progress', {
@@ -356,23 +363,32 @@ export default {
           }
 
           this.markCheckedAll()
-        })
-        .finally(() => {
+
           this.isLoading = false
           this.isLoaded = true
           this.isLoadingMore = false
         })
         .catch((err) => {
+          if (this.$axios.isCancel(err)) {
+            this.removeAxiosUniqueId(axiosUniqueId)
+          }
+
           // revert  list's filters to previous
           if (!_.isEmpty(this.appliedFiltersPreviousFilters)) {
             this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
             this.$VueEvent.fire('updateHasFilterChanges')
           }
 
-          this.isLoading = false
-          this.isLoaded = true
-          this.isLoadingMore = false
-          this.setListContactsLoaded(true)
+          const fetchCancelledWithNoFetchInProgress = this.$axios.isCancel(err) &&
+            !this.inProgressAxiosUniqueIds.length
+
+          if (!this.$axios.isCancel(err) || fetchCancelledWithNoFetchInProgress) {
+            this.isLoading = false
+            this.isLoaded = true
+            this.isLoadingMore = false
+            this.setListContactsLoaded(true)
+          }
+
           console.log(err)
         })
     },
@@ -914,7 +930,8 @@ export default {
       'previousListId',
       'previouslySavedListId',
       'previousListFilters',
-      'isAllContactsSelected'
+      'isAllContactsSelected',
+      'inProgressAxiosUniqueIds'
     ]),
 
     ...mapGetters('auth', [

@@ -534,5 +534,15 @@ export default {
   },
   SET_SHOW_CONTACT_RESOURCE_UNAVAILABLE (state, value) {
     state.showContactResourceUnavailable = value
+  },
+  ADD_AXIOS_UNIQUE_ID (state, value) {
+    state.inProgressAxiosUniqueIds.push(value)
+  },
+  REMOVE_AXIOS_UNIQUE_ID (state, value) {
+    const index = state.inProgressAxiosUniqueIds.findIndex(item => item === value)
+
+    if (index !== -1) {
+      state.inProgressAxiosUniqueIds.splice(index, 1)
+    }
   }
 }
