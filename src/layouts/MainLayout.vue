@@ -959,7 +959,7 @@ export default {
     }
 
     this.mainListeners.bulkContactsDeleted = (event) => {
-      if (!event?.success) {
+      if ('success' in event && !event.success) {
         this.$generalNotification(event.message, 'error')
         return
       }
