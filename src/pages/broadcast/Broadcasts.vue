@@ -636,19 +636,7 @@ export default {
     },
 
     onContextMenuButtonClicked (item, broadcast) {
-      let broadcasts = []
-      let isRowItemOnChecked = this.checked.find(item => item.id === broadcast.id)
-
-      // In case the list is empty, or the checked item is the same from the menu
-      if (this.checked.length === 0 || (this.checked.length === 1 && isRowItemOnChecked) || (this.checked.length > 0 && !isRowItemOnChecked)) {
-        broadcasts = [broadcast]
-      }
-
-      // In case there are checked items, and the context menu is from the selected list
-      if (this.checked.length > 1 && isRowItemOnChecked) {
-        broadcasts = this.checked
-      }
-
+      let broadcasts = [broadcast]
       this.popupActionList = broadcasts
 
       switch (item.name) {
