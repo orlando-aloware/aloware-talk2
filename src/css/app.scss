@@ -9321,6 +9321,11 @@ screen and (max-width: 956px) {
   .contact-details-container {
     width: 0;
     margin: 0;
+    &:not(.contact-details--opened) {
+      .mobile-header {
+        margin: 0;
+      }
+    }
   }
   .contact-activities-actions__mobile {
     display: flex;
