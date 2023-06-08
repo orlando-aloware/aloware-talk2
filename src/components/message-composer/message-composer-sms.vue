@@ -513,11 +513,11 @@ export default {
     },
 
     templateSelected (template) {
-      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + template.body)
     },
 
     variableSelected (variable) {
-      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + variable)
     },
 
     attachmentUploaded (files) {
