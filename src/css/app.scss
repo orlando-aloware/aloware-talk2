@@ -12932,6 +12932,26 @@ h1.contact-list-name-label {
     &__table {
       .broadcast-status-pill {
         border: solid black 1px;
+
+        &.new {
+          border-color: $primary;
+        }
+
+        &.enrolling, &.sending {
+          border-color: $indigo;
+        }
+        
+        &.paused {
+          border-color: $warning;
+        }
+
+        &.sent {
+          border-color: $green;
+        }
+
+        &.stopped {
+          border-color: $danger;
+        }
       }
 
       .datatable {

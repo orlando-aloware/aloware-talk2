@@ -144,7 +144,8 @@
               </td>
               <td :key="`c-${colIndex}`"
                   v-else-if="col.name == 'status'">
-                <broadcast-status-pill :status="row[col.field]" />
+                <broadcast-status-pill :status="row[col.field]"
+                                       :text="row['status_name']" />
               </td>
               <td :key="`c-${colIndex}`"
                   v-else-if="col.name == 'throttle_limit'">
