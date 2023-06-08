@@ -4,6 +4,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
 
 export default {
   data () {
@@ -114,18 +115,26 @@ export default {
         'contact-details',
         'message-composer'
       ],
-      listeners: {}
+      listeners: {},
+      contactFetchFailed: false
     }
   },
 
   computed: {
+    ...mapState('auth', [
+      'profile'
+    ]),
+
     ...mapState(['campaigns', 'auth']),
+
     ...mapState('contacts', [
       'contact',
       'communicationsSummary',
       'newCommunicationInprogressContactFetch'
     ]),
+
     ...mapState('inbox', { selectContact: 'selectedContact' }),
+
     ...mapState('cache', ['currentCompany']),
 
     selectedCampaign () {
@@ -137,50 +146,43 @@ export default {
     },
 
     filteredCommunications () {
-      const communications = { data: [] }
+      let communications = []
+
       if (this.communicationsAndAudits) {
         if (this.type !== undefined && this.type === 0) {
           // returns all communications
-          communications.data = this.communicationsAndAudits
+          communications = this.communicationsAndAudits
         } else if (this.type !== undefined && this.type === CommunicationTypes.NOTE) {
           // returns all note communications
-          communications.data = this.communicationsAndAudits.filter(communication => ((communication.type !== undefined && [CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE].includes(communication.type)) || communication.type === undefined))
+          communications = this.communicationsAndAudits.filter(communication =>
+            CommunicationTypes.NOTE_TYPES.includes(communication?.type) || communication.type === undefined
+          )
         } else if (this.type === undefined) {
-          communications.data = this.communicationsAndAudits.filter(communication => [CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE].includes(communication.type))
+          communications = this.communicationsAndAudits.filter(communication =>
+            CommunicationTypes.NOTE_TYPES.includes(communication.type)
+          )
         } else {
           // returns selected filter communications
-          communications.data = this.communicationsAndAudits.filter(communication => communication.type === this.type)
+          communications = this.communicationsAndAudits.filter(communication =>
+            communication.type === this.type
+          )
         }
       }
-      return communications.data.reduce((acc, current) => {
+
+      return communications.reduce((acc, current) => {
         const x = acc.find(item => item.id === current.id)
+
         if (!x) {
           return acc.concat([current])
-        } else {
-          return acc
         }
+
+        return acc
       }, [])
     },
 
     contactCampaignsFromCommunications () {
       if (this.contact && this.campaigns.length) {
         return this.campaignsAlphabeticalOrder
-        // .filter((cmp) => {
-        //   if (this.selectedContactCampaigns.includes(cmp.id)) {
-        //     return true
-        //   }
-        // })
-
-        // const campaign = { data: null }
-        // for (campaign.data of contactCampaigns) {
-        //   campaign.data.unread_count = this.communicationsAndAudits.filter((comm) => {
-        //     if (comm.type && (comm.type === CommunicationTypes.SMS || (comm.type === CommunicationTypes.CALL && [CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW].includes(comm.disposition_status2))) && comm.is_read === false && comm.campaign_id === campaign.data.id) {
-        //       return true
-        //     }
-        //   }).length
-        // }
-
-        // return contactCampaigns
       }
 
       return []
@@ -189,7 +191,9 @@ export default {
     otherCampaignsFromCommunications () {
       if (this.campaigns && this.contactCampaignsFromCommunications) {
         return _.difference(this.campaignsAlphabeticalOrder, this.contactCampaignsFromCommunications)
-      } else if (this.campaigns) {
+      }
+
+      if (this.campaigns) {
         return this.campaignsAlphabeticalOrder
       }
 
@@ -201,6 +205,7 @@ export default {
         return _.clone(this.campaigns).sort((a, b) => {
           const textA = a.name.toUpperCase()
           const textB = b.name.toUpperCase()
+
           return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
         })
       }
@@ -217,11 +222,18 @@ export default {
         return false
       }
 
-      return !this.currentCompany.pipedrive_integration_enabled && !this.currentCompany.hubspot_integration_enabled && !this.currentCompany.stripe_integration_enabled && !this.currentCompany.zoho_integration_enabled && !this.currentCompany.helpscout_integration_enabled && !this.currentCompany.guesty_integration_enabled
+      return !this.currentCompany.pipedrive_integration_enabled &&
+        !this.currentCompany.hubspot_integration_enabled &&
+        !this.currentCompany.stripe_integration_enabled &&
+        !this.currentCompany.zoho_integration_enabled &&
+        !this.currentCompany.helpscout_integration_enabled &&
+        !this.currentCompany.guesty_integration_enabled
     },
 
     isPushContactToCrmEnabled () {
-      return this.currentCompany ? this.resellerIdToPushContactToCrm.includes(this.currentCompany.reseller_id) : false
+      return this.currentCompany
+        ? this.resellerIdToPushContactToCrm.includes(this.currentCompany.reseller_id)
+        : false
     },
 
     addTemporaryCommunication (communication) {
@@ -377,7 +389,10 @@ export default {
 
       // check if communication's contact is the same as the current contact
       if (parseInt(contact.id) === parseInt(this.contact.id)) {
-        deleteCommsAndAudits && delete contact.communications_and_audits
+        if (deleteCommsAndAudits) {
+          delete contact.communications_and_audits
+        }
+
         Object.assign(updatedContact, contact)
         this.setContact(updatedContact)
         this.setContactClone(updatedContact)
@@ -438,6 +453,23 @@ export default {
       }
     },
 
+    fetchFailedNotification (response) {
+      let message = 'Cannot find Contact.'
+      const messageWithVisibilityLimit = ' Check your Contacts Visibility settings.'
+      const hasVisibilityLimit = this.profile.contacts_visibility !== CONTACTS_ACCESS_EVERYONE
+      message += hasVisibilityLimit ? messageWithVisibilityLimit : ''
+
+      if (response?.status === 404 && !this.fetchFailed) {
+        this.$generalNotification(message, 'error-redirect', 5000, hasVisibilityLimit, {
+          path: `/settings/visibility`
+        })
+      } else if (!this.fetchFailed) {
+        this.$handleErrors(response)
+      }
+
+      this.fetchFailed = true
+    },
+
     async fetchContactInfo (isFetchContact = true) {
       // Sanity check: if contact id is actually one of the lists, take person to the list
       if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(this.contactId)) {
@@ -457,6 +489,7 @@ export default {
       this.hasMoreCommunications = true
       this.loadingContact = true
       this.loadingContactCommunications = true
+      this.fetchFailed = false
 
       if (!this.contactId) {
         console.log('Failed to fetch contact info: Missing contact id!')
@@ -475,7 +508,7 @@ export default {
           this.setContactPhoneNumbers(response.data)
         }).catch(err => {
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       // get contact's communication summary
@@ -485,7 +518,7 @@ export default {
           this.setCommunicationSummary(response.data)
         }).catch(err => {
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       this.setSequenceInfoLoading(true)
@@ -498,7 +531,7 @@ export default {
         }).catch((err) => {
           this.setSequenceInfoLoading(false)
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       // get contact's contact attributes
@@ -507,17 +540,18 @@ export default {
           this.setContactAttributes(_.cloneDeep(response.data))
         }).catch(err => {
           console.log(err)
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
         })
 
       // get contact's communications
-      this.fetchContactCommunications(this.contactId, false)
+      this.fetchContactCommunications(this.contactId, false, false)
         .then(res => {
           this.loadingContact = false
 
           if (!res) {
             this.loadingContactCommunications = false
             this.setShowContactResourceUnavailable(true)
+
             return
           }
 
@@ -529,10 +563,19 @@ export default {
           }
 
           this.scrollMessages()
+        }).catch(err => {
+          if (window.axios.isCancel(err)) {
+            console.log('Request canceled', err.message)
+          }
+
+          this.fetchFailedNotification(err.response)
+          this.loadingContactCommunications = false
+          console.log(err)
         })
 
       if (!isFetchContact) {
         this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
+
         return
       }
 
@@ -546,6 +589,7 @@ export default {
 
           if (res) {
             this.$VueEvent.fire('contact_activity_update_contact_from_fetch', res.data)
+
             return res
           }
         }).catch(err => {
@@ -555,15 +599,17 @@ export default {
             console.log('Request canceled', err.message)
             this.loadingContact = false
             this.setShowContactResourceUnavailable(true)
+
             return
           }
 
-          this.$handleErrors(err.response)
+          this.fetchFailedNotification(err.response)
 
           // inside Inbox
           if (this.$route.name.includes('Inbox')) {
             // instead of redirecting to inbox, show contact is delete info
             this.setShowContactResourceUnavailable(true)
+
             return
           }
 
@@ -590,25 +636,29 @@ export default {
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
           return item.type === CommunicationTypes.SMS
         })
+
         if (latestCommunication) {
           this.selectedCampaignId = latestCommunication.campaign_id
         }
       }
 
       // 3. if user has a personal line and contact does not have an initial line
-      const userCampaignId = _.get(this.auth, 'profile.campaign_id', null)
+      const userCampaignId = _.get(this.profile, 'campaign_id', null)
+
       if (!this.selectedCampaign && userCampaignId) {
         this.selectedCampaignId = userCampaignId
       }
 
       // 4. if contact doesn't have situation 1 and 2 and selected_contact_campaigns has one campaign select the campaign
       const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
+
       if (!this.selectedCampaign && selectedContactFirstCampaignId) {
         this.selectedCampaignId = selectedContactFirstCampaignId
       }
 
       // 5. if contact doesn't have situation 1 and 2 and 3 and company has one campaign select that campaign
       const firstCampaignId = _.get(this.campaigns, '[0].id', null)
+
       if (!this.selectedCampaign && !selectedContactFirstCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
@@ -631,6 +681,7 @@ export default {
       if (_.isEmpty(contact) || _.isEmpty(this.contact) || (contact.id !== this.contact.id)) {
         return
       }
+
       contact.communications_and_audits = _.get(this.contact, 'communications_and_audits', [])
     },
 
@@ -647,7 +698,7 @@ export default {
       }
     },
 
-    async fetchContactCommunications (contactId, skipContactInfo = true) {
+    async fetchContactCommunications (contactId, skipContactInfo = true, useDefaultCatch = true) {
       this.communicationApiSource.cancel('fetchContactCommunications operation canceled by the user.')
       this.communicationApiSource = this.communicationApiCancelToken.source()
       let lastAuditCreatedAt = null
@@ -682,11 +733,16 @@ export default {
 
         return res
       }).catch(err => {
+        if (!useDefaultCatch) {
+          return
+        }
+
         if (window.axios.isCancel(err)) {
           console.log('Request canceled', err.message)
         }
 
         this.$handleErrors(err.response)
+
         this.loadingContactCommunications = false
         console.log(err)
       })
@@ -696,6 +752,7 @@ export default {
       if (tryCount > 10) {
         this.loadingContactCommunications = false
         this.$generalNotification('Communication is too old for automatic scrolling', 'error')
+
         return
       }
 
@@ -705,6 +762,7 @@ export default {
       if (this.isCommunicationFound()) {
         this.scrollIntoActivity()
         this.loadingContactCommunications = false
+
         return
       }
 
@@ -713,6 +771,7 @@ export default {
         if (!res) {
           this.scrollMessages()
           this.loadingContactCommunications = false
+
           return
         }
 
@@ -741,9 +800,11 @@ export default {
       this.communicationsAndAudits.map((o) => {
         if (o.type !== undefined) {
           const found = this.selectedContactCampaigns.find(cmp => cmp === o.campaign_id)
+
           if (!found) {
             this.selectedContactCampaigns.push(o.campaign_id)
           }
+
           o.tag_ids = !_.isEmpty(o.tags) ? o.tags.map((a) => a.id) : []
         }
       })
@@ -751,6 +812,7 @@ export default {
 
     loadMorePreviousActivities () {
       this.isLoadingPreviousActivities = true
+
       this.fetchContactCommunications(this.contactId).then(() => {
         this.isLoadingPreviousActivities = false
       }).catch(() => {
@@ -779,12 +841,16 @@ export default {
     markAllAsRead () {
       if (this.contact) {
         this.loadingMarkAsRead = true
+
         this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
           this.loadingMarkAsRead = false
-          const communication = { data: null }
-          for (communication.data of this.filteredCommunications) {
-            this.$set(communication.data, 'is_read', true)
+
+          for (let index in this.communicationsAndAudits) {
+            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined') {
+              this.communicationsAndAudits[index].is_read = true
+            }
           }
+
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
         }).catch(err => {
@@ -801,6 +867,7 @@ export default {
 
       this.markAllAsRead()
       this.loadingSendMessage = true
+
       this.$axios.post('/api/v1/campaign/send-message/' + this.selectedCampaignId + '/' + this.contact.id, {
         message: this.reply_text,
         phone_number: this.selectedPhoneNumber
@@ -818,6 +885,7 @@ export default {
       this.closeGiphyMediaModal()
       this.markAllAsRead()
       this.loadingSendMessage = true
+
       this.$axios.post(`/api/v1/campaign/send-gif/${this.selectedCampaignId}/${this.contact.id}`, {
         url: url,
         phone_number: this.selectedPhoneNumber
@@ -904,6 +972,7 @@ export default {
       this.loadingSendMediaBtn = true
       this.media.phone_number = this.selectedPhoneNumber
       this.media.files = this.uploadFileList.upload.map(item => item.response.file_name)
+
       this.$axios.post(`/api/v1/campaign/send-mms/${this.selectedCampaignId}/${this.contact.id}`, this.media)
         .then(res => {
           this.loadingSendMediaBtn = false
@@ -948,12 +1017,15 @@ export default {
     scrollMessages () {
       const counter = { data: 0 }
       clearInterval(this.contactActivitiesInterval)
+
       this.contactActivitiesInterval = setInterval(() => {
         if (this.$refs.contactActivities) {
           this.$refs.contactActivities.scrollMessages()
           clearInterval(this.contactActivitiesInterval)
         }
+
         counter.data++
+
         if (counter.data > 180) {
           clearInterval(this.contactActivitiesInterval)
         }
@@ -975,25 +1047,24 @@ export default {
         return false
       }
 
-      const hasActivity = { data: false }
+      let hasActivity = false
 
-      const type = { data: null }
-      for (type.data of this.activityTypes) {
-        if (this.$route.hash.includes(type.data)) {
-          hasActivity.data = true
+      for (let type of this.activityTypes) {
+        if (this.$route.hash.includes(type)) {
+          hasActivity = true
           break
         }
       }
 
-      if (!hasActivity.data) {
+      if (!hasActivity) {
         return false
       }
 
-      const hash = { data: this.$route.hash }
-      hash.data = hash.split('-')
+      let hash = this.$route.hash
+      hash = hash.split('-')
 
       // hash only has 2 items: activity type and id
-      return hash.data.length === 2
+      return hash.length === 2
     },
 
     isHashActivityFound () {
@@ -1010,31 +1081,34 @@ export default {
     scrollIntoActivity () {
       const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
-      const count = { data: 0 }
-      const communicationActivity = { data: null }
+      let count = 0
+      let communicationActivity = null
 
       // scroll to activity
       clearInterval(this.scrollInterval)
       this.scrollInterval = setInterval(() => {
-        communicationActivity.data = (this.$refs.contactActivities) ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null) : null
-        if (communicationActivity.data) {
-          communicationActivity.data.$el.scrollIntoView({
+        communicationActivity = (this.$refs.contactActivities)
+          ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null)
+          : null
+
+        if (communicationActivity) {
+          communicationActivity.$el.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest',
             inline: 'start'
           })
           // highlight the activity
-          this.highlightActivity(communicationActivity.data)
+          this.highlightActivity(communicationActivity)
           clearInterval(this.scrollInterval)
         }
 
         // if we've been waiting for too long to load,
         // clear this interval
-        if (count.data >= 120) {
+        if (count >= 120) {
           clearInterval(this.scrollInterval)
         }
 
-        count.data++
+        count++
       }, 250)
     },
 
@@ -1047,18 +1121,20 @@ export default {
 
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
-        const counter = { data: 0 }
-        const containerEl = { data: null }
-        this.containerElInterval = setInterval(() => {
-          containerEl.data = document.querySelector('.contact-activities .scrollbar-white')
+        let counter = 0
+        let containerEl = null
 
-          if (containerEl.data) {
-            containerEl.data.scrollTop = element.offsetTop
+        this.containerElInterval = setInterval(() => {
+          containerEl = document.querySelector('.contact-activities .scrollbar-white')
+
+          if (containerEl) {
+            containerEl.scrollTop = element.offsetTop
             clearInterval(this.containerElInterval)
           }
 
-          counter.data++
-          if (counter.data > 120) {
+          counter++
+
+          if (counter > 120) {
             clearInterval(this.containerElInterval)
           }
         }, 500)
@@ -1080,6 +1156,7 @@ export default {
     fetchIncomingNumber: _.debounce(function () {
       if (this.contact && this.selectedCampaign) {
         this.contactIncomingNumber = null
+
         this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
           this.contactIncomingNumber = res.data
         }).catch(err => {
@@ -1090,12 +1167,15 @@ export default {
     }, 200),
 
     checkEmailCapability () {
-      if (this.currentCompany && (this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled)) {
+      const mailIntegrationEnabled = this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled
+
+      if (this.currentCompany && mailIntegrationEnabled) {
         this.canEmail = true
+
         return
       }
 
-      this.canEmail = (this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id)
+      this.canEmail = this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id
     },
 
     updateMessageComposer () {
@@ -1107,6 +1187,7 @@ export default {
     updateLineIncomingNumber () {
       if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
         this.setLineIncomingNumberLoading(true)
+
         talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id).then(response => {
           this.setLineIncomingNumber(response.data)
         }).finally(() => {
@@ -1117,6 +1198,7 @@ export default {
 
     processFetchContactInfo (callback, isFetchContact = true) {
       this.loadingContactInProgress()
+
       return this.fetchContactInfo(isFetchContact).then(res => {
         if (!res) {
           this.selectedContactChanging(false)
@@ -1124,7 +1206,8 @@ export default {
         }
 
         // if contact status changes then redirect to the right url
-        if (this.$route.name === 'Inbox Contact Task' && this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
+        if (this.$route.name === 'Inbox Contact Task' &&
+          this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
           this.$router.push({
             name: 'Inbox Contact Task',
             params: {
@@ -1172,9 +1255,11 @@ export default {
 
       if (this.isPushContactToCrmEnabled) {
         this.activeNames.push('push-to-crm')
-      } else {
-        this.activeNames = this.activeNames.filter(name => name !== 'push-to-crm')
+
+        return
       }
+
+      this.activeNames = this.activeNames.filter(name => name !== 'push-to-crm')
     },
 
     processFetchedContactInfo (selectedContact, callback) {
@@ -1200,6 +1285,7 @@ export default {
     loadMoreContacts () {
       if (this.pagination && this.pagination.to && this.filter.page <= this.pagination.to) {
         this.filter.page += 1
+
         this.getContacts()
           .then(res => {
             this.loadingContact = false
@@ -1274,6 +1360,7 @@ export default {
       'setIsContactMixinUsed',
       'setShowContactResourceUnavailable'
     ]),
+
     ...mapActions('inbox', ['setSelectedContact'])
   },
 
@@ -1282,6 +1369,7 @@ export default {
       this.updateMessageComposer()
       this.updateLineIncomingNumber()
     }, 1000),
+
     contactId: function () {
       this.communicationsPage = 1
     }

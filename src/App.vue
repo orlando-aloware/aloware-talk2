@@ -1,5 +1,13 @@
 <template>
-  <div id="q-app">
+  <div class="position-relative"
+       id="q-app">
+    <b-overlay class="h-100 w-100 position-absolute"
+               :show="isPageLoading">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
     <router-view v-if="cookieValidated"/>
     <portal-target name="app"
                    multiple>
@@ -14,8 +22,8 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <custom-scripts v-if="authenticated && profile && profile.enabled"></custom-scripts>
-    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"></intercom>
+    <custom-scripts v-if="authenticated && profile && profile.enabled"/>
+    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"/>
   </div>
 </template>
 <script>
@@ -38,6 +46,7 @@ export default {
     return {
       cookieValidated: false,
       sharedCookie: null,
+      isPageLoading: false,
       fullstoryOrgId: process.env.FULLSTORY_ORG_ID
     }
   },
@@ -49,6 +58,7 @@ export default {
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
+
       return Number(urlParams.get('from_classic'))
     }
   },
@@ -87,6 +97,7 @@ export default {
 
     this.$VueEvent.listen('make_new_call', (data) => {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
+      this.isPageLoading = true
 
       if (/unhold:|barge:|whisper:|call:|hs:/.test(fixedPhoneNumber)) {
         window.axios.get('/api/v1/communication/info', {
@@ -95,6 +106,8 @@ export default {
             phone_number: fixedPhoneNumber
           }
         }).then(res => {
+          this.isPageLoading = false
+
           this.$VueEvent.fire('makeCall', {
             currentNumber: fixedPhoneNumber,
             outboundCampaignId: res.data.campaign_id,
@@ -103,32 +116,53 @@ export default {
             contactId: res.data?.contact?.id,
             contactTimezone: res.data?.contact?.timezone
           })
+        }).catch(() => {
+          this.isPageLoading = false
         })
-      } else {
-        window.axios.post('/api/v1/contact', {
-          add_phone_number: fixedPhoneNumber
-        }).then(res => {
-          const contact = res.data
-          const callData = {
-            currentNumber: fixedPhoneNumber,
-            contactName: contact.name,
-            companyName: contact.company_name,
-            contactId: contact.id,
-            contactTimezone: contact.timezone
-          }
 
-          this.$VueEvent.fire('callContact', callData)
-        })
+        return
       }
+
+      window.axios.post('/api/v1/contact', {
+        add_phone_number: fixedPhoneNumber
+      }).then(res => {
+        this.isPageLoading = false
+        const contact = res.data
+        const callData = {
+          currentNumber: fixedPhoneNumber,
+          contactName: contact.name,
+          companyName: contact.company_name,
+          contactId: contact.id,
+          contactTimezone: contact.timezone
+        }
+
+        this.$router.push({
+          name: 'Phone'
+        }, () => {
+          this.$VueEvent.fire('callContact', callData)
+        }, () => {
+          if (this.$route.name === 'Phone') {
+            this.$VueEvent.fire('callContact', callData)
+          }
+        })
+      }).catch(() => {
+        this.isPageLoading = false
+      })
     })
 
     this.$VueEvent.listen('add_contact', (data) => {
+      this.isPageLoading = true
+
       window.axios.post('/api/v1/contact', {
         add_phone_number: this.$options.filters.fixPhone(data.phone_number)
       }).then(res => {
+        this.isPageLoading = false
         this.$router.replace('/contacts/' + res.data.id)
+          .catch(this.$handleRouteError)
       }).catch(() => {
+        this.isPageLoading = false
         this.$router.replace('/')
+          .catch(this.$handleRouteError)
       })
     })
 
@@ -136,6 +170,7 @@ export default {
       if (this.authenticated) {
         this.clearUser()
         this.$router.push({ name: 'Login' })
+          .catch(this.$handleRouteError)
       }
     })
   },
@@ -156,6 +191,7 @@ export default {
           this.logout()
         })
       }
+
       if (!this.sharedCookie) {
         this.cookieValidated = true
       }
@@ -184,9 +220,8 @@ export default {
       this.logoutUser().then((res) => {
         this.setFullStory()
         this.response = res.data
-        this.$router.push({ name: 'Login' }).catch((err) => {
-          console.log(err)
-        })
+        this.$router.push({ name: 'Login' })
+          .catch(this.$handleRouteError)
       }).catch((err) => {
         console.log(err)
       })
@@ -205,6 +240,7 @@ export default {
         })
       }).catch(() => {
         console.log('Error while retrieving fullstory metadata from server. Using local variables.')
+
         this.$FullStory.identify(profile.id, {
           displayName: profile.name,
           email: profile.email,
@@ -227,6 +263,7 @@ export default {
         this.fullStoryIdentify(this.profile)
         return
       }
+
       this.$FullStory.anonymize()
     },
 

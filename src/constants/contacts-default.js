@@ -243,5 +243,6 @@ export const DEFAULT_STATE = {
   isContactMixinUsed: false,
   isShortenedUrlRemembered: false,
   newCommunicationInprogressContactFetch: [],
-  showContactResourceUnavailable: false
+  showContactResourceUnavailable: false,
+  inProgressAxiosUniqueIds: []
 }
