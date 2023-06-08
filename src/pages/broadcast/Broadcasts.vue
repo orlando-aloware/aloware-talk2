@@ -165,8 +165,7 @@
                   v-else-if="col.name == 'target_group'">
                 <template v-if="row['tag']">
                   <i class="fa fa-circle"
-                        :style="{ color: row['tag']?.color }">
-                  </i>
+                     :style="`color: ${row['tag']?.color}; font-size:36%; position: relative; top: -3px;`" />
                   <span class="tag_name">
                     {{ row['tag']?.name }}
                   </span>
