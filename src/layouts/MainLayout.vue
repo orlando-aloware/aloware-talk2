@@ -263,6 +263,9 @@ import {
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
+import {
+  MAX_SCREEN_WIDTH_MOBILE_HEADER
+} from 'src/constants/viewport-sizes'
 
 export default {
   name: 'MyLayout',
@@ -2686,7 +2689,8 @@ export default {
     },
 
     screenWidth (value) {
-      if (value <= 784 && this.$q.screen.gt.sm && !this.showContactsHeader) {
+      if (value <= MAX_SCREEN_WIDTH_MOBILE_HEADER && this.$q.screen.gt.sm &&
+        !this.showContactsHeader) {
         this.setShowContactsHeader(true)
       }
     }

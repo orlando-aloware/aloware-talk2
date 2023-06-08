@@ -102,6 +102,10 @@ import CloseIcon from 'components/icons/close-icon'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import _ from 'lodash'
+import {
+  MIN_TABLET_WIDTH,
+  MAX_TABLET_WIDTH
+} from 'src/constants/viewport-sizes'
 
 export default {
   name: 'contact',
@@ -170,7 +174,7 @@ export default {
     },
 
     isMediumScreen () {
-      return this.$q.screen.width >= 605 && this.$q.screen.width <= 1084
+      return this.$q.screen.width >= MIN_TABLET_WIDTH && this.$q.screen.width <= MAX_TABLET_WIDTH
     }
   },
 
