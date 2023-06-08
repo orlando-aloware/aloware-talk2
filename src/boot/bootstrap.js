@@ -107,6 +107,10 @@ window.guessLocale = function (phoneNumber) {
 
   // Use substring() and indexOf() functions to remove
   // portion of string after certain character (w => wait)
+  // example, the extension wwww2wwwwww5wwwwww9 waits 2 seconds
+  // before sending the digit 2, followed by a three second wait
+  // before sending th 5, and finally another three second wait
+  // before sending a 9. These are numbers behind IVR/extension
   let pos = phoneNumber.indexOf('w')
 
   if (pos !== -1) {
