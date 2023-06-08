@@ -1,6 +1,6 @@
 <template>
   <div class="page-side-menubar border-top-0">
-    <div class="page-side-menubar__left settings"
+    <div class="page-side-menubar__left settings overflow-y-scroll"
          :class="{'page-side-menubar__left--closed': closed }">
 
       <div class="header w-100 ml-3 mt-2">
