@@ -136,7 +136,6 @@
 
 <script>
 import _ from 'lodash'
-import * as storage from 'src/plugins/helpers/storage'
 import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
@@ -283,10 +282,6 @@ export default {
 
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
-    },
-
-    ak_widget_url () {
-      return storage.local.getItem('ak_widget_url')
     },
 
     currentUser () {

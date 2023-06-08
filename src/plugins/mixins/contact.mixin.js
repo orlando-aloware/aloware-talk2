@@ -3,6 +3,7 @@ import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
 
 export default {
@@ -470,6 +471,19 @@ export default {
     },
 
     async fetchContactInfo (isFetchContact = true) {
+      // Sanity check: if contact id is actually one of the lists, take person to the list
+      if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(this.contactId)) {
+        const path = '/contacts/list/' + this.contactId
+        this.$router.push({ path })
+        return
+      }
+
+      // Sanity check: if contact id is actually a weird number, just redirect to inbox
+      if (isNaN(Number.parseInt(this.contactId))) {
+        this.$router.push({ name: 'inbox' })
+        return
+      }
+
       this.communicationsAndAudits = []
       this.communicationsPage = 1
       this.hasMoreCommunications = true

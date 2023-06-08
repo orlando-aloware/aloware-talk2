@@ -2505,7 +2505,13 @@ export default {
       }
     },
     $route (to, from) {
+      // logout action
+      if (to.name === 'Login' && !storage.local.getItem('api_token')) {
+        return
+      }
+
       this.checkDebounce()
+
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
