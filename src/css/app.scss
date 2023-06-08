@@ -4570,7 +4570,7 @@ i.option-separator {
   padding: 17px 18px;
   bottom: 0;
   border-top: 1px solid $grey-70;
-  z-index: 9;
+  z-index: 999;
   left: 0;
 
   .label {
@@ -9319,7 +9319,8 @@ screen and (max-width: 956px) {
     }
   }
   .contact-details-container {
-    display: none;
+    width: 0;
+    margin: 0;
   }
   .contact-activities-actions__mobile {
     display: flex;
@@ -9425,6 +9426,16 @@ screen and (max-width: 956px) {
         &.desktop {
           display: none;
         }
+      }
+    }
+  }
+}
+
+@media (min-width: 785px) and (max-width: 1084px) {
+  .contact-details-container {
+    &-drawer {
+      &.has-contact-changes aside {
+        height: calc(100vh - 128px);
       }
     }
   }
@@ -9658,8 +9669,11 @@ screen and (max-width: 956px) {
   }
   .contact-details-container {
     &-drawer {
-      aside {
+      &:not(.has-contact-changes) aside {
         height: calc(100vh - 108px);
+      }
+      &.has-contact-changes aside {
+        height: calc(100vh - 123px);
       }
     }
   }
@@ -10033,7 +10047,7 @@ screen and (max-width: 956px) {
     .details-component-container {
       padding-bottom: 59px;
 
-      > div {
+      > div:not(:last-child) {
         margin-right: 10px !important;
         width: auto !important;
       }

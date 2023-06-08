@@ -14,10 +14,11 @@
         <div class="h-100"
              :class="headerContainerClass">
           <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="authenticated && !isWidget && !loading && showContactsHeader && !suspended && !isMobile">
+                    v-if="isShowAppHeader">
             <app-header @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container :class="pageContainerClasses">
+          <q-page-container :style="`${!isShowAppHeader ? 'padding-top: 0 !important;' : ''}`"
+                            :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
                 <transition :name="transitionName"
@@ -428,7 +429,7 @@ export default {
 
     mobilePhoneDrawerClass () {
       return {
-        'hidden': !this.mobilePhoneDrawer || !this.$q.screen.lt.lg,
+        'hidden': !this.mobilePhoneDrawer,
         'mobile-phone-visible': this.isPhoneVisible
       }
     },
@@ -468,6 +469,21 @@ export default {
         sidebarClass,
         mobilePhoneClass
       ]
+    },
+
+    screenWidth () {
+      return this.$q.screen.width
+    },
+
+    isShowAppHeader () {
+      let showForMobile = false
+
+      if ((this.isMobile && !this.mobilePhoneDrawer) || !this.isMobile) {
+        showForMobile = true
+      }
+
+      return this.authenticated && !this.isWidget && !this.loading &&
+        this.showContactsHeader && !this.suspended && showForMobile
     }
   },
 
@@ -2666,6 +2682,12 @@ export default {
     agentStatus (toVal, fromVal) {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
         this.$VueEvent.fire('endWrapUp')
+      }
+    },
+
+    screenWidth (value) {
+      if (value <= 784 && this.$q.screen.gt.sm && !this.showContactsHeader) {
+        this.setShowContactsHeader(true)
       }
     }
   },
