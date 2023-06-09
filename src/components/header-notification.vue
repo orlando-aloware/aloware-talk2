@@ -80,8 +80,6 @@ export default {
   ],
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
-
     ...mapState([
       'statics',
       'staticsLoaded',
@@ -93,8 +91,7 @@ export default {
     ]),
 
     isShow () {
-      return this.showNotification && this.diagnosis.length > 0 &&
-        this.shouldShowDiagnosis
+      return this.showNotification && this.diagnosis.length > 0
     },
 
     firstDiagnosis () {
@@ -107,14 +104,6 @@ export default {
 
     currentRouteName () {
       return this.$route.name
-    },
-
-    shouldShowDiagnosis () {
-      if (this.currentCompany && this.currentCompany.reseller_id === 357) {
-        return this.currentRouteName && ['Broadcasts', 'Bulk Message', 'Bulk RVM'].includes(this.currentRouteName)
-      }
-
-      return true
     },
 
     diagnosisClass () {
