@@ -121,7 +121,7 @@ export default {
         !inRoutesWithoutHeader.includes(this.$route.name) &&
         (!this.isInboxTaskOpened || !this.$q.screen.lt.md)
 
-      return !this.isMobile || isShowPageHeaderMobileScreen
+      return this.$q.screen.gt.sm || isShowPageHeaderMobileScreen
     }
   },
 

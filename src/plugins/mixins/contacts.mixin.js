@@ -80,7 +80,9 @@ export default {
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
-      'updateContactsListFilter'
+      'updateContactsListFilter',
+      'addAxiosUniqueId',
+      'removeAxiosUniqueId'
     ]),
 
     ...mapActions('powerDialer', [
@@ -109,7 +111,10 @@ export default {
         return
       }
 
-      this.fetch(typeof defaultFilters === 'string' ? {} : defaultFilters, true, clear)
+      const params = typeof defaultFilters === 'string' ? {} : this.$jsonClone(defaultFilters)
+
+      this.fetch(params, true, clear)
+
       this.initialListFilters = defaultFilters
       this.filtersCount = this.getFiltersCount(defaultFilters)
     }, 200),
@@ -264,6 +269,9 @@ export default {
     },
 
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
+      const axiosUniqueId = Date.now().toString(36) + Math.random().toString(36).substring(2)
+      this.addAxiosUniqueId(axiosUniqueId)
+
       this.setListContactsLoaded(false)
       params.search = this.search
 
@@ -328,6 +336,8 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          this.removeAxiosUniqueId(axiosUniqueId)
+
           if (this.isInPowerDialerList) {
             // clear add contacts loading screen in PD list
             this.$VueEvent.fire('add_contacts_progress', {
@@ -353,28 +363,38 @@ export default {
           }
 
           this.markCheckedAll()
-        })
-        .finally(() => {
+
           this.isLoading = false
           this.isLoaded = true
           this.isLoadingMore = false
         })
         .catch((err) => {
+          if (this.$axios.isCancel(err)) {
+            this.removeAxiosUniqueId(axiosUniqueId)
+          }
+
           // revert  list's filters to previous
           if (!_.isEmpty(this.appliedFiltersPreviousFilters)) {
             this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
             this.$VueEvent.fire('updateHasFilterChanges')
           }
 
-          this.isLoading = false
-          this.isLoaded = true
-          this.isLoadingMore = false
-          this.setListContactsLoaded(true)
+          const fetchCancelledWithNoFetchInProgress = this.$axios.isCancel(err) &&
+            !this.inProgressAxiosUniqueIds.length
+
+          if (!this.$axios.isCancel(err) || fetchCancelledWithNoFetchInProgress) {
+            this.isLoading = false
+            this.isLoaded = true
+            this.isLoadingMore = false
+            this.setListContactsLoaded(true)
+          }
+
           console.log(err)
         })
     },
 
-    fetch (params = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+      let params = this.$jsonClone(data)
       let eventListId = null
 
       if (typeof this.getCleanedListId !== 'undefined') {
@@ -403,28 +423,30 @@ export default {
         this.setPreviousListId(this.id)
       }
 
-      const defaultSort = {
-        data: _.get(params, 'sort', this.defaultContactDateFilter)
+      let defaultSort = _.get(params, 'sort', this.defaultContactDateFilter)
+
+      if (defaultSort.constructor !== 'Function') {
+        defaultSort = this.isPowerDialer ? 'order' : this.defaultContactDateFilter
       }
 
-      if (defaultSort.data.constructor !== 'Function') {
-        defaultSort.data = this.defaultContactDateFilter
-      }
+      let order = _.get(params, 'order', 'desc')
+      const emptySortOrder = this.isPowerDialer ? 'asc' : order
 
-      // const sort = (this.sorts) ? this.sorts.orderBy : defaultSort
-      const order = (this.sorts)
+      order = this.sorts
         ? this.sorts.order
-        : _.get(params, 'order', 'desc')
+        : emptySortOrder
 
       if (hasOrder) {
-        params.sort = _.isString(this.defaultDateFilter) ? this.defaultDateFilter : defaultSort.data // sort
+        params.sort = _.isString(this.defaultDateFilter)
+          ? this.defaultDateFilter
+          : defaultSort
         params.order = order
       }
 
       this.isLoading = true
 
       // for power dialer list contacts fetching
-      if (typeof this.isPowerDialer !== 'undefined') {
+      if (this.isPowerDialer) {
         // the variable is defined
         switch (this.$route.meta.id) {
           case 'power-dialer-queue-filter':
@@ -916,7 +938,8 @@ export default {
       'previousListId',
       'previouslySavedListId',
       'previousListFilters',
-      'isAllContactsSelected'
+      'isAllContactsSelected',
+      'inProgressAxiosUniqueIds'
     ]),
 
     ...mapGetters('auth', [

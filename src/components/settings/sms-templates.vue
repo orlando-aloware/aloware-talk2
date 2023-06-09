@@ -1,7 +1,11 @@
 <template>
-  <b-container fluid>
+  <b-container fluid
+               :class="horizontalPaddingClass">
     <b-row class="row-no-padding">
-      <b-col sm="12" md="12">
+      <b-col class="pt-2"
+             sm="12"
+             md="12"
+             :class="horizontalPaddingClass">
         <div class="d-inline-flex">
           <slot name="header">
           </slot>
@@ -10,39 +14,45 @@
       </b-col>
     </b-row>
     <b-row class="mt-4 row-no-padding">
-      <b-col sm="12" md="12" class="no-gutters">
-        <b-button variant="primary" size="sm" @click="onAdd('user')">
-          <i class="fa fa-plus mr-1"></i> New Template
+      <b-col class="no-gutters"
+             sm="12"
+             md="12"
+             :class="horizontalPaddingClass">
+        <b-button variant="primary"
+                  size="sm"
+                  @click="onAdd('user')">
+          <i class="fa fa-plus mr-1"/> New Template
         </b-button>
       </b-col>
     </b-row>
 
     <b-row class="mt-3 row-no-padding">
-      <b-col sm="12" md="12" class="no-gutters">
-        <datatable :columns="columns"
+      <b-col class="no-gutters"
+             sm="12"
+             md="12"
+             :class="horizontalPaddingClass">
+        <datatable :customClass="horizontalPaddingClass.join(' ')"
+                   :columns="columns"
                    :is-scrollable="false"
                    :is-loading-more="isLoading">
           <template slot="tbody">
-            <tr class="datatable-row" v-for="template in userTemplates" :key="template.id">
+            <tr class="datatable-row"
+                :key="template.id"
+                v-for="template in userTemplates">
               <template v-for="column in columns">
-                <td
-                  :key="column.name"
-                  class="datatable-row__name"
-                  v-if="column.name === 'id'"
-                >
+                <td class="datatable-row__name"
+                    :key="column.name"
+                    v-if="column.name === 'id'">
                   <div class="d-flex align-items-center">
-
                     <div class="flex-grow-1">
                       {{ template.id }}
                     </div>
                   </div>
                 </td>
 
-                <td
-                  :key="column.name"
-                  class="datatable-row__name"
-                  v-else-if="column.name === 'template_name'"
-                >
+                <td class="datatable-row__name"
+                    :key="column.name"
+                    v-else-if="column.name === 'template_name'">
                   <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
                      {{ template.name }}
@@ -50,33 +60,29 @@
                   </div>
                 </td>
 
-                <td
-                  :key="column.name"
-                  v-else-if="column.name === 'body'"
-                  class="datatable-row__phone"
-                >
+                <td class="datatable-row__phone"
+                    :key="column.name"
+                    v-else-if="column.name === 'body'">
                   <div class="ellipse">
                    {{ template.body }}
                   </div>
                 </td>
-                <td
-                  :key="column.name"
-                  v-else-if="column.name === 'action'"
-                  class="datatable-row__phone"
-                >
+                <td class="datatable-row__phone"
+                    :key="column.name"
+                    v-else-if="column.name === 'action'">
                   <div>
                     <b-button size="sm"
                               variant="primary"
                               @click="onEdit(template)">
 
-                      <pencil-o-icon color="#FFF"></pencil-o-icon>
+                      <pencil-o-icon color="#FFF"/>
                     </b-button>
                     <b-button size="sm"
                               variant="danger"
                               class="ml-1"
                               @click="onDelete(template)">
 
-                      <trash-o-icon color="#FFF"></trash-o-icon>
+                      <trash-o-icon color="#FFF"/>
                     </b-button>
                   </div>
                 </td>
@@ -86,7 +92,7 @@
         </datatable>
       </b-col>
     </b-row>
-    <sms-template-modal @templateSaved="templateSaved"></sms-template-modal>
+    <sms-template-modal @templateSaved="templateSaved"/>
   </b-container>
 </template>
 
@@ -97,11 +103,16 @@ import SmsTemplateModal from 'components/sms-template-modal'
 import talk2Api from 'src/plugins/api/api'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import { settingsLayoutMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'sms-templates',
 
   components: { PencilOIcon, TrashOIcon, SmsTemplateModal, Datatable },
+
+  mixins: [
+    settingsLayoutMixin
+  ],
 
   props: {
     user: {
@@ -156,8 +167,19 @@ export default {
     }
   },
 
+  mounted () {
+    this.getTemplates()
+
+    this.setSmsTemplateModal(
+      {
+        isOpen: false
+      }
+    )
+  },
+
   methods: {
     ...mapActions('contacts', ['setSmsTemplateModal']),
+
     onAdd (scope) {
       this.setSmsTemplateModal(
         {
@@ -166,6 +188,7 @@ export default {
         }
       )
     },
+
     onEdit (template) {
       this.setSmsTemplateModal({
         isOpen: true,
@@ -180,17 +203,19 @@ export default {
         okTitle: 'Yes, delete',
         cancelTitle: 'No, keep'
       }).then(confirm => {
-        if (confirm) {
-          talk2Api.V1.smsTemplate.delete(template.id)
-            .then(response => {
-              if (response.status === 204) {
-                this.templates = this.templates.filter(item => item.id !== template.id)
-                this.$generalNotification(`SMS template has been successfully deleted.`, 'success')
-              }
-            }).catch(() => {
-              this.$generalNotification(`Error while deleting selected template.`, 'error')
-            })
+        if (!confirm) {
+          return
         }
+
+        talk2Api.V1.smsTemplate.delete(template.id)
+          .then(response => {
+            if (response.status === 204) {
+              this.templates = this.templates.filter(item => item.id !== template.id)
+              this.$generalNotification(`SMS template has been successfully deleted.`, 'success')
+            }
+          }).catch(() => {
+            this.$generalNotification(`Error while deleting selected template.`, 'error')
+          })
       })
     },
 
@@ -200,6 +225,7 @@ export default {
 
     getTemplates () {
       this.isLoading = true
+
       return talk2Api.V1.smsTemplate.get()
         .then(response => {
           this.isLoading = false
@@ -208,16 +234,6 @@ export default {
           this.$handleErrors(error.response)
         })
     }
-  },
-
-  mounted () {
-    this.getTemplates()
-
-    this.setSmsTemplateModal(
-      {
-        isOpen: false
-      }
-    )
   }
 }
 </script>

@@ -234,7 +234,7 @@
                   v-else-if="column.name === 'phone_number'">
                 <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
                      v-if="contact.phone_number">
-                  {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+                  {{ contact.phone_number | fixPhone('NATIONAL', true, false, true) }}
                 </div>
                 <div class="ml-1 text-grey-7 text-center "
                      :class="`${column.draggable ? 'col-indented' : ''}`"
@@ -383,8 +383,8 @@
                   </div>
                 </div>
 
-                <div v-else-if="isColumnArrayValueNotEmpty([column.name])"
-                  class="text-left">
+                <div class="text-left"
+                     v-else-if="isColumnArrayValueNotEmpty(contact[column.name])">
                   <div class="d-flex align-items-center popover-items"
                        :id="`ot-${index}-${key}`"
                        v-if="contact[column.name].length > 0"

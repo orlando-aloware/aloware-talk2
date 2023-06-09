@@ -15,3 +15,8 @@ export const SYSNOTE = 11
 export const APPOINTMENT = 12
 // reminder
 export const REMINDER = 13
+
+export const NOTE_TYPES = [
+  NOTE,
+  SYSNOTE
+]

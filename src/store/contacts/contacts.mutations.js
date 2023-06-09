@@ -261,7 +261,7 @@ export default {
     state.messageComposer.sms = { ...state.messageComposer.sms, phone_number: phoneNumber }
   },
   SET_MESSAGE_COMPOSER_SMS_BODY: (state, body) => {
-    state.messageComposer.sms = { ...state.messageComposer.sms, body: body.trim() }
+    state.messageComposer.sms = { ...state.messageComposer.sms, body: body }
   },
   SET_MESSAGE_COMPOSER_SMS_GIF: (state, gif) => {
     state.messageComposer.sms = { ...state.messageComposer.sms, gif_url: gif }
@@ -534,5 +534,15 @@ export default {
   },
   SET_SHOW_CONTACT_RESOURCE_UNAVAILABLE (state, value) {
     state.showContactResourceUnavailable = value
+  },
+  ADD_AXIOS_UNIQUE_ID (state, value) {
+    state.inProgressAxiosUniqueIds.push(value)
+  },
+  REMOVE_AXIOS_UNIQUE_ID (state, value) {
+    const index = state.inProgressAxiosUniqueIds.findIndex(item => item === value)
+
+    if (index !== -1) {
+      state.inProgressAxiosUniqueIds.splice(index, 1)
+    }
   }
 }
