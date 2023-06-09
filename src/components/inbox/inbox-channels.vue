@@ -417,8 +417,8 @@ export default {
 
       if (this.$route.params.channel === 'all-communications') {
         const filteredTags = this.$route.query?.tagId
-          ? [this.$route.query.tagId]
-          : Filters.DEFAULT_STATE.filter.tagsFilter
+          ? [+this.$route.query.tagId]
+          : Filters.DEFAULT_STATE.filter.tags
 
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
         defaultFilterModel.filter = {
@@ -709,13 +709,12 @@ export default {
   mounted () {
     // check for url parameter filter to preselect and load
     if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId) {
+      this.setInboxShowMyContacts(false)
       this.filter = this.channelDefaultFilterModel.filter
       this.updateChannelChangedFilterFields({
         name: 'tags',
         value: this.channelDefaultFilterModel.filter.tags
       })
-      this.onApplyFilter(this.channelDefaultFilterModel.filter)
-      this.setInboxShowMyContacts(false)
     }
 
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
