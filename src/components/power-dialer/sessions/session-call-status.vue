@@ -14,7 +14,7 @@
         </div>
 
         <div class="w-100"
-             style="max-width: 340px;">
+             style="max-width: 370px;">
           <q-btn class="sessions-button my-1 ml-1"
                  size="sm"
                  style="width: 79.55px;"
@@ -61,26 +61,53 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
-                 size="sm"
-                 no-wrap
-                 unelevated
-                 no-caps
-                 :disabled="!canRedial"
-                 :color="canRedial  ? 'blue-7' : 'grey-8'"
-                 @click="onRedial">
-            <RefreshIcon class="mr-1"
-                         color="white" />
-            <div class="text-body2">
-              <q-tooltip content-class="bg-grey-light11"
-                         anchor="bottom middle"
-                         self="center middle"
-                         v-if="this.dialer.currentStatus === 'CALL_CONNECTED'">
-                  {{ redialTooltip }}
-              </q-tooltip>
-              Redial
-            </div>
-          </q-btn>
+          <q-btn-dropdown
+            class="sessions-button free-width my-1 ml-1"
+            size="sm"
+            no-wrap
+            unelevated
+            no-caps
+            left
+            :auto-close="true"
+            :disable="!canRedialNow && !canRedialLater"
+            :color="canRedialNow || canRedialLater ? 'blue-7' : 'grey-8'">
+            <template v-slot:label>
+              <RefreshIcon class="mr-2"
+                           color="white" />
+              <div class="text-body2">
+                <q-tooltip content-class="bg-grey-light11"
+                           anchor="bottom middle"
+                           self="center middle"
+                           v-if="dialer.currentStatus === 'CALL_CONNECTED' && !canRedialNow && !canRedialLater">
+                  This contact has already been redialed once
+                </q-tooltip>
+                Redial
+              </div>
+            </template>
+
+            <q-list>
+              <q-item v-for="option in redialOptions"
+                      :key="option.value"
+                      unelevated
+                      clickable
+                      v-close-popup
+                      :disable="option.value === 'now' ? !canRedialNow : !canRedialLater"
+                      :color="canRedialNow || canRedialLater  ? 'blue-7' : 'grey-8'"
+                      @click="onRedial(option.redial)">
+                <q-item-section>
+                  <q-item-label class="ml-2">
+                    <q-tooltip content-class="bg-grey-light11"
+                               anchor="center left"
+                               self="center right"
+                               v-if="dialer.currentStatus === 'CALL_CONNECTED'">
+                      {{ option.tooltip }}
+                    </q-tooltip>
+                    <i :class="option.icon"></i> {{ option.label }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
 
           <q-btn class="sessions-button free-width my-1 ml-1"
                  size="sm"
@@ -99,22 +126,34 @@
                       text="..."
                       right size="sm"
                       variant="white"
-                      no-caret
-                      :disabled="!statusCallConnected">
+                      no-caret>
             <template #button-content>
               <i class="fa fa-ellipsis-h"/>
             </template>
+            <b-dropdown-item v-if="hasPermissionTo('toggle block contact') && !(taskToCall?.is_dnc)"
+                             href="#"
+                             :disabled="isProcessingDNC"
+                             @click="dncContact">
+              <q-spinner-bars v-if="isProcessingDNC"
+                              class="mr-1"
+                              color="blue" />
+              <i class="fa fa-ban"></i>
+              DNC
+            </b-dropdown-item>
             <b-dropdown-item href="#"
+                             :disabled="!statusCallConnected"
                              @click="openDialPad">
               <DialPadIcon />
               Dial Pad
             </b-dropdown-item>
             <b-dropdown-item href="#"
+                             :disabled="!statusCallConnected"
                              @click="openAdd">
               <AddUserIcon color="#62666E" />
               Add
             </b-dropdown-item>
             <b-dropdown-item href="#"
+                             :disabled="!statusCallConnected"
                              @click="openTransfer">
               <TransferIcon color="#62666E" />
               Transfer
@@ -282,7 +321,7 @@ import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import {
   sessionCallStatusMixin,
-  dialerWrapUpMixin
+  dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
@@ -290,6 +329,8 @@ import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CompanyImportance from 'src/constants/importance-label'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'SessionCallStatus',
@@ -313,6 +354,7 @@ export default {
   },
 
   mixins: [
+    aclMixin,
     sessionCallStatusMixin,
     dialerWrapUpMixin
   ],
@@ -333,7 +375,9 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      redialedTask: {}
+      isProcessingDNC: false,
+      redialedTask: {},
+      CompanyImportance
     }
   },
 
@@ -563,17 +607,15 @@ export default {
       return !this.wrapUpPaused && !this.loadingNext && canNext
     },
 
-    canRedial () {
-      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.redialed.includes(this.activeTask.id) &&
-        this.powerDialerTasks.in_queue.length >= 1 &&
-        !this.isRedialClicked
+    canRedialLater () {
+      return this.canRedialNow &&
+        this.powerDialerTasks.in_queue.length >= 1
     },
 
-    redialTooltip () {
-      return this.canRedial
-        ? 'This contact will go to the bottom of the current session list'
-        : 'This contact has already been redialed once'
+    canRedialNow () {
+      return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        !this.redialed.includes(this.activeTask.id) &&
+        !this.isRedialClicked
     },
 
     pauseButtonText () {
@@ -647,6 +689,32 @@ export default {
       const backgroundClass = this.toggleEnd ? 'bg-btn-red' : ''
 
       return [backgroundClass]
+    },
+
+    redialOptions () {
+      let redialLaterTooltip = 'This contact will go to the bottom of the current session list'
+
+      // if we can redial now but not later it means we reached the end of the list
+      if (this.canRedialNow && !this.canRedialLater) {
+        redialLaterTooltip = 'Can not redial later, this contact is the last one in the list'
+      }
+
+      return [
+        {
+          label: 'Redial Now',
+          value: 'now',
+          icon: 'fas fa-bolt',
+          tooltip: 'This contact will stay on top of the current session list and will be redialed immediately',
+          redial: true
+        },
+        {
+          label: 'Redial Later',
+          value: 'later',
+          icon: 'fas fa-arrow-down',
+          tooltip: redialLaterTooltip,
+          redial: false
+        }
+      ]
     }
   },
 
@@ -1096,6 +1164,25 @@ export default {
       this.sessionPhoneExpansion = 'add'
     },
 
+    dncContact () {
+      if (this.isProcessingDNC) {
+        return
+      }
+
+      this.$bvModal.msgBoxConfirm('DNC will disable all communications to a contact and is irreversible. Do you wish to continue?', {
+        okTitle: 'Yes',
+        cancelTitle: 'No'
+      }).then(value => {
+        if (value) {
+          this.isProcessingDNC = true
+          talk2Api.V1.contact.update(this.taskToCall.id, { is_dnc: 1 }).then(response => {
+            this.isProcessingDNC = false
+            this.cancelSingleTask(this.taskToCall, 'DNC')
+          })
+        }
+      })
+    },
+
     openDialPad () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'dialpad'
@@ -1240,12 +1327,18 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial () {
+    async onRedial (redial) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
-      // get the next task
-      const task = get(this.powerDialerTasks.in_queue, '0', null)
+      let task = null
+      if (redial) {
+        // get the current task
+        task = this.activeTask
+      } else {
+        // get the next task
+        task = get(this.powerDialerTasks.in_queue, '0', null)
+      }
       this.taskToCall = cloneDeep(task)
 
       // end session if no more tasks
@@ -1257,8 +1350,9 @@ export default {
       }
 
       this.redialedTask = this.$jsonClone(this.activeTask)
+      this.redialedTask.redialed_now = redial
 
-      this.redialTask(this.activeTask).then(() => {
+      this.redialTask(this.activeTask, redial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
@@ -1268,8 +1362,9 @@ export default {
         if (this.wrapUpSeconds !== -1) {
           setTimeout(() => {
             this.isRedialClicked = false
+            // if it's redial now, we should skip wrap up
             this.wrapUp = false
-            this.skipWrapUp = false
+            this.skipWrapUp = redial
             this.processSession()
           }, 1000)
 
@@ -1299,10 +1394,12 @@ export default {
 
       const task = this.$jsonClone(this.redialedTask)
 
-      this.reQueuePowerDialerTask({
-        task: task,
-        id: task.contact_list_item_id
-      })
+      if (!task.redialed_now) {
+        this.reQueuePowerDialerTask({
+          task: task,
+          id: task.contact_list_item_id
+        })
+      }
 
       this.redialedTask = {}
     },
@@ -1384,7 +1481,7 @@ export default {
 
     'dialer.isReady': function () {
       // session is not ready if session failed to call the contact
-      // because dialer is not reaady. If dialer reconnects and status
+      // because dialer is not ready. If dialer reconnects and status
       // goes to ready, then we can continue running the task
       if (!this.sessionNotReady) {
         this.runTask()

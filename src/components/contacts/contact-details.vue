@@ -12,33 +12,29 @@
                :hide-profile-info="true"/>
     </div>
     <div class="contact-details-wrapper">
-      <div class="details-component-container"
+      <div class="details-component-container pb-5"
            ref="detailsComponentContainer">
-        <contact-info :campaign-id="campaignId">
-        </contact-info>
-        <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                          :contact="contact">
-        </contact-sequence>
-        <contact-aloha-bot v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                          :contact="contact">
-        </contact-aloha-bot>
-        <contact-phones></contact-phones>
-        <contact-information :first-outbound-call="communicationsSummary.first_outbound_call">
-        </contact-information>
-        <contact-tags :contact="contact">
-        </contact-tags>
-        <contact-notes v-if="contact"
-                       :contact="contact"
-                       @input="onNotesInput">
-        </contact-notes>
-        <contact-integrations :contact="contact"></contact-integrations>
-        <contact-scheduled-messages></contact-scheduled-messages>
-        <contact-activity-counts :summary="communicationsSummary.summaries"></contact-activity-counts>
-        <contact-lines></contact-lines>
-        <contact-ring-groups></contact-ring-groups>
-        <contact-broadcast></contact-broadcast>
-
-        <contact-save-bar></contact-save-bar>
+        <template v-if="!saveBarOnly">
+          <contact-info :campaign-id="campaignId"/>
+          <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
+                            :contact="contact"/>
+          <contact-aloha-bot v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
+                            :contact="contact"/>
+          <contact-phones/>
+          <contact-information :first-outbound-call="communicationsSummary.first_outbound_call"/>
+          <contact-tags :contact="contact"/>
+          <contact-notes v-if="contact"
+                         :contact="contact"
+                         @input="onNotesInput"/>
+          <contact-integrations :contact="contact"/>
+          <contact-scheduled-messages/>
+          <contact-activity-counts :summary="communicationsSummary.summaries"/>
+          <contact-lines/>
+          <contact-ring-groups/>
+          <contact-broadcast class="mb-5"/>
+          <div class="pb-5"/>
+        </template>
+        <contact-save-bar v-if="!noSaveBar"/>
       </div>
     </div>
   </div>
@@ -78,6 +74,18 @@ export default {
   props: {
     campaignId: {
       required: true
+    },
+
+    saveBarOnly: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    noSaveBar: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 

@@ -114,6 +114,10 @@ export default {
       'unsavedList'
     ]),
 
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapState(['isMobile']),
 
     mainClass () {
@@ -142,12 +146,18 @@ export default {
   },
 
   created () {
+    this.setShowContactResourceUnavailable(false)
     this.setListContactOwner(this.profile.id)
   },
 
   mounted () {
     if (this.$route.name === 'Contacts') {
       this.setShowContactsHeader(true)
+
+      // reset the table's default date column for sort
+      if (this.currentCompany?.default_contact_date_filter) {
+        this.setDefaultDateFilter(this.currentCompany.default_contact_date_filter)
+      }
     }
 
     if (this.isMobile) {
@@ -166,8 +176,11 @@ export default {
       'setAllContactsSelected',
       'setPreviousListFilters',
       'setPreviouslySavedListId',
-      'setPreviousListId'
+      'setPreviousListId',
+      'setShowContactResourceUnavailable'
     ]),
+
+    ...mapActions(['setDefaultDateFilter']),
 
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
@@ -200,6 +213,10 @@ export default {
 
   watch: {
     $route (to, from) {
+      if (to.name.includes('Contact')) {
+        this.setShowContactResourceUnavailable(false)
+      }
+
       // clear previous list state when moving out from Contacts page
       if (to.name !== 'Contacts' && from?.name === 'Contacts') {
         this.setPreviousListFilters({})
