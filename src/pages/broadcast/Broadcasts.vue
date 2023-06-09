@@ -788,7 +788,7 @@ export default {
       }
 
       if (item.name === 'delete') {
-        return this.isAdmin
+        return this.isAdmin && [4].includes(item.status)
       }
 
       return true
