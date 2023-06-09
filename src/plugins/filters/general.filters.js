@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import numeral from 'numeral'
 import numFormat from 'vue-filter-number-format'
+import googlePhone from 'google-libphonenumber'
 import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
 
@@ -12,9 +13,9 @@ import * as AgentStatus from '../../constants/agent-status'
 const toUpperCase = (text) => {
   if (text) {
     return text.toUpperCase()
-  } else {
-    return ''
   }
+
+  return ''
 }
 
 /**
@@ -25,9 +26,9 @@ const toUpperCase = (text) => {
 const capitalize = (text) => {
   if (text) {
     return _.capitalize(text)
-  } else {
-    return ''
   }
+
+  return ''
 }
 
 /**
@@ -37,7 +38,10 @@ const capitalize = (text) => {
  */
 const initials = (name) => {
   const initials = name.match(/\b\w/g) || []
-  return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
+  const firstItem = initials.shift() || ''
+  const lastItem = initials.pop() || ''
+
+  return `${firstItem}${lastItem}`.toUpperCase()
 }
 
 /**
@@ -48,9 +52,9 @@ const initials = (name) => {
 const humanReadableBool = (boolValue) => {
   if (boolValue) {
     return 'On'
-  } else {
-    return 'Off'
   }
+
+  return 'Off'
 }
 
 /**
@@ -67,6 +71,7 @@ const humanReadableDialMode = (mode) => {
     case 2:
       return 'Round-robin'
   }
+
   return '-'
 }
 
@@ -86,6 +91,7 @@ const humanReadableCallRouterBehavior = (mode) => {
     case CampaignCallRouterBehavior.CALL_ROUTER_BEHAVIOR_MODE_IVR:
       return 'IVR'
   }
+
   return '-'
 }
 
@@ -97,9 +103,9 @@ const humanReadableCallRouterBehavior = (mode) => {
 const ucfirst = (string) => {
   if (!string) {
     return '-'
-  } else {
-    return string.charAt(0).toUpperCase() + string.slice(1)
   }
+
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
 /**
@@ -110,9 +116,9 @@ const ucfirst = (string) => {
 const checkIfEmpty = (value) => {
   if (!value) {
     return '-'
-  } else {
-    return value
   }
+
+  return value
 }
 
 /**
@@ -123,9 +129,9 @@ const checkIfEmpty = (value) => {
 const checkIfTrue = (value) => {
   if (!value) {
     return '<i class="material-icons">&#xE876;</i>'
-  } else {
-    return '<i class="material-icons">&#xE14C;</i>'
   }
+
+  return '<i class="material-icons">&#xE14C;</i>'
 }
 
 /**
@@ -134,26 +140,24 @@ const checkIfTrue = (value) => {
  * @returns {string}
  */
 const prettifyCamelCase = (value) => {
-  const output = { data: '' }
-  const len = value.length
-  const char = { data: '' }
+  let output = ''
+  let char = ''
 
-  const index = { i: 0 }
-  for (index.i = 0; index.i < len; index.i++) {
-    char.data = value.charAt(index.i)
+  for (let index = 0; index < value.length; index++) {
+    char = value.charAt(index)
 
-    if (index.i === 0) {
-      output.data += char.data.toUpperCase()
-    } else if (char.data !== char.data.toLowerCase() && char.data === char.data.toUpperCase()) {
-      output.data += ' ' + char.data
-    } else if (char.data === '-' || char.data === '_') {
-      output.data += ' '
+    if (index === 0) {
+      output += char.toUpperCase()
+    } else if (char !== char.toLowerCase() && char === char.toUpperCase()) {
+      output += ` ${char}`
+    } else if (char === '-' || char === '_') {
+      output += ' '
     } else {
-      output.data += char.data
+      output += char
     }
   }
 
-  return output.data
+  return output
 }
 
 /**
@@ -176,9 +180,9 @@ const ucwords = (value) => {
 const filterDomain = (email) => {
   if (email) {
     return email.replace(/.*@/, '')
-  } else {
-    return '-'
   }
+
+  return '-'
 }
 
 /**
@@ -189,9 +193,9 @@ const filterDomain = (email) => {
 const fixCompanyRole = (label) => {
   if (label) {
     return label.replace('Company ', '')
-  } else {
-    return '-'
   }
+
+  return '-'
 }
 
 /**
@@ -202,7 +206,10 @@ const fixCompanyRole = (label) => {
  * @returns {*}
  */
 const truncate = (text, stop, clamp) => {
-  return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '')
+  const truncatedText = text.slice(0, stop)
+  const suffix = stop < text.length ? clamp || '...' : ''
+
+  return `${truncatedText}${suffix}`
 }
 
 /**
@@ -213,9 +220,9 @@ const truncate = (text, stop, clamp) => {
 const toInt = (amount) => {
   if (amount !== undefined) {
     return parseInt(amount)
-  } else {
-    return '-'
   }
+
+  return '-'
 }
 
 /**
@@ -233,9 +240,9 @@ const numberFormat = numFormat(numeral)
 const fixOrder = (order) => {
   if (order !== '' && order !== undefined) {
     return parseInt(order) + 1
-  } else {
-    return '-'
   }
+
+  return '-'
 }
 
 /**
@@ -246,9 +253,9 @@ const fixOrder = (order) => {
 const pretty = (value) => {
   if (value) {
     return JSON.stringify(value, null, 3)
-  } else {
-    return ''
   }
+
+  return ''
 }
 
 /**
@@ -260,10 +267,11 @@ const firstName = (fullName) => {
   if (fullName) {
     if (fullName.indexOf(' ') > -1) {
       const nameArr = fullName.split(/\s+/)
+
       return nameArr.slice(0, -1).join(' ')
-    } else {
-      return fullName
     }
+
+    return fullName
   }
 
   return ''
@@ -278,10 +286,11 @@ const lastName = (fullName) => {
   if (fullName) {
     if (fullName.indexOf(' ') > -1) {
       const nameArr = fullName.split(/\s+/)
+
       return nameArr.pop()
-    } else {
-      return fullName
     }
+
+    return fullName
   }
 
   return ''
@@ -295,9 +304,9 @@ const lastName = (fullName) => {
 const replaceDash = (text) => {
   if (text) {
     return text.replace('-', ' ')
-  } else {
-    return ''
   }
+
+  return ''
 }
 
 /**
@@ -307,6 +316,7 @@ const replaceDash = (text) => {
  */
 const agentStatusClass = (agentStatus) => {
   agentStatus = parseInt(agentStatus)
+
   if (agentStatus !== null) {
     switch (agentStatus) {
       case AgentStatus.AGENT_STATUS_OFFLINE:
@@ -344,12 +354,14 @@ const readableArrayValue = (value) => {
   if (value.length === 0) {
     return ''
   }
+
   if (value.length >= 2) {
     const last = value.pop()
+
     return value.join(', ') + ', or ' + last
-  } else {
-    return value.pop()
   }
+
+  return value.pop()
 }
 
 const fixBooleanType = (val) => {
@@ -359,40 +371,50 @@ const fixBooleanType = (val) => {
 const nl2br = (value, noValue = true) => {
   if (!value) {
     return noValue ? '-' : ''
-  } else {
-    const breakTag = '<br />'
-    return (value + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2')
   }
+
+  const breakTag = '<br />'
+  return (value + '')
+    .replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, `$1${breakTag}$2`)
 }
 
 const strLimit = (string, limit, appendEllipsis = true) => {
-  if (string) {
-    return string.slice(0, limit) + (appendEllipsis && string.length > limit ? '...' : '')
+  if (!string) {
+    return string
   }
-  return string
+
+  const truncatedText = string.slice(0, limit)
+  const suffix = appendEllipsis && string.length > limit ? '...' : ''
+
+  return `${truncatedText}${suffix}`
 }
 
 const momentFormat = (datetime, format, toUserTimezone = false) => {
   if (toUserTimezone) {
     return window.moment.utc(datetime).tz(window.timezone).format(format)
   }
+
   return window.moment(datetime).format(format)
 }
 
 const textTruncate = (text, lines, maxLength = 43) => {
   if (text) {
-    const texts = { data: text.split('<br />').filter(Boolean) }
-    if (texts.data.length >= 2) {
-      texts.data = texts.data.slice(0, 2).join('<br />')
+    let texts = text.split('<br />').filter(Boolean)
+
+    if (texts.length >= 2) {
+      texts = texts.slice(0, 2).join('<br />')
     } else {
-      texts.data = text
+      texts = text
     }
+
     const newMaxLength = maxLength * lines
-    texts.data = texts.data.substring(0, (texts.data.length > newMaxLength ? newMaxLength : texts.data.length))
-    const hasEllipse = texts.data.length < text.length
-    texts.data = texts.data.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
-    return texts.data + (hasEllipse ? '…' : '')
+    texts = texts.substring(0, (texts.length > newMaxLength ? newMaxLength : texts.length))
+    const hasEllipse = texts.length < text.length
+    texts = texts.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g, '').trim()
+
+    return texts + (hasEllipse ? '…' : '')
   }
+
   return text
 }
 
@@ -406,133 +428,167 @@ const textTruncate = (text, lines, maxLength = 43) => {
  */
 const fixPhone = (
   phoneNumber,
-  format = null,
+  format = 'E164',
   force = false,
-  includeSuffix = false
+  includeSuffix = false,
+  formatByLocale = false
 ) => {
-  if (phoneNumber) {
-    phoneNumber = phoneNumber.toString()
-    phoneNumber = phoneNumber.replace(/\s+/g, '')
-    phoneNumber = phoneNumber.replace('#', '')
-    phoneNumber = phoneNumber.replace('.', '')
-
-    if (phoneNumber.toLowerCase() === 'restricted') {
-      return phoneNumber
-    }
-
-    if (phoneNumber.toLowerCase() === 'anonymous') {
-      return phoneNumber
-    }
-
-    if (phoneNumber.toLowerCase() === 'unknown') {
-      return phoneNumber
-    }
-
-    if (phoneNumber === '+266696687') {
-      return phoneNumber
-    }
-
-    if (phoneNumber === '8656696') {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('unhold:')) {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('auto_dial_task:')) {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('power_dialer_task:')) {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('call:')) {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('barge:')) {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('whisper:')) {
-      return phoneNumber
-    }
-
-    if (phoneNumber.includes('hs:')) {
-      return phoneNumber
-    }
-
-    // sip uri used instead of phone number
-    if (phoneNumber.indexOf('@') > -1) {
-      return phoneNumber
-    }
-
-    // Use substring() and indexOf() functions to remove
-    // portion of string after certain character (w => wait)
-    const pos = phoneNumber.indexOf('w')
-    const suffix = { data: '' }
-    if (pos !== -1) {
-      suffix.data = phoneNumber.substring(pos, phoneNumber.length - 1).trim()
-      phoneNumber = phoneNumber.substring(0, pos).trim()
-    }
-
-    if (phoneNumber.toString().length <= 9) {
-      return force ? '-' : false
-    }
-
-    const locale = window.guessLocale(phoneNumber)
-
-    if (!locale) {
-      return force ? '-' : false
-    }
-
-    const tel = window.phoneUtil.parse(phoneNumber, locale)
-
-    if (['US', 'CA'].includes(locale) && !format) {
-      format = 'NATIONAL'
-    }
-
-    if (!format) {
-      format = 'E164'
-    }
-
-    const formattedPhoneNumber = { data: null }
-
-    if (format === 'INTERNATIONAL') {
-      formattedPhoneNumber.data = window.phoneUtil.format(tel, window.PNF.INTERNATIONAL).toString()
-    } else if (format === 'E164') {
-      formattedPhoneNumber.data = window.phoneUtil.format(tel, window.PNF.E164).toString()
-    } else {
-      formattedPhoneNumber.data = window.phoneUtil.format(tel, window.PNF.NATIONAL).toString()
-    }
-
-    // if we have to include suffix
-    if (includeSuffix) {
-      formattedPhoneNumber.data = formattedPhoneNumber.data + suffix.data
-    }
-
-    return formattedPhoneNumber.data
-  } else {
+  if (!phoneNumber) {
     return ''
   }
+
+  phoneNumber = phoneNumber.toString()
+  phoneNumber = phoneNumber.replace(/\s+/g, '')
+  phoneNumber = phoneNumber.replace('#', '')
+  phoneNumber = phoneNumber.replace('.', '')
+
+  if (phoneNumber.toLowerCase() === 'restricted') {
+    return phoneNumber
+  }
+
+  if (phoneNumber.toLowerCase() === 'anonymous') {
+    return phoneNumber
+  }
+
+  if (phoneNumber.toLowerCase() === 'unknown') {
+    return phoneNumber
+  }
+
+  // @todo: please remove this when there is a new update on identifying this number
+  if (phoneNumber === '+61483904553') {
+    return phoneNumber
+  }
+
+  if (phoneNumber === '+266696687') {
+    return phoneNumber
+  }
+
+  if (phoneNumber === '8656696') {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('unhold:')) {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('auto_dial_task:')) {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('power_dialer_task:')) {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('call:')) {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('barge:')) {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('whisper:')) {
+    return phoneNumber
+  }
+
+  if (phoneNumber.includes('hs:')) {
+    return phoneNumber
+  }
+
+  // sip uri used instead of phone number
+  if (phoneNumber.indexOf('@') > -1) {
+    return phoneNumber
+  }
+
+  // Use substring() and indexOf() functions to remove
+  // portion of string after certain character (w => wait)
+  const pos = phoneNumber.indexOf('w')
+  let suffix = ''
+
+  if (pos !== -1) {
+    suffix = phoneNumber.substring(pos, phoneNumber.length - 1).trim()
+    phoneNumber = phoneNumber.substring(0, pos).trim()
+  }
+
+  if (phoneNumber.toString().length <= 9) {
+    switch (phoneNumber.toString().length) {
+      case 5:
+      case 6:
+        // Get an instance of ShortNumberInfo
+        const shortInfo = googlePhone.ShortNumberInfo.getInstance()
+
+        try {
+          // Parse number with US country code and keep raw input
+          const number = window.phoneUtil.parseAndKeepRawInput(phoneNumber.toString(), 'US')
+
+          if (shortInfo.isValidShortNumberForRegion(number, 'US')) {
+            return phoneNumber.toString()
+          }
+        } catch (err) {
+          return false
+        }
+    }
+
+    // fallback
+    return false
+  }
+
+  const locale = window.guessLocale(phoneNumber)
+
+  if (!locale) {
+    return force ? '-' : false
+  }
+
+  const localesUS = ['US', 'CA']
+  const tel = window.phoneUtil.parse(phoneNumber, locale)
+  const notFormatByUSLocale = localesUS.includes(locale) && !format && !formatByLocale
+  const formatByUSLocale = localesUS.includes(locale) && formatByLocale
+  const formayByInternationalLocale = !localesUS.includes(locale) && formatByLocale
+
+  if (notFormatByUSLocale || formatByUSLocale) {
+    format = 'NATIONAL'
+  } else if (formayByInternationalLocale) {
+    format = 'INTERNATIONAL'
+  }
+
+  let formattedPhoneNumber = ''
+
+  switch (format) {
+    case 'INTERNATIONAL':
+      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.INTERNATIONAL).toString()
+      break
+    case 'E164':
+      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.E164).toString()
+      break
+    default:
+      formattedPhoneNumber = window.phoneUtil.format(tel, window.PNF.NATIONAL).toString()
+  }
+
+  // if we have to include suffix
+  if (includeSuffix) {
+    formattedPhoneNumber.data = formattedPhoneNumber + suffix
+  }
+
+  return formattedPhoneNumber
 }
 
 const numberPlusFormatter = (value, limit = 99) => {
   if (value >= limit) {
     return limit + '+'
   }
+
   return value
 }
 
-// eslint-disable-next-line no-return-assign,no-sequences
-const sortObjectByKey = obj => Object.keys(obj).sort().reduce((res, key) => (res[key] = obj[key], res), {})
+const sortObjectByKey = obj => Object.keys(obj).sort()
+  // eslint-disable-next-line no-return-assign,no-sequences
+  .reduce((res, key) => (res[key] = obj[key], res), {})
 
 const objAlphabeticalOrder = (object, sortProp) => {
   object = object.sort((a, b) => {
     const textA = a[sortProp].toUpperCase()
     const textB = b[sortProp].toUpperCase()
+
     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
   })
 
@@ -619,5 +675,6 @@ export default ({ Vue }) => {
     fullDuration,
     fullShortDate
   }
+
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

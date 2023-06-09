@@ -367,5 +367,11 @@ export default {
   },
   setShowContactResourceUnavailable: ({ commit }, value) => {
     commit('SET_SHOW_CONTACT_RESOURCE_UNAVAILABLE', value)
+  },
+  addAxiosUniqueId ({ commit }, value) {
+    commit('ADD_AXIOS_UNIQUE_ID', value)
+  },
+  removeAxiosUniqueId ({ commit }, value) {
+    commit('REMOVE_AXIOS_UNIQUE_ID', value)
   }
 }

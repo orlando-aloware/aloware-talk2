@@ -1,0 +1,3 @@
+export const MAX_SCREEN_WIDTH_MOBILE_HEADER = 784
+export const MIN_TABLET_WIDTH = 605
+export const MAX_TABLET_WIDTH = 1084

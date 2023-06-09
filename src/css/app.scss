@@ -2831,7 +2831,7 @@ i.option-separator {
   }
 
   form {
-    height: 14vh;
+    height: 130px;
     cursor: pointer;
     margin-bottom: 10px;
     position: relative;
@@ -4570,7 +4570,7 @@ i.option-separator {
   padding: 17px 18px;
   bottom: 0;
   border-top: 1px solid $grey-70;
-  z-index: 9;
+  z-index: 999;
   left: 0;
 
   .label {
@@ -9319,7 +9319,13 @@ screen and (max-width: 956px) {
     }
   }
   .contact-details-container {
-    display: none;
+    width: 0;
+    margin: 0;
+    &:not(.contact-details--opened) {
+      .mobile-header {
+        margin: 0;
+      }
+    }
   }
   .contact-activities-actions__mobile {
     display: flex;
@@ -9425,6 +9431,16 @@ screen and (max-width: 956px) {
         &.desktop {
           display: none;
         }
+      }
+    }
+  }
+}
+
+@media (min-width: 785px) and (max-width: 1084px) {
+  .contact-details-container {
+    &-drawer {
+      &.has-contact-changes aside {
+        height: calc(100vh - 128px);
       }
     }
   }
@@ -9658,8 +9674,11 @@ screen and (max-width: 956px) {
   }
   .contact-details-container {
     &-drawer {
-      aside {
+      &:not(.has-contact-changes) aside {
         height: calc(100vh - 108px);
+      }
+      &.has-contact-changes aside {
+        height: calc(100vh - 123px);
       }
     }
   }
@@ -9920,11 +9939,6 @@ screen and (max-width: 956px) {
               padding-right: 0 !important;
             }
 
-            .form-row:first-child:not(.general-settings-app-block),
-            .row:first-child {
-              display: none !important;
-            }
-
             .form-row:first-child,
             .row:first-child {
               > div > div > button {
@@ -10038,7 +10052,7 @@ screen and (max-width: 956px) {
     .details-component-container {
       padding-bottom: 59px;
 
-      > div {
+      > div:not(:last-child) {
         margin-right: 10px !important;
         width: auto !important;
       }
@@ -12580,7 +12594,7 @@ h1.contact-list-name-label {
 
       .form-group {
         margin-bottom: 0px;
-        
+
         span {
           font-size: 14px;
         }
@@ -12600,12 +12614,12 @@ h1.contact-list-name-label {
       width: 100%;
       display: flex;
       flex-direction: column;
-      
+
       // taller
       &--comfort {
         .overview__body__card {
           width: 20%;
-          
+
           &__container {
             flex-direction: column;
             justify-content: space-between;
@@ -12621,7 +12635,7 @@ h1.contact-list-name-label {
       &--compact {
         .overview__body__card {
           width: calc(100% / 3);
-          
+
           &__container {
             flex-direction: row;
 
@@ -12765,7 +12779,7 @@ h1.contact-list-name-label {
                 align-items: center;
                 cursor: pointer;
                 padding: 4px;
-                
+
                 &:hover {
                   background-color: $light-grey;
                 }
@@ -12866,7 +12880,7 @@ h1.contact-list-name-label {
             word-break: break-word !important;
           }
         }
-        
+
         .relative-time {
           font-size: 13px !important;
           color: $grey-92;

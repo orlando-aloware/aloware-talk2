@@ -211,6 +211,12 @@ export default {
         return
       }
 
+      // Check if the contact is DNC'ed
+      if (this.taskToCall?.is_dnc) {
+        this.cancelSingleTask(this.taskToCall, 'Task is removed because the contact is on DNC.')
+        return
+      }
+
       this.callInProgress = false
 
       // only proceed if task has a contact list item id and
@@ -263,18 +269,37 @@ export default {
         })
     },
 
-    redialTask (autoDialTask) {
+    cancelSingleTask (autoDialTask, message) {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
         return
       }
 
-      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`)
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/cancel`, { reason: message })
+        .then(res => {
+          this.$generalNotification(message, 'warning')
+          this.onNextTask(true, true)
+          return Promise.resolve(res)
+        }).catch(err => {
+          // this.$handleErrors(err.response)
+          return Promise.reject(err)
+        })
+    },
+
+    redialTask (autoDialTask, redial) {
+      const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
+
+      if (!contactListItemId) {
+        return
+      }
+
+      return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })
         .then(res => {
           this.addRedialedTask(autoDialTask.id)
 
-          this.$generalNotification('Success: contact is at the bottom of the current list')
+          const position = redial ? 'top' : 'bottom'
+          this.$generalNotification(`Success: contact is at the ${position} of the current list`)
           return Promise.resolve(res)
         }).catch(err => {
           return Promise.reject(err)

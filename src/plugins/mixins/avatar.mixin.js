@@ -21,7 +21,7 @@ export default {
       }
 
       const data = {
-        initials: this.getInitials(name),
+        initials: this.$options.filters.initials(name),
         color1: null,
         color2: null
       }
@@ -38,8 +38,7 @@ export default {
     },
 
     getInitials (name) {
-      const initials = name.match(/\b\w/g) || []
-      return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase()
+      return this.$options.filters.initials(name)
     },
 
     hashCode (str) {
