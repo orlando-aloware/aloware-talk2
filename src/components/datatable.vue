@@ -9,8 +9,7 @@
          @scroll="handleScroll">
 
       <table ref="table"
-             :class="[computedClass, 'pl-3']">
-
+             :class="tableClass">
         <thead>
           <draggable class="dragable-header"
                      tag="tr"
@@ -20,29 +19,21 @@
                      :move="onCheckMove"
                      @change="onOrderChanged">
 
-            <th :key="column.name"
+            <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
+                :key="column.name"
                 :data-column-id="column.name"
-                :class="{
-                  checkbox: column.name === 'checkbox',
-                  sticky: column.sticky,
-                  hovering: hoverKey === key ? isHovering : false
-                }"
                 :id="`cols-${column.name}`"
-                :style="{
-                  maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
-                  minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
-                }"
+                :style="getHeaderStyle(column.name, column.minWidth, column.maxWidth)"
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
-
               <label class="custom-checkbox-container check-all"
                      v-if="column.name === 'checkbox'">
-                <input type="checkbox"
+                <input ref="dataTableCheckAll"
                        class="data-table-check-all"
-                       ref="dataTableCheckAll"
+                       type="checkbox"
                        :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
-                <span class="checkmark"></span>
+                <span class="checkmark"/>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
                 <div class="move-icon-drag-container"
@@ -60,14 +51,9 @@
                 </span>
                 <div class="sorter-container"
                      :class="{ 'has-sorting': sorts.orderBy === column.name }">
-                <a href="#"
-                   class="sorter"
-                   :class="{
-                    'sorter-asc':
-                      sorts.order === 'asc' && sorts.orderBy === column.name,
-                    'sorter-desc':
-                      sorts.order === 'desc' && sorts.orderBy === column.name
-                    }"
+                <a class="sorter"
+                   href="#"
+                   :class="getSorterClass(column.name)"
                    v-if="column.sortable"
                    @click.prevent="onColumnSort(column)">
                 </a>
@@ -109,8 +95,8 @@
       </div>
     </div>
 
-    <div v-if="paginated"
-         class="d-flex justify-content-center bordered-top">
+    <div class="d-flex justify-content-center bordered-top"
+         v-if="paginated">
       <q-pagination class="table-pagination"
                     padding="0 15px"
                     boundary-links
@@ -124,11 +110,11 @@
       </q-pagination>
 
       <q-select class="mt-2 q-select-pager"
+                option-value="value"
+                option-label="label"
                 outlined
                 dense
                 emit-value
-                option-value="value"
-                option-label="label"
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`"
                 v-model="perPage" />
@@ -143,6 +129,7 @@ import draggable from 'vuedraggable'
 import MoveIcon from 'components/icons/move-icon-2'
 import * as DefaultContactDateFilter from 'src/constants/company_default_contact_date_filter'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
+import { DEFAULT_PAGES, LG_SCREEN_PAGES, XL_SCREEN_PAGES } from 'src/constants/datatable'
 
 export default {
   components: {
@@ -248,12 +235,18 @@ export default {
       return 'last_engagement_at'
     },
 
-    computedClass () {
-      return {
-        datatable: true,
-        [this.customClass]: !!this.customClass,
-        'datatable--sticky-columns': this.stickyHeaders
-      }
+    tableClass () {
+      const customClass = this.customClass ? this.customClass : ''
+      const stickyHeaderClass = this.stickyHeaders ? 'datatable--sticky-columns' : ''
+      const paddingClass = !customClass.includes('pl-0') && !customClass.includes('px-0') &&
+        !customClass.includes('p-0') ? 'pl-3' : ''
+
+      return [
+        'datatable',
+        customClass,
+        paddingClass,
+        stickyHeaderClass
+      ]
     },
 
     hasEmptySlot () {
@@ -261,7 +254,7 @@ export default {
     },
 
     fixedColumns () {
-      const newItems = JSON.parse(JSON.stringify(this.columns))
+      const newItems = this.$jsonClone(this.columns)
 
       // does not need to reference contacts
       if (!['Contacts', 'Power Dialer'].includes(this.$route.name)) {
@@ -272,9 +265,11 @@ export default {
       // check if column is required then update sortable.
       for (const index in newItems) {
         const found = ALL_COLUMNS.find(col => col.name === newItems[index].name)
+
         if (found && found.required) {
           newItems[index].sortable = found.sortable
         }
+
         if (found) {
           newItems[index].label = found.label
           newItems[index].default = found.default
@@ -289,24 +284,26 @@ export default {
 
     maxPaginationPages () {
       if (this.$q.screen.xl) {
-        return 11
+        return XL_SCREEN_PAGES
       }
 
       if (this.$q.screen.lg) {
-        return 7
+        return LG_SCREEN_PAGES
       }
 
-      return 3
+      return DEFAULT_PAGES
     },
 
     scrollableAreaClasses () {
-      let isDefault = this.$route.name === 'Contacts' || this.$route.name === 'Contact'
-      let optScroll = `scrollableArea ${isDefault ? '' : 'scroll-type-1'} position-relative `
+      const isDefault = this.$route.name === 'Contacts' || this.$route.name === 'Contact'
+      const optScroll = `scrollableArea ${!isDefault ? 'scroll-type-1' : ''} position-relative `
+      const scrollableClass = `${this.isScrollable ? optScroll : ''}d-flex flex-column h-100 w-100 flex-grow-1`
+      const mobileClass = this.isMobile ? 'mobile-scrollableArea' : ''
 
       return [
-        `${this.isScrollable ? optScroll : ' '}d-flex flex-column h-100 w-100 flex-grow-1`,
+        scrollableClass,
         this.scrollAreaClass,
-        `${this.isMobile ? 'mobile-scrollableArea' : ''}`
+        mobileClass
       ]
     },
 
@@ -350,6 +347,50 @@ export default {
   methods: {
     ...mapActions(['setDefaultDateFilter']),
 
+    getHeaderStyle (name, minWidth, maxWidth) {
+      let minWidthPixels = minWidth ? `${minWidth}px` : ''
+      let maxWidthPixels = maxWidth ? `${maxWidth}px` : ''
+
+      if (name === 'checkbox') {
+        minWidthPixels = '40px'
+        maxWidthPixels = '40px'
+      }
+
+      return {
+        minWidth: minWidthPixels,
+        maxWidth: maxWidthPixels
+      }
+    },
+
+    getHeaderCheckboxClass (key, sticky, name) {
+      const checkboxClass = name === 'checkbox' ? name : ''
+      const stickyClass = sticky ? 'sticky' : ''
+      const hoveringClass = this.hoverKey === key && this.isHovering
+        ? 'hovering' : ''
+
+      return [
+        checkboxClass,
+        stickyClass,
+        hoveringClass
+      ]
+    },
+
+    getSorterClass (columnName) {
+      if (this.sorts.orderBy !== columnName) {
+        return ''
+      }
+
+      const ascendingClass = this.sorts.order === 'asc'
+        ? 'sorter-asc' : ''
+      const descendingClass = this.sorts.order === 'desc'
+        ? 'sorter-desc' : ''
+
+      return [
+        ascendingClass,
+        descendingClass
+      ]
+    },
+
     resetScroll () {
       this.$refs.scrollableArea.scrollTop = 0
       this.lastScrollTop = this.$refs.scrollableArea.scrollTop
@@ -359,12 +400,14 @@ export default {
       // detect scroll direction; don't trigger api call if scroll direction is up
       if (element.srcElement.scrollTop < this.lastScrollTop) {
         this.onVisibilityChanged(false)
+
         return
       }
 
       if ((element.srcElement.clientHeight + element.srcElement.scrollTop) >= element.srcElement.offsetHeight) {
         this.lastScrollTop = element.srcElement.scrollTop
         this.onVisibilityChanged(true)
+
         return
       }
 
@@ -374,16 +417,17 @@ export default {
     },
 
     onResizeMouseMove (evt) {
-      if (this.column) {
-        const index = { i: 0 }
-        for (index.i = 0; index.i < evt.pageX; index.i++) {
-          requestAnimationFrame(() => {
-            if (this.column) {
-              this.column.style.minWidth = `${this.startOffset + index.i}px`
-              this.column.style.maxWidth = `${this.startOffset + index.i}px`
-            }
-          })
-        }
+      if (!this.column) {
+        return
+      }
+
+      for (let index = 0; index < evt.pageX; index++) {
+        requestAnimationFrame(() => {
+          if (this.column) {
+            this.column.style.minWidth = `${this.startOffset + index}px`
+            this.column.style.maxWidth = `${this.startOffset + index}px`
+          }
+        })
       }
     },
 
@@ -414,6 +458,7 @@ export default {
 
     onColumnSort (column) {
       let sorts = Object.assign({}, this.getColumnSorts(column))
+
       setTimeout(() => {
         this.$emit('sort', sorts)
       }, 100)
@@ -470,6 +515,7 @@ export default {
       }
 
       clearTimeout(this.scrollTimeout)
+
       // Set a timeout to run after scrolling ends
       this.scrollTimeout = setTimeout(() => {
         // Run the callback
@@ -499,6 +545,7 @@ export default {
       this.sorts.orderBy = this.defaultContactDateFilter
       this.sorts.order = this.customSortOptions ? '' : 'desc'
     }
+
     document.addEventListener('mouseup', this.onResizerMouseUp)
     document.addEventListener('mousemove', this.onResizeMouseMove)
   },
