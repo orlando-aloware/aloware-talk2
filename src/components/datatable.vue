@@ -42,11 +42,10 @@
               <label
                 v-if="column.name === 'checkbox'"
                 class="custom-checkbox-container check-all">
-                <input
-                  type="checkbox"
-                  class="data-table-check-all"
-                  ref="dataTableCheckAll"
-                  @change="onCheckboxClicked" />
+                <input ref="dataTableCheckAll"
+                       type="checkbox"
+                       class="data-table-check-all"
+                       @change="onCheckboxClicked" />
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
@@ -93,6 +92,10 @@
           </draggable>
         </thead>
         <tbody>
+          <tr v-if="isCheckboxAllChecked && totalRows < perPage">
+            <td class="text-center"
+                :colspan="tableColumnSpan">{{ checkedCount }} contacts on this page selected. Select all {{ totalRows }} contacts that match this search query.</td>
+          </tr>
           <slot name="tbody" />
         </tbody>
       </table>
@@ -236,6 +239,11 @@ export default {
     startOrder: {
       type: Object,
       required: false
+    },
+
+    checkedCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -320,6 +328,10 @@ export default {
       }
 
       return 'No contacts found on the current list'
+    },
+
+    tableColumnSpan () {
+      return this.fixedColumns.length
     }
   },
 
@@ -343,7 +355,8 @@ export default {
       moveColor: '#4F4F4F',
       column: null,
       scrollTimeout: null,
-      lastScrollTop: 0
+      lastScrollTop: 0,
+      isCheckboxAllChecked: false
     }
   },
 
@@ -401,6 +414,7 @@ export default {
 
     onCheckboxClicked (evt) {
       this.$emit('checked', evt.target.checked)
+      this.isCheckboxAllChecked = evt.target.checked
     },
 
     onOrderChanged ({ oldIndex, newIndex }) {

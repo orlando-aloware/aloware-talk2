@@ -140,7 +140,7 @@
     <template slot="actions">
       <power-dialer-bulk-action-menu :id="filteredSelectedListId"
                                      :disabledDelete="taskAddAndClearingDisabled"
-                                     v-if="checked.length > 0"
+                                     v-if="checkedCount > 0"
                                      @moved-contacts="onFetch({}, false)" />
     </template>
 
@@ -157,6 +157,7 @@
                  :total-rows="fixedContactsData.total"
                  :current-page="currentPage"
                  :last-page="lastPage"
+                 :checked-count="checkedCount"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -853,6 +854,10 @@ export default {
 
     checked () {
       return this.selectedContacts[this.filteredSelectedListId] || []
+    },
+
+    checkedCount () {
+      return this.checked.length
     },
 
     createContactToListText () {
