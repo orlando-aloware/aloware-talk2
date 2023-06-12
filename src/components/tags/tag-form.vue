@@ -338,8 +338,7 @@ export default {
 
       if (this.editableTag) {
         // edit/update api
-        const clonedTag = (({ category, ...o }) => o)(this.tag) // except category
-        xhr = API.V1.tags.update(this.editableTag.id, this.$jsonClone(clonedTag))
+        xhr = API.V1.tags.update(this.editableTag.id, { ...this.tag })
         msg = this.tagCategoryName + ' tag updated successfully'
       } else {
         // add api
