@@ -566,7 +566,7 @@ const fixPhone = (
 
   // if we have to include suffix
   if (includeSuffix) {
-    formattedPhoneNumber.data = formattedPhoneNumber + suffix
+    formattedPhoneNumber = formattedPhoneNumber + suffix
   }
 
   return formattedPhoneNumber
