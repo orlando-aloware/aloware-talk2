@@ -260,7 +260,7 @@
             <p v-if="popupActionList.length <= 1">Are you sure you want to delete this broadcast?</p>
             <p v-else>Are you sure you want to delete <span class="text-bold">{{ popupActionList.length }}</span> broadcasts?</p>
             <div class="d-flex">
-              <q-btn class="px-1 flex-grow-1"
+              <q-btn class="px-1 flex-grow-1 broadcasts-cancel-button"
                      color="white"
                      text-color="black"
                      unelevated

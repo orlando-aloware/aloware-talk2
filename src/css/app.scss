@@ -12918,6 +12918,10 @@ h1.contact-list-name-label {
 }
 
 .broadcasts {
+  &-cancel-button {
+    border: 1.6px solid #D8D8D8
+  }
+
   &__home {
     overflow-y: scroll;
 
@@ -13155,6 +13159,7 @@ h1.contact-list-name-label {
     }
   }
 }
+
 
 .steps-wrapper {
   display: flex;
