@@ -115,6 +115,37 @@
                                     :default_date_range="7"/>
     </div>
     <q-separator/>
+    <div class="d-flex align-items-center justify-content-end">
+      <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+                  id="bulk-action-dropdown"
+                  text="..."
+                  variant="light"
+                  no-caret
+                  right
+                  :disabled="bulkActionsDisabled"
+                  v-b-tooltip.hover="{ placement: 'top', title: (bulkActionsDisabled ? 'Select broadcasts in order to use bulk actions' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }">
+        <template #button-content>
+          <ellipse-icon />
+        </template>
+        <b-dropdown-item href=""
+                         :disabled="!shouldAllowContextMenuBulk('activity')"
+                         @click.prevent="bulkShowActivity">
+          <img class="mr-2"
+               :src="'app-icons/menu/context-menu-activity.svg'"/>
+          <span>
+            Activity
+          </span>
+        </b-dropdown-item>
+        <b-dropdown-item href=""
+                         :disabled="!shouldAllowContextMenuBulk('delete')"
+                         @click.prevent="bulkDelete">
+          <delete-red-icon />
+          <span class="text-danger">
+            Delete
+          </span>
+        </b-dropdown-item>
+      </b-dropdown>
+    </div>
     <div class="broadcasts__home__table flex-grow-1">
       <datatable class="h-100"
                  ref="broadcastsTable"
@@ -196,9 +227,14 @@
                                      v-for="(item, id) in contextMenuListItems"
                                      @click="onContextMenuButtonClicked(item, row)">
                       <div class="d-flex align-items-center">
-                        <img class="mr-2"
-                            :src="`app-icons/menu/${item.icon}`" />
-                        <span>{{ item.label }}</span>
+                        <template v-if="item.name === 'delete'">
+                          <delete-red-icon class="mr-2" />
+                        </template>
+                        <template v-else>
+                          <img class="mr-2"
+                              :src="`app-icons/menu/${item.icon}`" />
+                        </template>
+                        <span :class="[item.name === 'delete' ? 'text-danger' : '']">{{ item.label }}</span>
                       </div>
                     </b-dropdown-item>
                   </b-dropdown>
@@ -276,6 +312,7 @@ import Datatable from 'src/components/datatable.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
 import CommunicationActivityGraph from 'src/components/communication-activity-graph.vue'
+import DeleteRedIcon from 'components/icons/delete-red-icon'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
@@ -395,7 +432,8 @@ export default {
     Datatable,
     BroadcastStatusPill,
     CommunicationActivityGraph,
-    EllipseIcon
+    EllipseIcon,
+    DeleteRedIcon
   },
 
   mixins: [aclMixin],
@@ -571,7 +609,11 @@ export default {
     },
 
     contextMenuTarget () {
-      return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : true
+      return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : '#bulk-action-dropdown'
+    },
+
+    bulkActionsDisabled () {
+      return this.checked.length === 0
     }
   },
 
@@ -783,15 +825,30 @@ export default {
     },
 
     shouldAllowContextMenuButton (item, broadcast) {
-      if (item.name === 'rename') {
-        return this.checked.length === 0 || (this.checked.length === 1 && this.checked[0]?.id === broadcast.id) || (this.checked.length > 1 && !this.checked.map(item => item.id).includes(broadcast.id))
-      }
-
       if (item.name === 'delete') {
-        return this.isAdmin && [4].includes(item.status)
+        return this.isAdmin && [4].includes(broadcast.status)
       }
 
       return true
+    },
+
+    shouldAllowContextMenuBulk (action) {
+      if (action === 'delete') {
+        let isAllCheckedDone = this.checked.reduce((results, item) => results && item.status === 4, true)
+        return this.isAdmin && isAllCheckedDone
+      }
+
+      return true
+    },
+
+    bulkDelete () {
+      this.popupActionList = this.checked
+      this.popupOpen = true
+      this.popupAction = 'delete'
+    },
+
+    bulkShowActivity () {
+      this.showBroadcastActivity(this.checked)
     },
 
     isSelectedRow (row) {
