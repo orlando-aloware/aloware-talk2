@@ -12993,9 +12993,8 @@ h1.contact-list-name-label {
         td.datatable-row__checkbox {
           padding-right: 0 !important;
 
-          .custom-checkbox-container {
-            position: relative;
-            padding-left: 10px;
+          .custom-checkbox-container .checkmark {
+            left: 10px;
           }
         }
       }
