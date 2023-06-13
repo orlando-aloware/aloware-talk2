@@ -137,6 +137,26 @@
           </span>
         </b-dropdown-item>
         <b-dropdown-item href=""
+                         :disabled="!shouldAllowContextMenuBulk('pause')"
+                         v-if="!shouldAllowContextMenuBulk('play') && shouldAllowContextMenuBulk('pause')"
+                         @click.prevent="bulkPause">
+          <img class="mr-2"
+               :src="'app-icons/menu/context-menu-pause.svg'"/>
+          <span>
+            Pause
+          </span>
+        </b-dropdown-item>
+        <b-dropdown-item href=""
+                         :disabled="!shouldAllowContextMenuBulk('play')"
+                         v-if="!shouldAllowContextMenuBulk('pause') && shouldAllowContextMenuBulk('play')"
+                         @click.prevent="bulkPlay">
+          <img class="mr-2"
+               :src="'app-icons/menu/context-menu-play.svg'"/>
+          <span>
+            Resume
+          </span>
+        </b-dropdown-item>
+        <b-dropdown-item href=""
                          :disabled="!shouldAllowContextMenuBulk('delete')"
                          @click.prevent="bulkDelete">
           <delete-red-icon />
@@ -805,6 +825,7 @@ export default {
       this.popupOpen = false
       this.popupAction = ''
       this.popupActionList = []
+      this.checked = []
     },
 
     // CONTEXT MENU ACTIONS
@@ -919,18 +940,36 @@ export default {
     shouldShowContextMenuItem (item, broadcast) {
       switch (item.name) {
         case 'play':
-          return broadcast.status === BroadcastStatuses.STATUS_PAUSED
+          return this.isPlayable(broadcast)
         case 'pause':
-          return [BroadcastStatuses.STATUS_ENROLLING, BroadcastStatuses.STATUS_NEW].includes(broadcast.status)
+          return this.isPausable(broadcast)
         default:
           return true
       }
+    },
+
+    isPausable (broadcast) {
+      return [BroadcastStatuses.STATUS_ENROLLING, BroadcastStatuses.STATUS_NEW].includes(broadcast.status)
+    },
+
+    isPlayable (broadcast) {
+      return broadcast.status === BroadcastStatuses.STATUS_PAUSED
     },
 
     shouldAllowContextMenuBulk (action) {
       if (action === 'delete') {
         let isAllCheckedDone = this.checked.reduce((results, item) => results && item.status === 4, true)
         return this.isAdmin && isAllCheckedDone
+      }
+
+      if (action === 'play') {
+        const isAllCheckedPlayable = this.checked.reduce((results, broadcast) => results && this.isPlayable(broadcast), true)
+        return isAllCheckedPlayable
+      }
+
+      if (action === 'pause') {
+        const isAllCheckedPausable = this.checked.reduce((results, broadcast) => results && this.isPausable(broadcast), true)
+        return isAllCheckedPausable
       }
 
       return true
@@ -944,6 +983,18 @@ export default {
 
     bulkShowActivity () {
       this.showBroadcastActivity(this.checked)
+    },
+
+    bulkPause () {
+      this.popupActionList = this.checked
+      this.popupOpen = true
+      this.popupAction = 'pause'
+    },
+
+    bulkPlay () {
+      this.popupActionList = this.checked
+      this.popupOpen = true
+      this.popupAction = 'play'
     },
 
     isSelectedRow (row) {
