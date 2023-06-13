@@ -573,7 +573,7 @@ export default {
         return true
       }
 
-      if (['Wallboard Users', 'Wallboard Calls'].includes(this.$route.name) && name === 'Wallboard') {
+      if (['Wallboard Agents', 'Wallboard Calls'].includes(this.$route.name) && name === 'Wallboard') {
         return true
       }
 

@@ -47,21 +47,23 @@
            :class="{ 'contact-details--opened': detailsOpen }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
         <contact-details :campaign-id="selectedCampaignId"
+                         :save-bar-only="isMediumScreen"
                          v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
       </div>
-      <q-drawer overlay
-                bordered
-                class="contact-details-container-drawer position-relative"
+      <q-drawer class="contact-details-container-drawer position-relative"
                 side="right"
+                overlay
+                bordered
+                :class="{ 'has-contact-changes': isContactSaveBarVisible }"
                 :breakpoint="0"
                 :width="300"
                 v-model="drawer"
                 v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
-        <compact-btn borderless
-                     customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
+        <compact-btn customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
+                     borderless
                      @clicked="toggleDrawer">
           <close-icon width="18px"
                       height="18px"
@@ -69,6 +71,7 @@
           </close-icon>
         </compact-btn>
         <contact-details :campaign-id="selectedCampaignId"
+                         :no-save-bar="isMediumScreen"
                          v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>
@@ -99,6 +102,10 @@ import CloseIcon from 'components/icons/close-icon'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import _ from 'lodash'
+import {
+  MIN_TABLET_WIDTH,
+  MAX_TABLET_WIDTH
+} from 'src/constants/viewport-sizes'
 
 export default {
   name: 'contact',
@@ -122,7 +129,8 @@ export default {
     ...mapGetters('contacts', [
       'contact',
       'isSidebarCollapsed',
-      'changingSelectedContact'
+      'changingSelectedContact',
+      'isContactSaveBarVisible'
     ]),
 
     ...mapState('contacts', [
@@ -138,7 +146,8 @@ export default {
       'tagsFullyLoaded',
       'campaigns',
       'users',
-      'tags'
+      'tags',
+      'isMobile'
     ]),
 
     isInbox () {
@@ -162,6 +171,10 @@ export default {
     isShowContactActivities () {
       return !this.campaignsIsLoading && !this.usersIsLoading &&
         this.tagsFullyLoaded && this.campaigns && this.users && this.tags
+    },
+
+    isMediumScreen () {
+      return this.$q.screen.width >= MIN_TABLET_WIDTH && this.$q.screen.width <= MAX_TABLET_WIDTH
     }
   },
 
@@ -184,8 +197,7 @@ export default {
       'resetChangedContactProperties',
       'selectedContactChanging',
       'setContact',
-      'setContactClone',
-      'setShowContactResourceUnavailable'
+      'setContactClone'
     ]),
 
     ...mapActions(['setContactDetailsDrawer']),
@@ -286,8 +298,6 @@ export default {
 
   watch: {
     '$route.params.id': function (value) {
-      this.setShowContactResourceUnavailable(false)
-
       // Show loading overlay as soon as id changes
       this.selectedContactChanging(true)
 
@@ -325,21 +335,29 @@ export default {
     },
 
     'contact.task_status': function (newValue, oldValue) {
-      if (newValue === ContactTaskStatus.STATUS_PENDING &&
-        oldValue === ContactTaskStatus.STATUS_OPEN) {
-        this.communicationsAndAudits.map((communicationsAndAudit, index) => {
-          // make all inbound communications already read and
-          // set contact unread counts to 0 when contact status
-          // changes from open to pending.
-          if (communicationsAndAudit?.direction === CommunicationDirections.INBOUND) {
-            this.communicationsAndAudits[index].is_read = true
-            let newContact = this.$jsonClone(this.contact)
-            newContact.unread_texts_count = 0
-            newContact.unread_missed_calls_count = 0
-            newContact.unread_voicemails_count = 0
-            this.setContact(newContact)
-          }
-        })
+      if (newValue !== ContactTaskStatus.STATUS_PENDING ||
+        oldValue !== ContactTaskStatus.STATUS_OPEN) {
+        return
+      }
+
+      this.communicationsAndAudits.map((communicationsAndAudit, index) => {
+        // make all inbound communications already read and
+        // set contact unread counts to 0 when contact status
+        // changes from open to pending.
+        if (communicationsAndAudit?.direction === CommunicationDirections.INBOUND) {
+          this.communicationsAndAudits[index].is_read = true
+          let newContact = this.$jsonClone(this.contact)
+          newContact.unread_texts_count = 0
+          newContact.unread_missed_calls_count = 0
+          newContact.unread_voicemails_count = 0
+          this.setContact(newContact)
+        }
+      })
+    },
+
+    detailsOpen (value) {
+      if (!value && this.isMobile) {
+        this.$VueEvent.fire('hide_mobile_footer', false)
       }
     }
   },

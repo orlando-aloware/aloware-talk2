@@ -40,16 +40,11 @@
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               v-if="!isNotInprogressCall">
-            {{ contact.last_communication.direction | fixCommDirection }} {{ contact.last_communication.type | fixCommType }}
-          </div>
-          <div class="truncated-text call-parked-label"
-               v-if="isParkedCall && !isConnectedCall" >
-            Parked Call
-          </div>
-          <div class="truncated-text call-connected-label"
-               v-if="isConnectedCall && !isParkedCall">
-            Connected
+               :class="callStatusClass">
+            <q-tooltip>
+              {{ communicationLabel }}
+            </q-tooltip>
+            {{ communicationLabel }}
           </div>
 
           <div class="truncated-text"
@@ -442,18 +437,6 @@ export default {
       ]
     },
 
-    isNotInprogressCall () {
-      const notCallCommunicationType = [
-        CommunicationTypes.SMS,
-        CommunicationTypes.EMAIL,
-        CommunicationTypes.APPOINTMENT,
-        CommunicationTypes.REMINDER
-      ]
-
-      return notCallCommunicationType.includes(this.contact.last_communication.type) &&
-        !this.isParkedCall && !this.isConnectedCall
-    },
-
     hasSmsBody () {
       const hasBody = this.contact.last_communication.body === null ||
         !this.contact.last_communication.body || this.contact.last_communication.body.length < 1
@@ -475,6 +458,32 @@ export default {
       const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
 
       return isCallFishing || isIncomingCall
+    },
+
+    callStatusClass () {
+      if (this.isParkedCall) {
+        return 'call-parked-label'
+      }
+
+      if (this.isConnectedCall) {
+        return 'call-connected-label'
+      }
+
+      return ''
+    },
+
+    communicationLabel () {
+      let label = this.$options.filters.fixCommDirection(this.contact.last_communication.direction) + ' ' + this.$options.filters.fixCommType(this.contact.last_communication.type)
+
+      if (this.isParkedCall) {
+        return `Parked ${label}`
+      }
+
+      if (this.isConnectedCall) {
+        return `Connected ${label}`
+      }
+
+      return label
     }
   },
 
