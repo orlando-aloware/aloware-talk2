@@ -134,17 +134,50 @@ export default {
         ? this.schedule.date && this.schedule.time
         : true
 
-      return time && !isEmpty(this.campaign) && !isEmpty(this.throttle)
+      return time &&
+        !isEmpty(this.campaign) &&
+        !isEmpty(this.throttle) &&
+        !this.scheduleIsPast
     },
 
     companyTimezone () {
       return window.moment().tz(this.currentCompany.timezone).format('z')
     },
 
+    companyDate () {
+      return window.moment(this.utcDate).tz(this.currentCompany.timezone)
+    },
+
+    utcDate () {
+      return window.moment().tz('UTC')
+    },
+
     sendTimeLabel () {
       return 'Send ' + (this.time === 'now'
-        ? `today at ` + window.moment().format('hh:mm a')
+        ? `today at ` + this.companyDate.format('hh:mm a')
         : 'message at ' + window.moment(this.schedule.date + ' ' + this.schedule.time).format('MM/DD/YYYY hh:mm a'))
+    },
+
+    scheduleIsPast () {
+      if (this.time === 'now') {
+        return false
+      }
+
+      const scheduledDate = this.schedule.date + ' ' + this.schedule.time
+
+      return window.moment(scheduledDate).isBefore(this.companyDate)
+    },
+
+    isInsideRestrictedTime () {
+      if (!this.currentCompany.broadcast_open || !this.currentCompany.broadcast_close) {
+        return false
+      }
+
+      const time = this.time === 'now'
+        ? this.companyDate.format('HH:mm:ss')
+        : (this.schedule.time + ':00')
+
+      return time >= this.currentCompany.broadcast_open && time <= this.currentCompany.broadcast_close
     }
   },
 
@@ -184,6 +217,19 @@ export default {
       this.campaign = campaign
 
       this.$emit('campaign', this.campaign)
+    },
+
+    emitValues () {
+      this.$emit('time', {
+        time: this.time,
+        schedule: this.schedule
+      })
+
+      const date = this.time === 'now'
+        ? this.companyDate.format('YYYY-MM-DD HH:mm')
+        : `${this.schedule.date} ${this.schedule.time}`
+
+      this.$emit('date-changed', date)
     }
   },
 
@@ -197,19 +243,23 @@ export default {
 
     time: {
       immediate: true,
-      handler (time) {
-        this.$emit('time', {
-          time: time,
-          schedule: this.schedule
-        })
+      handler () {
+        this.emitValues()
       }
     },
 
-    schedule () {
-      this.$emit('time', {
-        time: this.time,
-        schedule: this.schedule
-      })
+    schedule: {
+      deep: true,
+      handler () {
+        this.emitValues()
+      }
+    },
+
+    isInsideRestrictedTime: {
+      immediate: true,
+      handler (state) {
+        this.$emit('restricted-time', !state)
+      }
     },
 
     throttle (value) {
