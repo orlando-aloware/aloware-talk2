@@ -160,6 +160,7 @@
     <div class="d-flex justify-content-between"
          @dragover.prevent>
       <message-composer-options :campaign-id="campaignId"
+                                :max-attachments="maxAttachments"
                                 @gifSelected="gifSelected"
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
@@ -253,6 +254,11 @@ export default {
     resetOnLoad: {
       type: Boolean,
       default: true
+    },
+
+    maxAttachments: {
+      type: Number,
+      default: null
     }
   },
 
