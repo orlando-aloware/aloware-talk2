@@ -224,7 +224,7 @@
                                      :disabled="!shouldAllowContextMenuButton(item, row)"
                                      dense
                                      clickable
-                                     v-for="(item, id) in contextMenuListItems"
+                                     v-for="(item, id) in contextMenuListItemsForSelectedRow"
                                      @click="onContextMenuButtonClicked(item, row)">
                       <div class="d-flex align-items-center">
                         <template v-if="item.name === 'delete'">
@@ -234,7 +234,9 @@
                           <img class="mr-2"
                               :src="`app-icons/menu/${item.icon}`" />
                         </template>
-                        <span :class="[item.name === 'delete' ? 'text-danger' : '']">{{ item.label }}</span>
+                        <span :class="[item.name === 'delete' ? 'text-danger' : '']">
+                          {{ item.label }}
+                        </span>
                       </div>
                     </b-dropdown-item>
                   </b-dropdown>
@@ -295,6 +297,28 @@
                      :loading="popupLoadingAction"
                      @click="renameBroadcast(popupActionList)">
                 <span class="px-2">Save</span>
+              </q-btn>
+            </div>
+          </template>
+          <template v-if="['play', 'pause'].includes(popupAction)">
+            <span class="text-h6">{{ popupAction === 'play' ? 'Resume' : 'Pause' }} Broadcasts</span>
+            <p>{{ toggleStatusPrompt }}</p>
+            <p v-if="popupAction === 'play'">Scheduled tasks such as calls or messages will GO out.</p>
+            <p v-else>Scheduled tasks such as calls or messages will NOT go out.</p>
+            <div class="d-flex">
+              <q-btn class="px-1 flex-grow-1 broadcasts-cancel-button"
+                     color="white"
+                     text-color="black"
+                     unelevated
+                     @click="onCancelPopup">
+                <span class="px-2">Cancel</span>
+              </q-btn>
+              <q-btn class="ml-3 flex-grow-1"
+                     :color="popupAction === 'play' ? 'primary' : 'warning'"
+                     unelevated
+                     :loading="popupLoadingAction"
+                     @click="toggleBroadcastStatus(popupActionList)">
+                <span class="px-2">{{ popupAction === 'play' ? 'Resume' : 'Pause' }}</span>
               </q-btn>
             </div>
           </template>
@@ -410,6 +434,16 @@ const contextMenuListItems = [
     name: 'activity',
     label: 'Activity',
     icon: 'context-menu-activity.svg'
+  },
+  {
+    name: 'play',
+    label: 'Play',
+    icon: 'context-menu-play.svg'
+  },
+  {
+    name: 'pause',
+    label: 'Pause',
+    icon: 'context-menu-pause.svg'
   },
   {
     name: 'rename',
@@ -614,6 +648,22 @@ export default {
 
     bulkActionsDisabled () {
       return this.checked.length === 0
+    },
+
+    contextMenuListItemsForSelectedRow () {
+      if (!this.contextMenuTargetId) {
+        return this.contextMenuListItems
+      }
+
+      let broadcast = this.broadcastData.find(item => item.id === this.contextMenuTargetId)
+
+      return this.contextMenuListItems.filter(item => this.shouldShowContextMenuItem(item, broadcast))
+    },
+
+    toggleStatusPrompt () {
+      let verb = this.popupAction === 'play' ? 'resume' : 'pause'
+      let demonstrative = this.popupActionList.length === 1 ? 'this broadcast' : 'these broadcasts'
+      return `Are you sure you want to ${verb} ${demonstrative}?`
     }
   },
 
@@ -702,6 +752,14 @@ export default {
           break
         case 'activity':
           this.showBroadcastActivity(broadcasts)
+          break
+        case 'play':
+          this.popupAction = 'play'
+          this.popupOpen = true
+          break
+        case 'pause':
+          this.popupAction = 'pause'
+          this.popupOpen = true
           break
       }
     },
@@ -824,12 +882,51 @@ export default {
       })
     },
 
+    async toggleBroadcastStatus (broadcasts) {
+      this.popupLoadingAction = true
+
+      for (let broadcast of broadcasts) {
+        API.V1.broadcasts.toggleStatus(broadcast.id)
+          .then(res => {
+            console.log({ res })
+            this.broadcastData.map(item => {
+              if (broadcast.id !== item.id) {
+                return
+              }
+
+              item.status = this.popupAction === 'play' ? BroadcastStatuses.STATUS_ENROLLING : BroadcastStatuses.STATUS_PAUSED
+              console.log({ status: item.status })
+            })
+          })
+          .catch(err => {
+            console.error('Broadcast status could not be toggled', {
+              broadcast,
+              err
+            })
+          })
+          .finally(() => {
+            this.onCancelPopup()
+          })
+      }
+    },
+
     shouldAllowContextMenuButton (item, broadcast) {
       if (item.name === 'delete') {
         return this.isAdmin && [4].includes(broadcast.status)
       }
 
       return true
+    },
+
+    shouldShowContextMenuItem (item, broadcast) {
+      switch (item.name) {
+        case 'play':
+          return broadcast.status === BroadcastStatuses.STATUS_PAUSED
+        case 'pause':
+          return [BroadcastStatuses.STATUS_ENROLLING, BroadcastStatuses.STATUS_NEW].includes(broadcast.status)
+        default:
+          return true
+      }
     },
 
     shouldAllowContextMenuBulk (action) {

@@ -441,6 +441,9 @@ export default {
       },
       update (id, broadcast) {
         return window.axios.put(`${suffixV1}broadcasts/${id}`, broadcast)
+      },
+      toggleStatus (id) {
+        return window.axios.post('/api/v1/broadcasts/' + id + '/toggle-active')
       }
     },
     contactCenter: {
