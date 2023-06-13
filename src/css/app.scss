@@ -2100,7 +2100,6 @@ i.option-separator {
 
   .details-component-container {
     width: 100%;
-    height: calc(100vh - 62px);
     overflow: auto;
 
     .card {
@@ -5430,10 +5429,6 @@ button#bs-folder-options {
 
   &__content {
     overflow: auto;
-
-    &:not(.no-folder) {
-      max-height: calc(100% - 163px);
-    }
 
     &.no-folder {
       padding-left: 18px;
@@ -8853,6 +8848,8 @@ span.mention {
       background: $grey-50;
       padding: 15px 0px 15px 15px;
       box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
+      top: 0 !important;
+      position: absolute !important;
 
       .details-component-container {
         padding-right: 15px;
@@ -9420,7 +9417,7 @@ screen and (max-width: 956px) {
   .contact-details-container {
     &-drawer {
       &.has-contact-changes aside {
-        height: calc(100vh - 128px);
+        height: calc(100% - 65px);
       }
     }
   }
@@ -9563,7 +9560,6 @@ screen and (max-width: 956px) {
       & > h1 {
         font-size: 18px;
         font-family: $font-family-body;
-        height: 27px;
       }
     }
 
@@ -9654,11 +9650,8 @@ screen and (max-width: 956px) {
   }
   .contact-details-container {
     &-drawer {
-      &:not(.has-contact-changes) aside {
-        height: calc(100vh - 108px);
-      }
       &.has-contact-changes aside {
-        height: calc(100vh - 123px);
+        height: calc(100% - 16px);
       }
     }
   }
@@ -10025,16 +10018,9 @@ screen and (max-width: 956px) {
     display: block !important;
     max-width: unset !important;
 
-    .contact-details-wrapper {
-      overflow: unset !important;
-    }
-
     .details-component-container {
-      padding-bottom: 59px;
-
-      > div:not(:last-child) {
+      > div {
         margin-right: 10px !important;
-        width: auto !important;
       }
     }
 
@@ -10467,7 +10453,7 @@ screen and (max-width: 956px) {
   aside {
     max-width: 784px !important;
     width: 100% !important;
-    height: calc(100% - 51px);
+    position: absolute !important;
 
     .q-drawer__content {
       & > div {

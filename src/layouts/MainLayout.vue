@@ -6,7 +6,6 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
@@ -14,11 +13,14 @@
         <div class="h-100 position-relative"
              :class="headerContainerClass">
           <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
-                    v-if="isShowAppHeader">
-            <app-header @toggleSidebar="toggleSidebar"/>
+                    :class="pageHeaderClass"
+                    v-if="showHeader">
+            <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"
+                                  @shown="onShowMobileLiveCallBar"/>
+            <app-header v-if="isShowAppHeader"
+                        @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container :style="`${!isShowAppHeader ? 'padding-top: 0 !important;' : ''}`"
-                            :class="pageContainerClasses">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
                 <transition :name="transitionName"
@@ -340,6 +342,8 @@ export default {
       isElectronEventsStarted: false,
       isMainEventsStarted: false,
       showMobileFooter: false,
+      showHeader: true,
+      mobileLiveCallBarShown: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -487,6 +491,10 @@ export default {
 
       return this.authenticated && !this.isWidget && !this.loading &&
         this.showContactsHeader && !this.suspended && showForMobile
+    },
+    pageHeaderClass () {
+      return !this.isShowAppHeader || !this.mobileLiveCallBarShown
+        ? 'h-auto' : ''
     }
   },
 
@@ -2406,6 +2414,10 @@ export default {
       this.$bvModal.hide('missed-call-modal')
     },
 
+    onShowMobileLiveCallBar (value) {
+      this.mobileLiveCallBarShown = value
+    },
+
     beforeUnload () {
       this.stopElectronEvents()
       this.stopMainEvents()
@@ -2627,6 +2639,11 @@ export default {
       if (!val) {
         this.setShowContactsHeader(true)
         this.mobilePhoneDrawer = false
+        this.showHeader = false
+
+        setTimeout(() => {
+          this.showHeader = true
+        }, 10)
       }
 
       if (!val && this.$route.name === 'Phone') {

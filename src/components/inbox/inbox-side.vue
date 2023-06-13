@@ -14,8 +14,8 @@
     <div class="inbox-side border-top-0 flex-shrink-0 h-100">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
-        <div>
-          <div class="inbox-side__nav">
+        <div class="h-100">
+          <div class="inbox-side__nav h-100">
             <inbox-nav-list :closed="closed"
                             :openCount="taskCounts.open"
                             :pendingCount="taskCounts.pending"
