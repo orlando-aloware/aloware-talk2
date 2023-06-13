@@ -66,7 +66,7 @@ export default {
     isReferrizer () {
       // dev testing
       if (process.env.APP_ENV !== 'production') {
-        return this.profile.company.id === 2139
+        return this.profile.company.id === 7
       }
 
       return this.profile.company.id === 2140
