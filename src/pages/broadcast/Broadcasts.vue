@@ -888,14 +888,12 @@ export default {
       for (let broadcast of broadcasts) {
         API.V1.broadcasts.toggleStatus(broadcast.id)
           .then(res => {
-            console.log({ res })
-            this.broadcastData.map(item => {
+            this.broadcastData = this.broadcastData.map(item => {
               if (broadcast.id !== item.id) {
-                return
+                return item
               }
 
-              item.status = this.popupAction === 'play' ? BroadcastStatuses.STATUS_ENROLLING : BroadcastStatuses.STATUS_PAUSED
-              console.log({ status: item.status })
+              return res.data.broadcast
             })
           })
           .catch(err => {
