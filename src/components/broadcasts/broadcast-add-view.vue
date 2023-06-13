@@ -6,41 +6,44 @@
       </div>
 
       <div class="broadcasts__add__view__form__content">
-        <component :is="mainComponent"
-                   ref="mainComponent"
-                   v-bind="mainComponentProps"
-                   @input="mainComponentChanged"
-                   @source-updated="onSourceUpdated"
-                   @type-updated="onTypeUpdated"
-                   @sms-price-updated="onSmsPriceUpdated"
-                   @time="onTimeUpdated"
-                   @campaign="onCampaignUpdated"
-                   @throttle="onThrottleUpdated"/>
+        <transition mode="out-in"
+                    :name="`horizontal-slide-${direction}`">
+          <component :is="mainComponent"
+                    ref="mainComponent"
+                    v-bind="mainComponentProps"
+                    @input="mainComponentChanged"
+                    @source-updated="onSourceUpdated"
+                    @type-updated="onTypeUpdated"
+                    @sms-price-updated="onSmsPriceUpdated"
+                    @time="onTimeUpdated"
+                    @date-changed="onDateChanged"
+                    @campaign="onCampaignUpdated"
+                    @throttle="onThrottleUpdated"
+                    @restricted-time="onRestrictedTimeChanged"/>
+        </transition>
       </div>
 
       <div class="broadcasts__add__view__form__footer">
         <!-- buttons -->
-        <b-button class="mr-2"
-                  size="sm"
-                  variant="light"
-                  v-if="currentStep.id > firstStep"
-                  @click="back">
+        <compact-btn class="mr-2"
+                     variant="outlined-light"
+                     v-if="currentStep.id > firstStep"
+                     @clicked="back">
           Back
-        </b-button>
+        </compact-btn>
 
-        <b-button size="sm"
-                  variant="primary"
-                  v-if="currentStep.id === lastStep">
+        <compact-btn variant="primary"
+                     v-if="currentStep.id === lastStep"
+                     @clicked="send">
           Send
-        </b-button>
+        </compact-btn>
 
-        <b-button size="sm"
-                  variant="primary"
-                  :disabled="!isStepValid"
-                  v-else
-                  @click="next">
+        <compact-btn variant="primary"
+                     :disabled="!isStepValid"
+                     v-else
+                    @clicked="next">
           Next
-        </b-button>
+        </compact-btn>
       </div>
     </div>
 
@@ -53,6 +56,28 @@
                  @contact-preview="onContactPreview"
                  @contacts-length="onContactsLength"/>
     </div>
+
+    <confirm-dialog id="outside-business-hours-dialog"
+                    :isOpen="outsideBusinessHoursDialog.open"
+                    @close="onOutsideBusinessHoursDialogClosed">
+      <template #content>
+        {{ outsideBusinessHoursDialog.message }}
+      </template>
+
+      <template #footer>
+        <div>
+          <button class="btn btn-sm btn-light mr-2"
+                  @click="onOutsideBusinessHoursDialogClosed">
+            No
+          </button>
+
+          <button class="btn btn-sm btn-primary"
+                  @click="onOutsideBusinessHoursDialogConfirmed">
+            Yes
+          </button>
+        </div>
+      </template>
+    </confirm-dialog>
   </div>
 </template>
 
@@ -63,6 +88,10 @@ import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
 import BroadcastAddViewPreview from './broadcast-add-view-preview.vue'
 import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
+import CompactBtn from 'components/compact-btn.vue'
+import ConfirmDialog from 'components/confirm-dialog.vue'
+// import API from 'src/plugins/api/api'
+import { mapGetters, mapState } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -74,7 +103,9 @@ export default {
     BroadcastAddViewMessage,
     BroadcastAddViewPreview,
     BroadcastAddViewSchedule,
-    BroadcastContactsPreview
+    BroadcastContactsPreview,
+    CompactBtn,
+    ConfirmDialog
   },
 
   props: {
@@ -100,6 +131,14 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
+    ...mapGetters('contacts', [
+      'messageComposer'
+    ]),
+
     mainComponent () {
       switch (this.currentStep.id) {
         case 1:
@@ -135,9 +174,9 @@ export default {
             contact: this.contactPreview,
             campaign: this.campaign,
             contactsLength: this.contactsLength,
+            date: this.date,
             source: this.source,
             throttle: this.throttle.name,
-            time: this.time,
             type: this.type
           }
         default:
@@ -194,6 +233,7 @@ export default {
   },
 
   data: () => ({
+    direction: 'left',
     isMainComponentValid: false,
     isFooterComponentValid: false,
     source: {},
@@ -203,8 +243,15 @@ export default {
     smsPrice: 0,
     campaign: null,
     throttle: null,
-    time: null,
-    messagesLength: 0
+    time: null, // holds the schedule's time options
+    date: null, // holds the send datetime
+    messagesLength: 0,
+    isRestrictedTime: false,
+    acceptedOutsideBusinessHours: false,
+    outsideBusinessHoursDialog: {
+      open: false,
+      message: 'You are trying to send outside the restricted time. Are you sure that you have the consent of all the recipients?'
+    }
   }),
 
   methods: {
@@ -229,8 +276,11 @@ export default {
     },
 
     onTimeUpdated (time) {
-      console.log(time)
       this.time = time
+    },
+
+    onDateChanged (date) {
+      this.date = date
     },
 
     onCampaignUpdated (campaign) {
@@ -241,14 +291,38 @@ export default {
       this.throttle = throttle
     },
 
+    onRestrictedTimeChanged (restrictedTime) {
+      this.isRestrictedTime = restrictedTime
+    },
+
+    onOutsideBusinessHoursDialogConfirmed () {
+      this.acceptedOutsideBusinessHours = true
+      this.outsideBusinessHoursDialog.open = false
+
+      this.next()
+    },
+
+    onOutsideBusinessHoursDialogClosed () {
+      this.outsideBusinessHoursDialog.open = false
+    },
+
     next () {
+      // send outside business hours confirmation
+      if (this.currentStep.id === 3 && this.isRestrictedTime && !this.acceptedOutsideBusinessHours) {
+        this.outsideBusinessHoursDialog.open = true
+
+        return
+      }
+
       this.isMainComponentValid = false
       this.isFooterComponentValid = false
 
+      this.direction = 'right'
       this.$emit('next')
     },
 
     back () {
+      this.direction = 'left'
       this.$emit('back')
     },
 
@@ -258,6 +332,58 @@ export default {
 
     onContactsLength (count) {
       this.contactsLength = count
+    },
+
+    send () {
+      this.$emit('loading', true)
+
+      const bulkMessage = {
+        name: '',
+        count: this.contactsLength,
+        // file_name: null,
+        // filters: null,
+        campaign_id: this.campaign.id,
+        // attachment_type: null,
+        run_at_date: this.date.substr(0, 10),
+        run_at_time: this.date.substr(11, 10),
+        message_body: this.messageComposer.sms.body,
+        throttle_limit: this.throttle.value,
+        accept_outside_business_hours: this.acceptedOutsideBusinessHours,
+        is_scheduled: this.time.time === 'scheduled'
+      }
+
+      // set attachment
+      if (this.messageComposer.sms.gif_url) {
+        bulkMessage.attachment_type = 'gif'
+        bulkMessage.file_name = this.messageComposer.sms.gif_url
+      } else if (this.messageComposer.sms.attachments.length) {
+        bulkMessage.attachment_type = 'media'
+        bulkMessage.file_name = this.messageComposer.sms.attachments[0].uuid
+      }
+
+      bulkMessage.talk_filters = !isEmpty(this.source.filters) ? this.source.filters : null
+      bulkMessage.contact_list_id = !isEmpty(this.source.list) ? this.source.list.id : null
+
+      // to be implemented
+      // list_id: null, // Hubspot
+      // view_id: null, // Zoho
+      // filter_id: null, // Pipedrive
+
+      // API.V1.broadcasts.sendBulkMessage(bulkMessage)
+      //   .then(() => {
+      //     this.$emit('loading', false)
+
+      //     this.$generalNotification('We have put your bulk message campaign on our outbound queue. Please wait a few minutes for us to send your messages.', 'success')
+
+      //     this.$router.push({ path: '/broadcasts' })
+      //   })
+      //   .catch(err => {
+      //     this.$emit('loading', false)
+
+      //     this.$handleErrors(err.response)
+
+      //     console.log(err.response)
+      //   })
     }
   }
 }

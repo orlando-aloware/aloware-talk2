@@ -12915,6 +12915,7 @@ h1.contact-list-name-label {
       flex-direction: column;
 
       &__form {
+        transition: all .5s;
         margin-bottom: 15px;
         background-color: $white;
         border-radius: 8px;
@@ -12931,6 +12932,8 @@ h1.contact-list-name-label {
         }
 
         &__content {
+          background-color: $white;
+
           .broadcast-add {
             padding: 15px 30px;
             height: 100%;

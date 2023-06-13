@@ -13,7 +13,8 @@
       </div>
 
       <div class="broadcast-add__message__sms__composer-body">
-        <message-composer-sms :reset-on-load="false"
+        <message-composer-sms :max-attachments="1"
+                              :reset-on-load="false"
                               :use-send-button="false"/>
       </div>
 
