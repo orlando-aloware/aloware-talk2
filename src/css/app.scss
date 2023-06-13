@@ -4592,10 +4592,6 @@ i.option-separator {
   color: $grey-100 !important;
 }
 
-.table-header {
-  min-height: 58px;
-}
-
 .start-state {
   align-items: center;
   background: $white;
@@ -5559,14 +5555,6 @@ button#bs-folder-options {
   }
 }
 
-.table-header {
-  min-height: 58px;
-}
-
-.datatable-wrapper {
-  height: calc(100vh - 160px);
-}
-
 .empty-state {
   position: absolute;
   width: 100%;
@@ -5585,16 +5573,6 @@ button#bs-folder-options {
   margin: auto;
   overflow-y: auto;
   overflow-x: auto;
-  max-height: calc(100vh - 172px);
-  height: 100vh !important;
-
-  &:not(.mobile-scrollableArea) {
-    max-height: calc(100vh - 172px);
-  }
-
-  &.mobile-scrollableArea {
-    max-height: calc(100vh - 242px);
-  }
 
   &.scroll-type-1 {
     max-height: calc(100vh - 217px);

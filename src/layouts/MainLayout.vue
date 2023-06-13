@@ -7,10 +7,10 @@
     </div>
     <div class="page h-100">
       <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
-      <q-layout class="page-layout position-relative"
+      <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
-                :height="'100%'">
+                style="min-height: 0 !important;">
         <div class="h-100 position-relative"
              :class="headerContainerClass">
           <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
@@ -100,7 +100,7 @@
                        v-if="isMobile">
           </dialer-form>
         </q-drawer>
-        <app-footer class="page-footer row d-block w-100 m-0 px-1"
+        <app-footer class="page-footer row d-block w-100 m-0 px-1 flex-grow-0"
                     ref="appFooter"
                     v-if="authenticated && !isWidget && !loading && isMobile && !suspended && showMobileFooter"
                     @toggleMobilePhone="toggleMobilePhone">

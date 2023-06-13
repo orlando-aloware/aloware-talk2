@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column"
+  <div class="d-flex flex-column h-100"
        :class="[paginated ? 'paginated' : '']"
        @mousemove="$emit('onMouseMove', $event)"
        @mouseleave="$emit('onMouseLeave', $event)">
@@ -385,7 +385,9 @@ export default {
         return
       }
 
-      if ((element.srcElement.clientHeight + element.srcElement.scrollTop) >= element.srcElement.offsetHeight) {
+      const adjustmentHeight = 48
+
+      if ((element.srcElement.clientHeight + element.srcElement.scrollTop) >= (element.srcElement.scrollHeight - adjustmentHeight)) {
         this.lastScrollTop = element.srcElement.scrollTop
         this.onVisibilityChanged(true)
 

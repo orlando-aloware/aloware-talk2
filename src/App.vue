@@ -1,5 +1,5 @@
 <template>
-  <div class="position-relative"
+  <div class="position-relative d-flex flex-column"
        id="q-app">
     <b-overlay class="h-100 w-100 position-absolute"
                :show="isPageLoading">
@@ -8,8 +8,9 @@
                         size="40px" />
       </template>
     </b-overlay>
-    <header-notification/>
-    <router-view v-if="cookieValidated"/>
+    <header-notification class="flex-grow-0"/>
+    <router-view class="flex-grow-1 overflow-hidden"
+                 v-if="cookieValidated"/>
     <portal-target name="app"
                    multiple>
     </portal-target>
