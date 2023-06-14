@@ -903,12 +903,18 @@ export default {
     }
 
     this.mainListeners.contactListBulkCreated = (event) => {
-      // Verify if we're in the contact page
       // Save the event to vuex
-      // Notify user of finish and push user to power dialer list
-      this.$generalNotification('Contacts were added to your Power Dialer list', null, null, false, {
-        path: `/power-dialer/list/${event.contact_list_id}/in-queue`
-      })
+      this.storeBulkActionNotification(event)
+
+      // Verify if we're in the contact list page
+      const isContactsListPage = this.$route.meta?.page === 'Contacts List'
+      const isIdMatch = this.$route.params.id === event.contact_list_id
+      if (isContactsListPage && isIdMatch) {
+        // Notify user of finish and push user to power dialer list
+        this.$generalNotification('Contacts were added to your Power Dialer list', null, null, false, {
+          path: `/power-dialer/list/${event.contact_list_id}/in-queue`
+        })
+      }
     }
 
     // new in-app fax notification
@@ -2483,7 +2489,8 @@ export default {
     ]),
     ...mapActions('contacts', [
       'resetSearch',
-      'setShowContactsHeader'
+      'setShowContactsHeader',
+      'storeBulkActionNotification'
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',

@@ -544,5 +544,11 @@ export default {
     if (index !== -1) {
       state.inProgressAxiosUniqueIds.splice(index, 1)
     }
+  },
+  STORE_BULK_ACTION_NOTIFICATION (state, value) {
+    state.bulkAddContactsNotification[value.contact_list_id] = value
+  },
+  CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
+    delete state.bulkAddContactsNotification[contactListId]
   }
 }

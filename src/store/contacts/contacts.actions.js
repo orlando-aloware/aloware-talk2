@@ -373,5 +373,11 @@ export default {
   },
   removeAxiosUniqueId ({ commit }, value) {
     commit('REMOVE_AXIOS_UNIQUE_ID', value)
+  },
+  storeBulkActionNotification ({ commit }, value) {
+    commit('STORE_BULK_ACTION_NOTIFICATION', value)
+  },
+  clearBulkActionNotification ({ commit }, value) {
+    commit('CLEAR_BULK_ACTION_NOTIFICATION', value)
   }
 }

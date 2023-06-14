@@ -106,7 +106,8 @@ export default {
   computed: {
     ...mapGetters('auth', [
       'authenticated',
-      'profile'
+      'profile',
+      'bulkAddNotifications'
     ]),
 
     ...mapState('contacts', [
@@ -151,6 +152,9 @@ export default {
   },
 
   mounted () {
+    const notification = this.bulkAddNotifications(this.$route.params.id)
+    console.log({ notification })
+
     if (this.$route.name === 'Contacts') {
       this.setShowContactsHeader(true)
 
@@ -177,7 +181,8 @@ export default {
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
-      'setShowContactResourceUnavailable'
+      'setShowContactResourceUnavailable',
+      'clearBulkActionNotification'
     ]),
 
     ...mapActions(['setDefaultDateFilter']),
