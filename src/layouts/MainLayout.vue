@@ -902,6 +902,15 @@ export default {
       console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
     }
 
+    this.mainListeners.contactListBulkCreated = (event) => {
+      // Verify if we're in the contact page
+      // Save the event to vuex
+      // Notify user of finish and push user to power dialer list
+      this.$generalNotification('Contacts were added to your Power Dialer list', null, null, false, {
+        path: `/power-dialer/list/${event.contact_list_id}/in-queue`
+      })
+    }
+
     // new in-app fax notification
     // this.$VueEvent.listen('new_in_app_fax', (communication) => {
     //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
@@ -1161,6 +1170,7 @@ export default {
       this.$VueEvent.listen('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
+      this.$VueEvent.listen('contact_list_bulk_created', this.mainListeners.contactListBulkCreated)
     },
 
     stopMainEvents () {
