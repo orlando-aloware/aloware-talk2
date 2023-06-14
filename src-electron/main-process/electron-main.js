@@ -96,13 +96,16 @@ function createWindow () {
   // Protocol handler for win32
   if (process.platform === 'win32') {
     let cleanArg = process.argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('aloware') || arg.startsWith('tel') || arg.startsWith('callto')))
+
     if (cleanArg.length > 0) {
       // Keep only command line / deep linked arguments
       deepLinkingUrl = cleanArg[0]
     }
   }
+
   if (deepLinkingUrl) {
     logEverywhere('createWindow# ' + deepLinkingUrl)
+
     setTimeout(() => {
       openUrl(deepLinkingUrl)
     }, 5000)
@@ -138,6 +141,7 @@ function createWindow () {
 
 // Force Single Instance Application
 const gotTheLock = app.requestSingleInstanceLock()
+
 if (gotTheLock) {
   app.on('second-instance', (e, argv) => {
     // Someone tried to run a second instance, we should focus our window.
@@ -146,24 +150,32 @@ if (gotTheLock) {
     // argv: An array of the second instance’s (command line / deep linked) arguments
     if (process.platform === 'win32') {
       let cleanArg = argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('alowaretalk') || arg.startsWith('tel') || arg.startsWith('callto')))
+
       if (cleanArg.length > 0) {
         // Keep only command line / deep linked arguments
         deepLinkingUrl = cleanArg[0]
       }
     }
+
     if (deepLinkingUrl) {
       logEverywhere('app.makeSingleInstance# ' + deepLinkingUrl)
+
       setTimeout(() => {
         openUrl(deepLinkingUrl)
-      }, 5000)
+      }, 1000)
     }
 
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore()
-      }
-      mainWindow.focus()
+    if (!mainWindow) {
+      return
     }
+
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    } else if (!mainWindow.isVisible()) {
+      mainWindow.show()
+    }
+
+    mainWindow.focus()
   })
 
   app.on('activate', () => {
@@ -171,30 +183,25 @@ if (gotTheLock) {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
       createWindow()
-      openUrl(deepLinkingUrl)
-      clearBadge()
+      processActivate(deepLinkingUrl)
 
-      if (process.env.NODE_ENV === 'production') {
-        log.info('Setup check for updates and notify')
-        autoUpdater.checkForUpdatesAndNotify()
-      }
-    } else {
-      mainWindow.show()
-      mainWindow.focus()
-      openUrl(deepLinkingUrl)
-      clearBadge()
-
-      if (process.env.NODE_ENV === 'production') {
-        log.info('Setup check for updates and notify')
-        autoUpdater.checkForUpdatesAndNotify()
-      }
+      return
     }
+
+    mainWindow.show()
+    mainWindow.focus()
+    processActivate(deepLinkingUrl)
   })
 
   app.on('ready', () => {
     createWindow()
     setTray()
-    openUrl(deepLinkingUrl)
+
+    // added delay so that deep linking works
+    setTimeout(() => {
+      openUrl(deepLinkingUrl)
+    }, 5000)
+
     clearBadge()
 
     if (process.env.NODE_ENV === 'production') {
@@ -205,6 +212,11 @@ if (gotTheLock) {
 } else {
   app.quit()
 }
+
+// remove so we can register each time as we run the app.
+app.removeAsDefaultProtocolClient('alowaretalk')
+app.removeAsDefaultProtocolClient('tel')
+app.removeAsDefaultProtocolClient('callto')
 
 if (!app.isDefaultProtocolClient('alowaretalk')) {
   // Define custom protocol handler. Deep linking works on packaged versions of the application!
@@ -234,21 +246,35 @@ app.on('will-finish-launching', () => {
   })
 })
 
+function processActivate (url) {
+  openUrl(url)
+  clearBadge()
+
+  if (process.env.NODE_ENV === 'production') {
+    log.info('Setup check for updates and notify')
+    autoUpdater.checkForUpdatesAndNotify()
+  }
+}
+
 function openUrl (url) {
   if (!url) {
     return
   }
+
   if (mainWindow && mainWindow.webContents) {
     url = url.replace(/\/$/, '')
     logEverywhere('Opening url: ' + url)
     mainWindow.webContents.send('open-url', url)
     deepLinkingUrl = null
-  } else {
-    logEverywhere('Rescheduling opening url: ' + url)
-    setTimeout(() => {
-      openUrl(url)
-    }, 1000)
+
+    return
   }
+
+  logEverywhere('Rescheduling opening url: ' + url)
+
+  setTimeout(() => {
+    openUrl(url)
+  }, 1000)
 }
 
 // Log both at dev console and at running node console instance
@@ -256,11 +282,13 @@ function logEverywhere (s) {
   if (!s) {
     return
   }
+
   log.info(s)
 }
 
 function sendStatusToWindow (channel, text) {
   log.info(text)
+
   if (mainWindow && mainWindow.webContents && channel && text) {
     mainWindow.webContents.send(channel, text)
   }
@@ -279,6 +307,7 @@ function clearBadge () {
 function setTray () {
   const iconPath = path.join(__statics, '/trayTemplate.png')
   tray = new Tray(iconPath)
+
   try {
     tray.setContextMenu(Menu.buildFromTemplate([
       {
@@ -301,10 +330,11 @@ function setTray () {
     tray.on('click', () => {
       if (mainWindow.isVisible()) {
         mainWindow.hide()
-      } else {
-        mainWindow.show()
-        mainWindow.focus()
+        return
       }
+
+      mainWindow.show()
+      mainWindow.focus()
     })
 
     // Ignore double click events for the tray icon
@@ -335,6 +365,7 @@ autoUpdater.on('update-available', (info) => {
   }
   sendStatusToWindow('update_available', 'A new update is available. Downloading now...')
 })
+
 autoUpdater.on('error', (err) => {
   log.info('Error in auto-update: ' + err)
   sendStatusToWindow('update_error', 'Error in auto-update. Please restart the application.')
@@ -344,6 +375,7 @@ autoUpdater.on('error', (err) => {
     enabled: true
   })
 })
+
 autoUpdater.on('update-not-available', () => {
   sendStatusToWindow('Update not available.')
   changeUpdaterMenu({
@@ -357,6 +389,7 @@ autoUpdater.on('update-not-available', () => {
     })
   }
 })
+
 autoUpdater.on('update-downloaded', (info) => {
   sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
   updateDownloaded = true
@@ -395,6 +428,7 @@ ipcMain.on('set_badge', (event, arg) => {
   if (arg === undefined) {
     return
   }
+
   try {
     if (arg === '') {
       badgeCount = 0
@@ -410,6 +444,7 @@ ipcMain.on('increase_badge', (event, arg) => {
   if (arg === undefined || arg === '') {
     return
   }
+
   try {
     badgeCount = app.getBadgeCount()
     badgeCount = badgeCount + arg
@@ -423,12 +458,15 @@ ipcMain.on('decrease_badge', (event, arg) => {
   if (arg === undefined || arg === '') {
     return
   }
+
   try {
     badgeCount = app.getBadgeCount()
     badgeCount = badgeCount - arg
+
     if (badgeCount <= 0) {
       badgeCount = 0
     }
+
     app.setBadgeCount(badgeCount)
   } catch (e) {
     log.info('Error on decreasing badge: ' + e.message)
@@ -443,8 +481,7 @@ try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
     require('fs').unlinkSync(require('path').join(app.getPath('userData'), 'DevTools Extensions'))
   }
-} catch (_) {
-}
+} catch (e) {}
 
 process.on('uncaughtException', (err) => {
   console.log(err)
@@ -453,6 +490,7 @@ process.on('uncaughtException', (err) => {
 
 export function checkForUpdates ({ silent }) {
   isSilent = true
+
   if (silent !== undefined) {
     isSilent = silent
   }
@@ -461,15 +499,18 @@ export function checkForUpdates ({ silent }) {
     label: 'Checking for updates...',
     enabled: false
   })
+
   if (updateDownloaded) {
     sendStatusToWindow('update_downloaded', 'Update downloaded, it will be installed on restart. Restart now?')
     changeUpdaterMenu({
       label: 'Updates available',
       enabled: true
     })
-  } else {
-    autoUpdater.checkForUpdates()
+
+    return
   }
+
+  autoUpdater.checkForUpdates()
 }
 
 const changeUpdaterMenu = ({

@@ -1,29 +1,27 @@
 <template>
   <div class="page-side-menubar border-top-0">
-    <div class="page-side-menubar__left settings"
+    <div class="page-side-menubar__left settings overflow-y-scroll"
          :class="{'page-side-menubar__left--closed': closed }">
 
       <div class="header w-100 ml-3 mt-2">
-        <q-select
-            ref="settingsSearcher"
-            class="bottom-border__none padding-left__none settings-searcher"
-            placeholder="Search settings..."
-            hide-dropdown-icon
-            clearable
-            dense
-            use-input
-            hide-selected
-            fill-input
-            input-debounce="0"
-            option-value="title"
-            option-label="description"
-            map-options
-            v-model="link"
-            :display-value="link ? link.title : ''"
-            :options="options"
-            @filter="filterFn"
-            style="width: 250px;"
-        >
+        <q-select ref="settingsSearcher"
+                  class="bottom-border__none padding-left__none settings-searcher"
+                  placeholder="Search settings..."
+                  input-debounce="0"
+                  option-value="title"
+                  option-label="description"
+                  style="width: 250px;"
+                  hide-dropdown-icon
+                  clearable
+                  dense
+                  use-input
+                  hide-selected
+                  fill-input
+                  map-options
+                  :display-value="link ? link.title : ''"
+                  :options="options"
+                  v-model="link"
+                  @filter="filterFn">
 
           <template v-slot:prepend>
             <q-icon name="search" />
@@ -31,10 +29,9 @@
 
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps"
-                    v-on="scope.itemEvents"
-            >
+                    v-on="scope.itemEvents">
               <q-item-section>
-                <q-item-label v-html="scope.opt.title"></q-item-label>
+                <q-item-label v-html="scope.opt.title"/>
                 <q-item-label caption>{{ scope.opt.description }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -55,8 +52,7 @@
       </div>
       <div>
         <div class="inbox-side__nav">
-          <settings-nav-list>
-          </settings-nav-list>
+          <settings-nav-list/>
         </div>
       </div>
     </div>
@@ -96,8 +92,14 @@ export default {
   },
 
   computed: {
-    ...mapState('settings', ['userClone', 'changedUserProperties', 'user']),
+    ...mapState('settings', [
+      'userClone',
+      'changedUserProperties',
+      'user'
+    ]),
+
     ...mapGetters('auth', ['authenticated', 'profile']),
+
     searchResult () {
       const query = this.searchText.trim().toLocaleLowerCase()
 
@@ -119,12 +121,17 @@ export default {
         return (data.title.toLocaleLowerCase().includes(query) || data.description.toLocaleLowerCase().includes(query)) && data.visible
       })
     },
+
     hasAdminRole () {
-      return this.user && (this.isCompanyAdmin || this.isBillingAdmin)
+      const isAdmin = this.isCompanyAdmin || this.isBillingAdmin
+
+      return this.user && isAdmin
     },
+
     isCompanyAdmin () {
       return this.user.role_names.includes('Company Admin')
     },
+
     isBillingAdmin () {
       return this.user.role_names.includes('Billing Admin')
     }
@@ -143,7 +150,12 @@ export default {
   },
 
   methods: {
-    ...mapActions('settings', ['resetChangedUserProperties', 'setUser', 'setFormValidity']),
+    ...mapActions('settings', [
+      'resetChangedUserProperties',
+      'setUser',
+      'setFormValidity'
+    ]),
+
     toggle () {
       this.closed = !this.closed
     },
@@ -171,19 +183,22 @@ export default {
 
   watch: {
     link: function () {
-      if (this.link) {
-        if (this.changedUserProperties.length > 0 && this.link.route !== this.$route.path) {
-          this.setUser({ ...this.userClone })
-          this.resetChangedUserProperties()
-          this.setFormValidity(true)
-        }
-
-        this.$router.push({
-          path: this.link.route + (this.link.hash_keyword ? '#' + this.link.hash_keyword : '')
-        })
-        this.$refs.settingsSearcher.blur()
-        this.link = null
+      if (!this.link) {
+        return
       }
+
+      if (this.changedUserProperties.length > 0 && this.link.route !== this.$route.path) {
+        this.setUser({ ...this.userClone })
+        this.resetChangedUserProperties()
+        this.setFormValidity(true)
+      }
+
+      this.$router.push({
+        path: this.link.route + (this.link.hash_keyword ? '#' + this.link.hash_keyword : '')
+      })
+
+      this.$refs.settingsSearcher.blur()
+      this.link = null
     }
   }
 }

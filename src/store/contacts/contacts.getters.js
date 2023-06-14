@@ -74,5 +74,11 @@ export default {
   activeFolder: (state) => state.activeFolder,
   removedFolder: (state) => state.removedFolder,
   clearList: (state) => state.clearList,
-  isAllContactsSelected: (state) => state.isAllContactsSelected
+  isAllContactsSelected: (state) => state.isAllContactsSelected,
+  isContactSaveBarVisible: (state) => {
+    const hasChanges = (state.changedContactProperties.length > 0 || state.changedContactAttributes.length > 0)
+
+    return state.contact?.id === state.contactClone.id &&
+      hasChanges && !state.changingSelectedContact
+  }
 }

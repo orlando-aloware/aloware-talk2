@@ -12,9 +12,12 @@
           <i class="fa fa-chevron-left" />
         </button>
       </router-link>
-      <h1 v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
-      <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
-      <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ $route.params.tab.replace('-', ' ') | ucwords }}</h1>
+      <h1 class="d-flex align-items-center"
+          v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
+      <h1 class="d-flex align-items-center"
+          v-if="forcePageTitle">{{ forcePageTitle }}</h1>
+      <h1 class="d-flex align-items-center"
+          v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ $route.params.tab.replace('-', ' ') | ucwords }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
       <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
@@ -316,6 +319,7 @@ export default {
   created () {
     this.$VueEvent.listen('callContact', (data) => {
       this.showDialer()
+
       setTimeout(() => {
         this.$VueEvent.fire('changePhoneNumber', data)
       }, 100)

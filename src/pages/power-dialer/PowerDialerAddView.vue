@@ -184,7 +184,7 @@
                   v-else-if="column.name === 'phone_number'">
                 <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
                      v-if="contact.phone_number">
-                  {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+                  {{ contact.phone_number | fixPhone('NATIONAL', true, false, true) }}
                 </div>
                 <div class="ml-1 text-grey-7 text-center "
                      :class="`${column.draggable ? 'col-indented' : ''}`"
