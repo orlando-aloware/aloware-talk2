@@ -46,7 +46,7 @@
             </b-col>
             <b-col cols="8"
                    v-if="!showMobileFilters">
-              <div class="d-flex">
+              <div class="d-flex justify-content-center">
                 <power-dialer-filter :list-data="fixedContactsData"
                                      :id="selectedListId"
                                      :filter="filter"
