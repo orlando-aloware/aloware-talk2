@@ -100,6 +100,10 @@ export default {
         return
       }
 
+      if (!lastCommunicationId) {
+        return
+      }
+
       let lastCommunicationData = await this.getLastCommunicationScript(lastCommunicationId)
 
       this.script = lastCommunicationData.data.find(script => {
