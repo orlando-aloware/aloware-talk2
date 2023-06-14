@@ -1,6 +1,6 @@
 <template>
   <div class="inbox-wrapper border-right">
-    <div class="mobile-header align-items-center justify-content-between pr-3"
+    <div class="mobile-header align-items-center justify-content-between pr-3 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
         <back-button @click="back"/>
@@ -11,7 +11,7 @@
       <profile class="p-0"
                :hide-profile-info="true"/>
     </div>
-    <div class="inbox-side border-top-0 flex-shrink-0 h-100">
+    <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">

@@ -372,8 +372,6 @@ export default {
         }).catch((err) => {
           console.log(err)
           this.loadingContact = false
-
-          return Promise.reject()
         })
       }
 

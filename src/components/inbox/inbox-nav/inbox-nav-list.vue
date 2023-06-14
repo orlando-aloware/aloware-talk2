@@ -1,31 +1,34 @@
 <template>
-  <div class="inbox-nav-list h-100 overflow-y-scroll"
+  <div class="inbox-nav-list h-100 overflow-y-scroll overflow-x-hidden"
        :class="{'inbox-nav-list--closed': closed}">
-    <nav-item
-      v-for="item in items"
-      :key="item.name"
-      :label="item.label"
-      :value="item.value"
-      :icon="item.icon"
-      :group="item.group"
-      :isActive="isActive(item.value)"
-      :closed="closed"
-      :badge="true"
-      :openCount="openCount"
-      :pending-count="pendingCount"
-      badge-value="20"
-      badge-color="danger"
-      @click="onItemClicked"
-    />
+    <nav-item badge-value="20"
+              badge-color="danger"
+              :key="item.name"
+              :label="item.label"
+              :value="item.value"
+              :icon="item.icon"
+              :group="item.group"
+              :isActive="isActive(item.value)"
+              :closed="closed"
+              :badge="true"
+              :openCount="openCount"
+              :pending-count="pendingCount"
+              v-for="item in items"
+              @click="onItemClicked"/>
   </div>
 </template>
 
 <script>
 import NavItem from './inbox-nav-item'
 import { mapActions, mapState } from 'vuex'
+import { inboxRoutesMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'inbox-nav-list',
+
+  mixins: [
+    inboxRoutesMixin
+  ],
 
   components: {
     NavItem
@@ -54,8 +57,11 @@ export default {
 
   computed: {
     ...mapState('inbox', ['items', 'activeChannel']),
+
     isShowActive () {
-      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && ['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name))
+      const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
+
+      return !this.$q.screen.lt.md || isMobileInboxRoutes
     }
   },
 
@@ -67,18 +73,22 @@ export default {
 
   methods: {
     ...mapActions('inbox', ['setActiveChannel']),
+
     onItemClicked (nextActive) {
       if (!this.activeChannel) {
         return
       }
 
-      if (this.activeChannel.value === nextActive) {
-        this.$q.screen.lt.md && this.$emit('toInbox')
+      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md) {
+        this.$emit('toInbox')
+
         return
       }
+
       this.active = nextActive
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
+
       if (this.active === 'inbox') {
         this.$router.push({
           name: 'Inbox Channel Task Status',
@@ -102,6 +112,7 @@ export default {
         })
       }
     },
+
     isActive (value) {
       return this.isShowActive && this.activeChannel && this.activeChannel.value === value
     }

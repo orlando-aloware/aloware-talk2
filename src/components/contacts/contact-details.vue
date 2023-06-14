@@ -11,15 +11,17 @@
       <profile class="p-0"
                :hide-profile-info="true"/>
     </div>
-    <div class="contact-details-wrapper h-100 flex-grow-1 overflow-hidden-y">
+    <div class="contact-details-wrapper h-100 flex-grow-1 overflow-hidden">
       <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
           <contact-info :campaign-id="campaignId"/>
-          <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                            :contact="contact"/>
-          <contact-aloha-bot v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                            :contact="contact"/>
+          <contact-sequence class="w-100"
+                            :contact="contact"
+                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
+          <contact-aloha-bot class="w-100"
+                             :contact="contact"
+                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-phones/>
           <contact-information :first-outbound-call="communicationsSummary.first_outbound_call"/>
           <contact-tags :contact="contact"/>

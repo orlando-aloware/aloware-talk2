@@ -74,7 +74,7 @@
             </app-sidebar>
           </q-list>
         </q-drawer>
-        <q-drawer class="mobile-phone-drawer position-relative"
+        <q-drawer class="mobile-phone-drawer position-relative h-100 overflow-hidden"
                   ref="mobilePhone"
                   side="right"
                   bordered
@@ -92,7 +92,7 @@
                         :title-only="true"/>
           </q-header>
           <phone :isMobile="isMobile"
-                 :class="{ 'hidden': mobilePhoneDrawer }"
+                 :class="{ 'hide': !mobilePhoneDrawer }"
                  @onPhoneVisible="onPhoneVisible">
           </phone>
           <dialer-form ref="dialerForm"
@@ -2328,7 +2328,7 @@ export default {
       // don't close the phone yet!
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.isPhoneVisible = true
-        this.mobilePhoneDrawer = true
+        this.mobilePhoneDrawer = false
       }
 
       if (typeof this.$refs.appFooter !== 'undefined') {
@@ -2506,16 +2506,17 @@ export default {
   },
 
   watch: {
-    '$q.screen.lt.lg': function () {
+    '$q.screen.lt.lg': function (value) {
       if (typeof this.$refs.mobilePhone === 'undefined') {
         return
       }
 
-      if (!this.$q.screen.lt.lg) {
+      if (!value) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
       }
     },
+
     $route (to, from) {
       // logout action
       if (to.name === 'Login' && !storage.local.getItem('api_token')) {

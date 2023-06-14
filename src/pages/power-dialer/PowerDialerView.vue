@@ -1,6 +1,6 @@
 <template>
   <power-dialer-view-screen :loading="isLoading"
-                         v-if="list">
+                            v-if="list">
     <template slot="title">
       <breadcrumbs :directory-list="folders" />
     </template>
@@ -18,59 +18,62 @@
     <template slot="actions">
       <div>
         <summary-info-labels />
-        <b-container fluid class="bv-example-row m-0 p-0 pb-0 border-bottom">
+        <b-container class="bv-example-row m-0 p-0 pb-0 border-bottom"
+                     fluid>
           <b-row class="pr-2 pt-4 pb-3"
-                 v-if="$q.screen.lt.lg">
-            <b-col cols="12">
+                 v-if="showMobileFilters">
+            <b-col class="d-flex justify-content-center"
+                   cols="12">
               <div class="d-flex">
                 <power-dialer-filter :list-data="fixedContactsData"
-                                   :id="selectedListId"
-                                   :filter="filter"
-                                   :active-route="activeRoute" />
+                                     :id="selectedListId"
+                                     :filter="filter"
+                                     :active-route="activeRoute" />
               </div>
             </b-col>
           </b-row>
-          <b-row class="pr-2 pt-4">
+          <b-row class="pr-2"
+                 :class="{ 'pt-4': !showMobileFilters }">
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
 
                 <search-list class="width-260"
-                            limitSearchCharacters
-                            :search="search"
-                            @search="onSearch" />
+                             limitSearchCharacters
+                             :search="search"
+                             @search="onSearch" />
 
               </div>
             </b-col>
             <b-col cols="8"
-                   v-if="$q.screen.gt.md">
+                   v-if="!showMobileFilters">
               <div class="d-flex">
                 <power-dialer-filter :list-data="fixedContactsData"
-                                   :id="selectedListId"
-                                   :filter="filter"
-                                   :active-route="activeRoute" />
+                                     :id="selectedListId"
+                                     :filter="filter"
+                                     :active-route="activeRoute" />
               </div>
             </b-col>
             <b-col class="p-0">
               <div class="d-flex float-right">
 
-                <b-dropdown text="Add Contacts"
-                            variant="light"
-                            class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                <b-dropdown class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                             toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
+                            text="Add Contacts"
+                            variant="light"
                             right
                             no-caret
                             :disabled="taskAddAndClearingDisabled">
-                  <template
-                    #button-content class="filter-toggle-button">
+                  <template class="filter-toggle-button"
+                            #button-content>
                     <div class="filter-toggle-button d-flex align-items-center"
                          style="margin-top: -2px;font-size:13px;">
                       Add Contacts
                     </div>
                     <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
-                       style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;">
-                    </i>
+                       style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;"/>
                     <q-tooltip content-class="bg-grey-light11"
-                               anchor="top middle" self="center middle"
+                               anchor="top middle"
+                               self="center middle"
                                v-if="taskAddAndClearingDisabled">
                       Clearing of task is currently disabled.
                     </q-tooltip>
@@ -91,10 +94,10 @@
 
                 <contact-create-modal @created="onContactCreated"/>
 
-                <b-dropdown text="..."
+                <b-dropdown class="m-0 mb-3 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+                            text="..."
                             right size="sm"
                             variant="white"
-                            class="m-0 mb-3 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                             no-caret>
                   <template #button-content>
                     <i class="fa fa-ellipsis-h"/>
@@ -117,7 +120,8 @@
                     <i class="fa fa-trash-alt mr-1 text-red"/>
                     <span class="text-red">Clear</span>
                     <q-tooltip content-class="bg-grey-light11"
-                               anchor="top middle" self="center middle"
+                               anchor="top middle"
+                               self="center middle"
                                v-if="taskAddAndClearingDisabled">
                       Clearing of task is currently disabled.
                     </q-tooltip>
@@ -145,7 +149,8 @@
     </template>
 
     <template slot="table">
-      <datatable :stickyHeaders="true"
+      <datatable scroll-area-class="pd-datatable"
+                 :stickyHeaders="true"
                  :columns="columns"
                  :is-empty="isEmpty || isStartState"
                  :is-loading-more="isLoadingMore"
@@ -153,7 +158,6 @@
                  :contact-list-id="selectedListId"
                  :paginated="false"
                  :show-pagination="!isStartState"
-                 scroll-area-class="pd-datatable"
                  :total-rows="fixedContactsData.total"
                  :current-page="currentPage"
                  :last-page="lastPage"
@@ -548,6 +552,7 @@ import {
   powerDialerMixin,
   powerDialerInitMixin
 } from 'src/plugins/mixins'
+import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'PowerDialerView',
@@ -859,6 +864,10 @@ export default {
       const text = this.taskAddAndClearingDisabled ? '' : ' & Add to List'
 
       return `Create Contact${text}`
+    },
+
+    showMobileFilters () {
+      return this.$q.screen.width <= PD_MAX_FILTER_LG
     }
   },
 

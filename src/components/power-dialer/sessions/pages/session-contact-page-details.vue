@@ -9,8 +9,9 @@
                         size="40px" />
       </template>
 
-      <div class="col-4 p-1 px-2">
-        <q-card flat class="p-3">
+      <div class="col-4 p-1 px-2 d-flex flex-column">
+        <q-card class="p-3 flex-grow-0"
+                flat>
           <q-card-section class="p-0">
             <div class="text-subtitle1 text-weight-medium">
               Scripts
@@ -18,12 +19,13 @@
           </q-card-section>
         </q-card>
 
-        <DetailsScripts :resources="scripts" />
+        <DetailsScripts class="flex-grow-1 h-100 overflow-hidden"
+                        :resources="scripts" />
       </div>
 
-      <div class="col-4 p-1 px-2">
-        <q-card flat
-                class="p-3"
+      <div class="col-4 p-1 px-2 d-flex flex-column h-100">
+        <q-card class="p-3 flex-grow-0 mb-2"
+                flat
                 v-if="isHubspotEnabled && hubspotLink">
           <q-card-section class="p-0">
             <b-link class="text-weight-medium text-decoration-none"
@@ -35,7 +37,8 @@
           </q-card-section>
         </q-card>
 
-        <DetailsContactInformation :resources="contact"
+        <DetailsContactInformation class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
+                                   :resources="contact"
                                    v-if="contact" />
       </div>
       <div class="col-4 p-1 px-2 h-100 overflow-y-scroll">
