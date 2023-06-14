@@ -163,8 +163,14 @@ export default {
       this.showNotification = false
     },
 
+    isAbsoluteURL (url) {
+      let regEx = new RegExp('^(?:[a-z+]+:)?//', 'i')
+
+      return regEx.test(url)
+    },
+
     getLink (link) {
-      if (!link.external) {
+      if (!link.external || !this.isAbsoluteURL(link.href)) {
         return `${process.env.API_URL}${link.href}`
       }
 
