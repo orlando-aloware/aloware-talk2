@@ -1,6 +1,7 @@
 <template>
   <div>
-    <vue-ctk-date-time-picker :formatted="formatted"
+    <vue-ctk-date-time-picker :format="format"
+                              :formatted="formatted"
                               :label="placeholder"
                               :only-date="dateOnly"
                               :no-label="noLabel"
@@ -12,6 +13,7 @@
                               :disabled-hours="disabledHours"
                               :no-value-to-custom-elem="noValueToCustomElem"
                               :no-clear-button="noClearButton"
+                              :only-time="onlyTime"
                               no-keyboard
                               v-model="date"
                               @input="onInput">
@@ -80,6 +82,10 @@ export default {
       required: false,
       default: () => { return [] }
     },
+    format: {
+      type: String,
+      default: 'YYYY-MM-DD hh:mm a'
+    },
     formatted: {
       type: String,
       required: false,
@@ -90,6 +96,10 @@ export default {
       default: false
     },
     noClearButton: {
+      type: Boolean,
+      default: false
+    },
+    onlyTime: {
       type: Boolean,
       default: false
     }

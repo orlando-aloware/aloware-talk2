@@ -30,14 +30,15 @@
                 <div class="time-schedule__row__label">
                   Time
                 </div>
-                <div class="time-schedule__row__field position-relative">
-                  <!-- <date-selector only-time
+                <div class="time-schedule__row__field time-schedule__row__field__time-selector">
+                  <date-selector only-time
                                  format="hh:mm a"
                                  formatted="hh:mm a"
+                                 placeholder="Select time"
                                  :date-only="false"
-                                 v-model="schedule.time"/> -->
-                  <predefined-time-selector v-model="schedule.time"
-                                            @select="onTimeSelected"/>
+                                 :auto-close="false"
+                                 :value="scheduledTimeValue"
+                                 @dateSelected="onTimeSelected"/>
                   <b-badge class="mr-2 position-absolute"
                            style="right: -50px; top: 15px"
                            variant="light">
@@ -88,7 +89,6 @@
 import BroadcastTimeRestrictionAlert from 'src/components/broadcasts/broadcast-time-restriction-alert'
 import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import DateSelector from 'src/components/date-selector.vue'
-import PredefinedTimeSelector from 'src/components/predefined-time-selector.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
@@ -100,7 +100,6 @@ export default {
     BroadcastTimeRestrictionAlert,
     ContactLineSelector,
     DateSelector,
-    PredefinedTimeSelector,
     ThrottleSelector
   },
 
@@ -138,6 +137,14 @@ export default {
         !isEmpty(this.campaign) &&
         !isEmpty(this.throttle) &&
         !this.scheduleIsPast
+    },
+
+    scheduledTimeValue () {
+      if (!this.schedule.date || !this.schedule.time) {
+        return null
+      }
+
+      return this.schedule.date + ' ' + this.schedule.time
     },
 
     companyTimezone () {
@@ -210,7 +217,7 @@ export default {
     },
 
     onTimeSelected (time) {
-      this.schedule.time = time.value
+      this.schedule.time = time
     },
 
     onCampaignSelected (campaign) {
