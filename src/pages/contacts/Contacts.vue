@@ -111,8 +111,7 @@ export default {
 
     ...mapState('contacts', [
       'showContactsListSidebar',
-      'unsavedList',
-      'bulkAddNotifications'
+      'unsavedList'
     ]),
 
     ...mapState('cache', [
@@ -152,9 +151,6 @@ export default {
   },
 
   mounted () {
-    const notification = this.bulkAddNotifications(this.$route.params.id)
-    console.log({ notification })
-
     if (this.$route.name === 'Contacts') {
       this.setShowContactsHeader(true)
 
