@@ -907,7 +907,7 @@ export default {
       this.storeBulkActionNotification(event)
 
       // Verify if we're in the contact list page
-      const isContactsListPage = this.$route.meta?.page === 'Contacts List'
+      const isContactsListPage = this.$route.meta?.id === 'power-dialer-list-filter'
       const isIdMatch = this.$route.params.id === event.contact_list_id
       if (isContactsListPage && isIdMatch) {
         // Notify user of finish and push user to power dialer list
