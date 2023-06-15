@@ -502,6 +502,7 @@ export default {
     },
 
     onSelectFilter (personalFilter) {
+      console.trace(personalFilter)
       this.setSelectedFilter(personalFilter)
 
       if (!personalFilter) {

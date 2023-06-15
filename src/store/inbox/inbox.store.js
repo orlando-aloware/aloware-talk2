@@ -18,61 +18,77 @@ export default function () {
         value: 'inbox',
         icon: 'inbox',
         disabled: false
-      },
-      {
-        label: 'Channels',
-        group: true,
-        value: '',
-        class: 'nav-list-group-title',
-        icon: '',
-        disabled: false
-      },
-      {
-        label: 'Calls',
-        value: 'calls',
-        icon: 'call',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'all'
-      },
-      {
-        label: 'Messages',
-        value: 'messages',
-        icon: 'message',
-        disabled: false,
-        type: 'sms',
-        answerStatus: 'all'
-      },
-      {
-        label: 'Mentions',
-        value: 'mentions',
-        icon: 'mention',
-        disabled: false
-      },
-      {
-        label: 'Voicemails',
-        value: 'voicemails',
-        icon: 'voicemail',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'voicemail'
-      },
-      {
-        label: 'Call Recordings',
-        value: 'recordings',
-        icon: 'record',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'recorded'
-      },
-      {
-        label: 'All Communications',
-        value: 'all-communications',
-        icon: 'all-communications',
-        disabled: false,
-        type: 'all',
-        answerStatus: 'all'
       }
+      // {
+      //   label: 'Personal Filters',
+      //   group: true,
+      //   value: '',
+      //   class: 'nav-list-group-title',
+      //   icon: '',
+      //   disabled: false
+      // },
+      // {
+      //   label: 'Company Filters',
+      //   group: true,
+      //   value: '',
+      //   class: 'nav-list-group-title',
+      //   icon: '',
+      //   disabled: false
+      // },
+      // {
+      //   label: 'Channels',
+      //   group: true,
+      //   value: '',
+      //   class: 'nav-list-group-title',
+      //   icon: '',
+      //   disabled: false
+      // },
+      // {
+      //   label: 'Calls',
+      //   value: 'calls',
+      //   icon: 'call',
+      //   disabled: false,
+      //   type: 'call',
+      //   answerStatus: 'all'
+      // },
+      // {
+      //   label: 'Messages',
+      //   value: 'messages',
+      //   icon: 'message',
+      //   disabled: false,
+      //   type: 'sms',
+      //   answerStatus: 'all'
+      // },
+      // {
+      //   label: 'Mentions',
+      //   value: 'mentions',
+      //   icon: 'mention',
+      //   disabled: false
+      // },
+      // {
+      //   label: 'Voicemails',
+      //   value: 'voicemails',
+      //   icon: 'voicemail',
+      //   disabled: false,
+      //   type: 'call',
+      //   answerStatus: 'voicemail'
+      // },
+      // {
+      //   label: 'Call Recordings',
+      //   value: 'recordings',
+      //   icon: 'record',
+      //   disabled: false,
+      //   type: 'call',
+      //   answerStatus: 'recorded'
+      // },
+      // {
+      //   label: 'All Communications',
+      //   value: 'all-communications',
+      //   icon: 'all-communications',
+      //   disabled: false,
+      //   type: 'all',
+      //   answerStatus: 'all'
+      // }
     ],
     communications: [],
     communicationsCurrentPage: 0,
