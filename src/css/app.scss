@@ -3703,8 +3703,9 @@ i.option-separator {
 
 .task-item {
   .contact-name {
-    @include font-size(14px, 500);
+    @include font-size(13px, 600);
     line-height: 17px;
+    color: $grey-10;
 
     &.truncated-text {
       padding-right: 5px;

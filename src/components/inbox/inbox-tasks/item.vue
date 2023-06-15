@@ -21,7 +21,8 @@
     </div>
     <div class="task-details flex-grow-1 pb-1 d-grid"
          role="button">
-      <div class="contact-name truncated-text">
+      <div class="contact-name truncated-text"
+           :class="hasUnreadsClass">
         {{ contactName }}
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top left"
@@ -40,7 +41,7 @@
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               :class="callStatusClass">
+               :class="[callStatusClass, hasUnreadsClass]">
             <q-tooltip>
               {{ communicationLabel }}
             </q-tooltip>
@@ -48,18 +49,22 @@
           </div>
 
           <div class="truncated-text"
+               :class="hasUnreadsClass"
                v-if="hasSmsBody">
             {{ smsEmptyBodyAlternativeText }}
           </div>
+
           <div class="truncated-text"
-               :class="appointmentReminderTextClass"
+               :class="[appointmentReminderTextClass, hasUnreadsClass]"
                v-if="contact.last_communication.body !== null">
             {{ contact.last_communication.body }}
           </div>
 
         </div>
       </div>
+
       <div class="campaign-name text-grey-10 truncated-text"
+           :class="hasUnreadsClass"
            v-if="contact.last_communication">
         {{ campaignName }}
       </div>
@@ -484,6 +489,10 @@ export default {
       }
 
       return label
+    },
+
+    hasUnreadsClass () {
+      return this.totalUnreads ? 'text-black' : ''
     }
   },
 
