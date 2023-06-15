@@ -106,13 +106,13 @@ export default {
   computed: {
     ...mapGetters('auth', [
       'authenticated',
-      'profile',
-      'bulkAddNotifications'
+      'profile'
     ]),
 
     ...mapState('contacts', [
       'showContactsListSidebar',
-      'unsavedList'
+      'unsavedList',
+      'bulkAddNotifications'
     ]),
 
     ...mapState('cache', [
