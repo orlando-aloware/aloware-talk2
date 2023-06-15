@@ -2277,6 +2277,19 @@ i.option-separator {
   div.options {
     margin-top: -3px;
     opacity: 0;
+
+    > *:not(:last-child) {
+      margin-right: 4px;
+    }
+
+    button {
+      padding: 0.10rem 0.40rem !important;
+      line-height: 12px !important;
+
+      svg, i {
+        margin-top: -2px;
+      }
+    }
   }
 
   .phone-actions {

@@ -35,16 +35,18 @@
       </div>
 
       <div class="d-inline-flex justify-content-between align-items-center">
-        <p class="phone-number m-0">
+        <div class="phone-number m-0">
           {{ phone.phone_number | fixPhone }}
-        </p>
+        </div>
         <div class="options phone-options px-3">
           <b-button class="btn-bg-transparent btn-b-0 line-height-1"
                     size="sm"
                     variant="light"
                     v-if="hasPermissionTo('update contact')"
                     @click="onEdit(phone)">
-            <pencil-o-icon color="#256EFF"></pencil-o-icon>
+            <pencil-o-icon width="12"
+                           height="12"
+                           color="#256EFF"></pencil-o-icon>
           </b-button>
 
           <b-dropdown variant="light"
@@ -53,9 +55,8 @@
                       offset="-125"
                       no-caret>
             <template slot="button-content">
-              <div class="line-height-1">
-                <i class="material-icons">more_vert</i>
-              </div>
+              <i class="material-icons"
+                 style="font-size: 12px;">more_vert</i>
             </template>
             <b-dropdown-item class="phone-actions"
                              :disabled="contact.is_dnc"
