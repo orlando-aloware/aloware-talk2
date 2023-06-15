@@ -142,8 +142,7 @@ import {
   get,
   isEmpty,
   isEqual,
-  debounce,
-  uniqBy
+  debounce
 } from 'lodash'
 import * as Countries from 'src/constants/countries'
 import { State } from 'country-state-city'
@@ -561,9 +560,7 @@ export default {
       let filters = allFilters[this.filterGroupIndex].filters[this.filter.key]
 
       // remove duplicate filter(s)
-      filters = uniqBy(filters, (item) => {
-        return JSON.stringify(item)
-      })
+      filters = filters.slice(0, 1)
 
       allFilters[this.filterGroupIndex].filters[this.filter.key] = filters
 
