@@ -704,7 +704,8 @@ export default {
       'selectedList',
       'isFiltersOpen',
       'currentListFilters',
-      'clearList'
+      'clearList',
+      'bulkAddNotifications'
     ]),
 
     taskAddAndClearingDisabled () {
@@ -1158,6 +1159,14 @@ export default {
       if (elem) {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
       }
+    },
+
+    /**
+     * Notifies summary of contacts added to PD list
+     */
+    checkTaskAddedNotification () {
+      const notification = this.bulkAddNotifications(this.$route.params.id)
+      console.log({ notification })
     }
   },
 
@@ -1201,6 +1210,12 @@ export default {
 
     checked: function (value) {
       this.onForcedCheckAll(value)
+    },
+
+    isLoading (loading) {
+      if (!loading) {
+        this.checkTaskAddedNotification()
+      }
     }
   },
 
