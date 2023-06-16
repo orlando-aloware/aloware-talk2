@@ -51,18 +51,17 @@
       </calls-header>
       <div class="w-100"
            v-if="!isSearch">
-        <q-btn-toggle
-          v-model="currentTask"
-          @click="onToggleStatus"
-          :options="options"
-          class="mx-2 mt-2 mb-1 custom-toggle-button"
-          no-caps
-          spread
-          dense
-          unelevated
-          :toggle-color="statusToggleColor"
-          color="transparent"
-          text-color="primary">
+        <q-btn-toggle class="mx-2 mt-2 mb-1 custom-toggle-button"
+                      color="transparent"
+                      text-color="primary"
+                      no-caps
+                      spread
+                      dense
+                      unelevated
+                      :toggle-color="statusToggleColor"
+                      :options="options"
+                      v-model="currentTask"
+                      @click="onToggleStatus">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
@@ -439,10 +438,11 @@ export default {
         return
       }
 
-      this.setLoadingPendingTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      this.setLoadingOpenTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      // this.setLoadingPendingTaskCount(true)
+      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      // this.setLoadingOpenTaskCount(true)
+      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.fetchTaskCounts()
 
       this.loadContactTasks(false).finally(() => {
         if (this.$route.params.id) {
@@ -540,8 +540,9 @@ export default {
       const isOpen = [ContactTaskStatus.STATUS_OPEN].includes(contact.task_status)
 
       if (loadCount && !isOpen) {
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.fetchTaskCounts()
       }
 
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
@@ -598,15 +599,18 @@ export default {
       this.isSearch = false
 
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
-        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
-          this.setLoadingPendingTaskCount(true)
-          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-        }
-
-        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
-          this.setLoadingOpenTaskCount(true)
-          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        }
+        // switch (this.currentTask) {
+        //   case ContactTaskStatus.STATUS_OPEN:
+        //     this.setLoadingOpenTaskCount(true)
+        //     this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        //     break
+        //
+        //   case ContactTaskStatus.STATUS_PENDING:
+        //     this.setLoadingPendingTaskCount(true)
+        //     this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        //     break
+        // }
+        this.fetchTaskCounts()
       }
 
       if (this.$route.params.status === this.statusText || this.$route.name === 'Inbox') {
@@ -630,15 +634,16 @@ export default {
       this.setAppliedFilter(null)
     },
     loadTaskCounts () {
-      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
-        this.setLoadingPendingTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      }
-
-      if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
-        this.setLoadingOpenTaskCount()
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      }
+      // if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
+      //   this.setLoadingPendingTaskCount(true)
+      //   this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      // }
+      //
+      // if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
+      //   this.setLoadingOpenTaskCount()
+      //   this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      // }
+      this.fetchTaskCounts()
     },
     onResetFilter () {
       this.resetFilter()
@@ -814,8 +819,9 @@ export default {
 
             // only trigger counts request if action comes from the same user
             if (communication.user_id === this.profile.id) {
-              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+              // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+              // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+              this.fetchTaskCounts()
             }
           }
         }
@@ -1050,8 +1056,9 @@ export default {
 
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.fetchTaskCounts()
       }
 
       const index = this.contacts.findIndex(item => item.id === contact.id)
@@ -1149,10 +1156,12 @@ export default {
         })
       }
 
-      this.setLoadingPendingTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      this.setLoadingOpenTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      // this.setLoadingPendingTaskCount(true)
+      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+      // this.setLoadingOpenTaskCount(true)
+      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
+      this.fetchTaskCounts()
+
       this.loadContactTasks(false).finally(() => {
         if (this.$route.params.id) {
           const id = this.$route.params.id

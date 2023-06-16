@@ -130,15 +130,16 @@ export default {
       this.page = 1
 
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask) && loadCount) {
-        if (this.currentTask === ContactTaskStatus.STATUS_OPEN && showLoading) {
-          this.setLoadingOpenTaskCount(true)
-        }
-
-        if (this.currentTask === ContactTaskStatus.STATUS_PENDING && showLoading) {
-          this.setLoadingPendingTaskCount(true)
-        }
-
-        this.getContactsCountByTaskStatus(this.currentTask)
+        // if (this.currentTask === ContactTaskStatus.STATUS_OPEN && showLoading) {
+        //   this.setLoadingOpenTaskCount(true)
+        // }
+        //
+        // if (this.currentTask === ContactTaskStatus.STATUS_PENDING && showLoading) {
+        //   this.setLoadingPendingTaskCount(true)
+        // }
+        //
+        // this.getContactsCountByTaskStatus(this.currentTask)
+        this.fetchTaskCounts()
       }
 
       return this.getContactsByTaskStatus(this.currentTask).then(response => {
@@ -201,25 +202,26 @@ export default {
     },
 
     getContactsCountByTaskStatus (taskId) {
-      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true)).then(response => {
-        if (response) {
-          if (taskId === ContactTaskStatus.STATUS_OPEN) {
-            this.setOpenTaskCount(response.data.count)
-            this.setLoadingOpenTaskCount(false)
-          } else if (taskId === ContactTaskStatus.STATUS_PENDING) {
-            this.setPendingTaskCount(response.data.count)
-            this.setLoadingPendingTaskCount(false)
+      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true))
+        .then(response => {
+          switch (taskId) {
+            case ContactTaskStatus.STATUS_OPEN:
+              if (response) {
+                this.setOpenTaskCount(response.data.count)
+              }
+
+              this.setLoadingOpenTaskCount(false)
+              break
+
+            case ContactTaskStatus.STATUS_PENDING:
+              if (response) {
+                this.setPendingTaskCount(response.data.count)
+              }
+
+              this.setLoadingPendingTaskCount(false)
+              break
           }
-
-          return
-        }
-
-        if (taskId === ContactTaskStatus.STATUS_OPEN) {
-          this.setLoadingOpenTaskCount(false)
-        } else if (taskId === ContactTaskStatus.STATUS_PENDING) {
-          this.setLoadingPendingTaskCount(false)
-        }
-      })
+        })
     },
 
     getParameters (taskId, count = false) {
@@ -310,6 +312,7 @@ export default {
       }
 
       query.timezone = window.timezone
+      query.inbox = true
 
       return query
     },
@@ -344,19 +347,25 @@ export default {
       this.setLoadingOpenTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
 
-      return talk2Api.V2.contacts.inboxCounts().then(res => {
-        this.setTaskCount({
-          new: res.data.open,
-          open: res.data.open,
-          pending: res.data.pending,
-          closed: res.data.closed
-        })
-      })
+      // return talk2Api.V2.contacts.inboxCounts({ cancelToken: this.sourceTasksCounts.token })
+      //   .then(res => {
+      //     this.setLoadingOpenTaskCount(false)
+      //     this.setLoadingPendingTaskCount(false)
+      //
+      //     this.setTaskCount({
+      //       new: res.data.new,
+      //       open: res.data.open,
+      //       pending: res.data.pending,
+      //       closed: res.data.closed
+      //     })
+      //   })
     }
   },
 
   created () {
     this.cancelToken = window.axios.CancelToken
     this.source = this.cancelToken.source()
+    this.cancelTokenTasksCounts = window.axios.CancelToken
+    this.sourceTasksCounts = this.cancelTokenTasksCounts.source()
   }
 }

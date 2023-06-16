@@ -115,9 +115,7 @@ export default {
   mounted () {
     if (this.authenticated) {
       this.setChannel()
-      if (this.$route.params.channel !== 'inbox' && this.$route.name !== 'Inbox') {
-        this.fetchTaskCounts()
-      }
+      this.fetchTaskCounts()
     }
   },
 
