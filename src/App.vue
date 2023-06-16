@@ -8,7 +8,8 @@
                         size="40px" />
       </template>
     </b-overlay>
-    <header-notification class="flex-grow-0"/>
+    <header-notification class="flex-grow-0"
+                         v-if="isLoggedIn"/>
     <router-view class="flex-grow-1 overflow-hidden"
                  v-if="cookieValidated"/>
     <portal-target name="app"
@@ -24,8 +25,8 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <custom-scripts v-if="authenticated && profile && profile.enabled"/>
-    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"/>
+    <custom-scripts v-if="isLoggedIn"/>
+    <intercom v-if="isLoggedIn && staticsLoaded && !statics.whitelabel"/>
   </div>
 </template>
 <script>
@@ -64,6 +65,10 @@ export default {
       const urlParams = new URLSearchParams(window.location.search)
 
       return Number(urlParams.get('from_classic'))
+    },
+
+    isLoggedIn () {
+      return this.authenticated && this.profile && this.profile.enabled
     }
   },
 
