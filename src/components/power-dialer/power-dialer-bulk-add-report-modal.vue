@@ -1,18 +1,18 @@
 <template>
   <b-modal title="Contact Upload Summary"
-           size="sm"
+           size="md"
            centered
            no-close-on-esc
            v-model="isOpen">
-    <div>
-      <p>{{ selected }} contact(s) selected</p>
-      <p>Contacts added</p>
+    <div class="container">
+      <p class="text-h5">{{ selected }} contact(s) selected</p>
+      <p class="m-0">Contacts added</p>
       <ul>
         <li>{{ addedFromContact }} tasks from contacts</li>
         <li v-if="addedFromMultipleNumbers > 0">{{ addedFromMultipleNumbers }} added from multiple numbers</li>
       </ul>
       <template v-if="skipped.length > 0">
-        <p>Contacts not added/skipeed</p>
+        <p class="m-0">Contacts not added/skipeed</p>
         <ul>
           <li v-for="(error, id) in skipped"
               v-bind:key="id">
@@ -20,15 +20,14 @@
           </li>
         </ul>
       </template>
-      <p>{{ totalTasksAdded }} Total tasks added to queue</p>
+      <p class="text-h5 font-weigh-bold">{{ totalTasksAdded }} Total tasks added to queue</p>
     </div>
     <template slot="modal-footer">
-      <q-btn color="primary"
-             @click.prevent="() => isOpen = false">
-        <span class="mx-4">
-          Ok
-        </span>
-      </q-btn>
+      <button class="btn btn-block mt-0 mr-2"
+              :style="{ 'background': 'var(--gray)', 'color': 'white' }"
+              @click="() => isOpen = false">
+        Close
+      </button>
     </template>
   </b-modal>
 </template>
@@ -54,7 +53,7 @@ export default {
   computed: {
     isOpen: {
       get () {
-        return Object.keys(this.statusReport).length > 0
+        return Object.keys(this.statusReport ?? {}).length > 0
       },
       set (val) {
         this.$emit('close')
@@ -71,7 +70,7 @@ export default {
     },
 
     addedFromMultipleNumbers () {
-      return this.statusReport?.success?.multiple ?? 0
+      return this.statusReport?.success?.multiple_numbers ?? 0
     },
 
     skipped () {
