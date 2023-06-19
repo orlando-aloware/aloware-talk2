@@ -13,7 +13,8 @@
                                    :list="filteredList"
                                    @start="beginDial"
                                    @on-update-session-metrics="onSessionMetricsUpdate" />
-      <bulk-add-report-modal :statusReport="bulkAddStatusReport" />
+      <bulk-add-report-modal :statusReport="bulkAddStatusReport"
+                             @close="onTaskAddedNotificationClose"/>
     </template>
 
     <template slot="actions">
@@ -927,7 +928,8 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'listLoaded',
       'pinnedCountLoaded',
-      'setShowMyContacts'
+      'setShowMyContacts',
+      'clearBulkActionNotification'
     ]),
 
     ...mapActions('powerDialer', [
@@ -1172,16 +1174,12 @@ export default {
       const notification = this.bulkAddNotifications(this.$route.params.id)
       console.log({ notification })
 
-      // this.bulkAddStatusReport = notification.statusReport
-      this.bulkAddStatusReport = {
-        'success': {
-          'total': 24,
-          'multiple_numbers': 24
-        },
-        'fail': {
-          '6': 1
-        }
-      }
+      this.bulkAddStatusReport = notification?.status_report
+    },
+
+    onTaskAddedNotificationClose () {
+      this.clearBulkActionNotification(this.$route.params.id)
+      this.bulkAddStatusReport = {}
     }
   },
 
