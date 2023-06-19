@@ -53,5 +53,8 @@ export default {
   personalSessionSettings: (state) => state.sessionSettingGroups.personal,
   companySessionSettings: (state) => state.sessionSettingGroups.company,
   sessionSettingGroups: (state) => state.sessionSettingGroups,
-  warmupDurations: (state) => state.warmupDurations
+  warmupDurations: (state) => state.warmupDurations,
+  bulkAddNotifications: (state) => (listId) => {
+    return state.bulkAddContactsNotification[listId]
+  }
 }

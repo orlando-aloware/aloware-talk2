@@ -697,7 +697,8 @@ export default {
       'powerDialerLists',
       'powerDialerDirectoryList',
       'datatableLoader',
-      'activeFilter'
+      'activeFilter',
+      'bulkAddNotifications'
     ]),
 
     ...mapGetters('contacts', [
@@ -708,8 +709,7 @@ export default {
       'selectedList',
       'isFiltersOpen',
       'currentListFilters',
-      'clearList',
-      'bulkAddNotifications'
+      'clearList'
     ]),
 
     taskAddAndClearingDisabled () {
@@ -928,15 +928,15 @@ export default {
       'setShouldUpdateSelectedListContactCount',
       'listLoaded',
       'pinnedCountLoaded',
-      'setShowMyContacts',
-      'clearBulkActionNotification'
+      'setShowMyContacts'
     ]),
 
     ...mapActions('powerDialer', [
       'updateContactsList',
       'getMyQueueList',
       'setPDListSource',
-      'setPDListCancelToken'
+      'setPDListCancelToken',
+      'clearBulkActionNotification'
     ]),
 
     createNewPowerDialerContact (contact) {

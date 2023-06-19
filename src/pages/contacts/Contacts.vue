@@ -177,8 +177,7 @@ export default {
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
-      'setShowContactResourceUnavailable',
-      'clearBulkActionNotification'
+      'setShowContactResourceUnavailable'
     ]),
 
     ...mapActions(['setDefaultDateFilter']),

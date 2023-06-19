@@ -240,5 +240,13 @@ export default {
 
     // add the task to the end of the queue
     state.powerDialerTasks.in_queue.push(task)
+  },
+
+  STORE_BULK_ACTION_NOTIFICATION (state, value) {
+    state.bulkAddContactsNotification[value.contact_list_id] = value
+  },
+
+  CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
+    delete state.bulkAddContactsNotification[contactListId]
   }
 }

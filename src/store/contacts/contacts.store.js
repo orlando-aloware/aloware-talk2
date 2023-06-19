@@ -262,7 +262,6 @@ export default function () {
     isShortenedUrlRemembered: false,
     newCommunicationInprogressContactFetch: [],
     showContactResourceUnavailable: false,
-    inProgressAxiosUniqueIds: [],
-    bulkAddContactsNotification: {}
+    inProgressAxiosUniqueIds: []
   }
 }

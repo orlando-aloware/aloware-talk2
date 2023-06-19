@@ -2446,7 +2446,10 @@ export default {
     },
 
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
-    ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
+    ...mapActions('powerDialer', [
+      'setFinishedPowerDialerSession',
+      'storeBulkActionNotification'
+    ]),
     ...mapActions([
       'resetVuex',
       'setUsage',
@@ -2489,8 +2492,7 @@ export default {
     ]),
     ...mapActions('contacts', [
       'resetSearch',
-      'setShowContactsHeader',
-      'storeBulkActionNotification'
+      'setShowContactsHeader'
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',

@@ -355,5 +355,13 @@ export default {
 
   setPDListSource ({ commit }, source) {
     commit('SET_PD_LIST_SOURCE', source)
+  },
+
+  storeBulkActionNotification ({ commit }, value) {
+    commit('STORE_BULK_ACTION_NOTIFICATION', value)
+  },
+
+  clearBulkActionNotification ({ commit }, value) {
+    commit('CLEAR_BULK_ACTION_NOTIFICATION', value)
   }
 }

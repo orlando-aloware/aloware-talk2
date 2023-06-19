@@ -80,8 +80,5 @@ export default {
 
     return state.contact?.id === state.contactClone.id &&
       hasChanges && !state.changingSelectedContact
-  },
-  bulkAddNotifications: (state) => (listId) => {
-    return state.bulkAddContactsNotification[listId]
   }
 }
