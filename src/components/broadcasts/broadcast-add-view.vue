@@ -185,6 +185,7 @@ export default {
     },
 
     footerComponent () {
+      // FIXME: check why isnt working
       console.log(!isEmpty(this.source.integration?.list))
       switch (true) {
         // FIXME: use mainComponentValid?
