@@ -176,6 +176,7 @@
                  :paginated="true"
                  :showPagination="true"
                  :lastPage="pagination.totalPages"
+                 :currentPage="pagination.currentPage"
                  :total-rows="visibleBroadcasts?.length ?? 0"
                  :loading="loading"
                  @sort="onSortTable"
@@ -558,35 +559,39 @@ export default {
       return this.broadcastCounts[this.broadcastFilter - 1] === 0
     },
 
-    visibleBroadcasts () {
+    filteredBroadcasts () {
       let filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
       let text = this.broadcastsSearchText.toLowerCase()
 
+      if (!filter && !text) {
+        return this.broadcastData
+      }
+
+      return this.broadcastData.filter(broadcast => {
+        let matchText = true
+        let matchType = true
+
+        if (text) {
+          let broadcastName = broadcast.name.toLowerCase()
+
+          matchText = (broadcast.id + '').includes(text) || broadcastName.includes(text)
+        }
+
+        if (filter) {
+          matchType = broadcast.status === filter
+        }
+
+        return matchText && matchType
+      })
+    },
+
+    visibleBroadcasts () {
       let { perPage, currentPage } = this.pagination
       let paginationStart = perPage * (currentPage - 1)
       let paginationEnd = (perPage * currentPage)
 
-      if (!filter && !text) {
-        return this.broadcastData.slice(paginationStart, paginationEnd)
-      }
-
-      return this.broadcastData
-        .filter(broadcast => {
-          let matchText = true
-          let matchType = true
-
-          if (text) {
-            let broadcastName = broadcast.name.toLowerCase()
-
-            matchText = (broadcast.id + '').includes(text) || broadcastName.includes(text)
-          }
-
-          if (filter) {
-            matchType = broadcast.status === filter
-          }
-
-          return matchText && matchType
-        }).slice(paginationStart, paginationEnd)
+      return this.filteredBroadcasts
+        .slice(paginationStart, paginationEnd)
     },
 
     broadcastCounts () {
@@ -803,6 +808,7 @@ export default {
     getBroadcasts () {
       API.V1.broadcasts.get().then(res => {
         this.broadcastData = res.data
+        this.calculateTotalPages()
       })
     },
 
@@ -1020,21 +1026,26 @@ export default {
     onPaginationChanged ({ page, per_page: perPage }) {
       this.pagination.currentPage = page
       this.pagination.perPage = perPage
+      this.calculateTotalPages()
+    },
+
+    calculateTotalPages () {
+      if (this.filteredBroadcasts.length === 0) {
+        this.pagination.totalPages = 1
+        return
+      }
+
+      this.pagination.totalPages = Math.ceil(this.filteredBroadcasts.length / this.pagination.perPage)
     }
   },
 
   watch: {
     broadcastData (data) {
-      if (data.length === 0) {
-        this.pagination.totalPages = 1
-        return
-      }
+      this.calculateTotalPages()
+    },
 
-      this.pagination.totalPages = Math.floor(data.length / this.pagination.perPage)
-
-      if (data.length % this.pagination.perPage) {
-        this.pagination.totalPages++
-      }
+    broadcastFilter (data) {
+      this.onPaginationChanged({ page: 1, per_page: this.pagination.perPage })
     }
   }
 }
