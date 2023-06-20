@@ -15,20 +15,21 @@
               badge-color="danger"
               @click="onItemClicked" />
     <hr>
-    <hr>
-    <!--<nav-item icon=""-->
-    <!--          value=""-->
-    <!--          label="Personal Views"-->
-    <!--          :group="true"-->
-    <!--          class="nav-list-group-title" />-->
+    <nav-item icon=""
+             value=""
+             label="Personal Views"
+             :group="true"
+             class="nav-list-group-title" />
 
-    <!--<nav-item icon=""-->
-    <!--          :value="filter.name"-->
-    <!--          :label="filter.name"-->
-    <!--          :isActive="isActive(filter.name)"-->
-    <!--          :key="`${filter.name}-${index}`"-->
-    <!--          v-for="(filter, index) in personalFilters"-->
-    <!--          @click="onSelectFilter(filter)" />-->
+    <nav-item icon=""
+              show-counts
+              :value="filter.name"
+              :label="filter.name"
+              :isActive="isActive(filter, 'view')"
+              :key="`${filter.name}-${index}`"
+              :open-count="filter.open_count || 0"
+              v-for="(filter, index) in personalFilters"
+              @click="onSelectFilter(filter)" />
 
     <!--<nav-item icon=""-->
     <!--          value=""-->
@@ -171,12 +172,16 @@ export default {
 
   created () {
     this.getFilters()
-  },
+      .then(() => {
+        if (this.$route.params?.channel && this.$route.params.channel.indexOf('views') !== -1) {
+          // get filterId based on URL
+          const filterId = +this.$route.params.channel.replace('views-', '')
+          // get filter from personal filters list
+          const filter = this.personalFilters.find(personalFilter => personalFilter.id === filterId)
 
-  mounted () {
-    if (this.$route.params?.channel && this.$route.params.channel.indexOf('views') !== -1) {
-      console.trace(this.activeChannel)
-    }
+          this.onSelectFilter(filter)
+        }
+      })
   },
 
   methods: {
@@ -228,8 +233,12 @@ export default {
       })
     },
 
-    isActive (value) {
-      return this.isShowActive && this.activeChannel && this.activeChannel.value === value
+    isActive (value, type = 'channel') {
+      if (type === 'channel') {
+        return this.isShowActive && this.activeChannel && this.activeChannel.value === value
+      }
+
+      return this.selectedFilter?.id === value.id
     },
 
     getFilters () {
@@ -239,36 +248,40 @@ export default {
         this.personalFilters = response.data.data.user || []
         this.companyFilters = response.data.data.company || []
 
-        // format filters like inbox items then merge
-        let views = [{
-          label: 'Personal Views',
-          group: true,
-          value: '',
-          class: 'nav-list-group-title',
-          icon: '',
-          disabled: false
-        }]
-        const pinnedViews = this.personalFilters.map(filter => {
-          return {
-            label: filter.name,
-            value: `views-${filter.id}`,
-            icon: '',
-            disabled: false,
-            active: this.isActive(filter.name),
-            type: 'view',
-            viewId: filter.id,
-            viewFilter: filter.filter
-          }
-        })
-        views = this.$jsonClone(views).concat(pinnedViews)
+        // // format filters like inbox items then merge
+        // let views = [{
+        //   label: 'Personal Views',
+        //   group: true,
+        //   value: '',
+        //   class: 'nav-list-group-title',
+        //   icon: '',
+        //   disabled: false
+        // }]
+        // const pinnedViews = this.personalFilters.map(filter => {
+        //   return {
+        //     label: filter.name,
+        //     value: `views-${filter.id}`,
+        //     icon: '',
+        //     disabled: false,
+        //     active: this.isActive(filter.name),
+        //     type: 'view',
+        //     viewId: filter.id,
+        //     viewFilter: filter.filter
+        //   }
+        // })
+        // views = this.$jsonClone(views).concat(pinnedViews)
 
-        this.setInboxNavItems(this.$jsonClone(this.items).concat(views))
+        // this.setInboxNavItems(this.$jsonClone(this.items).concat(views))
 
         this.isGettingFilters = false
       })
     },
 
     onSelectFilter (filter) {
+      if (!filter) {
+        return
+      }
+
       this.setSelectedFilter(filter)
 
       // combine default filter values with the selected one
@@ -278,7 +291,10 @@ export default {
         ...pick(personalFilterObject, this.filterFields)
       }
 
+      const route = `views-${filter.id}`
+
       this.onApply()
+      this.onItemClicked(route)
     },
 
     onApply () {
