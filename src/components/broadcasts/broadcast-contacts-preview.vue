@@ -73,7 +73,7 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
-import { parseInt } from 'lodash'
+import { isEmpty, parseInt } from 'lodash'
 
 export default {
   name: 'broadcast-contacts-preview',
@@ -93,6 +93,11 @@ export default {
     filters: {
       type: [Array, Object],
       required: false
+    },
+
+    integration: {
+      type: Object,
+      default: () => ({})
     }
   },
 
@@ -153,15 +158,18 @@ export default {
   methods: {
     init () {
       switch (true) {
-        case this.list.type === 'contacts-list':
+        case !isEmpty(this.list):
           this.setContactsListFilter()
           this.loadContacts()
           break
-        case !!this.filters:
+        case !isEmpty(this.filters):
           this.setContactsFilters()
           this.loadContacts()
           break
-        // FIXME: integrations
+        case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
+          // FIXME: integrations
+          this.setIntegrationHubspot()
+          break
       }
     },
 
@@ -212,6 +220,10 @@ export default {
 
     setContactsFilters () {
       this.defaultFilters.filter_groups = this.filters
+    },
+
+    setIntegrationHubspot () {
+      console.log(this.integration.list)
     }
   },
 

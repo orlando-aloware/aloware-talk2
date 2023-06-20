@@ -185,9 +185,10 @@ export default {
     },
 
     footerComponent () {
+      console.log(!isEmpty(this.source.integration?.list))
       switch (true) {
-        // FIXME: use only source?
-        case this.currentStep.id === 1 && (!!this.source.list?.id || !isEmpty(this.source.filters)):
+        // FIXME: use mainComponentValid?
+        case this.currentStep.id === 1 && (this.source?.list?.id || !isEmpty(this.source.filters) || !isEmpty(this.source.integration?.list)):
           return 'broadcast-contacts-preview'
         case this.currentStep.id === 2 || this.currentStep.id === 3 || this.currentStep.id === 4:
           return 'broadcast-add-cards'
@@ -198,10 +199,12 @@ export default {
 
     footerComponentProps () {
       switch (true) {
-        case this.currentStep.id === 1 && !!this.source.list?.id:
-          return { list: this.source.list }
-        case this.currentStep.id === 1 && !isEmpty(this.source.filters):
-          return { filters: this.source.filters }
+        case this.currentStep.id === 1:
+          return {
+            list: this.source.list,
+            filters: this.source.filters,
+            integration: this.source.integration
+          }
         case this.currentStep.id === 2 || this.currentStep.id === 3:
           return {
             contactsLength: this.contactsLength,

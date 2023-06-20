@@ -33,12 +33,37 @@
 
       <!-- Integration option -->
       <template v-else-if="optionSelected === 'integration'">
-        <p>Select a contact list</p>
+        <p>Select a {{ integrationText }} list</p>
         <!-- shows the selector based on which integration is enabled  -->
+        <div v-if="integrationsEnabled.length > 1">
+          <q-select style="word-break: break-all;"
+                    color="primary"
+                    use-input
+                    emit-value
+                    map-options
+                    dense
+                    outlined
+                    hide-bottom-space
+                    :placeholder="!source.integration.name ? 'Select a integration' : ''"
+                    :options="integrationsEnabled"
+                    v-model="source.integration.name">
+          </q-select>
+        </div>
+
+        <integration-list-selector ref="integrationListSelector"
+                                   :use-chips="false"
+                                   :multiple="false"
+                                   :clearable="true"
+                                   :generic-styling="false"
+                                   :integration="source.integration.name"
+                                   v-if="source.integration.name"
+                                   @change="onIntegrationListChanged"/>
       </template>
 
+      <!-- Filters option -->
       <transition name="slide-left">
         <contacts-filters class="broadcast-add__contacts__filters"
+                          no-close-button
                           v-if="optionSelected === 'filter'"
                           @filtersUpdated="onFiltersUpdated"/>
       </transition>
@@ -50,16 +75,23 @@
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
+import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
+import { integrationMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-contacts',
 
+  mixins: [
+    integrationMixin
+  ],
+
   components: {
     CheckOIcon,
     ContactsFilters,
-    ContactsListSelector
+    ContactsListSelector,
+    IntegrationListSelector
   },
 
   props: {
@@ -78,13 +110,20 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-        case 'integration':
           return !!this.source.list.id
         case 'filter':
           return !isEmpty(this.source.filters)
+        case 'integration':
+          return false // FIXME
         default:
           return false
       }
+    },
+
+    integrationText () {
+      return this.integrationsEnabled.length > 1
+        ? 'Integration'
+        : this.integrationsEnabled[0]
     }
   },
 
@@ -116,6 +155,15 @@ export default {
       this.optionSelected = 'list'
     }
 
+    if (!isEmpty(this.defaultSource.filters)) {
+      this.optionSelected = 'filter'
+      this.openFilters()
+    }
+
+    if (!isEmpty(this.defaultSource.integration)) {
+      this.optionSelected = 'integration'
+    }
+
     this.source = this.defaultSource
   },
 
@@ -131,11 +179,21 @@ export default {
 
       // reset to default values when option changes
       this.reset()
+
+      // force integration value when there is only one enabled integration
+      if (option.value === 'integration' && this.integrationsEnabled.length === 1) {
+        this.source.integration.name = this.integrationsEnabled[0]
+
+        // use next tick to make sure ref is loaded
+        this.$nextTick()
+          .then(() => {
+            this.$refs.integrationListSelector.getListsOfEnabledIntegration()
+          })
+      }
     },
 
     onContactListSelected (list) {
       this.source.list = {
-        type: 'contacts-list',
         id: list.id,
         name: list.name
       }
@@ -143,6 +201,10 @@ export default {
 
     onFiltersUpdated () {
       this.source.filters = this.currentListFilters
+    },
+
+    onIntegrationListChanged (integration) {
+      this.source.integration.list = integration.list
     },
 
     reset () {
@@ -166,20 +228,12 @@ export default {
       this.$emit('input', state)
     },
 
-    source (value) {
-      this.$emit('source-updated', value)
+    source: {
+      deep: true,
+      handler (value) {
+        this.$emit('source-updated', value)
+      }
     }
   }
 }
 </script>
-
-<style>
-/* FIXME: move this to a animations file */
-.slide-left-enter {
-  transform: translateX(100%);
-}
-
-.slide-left-leave-active {
-  transform: translateX(100%);
-}
-</style>
