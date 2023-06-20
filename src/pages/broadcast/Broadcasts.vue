@@ -173,11 +173,14 @@
                  :columns="broadcastsColumns"
                  :isEmpty="isBroadcastsTableEmpty"
                  :showSelectAll="false"
-                 :paginated="false"
+                 :paginated="true"
+                 :showPagination="true"
+                 :lastPage="pagination.totalPages"
                  :total-rows="visibleBroadcasts?.length ?? 0"
                  :loading="loading"
                  @sort="onSortTable"
-                 @reordered="onColumnsReordered">
+                 @reordered="onColumnsReordered"
+                 @paginated="onPaginationChanged">
         <template slot="tbody">
           <tr v-for="(row, rowIndex) in visibleBroadcasts"
               v-bind:key="rowIndex">
@@ -536,7 +539,12 @@ export default {
     popupAction: '',
     popupActionList: [],
     popupLoadingAction: false,
-    popupRename: ''
+    popupRename: '',
+    pagination: {
+      perPage: 25,
+      totalPages: 1,
+      currentPage: 1
+    }
   }),
 
   mounted () {
@@ -554,8 +562,12 @@ export default {
       let filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
       let text = this.broadcastsSearchText.toLowerCase()
 
+      let { perPage, currentPage } = this.pagination
+      let paginationStart = perPage * (currentPage - 1)
+      let paginationEnd = (perPage * currentPage)
+
       if (!filter && !text) {
-        return this.broadcastData
+        return this.broadcastData.slice(paginationStart, paginationEnd)
       }
 
       return this.broadcastData
@@ -574,7 +586,7 @@ export default {
           }
 
           return matchText && matchType
-        })
+        }).slice(paginationStart, paginationEnd)
     },
 
     broadcastCounts () {
@@ -1003,6 +1015,26 @@ export default {
 
     onColumnsReordered (columnOrder) {
       this.broadcastsColumns = columnOrder
+    },
+
+    onPaginationChanged ({ page, per_page: perPage }) {
+      this.pagination.currentPage = page
+      this.pagination.perPage = perPage
+    }
+  },
+
+  watch: {
+    broadcastData (data) {
+      if (data.length === 0) {
+        this.pagination.totalPages = 1
+        return
+      }
+
+      this.pagination.totalPages = Math.floor(data.length / this.pagination.perPage)
+
+      if (data.length % this.pagination.perPage) {
+        this.pagination.totalPages++
+      }
     }
   }
 }
