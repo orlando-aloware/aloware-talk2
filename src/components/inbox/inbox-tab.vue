@@ -208,6 +208,7 @@ import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   name: 'inbox-tab',
@@ -238,7 +239,8 @@ export default {
         'channelChangedFilterFields',
         'appliedFilter',
         'isLoadingOpenTaskCount',
-        'isLoadingPendingTaskCount'
+        'isLoadingPendingTaskCount',
+        'activeChannel'
       ]
     ),
     ...mapState('contacts', [
@@ -390,13 +392,13 @@ export default {
       previousRoute: null,
       newFilterModel: {
         name: '',
-        type: 6,
+        type: ChannelType.CHANNEL_INBOX,
         filter: [],
         scope: 'user'
       },
       defaultFilterModel: {
         name: '',
-        type: 6,
+        type: ChannelType.CHANNEL_INBOX,
         filter: defaultFilterModel,
         scope: 'user'
       },

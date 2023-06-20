@@ -18,39 +18,23 @@ export default function () {
         value: 'inbox',
         icon: 'inbox',
         disabled: false
+      },
+      {
+        label: 'Channels',
+        group: true,
+        value: '',
+        class: 'nav-list-group-title',
+        icon: '',
+        disabled: false
+      },
+      {
+        label: 'Calls',
+        value: 'calls',
+        icon: 'call',
+        disabled: false,
+        type: 'call',
+        answerStatus: 'all'
       }
-      // {
-      //   label: 'Personal Filters',
-      //   group: true,
-      //   value: '',
-      //   class: 'nav-list-group-title',
-      //   icon: '',
-      //   disabled: false
-      // },
-      // {
-      //   label: 'Company Filters',
-      //   group: true,
-      //   value: '',
-      //   class: 'nav-list-group-title',
-      //   icon: '',
-      //   disabled: false
-      // },
-      // {
-      //   label: 'Channels',
-      //   group: true,
-      //   value: '',
-      //   class: 'nav-list-group-title',
-      //   icon: '',
-      //   disabled: false
-      // },
-      // {
-      //   label: 'Calls',
-      //   value: 'calls',
-      //   icon: 'call',
-      //   disabled: false,
-      //   type: 'call',
-      //   answerStatus: 'all'
-      // },
       // {
       //   label: 'Messages',
       //   value: 'messages',

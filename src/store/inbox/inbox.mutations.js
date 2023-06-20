@@ -173,5 +173,8 @@ export default {
   },
   SET_IS_INBOX_FILTERS_LOADED (state, value) {
     state.isInboxFiltersLoaded = value
+  },
+  SET_INBOX_NAV_ITEMS (state, value) {
+    state.items = value
   }
 }

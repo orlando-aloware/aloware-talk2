@@ -89,5 +89,8 @@ export default {
   },
   setIsInboxFiltersLoaded: ({ commit }, value) => {
     commit('SET_IS_INBOX_FILTERS_LOADED', value)
+  },
+  setInboxNavItems: ({ commit }, value) => {
+    commit('SET_INBOX_NAV_ITEMS', value)
   }
 }
