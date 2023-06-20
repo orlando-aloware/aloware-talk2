@@ -3577,7 +3577,7 @@ i.option-separator {
 }
 
 .inbox-side {
-  max-width: 508px;
+  max-width: 558px;
   width: 100% !important;
   background-color: $white;
   display: flex;
@@ -3599,7 +3599,7 @@ i.option-separator {
   }
 
   &__left {
-    max-width: 200px;
+    max-width: 250px;
     width: 100%;
     overflow: hidden;
 
@@ -8962,7 +8962,7 @@ span.mention {
 
 .inbox-wrapper {
   display: flex;
-  max-width: 508px;
+  max-width: 558px;
   width: 100%;
   flex: 0 0 100%;
 }
