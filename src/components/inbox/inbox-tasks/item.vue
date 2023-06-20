@@ -40,7 +40,8 @@
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
-               :class="callStatusClass">
+               :class="callStatusClass"
+               v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX].includes(contact.last_communication.type)">
             <q-tooltip>
               {{ communicationLabel }}
             </q-tooltip>
