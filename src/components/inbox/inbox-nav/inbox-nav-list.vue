@@ -22,12 +22,11 @@
              class="nav-list-group-title" />
 
     <nav-item icon=""
-              show-counts
               :value="filter.name"
               :label="filter.name"
-              :isActive="isActive(filter, 'view')"
+              :is-active="isActive(filter, 'view')"
               :key="`${filter.name}-${index}`"
-              :open-count="filter.open_count || 0"
+              :custom-count="filter.open_count || 0"
               v-for="(filter, index) in personalFilters"
               @click="onSelectFilter(filter)" />
 

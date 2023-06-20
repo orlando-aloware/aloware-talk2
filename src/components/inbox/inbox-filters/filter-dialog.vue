@@ -628,7 +628,12 @@ export default {
   },
 
   watch: {
-    '$route.params.channel': function () {
+    '$route.params.channel' (route) {
+      // hack to avoid filter reset for views
+      if (route.substr(0, 5) === 'views') {
+        return
+      }
+
       this.setSelectedFilter(null)
     },
 
