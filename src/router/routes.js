@@ -105,6 +105,14 @@ const routes = [
             meta: {
               title: 'Communications'
             }
+          },
+          {
+            path: 'views/:view',
+            name: 'Inbox View',
+            component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
           }
         ]
       },
