@@ -15,11 +15,12 @@
               badge-color="danger"
               @click="onItemClicked" />
     <hr>
+
     <nav-item icon=""
-             value=""
-             label="Personal Views"
-             :group="true"
-             class="nav-list-group-title" />
+              value=""
+              label="Personal Views"
+              :group="true"
+              class="nav-list-group-title" />
 
     <nav-item icon=""
               :value="filter.name"
@@ -30,6 +31,14 @@
               v-for="(filter, index) in personalFilters"
               @click="onSelectFilter(filter)" />
 
+    <div class="mx-2 mt-4">
+      <compact-btn custom-class="text-white text-center btn-block"
+                   variant="primary"
+                   tooltip-text="Add, update and delete your views"
+                   @clicked="toggleFilterDialog(true)">
+        <span class="flex-grow-1">Edit Views</span>
+      </compact-btn>
+    </div>
     <!--<nav-item icon=""-->
     <!--          value=""-->
     <!--          label="Company Views"-->
@@ -47,6 +56,7 @@
 </template>
 
 <script>
+import CompactBtn from 'src/components/compact-btn.vue'
 import NavItem from './inbox-nav-item'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
@@ -60,6 +70,7 @@ export default {
   name: 'inbox-nav-list',
 
   components: {
+    CompactBtn,
     NavItem
   },
 
@@ -172,15 +183,19 @@ export default {
   created () {
     this.getFilters()
       .then(() => {
-        if (this.$route.params?.channel && this.$route.params.channel.indexOf('views') !== -1) {
+        if (this.$route.params?.view && this.$route.params.view.indexOf('views') !== -1) {
           // get filterId based on URL
-          const filterId = +this.$route.params.channel.replace('views-', '')
+          const filterId = +this.$route.params.view.replace('views-', '')
           // get filter from personal filters list
           const filter = this.personalFilters.find(personalFilter => personalFilter.id === filterId)
 
-          this.onSelectFilter(filter)
+          this.onSelectFilter(filter, false)
         }
       })
+
+    this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
+      this.personalFilters = personalFilters
+    })
   },
 
   methods: {
@@ -189,24 +204,26 @@ export default {
       'setSelectedFilter',
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
-      'setInboxNavItems'
+      'setInboxNavItems',
+      'toggleFilterDialog',
+      'setInboxShowMyContacts'
     ]),
 
     onItemClicked (nextActive) {
-      if (!this.activeChannel) {
-        return
-      }
+      // if (!this.activeChannel) {
+      //   return
+      // }
 
-      if (this.activeChannel.value === nextActive) {
-        this.$q.screen.lt.md && this.$emit('toInbox')
-        return
-      }
+      // if (this.activeChannel.value === nextActive) {
+      //   this.$emit('toInbox')
+      //   return
+      // }
 
       this.active = nextActive
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
-      if (this.active !== 'inbox' && this.active.indexOf('views') === -1) {
+      if (this.active !== 'inbox' /* && this.active.indexOf('views') === -1 */) {
         this.$router.push({
           name: 'Inbox Channel',
           params: {
@@ -276,8 +293,8 @@ export default {
       })
     },
 
-    onSelectFilter (filter) {
-      if (!filter) {
+    onSelectFilter (filter, redirect = true) {
+      if (!filter || filter?.id === this.selectedFilter?.id) {
         return
       }
 
@@ -293,7 +310,15 @@ export default {
       const route = `views-${filter.id}`
 
       this.onApply()
-      this.onItemClicked(route)
+
+      if (redirect) {
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            view: route
+          }
+        })
+      }
     },
 
     onApply () {

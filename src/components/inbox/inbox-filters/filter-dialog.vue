@@ -12,7 +12,7 @@
            @shown="onShown">
     <div class="modal-body-wrapper d-flex">
       <div class="left-column-wrapper">
-        <span class="filter-type-description">{{ channelFilterName }} Filters</span>
+        <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-3">
           <div class="mb-4">
@@ -179,26 +179,30 @@ export default {
       const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
 
       if (isInbox || this.$route.params.channel === 'inbox') {
-        return 'Inbox'
+        return 'Inbox Filters'
       }
 
       if (this.$route.params.channel === 'messages') {
-        return 'Messages'
+        return 'Messages Filters'
       }
 
       if (this.$route.params.channel === 'voicemails') {
-        return 'Voice Messages'
+        return 'Voice Messages Filters'
       }
 
       if (this.$route.params.channel === 'mentions') {
-        return 'Mentions'
+        return 'Mentions Filters'
       }
 
       if (this.$route.params.channel === 'all-communications') {
-        return 'All Comms.'
+        return 'All Comms. Filters'
       }
 
-      return 'Calls & Recordings'
+      if (this.$route.params.view) {
+        return 'Views'
+      }
+
+      return 'Calls & Recordings Filters'
     },
 
     selectedFilterHasChanges () {
@@ -313,6 +317,8 @@ export default {
       }
 
       this.personalFilters.push(filter)
+
+      this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
     })
   },
 
@@ -527,7 +533,7 @@ export default {
       this.isGettingFilters = true
       const type = this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS
         ? ChannelType.CHANNEL_CALLS
-        : this.defaultFilterModel.type
+        : (this.$route.params.view ? null : this.defaultFilterModel.type)
 
       return talk2Api.V2.inbox.filters.get({ type: type }).then(response => {
         this.personalFilters = response.data.data.user || []
@@ -560,6 +566,8 @@ export default {
 
           if (index >= 0) {
             this.personalFilters[index] = updatedFilter
+
+            this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
           }
         }
       })
@@ -583,6 +591,8 @@ export default {
 
         if (!filter.is_on_company) {
           this.personalFilters = this.personalFilters.filter(item => item.id !== filter.id)
+
+          this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
         }
       })
     },
@@ -629,8 +639,7 @@ export default {
 
   watch: {
     '$route.params.channel' (route) {
-      // hack to avoid filter reset for views
-      if (route.substr(0, 5) === 'views') {
+      if (!route) {
         return
       }
 
