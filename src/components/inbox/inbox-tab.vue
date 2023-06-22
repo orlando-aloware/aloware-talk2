@@ -33,10 +33,11 @@
                            self="center middle">
                   {{ appliedFilter.name }}
                 </q-tooltip>
-                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
+                <!-- <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
                              color="#62666E"
                              class="filter-icon">
-                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
+                </filter-icon> -->
+                {{ !appliedFilter ? '' : appliedFilter.name }}
                 {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
               </compact-btn>
               <b-badge v-if="hasChannelFilterChanges"
@@ -200,7 +201,7 @@ import {
   unownedContactTaskMixin,
   contactV2AttributesMixin
 } from 'src/plugins/mixins'
-import FilterIcon from 'components/icons/filter-icon'
+// import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CompactBtn from 'components/compact-btn'
@@ -221,7 +222,16 @@ export default {
     contactV2AttributesMixin
   ],
 
-  components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
+  components: {
+    CreateFilterDialog,
+    FilterDialog,
+    CompactBtn,
+    SearchToggle,
+    InboxSearcher,
+    // FilterIcon,
+    InboxTaskList,
+    CallsHeader
+  },
 
   computed: {
     ...mapState([
@@ -527,6 +537,18 @@ export default {
         this.$refs.taskListScroller.scrollTop = 0
       })
 
+      // handle view instead of inbox if view param exists
+      if (this.$route.params?.view) {
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            status: this.statusText
+          }
+        })
+
+        return
+      }
+
       this.$router.push({
         name: 'Inbox Channel Task Status',
         params: {
@@ -651,6 +673,17 @@ export default {
       this.resetFilter()
       this.loadContactTasks()
       this.loadTaskCounts()
+
+      // force route to inbox if user in some view
+      if (this.$route.params?.view) {
+        this.$router.push({
+          name: 'Inbox Channel Task Status',
+          params: {
+            channel: 'inbox',
+            status: 'open'
+          }
+        })
+      }
     },
     onApplyFilter (filter) {
       this.filter = filter
