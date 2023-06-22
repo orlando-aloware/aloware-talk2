@@ -339,7 +339,8 @@ export default {
         this.$router.push({
           name: 'Inbox View',
           params: {
-            view: route
+            view: route,
+            status: 'open'
           }
         })
       }
@@ -475,7 +476,8 @@ export default {
           this.$router.push({
             name: 'Inbox View',
             params: {
-              view: 'view-' + this.selectedFilter.id
+              view: 'view-' + this.selectedFilter.id,
+              status: 'open'
             }
           })
         }
