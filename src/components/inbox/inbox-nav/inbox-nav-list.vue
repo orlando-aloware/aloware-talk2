@@ -229,7 +229,8 @@ export default {
       'setAppliedFilter',
       'setInboxNavItems',
       'toggleFilterDialog',
-      'setInboxShowMyContacts'
+      'setInboxShowMyContacts',
+      'setChannelClonedFilter'
     ]),
 
     onItemClicked (nextActive) {
@@ -259,6 +260,8 @@ export default {
 
         return
       }
+
+      this.onResetFilter()
 
       this.$router.push({
         name: 'Inbox Channel Task Status',
@@ -449,6 +452,15 @@ export default {
         my_contact: +this.filter.my_contact
       }
 
+      this.loadContactTasks()
+      this.fetchTaskCounts()
+    },
+
+    onResetFilter () {
+      this.filter = { ...this.defaultFilterModel.filter }
+      this.setChannelClonedFilter(this.filter)
+      this.resetChannelChangedFilterFields()
+      this.setAppliedFilter(null)
       this.loadContactTasks()
       this.fetchTaskCounts()
     }
