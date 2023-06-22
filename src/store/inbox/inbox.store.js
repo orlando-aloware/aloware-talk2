@@ -92,6 +92,7 @@ export default function () {
     channelChangedFilterFields: [],
     isFilterModelFormShown: false,
     isFilterDialogShown: false,
+    isFilterDialogForView: false,
     selectedFilter: null,
     appliedFilter: null,
     isLoadingOpenTaskCount: false,

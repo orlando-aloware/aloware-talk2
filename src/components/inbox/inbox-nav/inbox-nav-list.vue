@@ -55,7 +55,7 @@
       <compact-btn custom-class="text-white text-center btn-block"
                    variant="primary"
                    tooltip-text="Add, update and delete your views"
-                   @clicked="toggleFilterDialog(true)">
+                   @clicked="onEditViewsClicked">
         <span class="flex-grow-1">Edit Views</span>
       </compact-btn>
     </div>
@@ -230,7 +230,8 @@ export default {
       'setInboxNavItems',
       'toggleFilterDialog',
       'setInboxShowMyContacts',
-      'setChannelClonedFilter'
+      'setChannelClonedFilter',
+      'setFilterDialogForView'
     ]),
 
     onItemClicked (nextActive) {
@@ -456,6 +457,11 @@ export default {
       this.fetchTaskCounts()
     },
 
+    onEditViewsClicked () {
+      this.setFilterDialogForView(true)
+      this.toggleFilterDialog(true)
+    },
+
     onResetFilter () {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
@@ -479,19 +485,24 @@ export default {
     },
 
     isFilterDialogShown (state) {
-      // fix route try when filter dialog is closed and user is in some view
-      if (!state && this.$route.params?.view) {
-        const currentViewRouteId = +this.$route.params.view.replace('view-', '')
+      // when filter dialog is closed
+      if (!state) {
+        this.setFilterDialogForView(false)
 
-        // this means that the filter was changed but the route remained
-        if (currentViewRouteId !== this.selectedFilter.id) {
-          this.$router.push({
-            name: 'Inbox View',
-            params: {
-              view: 'view-' + this.selectedFilter.id,
-              status: 'open'
-            }
-          })
+        // fix route when user is in some view
+        if (this.$route.params?.view) {
+          const currentViewRouteId = +this.$route.params.view.replace('view-', '')
+
+          // this means that the filter was changed but the route remained
+          if (currentViewRouteId !== this.selectedFilter.id) {
+            this.$router.push({
+              name: 'Inbox View',
+              params: {
+                view: 'view-' + this.selectedFilter.id,
+                status: 'open'
+              }
+            })
+          }
         }
       }
     }

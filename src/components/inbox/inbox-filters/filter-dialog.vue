@@ -159,6 +159,7 @@ export default {
       'channelChangedFilterFields',
       'selectedFilter',
       'isFilterDialogShown',
+      'isFilterDialogForView',
       'channelClonedFilter',
       'isFilterModelFormShown',
       'appliedFilter',
@@ -178,6 +179,10 @@ export default {
     channelFilterName () {
       const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
 
+      if (this.isFilterDialogForView) {
+        return 'Views'
+      }
+
       if (isInbox || this.$route.params.channel === 'inbox') {
         return 'Inbox Filters'
       }
@@ -196,10 +201,6 @@ export default {
 
       if (this.$route.params.channel === 'all-communications') {
         return 'All Comms. Filters'
-      }
-
-      if (this.$route.params.view) {
-        return 'Views'
       }
 
       return 'Calls & Recordings Filters'
@@ -532,7 +533,7 @@ export default {
       this.isGettingFilters = true
       const type = this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS
         ? ChannelType.CHANNEL_CALLS
-        : (this.$route.params.view ? null : this.defaultFilterModel.type)
+        : (this.isFilterDialogForView ? null : this.defaultFilterModel.type)
 
       return talk2Api.V2.inbox.filters.get({ type: type }).then(response => {
         this.personalFilters = response.data.data.user || []

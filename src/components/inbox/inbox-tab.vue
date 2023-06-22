@@ -33,10 +33,10 @@
                            self="center middle">
                   {{ appliedFilter.name }}
                 </q-tooltip>
-                <!-- <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
+                <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
                              color="#62666E"
                              class="filter-icon">
-                </filter-icon> -->
+                </filter-icon>
                 {{ !appliedFilter ? '' : appliedFilter.name }}
                 {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
               </compact-btn>
@@ -201,7 +201,7 @@ import {
   unownedContactTaskMixin,
   contactV2AttributesMixin
 } from 'src/plugins/mixins'
-// import FilterIcon from 'components/icons/filter-icon'
+import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CompactBtn from 'components/compact-btn'
@@ -228,7 +228,7 @@ export default {
     CompactBtn,
     SearchToggle,
     InboxSearcher,
-    // FilterIcon,
+    FilterIcon,
     InboxTaskList,
     CallsHeader
   },

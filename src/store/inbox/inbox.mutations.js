@@ -121,6 +121,9 @@ export default {
   TOGGLE_FILTER_DIALOG: (state, isShown = false) => {
     state.isFilterDialogShown = isShown
   },
+  SET_FILTER_DIALOG_FOR_VIEW: (state, value = false) => {
+    state.isFilterDialogForView = value
+  },
   SET_SELECTED_FILTER: (state, filter) => {
     state.selectedFilter = filter
   },

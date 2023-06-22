@@ -59,6 +59,9 @@ export default {
   toggleFilterDialog: ({ commit }, isShown = false) => {
     commit('TOGGLE_FILTER_DIALOG', isShown)
   },
+  setFilterDialogForView: ({ commit }, state) => {
+    commit('SET_FILTER_DIALOG_FOR_VIEW', state)
+  },
   setSelectedFilter: ({ commit }, selectedFilter) => {
     commit('SET_SELECTED_FILTER', selectedFilter)
   },
