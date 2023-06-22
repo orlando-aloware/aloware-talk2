@@ -14,13 +14,15 @@
               badge-value="20"
               badge-color="danger"
               @click="onItemClicked" />
-    <hr>
+
+    <hr v-if="personalFilters.length">
 
     <nav-item icon=""
               value=""
               label="Personal Views"
               :group="true"
-              class="nav-list-group-title" />
+              class="nav-list-group-title"
+              v-if="personalFilters.length" />
 
     <nav-item icon=""
               :value="filter.name"
@@ -31,6 +33,24 @@
               v-for="(filter, index) in personalFilters"
               @click="onSelectFilter(filter)" />
 
+    <hr v-if="companyFilters.length">
+
+    <nav-item icon=""
+              value=""
+              label="Company Views"
+              :group="true"
+              class="nav-list-group-title"
+              v-if="companyFilters.length"/>
+
+    <nav-item icon=""
+              :value="filter.name"
+              :label="filter.name"
+              :is-active="isActive(filter, 'view')"
+              :key="`${filter.name}-${index}`"
+              :custom-count="filter.open_count || 0"
+              v-for="(filter, index) in companyFilters"
+              @click="onSelectFilter(filter)" />
+
     <div class="mx-2 mt-4">
       <compact-btn custom-class="text-white text-center btn-block"
                    variant="primary"
@@ -39,6 +59,7 @@
         <span class="flex-grow-1">Edit Views</span>
       </compact-btn>
     </div>
+
     <!--<nav-item icon=""-->
     <!--          value=""-->
     <!--          label="Company Views"-->
@@ -103,7 +124,8 @@ export default {
     ...mapState('inbox', [
       'items',
       'activeChannel',
-      'selectedFilter'
+      'selectedFilter',
+      'isFilterDialogShown'
     ]),
 
     isShowActive () {
@@ -183,9 +205,9 @@ export default {
   created () {
     this.getFilters()
       .then(() => {
-        if (this.$route.params?.view && this.$route.params.view.indexOf('views') !== -1) {
+        if (this.$route.params?.view) {
           // get filterId based on URL
-          const filterId = +this.$route.params.view.replace('views-', '')
+          const filterId = +this.$route.params.view.replace('view-', '')
           // get filter from personal filters list
           const filter = this.personalFilters.find(personalFilter => personalFilter.id === filterId)
 
@@ -193,6 +215,7 @@ export default {
         }
       })
 
+    // listen to filter updates
     this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
       this.personalFilters = personalFilters
     })
@@ -223,7 +246,7 @@ export default {
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
-      if (this.active !== 'inbox' /* && this.active.indexOf('views') === -1 */) {
+      if (this.active !== 'inbox') {
         this.$router.push({
           name: 'Inbox Channel',
           params: {
@@ -307,7 +330,8 @@ export default {
         ...pick(personalFilterObject, this.filterFields)
       }
 
-      const route = `views-${filter.id}`
+      // view route name definition
+      const route = `view-${filter.id}`
 
       this.onApply()
 
@@ -438,6 +462,23 @@ export default {
       if (this.value !== undefined && this.active !== this.value) {
         this.$emit('active', this.items.find(item => item.value === val))
         this.$emit('update:value', val)
+      }
+    },
+
+    isFilterDialogShown (state) {
+      // fix route try when filter dialog is closed and user is in some view
+      if (!state && this.$route.params?.view) {
+        const currentViewRouteId = +this.$route.params.view.replace('view-', '')
+
+        // this means that the filter was changed but the route remained
+        if (currentViewRouteId !== this.selectedFilter.id) {
+          this.$router.push({
+            name: 'Inbox View',
+            params: {
+              view: 'view-' + this.selectedFilter.id
+            }
+          })
+        }
       }
     }
   }
