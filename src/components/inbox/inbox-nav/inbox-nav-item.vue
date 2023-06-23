@@ -50,6 +50,8 @@
          v-else>
       {{ label }}
     </div>
+
+    <slot name="action-icon"/>
   </div>
 </template>
 

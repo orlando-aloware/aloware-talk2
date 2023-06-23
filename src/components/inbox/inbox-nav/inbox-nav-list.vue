@@ -15,70 +15,46 @@
               badge-color="danger"
               @click="onItemClicked" />
 
-    <hr v-if="personalFilters.length">
+    <hr>
 
     <nav-item icon=""
               value=""
-              label="Personal Views"
+              label="Views"
               :group="true"
-              class="nav-list-group-title"
-              v-if="personalFilters.length" />
+              class="nav-list-group-title d-flex align-items-center justify-content-between"
+              v-if="personalFilters.length">
+      <template #action-icon>
+        <span class="mr-3"
+              @click="onEditViewsClicked">
+        <pencil-icon class="cursor-pointer"
+                     id="edit-views-icon"
+                     color="#256eff">
+        </pencil-icon>
+        </span>
+      </template>
+    </nav-item>
 
-    <nav-item icon=""
+    <!-- list only pinned views -->
+    <!-- <nav-item icon=""
               :value="filter.name"
               :label="filter.name"
               :is-active="isActive(filter, 'view')"
               :key="`${filter.name}-${index}`"
               :custom-count="filter.open_count || 0"
               v-for="(filter, index) in personalFilters"
-              @click="onSelectFilter(filter)" />
+              @click="onSelectFilter(filter)" /> -->
 
-    <hr v-if="companyFilters.length">
-
-    <nav-item icon=""
-              value=""
-              label="Company Views"
-              :group="true"
-              class="nav-list-group-title"
-              v-if="companyFilters.length"/>
-
-    <nav-item icon=""
-              :value="filter.name"
-              :label="filter.name"
-              :is-active="isActive(filter, 'view')"
-              :key="`${filter.name}-${index}`"
-              :custom-count="filter.open_count || 0"
-              v-for="(filter, index) in companyFilters"
-              @click="onSelectFilter(filter)" />
-
-    <div class="mx-2 mt-4">
-      <compact-btn custom-class="text-white text-center btn-block"
-                   variant="primary"
-                   tooltip-text="Add, update and delete your views"
-                   @clicked="onEditViewsClicked">
-        <span class="flex-grow-1">Edit Views</span>
-      </compact-btn>
-    </div>
-
-    <!--<nav-item icon=""-->
-    <!--          value=""-->
-    <!--          label="Company Views"-->
-    <!--          :group="true"-->
-    <!--          class="nav-list-group-title" />-->
-
-    <!--<nav-item icon=""-->
-    <!--          :value="filter.name"-->
-    <!--          :label="filter.name"-->
-    <!--          :isActive="isActive(filter.name)"-->
-    <!--          :key="filter.name"-->
-    <!--          v-for="filter in companyFilters">-->
-    <!--          @click="onSelectFilter(filter)" />-->
+    <inbox-views target="#edit-views-icon"
+                 :show="isEditingViews"
+                 :views="[...personalFilters, ...companyFilters]"
+                 @closed="onEditViewsClosed"/>
   </div>
 </template>
 
 <script>
-import CompactBtn from 'src/components/compact-btn.vue'
 import NavItem from './inbox-nav-item'
+import PencilIcon from 'src/components/icons/pencil-icon.vue'
+import InboxViews from 'src/components/inbox/inbox-views.vue'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import { pick, get } from 'lodash'
@@ -91,7 +67,8 @@ export default {
   name: 'inbox-nav-list',
 
   components: {
-    CompactBtn,
+    InboxViews,
+    PencilIcon,
     NavItem
   },
 
@@ -198,7 +175,8 @@ export default {
         filter: defaultFilterModel,
         scope: 'user'
       },
-      filter: defaultFilterModel
+      filter: defaultFilterModel,
+      isEditingViews: false
     }
   },
 
@@ -228,7 +206,6 @@ export default {
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
       'setInboxNavItems',
-      'toggleFilterDialog',
       'setInboxShowMyContacts',
       'setChannelClonedFilter',
       'setFilterDialogForView'
@@ -458,8 +435,11 @@ export default {
     },
 
     onEditViewsClicked () {
-      this.setFilterDialogForView(true)
-      this.toggleFilterDialog(true)
+      this.isEditingViews = !this.isEditingViews
+    },
+
+    onEditViewsClosed () {
+      this.isEditingViews = false
     },
 
     onResetFilter () {
