@@ -561,7 +561,7 @@ export default {
 
       // remove duplicate filter(s)
       // if the array have more than one node, means that its duplicated
-      filters = filters.slice(0, 1)
+      filters = (filters || []).slice(0, 1)
 
       allFilters[this.filterGroupIndex].filters[this.filter.key] = filters
 
