@@ -35,6 +35,11 @@ export default {
 
   methods: {
     setup (newRoute = false) {
+      // @custom for The Moderate Genius Reseller
+      if (this.currentCompany && this.currentCompany.reseller_id !== 2132) {
+        return
+      }
+
       if (!this.authenticated || !this.profile?.enabled || this.isWhiteLabel) {
         return
       }
@@ -61,6 +66,8 @@ export default {
             this.intercomBannerHeight = intercomIframeHeight
           }, 1 * 1000)
         }
+      }).catch(err => {
+        console.log(err)
       })
     },
 
@@ -116,8 +123,6 @@ export default {
     processSetup (newRoute = false) {
       if (!this.hasReporterAccess &&
         !this.isWhiteLabel &&
-        this.currentCompany &&
-        !this.currentCompany.reseller_id &&
         this.profile &&
         process.env.APP_ENV !== 'local') {
         this.setup(newRoute)
