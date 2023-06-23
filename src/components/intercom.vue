@@ -35,8 +35,8 @@ export default {
 
   methods: {
     setup (newRoute = false) {
-      // @custom for The Moderate Genius Reseller
-      if (this.currentCompany && this.currentCompany.reseller_id === 2132) {
+      // @custom for The Moderate Genius Reseller & SimpSocial
+      if (this.currentCompany && [2132, 357].includes(this.currentCompany.reseller_id)) {
         return
       }
 
