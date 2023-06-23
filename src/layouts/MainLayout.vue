@@ -631,6 +631,13 @@ export default {
       this.processActionNotification(communication, 'sms')
     }
 
+    this.mainListeners.newInAppHighSmsVolume = ({ incomingNumber, contact, direction }) => {
+      if (this.profile.sleep_mode) {
+        return
+      }
+      this.handleDesktopHighSmsVolumeNotification(incomingNumber, contact, direction)
+    }
+
     this.mainListeners.newInAppVoicemail = (communication) => {
       if (!this.checkCommunicationMatchesUserAccessibility(communication) || this.profile.sleep_mode) {
         return
@@ -1141,6 +1148,7 @@ export default {
       this.$VueEvent.listen('new_in_app_sms', this.mainListeners.newInAppSms)
       this.$VueEvent.listen('new_in_app_voicemail', this.mainListeners.newInAppVoicemail)
       this.$VueEvent.listen('new_desktop_contact_assigned', this.mainListeners.newDesktopContactAssigned)
+      this.$VueEvent.listen('new_in_app_high_sms_volume', this.mainListeners.newInAppHighSmsVolume)
       this.$VueEvent.listen('new_desktop_appointment', this.mainListeners.newDesktopAppointment)
       this.$VueEvent.listen('new_desktop_reminder', this.mainListeners.newDesktopReminder)
       this.$VueEvent.listen('new_desktop_call', this.mainListeners.newDesktopCall)
@@ -1168,6 +1176,7 @@ export default {
       this.$VueEvent.stop('new_in_app_sms', this.mainListeners.newInAppSms)
       this.$VueEvent.stop('new_in_app_voicemail', this.mainListeners.newInAppVoicemail)
       this.$VueEvent.stop('new_desktop_contact_assigned', this.mainListeners.newDesktopContactAssigned)
+      this.$VueEvent.stop('new_in_app_high_sms_volume', this.mainListeners.newInAppHighSmsVolume)
       this.$VueEvent.stop('new_desktop_appointment', this.mainListeners.newDesktopAppointment)
       this.$VueEvent.stop('new_desktop_reminder', this.mainListeners.newDesktopReminder)
       this.$VueEvent.stop('new_desktop_call', this.mainListeners.newDesktopCall)
@@ -2158,6 +2167,59 @@ export default {
           })
         })
 
+        this.bounceDock()
+        this.increaseAppBadge()
+      }
+    },
+
+    handleDesktopHighSmsVolumeNotification (incomingNumber, contact, direction) {
+      const found = this.contactNotifiedDesktop.length &&
+        this.contactNotifiedDesktop.find(item => item.id === contact.id)
+      if (window.Push.Permission.has() && !found) {
+        const self = this
+        const title = 'Sent too many messages to a contact'
+        const onClickFunction = function (res) {
+          window.focus()
+          self.closeDesktopNotification(contact.id, 'contact')
+          self.decreaseAppBadge()
+          self.restoreApp()
+          self.$router
+            .push({
+              name: 'Contact',
+              params: {
+                contactObj: contact,
+                contactId: contact.id
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        }
+        const options = {
+          icon: 'notification-icons/contact.png',
+          body: `Name: ${this.$options.filters.fixName(
+            this.sanitizeText(contact.name)
+          )} Phone number: ${this.$options.filters.fixPhone(
+            contact.phone_number
+          )}.`,
+          tag: 'contact-notification-' + contact.id,
+          requireInteraction: true,
+          timeout: 10000,
+          onClick: onClickFunction,
+          onError: (err) => {
+            self.removeContactNotifiedDesktop(contact.id)
+            console.log(err)
+          },
+          onClose: () => {
+            self.removeContactNotifiedDesktop(contact.id)
+          }
+        }
+        window.Push.create(title, options).then((data) => {
+          this.addVoicemailNotifiedDesktop({
+            id: contact.id,
+            close: data.close
+          })
+        })
         this.bounceDock()
         this.increaseAppBadge()
       }
