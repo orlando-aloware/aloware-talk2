@@ -16,6 +16,7 @@
               color="primary"
               option-value="id"
               option-label="name"
+              option-disable="enabled"
               input-debounce="0"
               style="word-break: break-all;"
               use-input
@@ -51,7 +52,9 @@
       </template>
 
       <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps"
+        <q-item :clickable="scope.opt.enabled === false ? false : true"
+                :disabled="scope.opt.enabled === false ? true : false"
+                v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
           <q-item-section>
             <q-item-label v-html="scope.opt.name"/>
@@ -123,27 +126,38 @@ export default {
       type: String,
       required: false
     },
+
     label: {
       type: String,
       default: 'Contact Ring Groups'
     },
+
     genericMultiselect: {
       type: Boolean,
       default: true
     },
+
     highlighted: {
       type: Boolean,
       default: false
     },
+
     highlightedClass: {
       type: String,
       default: 'q-field--highlighted'
     },
+
     isGenericSelectorStyle: {
       type: Boolean,
       default: false
     },
+
     clearable: {
+      type: Boolean,
+      default: false
+    },
+
+    splitByQueued: {
       type: Boolean,
       default: false
     }
@@ -159,10 +173,12 @@ export default {
   },
 
   computed: {
-    ...mapState(['ringGroups']),
+    ...mapState({
+      allRingGroups: 'ringGroups'
+    }),
 
     filteredRingGroups () {
-      return this.ringGroups.filter(ringGroup => !ringGroup.call_waiting)
+      return this.allRingGroups.filter(ringGroup => !ringGroup.call_waiting)
     },
 
     placeholder () {
@@ -188,32 +204,57 @@ export default {
       }
 
       return []
+    },
+
+    regularRingGroups () {
+      return this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.should_queue === false)
+    },
+
+    queuedRingGroups () {
+      return this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.should_queue === true)
+    },
+
+    groupedRingGroups () {
+      const regularGroupOption = { id: 0, name: 'Regular Ring Groups', enabled: false }
+      const queuedGroupOption = { id: 0, name: 'Queued Ring Groups', enabled: false }
+
+      return [
+        regularGroupOption,
+        ...this.regularRingGroups,
+        queuedGroupOption,
+        ...this.queuedRingGroups
+      ]
+    },
+
+    ringGroups () {
+      return this.splitByQueued ? this.groupedRingGroups : this.ringGroupsAlphabeticalOrder
     }
   },
 
   created () {
-    this.options = this.ringGroupsAlphabeticalOrder
+    this.options = this.ringGroups
   },
 
   methods: {
     filterFn (val, update) {
+      console.log('update')
       if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.options = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.id === this.selectedId)
+          this.options = this.ringGroups.filter(ringGroup => ringGroup.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.options = this.ringGroupsAlphabeticalOrder
+          this.options = this.ringGroups
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.ringGroupsAlphabeticalOrder.filter(ringGroup => ringGroup.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.ringGroups.filter(ringGroup => ringGroup.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     updateRingGroups (val) {
