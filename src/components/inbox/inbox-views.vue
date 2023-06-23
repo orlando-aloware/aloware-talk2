@@ -8,11 +8,13 @@
              @hidden="onClosed">
     <div class="d-flex flex-column"
          style="height: 350px; width: 350px;">
-      <search placeholder="Search Views"
+      <search class="py-1"
+              placeholder="Search Views"
+              :border="false"
               :search="search"
               @search="onSearch"/>
 
-      <div class="bordered-bottom flex-grow-1 d-flex flex-column px-3 overflow-auto">
+      <div class="bordered-bottom bordered-top flex-grow-1 d-flex flex-column px-3 overflow-auto">
         <div class="d-flex p-2 align-items-center"
              :key="view.id"
              v-for="view in filteredViews">
@@ -27,7 +29,7 @@
         </div>
       </div>
 
-      <span class="p-2 cursor-pointer"
+      <span class="p-3 text-bold text-grey-90 cursor-pointer"
             @click="onCreateViewClicked">
         Create View
       </span>
