@@ -602,7 +602,7 @@ export default {
     },
 
     getLocation (communication) {
-      return communication.city + ((communication.city && communication.state) ? ', ' : '') + communication.state
+      return (communication.city || '') + ((communication.city && communication.state) ? ', ' : '') + (communication.state || '')
     },
 
     setExpandedItem (index) {
