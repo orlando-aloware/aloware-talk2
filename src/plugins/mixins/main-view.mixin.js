@@ -16,7 +16,7 @@ export default {
     ...mapGetters('powerDialer', ['myQueueId']),
 
     isMainView () {
-      const isListPages = this.isContacts || this.isPowerDialer
+      const isListPages = this.$route.name === 'Power Dialer' || this.$route.name === 'Contacts'
 
       return isListPages && this.$route.path && !this.$route.path.includes('/add')
     },
@@ -27,14 +27,6 @@ export default {
         this.listAddRemoveContactsProgress.loading
 
       return this.isLoading || isListLoading
-    },
-
-    isPowerDialer () {
-      return this.$route.name === 'Power Dialer'
-    },
-
-    isContacts () {
-      return this.$route.name === 'Contacts'
     }
   },
 

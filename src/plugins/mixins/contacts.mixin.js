@@ -1019,7 +1019,7 @@ export default {
     },
 
     isPowerDialer () {
-      const routeMetaId = _.get(this.$route, 'meta.id', null)
+      const routeMetaId = this.$route?.meta?.id
       const notInAddContactsRoute = routeMetaId !== 'power-dialer-add-list' &&
         routeMetaId !== 'power-dialer-add-queue-list'
 
@@ -1027,7 +1027,7 @@ export default {
     },
 
     isPowerDialerAddContacts () {
-      const routeMetaId = _.get(this.$route, 'meta.id', null)
+      const routeMetaId = this.$route?.meta?.id
       const inAddContactsRoute = routeMetaId && routeMetaId.toString().includes('power-dialer-add-')
 
       return this.$route.name === 'Power Dialer' && inAddContactsRoute
