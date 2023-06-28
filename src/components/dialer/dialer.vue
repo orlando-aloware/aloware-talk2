@@ -537,7 +537,7 @@ export default {
          */
         // initialize twilio client
         this.device.initialize(this.dialer.token, {
-          edge: ['ashburn', 'roaming'],
+          edge: ['umatilla', 'ashburn', 'roaming'],
           codecPreferences: ['opus', 'pcmu']
         })
 
