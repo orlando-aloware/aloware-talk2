@@ -270,8 +270,8 @@ export default {
 
         const compare = function (a, b) {
           // Use toUpperCase() to ignore character casing
-          const filterA = a.label.toUpperCase()
-          const filterB = b.label.toUpperCase()
+          const filterA = a.label?.toUpperCase()
+          const filterB = b.label?.toUpperCase()
 
           return filterA > filterB
             ? 1

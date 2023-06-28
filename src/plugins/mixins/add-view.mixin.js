@@ -3,31 +3,12 @@ import { isEmpty, get } from 'lodash'
 export default {
   data () {
     return {
-      addViewListeners: {}
+      addViewListeners: {},
+      contactCount: 0
     }
   },
 
   computed: {
-    id () {
-      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
-        return this.$route.params.id
-      }
-
-      if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
-        return this.$route.params.id
-      }
-
-      if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
-        return this.$route.params.id
-      }
-
-      if (this.$route.name !== 'Contacts' && this.$route.name !== 'Power Dialer') {
-        return null
-      }
-
-      return 'all'
-    },
-
     addContactsGuideText () {
       return this.openEdit
         ? 'You can add contacts either by manually selecting them or by creating a filter'

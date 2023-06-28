@@ -122,7 +122,7 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import { integrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -180,7 +180,12 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapGetters('powerDialer', ['myQueueId']),
+    ...mapGetters('powerDialer', [
+      'myQueueId',
+      'currentListFilters'
+    ]),
+
+    ...mapState(['isDatatableSelectedAll']),
 
     isOpen: {
       get () {
@@ -199,6 +204,18 @@ export default {
         'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers'),
         'own_contacts_only': this.conversion.includes('own_contacts_only'),
         'direction': this.direction
+      }
+
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+
+        if (params?.contact_ids) {
+          delete params.contact_ids
+        }
+      }
+
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.currentListFilters
       }
 
       if (this.where === 'scheduled') {

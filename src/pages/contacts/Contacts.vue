@@ -20,7 +20,7 @@
                    :is-editable="isEditable"
                    :search="search"
                    :is-my-contacts-view="isMyContactsView"
-                   :is-loading="isLoading"
+                   :is-loading="isComponentLoading"
                    :columns="columns"
                    :is-empty="isEmpty"
                    :is-loading-more="isLoadingMore"
@@ -30,14 +30,17 @@
                    @checkboxChanged="onFetchMyContacts"
                    @sort="onSortByField"
                    @paginated="onPaginate"
-                   @loadMore="onLoadMore">
+                   @loadMore="onLoadMore"
+                   @onSelectedCountChange="onSelectedCountChange">
       </router-view>
     </div>
     <remove-folder-dialog v-if="isActive"/>
     <column-headers :previousRelations="previousRelations"
                     v-if="isActive"/>
-    <remove-contact v-if="isActive"/>
-    <remove-contact-confirmation v-if="isActive"
+    <remove-contact :selected-count="selectedContactsCount"
+                    v-if="isActive"/>
+    <remove-contact-confirmation :selected-count="selectedContactsCount"
+                                 v-if="isActive"
                                  @contactsRemoved="onRemoveContacts"/>
     <move-dialog v-if="isActive"/>
     <create-list-modal v-if="isActive"/>
@@ -65,7 +68,7 @@ import {
   aclMixin,
   visibilityMixin,
   contactsListFiltersMixin,
-  contactListCountMixin
+  contactListCountMixin, mainViewMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Contact from 'pages/contacts/Contact'
@@ -85,7 +88,8 @@ export default {
     aclMixin,
     visibilityMixin,
     contactsListFiltersMixin,
-    contactListCountMixin
+    contactListCountMixin,
+    mainViewMixin
   ],
 
   components: {
@@ -173,14 +177,15 @@ export default {
       'setShowContactsHeader',
       'setUnsavedList',
       'setListContactOwner',
-      'setAllContactsSelected',
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
       'setShowContactResourceUnavailable'
     ]),
 
-    ...mapActions(['setDefaultDateFilter']),
+    ...mapActions([
+      'setDefaultDateFilter'
+    ]),
 
     toggleSidebar () {
       this.setShowContactsListSidebar(false)
@@ -213,6 +218,9 @@ export default {
 
   watch: {
     $route (to, from) {
+      this.setAllContactsSelected(false)
+      this.setIsDatatableSelectedAll(false)
+
       if (to.name.includes('Contact')) {
         this.setShowContactResourceUnavailable(false)
       }
@@ -294,6 +302,8 @@ export default {
     if (to.name !== 'Contact') {
       this.stopEvents()
     }
+
+    this.stopMainViewEvents()
 
     setTimeout(() => {
       this.setAllContactsSelected(false)

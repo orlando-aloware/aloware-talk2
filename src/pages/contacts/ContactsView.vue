@@ -253,8 +253,9 @@
     </template>
     <template slot="actions">
       <bulk-action-menu :id="id"
-                        v-if="checked.length > 0"
-                        @onSetAllContactsSelected="onCheckAllItemsFromTheList" />
+                        :total-rows="totalRows"
+                        :checked-count="selectedAllCount"
+                        @onSelectedAll="onSelectedAll" />
     </template>
 
     <template slot="table">
@@ -267,10 +268,10 @@
                  :contact-list-id="id"
                  :paginated="false"
                  :show-pagination="!isStartState"
-                 :total-rows="fixedContactsData.total"
                  :current-page="fixedContactsData.current_page"
                  :last-page="fixedContactsData.last_page"
                  :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
+                 :total-rows="totalRows"
                  v-if="listItemsHasData"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
@@ -799,7 +800,6 @@ export default {
     ...mapGetters('contacts', [
       'lists',
       'listItems',
-      'selectedContacts',
       'isFiltersOpen',
       'selectedList',
       'currentListFilters',
@@ -1151,33 +1151,24 @@ export default {
     },
 
     onCheckAllItems (checked) {
-      const items = { data: [] }
+      let checkedItems = []
+
+      if (!checked) {
+        this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+        return
+      }
 
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           if (checked) {
-            items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
+            checkedItems.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
           } else {
-            items.data = items.data.filter(item => item.id !== Number(checkbox.value))
+            checkedItems = checkedItems.filter(item => item.id !== Number(checkbox.value))
           }
         })
 
-      this.setAllContactsSelected(false)
-      this.setListSelectedContacts({ id: this.id, contacts: items.data })
-    },
-
-    onCheckAllItemsFromTheList (checked) {
-      const items = { data: [] }
-
-      document
-        .querySelectorAll('.checker')
-        .forEach((checkbox) => {
-          items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
-        })
-
-      this.setAllContactsSelected(true)
-      this.setListSelectedContacts({ id: this.id, contacts: items.data })
+      this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
     },
 
     onEditColumnsClicked () {
@@ -1236,8 +1227,12 @@ export default {
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
 
+        const params = {
+          filters: _.pickBy(this.currentListFilters)
+        }
+
         return this.$axios
-          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
+          .put('/api/v2/contacts-list/' + this.selectedList.id, params)
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)

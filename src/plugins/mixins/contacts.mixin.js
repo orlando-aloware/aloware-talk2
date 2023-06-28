@@ -82,13 +82,16 @@ export default {
       'setPreviousListId',
       'updateContactsListFilter',
       'addAxiosUniqueId',
-      'removeAxiosUniqueId'
+      'removeAxiosUniqueId',
+      'setAllContactsSelected'
     ]),
 
     ...mapActions('powerDialer', [
       'updateMyQueueListData',
       'setSelectedPDList'
     ]),
+
+    ...mapActions(['setIsDatatableSelectedAll']),
 
     ...mapMutations('powerDialer', ['SET_FILTERED_ENDPOINT']),
 
@@ -192,10 +195,7 @@ export default {
             // Load contacts and force concatenation
             this.contactsLoaded(data, true)
             this.markCheckedAll()
-
-            if (this.isPowerDialer || this.isPowerDialerAddContacts) {
-              this.forcedCheckAllItems()
-            }
+            this.forcedCheckAllItems()
           })
           .finally(() => {
             this.isLoadingMore = false
@@ -328,6 +328,9 @@ export default {
         type: list.type
       })
 
+      this.setAllContactsSelected(false)
+      this.setIsDatatableSelectedAll(false)
+
       return this.$axios
         .get(this.apiEndpoint(queued), {
           params: queryString,
@@ -336,6 +339,7 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          // clear out selections every contact fetch request
           this.removeAxiosUniqueId(axiosUniqueId)
 
           if (this.isInPowerDialerList) {
@@ -398,12 +402,12 @@ export default {
       let eventListId = null
 
       if (typeof this.getCleanedListId !== 'undefined') {
-        eventListId = this.getCleanedListId(this.powerDialerListAddRemoveContactsProgress?.id)
+        eventListId = this.getCleanedListId(this.listAddRemoveContactsProgress?.id)
       }
 
-      // prevent fetching contacts when PD is still in-progress
-      // in adding contacts if current list is the affected list
-      if (this.isInPowerDialerList && this.powerDialerListAddRemoveContactsProgress?.loading &&
+      // prevent fetching contacts when in-progress in adding contacts
+      // if current list is the affected list
+      if (this.isInPowerDialerList && this.listAddRemoveContactsProgress?.loading &&
         this.cleanedListId === eventListId) {
         return
       }
@@ -501,7 +505,8 @@ export default {
       query.filter_groups = []
 
       // initial filter for static contact lists
-      if (this.list && this.list.type === ContactListTypes.STATIC) {
+      if (this.list && this.list.type === ContactListTypes.STATIC && this.$route.path &&
+        !this.$route.path.includes('/add')) {
         query.list_id = this.id
       }
 
@@ -606,9 +611,10 @@ export default {
 
     forcedCheckAllItems () {
       const elem = document.querySelector('.data-table-check-all')
+      const id = this.tempId || this.id
 
-      if (elem.checked) {
-        this.setListSelectedContacts({ id: this.tempId, contacts: this.contactsData.data })
+      if (elem?.checked) {
+        this.setListSelectedContacts({ id: id, contacts: this.contactsData.data })
       }
     },
 
@@ -974,15 +980,12 @@ export default {
     ]),
 
     id () {
-      if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {
-        return this.$route.params.id
-      }
+      const isContactsPages = ['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)
+      const isPowerDialerPages = ['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)
+      const isOtherPDPages = ['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)
+      const isAddPages = this.$route.path && this.$route.path.includes('/add')
 
-      if (['power-dialer', 'power-dialer-queue-filter'].includes(this.$route.meta.id)) {
-        return this.$route.params.id
-      }
-
-      if (['power-dialer-session', 'power-dialer-list', 'power-dialer-list-filter'].includes(this.$route.meta.id)) {
+      if (isContactsPages || isPowerDialerPages || isOtherPDPages || isAddPages) {
         return this.$route.params.id
       }
 

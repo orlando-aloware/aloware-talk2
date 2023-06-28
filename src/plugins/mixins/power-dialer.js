@@ -46,10 +46,6 @@ export default {
 
     dialogName () {
       return `remove-power-dialer-item-dialog`
-    },
-
-    cleanedListId () {
-      return this.getCleanedListId(this.$route?.params?.id)
     }
   },
 
@@ -71,12 +67,6 @@ export default {
     closeModal () {
       this.selectedItem = null
       this.isOpen = false
-    },
-
-    getCleanedListId (id) {
-      let cleanedId = this.$isNumeric(id) ? parseInt(id) : id
-
-      return cleanedId === 'in-queue' ? this.myQueueId : cleanedId
     }
   }
 }

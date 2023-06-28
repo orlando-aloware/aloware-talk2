@@ -25,7 +25,6 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'listLoaded',
-      // 'contactsLoaded',
       'setCurrentListFilters',
       'resetSearch'
     ]),

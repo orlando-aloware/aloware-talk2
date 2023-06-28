@@ -269,7 +269,8 @@ export default function (/* { ssrContext } */) {
       },
       staticsLoaded: false,
       isCallDisposed: false,
-      isContactDisposed: false
+      isContactDisposed: false,
+      isDatatableSelectedAll: false
     },
 
     getters: {
@@ -786,6 +787,10 @@ export default function (/* { ssrContext } */) {
 
       setIsContactDisposed ({ commit }, value) {
         commit('SET_IS_CONTACT_DISPOSED', value)
+      },
+
+      setIsDatatableSelectedAll ({ commit }, value) {
+        commit('SET_IS_DATATABLE_SELECTED_ALL', value)
       }
     },
 
@@ -1493,6 +1498,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_CONTACT_DISPOSED (state, value) {
         state.isContactDisposed = value
+      },
+
+      SET_IS_DATATABLE_SELECTED_ALL (state, value) {
+        state.isDatatableSelectedAll = value
       },
 
       updateField

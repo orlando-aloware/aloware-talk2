@@ -34,11 +34,11 @@
     <template slot="options">
       <div class="d-flex align-items-center">
         <div class="selected-contacts text-muted mr-2">
-          {{ checkedItems.length }} Selected Contact
+          {{ selectedAllCount }} Selected Contact
         </div>
         <compact-btn class="mr-2"
                      variant="primary"
-                     :disabled="!checkedItems.length || clicked"
+                     :disabled="!selectedAllCount || clicked"
                      @clicked="addSelectedContacts">
           Add Selected Contacts
         </compact-btn>
@@ -94,6 +94,13 @@
         </div>
       </div>
     </template>
+    <template slot="actions">
+      <bulk-action-menu :id="id"
+                        :total-rows="totalRows"
+                        :checked-count="selectedAllCount"
+                        @onSelectedAll="onSelectedAll"
+                        @on-delete="clearSelectAll" />
+    </template>
 
     <template slot="table">
       <datatable scroll-area-class="pd-datatable"
@@ -104,9 +111,9 @@
                  :is-loading="isLoading"
                  :paginated="false"
                  :show-pagination="!isStartState"
-                 :total-rows="fixedContactsData.total"
                  :current-page="fixedContactsData.current_page"
                  :last-page="fixedContactsData.last_page"
+                 :total-rows="totalRows"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -129,7 +136,7 @@
                   <input type="checkbox"
                          class="checker"
                          :value="contact.id"
-                         :checked="checkedItems.find(item => item.id === contact.id) || isAllContactsSelected"
+                         :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
                          @change="onCheckerClicked(contact)" />
                   <span class="checkmark"></span>
                 </label>
@@ -435,6 +442,7 @@ import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TextPopover from 'components/popover/text-popover'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import ContactsFilters from 'components/contacts/contacts-filters'
+import BulkActionMenu from 'src/components/bulk-action-menu'
 import {
   aclMixin,
   visibilityMixin,
@@ -442,7 +450,7 @@ import {
   avatarMixin,
   addViewMixin
 } from 'src/plugins/mixins'
-import { isEqual } from 'lodash'
+import { isEqual, isEmpty } from 'lodash'
 
 export default {
   components: {
@@ -453,7 +461,8 @@ export default {
     Datatable,
     ImportContactsModal,
     TextPopover,
-    FolderStaticIcon
+    FolderStaticIcon,
+    BulkActionMenu
   },
 
   props: {
@@ -533,7 +542,8 @@ export default {
     ...mapGetters('contacts', [
       'lists',
       'listItems',
-      'isFiltersOpen'
+      'isFiltersOpen',
+      'currentListFilters'
     ]),
 
     contactList () {
@@ -584,15 +594,6 @@ export default {
       return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
     },
 
-    checkedItemIds () {
-      const ids = []
-      this.checkedItems.forEach(check => {
-        ids.push(check.id)
-      })
-
-      return ids
-    },
-
     contactListName () {
       return this.listName || this.contactList.name
     },
@@ -607,10 +608,6 @@ export default {
 
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
-    },
-
-    totalRows () {
-      return this.listItems?.[this.id]?.total || 0
     },
 
     contactWithNoPrimaryNumbers () {
@@ -633,12 +630,9 @@ export default {
       ContactListTypes,
       openEdit: true,
       isContactModule: true,
-      checkedItems: [],
       filterHasChanges: false,
       listName: '',
-      myContacts: false,
-      clicked: false,
-      contactCount: 0
+      myContacts: false
     }
   },
 
@@ -706,7 +700,7 @@ export default {
         })
     },
 
-    addSelectedContacts () {
+    processAddSelectedContacts () {
       this.clicked = true
       this.closeFilters()
 
@@ -731,35 +725,40 @@ export default {
         })
     },
 
+    addSelectedContacts () {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to add the selected contacts?`, {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'Cancel',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.processAddSelectedContacts()
+        }
+      })
+    },
+
     attachedParams () {
-      if (this.isContactModule) {
-        return {
-          contact_list_id: this.contactList.id,
-          contacts: this.checkedItems
-        }
+      let params = {
+        contact_list_id: parseInt(this.contactList.id)
       }
 
-      if (this.contactList.id === 'my-queue') {
-        return {
-          // allow_international_phone_numbers: 1,
-          // multiple_phone_numbers: 1,
-          // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-          contact_ids: this.checkedItemIds
-        }
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+      } else {
+        params.contacts = this.checked
       }
 
-      return {
-        // allow_international_phone_numbers: 1,
-        // multiple_phone_numbers: 1,
-        // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-        contact_list_id: this.contactList.id,
-        contact_ids: this.checkedItemIds
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.currentListFilters
       }
+
+      return params
     },
 
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>
-        this.checkedItems.includes(i.id)
+        this.checked.includes(i.id)
       )
     },
 
@@ -782,32 +781,32 @@ export default {
     },
 
     onCheckAllItems (checked) {
-      this.checkedItems = []
+      let checkedItems = []
+
+      if (!checked) {
+        this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+        return
+      }
 
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
-          if (checked && this.isContactModule) {
-            this.checkedItems.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
-            return
-          }
-
-          if (checked && !this.isContactModule) {
+          if (this.isContactModule) {
+            checkedItems.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
+          } else {
             let foundContact = this.fixedContactsData.data.find(item => item.id === Number(checkbox.value))
 
             if (!(foundContact.is_blocked || foundContact.is_dnc)) {
-              this.checkedItems.push(foundContact)
+              checkedItems.push(foundContact)
             }
-
-            return
           }
-
-          this.checkedItems = this.checkedItems.filter(item => item.id !== Number(checkbox.value))
         })
+
+      this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
     },
 
     onCheckedRows (checked) {
-      this.checkedItems = checked
+      this.setListSelectedContacts({ id: this.id, contacts: checked })
     },
 
     onFiltersClicked () {
@@ -845,7 +844,7 @@ export default {
     },
 
     onPagination (params) {
-      this.checkedItems = []
+      this.setListSelectedContacts({ id: this.id, contacts: [] })
       this.onPaginate(params)
     },
 
@@ -872,18 +871,18 @@ export default {
     },
 
     onCheckerClicked (contact) {
-      const items = { data: [] }
-      const found = this.checkedItems.find(item => item.id === contact.id)
+      let items = []
+      const found = this.checked.find(item => item.id === contact.id)
 
       if (found) {
-        items.data = this.checkedItems.filter(item => item.id !== contact.id)
+        items = this.checked.filter(item => item.id !== contact.id)
       } else {
-        items.data = [...this.checkedItems]
-        items.data.push(contact)
+        items = [...this.checked]
+        items.push(contact)
       }
 
       this.setAllContactsSelected(false)
-      this.onCheckedRows(items.data)
+      this.onCheckedRows(items)
     }
   },
 
@@ -915,12 +914,6 @@ export default {
       })
 
       document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
-    },
-
-    clicked: function (value) {
-      if (value) {
-        setTimeout(() => { this.clicked = false }, 2000)
-      }
     }
   }
 }

@@ -25,12 +25,16 @@
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
               <label class="custom-checkbox-container check-all"
+                     :class="customCheckboxContainerClass"
                      v-if="column.name === 'checkbox'">
                 <input ref="dataTableCheckAll"
                        class="data-table-check-all"
                        type="checkbox"
+                       :class="checkAllClass"
+                       :disabled="isDisabledCheckAll"
                        @change="onCheckboxClicked" />
-                <span class="checkmark"/>
+                <span class="checkmark"
+                      :class="checkAllClass"/>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
                 <div class="move-icon-drag-container"
@@ -66,10 +70,6 @@
           </draggable>
         </thead>
         <tbody>
-          <tr v-if="isCheckboxAllChecked && totalRows < perPage">
-            <td class="text-center"
-                :colspan="tableColumnSpan">{{ checkedCount }} contacts on this page selected. Select all {{ totalRows }} contacts that match this search query.</td>
-          </tr>
           <slot name="tbody" />
         </tbody>
       </table>
@@ -182,11 +182,6 @@ export default {
       default: true
     },
 
-    totalRows: {
-      type: Number,
-      default: 0
-    },
-
     currentPage: {
       type: Number,
       default: 1
@@ -212,7 +207,7 @@ export default {
       required: false
     },
 
-    checkedCount: {
+    totalRows: {
       type: Number,
       default: 0
     }
@@ -311,6 +306,34 @@ export default {
 
     tableColumnSpan () {
       return this.fixedColumns.length
+    },
+
+    customCheckboxContainerClass () {
+      const isCheckedClass = this.isCheckboxAllChecked ? 'checked' : ''
+      let pageClass = ''
+
+      if (this.isPowerDialerAdd) {
+        pageClass = 'pd-add'
+      } else if (this.isContacts) {
+        pageClass = 'contacts'
+      }
+
+      return [
+        isCheckedClass,
+        pageClass
+      ].concat(this.checkAllClass)
+    },
+
+    isDisabledCheckAll () {
+      return this.isLoading || this.isLoadingMore || this.totalRows === 0
+    },
+
+    checkAllClass () {
+      const isDisabledClass = this.isDisabledCheckAll ? 'cursor-blocked pe-none' : ''
+
+      return [
+        isDisabledClass
+      ]
     }
   },
 
@@ -334,13 +357,16 @@ export default {
       moveColor: '#4F4F4F',
       column: null,
       scrollTimeout: null,
-      lastScrollTop: 0,
-      isCheckboxAllChecked: false
+      lastScrollTop: 0
     }
   },
 
   methods: {
     ...mapActions(['setDefaultDateFilter']),
+
+    ...mapActions('contacts', [
+      'setAllContactsSelected'
+    ]),
 
     getHeaderStyle (name, minWidth, maxWidth) {
       let minWidthPixels = minWidth ? `${minWidth}px` : ''
@@ -358,7 +384,7 @@ export default {
     },
 
     getHeaderCheckboxClass (key, sticky, name) {
-      const checkboxClass = name === 'checkbox' ? name : ''
+      const checkboxClass = name === 'checkbox' ? `${name} cursor-default` : ''
       const stickyClass = sticky ? 'sticky' : ''
       const hoveringClass = this.hoverKey === key && this.isHovering
         ? 'hovering' : ''
@@ -436,11 +462,6 @@ export default {
       this.column = evt.target.parentNode
       this.startOffset = this.column.offsetWidth - evt.pageX
       document.body.style.cursor = 'col-resize'
-    },
-
-    onCheckboxClicked (evt) {
-      this.$emit('checked', evt.target.checked)
-      this.isCheckboxAllChecked = evt.target.checked
     },
 
     onOrderChanged ({ oldIndex, newIndex }) {
@@ -525,6 +546,11 @@ export default {
       this.moveColor = value ? '#256eff' : '#4F4F4F'
       this.isHovering = value
       this.hoverKey = key
+    },
+
+    onCheckboxClicked (evt) {
+      this.$emit('checked', evt.target.checked)
+      this.setAllContactsSelected(evt.target.checked)
     }
   },
 
