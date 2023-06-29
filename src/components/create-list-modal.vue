@@ -223,6 +223,8 @@ export default {
         params.selected_all = true
       }
 
+      params.filter_groups = this.currentListFilters
+
       return params
     },
 
@@ -232,7 +234,7 @@ export default {
       this.$axios
         .post(this.listsEndpoint, this.getParams())
         .then((response) => {
-          const data = response.data.data
+          const data = response.data
           const message = response.data.message
 
           if (this.createList.mode === FROM_BULK_MENU) {

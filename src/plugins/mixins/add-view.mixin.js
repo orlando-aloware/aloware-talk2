@@ -17,7 +17,6 @@ export default {
   },
 
   mounted () {
-    this.setDataCount([], true)
     this.addViewListeners.shouldUpdateListCountOnSearch = (data) => {
       this.setDataCount(data, true)
     }

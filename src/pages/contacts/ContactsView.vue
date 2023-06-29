@@ -122,11 +122,21 @@
         <div class="contacts-total desktop">
           <div class="small text-muted fs-13 text-right"
                v-if="selectedList.type === ContactListTypes.DYNAMIC">
-            {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            <template v-if="!isDatatableCountLoading">
+              {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </template>
+            <q-skeleton type="text"
+                        style="width:80px"
+                        v-else/>
           </div>
           <div class="small text-muted fs-13 text-right"
                v-else>
-            {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            <template v-if="!isDatatableCountLoading">
+              {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </template>
+            <q-skeleton type="text"
+                        style="width:80px"
+                        v-else/>
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">

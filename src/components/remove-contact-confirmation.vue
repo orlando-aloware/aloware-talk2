@@ -1,6 +1,7 @@
 <template>
   <confirm-dialog id="remove-contact-confirmation-dialog"
                   :title="title"
+                  :is-busy="isBusy"
                   @close="removeContactClose"
                   @hide="onHide"
                   @shown="onShown">
@@ -21,7 +22,8 @@
       <div class="d-flex w-100">
         <div class="flex-grow-1"/>
         <button class="btn btn-sm btn-outline-dark mr-2"
-          @click="onCancel">
+                :disabled="isBusy"
+                @click="onCancel">
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
@@ -214,6 +216,7 @@ export default {
 
       this.isBusy = true
       const ids = this.selectedContacts[this.listId].map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+
       let params = {}
 
       if (this.isDatatableSelectedAll) {
@@ -229,10 +232,10 @@ export default {
       }
 
       return this.$axios
-        .delete(url, { params: params })
-        .then(() => {
+        .delete(url, { data: params })
+        .then((res) => {
           this.$emit('contactsRemoved', this.selectedList)
-          this.$generalNotification('Contacts was successfully removed.')
+          this.$generalNotification(res.data.message)
         })
         .catch((_err) => {
           this.$generalNotification('Unable to remove contacts please try again.', 'error')

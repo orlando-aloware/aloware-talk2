@@ -180,7 +180,8 @@ export default {
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
-      'setShowContactResourceUnavailable'
+      'setShowContactResourceUnavailable',
+      'setSelectedListContactCount'
     ]),
 
     ...mapActions([
@@ -218,6 +219,7 @@ export default {
 
   watch: {
     $route (to, from) {
+      this.setSelectedListContactCount(0)
       this.setAllContactsSelected(false)
       this.setIsDatatableSelectedAll(false)
 

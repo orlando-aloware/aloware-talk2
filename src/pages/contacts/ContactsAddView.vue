@@ -1,5 +1,5 @@
 <template>
-  <contacts-screen :loading="isLoadingDisabled">
+  <contacts-screen :loading="isLoadingDisabled || clicked">
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="d-flex align-items-center">
@@ -66,7 +66,12 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
-          <span class="small text-muted selected-contacts mr-2">{{ contactCount | numFormat }} Contacts</span>
+          <span class="small text-muted selected-contacts mr-2">
+            <template v-if="!isDatatableCountLoading">{{ contactCount | numFormat }} Contacts</template>
+            <q-skeleton type="text"
+                        style="width:80px"
+                        v-else/>
+          </span>
           <div class="v-divider">
           </div>
           <div :class="['btn-filter-wrapper mr-2', hasAppliedFilters ? 'background' : '' ]">
@@ -450,7 +455,7 @@ import {
   avatarMixin,
   addViewMixin
 } from 'src/plugins/mixins'
-import { isEqual, isEmpty } from 'lodash'
+import { isEqual, isEmpty, pickBy } from 'lodash'
 
 export default {
   components: {
@@ -706,7 +711,7 @@ export default {
 
       return this.$axios
         .post(this.addItemEndpoint, this.attachedParams())
-        .then(() => {
+        .then((res) => {
           this.setShouldUpdateSelectedListContactCount(true)
 
           if (this.contactList.id === 'my-queue') {
@@ -715,10 +720,12 @@ export default {
             this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           }
 
+          this.clicked = false
           this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added.')
+          this.$generalNotification(res.data.message)
         })
         .catch((err) => {
+          this.clicked = false
           const { message, html } = extractErrorMessage(err)
           console.log(html)
           this.$generalNotification(message, 'error')
@@ -726,6 +733,10 @@ export default {
     },
 
     addSelectedContacts () {
+      if (this.clicked) {
+        return
+      }
+
       this.$bvModal.msgBoxConfirm(`Are you sure you want to add the selected contacts?`, {
         buttonSize: 'sm',
         okTitle: 'Yes',
@@ -746,7 +757,12 @@ export default {
       if (this.isDatatableSelectedAll) {
         params.selected_all = true
       } else {
-        params.contacts = this.checked
+        // we only submit needed contact properties which has values
+        params.contacts = this.checked.map(item => pickBy({
+          id: item.id,
+          incoming_number_id: item?.incoming_number_id,
+          contact_phone_number_id: item?.contact_phone_number_id
+        }, i => ![undefined, null].includes(i)))
       }
 
       if (!isEmpty(this.currentListFilters)) {

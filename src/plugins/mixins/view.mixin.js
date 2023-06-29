@@ -38,7 +38,8 @@ export default {
     ...mapState([
       'users',
       'campaigns',
-      'isDatatableSelectedAll'
+      'isDatatableSelectedAll',
+      'isDatatableCountLoading'
     ]),
 
     ...mapState('powerDialer', [
@@ -151,6 +152,10 @@ export default {
 
   created () {
     this.pdViewListeners.contactListBulkCreated = (event) => {
+      if (typeof this.onFetch !== 'function') {
+        return
+      }
+
       const eventListId = this.getCleanedListId(event.contact_list_id)
 
       if (this.cleanedListId && eventListId && this.cleanedListId === eventListId) {
@@ -465,14 +470,6 @@ export default {
   },
 
   watch: {
-    clicked: function (value) {
-      if (value) {
-        setTimeout(() => {
-          this.clicked = false
-        }, 2000)
-      }
-    },
-
     selectedAllCount (value) {
       this.$emit('onSelectedCountChange', value)
     }

@@ -69,7 +69,12 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
-          <span class="small text-muted selected-contacts mr-2">{{ contactCount | numFormat }} Contacts</span>
+          <span class="small text-muted selected-contacts mr-2">
+            <template v-if="!isDatatableCountLoading">{{ contactCount | numFormat }} Contacts</template>
+            <q-skeleton type="text"
+                        style="width:80px"
+                        v-else/>
+          </span>
           <div class="v-divider">
           </div>
           <div :class="['btn-filter-wrapper mr-2', hasAppliedFilters ? 'background' : '' ]">

@@ -270,7 +270,8 @@ export default function (/* { ssrContext } */) {
       staticsLoaded: false,
       isCallDisposed: false,
       isContactDisposed: false,
-      isDatatableSelectedAll: false
+      isDatatableSelectedAll: false,
+      isDatatableCountLoading: false
     },
 
     getters: {
@@ -791,6 +792,10 @@ export default function (/* { ssrContext } */) {
 
       setIsDatatableSelectedAll ({ commit }, value) {
         commit('SET_IS_DATATABLE_SELECTED_ALL', value)
+      },
+
+      setIsDatatableCountLoading ({ commit }, value) {
+        commit('SET_IS_DATATABLE_COUNT_LOADING', value)
       }
     },
 
@@ -1502,6 +1507,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_DATATABLE_SELECTED_ALL (state, value) {
         state.isDatatableSelectedAll = value
+      },
+
+      SET_IS_DATATABLE_COUNT_LOADING (state, value) {
+        state.isDatatableCountLoading = value
       },
 
       updateField

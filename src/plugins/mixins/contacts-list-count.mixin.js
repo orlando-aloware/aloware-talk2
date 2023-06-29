@@ -25,6 +25,8 @@ export default {
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
 
+      this.setIsDatatableCountLoading(true)
+
       this.getListDataCount(data.data, skipCancelToken).then(response => {
         if (data.thenFunctions) {
           const funcs = Object.keys(data.thenFunctions)
@@ -51,6 +53,8 @@ export default {
             count: response.data.count
           })
         }
+
+        this.setIsDatatableCountLoading(false)
       }).catch((err) => {
         const className = get(err, 'constructor.name', null)
 
@@ -73,6 +77,8 @@ export default {
             this.$VueEvent.fire(event, data.catchEventFires[event])
           }
         }
+
+        this.setIsDatatableCountLoading(false)
       })
     }
 
@@ -171,7 +177,9 @@ export default {
       'pinnedCountLoaded',
       'setPinnedListsLoaded',
       'setSelectedListContactCount'
-    ])
+    ]),
+
+    ...mapActions(['setIsDatatableCountLoading'])
   },
 
   beforeDestroy () {

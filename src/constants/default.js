@@ -228,5 +228,6 @@ export const DEFAULT_STATE = {
   staticsLoaded: false,
   isCallDisposed: false,
   isContactDisposed: false,
-  isDatatableSelectedAll: false
+  isDatatableSelectedAll: false,
+  isDatatableCountLoading: false
 }
