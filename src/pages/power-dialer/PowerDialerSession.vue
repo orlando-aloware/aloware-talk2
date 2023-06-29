@@ -10,7 +10,7 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div class="d-flex bg-white h-100">
+          <div class="d-flex bg-white">
             <div class="col-7 p-0 bordered-right">
               <CallDisposition />
             </div>
