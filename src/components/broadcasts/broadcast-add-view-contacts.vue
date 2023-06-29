@@ -204,7 +204,7 @@ export default {
     },
 
     onIntegrationListChanged (integration) {
-      this.source.integration.list = integration.list
+      this.$set(this.source.integration, 'list', integration.list)
     },
 
     reset () {

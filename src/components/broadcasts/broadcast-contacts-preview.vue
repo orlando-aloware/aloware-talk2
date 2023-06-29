@@ -167,9 +167,10 @@ export default {
           this.loadContacts()
           break
         case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
-          // FIXME: integrations
           this.setIntegrationHubspot()
           break
+        // FIXME: Zoho
+        // FIXME: Pipedrive
       }
     },
 
@@ -223,7 +224,10 @@ export default {
     },
 
     setIntegrationHubspot () {
-      console.log(this.integration.list)
+      this.contactsLength = this.integration.list.metaData.size
+
+      // set contacts
+      // this.$emit('contact-preview', data.data[0])
     }
   },
 
@@ -236,6 +240,13 @@ export default {
     },
 
     filters: {
+      deep: true,
+      handler () {
+        this.init()
+      }
+    },
+
+    integration: {
       deep: true,
       handler () {
         this.init()

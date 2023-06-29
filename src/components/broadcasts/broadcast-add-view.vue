@@ -185,8 +185,6 @@ export default {
     },
 
     footerComponent () {
-      // FIXME: check why isnt working
-      console.log(!isEmpty(this.source.integration?.list))
       switch (true) {
         // FIXME: use mainComponentValid?
         case this.currentStep.id === 1 && (this.source?.list?.id || !isEmpty(this.source.filters) || !isEmpty(this.source.integration?.list)):
