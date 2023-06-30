@@ -11,14 +11,18 @@
                name="broadcast-add-view-contacts-option"
                :id="`contacts-option-${option.value}`"
                :value="option.value"
+               :disabled="!option.enabled"
                @input="onOptionSelected(option)">
-        <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
+        <label :class="getOptionClasses(option)"
                :for="`contacts-option-${option.value}`">
           {{ option.text }}
           <span class="broadcast-add__contacts__options__option__icon"
                 v-if="optionSelected === option.value">
             <check-o-icon color="#fff"/>
           </span>
+          <q-tooltip v-if="!option.enabled">
+            This option is disabled
+          </q-tooltip>
         </label>
       </div>
     </div>
@@ -122,6 +126,26 @@ export default {
       }
     },
 
+    options () {
+      return [
+        {
+          value: 'list',
+          text: 'By List',
+          enabled: true
+        },
+        {
+          value: 'filter',
+          text: 'By Filter',
+          enabled: true
+        },
+        {
+          value: 'integration',
+          text: 'Integrations',
+          enabled: this.integrationsEnabled.length > 0
+        }
+      ]
+    },
+
     integrationText () {
       return this.integrationsEnabled.length > 1
         ? 'Integration'
@@ -131,20 +155,6 @@ export default {
 
   data: () => ({
     optionSelected: null,
-    options: [
-      {
-        value: 'list',
-        text: 'By List'
-      },
-      {
-        value: 'filter',
-        text: 'By Filter'
-      },
-      {
-        value: 'integration',
-        text: 'Integrations'
-      }
-    ],
     source: {
       list: {},
       filters: {},
@@ -175,6 +185,14 @@ export default {
       'openFilters',
       'setCurrentListFilters'
     ]),
+
+    getOptionClasses (option) {
+      return [
+        'broadcast-add__contacts__options__option',
+        { 'broadcast-add__contacts__options__option--active': this.optionSelected === option.value },
+        { 'broadcast-add__contacts__options__option--disabled': !option.enabled }
+      ]
+    },
 
     onOptionSelected (option) {
       this.optionSelected = option.value

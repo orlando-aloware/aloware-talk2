@@ -12986,6 +12986,12 @@ h1.contact-list-name-label {
                   &--active {
                     border-color: $primary;
                   }
+
+                  &--disabled {
+                    cursor: not-allowed;
+                    border-color: $grey-light3;
+                    color: $grey-light3;
+                  }
                 }
               }
 
