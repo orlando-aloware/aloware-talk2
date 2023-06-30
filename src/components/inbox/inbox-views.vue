@@ -21,10 +21,13 @@
           <span class="flex-grow-1">{{ view.name }}</span>
           <span class="mr-1">{{ view.open_count || 0 }}</span>
           <span class="cursor-pointer px-1">
-            <pin-icon/>
-            <q-tooltip>
-              <span>Pin List</span>
-            </q-tooltip>
+            <q-btn icon="push_pin"
+                   size="xs"
+                   flat>
+              <q-tooltip>
+                <span>Pin List</span>
+              </q-tooltip>
+            </q-btn>
           </span>
         </div>
       </div>
@@ -38,13 +41,11 @@
 </template>
 
 <script>
-import PinIcon from 'src/components/icons/pin-icon.vue'
 import Search from 'src/components/search.vue'
 import { mapActions } from 'vuex'
 
 export default {
   components: {
-    PinIcon,
     Search
   },
 
