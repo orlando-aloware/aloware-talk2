@@ -34,45 +34,45 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'all'
+      },
+      {
+        label: 'Messages',
+        value: 'messages',
+        icon: 'message',
+        disabled: false,
+        type: 'sms',
+        answerStatus: 'all'
+      },
+      {
+        label: 'Mentions',
+        value: 'mentions',
+        icon: 'mention',
+        disabled: false
+      },
+      {
+        label: 'Voicemails',
+        value: 'voicemails',
+        icon: 'voicemail',
+        disabled: false,
+        type: 'call',
+        answerStatus: 'voicemail'
+      },
+      {
+        label: 'Call Recordings',
+        value: 'recordings',
+        icon: 'record',
+        disabled: false,
+        type: 'call',
+        answerStatus: 'recorded'
+      },
+      {
+        label: 'All Communications',
+        value: 'all-communications',
+        icon: 'all-communications',
+        disabled: false,
+        type: 'all',
+        answerStatus: 'all'
       }
-      // {
-      //   label: 'Messages',
-      //   value: 'messages',
-      //   icon: 'message',
-      //   disabled: false,
-      //   type: 'sms',
-      //   answerStatus: 'all'
-      // },
-      // {
-      //   label: 'Mentions',
-      //   value: 'mentions',
-      //   icon: 'mention',
-      //   disabled: false
-      // },
-      // {
-      //   label: 'Voicemails',
-      //   value: 'voicemails',
-      //   icon: 'voicemail',
-      //   disabled: false,
-      //   type: 'call',
-      //   answerStatus: 'voicemail'
-      // },
-      // {
-      //   label: 'Call Recordings',
-      //   value: 'recordings',
-      //   icon: 'record',
-      //   disabled: false,
-      //   type: 'call',
-      //   answerStatus: 'recorded'
-      // },
-      // {
-      //   label: 'All Communications',
-      //   value: 'all-communications',
-      //   icon: 'all-communications',
-      //   disabled: false,
-      //   type: 'all',
-      //   answerStatus: 'all'
-      // }
     ],
     communications: [],
     communicationsCurrentPage: 0,
@@ -98,6 +98,7 @@ export default function () {
     isLoadingOpenTaskCount: false,
     isLoadingPendingTaskCount: false,
     inboxShowMyContacts: true,
-    isInboxFiltersLoaded: true
+    isInboxFiltersLoaded: true,
+    pinnedViews: []
   }
 }

@@ -232,17 +232,16 @@ export default {
       query.filter_groups = []
 
       if (this.searchText && this.searchText.trim() && this.searchText.length >= 3) {
-        this.filters.search = [
-          {
-            value: this.searchText
-          }
-        ]
+        this.filters.search = [{
+          value: this.searchText
+        }]
+
         delete this.filters.contact_task_status
       } else {
         this.filters.contact_task_status[0].value = [taskId]
       }
 
-      if (this.filter && this.filter.campaigns.length) {
+      if (this.filter && this.filter?.campaigns && this.filter.campaigns.length) {
         this.filters = {
           ...this.filters,
           'lines': [
@@ -251,7 +250,7 @@ export default {
         }
       }
 
-      if (this.filter && this.filter.ring_groups.length) {
+      if (this.filter && this.filter?.ring_groups && this.filter.ring_groups.length) {
         this.filters = {
           ...this.filters,
           'ring_groups': [
@@ -259,8 +258,9 @@ export default {
           ]
         }
       }
+      console.log(this.filter)
 
-      if (this.filter && this.filter.contact_owner.length && !this.filter.my_contact) {
+      if (this.filter && this.filter?.contact_owner && this.filter.contact_owner.length && !this.filter.my_contact) {
         this.filters = {
           ...this.filters,
           'contact_owner': [
@@ -269,11 +269,11 @@ export default {
         }
       }
 
-      if (this.filter && this.filter.my_contact) {
+      if (this.filter && this.filter?.my_contact && this.filter.my_contact) {
         query.my_contact = this.filter.my_contact
       }
 
-      if ((this.filter && this.filter.my_contact) || this.inboxShowMyContacts) {
+      if ((this.filter && this.filter?.my_contact && this.filter.my_contact) || this.inboxShowMyContacts) {
         this.filters = {
           ...this.filters,
           'contact_owner': [
@@ -282,7 +282,7 @@ export default {
         }
       }
 
-      if (this.filter && this.filter.from_date && this.filter.to_date) {
+      if (this.filter && this.filter?.from_date && this.filter?.to_date && this.filter.from_date && this.filter.to_date) {
         this.filters = {
           ...this.filters,
           'last_engagement_at': [

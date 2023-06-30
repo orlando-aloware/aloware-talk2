@@ -24,25 +24,30 @@
               class="nav-list-group-title d-flex align-items-center justify-content-between"
               v-if="personalFilters.length">
       <template #action-icon>
-        <span class="mr-3"
-              @click="onEditViewsClicked">
-        <pencil-icon class="cursor-pointer"
-                     id="edit-views-icon"
-                     color="#256eff">
-        </pencil-icon>
-        </span>
+          <q-btn id="edit-views-icon"
+                 class="mr-3 cursor-pointer"
+                 icon="edit"
+                 size="xs"
+                 flat
+                 @click="onEditViewsClicked"/>
       </template>
     </nav-item>
 
     <!-- list only pinned views -->
-    <!-- <nav-item icon=""
-              :value="filter.name"
-              :label="filter.name"
-              :is-active="isActive(filter, 'view')"
-              :key="`${filter.name}-${index}`"
-              :custom-count="filter.open_count || 0"
-              v-for="(filter, index) in personalFilters"
-              @click="onSelectFilter(filter)" /> -->
+    <!--<router-link :to="`/channels/view/${view.filter_id}/open`"-->
+    <!--             :key="`${view.filter.name}-${index}`"-->
+    <!--             v-for="(view, index) in pinnedViews">-->
+    <!--  <div>{{ view.filter.name }}</div>-->
+    <!--</router-link>-->
+
+    <nav-item icon=""
+              :value="`view-${view.filter_id}`"
+              :label="view.filter.name"
+              :is-active="isActive(view, 'view')"
+              :key="`${view.filter.name}-${index}`"
+              :custom-count="view.filter?.open_count || 0"
+              v-for="(view, index) in pinnedViews"
+              @click="onItemClicked" />
 
     <inbox-views target="#edit-views-icon"
                  :show="isEditingViews"
@@ -53,7 +58,6 @@
 
 <script>
 import NavItem from './inbox-nav-item'
-import PencilIcon from 'src/components/icons/pencil-icon.vue'
 import InboxViews from 'src/components/inbox/inbox-views.vue'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
@@ -68,7 +72,6 @@ export default {
 
   components: {
     InboxViews,
-    PencilIcon,
     NavItem
   },
 
@@ -102,7 +105,8 @@ export default {
       'items',
       'activeChannel',
       'selectedFilter',
-      'isFilterDialogShown'
+      'isFilterDialogShown',
+      'pinnedViews'
     ]),
 
     isShowActive () {
@@ -181,6 +185,7 @@ export default {
   },
 
   created () {
+    this.getPinnedViews()
     this.getFilters()
       .then(() => {
         if (this.$route.params?.view) {
@@ -199,19 +204,34 @@ export default {
     })
   },
 
+  mounted () {
+    this.$VueEvent.listen('viewPinned', () => {
+      this.getPinnedViews()
+    })
+
+    this.$VueEvent.listen('viewUnpinned', () => {
+      this.getPinnedViews()
+    })
+  },
+
   methods: {
     ...mapActions('inbox', [
       'setActiveChannel',
       'setSelectedFilter',
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
-      'setInboxNavItems',
+      'setPinnedViews',
       'setInboxShowMyContacts',
       'setChannelClonedFilter',
       'setFilterDialogForView'
     ]),
 
     onItemClicked (nextActive) {
+      // eslint-disable-next-line no-constant-condition
+      // if (true) {
+      //   console.log(nextActive)
+      //   return
+      // }
       // if (!this.activeChannel) {
       //   return
       // }
@@ -222,7 +242,43 @@ export default {
       // }
 
       this.active = nextActive
+      const isView = nextActive.indexOf('view') !== -1
+
+      if (isView) {
+        const viewId = nextActive.split('-')[1]
+        const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
+        const channel = {
+          label: view.filter.name,
+          value: `view-${view.filter_id}`,
+          icon: '',
+          disabled: false
+        }
+
+        this.setActiveChannel(channel)
+
+        this.filter = { ...view.filter.filter }
+        this.setChannelClonedFilter(this.filter)
+        this.resetChannelChangedFilterFields()
+        this.setAppliedFilter(null)
+        this.loadContactTasks()
+        this.fetchTaskCounts()
+
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: viewId,
+            status: 'open'
+          }
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+        return
+      }
+
       const channel = this.items.find(item => item.value === nextActive)
+      console.log(channel)
       this.setActiveChannel(channel)
 
       if (this.active !== 'inbox') {
@@ -449,6 +505,17 @@ export default {
       this.setAppliedFilter(null)
       this.loadContactTasks()
       this.fetchTaskCounts()
+    },
+
+    getPinnedViews () {
+      this.$axios
+        .get('/api/v2/filters/pinned')
+        .then(res => {
+          this.setPinnedViews([...res.data.data])
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   },
 
@@ -459,7 +526,22 @@ export default {
 
     active (val) {
       if (this.value !== undefined && this.active !== this.value) {
-        this.$emit('active', this.items.find(item => item.value === val))
+        let activeChannel = null
+
+        if (val.indexOf('view') !== -1) {
+          const viewId = val.split('-')[1]
+          const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
+          activeChannel = {
+            label: view.filter.name,
+            value: `view-${view.filter_id}`,
+            icon: '',
+            disabled: false
+          }
+        } else {
+          activeChannel = this.items.find(item => item.value === val)
+        }
+
+        this.$emit('active', activeChannel)
         this.$emit('update:value', val)
       }
     },

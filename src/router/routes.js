@@ -107,7 +107,7 @@ const routes = [
             }
           },
           {
-            path: 'views/:view/:status',
+            path: 'channels/view/:viewId/:status',
             name: 'Inbox View',
             component: Inbox,
             meta: {

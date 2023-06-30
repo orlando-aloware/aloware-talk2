@@ -250,7 +250,8 @@ export default {
         'appliedFilter',
         'isLoadingOpenTaskCount',
         'isLoadingPendingTaskCount',
-        'activeChannel'
+        'activeChannel',
+        'pinnedViews'
       ]
     ),
     ...mapState('contacts', [
@@ -889,7 +890,17 @@ export default {
   },
 
   created () {
-    this.resetFilter()
+    if ('view' in this.$route.params) {
+      const viewId = this.$route.params.viewId
+      const view = this.pinnedViews.filter(view => view?.filter_id === viewId)
+      this.filter = view.filter.filter
+      console.log('inbox-tab > created', this.filter)
+      this.setChannelClonedFilter(this.filter)
+      this.resetChannelChangedFilterFields()
+      this.setAppliedFilter(null)
+    } else {
+      this.resetFilter()
+    }
     this.toggleFilterDialog(false)
   },
 

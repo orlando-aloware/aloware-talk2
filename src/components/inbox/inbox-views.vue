@@ -19,13 +19,34 @@
              :key="view.id"
              v-for="view in filteredViews">
           <span class="flex-grow-1">{{ view.name }}</span>
-          <span class="mr-1">{{ view.open_count || 0 }}</span>
+          <span class="mr-2">{{ view.open_count || 0 }}</span>
           <span class="cursor-pointer px-1">
+            <q-btn class="mr-2"
+                   icon="edit"
+                   size="xs"
+                   flat
+                   @click="editView(view.id)">
+              <q-tooltip>
+                <span>Edit View</span>
+              </q-tooltip>
+            </q-btn>
+            <q-btn size="xs"
+                   flat
+                   v-if="!isPinnedView(view.id)"
+                   @click="pinView(view.id)">
+              <q-icon name="o_push_pin"></q-icon>
+              <q-tooltip>
+                <span>Pin View</span>
+              </q-tooltip>
+            </q-btn>
             <q-btn icon="push_pin"
                    size="xs"
-                   flat>
+                   class="primary"
+                   flat
+                   v-if="isPinnedView(view.id)"
+                   @click="unpinView(view.id)">
               <q-tooltip>
-                <span>Pin List</span>
+                <span>Unpin View</span>
               </q-tooltip>
             </q-btn>
           </span>
@@ -42,7 +63,7 @@
 
 <script>
 import Search from 'src/components/search.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   components: {
@@ -78,6 +99,10 @@ export default {
   },
 
   computed: {
+    ...mapState('inbox', [
+      'pinnedViews'
+    ]),
+
     filteredViews () {
       return this.views.filter(view => view.name.toUpperCase().includes(this.search.toUpperCase()))
     }
@@ -106,6 +131,38 @@ export default {
 
     onClosed () {
       this.$emit('closed')
+    },
+
+    editView (viewId) {
+      console.log('Edit view id: ' + viewId)
+    },
+
+    pinView (viewId) {
+      this.$axios
+        .post(`/api/v2/filters/${viewId}/pin`)
+        .then(res => {
+          console.log(res)
+          this.$VueEvent.fire('viewPinned')
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    unpinView (viewId) {
+      this.$axios
+        .delete(`/api/v2/filters/${viewId}/unpin`)
+        .then(res => {
+          console.log(res)
+          this.$VueEvent.fire('viewUnpinned')
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    isPinnedView (viewId) {
+      return this.pinnedViews.find(view => +view.filter_id === viewId)
     }
   }
 }

@@ -30,7 +30,7 @@
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <inbox-tab :search-text="searchText"
-                   v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('views') !== -1"
+                   v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
                    @itemSelected="onItemSelected"/>
         <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
                         :filter-type="activeChannel.type"
@@ -38,7 +38,7 @@
                         :channel="activeChannel.value"
                         :search-text="searchText"
                         :sort="sort"
-                        v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('views') === -1">
+                        v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1">
         </inbox-channels>
       </div>
     </div>
