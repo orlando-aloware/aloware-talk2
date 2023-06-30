@@ -60,11 +60,21 @@
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right"
                  v-if="selectedList.type === ContactListTypes.DYNAMIC">
-              {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              <template v-if="!isDatatableCountLoading">
+                {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              </template>
+              <q-skeleton type="text"
+                          style="width: 80px;"
+                          v-else/>
             </div>
             <div class="small text-muted fs-13 text-right"
                  v-else>
-              {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              <template v-if="!isDatatableCountLoading">
+                {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              </template>
+              <q-skeleton type="text"
+                          style="width: 80px;"
+                          v-else/>
             </div>
           </div>
         </div>
@@ -126,7 +136,7 @@
               {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
             </template>
             <q-skeleton type="text"
-                        style="width:80px"
+                        style="width: 80px;"
                         v-else/>
           </div>
           <div class="small text-muted fs-13 text-right"
@@ -135,7 +145,7 @@
               {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
             </template>
             <q-skeleton type="text"
-                        style="width:80px"
+                        style="width: 80px;"
                         v-else/>
           </div>
         </div>

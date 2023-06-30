@@ -68,15 +68,19 @@
          v-if="isCheckboxAllChecked">
       {{ checkedCount | numFormat }} contacts on this page selected.&nbsp;
       <a href=""
-         v-if="!isAllSelected && checkedCount < totalRows"
+         v-if="!isAllSelected && checkedCount < totalRows && !isDatatableCountLoading"
          @click.prevent="onClickAll">
-        Select all {{ totalRows | numFormat }} contacts.
+          Select all {{ totalRows | numFormat }} contacts.
       </a>
       <a href=""
-         v-if="isAllSelected && checkedCount === totalRows"
+         v-if="isAllSelected && checkedCount === totalRows && !isDatatableCountLoading"
          @click.prevent="onClearAll">
         Clear selection
       </a>
+      <q-skeleton class="bg-blue-5 w-100"
+                  type="text"
+                  style="max-width: 120px;"
+                  v-if="isDatatableCountLoading"/>
     </div>
   </div>
 </template>
@@ -136,6 +140,8 @@ export default {
     ...mapState('contacts', [
       'isAllContactsSelected'
     ]),
+
+    ...mapState(['isDatatableCountLoading']),
 
     selectedContactIds () {
       return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
