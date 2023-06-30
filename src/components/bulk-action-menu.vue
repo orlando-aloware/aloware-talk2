@@ -72,6 +72,11 @@
          @click.prevent="onClickAll">
         Select all {{ totalRows | numFormat }} contacts.
       </a>
+      <a href=""
+         v-if="isAllSelected && checkedCount === totalRows"
+         @click.prevent="onClearAll">
+        Clear selection
+      </a>
     </div>
   </div>
 </template>
@@ -278,9 +283,13 @@ export default {
     },
 
     onClickAll () {
-      this.$emit('bulk-selected-all')
       this.isAllSelected = true
       this.selectedContactsCount = this.totalRows
+    },
+
+    onClearAll () {
+      this.isAllSelected = false
+      this.selectedContactsCount = this.checkedCount
     },
 
     resetCheckbox () {

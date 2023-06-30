@@ -452,6 +452,11 @@ export default {
     onSelectedAll (value) {
       this.isSelectedAll = value
       this.$emit('onSelectedAll', value)
+
+      if (!value) {
+        this.clearSelectAll()
+        this.setListSelectedContacts({ id: this.id, contacts: [] })
+      }
     },
 
     stopEvents () {
