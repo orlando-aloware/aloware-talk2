@@ -220,6 +220,15 @@ export default {
             campaignId: campaignId.data
           }
           break
+        case 'high sms volume':
+          params.data = {
+            title: name.data,
+            message: 'High SMS Volume',
+            type: 'sms',
+            contactId: communication.contact.id,
+            communicationId: communication.id
+          }
+          break
         case 'mention':
           name.data = _.get(communication, 'mentioner_user.name', '')
           contactId.data = _.get(communication, 'contact_id', null)
