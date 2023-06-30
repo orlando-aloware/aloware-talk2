@@ -10,7 +10,8 @@
       </template>
     </b-overlay>
 
-    <div class="contacts-preview__header">
+    <div class="contacts-preview__header"
+         v-if="!loading">
       Contacts Preview
       <span class="contacts-preview__header__counter">
         {{ contactsLength }} {{ contactsLength === 1 ? 'Contact' : 'Contacts' }}
@@ -18,9 +19,11 @@
     </div>
 
     <datatable class="contacts-preview__body"
+               use-empty-slot
+               :is-empty="contacts.length === 0"
                :columns="columns"
                :is-scrollable="false"
-               v-if="contacts.length">
+               v-if="!loading">
       <template slot="tbody">
         <tr class="datatable-row"
             :key="index"
@@ -64,6 +67,14 @@
             </td>
           </template>
         </tr>
+      </template>
+      <template #empty
+                v-if="contacts.length === 0">
+        <div class="empty-state">
+          <div class="h5">
+            {{ noContactsPlaceholder }}
+          </div>
+        </div>
       </template>
     </datatable>
   </div>
@@ -132,6 +143,19 @@ export default {
 
     isValid () {
       return this.contactsLength > 0 && !this.loading
+    },
+
+    noContactsPlaceholder () {
+      switch (true) {
+        case !isEmpty(this.list):
+          return 'No contacts found on the current list'
+        case !isEmpty(this.filters):
+          return 'No contacts found based on the current filters'
+        case !isEmpty(this.integration):
+          return 'Contacts preview isn\'t available for integrations'
+        default:
+          return 'No contacts found'
+      }
     }
   },
 
@@ -226,8 +250,8 @@ export default {
     setIntegrationHubspot () {
       this.contactsLength = this.integration.list.metaData.size
 
-      // set contacts
-      // this.$emit('contact-preview', data.data[0])
+      // FIXME: set contacts
+      // FIXME: this.$emit('contact-preview', data.data[0])
     }
   },
 
@@ -254,6 +278,7 @@ export default {
     },
 
     isValid (state) {
+      console.log('is valid watcher')
       this.$emit('input', state)
     },
 

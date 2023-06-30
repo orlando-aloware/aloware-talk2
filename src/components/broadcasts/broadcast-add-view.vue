@@ -187,7 +187,7 @@ export default {
     footerComponent () {
       switch (true) {
         // FIXME: use mainComponentValid?
-        case this.currentStep.id === 1 && (this.source?.list?.id || !isEmpty(this.source.filters) || !isEmpty(this.source.integration?.list)):
+        case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || !isEmpty(this.source.filters) || !isEmpty(this.source.integration?.list)):
           return 'broadcast-contacts-preview'
         case this.currentStep.id === 2 || this.currentStep.id === 3 || this.currentStep.id === 4:
           return 'broadcast-add-cards'

@@ -113,8 +113,10 @@ export default {
           return !!this.source.list.id
         case 'filter':
           return !isEmpty(this.source.filters)
+        // FIXME: add Zoho
+        // FIXME: add Pipedrive
         case 'integration':
-          return false // FIXME
+          return !isEmpty(this.source.integration?.list)
         default:
           return false
       }
