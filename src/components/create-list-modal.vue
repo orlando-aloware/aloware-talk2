@@ -125,10 +125,10 @@ export default {
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
         const typeText = (this.createList.type === this.ContactListTypes.STATIC) ? 'Static' : 'Dynamic'
-        return `New ${typeText} Lists`
+        return `New ${typeText} List`
       }
 
-      return 'New Lists'
+      return 'New List'
     },
 
     isNameValid () {
@@ -234,13 +234,13 @@ export default {
       this.$axios
         .post(this.listsEndpoint, this.getParams())
         .then((response) => {
-          const data = response.data
           const message = response.data.message
+          const id = response.data?.id || response.data?.data?.id
 
           if (this.createList.mode === FROM_BULK_MENU) {
-            this.$router.push(`${this.redirectPath}/${data.id}`)
+            this.$router.push(`${this.redirectPath}/${id}`)
           } else {
-            this.$router.push(`${this.redirectPath}/${data.id}?start=1`)
+            this.$router.push(`${this.redirectPath}/${id}?start=1`)
           }
 
           this.createListClose()
