@@ -90,7 +90,7 @@ import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
-// import API from 'src/plugins/api/api'
+import API from 'src/plugins/api/api'
 import { mapGetters, mapState } from 'vuex'
 import { isEmpty } from 'lodash'
 
@@ -240,7 +240,7 @@ export default {
     isFooterComponentValid: false,
     source: {},
     contactPreview: {},
-    contactsLength: 0, // FIXME: is this necessary?
+    contactsLength: 0,
     type: null, // sms, voicemail
     smsPrice: 0,
     campaign: null,
@@ -343,7 +343,6 @@ export default {
         name: '',
         count: this.contactsLength,
         // file_name: null,
-        // filters: null,
         campaign_id: this.campaign.id,
         // attachment_type: null,
         run_at_date: this.date.substr(0, 10),
@@ -365,27 +364,25 @@ export default {
 
       bulkMessage.talk_filters = !isEmpty(this.source.filters) ? this.source.filters : null
       bulkMessage.contact_list_id = !isEmpty(this.source.list) ? this.source.list.id : null
+      bulkMessage.list_id = !isEmpty(this.source.integration?.list) ? this.source.integration.list.listId : null
 
       // to be implemented
-      // list_id: null, // Hubspot
       // view_id: null, // Zoho
       // filter_id: null, // Pipedrive
 
-      // API.V1.broadcasts.sendBulkMessage(bulkMessage)
-      //   .then(() => {
-      //     this.$emit('loading', false)
+      API.V1.broadcasts.sendBulkMessage(bulkMessage)
+        .then(() => {
+          this.$emit('loading', false)
 
-      //     this.$generalNotification('We have put your bulk message campaign on our outbound queue. Please wait a few minutes for us to send your messages.', 'success')
+          this.$generalNotification('We have put your bulk message campaign on our outbound queue. Please wait a few minutes for us to send your messages.', 'success')
 
-      //     this.$router.push({ path: '/broadcasts' })
-      //   })
-      //   .catch(err => {
-      //     this.$emit('loading', false)
+          this.$router.push({ path: '/broadcasts' })
+        })
+        .catch(err => {
+          this.$emit('loading', false)
 
-      //     this.$handleErrors(err.response)
-
-      //     console.log(err.response)
-      //   })
+          this.$handleErrors(err.response)
+        })
     }
   }
 }

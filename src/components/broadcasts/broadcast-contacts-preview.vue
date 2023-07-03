@@ -198,16 +198,17 @@ export default {
       }
     },
 
-    loadContacts () {
-      this.loading = true
-
+    getContacts () {
       const cancelToken = window.axios.CancelToken
       const source = cancelToken.source()
 
       // load contacts based on filters
-      const contactsPromise = API.V2.contacts.list(this.defaultFilters, source.token)
+      return API.V2.contacts.list(this.defaultFilters, source.token)
         .then(({ data }) => {
-          this.contacts = data.data
+          // only set contacts if it's not integration
+          if (isEmpty(this.integration)) {
+            this.contacts = data.data
+          }
 
           if (data.data.length) {
             this.$emit('contact-preview', data.data[0])
@@ -218,9 +219,10 @@ export default {
         .catch(err => {
           this.$handleErrors(err.response)
         })
+    },
 
-      // load count
-      const countsPromise = API.V2.contacts.counts(this.defaultFilters)
+    getContactsCount () {
+      return API.V2.contacts.counts(this.defaultFilters)
         .then(({ data }) => {
           this.contactsLength = parseInt(data.count)
 
@@ -229,6 +231,16 @@ export default {
         .catch(err => {
           this.$handleErrors(err.response)
         })
+    },
+
+    loadContacts () {
+      this.loading = true
+
+      // load contacts based on filters
+      const contactsPromise = this.getContacts()
+
+      // load count
+      const countsPromise = this.getContactsCount()
 
       Promise.all([
         contactsPromise,
@@ -247,11 +259,16 @@ export default {
       this.defaultFilters.filter_groups = this.filters
     },
 
-    setIntegrationHubspot () {
+    async setIntegrationHubspot () {
+      this.loading = true
+
       this.contactsLength = this.integration.list.metaData.size
 
+      // run this to get a preview contact
+      await this.getContacts()
+
+      this.loading = false
       // FIXME: set contacts
-      // FIXME: this.$emit('contact-preview', data.data[0])
     }
   },
 
@@ -278,7 +295,6 @@ export default {
     },
 
     isValid (state) {
-      console.log('is valid watcher')
       this.$emit('input', state)
     },
 

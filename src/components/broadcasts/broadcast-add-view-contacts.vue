@@ -21,7 +21,7 @@
             <check-o-icon color="#fff"/>
           </span>
           <q-tooltip v-if="!option.enabled">
-            This option is disabled
+            {{ option.disabledTooltip }}
           </q-tooltip>
         </label>
       </div>
@@ -141,7 +141,8 @@ export default {
         {
           value: 'integration',
           text: 'Integrations',
-          enabled: this.integrationsEnabled.length > 0
+          enabled: this.integrationsEnabled.length > 0,
+          disabledTooltip: 'You don\'t have any integration enabled'
         }
       ]
     },
