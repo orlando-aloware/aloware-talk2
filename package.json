@@ -74,6 +74,7 @@
     "vue-masonry-gallery": "^1.1.1",
     "vue-multiselect": "^2.1.7",
     "vue-popperjs": "^2.3.0",
+    "vue-recaptcha": "^2.0.3",
     "vue-wave-surfer": "^1.0.1",
     "vue2-daterange-picker": "^0.6.8",
     "vuedraggable": "^2.24.3",
