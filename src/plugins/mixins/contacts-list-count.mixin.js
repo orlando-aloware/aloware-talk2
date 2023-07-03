@@ -27,59 +27,60 @@ export default {
 
       this.setIsDatatableCountLoading(true)
 
-      this.getListDataCount(data.data, skipCancelToken).then(response => {
-        if (data.thenFunctions) {
-          const funcs = Object.keys(data.thenFunctions)
+      this.getListDataCount(data.data, skipCancelToken)
+        .then(response => {
+          if (data.thenFunctions) {
+            const funcs = Object.keys(data.thenFunctions)
 
-          for (let func of funcs) {
-            if (typeof this[func] !== 'undefined') {
-              this[func](this.fixFunctionData(data.thenFunctions[func], response))
+            for (let func of funcs) {
+              if (typeof this[func] !== 'undefined') {
+                this[func](this.fixFunctionData(data.thenFunctions[func], response))
+              }
             }
           }
-        }
 
-        if (data.thenEventFires) {
-          const events = Object.keys(data.thenEventFires)
-          for (let event of events) {
-            this.$VueEvent.fire(event, this.fixFunctionData(data.thenEventFires[event], response))
-          }
-        }
-
-        if (listId) {
-          this.$VueEvent.fire('listCountUpdated', {
-            list: {
-              id: listId
-            },
-            count: response.data.count
-          })
-        }
-
-        this.setIsDatatableCountLoading(false)
-      }).catch((err) => {
-        const className = get(err, 'constructor.name', null)
-
-        if (className && className === 'Cancel') {
-          return
-        }
-
-        if (data.catchFunctions) {
-          const funcs = Object.keys(data.catchFunctions)
-          for (let func in funcs) {
-            if (typeof this[func] !== 'undefined') {
-              this[func](data.catchFunctions[func])
+          if (data.thenEventFires) {
+            const events = Object.keys(data.thenEventFires)
+            for (let event of events) {
+              this.$VueEvent.fire(event, this.fixFunctionData(data.thenEventFires[event], response))
             }
           }
-        }
 
-        if (data.catchEventFires) {
-          const events = Object.keys(data.catchEventFires)
-          for (let event of events) {
-            this.$VueEvent.fire(event, data.catchEventFires[event])
+          if (listId) {
+            this.$VueEvent.fire('listCountUpdated', {
+              list: {
+                id: listId
+              },
+              count: response.data.count
+            })
           }
-        }
 
-        this.setIsDatatableCountLoading(false)
-      })
+          this.setIsDatatableCountLoading(false)
+        }).catch((err) => {
+          const className = get(err, 'constructor.name', null)
+
+          if (className && className === 'Cancel') {
+            return
+          }
+
+          if (data.catchFunctions) {
+            const funcs = Object.keys(data.catchFunctions)
+            for (let func in funcs) {
+              if (typeof this[func] !== 'undefined') {
+                this[func](data.catchFunctions[func])
+              }
+            }
+          }
+
+          if (data.catchEventFires) {
+            const events = Object.keys(data.catchEventFires)
+            for (let event of events) {
+              this.$VueEvent.fire(event, data.catchEventFires[event])
+            }
+          }
+
+          this.setIsDatatableCountLoading(false)
+        })
     }
 
     this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
@@ -92,14 +93,19 @@ export default {
         this.countSource = this.countCancelToken.source()
       }
 
+      const filters = typeof data.filters === 'object'
+        ? this.$jsonClone(data.filters)
+        : JSON.parse(data.filters)
+      const params = this.getQueryString(filters, true)
+
       return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
-        params: this.getQueryString(typeof data.filters === 'object' ? data.filters : JSON.parse(data.filters)),
+        params: params,
         paramsSerializer: qs.stringify,
         cancelToken: this.countSource.token
       })
     },
 
-    getQueryString (filters) {
+    getQueryString (filters, isCount = false) {
       const query = {}
       const keys = Object.keys(filters)
 
@@ -134,7 +140,18 @@ export default {
           }
 
           // contact list id becomes a separate filter
-          if (key === 'list_id') {
+          if (key === 'list_id' && isCount) {
+            query.filter_groups.push({
+              filters: {
+                'contact_lists': [
+                  {
+                    value: [filters[key]],
+                    operator: 1
+                  }
+                ]
+              }
+            })
+          } else if (key === 'list_id') {
             query.list_id = filters[key]
           }
 
