@@ -50,7 +50,8 @@
           <q-checkbox class="checkbox pl-1 remember-me"
                       label="Remember me"
                       color="positive"
-                      v-model="user.remember_me"/>
+                      v-model="user.remember_me">
+          </q-checkbox>
         </div>
         <div class="field mt-2 text-left">
           <q-btn
@@ -59,6 +60,7 @@
             color="positive"
             type="submit"
             style="width: 148px; height: 50px;"
+            :disable="loading || !user.recaptcha_response"
             :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1">
@@ -82,8 +84,8 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { aclMixin, guestFormsMixin } from 'src/plugins/mixins'
+import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -110,8 +112,10 @@ export default {
       user: {
         email: null,
         password: null,
-        remember_me: !!this.$q.platform.is.electron
+        remember_me: !!this.$q.platform.is.electron,
+        recaptcha_response: null
       },
+      siteKey: process.env.RECAPTCHA_SITE_KEY,
       loading: false,
       sb: null,
       deviceInfo: null,
@@ -120,6 +124,14 @@ export default {
   },
 
   methods: {
+    onVerify (response) {
+      this.user.recaptcha_response = response
+    },
+
+    onExpired () {
+      this.user.recaptcha_response = null
+    },
+
     getLoginParams () {
       return {
         email: this.user.email,
