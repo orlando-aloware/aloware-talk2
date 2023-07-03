@@ -153,6 +153,11 @@ export default {
     mode: {
       type: String,
       default: 'add' // add, duplicate, hubspot
+    },
+
+    checkedCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -227,7 +232,7 @@ export default {
       let description = ''
 
       if (this.count !== null) {
-        description += this.count
+        description += this.$options.filters.numFormat(this.count)
       }
 
       description += (this.count === 1 ? ' contact' : ' contacts')
@@ -315,6 +320,12 @@ export default {
     ]),
 
     setCount () {
+      if (this.checkedCount) {
+        this.count = this.checkedCount
+        this.loading--
+        return
+      }
+
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
         this.loading--

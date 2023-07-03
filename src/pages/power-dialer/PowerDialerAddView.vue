@@ -438,6 +438,7 @@
     <template slot="footer">
       <import-contacts-modal ref="importContacts"/>
       <power-dialer-add-modal :params="attachedParams()"
+                              :checked-count="selectedAllCount"
                               v-if="openPDModal"
                               @hidden="openPDModal = false"/>
     </template>
