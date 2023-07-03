@@ -152,8 +152,12 @@ export default {
         this.$route.meta.id === 'power-dialer-queue-filter'
     },
 
+    isDisabledBulkActions () {
+      return this.isAllSelected || this.checkedCount === this.totalRows
+    },
+
     optionsDisabledClass () {
-      const isCheckedAllClass = this.isAllSelected ? 'cursor-blocked pe-none disabled' : 'cursor-pointer'
+      const isCheckedAllClass = this.isDisabledBulkActions ? 'cursor-blocked pe-none disabled' : 'cursor-pointer'
 
       return [
         isCheckedAllClass
@@ -233,7 +237,7 @@ export default {
     },
 
     onMoveToTop () {
-      if (this.isAllSelected) {
+      if (this.isDisabledBulkActions) {
         return
       }
 
@@ -250,7 +254,7 @@ export default {
     },
 
     onMoveToBottom () {
-      if (this.isAllSelected) {
+      if (this.isDisabledBulkActions) {
         return
       }
 
