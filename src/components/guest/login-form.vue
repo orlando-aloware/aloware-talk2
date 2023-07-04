@@ -60,7 +60,7 @@
             color="positive"
             type="submit"
             style="width: 148px; height: 50px;"
-            :disable="loading || !user.recaptcha_response"
+            :disable="loading"
             :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1">
