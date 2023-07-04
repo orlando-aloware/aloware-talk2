@@ -214,7 +214,9 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (to.name.includes('Inbox') && to.name !== 'Inbox') {
+      const redirectingToInbox = (to.name.includes('Inbox') && to.name !== 'Inbox') || from.name === 'Inbox View'
+
+      if (redirectingToInbox) {
         this.onLoadShowTasks = true
       }
 

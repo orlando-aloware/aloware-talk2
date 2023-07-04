@@ -914,14 +914,19 @@ export default {
   },
 
   created () {
-    this.resetFilter()
+    if (this.$route.name !== 'Inbox View') {
+      this.resetFilter()
+    }
     this.toggleFilterDialog(false)
   },
 
   mounted () {
     this.setContacts([])
     this.setStatus()
-    this.initInboxTaskRoute()
+
+    if (this.$route.name !== 'Inbox View') {
+      this.initInboxTaskRoute()
+    }
 
     if (['Inbox Channel', 'Inbox', 'Inbox View'].includes(this.$route.name)) {
       this.setSelectedContact({})
@@ -1222,7 +1227,7 @@ export default {
       // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
       this.fetchTaskCounts()
 
-      this.loadContactTasks(false).finally(() => {
+      this.loadContactTasks(true).finally(() => {
         if (this.$route.params.id) {
           const id = this.$route.params.id
           const contact = this.contactTasks.find(item => item.id.toString() === id)
@@ -1258,6 +1263,11 @@ export default {
 
   watch: {
     $route (to, from) {
+      if (from.name === 'Inbox View') {
+        this.loadContactTasks()
+        this.fetchTaskCounts()
+      }
+
       this.previousRoute = from
     },
 

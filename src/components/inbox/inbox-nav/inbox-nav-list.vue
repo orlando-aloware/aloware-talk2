@@ -233,20 +233,10 @@ export default {
         const filter = this.allFilters.find(filter => +filter.id === +viewId)
 
         this.onSelectView(filter)
-
-        this.$router.push({
-          name: 'Inbox View',
-          params: {
-            viewId: viewId,
-            status: 'open'
-          }
-        }).catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-        })
-
         return
       }
+
+      this.resetFilter()
 
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
@@ -265,8 +255,6 @@ export default {
 
         return
       }
-
-      this.onResetFilter()
 
       // redirect page to Inbox
       this.$router.push({
@@ -301,7 +289,7 @@ export default {
       })
     },
 
-    onSelectView (filter, redirect = true) {
+    onSelectView (filter) {
       if (!filter || filter?.id === this.selectedFilter?.id) {
         return
       }
@@ -316,16 +304,6 @@ export default {
       }
 
       this.onApply()
-
-      if (redirect) {
-        this.$router.push({
-          name: 'Inbox View',
-          params: {
-            viewId: filter.id,
-            status: 'open'
-          }
-        })
-      }
     },
 
     onApply () {
@@ -433,6 +411,17 @@ export default {
 
       this.loadContactTasks()
       this.fetchTaskCounts()
+
+      this.$router.push({
+        name: 'Inbox View',
+        params: {
+          viewId: this.selectedFilter.id,
+          status: 'open'
+        }
+      }).catch(err => {
+        console.log(err)
+        this.$handleErrors(err.response)
+      })
     },
 
     onEditViewsClicked () {
@@ -443,13 +432,11 @@ export default {
       this.isEditingViews = false
     },
 
-    onResetFilter () {
+    resetFilter () {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setAppliedFilter(null)
-      this.loadContactTasks()
-      this.fetchTaskCounts()
     }
   },
 

@@ -84,7 +84,10 @@ export default {
       inboxRoutes: inboxRoutes,
       inboxChannelRoutes: [
         ...inboxRoutes,
-        ...['Inbox Contact']
+        ...[
+          'Inbox Channel',
+          'Inbox Contact'
+        ]
       ]
     }
   },
@@ -161,7 +164,7 @@ export default {
         // }
         //
         // this.getContactsCountByTaskStatus(this.currentTask)
-        // this.fetchTaskCounts()
+        this.fetchTaskCounts()
       }
 
       return this.getContactsByTaskStatus(this.currentTask)
