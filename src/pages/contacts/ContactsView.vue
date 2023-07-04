@@ -1704,6 +1704,7 @@ export default {
 
     checked: function (value) {
       const elem = document.querySelector('.data-table-check-all')
+
       if (elem) {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
       }

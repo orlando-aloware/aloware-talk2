@@ -611,7 +611,19 @@ export default {
 
     forcedCheckAllItems () {
       const elem = document.querySelector('.data-table-check-all')
-      const id = this.tempId || this.id
+      const id = this.tempId || this.id || this.myQueueId
+      const isPD = this.isPowerDialer || this.isPowerDialerAddContacts
+
+      if (isPD && elem?.checked) {
+        this.setListSelectedContacts({
+          id: id,
+          contacts: this.contactsData.data.filter(c => {
+            return !c.is_dnc && !c.is_blocked
+          })
+        })
+
+        return
+      }
 
       if (elem?.checked) {
         this.setListSelectedContacts({ id: id, contacts: this.contactsData.data })

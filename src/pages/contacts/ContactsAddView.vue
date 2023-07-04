@@ -917,19 +917,6 @@ export default {
       if (this.$route.name === 'Contacts' && id) {
         this.loadList(id)
       }
-    },
-
-    checkedItemIds: function (value) {
-      if (this.isContactModule) {
-        document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === this.fixedContactsData.data.length
-        return
-      }
-
-      const filteredContacts = this.fixedContactsData.data.filter(c => {
-        return !c.is_dnc && !c.is_blocked
-      })
-
-      document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
     }
   }
 }

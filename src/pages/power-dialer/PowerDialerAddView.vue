@@ -932,25 +932,6 @@ export default {
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
       }
-    },
-
-    checkedItemIds: function (value) {
-      const element = document.querySelector('.data-table-check-all')
-
-      if (!element) {
-        return
-      }
-
-      if (this.isContactModule) {
-        element.checked = this.fixedContactsData.data.length > 0 && value.length === this.fixedContactsData.data.length
-        return
-      }
-
-      const filteredContacts = this.fixedContactsData.data.filter(c => {
-        return !c.is_dnc && !c.is_blocked
-      })
-
-      element.checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
     }
   }
 }
