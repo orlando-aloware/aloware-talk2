@@ -34,12 +34,6 @@
     </nav-item>
 
     <!-- list only pinned views -->
-    <!--<router-link :to="`/channels/view/${view.filter_id}/open`"-->
-    <!--             :key="`${view.filter.name}-${index}`"-->
-    <!--             v-for="(view, index) in pinnedViews">-->
-    <!--  <div>{{ view.filter.name }}</div>-->
-    <!--</router-link>-->
-
     <nav-item icon=""
               :value="`view-${view.filter_id}`"
               :label="view.filter.name"
@@ -51,7 +45,7 @@
 
     <inbox-views target="#edit-views-icon"
                  :show="isEditingViews"
-                 :views="[...personalFilters, ...companyFilters]"
+                 :views="allFilters"
                  @closed="onEditViewsClosed"/>
   </div>
 </template>
@@ -59,7 +53,7 @@
 <script>
 import NavItem from './inbox-nav-item'
 import InboxViews from 'src/components/inbox/inbox-views.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import { pick, get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
@@ -103,14 +97,19 @@ export default {
   computed: {
     ...mapState('inbox', [
       'items',
-      'activeChannel',
       'selectedFilter',
       'isFilterDialogShown',
-      'pinnedViews'
+      'pinnedViews',
+      'personalFilters',
+      'companyFilters'
+    ]),
+
+    ...mapGetters('inbox', [
+      'allFilters'
     ]),
 
     isShowActive () {
-      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && ['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes(this.$route.name))
+      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && this.inboxChannelRoutes.includes(this.$route.name))
     }
   },
 
@@ -142,8 +141,6 @@ export default {
 
     return {
       active: this.value,
-      personalFilters: [],
-      companyFilters: [],
       isGettingFilters: false,
       filterFields: [
         'campaigns',
@@ -185,16 +182,15 @@ export default {
   },
 
   created () {
-    this.getPinnedViews()
     this.getFilters()
       .then(() => {
-        if (this.$route.params?.view) {
-          // get filterId based on URL
-          const filterId = +this.$route.params.view.replace('view-', '')
-          // get filter from personal filters list
-          const filter = this.personalFilters.find(personalFilter => personalFilter.id === filterId)
+        if (this.$route.params?.viewId) {
+          // get view id
+          const viewId = +this.$route.params.viewId
+          // get filter from all filters list
+          const filter = this.allFilters.find(filter => +filter.id === +viewId)
 
-          this.onSelectFilter(filter, false)
+          this.onSelectView(filter, false)
         }
       })
 
@@ -220,48 +216,23 @@ export default {
       'setSelectedFilter',
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
-      'setPinnedViews',
       'setInboxShowMyContacts',
       'setChannelClonedFilter',
-      'setFilterDialogForView'
+      'setFilterDialogForView',
+      'setPersonalFilters',
+      'setCompanyFilters'
     ]),
 
     onItemClicked (nextActive) {
-      // eslint-disable-next-line no-constant-condition
-      // if (true) {
-      //   console.log(nextActive)
-      //   return
-      // }
-      // if (!this.activeChannel) {
-      //   return
-      // }
-
-      // if (this.activeChannel.value === nextActive) {
-      //   this.$emit('toInbox')
-      //   return
-      // }
-
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
 
+      // redirect page to Inbox View
       if (isView) {
         const viewId = nextActive.split('-')[1]
-        const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
-        const channel = {
-          label: view.filter.name,
-          value: `view-${view.filter_id}`,
-          icon: '',
-          disabled: false
-        }
+        const filter = this.allFilters.find(filter => +filter.id === +viewId)
 
-        this.setActiveChannel(channel)
-
-        this.filter = { ...view.filter.filter }
-        this.setChannelClonedFilter(this.filter)
-        this.resetChannelChangedFilterFields()
-        this.setAppliedFilter(null)
-        this.loadContactTasks()
-        this.fetchTaskCounts()
+        this.onSelectView(filter)
 
         this.$router.push({
           name: 'Inbox View',
@@ -278,9 +249,9 @@ export default {
       }
 
       const channel = this.items.find(item => item.value === nextActive)
-      console.log(channel)
       this.setActiveChannel(channel)
 
+      // redirect page to Channel
       if (this.active !== 'inbox') {
         this.$router.push({
           name: 'Inbox Channel',
@@ -297,6 +268,7 @@ export default {
 
       this.onResetFilter()
 
+      // redirect page to Inbox
       this.$router.push({
         name: 'Inbox Channel Task Status',
         params: {
@@ -320,40 +292,16 @@ export default {
     getFilters () {
       this.isGettingFilters = true
 
+      // todo: get only contacts type filters
       return talk2Api.V2.inbox.filters.get().then(response => {
-        this.personalFilters = response.data.data.user || []
-        this.companyFilters = response.data.data.company || []
-
-        // // format filters like inbox items then merge
-        // let views = [{
-        //   label: 'Personal Views',
-        //   group: true,
-        //   value: '',
-        //   class: 'nav-list-group-title',
-        //   icon: '',
-        //   disabled: false
-        // }]
-        // const pinnedViews = this.personalFilters.map(filter => {
-        //   return {
-        //     label: filter.name,
-        //     value: `views-${filter.id}`,
-        //     icon: '',
-        //     disabled: false,
-        //     active: this.isActive(filter.name),
-        //     type: 'view',
-        //     viewId: filter.id,
-        //     viewFilter: filter.filter
-        //   }
-        // })
-        // views = this.$jsonClone(views).concat(pinnedViews)
-
-        // this.setInboxNavItems(this.$jsonClone(this.items).concat(views))
+        this.setPersonalFilters(response.data.data.user || [])
+        this.setCompanyFilters(response.data.data.company || [])
 
         this.isGettingFilters = false
       })
     },
 
-    onSelectFilter (filter, redirect = true) {
+    onSelectView (filter, redirect = true) {
       if (!filter || filter?.id === this.selectedFilter?.id) {
         return
       }
@@ -361,14 +309,11 @@ export default {
       this.setSelectedFilter(filter)
 
       // combine default filter values with the selected one
-      const personalFilterObject = filter.filter
+      const viewFilters = filter.filter
       this.filter = {
         ...this.defaultFilterModel.filter,
-        ...pick(personalFilterObject, this.filterFields)
+        ...pick(viewFilters, this.filterFields)
       }
-
-      // view route name definition
-      const route = `view-${filter.id}`
 
       this.onApply()
 
@@ -376,7 +321,7 @@ export default {
         this.$router.push({
           name: 'Inbox View',
           params: {
-            view: route,
+            viewId: filter.id,
             status: 'open'
           }
         })
@@ -505,17 +450,6 @@ export default {
       this.setAppliedFilter(null)
       this.loadContactTasks()
       this.fetchTaskCounts()
-    },
-
-    getPinnedViews () {
-      this.$axios
-        .get('/api/v2/filters/pinned')
-        .then(res => {
-          this.setPinnedViews([...res.data.data])
-        })
-        .catch(err => {
-          console.log(err)
-        })
     }
   },
 
@@ -525,18 +459,13 @@ export default {
     },
 
     active (val) {
+      // set & emit correct active channel
       if (this.value !== undefined && this.active !== this.value) {
         let activeChannel = null
 
-        if (val.indexOf('view') !== -1) {
+        if (val.indexOf('view') !== -1) { // "e.g.. view-123"
           const viewId = val.split('-')[1]
-          const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
-          activeChannel = {
-            label: view.filter.name,
-            value: `view-${view.filter_id}`,
-            icon: '',
-            disabled: false
-          }
+          activeChannel = this.getPinnedViewChannel(viewId)
         } else {
           activeChannel = this.items.find(item => item.value === val)
         }
@@ -552,17 +481,23 @@ export default {
         this.setFilterDialogForView(false)
 
         // fix route when user is in some view
-        if (this.$route.params?.view) {
-          const currentViewRouteId = +this.$route.params.view.replace('view-', '')
+        if (this.$route.params?.viewId) {
+          const currentViewRouteId = this.$route.params.viewId
 
           // this means that the filter was changed but the route remained
           if (currentViewRouteId !== this.selectedFilter.id) {
+            const channel = this.getPinnedViewChannel(this.selectedFilter.id)
+            this.setActiveChannel(channel)
+
             this.$router.push({
               name: 'Inbox View',
               params: {
-                view: 'view-' + this.selectedFilter.id,
+                viewId: this.selectedFilter.id,
                 status: 'open'
               }
+            }).catch(err => {
+              console.log(err)
+              this.$handleErrors(err.response)
             })
           }
         }

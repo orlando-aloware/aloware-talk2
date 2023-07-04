@@ -17,8 +17,8 @@
         <div>
           <div class="inbox-side__nav">
             <inbox-nav-list :closed="closed"
-                            :openCount="taskCounts.open"
-                            :pendingCount="taskCounts.pending"
+                            :openCount="inboxTaskCounts.open"
+                            :pendingCount="inboxTaskCounts.pending"
                             :value.sync="active"
                             v-model="active"
                             @active="newActive"
@@ -33,9 +33,9 @@
                    v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
                    @itemSelected="onItemSelected"/>
         <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
-                        :filter-type="activeChannel.type"
-                        :answer-status="activeChannel.answerStatus"
-                        :channel="activeChannel.value"
+                        :filter-type="activeChannel?.type"
+                        :answer-status="activeChannel?.answerStatus"
+                        :channel="activeChannel?.value"
                         :search-text="searchText"
                         :sort="sort"
                         v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1">
@@ -83,7 +83,13 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts', 'items']),
+    ...mapState('inbox', [
+      'activeChannel',
+      'communications',
+      'taskCounts',
+      'inboxTaskCounts',
+      'items'
+    ]),
 
     ...mapState(['isMobile']),
 

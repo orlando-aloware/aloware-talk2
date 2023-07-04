@@ -39,6 +39,21 @@ export default {
   SET_CLOSED_TASK_COUNT: (state, count) => {
     state.taskCounts = { ...state.taskCounts, closed: count }
   },
+  SET_INBOX_TASK_COUNT: (state, payload) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, ...payload }
+  },
+  SET_INBOX_OPEN_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, open: count }
+  },
+  SET_INBOX_PENDING_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, pending: count }
+  },
+  SET_INBOX_NEW_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, new: count }
+  },
+  SET_INBOX_CLOSED_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, closed: count }
+  },
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
   },
@@ -136,6 +151,9 @@ export default {
   SET_HAS_MORE_COMMUNICATIONS: (state, hasMore) => {
     state.hasMoreCommunications = hasMore
   },
+  SET_CONTACTS: (state, contacts) => {
+    state.contacts = contacts
+  },
   SET_SEARCHER_OPEN: (state, isOpen) => {
     state.isSearcherOpen = isOpen
   },
@@ -179,5 +197,11 @@ export default {
   },
   SET_PINNED_VIEWS (state, value) {
     state.pinnedViews = value
+  },
+  SET_PERSONAL_FILTERS (state, value) {
+    state.personalFilters = value
+  },
+  SET_COMPANY_FILTERS (state, value) {
+    state.companyFilters = value
   }
 }

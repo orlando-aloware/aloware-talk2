@@ -88,6 +88,12 @@ export default function () {
       pending: 0,
       closed: 0
     },
+    inboxTaskCounts: {
+      new: 0,
+      open: 0,
+      pending: 0,
+      closed: 0
+    },
     channelClonedFilter: {},
     channelChangedFilterFields: [],
     isFilterModelFormShown: false,
@@ -99,6 +105,8 @@ export default function () {
     isLoadingPendingTaskCount: false,
     inboxShowMyContacts: true,
     isInboxFiltersLoaded: true,
-    pinnedViews: []
+    pinnedViews: [],
+    personalFilters: [],
+    companyFilters: []
   }
 }

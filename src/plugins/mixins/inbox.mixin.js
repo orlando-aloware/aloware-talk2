@@ -8,13 +8,15 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
 
 export default {
-
   computed: {
     ...mapState('inbox', [
       'isFetchingContacts',
       'contactsCurrentPage',
       'liveContacts',
-      'inboxShowMyContacts'
+      'inboxShowMyContacts',
+      'activeChannel',
+      'pinnedViews',
+      'contacts'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -25,6 +27,14 @@ export default {
   },
 
   data () {
+    const inboxRoutes = [
+      'Inbox',
+      'Inbox Contact Task',
+      'Inbox Channel Task Status',
+      'Inbox Contact Communication',
+      'Inbox View'
+    ]
+
     return {
       currentTask: ContactTaskStatus.STATUS_OPEN,
       options: [
@@ -59,15 +69,22 @@ export default {
       perPage: 20,
       lineOrRingGroupFilter: null,
       lineOrRingGroupFilteredId: null,
-      contacts: [],
       cancelToken: null,
       source: null,
+      cancelTokenPinnedViews: null,
+      sourcePinnedViews: null,
       communicationInProgressStatuses: [
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_TRANSFERRING_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
+      ],
+      isLoadedPinnedViews: false,
+      inboxRoutes: inboxRoutes,
+      inboxChannelRoutes: [
+        ...inboxRoutes,
+        ...['Inbox Contact']
       ]
     }
   },
@@ -79,13 +96,18 @@ export default {
       'setHasMoreContacts',
       'gettingContactsList',
       'setContactsCurrentPage',
+      'setInboxTaskCount',
       'setOpenTaskCount',
       'setPendingTaskCount',
+      'setInboxOpenTaskCount',
+      'setInboxPendingTaskCount',
       'setLoadingOpenTaskCount',
       'setLoadingPendingTaskCount',
       'setIsInboxFiltersLoaded',
       'gettingTasksList',
-      'setTaskCount'
+      'setTaskCount',
+      'setPinnedViews',
+      'setContacts'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -129,7 +151,7 @@ export default {
       // always reset page when fresh loading contacts
       this.page = 1
 
-      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask) && loadCount) {
+      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask) || loadCount) {
         // if (this.currentTask === ContactTaskStatus.STATUS_OPEN && showLoading) {
         //   this.setLoadingOpenTaskCount(true)
         // }
@@ -139,13 +161,17 @@ export default {
         // }
         //
         // this.getContactsCountByTaskStatus(this.currentTask)
-        this.fetchTaskCounts()
+        // this.fetchTaskCounts()
       }
 
-      return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.taskListHasError = false
+      return this.getContactsByTaskStatus(this.currentTask)
+        .then(response => {
+          this.taskListHasError = false
 
-        if (response) {
+          if (!response) {
+            return
+          }
+
           // only empty contacts after the request is done since we are now showing the animation
           if (!showLoading) {
             this.setContacts([])
@@ -158,40 +184,42 @@ export default {
           this.isLoadingMore = false
           this.isLoaded = true
           this.setIsInboxFiltersLoaded(this.isLoaded)
-        }
-      }).catch((thrown) => {
-        if (window.axios.isCancel(thrown) && thrown) {
-          console.log(thrown.message)
-        } else {
-          this.taskListHasError = true
+        })
+        .catch((thrown) => {
+          if (window.axios.isCancel(thrown) && thrown) {
+            console.log(thrown.message)
+          } else {
+            this.taskListHasError = true
 
-          if (showLoading) {
-            this.gettingContactsList(false)
+            if (showLoading) {
+              this.gettingContactsList(false)
+            }
+
+            this.$generalNotification(`An exception was encountered while fetching contact tasks.`, 'error')
           }
 
-          this.$generalNotification(`An exception was encountered while fetching contact tasks.`, 'error')
-        }
-
-        this.isLoaded = true
-        this.setIsInboxFiltersLoaded(this.isLoaded)
-      })
+          this.isLoaded = true
+          this.setIsInboxFiltersLoaded(this.isLoaded)
+        })
     },
 
     loadMoreContactTasks () {
       this.isLoaded = false
       this.isLoadingMore = true
 
-      return this.getContactsByTaskStatus(this.currentTask).then(response => {
-        this.setContacts([...this.contacts, ...this.getNoneLiveCallContactTasks(response.data.data)])
-        this.setContactsCurrentPage(response.data.current_page)
-        this.setHasMoreContacts(response.data.next_page_url)
+      return this.getContactsByTaskStatus(this.currentTask)
+        .then(response => {
+          this.setContacts([...this.contacts, ...this.getNoneLiveCallContactTasks(response.data.data)])
+          this.setContactsCurrentPage(response.data.current_page)
+          this.setHasMoreContacts(response.data.next_page_url)
 
-        this.isLoadingMore = false
-        this.isLoaded = true
-      }).catch(() => {
-        this.isLoaded = true
-        this.setIsInboxFiltersLoaded(this.isLoaded)
-      })
+          this.isLoadingMore = false
+          this.isLoaded = true
+        })
+        .catch(() => {
+          this.isLoaded = true
+          this.setIsInboxFiltersLoaded(this.isLoaded)
+        })
     },
 
     getContactsByTaskStatus (taskId) {
@@ -202,12 +230,18 @@ export default {
     },
 
     getContactsCountByTaskStatus (taskId) {
-      return talk2Api.V2.contacts.counts(this.getParameters(taskId, true))
+      const params = this.getParameters(taskId, true)
+
+      return talk2Api.V2.contacts.counts(params)
         .then(response => {
           switch (taskId) {
             case ContactTaskStatus.STATUS_OPEN:
               if (response) {
-                this.setOpenTaskCount(response.data.count)
+                this.setOpenTaskCount(+response.data.count)
+
+                if (!this.activeChannel || this.activeChannel.value === 'inbox') {
+                  this.setInboxOpenTaskCount(+response.data.count)
+                }
               }
 
               this.setLoadingOpenTaskCount(false)
@@ -215,7 +249,11 @@ export default {
 
             case ContactTaskStatus.STATUS_PENDING:
               if (response) {
-                this.setPendingTaskCount(response.data.count)
+                this.setPendingTaskCount(+response.data.count)
+
+                if (!this.activeChannel || this.activeChannel.value === 'inbox') {
+                  this.setInboxPendingTaskCount(+response.data.count)
+                }
               }
 
               this.setLoadingPendingTaskCount(false)
@@ -258,7 +296,6 @@ export default {
           ]
         }
       }
-      console.log(this.filter)
 
       if (this.filter && this.filter?.contact_owner && this.filter.contact_owner.length && !this.filter.my_contact) {
         this.filters = {
@@ -337,10 +374,6 @@ export default {
       }
     },
 
-    setContacts (contacts) {
-      this.contacts = contacts
-    },
-
     fetchTaskCounts () {
       this.setLoadingPendingTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
@@ -359,13 +392,44 @@ export default {
       //       closed: res.data.closed
       //     })
       //   })
+    },
+
+    getPinnedViews () {
+      this.sourcePinnedViews.cancel('Loading of pinned views is canceled.')
+      this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
+
+      this.$axios
+        .get('/api/v2/filters/pinned', {
+          cancelToken: this.sourcePinnedViews.token
+        })
+        .then(res => {
+          this.setPinnedViews([...res.data.data])
+          this.isLoadedPinnedViews = true
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    getPinnedViewChannel (viewId) {
+      const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
+
+      return view && !isEmpty(view)
+        ? {
+          label: view.filter.name,
+          value: `view-${view.filter_id}`,
+          icon: '',
+          disabled: false,
+          filters: view.filter.filter
+        }
+        : {}
     }
   },
 
   created () {
     this.cancelToken = window.axios.CancelToken
     this.source = this.cancelToken.source()
-    this.cancelTokenTasksCounts = window.axios.CancelToken
-    this.sourceTasksCounts = this.cancelTokenTasksCounts.source()
+    this.cancelTokenPinnedViews = window.axios.CancelToken
+    this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
   }
 }

@@ -29,6 +29,15 @@ export default {
   setPendingTaskCount: ({ commit }, count = 0) => {
     commit('SET_PENDING_TASK_COUNT', count)
   },
+  setInboxTaskCount: ({ commit }, payload) => {
+    commit('SET_INBOX_TASK_COUNT', payload)
+  },
+  setInboxOpenTaskCount: ({ commit }, count = 0) => {
+    commit('SET_INBOX_OPEN_TASK_COUNT', count)
+  },
+  setInboxPendingTaskCount: ({ commit }, count = 0) => {
+    commit('SET_INBOX_PENDING_TASK_COUNT', count)
+  },
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
   },
@@ -74,7 +83,9 @@ export default {
   setHasMoreCommunications: ({ commit }, hasMore = false) => {
     commit('SET_HAS_MORE_COMMUNICATIONS', hasMore)
   },
-
+  setContacts: ({ commit }, contacts = false) => {
+    commit('SET_CONTACTS', contacts)
+  },
   setSearcherOpen: ({ commit }, isOpen = false) => {
     commit('SET_SEARCHER_OPEN', isOpen)
   },
@@ -95,5 +106,11 @@ export default {
   },
   setPinnedViews: ({ commit }, value) => {
     commit('SET_PINNED_VIEWS', value)
+  },
+  setPersonalFilters: ({ commit }, value) => {
+    commit('SET_PERSONAL_FILTERS', value)
+  },
+  setCompanyFilters: ({ commit }, value) => {
+    commit('SET_COMPANY_FILTERS', value)
   }
 }

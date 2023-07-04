@@ -38,11 +38,23 @@ export default {
     visibilityMixin
   ],
 
-  components: { Contact, InboxSide },
+  components: {
+    Contact,
+    InboxSide
+  },
 
   computed: {
-    ...mapGetters('auth', ['authenticated']),
-    ...mapState('inbox', ['items', 'activeChannel']),
+    ...mapGetters('auth', [
+      'authenticated'
+    ]),
+
+    ...mapGetters('inbox', [
+      'allFilters'
+    ]),
+
+    ...mapState('inbox', [
+      'items'
+    ]),
 
     isMobileContactActive () {
       return this.mobileContactScreenRoutes.includes(this.$route.name)
@@ -70,23 +82,26 @@ export default {
         'Inbox Contact',
         'Inbox Contact Task',
         'Inbox Contact Communication'
-      ],
-      channelRoutes: [
-        'Inbox Channel',
-        'Inbox Contact',
-        'Inbox Contact Task',
-        'Inbox Channel Task Status',
-        'Inbox Contact Communication'
       ]
     }
   },
 
   methods: {
-    ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
+    ...mapActions('inbox', [
+      'setActiveChannel',
+      'setTaskCount'
+    ]),
 
     setChannel (routeChanged = false) {
-      if (this.channelRoutes.includes(this.$route.name)) {
-        const channel = this.items.find(item => item.value === this.$route.params.channel)
+      if (this.inboxChannelRoutes.includes(this.$route.name)) {
+        let channel = null
+
+        if (this.$route.name === 'Inbox View' && this.isLoadedPinnedViews) {
+          channel = this.getPinnedViewChannel(this.$route.params.viewId)
+        } else {
+          channel = this.items.find(item => item.value === this.$route.params.channel)
+        }
+
         this.setActiveChannel(channel)
       } else if (this.$route.name === 'Inbox' && !this.activeChannel) {
         const channel = this.items.find(item => item.value === 'inbox')
@@ -105,6 +120,8 @@ export default {
   },
 
   created () {
+    this.getPinnedViews()
+
     if (this.$route.query && this.$route.query.add_contact) {
       this.$VueEvent.fire('add_contact', {
         phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
@@ -113,7 +130,7 @@ export default {
   },
 
   mounted () {
-    if (this.authenticated) {
+    if (this.authenticated && this.$route.name !== 'Inbox View') {
       this.setChannel()
       this.fetchTaskCounts()
     }
@@ -123,6 +140,13 @@ export default {
     '$route.name': function (value) {
       const isNotInboxRouteName = !value.includes('Inbox')
       this.setChannel(isNotInboxRouteName)
+    },
+
+    isLoadedPinnedViews (value) {
+      if (value && this.$route.name === 'Inbox View') {
+        this.setChannel()
+        this.fetchTaskCounts()
+      }
     }
   }
 }
