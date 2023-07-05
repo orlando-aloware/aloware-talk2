@@ -192,6 +192,11 @@ export default {
     noCloseButton: {
       type: Boolean,
       default: false
+    },
+
+    keepOpen: {
+      type: Boolean,
+      default: false
     }
   },
 
