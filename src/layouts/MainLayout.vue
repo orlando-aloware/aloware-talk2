@@ -635,8 +635,7 @@ export default {
       if (this.profile.sleep_mode) {
         return
       }
-      console.log('HAMED_LOG_8', data)
-      // this.handleInAppHighSmsVolumeNotification(incomingNumber, contact, direction)
+      this.handleInAppHighSmsVolumeNotification(data.incoming_number, data.contact, data.direction)
     }
 
     this.mainListeners.newInAppVoicemail = (communication) => {
