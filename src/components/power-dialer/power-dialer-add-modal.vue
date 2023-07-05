@@ -122,7 +122,7 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import { integrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -220,6 +220,10 @@ export default {
       }
 
       params.filter_groups = this.currentListFilters
+
+      if (isEmpty(params.filter_groups)) {
+        params.filter_groups = []
+      }
 
       if (this.where === 'scheduled') {
         params.future_scheduled_time = this.schedule.toISOString().substr(0, 10)
