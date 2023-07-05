@@ -2173,7 +2173,7 @@ export default {
     },
 
     handleInAppHighSmsVolumeNotification (incomingNumber, contact, direction) {
-      console.log('HAMED_LOG_10')
+      console.log('HAMED_LOG_10', incomingNumber, contact.name)
       if (window.Push.Permission.has()) {
         this.$generalNotification(`Received too many messages from a contacts.</br>Name: ${contact.name}</br>Incoming Number: ${incomingNumber.phone_number}`, 'error', 5000, true)
       }
