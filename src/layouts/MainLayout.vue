@@ -635,7 +635,7 @@ export default {
       if (this.profile.sleep_mode) {
         return
       }
-      this.handleDesktopHighSmsVolumeNotification(incomingNumber, contact, direction)
+      this.handleInAppHighSmsVolumeNotification(incomingNumber, contact, direction)
     }
 
     this.mainListeners.newInAppVoicemail = (communication) => {
@@ -2172,56 +2172,10 @@ export default {
       }
     },
 
-    handleDesktopHighSmsVolumeNotification (incomingNumber, contact, direction) {
-      const found = this.contactNotifiedDesktop.length &&
-        this.contactNotifiedDesktop.find(item => item.id === contact.id)
-      if (window.Push.Permission.has() && !found) {
-        const self = this
-        const title = 'Sent too many messages to a contact'
-        const onClickFunction = function (res) {
-          window.focus()
-          self.closeDesktopNotification(contact.id, 'contact')
-          self.decreaseAppBadge()
-          self.restoreApp()
-          self.$router
-            .push({
-              name: 'Contact',
-              params: {
-                contactObj: contact,
-                contactId: contact.id
-              }
-            })
-            .catch((err) => {
-              console.log(err)
-            })
-        }
-        const options = {
-          icon: 'notification-icons/contact.png',
-          body: `Name: ${this.$options.filters.fixName(
-            this.sanitizeText(contact.name)
-          )} Phone number: ${this.$options.filters.fixPhone(
-            contact.phone_number
-          )}.`,
-          tag: 'contact-notification-' + contact.id,
-          requireInteraction: true,
-          timeout: 10000,
-          onClick: onClickFunction,
-          onError: (err) => {
-            self.removeContactNotifiedDesktop(contact.id)
-            console.log(err)
-          },
-          onClose: () => {
-            self.removeContactNotifiedDesktop(contact.id)
-          }
-        }
-        window.Push.create(title, options).then((data) => {
-          this.addVoicemailNotifiedDesktop({
-            id: contact.id,
-            close: data.close
-          })
-        })
-        this.bounceDock()
-        this.increaseAppBadge()
+    handleInAppHighSmsVolumeNotification (incomingNumber, contact, direction) {
+      console.log('HAMED_LOG_10')
+      if (window.Push.Permission.has()) {
+        this.$generalNotification(`Received too many messages from a contacts.</br>Name: ${contact.name}</br>Incoming Number: ${incomingNumber.phone_number}`, 'error', 5000, true)
       }
     },
 
