@@ -29,7 +29,6 @@ import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-cou
 import log from 'electron-log'
 
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
-Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
 loadStock(Highcharts)
 loadExporting(Highcharts)
