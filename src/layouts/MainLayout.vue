@@ -631,12 +631,12 @@ export default {
       this.processActionNotification(communication, 'sms')
     }
 
-    this.mainListeners.newInAppHighSmsVolume = ({ incomingNumber, contact, direction }) => {
+    this.mainListeners.newInAppHighSmsVolume = (data) => {
       if (this.profile.sleep_mode) {
         return
       }
-      console.log('HAMED_LOG_8', incomingNumber, contact, direction)
-      this.handleInAppHighSmsVolumeNotification(incomingNumber, contact, direction)
+      console.log('HAMED_LOG_8', data)
+      // this.handleInAppHighSmsVolumeNotification(incomingNumber, contact, direction)
     }
 
     this.mainListeners.newInAppVoicemail = (communication) => {
