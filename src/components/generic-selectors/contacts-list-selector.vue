@@ -11,6 +11,7 @@
                      :options="lists"
                      :show-labels="false"
                      :allow-empty="false"
+                     :loading="loading"
                      v-model="list"
                      @select="onSelect" />
   </div>
@@ -43,13 +44,18 @@ export default {
 
   data () {
     return {
-      list: null
+      list: null,
+      loading: false
     }
   },
 
   async mounted () {
     if (!this.lists.length) {
+      this.loading = true
+
       await this.fetchContactsLists()
+
+      this.loading = false
     }
 
     if (this.value) {

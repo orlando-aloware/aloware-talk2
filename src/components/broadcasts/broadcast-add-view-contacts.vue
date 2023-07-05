@@ -11,14 +11,18 @@
                name="broadcast-add-view-contacts-option"
                :id="`contacts-option-${option.value}`"
                :value="option.value"
+               :disabled="!option.enabled"
                @input="onOptionSelected(option)">
-        <label :class="['broadcast-add__contacts__options__option', { 'broadcast-add__contacts__options__option--active': optionSelected === option.value }]"
+        <label :class="getOptionClasses(option)"
                :for="`contacts-option-${option.value}`">
           {{ option.text }}
           <span class="broadcast-add__contacts__options__option__icon"
                 v-if="optionSelected === option.value">
             <check-o-icon color="#fff"/>
           </span>
+          <q-tooltip v-if="!option.enabled">
+            {{ option.disabledTooltip }}
+          </q-tooltip>
         </label>
       </div>
     </div>
@@ -33,12 +37,37 @@
 
       <!-- Integration option -->
       <template v-else-if="optionSelected === 'integration'">
-        <p>Select a contact list</p>
+        <p>Select a {{ integrationText }} list</p>
         <!-- shows the selector based on which integration is enabled  -->
+        <div v-if="integrationsEnabled.length > 1">
+          <q-select style="word-break: break-all;"
+                    color="primary"
+                    use-input
+                    emit-value
+                    map-options
+                    dense
+                    outlined
+                    hide-bottom-space
+                    :placeholder="!source.integration.name ? 'Select a integration' : ''"
+                    :options="integrationsEnabled"
+                    v-model="source.integration.name">
+          </q-select>
+        </div>
+
+        <integration-list-selector ref="integrationListSelector"
+                                   :use-chips="false"
+                                   :multiple="false"
+                                   :clearable="true"
+                                   :generic-styling="false"
+                                   :integration="source.integration.name"
+                                   v-if="source.integration.name"
+                                   @change="onIntegrationListChanged"/>
       </template>
 
+      <!-- Filters option -->
       <transition name="slide-left">
         <contacts-filters class="broadcast-add__contacts__filters"
+                          no-close-button
                           v-if="optionSelected === 'filter'"
                           @filtersUpdated="onFiltersUpdated"/>
       </transition>
@@ -50,16 +79,23 @@
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
+import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
+import { integrationMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-contacts',
 
+  mixins: [
+    integrationMixin
+  ],
+
   components: {
     CheckOIcon,
     ContactsFilters,
-    ContactsListSelector
+    ContactsListSelector,
+    IntegrationListSelector
   },
 
   props: {
@@ -78,32 +114,48 @@ export default {
     isValid () {
       switch (this.optionSelected) {
         case 'list':
-        case 'integration':
           return !!this.source.list.id
         case 'filter':
           return !isEmpty(this.source.filters)
+        // FIXME: add Zoho
+        // FIXME: add Pipedrive
+        case 'integration':
+          return !isEmpty(this.source.integration?.list)
         default:
           return false
       }
+    },
+
+    options () {
+      return [
+        {
+          value: 'list',
+          text: 'By List',
+          enabled: true
+        },
+        {
+          value: 'filter',
+          text: 'By Filter',
+          enabled: true
+        },
+        {
+          value: 'integration',
+          text: 'Integrations',
+          enabled: this.integrationsEnabled.length > 0,
+          disabledTooltip: 'You don\'t have any integration enabled'
+        }
+      ]
+    },
+
+    integrationText () {
+      return this.integrationsEnabled.length > 1
+        ? 'Integration'
+        : this.integrationsEnabled[0]
     }
   },
 
   data: () => ({
     optionSelected: null,
-    options: [
-      {
-        value: 'list',
-        text: 'By List'
-      },
-      {
-        value: 'filter',
-        text: 'By Filter'
-      },
-      {
-        value: 'integration',
-        text: 'Integrations'
-      }
-    ],
     source: {
       list: {},
       filters: {},
@@ -116,6 +168,15 @@ export default {
       this.optionSelected = 'list'
     }
 
+    if (!isEmpty(this.defaultSource.filters)) {
+      this.optionSelected = 'filter'
+      this.openFilters()
+    }
+
+    if (!isEmpty(this.defaultSource.integration)) {
+      this.optionSelected = 'integration'
+    }
+
     this.source = this.defaultSource
   },
 
@@ -126,22 +187,45 @@ export default {
       'setCurrentListFilters'
     ]),
 
+    getOptionClasses (option) {
+      return [
+        'broadcast-add__contacts__options__option',
+        { 'broadcast-add__contacts__options__option--active': this.optionSelected === option.value },
+        { 'broadcast-add__contacts__options__option--disabled': !option.enabled }
+      ]
+    },
+
     onOptionSelected (option) {
       this.optionSelected = option.value
 
       // reset to default values when option changes
       this.reset()
+
+      // force integration value when there is only one enabled integration
+      if (option.value === 'integration' && this.integrationsEnabled.length === 1) {
+        this.source.integration.name = this.integrationsEnabled[0]
+
+        // use next tick to make sure ref is loaded
+        this.$nextTick()
+          .then(() => {
+            this.$refs.integrationListSelector.getListsOfEnabledIntegration()
+          })
+      }
     },
 
     onContactListSelected (list) {
       this.source.list = {
-        type: 'contacts-list',
-        id: list.id
+        id: list.id,
+        name: list.name
       }
     },
 
     onFiltersUpdated () {
       this.source.filters = this.currentListFilters
+    },
+
+    onIntegrationListChanged (integration) {
+      this.$set(this.source.integration, 'list', integration.list)
     },
 
     reset () {
@@ -165,20 +249,12 @@ export default {
       this.$emit('input', state)
     },
 
-    source (value) {
-      this.$emit('source-updated', value)
+    source: {
+      deep: true,
+      handler (value) {
+        this.$emit('source-updated', value)
+      }
     }
   }
 }
 </script>
-
-<style>
-/* FIXME: move this to a animations file */
-.slide-left-enter {
-  transform: translateX(100%);
-}
-
-.slide-left-leave-active {
-  transform: translateX(100%);
-}
-</style>

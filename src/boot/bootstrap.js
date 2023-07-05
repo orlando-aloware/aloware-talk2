@@ -22,12 +22,14 @@ import loadDrilldown from 'highcharts/modules/drilldown'
 import VueHighcharts from 'vue-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsThemes from './HighchartsTheme'
-
-import { Screen } from 'quasar'
-Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
-
+import { Screen, Platform } from 'quasar'
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
+import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
+import log from 'electron-log'
+
+Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
+Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
 loadStock(Highcharts)
 loadExporting(Highcharts)
@@ -71,7 +73,6 @@ storage.local.setItem('api_reporting_url', process.env.API_REPORITNG_URL)
 storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
-storage.local.setItem('ak_widget_url', process.env.AK_WIDGET_URL)
 
 Vue.use(infiniteScroll)
 Vue.use(BootstrapVue)
@@ -83,7 +84,9 @@ Vue.use(BusinessHours)
 Vue.use(VueHighcharts, { Highcharts })
 
 window.Bowser = Bowser
-window.timezone = 'Intl' in window ? new Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/Los_Angeles'
+window.timezone = 'Intl' in window
+  ? new Intl.DateTimeFormat().resolvedOptions().timeZone
+  : 'America/Los_Angeles'
 
 if (process.env.APP_DEBUG) {
   Vue.config.devtools = true
@@ -98,26 +101,45 @@ window.phoneUtil = googlePhone.PhoneNumberUtil.getInstance()
 // Timezones for international companies (outside US and CA)
 window.CountriesAndTimezones = CountriesAndTimezones
 
-window.getLocaleIfPhoneNumberIsFromUsAndCa = function (phoneNumber) {
+window.getLocaleIfPhoneNumberIsFromNorthAmerica = function (phoneNumber) {
   if (!phoneNumber) {
     return false
   }
 
-  const validCountries = ['US', 'CA']
-
   try {
-    const validCountry = { data: null }
-    for (validCountry.data of validCountries) {
+    for (const validCountry of VALID_NA_COUNTRIES) {
       const number = window.phoneUtil.parseAndKeepRawInput(
         phoneNumber,
-        validCountry.data
+        validCountry
       )
-      if (window.phoneUtil.isPossibleNumber(number)) {
-        if (window.phoneUtil.isValidNumberForRegion(number, validCountry.data)) {
-          return validCountry.data
-        }
+      let isPossible = window.phoneUtil.isPossibleNumber(number)
+
+      if (isPossible && window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
+        return validCountry
       }
     }
+
+    return false
+  } catch (err) {
+    return false
+  }
+}
+
+window.getLocaleIfPhoneNumberIsFromGreatBritainOrAustralia = function (phoneNumber) {
+  if (!phoneNumber) {
+    return false
+  }
+
+  try {
+    for (let validCountry of VALID_ENG_COUNTRIES) {
+      let number = window.phoneUtil.parseAndKeepRawInput(phoneNumber, validCountry)
+      let isPossible = window.phoneUtil.isPossibleNumber(number)
+
+      if (isPossible && window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
+        return validCountry
+      }
+    }
+
     return false
   } catch (err) {
     return false
@@ -129,14 +151,53 @@ window.guessLocale = function (phoneNumber) {
     return false
   }
 
+  // Use substring() and indexOf() functions to remove
+  // portion of string after certain character (w => wait)
+  // example, the extension wwww2wwwwww5wwwwww9 waits 2 seconds
+  // before sending the digit 2, followed by a three second wait
+  // before sending th 5, and finally another three second wait
+  // before sending a 9. These are numbers behind IVR/extension
+  let pos = phoneNumber.indexOf('w')
+
+  if (pos !== -1) {
+    phoneNumber = phoneNumber.substring(0, pos).trim()
+  }
+
   try {
     // handle US and CA as an special case
-    const northAmericaLocale = window.getLocaleIfPhoneNumberIsFromUsAndCa(
+    let northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica(
       phoneNumber
     )
+
     if (northAmericaLocale) {
       return northAmericaLocale
     }
+
+    // will add + to phone number and check again
+    if (!phoneNumber.includes('+')) {
+      northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica('+' + phoneNumber)
+
+      if (northAmericaLocale) {
+        return northAmericaLocale
+      }
+    }
+
+    // will add +1 to phone number and check again
+    if (!phoneNumber.includes('+')) {
+      northAmericaLocale = window.getLocaleIfPhoneNumberIsFromNorthAmerica('+1' + phoneNumber)
+
+      if (northAmericaLocale) {
+        return northAmericaLocale
+      }
+    }
+
+    // handle GB & AU as a special case
+    let englishLocale = window.getLocaleIfPhoneNumberIsFromGreatBritainOrAustralia(phoneNumber)
+
+    if (englishLocale) {
+      return englishLocale
+    }
+
     // if we reached here then it's definitely not a US or CA number according to google-libphonenumber
     // let's check for international locales
 
@@ -144,11 +205,16 @@ window.guessLocale = function (phoneNumber) {
       phoneNumber = '+' + phoneNumber
     }
 
-    const number = window.phoneUtil.parse(phoneNumber)
-    const locale = window.phoneUtil.getRegionCodeForNumber(number)
+    let number = window.phoneUtil.parse(phoneNumber)
+    let locale = window.phoneUtil.getRegionCodeForNumber(number)
+    let isValid = window.phoneUtil.isValidNumber(number)
 
     if (!locale) {
-      return false
+      number = window.phoneUtil.parse(phoneNumber, 'US')
+      locale = window.phoneUtil.getRegionCodeForNumber(number)
+      isValid = window.phoneUtil.isValidNumber(number)
+
+      return isValid
     }
 
     return locale
@@ -181,11 +247,9 @@ if (process.env.APP_ENV !== 'production') {
   storage.local.setItem('env', 'development')
 }
 
-if (
-  (process.env.NODE_ENV === 'production' ||
-    process.env.NODE_ENV === 'development') &&
-  process.env.APP_ENV !== 'local'
-) {
+const isNotLocal = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development'
+
+if (isNotLocal && process.env.APP_ENV !== 'local') {
   Sentry.init({
     Vue,
     dsn: process.env.SENTRY_DSN_PUBLIC,
@@ -245,6 +309,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
   if (response && response.status) {
     const message = { data: response.data.error }
     const error = { data: null }
+
     switch (response.status) {
       case 401:
         if (!response.data.errors.length && response.data.error) {
@@ -257,6 +322,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
 
         if (response.data.errors.length) {
           response.data.errors = ''
+
           for (error.data of response.data.errors) {
             message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
           }
@@ -265,9 +331,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         break
       case 403:
         message.data = 'You do not have enough permissions to make this request.'
+
         if (response.data && response.data.error) {
           message.data = response.data.error
         }
+
         break
       case 404:
         message.data = response?.data?.error ?? 'Requested resource not found.'
@@ -278,9 +346,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
       case 422:
         message.data = ''
         const keys = Object.keys(response.data.errors)
+
         keys.forEach((value) => {
           message.data += keys.length > 1 ? `<p class="pt-1 pb-1">- ${response.data.errors[value]}</p>` : response.data.errors[value]
         })
+
         break
       case 500:
         message.data = 'Oops! We are having some problems right now, please try again later.'
@@ -298,13 +368,15 @@ Vue.prototype.$handleUploadErrors = function (error) {
   if (typeof error === 'string') {
     error = JSON.parse(error)
   }
-  const err = { data: {} }
+
+  let err = {}
+
   if (error.message === 'This action is unauthorized.') {
-    err.data = {
+    err = {
       status: 403
     }
   } else {
-    err.data = {
+    err = {
       status: 422,
       data: {
         errors: error.errors.file
@@ -312,7 +384,14 @@ Vue.prototype.$handleUploadErrors = function (error) {
     }
   }
 
-  this.$handleErrors(err.data)
+  this.$handleErrors(err)
+}
+
+Vue.prototype.$handleRouteError = (error) => {
+  if (error.name !== 'NavigationDuplicated' &&
+    !error.message.includes('Avoided redundant navigation to current location')) {
+    console.log(error)
+  }
 }
 
 Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') => {
@@ -411,6 +490,21 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
       }]
       colorClass.data = 'bg-green-10'
       break
+    case 'error-redirect':
+      actions = [{
+        label: 'Go to page',
+        color: 'primary',
+        class: 'px-2',
+        handler: () => {
+          if (actionOptions.path) {
+            this.$router.push({
+              path: actionOptions.path
+            })
+          }
+        }
+      }]
+      colorClass.data = 'bg-red-10'
+      break
     default:
       colorClass.data = 'bg-green-10'
   }
@@ -452,9 +546,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     return
   }
 
-  if (!settings.title ||
-    (!['sms', 'incomingCall', 'callFishing'].includes(settings.type) && !settings.message) ||
-    (settings.type === 'sms' && !settings.message && !settings.attachment)) {
+  const noMessage = !['sms', 'incomingCall', 'callFishing'].includes(settings.type) && !settings.message
+  const smsNoMessage = settings.type === 'sms' && !settings.message && !settings.attachment
+
+  if (!settings.title || noMessage || smsNoMessage) {
     return
   }
 
@@ -467,22 +562,24 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   if (settings.type === 'callFishing' &&
     this.$store.state.notifications[settings.type].communicationId &&
     this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
-    this.$store.state.notifications[settings.type].contactId !== settings.contactId
-  ) {
-    const queue = { data: window._.get(this.$store.state.notifications, `${settings.type}.queue`, []) }
-    queue.data = !queue.data ? [] : JSON.parse(JSON.stringify(queue.data))
-    const found = queue.data.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
+    this.$store.state.notifications[settings.type].contactId !== settings.contactId) {
+    let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
+    queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
+    const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
       return
     }
 
-    queue.data.push(settings)
+    queue.push(settings)
 
     data.data = JSON.parse(JSON.stringify(this.$store.state.notifications[settings.type]))
-    data.data.queue = queue.data
+    data.data.queue = queue
     this.$store.commit('SET_NOTIFICATIONS', data)
-    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+
+    if (settings.type === 'callFishing') {
+      this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+    }
 
     return
   }
@@ -497,22 +594,25 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     this.$store.commit('SET_NOTIFICATIONS', data)
     settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
     this.$bvToast.show(settings.type)
+
     return
   }
 
-  const counter = { data: 0 }
-  const notificationInterval = { data: null }
-  notificationInterval.data = setInterval(() => {
+  let counter = 0
+  let notificationInterval = null
+
+  notificationInterval = setInterval(() => {
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
       settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
       this.$bvToast.show(settings.type)
-      clearInterval(notificationInterval.data)
+      clearInterval(notificationInterval)
     }
-    counter.data++
 
-    if (counter.data > 120) {
-      clearInterval(notificationInterval.data)
+    counter++
+
+    if (counter > 120) {
+      clearInterval(notificationInterval)
     }
   }, 500)
 }, 100)
@@ -564,6 +664,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
       )
     ]
   )
+
   // Pass the VNodes as an array for message and title
   this.$bvToast.toast([vNodesMsg], {
     title: null,
@@ -623,6 +724,7 @@ Vue.prototype.$alphabeticalSort = (items, property = 'name') => {
   return window._.clone(items).sort((a, b) => {
     const textA = a[property].toUpperCase()
     const textB = b[property].toUpperCase()
+
     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
   })
 }
@@ -631,4 +733,14 @@ Vue.prototype.$isNumeric = (value) => {
   let regex = /^-{0,1}\d*\.{0,1}\d+$/
 
   return regex.test(value)
+}
+
+Vue.prototype.$electronLog = (value) => {
+  if (!value || !Platform.is.electron) {
+    return
+  }
+
+  log.transports.file.level = 'info'
+  log.transports.file.maxSize = 5 * 1024 * 1024
+  log.info(value)
 }

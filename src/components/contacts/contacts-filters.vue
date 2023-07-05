@@ -22,6 +22,7 @@
             <b-button variant="light"
                       class="header-buttons btn-close-filter border-0 grey-90"
                       size="sm"
+                      v-if="!noCloseButton"
                       @click="onCloseFilter">
               <i class="fa fa-times"></i>
             </b-button>
@@ -188,7 +189,7 @@ export default {
   },
 
   props: {
-    keepOpen: {
+    noCloseButton: {
       type: Boolean,
       default: false
     }

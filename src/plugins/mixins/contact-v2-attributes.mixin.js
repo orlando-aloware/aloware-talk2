@@ -3,10 +3,12 @@ import { get, isEmpty } from 'lodash'
 export default {
   methods: {
     addV2ContactAttributes (contact, communication = null, contactToUpdate = null) {
+      const oldContact = this.$jsonClone(contact)
+      const newContact = this.$jsonClone(contactToUpdate)
       // initialize the v2 contact attributes
-      const unreadCount = get(contact, 'unread_count', 0)
-      const unreadMissedCallCount = get(contact, 'unread_missed_call_count', 0)
-      const unreadVoicemailCount = get(contact, 'unread_voicemail_count', 0)
+      const unreadCount = get(oldContact, 'unread_count', 0)
+      const unreadMissedCallCount = get(oldContact, 'unread_missed_call_count', 0)
+      const unreadVoicemailCount = get(oldContact, 'unread_voicemail_count', 0)
       let engagementDate = null
 
       // remove the contact from communication
@@ -16,7 +18,7 @@ export default {
 
       // add the last communication
       if (communication) {
-        contact.last_communication = communication
+        oldContact.last_communication = communication
       }
 
       // we only declare engagement date if there is a communication
@@ -27,21 +29,22 @@ export default {
 
       // assign value for contact's last engagement from
       // communication if it doesn't exist
-      if (contactToUpdate && engagementDate && !('last_engagement_at' in contactToUpdate)) {
-        contact.last_engagement_at = engagementDate
+      if (newContact && engagementDate && !('last_engagement_at' in newContact)) {
+        oldContact.last_engagement_at = engagementDate
       }
 
       // assign zero value for the unreads
-      contact.unread_texts_count = unreadCount
-      contact.unread_missed_calls_count = unreadMissedCallCount
-      contact.unread_voicemails_count = unreadVoicemailCount
+      oldContact.unread_texts_count = unreadCount
+      oldContact.unread_missed_calls_count = unreadMissedCallCount
+      oldContact.unread_voicemails_count = unreadVoicemailCount
 
-      if (!isEmpty(contactToUpdate)) {
-        Object.assign(contactToUpdate, contact)
-        return contactToUpdate
+      if (!isEmpty(newContact)) {
+        Object.assign(newContact, oldContact)
+
+        return newContact
       }
 
-      return contact
+      return oldContact
     }
   }
 }

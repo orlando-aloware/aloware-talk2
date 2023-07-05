@@ -160,6 +160,7 @@
     <div class="d-flex justify-content-between"
          @dragover.prevent>
       <message-composer-options :campaign-id="campaignId"
+                                :max-attachments="maxAttachments"
                                 @gifSelected="gifSelected"
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
@@ -248,6 +249,16 @@ export default {
     useSendButton: {
       type: Boolean,
       default: true
+    },
+
+    resetOnLoad: {
+      type: Boolean,
+      default: true
+    },
+
+    maxAttachments: {
+      type: Number,
+      default: null
     }
   },
 
@@ -519,11 +530,11 @@ export default {
     },
 
     templateSelected (template) {
-      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + template.body)
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + template.body)
     },
 
     variableSelected (variable) {
-      this.setMessageComposerSmsBody((this.messageComposer.sms.body ?? '') + ' ' + variable)
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + variable)
     },
 
     attachmentUploaded (files) {
@@ -683,7 +694,11 @@ export default {
 
   mounted () {
     this.getDomains()
-    this.resetMessageComposerSms()
+
+    if (this.resetOnLoad) {
+      this.resetMessageComposerSms()
+    }
+
     if (this.messageComposer.mode === 'sms') {
       this.focusInput()
     }

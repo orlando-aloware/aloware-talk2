@@ -20,7 +20,8 @@
                         :first-step="steps[0].id"
                         :last-step="steps[steps.length - 1].id"
                         @next="onNext"
-                        @back="onBack"/>
+                        @back="onBack"
+                        @loading="onLoading"/>
   </div>
 </template>
 
@@ -72,6 +73,10 @@ export default {
 
     onNext () {
       this.step++
+    },
+
+    onLoading (state) {
+      this.loading = state
     }
   }
 }

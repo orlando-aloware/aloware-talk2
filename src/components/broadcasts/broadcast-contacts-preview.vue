@@ -10,7 +10,8 @@
       </template>
     </b-overlay>
 
-    <div class="contacts-preview__header">
+    <div class="contacts-preview__header"
+         v-if="!loading">
       Contacts Preview
       <span class="contacts-preview__header__counter">
         {{ contactsLength }} {{ contactsLength === 1 ? 'Contact' : 'Contacts' }}
@@ -18,9 +19,11 @@
     </div>
 
     <datatable class="contacts-preview__body"
+               use-empty-slot
+               :is-empty="contacts.length === 0"
                :columns="columns"
                :is-scrollable="false"
-               v-if="contacts.length">
+               v-if="!loading">
       <template slot="tbody">
         <tr class="datatable-row"
             :key="index"
@@ -65,6 +68,14 @@
           </template>
         </tr>
       </template>
+      <template #empty
+                v-if="contacts.length === 0">
+        <div class="empty-state">
+          <div class="h5">
+            {{ noContactsPlaceholder }}
+          </div>
+        </div>
+      </template>
     </datatable>
   </div>
 </template>
@@ -73,6 +84,7 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
+import { isEmpty, parseInt } from 'lodash'
 
 export default {
   name: 'broadcast-contacts-preview',
@@ -92,6 +104,11 @@ export default {
     filters: {
       type: [Array, Object],
       required: false
+    },
+
+    integration: {
+      type: Object,
+      default: () => ({})
     }
   },
 
@@ -126,6 +143,19 @@ export default {
 
     isValid () {
       return this.contactsLength > 0 && !this.loading
+    },
+
+    noContactsPlaceholder () {
+      switch (true) {
+        case !isEmpty(this.list):
+          return 'No contacts found on the current list'
+        case !isEmpty(this.filters):
+          return 'No contacts found based on the current filters'
+        case !isEmpty(this.integration):
+          return 'Contacts preview isn\'t available for integrations'
+        default:
+          return 'No contacts found'
+      }
     }
   },
 
@@ -152,28 +182,33 @@ export default {
   methods: {
     init () {
       switch (true) {
-        case this.list.type === 'contacts-list':
+        case !isEmpty(this.list):
           this.setContactsListFilter()
           this.loadContacts()
           break
-        case !!this.filters:
+        case !isEmpty(this.filters):
           this.setContactsFilters()
           this.loadContacts()
           break
-        // FIXME: integrations
+        case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
+          this.setIntegrationHubspot()
+          break
+        // FIXME: Zoho
+        // FIXME: Pipedrive
       }
     },
 
-    loadContacts () {
-      this.loading = true
-
+    getContacts () {
       const cancelToken = window.axios.CancelToken
       const source = cancelToken.source()
 
       // load contacts based on filters
-      const contactsPromise = API.V2.contacts.list(this.defaultFilters, source.token)
+      return API.V2.contacts.list(this.defaultFilters, source.token)
         .then(({ data }) => {
-          this.contacts = data.data
+          // only set contacts if it's not integration
+          if (isEmpty(this.integration)) {
+            this.contacts = data.data
+          }
 
           if (data.data.length) {
             this.$emit('contact-preview', data.data[0])
@@ -184,17 +219,28 @@ export default {
         .catch(err => {
           this.$handleErrors(err.response)
         })
+    },
 
-      // load count
-      const countsPromise = API.V2.contacts.counts(this.defaultFilters)
+    getContactsCount () {
+      return API.V2.contacts.counts(this.defaultFilters)
         .then(({ data }) => {
-          this.contactsLength = data.count
+          this.contactsLength = parseInt(data.count)
 
           return Promise.resolve()
         })
         .catch(err => {
           this.$handleErrors(err.response)
         })
+    },
+
+    loadContacts () {
+      this.loading = true
+
+      // load contacts based on filters
+      const contactsPromise = this.getContacts()
+
+      // load count
+      const countsPromise = this.getContactsCount()
 
       Promise.all([
         contactsPromise,
@@ -211,6 +257,18 @@ export default {
 
     setContactsFilters () {
       this.defaultFilters.filter_groups = this.filters
+    },
+
+    async setIntegrationHubspot () {
+      this.loading = true
+
+      this.contactsLength = this.integration.list.metaData.size
+
+      // run this to get a preview contact
+      await this.getContacts()
+
+      this.loading = false
+      // FIXME: set contacts
     }
   },
 
@@ -229,8 +287,22 @@ export default {
       }
     },
 
+    integration: {
+      deep: true,
+      handler () {
+        this.init()
+      }
+    },
+
     isValid (state) {
       this.$emit('input', state)
+    },
+
+    contactsLength: {
+      immediate: true,
+      handler (count) {
+        this.$emit('contacts-length', count)
+      }
     }
   },
 

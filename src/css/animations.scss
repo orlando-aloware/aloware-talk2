@@ -17,3 +17,28 @@
 .list-fade-leave-active {
   position: absolute;
 }
+
+.slide-left-enter {
+  transform: translateX(100%);
+}
+
+.slide-left-leave-active {
+  transform: translateX(100%);
+}
+
+.horizontal-slide-left-enter-active, 
+.horizontal-slide-left-leave-active,
+.horizontal-slide-right-enter-active, 
+.horizontal-slide-right-leave-active {
+  transition: transform 0.5s;
+}
+
+.horizontal-slide-left-enter,
+.horizontal-slide-left-leave {
+  transform: translateX(-100vw);
+}
+
+.horizontal-slide-right-enter,
+.horizontal-slide-right-leave  {
+  transform: translateX(100vw);
+}

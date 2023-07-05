@@ -287,6 +287,53 @@
               <hr/>
             </div>
 
+            <div v-if="communication.type === CommunicationTypes.CALL && communication.metadata && communication.metadata.reports">
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Answered with Fishing Mode: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.metadata.reports.is_fishing ? 'Yes' : 'No' }}
+                  </div>
+                </b-col>
+              </b-form-row>
+
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Barged: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.metadata.reports.is_barge ? 'Yes' : 'No' }}
+                  </div>
+                </b-col>
+              </b-form-row>
+
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Whispered: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.metadata.reports.is_whisper ? 'Yes' : 'No' }}
+                  </div>
+                </b-col>
+              </b-form-row>
+
+              <b-form-row>
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Queued: </q-item-label>
+                </b-col>
+                <b-col>
+                  <div class="d-flex align-items-center">
+                    {{ communication.metadata.reports.is_queued ? 'Yes' : 'No' }}
+                  </div>
+                </b-col>
+              </b-form-row>
+              <hr/>
+            </div>
+
             <b-form-row v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <b-col class="pl-0 pr-0">
                 <q-item-label>{{ communication.type === CommunicationTypes.CALL ? 'Started at' : 'Sent at'}}: </q-item-label>
