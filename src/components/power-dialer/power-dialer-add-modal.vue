@@ -219,10 +219,8 @@ export default {
         }
       }
 
-      params.filter_groups = this.currentListFilters
-
-      if (isEmpty(params.filter_groups)) {
-        params.filter_groups = []
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.currentListFilters
       }
 
       if (this.where === 'scheduled') {

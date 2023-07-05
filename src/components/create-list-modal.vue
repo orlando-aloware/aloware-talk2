@@ -101,6 +101,7 @@ import {
   FROM_FOLDERS,
   FROM_BULK_MENU
 } from 'src/constants/contacts-list-create-mode'
+import { isEmpty } from 'lodash'
 
 export default {
   props: {
@@ -223,7 +224,9 @@ export default {
         params.selected_all = true
       }
 
-      params.filter_groups = this.currentListFilters
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.currentListFilters
+      }
 
       return params
     },
