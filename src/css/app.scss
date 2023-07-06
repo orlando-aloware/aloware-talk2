@@ -8149,11 +8149,13 @@ span.mention {
       text-align: center;
       font-family: 'Inter', sans-serif !important;
 
-      .task-status-name, .broadcast-filter-name {
+      .task-status-name,
+      .broadcast-filter-name {
         margin-top: -2px;
       }
 
-      .task-count, .broadcast-count {
+      .task-count,
+      .broadcast-count {
         background: rgba(255, 255, 255, 0.22);
         border-radius: 5px;
         font-size: 10px;
