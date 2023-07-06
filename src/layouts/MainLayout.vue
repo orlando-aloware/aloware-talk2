@@ -240,6 +240,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 import {
   CURRENT_STATUS_HOLD_NEW,
   CURRENT_STATUS_INPROGRESS_NEW,
@@ -2189,7 +2190,11 @@ export default {
 
     handleDesktopHighSmsVolumeNotification (incomingNumber, contact, direction) {
       if (window.Push.Permission.has()) {
-        this.$generalNotification(`Received too many messages from a contacts.</br>Name: ${contact.name}</br>Incoming Number: ${incomingNumber.phone_number}`, 'error', 5000, true)
+        let title = 'Received too many messages from a contact.'
+        if (direction === CommunicationDirection.OUTBOUND) {
+          title = 'Sent too many messages to a contact.'
+        }
+        this.$generalNotification(`${title}.</br>Name: ${contact.name}</br>Incoming Number: ${incomingNumber.phone_number}`, 'error', 5000, true)
       }
     },
 
