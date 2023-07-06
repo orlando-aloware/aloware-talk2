@@ -103,7 +103,10 @@ export default {
         }
 
         this.setActiveChannel(channel)
-      } else if (this.$route.name === 'Inbox' && !this.activeChannel) {
+        return
+      }
+
+      if (this.$route.name === 'Inbox' && !this.activeChannel) {
         const channel = this.items.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }

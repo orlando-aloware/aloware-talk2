@@ -195,9 +195,9 @@ export default {
       })
 
     // listen to filter updates
-    this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
-      this.personalFilters = personalFilters
-    })
+    // this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
+    //   this.personalFilters = personalFilters
+    // })
   },
 
   mounted () {
@@ -303,10 +303,10 @@ export default {
         ...pick(viewFilters, this.filterFields)
       }
 
-      this.onApply()
+      this.applyFilter()
     },
 
-    onApply () {
+    applyFilter () {
       this.resetChannelChangedFilterFields()
       const myContactsFilter = get(this.filter, 'my_contact', null)
 
@@ -388,26 +388,6 @@ export default {
       //   communicationAnswerStatus) {
       //   this.filter.answer_status = communicationAnswerStatus
       // }
-
-      this.applyFilter()
-    },
-
-    applyFilter () {
-      if (!this.selectedFilter) {
-        return
-      }
-
-      for (const prop in this.selectedFilter.filter) {
-        this.filter[prop] = this.selectedFilter.filter[prop]
-      }
-
-      this.filter = {
-        ...this.filter,
-        untagged_only: +this.filter.untagged_only,
-        first_time_only: +this.filter.first_time_only,
-        exclude_automated_communications: +this.filter.exclude_automated_communications,
-        my_contact: +this.filter.my_contact
-      }
 
       this.loadContactTasks()
       this.fetchTaskCounts()

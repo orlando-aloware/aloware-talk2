@@ -16,7 +16,8 @@ export default {
       'inboxShowMyContacts',
       'activeChannel',
       'pinnedViews',
-      'contacts'
+      'contacts',
+      'appliedFilter'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -282,38 +283,40 @@ export default {
         this.filters.contact_task_status[0].value = [taskId]
       }
 
-      if (this.filter && this.filter?.campaigns && this.filter.campaigns.length) {
+      const filter = this.appliedFilter?.filter ?? null
+
+      if (filter && filter?.campaigns && filter.campaigns.length) {
         this.filters = {
           ...this.filters,
           'lines': [
-            { value: this.filter.campaigns, operator: OPERATORS.IS_ANY_OF }
+            { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
           ]
         }
       }
 
-      if (this.filter && this.filter?.ring_groups && this.filter.ring_groups.length) {
+      if (filter && filter?.ring_groups && filter.ring_groups.length) {
         this.filters = {
           ...this.filters,
           'ring_groups': [
-            { value: this.filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
+            { value: filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
           ]
         }
       }
 
-      if (this.filter && this.filter?.contact_owner && this.filter.contact_owner.length && !this.filter.my_contact) {
+      if (filter && filter?.contact_owner && filter.contact_owner.length && !filter.my_contact) {
         this.filters = {
           ...this.filters,
           'contact_owner': [
-            { value: this.filter.contact_owner, operator: OPERATORS.IS_ANY_OF }
+            { value: filter.contact_owner, operator: OPERATORS.IS_ANY_OF }
           ]
         }
       }
 
-      if (this.filter && this.filter?.my_contact && this.filter.my_contact) {
-        query.my_contact = this.filter.my_contact
+      if (filter && filter?.my_contact && filter.my_contact) {
+        query.my_contact = filter.my_contact
       }
 
-      if ((this.filter && this.filter?.my_contact && this.filter.my_contact) || this.inboxShowMyContacts) {
+      if ((filter && filter?.my_contact && filter.my_contact) || this.inboxShowMyContacts) {
         this.filters = {
           ...this.filters,
           'contact_owner': [
@@ -322,20 +325,20 @@ export default {
         }
       }
 
-      if (this.filter && this.filter?.from_date && this.filter?.to_date && this.filter.from_date && this.filter.to_date) {
+      if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
           ...this.filters,
           'last_engagement_at': [
-            { value: [this.filter.from_date, this.filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
+            { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
           ]
         }
       }
 
-      if (this.filter && !isEmpty(this.filter.tags)) {
+      if (filter && !isEmpty(filter.tags)) {
         this.filters = {
           ...this.filters,
           'tags': [
-            { value: this.filter.tags, operator: OPERATORS.IS_ANY_OF }
+            { value: filter.tags, operator: OPERATORS.IS_ANY_OF }
           ]
         }
         relations.push('tags')

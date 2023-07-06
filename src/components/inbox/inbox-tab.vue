@@ -50,6 +50,7 @@
           </div>
         </template>
       </calls-header>
+
       <div class="w-100"
            v-if="!isSearch">
         <q-btn-toggle class="mx-2 mt-2 mb-1 custom-toggle-button"
@@ -118,11 +119,13 @@
           </template>
         </q-btn-toggle>
       </div>
+
       <search-toggle ref="searchToggle"
                      v-if="isSearch"
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
+
       <div class="w-100 flex-grow-1"
            v-if="liveCalls.length > 0 && !isSearch">
         <inbox-task-list key-prefix="live-call"
@@ -133,6 +136,7 @@
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
       </div>
+
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
@@ -169,14 +173,13 @@
           </b-overlay>
         </div>
       </div>
+
       <filter-dialog v-model="filter"
                      :default-filter-model="defaultFilterModel"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
-                     @onResetFilter="onResetFilter">
-      </filter-dialog>
-      <create-filter-dialog :filter-model="newFilterModel">
-      </create-filter-dialog>
+                     @onResetFilter="onResetFilter" />
+      <create-filter-dialog :filter-model="newFilterModel" />
     </div>
 </template>
 
@@ -556,6 +559,20 @@ export default {
       this.$nextTick(() => {
         this.$refs.taskListScroller.scrollTop = 0
       })
+
+      if (this.$route.name === 'Inbox View') {
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: this.$route.params.viewId,
+            status: this.statusText
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+
+        return
+      }
 
       this.$router.push({
         name: 'Inbox Channel Task Status',
@@ -1263,7 +1280,8 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (from.name === 'Inbox View') {
+      // load contacts if not from the same route
+      if (from.name === 'Inbox View' && from.name !== to.name) {
         this.loadContactTasks()
         this.fetchTaskCounts()
       }
