@@ -8136,7 +8136,8 @@ span.mention {
     &[aria-pressed="false"] {
       color: transparent !important;
 
-      .task-count, .broadcast-count {
+      .task-count,
+      .broadcast-count {
         background: $grey-70 !important;
         color: $grey-90 !important;
       }
