@@ -113,7 +113,7 @@
     <div class="broadcasts__home__graph">
       <communication-activity-graph base="broadcast"
                                     :default-date-range="7"/>
-re    </div>
+    </div>
     <q-separator/>
     <div class="d-flex align-items-center justify-content-end">
       <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"

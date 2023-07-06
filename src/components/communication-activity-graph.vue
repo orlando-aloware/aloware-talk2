@@ -250,8 +250,7 @@ export default {
               s.push(`<i class="fa fa-circle" style="color: ${point.series.color};"></i><span class="text-grey-900" style="font-size: 0.875rem"> ${point.series.name}: <b>${point.y.toLocaleString()}</b></span>`)
             }
 
-            s = s.join('</br>')
-            return s
+            return s.join('</br>')
           }
         },
         legend: {
@@ -283,21 +282,13 @@ export default {
 
   computed: {
     getStyle () {
-      let height = '450px'
-
-      if (this.options.series.length > 10) {
-        height = '650px'
-      }
-
       return {
-        height: height
+        height: this.options.series.length > 10 ? '650px' : '450px'
       }
     },
 
     isLargeEnough () {
-      let validSizes = ['xxl', 'xl', 'lg']
-
-      return validSizes.includes(this.$mq)
+      return ['xxl', 'xl', 'lg'].includes(this.$mq)
     },
 
     isNoData () {
