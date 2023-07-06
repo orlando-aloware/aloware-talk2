@@ -30,7 +30,7 @@
                        class="data-table-check-all"
                        type="checkbox"
                        @change="onCheckboxClicked" />
-                <span class="checkmark"></span>
+                <span class="checkmark"/>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
                 <div class="move-icon-drag-container"
