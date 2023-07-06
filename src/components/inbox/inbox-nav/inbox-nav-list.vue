@@ -269,19 +269,19 @@ export default {
       })
     },
 
-    isActive (value, type = 'channel') {
-      if (type === 'channel') {
-        return this.isShowActive && this.activeChannel && this.activeChannel.value === value
+    isActive (value, type = null) {
+      if (type === 'view') {
+        return this.selectedFilter?.id === value.filter_id
       }
 
-      return this.selectedFilter?.id === value.id
+      return this.isShowActive && this.activeChannel && this.activeChannel.value === value
     },
 
     getFilters () {
       this.isGettingFilters = true
 
       // todo: get only contacts type filters
-      return talk2Api.V2.inbox.filters.get().then(response => {
+      return talk2Api.V2.inbox.filters.get({ type: ChannelType.CHANNEL_INBOX }).then(response => {
         this.setPersonalFilters(response.data.data.user || [])
         this.setCompanyFilters(response.data.data.company || [])
 

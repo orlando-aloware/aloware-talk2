@@ -450,7 +450,8 @@ export default {
       'setLoadingPendingTaskCount',
       'setOpenTaskCount',
       'setPendingTaskCount',
-      'updateChannelChangedFilterFields'
+      'updateChannelChangedFilterFields',
+      'setInboxShowMyContacts'
     ]),
 
     initInboxTaskRoute () {
@@ -1284,6 +1285,7 @@ export default {
       if (from.name === 'Inbox View' && from.name !== to.name) {
         this.loadContactTasks()
         this.fetchTaskCounts()
+        this.setInboxShowMyContacts(false)
       }
 
       this.previousRoute = from

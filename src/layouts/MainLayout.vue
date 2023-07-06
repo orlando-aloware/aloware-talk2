@@ -2483,7 +2483,8 @@ export default {
       'setLiveContacts',
       'updateLiveContactLastCommProperties',
       'setIsInboxFiltersLoaded',
-      'gettingTasksList'
+      'gettingTasksList',
+      'setInboxShowMyContacts'
     ])
   },
 
@@ -2531,6 +2532,11 @@ export default {
         !fromInboxContactToInbox &&
         to.name !== from.name) {
         this.resetVuex(['inbox', 'non-cache'])
+      }
+
+      // reset My Contacts toggle to default
+      if (from.name === 'Inbox View' && from.name !== to.name) {
+        this.setInboxShowMyContacts(false)
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
