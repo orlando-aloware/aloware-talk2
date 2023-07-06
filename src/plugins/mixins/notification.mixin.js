@@ -205,6 +205,7 @@ export default {
             attachment: firstAttachment.data,
             type: 'sms',
             contactId: communication.contact.id,
+            messageIcon: 'error-icon',
             communicationId: communication.id,
             campaignId: campaignId.data
           }
@@ -218,15 +219,6 @@ export default {
             contactId: communication.contact.id,
             communicationId: communication.id,
             campaignId: campaignId.data
-          }
-          break
-        case 'high sms volume':
-          params.data = {
-            title: name.data,
-            message: 'High SMS Volume',
-            type: 'sms',
-            contactId: communication.contact.id,
-            communicationId: communication.id
           }
           break
         case 'mention':

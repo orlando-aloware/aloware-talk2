@@ -116,7 +116,6 @@ export default {
           }
         })
         .listen('.user.in-app.incoming_number.high_sms_volume', (event) => {
-          console.log('HAMED_LOG_1')
           this.$VueEvent.fire('new_in_app_high_sms_volume', event)
         })
         .listen('.user.in-app.communication.answered_call', (event) => {
