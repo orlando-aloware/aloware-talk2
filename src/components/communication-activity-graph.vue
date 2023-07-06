@@ -61,7 +61,7 @@
                  :options="options"
                  :style="getStyle"
                  :id="graphId"
-                 v-if="is_done && options.series.length > 0">
+                 v-if="ready && options.series.length > 0">
       </highstock>
       <div class="d-flex justify-content-center align-items-center"
            :style="{ height: '450px' }"
@@ -292,7 +292,7 @@ export default {
     },
 
     isNoData () {
-      return this.is_done && this.options.series.length === 0
+      return this.ready && this.options.series.length === 0
     }
   },
 
@@ -306,8 +306,8 @@ export default {
 
       this.filter.report_type = 'date_v_' + this.base // "date_v_campaign", "date_v_user"
       this.source.cancel('getCommunications canceled by the user.')
-      this.source = this.CancelToken.source()
-      this.is_done = false
+      this.source = this.cancelToken.source()
+      this.ready = false
       this.loading = true
       this.graphCanLoad = true
       this.options.series = []
@@ -472,7 +472,7 @@ export default {
         this.options.xAxis.tickInterval = moment.duration(1, this.filter.chart_period).asMilliseconds()
 
         this.loading = false
-        this.is_done = true
+        this.ready = true
         this.$nextTick(() => {
           const highchartsContainer = document.getElementById(this.graphId)
 
