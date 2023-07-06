@@ -6,30 +6,6 @@
 @import 'svg.scss';
 @import 'components/styles.scss';
 @import "dhtmlxscheduler_material.css"; // from ~dhtmlx-scheduler/codebase/dhtmlxscheduler_material.css
-
-@keyframes fade {
-  from {
-    opacity: 1.0;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  to {
-    opacity: 1.0;
-  }
-}
-
-@-webkit-keyframes fade {
-  from {
-    opacity: 1.0;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  to {
-    opacity: 1.0;
-  }
-}
 @import "animations.scss";
 
 html {
@@ -12955,7 +12931,8 @@ h1.contact-list-name-label {
           border-color: $primary;
         }
 
-        &.enrolling, &.sending {
+        &.enrolling,
+        &.sending {
           border-color: $indigo;
         }
         
@@ -12988,7 +12965,8 @@ h1.contact-list-name-label {
               display: none;
             }
 
-            button, .show button {
+            button,
+            .show button {
               background-color: $grey-light2 !important;
               border: $grey-light4 solid 1px !important;
             }
@@ -13003,7 +12981,8 @@ h1.contact-list-name-label {
           }
         }
 
-        tr:hover, tr:hover td {
+        tr:hover,
+        tr:hover td {
           background-color: #F4F4F6 !important;
         }
 
