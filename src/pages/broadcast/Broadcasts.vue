@@ -21,8 +21,8 @@
                       spread
                       unelevated
                       dense
-                      v-model="broadcastFilter"
-                      :options="broadcastFilterOptions">
+                      :options="broadcastFilterOptions"
+                      v-model="broadcastFilter">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 px-1 options"
                 :class="[broadcastFilter === 1 ? 'text-white' : 'text-grey-90']">
@@ -97,12 +97,12 @@
       </div>
       <div class="col-2 d-flex justify-content-end">
         <q-btn class="px-4 border-half-rounded stats-page-btn"
-               :to="{ path: '/broadcasts/new' }"
                color="primary"
                padding="0rem"
                unelevated
                no-caps
-               dense>
+               dense
+               :to="{ path: '/broadcasts/new' }">
             <plus-icon class="mr-1"
                       color="white"/>
           New Bulk Message
@@ -123,7 +123,7 @@
                   no-caret
                   right
                   :disabled="bulkActionsDisabled"
-                  v-b-tooltip.hover="{ placement: 'top', title: (bulkActionsDisabled ? 'Select broadcasts in order to use bulk actions' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }">
+                  v-b-tooltip.hover="bulkActionsTooltipProps">
         <template #button-content>
           <ellipse-icon />
         </template>
@@ -183,19 +183,19 @@
                  @reordered="onColumnsReordered"
                  @paginated="onPaginationChanged">
         <template slot="tbody">
-          <tr v-for="(row, rowIndex) in visibleBroadcasts"
-              v-bind:key="rowIndex">
+          <tr :key="rowIndex"
+              v-for="(row, rowIndex) in visibleBroadcasts">
             <template v-for="(col, colIndex) in broadcastsColumns">
-              <td :key="`c-${colIndex}`"
-                  v-if="col.name == 'checkbox'"
-                  class="datatable-row__checkbox">
+              <td class="datatable-row__checkbox"
+                  :key="`c-${colIndex}`"
+                  v-if="col.name == 'checkbox'">
                 <label class="custom-checkbox-container">
                   <input type="checkbox"
                          class="checker"
                          :value="row.id"
                          :checked="checked.find(item => item.id === row.id) || isAllChecked"
                          @change="onCheckerClicked(row)"/>
-                  <span class="checkmark"></span>
+                  <span class="checkmark"/>
                 </label>
               </td>
               <td :key="`c-${colIndex}`"
@@ -235,19 +235,19 @@
                 <div class="context-menu"
                      :class="[isSelectedRow(row) ? 'keep-visible' : '']">
                   <b-dropdown class="position-absolute"
-                              :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
-                              :id="getContextMenuTargetElementId(row)"
                               size="sm"
                               right
+                              :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
+                              :id="getContextMenuTargetElementId(row)"
                               @show="onContextMenuShow(row)"
                               @hide="onContextMenuHide(row)">
                     <template #button-content>
                       <ellipse-icon/>
                     </template>
-                    <b-dropdown-item :key="id"
-                                     :disabled="!shouldAllowContextMenuButton(item, row)"
-                                     dense
+                    <b-dropdown-item dense
                                      clickable
+                                     :key="id"
+                                     :disabled="!shouldAllowContextMenuButton(item, row)"
                                      v-for="(item, id) in contextMenuListItemsForSelectedRow"
                                      @click="onContextMenuButtonClicked(item, row)">
                       <div class="d-flex align-items-center">
@@ -275,16 +275,22 @@
         </template>
       </datatable>
     </div>
-    <q-popup-proxy :target="contextMenuTarget ?? true"
-                   no-parent-event
-                   @hide="onPopupHide()"
-                   v-model="popupOpen">
+    <q-popup-proxy no-parent-event
+                   :target="contextMenuTarget ?? true"
+                   v-model="popupOpen"
+                   @hide="onPopupHide()">
       <q-card>
         <q-card-section>
           <template v-if="popupAction === 'delete'">
-            <span class="text-h6">Delete broadcast</span>
-            <p v-if="popupActionList.length <= 1">Are you sure you want to delete this broadcast?</p>
-            <p v-else>Are you sure you want to delete <span class="text-bold">{{ popupActionList.length }}</span> broadcasts?</p>
+            <span class="text-h6">
+              Delete broadcast
+            </span>
+            <p v-if="popupActionList.length <= 1">
+              Are you sure you want to delete this broadcast?
+            </p>
+            <p v-else>
+              Are you sure you want to delete <span class="text-bold">{{ popupActionList.length }}</span> broadcasts?
+            </p>
             <div class="d-flex">
               <q-btn class="px-1 flex-grow-1 broadcasts-cancel-button"
                      color="white"
@@ -303,8 +309,12 @@
             </div>
           </template>
           <template v-if="popupAction === 'rename'">
-            <div class="text-h6">Rename broadcast</div>
-            <div class="mt-2 text-muted">Name</div>
+            <div class="text-h6">
+              Rename broadcast
+            </div>
+            <div class="mt-2 text-muted">
+              Name
+            </div>
             <q-input outlined
                      v-model="popupRename"/>
             <div class="d-flex">
@@ -325,10 +335,18 @@
             </div>
           </template>
           <template v-if="['play', 'pause'].includes(popupAction)">
-            <span class="text-h6">{{ popupAction === 'play' ? 'Resume' : 'Pause' }} Broadcasts</span>
-            <p>{{ toggleStatusPrompt }}</p>
-            <p v-if="popupAction === 'play'">Scheduled tasks such as calls or messages will GO out.</p>
-            <p v-else>Scheduled tasks such as calls or messages will NOT go out.</p>
+            <span class="text-h6">
+              {{ popupAction === 'play' ? 'Resume' : 'Pause' }} Broadcasts
+            </span>
+            <p>
+              {{ toggleStatusPrompt }}
+            </p>
+            <p v-if="popupAction === 'play'">
+              Scheduled tasks such as calls or messages will GO out.
+            </p>
+            <p v-else>
+              Scheduled tasks such as calls or messages will NOT go out.
+            </p>
             <div class="d-flex">
               <q-btn class="px-1 flex-grow-1 broadcasts-cancel-button"
                      color="white"
@@ -338,8 +356,8 @@
                 <span class="px-2">Cancel</span>
               </q-btn>
               <q-btn class="ml-3 flex-grow-1"
-                     :color="popupAction === 'play' ? 'primary' : 'warning'"
                      unelevated
+                     :color="popupAction === 'play' ? 'primary' : 'warning'"
                      :loading="popupLoadingAction"
                      @click="toggleBroadcastStatus(popupActionList)">
                 <span class="px-2">{{ popupAction === 'play' ? 'Resume' : 'Pause' }}</span>
@@ -494,7 +512,9 @@ export default {
     DeleteRedIcon
   },
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin
+  ],
 
   data: () => ({
     loading: false,
@@ -560,8 +580,8 @@ export default {
     },
 
     filteredBroadcasts () {
-      let filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
-      let text = this.broadcastsSearchText.toLowerCase()
+      const filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
+      const text = this.broadcastsSearchText.toLowerCase()
 
       if (!filter && !text) {
         return this.broadcastData
@@ -586,9 +606,9 @@ export default {
     },
 
     visibleBroadcasts () {
-      let { perPage, currentPage } = this.pagination
-      let paginationStart = perPage * (currentPage - 1)
-      let paginationEnd = (perPage * currentPage)
+      const { perPage, currentPage } = this.pagination
+      const paginationStart = perPage * (currentPage - 1)
+      const paginationEnd = (perPage * currentPage)
 
       return this.filteredBroadcasts
         .slice(paginationStart, paginationEnd)
@@ -608,76 +628,72 @@ export default {
       return 'active'
     },
 
-    chartOptions () {
-      return {
-        loading: false,
-        graph_can_load: true,
-        aggregated_counts: [],
-        graph_id: 'activity-graph',
-        report_type: 'date_v_campaign', // changes to date_v_user
-        chart_period: 'day',
-        chart_type: 'spline',
-        time: {
-          useUTC: false,
-          timezone: window.timezone
-        },
-        // force the plot to show all ticks daily
-        xAxis: {
-          type: 'datetime',
-          dateTimeLabelFormats: {
-            millisecond: '%e %b', // always use day as highest resolution.
-            second: '%e %b', // always use day as highest resolution.
-            minute: '%e %b', // always use day as highest resolution.
-            hour: '%H:%M',
-            day: '%e %b', // always use day as highest resolution.
-            week: '%e %b', // always use day as highest resolution.
-            month: '%b \'%y',
-            year: '%Y'
-          },
-          // minRange: 1 * 24 * 3600000, // 1 day
-          labels: {
-            rotation: 45,
-            // step: 1,
-            style: {
-              fontSize: '14px'
-            }
-          }
-        },
+    // chartOptions () {
+    //   return {
+    //     loading: false,
+    //     graph_can_load: true,
+    //     aggregated_counts: [],
+    //     graph_id: 'activity-graph',
+    //     report_type: 'date_v_campaign', // changes to date_v_user
+    //     chart_period: 'day',
+    //     chart_type: 'spline',
+    //     time: {
+    //       useUTC: false,
+    //       timezone: window.timezone
+    //     },
+    //     // force the plot to show all ticks daily
+    //     xAxis: {
+    //       type: 'datetime',
+    //       dateTimeLabelFormats: {
+    //         millisecond: '%e %b', // always use day as highest resolution.
+    //         second: '%e %b', // always use day as highest resolution.
+    //         minute: '%e %b', // always use day as highest resolution.
+    //         hour: '%H:%M',
+    //         day: '%e %b', // always use day as highest resolution.
+    //         week: '%e %b', // always use day as highest resolution.
+    //         month: '%b \'%y',
+    //         year: '%Y'
+    //       },
+    //       // minRange: 1 * 24 * 3600000, // 1 day
+    //       labels: {
+    //         rotation: 45,
+    //         // step: 1,
+    //         style: {
+    //           fontSize: '14px'
+    //         }
+    //       }
+    //     },
 
-        yAxis: {
-          allowDecimals: false,
-          offset: 20,
-          title: {
-            text: 'Number Of Calls & Texts',
-            style: {
-              'font-size': '14px',
-              'color': '#090A0D'
-            }
-          }
-        },
-        legend: {
-          layout: 'horizontal',
-          enabled: true,
-          verticalAlign: 'bottom',
-          floating: false
-        },
+    //     yAxis: {
+    //       allowDecimals: false,
+    //       offset: 20,
+    //       title: {
+    //         text: 'Number Of Calls & Texts',
+    //         style: {
+    //           'font-size': '14px',
+    //           'color': '#090A0D'
+    //         }
+    //       }
+    //     },
+    //     legend: {
+    //       layout: 'horizontal',
+    //       enabled: true,
+    //       verticalAlign: 'bottom',
+    //       floating: false
+    //     },
 
-        credits: {
-          enabled: false
-        },
+    //     credits: {
+    //       enabled: false
+    //     },
 
-        exporting: {
-          sourceWidth: 0,
-          sourceHeight: 0
-        },
+    //     exporting: {
+    //       sourceWidth: 0,
+    //       sourceHeight: 0
+    //     },
 
-        series: []
-      }
-    },
-
-    isAdmin () {
-      return this.hasRole('Company Admin')
-    },
+    //     series: []
+    //   }
+    // },
 
     contextMenuTarget () {
       return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : '#bulk-action-dropdown'
@@ -692,15 +708,24 @@ export default {
         return this.contextMenuListItems
       }
 
-      let broadcast = this.broadcastData.find(item => item.id === this.contextMenuTargetId)
+      const broadcast = this.broadcastData.find(item => item.id === this.contextMenuTargetId)
 
       return this.contextMenuListItems.filter(item => this.shouldShowContextMenuItem(item, broadcast))
     },
 
     toggleStatusPrompt () {
-      let verb = this.popupAction === 'play' ? 'resume' : 'pause'
-      let demonstrative = this.popupActionList.length === 1 ? 'this broadcast' : 'these broadcasts'
+      const verb = this.popupAction === 'play' ? 'resume' : 'pause'
+      const demonstrative = this.popupActionList.length === 1 ? 'this broadcast' : 'these broadcasts'
+
       return `Are you sure you want to ${verb} ${demonstrative}?`
+    },
+
+    bulkActionsTooltipProps () {
+      return {
+        placement: 'top',
+        title: (this.bulkActionsDisabled ? 'Select broadcasts in order to use bulk actions' : null),
+        customClass: 'q-tooltip q-tooltip--style no-pointer-events'
+      }
     }
   },
 
@@ -711,7 +736,7 @@ export default {
         return
       }
 
-      let foundItem = this.checked.find(item => item.id === row.id)
+      const foundItem = this.checked.find(item => item.id === row.id)
 
       if (foundItem) {
         this.checked = this.checked.filter(item => item.id !== row.id)
@@ -722,7 +747,8 @@ export default {
     },
 
     onSortTable (sort) {
-      let { orderBy, order } = sort
+      const { orderBy, order } = sort
+
       this.broadcastData = this.broadcastData.sort((a, b) => {
         if (!orderBy) {
           return 0
@@ -774,7 +800,7 @@ export default {
     },
 
     onContextMenuButtonClicked (item, broadcast) {
-      let broadcasts = [broadcast]
+      const broadcasts = [broadcast]
       this.popupActionList = broadcasts
 
       switch (item.name) {
@@ -825,7 +851,7 @@ export default {
         return null
       }
 
-      let found = this.campaigns.find(campaign => campaign.id === campaignId)
+      const found = this.campaigns.find(campaign => campaign.id === campaignId)
 
       if (!found) {
         return null
@@ -878,7 +904,7 @@ export default {
     async renameBroadcast ([broadcast]) {
       this.popupLoadingAction = true
 
-      let payload = {
+      const payload = {
         name: this.popupRename,
         id: broadcast.id,
         timezone: broadcast.timezone
@@ -924,7 +950,7 @@ export default {
     async toggleBroadcastStatus (broadcasts) {
       this.popupLoadingAction = true
 
-      for (let broadcast of broadcasts) {
+      for (const broadcast of broadcasts) {
         API.V1.broadcasts.toggleStatus(broadcast.id)
           .then(res => {
             this.broadcastData = this.broadcastData.map(item => {
@@ -976,7 +1002,7 @@ export default {
 
     shouldAllowContextMenuBulk (action) {
       if (action === 'delete') {
-        let isAllCheckedDone = this.checked.reduce((results, item) => results && item.status === 4, true)
+        const isAllCheckedDone = this.checked.reduce((results, item) => results && item.status === 4, true)
         return this.isAdmin && isAllCheckedDone
       }
 
