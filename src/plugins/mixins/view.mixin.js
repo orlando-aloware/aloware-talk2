@@ -8,6 +8,11 @@ import talk2Api from 'src/plugins/api/api'
 import { mapFields } from 'vuex-map-fields'
 
 export default {
+  inject: [
+    'contactsData',
+    'selectedContacts'
+  ],
+
   data () {
     return {
       moment,
@@ -31,7 +36,6 @@ export default {
     ...mapState('contacts', [
       'isAllContactsSelected',
       'showMyContacts',
-      'selectedContacts',
       'lists'
     ]),
 
@@ -160,7 +164,7 @@ export default {
 
       if (this.cleanedListId && eventListId && this.cleanedListId === eventListId) {
         if (this.isInPowerDialerList) {
-          this.$VueEvent.fire('add_contacts_progress', {
+          this.$VueEvent.fire('addContactsProgress', {
             id: null,
             loading: false
           })
@@ -179,28 +183,27 @@ export default {
 
   methods: {
     ...mapActions('contacts', [
-      'setListSelectedContacts',
       'setAllContactsSelected'
     ]),
 
     onCheckerClicked (contact) {
-      const items = { data: [] }
+      let items = []
       const found = this.checked.find(item => item.id === contact.id)
 
       if (found) {
-        items.data = this.checked.filter(item => item.id !== contact.id)
+        items = this.checked.filter(item => item.id !== contact.id)
       } else {
-        items.data = [...this.checked]
-        items.data.push(contact)
+        items = [...this.checked]
+        items.push(contact)
       }
 
-      this.setAllContactsSelected(false)
-      this.onCheckedRows(items.data)
+      this.clearSelectAll()
+      this.onCheckedRows(items)
     },
 
     onCheckedRows (checked) {
       this.setAllContactsSelected(false)
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checked })
     },
 
     generateRoute (contactId) {
@@ -242,9 +245,14 @@ export default {
         return
       }
 
+      if (!this.fixedContactsData?.data?.[index]?.[colName]) {
+        return
+      }
+
       this.hoverPopover.key = (this.hoverPopover.key + 1)
       this.hoverPopover.title = title
       this.hoverPopover.target = id
+
       const data = this.fixedContactsData.data[index][colName]
       this.hoverPopover.data = data ? data.slice(0, 10) : ''
       this.hoverPopover.dataLength = data.length
@@ -440,7 +448,6 @@ export default {
     },
 
     clearSelectAll () {
-      document.querySelector('.data-table-check-all').checked = false
       this.setAllContactsSelected(false)
     },
 
@@ -455,7 +462,7 @@ export default {
 
       if (!value) {
         this.clearSelectAll()
-        this.setListSelectedContacts({ id: this.id, contacts: [] })
+        this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
       }
     },
 

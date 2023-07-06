@@ -113,12 +113,6 @@ export default {
     mainViewMixin
   ],
 
-  provide () {
-    return {
-      contactsData: this.powerDialerActiveList
-    }
-  },
-
   data () {
     return {
       powerDialerListeners: {},
@@ -149,7 +143,6 @@ export default {
       'selectedList',
       'contactToRemove',
       'isBulkDelete',
-      'selectedContacts',
       'removeContactActionType',
       'currentListFilters'
     ]),

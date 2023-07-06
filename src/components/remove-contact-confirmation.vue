@@ -50,6 +50,10 @@ import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 
 export default {
+  inject: [
+    'selectedContacts'
+  ],
+
   components: {
     ConfirmDialog
   },
@@ -64,7 +68,6 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'contactToRemove',
-      'selectedContacts',
       'removeContactActionType',
       'selectedList',
       'isBulkDelete',

@@ -44,6 +44,10 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
+  inject: [
+    'selectedContacts'
+  ],
+
   props: {
     isContactModuleType: {
       type: Boolean,
@@ -63,7 +67,6 @@ export default {
     ...mapGetters('contacts', [
       'isRemoveContactOpen',
       'contactToRemove',
-      'selectedContacts',
       'selectedList'
     ]),
 

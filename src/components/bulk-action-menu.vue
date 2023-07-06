@@ -95,6 +95,10 @@ import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 export default {
   name: 'bulk-action-menu',
 
+  inject: [
+    'selectedContacts'
+  ],
+
   mixins: [aclMixin],
 
   props: {
@@ -131,7 +135,6 @@ export default {
 
   computed: {
     ...mapGetters('contacts', [
-      'selectedContacts',
       'selectedList'
     ]),
 
@@ -210,7 +213,6 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'setBulkDelete',
-      'setListSelectedContacts',
       'setAllContactsSelected',
       'removeContactOpen',
       'createListOpen',
@@ -279,7 +281,7 @@ export default {
         }
       })
 
-      this.setListSelectedContacts({ id: this.id, contacts: [] })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 
       if (res.data?.message) {
         this.$VueEvent.fire('clearContacts')

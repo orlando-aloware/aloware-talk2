@@ -86,9 +86,6 @@ export default {
   setBulkDelete: ({ commit }, payload) => {
     commit('SET_BULK_DELETE', payload)
   },
-  setListSelectedContacts: ({ commit }, payload) => {
-    commit('SET_LIST_SELECTED_CONTACTS', payload)
-  },
   setSelectedList: ({ commit }, payload) => {
     commit('SET_SELECTED_LIST', payload)
     // commit('powerDialer/SET_SELECTED_PD_LIST', payload, { root: true })

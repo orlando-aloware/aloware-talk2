@@ -19,7 +19,6 @@ export default {
   columns: (state) => state.columns,
   moveDialog: (state) => state.moveDialog,
   createDialog: (state) => state.createDialog,
-  selectedContacts: (state) => state.selectedContacts,
   selectedList: (state) => state.selectedList,
   selectedStaticList: (state) => state.selectedStaticList,
   createList: (state) => state.createList,

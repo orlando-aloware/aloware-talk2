@@ -70,7 +70,6 @@ export default {
       'selectedContactChanging',
       'setSearch',
       'setCurrentListFilters',
-      'setListSelectedContacts',
       'setShouldUpdateSelectedListContactCount',
       'setSelectedListContactCount',
       'setSelectedList',
@@ -290,7 +289,7 @@ export default {
       }
 
       // clear out selections every contact fetch request
-      this.setListSelectedContacts({ id: this.id, contacts: [] })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
       const queryString = this.buildQueryString(params, isContactModule)
 
       // use the same query string to update the list count
@@ -344,7 +343,7 @@ export default {
 
           if (this.isInPowerDialerList) {
             // clear add contacts loading screen in PD list
-            this.$VueEvent.fire('add_contacts_progress', {
+            this.$VueEvent.fire('addContactsProgress', {
               id: null,
               loading: false
             })
@@ -611,11 +610,12 @@ export default {
 
     forcedCheckAllItems () {
       const elem = document.querySelector('.data-table-check-all')
-      const id = this.tempId || this.id || this.myQueueId
       const isPD = this.isPowerDialer || this.isPowerDialerAddContacts
+      const isInQueue = isPD && (this.$route.params?.id === 'in-queue' || this.$route?.meta?.id === 'power-dialer-add-queue-list')
+      const id = isInQueue ? this.myQueueId : (this.tempId || this.id)
 
       if (isPD && elem?.checked) {
-        this.setListSelectedContacts({
+        this.$VueEvent.fire('setListSelectedContacts', {
           id: id,
           contacts: this.contactsData.data.filter(c => {
             return !c.is_dnc && !c.is_blocked
@@ -626,7 +626,7 @@ export default {
       }
 
       if (elem?.checked) {
-        this.setListSelectedContacts({ id: id, contacts: this.contactsData.data })
+        this.$VueEvent.fire('setListSelectedContacts', { id: id, contacts: this.contactsData.data })
       }
     },
 
@@ -967,7 +967,6 @@ export default {
     ...mapGetters('contacts', [
       'lists',
       'listItems',
-      'selectedContacts',
       'currentListFilters',
       'changingSelectedContact',
       'selectedList',

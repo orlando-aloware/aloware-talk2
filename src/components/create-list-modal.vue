@@ -104,6 +104,10 @@ import {
 import { isEmpty } from 'lodash'
 
 export default {
+  inject: [
+    'selectedContacts'
+  ],
+
   props: {
     isDefault: {
       type: Boolean,
@@ -116,7 +120,6 @@ export default {
       'createList',
       'currentListFilters',
       'selectedList',
-      'selectedContacts',
       'unsavedList',
       'isAllContactsSelected'
     ]),

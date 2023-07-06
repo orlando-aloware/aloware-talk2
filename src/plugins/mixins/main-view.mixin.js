@@ -1,6 +1,14 @@
 import { mapGetters } from 'vuex'
+import Vue from 'vue'
 
 export default {
+  provide () {
+    return {
+      contactsData: this.contactsData,
+      selectedContacts: this.selectedContacts
+    }
+  },
+
   data () {
     return {
       listAddRemoveContactsProgress: {
@@ -8,6 +16,7 @@ export default {
         loading: false
       },
       mainViewListeners: {},
+      selectedContacts: {},
       selectedContactsCount: 0
     }
   },
@@ -35,7 +44,12 @@ export default {
       this.listAddRemoveContactsProgress = data
     }
 
-    this.$VueEvent.listen('add_contacts_progress', this.mainViewListeners.addContactsProgress)
+    this.mainViewListeners.setListSelectedContacts = (data) => {
+      Vue.set(this.selectedContacts, data.id, data.contacts.map(item => ({ id: item.id })))
+    }
+
+    this.$VueEvent.listen('addContactsProgress', this.mainViewListeners.addContactsProgress)
+    this.$VueEvent.listen('setListSelectedContacts', this.mainViewListeners.setListSelectedContacts)
   },
 
   methods: {
@@ -46,7 +60,8 @@ export default {
     },
 
     stopMainViewEvents () {
-      this.$VueEvent.stop('add_contacts_progress', this.mainViewListeners.addContactsProgress)
+      this.$VueEvent.stop('addContactsProgress', this.mainViewListeners.addContactsProgress)
+      this.$VueEvent.stop('setListSelectedContacts', this.mainViewListeners.setListSelectedContacts)
     },
 
     onSelectedCountChange (count) {

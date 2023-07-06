@@ -129,7 +129,6 @@ export const DEFAULT_STATE = {
     type: 'folder',
     target: null
   },
-  selectedContacts: {},
   selectedList: {
     id: 'all',
     name: 'All Contacts'

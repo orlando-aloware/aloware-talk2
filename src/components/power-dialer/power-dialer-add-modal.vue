@@ -388,7 +388,7 @@ export default {
     addContacts () {
       const listId = get(this.requestParams, 'contact_list_id', this.myQueueId)
 
-      this.$VueEvent.fire('add_contacts_progress', {
+      this.$VueEvent.fire('addContactsProgress', {
         id: listId,
         loading: true
       })
@@ -411,7 +411,7 @@ export default {
             this.$router.push(`/power-dialer`)
           }
         }).catch(error => {
-          this.$VueEvent.fire('add_contacts_progress', {
+          this.$VueEvent.fire('addContactsProgress', {
             id: null,
             loading: false
           })

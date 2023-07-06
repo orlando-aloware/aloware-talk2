@@ -636,10 +636,6 @@ export default {
     avatarMixin
   ],
 
-  inject: [
-    'contactsData'
-  ],
-
   components: {
     ContactsScreen,
     PowerDialerFilter,
@@ -662,6 +658,8 @@ export default {
   },
 
   async mounted () {
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
     this.removeListClose()
 
     if (!this.isMyQueue) {
@@ -886,7 +884,6 @@ export default {
       'openFilters',
       'closeFilters',
       'columnsReordered',
-      'setListSelectedContacts',
       'createListOpen',
       'removeListClose',
       'setCurrentListFilters',
@@ -968,7 +965,7 @@ export default {
     },
 
     onCheckboxCheck (obj) {
-      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: obj.data })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.filteredSelectedListId, contacts: obj.data })
     },
 
     onCheckAllItems (checked) {
@@ -980,7 +977,7 @@ export default {
         items = []
       }
 
-      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: items })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.filteredSelectedListId, contacts: items })
     },
 
     onRemoveList () {
@@ -1002,7 +999,7 @@ export default {
     },
 
     onCheckedRows (checked) {
-      this.setListSelectedContacts({ id: this.selectedListId, contacts: checked })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.selectedListId, contacts: checked })
     },
 
     onEditColumnsClicked () {
@@ -1164,7 +1161,7 @@ export default {
     },
 
     selectedList (value) {
-      this.setListSelectedContacts({ id: value.id, contacts: [] })
+      this.$VueEvent.fire('setListSelectedContacts', { id: value.id, contacts: [] })
     },
 
     clearList (value) {

@@ -699,10 +699,6 @@ export default {
     simpsocialMixin
   ],
 
-  inject: [
-    'contactsData'
-  ],
-
   components: {
     RefreshIcon,
     BackButton,
@@ -871,10 +867,6 @@ export default {
         this.lists[String(this.id)])
     },
 
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
-
     saveFilterButtonClass () {
       return {
         'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
@@ -1019,6 +1011,8 @@ export default {
   },
 
   mounted () {
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
     if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
       this.loadList(this.$route.params.id)
     }
@@ -1174,7 +1168,7 @@ export default {
       let checkedItems = []
 
       if (!checked) {
-        this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+        this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
         return
       }
 
@@ -1188,7 +1182,7 @@ export default {
           }
         })
 
-      this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
     },
 
     onEditColumnsClicked () {
@@ -1677,13 +1671,15 @@ export default {
           }
         })
       }
+
       this.setAllContactsSelected(false)
     },
 
     selectedList: function (value) {
       if (this.selectedContacts[value.id]) {
-        this.setListSelectedContacts({ id: value.id, contacts: [] })
+        this.$VueEvent.fire('setListSelectedContacts', { id: value.id, contacts: [] })
       }
+
       this.folderPath = this.generateFolderPath(this.folders)
     },
 

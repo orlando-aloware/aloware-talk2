@@ -549,10 +549,6 @@ export default {
     addViewMixin
   ],
 
-  inject: [
-    'contactsData'
-  ],
-
   components: {
     ContactsFilters,
     CompactBtn,
@@ -567,6 +563,7 @@ export default {
   },
 
   mounted () {
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
     this.loadList(this.$route.params.id)
 
     if (!this.isAdmin && this.currentCompany.disable_power_dialer_add && this.$route.name === 'Power Dialer') {
@@ -844,11 +841,11 @@ export default {
           }
         })
 
-      this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
     },
 
     onCheckedRows (checked) {
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checked })
     },
 
     onFiltersClicked () {
@@ -885,7 +882,7 @@ export default {
     },
 
     onPagination (params) {
-      this.setListSelectedContacts({ id: this.id, contacts: [] })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
       this.onPaginate(params)
     },
 
@@ -909,21 +906,6 @@ export default {
 
     onLoadMore () {
       this.$emit('loadMore')
-    },
-
-    onCheckerClicked (contact) {
-      const items = { data: [] }
-      const found = this.checked.find(item => item.id === contact.id)
-
-      if (found) {
-        items.data = this.checked.filter(item => item.id !== contact.id)
-      } else {
-        items.data = [...this.checked]
-        items.data.push(contact)
-      }
-
-      this.setAllContactsSelected(false)
-      this.onCheckedRows(items.data)
     }
   },
 

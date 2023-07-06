@@ -76,12 +76,6 @@ import Contact from 'pages/contacts/Contact'
 export default {
   name: 'Contacts',
 
-  provide () {
-    return {
-      contactsData: this.contactsData
-    }
-  },
-
   mixins: [
     contactsMixins,
     contactV2AttributesMixin,

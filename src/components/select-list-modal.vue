@@ -69,6 +69,10 @@ import Search from 'src/components/search'
 import { isEmpty } from 'lodash'
 
 export default {
+  inject: [
+    'selectedContacts'
+  ],
+
   components: { Search, SelectListTreeFolder },
 
   computed: {
@@ -77,7 +81,6 @@ export default {
       'currentListFilters',
       'selectedStaticList',
       'selectedList',
-      'selectedContacts',
       'folders'
     ]),
 

@@ -143,7 +143,6 @@ export default function () {
       type: 'list',
       target: null
     },
-    selectedContacts: {},
     isAllContactsSelected: false,
     selectedList: {
       id: 'all',

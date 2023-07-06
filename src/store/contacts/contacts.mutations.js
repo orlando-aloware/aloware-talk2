@@ -134,12 +134,6 @@ export default {
   SET_BULK_DELETE: (state, payload) => {
     state.isBulkDelete = payload
   },
-  SET_LIST_SELECTED_CONTACTS: (state, payload) => {
-    state.selectedContacts = {
-      ...state.selectedContacts,
-      [payload.id]: payload.contacts
-    }
-  },
   SET_ALL_CONTACTS_SELECTED: (state, isSelected) => {
     state.isAllContactsSelected = isSelected
   },

@@ -535,10 +535,6 @@ export default {
     addViewMixin
   ],
 
-  inject: [
-    'contactsData'
-  ],
-
   computed: {
     ...mapGetters('auth', ['profile']),
 
@@ -800,7 +796,7 @@ export default {
       let checkedItems = []
 
       if (!checked) {
-        this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+        this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
         return
       }
 
@@ -818,11 +814,11 @@ export default {
           }
         })
 
-      this.setListSelectedContacts({ id: this.id, contacts: checkedItems })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
     },
 
     onCheckedRows (checked) {
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checked })
     },
 
     onFiltersClicked () {
@@ -860,7 +856,7 @@ export default {
     },
 
     onPagination (params) {
-      this.setListSelectedContacts({ id: this.id, contacts: [] })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
       this.onPaginate(params)
     },
 
@@ -903,6 +899,8 @@ export default {
   },
 
   mounted () {
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
     this.loadList(this.$route.params.id)
 
     if (this.contactList && this.contactList.type === this.ContactListTypes.DYNAMIC) {

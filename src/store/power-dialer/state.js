@@ -61,16 +61,7 @@ export default function () {
       'in-queue': {
         id: 'in-queue',
         headers: DEFAULT_COLUMNS,
-        filters: [
-          // {
-          //   filters: {
-          //     in_queue: {
-          //       value: 1
-          //     }
-          //   },
-          //   is_conjunction: true
-          // }
-        ],
+        filters: [],
         name: 'In Queue'
       },
       'called': {
@@ -140,10 +131,7 @@ export default function () {
       type: 'list',
       target: null
     },
-    // powerDialerList: null,
     contactResources: [],
-    // contacts: [],
-    selectedContacts: {},
     isStartingDial: false,
     searchedListItem: '',
     currentListFilters: [],
