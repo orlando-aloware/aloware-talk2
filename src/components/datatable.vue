@@ -10,39 +10,26 @@
       <table ref="table"
              :class="tableClass">
         <thead>
-          <draggable
-            tag="tr"
-            ghost-class="ghost"
-            handle=".handle"
-            :list="fixedColumns"
-            :move="onCheckMove"
-            @change="onOrderChanged"
-            class="dragable-header"
-          >
-            <th
-              v-for="(column, key) in fixedColumns"
-              :key="column.name"
-              :data-column-id="column.name"
-              :class="{
-                checkbox: column.name === 'checkbox',
-                sticky: column.sticky,
-                hovering: hoverKey === key ? isHovering : false
-              }"
-              :id="`cols-${column.name}`"
-              :style="{
-                maxWidth: column.maxWidth ? `${column.maxWidth}px` : (column.name === 'checkbox' ?  '40px' : ''),
-                minWidth: column.minWidth ? `${column.minWidth}px` : (column.name === 'checkbox' ?  '40px' : '')
-              }"
-              @mouseout="onInitReorder(false, null)">
-
-              <label
-                v-if="column.name === 'checkbox' && showSelectAll"
-                class="custom-checkbox-container check-all">
-                <input
-                  type="checkbox"
-                  class="data-table-check-all"
-                  ref="dataTableCheckAll"
-                  @change="onCheckboxClicked" />
+          <draggable class="dragable-header"
+                     tag="tr"
+                     ghost-class="ghost"
+                     handle=".handle"
+                     :list="fixedColumns"
+                     :move="onCheckMove"
+                     @change="onOrderChanged">
+            <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
+                :key="column.name"
+                :data-column-id="column.name"
+                :id="`cols-${column.name}`"
+                :style="getHeaderStyle(column.name, column.minWidth, column.maxWidth)"
+                v-for="(column, key) in fixedColumns"
+                @mouseout="onInitReorder(false, null)">
+              <label class="custom-checkbox-container check-all"
+                     v-if="column.name === 'checkbox' && showSelectAll">
+                <input ref="dataTableCheckAll"
+                       class="data-table-check-all"
+                       type="checkbox"
+                       @change="onCheckboxClicked" />
                 <span class="checkmark"></span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">

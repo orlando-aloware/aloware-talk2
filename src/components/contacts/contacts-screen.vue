@@ -42,11 +42,13 @@ export default {
   components: {
     card
   },
+
   props: {
     loading: {
       type: Boolean,
       default: false
     },
+
     noHeader: {
       type: Boolean,
       default: false
