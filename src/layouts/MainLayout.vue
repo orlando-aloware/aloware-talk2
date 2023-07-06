@@ -638,6 +638,13 @@ export default {
       this.handleInAppHighSmsVolumeNotification(data.incoming_number, data.contact, data.direction)
     }
 
+    this.mainListeners.newDesktopHighSmsVolume = (data) => {
+      if (this.profile.sleep_mode) {
+        return
+      }
+      this.handleDesktopHighSmsVolumeNotification(data.incoming_number, data.contact, data.direction)
+    }
+
     this.mainListeners.newInAppVoicemail = (communication) => {
       if (!this.checkCommunicationMatchesUserAccessibility(communication) || this.profile.sleep_mode) {
         return
@@ -1149,6 +1156,7 @@ export default {
       this.$VueEvent.listen('new_in_app_voicemail', this.mainListeners.newInAppVoicemail)
       this.$VueEvent.listen('new_desktop_contact_assigned', this.mainListeners.newDesktopContactAssigned)
       this.$VueEvent.listen('new_in_app_high_sms_volume', this.mainListeners.newInAppHighSmsVolume)
+      this.$VueEvent.listen('desktop_high_sms_volume', this.mainListeners.newDesktopHighSmsVolume)
       this.$VueEvent.listen('new_desktop_appointment', this.mainListeners.newDesktopAppointment)
       this.$VueEvent.listen('new_desktop_reminder', this.mainListeners.newDesktopReminder)
       this.$VueEvent.listen('new_desktop_call', this.mainListeners.newDesktopCall)
@@ -1177,6 +1185,7 @@ export default {
       this.$VueEvent.stop('new_in_app_voicemail', this.mainListeners.newInAppVoicemail)
       this.$VueEvent.stop('new_desktop_contact_assigned', this.mainListeners.newDesktopContactAssigned)
       this.$VueEvent.stop('new_in_app_high_sms_volume', this.mainListeners.newInAppHighSmsVolume)
+      this.$VueEvent.stop('desktop_high_sms_volume', this.mainListeners.newDesktopHighSmsVolume)
       this.$VueEvent.stop('new_desktop_appointment', this.mainListeners.newDesktopAppointment)
       this.$VueEvent.stop('new_desktop_reminder', this.mainListeners.newDesktopReminder)
       this.$VueEvent.stop('new_desktop_call', this.mainListeners.newDesktopCall)
@@ -2173,6 +2182,12 @@ export default {
     },
 
     handleInAppHighSmsVolumeNotification (incomingNumber, contact, direction) {
+      if (window.Push.Permission.has()) {
+        this.$generalNotification(`Received too many messages from a contacts.</br>Name: ${contact.name}</br>Incoming Number: ${incomingNumber.phone_number}`, 'error', 5000, true)
+      }
+    },
+
+    handleDesktopHighSmsVolumeNotification (incomingNumber, contact, direction) {
       if (window.Push.Permission.has()) {
         this.$generalNotification(`Received too many messages from a contacts.</br>Name: ${contact.name}</br>Incoming Number: ${incomingNumber.phone_number}`, 'error', 5000, true)
       }
