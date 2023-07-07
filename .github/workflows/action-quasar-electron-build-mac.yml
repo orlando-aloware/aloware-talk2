@@ -53,7 +53,7 @@ jobs:
       - name: Setup Python2
         uses: actions/setup-python@v4
         with:
-          python-version: '2.7.18'
+          python-version: '3.*'
           architecture: 'x64'
 
       - name: Prepare for app notarization (macOS)
