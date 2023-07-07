@@ -21,16 +21,10 @@ jobs:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '14.x' ]
-        python-version: [ '2.7.18-buster' ]
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
 
       - name: Get branch name
         id: branch-name
@@ -55,6 +49,12 @@ jobs:
 
       - name: NPM version
         run: npm --version
+
+      - name: Setup Python2
+        uses: actions/setup-python@v4
+        with:
+          python-version: '2.7.18-buster'
+          architecture: 'x64'
 
       - name: Install dependencies & Quasar
         run: npm install && npm install -g @quasar/cli
