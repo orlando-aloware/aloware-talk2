@@ -106,7 +106,7 @@ export default function () {
     inboxShowMyContacts: true,
     isInboxFiltersLoaded: true,
     pinnedViews: [],
-    personalFilters: [],
-    companyFilters: []
+    inboxPersonalFilters: [],
+    inboxCompanyFilters: []
   }
 }

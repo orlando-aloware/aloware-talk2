@@ -22,7 +22,7 @@
               label="Views"
               :group="true"
               class="nav-list-group-title d-flex align-items-center justify-content-between"
-              v-if="personalFilters.length">
+              v-if="allInboxFilters.length">
       <template #action-icon>
           <q-btn id="edit-views-icon"
                  class="mr-3 cursor-pointer"
@@ -45,7 +45,7 @@
 
     <inbox-views target="#edit-views-icon"
                  :show="isEditingViews"
-                 :views="allFilters"
+                 :views="allInboxFilters"
                  @closed="onEditViewsClosed"/>
   </div>
 </template>
@@ -60,6 +60,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
 import { inboxMixin } from 'src/plugins/mixins'
+import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox-nav-list',
@@ -100,12 +101,12 @@ export default {
       'selectedFilter',
       'isFilterDialogShown',
       'pinnedViews',
-      'personalFilters',
-      'companyFilters'
+      'inboxPersonalFilters',
+      'inboxCompanyFilters'
     ]),
 
     ...mapGetters('inbox', [
-      'allFilters'
+      'allInboxFilters'
     ]),
 
     isShowActive () {
@@ -114,31 +115,6 @@ export default {
   },
 
   data () {
-    // eslint-disable-next-line no-unused-vars
-    const defaultFilterModel = {
-      campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-      ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-      direction: Filters.DEFAULT_STATE.filter.direction,
-      answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-      min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-      transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-      callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-      tags: Filters.DEFAULT_STATE.filter.tags,
-      call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-      first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-      untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-      exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-      incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-      users: Filters.DEFAULT_STATE.filter.users,
-      workflows: Filters.DEFAULT_STATE.filter.workflows,
-      broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-      contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-      from_date: Filters.DEFAULT_STATE.filter.from_date,
-      to_date: Filters.DEFAULT_STATE.filter.to_date,
-      my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-      creator_type: Filters.DEFAULT_STATE.filter.creator_type
-    }
-
     return {
       active: this.value,
       isGettingFilters: false,
@@ -170,13 +146,7 @@ export default {
         'untagged_only',
         'my_contact'
       ],
-      defaultFilterModel: {
-        name: '',
-        type: ChannelType.CHANNEL_INBOX,
-        filter: defaultFilterModel,
-        scope: 'user'
-      },
-      filter: defaultFilterModel,
+      filter: Filters.EXCERPT,
       isEditingViews: false
     }
   },
@@ -188,9 +158,10 @@ export default {
           // get view id
           const viewId = +this.$route.params.viewId
           // get filter from all filters list
-          const filter = this.allFilters.find(filter => +filter.id === +viewId)
+          const filter = this.allInboxFilters.find(filter => +filter.id === +viewId)
 
-          this.onSelectView(filter, false)
+          this.setStatus()
+          this.onSelectView(filter)
         }
       })
 
@@ -219,8 +190,8 @@ export default {
       'setInboxShowMyContacts',
       'setChannelClonedFilter',
       'setFilterDialogForView',
-      'setPersonalFilters',
-      'setCompanyFilters'
+      'setInboxPersonalFilters',
+      'setInboxCompanyFilters'
     ]),
 
     onItemClicked (nextActive) {
@@ -230,8 +201,9 @@ export default {
       // redirect page to Inbox View
       if (isView) {
         const viewId = nextActive.split('-')[1]
-        const filter = this.allFilters.find(filter => +filter.id === +viewId)
+        const filter = this.allInboxFilters.find(filter => +filter.id === +viewId)
 
+        this.currentTask = ContactTaskStatus.STATUS_OPEN
         this.onSelectView(filter)
         return
       }
@@ -282,8 +254,8 @@ export default {
 
       // todo: get only contacts type filters
       return talk2Api.V2.inbox.filters.get({ type: ChannelType.CHANNEL_INBOX }).then(response => {
-        this.setPersonalFilters(response.data.data.user || [])
-        this.setCompanyFilters(response.data.data.company || [])
+        this.setInboxPersonalFilters(response.data.data.user || [])
+        this.setInboxCompanyFilters(response.data.data.company || [])
 
         this.isGettingFilters = false
       })
@@ -315,44 +287,6 @@ export default {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
       }
 
-      // logic for fields with boolean value
-      // const props = [
-      //   'first_time_only',
-      //   'exclude_automated_communications',
-      //   'untagged_only'
-      // ]
-
-      // for (const item in this.filter) {
-      //   if (item === 'answer_status' && this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
-      //     continue
-      //   }
-      //   console.log({ ...this.defaultFilterModel })
-      //
-      //   const hasField = (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))
-      //
-      //   // exceptions for fields with boolean value
-      //   if (props.includes(item) &&
-      //     +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
-      //     hasField) {
-      //     this.updateChannelChangedFilterFields({
-      //       name: item,
-      //       value: +this.filter[item]
-      //     })
-      //
-      //     continue
-      //   }
-      //
-      //   // exceptions for fields with boolean value
-      //   if (!this.booleanFields.includes(item) &&
-      //     JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) &&
-      //     hasField) {
-      //     this.updateChannelChangedFilterFields({
-      //       name: item,
-      //       value: this.filter[item]
-      //     })
-      //   }
-      // }
-
       // updating filters for user scope
       if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
         this.isUpdatingFilter = true
@@ -376,27 +310,14 @@ export default {
 
       this.setAppliedFilter(this.selectedFilter || null)
 
-      // add the communication type and answer_status filters
-      // const communicationType = get(this.value, 'type', null)
-      // const communicationAnswerStatus = get(this.value, 'answer_status', null)
-      //
-      // if (communicationType) {
-      //   this.filter.type = communicationType
-      // }
-      //
-      // if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.defaultFilterModel.type) &&
-      //   communicationAnswerStatus) {
-      //   this.filter.answer_status = communicationAnswerStatus
-      // }
-
-      this.loadContactTasks()
+      this.loadContactTasks(false)
       this.fetchTaskCounts()
 
       this.$router.push({
         name: 'Inbox View',
         params: {
           viewId: this.selectedFilter.id,
-          status: 'open'
+          status: this.statusText
         }
       }).catch(err => {
         console.log(err)
@@ -460,7 +381,7 @@ export default {
               name: 'Inbox View',
               params: {
                 viewId: this.selectedFilter.id,
-                status: 'open'
+                status: this.statusText
               }
             }).catch(err => {
               console.log(err)

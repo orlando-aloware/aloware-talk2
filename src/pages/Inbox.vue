@@ -48,10 +48,6 @@ export default {
       'authenticated'
     ]),
 
-    ...mapGetters('inbox', [
-      'allFilters'
-    ]),
-
     ...mapState('inbox', [
       'items'
     ]),
@@ -148,7 +144,9 @@ export default {
     isLoadedPinnedViews (value) {
       if (value && this.$route.name === 'Inbox View') {
         this.setChannel()
-        this.fetchTaskCounts()
+
+        // get counts for inbox
+        this.fetchInboxTaskCounts()
       }
     }
   }

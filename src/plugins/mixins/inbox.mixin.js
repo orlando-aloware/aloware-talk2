@@ -6,6 +6,8 @@ import { isEmpty } from 'lodash'
 import { RELATIONS as CONTACT_RELATIONS } from 'src/constants/contacts-list-relations'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
+import * as Filters from 'src/constants/filters'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   computed: {
@@ -24,6 +26,18 @@ export default {
 
     nextPage () {
       return this.contactsCurrentPage + 1
+    },
+
+    statusText () {
+      switch (this.currentTask) {
+        case ContactTaskStatus.STATUS_PENDING:
+          return 'pending'
+        case ContactTaskStatus.STATUS_CLOSED:
+          return 'closed'
+        case ContactTaskStatus.STATUS_OPEN:
+        default:
+          return 'open'
+      }
     }
   },
 
@@ -89,7 +103,13 @@ export default {
           'Inbox Channel',
           'Inbox Contact'
         ]
-      ]
+      ],
+      defaultFilterModel: {
+        name: '',
+        type: ChannelType.CHANNEL_INBOX,
+        filter: Filters.EXCERPT,
+        scope: 'user'
+      }
     }
   },
 
@@ -155,7 +175,7 @@ export default {
       // always reset page when fresh loading contacts
       this.page = 1
 
-      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask) || loadCount) {
+      if (loadCount) {
         // if (this.currentTask === ContactTaskStatus.STATUS_OPEN && showLoading) {
         //   this.setLoadingOpenTaskCount(true)
         // }
@@ -233,17 +253,19 @@ export default {
       return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
 
-    getContactsCountByTaskStatus (taskId) {
-      const params = this.getParameters(taskId, true)
+    getContactsCountByTaskStatus (taskId, forInbox = false, params = null) {
+      params = forInbox && !isEmpty(params) ? params : this.getParameters(taskId, true)
 
       return talk2Api.V2.contacts.counts(params)
         .then(response => {
           switch (taskId) {
             case ContactTaskStatus.STATUS_OPEN:
               if (response) {
-                this.setOpenTaskCount(+response.data.count)
+                if (!forInbox) {
+                  this.setOpenTaskCount(+response.data.count)
+                }
 
-                if (!this.activeChannel || this.activeChannel.value === 'inbox') {
+                if (!this.activeChannel || this.activeChannel.value === 'inbox' || forInbox) {
                   this.setInboxOpenTaskCount(+response.data.count)
                 }
               }
@@ -253,9 +275,11 @@ export default {
 
             case ContactTaskStatus.STATUS_PENDING:
               if (response) {
-                this.setPendingTaskCount(+response.data.count)
+                if (!forInbox) {
+                  this.setPendingTaskCount(+response.data.count)
+                }
 
-                if (!this.activeChannel || this.activeChannel.value === 'inbox') {
+                if (!this.activeChannel || this.activeChannel.value === 'inbox' || forInbox) {
                   this.setInboxPendingTaskCount(+response.data.count)
                 }
               }
@@ -266,7 +290,7 @@ export default {
         })
     },
 
-    getParameters (taskId, count = false) {
+    getParameters (taskId, count = false, filters = null) {
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
       let relations = []
 
@@ -283,7 +307,7 @@ export default {
         this.filters.contact_task_status[0].value = [taskId]
       }
 
-      const filter = this.appliedFilter?.filter ?? null
+      const filter = filters ?? this.appliedFilter?.filter ?? null
 
       if (filter && filter?.campaigns && filter.campaigns.length) {
         this.filters = {
@@ -381,6 +405,7 @@ export default {
     },
 
     fetchTaskCounts () {
+      // console.trace('fetch counts')
       this.setLoadingPendingTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       this.setLoadingOpenTaskCount(true)
@@ -398,6 +423,14 @@ export default {
       //       closed: res.data.closed
       //     })
       //   })
+    },
+
+    fetchInboxTaskCounts () {
+      const paramsPending = this.getParameters(ContactTaskStatus.STATUS_PENDING, true, { ...this.defaultFilterModel.filter })
+      const paramsOpen = this.getParameters(ContactTaskStatus.STATUS_OPEN, true, { ...this.defaultFilterModel.filter })
+
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING, true, paramsPending)
+      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN, true, paramsOpen)
     },
 
     getPinnedViews () {
@@ -429,6 +462,20 @@ export default {
           filters: view.filter.filter
         }
         : {}
+    },
+
+    setStatus () {
+      switch (this.$route.params.status) {
+        case 'pending':
+          this.currentTask = ContactTaskStatus.STATUS_PENDING
+          break
+        case 'closed':
+          this.currentTask = ContactTaskStatus.STATUS_CLOSED
+          break
+        case 'open':
+          break
+        default:
+      }
     }
   },
 

@@ -107,10 +107,10 @@ export default {
   setPinnedViews: ({ commit }, value) => {
     commit('SET_PINNED_VIEWS', value)
   },
-  setPersonalFilters: ({ commit }, value) => {
-    commit('SET_PERSONAL_FILTERS', value)
+  setInboxPersonalFilters: ({ commit }, value) => {
+    commit('SET_INBOX_PERSONAL_FILTERS', value)
   },
-  setCompanyFilters: ({ commit }, value) => {
-    commit('SET_COMPANY_FILTERS', value)
+  setInboxCompanyFilters: ({ commit }, value) => {
+    commit('SET_INBOX_COMPANY_FILTERS', value)
   }
 }

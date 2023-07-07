@@ -267,18 +267,6 @@ export default {
       'allFilters'
     ]),
 
-    statusText () {
-      switch (this.currentTask) {
-        case ContactTaskStatus.STATUS_PENDING:
-          return 'pending'
-        case ContactTaskStatus.STATUS_CLOSED:
-          return 'closed'
-        case ContactTaskStatus.STATUS_OPEN:
-        default:
-          return 'open'
-      }
-    },
-
     statusToggleColor () {
       return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
     },
@@ -392,30 +380,6 @@ export default {
   },
 
   data () {
-    const defaultFilterModel = {
-      campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-      ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-      direction: Filters.DEFAULT_STATE.filter.direction,
-      answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-      min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-      transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-      callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-      tags: Filters.DEFAULT_STATE.filter.tags,
-      call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-      first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-      untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-      exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-      incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-      users: Filters.DEFAULT_STATE.filter.users,
-      workflows: Filters.DEFAULT_STATE.filter.workflows,
-      broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-      contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-      from_date: Filters.DEFAULT_STATE.filter.from_date,
-      to_date: Filters.DEFAULT_STATE.filter.to_date,
-      my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-      creator_type: Filters.DEFAULT_STATE.filter.creator_type
-    }
-
     return {
       searchText: '',
       isSearch: false,
@@ -426,13 +390,7 @@ export default {
         filter: [],
         scope: 'user'
       },
-      defaultFilterModel: {
-        name: '',
-        type: ChannelType.CHANNEL_INBOX,
-        filter: defaultFilterModel,
-        scope: 'user'
-      },
-      filter: defaultFilterModel,
+      filter: Filters.EXCERPT,
       scrollTimeout: null,
       CommunicationCurrentStatus,
       listeners: {}
@@ -521,20 +479,6 @@ export default {
 
       if (!this.$route.params.id) {
         this.setSelectedContact({})
-      }
-    },
-
-    setStatus () {
-      switch (this.$route.params.status) {
-        case 'pending':
-          this.currentTask = ContactTaskStatus.STATUS_PENDING
-          break
-        case 'closed':
-          this.currentTask = ContactTaskStatus.STATUS_CLOSED
-          break
-        case 'open':
-          break
-        default:
       }
     },
 
