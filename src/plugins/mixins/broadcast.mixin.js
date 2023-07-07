@@ -115,9 +115,6 @@ export default {
             this.$VueEvent.fire('new_in_app_call', event.communication)
           }
         })
-        .listen('.user.in-app.incoming_number.high_sms_volume', (event) => {
-          this.$VueEvent.fire('new_in_app_high_sms_volume', event)
-        })
         .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
           this.$VueEvent.fire('desktop_high_sms_volume', event)
         })
