@@ -96,17 +96,13 @@
         </q-btn-toggle>
       </div>
       <div class="col-2 d-flex justify-content-end">
-        <q-btn class="px-4 border-half-rounded stats-page-btn"
-               color="primary"
-               padding="0rem"
-               unelevated
-               no-caps
-               dense
-               :to="{ path: '/broadcasts/new' }">
-            <plus-icon class="mr-1"
-                      color="white"/>
+        <compact-btn class="mr-2"
+                     variant="primary"
+                     @clicked="$router.push({ path: '/broadcasts/new' })">
+          <plus-icon class="mr-1"
+                     color="white"/>
           New Bulk Message
-        </q-btn>
+        </compact-btn>
       </div>
     </div>
     <q-separator/>
@@ -379,6 +375,7 @@ import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill.vue'
 import CommunicationActivityGraph from 'src/components/communication-activity-graph.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
+import CompactBtn from 'components/compact-btn.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
@@ -509,7 +506,8 @@ export default {
     BroadcastStatusPill,
     CommunicationActivityGraph,
     EllipseIcon,
-    DeleteRedIcon
+    DeleteRedIcon,
+    CompactBtn
   },
 
   mixins: [
