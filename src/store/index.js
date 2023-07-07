@@ -12,8 +12,8 @@ import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
-import wallboard from './wallboard'
 import broadcast from './broadcast'
+import wallboard from './wallboard'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -38,8 +38,8 @@ export default function (/* { ssrContext } */) {
       stats,
       powerDialer,
       settings,
-      wallboard,
       broadcast,
+      wallboard,
       cache
     },
 

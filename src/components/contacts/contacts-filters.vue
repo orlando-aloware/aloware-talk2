@@ -1,6 +1,6 @@
 <template>
   <div class="contacts-filter-sidebar"
-       v-if="show">
+       v-if="show || keepOpen">
     <b-overlay class="full-width"
                spinner-variant="success"
                spinner-type="grow"
@@ -190,6 +190,11 @@ export default {
 
   props: {
     noCloseButton: {
+      type: Boolean,
+      default: false
+    },
+
+    keepOpen: {
       type: Boolean,
       default: false
     }

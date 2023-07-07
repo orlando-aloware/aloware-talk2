@@ -251,6 +251,11 @@ body,
   }
 }
 
+.blink {
+  animation: fade 1500ms infinite;
+  -webkit-animation: fade 1500ms infinite;
+}
+
 .guest {
   .page-container {
     padding: 0 0 0 0 !important;
@@ -8124,14 +8129,15 @@ span.mention {
     border: none !important;
     height: 24px;
 
-    &.active:hover {
+    &[aria-pressed="true"]:hover {
       background: lighten($primary, 10%) !important;
     }
 
-    &:not(.active) {
+    &[aria-pressed="false"] {
       color: transparent !important;
 
-      .task-count {
+      .task-count,
+      .broadcast-count {
         background: $grey-70 !important;
         color: $grey-90 !important;
       }
@@ -8144,11 +8150,13 @@ span.mention {
       text-align: center;
       font-family: 'Inter', sans-serif !important;
 
-      .task-status-name {
+      .task-status-name,
+      .broadcast-filter-name {
         margin-top: -2px;
       }
 
-      .task-count {
+      .task-count,
+      .broadcast-count {
         background: rgba(255, 255, 255, 0.22);
         border-radius: 5px;
         font-size: 10px;
@@ -12903,8 +12911,93 @@ h1.contact-list-name-label {
 }
 
 .broadcasts {
-  &__home {
+  &-cancel-button {
+    border: 1.6px solid #D8D8D8
+  }
 
+  &__home {
+    overflow-y: scroll;
+
+    &__graph {
+      .custom-toggle-button {
+        button[aria-pressed="true"]:hover {
+          background: lighten(#4caf50, 10%) !important;
+        }
+      }
+    }
+
+    &__table {
+      .broadcast-status-pill {
+        border: solid black 1px;
+
+        &.new {
+          border-color: $primary;
+        }
+
+        &.enrolling,
+        &.sending {
+          border-color: $indigo;
+        }
+        
+        &.paused {
+          border-color: $warning;
+        }
+
+        &.sent {
+          border-color: $green;
+        }
+
+        &.stopped {
+          border-color: $danger;
+        }
+      }
+
+      .datatable {
+        padding-left: 0 !important;
+
+        tr {
+          min-height: 50px;
+          height: 50px;
+
+          .context-menu {
+            &:not(.keep-visible) {
+              visibility: hidden;
+            }
+
+            .dropdown-toggle::after {
+              display: none;
+            }
+
+            button,
+            .show button {
+              background-color: $grey-light2 !important;
+              border: $grey-light4 solid 1px !important;
+            }
+
+            button:focus {
+              box-shadow: 0 0 0 0.2rem $grey-light3 !important;
+            }
+          }
+
+          &:hover .context-menu {
+            visibility: visible;
+          }
+        }
+
+        tr:hover,
+        tr:hover td {
+          background-color: #F4F4F6 !important;
+        }
+
+        td.datatable-row__checkbox {
+          padding-right: 0 !important;
+
+          .custom-checkbox-container .checkmark {
+            left: 10px;
+          }
+        }
+      }
+    }
   }
 
   &__add {
@@ -13213,6 +13306,7 @@ h1.contact-list-name-label {
     }
   }
 }
+
 
 .steps-wrapper {
   display: flex;

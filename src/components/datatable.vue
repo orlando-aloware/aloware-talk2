@@ -25,7 +25,7 @@
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
               <label class="custom-checkbox-container check-all"
-                     v-if="column.name === 'checkbox'">
+                     v-if="column.name === 'checkbox' && showSelectAll">
                 <input ref="dataTableCheckAll"
                        class="data-table-check-all"
                        type="checkbox"
@@ -174,6 +174,11 @@ export default {
     },
 
     showPagination: {
+      type: Boolean,
+      default: true
+    },
+
+    showSelectAll: {
       type: Boolean,
       default: true
     },
