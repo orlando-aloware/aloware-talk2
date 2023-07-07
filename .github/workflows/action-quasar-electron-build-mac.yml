@@ -52,12 +52,6 @@ jobs:
       - name: NPM version
         run: npm --version
 
-      - name: Setup Python2
-        uses: actions/setup-python@v4
-        with:
-          python-version: '2.*'
-          architecture: 'x64'
-
       - name: Prepare for app notarization (macOS)
         # Import Apple API key for app notarization on macOS
         run: |
