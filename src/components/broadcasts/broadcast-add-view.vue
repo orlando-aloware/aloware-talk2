@@ -27,7 +27,6 @@
         <!-- buttons -->
         <compact-btn class="mr-2"
                      variant="outlined-light"
-                     v-if="currentStep.id > firstStep"
                      @clicked="back">
           Back
         </compact-btn>
@@ -324,6 +323,14 @@ export default {
     },
 
     back () {
+      if (this.currentStep.id === this.firstStep) {
+        this.$router.push({
+          path: '/broadcasts'
+        })
+
+        return
+      }
+
       this.direction = 'left'
       this.$emit('back')
     },
