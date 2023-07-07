@@ -50,7 +50,7 @@ jobs:
       - name: NPM version
         run: npm --version
 
-      - name: Setup Python2
+      - name: Setup Python3
         uses: actions/setup-python@v4
         with:
           python-version: '3.*'
