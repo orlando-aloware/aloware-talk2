@@ -330,7 +330,7 @@ export default {
     isActiveItem () {
       return this.selectedContact &&
         this.selectedContact.id === this.contact.id &&
-        this.$route.name === 'Inbox Contact Task'
+        ['Inbox Contact Task', 'Inbox View Contact Task'].includes(this.$route.name)
     },
 
     activeClass () {

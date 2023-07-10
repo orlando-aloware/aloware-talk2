@@ -560,6 +560,19 @@ export default {
         this.currentTask = contact.task_status
       }
 
+      if (this.inboxViewsRoutes.includes(this.$route.name)) {
+        this.$emit('itemSelected', {
+          name: 'Inbox View Contact Task',
+          params: {
+            id: contactId.toString(),
+            viewId: this.$route.params.viewId,
+            status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
+          }
+        })
+
+        return
+      }
+
       this.$emit('itemSelected', {
         name: 'Inbox Contact Task',
         params: {
@@ -1225,8 +1238,8 @@ export default {
 
   watch: {
     $route (to, from) {
-      // load contacts if not from the same route
-      if (from.name === 'Inbox View' && from.name !== to.name) {
+      // load contacts if not inbox view related route
+      if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
         this.loadContactTasks()
         this.fetchTaskCounts()
         this.setInboxShowMyContacts(false)

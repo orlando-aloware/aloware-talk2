@@ -46,8 +46,11 @@ export default {
       'Inbox',
       'Inbox Contact Task',
       'Inbox Channel Task Status',
-      'Inbox Contact Communication',
-      'Inbox View'
+      'Inbox Contact Communication'
+    ]
+    const inboxViewsRoutes = [
+      'Inbox View',
+      'Inbox View Contact Task'
     ]
 
     return {
@@ -96,14 +99,19 @@ export default {
         CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW
       ],
       isLoadedPinnedViews: false,
-      inboxRoutes: inboxRoutes,
+      inboxRoutes: [
+        ...inboxRoutes,
+        ...inboxViewsRoutes
+      ],
       inboxChannelRoutes: [
         ...inboxRoutes,
+        ...inboxViewsRoutes,
         ...[
           'Inbox Channel',
           'Inbox Contact'
         ]
       ],
+      inboxViewsRoutes: inboxViewsRoutes,
       defaultFilterModel: {
         name: '',
         type: ChannelType.CHANNEL_INBOX,

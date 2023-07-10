@@ -77,6 +77,7 @@ export default {
       mobileContactScreenRoutes: [
         'Inbox Contact',
         'Inbox Contact Task',
+        'Inbox View Contact Task',
         'Inbox Contact Communication'
       ]
     }
@@ -92,7 +93,7 @@ export default {
       if (this.inboxChannelRoutes.includes(this.$route.name)) {
         let channel = null
 
-        if (this.$route.name === 'Inbox View' && this.isLoadedPinnedViews) {
+        if (this.inboxViewsRoutes.includes(this.$route.name) && this.isLoadedPinnedViews) {
           channel = this.getPinnedViewChannel(this.$route.params.viewId)
         } else {
           channel = this.items.find(item => item.value === this.$route.params.channel)
