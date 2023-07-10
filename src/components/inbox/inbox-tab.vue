@@ -510,7 +510,8 @@ export default {
           name: 'Inbox View',
           params: {
             viewId: this.$route.params.viewId,
-            status: this.statusText
+            status: this.statusText,
+            channel: 'views'
           }
         }).catch(err => {
           console.log(err)
@@ -565,6 +566,7 @@ export default {
           name: 'Inbox View Contact Task',
           params: {
             id: contactId.toString(),
+            channel: 'views',
             viewId: this.$route.params.viewId,
             status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }

@@ -317,7 +317,8 @@ export default {
         name: 'Inbox View',
         params: {
           viewId: this.selectedFilter.id,
-          status: this.statusText
+          status: this.statusText,
+          channel: 'views'
         }
       }).catch(err => {
         console.log(err)
@@ -381,7 +382,8 @@ export default {
               name: 'Inbox View',
               params: {
                 viewId: this.selectedFilter.id,
-                status: this.statusText
+                status: this.statusText,
+                channel: 'views'
               }
             }).catch(err => {
               console.log(err)

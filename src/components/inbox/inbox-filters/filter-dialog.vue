@@ -179,7 +179,7 @@ export default {
     channelFilterName () {
       const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
 
-      if (this.isFilterDialogForView) {
+      if (this.isFilterDialogForView || ['Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) {
         return 'Views'
       }
 

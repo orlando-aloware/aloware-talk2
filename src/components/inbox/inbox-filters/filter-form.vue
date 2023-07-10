@@ -154,7 +154,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="!isInbox && isCallsAndRecordingsChannel">
+                   v-if="!isInboxOrInboxViews && isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -165,7 +165,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row v-if="!isInbox">
+          <b-form-row v-if="!isInboxOrInboxViews">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -232,6 +232,30 @@
           </b-form-row>
         </div>
 
+        <div v-if="isInboxOrInboxViews">
+          <h5 class="mt-4 section-header">Has Communicated Within</h5>
+          <b-form-row class="mt-2">
+            <b-col sm="12"
+                     md="6">
+              <b-form-group class="form-label"
+                              label="Last Engagement Date Period">
+                <q-select class="q-user-selector q-basic-selector"
+                          options-selected-class="text-primary"
+                          color="primary"
+                          option-value="id"
+                          option-label="name"
+                          map-options
+                          use-input
+                          emit-value
+                          dense
+                          outlined
+                          v-model="filter.dynamic_engagement_date_range"
+                          :options="relativeRanges" />
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+        </div>
+
         <div>
           <h5 class="mt-4 section-header">Attribution</h5>
           <b-form-row class="mt-2">
@@ -250,7 +274,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsOrInboxChannel">
+                   v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label"
                             label="Communication Owners">
                 <div class="comm-owner-filter-tooltip-wrapper">
@@ -438,16 +462,16 @@ export default {
     },
 
     isMentionsOrInboxChannel () {
-      const nonCommunicationChannels = ['mentions', 'inbox']
+      const nonCommunicationChannels = ['mentions', 'inbox', 'views']
 
-      return this.$route.name === 'Inbox' ||
+      return this.isInboxOrInboxViews ||
         nonCommunicationChannels.includes(this.$route.params.channel)
     },
 
     isInboxOrAllCallsChannel () {
-      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications']
+      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications', 'views']
 
-      return this.$route.name === 'Inbox' ||
+      return this.isInboxOrInboxViews ||
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
@@ -475,6 +499,10 @@ export default {
 
     tagsFilterCategory () {
       return this.isInbox ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+    },
+
+    isInboxOrInboxViews () {
+      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'views'].includes(this.$route.params.channel)
     }
   },
 
@@ -498,7 +526,41 @@ export default {
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
       rangePicker: null,
-      TagCategories
+      TagCategories,
+      relativeRanges: [
+        {
+          id: 1,
+          name: 'All Time'
+        },
+        {
+          id: 2,
+          name: 'Today'
+        },
+        {
+          id: 3,
+          name: 'Yesterday'
+        },
+        {
+          id: 4,
+          name: 'This Week'
+        },
+        {
+          id: 5,
+          name: 'This Month'
+        },
+        {
+          id: 6,
+          name: 'Last 7 Days'
+        },
+        {
+          id: 7,
+          name: 'Last 30 Days'
+        },
+        {
+          id: 8,
+          name: 'Last 3 Months'
+        }
+      ]
     }
   },
 

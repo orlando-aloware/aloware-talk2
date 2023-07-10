@@ -315,7 +315,7 @@ export default {
         this.filters.contact_task_status[0].value = [taskId]
       }
 
-      const filter = filters ?? this.appliedFilter?.filter ?? null
+      const filter = filters ?? this.appliedFilter?.filter ?? this.filter ?? null
 
       if (filter && filter?.campaigns && filter.campaigns.length) {
         this.filters = {
@@ -374,6 +374,17 @@ export default {
           ]
         }
         relations.push('tags')
+      }
+
+      // apply only if filter is not "All Time"
+      if (filter && filter.dynamic_engagement_date_range > 1) {
+        const dateRange = this.generateDateRanges(filter.dynamic_engagement_date_range)
+        this.filters = {
+          ...this.filters,
+          'dynamic_engagement_date_range': [
+            { value: [dateRange.from_date, dateRange.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
+          ]
+        }
       }
 
       query.filter_groups.push({ 'filters': this.filters, 'is_conjunction': true })
@@ -483,6 +494,52 @@ export default {
         case 'open':
           break
         default:
+      }
+    },
+
+    generateDateRanges (relativeDateRangeOpt) {
+      switch (relativeDateRangeOpt) {
+        case 2: // Today
+          return {
+            from_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD hh:mm:ss')
+          }
+
+        case 3: // Yesterday
+          return {
+            from_date: window.moment.utc().tz(window.timezone).subtract(1, 'day').format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).subtract(1, 'day').format('YYYY-MM-DD hh:mm:ss')
+          }
+
+        case 4: // This Week
+          return {
+            from_date: window.moment.utc().tz(window.timezone).startOf('week').format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).endOf('week').format('YYYY-MM-DD hh:mm:ss')
+          }
+
+        case 5: // This Month
+          return {
+            from_date: window.moment.utc().tz(window.timezone).startOf('month').format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+          }
+
+        case 6: // Last 7 Days
+          return {
+            from_date: window.moment.utc().tz(window.timezone).subtract(7, 'days').format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD hh:mm:ss')
+          }
+
+        case 7: // Last 30 Days
+          return {
+            from_date: window.moment.utc().tz(window.timezone).subtract(30, 'days').format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD hh:mm:ss')
+          }
+
+        case 8: // Last 3 Months
+          return {
+            from_date: window.moment.utc().tz(window.timezone).subtract(3, 'months').format('YYYY-MM-DD hh:mm:ss'),
+            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD hh:mm:ss')
+          }
       }
     }
   },
