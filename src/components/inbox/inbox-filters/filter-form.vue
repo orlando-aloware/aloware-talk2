@@ -529,36 +529,44 @@ export default {
       TagCategories,
       relativeRanges: [
         {
-          id: 1,
+          id: 0,
           name: 'All Time'
         },
         {
-          id: 2,
+          id: 1,
           name: 'Today'
         },
         {
-          id: 3,
+          id: 2,
           name: 'Yesterday'
         },
         {
-          id: 4,
+          id: 3,
           name: 'This Week'
         },
         {
-          id: 5,
-          name: 'This Month'
+          id: 4,
+          name: 'Last Week'
         },
         {
-          id: 6,
+          id: 5,
           name: 'Last 7 Days'
         },
         {
+          id: 6,
+          name: 'This Month'
+        },
+        {
           id: 7,
-          name: 'Last 30 Days'
+          name: 'Last Month'
         },
         {
           id: 8,
-          name: 'Last 3 Months'
+          name: 'Last 30 Days'
+        },
+        {
+          id: 9,
+          name: 'Recent (Last 30 Days + Today)'
         }
       ]
     }

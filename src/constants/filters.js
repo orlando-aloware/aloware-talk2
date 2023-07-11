@@ -45,7 +45,7 @@ export const DEFAULT_STATE = {
     my_contact: 0,
     contact_owner: [],
     creator_type: null,
-    dynamic_engagement_date_range: 1
+    dynamic_engagement_date_range: 0
   }
 }
 

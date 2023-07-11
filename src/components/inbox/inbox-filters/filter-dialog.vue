@@ -291,7 +291,8 @@ export default {
         'my_contact',
         'from_date',
         'to_date',
-        'creator_type'
+        'creator_type',
+        'dynamic_engagement_date_range'
       ],
       inputTimeout: null,
       booleanFields: [

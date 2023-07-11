@@ -335,6 +335,15 @@ export default {
         }
       }
 
+      if (filter && filter?.users && filter.users.length) {
+        this.filters = {
+          ...this.filters,
+          'users': [
+            { value: filter.users, operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+      }
+
       if (filter && filter?.contact_owner && filter.contact_owner.length && !filter.my_contact) {
         this.filters = {
           ...this.filters,
@@ -377,12 +386,11 @@ export default {
       }
 
       // apply only if filter is not "All Time"
-      if (filter && filter.dynamic_engagement_date_range > 1) {
-        const dateRange = this.generateDateRanges(filter.dynamic_engagement_date_range)
+      if (filter && filter.dynamic_engagement_date_range > 0) {
         this.filters = {
           ...this.filters,
           'dynamic_engagement_date_range': [
-            { value: [dateRange.from_date, dateRange.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
+            { value: filter.dynamic_engagement_date_range, operator: 1 }
           ]
         }
       }
