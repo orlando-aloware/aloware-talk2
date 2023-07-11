@@ -1436,7 +1436,12 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_NOTIFICATION_AUDIO (state) {
-        state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
+        const ringGroup = state.ringGroups.find((o) => o.id === state.dialer.communication.ring_group_id)
+        if (ringGroup && ringGroup.fishing_mode) {
+          state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/incoming.mp3')
+        } else {
+          state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
+        }
       },
 
       SET_LOADING_PARKED_CALLS (state, value) {
