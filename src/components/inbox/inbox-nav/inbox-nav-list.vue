@@ -21,8 +21,7 @@
               value=""
               label="Views"
               :group="true"
-              class="nav-list-group-title d-flex align-items-center justify-content-between"
-              v-if="allInboxFilters.length">
+              class="nav-list-group-title d-flex align-items-center justify-content-between">
       <template #action-icon>
           <q-btn id="edit-views-icon"
                  class="mr-3 cursor-pointer"
