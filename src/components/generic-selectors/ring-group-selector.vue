@@ -237,7 +237,6 @@ export default {
 
   methods: {
     filterFn (val, update) {
-      console.log('update')
       if (this.selectedId && val === this.selectedId) {
         update(() => {
           this.options = this.ringGroups.filter(ringGroup => ringGroup.id === this.selectedId)
