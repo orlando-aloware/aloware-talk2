@@ -1,19 +1,22 @@
 import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
 import { get } from 'lodash'
+import { STATIC } from 'src/constants/contacts-list-types'
 
 export default {
   data () {
     return {
       countCancelToken: null,
       countSource: null,
-      contactsListCountListeners: {}
+      contactsListCountListeners: {},
+      STATIC
     }
   },
 
   computed: {
     ...mapGetters('contacts', [
-      'pinnedLists'
+      'pinnedLists',
+      'lists'
     ])
   },
 
@@ -24,10 +27,11 @@ export default {
     this.contactsListCountListeners.getListCount = (data) => {
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
+      const isStaticList = listId !== null && this.lists?.[listId] && this.lists[listId]?.type === STATIC
 
       this.setIsDatatableCountLoading(true)
 
-      this.getListDataCount(data.data, skipCancelToken)
+      this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
         .then(response => {
           if (data.thenFunctions) {
             const funcs = Object.keys(data.thenFunctions)
@@ -87,10 +91,18 @@ export default {
   },
 
   methods: {
-    getListDataCount (data, skipCancelToken = false) {
+    getListDataCount (data, skipCancelToken = false, isStaticList = false, listId = null) {
       if (!skipCancelToken) {
         this.countSource.cancel('Loading of contacts list count operation is canceled by the user.')
         this.countSource = this.countCancelToken.source()
+      }
+
+      // check if list is a static list, then we should fetch
+      // from the static list count endpoint
+      if (isStaticList) {
+        return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts-lits/${listId}/count`, {
+          cancelToken: this.countSource.token
+        })
       }
 
       const filters = typeof data.filters === 'object'
