@@ -35,21 +35,69 @@
         <message-composer-sms-preview :contact="contact"/>
       </div>
     </div>
-    <!-- voicemail (TBD) -->
+
+    <!-- voicemail -->
+    <div class="broadcast-add__message__rmv"
+         v-if="type === 'rvm'">
+      <div class="broadcast-add__message__rmv__file-upload"
+           v-if="!rvm">
+        <audio-recorder class="flex-grow-1"
+                        :upload-url="vmDropUploadUrl"
+                        @recordedAudioUploaded="applyVMDropAudioFile">
+        </audio-recorder>
+
+        <b-card class="flex-grow-1"
+                title="Upload an audio file">
+          <file-uploader accepted-file-types=".mp3, .wav"
+                        :upload-url="vmDropUploadUrl"
+                        @fileUploaded="vmFileUploaded">
+            <template slot="description">
+              <div class="text-center mt-2 notice">
+                <p class="mb-0">Supports MP3/WAV only.</p>
+                <p class="mb-0">Max. files size for images is 8MB</p>
+              </div>
+            </template>
+          </file-uploader>
+        </b-card>
+      </div>
+
+      <div class="broadcast-add__message__rmv__file-preview"
+           v-else>
+        <waveform uniqueId="broadcast-rvm-preview"
+                  :remote-url="rvmUrl" />
+        <span class="broadcast-add__message__rmv__file-preview__remove-icon"
+              @click="onRemoveRVM">
+          <close-icon icon-color="#fff"
+                      height="20"
+                      width="20"/>
+          <q-tooltip>
+            Remove RVM
+          </q-tooltip>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import AudioRecorder from 'components/audio-recorder'
+import CloseIcon from 'src/components/icons/close-icon.vue'
+import FileUploader from 'components/file-uploader'
 import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
+import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'broadcast-add-view-message',
 
   components: {
+    AudioRecorder,
+    CloseIcon,
+    FileUploader,
     MessageComposerSms,
-    MessageComposerSmsPreview
+    MessageComposerSmsPreview,
+    Waveform
   },
 
   props: {
@@ -61,6 +109,11 @@ export default {
     contactsLength: {
       type: Number,
       default: 0
+    },
+
+    rvm: {
+      type: Object,
+      default: null
     }
   },
 
@@ -81,6 +134,8 @@ export default {
       switch (this.type) {
         case 'sms':
           return (this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
+        case 'rvm':
+          return !!this.rvm?.file_name
         default:
           return false
       }
@@ -124,6 +179,14 @@ export default {
       let rate = this.useMmsRate ? this.profile.rate.local_mms : this.profile.rate.local_sms
 
       return this.contactsLength * this.messageCount * rate
+    },
+
+    vmDropUploadUrl () {
+      return `${window.axios.defaults.baseURL}/api/v1/broadcasts/upload/rvm`
+    },
+
+    rvmUrl () {
+      return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm.file_name}`
     }
   },
 
@@ -136,9 +199,9 @@ export default {
         enabled: true
       },
       {
-        id: 'voicemail',
+        id: 'rvm',
         label: 'Ringless Voicemail',
-        enabled: false
+        enabled: true
       }
     ],
     maxSmsBodyLength: 1600
@@ -156,7 +219,19 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'setSelectedLine'
-    ])
+    ]),
+
+    applyVMDropAudioFile (data) {
+      this.$emit('rvm-updated', data)
+    },
+
+    vmFileUploaded (file) {
+      this.$emit('rvm-updated', file)
+    },
+
+    onRemoveRVM () {
+      this.$emit('rvm-updated', null)
+    }
   },
 
   watch: {

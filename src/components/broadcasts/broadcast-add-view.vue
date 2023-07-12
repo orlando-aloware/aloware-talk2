@@ -14,6 +14,7 @@
                     @input="mainComponentChanged"
                     @source-updated="onSourceUpdated"
                     @type-updated="onTypeUpdated"
+                    @rvm-updated="onRvmUpdated"
                     @sms-price-updated="onSmsPriceUpdated"
                     @time="onTimeUpdated"
                     @date-changed="onDateChanged"
@@ -160,7 +161,8 @@ export default {
         case 2:
           return {
             contact: this.contactPreview,
-            contactsLength: this.contactsLength
+            contactsLength: this.contactsLength,
+            rvm: this.rvm
           }
         case 3:
           return {
@@ -241,6 +243,7 @@ export default {
     contactPreview: {},
     contactsLength: 0,
     type: null, // sms, voicemail
+    rvm: null,
     smsPrice: 0,
     campaign: null,
     throttle: null,
@@ -270,6 +273,10 @@ export default {
 
     onTypeUpdated (type) {
       this.type = type
+    },
+
+    onRvmUpdated (file) {
+      this.rvm = file
     },
 
     onSmsPriceUpdated (price) {
