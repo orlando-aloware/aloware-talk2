@@ -562,7 +562,7 @@ export default {
       }
 
       this.isValidNotification = true
-      this.playAudio()
+      this.playAudio(this.id === 'callFishing')
     },
 
     runDateTimeInterval () {

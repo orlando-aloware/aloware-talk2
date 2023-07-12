@@ -43,12 +43,17 @@ export default {
       'setShowIncomingCallNotification'
     ]),
 
-    playAudio () {
+    playAudio (fishingMode = false) {
       if (!this.enableAudio) {
         return
       }
 
-      const promise = this.notificationAudio.play()
+      let promise
+      if (fishingMode) {
+        promise = this.fishinModeNotificationAudio.play()
+      } else {
+        promise = this.notificationAudio.play()
+      }
 
       if (promise !== undefined) {
         promise.catch(err => {
@@ -57,6 +62,14 @@ export default {
           console.log(err)
         })
       }
+    },
+
+    stopAudio () {
+      if (!this.enableAudio) {
+        return
+      }
+
+      this.fishinModeNotificationAudio.pause()
     },
 
     processRemoveFromNotification (communication) {
@@ -96,6 +109,10 @@ export default {
 
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
+
+      if (type === 'callFishing') {
+        this.stopAudio()
+      }
 
       if (
         (notificationCommId.data === communicationId &&

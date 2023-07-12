@@ -249,6 +249,7 @@ export default function (/* { ssrContext } */) {
       defaultDateFilter: null,
       sessionPhoneExpansion: '',
       notificationAudio: null,
+      fishinModeNotificationAudio: null,
       loadingParkedCalls: false,
       parkedCalls: [],
       suspended: false,
@@ -742,6 +743,10 @@ export default function (/* { ssrContext } */) {
 
       setNotificationAudio ({ commit }) {
         commit('SET_NOTIFICATION_AUDIO')
+      },
+
+      setFishingModeNotificationAudio ({ commit }) {
+        commit('SET_FISHING_MODE_NOTIFICATION_AUDIO')
       },
 
       setLoadingParkedCalls ({ commit }, value) {
@@ -1436,12 +1441,12 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_NOTIFICATION_AUDIO (state) {
-        const ringGroup = state.ringGroups.find((o) => o.id === state.dialer.communication.ring_group_id)
-        if (ringGroup && ringGroup.fishing_mode) {
-          state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/incoming.mp3')
-        } else {
-          state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
-        }
+        state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
+      },
+
+      SET_FISHING_MODE_NOTIFICATION_AUDIO (state) {
+        state.fishinModeNotificationAudio = new Audio(process.env.API_URL + '/static/ivr/incoming.mp3')
+        state.fishinModeNotificationAudio.loop = true
       },
 
       SET_LOADING_PARKED_CALLS (state, value) {

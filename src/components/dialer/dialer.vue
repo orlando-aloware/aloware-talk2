@@ -312,6 +312,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
       console.log('Received call invite', call)
