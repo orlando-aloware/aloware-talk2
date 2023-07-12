@@ -18,6 +18,7 @@ export default {
       'communicationNotifiedDesktop',
       'voicemailNotifiedDesktop',
       'contactNotifiedDesktop',
+      'fishinModeNotificationAudio',
       'appointmentNotifiedDesktop',
       'reminderNotifiedDesktop',
       'notificationAudio'
