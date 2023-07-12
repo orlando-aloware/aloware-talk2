@@ -233,6 +233,7 @@ export default {
 
   computed: {
     ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
+    ...mapState('cache', ['currentCompany']),
 
     isCall () {
       return ['incomingCall', 'callFishing'].includes(this.id)
@@ -562,7 +563,8 @@ export default {
       }
 
       this.isValidNotification = true
-      this.playAudio()
+      const shouldPlayFishingNotificationSound = this.id === 'callFishing' && this.currentCompany.fishing_mode_notification_sound
+      this.playAudio(shouldPlayFishingNotificationSound)
     },
 
     runDateTimeInterval () {
