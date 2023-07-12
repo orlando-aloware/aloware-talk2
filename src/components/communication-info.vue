@@ -220,7 +220,7 @@
               <template v-for="(image, index) in communication.attachments">
                 <q-img
                   class="img-fluid d-block r-2x"
-                  v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
+                  v-if="isAttachmentMigrated(image) && [CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
                   :class="index > 0 ? 'mb-1' : ''"
                   :key="index"
                   height="200px"
@@ -231,6 +231,11 @@
                     </div>
                   </template>
                 </q-img>
+                <div v-else
+                     :key="index"
+                     class="absolute-full flex flex-center text-white">
+                  <i class="fa fa-spinner fa-spin"></i> Preparing attachment...
+                </div>
               </template>
 
               <div v-if="communication.body">
