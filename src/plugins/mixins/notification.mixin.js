@@ -21,7 +21,8 @@ export default {
       'appointmentNotifiedDesktop',
       'reminderNotifiedDesktop',
       'notificationAudio'
-    ])
+    ]),
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {
@@ -43,13 +44,13 @@ export default {
       'setShowIncomingCallNotification'
     ]),
 
-    playAudio (fishingMode = false) {
+    playAudio (shouldPlayFishingNotificationSound = false) {
       if (!this.enableAudio) {
         return
       }
 
       let promise
-      if (fishingMode) {
+      if (shouldPlayFishingNotificationSound) {
         promise = this.fishinModeNotificationAudio.play()
       } else {
         promise = this.notificationAudio.play()
@@ -110,7 +111,7 @@ export default {
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
 
-      if (type === 'callFishing') {
+      if (type === 'callFishing' && this.currentCompany.fishing_mode_notification_sound) {
         this.stopAudio()
       }
 
