@@ -83,7 +83,7 @@ export default {
       return
     }
 
-    state.calls.live.unshift(communication)
+    state.calls.live.push(communication)
   },
 
   SET_LIVE_CALLS: (state, data) => {
@@ -117,7 +117,7 @@ export default {
       return
     }
 
-    state.calls.parked.unshift(communication)
+    state.calls.parked.push(communication)
   },
 
   SET_PARKED_CALLS: (state, data) => {
@@ -147,7 +147,7 @@ export default {
       return
     }
 
-    state.calls.queued.unshift(communication)
+    state.calls.queued.push(communication)
   },
 
   SET_QUEUED_CALLS: (state, data) => {
