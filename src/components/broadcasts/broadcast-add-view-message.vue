@@ -63,7 +63,7 @@
 
       <div class="broadcast-add__message__rmv__file-preview"
            v-else>
-        <waveform uniqueId="broadcast-rvm-preview"
+        <waveform unique-id="broadcast-rvm-preview"
                   :remote-url="rvmUrl" />
         <span class="broadcast-add__message__rmv__file-preview__remove-icon"
               @click="onRemoveRVM">
@@ -214,10 +214,14 @@ export default {
       : this.campaigns[0]
 
     this.setSelectedLine(campaign)
+
+    // type setup
+    this.type = this.rvm ? 'rvm' : 'sms'
   },
 
   methods: {
     ...mapActions('contacts', [
+      'setMessageComposerSmsBody',
       'setSelectedLine'
     ]),
 
@@ -245,6 +249,16 @@ export default {
     type: {
       immediate: true,
       handler (type) {
+        // clean content of non-selected types
+        switch (type) {
+          case 'sms':
+            this.$emit('rvm-updated', null)
+            break
+          case 'rvm':
+            this.setMessageComposerSmsBody('')
+            break
+        }
+
         this.$emit('type-updated', type)
       }
     },

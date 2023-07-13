@@ -178,7 +178,8 @@ export default {
             date: this.date,
             source: this.source,
             throttle: this.throttle.name,
-            type: this.type
+            type: this.type,
+            rvm: this.rvm
           }
         default:
           return null
@@ -353,12 +354,11 @@ export default {
     send () {
       this.$emit('loading', true)
 
+      let method = null
       const bulkMessage = {
         name: '',
         count: this.contactsLength,
-        // file_name: null,
         campaign_id: this.campaign.id,
-        // attachment_type: null,
         run_at_date: this.date.substr(0, 10),
         run_at_time: this.date.substr(11, 10),
         message_body: this.messageComposer.sms.body,
@@ -367,13 +367,26 @@ export default {
         is_scheduled: this.time.time === 'scheduled'
       }
 
-      // set attachment
-      if (this.messageComposer.sms.gif_url) {
-        bulkMessage.attachment_type = 'gif'
-        bulkMessage.file_name = this.messageComposer.sms.gif_url
-      } else if (this.messageComposer.sms.attachments.length) {
-        bulkMessage.attachment_type = 'media'
-        bulkMessage.file_name = this.messageComposer.sms.attachments[0].uuid
+      switch (this.type) {
+        case 'sms':
+          method = 'sendBulkMessage'
+
+          // set attachment
+          if (this.messageComposer.sms.gif_url) {
+            bulkMessage.attachment_type = 'gif'
+            bulkMessage.file_name = this.messageComposer.sms.gif_url
+          } else if (this.messageComposer.sms.attachments.length) {
+            bulkMessage.attachment_type = 'media'
+            bulkMessage.file_name = this.messageComposer.sms.attachments[0].uuid
+          }
+
+          break
+
+        case 'rvm':
+          method = 'sendBulkRvm'
+          bulkMessage.file_name = this.rvm.file_name
+
+          break
       }
 
       bulkMessage.talk_filters = !isEmpty(this.source.filters) ? this.source.filters : null
@@ -384,7 +397,7 @@ export default {
       // view_id: null, // Zoho
       // filter_id: null, // Pipedrive
 
-      API.V1.broadcasts.sendBulkMessage(bulkMessage)
+      API.V1.broadcasts[method](bulkMessage)
         .then(() => {
           this.$emit('loading', false)
 

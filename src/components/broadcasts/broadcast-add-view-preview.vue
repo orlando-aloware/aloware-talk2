@@ -21,6 +21,11 @@
              v-if="type === 'sms'">
           <message-composer-sms-preview :contact="contact"/>
         </div>
+        <div class="broadcast-add__preview__row__field__rvm-preview"
+             v-else-if="type === 'rvm'">
+          <waveform unique-id="broadcast-rvm-preview"
+                    :remote-url="rvmUrl" />
+        </div>
       </div>
     </div>
 
@@ -46,6 +51,7 @@
 
 <script>
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
+import Waveform from 'src/components/waveform.vue'
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
 
@@ -53,7 +59,8 @@ export default {
   name: 'broadcast-add-view-preview',
 
   components: {
-    MessageComposerSmsPreview
+    MessageComposerSmsPreview,
+    Waveform
   },
 
   props: {
@@ -90,6 +97,11 @@ export default {
     type: {
       type: String,
       required: true
+    },
+
+    rvm: {
+      type: Object,
+      required: false
     }
   },
 
@@ -136,6 +148,10 @@ export default {
 
     companyTimezone () {
       return window.moment().tz(this.currentCompany.timezone).format('z')
+    },
+
+    rvmUrl () {
+      return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm.file_name}`
     }
   }
 }
