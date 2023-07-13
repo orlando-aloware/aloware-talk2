@@ -48,6 +48,7 @@ import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
+import { STATIC } from 'src/constants/contacts-list-types'
 
 export default {
   inject: [
@@ -106,6 +107,7 @@ export default {
       if (this.isContactsRoute) {
         return 'contact-list-item'
       }
+
       return 'power-dialer-list-items'
     },
 
@@ -126,7 +128,8 @@ export default {
     return {
       isBusy: false,
       contactsToDelete: null,
-      ContactsListRemoveFromTypes
+      ContactsListRemoveFromTypes,
+      STATIC
     }
   },
 
@@ -161,10 +164,12 @@ export default {
     },
 
     handleSingleDeletion () {
-      const url = { data: null }
+      let url = null
+      let payload = {}
+
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
-          url.data = `/api/v2/${this.endpointForList}/` +
+          url = `/api/v2/${this.endpointForList}/` +
             this.selectedList.id +
             '/items/' +
             this.contactToRemove.id
@@ -177,15 +182,19 @@ export default {
             return
           }
 
-          url.data = `/api/v2/contacts/${contactId}`
+          if (this.selectedList.type === STATIC) {
+            payload.contact_list_id = this.selectedList.id
+          }
+
+          url = `/api/v2/contacts/${contactId}`
           break
       }
 
       this.isBusy = true
-      return this.$axios
-        .delete(
-          url.data
-        )
+
+      return this.$axios.delete(url, {
+        data: payload
+      })
         .then(() => {
           this.$VueEvent.fire('fetchContacts', { clear: true })
           this.$VueEvent.fire('shouldUpdateListCount')
@@ -207,6 +216,7 @@ export default {
 
     handleBulkDeletion () {
       let url = null
+      let params = {}
 
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
@@ -214,13 +224,16 @@ export default {
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
           url = `/api/v2/contacts/bulk-delete`
+
+          if (this.selectedList.type === STATIC) {
+            params.list_id = this.selectedList.id
+          }
+
           break
       }
 
       this.isBusy = true
       const ids = this.selectedContacts[this.listId].map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
-
-      let params = {}
 
       if (this.isDatatableSelectedAll) {
         params.selected_all = true
