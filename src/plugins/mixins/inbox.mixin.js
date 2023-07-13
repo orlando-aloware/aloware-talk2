@@ -19,7 +19,8 @@ export default {
       'activeChannel',
       'pinnedViews',
       'contacts',
-      'appliedFilter'
+      'appliedFilter',
+      'channelClonedFilter'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -302,7 +303,7 @@ export default {
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
       let relations = []
 
-      this.resetFilters()
+      this.reInitFilters()
       query.filter_groups = []
 
       if (this.searchText && this.searchText.trim() && this.searchText.length >= 3) {
@@ -315,7 +316,8 @@ export default {
         this.filters.contact_task_status[0].value = [taskId]
       }
 
-      const filter = filters ?? this.appliedFilter?.filter ?? this.filter ?? null
+      const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
+      console.trace(filter, filters, this.appliedFilter, this.channelClonedFilter)
 
       if (filter && filter?.campaigns && filter.campaigns.length) {
         this.filters = {
@@ -411,7 +413,7 @@ export default {
       return query
     },
 
-    resetFilters () {
+    reInitFilters () {
       this.filters = {
         contact_task_status: [
           {

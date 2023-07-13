@@ -162,7 +162,7 @@ export default {
     },
 
     isPinnedView (viewId) {
-      return this.pinnedViews.find(view => +view.filter_id === viewId)
+      return this.pinnedViews.find(view => +view.filter_id === +viewId)
     }
   }
 }

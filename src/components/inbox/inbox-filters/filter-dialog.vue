@@ -11,7 +11,8 @@
            @show="onShow"
            @shown="onShown">
     <div class="modal-body-wrapper d-flex">
-      <div class="left-column-wrapper">
+      <div class="left-column-wrapper"
+           v-if="!$route.params?.viewId">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-3">
@@ -53,6 +54,7 @@
                v-if="companyFilters.length < 1">
               None
             </p>
+
             <div class="filter-items cursor-pointer"
                  :class="getFilterItemClass(item)"
                  :key="item.id"
@@ -69,6 +71,7 @@
           </div>
         </div>
       </div>
+
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
           <div class="w-100 text-left">
@@ -163,7 +166,8 @@ export default {
       'channelClonedFilter',
       'isFilterModelFormShown',
       'appliedFilter',
-      'inboxShowMyContacts'
+      'inboxShowMyContacts',
+      'pinnedViews'
     ]),
 
     isOpen: {
@@ -246,7 +250,8 @@ export default {
         return 'Saving changes..'
       }
 
-      if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
+      const userScope = (this.selectedFilter?.scope === 'user' || +!this.selectedFilter?.is_on_company)
+      if (this.selectedFilter && userScope && this.filterHasChanges) {
         return 'Apply & Save'
       }
 
@@ -333,7 +338,8 @@ export default {
       'resetChannelChangedFilterFields',
       'toggleFilterDialog',
       'setChannelClonedFilter',
-      'setInboxShowMyContacts'
+      'setInboxShowMyContacts',
+      'setPinnedViews'
     ]),
 
     hideModal () {
@@ -355,12 +361,12 @@ export default {
       this.getFilters()
 
       if (this.selectedFilter) {
-        this.filter = { ...this.selectedFilter.filter, ...this.filter }
+        this.filter = { ...this.selectedFilter.filter }
       } else {
         this.filter = _.pick(this.value, this.filterFields)
       }
 
-      this.setChannelClonedFilter(this.defaultFilterModel.filter)
+      this.setChannelClonedFilter(this.filter)
     },
 
     onShown () {
@@ -441,14 +447,15 @@ export default {
         }
       }
 
-      if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
+      const userScope = (this.selectedFilter.scope === 'user' || +!this.selectedFilter?.is_on_company)
+      if (this.selectedFilter && userScope && this.filterHasChanges) {
         this.isUpdatingFilter = true
 
         this.updateFilter(this.selectedFilter, {
           filter: this.filter,
           type: this.defaultFilterModel.type,
-          name: this.selectedFilter.name,
-          scope: this.selectedFilter.scope }).then(res => {
+          name: this.selectedFilter.name
+        }).then(res => {
           this.isUpdatingFilter = false
         }).catch(error => {
           const {
@@ -460,7 +467,8 @@ export default {
         })
       }
 
-      this.setAppliedFilter(this.selectedFilter || null)
+      console.log('applying filter...')
+      this.setAppliedFilter(this.selectedFilter)
 
       // add the communication type and answer_status filters
       const communicationType = _.get(this.value, 'type', null)
@@ -536,11 +544,12 @@ export default {
         ? ChannelType.CHANNEL_CALLS
         : (this.isFilterDialogForView ? null : this.defaultFilterModel.type)
 
-      return talk2Api.V2.inbox.filters.get({ type: type }).then(response => {
-        this.personalFilters = response.data.data.user || []
-        this.companyFilters = response.data.data.company || []
-        this.isGettingFilters = false
-      })
+      return talk2Api.V2.inbox.filters.get({ type: type })
+        .then(response => {
+          this.personalFilters = response.data.data.user || []
+          this.companyFilters = response.data.data.company || []
+          this.isGettingFilters = false
+        })
     },
 
     updateFilter (filter, params) {
@@ -560,14 +569,28 @@ export default {
           const filter = { ...this.selectedFilter }
           filter.filter = { ...this.filter }
           this.setSelectedFilter(filter)
+          this.setAppliedFilter(filter)
+          this.setChannelClonedFilter(filter.filter)
         }
 
         if (!updatedFilter.is_on_company) {
           const index = this.personalFilters.findIndex(item => item.id === filter.id)
+          const pinnedViewIndex = this.pinnedViews.findIndex(view => +view.filter_id === +filter.id)
+          let fireEvent = false
+          console.log(pinnedViewIndex)
 
           if (index >= 0) {
             this.personalFilters[index] = updatedFilter
+            fireEvent = true
+          }
 
+          if (pinnedViewIndex >= 0) {
+            this.pinnedViews[pinnedViewIndex].filter = updatedFilter
+            this.setPinnedViews([...this.pinnedViews])
+            fireEvent = true
+          }
+
+          if (fireEvent) {
             this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
           }
         }
@@ -640,7 +663,8 @@ export default {
 
   watch: {
     '$route.params.channel' (route) {
-      if (!route) {
+      // do not reset selected filter for inbox views
+      if (!route || route === 'view') {
         return
       }
 

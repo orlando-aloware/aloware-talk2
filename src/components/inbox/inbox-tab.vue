@@ -15,7 +15,10 @@
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
+
             <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
+
+            <!-- reset/close selected filter button -->
             <div class="filter-wrapper"
                  :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
               <compact-btn v-if="hasChannelFilterChanges || appliedFilter"
@@ -25,6 +28,8 @@
                            @clicked="onResetFilter">
                 <i class="fa fa-times"></i>
               </compact-btn>
+
+              <!-- applied/selected filter name -->
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            @clicked="toggleFilterDialog(true)">
@@ -40,6 +45,8 @@
                 {{ !appliedFilter ? '' : appliedFilter.name }}
                 {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
               </compact-btn>
+
+              <!-- applied/selected filter field changes count -->
               <b-badge v-if="hasChannelFilterChanges"
                        class="ml-1 fs-12"
                        variant="primary"
@@ -174,7 +181,7 @@
         </div>
       </div>
 
-      <filter-dialog v-model="filter"
+      <filter-dialog v-model="channelClonedFilter"
                      :default-filter-model="defaultFilterModel"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
@@ -195,7 +202,7 @@ import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapActions, mapState, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import {
   aclMixin,
@@ -255,16 +262,13 @@ export default {
       'isLoadingPendingTaskCount',
       'activeChannel',
       'pinnedViews',
-      'contacts'
+      'contacts',
+      'channelClonedFilter'
     ]),
 
     ...mapState('contacts', [
       'contact',
       'isContactMixinUsed'
-    ]),
-
-    ...mapGetters('inbox', [
-      'allFilters'
     ]),
 
     statusToggleColor () {
@@ -402,6 +406,7 @@ export default {
       'toggleFilterDialog',
       'resetChannelChangedFilterFields',
       'toggleFilterModelForm',
+      'setSelectedFilter',
       'setAppliedFilter',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
@@ -511,7 +516,7 @@ export default {
           params: {
             viewId: this.$route.params.viewId,
             status: this.statusText,
-            channel: 'views'
+            channel: 'view'
           }
         }).catch(err => {
           console.log(err)
@@ -566,7 +571,7 @@ export default {
           name: 'Inbox View Contact Task',
           params: {
             id: contactId.toString(),
-            channel: 'views',
+            channel: 'view',
             viewId: this.$route.params.viewId,
             status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }
@@ -652,33 +657,38 @@ export default {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
+      this.setSelectedFilter(null)
       this.setAppliedFilter(null)
-    },
-
-    loadTaskCounts () {
-      // if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
-      //   this.setLoadingPendingTaskCount(true)
-      //   this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      // }
-      //
-      // if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
-      //   this.setLoadingOpenTaskCount()
-      //   this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      // }
-      this.fetchTaskCounts()
     },
 
     onResetFilter () {
       this.resetFilter()
+
+      // redirect
+      if (this.$route.params?.viewId) {
+        this.$router.push({
+          name: 'Inbox Channel Task Status',
+          params: {
+            channel: 'inbox',
+            status: this.statusText
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+
+        return
+      }
+
       this.loadContactTasks()
-      this.loadTaskCounts()
+      this.fetchInboxTaskCounts()
     },
 
     onApplyFilter (filter) {
       this.filter = filter
       this.isLoaded = false
+      this.setChannelClonedFilter(this.filter)
       this.loadContactTasks()
-      this.loadTaskCounts()
+      this.fetchTaskCounts()
     },
 
     onCreateNewFilter (filter) {

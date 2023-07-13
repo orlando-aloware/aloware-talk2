@@ -498,7 +498,7 @@ export default {
     },
 
     tagsFilterCategory () {
-      return this.isInbox ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+      return this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
     },
 
     isInboxOrInboxViews () {

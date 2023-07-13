@@ -54,9 +54,8 @@ import NavItem from './inbox-nav-item'
 import InboxViews from 'src/components/inbox/inbox-views.vue'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import { pick, get } from 'lodash'
+import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
-import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
 import { inboxMixin } from 'src/plugins/mixins'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
@@ -98,6 +97,7 @@ export default {
     ...mapState('inbox', [
       'items',
       'selectedFilter',
+      'appliedFilter',
       'isFilterDialogShown',
       'pinnedViews',
       'inboxPersonalFilters',
@@ -164,10 +164,10 @@ export default {
         }
       })
 
-    // listen to filter updates
-    // this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
-    //   this.personalFilters = personalFilters
-    // })
+    // listen to filter updates to update the inbox views dialog selection
+    this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
+      this.setInboxPersonalFilters(personalFilters)
+    })
   },
 
   mounted () {
@@ -194,20 +194,20 @@ export default {
     ]),
 
     onItemClicked (nextActive) {
+      this.resetFilter()
+
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
 
       // redirect page to Inbox View
       if (isView) {
         const viewId = nextActive.split('-')[1]
-        const filter = this.allInboxFilters.find(filter => +filter.id === +viewId)
+        const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
 
         this.currentTask = ContactTaskStatus.STATUS_OPEN
-        this.onSelectView(filter)
+        this.onSelectView(view.filter)
         return
       }
-
-      this.resetFilter()
 
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
@@ -241,8 +241,8 @@ export default {
     },
 
     isActive (value, type = null) {
-      if (type === 'view') {
-        return this.selectedFilter?.id === value.filter_id
+      if (type === 'view' || this.$route.params?.viewId) {
+        return this.$route.params?.viewId && this.appliedFilter?.id === value.filter_id
       }
 
       return this.isShowActive && this.activeChannel && this.activeChannel.value === value
@@ -251,13 +251,13 @@ export default {
     getFilters () {
       this.isGettingFilters = true
 
-      // todo: get only contacts type filters
-      return talk2Api.V2.inbox.filters.get({ type: ChannelType.CHANNEL_INBOX }).then(response => {
-        this.setInboxPersonalFilters(response.data.data.user || [])
-        this.setInboxCompanyFilters(response.data.data.company || [])
+      return talk2Api.V2.inbox.filters.get({ type: ChannelType.CHANNEL_INBOX })
+        .then(response => {
+          this.setInboxPersonalFilters(response.data.data.user || [])
+          this.setInboxCompanyFilters(response.data.data.company || [])
 
-        this.isGettingFilters = false
-      })
+          this.isGettingFilters = false
+        })
     },
 
     onSelectView (filter) {
@@ -265,59 +265,34 @@ export default {
         return
       }
 
-      this.setSelectedFilter(filter)
-
-      // combine default filter values with the selected one
-      const viewFilters = filter.filter
-      this.filter = {
-        ...this.defaultFilterModel.filter,
-        ...pick(viewFilters, this.filterFields)
+      // fill in the value for the newly added filter in case it's not yet included
+      // in the existing saved set to properly display in its respective select component
+      if (!filter.filter.hasOwnProperty('dynamic_engagement_date_range')) {
+        filter.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
       }
 
+      this.setSelectedFilter(filter)
       this.applyFilter()
     },
 
     applyFilter () {
       this.resetChannelChangedFilterFields()
-      const myContactsFilter = get(this.filter, 'my_contact', null)
+      const myContactsFilter = get(this.selectedFilter.filter, 'my_contact', null)
 
       // set My Contacts toggle state
       if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
       }
 
-      // updating filters for user scope
-      if (this.selectedFilter && this.selectedFilter.scope === 'user' && this.filterHasChanges) {
-        this.isUpdatingFilter = true
-
-        this.updateFilter(this.selectedFilter, {
-          filter: this.filter,
-          type: this.defaultFilterModel.type,
-          name: this.selectedFilter.name,
-          scope: this.selectedFilter.scope
-        }).then(res => {
-          this.isUpdatingFilter = false
-        }).catch(error => {
-          const {
-            message,
-            html
-          } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
-      }
-
-      this.setAppliedFilter(this.selectedFilter || null)
-
-      this.loadContactTasks(false)
-      this.fetchTaskCounts()
+      this.setAppliedFilter(this.selectedFilter)
+      this.loadContactTasks()
 
       this.$router.push({
         name: 'Inbox View',
         params: {
           viewId: this.selectedFilter.id,
           status: this.statusText,
-          channel: 'views'
+          channel: 'view'
         }
       }).catch(err => {
         console.log(err)
@@ -337,6 +312,7 @@ export default {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
+      this.setSelectedFilter(null)
       this.setAppliedFilter(null)
     }
   },
@@ -364,32 +340,36 @@ export default {
     },
 
     isFilterDialogShown (state) {
+      if (state || !this.selectedFilter) {
+        return
+      }
+
       // when filter dialog is closed
-      if (!state) {
-        this.setFilterDialogForView(false)
+      this.setFilterDialogForView(false)
 
-        // fix route when user is in some view
-        if (this.$route.params?.viewId) {
-          const currentViewRouteId = this.$route.params.viewId
+      if (!this.$route.params.hasOwnProperty('viewId')) {
+        return
+      }
 
-          // this means that the filter was changed but the route remained
-          if (currentViewRouteId !== this.selectedFilter.id) {
-            const channel = this.getPinnedViewChannel(this.selectedFilter.id)
-            this.setActiveChannel(channel)
+      // fix route when user is in some view
+      const currentViewRouteId = this.$route.params.viewId
 
-            this.$router.push({
-              name: 'Inbox View',
-              params: {
-                viewId: this.selectedFilter.id,
-                status: this.statusText,
-                channel: 'views'
-              }
-            }).catch(err => {
-              console.log(err)
-              this.$handleErrors(err.response)
-            })
+      // this means that the filter was changed but the route remained
+      if (currentViewRouteId !== this.selectedFilter.id) {
+        const channel = this.getPinnedViewChannel(this.selectedFilter.id)
+        this.setActiveChannel(channel)
+
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: this.selectedFilter.id,
+            status: this.statusText,
+            channel: 'view'
           }
-        }
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
       }
     }
   }
