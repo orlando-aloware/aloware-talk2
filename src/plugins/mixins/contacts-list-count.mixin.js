@@ -99,7 +99,7 @@ export default {
 
       // check if list is a static list, then we should fetch
       // from the static list count endpoint
-      if (isStaticList) {
+      if (isStaticList && !this.$route.path.includes('/add')) {
         return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts-lits/${listId}/count`, {
           cancelToken: this.countSource.token
         })

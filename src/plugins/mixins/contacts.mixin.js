@@ -406,7 +406,7 @@ export default {
 
       // prevent fetching contacts when in-progress in adding contacts
       // if current list is the affected list
-      if (this.isInPowerDialerList && this.listAddRemoveContactsProgress?.loading &&
+      if (this.isMainView && this.listAddRemoveContactsProgress?.loading &&
         this.cleanedListId === eventListId) {
         return
       }

@@ -345,6 +345,12 @@ export default {
         .listen('.bulk_contact_list_items.created', (event) => {
           window.VueEvent.fire('contact_list_bulk_created', event)
         })
+        .listen('.bulk_contact_list_items.deleted', (event) => {
+          window.VueEvent.fire('contact_list_bulk_deleted', event)
+        })
+        .listen('.bulk_contacts.deleted', (event) => {
+          window.VueEvent.fire('contacts_bulk_deleted', event)
+        })
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
         })

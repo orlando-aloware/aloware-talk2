@@ -243,6 +243,11 @@ export default {
           const message = response.data.message
           const id = response.data?.id || response.data?.data?.id
 
+          this.$VueEvent.fire('addContactsProgress', {
+            id: id,
+            loading: true
+          })
+
           if (this.createList.mode === FROM_BULK_MENU) {
             this.$router.push(`${this.redirectPath}/${id}`)
           } else {
@@ -256,6 +261,11 @@ export default {
           this.loadFolders()
         })
         .catch((error) => {
+          this.$VueEvent.fire('addContactsProgress', {
+            id: null,
+            loading: false
+          })
+
           const { message, html } = extractErrorMessage(error)
           console.log(html)
           this.errorMsg = message

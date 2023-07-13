@@ -123,6 +123,11 @@ export default {
         params.filter_groups = this.currentListFilters
       }
 
+      this.$VueEvent.fire('addContactsProgress', {
+        id: this.selectedStaticList.id,
+        loading: true
+      })
+
       this.$axios
         .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, params)
         .then((response) => {
@@ -137,6 +142,11 @@ export default {
           this.loadFolders()
         })
         .catch((error) => {
+          this.$VueEvent.fire('addContactsProgress', {
+            id: null,
+            loading: false
+          })
+
           const { message, html } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')

@@ -28,7 +28,8 @@ export default {
       countFields: COUNT_FIELDS,
       clicked: false,
       isSelectedAll: false,
-      pdViewListeners: {}
+      pdViewListeners: {},
+      bulkViewListeners: {}
     }
   },
 
@@ -155,7 +156,7 @@ export default {
   },
 
   created () {
-    this.pdViewListeners.contactListBulkCreated = (event) => {
+    this.bulkViewListeners.contactListBulkCreated = (event) => {
       if (typeof this.onFetch !== 'function') {
         return
       }
@@ -163,7 +164,7 @@ export default {
       const eventListId = this.getCleanedListId(event.contact_list_id)
 
       if (this.cleanedListId && eventListId && this.cleanedListId === eventListId) {
-        if (this.isInPowerDialerList) {
+        if (this.isMainView) {
           this.$VueEvent.fire('addContactsProgress', {
             id: null,
             loading: false
@@ -175,9 +176,36 @@ export default {
       }
     }
 
+    this.bulkViewListeners.contactListBulkDeleted = (event) => {
+      if (typeof this.onFetch !== 'function') {
+        return
+      }
+
+      const eventListId = this.getCleanedListId(event.contact_list_id)
+
+      if (this.cleanedListId && eventListId && this.cleanedListId === eventListId) {
+        if (this.isMainView) {
+          this.$VueEvent.fire('deleteContactsProgress', {
+            id: null,
+            loading: false
+          })
+        }
+
+        let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+        this.onFetch(params, false, true)
+      }
+    }
+
     if (this.isMainView) {
-      this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
-      this.$VueEvent.listen('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+      this.$VueEvent.stop('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+      this.$VueEvent.stop('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      this.$VueEvent.listen('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+      this.$VueEvent.listen('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+    }
+
+    if (this.$route.name === 'Contacts') {
+      this.$VueEvent.stop('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      this.$VueEvent.listen('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
     }
   },
 
@@ -470,7 +498,12 @@ export default {
       this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
 
       if (this.isMainView) {
-        this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+        this.$VueEvent.stop('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+        this.$VueEvent.stop('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      }
+
+      if (this.$route.name === 'Contacts') {
+        this.$VueEvent.stop('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
       }
     },
 
