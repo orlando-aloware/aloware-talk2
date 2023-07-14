@@ -63,6 +63,10 @@ export default {
         default:
           return 'No Name (' + user.phone_number + ')'
       }
+    },
+
+    isCompanyPartOfAlowareDemoCompanies (companyId) {
+      return window.storage.local.getItem('aloware_demo_companies') && window.storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
     }
   }
 }
