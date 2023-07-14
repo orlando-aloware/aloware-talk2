@@ -175,10 +175,18 @@ export default {
       return this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
     },
 
-    smsPricing () {
-      let rate = this.useMmsRate ? this.profile.rate.local_mms : this.profile.rate.local_sms
+    price () {
+      // get the rate based on the type
+      const rate = this.type === 'rvm'
+        ? this.profile.rate.rvm
+        : this.useMmsRate ? this.profile.rate.local_mms : this.profile.rate.local_sms
 
-      return this.contactsLength * this.messageCount * rate
+      // get the messages count based on the type
+      const messages = this.type === 'sms'
+        ? this.messageCount
+        : this.rvm ? 1 : 0
+
+      return this.contactsLength * messages * rate
     },
 
     vmDropUploadUrl () {
@@ -186,7 +194,7 @@ export default {
     },
 
     rvmUrl () {
-      return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm.file_name}`
+      return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm?.file_name}`
     }
   },
 
@@ -263,8 +271,8 @@ export default {
       }
     },
 
-    smsPricing (price) {
-      this.$emit('sms-price-updated', price)
+    price (price) {
+      this.$emit('price-updated', price)
     }
   }
 }

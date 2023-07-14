@@ -15,7 +15,7 @@
                     @source-updated="onSourceUpdated"
                     @type-updated="onTypeUpdated"
                     @rvm-updated="onRvmUpdated"
-                    @sms-price-updated="onSmsPriceUpdated"
+                    @price-updated="onPriceUpdated"
                     @time="onTimeUpdated"
                     @date-changed="onDateChanged"
                     @campaign="onCampaignUpdated"
@@ -209,12 +209,12 @@ export default {
         case this.currentStep.id === 2 || this.currentStep.id === 3:
           return {
             contactsLength: this.contactsLength,
-            estimatedCost: this.smsPrice
+            estimatedCost: this.price
           }
         case this.currentStep.id === 4:
           return {
             contactsLength: this.contactsLength,
-            estimatedCost: this.smsPrice,
+            estimatedCost: this.price,
             messagesLength: this.messagesLength
           }
         default:
@@ -245,7 +245,7 @@ export default {
     contactsLength: 0,
     type: null, // sms, voicemail
     rvm: null,
-    smsPrice: 0,
+    price: 0,
     campaign: null,
     throttle: null,
     time: null, // holds the schedule's time options
@@ -280,8 +280,8 @@ export default {
       this.rvm = file
     },
 
-    onSmsPriceUpdated (price) {
-      this.smsPrice = price
+    onPriceUpdated (price) {
+      this.price = price
     },
 
     onTimeUpdated (time) {
