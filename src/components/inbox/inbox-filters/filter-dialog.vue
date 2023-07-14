@@ -75,7 +75,7 @@
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
           <div class="w-100 text-left">
-            <span class="filter-name">{{ selectedFilter ? selectedFilter.name : 'Untitled' }}</span>
+            <span class="filter-name">{{ filterFormDisplayName }}</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
                        @clicked="onHide">
@@ -101,6 +101,7 @@
             <compact-btn variant="primary"
                          class="ml-3"
                          :disabled="isUpdatingFilter"
+                         v-if="!isFilterDialogForView || (isFilterDialogForView && isEditingView)"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
@@ -133,6 +134,7 @@ import CloseIcon from 'components/icons/close-icon'
 import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import * as Filters from 'src/constants/filters'
 
 export default {
   name: 'filter-dialog',
@@ -167,7 +169,8 @@ export default {
       'isFilterModelFormShown',
       'appliedFilter',
       'inboxShowMyContacts',
-      'pinnedViews'
+      'pinnedViews',
+      'isEditingView'
     ]),
 
     isOpen: {
@@ -258,9 +261,27 @@ export default {
       return 'Apply'
     },
 
+    isNonViewCreateModeUnchanged () {
+      return !this.isFilterDialogForView && !this.selectedFilter && !this.filterHasChanges
+    },
+
+    isViewCreateModeUnchanged () {
+      return this.isFilterDialogForView && !this.isEditingView && !this.filterHasChanges
+    },
+
     isSaveAsNewDisabled () {
-      return !this.filterHasChanges ||
+      return this.isNonViewCreateModeUnchanged ||
+        this.isViewCreateModeUnchanged ||
         this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS
+    },
+
+    filterFormDisplayName () {
+      const nonViewEditMode = (!this.isFilterDialogForView && this.selectedFilter)
+      const viewEditMode = (this.isFilterDialogForView && this.isEditingView)
+
+      return nonViewEditMode || viewEditMode
+        ? this.selectedFilter.name
+        : 'New (Untitled)'
     }
   },
 
@@ -297,14 +318,16 @@ export default {
         'from_date',
         'to_date',
         'creator_type',
-        'dynamic_engagement_date_range'
+        'dynamic_engagement_date_range',
+        'has_unread'
       ],
       inputTimeout: null,
       booleanFields: [
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
-        'my_contact'
+        'my_contact',
+        'has_unread'
       ],
       ChannelType
     }
@@ -343,6 +366,10 @@ export default {
     ]),
 
     hideModal () {
+      if (this.appliedFilter) {
+        this.setSelectedFilter(this.appliedFilter)
+      }
+
       this.$refs.inboxChannelFilterModal.hide()
     },
 
@@ -365,6 +392,18 @@ export default {
       } else {
         this.filter = _.pick(this.value, this.filterFields)
       }
+
+      // if not editing a certain view, set default group filter for elements
+      if (this.isFilterDialogForView && !this.isEditingView) {
+        this.filter = this.defaultFilterModel.filter
+      }
+
+      // fill in the value for the newly added filter in case it's not yet included
+      // in the existing saved set to properly display in its respective select component
+      if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
+        this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
+      }
+      console.log(this.filter)
 
       this.setChannelClonedFilter(this.filter)
     },
@@ -416,7 +455,8 @@ export default {
       const props = [
         'first_time_only',
         'exclude_automated_communications',
-        'untagged_only'
+        'untagged_only',
+        'has_unread'
       ]
 
       for (const item in this.filter) {
@@ -426,6 +466,7 @@ export default {
 
         const hasField = (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))
 
+        // for boolean fields change tracking
         if (props.includes(item) &&
           +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
           hasField) {
@@ -437,6 +478,7 @@ export default {
           continue
         }
 
+        // for non-boolean fields change tracking
         if (!this.booleanFields.includes(item) &&
           JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) &&
           hasField) {
@@ -447,7 +489,8 @@ export default {
         }
       }
 
-      const userScope = (this.selectedFilter.scope === 'user' || +!this.selectedFilter?.is_on_company)
+      // save filter changes
+      const userScope = (this.selectedFilter?.scope === 'user' || !+this.selectedFilter?.is_on_company)
       if (this.selectedFilter && userScope && this.filterHasChanges) {
         this.isUpdatingFilter = true
 
@@ -467,8 +510,14 @@ export default {
         })
       }
 
-      console.log('applying filter...')
-      this.setAppliedFilter(this.selectedFilter)
+      // apply filters of selected view/filter in inbox
+      if (this.selectedFilter) {
+        const filter = { ...this.selectedFilter }
+        filter.filter = { ...this.filter }
+        this.setSelectedFilter(filter)
+        this.setAppliedFilter(filter)
+        this.setChannelClonedFilter(filter.filter)
+      }
 
       // add the communication type and answer_status filters
       const communicationType = _.get(this.value, 'type', null)
@@ -542,7 +591,7 @@ export default {
       this.isGettingFilters = true
       const type = this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS
         ? ChannelType.CHANNEL_CALLS
-        : (this.isFilterDialogForView ? null : this.defaultFilterModel.type)
+        : (this.isFilterDialogForView ? ChannelType.CHANNEL_INBOX : this.defaultFilterModel.type)
 
       return talk2Api.V2.inbox.filters.get({ type: type })
         .then(response => {
@@ -577,7 +626,6 @@ export default {
           const index = this.personalFilters.findIndex(item => item.id === filter.id)
           const pinnedViewIndex = this.pinnedViews.findIndex(view => +view.filter_id === +filter.id)
           let fireEvent = false
-          console.log(pinnedViewIndex)
 
           if (index >= 0) {
             this.personalFilters[index] = updatedFilter

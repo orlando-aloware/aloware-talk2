@@ -203,5 +203,8 @@ export default {
   },
   SET_INBOX_COMPANY_FILTERS (state, value) {
     state.inboxCompanyFilters = value
+  },
+  SET_IS_EDITING_VIEW (state, value) {
+    state.isEditingView = value
   }
 }

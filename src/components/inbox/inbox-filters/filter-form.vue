@@ -230,6 +230,23 @@
             </b-col>
 
           </b-form-row>
+          <b-form-row v-if="isInboxOrInboxViews">
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
+                <span class="form-label">Show contacts with unread communications only</span>
+                <div>
+                  <b-form-checkbox class="switch-success"
+                                   size="lg"
+                                   switch
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   v-model="filter.has_unread">
+                  </b-form-checkbox>
+                </div>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
         </div>
 
         <div v-if="isInboxOrInboxViews">

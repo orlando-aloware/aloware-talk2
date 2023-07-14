@@ -112,5 +112,8 @@ export default {
   },
   setInboxCompanyFilters: ({ commit }, value) => {
     commit('SET_INBOX_COMPANY_FILTERS', value)
+  },
+  setIsEditingView: ({ commit }, value) => {
+    commit('SET_IS_EDITING_VIEW', value)
   }
 }

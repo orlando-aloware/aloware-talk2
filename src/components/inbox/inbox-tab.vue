@@ -1257,6 +1257,11 @@ export default {
         this.setInboxShowMyContacts(false)
       }
 
+      // load contacts for inbox
+      if (this.inboxViewsRoutes.includes(to.name) && !this.inboxViewsRoutes.includes(to.name)) {
+        this.fetchInboxTaskCounts()
+      }
+
       this.previousRoute = from
     },
 

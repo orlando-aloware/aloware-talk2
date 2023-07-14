@@ -397,6 +397,15 @@ export default {
         }
       }
 
+      if (filter && !!+filter.has_unread) {
+        this.filters = {
+          ...this.filters,
+          'is_unanswered_contact': [
+            { value: 1, operator: 1 }
+          ]
+        }
+      }
+
       query.filter_groups.push({ 'filters': this.filters, 'is_conjunction': true })
 
       if (!count) {
@@ -408,7 +417,6 @@ export default {
       }
 
       query.timezone = window.timezone
-      query.inbox = true
 
       return query
     },

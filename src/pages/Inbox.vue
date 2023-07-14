@@ -134,6 +134,10 @@ export default {
       this.setChannel()
       this.fetchTaskCounts()
     }
+
+    this.$VueEvent.listen('fetchInbox', () => {
+      this.loadContactTasks()
+    })
   },
 
   watch: {

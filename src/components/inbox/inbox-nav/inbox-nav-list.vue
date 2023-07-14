@@ -28,7 +28,7 @@
                  icon="edit"
                  size="xs"
                  flat
-                 @click="onEditViewsClicked"/>
+                 @click="onShowViewsList"/>
       </template>
     </nav-item>
 
@@ -38,14 +38,13 @@
               :label="view.filter.name"
               :is-active="isActive(view, 'view')"
               :key="`${view.filter.name}-${index}`"
-              :custom-count="view.filter?.open_count || 0"
               v-for="(view, index) in pinnedViews"
               @click="onItemClicked" />
 
     <inbox-views target="#edit-views-icon"
-                 :show="isEditingViews"
+                 :show="showViewsList"
                  :views="allInboxFilters"
-                 @closed="onEditViewsClosed"/>
+                 @closed="onCloseViewsList"/>
   </div>
 </template>
 
@@ -101,7 +100,8 @@ export default {
       'isFilterDialogShown',
       'pinnedViews',
       'inboxPersonalFilters',
-      'inboxCompanyFilters'
+      'inboxCompanyFilters',
+      'isEditingView'
     ]),
 
     ...mapGetters('inbox', [
@@ -145,8 +145,7 @@ export default {
         'untagged_only',
         'my_contact'
       ],
-      filter: Filters.EXCERPT,
-      isEditingViews: false
+      showViewsList: false
     }
   },
 
@@ -300,12 +299,12 @@ export default {
       })
     },
 
-    onEditViewsClicked () {
-      this.isEditingViews = !this.isEditingViews
+    onShowViewsList () {
+      this.showViewsList = !this.showViewsList
     },
 
-    onEditViewsClosed () {
-      this.isEditingViews = false
+    onCloseViewsList () {
+      this.showViewsList = false
     },
 
     resetFilter () {
@@ -314,6 +313,7 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
+      this.fetchInboxTaskCounts()
     }
   },
 

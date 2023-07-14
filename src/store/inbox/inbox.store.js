@@ -107,6 +107,7 @@ export default function () {
     isInboxFiltersLoaded: true,
     pinnedViews: [],
     inboxPersonalFilters: [],
-    inboxCompanyFilters: []
+    inboxCompanyFilters: [],
+    isEditingView: false
   }
 }

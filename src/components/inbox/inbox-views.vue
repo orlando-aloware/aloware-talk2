@@ -18,8 +18,12 @@
         <div class="d-flex p-2 align-items-center"
              :key="view.id"
              v-for="view in filteredViews">
-          <span class="flex-grow-1">{{ view.name }}</span>
-          <span class="mr-2">{{ view.open_count || 0 }}</span>
+          <span class="flex-grow-1">
+            <i class="fa fa-circle text-primary text-10"
+               v-if="!+view?.is_on_company">
+            </i>
+            {{ view.name }}
+          </span>
           <span class="cursor-pointer px-1">
             <q-btn class="mr-2"
                    icon="edit"
@@ -54,7 +58,7 @@
       </div>
 
       <span class="p-3 text-bold text-grey-90 cursor-pointer"
-            @click="onCreateViewClicked">
+            @click="onCreateView">
         Create View
       </span>
     </div>
@@ -63,7 +67,7 @@
 
 <script>
 import Search from 'src/components/search.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   components: {
@@ -83,7 +87,7 @@ export default {
 
     triggers: {
       type: String,
-      default: 'click'
+      default: 'focus'
     },
 
     show: {
@@ -100,7 +104,12 @@ export default {
 
   computed: {
     ...mapState('inbox', [
-      'pinnedViews'
+      'pinnedViews',
+      'isFilterDialogShown'
+    ]),
+
+    ...mapGetters('inbox', [
+      'allInboxFilters'
     ]),
 
     filteredViews () {
@@ -115,16 +124,19 @@ export default {
   methods: {
     ...mapActions('inbox', [
       'setFilterDialogForView',
-      'toggleFilterDialog'
+      'setIsEditingView',
+      'toggleFilterDialog',
+      'setSelectedFilter'
     ]),
 
     onSearch (search) {
       this.search = search
     },
 
-    onCreateViewClicked () {
+    onCreateView () {
       this.$emit('closed')
 
+      this.setIsEditingView(false)
       this.setFilterDialogForView(true)
       this.toggleFilterDialog(true)
     },
@@ -134,7 +146,13 @@ export default {
     },
 
     editView (viewId) {
-      console.log('Edit view id: ' + viewId)
+      this.$emit('closed')
+
+      const view = this.allInboxFilters.find(view => +view.id === +viewId)
+      this.setSelectedFilter(view)
+      this.setIsEditingView(true)
+      this.setFilterDialogForView(true)
+      this.toggleFilterDialog(true)
     },
 
     pinView (viewId) {
@@ -163,6 +181,14 @@ export default {
 
     isPinnedView (viewId) {
       return this.pinnedViews.find(view => +view.filter_id === +viewId)
+    }
+  },
+
+  watch: {
+    isFilterDialogShown (value) {
+      if (value) {
+        this.$emit('closed')
+      }
     }
   }
 }
