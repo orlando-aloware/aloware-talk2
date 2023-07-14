@@ -87,7 +87,7 @@ export default {
 
     triggers: {
       type: String,
-      default: 'focus'
+      default: 'click'
     },
 
     show: {
