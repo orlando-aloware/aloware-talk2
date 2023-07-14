@@ -90,6 +90,7 @@ export default {
       const zipcode = this.contact.cnam_zipcode
       const email = this.contact.email
       const website = this.contact.website
+      const userId = this.profile.id
       let mappedParams = []
 
       for (const entry of params.entries()) {
@@ -136,6 +137,10 @@ export default {
 
             case '[Website]':
               value = website
+              break
+
+            case '[UserId]':
+              value = userId
               break
           }
         }

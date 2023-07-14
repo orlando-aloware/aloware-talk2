@@ -285,6 +285,8 @@ export default {
         console.log(error)
       })
 
+      this.setDialerErrorDefault()
+
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
@@ -312,6 +314,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
       console.log('Received call invite', call)
@@ -537,7 +540,7 @@ export default {
          */
         // initialize twilio client
         this.device.initialize(this.dialer.token, {
-          edge: ['ashburn', 'roaming'],
+          edge: ['umatilla', 'ashburn', 'roaming'],
           codecPreferences: ['opus', 'pcmu']
         })
 
@@ -1387,6 +1390,9 @@ export default {
       })
       const err = new Error(`${error.message} Code: ${error.code}`)
       err.code = error.code
+
+      console.log(error)
+
       // 31000 => General Twilio Client error.
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
       // there may be an issue resolving the hostname provided. If a region is being specified in Device setup, ensure it's a valid region.
@@ -1398,16 +1404,15 @@ export default {
       // 31204 => Invalid JWT token.
       // 31205 => JWT token expired.
       // 9221 => Cannot connect to insights
-      if (![53405, 31204, 31205, 9221].includes(err.code)) {
+      if (![53405, 31204, 31205, 9221, 31000, 31005, 31009].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
 
       // Request new token if error
-      if ([31204, 31205, 31005].includes(err.code)) {
+      if ([31204, 31205].includes(err.code)) {
         return this.getDesktopToken(true)
       }
 
-      console.log(error)
       this.setDialerIsReady(false)
     },
 
