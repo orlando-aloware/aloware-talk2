@@ -353,7 +353,7 @@ import {
   avatarMixin,
   userMixin
 } from 'src/plugins/mixins'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -536,9 +536,6 @@ export default {
   },
 
   methods: {
-    ...mapGetters('inbox', ['getOpenTaskCount']),
-    ...mapActions('inbox', ['setOpenTaskCount']),
-
     generalAuditsConditions (data) {
       // skip if not a property of contact audits
       if (!this.general_audit_properties.includes(data.property)) {
@@ -709,13 +706,6 @@ export default {
       }).then(res => {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = true
-
-        // if contact has no unreads decrease "Open" count by 1
-        const contact = res.data.contact
-        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
-        if (hasUnreads < 1) {
-          this.setOpenTaskCount(this.getOpenTaskCount() - 1)
-        }
       }).catch(err => {
         this.$handleErrors(err.response)
       })
@@ -727,12 +717,6 @@ export default {
       }).then(res => {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = false
-
-        // if contact has no unreads before increase "Open" count by 1
-        const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
-        if (oldTotalUnreads < 1) {
-          this.setOpenTaskCount(this.getOpenTaskCount() + 1)
-        }
       }).catch(err => {
         this.$handleErrors(err.response)
       })
