@@ -23,7 +23,8 @@ import {
   contactV2AttributesMixin,
   inboxMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
 
@@ -35,7 +36,8 @@ export default {
     contactV2AttributesMixin,
     inboxMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    userMixin
   ],
 
   components: {
@@ -120,7 +122,9 @@ export default {
   },
 
   created () {
-    this.getPinnedViews()
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      this.getPinnedViews()
+    }
 
     if (this.$route.query && this.$route.query.add_contact) {
       this.$VueEvent.fire('add_contact', {

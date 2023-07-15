@@ -68,11 +68,16 @@
 <script>
 import Search from 'src/components/search.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { inboxMixin } from 'src/plugins/mixins'
 
 export default {
   components: {
     Search
   },
+
+  mixins: [
+    inboxMixin
+  ],
 
   props: {
     target: {
@@ -87,7 +92,7 @@ export default {
 
     triggers: {
       type: String,
-      default: 'click'
+      default: 'focus hover'
     },
 
     show: {
@@ -153,30 +158,6 @@ export default {
       this.setIsEditingView(true)
       this.setFilterDialogForView(true)
       this.toggleFilterDialog(true)
-    },
-
-    pinView (viewId) {
-      this.$axios
-        .post(`/api/v2/filters/${viewId}/pin`)
-        .then(res => {
-          console.log(res)
-          this.$VueEvent.fire('viewPinned')
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    },
-
-    unpinView (viewId) {
-      this.$axios
-        .delete(`/api/v2/filters/${viewId}/unpin`)
-        .then(res => {
-          console.log(res)
-          this.$VueEvent.fire('viewUnpinned')
-        })
-        .catch(err => {
-          console.log(err)
-        })
     },
 
     isPinnedView (viewId) {

@@ -479,7 +479,8 @@ export default {
           cancelToken: this.sourcePinnedViews.token
         })
         .then(res => {
-          this.setPinnedViews([...res.data.data])
+          const views = [...res.data.data].filter(view => view?.filter)
+          this.setPinnedViews(views)
           this.isLoadedPinnedViews = true
         })
         .catch(err => {
@@ -559,6 +560,28 @@ export default {
             to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD HH:mm:ss')
           }
       }
+    },
+
+    pinView (viewId) {
+      this.$axios
+        .post(`/api/v2/filters/${viewId}/pin`)
+        .then(res => {
+          this.$VueEvent.fire('viewPinned')
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    unpinView (viewId) {
+      this.$axios
+        .delete(`/api/v2/filters/${viewId}/unpin`)
+        .then(res => {
+          this.$VueEvent.fire('viewUnpinned')
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   },
 

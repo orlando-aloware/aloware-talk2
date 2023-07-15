@@ -12,7 +12,7 @@
            @shown="onShown">
     <div class="modal-body-wrapper d-flex">
       <div class="left-column-wrapper"
-           v-if="!$route.params?.viewId">
+           v-if="!this.isFilterDialogForView">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-3">
@@ -186,7 +186,7 @@ export default {
     channelFilterName () {
       const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
 
-      if (this.isFilterDialogForView || ['Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) {
+      if (this.isFilterDialogForView && ['Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) {
         return 'Views'
       }
 
@@ -362,7 +362,8 @@ export default {
       'toggleFilterDialog',
       'setChannelClonedFilter',
       'setInboxShowMyContacts',
-      'setPinnedViews'
+      'setPinnedViews',
+      'setFilterDialogForView'
     ]),
 
     hideModal () {
@@ -375,6 +376,7 @@ export default {
 
     onHidden () {
       this.toggleFilterDialog()
+      this.setFilterDialogForView(false)
     },
 
     onHide () {
@@ -412,8 +414,12 @@ export default {
       this.refreshTagSelector()
 
       if (!this.appliedFilter) {
-        this.setSelectedFilter(null)
-        this.filter = _.pick(this.value, this.filterFields)
+        if (!this.isFilterDialogForView || (this.isFilterDialogForView && !this.isEditingView)) {
+          this.setSelectedFilter(null)
+        }
+
+        this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
+        console.log(this.defaultFilterModel.filter, this.filter)
         this.applyFilter()
       }
     },
@@ -442,6 +448,8 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
+
+      this.setChannelClonedFilter(this.filter)
     },
 
     onApply () {
@@ -537,29 +545,6 @@ export default {
 
       this.$emit('applyFilter', finalFilters)
       this.hideModal()
-    },
-
-    onSaveFilter () {
-      if (!this.selectedFilter) {
-        this.toggleFilterModelForm(true)
-        return
-      }
-
-      this.isUpdatingFilter = true
-      this.updateFilter(this.selectedFilter, {
-        ...this.filter,
-        name: this.selectedFilter.name,
-        scope: this.selectedFilter.scope
-      }).then(() => {
-        this.isUpdatingFilter = false
-      }).catch(error => {
-        const {
-          message,
-          html
-        } = extractErrorMessage(error)
-        console.log(html)
-        this.$generalNotification(message, 'error')
-      })
     },
 
     onSaveNewFilter () {
@@ -667,15 +652,6 @@ export default {
           this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
         }
       })
-    },
-
-    filterCreated (filter) {
-      if (filter.is_on_company) {
-        this.companyFilters.push(filter)
-        return
-      }
-
-      this.personalFilters.push(filter)
     },
 
     applyFilter () {

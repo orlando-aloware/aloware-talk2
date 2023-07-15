@@ -32,7 +32,7 @@
               <!-- applied/selected filter name -->
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
-                           @clicked="toggleFilterDialog(true)">
+                           @clicked="onClickAppliedFilterButton()">
                 <q-tooltip v-if="appliedFilter"
                            anchor="top middle"
                            self="center middle">
@@ -414,7 +414,8 @@ export default {
       'setOpenTaskCount',
       'setPendingTaskCount',
       'updateChannelChangedFilterFields',
-      'setInboxShowMyContacts'
+      'setInboxShowMyContacts',
+      'setFilterDialogForView'
     ]),
 
     initInboxTaskRoute () {
@@ -871,6 +872,14 @@ export default {
           }
         }
       }
+    },
+
+    onClickAppliedFilterButton () {
+      if (this.$route.params?.viewId) {
+        this.setFilterDialogForView(true)
+      }
+
+      this.toggleFilterDialog(true)
     },
 
     startInboxListeners () {

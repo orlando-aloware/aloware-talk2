@@ -33,18 +33,20 @@
     </nav-item>
 
     <!-- list only pinned views -->
-    <nav-item icon=""
-              :value="`view-${view.filter_id}`"
-              :label="view.filter.name"
-              :is-active="isActive(view, 'view')"
-              :key="`${view.filter.name}-${index}`"
-              v-for="(view, index) in pinnedViews"
-              @click="onItemClicked" />
+    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id)">
+      <nav-item :icon="!+view.filter?.is_on_company ? 'view' : ''"
+                :value="`view-${view.filter_id}`"
+                :label="view.filter.name"
+                :is-active="isActive(view, 'view')"
+                :key="`${view.filter.name}-${index}`"
+                v-for="(view, index) in pinnedViews"
+                @click="onItemClicked" />
 
-    <inbox-views target="#edit-views-icon"
-                 :show="showViewsList"
-                 :views="allInboxFilters"
-                 @closed="onCloseViewsList"/>
+      <inbox-views target="#edit-views-icon"
+                   :show="showViewsList"
+                   :views="allInboxFilters"
+                   @closed="onCloseViewsList"/>
+    </div>
   </div>
 </template>
 
@@ -56,7 +58,7 @@ import talk2Api from 'src/plugins/api/api'
 import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { inboxMixin } from 'src/plugins/mixins'
+import { inboxMixin, userMixin } from 'src/plugins/mixins'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
@@ -68,7 +70,8 @@ export default {
   },
 
   mixins: [
-    inboxMixin
+    inboxMixin,
+    userMixin
   ],
 
   props: {
@@ -177,6 +180,13 @@ export default {
     this.$VueEvent.listen('viewUnpinned', () => {
       this.getPinnedViews()
     })
+
+    this.$VueEvent.listen('filter_deleted', (filter) => {
+      const view = this.pinnedViews.find(view => +view.filter_id === +filter.id)
+      if (view) {
+        this.unpinView(view.id)
+      }
+    })
   },
 
   methods: {
@@ -193,6 +203,7 @@ export default {
     ]),
 
     onItemClicked (nextActive) {
+      this.onCloseViewsList()
       this.resetFilter()
 
       this.active = nextActive
@@ -308,12 +319,12 @@ export default {
     },
 
     resetFilter () {
+      this.fetchInboxTaskCounts()
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
-      this.fetchInboxTaskCounts()
     }
   },
 
@@ -340,7 +351,7 @@ export default {
     },
 
     isFilterDialogShown (state) {
-      if (state || !this.selectedFilter) {
+      if (state || !this.appliedFilter) {
         return
       }
 
@@ -355,14 +366,14 @@ export default {
       const currentViewRouteId = this.$route.params.viewId
 
       // this means that the filter was changed but the route remained
-      if (currentViewRouteId !== this.selectedFilter.id) {
-        const channel = this.getPinnedViewChannel(this.selectedFilter.id)
+      if (currentViewRouteId !== this.appliedFilter.id) {
+        const channel = this.getPinnedViewChannel(this.appliedFilter.id)
         this.setActiveChannel(channel)
 
         this.$router.push({
           name: 'Inbox View',
           params: {
-            viewId: this.selectedFilter.id,
+            viewId: this.appliedFilter.id,
             status: this.statusText,
             channel: 'view'
           }

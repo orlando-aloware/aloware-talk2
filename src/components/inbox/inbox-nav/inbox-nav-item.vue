@@ -9,8 +9,12 @@
        @click.prevent="onClick">
       <div :class="['inbox-nav-item__inner', { 'inbox-nav-item__inner--closed': closed, 'inbox-nav-item__inner--opened': !closed }]">
         <div :class="['inbox-nav-item__icon', { 'inbox-nav-item__icon--closed': closed, 'inbox-nav-item__icon--opened': !closed }]">
+          <i class="fa fa-circle text-10"
+             v-if="icon === 'view'">
+          </i>
           <icon :icon="icon"
-                :isActive="isActive"/>
+                :isActive="isActive"
+                v-if="icon !== 'view'"/>
         </div>
         <div class="inbox-nav-item__label h-100">
           {{ label }}
