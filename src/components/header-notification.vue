@@ -27,7 +27,7 @@
         <compact-btn customClass="fs-14 _500 position-relative primary not-focusable ml-2 text-danger"
                      borderless
                      :variant="filterButtonVariant"
-                     v-if="diagnosis && diagnosis.closeable"
+                     v-if="diagnosis && diagnosis.closable"
                      @clicked="close">
           <i class="fa fa-times"/>
         </compact-btn>
