@@ -180,6 +180,11 @@ export default {
     state.filters = filters
   },
   SET_CURRENT_LIST_FILTERS: (state, filters) => {
+    // remove null values if array
+    if (Array.isArray(filters)) {
+      filters = filters.filter(filter => filter !== null)
+    }
+
     state.currentListFilters = filters
   },
   SET_CONTACT: (state, contact) => {

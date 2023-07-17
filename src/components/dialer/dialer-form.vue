@@ -37,7 +37,7 @@
                                            ref="callContactPhoneNumberSearch"
                                            :no_prepend="true"
                                            v-model="phoneNumber"
-                                           @change="changePhoneNumber"
+                                           @change="phoneNumberChanged"
                                            @keyup.enter.native="onCall"
                                            @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
@@ -95,7 +95,7 @@
                           :state="validPhoneNumberSearch">
               <contact-phone-number-search ref="textContactPhoneNumberSearch"
                                            v-model="phoneNumber"
-                                           @change="changePhoneNumber"
+                                           @change="phoneNumberChanged"
                                            @keyup.enter.native="sendText"
                                            @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
@@ -151,7 +151,7 @@
     </div>
     <h1 class="phone-padding lh-27 mb-3"
         v-if="isMobile && parkedCalls.length > 0">
-      Parked Call{{ parkedCalls.length > 1 ? 's' : ''}}
+      Parked Call{{ parkedCalls.length > 1 ? 's' : '' }}
     </h1>
     <div class="mobile-parked-calls-list"
          v-if="isMobile">
@@ -183,13 +183,7 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import {
-  contactMixin,
-  contactV2AttributesMixin,
-  timezoneCheckMixin,
-  visibilityMixin,
-  aclMixin
-} from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
@@ -351,6 +345,11 @@ export default {
 
       this.mode = 'call'
       this.textMessage = ''
+    },
+
+    phoneNumberChanged (data) {
+      this.changePhoneNumber(data).catch(_ => {
+      })
     },
 
     async changePhoneNumber (data) {

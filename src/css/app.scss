@@ -1963,7 +1963,8 @@ i.option-separator {
 
   .contacts {
     .main {
-      width: calc(100vw - 324px);
+      width: 100%;
+      overflow: hidden;
 
       .table-header {
         > div {
@@ -8810,7 +8811,7 @@ span.mention {
 
   .sessions-main-page {
     &.minimized {
-      width: 100vw;
+      width: 100%;
     }
   }
 }
