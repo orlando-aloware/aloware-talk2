@@ -20,16 +20,11 @@
                        v-if="staticsLoaded && !statics.whitelabel && isMobile">
         </portal-target>
       </div>
-      <div class="ml-auto d-flex flex-md-row flex-column justify-content-center align-items-center">
+      <div class="ml-auto d-flex flex-md-row flex-column justify-content-center align-items-center"
+           v-if='staticsLoaded && !statics.whitelabel'>
         <portal-target name="diagnosisButtons"
                        v-if="!isMobile">
         </portal-target>
-        <compact-btn customClass="fs-14 _500 position-relative primary not-focusable ml-2 text-danger"
-                     borderless
-                     v-if="diagnosis && diagnosis.closable"
-                     @clicked="close">
-          <i class="fa fa-times"/>
-        </compact-btn>
       </div>
     </div>
 
@@ -60,6 +55,13 @@
           {{ link.title }}
         </b-button>
       </a>
+
+      <compact-btn customClass="fs-14 _500 position-relative primary not-focusable ml-2 text-danger"
+                   borderless
+                   v-if="diagnosis && diagnosis.closeable"
+                   @clicked="close">
+        <i class="fa fa-times"/>
+      </compact-btn>
     </portal>
   </div>
 </template>
@@ -72,9 +74,7 @@ import CompactBtn from 'components/compact-btn'
 
 export default {
   name: 'header-notification',
-
   components: { CompactBtn },
-
   mixins: [
     aclMixin
   ],
