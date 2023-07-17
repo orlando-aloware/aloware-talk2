@@ -11018,6 +11018,12 @@ screen and (max-width: 956px) {
   top: -1px;
 }
 
+.last-engagement-dynamic-tooltip-wrapper {
+  position: absolute;
+  right: 40%;
+  top: -1px;
+}
+
 .bridge-menu-wrapper {
   margin-right: 20px;
 }
@@ -12901,5 +12907,12 @@ h1.contact-list-name-label {
     & > div {
       border-radius: 10px;
     }
+  }
+}
+
+.view-filter-name {
+  &.row.q-input .q-field__control .q-field__native {
+    padding-top: 14px;
+    padding-bottom: 2px
   }
 }

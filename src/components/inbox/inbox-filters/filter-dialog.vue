@@ -74,7 +74,17 @@
 
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <div class="w-100 text-left">
+          <q-input class="view-filter-name mb-0"
+                   :label="filterFormDisplayName"
+                   :dense="true"
+                   debounce="500"
+                   ref="viewName"
+                   clearable
+                   v-model.trim="viewName"
+                   v-if="selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
+                   @keyup.enter="renameFilter" />
+          <div class="w-100 text-left pt-2 pb-1"
+              v-else>
             <span class="filter-name">{{ filterFormDisplayName }}</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
@@ -329,7 +339,8 @@ export default {
         'my_contact',
         'has_unread'
       ],
-      ChannelType
+      ChannelType,
+      viewName: null
     }
   },
 
@@ -405,7 +416,6 @@ export default {
       if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
         this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
       }
-      console.log(this.filter)
 
       this.setChannelClonedFilter(this.filter)
     },
@@ -682,6 +692,20 @@ export default {
         : ''
 
       return [selectedFilterClass]
+    },
+
+    renameFilter () {
+      if (_.isEmpty(this.viewName)) {
+        this.viewName = null
+        return false
+      }
+
+      let filter = { ...this.selectedFilter }
+      filter.name = this.viewName
+      this.onRenameFilter(filter)
+      this.setSelectedFilter(filter)
+      this.viewName = null
+      this.$refs['viewName'].blur()
     }
   },
 
