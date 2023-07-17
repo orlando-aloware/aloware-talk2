@@ -20,8 +20,7 @@
                        v-if="staticsLoaded && !statics.whitelabel && isMobile">
         </portal-target>
       </div>
-      <div class="ml-auto d-flex flex-md-row flex-column justify-content-center align-items-center"
-           v-if="staticsLoaded && !statics.whitelabel">
+      <div class="ml-auto d-flex flex-md-row flex-column justify-content-center align-items-center">
         <portal-target name="diagnosisButtons"
                        v-if="!isMobile">
         </portal-target>
