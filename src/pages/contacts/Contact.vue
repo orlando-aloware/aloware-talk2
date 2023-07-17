@@ -285,7 +285,7 @@ export default {
         this.setContact(contact)
       }
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
     }
@@ -300,7 +300,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()

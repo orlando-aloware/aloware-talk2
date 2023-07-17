@@ -17,6 +17,9 @@
                 v-if="icon !== 'view'"/>
         </div>
         <div class="inbox-nav-item__label h-100">
+          <q-tooltip>
+            {{ label }}
+          </q-tooltip>
           {{ label }}
         </div>
         <span class="count-label h-100"

@@ -74,14 +74,14 @@
 
       <div class="flex-grow-1 right-column-wrapper">
         <div class="container d-flex justify-content-between mb-3 action-option-container">
-          <q-input class="view-filter-name mb-0"
+          <q-input class="view-filter-name mb-0 w-50"
+                   ref="viewName"
+                   debounce="500"
                    :label="filterFormDisplayName"
                    :dense="true"
-                   debounce="500"
-                   ref="viewName"
                    clearable
                    v-model.trim="viewName"
-                   v-if="selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
+                   v-if="isEditingView && selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
                    @keyup.enter="renameFilter" />
           <div class="w-100 text-left pt-2 pb-1"
               v-else>

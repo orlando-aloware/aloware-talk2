@@ -7059,6 +7059,9 @@ table.datatable {
     line-height: 17px;
     letter-spacing: -0.0025em;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &--opened {
       display: block;
