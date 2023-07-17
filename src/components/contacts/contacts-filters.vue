@@ -110,14 +110,14 @@
             To save list, add at least 1 filter
           </p>
         </div>
-        <div class="filter-contents step-2 p-2 h-100"
+        <div class="filter-contents step-2 p-2 h-100 d-flex flex-column"
              v-else-if="step === 2">
-          <div class="mb-3">
+          <div class="mb-3 flex-grow-0">
             <h6 class="contact-prop-label mb-1">Contact properties</h6>
             <search placeholder="Search"
                     @search="searchFilter"/>
           </div>
-          <b-list-group class="filter-list">
+          <b-list-group class="filter-list flex-grow-1">
             <b-list-group-item class="filter-divider">
               All properties
             </b-list-group-item>
