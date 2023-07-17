@@ -299,7 +299,7 @@
                      color="danger"
                      unelevated
                      :loading="popupLoadingAction"
-                     @click="deleteBroadcast(popupActionList)">
+                     @click="onDeleteBroadcast(popupActionList)">
                 <span class="px-2">Delete</span>
               </q-btn>
             </div>
@@ -377,7 +377,7 @@ import CommunicationActivityGraph from 'src/components/communication-activity-gr
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import CompactBtn from 'components/compact-btn.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
-import { mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 
 const broadcastsColumns = [
@@ -545,7 +545,6 @@ export default {
         filter: null
       }
     ],
-    broadcastData: [],
     broadcastsColumns,
     broadcastSort: {},
     checked: [],
@@ -563,18 +562,80 @@ export default {
       perPage: 25,
       totalPages: 1,
       currentPage: 1
-    }
+    },
+    sort: null
   }),
 
-  mounted () {
-    this.getBroadcasts()
+  async mounted () {
+    await this.fetchBroadcasts()
+
+    this.calculateTotalPages()
+
+    this.$VueEvent.listen('broadcasts_created', (broadcast) => {
+      this.UPDATE_BROADCAST(broadcast)
+    })
+
+    this.$VueEvent.listen('broadcasts_updated', (broadcast) => {
+      this.UPDATE_BROADCAST(broadcast)
+    })
+
+    this.$VueEvent.listen('broadcasts_deleted', (broadcast) => {
+      this.DELETE_BROADCAST(broadcast)
+    })
   },
 
   computed: {
     ...mapState(['campaigns']),
+    ...mapGetters('broadcast', {
+      broadcasts: 'getBroadcasts'
+    }),
 
     isBroadcastsTableEmpty () {
       return this.broadcastCounts[this.broadcastFilter - 1] === 0
+    },
+
+    orderedBroadcasts () {
+      const broadcasts = this.broadcasts
+
+      if (!this.sort) {
+        return broadcasts
+      }
+
+      return broadcasts.sort((a, b) => {
+        if (!this.sort.orderBy) {
+          return 0
+        }
+
+        let aOrderBy = a[this.sort.orderBy]
+        let bOrderBy = b[this.sort.orderBy]
+
+        if (this.sort.orderBy === 'campaign_id') {
+          aOrderBy = this.getCampaign(aOrderBy)?.name
+          bOrderBy = this.getCampaign(bOrderBy)?.name
+
+          if (aOrderBy && !bOrderBy) {
+            return -1
+          } else if (!aOrderBy && bOrderBy) {
+            return 1
+          }
+        }
+
+        if (aOrderBy === bOrderBy) {
+          return 0
+        }
+
+        let comparison = aOrderBy > bOrderBy ? 1 : -1
+
+        if (typeof aOrderBy === 'string' && typeof bOrderBy === 'string') {
+          comparison = aOrderBy.localeCompare(bOrderBy)
+        }
+
+        if (this.sort.order !== 'asc') {
+          comparison = comparison * -1
+        }
+
+        return comparison
+      })
     },
 
     filteredBroadcasts () {
@@ -582,10 +643,10 @@ export default {
       const text = this.broadcastsSearchText.toLowerCase()
 
       if (!filter && !text) {
-        return this.broadcastData
+        return this.orderedBroadcasts
       }
 
-      return this.broadcastData.filter(broadcast => {
+      return this.orderedBroadcasts.filter(broadcast => {
         let matchText = true
         let matchType = true
 
@@ -618,7 +679,7 @@ export default {
         this.getCount(BroadcastStatuses.STATUS_ENROLLING),
         this.getCount(BroadcastStatuses.STATUS_DONE),
         this.getCount(BroadcastStatuses.STATUS_PAUSED),
-        this.broadcastData.length
+        this.broadcasts.length
       ]
     },
 
@@ -635,7 +696,11 @@ export default {
         return this.contextMenuListItems
       }
 
-      const broadcast = this.broadcastData.find(item => item.id === this.contextMenuTargetId)
+      const broadcast = this.broadcasts.find(item => item.id === this.contextMenuTargetId)
+
+      if (!broadcast) {
+        return []
+      }
 
       return this.contextMenuListItems.filter(item => this.shouldShowContextMenuItem(item, broadcast))
     },
@@ -657,6 +722,16 @@ export default {
   },
 
   methods: {
+    ...mapActions('broadcast', [
+      'deleteBroadcast',
+      'fetchBroadcasts'
+    ]),
+
+    ...mapMutations('broadcast', [
+      'DELETE_BROADCAST',
+      'UPDATE_BROADCAST'
+    ]),
+
     onCheckerClicked (row) {
       if (!row) {
         this.isAllChecked = !this.isAllChecked
@@ -674,43 +749,7 @@ export default {
     },
 
     onSortTable (sort) {
-      const { orderBy, order } = sort
-
-      this.broadcastData = this.broadcastData.sort((a, b) => {
-        if (!orderBy) {
-          return 0
-        }
-
-        let aOrderBy = a[orderBy]
-        let bOrderBy = b[orderBy]
-
-        if (orderBy === 'campaign_id') {
-          aOrderBy = this.getCampaign(aOrderBy)?.name
-          bOrderBy = this.getCampaign(bOrderBy)?.name
-
-          if (aOrderBy && !bOrderBy) {
-            return -1
-          } else if (!aOrderBy && bOrderBy) {
-            return 1
-          }
-        }
-
-        if (aOrderBy === bOrderBy) {
-          return 0
-        }
-
-        let comparison = aOrderBy > bOrderBy ? 1 : -1
-
-        if (typeof aOrderBy === 'string' && typeof bOrderBy === 'string') {
-          comparison = aOrderBy.localeCompare(bOrderBy)
-        }
-
-        if (order !== 'asc') {
-          comparison = comparison * -1
-        }
-
-        return comparison
-      })
+      this.sort = sort
     },
 
     onContextMenuShow (row) {
@@ -758,15 +797,8 @@ export default {
       return `context-menu-btn-${row.id}`
     },
 
-    getBroadcasts () {
-      API.V1.broadcasts.get().then(res => {
-        this.broadcastData = res.data
-        this.calculateTotalPages()
-      })
-    },
-
     getCount (filter) {
-      return this.broadcastData.filter(broadcast => broadcast.status === filter).length
+      return this.broadcasts.filter(broadcast => broadcast.status === filter).length
     },
 
     getThrottling (messagePerMinute) {
@@ -800,12 +832,12 @@ export default {
     },
 
     // CONTEXT MENU ACTIONS
-    async deleteBroadcast (broadcasts) {
+    async onDeleteBroadcast (broadcasts) {
       this.popupLoadingAction = true
       let deletedCount = 0
 
       for (let broadcast of broadcasts) {
-        await API.V1.broadcasts.delete(broadcast.id)
+        await this.deleteBroadcast(broadcast.id)
           .then(res => {
             deletedCount++
           })
@@ -818,7 +850,6 @@ export default {
       }
 
       this.onCancelPopup()
-      this.getBroadcasts()
 
       if (deletedCount !== broadcasts.length) {
         this.$generalNotification(`Not all broadcasts were deleted. ${deletedCount} of ${broadcasts.length} were deleted.`, 'error')
@@ -837,7 +868,7 @@ export default {
         timezone: broadcast.timezone
       }
       await API.V1.broadcasts.update(broadcast.id, payload).then(() => {
-        this.broadcastData.map(item => {
+        this.broadcasts.map(item => {
           if (broadcast.id !== item.id) {
             return
           }
@@ -880,7 +911,7 @@ export default {
       for (const broadcast of broadcasts) {
         API.V1.broadcasts.toggleStatus(broadcast.id)
           .then(res => {
-            this.broadcastData = this.broadcastData.map(item => {
+            this.broadcasts = this.broadcasts.map(item => {
               if (broadcast.id !== item.id) {
                 return item
               }
@@ -993,7 +1024,7 @@ export default {
   },
 
   watch: {
-    broadcastData (data) {
+    broadcasts (data) {
       this.calculateTotalPages()
     },
 

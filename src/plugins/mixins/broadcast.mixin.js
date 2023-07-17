@@ -595,6 +595,15 @@ export default {
         .listen('.contact-list.import-failed', (event) => {
           window.VueEvent.fire('contact_list_import_failed', event)
         })
+        .listen('.broadcasts.created', (event) => {
+          window.VueEvent.fire('broadcasts_created', event.broadcaster)
+        })
+        .listen('.broadcasts.updated', (event) => {
+          window.VueEvent.fire('broadcasts_updated', event.broadcaster)
+        })
+        .listen('.broadcasts.deleted', (event) => {
+          window.VueEvent.fire('broadcasts_deleted', event.broadcaster)
+        })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event

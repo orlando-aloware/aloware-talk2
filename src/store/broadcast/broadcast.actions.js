@@ -6,9 +6,11 @@ export default {
    */
   async deleteBroadcast ({ commit }, id) {
     try {
-      await API.V1.broadcast.delete(id)
+      await API.V1.broadcasts.delete(id)
 
       commit('DELETE_BROADCAST', id)
+
+      return Promise.resolve()
     } catch (err) {
       console.log(err)
       this._vm.$handleErrors(err.response)
@@ -28,8 +30,10 @@ export default {
 
       const res = await API.V1.broadcasts.get()
 
-      commit('SET_BROADCASTS', res.data)
+      commit('SET_BROADCASTS', res.data.reverse())
       commit('SET_BROADCASTS_LOADING', false)
+
+      return Promise.resolve()
     } catch (err) {
       commit('SET_BROADCASTS_LOADING', false)
       console.log(err)
