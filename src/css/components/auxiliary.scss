@@ -326,11 +326,11 @@
 
 .t-panel-container {
   height: 100%;
-  .q-tab-panels {
-    height: calc(100vh - 298px);
-    .q-panel {
+  overflow: hidden;
 
-    }
+  .q-tab-panels {
+    height: 100%;
+    overflow: hidden;
   }
 }
 
@@ -426,13 +426,13 @@ iframe > html {
 
 .hubspot-iframe-container,
 .referrizer-iframe-container {
-  height: calc(100% - 12px);
+  height: 100%;
   width: 100%;
   overflow: hidden;
 
   #hubspot-crm,
   #referrizer-crm {
-    width: calc(100% + 0px);
+    width: 100%;
     height: 100%;
   }
 }

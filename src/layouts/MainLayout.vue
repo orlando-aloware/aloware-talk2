@@ -507,6 +507,7 @@ export default {
     }
 
     this.setNotificationAudio()
+    this.setFishingModeNotificationAudio()
 
     if (this.$route.name === 'Phone' && !this.isMobile) {
       this.$router.replace({ path: '/' })
@@ -2476,6 +2477,7 @@ export default {
       'setEnableAudio',
       'setDefaultDateFilter',
       'setNotificationAudio',
+      'setFishingModeNotificationAudio',
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
