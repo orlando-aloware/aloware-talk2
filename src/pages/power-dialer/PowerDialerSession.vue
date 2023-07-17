@@ -10,7 +10,7 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div class="d-flex bg-white">
+          <div class="d-flex bg-white flex-grow-0">
             <div class="col-7 p-0 bordered-right">
               <CallDisposition />
             </div>
@@ -21,7 +21,7 @@
             </div>
           </div>
           <!-- Session Main Page -->
-          <SessionContactPage />
+          <SessionContactPage class="flex-grow-1 overflow-hidden" />
         </div>
       </div>
     </div>
@@ -146,6 +146,7 @@ export default {
 
     await this.fetchTasks()
   },
+
   methods: {
     ...mapActions('powerDialer', [
       'resetPowerDialerTasks',
@@ -259,6 +260,7 @@ export default {
 
       this.activeList = response
       this.activeMetrics = response.session_metrics
+
       this.setSelectedPDList({
         id: response.id,
         name: response.name,

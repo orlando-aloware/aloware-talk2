@@ -8,7 +8,7 @@
                       :ripple="false"
                       :menu-offset="[4, 16]">
         <template v-slot:label>
-                  <i class="fa fa-question-circle text-2x text-danger header-help-icon-wrapper"></i>
+                  <i class="fa fa-question-circle text-2x text-danger header-help-icon-wrapper"/>
         </template>
 
         <q-list class="tab-dropdown-list p-3 allow-select header-help-dropdown-list">
@@ -28,9 +28,9 @@
                  href="https://support.aloware.com"
                  target="_blank"
                  type="a"
+                 color="primary"
                  unelevated
                  no-caps
-                 color="primary"
                  v-if="!user.profile.company.reseller_id">
             Get Help
           </q-btn>
@@ -65,6 +65,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['user']),
     ...mapState(['statics']),
+
     isMobileSize () {
       return this.windowSize <= 425
     }
@@ -74,11 +75,16 @@ export default {
     windowResize () {
       this.windowSize = window.screen.width
     },
+
     noClose (event) {
       if (event) {
         event.stopPropagation()
       }
     }
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.windowResize)
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="wallboard__sidebar bordered-right">
+    <div class="wallboard__sidebar bordered-right overflow-y-scroll">
       <wallboard-sidebar-item name="Overview"
                               route="/wallboard/overview"
                               icon="wallboard-overview-icon"

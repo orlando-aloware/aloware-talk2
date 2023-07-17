@@ -6,19 +6,21 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
-      <q-layout class="page-layout"
+      <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
-                :height="'100%'">
-        <div class="h-100"
+                style="min-height: 0 !important;">
+        <div class="h-100 position-relative"
              :class="headerContainerClass">
-          <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="isShowAppHeader">
-            <app-header @toggleSidebar="toggleSidebar"/>
+          <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
+                    :class="pageHeaderClass"
+                    v-if="showHeader">
+            <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"
+                                  @shown="onShowMobileLiveCallBar"/>
+            <app-header v-if="isShowAppHeader"
+                        @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container :style="`${!isShowAppHeader ? 'padding-top: 0 !important;' : ''}`"
-                            :class="pageContainerClasses">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
                 <transition :name="transitionName"
@@ -59,7 +61,7 @@
             <dialer v-if="authenticated && !suspended"/>
           </q-page-container>
         </div>
-        <q-drawer class="h-100 sidebar-wrapper d-block"
+        <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
                   content-class="sidebar"
                   :breakpoint="0"
                   :width="64"
@@ -72,7 +74,7 @@
             </app-sidebar>
           </q-list>
         </q-drawer>
-        <q-drawer class="mobile-phone-drawer position-relative"
+        <q-drawer class="mobile-phone-drawer position-relative h-100 overflow-hidden"
                   ref="mobilePhone"
                   side="right"
                   bordered
@@ -90,7 +92,7 @@
                         :title-only="true"/>
           </q-header>
           <phone :isMobile="isMobile"
-                 :class="{ 'hidden': mobilePhoneDrawer }"
+                 :class="{ 'hide': !mobilePhoneDrawer }"
                  @onPhoneVisible="onPhoneVisible">
           </phone>
           <dialer-form ref="dialerForm"
@@ -100,7 +102,7 @@
                        v-if="isMobile">
           </dialer-form>
         </q-drawer>
-        <app-footer class="page-footer row d-block w-100 m-0 px-1"
+        <app-footer class="page-footer row d-block w-100 m-0 px-1 flex-grow-0"
                     ref="appFooter"
                     v-if="authenticated && !isWidget && !loading && isMobile && !suspended && showMobileFooter"
                     @toggleMobilePhone="toggleMobilePhone">
@@ -340,6 +342,8 @@ export default {
       isElectronEventsStarted: false,
       isMainEventsStarted: false,
       showMobileFooter: false,
+      showHeader: true,
+      mobileLiveCallBarShown: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -487,6 +491,10 @@ export default {
 
       return this.authenticated && !this.isWidget && !this.loading &&
         this.showContactsHeader && !this.suspended && showForMobile
+    },
+    pageHeaderClass () {
+      return !this.isShowAppHeader || !this.mobileLiveCallBarShown
+        ? 'h-auto' : ''
     }
   },
 
@@ -2321,7 +2329,7 @@ export default {
       // don't close the phone yet!
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.isPhoneVisible = true
-        this.mobilePhoneDrawer = true
+        this.mobilePhoneDrawer = false
       }
 
       if (typeof this.$refs.appFooter !== 'undefined') {
@@ -2405,6 +2413,10 @@ export default {
     stayBusy () {
       this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
       this.$bvModal.hide('missed-call-modal')
+    },
+
+    onShowMobileLiveCallBar (value) {
+      this.mobileLiveCallBarShown = value
     },
 
     beforeUnload () {
@@ -2496,16 +2508,17 @@ export default {
   },
 
   watch: {
-    '$q.screen.lt.lg': function () {
+    '$q.screen.lt.lg': function (value) {
       if (typeof this.$refs.mobilePhone === 'undefined') {
         return
       }
 
-      if (!this.$q.screen.lt.lg) {
+      if (!value) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
       }
     },
+
     $route (to, from) {
       // logout action
       if (to.name === 'Login' && !storage.local.getItem('api_token')) {
@@ -2629,6 +2642,11 @@ export default {
       if (!val) {
         this.setShowContactsHeader(true)
         this.mobilePhoneDrawer = false
+        this.showHeader = false
+
+        setTimeout(() => {
+          this.showHeader = true
+        }, 10)
       }
 
       if (!val && this.$route.name === 'Phone') {
