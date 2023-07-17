@@ -56,9 +56,9 @@
         </b-button>
       </a>
 
-      <compact-btn customClass="fs-14 _500 position-relative primary not-focusable ml-2 text-danger"
+      <compact-btn customClass="fs-14 _500 position-relative not-focusable ml-2 text-red-130"
                    borderless
-                   v-if="diagnosis && diagnosis.closable"
+                   v-if="isClosable"
                    @clicked="close">
         <i class="fa fa-times"/>
       </compact-btn>
@@ -71,10 +71,13 @@ import { mapGetters, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import * as CompanyIssues from 'src/constants/company-issues'
 import CompactBtn from 'components/compact-btn'
+import { get } from 'lodash'
 
 export default {
   name: 'header-notification',
+
   components: { CompactBtn },
+
   mixins: [
     aclMixin
   ],
@@ -120,6 +123,10 @@ export default {
       return [
         mobileClass
       ]
+    },
+
+    isClosable () {
+      return get(this.diagnosis, 'closable', true)
     }
   },
 
