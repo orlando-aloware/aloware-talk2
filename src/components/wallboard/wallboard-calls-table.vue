@@ -133,7 +133,7 @@
                     <router-link class="mb-1"
                                  :to="{ path: `/contacts/${call.contact_id}` }"
                                  v-if="call.contact">
-                      {{ call.contact.name | capitalize }}
+                      {{ call.contact.name | ucwords }}
                     </router-link>
 
                     <!-- lead number -->
