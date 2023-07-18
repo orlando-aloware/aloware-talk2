@@ -1,6 +1,6 @@
 <template>
-  <div class="h-100">
-    <div class="mobile-header align-items-center justify-content-between pr-3"
+  <div class="h-100 d-flex flex-column">
+    <div class="mobile-header align-items-center justify-content-between pr-3 flex-grow-0"
          v-if="$q.screen.lt.md">
       <div class="mobile-header-labels h-100 align-items-center justify-content-start">
         <back-button @click="$emit('back')"/>
@@ -11,15 +11,17 @@
       <profile class="p-0"
                :hide-profile-info="true"/>
     </div>
-    <div class="contact-details-wrapper">
-      <div class="details-component-container pb-5"
+    <div class="contact-details-wrapper h-100 flex-grow-1 overflow-hidden">
+      <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
           <contact-info :campaign-id="campaignId"/>
-          <contact-sequence v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                            :contact="contact"/>
-          <contact-aloha-bot v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"
-                            :contact="contact"/>
+          <contact-sequence class="w-100"
+                            :contact="contact"
+                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
+          <contact-aloha-bot class="w-100"
+                             :contact="contact"
+                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-phones/>
           <contact-information :first-outbound-call="communicationsSummary.first_outbound_call"/>
           <contact-tags :contact="contact"/>
@@ -31,8 +33,7 @@
           <contact-activity-counts :summary="communicationsSummary.summaries"/>
           <contact-lines/>
           <contact-ring-groups/>
-          <contact-broadcast class="mb-5"/>
-          <div class="pb-5"/>
+          <contact-broadcast/>
         </template>
         <contact-save-bar v-if="!noSaveBar"/>
       </div>

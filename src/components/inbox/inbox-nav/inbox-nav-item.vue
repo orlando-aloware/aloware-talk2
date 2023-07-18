@@ -2,21 +2,20 @@
   <div>
     <hr class="nav-item-separator"
         v-if="value === 'voicemails'"/>
-    <a href="/"
-       :class="['inbox-nav-item mx-2 px-1', { 'inbox-nav-item__active': isActive, 'inbox-nav-item--closed': closed }]"
+    <a class="inbox-nav-item mx-2 px-1"
+       href="/"
+       :class="navItemClass"
        :disabled="disabled"
        v-if="!group"
        @click.prevent="onClick">
-      <div :class="['inbox-nav-item__inner', { 'inbox-nav-item__inner--closed': closed, 'inbox-nav-item__inner--opened': !closed }]">
-        <div :class="['inbox-nav-item__icon', { 'inbox-nav-item__icon--closed': closed, 'inbox-nav-item__icon--opened': !closed }]">
-          <i class="fa fa-circle text-10"
-             v-if="icon === 'view'">
-          </i>
+      <div class="inbox-nav-item__inner"
+           :class="navItemInnerClass">
+        <div class="inbox-nav-item__icon"
+             :class="navItemIconClass">
           <icon :icon="icon"
-                :isActive="isActive"
-                v-if="icon !== 'view'"/>
+                :isActive="isActive"/>
         </div>
-        <div class="inbox-nav-item__label h-100">
+        <div class="inbox-nav-item__label h-100  text-truncate">
           <q-tooltip>
             {{ label }}
           </q-tooltip>
@@ -74,10 +73,28 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
-      'isLoadingOpenTaskCount',
-      'isLoadingPendingTaskCount'
-    ])
+    ...mapState('inbox', ['isLoadingOpenTaskCount', 'isLoadingPendingTaskCount']),
+
+    navItemClass () {
+      return {
+        'inbox-nav-item__active': this.isActive,
+        'inbox-nav-item--closed': this.closed
+      }
+    },
+
+    navItemInnerClass () {
+      return {
+        'inbox-nav-item__inner--closed': this.closed,
+        'inbox-nav-item__inner--opened': !this.closed
+      }
+    },
+
+    navItemIconClass () {
+      return {
+        'inbox-nav-item__icon--closed': this.closed,
+        'inbox-nav-item__icon--opened': !this.closed
+      }
+    }
   },
 
   props: {
@@ -147,6 +164,7 @@ export default {
       if (this.disabled) {
         return
       }
+
       this.$emit('click', this.value)
     }
   }

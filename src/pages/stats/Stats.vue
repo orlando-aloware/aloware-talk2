@@ -1,17 +1,15 @@
 <template>
   <div class="h-100 w-100 position-relative">
-    <b-overlay
-      class="h-100 w-100 position-absolute"
-      :show="metricLoader"
-      rounded="sm"
-    >
+    <b-overlay class="h-100 w-100 position-absolute"
+               rounded="sm"
+               :show="metricLoader">
       <template #overlay>
-        <q-spinner-bars color="primary" size="40px" />
+        <q-spinner-bars color="primary"
+                        size="40px" />
       </template>
     </b-overlay>
-    <q-scroll-area
-      class="pb-4 bg-grey-40 stats-container"
-      v-if="!metricLoader">
+    <q-scroll-area class="pb-4 bg-grey-40 stats-container h-100 overflow-hidden-y"
+                   v-if="!metricLoader">
       <div class="px-4 py-0 stats-header">
         <AddMetricGroup @focusToNewMetricGroup="focusToNewMetricGroup"/>
       </div>
@@ -52,22 +50,28 @@ export default {
 
   methods: {
     ...mapActions('stats', ['setMetricGroups']),
+
     focusToNewMetricGroup (metricGroupId) {
       const counter = { data: 0 }
       const metricGroup = { data: null }
+
       this.clearFocusInterval = setInterval(() => {
         metricGroup.data = this.metricGroups.find(metricGroup => metricGroup.id === metricGroupId)
+
         if (metricGroup.data) {
           // test this
           this.metricGroupId = metricGroup.data.id
           clearInterval(this.clearFocusInterval)
         }
+
         counter.data++
+
         if (counter.data > 60000) {
           clearInterval(this.clearFocusInterval)
         }
       }, 100)
     },
+
     updated () {
       this.metricGroupId = null
     },
@@ -78,6 +82,7 @@ export default {
       }
 
       this.loadingMetricGroups = true
+
       return this.$axios
         .get(`/api/v2/agents/${this.profile.id}/statistics/metric-groups`, {
           params: {
@@ -87,22 +92,18 @@ export default {
         .then(response => {
           this.loadingMetricGroups = false
           this.setMetricGroups(response.data)
+
           return Promise.resolve()
         })
         .catch((err) => {
           console.error(err)
           this.loadingMetricGroups = false
           this.$handleErrors(err.response)
+
           return Promise.reject()
         })
     }
   },
-
-  // mounted () {
-  //   if (this.metricGroups && this.metricGroups.length < 1) {
-  //     this.getMetricGroups()
-  //   }
-  // },
 
   beforeDestroy () {
     clearInterval(this.clearFocusInterval)

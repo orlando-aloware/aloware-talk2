@@ -1,5 +1,6 @@
 <template>
-  <div class="inbox-nav-list" :class="{'inbox-nav-list--closed': closed}">
+  <div class="inbox-nav-list h-100 overflow-y-scroll overflow-x-hidden"
+       :class="{'inbox-nav-list--closed': closed}">
     <nav-item v-for="item in items"
               :key="item.name"
               :label="item.label"
@@ -58,7 +59,7 @@ import talk2Api from 'src/plugins/api/api'
 import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { inboxMixin, userMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, inboxMixin, userMixin } from 'src/plugins/mixins'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 
 export default {
@@ -70,6 +71,7 @@ export default {
   },
 
   mixins: [
+    inboxRoutesMixin,
     inboxMixin,
     userMixin
   ],
@@ -98,6 +100,7 @@ export default {
   computed: {
     ...mapState('inbox', [
       'items',
+      'activeChannel',
       'selectedFilter',
       'appliedFilter',
       'isFilterDialogShown',
@@ -112,7 +115,9 @@ export default {
     ]),
 
     isShowActive () {
-      return !this.$q.screen.lt.md || (this.$q.screen.lt.md && this.inboxChannelRoutes.includes(this.$route.name))
+      const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxChannelRoutes.includes(this.$route.name)
+
+      return !this.$q.screen.lt.md || isMobileInboxRoutes
     }
   },
 
@@ -219,6 +224,17 @@ export default {
         return
       }
 
+      if (!this.activeChannel) {
+        return
+      }
+
+      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md) {
+        this.$emit('toInbox')
+
+        return
+      }
+
+      this.active = nextActive
       const channel = this.items.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 

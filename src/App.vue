@@ -1,5 +1,5 @@
 <template>
-  <div class="position-relative"
+  <div class="position-relative d-flex flex-column"
        id="q-app">
     <b-overlay class="h-100 w-100 position-absolute"
                :show="isPageLoading">
@@ -8,7 +8,10 @@
                         size="40px" />
       </template>
     </b-overlay>
-    <router-view v-if="cookieValidated"/>
+    <header-notification class="flex-grow-0"
+                         v-if="isLoggedIn"/>
+    <router-view class="flex-grow-1 overflow-hidden"
+                 v-if="cookieValidated"/>
     <portal-target name="app"
                    multiple>
     </portal-target>
@@ -22,8 +25,8 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <custom-scripts v-if="authenticated && profile && profile.enabled"/>
-    <intercom v-if="authenticated && profile && profile.enabled && staticsLoaded && !statics.whitelabel"/>
+    <custom-scripts v-if="isLoggedIn"/>
+    <intercom v-if="isLoggedIn && staticsLoaded && !statics.whitelabel"/>
   </div>
 </template>
 <script>
@@ -32,11 +35,13 @@ import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import CustomScripts from 'components/custom-scripts'
+import HeaderNotification from 'components/header-notification'
 
 export default {
   name: 'App',
 
   components: {
+    HeaderNotification,
     Intercom,
     CustomScripts,
     ActionNotification
@@ -60,6 +65,10 @@ export default {
       const urlParams = new URLSearchParams(window.location.search)
 
       return Number(urlParams.get('from_classic'))
+    },
+
+    isLoggedIn () {
+      return this.authenticated && this.profile && this.profile.enabled
     }
   },
 

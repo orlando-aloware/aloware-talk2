@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar position-relative">
+  <div class="calendar position-relative h-100 d-flex flex-column">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -11,7 +11,7 @@
     </b-overlay>
 
     <!-- header -->
-    <div class="calendar__header">
+    <div class="calendar__header flex-grow-0">
       <div class="calendar__header__action-left">
         <b-button size="sm"
                   variant="light"
@@ -76,8 +76,8 @@
     </div>
 
     <!-- scheduler -->
-    <div class="scheduler">
-      <div class="scheduler__header">
+    <div class="scheduler d-flex flex-column flex-grow-1 h-100 overflow-hidden-y">
+      <div class="scheduler__header flex-grow-0">
         <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
           <tr v-if="view === 'week'">
             <td :class="d.today ? 'today': ''"
@@ -97,9 +97,10 @@
           </tr>
         </table>
       </div>
-      <div :class="['scheduler__body', view]">
+      <div class="flex-grow-1 h-100 overflow-hidden-y"
+           :class="['scheduler__body', view]">
         <scheduler ref="scheduler"
-                   :class="['actual-scheduler', view + '-view']"
+                   :class="['actual-scheduler h-100', view + '-view']"
                    :events="events"
                    @edit-schedule="editSchedule"
                    @add-schedule="addSchedule"

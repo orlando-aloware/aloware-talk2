@@ -1,10 +1,12 @@
 <template>
   <div class="wallboard__body">
-    <div :class="['users', `users--${viewMode}`]">
-      <b-overlay rounded="sm"
+    <div class="h-100 w-100 oveflow-hidden"
+         :class="['users', `users--${viewMode}`]">
+      <b-overlay class="h-100 d-flex flex-column"
+                 rounded="sm"
                  :show="isAgentsLoading">
-        <wallboard-agents-header />
-        <wallboard-agents-table />
+        <wallboard-agents-header class="flex-grow-0"/>
+        <wallboard-agents-table class="flex-grow-1 h-100 overflow-hidden"/>
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px"/>
