@@ -71,7 +71,6 @@ import { mapGetters, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import * as CompanyIssues from 'src/constants/company-issues'
 import CompactBtn from 'components/compact-btn'
-import { get } from 'lodash'
 
 export default {
   name: 'header-notification',
