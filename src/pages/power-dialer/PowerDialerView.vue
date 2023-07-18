@@ -21,8 +21,9 @@
         <b-container class="bv-example-row m-0 p-0 pb-0"
                      fluid>
           <b-row class="pr-2 pt-4 pb-3"
-                 v-if="$q.screen.lt.lg">
-            <b-col cols="12">
+                 v-if="showMobileFilters">
+            <b-col class="d-flex justify-content-center"
+                   cols="12">
               <div class="d-flex">
                 <power-dialer-filter :list-data="fixedContactsData"
                                      :id="selectedListId"
@@ -31,7 +32,8 @@
               </div>
             </b-col>
           </b-row>
-          <b-row class="pr-2 pt-4">
+          <b-row class="pr-2"
+                 :class="{ 'pt-4': !showMobileFilters }">
             <b-col class="p-0 pr-2 m-0">
               <div class="d-flex">
 
@@ -43,8 +45,8 @@
               </div>
             </b-col>
             <b-col cols="8"
-                   v-if="$q.screen.gt.md">
-              <div class="d-flex">
+                   v-if="!showMobileFilters">
+              <div class="d-flex justify-content-center">
                 <power-dialer-filter :list-data="fixedContactsData"
                                      :id="selectedListId"
                                      :filter="filter"
@@ -55,9 +57,9 @@
               <div class="d-flex float-right">
 
                 <b-dropdown class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                            toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                             text="Add Contacts"
                             variant="light"
-                            toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                             right
                             no-caret
                             :disabled="taskAddAndClearingDisabled">
@@ -68,8 +70,7 @@
                       Add Contacts
                     </div>
                     <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2"
-                       style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;">
-                    </i>
+                       style="margin-top: 2px;font-size: 9px !important;position: relative;top: -2px;"/>
                     <q-tooltip content-class="bg-grey-light11"
                                anchor="top middle"
                                self="center middle"
@@ -555,6 +556,7 @@ import {
   powerDialerMixin,
   powerDialerInitMixin
 } from 'src/plugins/mixins'
+import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'PowerDialerView',
@@ -850,6 +852,10 @@ export default {
       const text = this.taskAddAndClearingDisabled ? '' : ' & Add to List'
 
       return `Create Contact${text}`
+    },
+
+    showMobileFilters () {
+      return this.$q.screen.width <= PD_MAX_FILTER_LG
     }
   },
 

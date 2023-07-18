@@ -21,10 +21,10 @@
             {{ contactList.name }}
           </div>
           <text-popover :id="contactList.id"
-                       :editable="!isMyQueue"
-                       v-else
-                       v-model="contactListName"
-                       @input="updateListName"/>
+                        :editable="!isMyQueue"
+                        v-model="contactListName"
+                        v-else
+                        @input="updateListName"/>
         </div>
         <div class="text-muted small action-desc">
           {{ addContactsGuideText }}
@@ -39,6 +39,7 @@
         </div>
         <compact-btn class="mr-2"
                      variant="primary"
+                     style="min-width: 153px;"
                      :disabled="!selectedAllCount || openPDModal"
                      @clicked="addSelectedContacts">
           Add Selected Contacts
@@ -82,10 +83,10 @@
                          variant="outlined-light"
                          customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
                          @clicked="onFiltersClicked">
-              <b-badge v-if="hasAppliedFilters"
-                       class="ml-2 mt-1"
+              <b-badge class="ml-2 mt-1"
+                       variant="primary"
                        pill
-                       variant="primary">
+                       v-if="hasAppliedFilters">
                 {{ filtersCount }}
               </b-badge>
               <span class="pl-2  pr-2">Filters</span>
@@ -187,8 +188,8 @@
                       </template>
                     </router-link>
 
-                    <b-badge variant="danger"
-                             class="badge-phone-info"
+                    <b-badge class="badge-phone-info"
+                             variant="danger"
                              v-if="contact.is_dnc">
                       DNC
                     </b-badge>

@@ -1,11 +1,11 @@
 <template>
   <b-overlay class="h-100"
              :show="isBusy">
-    <div class="t-flex-group__no-bg flex-column border-top h-100">
+    <div class="t-flex-group__no-bg flex-column border-top h-100 overflow-hidden">
       <SessionFilters @selected-tab="selectTab" />
 
-      <div class="t-panel-container h-100">
-        <q-tab-panels class="bg-transparent"
+      <div class="t-panel-container h-100 flex-grow-0 overflow-hidden">
+        <q-tab-panels class="bg-transparent h-100 overflow-hidden"
                       v-model="panel">
 
           <q-tab-panel class="p-0 h-100"

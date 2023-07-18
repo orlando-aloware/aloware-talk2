@@ -1,27 +1,26 @@
 <template>
   <div :class="`${widthClass}`">
     <div class="contact-list-sidebar-wrapper">
-      <b-button
-        variant="light"
-        size="sm"
-        class="sidebar-toggle"
-        v-if="!$q.screen.lt.md"
-        @click="onSidebarToggle">
+      <b-button class="sidebar-toggle"
+                variant="light"
+                size="sm"
+                v-if="!$q.screen.lt.md"
+                @click="onSidebarToggle">
         <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
-      <b-card no-body
-              class="no-border position-relative"
+      <b-card class="no-border position-relative h-100"
+              no-body
               @scroll="handScroll">
         <b-list-group class="p-2 pr-2">
-            <contact-list-sidebar-item v-for="(item, index) in fixedContactsData.data"
-                                       v-model="fixedContactsData.data[index]"
-                                       :class="[isSelected(item) ? 'router-link-exact-active router-link-active' : '']"
+            <contact-list-sidebar-item :class="[isSelected(item) ? 'router-link-exact-active router-link-active' : '']"
                                        :key="item.id"
+                                       v-for="(item, index) in fixedContactsData.data"
+                                       v-model="fixedContactsData.data[index]"
                                        @itemSelected="onSidebarToggleMobile(item)"/>
         </b-list-group>
         <div class="relative py-4">
-          <b-overlay :show="isLoadingMore"
-                     rounded="sm">
+          <b-overlay rounded="sm"
+                     :show="isLoadingMore">
             <template #overlay>
               <q-spinner-bars color="primary"/>
             </template>
@@ -71,6 +70,7 @@ export default {
 
     widthClass () {
       const widthClass = this.isExpanded ? (this.$q.screen.lt.md ? 'contact-list-sidebar-open' : 'width-300') : 'width-0'
+
       return `px-0 contact-list-sidebar-container ${widthClass}${this.$q.screen.lt.md ? ' mx-0' : ''}`
     },
 
@@ -89,6 +89,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['setSidebarCollapsed', 'setShowContactsHeader']),
+
     onBottomScroll () {
       clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
@@ -104,6 +105,7 @@ export default {
       this.isExpanded = !this.isExpanded
       this.desktopIsExpanded = this.isExpanded
       this.setSidebarCollapsed(!this.isExpanded)
+
       if (this.isMobile) {
         this.setShowContactsHeader(this.isExpanded)
       }
@@ -130,9 +132,9 @@ export default {
     isSelected (item) {
       if (this.contact.id !== this.contactIdOnUrl) {
         return this.contactIdOnUrl === item.id
-      } else {
-        return this.contact.id === item.id
       }
+
+      return this.contact.id === item.id
     }
   },
 

@@ -370,7 +370,7 @@
       <template #empty>
         <div class="empty-state"
              v-if="calls.length === 0">
-          <div class="h5">
+          <div class="h5 px-2 text-center">
             No {{ $route.params.id }} calls found based on the current filters
           </div>
         </div>
