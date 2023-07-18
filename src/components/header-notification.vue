@@ -126,7 +126,7 @@ export default {
     },
 
     isClosable () {
-      return get(this.diagnosis, 'closable', true)
+      return this.diagnosis?.closable
     }
   },
 
@@ -152,17 +152,6 @@ export default {
         this.diagnosis = res.data.issues
         this.link = res.data.link
         this.showDiagnosis = res.data.has_issues
-
-        // if account has reached max negative balance and auto recharge is not set
-        if (this.issueCodes.length &&
-          this.issueCodes.includes(CompanyIssues.ISSUE_MAX_NEGATIVE_BALANCE) &&
-          !this.profile.usage.auto_recharge) {
-          this.$router.push({
-            name: 'Account', query: { tab: 'billing' }
-          }).catch(err => {
-            console.log(err)
-          })
-        }
       })
     },
 
