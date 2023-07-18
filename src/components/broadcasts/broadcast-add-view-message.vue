@@ -254,21 +254,18 @@ export default {
       }
     },
 
-    type: {
-      immediate: true,
-      handler (type) {
-        // clean content of non-selected types
-        switch (type) {
-          case 'sms':
-            this.$emit('rvm-updated', null)
-            break
-          case 'rvm':
-            this.setMessageComposerSmsBody('')
-            break
-        }
-
-        this.$emit('type-updated', type)
+    type (type) {
+      // clean content of non-selected types
+      switch (type) {
+        case 'sms':
+          this.$emit('rvm-updated', null)
+          break
+        case 'rvm':
+          this.setMessageComposerSmsBody('')
+          break
       }
+
+      this.$emit('type-updated', type)
     },
 
     price (price) {
