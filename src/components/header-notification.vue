@@ -29,14 +29,6 @@
     </div>
 
     <portal to="diagnosisButtons">
-      <strong class="mr-2"
-              v-if="!link && !issueCodes.includes(CompanyIssues.ISSUE_ACTIVE_DUNNING)">
-        Contact Support:
-        <a href="tel:(855) 256-2001">
-          (855) 256-2001
-        </a>
-      </strong>
-
       <a :href="getLink(link)"
          v-if="link && !link.external">
         <b-button class="text-nowrap"
