@@ -196,7 +196,7 @@ export default {
     channelFilterName () {
       const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
 
-      if (this.isFilterDialogForView && ['Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) {
+      if (this.isFilterDialogForView || ['Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) {
         return 'Views'
       }
 
@@ -408,7 +408,7 @@ export default {
 
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
-        this.filter = this.defaultFilterModel.filter
+        this.filter = { ...this.defaultFilterModel.filter }
       }
 
       // fill in the value for the newly added filter in case it's not yet included
@@ -447,7 +447,7 @@ export default {
 
     onResetFilter: function () {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
-      const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
+      const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
       for (const item in useFilter) {
         if (this.booleanFields.includes(item)) {

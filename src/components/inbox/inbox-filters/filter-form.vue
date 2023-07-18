@@ -401,7 +401,7 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -606,10 +606,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
-      'updateChannelChangedFilterFields'
-    ]),
-
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },

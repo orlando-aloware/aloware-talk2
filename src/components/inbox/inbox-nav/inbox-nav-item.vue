@@ -12,8 +12,12 @@
            :class="navItemInnerClass">
         <div class="inbox-nav-item__icon"
              :class="navItemIconClass">
+          <i class="fa fa-circle text-10"
+             v-if="icon === 'view'">
+          </i>
           <icon :icon="icon"
-                :isActive="isActive"/>
+                :isActive="isActive"
+                v-if="icon !== 'view'"/>
         </div>
         <div class="inbox-nav-item__label h-100  text-truncate">
           <q-tooltip>
@@ -73,7 +77,10 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isLoadingOpenTaskCount', 'isLoadingPendingTaskCount']),
+    ...mapState('inbox', [
+      'isLoadingOpenTaskCount',
+      'isLoadingPendingTaskCount'
+    ]),
 
     navItemClass () {
       return {

@@ -312,15 +312,11 @@ export default {
         }]
 
         delete this.filters.contact_task_status
-      } else if (this.$route.params?.status) {
-        const taskStatus = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
-        this.filters.contact_task_status[0].value = [taskStatus]
       } else {
         this.filters.contact_task_status[0].value = [taskId]
       }
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
-      console.trace(filter, filters, this.appliedFilter, this.channelClonedFilter)
 
       if (filter && filter?.campaigns && filter.campaigns.length) {
         this.filters = {

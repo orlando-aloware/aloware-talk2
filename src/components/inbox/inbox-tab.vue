@@ -1264,7 +1264,7 @@ export default {
     $route (to, from) {
       // load contacts if not inbox view related route
       if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
-        this.loadContactTasks()
+        this.loadContactTasks(false)
         this.fetchTaskCounts()
         this.setInboxShowMyContacts(false)
       }

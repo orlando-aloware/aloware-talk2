@@ -140,7 +140,12 @@ export default {
     }
 
     this.$VueEvent.listen('fetchInbox', () => {
-      this.loadContactTasks()
+      if (this.$route.params?.status) {
+        this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+      }
+
+      this.loadContactTasks(false)
+      this.fetchTaskCounts()
     })
   },
 

@@ -158,18 +158,20 @@ export default {
   },
 
   created () {
-    this.getFilters()
-      .then(() => {
-        if (this.$route.params?.viewId) {
-          // get view id
-          const viewId = +this.$route.params.viewId
-          // get filter from all filters list
-          const filter = this.allInboxFilters.find(filter => +filter.id === +viewId)
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      this.getFilters()
+        .then(() => {
+          if (this.$route.params?.viewId) {
+            // get view id
+            const viewId = +this.$route.params.viewId
+            // get filter from all filters list
+            const filter = this.allInboxFilters.find(filter => +filter.id === +viewId)
 
-          this.setStatus()
-          this.onSelectView(filter)
-        }
-      })
+            this.setStatus()
+            this.onSelectView(filter)
+          }
+        })
+    }
 
     // listen to filter updates to update the inbox views dialog selection
     this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
@@ -184,6 +186,10 @@ export default {
 
     this.$VueEvent.listen('viewUnpinned', () => {
       this.getPinnedViews()
+    })
+
+    this.$VueEvent.listen('openInboxViewPopup', () => {
+      this.showViewsList = true
     })
 
     this.$VueEvent.listen('filter_deleted', (filter) => {
