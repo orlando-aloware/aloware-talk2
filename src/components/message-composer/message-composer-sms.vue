@@ -161,6 +161,7 @@
          @dragover.prevent>
       <message-composer-options :campaign-id="campaignId"
                                 :max-attachments="maxAttachments"
+                                :is-broadcast="isBroadcast"
                                 @gifSelected="gifSelected"
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
@@ -259,6 +260,11 @@ export default {
     maxAttachments: {
       type: Number,
       default: null
+    },
+
+    isBroadcast: {
+      type: Boolean,
+      default: false
     }
   },
 

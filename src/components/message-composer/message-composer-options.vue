@@ -23,7 +23,8 @@
       <q-menu ref="attachmentMenu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
-          <attachments @attachmentUploaded="onAttachmentUploaded"></attachments>
+          <attachments :is-broadcast="isBroadcast"
+                       @attachmentUploaded="onAttachmentUploaded"/>
         </div>
       </q-menu>
       <attachment-icon></attachment-icon>
@@ -131,6 +132,11 @@ export default {
     maxAttachments: {
       type: Number,
       default: null
+    },
+
+    isBroadcast: {
+      type: Boolean,
+      default: false
     }
   },
 
