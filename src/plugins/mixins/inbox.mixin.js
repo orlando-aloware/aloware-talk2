@@ -312,6 +312,9 @@ export default {
         }]
 
         delete this.filters.contact_task_status
+      } else if (this.$route.params?.status) {
+        const taskStatus = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+        this.filters.contact_task_status[0].value = [taskStatus]
       } else {
         this.filters.contact_task_status[0].value = [taskId]
       }
