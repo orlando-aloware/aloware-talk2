@@ -302,6 +302,7 @@ export default {
     onClearAll () {
       this.isAllSelected = false
       this.selectedContactsCount = this.checkedCount
+      document.querySelector('.data-table-check-all').checked = false
     },
 
     resetCheckbox () {
