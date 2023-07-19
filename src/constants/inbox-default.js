@@ -79,14 +79,24 @@ export const DEFAULT_STATE = {
     pending: 0,
     closed: 0
   },
+  inboxTaskCounts: {
+    new: 0,
+    open: 0,
+    pending: 0,
+    closed: 0
+  },
   channelClonedFilter: {},
   channelChangedFilterFields: [],
   isFilterModelFormShown: false,
   isFilterDialogShown: false,
+  isFilterDialogForView: false,
   selectedFilter: null,
   appliedFilter: null,
   isLoadingOpenTaskCount: false,
   isLoadingPendingTaskCount: false,
   inboxShowMyContacts: true,
-  isInboxFiltersLoaded: true
+  isInboxFiltersLoaded: true,
+  pinnedViews: [],
+  inboxPersonalFilters: [],
+  inboxCompanyFilters: []
 }

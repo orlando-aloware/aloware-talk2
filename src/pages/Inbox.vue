@@ -23,7 +23,8 @@ import {
   contactV2AttributesMixin,
   inboxMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
 
@@ -35,14 +36,23 @@ export default {
     contactV2AttributesMixin,
     inboxMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    userMixin
   ],
 
-  components: { Contact, InboxSide },
+  components: {
+    Contact,
+    InboxSide
+  },
 
   computed: {
-    ...mapGetters('auth', ['authenticated']),
-    ...mapState('inbox', ['items', 'activeChannel']),
+    ...mapGetters('auth', [
+      'authenticated'
+    ]),
+
+    ...mapState('inbox', [
+      'items'
+    ]),
 
     isMobileContactActive () {
       return this.mobileContactScreenRoutes.includes(this.$route.name)
@@ -69,26 +79,33 @@ export default {
       mobileContactScreenRoutes: [
         'Inbox Contact',
         'Inbox Contact Task',
-        'Inbox Contact Communication'
-      ],
-      channelRoutes: [
-        'Inbox Channel',
-        'Inbox Contact',
-        'Inbox Contact Task',
-        'Inbox Channel Task Status',
+        'Inbox View Contact Task',
         'Inbox Contact Communication'
       ]
     }
   },
 
   methods: {
-    ...mapActions('inbox', ['setActiveChannel', 'setTaskCount']),
+    ...mapActions('inbox', [
+      'setActiveChannel',
+      'setTaskCount'
+    ]),
 
     setChannel (routeChanged = false) {
-      if (this.channelRoutes.includes(this.$route.name)) {
-        const channel = this.items.find(item => item.value === this.$route.params.channel)
+      if (this.inboxChannelRoutes.includes(this.$route.name)) {
+        let channel = null
+
+        if (this.inboxViewsRoutes.includes(this.$route.name) && this.isLoadedPinnedViews) {
+          channel = this.getPinnedViewChannel(this.$route.params.viewId)
+        } else {
+          channel = this.items.find(item => item.value === this.$route.params.channel)
+        }
+
         this.setActiveChannel(channel)
-      } else if (this.$route.name === 'Inbox' && !this.activeChannel) {
+        return
+      }
+
+      if (this.$route.name === 'Inbox' && !this.activeChannel) {
         const channel = this.items.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
@@ -105,6 +122,10 @@ export default {
   },
 
   created () {
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+      this.getPinnedViews()
+    }
+
     if (this.$route.query && this.$route.query.add_contact) {
       this.$VueEvent.fire('add_contact', {
         phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
@@ -113,18 +134,34 @@ export default {
   },
 
   mounted () {
-    if (this.authenticated) {
+    if (this.authenticated && this.$route.name !== 'Inbox View') {
       this.setChannel()
-      if (this.$route.params.channel !== 'inbox' && this.$route.name !== 'Inbox') {
-        this.fetchTaskCounts()
-      }
+      this.fetchTaskCounts()
     }
+
+    this.$VueEvent.listen('fetchInbox', () => {
+      if (this.$route.params?.status) {
+        this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+      }
+
+      this.loadContactTasks(false)
+      this.fetchTaskCounts()
+    })
   },
 
   watch: {
     '$route.name': function (value) {
       const isNotInboxRouteName = !value.includes('Inbox')
       this.setChannel(isNotInboxRouteName)
+    },
+
+    isLoadedPinnedViews (value) {
+      if (value && this.$route.name === 'Inbox View') {
+        this.setChannel()
+
+        // get counts for inbox
+        this.fetchInboxTaskCounts()
+      }
     }
   }
 }
