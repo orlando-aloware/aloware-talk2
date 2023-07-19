@@ -41,7 +41,7 @@
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
                :class="callStatusClass"
-               v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX, CommunicationTypes.NOTE].includes(contact.last_communication.type)">
+               v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX].includes(contact.last_communication.type)">
             <q-tooltip>
               {{ communicationLabel }}
             </q-tooltip>
@@ -54,8 +54,8 @@
           </div>
           <div class="truncated-text"
                :class="appointmentReminderTextClass"
-               v-if="contact.last_communication.body !== null && ![CommunicationTypes.NOTE].includes(contact.last_communication.type)">
-            {{ contact.last_communication.body }}
+               v-if="contact.last_communication.body !== null">
+            {{ parsedBody }}
           </div>
 
         </div>
@@ -237,7 +237,8 @@ import {
   communicationInfoMixin,
   notificationMixin,
   liveCallsMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  mentionsMixin
 } from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -261,7 +262,8 @@ export default {
     communicationInfoMixin,
     notificationMixin,
     liveCallsMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    mentionsMixin
   ],
 
   components: {
@@ -485,6 +487,14 @@ export default {
       }
 
       return label
+    },
+
+    parsedBody () {
+      if (this.contact.last_communication.type === CommunicationTypes.NOTE) {
+        return this.parseMentionToView(this.contact.last_communication.body)
+      }
+
+      return this.contact.last_communication.body
     }
   },
 
