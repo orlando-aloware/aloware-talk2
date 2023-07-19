@@ -27,7 +27,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="selectedLineIsNotRegistered" class="custom-badge mb-2">
+            <div v-if="selectedLineIsNotRegistered" class="compliance-badge mb-2">
               Due to regulatory requirements from carriers you are unable to send out automated messages using broadcasts and sequences, please register your lines to access this feature.
             </div>
           </b-form-group>
@@ -91,7 +91,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="selectedLineIsNotRegistered" class="custom-badge mb-2">
+            <div v-if="selectedLineIsNotRegistered" class="compliance-badge mb-2">
               Due to regulatory requirements from carriers you are unable to send out automated messages using broadcasts and sequences, please register your lines to access this feature.
             </div>
           </b-form-group>
