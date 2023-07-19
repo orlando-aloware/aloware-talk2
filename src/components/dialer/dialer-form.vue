@@ -27,10 +27,9 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <q-badge v-if="selectedLineIsNotRegistered"
-                     color="red">
+            <div v-if="selectedLineIsNotRegistered" class="custom-badge mb-2">
               Due to regulatory requirements from carriers you are unable to send out automated messages using broadcasts and sequences, please register your lines to access this feature.
-            </q-badge>
+            </div>
           </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
