@@ -230,6 +230,7 @@ export default {
       }
 
       this.clearSelectAll()
+      document.querySelector('.data-table-check-all').checked = false
       this.onCheckedRows(items)
     },
 

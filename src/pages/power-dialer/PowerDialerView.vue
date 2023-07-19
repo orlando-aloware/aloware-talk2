@@ -978,9 +978,15 @@ export default {
       let items = []
 
       if (checked) {
-        items = this.fixedContactsDataItems
-      } else {
-        items = []
+        document
+          .querySelectorAll('.checker')
+          .forEach((checkbox) => {
+            let foundContact = this.fixedContactsData.data.find(item => item.id === Number(checkbox.value))
+
+            if (!(foundContact.is_blocked || foundContact.is_dnc)) {
+              items.push(foundContact)
+            }
+          })
       }
 
       this.$VueEvent.fire('setListSelectedContacts', { id: this.filteredSelectedListId, contacts: items })
@@ -1126,14 +1132,6 @@ export default {
       }
 
       return obj
-    },
-
-    onForcedCheckAll (value) {
-      const elem = document.querySelector('.data-table-check-all')
-
-      if (elem) {
-        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
-      }
     }
   },
 
@@ -1172,10 +1170,6 @@ export default {
 
     clearList (value) {
       this.onFetch()
-    },
-
-    checked (value) {
-      this.onForcedCheckAll(value)
     }
   },
 

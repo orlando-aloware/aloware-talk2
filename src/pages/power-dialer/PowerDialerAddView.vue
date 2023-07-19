@@ -828,19 +828,17 @@ export default {
     onCheckAllItems (checked) {
       let checkedItems = []
 
-      if (!checked) {
-        return
+      if (checked) {
+        document
+          .querySelectorAll('.checker')
+          .forEach((checkbox) => {
+            let foundContact = this.fixedContactsData.data.find(item => item.id === Number(checkbox.value))
+
+            if (!(foundContact.is_blocked || foundContact.is_dnc)) {
+              checkedItems.push(foundContact)
+            }
+          })
       }
-
-      document
-        .querySelectorAll('.checker')
-        .forEach((checkbox) => {
-          let foundContact = this.fixedContactsData.data.find(item => item.id === Number(checkbox.value))
-
-          if (!(foundContact.is_blocked || foundContact.is_dnc)) {
-            checkedItems.push(foundContact)
-          }
-        })
 
       this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
     },
