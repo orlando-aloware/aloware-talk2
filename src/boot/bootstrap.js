@@ -22,7 +22,6 @@ import log from 'electron-log'
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
 // local storage
-console.log(process.env.DEMO_COMPANY_IDS)
 storage.local.setItem('api_url', process.env.API_URL)
 storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
 storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
