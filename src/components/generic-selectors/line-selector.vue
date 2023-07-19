@@ -200,11 +200,6 @@ export default {
     borderless: {
       type: Boolean,
       default: false
-    },
-
-    checkBlockedMessaging: {
-      type: Boolean,
-      default: false
     }
   },
 
