@@ -29,6 +29,15 @@ export default {
   setPendingTaskCount: ({ commit }, count = 0) => {
     commit('SET_PENDING_TASK_COUNT', count)
   },
+  setInboxTaskCount: ({ commit }, payload) => {
+    commit('SET_INBOX_TASK_COUNT', payload)
+  },
+  setInboxOpenTaskCount: ({ commit }, count = 0) => {
+    commit('SET_INBOX_OPEN_TASK_COUNT', count)
+  },
+  setInboxPendingTaskCount: ({ commit }, count = 0) => {
+    commit('SET_INBOX_PENDING_TASK_COUNT', count)
+  },
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
   },
@@ -59,6 +68,9 @@ export default {
   toggleFilterDialog: ({ commit }, isShown = false) => {
     commit('TOGGLE_FILTER_DIALOG', isShown)
   },
+  setFilterDialogForView: ({ commit }, state) => {
+    commit('SET_FILTER_DIALOG_FOR_VIEW', state)
+  },
   setSelectedFilter: ({ commit }, selectedFilter) => {
     commit('SET_SELECTED_FILTER', selectedFilter)
   },
@@ -71,7 +83,9 @@ export default {
   setHasMoreCommunications: ({ commit }, hasMore = false) => {
     commit('SET_HAS_MORE_COMMUNICATIONS', hasMore)
   },
-
+  setContacts: ({ commit }, contacts = false) => {
+    commit('SET_CONTACTS', contacts)
+  },
   setSearcherOpen: ({ commit }, isOpen = false) => {
     commit('SET_SEARCHER_OPEN', isOpen)
   },
@@ -89,5 +103,17 @@ export default {
   },
   setIsInboxFiltersLoaded: ({ commit }, value) => {
     commit('SET_IS_INBOX_FILTERS_LOADED', value)
+  },
+  setPinnedViews: ({ commit }, value) => {
+    commit('SET_PINNED_VIEWS', value)
+  },
+  setInboxPersonalFilters: ({ commit }, value) => {
+    commit('SET_INBOX_PERSONAL_FILTERS', value)
+  },
+  setInboxCompanyFilters: ({ commit }, value) => {
+    commit('SET_INBOX_COMPANY_FILTERS', value)
+  },
+  setIsEditingView: ({ commit }, value) => {
+    commit('SET_IS_EDITING_VIEW', value)
   }
 }

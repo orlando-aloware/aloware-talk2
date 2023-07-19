@@ -475,8 +475,8 @@ export default {
       counts (params, cancelTokenSource) {
         return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
-      inboxCounts () {
-        return window.axios.get(`/api/v2/contacts/inbox-counts`)
+      inboxCounts (params) {
+        return window.axios.get(`/api/v2/contacts/inbox-counts`, params)
       },
       taskStatusUpdate (id, params) {
         return window.axios.put(`/api/v2/contacts/${id}/task-status`, params)

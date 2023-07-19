@@ -78,6 +78,7 @@ jobs:
           ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
+          DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
           file-name: .env.prod
 
       - name: Build/release Electron win app
@@ -122,3 +123,6 @@ jobs:
           SENTRY_ORG: ${{ secrets.sentry_org }}
           SENTRY_PROJECT: ${{ secrets.sentry_project }}
           #SENTRY_VERSION: ${{ secrets.sentry_version }}
+
+          # Demo Company Ids
+          DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
