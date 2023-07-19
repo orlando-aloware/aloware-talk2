@@ -20,17 +20,20 @@
       <template v-slot:option="scope">
         <q-item v-if="!scope.opt.group"
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-        >
+                v-on="scope.itemEvents">
           <q-item-section>
             <q-item-label v-html="scope.opt.name"></q-item-label>
             <q-item-label caption>{{ scope.opt.email }}</q-item-label>
           </q-item-section>
+          <q-item-section side>
+            <q-badge v-if="isNotARegisteredLine(scope.opt)" color="red">
+              Not registered
+            </q-badge>
+          </q-item-section>
         </q-item>
         <q-item v-if="scope.opt.group"
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-        >
+                v-on="scope.itemEvents">
           <q-item-label header class="group-label">{{ scope.opt.group }}</q-item-label>
         </q-item>
       </template>
@@ -49,7 +52,8 @@ import {
   contactMixin,
   contactV2AttributesMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  selectorMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 
@@ -60,7 +64,8 @@ export default {
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    selectorMixin
   ],
 
   props: {

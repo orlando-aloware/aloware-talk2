@@ -330,10 +330,6 @@ export default {
       })
     },
 
-    isNotARegisteredLine (campaign) {
-      return campaign && campaign?.is_10_dlc && !campaign?.is_a2p_registered
-    },
-
     updateLines (val) {
       if (!this.genericMultiselect) {
         this.$refs.lineSelect.blur()
