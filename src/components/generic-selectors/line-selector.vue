@@ -50,7 +50,9 @@
             <q-item-label>{{ opt.name }}</q-item-label>
           </q-item-section>
           <q-item-section v-if="isNotARegisteredLine(opt)" side>
-            Not registered
+            <q-badge color="red">
+              Not registered
+            </q-badge>
           </q-item-section>
         </q-item>
       </template>
