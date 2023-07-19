@@ -224,7 +224,7 @@ export default {
     },
 
     isNotARegisteredLine (campaign) {
-      return campaign && campaign?.is_10_dlc && !campaign?.is_a2p_registered
+      return campaign && campaign.is_10_dlc && !campaign.is_a2p_registered
     }
   },
   watch: {

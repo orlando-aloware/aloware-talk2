@@ -71,6 +71,11 @@
         </div>
       </div>
     </div>
+    <div v-if="isNotARegisteredLine(selectedLine)" class="composer-footer">
+      <div class="compliance-badge mb-2">
+        Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
+      </div>
+    </div>
   </div>
 </template>
 
@@ -81,7 +86,8 @@ import {
   contactMixin,
   contactV2AttributesMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  selectorMixin
 } from 'src/plugins/mixins'
 import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
@@ -99,7 +105,8 @@ export default {
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    selectorMixin
   ],
 
   props: {

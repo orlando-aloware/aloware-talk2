@@ -282,12 +282,6 @@ export default {
 
     selectedLine () {
       return this.campaigns.find(campaign => campaign.id === this.selectedId)
-    },
-
-    selectedLineIsNotRegistered () {
-      const campaign = this.selectedLine
-
-      return campaign && campaign?.is_10_dlc && !campaign?.is_a2p_registered
     }
   },
 

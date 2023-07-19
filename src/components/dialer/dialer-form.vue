@@ -27,7 +27,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="selectedLineIsNotRegistered" class="compliance-badge mb-2">
+            <div v-if="isNotARegisteredLine(selectedCampaign)" class="compliance-badge mb-2">
               Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
             </div>
           </b-form-group>
@@ -91,7 +91,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="selectedLineIsNotRegistered" class="compliance-badge mb-2">
+            <div v-if="isNotARegisteredLine(selectedCampaign)" class="compliance-badge mb-2">
               Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
             </div>
           </b-form-group>
@@ -190,7 +190,7 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import { aclMixin, contactMixin, contactV2AttributesMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
@@ -200,7 +200,8 @@ export default {
     contactV2AttributesMixin,
     timezoneCheckMixin,
     visibilityMixin,
-    aclMixin
+    aclMixin,
+    selectorMixin
   ],
 
   components: {
@@ -298,10 +299,6 @@ export default {
         callClass,
         modeClass
       ]
-    },
-
-    selectedLineIsNotRegistered () {
-      return this.selectedCampaign && this.selectedCampaign?.is_10_dlc && !this.selectedCampaign?.is_a2p_registered
     }
   },
 
