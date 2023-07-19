@@ -41,7 +41,7 @@
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text"
                :class="callStatusClass"
-               v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX].includes(contact.last_communication.type)">
+               v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX, CommunicationTypes.NOTE].includes(contact.last_communication.type)">
             <q-tooltip>
               {{ communicationLabel }}
             </q-tooltip>
@@ -54,7 +54,7 @@
           </div>
           <div class="truncated-text"
                :class="appointmentReminderTextClass"
-               v-if="contact.last_communication.body !== null">
+               v-if="contact.last_communication.body !== null && ![CommunicationTypes.NOTE].includes(contact.last_communication.type)">
             {{ contact.last_communication.body }}
           </div>
 
