@@ -82,8 +82,9 @@
                         :state="validCampaign">
             <line-selector class="line-selector"
                            prepend="From:"
+                           check-blocked-messaging
                            :generic-multiselect="false"
-                           :useOnlyActives="true"
+                           :use-only-actives="true"
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
