@@ -28,7 +28,7 @@
                            @change="changeCampaignId">
             </line-selector>
             <div v-if="selectedLineIsNotRegistered" class="compliance-badge mb-2">
-              Due to regulatory requirements from carriers you are unable to send out automated messages using broadcasts and sequences, please register your lines to access this feature.
+              Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
@@ -92,7 +92,7 @@
                            @change="changeCampaignId">
             </line-selector>
             <div v-if="selectedLineIsNotRegistered" class="compliance-badge mb-2">
-              Due to regulatory requirements from carriers you are unable to send out automated messages using broadcasts and sequences, please register your lines to access this feature.
+              Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
