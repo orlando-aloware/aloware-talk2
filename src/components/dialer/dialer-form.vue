@@ -88,6 +88,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
+            <p v-if="selectedLineIsNotRegistered">ERROR MESSAGE</p>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
@@ -238,7 +239,8 @@ export default {
       'dialer',
       'parkedCalls',
       'loadingParkedCalls',
-      'isMobile'
+      'isMobile',
+      'campaigns'
     ]),
 
     ...mapGetters('auth', ['profile']),
@@ -291,6 +293,10 @@ export default {
         callClass,
         modeClass
       ]
+    },
+
+    selectedLineIsNotRegistered () {
+      return this.selectedCampaign && this.selectedCampaign?.is_10_dlc && !this.selectedCampaign?.is_a2p_registered
     }
   },
 
@@ -399,6 +405,7 @@ export default {
 
     changeCampaignId (campaignId) {
       this.campaignId = campaignId
+      this.selectedCampaignId = campaignId
     },
 
     findDefaultOutboundCampaign () {

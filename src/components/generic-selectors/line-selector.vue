@@ -45,11 +45,11 @@
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
       <template v-slot:option="{ itemProps, opt }">
-        <q-item clickable v-bind="itemProps">
+        <q-item v-bind="itemProps" @click.native="selectOption(opt)">
           <q-item-section>
             <q-item-label>{{ opt.name }}</q-item-label>
           </q-item-section>
-          <q-item-section side>
+          <q-item-section v-if="isNotARegisteredLine(opt)" side>
             Not registered
           </q-item-section>
         </q-item>
@@ -208,7 +208,6 @@ export default {
 
   data () {
     return {
-      // campaignId: this.value || null,
       selectedId: null,
       options: [],
       reference: 'lineSelect',
@@ -282,6 +281,16 @@ export default {
         this.highlighted ? this.highlightedClass : '',
         this.specificClass ? this.specificClass : ''
       ]
+    },
+
+    selectedLine () {
+      return this.campaigns.find(campaign => campaign.id === this.selectedId)
+    },
+
+    selectedLineIsNotRegistered () {
+      const campaign = this.selectedLine
+
+      return campaign && campaign?.is_10_dlc && !campaign?.is_a2p_registered
     }
   },
 
@@ -294,6 +303,10 @@ export default {
   },
 
   methods: {
+    selectOption (option) {
+      this.selectedId = option.id
+    },
+
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
@@ -313,6 +326,10 @@ export default {
         const needle = val.toLowerCase()
         this.options = this.activeCampaignsAlphabeticalOrder.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    isNotARegisteredLine (campaign) {
+      return campaign && campaign?.is_10_dlc && !campaign?.is_a2p_registered
     },
 
     updateLines (val) {
