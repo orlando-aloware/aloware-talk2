@@ -54,8 +54,8 @@
           </div>
           <div class="truncated-text"
                :class="appointmentReminderTextClass"
-               v-if="contact.last_communication.body !== null">
-            {{ parsedBody }}
+               v-if="contact.last_communication.body !== null"
+               v-html="parsedBody">
           </div>
 
         </div>
