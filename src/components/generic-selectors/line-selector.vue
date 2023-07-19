@@ -44,6 +44,19 @@
                 v-if="prepend">
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
+      <template v-slot:option="{ itemProps, opt }">
+        <q-item clickable v-bind="itemProps">
+          <q-item-section>
+            <q-item-label>{{ opt.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            Not registered
+          </q-item-section>
+        </q-item>
+      </template>
+      <template v-slot:selected-item="{ opt }">
+        {{ opt.name }}
+      </template>
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
@@ -183,6 +196,11 @@ export default {
     },
 
     borderless: {
+      type: Boolean,
+      default: false
+    },
+
+    checkBlockedMessaging: {
       type: Boolean,
       default: false
     }
