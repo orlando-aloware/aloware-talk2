@@ -429,7 +429,6 @@ export default {
         }
 
         this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
-        console.log(this.defaultFilterModel.filter, this.filter)
         this.applyFilter()
       }
     },

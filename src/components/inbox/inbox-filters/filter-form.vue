@@ -274,8 +274,8 @@
                           emit-value
                           dense
                           outlined
-                          v-model="filter.dynamic_engagement_date_range"
-                          :options="relativeRanges" />
+                          :options="relativeRanges"
+                          v-model="filter.dynamic_engagement_date_range" />
               </b-form-group>
             </b-col>
           </b-form-row>
@@ -489,14 +489,14 @@ export default {
     },
 
     isMentionsOrInboxChannel () {
-      const nonCommunicationChannels = ['mentions', 'inbox', 'views']
+      const nonCommunicationChannels = ['mentions', 'inbox', 'view']
 
       return this.isInboxOrInboxViews ||
         nonCommunicationChannels.includes(this.$route.params.channel)
     },
 
     isInboxOrAllCallsChannel () {
-      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications', 'views']
+      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications', 'view']
 
       return this.isInboxOrInboxViews ||
         nonSmsChannels.includes(this.$route.params.channel)
@@ -529,7 +529,7 @@ export default {
     },
 
     isInboxOrInboxViews () {
-      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'views'].includes(this.$route.params.channel)
+      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel)
     }
   },
 

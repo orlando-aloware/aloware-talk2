@@ -185,15 +185,6 @@ export default {
       this.page = 1
 
       if (loadCount) {
-        // if (this.currentTask === ContactTaskStatus.STATUS_OPEN && showLoading) {
-        //   this.setLoadingOpenTaskCount(true)
-        // }
-        //
-        // if (this.currentTask === ContactTaskStatus.STATUS_PENDING && showLoading) {
-        //   this.setLoadingPendingTaskCount(true)
-        // }
-        //
-        // this.getContactsCountByTaskStatus(this.currentTask)
         this.fetchTaskCounts()
       }
 
@@ -441,24 +432,10 @@ export default {
     },
 
     fetchTaskCounts () {
-      // console.trace('fetch counts')
       this.setLoadingPendingTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
       this.setLoadingOpenTaskCount(true)
       this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-
-      // return talk2Api.V2.contacts.inboxCounts({ cancelToken: this.sourceTasksCounts.token })
-      //   .then(res => {
-      //     this.setLoadingOpenTaskCount(false)
-      //     this.setLoadingPendingTaskCount(false)
-      //
-      //     this.setTaskCount({
-      //       new: res.data.new,
-      //       open: res.data.open,
-      //       pending: res.data.pending,
-      //       closed: res.data.closed
-      //     })
-      //   })
     },
 
     fetchInboxTaskCounts () {
@@ -512,52 +489,6 @@ export default {
         case 'open':
           break
         default:
-      }
-    },
-
-    generateDateRanges (relativeDateRangeOpt) {
-      switch (relativeDateRangeOpt) {
-        case 2: // Today
-          return {
-            from_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD HH:mm:ss')
-          }
-
-        case 3: // Yesterday
-          return {
-            from_date: window.moment.utc().tz(window.timezone).subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss')
-          }
-
-        case 4: // This Week
-          return {
-            from_date: window.moment.utc().tz(window.timezone).startOf('week').format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).endOf('week').format('YYYY-MM-DD HH:mm:ss')
-          }
-
-        case 5: // This Month
-          return {
-            from_date: window.moment.utc().tz(window.timezone).startOf('month').format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).endOf('month').format('YYYY-MM-DD HH:mm:ss')
-          }
-
-        case 6: // Last 7 Days
-          return {
-            from_date: window.moment.utc().tz(window.timezone).subtract(7, 'days').format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD HH:mm:ss')
-          }
-
-        case 7: // Last 30 Days
-          return {
-            from_date: window.moment.utc().tz(window.timezone).subtract(30, 'days').format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD HH:mm:ss')
-          }
-
-        case 8: // Last 3 Months
-          return {
-            from_date: window.moment.utc().tz(window.timezone).subtract(3, 'months').format('YYYY-MM-DD HH:mm:ss'),
-            to_date: window.moment.utc().tz(window.timezone).format('YYYY-MM-DD HH:mm:ss')
-          }
       }
     },
 

@@ -181,11 +181,12 @@
         </div>
       </div>
 
-      <filter-dialog v-model="channelClonedFilter"
-                     :default-filter-model="defaultFilterModel"
+      <filter-dialog :default-filter-model="defaultFilterModel"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
-                     @onResetFilter="onResetFilter" />
+                     @onResetFilter="onResetFilter"
+                     v-model="channelClonedFilter" />
+
       <create-filter-dialog :filter-model="newFilterModel" />
     </div>
 </template>
@@ -430,12 +431,6 @@ export default {
         return
       }
 
-      // this.setLoadingPendingTaskCount(true)
-      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      // this.setLoadingOpenTaskCount(true)
-      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      // this.fetchTaskCounts()
-
       this.loadContactTasks()
         .finally(() => {
           if (this.$route.params.id) {
@@ -512,6 +507,7 @@ export default {
         this.$refs.taskListScroller.scrollTop = 0
       })
 
+      // Inbox View
       if (this.$route.name === 'Inbox View') {
         this.$router.push({
           name: 'Inbox View',
@@ -543,8 +539,6 @@ export default {
       const isOpen = [ContactTaskStatus.STATUS_OPEN].includes(contact.task_status)
 
       if (loadCount && !isOpen) {
-        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
         this.fetchTaskCounts()
       }
 
@@ -625,17 +619,6 @@ export default {
       this.isSearch = false
 
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
-        // switch (this.currentTask) {
-        //   case ContactTaskStatus.STATUS_OPEN:
-        //     this.setLoadingOpenTaskCount(true)
-        //     this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        //     break
-        //
-        //   case ContactTaskStatus.STATUS_PENDING:
-        //     this.setLoadingPendingTaskCount(true)
-        //     this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-        //     break
-        // }
         this.fetchTaskCounts()
       }
 
@@ -720,7 +703,7 @@ export default {
     onRouteChange () {
       this.setStatus()
 
-      if (!['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+      if (!['Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
         return
       }
 
@@ -866,8 +849,6 @@ export default {
 
             // only trigger counts request if action comes from the same user
             if (communication.user_id === this.profile.id) {
-              // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-              // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
               this.fetchTaskCounts()
             }
           }
@@ -1120,8 +1101,6 @@ export default {
 
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
-        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
         this.fetchTaskCounts()
       }
 
@@ -1220,21 +1199,16 @@ export default {
         })
       }
 
-      // this.setLoadingPendingTaskCount(true)
-      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      // this.setLoadingOpenTaskCount(true)
-      // this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      this.fetchTaskCounts()
-
-      this.loadContactTasks(true).finally(() => {
-        if (this.$route.params.id) {
-          const id = this.$route.params.id
-          const contact = this.contactTasks.find(item => item.id.toString() === id)
-          if (contact) {
-            this.setSelectedContact(contact)
+      this.loadContactTasks(true)
+        .finally(() => {
+          if (this.$route.params.id) {
+            const id = this.$route.params.id
+            const contact = this.contactTasks.find(item => item.id.toString() === id)
+            if (contact) {
+              this.setSelectedContact(contact)
+            }
           }
-        }
-      })
+        })
     }, 100)
 
     // process the event from contact.mixin

@@ -18,11 +18,11 @@
 
     <hr>
 
-    <nav-item icon=""
+    <nav-item class="nav-list-group-title d-flex align-items-center justify-content-between"
+              icon=""
               value=""
               label="Views"
-              :group="true"
-              class="nav-list-group-title d-flex align-items-center justify-content-between">
+              :group="true">
       <template #action-icon>
           <q-btn id="edit-views-icon"
                  class="mr-3 cursor-pointer"
@@ -115,7 +115,7 @@ export default {
     ]),
 
     isShowActive () {
-      const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxChannelRoutes.includes(this.$route.name)
+      const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
 
       return !this.$q.screen.lt.md || isMobileInboxRoutes
     }
