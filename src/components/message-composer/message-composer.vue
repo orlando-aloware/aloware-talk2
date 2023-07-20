@@ -66,12 +66,13 @@
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
           <line-selector :campaignId="campaignId"
+                         check-blocked-messaging
                          @change="onLineChange">
           </line-selector>
         </div>
       </div>
     </div>
-    <div v-if="isMessagingBlocked(selectedLine)" class="composer-footer">
+    <div v-if="isMessagingBlocked(selectedLine, true)" class="composer-footer">
       <div class="compliance-badge mb-2">
         {{ selectedLine.blocked_messaging_information['reason'] }}
       </div>

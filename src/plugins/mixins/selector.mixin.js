@@ -223,8 +223,8 @@ export default {
       }
     },
 
-    isMessagingBlocked (campaign, isAutomated = false) {
-      return campaign && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
+    isMessagingBlocked (campaign, checkBlockedMessaging, isAutomated = false) {
+      return checkBlockedMessaging && campaign && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
     }
   },
   watch: {

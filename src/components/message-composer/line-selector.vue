@@ -20,15 +20,13 @@
       <template v-slot:option="scope">
         <q-item v-if="!scope.opt.group"
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
+                v-on="scope.itemEvents"
+                v-close-popup>
           <q-item-section>
             <q-item-label v-html="scope.opt.name"></q-item-label>
-            <q-item-label caption>{{ scope.opt.email }}</q-item-label>
           </q-item-section>
-          <q-item-section side>
-            <q-badge v-if="isMessagingBlocked(scope.opt)" color="red">
-              !
-            </q-badge>
+          <q-item-section v-if="isMessagingBlocked(scope.opt, checkBlockedMessaging)" side>
+            <q-badge color="red">!</q-badge>
           </q-item-section>
         </q-item>
         <q-item v-if="scope.opt.group"
@@ -71,6 +69,11 @@ export default {
   props: {
     campaignId: {
       required: false
+    },
+
+    checkBlockedMessaging: {
+      type: Boolean,
+      default: false
     }
   },
 

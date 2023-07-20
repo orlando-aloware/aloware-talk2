@@ -45,14 +45,12 @@
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
       <template v-slot:option="{ itemProps, opt }">
-        <q-item v-bind="itemProps" @click.native="selectOption(opt)">
+        <q-item v-bind="itemProps" v-close-popup @click.native="selectOption(opt)">
           <q-item-section>
             <q-item-label>{{ opt.name }}</q-item-label>
           </q-item-section>
-          <q-item-section v-if="isMessagingBlocked(opt)" side>
-            <q-badge color="red">
-              !
-            </q-badge>
+          <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging)" side>
+            <q-badge color="red">!</q-badge>
           </q-item-section>
         </q-item>
       </template>
@@ -198,6 +196,11 @@ export default {
     },
 
     borderless: {
+      type: Boolean,
+      default: false
+    },
+
+    checkBlockedMessaging: {
       type: Boolean,
       default: false
     }
