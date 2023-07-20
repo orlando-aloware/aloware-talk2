@@ -39,6 +39,21 @@ export default {
   SET_CLOSED_TASK_COUNT: (state, count) => {
     state.taskCounts = { ...state.taskCounts, closed: count }
   },
+  SET_INBOX_TASK_COUNT: (state, payload) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, ...payload }
+  },
+  SET_INBOX_OPEN_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, open: count }
+  },
+  SET_INBOX_PENDING_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, pending: count }
+  },
+  SET_INBOX_NEW_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, new: count }
+  },
+  SET_INBOX_CLOSED_TASK_COUNT: (state, count) => {
+    state.inboxTaskCounts = { ...state.inboxTaskCounts, closed: count }
+  },
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
   },
@@ -121,6 +136,9 @@ export default {
   TOGGLE_FILTER_DIALOG: (state, isShown = false) => {
     state.isFilterDialogShown = isShown
   },
+  SET_FILTER_DIALOG_FOR_VIEW: (state, value = false) => {
+    state.isFilterDialogForView = value
+  },
   SET_SELECTED_FILTER: (state, filter) => {
     state.selectedFilter = filter
   },
@@ -132,6 +150,9 @@ export default {
   },
   SET_HAS_MORE_COMMUNICATIONS: (state, hasMore) => {
     state.hasMoreCommunications = hasMore
+  },
+  SET_CONTACTS: (state, contacts) => {
+    state.contacts = contacts
   },
   SET_SEARCHER_OPEN: (state, isOpen) => {
     state.isSearcherOpen = isOpen
@@ -173,5 +194,17 @@ export default {
   },
   SET_IS_INBOX_FILTERS_LOADED (state, value) {
     state.isInboxFiltersLoaded = value
+  },
+  SET_PINNED_VIEWS (state, value) {
+    state.pinnedViews = value
+  },
+  SET_INBOX_PERSONAL_FILTERS (state, value) {
+    state.inboxPersonalFilters = value
+  },
+  SET_INBOX_COMPANY_FILTERS (state, value) {
+    state.inboxCompanyFilters = value
+  },
+  SET_IS_EDITING_VIEW (state, value) {
+    state.isEditingView = value
   }
 }

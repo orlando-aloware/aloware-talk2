@@ -15,7 +15,10 @@
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
             </inbox-searcher>
+
             <hr role="separator" aria-orientation="vertical" class="q-separator height-24 margin-auto q-separator q-separator--vertical">
+
+            <!-- reset/close selected filter button -->
             <div class="filter-wrapper"
                  :class="[hasChannelFilterChanges || appliedFilter ? '--highlighted' : '']">
               <compact-btn v-if="hasChannelFilterChanges || appliedFilter"
@@ -25,9 +28,11 @@
                            @clicked="onResetFilter">
                 <i class="fa fa-times"></i>
               </compact-btn>
+
+              <!-- applied/selected filter name -->
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
-                           @clicked="toggleFilterDialog(true)">
+                           @clicked="onClickAppliedFilterButton">
                 <q-tooltip v-if="appliedFilter"
                            anchor="top middle"
                            self="center middle">
@@ -36,9 +41,12 @@
                 <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
                              color="#62666E"
                              class="filter-icon">
-                </filter-icon> {{ !appliedFilter ? '' : appliedFilter.name }}
+                </filter-icon>
+                {{ !appliedFilter ? '' : appliedFilter.name }}
                 {{ !appliedFilter && channelChangedFilterFields.length ? 'Filters' : '' }}
               </compact-btn>
+
+              <!-- applied/selected filter field changes count -->
               <b-badge v-if="hasChannelFilterChanges"
                        class="ml-1 fs-12"
                        variant="primary"
@@ -49,20 +57,20 @@
           </div>
         </template>
       </calls-header>
+
       <div class="w-100"
            v-if="!isSearch">
-        <q-btn-toggle
-          v-model="currentTask"
-          @click="onToggleStatus"
-          :options="options"
-          class="mx-2 mt-2 mb-1 custom-toggle-button"
-          no-caps
-          spread
-          dense
-          unelevated
-          :toggle-color="statusToggleColor"
-          color="transparent"
-          text-color="primary">
+        <q-btn-toggle class="mx-2 mt-2 mb-1 custom-toggle-button"
+                      color="transparent"
+                      text-color="primary"
+                      no-caps
+                      spread
+                      dense
+                      unelevated
+                      :toggle-color="statusToggleColor"
+                      :options="options"
+                      v-model="currentTask"
+                      @click="onToggleStatus">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
@@ -118,11 +126,13 @@
           </template>
         </q-btn-toggle>
       </div>
+
       <search-toggle ref="searchToggle"
                      v-if="isSearch"
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
+
       <div class="w-100 flex-grow-1"
            v-if="liveCalls.length > 0 && !isSearch">
         <inbox-task-list key-prefix="live-call"
@@ -133,6 +143,7 @@
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
       </div>
+
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
            @scroll="handleScroll">
@@ -169,14 +180,14 @@
           </b-overlay>
         </div>
       </div>
-      <filter-dialog v-model="filter"
-                     :default-filter-model="defaultFilterModel"
+
+      <filter-dialog :default-filter-model="defaultFilterModel"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
-                     @onResetFilter="onResetFilter">
-      </filter-dialog>
-      <create-filter-dialog :filter-model="newFilterModel">
-      </create-filter-dialog>
+                     @onResetFilter="onResetFilter"
+                     v-model="channelClonedFilter" />
+
+      <create-filter-dialog :filter-model="newFilterModel" />
     </div>
 </template>
 
@@ -209,6 +220,7 @@ import FilterDialog from 'components/inbox/inbox-filters/filter-dialog'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   name: 'inbox-tab',
@@ -221,7 +233,16 @@ export default {
     contactV2AttributesMixin
   ],
 
-  components: { CreateFilterDialog, FilterDialog, CompactBtn, SearchToggle, InboxSearcher, FilterIcon, InboxTaskList, CallsHeader },
+  components: {
+    CreateFilterDialog,
+    FilterDialog,
+    CompactBtn,
+    SearchToggle,
+    InboxSearcher,
+    FilterIcon,
+    InboxTaskList,
+    CallsHeader
+  },
 
   computed: {
     ...mapState([
@@ -229,49 +250,47 @@ export default {
       'parkedCalls',
       'isMobile'
     ]),
-    ...mapState('inbox',
-      [
-        'taskCounts',
-        'liveContacts',
-        'selectedContact',
-        'hasMoreContacts',
-        'isFetchingContacts',
-        'channelChangedFilterFields',
-        'appliedFilter',
-        'isLoadingOpenTaskCount',
-        'isLoadingPendingTaskCount'
-      ]
-    ),
+
+    ...mapState('inbox', [
+      'taskCounts',
+      'liveContacts',
+      'selectedContact',
+      'hasMoreContacts',
+      'isFetchingContacts',
+      'channelChangedFilterFields',
+      'appliedFilter',
+      'isLoadingOpenTaskCount',
+      'isLoadingPendingTaskCount',
+      'activeChannel',
+      'pinnedViews',
+      'contacts',
+      'channelClonedFilter'
+    ]),
+
     ...mapState('contacts', [
       'contact',
       'isContactMixinUsed'
     ]),
-    statusText () {
-      switch (this.currentTask) {
-        case ContactTaskStatus.STATUS_PENDING:
-          return 'pending'
-        case ContactTaskStatus.STATUS_CLOSED:
-          return 'closed'
-        case ContactTaskStatus.STATUS_OPEN:
-        default:
-          return 'open'
-      }
-    },
+
     statusToggleColor () {
       return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
     },
+
     hasChannelFilterChanges () {
       return this.channelChangedFilterFields.length > 0
     },
+
     filterButtonVariant () {
       return 'outlined-light'
     },
+
     contactTasks () {
       if (this.isSearch) {
         return [
           ...this.contacts
         ]
       }
+
       return [
         ...this.incomingCalls,
         ...this.contacts.filter(item => {
@@ -285,13 +304,16 @@ export default {
         })
       ]
     },
+
     hasLiveCall () {
       return this.dialer.call &&
         this.dialer.call.state === 'open'
     },
+
     hasIncomingLiveCall () {
       return this.incomingCalls.length > 0
     },
+
     incomingCalls () {
       return this.liveContacts.filter(item => {
         const found = [
@@ -315,6 +337,7 @@ export default {
         return found
       })
     },
+
     liveCalls () {
       return [
         // parked calls
@@ -351,6 +374,7 @@ export default {
         })
       ]
     },
+
     changedFilterFieldCount () {
       const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
       if (dateFieldIndex >= 0) {
@@ -361,47 +385,17 @@ export default {
   },
 
   data () {
-    const defaultFilterModel = {
-      campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-      ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-      direction: Filters.DEFAULT_STATE.filter.direction,
-      answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-      min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-      transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-      callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-      tags: Filters.DEFAULT_STATE.filter.tags,
-      call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-      first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-      untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-      exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-      incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-      users: Filters.DEFAULT_STATE.filter.users,
-      workflows: Filters.DEFAULT_STATE.filter.workflows,
-      broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-      contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-      from_date: Filters.DEFAULT_STATE.filter.from_date,
-      to_date: Filters.DEFAULT_STATE.filter.to_date,
-      my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-      creator_type: Filters.DEFAULT_STATE.filter.creator_type
-    }
-
     return {
       searchText: '',
       isSearch: false,
       previousRoute: null,
       newFilterModel: {
         name: '',
-        type: 6,
+        type: ChannelType.CHANNEL_INBOX,
         filter: [],
         scope: 'user'
       },
-      defaultFilterModel: {
-        name: '',
-        type: 6,
-        filter: defaultFilterModel,
-        scope: 'user'
-      },
-      filter: defaultFilterModel,
+      filter: Filters.EXCERPT,
       scrollTimeout: null,
       CommunicationCurrentStatus,
       listeners: {}
@@ -413,55 +407,52 @@ export default {
       'toggleFilterDialog',
       'resetChannelChangedFilterFields',
       'toggleFilterModelForm',
+      'setSelectedFilter',
       'setAppliedFilter',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
       'setLoadingPendingTaskCount',
       'setOpenTaskCount',
       'setPendingTaskCount',
-      'updateChannelChangedFilterFields'
+      'updateChannelChangedFilterFields',
+      'setInboxShowMyContacts',
+      'setFilterDialogForView',
+      'setIsEditingView'
     ]),
-    initInboxTaskRoute () {
-      const inboxRoutes = [
-        'Inbox',
-        'Inbox Channel Task Status',
-        'Inbox Contact Task',
-        'Inbox Contact Communication'
-      ]
 
+    initInboxTaskRoute () {
       // if currently in inbox routes which works with contact's
       // task status, compare if current task is in the correct
       // inbox route
-      if (!inboxRoutes.includes(this.$route.name) ||
-        (inboxRoutes.includes(this.$route.name) &&
+      if (!this.inboxRoutes.includes(this.$route.name) ||
+        (this.inboxRoutes.includes(this.$route.name) &&
           !isEmpty(this.$route.params) &&
           this.$route.params.status !== this.statusText)) {
         return
       }
 
-      this.setLoadingPendingTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      this.setLoadingOpenTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-
-      this.loadContactTasks(false).finally(() => {
-        if (this.$route.params.id) {
-          const id = this.$route.params.id
-          const contact = this.contactTasks.find(item => item.id.toString() === id)
-          if (contact) {
-            this.setSelectedContact(contact)
+      this.loadContactTasks()
+        .finally(() => {
+          if (this.$route.params.id) {
+            const id = this.$route.params.id
+            const contact = this.contactTasks.find(item => item.id.toString() === id)
+            if (contact) {
+              this.setSelectedContact(contact)
+            }
           }
-        }
-      })
+        })
     },
+
     sortContactTasks (value) {
       this.sorting.order = value ? (value === 'newest' ? 'desc' : 'asc') : 'desc'
     },
+
     handleScroll (el) {
       if ((el.target.offsetHeight + el.target.scrollTop) >= (el.target.scrollHeight - 70) && el.target.scrollTop > 0) {
         this.onTaskListBottomScroll()
       }
     },
+
     onTaskListBottomScroll () {
       clearTimeout(this.scrollTimeout)
       // Set a timeout to run after scrolling ends
@@ -473,6 +464,7 @@ export default {
         }
       }, 66)
     },
+
     updateContacts (updatedContact) {
       const index = this.contacts.findIndex(contact => contact.id === updatedContact.id)
 
@@ -480,28 +472,18 @@ export default {
         Object.assign(this.contacts[index], updatedContact)
       }
     },
+
     resetList () {
       this.setContacts([])
       this.page = 1
       this.isLoaded = false
       this.loadContactTasks()
+
       if (!this.$route.params.id) {
         this.setSelectedContact({})
       }
     },
-    setStatus () {
-      switch (this.$route.params.status) {
-        case 'pending':
-          this.currentTask = ContactTaskStatus.STATUS_PENDING
-          break
-        case 'closed':
-          this.currentTask = ContactTaskStatus.STATUS_CLOSED
-          break
-        case 'open':
-          break
-        default:
-      }
-    },
+
     getStatusName (taskStatusId) {
       switch (taskStatusId) {
         case ContactTaskStatus.STATUS_PENDING:
@@ -525,6 +507,22 @@ export default {
         this.$refs.taskListScroller.scrollTop = 0
       })
 
+      // Inbox View
+      if (this.$route.name === 'Inbox View') {
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: this.$route.params.viewId,
+            status: this.statusText,
+            channel: 'view'
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+
+        return
+      }
+
       this.$router.push({
         name: 'Inbox Channel Task Status',
         params: {
@@ -535,13 +533,13 @@ export default {
         console.log(err)
       })
     },
+
     async onItemRemoved (contact, callback, loadCount = true) {
       // avoid request in duplicity when task is moved to open
       const isOpen = [ContactTaskStatus.STATUS_OPEN].includes(contact.task_status)
 
       if (loadCount && !isOpen) {
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.fetchTaskCounts()
       }
 
       const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
@@ -551,28 +549,48 @@ export default {
         callback()
       }
     },
+
     onItemSelected (contact) {
       this.setSelectedContact(contact)
       const contactId = get(contact, 'id', null)
-      if (contactId) {
-        if (this.currentTask !== contact.task_status) {
-          this.currentTask = contact.task_status
-        }
 
+      if (!contactId) {
+        return
+      }
+
+      if (this.currentTask !== contact.task_status) {
+        this.currentTask = contact.task_status
+      }
+
+      if (this.inboxViewsRoutes.includes(this.$route.name)) {
         this.$emit('itemSelected', {
-          name: 'Inbox Contact Task',
+          name: 'Inbox View Contact Task',
           params: {
             id: contactId.toString(),
-            channel: 'inbox',
+            channel: 'view',
+            viewId: this.$route.params.viewId,
             status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
           }
         })
+
+        return
       }
+
+      this.$emit('itemSelected', {
+        name: 'Inbox Contact Task',
+        params: {
+          id: contactId.toString(),
+          channel: 'inbox',
+          status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
+        }
+      })
     },
+
     onFilterItemSelected (item) {
       this.resetFilters()
       this.lineOrRingGroupFilter = item
     },
+
     makeSelectedItemVisible () {
       const container = document.querySelector('.task-list-scroller')
       const target = document.querySelector('.contact-task-item.active')
@@ -581,9 +599,11 @@ export default {
         container.scrollTop = target.offsetTop - 757
       }
     },
+
     onSearch (value) {
       this.searchText = value
     },
+
     onSearchOpened () {
       this.setHasMoreContacts(null)
       this.setContacts([])
@@ -592,69 +612,75 @@ export default {
         this.$refs.searchToggle.inputFocus()
       }.bind(this))
     },
+
     onSearchClosed () {
       this.searchText = ''
       this.setContacts([])
       this.isSearch = false
 
       if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.currentTask)) {
-        if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
-          this.setLoadingPendingTaskCount(true)
-          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-        }
-
-        if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
-          this.setLoadingOpenTaskCount(true)
-          this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        }
+        this.fetchTaskCounts()
       }
 
-      if (this.$route.params.status === this.statusText || this.$route.name === 'Inbox') {
+      if (this.$route.params.status === this.statusText || ['Inbox', 'Inbox View'].includes(this.$route.name)) {
         this.loadContactTasks()
       }
     },
+
     searching (value) {
-      if ((value && value.length >= 3) || value === '') {
-        if (value === '') {
-          this.setContacts([])
-        } else {
-          this.searchText = value
-          this.loadContactTasks()
-        }
+      if (value === '') {
+        this.setContacts([])
+      }
+
+      if (value && value.length >= 3) {
+        this.searchText = value
+        this.loadContactTasks()
       }
     },
+
     resetFilter () {
       this.filter = { ...this.defaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
+      this.setSelectedFilter(null)
       this.setAppliedFilter(null)
     },
-    loadTaskCounts () {
-      if ([ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
-        this.setLoadingPendingTaskCount(true)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      }
 
-      if ([ContactTaskStatus.STATUS_PENDING, ContactTaskStatus.STATUS_CLOSED].includes(this.currentTask)) {
-        this.setLoadingOpenTaskCount()
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      }
-    },
     onResetFilter () {
       this.resetFilter()
+
+      // redirect
+      if (this.$route.params?.viewId) {
+        this.$router.push({
+          name: 'Inbox Channel Task Status',
+          params: {
+            channel: 'inbox',
+            status: this.statusText
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+
+        return
+      }
+
       this.loadContactTasks()
-      this.loadTaskCounts()
+      this.fetchInboxTaskCounts()
     },
+
     onApplyFilter (filter) {
       this.filter = filter
       this.isLoaded = false
+      this.setChannelClonedFilter(this.filter)
       this.loadContactTasks()
-      this.loadTaskCounts()
+      this.fetchTaskCounts()
     },
+
     onCreateNewFilter (filter) {
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.defaultFilterModel.type }
       this.toggleFilterModelForm(true)
     },
+
     updateContact (contact) {
       if (isEmpty(this.contact) ||
         isEmpty(contact) ||
@@ -673,28 +699,36 @@ export default {
       Object.assign(currentContact, contactNoCommAndAudits)
       this.setSelectedContact(currentContact)
     },
+
     onRouteChange () {
       this.setStatus()
-      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
-        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
-          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
-        }
 
-        this.lineOrRingGroupFilter = null
-        // prevent reset of filters if coming from the root
-        if (!this.$route.params.id) {
-          this.resetList()
-        } else {
-          if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
-            this.loadContactTasks()
-          }
-        }
+      if (!['Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) {
+        return
+      }
+
+      if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+        this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+      }
+
+      this.lineOrRingGroupFilter = null
+
+      // prevent reset of filters if coming from the root
+      if (!this.$route.params.id) {
+        this.resetList()
+        return
+      }
+
+      if (!this.isSearch && this.previousRoute.name !== 'Inbox') {
+        this.loadContactTasks()
       }
     },
+
     onRouteNameChange () {
       this.currentTask = ContactTaskStatus.STATUS_OPEN
       this.resetList()
     },
+
     checkFilterAndUnownedContact (contact) {
       if (this.dialer.communication &&
         contact.last_communication &&
@@ -726,6 +760,7 @@ export default {
 
       return null
     },
+
     processNewCommunicationEvent (data, communication) {
       const contact = this.$jsonClone(data)
 
@@ -814,13 +849,23 @@ export default {
 
             // only trigger counts request if action comes from the same user
             if (communication.user_id === this.profile.id) {
-              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-              this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+              this.fetchTaskCounts()
             }
           }
         }
       }
     },
+
+    onClickAppliedFilterButton () {
+      if (this.$route.params?.viewId) {
+        this.setSelectedFilter(this.appliedFilter)
+        this.setFilterDialogForView(true)
+        this.setIsEditingView(true)
+      }
+
+      this.toggleFilterDialog(true)
+    },
+
     startInboxListeners () {
       this.$VueEvent.listen('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
       this.$VueEvent.listen('navigate_task_tab', this.listeners.navigateTaskTab)
@@ -833,6 +878,7 @@ export default {
       this.$VueEvent.listen('inbox_load_contacts', this.listeners.inboxLoadContacts)
       this.$VueEvent.listen('inbox_contact_updated', this.listeners.inboxContactUpdated)
     },
+
     stopInboxListeners () {
       this.$VueEvent.stop('load_and_navigate_inbox_tab', this.listeners.loadAndNavigateInboxTab)
       this.$VueEvent.stop('navigate_task_tab', this.listeners.navigateTaskTab)
@@ -848,16 +894,21 @@ export default {
   },
 
   created () {
-    this.resetFilter()
+    if (this.$route.name !== 'Inbox View') {
+      this.resetFilter()
+    }
     this.toggleFilterDialog(false)
   },
 
   mounted () {
     this.setContacts([])
     this.setStatus()
-    this.initInboxTaskRoute()
 
-    if (['Inbox Channel', 'Inbox'].includes(this.$route.name)) {
+    if (this.$route.name !== 'Inbox View') {
+      this.initInboxTaskRoute()
+    }
+
+    if (['Inbox Channel', 'Inbox', 'Inbox View'].includes(this.$route.name)) {
       this.setSelectedContact({})
     }
 
@@ -1050,8 +1101,7 @@ export default {
 
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-        this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
+        this.fetchTaskCounts()
       }
 
       const index = this.contacts.findIndex(item => item.id === contact.id)
@@ -1149,19 +1199,16 @@ export default {
         })
       }
 
-      this.setLoadingPendingTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
-      this.setLoadingOpenTaskCount(true)
-      this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_OPEN)
-      this.loadContactTasks(false).finally(() => {
-        if (this.$route.params.id) {
-          const id = this.$route.params.id
-          const contact = this.contactTasks.find(item => item.id.toString() === id)
-          if (contact) {
-            this.setSelectedContact(contact)
+      this.loadContactTasks(true)
+        .finally(() => {
+          if (this.$route.params.id) {
+            const id = this.$route.params.id
+            const contact = this.contactTasks.find(item => item.id.toString() === id)
+            if (contact) {
+              this.setSelectedContact(contact)
+            }
           }
-        }
-      })
+        })
     }, 100)
 
     // process the event from contact.mixin
@@ -1189,40 +1236,60 @@ export default {
 
   watch: {
     $route (to, from) {
+      // load contacts if not inbox view related route
+      if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
+        this.loadContactTasks(false)
+        this.fetchTaskCounts()
+        this.setInboxShowMyContacts(false)
+      }
+
+      // load contacts for inbox
+      if (this.inboxViewsRoutes.includes(to.name) && !this.inboxViewsRoutes.includes(to.name)) {
+        this.fetchInboxTaskCounts()
+      }
+
       this.previousRoute = from
     },
+
     'sorting.order': function () {
       this.setContacts([])
       this.loadContactTasks()
     },
+
     '$route.params.status': function () {
       this.setStatus()
-      if (this.isSearch || (this.previousRoute.name === 'Inbox' && this.currentTask === ContactTaskStatus.STATUS_OPEN)) {
+
+      if (this.isSearch || (['Inbox', 'Inbox View'].includes[this.previousRoute.name] && this.currentTask === ContactTaskStatus.STATUS_OPEN)) {
         return
       }
 
-      if (['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name)) {
-        if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
-          this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
-        }
+      if (!['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View'].includes(this.$route.name)) {
+        return
+      }
 
-        this.lineOrRingGroupFilter = null
+      if (this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase() !== this.$route.params.status) {
+        this.currentTask = this.$options.filters.getTaskStatusIdByName(this.$route.params.status)
+      }
 
-        // avoid contacts refresh if status is not expected
-        if (!['open', 'pending', 'closed'].includes(this.$route.params.status)) {
-          return
-        }
+      this.lineOrRingGroupFilter = null
 
-        // prevent reset of filters if coming from the root
-        if (!this.$route.params.id) {
-          this.resetList()
-        } else {
-          if ((!this.isSearch && this.previousRoute.name !== 'Inbox') || this.$route.params.id) {
-            this.loadContactTasks()
-          }
-        }
+      // avoid contacts refresh if status is not expected
+      if (!['open', 'pending', 'closed'].includes(this.$route.params.status)) {
+        return
+      }
+
+      // prevent reset of filters if coming from the root
+      if (this.$route.name !== 'Inbox View' && !this.$route.params.id) {
+        this.resetList()
+
+        return
+      }
+
+      if ((!this.isSearch && ['Inbox', 'Inbox View'].includes(this.previousRoute.name)) || this.$route.params.id) {
+        this.loadContactTasks()
       }
     },
+
     '$route.name': function (value) {
       if (['Inbox'].includes(value)) {
         this.searchText = ''
@@ -1235,6 +1302,7 @@ export default {
         }
       }
     },
+
     '$route.params.id': function (value) {
       if (['Inbox Contact Communication', 'Inbox Contact Task'].includes(this.$route.name) && value && this.contactTasks && this.contactTasks.length) {
         const contact = this.contactTasks.find(item => item.id.toString() === value)
@@ -1247,6 +1315,7 @@ export default {
         this.setSelectedContact({})
       }
     },
+
     '$route.params.channel': function () {
       if (this.$route.name === 'Inbox Channel') {
         this.isSearch = false
