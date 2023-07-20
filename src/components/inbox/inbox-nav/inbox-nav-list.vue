@@ -18,23 +18,23 @@
 
     <hr>
 
-    <nav-item class="nav-list-group-title d-flex align-items-center justify-content-between"
-              icon=""
-              value=""
-              label="Views"
-              :group="true">
-      <template #action-icon>
-          <q-btn id="edit-views-icon"
-                 class="mr-3 cursor-pointer"
-                 icon="edit"
-                 size="xs"
-                 flat
-                 @click="onShowViewsList"/>
-      </template>
-    </nav-item>
+    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isJobNimbus">
+      <nav-item class="nav-list-group-title d-flex align-items-center justify-content-between"
+                icon=""
+                value=""
+                label="Views"
+                :group="true">
+        <template #action-icon>
+            <q-btn id="edit-views-icon"
+                   class="mr-3 cursor-pointer"
+                   icon="edit"
+                   size="xs"
+                   flat
+                   @click="onShowViewsList"/>
+        </template>
+      </nav-item>
 
-    <!-- list only pinned views -->
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id)">
+      <!-- list only pinned views -->
       <nav-item :icon="!+view.filter?.is_on_company ? 'view' : ''"
                 :value="`view-${view.filter_id}`"
                 :label="view.filter.name"
@@ -158,7 +158,7 @@ export default {
   },
 
   created () {
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)) {
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isJobNimbus) {
       this.getFilters()
         .then(() => {
           if (this.$route.params?.viewId) {

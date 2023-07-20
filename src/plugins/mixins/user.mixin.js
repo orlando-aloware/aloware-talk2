@@ -5,7 +5,11 @@ import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   computed: {
-    ...mapState(['users'])
+    ...mapState(['users']),
+
+    isJobNimbus () {
+      return this.profile.company_id === 1261
+    }
   },
 
   methods: {
