@@ -187,11 +187,15 @@ export default {
     },
 
     footerComponent () {
+      const isIntegration = !isEmpty(this.source.integration?.list)
+      const isIntegrationHubspot = isIntegration && this.source.integration.name === 'HubSpot'
+
       switch (true) {
-        // FIXME: use mainComponentValid?
-        case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || !isEmpty(this.source.filters) || !isEmpty(this.source.integration?.list)):
+        // if integrations, enabled only for HubSpot
+        case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || !isEmpty(this.source.filters) || isIntegrationHubspot):
           return 'broadcast-contacts-preview'
-        case this.currentStep.id === 2 || this.currentStep.id === 3 || this.currentStep.id === 4:
+        // if integrations, enabled only for HubSpot
+        case (this.currentStep.id === 2 || this.currentStep.id === 3 || this.currentStep.id === 4) && (isIntegration ? isIntegrationHubspot : true):
           return 'broadcast-add-cards'
         default:
           return null
@@ -225,7 +229,7 @@ export default {
     isStepValid () {
       switch (this.currentStep.id) {
         case 1:
-          return this.isMainComponentValid && this.isFooterComponentValid
+          return this.isMainComponentValid && (this.footerComponent ? this.isFooterComponentValid : true)
         case 2:
         case 3:
         case 4:
@@ -243,7 +247,7 @@ export default {
     source: {},
     contactPreview: {},
     contactsLength: 0,
-    type: null, // sms, voicemail
+    type: 'sms', // sms, voicemail
     rvm: null,
     price: 0,
     campaign: null,

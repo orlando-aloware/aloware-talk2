@@ -3,7 +3,7 @@
     <div class="broadcast-add__preview__row">
       <div class="broadcast-add__preview__row__label">To</div>
       <div class="broadcast-add__preview__row__field">
-        {{ sourceText }} ({{ contactsText }})
+        {{ sourceText }} {{ contactsText }}
       </div>
     </div>
 
@@ -115,19 +115,21 @@ export default {
     },
 
     sourceText () {
-      if (!isEmpty(this.source.list)) {
-        return this.source.list.name
+      switch (true) {
+        case !isEmpty(this.source.list):
+          return this.source.list.name
+
+        case !isEmpty(this.source.filters):
+          return 'Custom filters'
+
+        case !isEmpty(this.source.integration) && this.source.integration.name === 'Zoho':
+          return this.source.integration.list.name
+
+          // FIXME: add Hubspot and Pipedrive
+
+        default:
+          return ''
       }
-
-      if (!isEmpty(this.source.filters)) {
-        return 'Custom filters'
-      }
-
-      // FIXME: to be implemented
-      // if (!isEmpty(this.source.integration)) {
-      // }
-
-      return ''
     },
 
     campaignText () {
@@ -135,7 +137,11 @@ export default {
     },
 
     contactsText () {
-      return this.contactsLength + (this.contactsLength === 1 ? ' Contact' : ' Contacts')
+      if (!this.contactsLength) {
+        return ''
+      }
+
+      return '(' + this.contactsLength + (this.contactsLength === 1 ? ' Contact' : ' Contacts') + ')'
     },
 
     scheduleText () {
