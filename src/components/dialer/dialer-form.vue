@@ -27,9 +27,6 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="isMessagingBlocked(selectedCampaign)" class="compliance-badge mb-2">
-              {{ selectedCampaign.blocked_messaging_information['reason'] }}
-            </div>
           </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
@@ -91,7 +88,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="isMessagingBlocked(selectedCampaign)" class="compliance-badge mb-2">
+            <div v-if="isMessagingBlocked(selectedCampaign, true)" class="compliance-badge mb-2">
               {{ selectedCampaign.blocked_messaging_information['reason'] }}
             </div>
           </b-form-group>
@@ -135,7 +132,7 @@
                   <q-btn class="height-16 no-q-btn-focus"
                          padding="none"
                          flat
-                         :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign)"
+                         :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign, true)"
                          :ripple="false"
                          @click="sendText">
                     <send-text-icon :width="isMobile ? 18 : 16"
@@ -407,7 +404,6 @@ export default {
 
     changeCampaignId (campaignId) {
       this.campaignId = campaignId
-      this.selectedCampaignId = campaignId
     },
 
     findDefaultOutboundCampaign () {
@@ -534,6 +530,10 @@ export default {
       }
 
       this.hideDialer()
+    },
+
+    campaignId (value) {
+      this.selectedCampaignId = value
     },
 
     'dialer.currentStatus': function () {
