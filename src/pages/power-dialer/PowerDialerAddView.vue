@@ -71,7 +71,7 @@
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
           <span class="small text-muted selected-contacts mr-2">
-            <template v-if="!isDatatableCountLoading">{{ contactCount | numFormat }} Contacts</template>
+            <template v-if="!isDatatableCountLoading">{{ contactsCountText }}</template>
             <q-skeleton type="text"
                         style="width:80px"
                         v-else/>
@@ -89,7 +89,7 @@
                        v-if="hasAppliedFilters">
                 {{ filtersCount }}
               </b-badge>
-              <span class="pl-2  pr-2">Filters</span>
+              <span class="pl-2  pr-2">{{ filtersText }}</span>
             </compact-btn>
             <compact-btn customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
                          variant="outlined-light"

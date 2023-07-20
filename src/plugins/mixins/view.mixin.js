@@ -156,6 +156,16 @@ export default {
 
     cleanedListId () {
       return this.getCleanedListId(this.$route?.params?.id)
+    },
+
+    contactsCountText () {
+      const postfix = this.contactCount > 1 ? 's' : ''
+
+      return `${this.$options.filters.numFormat(this.contactCount)} Contact${postfix}`
+    },
+
+    filtersText () {
+      return this.filtersCount > 1 ? 'Filters' : 'Filter'
     }
   },
 

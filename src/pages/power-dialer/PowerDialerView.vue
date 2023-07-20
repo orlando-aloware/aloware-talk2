@@ -760,7 +760,10 @@ export default {
           total = list.total_items
       }
 
-      return `${this.selectedAllCount} of ${total || 0} Contacts`
+      const totalContacts = total || 0
+      const postfix = totalContacts > 1 ? 's' : ''
+
+      return `${this.selectedAllCount} of ${totalContacts} Contact${postfix}`
     },
 
     activeList () {
