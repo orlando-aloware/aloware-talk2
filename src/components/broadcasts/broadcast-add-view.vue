@@ -395,11 +395,23 @@ export default {
 
       bulkMessage.talk_filters = !isEmpty(this.source.filters) ? this.source.filters : null
       bulkMessage.contact_list_id = !isEmpty(this.source.list) ? this.source.list.id : null
-      bulkMessage.list_id = !isEmpty(this.source.integration?.list) ? this.source.integration.list.listId : null
 
-      // to be implemented
-      // view_id: null, // Zoho
-      // filter_id: null, // Pipedrive
+      if (!isEmpty(this.source.integration?.list)) {
+        switch (this.source.integration.name) {
+          case 'HubSpot':
+            bulkMessage.list_id = this.source.integration.list.listId
+
+            break
+          case 'Zoho':
+            bulkMessage.view_id = this.source.integration.list.id
+
+            break
+          case 'Pipedrive':
+            bulkMessage.filter_id = this.source.integration.list.id
+
+            break
+        }
+      }
 
       API.V1.broadcasts[method](bulkMessage)
         .then(() => {

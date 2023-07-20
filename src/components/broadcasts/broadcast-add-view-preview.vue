@@ -122,10 +122,8 @@ export default {
         case !isEmpty(this.source.filters):
           return 'Custom filters'
 
-        case !isEmpty(this.source.integration) && this.source.integration.name === 'Zoho':
+        case !isEmpty(this.source.integration):
           return this.source.integration.list.name
-
-          // FIXME: add Hubspot and Pipedrive
 
         default:
           return ''
