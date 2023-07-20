@@ -139,7 +139,7 @@ export default {
     },
 
     isSmsDisabled () {
-      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS) || this.isMessagingBlocked(this.selectedLine)
+      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS) || this.isMessagingBlocked(this.selectedLine, true)
     },
 
     isPhoneNumberInvalid () {
