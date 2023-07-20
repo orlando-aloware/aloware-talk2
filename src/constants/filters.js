@@ -44,6 +44,33 @@ export const DEFAULT_STATE = {
     owners: [],
     my_contact: 0,
     contact_owner: [],
-    creator_type: null
+    creator_type: null,
+    dynamic_engagement_date_range: 0
   }
+}
+
+export const EXCERPT = {
+  campaigns: DEFAULT_STATE.filter.campaigns,
+  ring_groups: DEFAULT_STATE.filter.ring_groups,
+  direction: DEFAULT_STATE.filter.direction,
+  answer_status: DEFAULT_STATE.filter.answer_status,
+  min_talk_time: DEFAULT_STATE.filter.min_talk_time,
+  transfer_type: DEFAULT_STATE.filter.transfer_type,
+  callback_status: DEFAULT_STATE.filter.callback_status,
+  tags: DEFAULT_STATE.filter.tags,
+  call_dispositions: DEFAULT_STATE.filter.call_dispositions,
+  first_time_only: DEFAULT_STATE.filter.first_time_only,
+  untagged_only: DEFAULT_STATE.filter.untagged_only,
+  exclude_automated_communications: DEFAULT_STATE.filter.exclude_automated_communications,
+  incoming_numbers: DEFAULT_STATE.filter.incoming_numbers,
+  users: DEFAULT_STATE.filter.users,
+  workflows: DEFAULT_STATE.filter.workflows,
+  broadcasts: DEFAULT_STATE.filter.broadcasts,
+  contact_owner: DEFAULT_STATE.filter.contact_owner,
+  from_date: DEFAULT_STATE.filter.from_date,
+  to_date: DEFAULT_STATE.filter.to_date,
+  my_contact: DEFAULT_STATE.filter.my_contact,
+  creator_type: DEFAULT_STATE.filter.creator_type,
+  dynamic_engagement_date_range: DEFAULT_STATE.filter.dynamic_engagement_date_range,
+  has_unread: DEFAULT_STATE.filter.has_unread
 }

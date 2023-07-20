@@ -2,6 +2,7 @@ import Echo from 'laravel-echo'
 import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   computed: {
@@ -546,6 +547,11 @@ export default {
           this.updateFilter(event.filter)
         })
         .listen('.filter.deleted', (event) => {
+          // for Inbox Filter Types
+          if (event.filter.type === ChannelType.CHANNEL_INBOX) {
+            this.$VueEvent.fire('filter_deleted', event.filter)
+          }
+
           if (this.filters.find((o) => {
             return o.id === event.filter.id
           })) {

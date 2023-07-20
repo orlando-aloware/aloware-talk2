@@ -17,8 +17,8 @@
         <div class="h-100">
           <div class="inbox-side__nav h-100">
             <inbox-nav-list :closed="closed"
-                            :openCount="taskCounts.open"
-                            :pendingCount="taskCounts.pending"
+                            :openCount="inboxTaskCounts.open"
+                            :pendingCount="inboxTaskCounts.pending"
                             :value.sync="active"
                             v-model="active"
                             @active="newActive"
@@ -29,17 +29,19 @@
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
+        <!-- Inbox Tab (Inbox/Inbox View) UI -->
         <inbox-tab :search-text="searchText"
-                   v-if="!activeChannel || activeChannel.value === 'inbox'"
-                   @itemSelected="onItemSelected"/>
+                   v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
+                   @itemSelected="onItemSelected" />
+
+        <!-- Channels (Communications) UI -->
         <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
-                        :filter-type="activeChannel.type"
-                        :answer-status="activeChannel.answerStatus"
-                        :channel="activeChannel.value"
+                        :filter-type="activeChannel?.type"
+                        :answer-status="activeChannel?.answerStatus"
+                        :channel="activeChannel?.value"
                         :search-text="searchText"
                         :sort="sort"
-                        v-if="activeChannel && !['inbox'].includes(activeChannel.value)">
-        </inbox-channels>
+                        v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
       </div>
     </div>
   </div>
@@ -83,7 +85,13 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts', 'items']),
+    ...mapState('inbox', [
+      'activeChannel',
+      'communications',
+      'taskCounts',
+      'inboxTaskCounts',
+      'items'
+    ]),
 
     ...mapState(['isMobile']),
 
@@ -208,7 +216,9 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (to.name.includes('Inbox') && to.name !== 'Inbox') {
+      const redirectingToInbox = (to.name.includes('Inbox') && to.name !== 'Inbox') || from.name === 'Inbox View'
+
+      if (redirectingToInbox) {
         this.onLoadShowTasks = true
       }
 

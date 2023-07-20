@@ -20,8 +20,6 @@
       <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
       <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
-      <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
-
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    :disabled="loading"
                    v-if="$route.name === 'Stats' && !titleOnly"
@@ -29,6 +27,7 @@
         <refresh-icon />
         Refresh
       </compact-btn>
+
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    :disabled="loading || contactsRefreshIsDisabled"
                    v-if="$route.name === 'Contacts'"
@@ -36,6 +35,16 @@
         <refresh-icon />
         Refresh
       </compact-btn>
+
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
+                   :disabled="loading"
+                   v-if="isInInboxPage"
+                   @clicked="refreshInbox">
+        <refresh-icon />
+        Refresh
+      </compact-btn>
+
+      <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
@@ -310,6 +319,13 @@ export default {
 
     isDialerDisabled () {
       return (!this.isDialerReady && !this.dialer.error.code) || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
+    },
+
+    isInInboxPage () {
+      const path = this.$route.path
+      return this.$route.name === 'Inbox' ||
+          path.includes('inbox') ||
+          path.includes('channels')
     }
   },
 
@@ -324,6 +340,17 @@ export default {
   },
 
   methods: {
+    ...mapActions('stats', [
+      'setMetricGroups',
+      'setMetricLoader'
+    ]),
+
+    ...mapActions('contacts', [
+      'updateContactsListFilter'
+    ]),
+
+    ...mapActions(['setDialerFormStatus']),
+
     reconnectDialer () {
       this.$VueEvent.fire('reconnectDialer')
     },
@@ -409,16 +436,9 @@ export default {
       }
     },
 
-    ...mapActions('stats', [
-      'setMetricGroups',
-      'setMetricLoader'
-    ]),
-
-    ...mapActions('contacts', [
-      'updateContactsListFilter'
-    ]),
-
-    ...mapActions(['setDialerFormStatus'])
+    refreshInbox () {
+      this.$VueEvent.fire('fetchInbox')
+    }
   },
 
   watch: {
