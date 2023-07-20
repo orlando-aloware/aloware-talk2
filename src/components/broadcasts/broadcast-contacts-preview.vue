@@ -22,7 +22,6 @@
                use-empty-slot
                :is-empty="contacts.length === 0"
                :columns="columns"
-               :is-scrollable="false"
                v-if="!loading">
       <template slot="tbody">
         <tr class="datatable-row"
@@ -193,8 +192,6 @@ export default {
         case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
           this.setIntegrationHubspot()
           break
-        // FIXME: Zoho
-        // FIXME: Pipedrive
       }
     },
 

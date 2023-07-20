@@ -13007,19 +13007,27 @@ h1.contact-list-name-label {
     padding: 15px;
 
     &__sidebar {
-      width: 300px;
+      width: 200px;
       margin-right: 15px;
       background-color: $white;
       border-radius: 8px;
       padding: 20px;
+
+      @media (min-width: 1425px) {
+        width: 300px;
+      }
     }
 
     &__view {
-      max-width: 1000px;
+      max-width: 500px;
       flex-grow: 1;
       margin-right: 15px;
       display: flex;
       flex-direction: column;
+
+      @media (min-width: 1425px) {
+        max-width: 1000px;
+      }
 
       &__form {
         transition: all .5s;
@@ -13097,6 +13105,11 @@ h1.contact-list-name-label {
                 position: fixed;
                 right: 0px;
                 top: 62px;
+                width: 300px;
+
+                @media (min-width: 1425px) {
+                  width: 400px;
+                }
               }
             }
 
@@ -13334,10 +13347,6 @@ h1.contact-list-name-label {
           }
         }
       }
-    }
-
-    &__filters {
-      width: 300px;
     }
   }
 }
