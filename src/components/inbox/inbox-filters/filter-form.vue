@@ -14,7 +14,7 @@
                   <information-circle-icon color="#2F80ED"/>
                   <q-tooltip  anchor="top middle"
                               self="center middle">
-                    Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)
+                    <span class="text-13">Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)</span>
                   </q-tooltip>
                 </div>
 
@@ -154,7 +154,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="!isInbox && isCallsAndRecordingsChannel">
+                   v-if="!isInboxOrInboxViews && isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -165,7 +165,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row v-if="!isInbox">
+          <b-form-row v-if="!isInboxOrInboxViews">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -230,6 +230,55 @@
             </b-col>
 
           </b-form-row>
+          <b-form-row v-if="isInboxOrInboxViews">
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
+                <span class="form-label">Show contacts with unread communications only</span>
+                <div>
+                  <b-form-checkbox class="switch-success"
+                                   size="lg"
+                                   switch
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   v-model="filter.has_unread">
+                  </b-form-checkbox>
+                </div>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+        </div>
+
+        <div v-if="isInboxOrInboxViews">
+          <h5 class="mt-4 section-header">Has Communicated Within</h5>
+          <b-form-row class="mt-2">
+            <b-col sm="12"
+                     md="6">
+              <b-form-group class="form-label"
+                              label="Last Engagement Date Period">
+                <div class="last-engagement-dynamic-tooltip-wrapper"
+                     v-if="isInboxOrInboxViews">
+                  <information-circle-icon color="#2F80ED"/>
+                  <q-tooltip  anchor="top middle"
+                              self="center middle">
+                    <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
+                  </q-tooltip>
+                </div>
+                <q-select class="q-user-selector q-basic-selector"
+                          options-selected-class="text-primary"
+                          color="primary"
+                          option-value="id"
+                          option-label="name"
+                          map-options
+                          use-input
+                          emit-value
+                          dense
+                          outlined
+                          :options="relativeRanges"
+                          v-model="filter.dynamic_engagement_date_range" />
+              </b-form-group>
+            </b-col>
+          </b-form-row>
         </div>
 
         <div>
@@ -250,24 +299,26 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsOrInboxChannel">
+                   v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label"
                             label="Communication Owners">
                 <div class="comm-owner-filter-tooltip-wrapper">
                   <information-circle-icon color="#2F80ED"/>
-                  <q-tooltip  anchor="top middle"
-                              self="center middle">
-                    <p class="font-weight-bold">Who is the communication owner?</p>
-                    <p class="font-weight-bold mb-0">For outbound communication:</p>
-                    <p class="mb-0">Calls, SMS, fax & emails:</p>
-                    <p><ul><li>The agent that sent the communication</li></ul></p>
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    <div class="text-13">
+                      <p class="font-weight-bold">Who is the communication owner?</p>
+                      <p class="font-weight-bold mb-0">For outbound communication:</p>
+                      <p class="mb-0">Calls, SMS, fax & emails:</p>
+                      <p><ul><li>The agent that sent the communication</li></ul></p>
 
-                    <p class="font-weight-bold mb-0">For inbound communication:</p>
-                    <p class="mb-0">Calls:</p>
-                    <p><ul><li>The agent that answered the call</li></ul></p>
+                      <p class="font-weight-bold mb-0">For inbound communication:</p>
+                      <p class="mb-0">Calls:</p>
+                      <p><ul><li>The agent that answered the call</li></ul></p>
 
-                    <p class="mb-0">SMS, fax & email:</p>
-                    <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
+                      <p class="mb-0">SMS, fax & email:</p>
+                      <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
+                    </div>
                   </q-tooltip>
                 </div>
                 <user-selector custom-placeholder="Select Communication Owners"
@@ -350,7 +401,7 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -438,16 +489,16 @@ export default {
     },
 
     isMentionsOrInboxChannel () {
-      const nonCommunicationChannels = ['mentions', 'inbox']
+      const nonCommunicationChannels = ['mentions', 'inbox', 'view']
 
-      return this.$route.name === 'Inbox' ||
+      return this.isInboxOrInboxViews ||
         nonCommunicationChannels.includes(this.$route.params.channel)
     },
 
     isInboxOrAllCallsChannel () {
-      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications']
+      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications', 'view']
 
-      return this.$route.name === 'Inbox' ||
+      return this.isInboxOrInboxViews ||
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
@@ -474,7 +525,11 @@ export default {
     },
 
     tagsFilterCategory () {
-      return this.isInbox ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+      return this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+    },
+
+    isInboxOrInboxViews () {
+      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel)
     }
   },
 
@@ -498,7 +553,49 @@ export default {
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
       rangePicker: null,
-      TagCategories
+      TagCategories,
+      relativeRanges: [
+        {
+          id: 0,
+          name: 'All Time'
+        },
+        {
+          id: 1,
+          name: 'Today'
+        },
+        {
+          id: 2,
+          name: 'Yesterday'
+        },
+        {
+          id: 3,
+          name: 'This Week'
+        },
+        {
+          id: 4,
+          name: 'Last Week'
+        },
+        {
+          id: 5,
+          name: 'Last 7 Days'
+        },
+        {
+          id: 6,
+          name: 'This Month'
+        },
+        {
+          id: 7,
+          name: 'Last Month'
+        },
+        {
+          id: 8,
+          name: 'Last 30 Days'
+        },
+        {
+          id: 9,
+          name: 'Recent (Last 30 Days + Today)'
+        }
+      ]
     }
   },
 
@@ -509,10 +606,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
-      'updateChannelChangedFilterFields'
-    ]),
-
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },

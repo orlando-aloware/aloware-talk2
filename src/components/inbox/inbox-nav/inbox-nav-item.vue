@@ -12,10 +12,17 @@
            :class="navItemInnerClass">
         <div class="inbox-nav-item__icon"
              :class="navItemIconClass">
+          <i class="fa fa-circle text-10"
+             v-if="icon === 'view'">
+          </i>
           <icon :icon="icon"
-                :isActive="isActive"/>
+                :isActive="isActive"
+                v-if="icon !== 'view'"/>
         </div>
         <div class="inbox-nav-item__label h-100  text-truncate">
+          <q-tooltip>
+            {{ label }}
+          </q-tooltip>
           {{ label }}
         </div>
         <span class="count-label h-100"
@@ -26,7 +33,9 @@
                             color="blue" />
           </span>
           <span class="open-count border-right pr-1"
-                v-if="!isLoadingOpenTaskCount">{{ openCount | numberPlusFormatter(99) }}</span>
+                v-if="!isLoadingOpenTaskCount">
+            {{ openCount | numberPlusFormatter(99) }}
+          </span>
 
           <span class="ml-1"
                 v-if="isLoadingPendingTaskCount">
@@ -34,7 +43,16 @@
                             color="blue" />
           </span>
           <span class="pending-count ml-1"
-                v-if="!isLoadingPendingTaskCount">{{ pendingCount | numberPlusFormatter(99) }}</span>
+                v-if="!isLoadingPendingTaskCount">
+            {{ pendingCount | numberPlusFormatter(99) }}
+          </span>
+        </span>
+
+        <span class="count-label h-100"
+              v-if="customCount !== null">
+          <span class="open-count pr-1">
+            {{ customCount | numberPlusFormatter(99) }}
+          </span>
         </span>
       </div>
     </a>
@@ -42,6 +60,8 @@
          v-else>
       {{ label }}
     </div>
+
+    <slot name="action-icon"/>
   </div>
 </template>
 
@@ -57,7 +77,10 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isLoadingOpenTaskCount', 'isLoadingPendingTaskCount']),
+    ...mapState('inbox', [
+      'isLoadingOpenTaskCount',
+      'isLoadingPendingTaskCount'
+    ]),
 
     navItemClass () {
       return {
@@ -135,6 +158,11 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+
+    customCount: {
+      type: Number,
+      default: null
     }
   },
 

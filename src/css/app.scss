@@ -3587,7 +3587,7 @@ i.option-separator {
 }
 
 .inbox-side {
-  max-width: 508px;
+  max-width: 558px;
   width: 100% !important;
   background-color: $white;
   display: flex;
@@ -3609,7 +3609,7 @@ i.option-separator {
   }
 
   &__left {
-    max-width: 200px;
+    max-width: 250px;
     width: 100%;
     overflow: hidden;
 
@@ -3713,8 +3713,9 @@ i.option-separator {
 
 .task-item {
   .contact-name {
-    @include font-size(14px, 500);
+    @include font-size(13px, 600);
     line-height: 17px;
+    color: $grey-10;
 
     &.truncated-text {
       padding-right: 5px;
@@ -7008,6 +7009,9 @@ table.datatable {
     line-height: 17px;
     letter-spacing: -0.0025em;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &--opened {
       display: block;
@@ -8927,7 +8931,7 @@ span.mention {
 
 .inbox-wrapper {
   display: flex;
-  max-width: 508px;
+  max-width: 558px;
   width: 100%;
   flex: 0 0 100%;
 }
@@ -10960,6 +10964,12 @@ screen and (max-width: 956px) {
   top: -1px;
 }
 
+.last-engagement-dynamic-tooltip-wrapper {
+  position: absolute;
+  right: 40%;
+  top: -1px;
+}
+
 .bridge-menu-wrapper {
   margin-right: 20px;
 }
@@ -12838,5 +12848,12 @@ h1.contact-list-name-label {
     &:hover {
       color: $red-130;
     }
+  }
+}
+
+.view-filter-name {
+  &.row.q-input .q-field__control .q-field__native {
+    padding-top: 14px;
+    padding-bottom: 2px
   }
 }

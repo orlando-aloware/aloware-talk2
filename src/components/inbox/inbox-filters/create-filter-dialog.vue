@@ -94,11 +94,17 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['isFilterModelFormShown']),
+    ...mapState('inbox', [
+      'isFilterModelFormShown',
+      'isFilterDialogForView',
+      'isEditingView'
+    ]),
+
     isOpen: {
       get () {
         return this.isFilterModelFormShown
       },
+
       set (isOpen) {
         return isOpen
       }
@@ -139,57 +145,82 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['toggleFilterModelForm', 'toggleFilterDialog']),
+    ...mapActions('inbox', [
+      'toggleFilterModelForm',
+      'toggleFilterDialog',
+      'setIsEditingView',
+      'setFilterDialogForView'
+    ]),
+
     validateState (input) {
       const { $dirty, $error } = this.$v.filter[input]
       return $dirty ? !$error : null
     },
+
     onHidden () {
       this.$v.filter.$reset()
       this.filter.name = ''
       this.filter.scope = 'user'
       this.toggleFilterModelForm()
     },
+
     onHide () {
       this.toggleFilterModelForm()
+
+      if (this.isFilterDialogForView) {
+        this.setIsEditingView(false)
+        this.setFilterDialogForView(false)
+        this.toggleFilterDialog(false)
+        this.$VueEvent.fire('openInboxViewPopup')
+        return
+      }
+
       this.toggleFilterDialog(true)
     },
+
     onShow () {
       this.toggleFilterDialog()
     },
+
     onShown () {
       this.$refs.filterNameInput.focus()
     },
+
     onFilterTypeShowMenu () {
       this.selectWidth = this.$refs.filterTypeSelect.$el.offsetWidth
     },
+
     onSubmit () {
       this.$v.$touch()
+
       if (this.$v.$invalid) {
         return
       }
+
       this.isCreating = true
       this.filter = {
         ...this.filter,
         type: this.filterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.filterModel.type,
         filter: this.filterModel.filter }
-      return talk2Api.V2.inbox.filters.save(this.filter).then(response => {
-        this.isCreating = false
-        this.$VueEvent.fire('channel_filter_created', response.data.filter)
-        this.$emit('created', response.data.filter)
-        this.$nextTick(function () {
-          this.onHide()
+
+      return talk2Api.V2.inbox.filters.save(this.filter)
+        .then(response => {
+          this.isCreating = false
+          this.$VueEvent.fire('channel_filter_created', response.data.filter)
+          this.$emit('created', response.data.filter)
+          this.$nextTick(function () {
+            this.onHide()
+          })
+        }).catch(error => {
+          const errors = error.response.data.errors
+          const keys = Object.keys(errors)
+
+          if (keys && keys.length > 0) {
+            this.$generalNotification(errors[keys[0]], 'error')
+          }
+
+          this.isCreating = false
         })
-      }).catch(error => {
-        const errors = error.response.data.errors
-        const keys = Object.keys(errors)
-
-        if (keys && keys.length > 0) {
-          this.$generalNotification(errors[keys[0]], 'error')
-        }
-
-        this.isCreating = false
-      })
     }
   },
 

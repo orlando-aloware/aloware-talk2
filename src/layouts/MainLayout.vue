@@ -997,12 +997,6 @@ export default {
       this.setShowContactsHeader(true)
     }
 
-    if (this.$route.name.includes('Inbox')) {
-      setTimeout(() => {
-        this.$VueEvent.fire('inbox_route_name_change')
-      }, 1000)
-    }
-
     this.resetPowerDialerSession(this.$route)
   },
 
@@ -2503,7 +2497,8 @@ export default {
       'setLiveContacts',
       'updateLiveContactLastCommProperties',
       'setIsInboxFiltersLoaded',
-      'gettingTasksList'
+      'gettingTasksList',
+      'setInboxShowMyContacts'
     ])
   },
 
@@ -2531,21 +2526,32 @@ export default {
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
 
-      if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
-        !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
+      const fromContactsToContact = (from.name === 'Contacts' && this.$route.name === 'Contact')
+      const fromContactToContacts = (from.name === 'Contact' && this.$route.name === 'Contacts')
+      const notToPDorPDSession = (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session')
+      if (!fromContactsToContact &&
+        !fromContactToContacts &&
         to.name !== from.name &&
-        (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session')) {
+        notToPDorPDSession) {
         this.resetVuex(['contacts', 'non-cache'])
       }
 
+      // reset search if contact is changed
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {
         this.resetSearch()
       }
 
-      if (!(from.name === 'Inbox' && this.$route.name === 'Inbox Contact') &&
-        !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
+      const fromInboxToInboxContact = (from.name === 'Inbox' && this.$route.name === 'Inbox Contact')
+      const fromInboxContactToInbox = (from.name === 'Inbox Contact' && this.$route.name === 'Inbox')
+      if (!fromInboxToInboxContact &&
+        !fromInboxContactToInbox &&
         to.name !== from.name) {
         this.resetVuex(['inbox', 'non-cache'])
+      }
+
+      // reset My Contacts toggle to default
+      if (from.name === 'Inbox View' && from.name !== to.name) {
+        this.setInboxShowMyContacts(false)
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
@@ -2572,21 +2578,7 @@ export default {
         this.mobilePhoneDrawer = true
       }
 
-      const inboxStatus = _.get(this.$route, 'params.status', null)
-
-      if (inboxStatus) {
-        setTimeout(() => {
-          this.$VueEvent.fire('inbox_route_change')
-        }, 1000)
-      }
-
-      if (to.name.includes('Inbox')) {
-        setTimeout(() => {
-          this.$VueEvent.fire('inbox_route_name_change')
-        }, 1000)
-      }
-
-      if (to.name === 'Inbox' && !from.name.includes('Inbox')) {
+      if (to.name === 'Inbox' && from.name.includes('Inbox')) {
         this.setIsInboxFiltersLoaded(false)
         this.gettingTasksList(true)
       }
