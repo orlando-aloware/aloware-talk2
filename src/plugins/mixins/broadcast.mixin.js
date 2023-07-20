@@ -395,6 +395,10 @@ export default {
           }
           if (event.contact) {
             event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
           }
           if (event.owner) {
             event.communication.owner = event.owner
@@ -412,6 +416,10 @@ export default {
           }
           if (event.contact) {
             event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
           }
           if (event.owner) {
             event.communication.owner = event.owner

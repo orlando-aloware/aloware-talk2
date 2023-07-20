@@ -57,7 +57,7 @@
         </div>
       </div>
 
-      <span class="p-3 text-bold text-grey-90 cursor-pointer"
+      <span class="p-3 text-bold text-grey-90 cursor-pointer custom-link"
             @click="onCreateView">
         Create View
       </span>
