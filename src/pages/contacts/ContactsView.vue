@@ -885,11 +885,6 @@ export default {
       return total !== null ? total : 0
     },
 
-    listItemsTotalContacts () {
-      const data = _.get(this.fixedContactsData, `data`, null)
-      return data.length || 0
-    },
-
     filterButtonVariant () {
       return this.isFiltersOpen ? 'primary' : 'outlined-light'
     },

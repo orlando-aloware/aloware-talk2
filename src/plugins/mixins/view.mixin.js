@@ -166,6 +166,11 @@ export default {
 
     filtersText () {
       return this.filtersCount > 1 ? 'Filters' : 'Filter'
+    },
+
+    listItemsTotalContacts () {
+      const data = get(this.fixedContactsData, `data`, null)
+      return data.length || 0
     }
   },
 
