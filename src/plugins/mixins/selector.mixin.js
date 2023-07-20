@@ -223,8 +223,8 @@ export default {
       }
     },
 
-    isNotARegisteredLine (campaign) {
-      return campaign && campaign.is_10_dlc && !campaign.is_a2p_registered
+    isMessagingBlocked (campaign, isAutomated = false) {
+      return campaign && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
     }
   },
   watch: {

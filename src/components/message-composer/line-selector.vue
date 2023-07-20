@@ -26,8 +26,8 @@
             <q-item-label caption>{{ scope.opt.email }}</q-item-label>
           </q-item-section>
           <q-item-section side>
-            <q-badge v-if="isNotARegisteredLine(scope.opt)" color="red">
-              Not registered
+            <q-badge v-if="isMessagingBlocked(scope.opt)" color="red">
+              !
             </q-badge>
           </q-item-section>
         </q-item>

@@ -49,9 +49,9 @@
           <q-item-section>
             <q-item-label>{{ opt.name }}</q-item-label>
           </q-item-section>
-          <q-item-section v-if="isNotARegisteredLine(opt)" side>
+          <q-item-section v-if="isMessagingBlocked(opt)" side>
             <q-badge color="red">
-              Not registered
+              !
             </q-badge>
           </q-item-section>
         </q-item>

@@ -27,8 +27,8 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="isNotARegisteredLine(selectedCampaign)" class="compliance-badge mb-2">
-              Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
+            <div v-if="isMessagingBlocked(selectedCampaign)" class="compliance-badge mb-2">
+              {{ selectedCampaign.blocked_messaging_information['reason'] }}
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
@@ -91,8 +91,8 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="isNotARegisteredLine(selectedCampaign)" class="compliance-badge mb-2">
-              Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
+            <div v-if="isMessagingBlocked(selectedCampaign)" class="compliance-badge mb-2">
+              {{ selectedCampaign.blocked_messaging_information['reason'] }}
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
@@ -135,7 +135,7 @@
                   <q-btn class="height-16 no-q-btn-focus"
                          padding="none"
                          flat
-                         :disable="sendDisabled || isSending"
+                         :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign)"
                          :ripple="false"
                          @click="sendText">
                     <send-text-icon :width="isMobile ? 18 : 16"

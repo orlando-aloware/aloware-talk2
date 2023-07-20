@@ -71,9 +71,9 @@
         </div>
       </div>
     </div>
-    <div v-if="isNotARegisteredLine(selectedLine)" class="composer-footer">
+    <div v-if="isMessagingBlocked(selectedLine)" class="composer-footer">
       <div class="compliance-badge mb-2">
-        Due to regulatory requirements from carriers you are unable to send out any outbound SMS on an unregistered 10DLC line, please register your lines to access this feature.
+        {{ selectedLine.blocked_messaging_information['reason'] }}
       </div>
     </div>
   </div>
@@ -138,7 +138,7 @@ export default {
     },
 
     isSmsDisabled () {
-      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
+      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS) || this.isMessagingBlocked(this.selectedLine)
     },
 
     isPhoneNumberInvalid () {
