@@ -27,6 +27,9 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
+            <div v-if="isMessagingBlocked(selectedCampaign)" class="compliance-badge mb-2">
+              {{ selectedCampaign.blocked_messaging_information['reason'] }}
+            </div>
           </b-form-group>
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
@@ -82,11 +85,15 @@
                         :state="validCampaign">
             <line-selector class="line-selector"
                            prepend="From:"
+                           check-blocked-messaging
                            :generic-multiselect="false"
-                           :useOnlyActives="true"
+                           :use-only-actives="true"
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
+            <div v-if="isMessagingBlocked(selectedCampaign)" class="compliance-badge mb-2">
+              {{ selectedCampaign.blocked_messaging_information['reason'] }}
+            </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
@@ -128,7 +135,7 @@
                   <q-btn class="height-16 no-q-btn-focus"
                          padding="none"
                          flat
-                         :disable="sendDisabled || isSending"
+                         :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign)"
                          :ripple="false"
                          @click="sendText">
                     <send-text-icon :width="isMobile ? 18 : 16"
@@ -183,7 +190,7 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import { aclMixin, contactMixin, contactV2AttributesMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
@@ -193,7 +200,8 @@ export default {
     contactV2AttributesMixin,
     timezoneCheckMixin,
     visibilityMixin,
-    aclMixin
+    aclMixin,
+    selectorMixin
   ],
 
   components: {
@@ -237,7 +245,8 @@ export default {
       'dialer',
       'parkedCalls',
       'loadingParkedCalls',
-      'isMobile'
+      'isMobile',
+      'campaigns'
     ]),
 
     ...mapGetters('auth', ['profile']),
@@ -398,6 +407,7 @@ export default {
 
     changeCampaignId (campaignId) {
       this.campaignId = campaignId
+      this.selectedCampaignId = campaignId
     },
 
     findDefaultOutboundCampaign () {

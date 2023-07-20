@@ -66,9 +66,15 @@
         <div class="float-right d-inline-flex">
           <span class="pr-2 pt-1">From:</span>
           <line-selector :campaignId="campaignId"
+                         check-blocked-messaging
                          @change="onLineChange">
           </line-selector>
         </div>
+      </div>
+    </div>
+    <div v-if="isMessagingBlocked(selectedLine, true)" class="composer-footer">
+      <div class="compliance-badge mb-2">
+        {{ selectedLine.blocked_messaging_information['reason'] }}
       </div>
     </div>
   </div>
@@ -81,7 +87,8 @@ import {
   contactMixin,
   contactV2AttributesMixin,
   aclMixin,
-  visibilityMixin
+  visibilityMixin,
+  selectorMixin
 } from 'src/plugins/mixins'
 import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
@@ -99,7 +106,8 @@ export default {
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    selectorMixin
   ],
 
   props: {
@@ -131,7 +139,7 @@ export default {
     },
 
     isSmsDisabled () {
-      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS)
+      return !this.currentCompany.sms_enabled || this.hasRole(Roles.COMPANY_REPORTER_ACCESS) || this.isMessagingBlocked(this.selectedLine)
     },
 
     isPhoneNumberInvalid () {
