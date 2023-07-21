@@ -133,7 +133,7 @@
                     <router-link class="mb-1"
                                  :to="{ path: `/contacts/${call.contact_id}` }"
                                  v-if="call.contact">
-                      {{ call.contact.name | capitalize }}
+                      {{ call.contact.name | ucwords }}
                     </router-link>
 
                     <!-- lead number -->
@@ -602,7 +602,7 @@ export default {
     },
 
     getLocation (communication) {
-      return communication.city + ((communication.city && communication.state) ? ', ' : '') + communication.state
+      return (communication.city || '') + ((communication.city && communication.state) ? ', ' : '') + (communication.state || '')
     },
 
     setExpandedItem (index) {

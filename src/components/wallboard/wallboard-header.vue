@@ -6,8 +6,9 @@
     <div class="wallboard__header__actions bordered-bottom">
       For {{ new Date() | fullShortDate }}
 
-      <ring-group-selector clearable
-                           class="ml-2 ring-group-filter"
+      <ring-group-selector class="ml-2 ring-group-filter"
+                           clearable
+                           split-by-queued
                            :force-remove-missing-values="true"
                            :generic-multiselect="false"
                            :value="filters.ringGroup"
