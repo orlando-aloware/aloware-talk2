@@ -240,7 +240,7 @@ export default {
           }
           break
         case 'mention':
-          name.data = _.get(communication, 'mentioner_user.name', '')
+          name.data = _.get(communication, 'mentioner_user_name', '')
           contactId.data = _.get(communication, 'contact_id', null)
           communicationId.data = _.get(communication, 'mention_subject_id', null)
           message.data = _.get(communication, 'preview_text', '')
