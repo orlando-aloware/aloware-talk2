@@ -164,7 +164,7 @@ export default {
         })
       }
 
-      if (query?.filter_groups && query.filter_groups.length) {
+      if (query?.list_id && query?.filter_groups && query.filter_groups.length) {
         query.filter_groups.forEach((item, index) => {
           Object.assign(query.filter_groups[index].filters, {
             'contact_lists': [
