@@ -1,6 +1,6 @@
 import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import { STATIC } from 'src/constants/contacts-list-types'
 
 export default {
@@ -97,17 +97,18 @@ export default {
         this.countSource = this.countCancelToken.source()
       }
 
+      const filters = typeof data.filters === 'object'
+        ? this.$jsonClone(data.filters)
+        : JSON.parse(data.filters)
+
       // check if list is a static list, then we should fetch
       // from the static list count endpoint
-      if (isStaticList && !this.$route.path.includes('/add')) {
+      if (isStaticList && !this.$route.path.includes('/add') && isEmpty(filters)) {
         return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${listId}/count`, {
           cancelToken: this.countSource.token
         })
       }
 
-      const filters = typeof data.filters === 'object'
-        ? this.$jsonClone(data.filters)
-        : JSON.parse(data.filters)
       const params = this.getQueryString(filters, true)
 
       return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
@@ -152,18 +153,7 @@ export default {
           }
 
           // contact list id becomes a separate filter
-          if (key === 'list_id' && isCount) {
-            query.filter_groups.push({
-              filters: {
-                'contact_lists': [
-                  {
-                    value: [filters[key]],
-                    operator: 1
-                  }
-                ]
-              }
-            })
-          } else if (key === 'list_id') {
+          if (key === 'list_id') {
             query.list_id = filters[key]
           }
 
@@ -171,6 +161,19 @@ export default {
           if (key === 'my_contacts') {
             query.my_contacts = filters[key]
           }
+        })
+      }
+
+      if (query?.filter_groups && query.filter_groups.length) {
+        query.filter_groups.forEach((item, index) => {
+          Object.assign(query.filter_groups[index].filters, {
+            'contact_lists': [
+              {
+                value: [query.list_id],
+                operator: 1
+              }
+            ]
+          })
         })
       }
 
