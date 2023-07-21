@@ -32,7 +32,8 @@ export default {
 
     isComponentLoading () {
       const eventListId = this.getCleanedListId(this.listAddRemoveContactsProgress.id)
-      const isListLoading = this.isMainView && this.cleanedListId === eventListId &&
+      const isListLoading = this.isMainView &&
+        this.getCleanedListId(this.$route?.params?.id) === eventListId &&
         this.listAddRemoveContactsProgress.loading
 
       return this.isLoading || isListLoading

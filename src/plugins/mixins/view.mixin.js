@@ -154,10 +154,6 @@ export default {
       return this.checked.length
     },
 
-    cleanedListId () {
-      return this.getCleanedListId(this.$route?.params?.id)
-    },
-
     contactsCountText () {
       const postfix = this.contactCount > 1 ? 's' : ''
 
@@ -181,8 +177,9 @@ export default {
       }
 
       const eventListId = this.getCleanedListId(event.contact_list_id)
+      const cleanedListId = this.getCleanedListId(this.$route?.params?.id)
 
-      if (this.cleanedListId && eventListId && this.cleanedListId === eventListId) {
+      if (cleanedListId && eventListId && cleanedListId === eventListId) {
         if (this.isMainView) {
           this.$VueEvent.fire('addContactsProgress', {
             id: null,
@@ -201,8 +198,9 @@ export default {
       }
 
       const eventListId = this.getCleanedListId(event.contact_list_id)
+      const cleanedListId = this.getCleanedListId(this.$route?.params?.id)
 
-      if (this.cleanedListId && eventListId && this.cleanedListId === eventListId) {
+      if (cleanedListId && eventListId && cleanedListId === eventListId) {
         if (this.isMainView) {
           this.$VueEvent.fire('deleteContactsProgress', {
             id: null,

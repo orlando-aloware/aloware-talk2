@@ -167,7 +167,7 @@ export default {
         }
 
         if (list) {
-          path = this.apiEndpoint(this.myQueueId !== null)
+          path = this.apiEndpoint(this.id === 'my-queue')
         }
 
         let params = {
@@ -407,7 +407,7 @@ export default {
       // prevent fetching contacts when in-progress in adding contacts
       // if current list is the affected list
       if (this.isMainView && this.listAddRemoveContactsProgress?.loading &&
-        this.cleanedListId === eventListId) {
+        this.getCleanedListId(this.$route?.params?.id) === eventListId) {
         return
       }
 
@@ -1045,7 +1045,7 @@ export default {
     },
 
     isLoadingDisabled () {
-      return this.isLoading || !this.isLoaded
+      return this.isComponentLoading || !this.isLoaded
     },
 
     isStartState () {

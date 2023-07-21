@@ -25,6 +25,7 @@
                    :is-empty="isEmpty"
                    :is-loading-more="isLoadingMore"
                    :filters-count="filtersCount"
+                   :on-fetch="fetch"
                    v-if="$route.name === 'Contacts' && list"
                    @search="onSearch"
                    @checkboxChanged="onFetchMyContacts"

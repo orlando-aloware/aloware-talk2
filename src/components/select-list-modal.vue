@@ -123,10 +123,13 @@ export default {
         params.filter_groups = this.currentListFilters
       }
 
-      this.$VueEvent.fire('addContactsProgress', {
-        id: this.selectedStaticList.id,
-        loading: true
-      })
+      // only show list's loading view if all contacts were selected
+      if (params?.selected_all) {
+        this.$VueEvent.fire('addContactsProgress', {
+          id: this.selectedStaticList.id,
+          loading: true
+        })
+      }
 
       this.$axios
         .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, params)

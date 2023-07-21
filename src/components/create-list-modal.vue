@@ -157,6 +157,10 @@ export default {
 
     defaultTemplateResponse () {
       return DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
+    },
+
+    isPowerDialer () {
+      return this.$route.name.includes('Power Dialer')
     }
   },
 
@@ -177,7 +181,7 @@ export default {
     getParams () {
       let headers = DEFAULT_COLUMNS
 
-      if (this.$route.name.includes('Power Dialer')) {
+      if (this.isPowerDialer) {
         headers = POWER_DIALER_DEFAULT_COLUMNS
       }
 
@@ -234,19 +238,25 @@ export default {
       return params
     },
 
-    processSubmit () {
+    processSubmit (skipListLoading = false) {
       this.isLoading = true
+      const params = this.getParams()
 
       this.$axios
-        .post(this.listsEndpoint, this.getParams())
+        .post(this.listsEndpoint, params)
         .then((response) => {
           const message = response.data.message
           const id = response.data?.id || response.data?.data?.id
+          const newStaticListWithContacts = isEmpty(params.contact_folder_id) &&
+            !isEmpty(params.contacts)
 
-          this.$VueEvent.fire('addContactsProgress', {
-            id: id,
-            loading: true
-          })
+          // skip list's loading view too if we're sending contact ids
+          if (!skipListLoading && !newStaticListWithContacts) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: id,
+              loading: true
+            })
+          }
 
           if (this.createList.mode === FROM_BULK_MENU) {
             this.$router.push(`${this.redirectPath}/${id}`)
@@ -277,6 +287,14 @@ export default {
     },
 
     onSubmit () {
+      // should skip list's loading view after creating the list
+      if (this.createList.type === this.ContactListTypes.STATIC &&
+        !this.isDatatableSelectedAll &&
+        isEmpty(this.selectedContacts[this.selectedList.id])) {
+        this.processSubmit(true)
+        return
+      }
+
       if (this.createList.type === this.ContactListTypes.STATIC) {
         this.$bvModal.msgBoxConfirm('Are you sure you want to continue?', {
           buttonSize: 'sm',

@@ -583,14 +583,6 @@ export default {
       return this.columns.filter(column => column.label !== 'Actions')
     },
 
-    urlRoutePath () {
-      if (this.isContactModule) {
-        return '/contacts/list/'
-      }
-
-      return '/power-dialer/list/'
-    },
-
     addItemEndpoint () {
       return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
     },
@@ -628,12 +620,13 @@ export default {
 
   data () {
     return {
-      ContactListTypes,
       openEdit: true,
       isContactModule: true,
       filterHasChanges: false,
       listName: '',
-      myContacts: false
+      myContacts: false,
+      urlRoutePath: '/contacts/list/',
+      ContactListTypes
     }
   },
 
@@ -710,12 +703,12 @@ export default {
         .then((res) => {
           this.setShouldUpdateSelectedListContactCount(true)
 
-          if (this.contactList.id === 'my-queue') {
-            this.$router.push(`/power-dialer`)
-          } else {
-            this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
-          }
+          this.$VueEvent.fire('addContactsProgress', {
+            id: this.contactList.id,
+            loading: true
+          })
 
+          this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           this.clicked = false
           this.setSearch('')
           this.$generalNotification(res.data.message)

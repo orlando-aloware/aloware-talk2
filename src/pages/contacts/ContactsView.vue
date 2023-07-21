@@ -724,10 +724,8 @@ export default {
   },
 
   props: {
-    // contactsData: {
-    //   type: Object,
-    //   default: () => {}
-    // },
+    onFetch: Function,
+
     list: {
       type: Object,
       default: () => {}

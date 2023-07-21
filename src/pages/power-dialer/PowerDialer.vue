@@ -20,7 +20,7 @@
                    :is-loading-more="isLoadingMore"
                    :filters-count="filtersCount"
                    :selected-list-id="filteredId"
-                   :onFetch="fetch"
+                   :on-fetch="fetch"
                    v-if="!isPowerDialerSession"
                    @search="onSearch"
                    @checkboxChanged="onFetchMyContacts"
@@ -328,7 +328,7 @@ export default {
         this.selectedContacts[this.selectedList.id].constructor !== Object &&
         this.isBulkDelete) {
         this.listAddRemoveContactsProgress = {
-          id: this.cleanedListId,
+          id: this.getCleanedListId(this.$route?.params?.id),
           loading: true
         }
 
