@@ -50,10 +50,10 @@ jobs:
       - name: NPM version
         run: npm --version
 
-      - name: Setup Python2
+      - name: Setup Python3
         uses: actions/setup-python@v4
         with:
-          python-version: '2.*'
+          python-version: '3.*'
           architecture: 'x64'
 
       - name: Prepare for app notarization (macOS)
@@ -84,6 +84,7 @@ jobs:
           ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
+          DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
           file-name: .env.prod
 
       - name: Build/release Electron mac app
@@ -132,3 +133,6 @@ jobs:
           SENTRY_ORG: ${{ secrets.sentry_org }}
           SENTRY_PROJECT: ${{ secrets.sentry_project }}
           #SENTRY_VERSION: ${{ secrets.sentry_version }}
+
+          # Demo Company Ids
+          DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}

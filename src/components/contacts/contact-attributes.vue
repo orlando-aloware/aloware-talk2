@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <div class="d-block"
-         v-for="attribute in attributes"
+  <div class="h-100 w-100">
+    <div v-for="attribute in attributes"
          :key="attribute.id">
       <p class="text-muted custom-input-label mb-0">{{ attribute.name }}</p>
       <contact-input-field v-model="attribute.value"

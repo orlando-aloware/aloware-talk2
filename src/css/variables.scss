@@ -123,11 +123,13 @@ $grey-9: #767C89;
 $grey-11: #495057;
 
 // Red
+$red-130: #721C24;
 $red-100: #C4183C;
 $red-90: #F23333;
 $red-50: #EB5757;
 $red-80: #EB5757;
 $red-10: #FECCD9;
+$red-9: #F8D7DA;
 
 // purple
 $purple-100: #9B51E0;
@@ -178,6 +180,7 @@ $primary-hover: #054CDB;
 @include text-color('grey-10', $grey-10, true);
 @include text-color('red-100', $red-100);
 @include text-color('red-80', $red-80);
+@include text-color('red-130', $red-130);
 
 // Background Colors
 @include bg-color('grey-light', $grey-light, true);
@@ -205,6 +208,7 @@ $primary-hover: #054CDB;
 @include bg-color('grey-70', $grey-70, true);
 @include bg-color('primary', $primary, true);
 @include bg-color('purple-100', $purple-100, true);
+@include bg-color('red-9', $red-9, true);
 
 
 .bg-primary {

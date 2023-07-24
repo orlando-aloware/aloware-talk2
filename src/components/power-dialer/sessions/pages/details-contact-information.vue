@@ -1,7 +1,7 @@
 <template>
   <div>
-    <q-card flat
-            class="mt-0 p-0">
+    <q-card class="mt-0 mb-1 p-0 flex-grow-0"
+            flat>
       <q-toolbar class="mt-2 shadow-2">
         <q-toolbar-title>
           <div class="text-subtitle1 text-weight-medium px-2">
@@ -10,47 +10,12 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-card>
-    <q-card flat
-            class="mt-1 p-0 py-0 session-contact-info-scroller"
+    <q-card class="p-0 py-0 flex-grow-1 h-100 overflow-hidden"
+            flat
             :disabled="sessionLoader">
-      <q-card-section class="p-0">
+      <q-card-section class="p-0 h-100 session-contact-block overflow-y-scroll">
         <ContactInfo :has-expanded="false" />
         <ContactSaveBar v-if="isValidResource" />
-      </q-card-section>
-      <!-- <q-card-section
-        v-for="(f, i) in form"
-        :key="`f.name-${i}`"
-        class="py-0">
-        <div class="d-block">
-          <div
-            :class="`${f.name === 'label' ? 'text-uppercase text-weight-medium text-caption pb-2 pt-3' : ''} text-muted custom-input-label mb-0`">
-            {{ f.label }}
-          </div>
-          <template>
-            <InputField
-              v-if="f.type === 'text'"
-              v-model="localResource[f.name]"
-              :disabled="f.disabled" />
-            <SelectStateField
-              v-else-if="f.type === 'select' && f.name === 'state'"
-              v-model="localResource[f.name]" dense
-              :options="[]"
-              :disabled="f.disabled" />
-            <SelectCountryField
-              v-else-if="f.type === 'select' && f.name === 'country'"
-              v-model="localResource[f.name]" dense
-              :options="[]"
-              :disabled="f.disabled" />
-            <SelectField
-              v-else-if="f.type === 'select'"
-              v-model="localResource[f.name]" dense
-              :options="[]"
-              :disabled="f.disabled" />
-          </template>
-        </div>
-      </q-card-section> -->
-      <q-card-section>
-
       </q-card-section>
     </q-card>
   </div>
@@ -58,10 +23,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-// import InputField from 'components/contacts/contact-input-field'
-// import SelectField from 'components/generic-selectors/user-selector'
-// import SelectStateField from 'src/components/contacts/location-state-selector'
-// import SelectCountryField from 'src/components/contacts/location-country-selector'
 import ContactInfo from 'components/contacts/contact-information'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
 import {
@@ -80,10 +41,6 @@ export default {
   },
 
   components: {
-    // InputField,
-    // SelectField,
-    // SelectStateField,
-    // SelectCountryField,
     ContactSaveBar,
     ContactInfo
   },

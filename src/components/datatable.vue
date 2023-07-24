@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column"
-       :class="[paginated ? 'paginated' : '']"
+  <div class="d-flex flex-column h-100"
+       :class="[paginated ? 'paginated overflow-x-hidden w-100' : '']"
        @mousemove="$emit('onMouseMove', $event)"
        @mouseleave="$emit('onMouseLeave', $event)">
     <div ref="scrollableArea"
@@ -84,14 +84,15 @@
       </template>
       <div class="empty-state"
            v-else-if="!hasEmptySlot && isEmpty &&  !isLoading">
-        <div class="h5">{{ defaultPlaceholderMessage }}</div>
+        <div class="h5 px-2 text-center">{{ defaultPlaceholderMessage }}</div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-center"
+    <div class="d-flex justify-content-center flex-grow-0 overflow-x-hidden"
+         style="min-height: 56px;"
          v-if="paginated">
       <q-pagination class="table-pagination"
-                    padding="0 15px"
+                    padding="0 5px"
                     boundary-links
                     direction-links
                     dense
@@ -276,8 +277,7 @@ export default {
     },
 
     scrollableAreaClasses () {
-      const isDefault = this.$route.name === 'Contacts' || this.$route.name === 'Contact'
-      const optScroll = `scrollableArea ${!isDefault ? 'scroll-type-1' : ''} position-relative `
+      const optScroll = `scrollableArea position-relative `
       const scrollableClass = `${this.isScrollable ? optScroll : ''}d-flex flex-column h-100 w-100 flex-grow-1`
       const mobileClass = this.isMobile ? 'mobile-scrollableArea' : ''
 
@@ -385,7 +385,11 @@ export default {
         return
       }
 
-      if ((element.srcElement.clientHeight + element.srcElement.scrollTop) >= element.srcElement.offsetHeight) {
+      const adjustmentHeight = 48
+      const elementScrollHeight = element.srcElement.scrollHeight - adjustmentHeight
+      const currentScrollHeight = element.srcElement.clientHeight + element.srcElement.scrollTop
+
+      if (currentScrollHeight >= elementScrollHeight) {
         this.lastScrollTop = element.srcElement.scrollTop
         this.onVisibilityChanged(true)
 
@@ -514,10 +518,8 @@ export default {
   },
 
   mounted () {
-    if (this.$refs.scrollableArea) {
-      this.lastScrollTop = this.$refs.scrollableArea.scrollTop
-      this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
-    }
+    this.lastScrollTop = this.$refs.scrollableArea.scrollTop
+    this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
 
     // apply a custom starting order if defined
     if (this.startOrder) {
@@ -534,7 +536,11 @@ export default {
   beforeDestroy () {
     clearTimeout(this.scrollTimeout)
     this.resetScroll()
-    this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
+
+    if (this.$refs.scrollableArea) {
+      this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
+    }
+
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)
   },

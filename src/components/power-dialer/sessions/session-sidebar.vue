@@ -1,6 +1,6 @@
 <template>
   <div class="h-100 border-0 no-border-radius">
-    <div class="contact-list-sidebar-wrapper d-block">
+    <div class="contact-list-sidebar-wrapper d-flex flex-column h-100">
       <b-button
         variant="light"
         size="sm"
@@ -10,8 +10,8 @@
           {{ !sessionSidebarExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}
         </i>
       </b-button>
-      <SessionStats />
-      <SessionGroups />
+      <SessionStats class="flex-grow-0"/>
+      <SessionGroups class="flex-grow-1 h-100 overflow-hidden"/>
     </div>
   </div>
 </template>

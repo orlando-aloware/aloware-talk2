@@ -1,10 +1,13 @@
 <template>
   <div class="wallboard__body">
-    <div :class="['calls', `calls--${viewMode}`]">
-      <b-overlay rounded="sm"
+    <div class="h-100 w-100 oveflow-hidden"
+         :class="['calls', `calls--${viewMode}`]">
+      <b-overlay class="h-100 d-flex flex-column"
+                 rounded="sm"
                  :show="isLoading">
-        <wallboard-calls-header/>
-        <wallboard-calls-table :calls="calls"/>
+        <wallboard-calls-header class="flex-grow-0"/>
+        <wallboard-calls-table class="flex-grow-1 h-100 overflow-hidden"
+                               :calls="calls"/>
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px"/>

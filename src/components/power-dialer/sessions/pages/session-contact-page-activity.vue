@@ -1,41 +1,37 @@
 <template>
-  <b-overlay
-    :show="changingSelectedContact"
-    :opacity="0.85"
-    class="h-100"
-    variant="white"
-    rounded="sm"
-    v-if="authenticated">
+  <b-overlay class="h-100"
+             variant="white"
+             rounded="sm"
+             :show="changingSelectedContact"
+             :opacity="0.85"
+             v-if="authenticated">
     <div class="row">
       <div class="col-12 p-1">
 
-        <div
-          :class="`contact-activity-wrapper ${widthClass}`"
-          style="height:calc(100vh - 340px);">
+        <div :class="`contact-activity-wrapper ${widthClass}`"
+             style="height:calc(100vh - 340px);">
 
-          <ContactActivities
-            ref="contactActivities"
-            :communications="filteredCommunications"
-            :campaign-id="selectedCampaignId"
-            v-if="contact"
-            @mark-all-as-read="markAllAsRead"
-            @toggleDrawer="toggleDrawer"
-            @toggleDetails="toggleDetails">
+          <ContactActivities ref="contactActivities"
+                             :communications="filteredCommunications"
+                             :campaign-id="selectedCampaignId"
+                             v-if="contact"
+                             @mark-all-as-read="markAllAsRead"
+                             @toggleDrawer="toggleDrawer"
+                             @toggleDetails="toggleDetails">
 
             <template v-slot:moreActivities>
-              <q-btn
-                class="prev-activities mx-2"
-                color="primary"
-                size="md"
-                outline
-                dense
-                rounded
-                no-caps
-                :isLoadingMore="sessionLoader"
-                :loading="isLoadingPreviousActivities"
-                :disable="isLoadingPreviousActivities"
-                v-if="hasMoreCommunications"
-                @click="loadMorePreviousActivities">
+              <q-btn class="prev-activities mx-2"
+                     color="primary"
+                     size="md"
+                     outline
+                     dense
+                     rounded
+                     no-caps
+                     :isLoadingMore="sessionLoader"
+                     :loading="isLoadingPreviousActivities"
+                     :disable="isLoadingPreviousActivities"
+                     v-if="hasMoreCommunications"
+                     @click="loadMorePreviousActivities">
                 <div class="px-2">
                   Previous Activities
                 </div>
@@ -89,7 +85,6 @@ export default {
   },
 
   created () {
-    window.addEventListener('resize', this.resizeHandler)
     this.setIsContactMixinUsed(true)
     this.initListeners()
 
@@ -168,6 +163,7 @@ export default {
       if (this.isInbox) {
         return 'w-less-330px'
       }
+
       return 'w-less-500px'
     }
   },
