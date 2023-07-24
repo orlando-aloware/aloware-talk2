@@ -325,7 +325,9 @@ export default {
     },
 
     isDisabledCheckAll () {
-      return this.isLoading || this.isLoadingMore || this.totalRows === 0
+      const isEmpty = this.totalRows === 0 && this.hasEmptySlot
+
+      return this.isLoading || this.isLoadingMore || isEmpty
     },
 
     checkAllClass () {
