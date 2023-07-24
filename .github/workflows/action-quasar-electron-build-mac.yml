@@ -84,7 +84,7 @@ jobs:
           ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
-          DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+          ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
           file-name: .env.prod
 
       - name: Build/release Electron mac app
