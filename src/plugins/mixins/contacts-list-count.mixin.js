@@ -9,6 +9,7 @@ export default {
       countCancelToken: null,
       countSource: null,
       contactsListCountListeners: {},
+      fetchCount: 0,
       STATIC
     }
   },
@@ -33,6 +34,20 @@ export default {
 
       this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
         .then(response => {
+          // we have to re-fetch the count if count is less than
+          // current contacts fetched
+          if (this.contactsData && this.contactsData?.data.length > 0 &&
+            response.data.count < this.contactsData.data.length) {
+            this.fetchCount++
+            setTimeout(() => {
+              this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
+            }, 5000)
+
+            if (this.fetchCount < 4) {
+              return
+            }
+          }
+
           if (data.thenFunctions) {
             const funcs = Object.keys(data.thenFunctions)
 

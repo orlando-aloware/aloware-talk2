@@ -341,7 +341,8 @@ export default {
           // clear out selections every contact fetch request
           this.removeAxiosUniqueId(axiosUniqueId)
 
-          if (this.isInPowerDialerList) {
+          if (this?.listAddRemoveContactsProgress?.id &&
+            this?.listAddRemoveContactsProgress?.loading) {
             // clear add contacts loading screen in PD list
             this.$VueEvent.fire('addContactsProgress', {
               id: null,
