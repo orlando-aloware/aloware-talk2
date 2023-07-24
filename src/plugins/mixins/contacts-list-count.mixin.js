@@ -48,6 +48,8 @@ export default {
             }
           }
 
+          this.fetchCount = 0
+
           if (data.thenFunctions) {
             const funcs = Object.keys(data.thenFunctions)
 
