@@ -145,6 +145,7 @@ export default {
   },
 
   created () {
+    this.setSelectedTagCategory(this.ContactTags)
     this.oldTagCategory = this.selectedTagCategory
     this.cancelToken = window.axios.CancelToken
     this.source = this.cancelToken.source()
