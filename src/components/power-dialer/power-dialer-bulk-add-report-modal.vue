@@ -9,7 +9,7 @@
       <p class="m-0">Contacts added</p>
       <ul>
         <li>{{ addedFromContact }} tasks from contacts</li>
-        <li v-if="addedFromMultipleNumbers > 0">{{ addedFromMultipleNumbers }} added from multiple numbers</li>
+        <li v-if="addedFromMultipleNumbers > 0">{{ addedFromMultipleNumbers }} tasks from multiple numbers</li>
       </ul>
       <template v-if="skipped.length > 0">
         <p class="m-0">Contacts not added/skipped</p>

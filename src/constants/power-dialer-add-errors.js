@@ -12,10 +12,10 @@ export const INVALID = 5
 export const INTERNATIONAL_DISALLOWED = 6
 
 export const PD_BULK_ADD_MESSAGES = {
-  1: 'Duplicated',
-  2: 'Multiple phone numbers not processed',
+  1: 'Duplicate phone number(s)',
+  2: 'Tasks from multiple phone number(s)',
   3: 'Unauthorized disposition / DNC',
   4: 'No primary phone number',
-  5: 'Invalid phone number',
-  6: 'International phone numbers not processed'
+  5: 'Invalid phone number(s)',
+  6: 'International phone number(s)'
 }
