@@ -39,6 +39,16 @@
         <refresh-icon />
         Refresh
       </compact-btn>
+
+      <!-- Broadcast help article -->
+      <a href="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
+         target="_blank"
+         v-if="$route.name === 'Broadcasts'">
+        <information-circle-icon class="ml-2 cursor-pointer"/>
+        <q-tooltip>
+          Check the article how to use the Broadcast
+        </q-tooltip>
+      </a>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
@@ -161,6 +171,7 @@ import HeaderHelp from 'components/header-help'
 import InboxMyContactsFilter from 'components/inbox/inbox-my-contacts-filter'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 
@@ -191,7 +202,8 @@ export default {
     CompactBtn,
     RefreshIcon,
     HeaderHelp,
-    InboxMyContactsFilter
+    InboxMyContactsFilter,
+    InformationCircleIcon
   },
 
   props: {
