@@ -13,8 +13,8 @@
                                    :list="filteredList"
                                    @start="beginDial"
                                    @on-update-session-metrics="onSessionMetricsUpdate" />
-      <bulk-add-report-modal :statusReport="bulkAddStatusReport"
-                             @close="onTaskAddedNotificationClose"/>
+      <power-dialer-bulk-add-report-modal :statusReport="bulkAddStatusReport"
+                                          @close="onTaskAddedNotificationClose"/>
     </template>
 
     <template slot="actions">
@@ -539,7 +539,7 @@ import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-
 import Datatable from 'src/components/datatable'
 import SearchList from 'src/components/search'
 import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
-import BulkAddReportModal from 'src/components/power-dialer/power-dialer-bulk-add-report-modal'
+import PowerDialerBulkAddReportModal from 'src/components/power-dialer/power-dialer-bulk-add-report-modal'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
@@ -658,7 +658,7 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     PowerDialerBulkActionMenu,
-    BulkAddReportModal
+    PowerDialerBulkAddReportModal
   },
 
   filters: {
@@ -1181,8 +1181,6 @@ export default {
      */
     checkTaskAddedNotification () {
       const notification = this.bulkAddNotifications(this.$route.params.id)
-      console.log({ notification })
-
       this.bulkAddStatusReport = notification?.status_report
     },
 
@@ -1202,13 +1200,13 @@ export default {
       deep: true
     },
 
-    '$route.params.id': {
-      handler () {
-        if (!this.$route.name.includes('Contact')) {
-          this.init(true)
-        }
-      },
-      deep: true
+    '$route.params.id': function (newId, oldId) {
+      if (!this.$route.name.includes('Contact')) {
+        this.init(true)
+      }
+
+      this.clearBulkActionNotification(oldId)
+      this.bulkAddStatusReport = {}
     },
 
     currentListFilters: {

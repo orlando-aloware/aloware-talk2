@@ -12,11 +12,11 @@
         <li v-if="addedFromMultipleNumbers > 0">{{ addedFromMultipleNumbers }} added from multiple numbers</li>
       </ul>
       <template v-if="skipped.length > 0">
-        <p class="m-0">Contacts not added/skipeed</p>
+        <p class="m-0">Contacts not added/skipped</p>
         <ul>
           <li v-for="(error, id) in skipped"
               v-bind:key="id">
-            {{ error[1] }} {{ getErrorName(error[0]) }}
+            {{ error[1] }} {{ getErrorMessage(error[0]) }}
           </li>
         </ul>
       </template>
@@ -32,16 +32,11 @@
   </b-modal>
 </template>
 <script>
-const ERROR_DICT = {
-  1: 'Duplicated',
-  2: 'Multiple numbers not allowed',
-  3: 'Unauthorized disposition / DNC',
-  4: 'No primary phone number',
-  5: 'Invalid number',
-  6: 'International Disallowed'
-}
+import { PD_BULK_ADD_MESSAGES } from 'src/constants/power-dialer-add-errors'
 
 export default {
+  name: 'PowerDialerBulkAddReportModal',
+
   props: {
     statusReport: {
       type: Object,
@@ -84,13 +79,9 @@ export default {
   },
 
   methods: {
-    getErrorName (errorNumber) {
-      return ERROR_DICT[errorNumber]
+    getErrorMessage (errorNumber) {
+      return PD_BULK_ADD_MESSAGES[errorNumber]
     }
-  },
-
-  mounted () {
-    console.log({ statusReport: this.statusReport })
   }
 }
 </script>
