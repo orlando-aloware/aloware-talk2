@@ -1,3 +1,5 @@
+import * as BroadcastDefault from 'src/constants/broadcast-default'
+
 export default {
   DELETE_BROADCAST (state, broadcast) {
     const index = state.broadcasts.findIndex(b => b.id === broadcast.id)
@@ -23,5 +25,9 @@ export default {
     } else {
       state.broadcasts.unshift(broadcast)
     }
+  },
+
+  RESET_VUEX (state) {
+    state = Object.assign({}, BroadcastDefault.DEFAULT_STATE)
   }
 }
