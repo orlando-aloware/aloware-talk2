@@ -43,27 +43,6 @@
                 v-else-if="column.name === 'created_at'">
               {{ contact.created_at | fixFullDateTime }}
             </td>
-
-            <td :key="column.name"
-                v-else-if="column.name === 'tags'">
-              <template v-if="Array.isArray(contact.tags) && contact.tags.length">
-                <span>
-                  <i class="fa fa-circle"
-                     :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`" />
-                  <span v-if="contact.tags.length > 1">
-                    {{ contact.tags[0].name | truncate(17) }}
-                  </span>
-                  <span v-else>
-                    {{ contact.tags[0].name | truncate(27) }}
-                  </span>
-                </span>
-                <span class="ml-1 text-grey-7"
-                      v-if="contact.tags.length > 1">
-                  +{{ (contact.tags.length - 1) }} more
-                </span>
-              </template>
-              <span v-else>-</span>
-            </td>
           </template>
         </tr>
       </template>
@@ -130,12 +109,6 @@ export default {
           label: 'Date Added',
           order: 2,
           minWidth: 140
-        },
-        {
-          name: 'tags',
-          relationName: 'tags',
-          order: 3,
-          minWidth: 200
         }
       ]
     },
@@ -265,7 +238,6 @@ export default {
       await this.getContacts()
 
       this.loading = false
-      // FIXME: set contacts
     }
   },
 
