@@ -418,7 +418,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled"
+           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -437,7 +437,7 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Broadcasts') && profile.bulk_sms_enabled"
+           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled)"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -451,7 +451,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Broadcasts') && profile.bulk_sms_enabled"
+           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled)"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"

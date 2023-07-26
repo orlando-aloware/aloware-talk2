@@ -98,7 +98,8 @@
       <div class="col-2 d-flex justify-content-end">
         <compact-btn class="mr-2"
                      variant="primary"
-                     @clicked="$router.push({ path: '/broadcasts/new' })">
+                     @clicked="$router.push({ path: '/broadcasts/new' })"
+                     v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])">
           <plus-icon class="mr-1"
                      color="white"/>
           New Bulk Message

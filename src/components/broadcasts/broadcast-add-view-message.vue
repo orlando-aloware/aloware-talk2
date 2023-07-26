@@ -1,7 +1,7 @@
 <template>
   <div class="broadcast-add broadcast-add__message">
     <b-form-radio-group stacked
-                        :options="enabledTypes"
+                        :options="types"
                         value-field="id"
                         text-field="label"
                         v-model="type"/>
@@ -88,9 +88,14 @@ import MessageComposerSms from 'src/components/message-composer/message-composer
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-view-message',
+
+  mixins: [
+    aclMixin
+  ],
 
   components: {
     AudioRecorder,
@@ -142,8 +147,19 @@ export default {
       }
     },
 
-    enabledTypes () {
-      return this.types.filter(type => type.enabled)
+    types () {
+      return [
+        {
+          id: 'sms',
+          label: 'SMS',
+          enabled: this.hasPermissionTo('create broadcast message')
+        },
+        {
+          id: 'rvm',
+          label: 'Ringless Voicemail',
+          enabled: this.hasPermissionTo('create broadcast rvm')
+        }
+      ].filter(type => type.enabled)
     },
 
     smsBodyLength () {
@@ -201,18 +217,6 @@ export default {
 
   data: () => ({
     type: 'sms',
-    types: [
-      {
-        id: 'sms',
-        label: 'SMS',
-        enabled: true
-      },
-      {
-        id: 'rvm',
-        label: 'Ringless Voicemail',
-        enabled: true
-      }
-    ],
     maxSmsBodyLength: 1600
   }),
 

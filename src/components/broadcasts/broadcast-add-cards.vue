@@ -26,9 +26,14 @@
 </template>
 
 <script>
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-cards',
+
+  mixins: [
+    simpsocialMixin
+  ],
 
   props: {
     contactsLength: {
@@ -48,13 +53,15 @@ export default {
       return [
         {
           title: this.contactsLength,
-          text: (this.contactsLength === 1 ? 'Contact' : 'Contacts')
+          text: (this.contactsLength === 1 ? 'Contact' : 'Contacts'),
+          enabled: true
         },
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),
-          text: 'Estimated Cost'
+          text: 'Estimated Cost',
+          enabled: this.isNotSimpsocial
         }
-      ]
+      ].filter(card => card.enabled)
     },
 
     isValid () {
