@@ -26,6 +26,7 @@ export default {
     this.countSource = this.countCancelToken.source()
 
     this.contactsListCountListeners.getListCount = (data) => {
+      this.fetchCount = 0
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
       const isStaticList = listId !== null && this.lists?.[listId] && this.lists[listId]?.type === STATIC
@@ -43,7 +44,7 @@ export default {
               this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
             }, 5000)
 
-            if (this.fetchCount < 4) {
+            if (this.fetchCount < 5) {
               return
             }
           }
@@ -117,10 +118,16 @@ export default {
       const filters = typeof data.filters === 'object'
         ? this.$jsonClone(data.filters)
         : JSON.parse(data.filters)
+      const tempFilters = this.$jsonClone(filters)
+
+      // we remove unnecessary filter so we can check for emptiness
+      if (tempFilters?.list_id) {
+        delete tempFilters.list_id
+      }
 
       // check if list is a static list, then we should fetch
       // from the static list count endpoint
-      if (isStaticList && !this.$route.path.includes('/add') && isEmpty(filters)) {
+      if (isStaticList && !this.$route.path.includes('/add') && isEmpty(tempFilters)) {
         return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${listId}/count`, {
           cancelToken: this.countSource.token
         })
