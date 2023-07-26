@@ -41,25 +41,6 @@ Highcharts.theme = HighchartsThemes.themes.future
 Highcharts.setOptions(Highcharts.theme)
 Highcharts.setOptions({
   chart: {
-    events: {
-      load: function () {
-        // let chart = this
-
-        // setTimeout(() => {
-        //   if (chart && chart.series) {
-        //     $.each(chart.series, function (i, series) {
-        //       $.each(series.data, function (j, data) {
-        //         if (data && data.yBottom && data.plotY && data.dataLabel) {
-        //           if (data.yBottom - data.plotY < 15) {
-        //             data.dataLabel = data.dataLabel.destroy()
-        //           }
-        //         }
-        //       })
-        //     })
-        //   }
-        // }, 100)
-      }
-    },
     style: {
       fontFamily: ['Quicksand', '-apple-system', 'system-ui', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
     }
