@@ -6,7 +6,7 @@
                      style="width: 100%"
                      placeholder="Select list"
                      :searchable="true"
-                     :showNoResults="false"
+                     :show-no-results="false"
                      :close-on-select="true"
                      :options="lists"
                      :show-labels="false"
@@ -42,12 +42,10 @@ export default {
     })
   },
 
-  data () {
-    return {
-      list: null,
-      loading: false
-    }
-  },
+  data: () => ({
+    list: null,
+    loading: false
+  }),
 
   async mounted () {
     if (!this.lists.length) {

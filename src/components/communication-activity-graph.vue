@@ -50,8 +50,8 @@
       </div>
     </div>
     <div class="placeholder w-100 d-flex justify-content-center"
-         :class="{ blink: loading }"
          style="height: 450px"
+         :class="{ blink: loading }"
          v-if="loading">
       <img src="images/placeholder-number-of-communications.png"
            class="img-responsive"/>
@@ -102,6 +102,8 @@ const chartOptions = [
 ]
 
 export default {
+  name: 'communication-activity-graph',
+
   mixins: [
     ReportMixin,
     DateMixin
