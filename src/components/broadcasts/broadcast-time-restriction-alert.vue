@@ -30,6 +30,8 @@ import { aclMixin, classicMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 export default {
+  name: 'broadcast-time-restriction-alert',
+
   mixins: [
     aclMixin,
     classicMixin
