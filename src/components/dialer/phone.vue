@@ -4,11 +4,11 @@
        :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
-    <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center"
+    <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
          ref="phoneHeader"
          :class="{ 'call-ended': isCallCompleted }">
-      <div v-if="shouldShow"
-           class="d-flex flex-row text-size-rg _500 text-white width-65">
+      <div class="d-flex flex-row text-size-rg _500 text-white width-65"
+           v-if="shouldShow">
         <span v-if="dialer.timer">{{ dialer.timer }}</span>
         <span v-else-if="isCallCompleted"></span>
         <span v-else>
@@ -56,9 +56,9 @@
                         :ripple="false"
                         :menu-offset="[29, 8]">
           <template v-slot:label>
-            <q-btn icon="img:app-icons/dialer/phone_settings.svg"
+            <q-btn class="icon-btn auto-size height-12 phone-settings-icon"
+                   icon="img:app-icons/dialer/phone_settings.svg"
                    size="12px"
-                   class="icon-btn auto-size height-12 phone-settings-icon"
                    padding="none"
                    flat>
             </q-btn>
@@ -76,8 +76,8 @@
                              @change="setOutputDevice">
             </device-selector>
 
-            <q-btn color="primary"
-                   class="full-width border-half-rounded mt-2 text-size-sm q-pa-xs"
+            <q-btn class="full-width border-half-rounded mt-2 text-size-sm q-pa-xs"
+                   color="primary"
                    label="Speaker Test"
                    no-caps
                    unelevated
@@ -92,17 +92,17 @@
           </div>
         </q-btn-dropdown>
 
-        <q-btn icon="img:app-icons/dialer/phone_exit.svg"
+        <q-btn class="icon-btn auto-size height-12"
+               icon="img:app-icons/dialer/phone_exit.svg"
                size="12px"
-               class="icon-btn auto-size height-12"
                padding="none"
                flat
                @click="closePhone">
         </q-btn>
       </div>
     </div>
-    <div v-if="loadingPhone"
-         class="bg-dark d-flex align-items-center justify-content-center h-100">
+    <div class="bg-dark d-flex align-items-center justify-content-center h-100 flex-grow-1 overflow-hidden"
+         v-if="loadingPhone">
       <q-spinner-bars color="white"
                       size="2em" />
     </div>
@@ -116,16 +116,16 @@
                       rounded
                       dense>
               <template v-slot:avatar>
-                <q-icon name="o_info"
-                        color="white"
-                        class="text-size-rg">
+                <q-icon class="text-size-rg"
+                        name="o_info"
+                        color="white">
                 </q-icon>
               </template>
               <span class="text-size-xs">It's {{ currentLocalTime }} in the timezone of the person you are calling</span>
               <template v-slot:action>
-                <q-btn color="white"
+                <q-btn class="text-size-rg"
+                       color="white"
                        icon="o_cancel"
-                       class="text-size-rg"
                        padding="none"
                        flat
                        round
@@ -143,9 +143,9 @@
                 <span class="d-inline-flex">
                   {{ contactName | truncate(15) }}
                 </span>
-                <q-btn color="white"
+                <q-btn class="text-size-rg d-inline-flex ml-1"
+                       color="white"
                        icon="o_info"
-                       class="text-size-rg d-inline-flex ml-1"
                        flat
                        round
                        @click="goToContact">
@@ -153,8 +153,8 @@
               </q-item-label>
               <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
                 <span class="d-inline-flex">{{ leadNumber }}</span>
-                <b-link href="#"
-                        class="copy-phone-number text-white d-inline-flex ml-1"
+                <b-link class="copy-phone-number text-white d-inline-flex ml-1"
+                        href="#"
                         @click.prevent="copyPhoneNumber(leadNumberRaw)">
                   <copy-icon />
                 </b-link>
@@ -249,8 +249,8 @@
           <div class="phone-main d-flex flex-column align-items-center">
             <div class="dummy bg-dark w-100 height-36"></div>
             <div class="phone-avatar">
-              <avatar v-if="!isCallAdding && !isCallAdded"
-                      class="contact-avatar"
+              <avatar class="contact-avatar"
+                      v-if="!isCallAdding && !isCallAdded"
                       width="50"
                       height="50"
                       :name="contactName">
@@ -263,9 +263,9 @@
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
                   <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
-                  <q-btn color="text-grey-100"
+                  <q-btn class="text-size-rg d-inline-flex ml-1"
+                         color="text-grey-100"
                          icon="o_info"
-                         class="text-size-rg d-inline-flex ml-1"
                          flat
                          round
                          @click="goToContact">
@@ -273,8 +273,8 @@
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
                   <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
-                  <b-link href="#"
-                          class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                  <b-link class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                          href="#"
                           @click.prevent="copyPhoneNumber(dialer.communication.lead_number)">
                     <copy-icon />
                   </b-link>
@@ -293,8 +293,8 @@
             <div class="phone-info w-100 mt-2 pl-2 pr-2 small d-flex flex-column align-items-start"
                  v-else>
               <div class="d-flex justify-content-between align-items-center w-100 pr-2">
-                <q-item-label v-if="contact"
-                              class="cursor-pointer"
+                <q-item-label class="cursor-pointer"
+                              v-if="contact"
                               @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
                     <ready-icon v-if="!shouldIntroduce" />
@@ -396,6 +396,12 @@
                                    :height="iconSizes.recording.height"
                                    v-show="dialer.recordingStatus === 'in-progress' && dialer.communication.should_record === true">
                 </pause-record-icon>
+                <pause-record-icon pathColor="#95989E"
+                                   circle-color="#95989E"
+                                   :width="iconSizes.recording.width"
+                                   :height="iconSizes.recording.height"
+                                   v-show="dialer.communication.should_record !== true">
+                </pause-record-icon>
                 <span>{{ recordingText }}</span>
               </button>
             </div>
@@ -471,10 +477,10 @@
                 <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
                   <div class="mr-auto">
                     <p class="contact-name mb-1">
-                      <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
-                      <q-btn color="black"
+                      <span class="d-inline-flex text-truncate">{{ contactName }}</span>
+                      <q-btn class="text-size-rg d-inline-flex ml-1"
+                             color="black"
                              icon="o_info"
-                             class="text-size-rg d-inline-flex ml-1"
                              flat
                              round
                              @click="goToContact">
@@ -483,8 +489,8 @@
                     <p class="text-sm-left contact-phone mb-1"
                        v-if="contact">
                       <span>{{ contact.phone_number | fixPhone }}</span>
-                      <b-link href="#"
-                              class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                      <b-link class="copy-phone-number text-grey-100 d-inline-flex ml-1"
+                              href="#"
                               @click.prevent="copyPhoneNumber(contact.phone_number)">
                         <copy-icon/>
                       </b-link>
@@ -732,12 +738,12 @@
                   </q-item-label>
                   <div class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-start"
                        v-if="addedParty.id">
-                    <q-item-label v-if="!addedParty.is_destination"
-                                  class="text-size-sm text-grey-90 _400 mt-1">
+                    <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
+                                  v-if="!addedParty.is_destination">
                       {{ addedParty.email }} - {{ getLabel(addedParty) }}
                     </q-item-label>
-                    <q-item-label v-else
-                                  class="text-size-sm text-grey-90 _400 mt-1">
+                    <q-item-label class="text-size-sm text-grey-90 _400 mt-1"
+                                  v-else>
                       {{ getLabel(addedParty) }}
                     </q-item-label>
                   </div>
@@ -884,9 +890,9 @@
             </template>
             <template v-if="bottomExpansion === 'tags'">
               <q-card-section class="height-240 mx-2 px-3">
-                <communication-tags buttonText="Modify Tags"
-                                    :communication="dialer.communication"
-                                    ref="communicationTags">
+                <communication-tags ref="communicationTags"
+                                    buttonText="Modify Tags"
+                                    :communication="dialer.communication">
                 </communication-tags>
               </q-card-section>
             </template>
@@ -910,8 +916,8 @@
                 <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
                   <div class="d-flex w-100">
                     <q-list class="phone-radio-select w-100">
-                      <q-item tag="label"
-                              class="pl-0 pr-0"
+                      <q-item class="pl-0 pr-0"
+                              tag="label"
                               dense>
                         <q-item-section avatar>
                           <q-radio val="user"
@@ -930,9 +936,9 @@
                                                        v-model="add.userId"
                                                        @change="changeAddUser">
                               </available-user-selector>
-                              <q-btn color="black"
+                              <q-btn class="text-size-xxs ml-1"
+                                     color="black"
                                      icon="refresh"
-                                     class="text-size-xxs ml-1"
                                      flat
                                      round
                                      @click="getUsers">
@@ -1024,8 +1030,8 @@
                       </div>
                     </div>
                     <b-button id="add-help"
-                              variant="outline-dark"
                               class="ml-2 no-border p-0 flex-shrink-1"
+                              variant="outline-dark"
                               size="sm">
                       <i class="material-icons-outlined">info</i>
                     </b-button>
@@ -1052,8 +1058,8 @@
                 <div class="d-flex flex-column justify-content-between w-100 pt-3 pb-3 pl-3 pr-3 h-100">
                   <div class="d-flex w-100">
                     <q-list class="phone-radio-select w-100">
-                      <q-item tag="label"
-                              class="pl-0 pr-0"
+                      <q-item class="pl-0 pr-0"
+                              tag="label"
                               dense>
                         <q-item-section avatar>
                           <q-radio val="user"
@@ -1072,9 +1078,9 @@
                                                        v-model="transfer.userId"
                                                        @change="changeTransferUser">
                               </available-user-selector>
-                              <q-btn color="black"
+                              <q-btn class="text-size-xxs ml-1"
+                                     color="black"
                                      icon="refresh"
-                                     class="text-size-xxs ml-1"
                                      flat
                                      round
                                      @click="getUsers">
@@ -1086,8 +1092,8 @@
                           </template>
                         </q-item-section>
                       </q-item>
-                      <q-item tag="label"
-                              class="pl-0 pr-0"
+                      <q-item class="pl-0 pr-0"
+                              tag="label"
                               dense>
                         <q-item-section avatar>
                           <q-radio val="ring-group"
@@ -1111,8 +1117,8 @@
                           </template>
                         </q-item-section>
                       </q-item>
-                      <q-item tag="label"
-                              class="pl-0 pr-0"
+                      <q-item class="pl-0 pr-0"
+                              tag="label"
                               dense>
                         <q-item-section avatar>
                           <q-radio val="phone-number"
@@ -1527,12 +1533,15 @@ export default {
       if (this.transfer.mode === 'user' && this.transfer.userId) {
         return true
       }
+
       if (this.transfer.mode === 'ring-group' && this.transfer.ringGroupId) {
         return true
       }
+
       if (this.transfer.mode === 'phone-number' && this.transfer.phoneNumber && this.$options.filters.fixPhone(this.transfer.phoneNumber)) {
         return true
       }
+
       return false
     },
 
@@ -1548,6 +1557,7 @@ export default {
       if (this.add.mode === 'phone-number' && this.add.phoneNumber && this.$options.filters.fixPhone(this.add.phoneNumber)) {
         return true
       }
+
       return false
     },
 
@@ -1602,6 +1612,7 @@ export default {
       if (!this.dialer.communication) {
         return ''
       }
+
       switch (this.dialer.communication.current_status2) {
         case CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW:
           return 'Calling...'
@@ -1614,9 +1625,11 @@ export default {
       if (this.dialer.recordingStatus === 'in-progress' && this.dialer.communication && this.dialer.communication.should_record === true) {
         return 'Pause Rec'
       }
+
       if (this.dialer.recordingStatus === 'paused' && this.dialer.communication && this.dialer.communication.should_record === true) {
         return 'Start Rec'
       }
+
       return 'Start Rec'
     },
 
@@ -1628,11 +1641,13 @@ export default {
       if (this.contact) {
         return this.contact.name || 'No Name'
       }
+
       const callFishingContactName = _.get(this.dialer.callFishing, 'contact.name', 'No Name')
 
       if (callFishingContactName) {
         return callFishingContactName
       }
+
       return 'No Name'
     },
 
@@ -1786,6 +1801,7 @@ export default {
       }
 
       const found = this.callFishingQueue.find(item => item.communicationId === this.dialer.callFishing.communication.id)
+
       return _.isEmpty(found)
     },
 
@@ -1904,6 +1920,7 @@ export default {
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
         this.openPhone()
+
         setTimeout(() => {
           window.addEventListener('resize', this.resizeHandler)
           this.dragElement()
@@ -1971,6 +1988,7 @@ export default {
           companyName: _.get(this.dialer, 'callFishing.contact.company_name', null),
           contactId: _.get(this.dialer, 'callFishing.communication.contact_id', null)
         })
+
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
 
@@ -2000,6 +2018,7 @@ export default {
 
       this.$VueEvent.fire('toggleHold')
       this.$options.holdIntervalCount = 0
+
       this.$options.holdInterval = setInterval(() => {
         if (this.loadingHold && this.dialer.isHeld) {
           this.loadingHold = false
@@ -2026,6 +2045,7 @@ export default {
 
       this.expansionEnabled = true
       this.bottomExpansion = mode
+
       setTimeout(() => {
         this.expanded = true
       }, 50)
@@ -2040,6 +2060,7 @@ export default {
       this.loadingPark = true
       this.$VueEvent.fire('parkCall')
       this.saveAndResetExpansion($event)
+
       setTimeout(() => {
         this.loadingPark = false
       }, 1000)
@@ -2077,6 +2098,7 @@ export default {
     handleLongPress (isLong = false) {
       if (isLong) {
         this.sendDigit('+')
+
         return
       }
 
@@ -2241,6 +2263,7 @@ export default {
       $event.target.blur()
       this.loadingCommunication = true
       this.$VueEvent.fire('forceRefreshCommunication')
+
       setTimeout(() => {
         this.loadingCommunication = false
       }, 1000)
@@ -2282,6 +2305,7 @@ export default {
       }
 
       this.loadingSendVmDrop = true
+
       this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
         communication_id: this.dialer.communication.id,
         file_name: this.vmDrop.uploaded_file.uuid,
@@ -2305,6 +2329,7 @@ export default {
       }
 
       this.loadingSendMessage = true
+
       this.$axios.post('/api/v1/campaign/send-message/' + this.dialer.communication.campaign_id + '/' + this.dialer.communication.contact_id, {
         message: this.template.body,
         phone_number: this.dialer.communication.lead_number
@@ -2383,6 +2408,7 @@ export default {
       this.$VueEvent.fire('transferCall', this.transfer)
       this.resetTransfer()
       this.saveAndResetExpansion($event)
+
       setTimeout(() => {
         this.loadingTransfer = false
       }, 1000)
@@ -2393,6 +2419,7 @@ export default {
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
+
       setTimeout(() => {
         this.loadingAdd = false
       }, 1000)
@@ -2404,6 +2431,7 @@ export default {
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
+
       setTimeout(() => {
         this.loadingIntroduce = false
       }, 1000)
@@ -2412,6 +2440,7 @@ export default {
     dropThirdParty () {
       this.loadingDropThirdParty = true
       this.$VueEvent.fire('dropThirdParty')
+
       setTimeout(() => {
         this.loadingDropThirdParty = false
       }, 1000)
@@ -2420,6 +2449,7 @@ export default {
     mergeCalls () {
       this.loadingMerge = true
       this.$VueEvent.fire('mergeCalls')
+
       setTimeout(() => {
         this.loadingMerge = false
       }, 1000)
@@ -2498,6 +2528,7 @@ export default {
 
       if (!this.shouldShow) {
         this.$emit('onPhoneVisible', false)
+
         return
       }
 

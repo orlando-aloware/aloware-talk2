@@ -172,8 +172,8 @@
           size="sm"
           padding="0px 12px"
           :ripple="false"
-          :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl"
-          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl"
+          :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
+          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
           :menu-offset="[0, 6]"
           @click="onSend"
         >

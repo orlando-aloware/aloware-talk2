@@ -79,7 +79,7 @@
       <template #empty>
         <div class="empty-state"
              v-if="agents.length === 0">
-          <div class="h5">
+          <div class="h5 px-2 text-center">
             No agents found based on the current filters
           </div>
         </div>

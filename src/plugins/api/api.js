@@ -550,8 +550,8 @@ export default {
         return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
 
-      inboxCounts () {
-        return window.axios.get(`/api/v2/contacts/inbox-counts`)
+      inboxCounts (params) {
+        return window.axios.get(`/api/v2/contacts/inbox-counts`, params)
       },
 
       taskStatusUpdate (id, params) {

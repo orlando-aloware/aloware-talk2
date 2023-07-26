@@ -178,7 +178,6 @@
 }
 
 .t-scroll-y {
-  height: calc(100vh - 270px) !important;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -302,8 +301,7 @@
 
 .t-flex-group,
 .t-flex-group__no-bg {
-  display: table;
-  table-layout: fixed;
+  display: flex;
   border-spacing: 0;
   width: 100%;
   height: 100%;
@@ -316,7 +314,7 @@
   background-color: $grey-1;
   overflow: hidden;
   .card {
-    flex: 0 1 auto;
+    flex: 0 0 auto;
   }
   .t-panel-container {
     flex: 1 1 auto;
@@ -328,11 +326,11 @@
 
 .t-panel-container {
   height: 100%;
-  .q-tab-panels {
-    height: calc(100vh - 298px);
-    .q-panel {
+  overflow: hidden;
 
-    }
+  .q-tab-panels {
+    height: 100%;
+    overflow: hidden;
   }
 }
 
@@ -428,13 +426,13 @@ iframe > html {
 
 .hubspot-iframe-container,
 .referrizer-iframe-container {
-  height: calc(100% - 12px);
+  height: 100%;
   width: 100%;
   overflow: hidden;
 
   #hubspot-crm,
   #referrizer-crm {
-    width: calc(100% + 0px);
+    width: 100%;
     height: 100%;
   }
 }

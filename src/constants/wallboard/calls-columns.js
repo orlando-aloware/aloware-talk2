@@ -64,7 +64,7 @@ export const COLUMNS = [
     sortable: true,
     selectable: true,
     draggable: true,
-    minWidth: 200
+    minWidth: 300
   },
   {
     name: 'lead_location',
