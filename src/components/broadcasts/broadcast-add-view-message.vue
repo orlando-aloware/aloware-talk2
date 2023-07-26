@@ -1,9 +1,9 @@
 <template>
   <div class="broadcast-add broadcast-add__message">
     <b-form-radio-group stacked
-                        :options="types"
                         value-field="id"
                         text-field="label"
+                        :options="types"
                         v-model="type"/>
     <!-- sms -->
     <div class="broadcast-add__message__sms"
@@ -221,7 +221,6 @@ export default {
   }),
 
   created () {
-    // FIXME?: check implemented logic in contact.mixin::showContactInfo to select a campaign properly
     const campaign = this.profile.campaign_id
       ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
       : this.campaigns[0]
