@@ -53,7 +53,7 @@
       </b-col>
     </b-row>
 
-  <!-- loading spinner -->
+    <!-- loading spinner -->
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -189,6 +189,12 @@ export default {
       this.getTags()
     }
 
+    this.listeners.bulkTagsDeleted = (data) => {
+      this.$generalNotification(data.message)
+      this.getTagCategoriesCount(data.category)
+      this.getTags()
+    }
+
     // contact tags - add to pd event
     this.listeners.contactListBulkCreated = (data) => {
       if (data.user_id === this.profile.id && data.items_count > 0) {
@@ -200,6 +206,7 @@ export default {
     this.$VueEvent.listen('tag_created', this.listeners.tagCreated)
     this.$VueEvent.listen('tag_updated', this.listeners.tagUpdated)
     this.$VueEvent.listen('tag_deleting', this.listeners.tagDeleting)
+    this.$VueEvent.listen('bulk_tags_deleted', this.listeners.bulkTagsDeleted)
     this.$VueEvent.listen('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   },
 
@@ -237,6 +244,7 @@ export default {
 
       this.reloadData()
       this.resetPaginationAndSearch()
+      this.getTagCategoriesCount(this.oldTagCategory)
       this.getTags({
         cancelToken: this.source.token
       })
@@ -245,16 +253,16 @@ export default {
     getTagCategoriesCount (category = null) {
       switch (category) {
         case this.CommunicationTags:
-          this.tagCategoriesCount.communications = this.getCommunicationTagsCount() ?? 0
+          this.getCommunicationTagsCount()
           break
 
         case this.ContactTags:
-          this.tagCategoriesCount.contacts = this.getContactTagsCount() ?? 0
+          this.getContactTagsCount()
           break
 
         default:
-          this.tagCategoriesCount.communications = this.getCommunicationTagsCount() ?? 0
-          this.tagCategoriesCount.contacts = this.getContactTagsCount() ?? 0
+          this.getCommunicationTagsCount()
+          this.getContactTagsCount()
       }
     },
 
@@ -356,6 +364,7 @@ export default {
     this.$VueEvent.stop('tag_created', this.listeners.tagCreated)
     this.$VueEvent.stop('tag_updated', this.listeners.tagUpdated)
     this.$VueEvent.stop('tag_deleting', this.listeners.tagDeleting)
+    this.$VueEvent.stop('bulk_tags_deleted', this.listeners.bulkTagsDeleted)
     this.$VueEvent.stop('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   }
 }
