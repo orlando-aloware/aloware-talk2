@@ -73,7 +73,7 @@
           Select all {{ totalRows | numFormat }} contacts.
       </a>
       <a href=""
-         v-if="isAllSelected && checkedCount === totalRows && !isDatatableCountLoading"
+         v-if="isAllSelected && !isDatatableCountLoading"
          @click.prevent="onClearAll">
         Clear selection
       </a>
