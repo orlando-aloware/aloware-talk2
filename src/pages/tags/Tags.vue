@@ -1,15 +1,7 @@
 <template>
   <div class="tags position-relative h-100 d-flex"
        v-if="authenticated">
-    <!-- loading spinner -->
-    <b-overlay class="h-100 w-100 d-flex flex-column"
-               rounded="sm"
-               :show="isLoading">
-      <template #overlay>
-        <q-spinner-bars color="primary"
-                        size="40px" />
-      </template>
-
+    <div class="h-100 w-100 d-flex flex-column">
       <b-row class="tags__header d-flex px-1 py-3">
         <!-- search -->
         <b-col class="d-flex align-self-center">
@@ -62,28 +54,38 @@
         </b-col>
       </b-row>
 
-      <!-- bulk actions -->
-      <div class="row mx-0 relative-position"
-          v-if="hasRole('Company Admin')">
-        <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
-                               @reloadTags="getTags" />
-      </div>
+       <!-- loading spinner -->
+      <b-overlay class="h-100 w-100 d-flex flex-column overflow-hidden"
+                 rounded="sm"
+                 :show="isLoading">
+        <template #overlay>
+          <q-spinner-bars color="primary"
+                          size="40px" />
+        </template>
 
-      <!-- table -->
-      <tags-table :tags="tags"
-                  :is-loading="isLoading"
-                  :is-loading-refresh-count="isLoadingRefreshCount"
-                  :pagination="pagination"
-                  @paginated="paginate"
-                  @sort="sort"
-                  @editTag="editTag"
-                  @updateTagCount="updateTagCount" />
+        <!-- bulk actions -->
+        <div class="row mx-0 relative-position"
+            v-if="hasRole('Company Admin')">
+          <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
+                                 @reloadTags="getTags" />
+        </div>
 
-      <tag-form :is-show="isOpenTagForm"
-                :tag-category="selectedTagCategory"
-                :editable-tag="tag"
-                @closeTagForm="closeTagForm" />
-    </b-overlay>
+        <!-- table -->
+        <tags-table :tags="tags"
+                    :is-loading="isLoading"
+                    :is-loading-refresh-count="isLoadingRefreshCount"
+                    :pagination="pagination"
+                    @paginated="paginate"
+                    @sort="sort"
+                    @editTag="editTag"
+                    @updateTagCount="updateTagCount" />
+
+        <tag-form :is-show="isOpenTagForm"
+                  :tag-category="selectedTagCategory"
+                  :editable-tag="tag"
+                  @closeTagForm="closeTagForm" />
+      </b-overlay>
+    </div>
   </div>
 </template>
 
