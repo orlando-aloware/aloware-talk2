@@ -1,6 +1,4 @@
-let colorSchemes, markers, themes = {}
-
-colorSchemes = {
+const colorSchemes = {
   future: [
     '#00BF50',
     '#190E4F',
@@ -105,7 +103,7 @@ colorSchemes = {
   ]
 }
 
-markers = {
+const markers = {
   future: {
     enabled: true,
     lineWidth: 2,
@@ -122,34 +120,36 @@ markers = {
   }
 }
 
-themes.future = {
-  chart: {
-    style: {
-      fontFamily: ['Quicksand', '-apple-system', 'system-ui', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
-    }
-  },
-  xAxis: {
-    lineColor: '#ccc'
-  },
-  yAxis: {
-    gridLineColor: '#e0e0e0'
-  },
-  credits: false,
-  legend: {
-    borderRadius: 0,
-    borderWidth: 0,
-    align: 'center',
-    x: 15
-  },
-  colors: colorSchemes.future,
-  plotOptions: {
-    line: {
-      marker: markers.future
+const themes = {
+  future: {
+    chart: {
+      style: {
+        fontFamily: ['Quicksand', '-apple-system', 'system-ui', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
+      }
     },
-    bar: {
-      dataLabels: {
-        style: {
-          textOutline: false
+    xAxis: {
+      lineColor: '#ccc'
+    },
+    yAxis: {
+      gridLineColor: '#e0e0e0'
+    },
+    credits: false,
+    legend: {
+      borderRadius: 0,
+      borderWidth: 0,
+      align: 'center',
+      x: 15
+    },
+    colors: colorSchemes.future,
+    plotOptions: {
+      line: {
+        marker: markers.future
+      },
+      bar: {
+        dataLabels: {
+          style: {
+            textOutline: false
+          }
         }
       }
     }
