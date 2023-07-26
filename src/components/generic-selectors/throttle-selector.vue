@@ -6,7 +6,7 @@
                      style="width: 100%"
                      placeholder="Select throttling"
                      :searchable="true"
-                     :showNoResults="false"
+                     :show-no-results="false"
                      :close-on-select="true"
                      :options="options"
                      :show-labels="false"
