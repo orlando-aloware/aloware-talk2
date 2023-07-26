@@ -97,26 +97,13 @@ export default {
         return options
       }
 
-      const maxMinMessages = this.campaign.max_mps * 60
-      let minMessages = 4 // minimum messages per minute that they can select
-      let counter = 1
+      let mpsList = [0.05, 0.1, 0.25, 0.5, 1, 2, 3, 4, 6, 8, 10]
 
-      while (minMessages <= maxMinMessages) {
+      for (let index = 0; mpsList[index] <= this.campaign.max_mps; index++) {
         options.push({
-          id: counter++,
-          name: minMessages * 60 + ' per hour',
-          value: minMessages
-        })
-
-        minMessages *= 2
-      }
-
-      // add max throttle option
-      if ((minMessages / 2) < maxMinMessages) {
-        options.push({
-          id: counter,
-          name: maxMinMessages * 60 + ' per hour',
-          value: maxMinMessages
+          id: index + 1,
+          name: mpsList[index] * 60 * 60 + ' per hour',
+          value: mpsList[index] * 60
         })
       }
 
