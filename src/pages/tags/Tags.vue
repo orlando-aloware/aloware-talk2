@@ -1,90 +1,89 @@
 <template>
-  <div class="tags position-relative"
+  <div class="tags position-relative h-100 d-flex"
        v-if="authenticated">
-    <b-row class="tags__header d-flex px-1 py-3">
-      <!-- search -->
-      <b-col class="d-flex align-self-center">
-        <search placeholder="Search ID or name"
-                class="width-300"
-                :search="search"
-                @search="onSearch">
-        </search>
-      </b-col>
-
-      <!-- category tabs -->
-      <b-col class="d-flex align-self-center justify-around">
-        <tags-tabs :categories-count="tagCategoriesCount"
-                   @loadTags="loadTags">
-        </tags-tabs>
-      </b-col>
-
-      <!-- add|help buttons -->
-      <b-col class="d-flex align-self-center justify-content-end row">
-        <!-- add tag -->
-        <b-button class="mr-1"
-                  size="sm"
-                  variant="primary"
-                  :title="`Add ${ tagCategoryName } Tag`"
-                  @click="openTagForm">
-          <i class="fa fa-plus"></i>
-          <span v-show="!$q.screen.sm && !$q.screen.md"> Add {{ tagCategoryName }} Tag</span>
-        </b-button>
-
-        <!-- help -->
-        <b-button id="tags-helper"
-                  class="btn-light align-items-center"
-                  size="sm"
-                  title="Help"
-                  variant="light">
-          <i class="large material-icons mr-1">help_outline</i>
-          <span v-show="!$q.screen.sm && !$q.screen.md"> Help</span>
-        </b-button>
-        <b-popover custom-class="tags__helper__popover"
-                   target="tags-helper"
-                   placement="bottomleft"
-                   title="What are Tags?"
-                   width="300"
-                   triggers="click blur">
-          <div>
-            <p>Tags help you categorize and segment your audience in a way like Lists, but with the added benefit of having the same person in multiple places.</p>
-            <p>The entire audience of a Tag can be enrolled in a sequence. Your contact imports show up as a new tag with the date of upload.</p>
-          </div>
-        </b-popover>
-      </b-col>
-    </b-row>
-
     <!-- loading spinner -->
-    <b-overlay class="h-100 w-100 position-absolute"
+    <b-overlay class="h-100 w-100 d-flex flex-column"
                rounded="sm"
-               :show="true"
-               v-show="isLoading">
+               :show="isLoading">
       <template #overlay>
         <q-spinner-bars color="primary"
                         size="40px" />
       </template>
+
+      <b-row class="tags__header d-flex px-1 py-3">
+        <!-- search -->
+        <b-col class="d-flex align-self-center">
+          <search placeholder="Search ID or name"
+                  class="width-300"
+                  :search="search"
+                  @search="onSearch">
+          </search>
+        </b-col>
+
+        <!-- category tabs -->
+        <b-col class="d-flex align-self-center justify-around">
+          <tags-tabs :categories-count="tagCategoriesCount"
+                     @loadTags="loadTags">
+          </tags-tabs>
+        </b-col>
+
+        <!-- add|help buttons -->
+        <b-col class="d-flex align-self-center justify-content-end row">
+          <!-- add tag -->
+          <b-button class="mr-1"
+                    size="sm"
+                    variant="primary"
+                    :title="`Add ${ tagCategoryName } Tag`"
+                    @click="openTagForm">
+            <i class="fa fa-plus"></i>
+            <span v-show="!$q.screen.sm && !$q.screen.md"> Add {{ tagCategoryName }} Tag</span>
+          </b-button>
+
+          <!-- help -->
+          <b-button id="tags-helper"
+                    class="btn-light align-items-center"
+                    size="sm"
+                    title="Help"
+                    variant="light">
+            <i class="large material-icons mr-1">help_outline</i>
+            <span v-show="!$q.screen.sm && !$q.screen.md"> Help</span>
+          </b-button>
+          <b-popover custom-class="tags__helper__popover"
+                     target="tags-helper"
+                     placement="bottomleft"
+                     title="What are Tags?"
+                     width="300"
+                     triggers="click blur">
+            <div>
+              <p>Tags help you categorize and segment your audience in a way like Lists, but with the added benefit of having the same person in multiple places.</p>
+              <p>The entire audience of a Tag can be enrolled in a sequence. Your contact imports show up as a new tag with the date of upload.</p>
+            </div>
+          </b-popover>
+        </b-col>
+      </b-row>
+
+      <!-- bulk actions -->
+      <div class="row mx-0 relative-position"
+          v-if="hasRole('Company Admin')">
+        <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
+                               @reloadTags="getTags" />
+      </div>
+
+      <!-- table -->
+      <tags-table :tags="tags"
+                  :is-loading="isLoading"
+                  :is-loading-refresh-count="isLoadingRefreshCount"
+                  :pagination="pagination"
+                  @paginated="paginate"
+                  @sort="sort"
+                  @editTag="editTag"
+                  @updateTagCount="updateTagCount" />
+
+      <tag-form :is-show="isOpenTagForm"
+                :tag-category="selectedTagCategory"
+                :editable-tag="tag"
+                @closeTagForm="closeTagForm" />
     </b-overlay>
-
-    <!-- bulk actions -->
-    <div class="row mx-0 relative-position"
-        v-if="hasRole('Company Admin')">
-      <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
-                             @reloadTags="getTags" />
-    </div>
-
-    <!-- table -->
-    <tags-table :tags="tags"
-                :is-loading="isLoading"
-                :is-loading-refresh-count="isLoadingRefreshCount"
-                :pagination="pagination"
-                @paginated="paginate"
-                @sort="sort"
-                @editTag="editTag"
-                @updateTagCount="updateTagCount" />
-
-    <tag-form :is-show="isOpenTagForm"
-              :tag-category="selectedTagCategory"
-              :editable-tag="tag"
-              @closeTagForm="closeTagForm" />
   </div>
 </template>
 

@@ -95,7 +95,7 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-center flex-grow-0 overflow-x-hidden"
+    <div class="d-flex justify-content-center border-top flex-grow-0 overflow-x-hidden"
          style="min-height: 56px;"
          v-if="paginated">
       <q-pagination class="table-pagination"

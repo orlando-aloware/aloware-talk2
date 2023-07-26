@@ -1,5 +1,5 @@
 <template>
-  <div class="tags-table position-relative">
+  <div class="tags-table position-relative overflow-hidden">
     <datatable custom-class="pr-3"
                paginated
                show-pagination
