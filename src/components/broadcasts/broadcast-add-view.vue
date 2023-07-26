@@ -9,18 +9,18 @@
         <transition mode="out-in"
                     :name="`horizontal-slide-${direction}`">
           <component :is="mainComponent"
-                    ref="mainComponent"
-                    v-bind="mainComponentProps"
-                    @input="mainComponentChanged"
-                    @source-updated="onSourceUpdated"
-                    @type-updated="onTypeUpdated"
-                    @rvm-updated="onRvmUpdated"
-                    @price-updated="onPriceUpdated"
-                    @time="onTimeUpdated"
-                    @date-changed="onDateChanged"
-                    @campaign="onCampaignUpdated"
-                    @throttle="onThrottleUpdated"
-                    @restricted-time="onRestrictedTimeChanged"/>
+                     ref="mainComponent"
+                     v-bind="mainComponentProps"
+                     @input="mainComponentChanged"
+                     @source-updated="onSourceUpdated"
+                     @type-updated="onTypeUpdated"
+                     @rvm-updated="onRvmUpdated"
+                     @price-updated="onPriceUpdated"
+                     @time="onTimeUpdated"
+                     @date-changed="onDateChanged"
+                     @campaign="onCampaignUpdated"
+                     @throttle="onThrottleUpdated"
+                     @restricted-time="onRestrictedTimeChanged"/>
         </transition>
       </div>
 
@@ -58,7 +58,7 @@
     </div>
 
     <confirm-dialog id="outside-business-hours-dialog"
-                    :isOpen="outsideBusinessHoursDialog.open"
+                    :is-open="outsideBusinessHoursDialog.open"
                     @close="onOutsideBusinessHoursDialogClosed">
       <template #content>
         {{ outsideBusinessHoursDialog.message }}
@@ -385,7 +385,6 @@ export default {
           }
 
           break
-
         case 'rvm':
           method = 'sendBulkRvm'
           bulkMessage.file_name = this.rvm.file_name
