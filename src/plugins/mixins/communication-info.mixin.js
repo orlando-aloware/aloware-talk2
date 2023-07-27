@@ -252,6 +252,12 @@ export default {
           return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
         case CommunicationRejectionReasons.REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER:
           return 'Short Code is not allowed to send messages to non-US numbers.'
+        case CommunicationRejectionReasons.REJECTION_REASON_LRN_TYPE_IS_LANDLINE:
+          return 'Landlines are not capable of receiving SMS/MMS.'
+        case CommunicationRejectionReasons.REJECTION_REASON_MESSAGING_DISABLED:
+          return 'Messaging is disabled for this line.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CALL_TO_SELF_NUMBER:
+          return 'You cannot place a call to your own number.'
       }
     },
 
