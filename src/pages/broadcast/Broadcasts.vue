@@ -25,7 +25,7 @@
                       v-model="broadcastFilter">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                :class="[broadcastFilter === 1 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 1 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   New
                 </span>
@@ -39,12 +39,12 @@
           </template>
           <template v-slot:two>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                :class="[broadcastFilter === 2 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 2 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Enrolling
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                      v-if="broadcastCounts[1] > 0">
+                     v-if="broadcastCounts[1] > 0">
                   <span>
                     {{ broadcastCounts[1] | numberPlusFormatter(99) }}
                   </span>
@@ -53,7 +53,7 @@
           </template>
           <template v-slot:three>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                :class="[broadcastFilter === 3 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 3 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Sent
                 </span>
@@ -67,7 +67,7 @@
           </template>
           <template v-slot:four>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                :class="[broadcastFilter === 4 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 4 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Paused
                 </span>
@@ -81,12 +81,12 @@
           </template>
           <template v-slot:five>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                :class="[broadcastFilter === 5 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 5 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   All
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                      v-if="broadcastCounts[4] > 0">
+                     v-if="broadcastCounts[4] > 0">
                   <span>
                     {{ broadcastCounts[4] | numberPlusFormatter(99) }}
                   </span>
@@ -98,8 +98,8 @@
       <div class="col-2 d-flex justify-content-end">
         <compact-btn class="mr-2"
                      variant="primary"
-                     @clicked="$router.push({ path: '/broadcasts/new' })"
-                     v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])">
+                     v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
+                     @clicked="$router.push({ path: '/broadcasts/new' })">
           <plus-icon class="mr-1"
                      color="white"/>
           New Bulk Message
