@@ -493,7 +493,7 @@ export default {
     },
 
     hasUnreadsClass () {
-      return this.totalUnreads ? 'text-black' : ''
+      return this.totalUnreads && (!this.isParkedCall && !this.isConnectedCall) ? 'text-black' : ''
     }
   },
 
