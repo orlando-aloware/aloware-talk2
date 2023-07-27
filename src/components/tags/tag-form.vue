@@ -26,7 +26,7 @@
                     invalid-feedback="Please provide a tag name"
                     :state="validateState('name')">
         <b-form-input placeholder="Enter tag name"
-                      v-model.trim="$v.tag.name.$model"
+                      v-model="$v.tag.name.$model"
                       required />
       </b-form-group>
 
@@ -96,7 +96,7 @@
         <b-form-textarea id="textarea"
                          rows="3"
                          placeholder="Enter tag description"
-                         v-model.trim="$v.tag.description.$model"/>
+                         v-model="$v.tag.description.$model"/>
       </b-form-group>
     </b-form>
 
