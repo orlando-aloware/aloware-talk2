@@ -72,3 +72,9 @@ export const REJECTION_REASON_COMPANY_SUSPENDED = 35
 export const REJECTION_REASON_LINE_IS_SPAMMING = 36
 // An Sms/Mms was rejected to send by our system because Short Code is sending the message to a non-US number.
 export const REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER = 37
+// An Sms/Mms was rejected to send by our system because a landline it's not a number capable of receiving it.
+export const REJECTION_REASON_LRN_TYPE_IS_LANDLINE = 38
+// Bulk messaging is disabled for this company and the message is created by sequence or broadcast.
+export const REJECTION_REASON_MESSAGING_DISABLED = 39
+// A call was rejected by our system because caller and callee numbers are the same.
+export const REJECTION_REASON_CALL_TO_SELF_NUMBER = 40
