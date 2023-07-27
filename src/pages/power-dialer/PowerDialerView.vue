@@ -115,7 +115,6 @@
                   </b-dropdown-item>
                   <b-dropdown-item href="#"
                                    :disabled="taskAddAndClearingDisabled"
-                                   v-if="isMyQueue"
                                    @click="onClearList">
                     <i class="fa fa-trash-alt mr-1 text-red"/>
                     <span class="text-red">Clear</span>
@@ -126,12 +125,12 @@
                       Clearing of task is currently disabled.
                     </q-tooltip>
                   </b-dropdown-item>
-                  <b-dropdown-item href="#"
+                  <!--b-dropdown-item href="#"
                                    v-else
                                    @click="onRemoveList">
                     <i class="fa fa-trash-alt mr-1 text-red"/>
                     <span class="text-red">Delete</span>
-                  </b-dropdown-item>
+                  </b-dropdown-item-->
                 </b-dropdown>
 
               </div>
