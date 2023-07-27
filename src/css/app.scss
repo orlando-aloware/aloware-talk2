@@ -332,15 +332,6 @@ body,
   }
 }
 
-@media (min-width: 785px) and (max-width: 991px) {
-  .paginated {
-    .scrollableArea {
-      max-height: calc(100vh - 260px) !important;
-      min-height: calc(100vh - 260px) !important;
-    }
-  }
-}
-
 @media (min-width: 992px) {
   .dashboard {
     header {
@@ -798,6 +789,8 @@ body,
 .sidebar-wrapper,
 .sidebar-wrapper > aside {
   max-width: 64px;
+  position: absolute !important;
+  top: 0;
 }
 
 .separator-blur {
@@ -1968,7 +1961,8 @@ i.option-separator {
 
   .contacts {
     .main {
-      width: calc(100vw - 324px);
+      width: 100%;
+      overflow: hidden;
 
       .table-header {
         > div {
@@ -2012,7 +2006,6 @@ i.option-separator {
   }
 
   .card {
-    height: calc(100vh - 62px) !important;
     overflow: auto;
     position: relative;
     width: 300px;
@@ -2103,7 +2096,6 @@ i.option-separator {
 
   .details-component-container {
     width: 100%;
-    height: calc(100vh - 62px);
     overflow: auto;
 
     .card {
@@ -2291,6 +2283,19 @@ i.option-separator {
   div.options {
     margin-top: -3px;
     opacity: 0;
+
+    > *:not(:last-child) {
+      margin-right: 4px;
+    }
+
+    button {
+      padding: 0.10rem 0.40rem !important;
+      line-height: 12px !important;
+
+      svg, i {
+        margin-top: -2px;
+      }
+    }
   }
 
   .phone-actions {
@@ -2310,8 +2315,9 @@ i.option-separator {
 //ABOUT THIS CONTACT
 .contact-about-wrapper {
   .information-container {
+    display: flex;
+    flex-direction: column;
     height: 225px;
-    overflow: hidden;
     padding: 0 !important;
     margin-bottom: 12px;
 
@@ -3582,7 +3588,7 @@ i.option-separator {
 }
 
 .inbox-side {
-  max-width: 508px;
+  max-width: 558px;
   width: 100% !important;
   background-color: $white;
   display: flex;
@@ -3604,7 +3610,7 @@ i.option-separator {
   }
 
   &__left {
-    max-width: 200px;
+    max-width: 250px;
     width: 100%;
     overflow: hidden;
 
@@ -3708,8 +3714,9 @@ i.option-separator {
 
 .task-item {
   .contact-name {
-    @include font-size(14px, 500);
+    @include font-size(13px, 600);
     line-height: 17px;
+    color: $grey-10;
 
     &.truncated-text {
       padding-right: 5px;
@@ -3726,7 +3733,7 @@ i.option-separator {
   }
 
   .comm-label {
-    @include font-size(12px, 'normal');
+    @include font-size(12px, normal);
     line-height: 15px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3745,13 +3752,13 @@ i.option-separator {
   }
 
   .campaign-name {
-    @include font-size(10px, 'normal');
+    @include font-size(10px, normal);
     line-height: 12px;
     color: $grey-10 !important;
   }
 
   .time-passed {
-    @include font-size(12px, 'normal');
+    @include font-size(12px, normal);
     line-height: 15px;
   }
 }
@@ -4093,7 +4100,7 @@ i.option-separator {
 
 .phone {
   position: fixed;
-  top: 67px;
+  top: 110px;
   right: 5px;
   width: 300px;
   height: 522px;
@@ -4593,10 +4600,6 @@ i.option-separator {
 .q-manual-focusable--focused:not(.q-item--active) {
   background: $grey-50 !important;
   color: $grey-100 !important;
-}
-
-.table-header {
-  min-height: 58px;
 }
 
 .start-state {
@@ -5438,10 +5441,6 @@ button#bs-folder-options {
   &__content {
     overflow: auto;
 
-    &:not(.no-folder) {
-      max-height: calc(100% - 163px);
-    }
-
     &.no-folder {
       padding-left: 18px;
       height: 34px;
@@ -5562,14 +5561,6 @@ button#bs-folder-options {
   }
 }
 
-.table-header {
-  min-height: 58px;
-}
-
-.datatable-wrapper {
-  height: calc(100vh - 160px);
-}
-
 .empty-state {
   position: absolute;
   width: 100%;
@@ -5588,52 +5579,9 @@ button#bs-folder-options {
   margin: auto;
   overflow-y: auto;
   overflow-x: auto;
-  max-height: calc(100vh - 172px);
-  height: 100vh !important;
-
-  &:not(.mobile-scrollableArea) {
-    max-height: calc(100vh - 172px);
-  }
-
-  &.mobile-scrollableArea {
-    max-height: calc(100vh - 242px);
-  }
-
-  &.scroll-type-1 {
-    max-height: calc(100vh - 217px);
-
-    &:not(.mobile-scrollableArea) {
-      max-height: calc(100vh - 217px);
-    }
-
-    &.mobile-scrollableArea {
-      max-height: calc(100vh - 310);
-    }
-  }
-
-  &.scroll-type-2 {
-    max-height: calc(100vh - 267px);
-
-    &:not(.mobile-scrollableArea) {
-      max-height: calc(100vh - 267px);
-    }
-
-    &.mobile-scrollableArea {
-      max-height: calc(100vh - 360px);
-    }
-  }
 }
 
 .paginated {
-  .scrollableArea {
-    max-height: calc(100vh - 229px);
-
-    &.pd-datatable {
-      max-height: calc(100vh - 270px) !important;
-      min-height: calc(100vh - 270px) !important;
-    }
-  }
-
   .table-pagination {
     .q-btn__wrapper {
       min-height: 35px !important;
@@ -7062,6 +7010,9 @@ table.datatable {
     line-height: 17px;
     letter-spacing: -0.0025em;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &--opened {
       display: block;
@@ -8801,7 +8752,7 @@ span.mention {
 
   .sessions-main-page {
     &.minimized {
-      width: 100vw;
+      width: 100%;
     }
   }
 }
@@ -8881,6 +8832,8 @@ span.mention {
       background: $grey-50;
       padding: 15px 0px 15px 15px;
       box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
+      top: 0 !important;
+      position: absolute !important;
 
       .details-component-container {
         padding-right: 15px;
@@ -8969,7 +8922,7 @@ span.mention {
 
 .inbox-wrapper {
   display: flex;
-  max-width: 508px;
+  max-width: 558px;
   width: 100%;
   flex: 0 0 100%;
 }
@@ -9448,7 +9401,7 @@ screen and (max-width: 956px) {
   .contact-details-container {
     &-drawer {
       &.has-contact-changes aside {
-        height: calc(100vh - 128px);
+        height: calc(100% - 65px);
       }
     }
   }
@@ -9591,7 +9544,6 @@ screen and (max-width: 956px) {
       & > h1 {
         font-size: 18px;
         font-family: $font-family-body;
-        height: 27px;
       }
     }
 
@@ -9674,19 +9626,10 @@ screen and (max-width: 956px) {
       }
     }
   }
-  .paginated {
-    .scrollableArea {
-      max-height: calc(100vh - 307px) !important;
-      min-height: calc(100vh - 307px) !important;
-    }
-  }
   .contact-details-container {
     &-drawer {
-      &:not(.has-contact-changes) aside {
-        height: calc(100vh - 108px);
-      }
       &.has-contact-changes aside {
-        height: calc(100vh - 123px);
+        height: calc(100% - 16px);
       }
     }
   }
@@ -9840,11 +9783,13 @@ screen and (max-width: 956px) {
     overflow-x: hidden;
 
     &-wrapper {
-      display: initial;
-      flex: initial;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
       max-width: unset;
 
       &.mobile-contact-active {
+        flex: 0 0 auto !important;
         width: 0 !important;
       }
     }
@@ -10053,16 +9998,9 @@ screen and (max-width: 956px) {
     display: block !important;
     max-width: unset !important;
 
-    .contact-details-wrapper {
-      overflow: unset !important;
-    }
-
     .details-component-container {
-      padding-bottom: 59px;
-
-      > div:not(:last-child) {
+      > div {
         margin-right: 10px !important;
-        width: auto !important;
       }
     }
 
@@ -10148,12 +10086,6 @@ screen and (max-width: 956px) {
   }
   .contacts-filter-sidebar {
     width: 260px;
-  }
-  .paginated {
-    .scrollableArea {
-      max-height: calc(100vh - 238px) !important;
-      min-height: calc(100vh - 238px) !important;
-    }
   }
 }
 
@@ -10495,7 +10427,7 @@ screen and (max-width: 956px) {
   aside {
     max-width: 784px !important;
     width: 100% !important;
-    height: calc(100% - 51px);
+    position: absolute !important;
 
     .q-drawer__content {
       & > div {
@@ -10667,7 +10599,6 @@ screen and (max-width: 956px) {
         .mobile-live-call-bar {
           z-index: 10;
           position: absolute;
-          top: 28px;
 
           .dropdown-menu {
             max-width: 375px;
@@ -11021,6 +10952,12 @@ screen and (max-width: 956px) {
 .last-engagement-tooltip-wrapper {
   position: absolute;
   right: 50%;
+  top: -1px;
+}
+
+.last-engagement-dynamic-tooltip-wrapper {
+  position: absolute;
+  right: 40%;
   top: -1px;
 }
 
@@ -11942,13 +11879,6 @@ h1.contact-list-name-label {
   }
 }
 
-
-.session-contact-info-scroller {
-  height: calc(100vh - 380px) !important;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
 .session-integration-title {
   color: #303133
 }
@@ -11997,11 +11927,9 @@ h1.contact-list-name-label {
 .calendar {
   &__header {
     width: 100%;
-    position: fixed;
     display: flex;
     flex-direction: column;
     align-items: center;
-    top: 60px;
     background-color: #fff;
     border-bottom: 1px solid #e0e0e0;
     z-index: 1000;
@@ -12036,8 +11964,6 @@ h1.contact-list-name-label {
     }
 
     @include screen('lg') {
-      width: calc(100% - 65px);
-      top: 60px;
       flex-direction: row;
 
       &__action-left {
@@ -12063,7 +11989,6 @@ h1.contact-list-name-label {
   }
 
   .scheduler {
-    margin-top: 120px;
     background-color: #fff;
 
     &__header {
@@ -12127,11 +12052,6 @@ h1.contact-list-name-label {
       background-color: #fff;
 
       .actual-scheduler {
-        height: calc(100vh - 263px);
-
-        @include screen('lg') {
-          height: calc(100vh - 157px);
-        }
 
         .dhx_before .dhx_month_head,
         .dhx_after .dhx_month_head {
@@ -12291,10 +12211,6 @@ h1.contact-list-name-label {
           height: calc(100vh - 90px);
         }
       }
-    }
-
-    @include screen('lg') {
-      margin-top: 60px;
     }
   }
 
@@ -12533,12 +12449,12 @@ h1.contact-list-name-label {
   height: 100%;
 
   &__sidebar {
+    min-width: 200px;
     width: 200px;
     height: 100%;
     display: flex;
     flex-direction: column;
     padding: 6px;
-    float: left;
     color: $grey-90;
 
     &__title {
@@ -12577,7 +12493,6 @@ h1.contact-list-name-label {
 
   &__header {
     height: 100px;
-    margin-left: 200px;
     display: flex;
     flex-direction: column;
 
@@ -12611,12 +12526,13 @@ h1.contact-list-name-label {
   }
 
   &__body {
-    margin-left: 200px;
-    height: calc(100% - 100px);
+    height: 100%;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     transition: all 1s;
+    overflow-y: hidden;
+    flex-grow: 1;
 
     .overview {
       width: 100%;
@@ -12908,6 +12824,37 @@ h1.contact-list-name-label {
       border-radius: 10px;
     }
   }
+}
+
+.top-0 {
+  top: 0;
+}
+
+.text-decoration-underline {
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+  &.text-red-130 {
+    &:hover {
+      color: $red-130;
+    }
+  }
+}
+
+.view-filter-name {
+  &.row.q-input .q-field__control .q-field__native {
+    padding-top: 14px;
+    padding-bottom: 2px
+  }
+}
+
+.compliance-badge {
+  background-color: #f44336;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  height: unset !important;
 }
 
 .broadcasts {
@@ -13351,7 +13298,6 @@ h1.contact-list-name-label {
     }
   }
 }
-
 
 .steps-wrapper {
   display: flex;

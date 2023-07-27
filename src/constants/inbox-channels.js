@@ -5,3 +5,4 @@ export const CHANNEL_RECORDINGS = 4
 export const CHANNEL_MENTIONS = 5
 export const CHANNEL_INBOX = 6
 export const CHANNEL_ALL_COMMUNICATIONS = 7
+export const CHANNEL_VIEWS = 8

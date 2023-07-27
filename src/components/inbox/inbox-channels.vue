@@ -788,26 +788,28 @@ export default {
     const generalChannelRoutes = ['Inbox Channel', 'Inbox Contact']
     const communicationsChannelRoutes = ['Inbox Contact', 'Inbox Contact Communication']
 
-    if (inboxChannelRoutes.includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
-      this.getCommunications(this.filter, () => {
-        const isGeneralChannelRoutesOrMentions = generalChannelRoutes.includes(this.$route.name) ||
-          ['mentions'].includes(this.$route.params.channel)
-
-        if (isGeneralChannelRoutesOrMentions && communicationsChannelRoutes.includes(this.$route.name)) {
-          let communication = null
-
-          if (this.$route.name === 'Inbox Contact Communication') {
-            communication = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
-          } else {
-            communication = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
-          }
-
-          if (communication) {
-            this.setSelectedCommunication(communication)
-          }
-        }
-      })
+    if (!inboxChannelRoutes.includes(this.$route.name) || this.$route.params.channel === 'inbox') {
+      return
     }
+
+    this.getCommunications(this.filter, () => {
+      const isGeneralChannelRoutesOrMentions = generalChannelRoutes.includes(this.$route.name) ||
+        ['mentions'].includes(this.$route.params.channel)
+
+      if (isGeneralChannelRoutesOrMentions && communicationsChannelRoutes.includes(this.$route.name)) {
+        let communication = null
+
+        if (this.$route.name === 'Inbox Contact Communication') {
+          communication = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
+        } else {
+          communication = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
+        }
+
+        if (communication) {
+          this.setSelectedCommunication(communication)
+        }
+      }
+    })
   },
 
   methods: {

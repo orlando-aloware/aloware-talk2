@@ -285,11 +285,8 @@ export default {
         this.setContact(contact)
       }
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
-        this.setLoadingPendingTaskCount(true)
-        this.getContactsCountByTaskStatus(this.ContactTaskStatusPending)
-        this.setLoadingOpenTaskCount(true)
-        this.getContactsCountByTaskStatus(this.ContactTaskStatusOpen)
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
+        this.fetchTaskCounts()
       }
     }
 
@@ -303,7 +300,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()

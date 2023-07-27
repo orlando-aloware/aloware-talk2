@@ -44,6 +44,19 @@
                 v-if="prepend">
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
+      <template v-slot:option="{ itemProps, opt }">
+        <q-item v-bind="itemProps" v-close-popup @click.native="selectOption(opt)">
+          <q-item-section>
+            <q-item-label>{{ opt.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging)" side>
+            <q-badge color="red">!</q-badge>
+          </q-item-section>
+        </q-item>
+      </template>
+      <template v-slot:selected-item="{ opt }">
+        {{ opt.name }}
+      </template>
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
@@ -185,12 +198,16 @@ export default {
     borderless: {
       type: Boolean,
       default: false
+    },
+
+    checkBlockedMessaging: {
+      type: Boolean,
+      default: false
     }
   },
 
   data () {
     return {
-      // campaignId: this.value || null,
       selectedId: null,
       options: [],
       reference: 'lineSelect',
@@ -264,6 +281,10 @@ export default {
         this.highlighted ? this.highlightedClass : '',
         this.specificClass ? this.specificClass : ''
       ]
+    },
+
+    selectedLine () {
+      return this.campaigns.find(campaign => campaign.id === this.selectedId)
     }
   },
 
@@ -276,6 +297,10 @@ export default {
   },
 
   methods: {
+    selectOption (option) {
+      this.selectedId = option.id
+    },
+
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {

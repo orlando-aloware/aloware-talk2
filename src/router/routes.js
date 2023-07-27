@@ -107,6 +107,22 @@ const routes = [
             meta: {
               title: 'Communications'
             }
+          },
+          {
+            path: 'channels/view/:viewId/:status',
+            name: 'Inbox View',
+            component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status/contacts/:id',
+            name: 'Inbox View Contact Task',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
           }
         ]
       },

@@ -707,6 +707,13 @@ export default {
       }).then(res => {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = true
+
+        // if contact has no unreads anymore, refresh inbox result
+        const contact = res.data.contact
+        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
+        if (hasUnreads < 1) {
+          this.$VueEvent.fire('fetchInbox')
+        }
       }).catch(err => {
         this.$handleErrors(err.response)
       })
@@ -718,6 +725,12 @@ export default {
       }).then(res => {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = false
+
+        // if contact has no unreads before, refresh inbox result
+        const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
+        if (oldTotalUnreads < 1) {
+          this.$VueEvent.fire('fetchInbox')
+        }
       }).catch(err => {
         this.$handleErrors(err.response)
       })
