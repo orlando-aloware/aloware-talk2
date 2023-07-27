@@ -346,7 +346,7 @@ export default {
       axios.get(`/api/v1/tag/${tagId}`)
         .then(res => {
           const parsedTags = this.$jsonClone(this.tags)
-          const index = parsedTags.findIndex(item => item.id === res.data.id.id)
+          const index = parsedTags.findIndex(item => +item.id === +res.data.id)
 
           parsedTags[index] = res.data
           this.tags = parsedTags
