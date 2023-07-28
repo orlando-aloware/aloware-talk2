@@ -232,7 +232,7 @@ export default {
       }
 
       return this.filters.filter(filter =>
-        filter.label.trim()
+        filter?.label?.trim()
           .toLowerCase()
           .includes(this.filterSearch.trim().toLowerCase())
       )

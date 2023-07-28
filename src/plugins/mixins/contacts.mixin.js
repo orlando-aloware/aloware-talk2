@@ -170,6 +170,10 @@ export default {
           path = this.apiEndpoint(this.id === 'my-queue')
         }
 
+        if (!path) {
+          return
+        }
+
         let params = {
           page: nextPage,
           search: this.search,
@@ -263,11 +267,21 @@ export default {
           return `api/v2/power-dialer-lists/my-queue/items`
 
         default:
+          if (this.id === 'in-queue') {
+            return ''
+          }
+
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
 
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
+      const endpoint = this.apiEndpoint(queued)
+
+      if (!endpoint) {
+        return
+      }
+
       const axiosUniqueId = Date.now().toString(36) + Math.random().toString(36).substring(2)
       this.addAxiosUniqueId(axiosUniqueId)
 
@@ -280,7 +294,7 @@ export default {
       }
 
       if (this.$route.name === 'Power Dialer') {
-        this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
+        this.SET_FILTERED_ENDPOINT(endpoint)
       }
 
       // my contacts toggle is not applicable in "Unassigned Contacts" list
@@ -331,7 +345,7 @@ export default {
       this.setIsDatatableSelectedAll(false)
 
       return this.$axios
-        .get(this.apiEndpoint(queued), {
+        .get(endpoint, {
           params: queryString,
           paramsSerializer: qs.stringify,
           cancelToken: this.listContactsSource.token
@@ -361,7 +375,7 @@ export default {
             this.$VueEvent.fire('contactsListSidebarDataLoaded', data.data)
           }
 
-          if (this.apiEndpoint(queued).includes('my-queue')) {
+          if (endpoint.includes('my-queue')) {
             // TODOs: Use vuex for storing filtered power dialer contact lists
             this.updateMyQueueListData(data)
           }

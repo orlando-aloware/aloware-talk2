@@ -1027,6 +1027,7 @@ export default {
     this.$VueEvent.listen('shouldUpdateListCount', () => {
       if (this.list.type === this.ContactListTypes.DYNAMIC) {
         this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
+
         return
       }
 

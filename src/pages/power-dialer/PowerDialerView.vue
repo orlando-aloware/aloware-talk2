@@ -1160,7 +1160,7 @@ export default {
       deep: true,
       handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
-          let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          let params = typeof val === 'string' ? {} : val
           this.onFetch(params, false, true)
         }
       }

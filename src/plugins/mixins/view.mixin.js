@@ -514,15 +514,9 @@ export default {
 
     stopEvents () {
       this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
-
-      if (this.isMainView) {
-        this.$VueEvent.stop('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
-        this.$VueEvent.stop('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
-      }
-
-      if (this.$route.name === 'Contacts') {
-        this.$VueEvent.stop('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
-      }
+      this.$VueEvent.stop('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+      this.$VueEvent.stop('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      this.$VueEvent.stop('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
     },
 
     getCleanedListId (id) {

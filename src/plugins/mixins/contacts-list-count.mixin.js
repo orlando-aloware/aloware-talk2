@@ -17,7 +17,8 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'pinnedLists',
-      'lists'
+      'lists',
+      'selectedList'
     ])
   },
 
@@ -37,9 +38,12 @@ export default {
         .then(response => {
           // we have to re-fetch the count if count is less than
           // current contacts fetched
-          if (this.contactsData && this.contactsData?.data.length > 0 &&
+          if (!this.$route.path.includes('/add') && this.contactsData &&
+            this.contactsData?.data.length > 0 &&
+            listId === this.selectedList.id &&
             response.data.count < this.contactsData.data.length) {
             this.fetchCount++
+
             setTimeout(() => {
               this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
             }, 5000)
