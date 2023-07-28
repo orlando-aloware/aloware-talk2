@@ -38,6 +38,20 @@
 
         <q-list class="tab-dropdown-list no-select">
           <q-item dense
+                  v-if="profile.campaign_id && campaigns.length">
+            <div class="d-flex flex-column">
+              <span>
+                {{ userPersonalLine.name }}
+              </span>
+              <span class="text-grey-90">
+                Number: {{ userPersonalLine.incoming_number | fixPhone('NATIONAL', true, false, true) }}
+              </span>
+            </div>
+          </q-item>
+
+          <q-separator class="mt-1 mb-1"/>
+
+          <q-item dense
                   clickable
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'cursor-inherit' : '']"
@@ -178,9 +192,16 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'profile',
 
-  components: { HalfMoonIcon, LogoutIcon },
+  components: {
+    HalfMoonIcon,
+    LogoutIcon
+  },
 
-  mixins: [aclMixin, avatarMixin, agentMixin],
+  mixins: [
+    aclMixin,
+    avatarMixin,
+    agentMixin
+  ],
 
   props: {
     hideProfileInfo: {
@@ -246,6 +267,10 @@ export default {
       return this.loadingAgentStatus ||
         ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
         this.isAgentOnCall || isForcedDispositionOnWrapUp
+    },
+
+    userPersonalLine () {
+      return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
     }
   },
 
