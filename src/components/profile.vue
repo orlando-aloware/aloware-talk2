@@ -49,7 +49,7 @@
             </div>
           </q-item>
 
-          <q-separator class="mt-1 mb-1"/>
+          <q-separator class="mt-3 mb-1"/>
 
           <q-item dense
                   clickable
