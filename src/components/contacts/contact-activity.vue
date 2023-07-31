@@ -99,7 +99,7 @@
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <template v-if="isAttachmentImage(attachment.mimeType)">
+            <template v-if="isAttachmentImage(attachment.mime_type)">
               <q-img
                 v-if="isAttachmentMigrated(attachment)"
                 class="border-rounded img-fluid d-block r-2x mb-1"
