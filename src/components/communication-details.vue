@@ -49,7 +49,7 @@
                    :key="index">
                 <template v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
                   <q-img
-                    v-if="isAttachmentMigrated(image)"
+                    v-if="isAttachmentMigrated(attachment)"
                     class="img-fluid d-block r-2x br-8"
                     height="300px"
                     native-context-menu
@@ -67,7 +67,7 @@
                     </template>
                   </q-img>
                   <q-img
-                    v-else
+                    v-if="!isAttachmentMigrated(attachment)"
                     class="img-fluid d-block r-2x br-8"
                     :class="index > 0 ? 'mb-1' : ''"
                     height="300px"
