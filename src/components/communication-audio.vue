@@ -1,6 +1,6 @@
 <template>
   <div class="w-100">
-    <div v-if="hasAudio">
+    <div v-if="hasAudio && isMigrated">
       <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"
              v-if="remoteUrl">
@@ -12,6 +12,13 @@
                            is-simple
                            :filename="filename"
                            :file-uuid="fileUuid"/>
+        </div>
+      </div>
+    </div>
+    <div v-if="hasAudio && !isMigrated">
+      <div class="audio-player p-2">
+        <div class="d-flex flex-row align-items-center w-100">
+          <i class="fa fa-spinner fa-spin"></i> Preparing {{ typeString }}...
         </div>
       </div>
     </div>
@@ -70,8 +77,12 @@ export default {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.has_recording : this.communication.has_voicemail
     },
 
+    typeString () {
+      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Recording' : 'Voicemail'
+    },
+
     title () {
-      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Play Recording' : 'Play Voicemail'
+      return 'Play ' + this.typeString
     }
   },
 
@@ -106,6 +117,14 @@ export default {
 
     onDownload () {
       this.$downloadFileWithUuid(this.fileUuid, this.filename)
+    }
+  },
+  filters: {
+    isMigrated () {
+      this.onShow()
+    },
+    hasAudio () {
+      this.onShow()
     }
   }
 }
