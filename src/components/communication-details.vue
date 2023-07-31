@@ -66,13 +66,12 @@
                                        :attachment-url="attachment.url"/>
                     </template>
                   </q-img>
-                  <q-img
+                  <img
                     v-if="!isAttachmentMigrated(attachment)"
                     class="img-fluid d-block r-2x br-8"
                     :class="index > 0 ? 'mb-1' : ''"
                     height="300px"
-                    src="/assets/images/loading.svg">
-                  </q-img>
+                    src="/assets/images/loading.svg"/>
                 </template>
 
                 <div v-if="attachment.mime_type && isAttachmentAudio(attachment.mime_type)">
