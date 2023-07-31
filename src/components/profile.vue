@@ -49,7 +49,8 @@
             </div>
           </q-item>
 
-          <q-separator class="mt-3 mb-1"/>
+          <q-separator class="mt-3 mb-1"
+                       v-if="profile.campaign_id && campaigns.length"/>
 
           <q-item dense
                   clickable
