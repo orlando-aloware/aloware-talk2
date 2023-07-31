@@ -30,13 +30,15 @@ export default {
   },
 
   getMyQueueList: async ({ commit }) => {
-    const res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
+    return Promise.all([
+      window.axios.get(`api/v2/power-dialer-lists/my-queue`),
+      window.axios.get(`api/v2/power-dialer-lists/my-queue/session-metrics`)
+    ]).then(([listResponse, sessionMetricsResponse]) => {
+      listResponse.data.session_metrics = sessionMetricsResponse.data.session_metrics
+      commit('SET_MY_QUEUE_LIST', listResponse.data)
 
-    if (res.status === 200) {
-      commit('SET_MY_QUEUE_LIST', res.data)
-    }
-
-    return res
+      return listResponse
+    })
   },
 
   getPowerDialerList: async ({ commit }, id = '') => {

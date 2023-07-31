@@ -59,12 +59,17 @@ export default {
           config.cancelToken = this.pdViewSource.token
         }
 
-        this.$axios
-          .get(`/api/v2/power-dialer-lists/${stringId}`, config)
-          .then((response) => response.data)
-          .then((response) => {
-            this.listLoaded({ ...response, id: stringId })
-            this.setSelectedPDList({ id: response.id, name: response.name, type: response.type })
+        Promise.all([
+          this.$axios.get(`/api/v2/power-dialer-lists/${stringId}`, config),
+          this.$axios.get(`/api/v2/power-dialer-lists/${stringId}/session-metrics`, config)
+        ])
+          .then(([listResponse, sessionMetricsResponse]) => {
+            this.listLoaded({ ...listResponse.data, id: stringId })
+            this.setSelectedPDList({
+              id: listResponse.data.id,
+              name: listResponse.data.name,
+              type: listResponse.data.type
+            })
 
             let filters = {
               contact_lists: {
@@ -74,13 +79,13 @@ export default {
             }
 
             this.setCurrentListFilters(filters)
-            this.activeMetrics = response.session_metrics
+            this.activeMetrics = sessionMetricsResponse.data.session_metrics
 
             if (this.isMyQueue) {
-              this.SET_MY_QUEUE_LIST(response)
+              this.SET_MY_QUEUE_LIST(listResponse.data)
             }
           })
-          .catch((error) => {
+          .catch(error => {
             if (window.axios.isCancel(error) && error) {
               console.log('Request canceled', error.message)
               return

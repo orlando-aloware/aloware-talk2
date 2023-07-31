@@ -807,10 +807,9 @@ export default {
     filteredList () {
       if (this.selectedListId === 'my-queue') {
         return this.myQueue
-        // return this.lists['my-queue']
       }
 
-      return this.list
+      return this.selectedList
     },
 
     filteredListId () {
