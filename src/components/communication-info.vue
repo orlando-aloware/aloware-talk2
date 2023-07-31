@@ -236,7 +236,7 @@
                     </template>
                   </q-img>
                   <q-img
-                    v-else
+                    v-if="!isAttachmentMigrated(image)"
                     :key="index"
                     class="img-fluid d-block r-2x"
                     :class="index > 0 ? 'mb-1' : ''"
