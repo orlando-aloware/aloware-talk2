@@ -64,6 +64,10 @@
                     class="message-text"
                     v-html="$options.filters.nl2br(message, false)">
               </span>
+              <span v-if="id === 'sms' && attachment"
+                    class="message-text">
+                Inbound MMS
+              </span>
               <div class="message-text row has-ring-group"
                    v-else-if="isCall && campaignName && ringGroupName">
                 <div class="campaign-wrapper col-5">
@@ -79,9 +83,6 @@
                 {{ campaignName }}
               </span>
             </div>
-            <template v-if="id === 'sms' && attachment">
-              Inbound MMS
-            </template>
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
