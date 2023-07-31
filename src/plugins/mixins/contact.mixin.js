@@ -266,6 +266,7 @@ export default {
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
+      console.log('listeners.updateCommunication', data)
 
       this.updateCommunication(data)
     }
@@ -416,8 +417,10 @@ export default {
     }, 500),
 
     updateCommunication (data) {
+      console.log('updateCommunication 1', data.id)
       // checks if contact is the same in communication
       if (this.isNotSameContact(data.contact_id)) {
+        console.log('not same contact', data.id)
         return false
       }
 
@@ -430,6 +433,7 @@ export default {
         if (index > -1) {
           // update communication
           Object.assign(this.communicationsAndAudits[index], data)
+          console.log('updatedCommunication 2', data.id)
         }
       }
     },
