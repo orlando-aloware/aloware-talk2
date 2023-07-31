@@ -119,7 +119,7 @@ export default {
       this.$downloadFileWithUuid(this.fileUuid, this.filename)
     }
   },
-  filters: {
+  watch: {
     isMigrated () {
       this.onShow()
     },
