@@ -1003,7 +1003,7 @@ export default {
       this.activityExpansionClass = [activityClass.data]
     },
 
-    isAttachmentMigrated(attachment) {
+    isAttachmentMigrated (attachment) {
       return !attachment.url.includes('twilio')
     },
 
