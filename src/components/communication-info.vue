@@ -235,14 +235,13 @@
                       </div>
                     </template>
                   </q-img>
-                  <q-img
-                    v-else
+                  <img
+                    v-if="!isAttachmentMigrated(image)"
                     :key="index"
                     class="img-fluid d-block r-2x"
                     :class="index > 0 ? 'mb-1' : ''"
                     height="200px"
-                    src="/assets/images/loading.svg">
-                  </q-img>
+                    src="/assets/images/loading.svg"/>
                 </template>
               </template>
 
