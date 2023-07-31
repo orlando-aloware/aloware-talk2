@@ -26,6 +26,7 @@
                     size="sm"
                     variant="primary"
                     :title="`Add ${ tagCategoryName } Tag`"
+                    v-if="hasRole('Company Admin')"
                     @click="openTagForm">
             <i class="fa fa-plus"></i>
             <span v-show="!$q.screen.sm && !$q.screen.md"> Add {{ tagCategoryName }} Tag</span>
