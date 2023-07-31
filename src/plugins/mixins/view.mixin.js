@@ -188,6 +188,10 @@ export default {
         }
 
         let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+        params.event = {
+          name: 'bulk-created',
+          count: event.count
+        }
         this.onFetch(params, false, true)
       }
     }
@@ -209,6 +213,10 @@ export default {
         }
 
         let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+        params.event = {
+          name: 'bulk-deleted',
+          count: event.count
+        }
         this.onFetch(params, false, true)
       }
     }

@@ -1042,8 +1042,10 @@ export default {
       })
     })
 
-    this.viewListeners.setDataCount = _.debounce((filters) => {
-      this.setDataCount(filters)
+    this.viewListeners.setDataCount = _.debounce((data) => {
+      const event = data.event
+      const filters = data.filters
+      this.setDataCount(filters, event)
     }, 100)
 
     this.viewListeners.updateHasFilterChanges = () => {
@@ -1261,7 +1263,7 @@ export default {
             if (this.list.type === this.ContactListTypes.DYNAMIC) {
               this.setDataCount({
                 filter_groups: this.currentListFilters
-              }, true)
+              }, null, true)
               return
             }
 
@@ -1279,7 +1281,7 @@ export default {
                   is_conjunction: true
                 }
               ]
-            }, true)
+            }, null, true)
           })
           .catch((_err) => {
             console.log(_err)
@@ -1605,10 +1607,11 @@ export default {
       })
     },
 
-    setDataCount (data, updatePinned = false) {
+    setDataCount (data, event = null, updatePinned = false) {
       const fireData = {
         data: { filters: data },
         id: this.id,
+        event: event,
         thenFunctions: {
           setSelectedListContactCount: 'response.data.count'
         }

@@ -10,6 +10,7 @@ export default {
       countSource: null,
       contactsListCountListeners: {},
       fetchCount: 0,
+      bulkActions: ['bulk-created', 'bulk-deleted'],
       STATIC
     }
   },
@@ -36,12 +37,22 @@ export default {
 
       this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
         .then(response => {
-          // we have to re-fetch the count if count is less than
-          // current contacts fetched
+          const count = response.data.count
+          // check if the count is not what we're expecting or
+          // is not the latest count due to redshift delay
+          const currentTotalCount = this.selectedList.contactCount
+          const isInvalidCountWithoutEvent = isEmpty(data.event) &&
+            count < currentTotalCount
+          const isInvalidCountWithEvent = !isEmpty(data.event) &&
+            this.isFromBulkActionInvalidCount(data.event, count)
+          const isInvalidCount = isInvalidCountWithoutEvent ||
+            isInvalidCountWithEvent
+
+          // we have to re-fetch the count if count is not correct
           if (!this.$route.path.includes('/add') && this.contactsData &&
             this.contactsData?.data.length > 0 &&
             listId === this.selectedList.id &&
-            response.data.count < this.contactsData.data.length) {
+            isInvalidCount) {
             this.fetchCount++
 
             setTimeout(() => {
@@ -77,7 +88,7 @@ export default {
               list: {
                 id: listId
               },
-              count: response.data.count
+              count: count
             })
           }
 
@@ -231,6 +242,29 @@ export default {
         params.includes('response.')
         ? get(response, params.replace('response.', ''), 0)
         : params
+    },
+
+    isFromBulkActionInvalidCount (event, count) {
+      const eventName = event.name
+
+      if (!this.bulkActions.includes(eventName)) {
+        return false
+      }
+
+      const eventCount = event.count
+
+      const currentTotalCount = this.selectedList.contactCount
+      let estimatedCount = currentTotalCount
+
+      switch (eventName) {
+        case 'bulk-created':
+          estimatedCount = estimatedCount + eventCount
+          break
+        case 'bulk-deleted':
+          estimatedCount = estimatedCount - eventCount
+      }
+
+      return count !== estimatedCount
     },
 
     ...mapActions('contacts', [

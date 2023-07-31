@@ -309,7 +309,10 @@ export default {
       // use the same query string to update the list count
       // eslint-disable-next-line camelcase
       const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
+        event: params.event,
+        filters: countQueryString
+      })
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
@@ -413,6 +416,13 @@ export default {
 
     fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
       let params = this.$jsonClone(data)
+      const event = params?.event
+
+      // remove the event property as we don't need it at this point
+      if (params?.event) {
+        delete params.event
+      }
+
       let eventListId = null
 
       if (typeof this.getCleanedListId !== 'undefined') {
@@ -461,6 +471,8 @@ export default {
         params.order = order
       }
 
+      // add the event back
+      params.event = event
       this.isLoading = true
 
       // for power dialer list contacts fetching

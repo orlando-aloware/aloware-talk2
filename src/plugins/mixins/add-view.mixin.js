@@ -18,7 +18,9 @@ export default {
 
   mounted () {
     this.addViewListeners.shouldUpdateListCountOnSearch = (data) => {
-      this.setDataCount(data, true)
+      const event = data.event
+      const filters = data.filters
+      this.setDataCount(filters, event, true)
     }
     this.addViewListeners.addViewSetCount = (value) => {
       this.contactCount = value
@@ -28,7 +30,7 @@ export default {
   },
 
   methods: {
-    setDataCount (data, skipCancelToken) {
+    setDataCount (data, event, skipCancelToken) {
       if (!data) {
         return
       }
@@ -36,6 +38,7 @@ export default {
       this.$VueEvent.fire('get-list-count', {
         data: { filters: data },
         id: this.id,
+        event: event,
         skipCancelToken: skipCancelToken,
         thenEventFires: {
           addViewSetCount: 'response.data.count'
