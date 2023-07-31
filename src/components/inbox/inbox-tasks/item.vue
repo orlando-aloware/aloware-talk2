@@ -57,8 +57,8 @@
 
           <div class="truncated-text"
                :class="[appointmentReminderTextClass, hasUnreadsClass]"
-               v-if="contact.last_communication.body !== null">
-            {{ contact.last_communication.body }}
+               v-if="contact.last_communication.body !== null"
+               v-html="parsedBody">
           </div>
 
         </div>
@@ -242,7 +242,8 @@ import {
   communicationInfoMixin,
   notificationMixin,
   liveCallsMixin,
-  unownedContactTaskMixin
+  unownedContactTaskMixin,
+  mentionsMixin
 } from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
@@ -266,7 +267,8 @@ export default {
     communicationInfoMixin,
     notificationMixin,
     liveCallsMixin,
-    unownedContactTaskMixin
+    unownedContactTaskMixin,
+    mentionsMixin
   ],
 
   components: {
@@ -494,6 +496,14 @@ export default {
 
     hasUnreadsClass () {
       return this.totalUnreads ? 'text-black' : ''
+    },
+
+    parsedBody () {
+      if (this.contact.last_communication.type === CommunicationTypes.NOTE) {
+        return this.parseMentionToView(this.contact.last_communication.body)
+      }
+
+      return this.contact.last_communication.body
     }
   },
 
