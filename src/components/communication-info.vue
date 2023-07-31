@@ -231,7 +231,7 @@
                     </div>
                   </template>
                 </q-img>
-                <div v-else
+                <div v-if="!isAttachmentMigrated(image) && [CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
                      :key="index"
                      class="absolute-full flex flex-center text-white">
                   <i class="fa fa-spinner fa-spin"></i> Preparing attachment...
@@ -1001,6 +1001,10 @@ export default {
         activityClass.data += ' collapsed-has-notes'
       }
       this.activityExpansionClass = [activityClass.data]
+    },
+
+    isAttachmentMigrated(attachment) {
+      return !attachment.url.includes('twilio')
     },
 
     getCampaign (id) {
