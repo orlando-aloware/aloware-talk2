@@ -80,11 +80,7 @@
               </span>
             </div>
             <template v-if="id === 'sms' && attachment">
-              <q-img
-                :src="attachment"
-                class="attachment mr-2"
-                fit="cover"
-              />
+              Inbound MMS
             </template>
           </div>
         </div>

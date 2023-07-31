@@ -222,8 +222,8 @@
                   <q-img
                     v-if="isAttachmentMigrated(image)"
                     class="img-fluid d-block r-2x"
-                    :class="index > 0 ? 'mb-1' : ''"
                     :key="index"
+                    :class="index > 0 ? 'mb-1' : ''"
                     height="200px"
                     :src="image.url">
                     <template v-slot:loading>
@@ -237,9 +237,9 @@
                   </q-img>
                   <q-img
                     v-else
+                    :key="index"
                     class="img-fluid d-block r-2x"
                     :class="index > 0 ? 'mb-1' : ''"
-                    :key="index"
                     height="200px"
                     src="/assets/images/loading.svg">
                   </q-img>
