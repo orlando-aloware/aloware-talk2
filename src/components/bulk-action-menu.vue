@@ -80,7 +80,7 @@
       <q-skeleton class="bg-blue-5 w-100"
                   type="text"
                   style="max-width: 120px;"
-                  v-if="isDatatableCountLoading"/>
+                  v-if="!isAllSelected && isDatatableCountLoading"/>
     </div>
   </div>
 </template>
