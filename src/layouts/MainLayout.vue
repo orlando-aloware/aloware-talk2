@@ -636,7 +636,8 @@ export default {
       if (this.profile.sleep_mode) {
         return
       }
-      this.handleDesktopHighSmsVolumeNotification(data.incoming_number, data.contact, data.direction)
+      console.log('handleDesktopHighSmsVolumeNotification', data)
+      this.handleDesktopHighSmsVolumeNotification(data.incomingNumber, data.contact, data.direction)
     }
 
     this.mainListeners.newInAppVoicemail = (communication) => {
