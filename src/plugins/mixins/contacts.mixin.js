@@ -311,6 +311,7 @@ export default {
       const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
         event: params.event,
+        clear: clear,
         filters: countQueryString
       })
 

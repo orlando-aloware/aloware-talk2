@@ -1045,7 +1045,8 @@ export default {
     this.viewListeners.setDataCount = _.debounce((data) => {
       const event = data.event
       const filters = data.filters
-      this.setDataCount(filters, event)
+      const clear = data?.clear ?? false
+      this.setDataCount(filters, event, false, clear)
     }, 100)
 
     this.viewListeners.updateHasFilterChanges = () => {
@@ -1607,11 +1608,12 @@ export default {
       })
     },
 
-    setDataCount (data, event = null, updatePinned = false) {
+    setDataCount (data, event = null, updatePinned = false, clear = false) {
       const fireData = {
         data: { filters: data },
         id: this.id,
         event: event,
+        clear: clear,
         thenFunctions: {
           setSelectedListContactCount: 'response.data.count'
         }
@@ -1661,6 +1663,7 @@ export default {
       if (this.$route.params.id === 'unsaved') {
         this.$VueEvent.fire('get-list-count', {
           data: { filters: JSON.stringify(this.list.filters) },
+          clear: true,
           thenFunctions: {
             'setSelectedListContactCount': {
               count: 'response.data.count'

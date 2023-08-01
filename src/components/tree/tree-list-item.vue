@@ -329,6 +329,7 @@ export default {
     setDataCount (data) {
       this.$VueEvent.fire('get-list-count', {
         data: data,
+        clear: true,
         thenFunctions: {
           'pinnedCountLoaded': {
             id: this.id,

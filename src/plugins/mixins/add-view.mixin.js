@@ -20,7 +20,8 @@ export default {
     this.addViewListeners.shouldUpdateListCountOnSearch = (data) => {
       const event = data.event
       const filters = data.filters
-      this.setDataCount(filters, event, true)
+      const clear = data?.clear ?? false
+      this.setDataCount(filters, event, true, clear)
     }
     this.addViewListeners.addViewSetCount = (value) => {
       this.contactCount = value
@@ -30,7 +31,7 @@ export default {
   },
 
   methods: {
-    setDataCount (data, event, skipCancelToken) {
+    setDataCount (data, event, skipCancelToken, clear = false) {
       if (!data) {
         return
       }
@@ -39,6 +40,7 @@ export default {
         data: { filters: data },
         id: this.id,
         event: event,
+        clear: clear,
         skipCancelToken: skipCancelToken,
         thenEventFires: {
           addViewSetCount: 'response.data.count'

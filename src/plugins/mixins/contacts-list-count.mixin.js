@@ -32,19 +32,23 @@ export default {
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
       const isStaticList = listId !== null && this.lists?.[listId] && this.lists[listId]?.type === STATIC
+      // bulk event data
+      const event = data?.event
+      // flag needed for checking if it's a new search/filter
+      const clear = data?.clear ?? false
 
       this.setIsDatatableCountLoading(true)
 
       this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
         .then(response => {
           const count = response.data.count
+          const currentTotalCount = this.selectedList.contactCount
           // check if the count is not what we're expecting or
           // is not the latest count due to redshift delay
-          const currentTotalCount = this.selectedList.contactCount
-          const isInvalidCountWithoutEvent = isEmpty(data.event) &&
-            count < currentTotalCount
-          const isInvalidCountWithEvent = !isEmpty(data.event) &&
-            this.isFromBulkActionInvalidCount(data.event, count)
+          const isInvalidCountWithoutEvent = isEmpty(event) &&
+            count < currentTotalCount && !clear
+          const isInvalidCountWithEvent = !isEmpty(event) &&
+            this.isFromBulkActionInvalidCount(event, count)
           const isInvalidCount = isInvalidCountWithoutEvent ||
             isInvalidCountWithEvent
 
