@@ -47,25 +47,32 @@
             <div v-if="communication.attachments && communication.attachments.length > 0">
               <div v-for="(attachment, index) in communication.attachments"
                    :key="index">
-                <q-img
-                  class="img-fluid d-block r-2x br-8"
-                  height="300px"
-                  native-context-menu
-                  v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type"
-                  :class="index > 0 ? 'mb-1' : ''"
-                  :key="index"
-                  :src="attachment.url">
-                  <template v-slot:error>
-                    <div class="absolute-full flex flex-center bg-negative text-white">
-                      Error!
-                    </div>
-                  </template>
-                  <template v-slot:default>
-                    <download-button buttonStyle="top: 8px; left: 8px"
-                                     :filename="attachment.name"
-                                     :attachment-url="attachment.url"/>
-                  </template>
-                </q-img>
+                <template v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
+                  <q-img
+                    v-if="isAttachmentMigrated(attachment)"
+                    class="img-fluid d-block r-2x br-8"
+                    height="300px"
+                    native-context-menu
+                    :class="index > 0 ? 'mb-1' : ''"
+                    :src="attachment.url">
+                    <template v-slot:error>
+                      <div class="absolute-full flex flex-center bg-negative text-white">
+                        Error!
+                      </div>
+                    </template>
+                    <template v-slot:default>
+                      <download-button buttonStyle="top: 8px; left: 8px"
+                                       :filename="attachment.name"
+                                       :attachment-url="attachment.url"/>
+                    </template>
+                  </q-img>
+                  <img
+                    v-if="!isAttachmentMigrated(attachment)"
+                    class="img-fluid d-block r-2x br-8"
+                    :class="index > 0 ? 'mb-1' : ''"
+                    height="300px"
+                    src="/assets/images/loading.svg"/>
+                </template>
 
                 <div v-if="attachment.mime_type && isAttachmentAudio(attachment.mime_type)">
                   <audio class="audio-player"
@@ -978,6 +985,10 @@ export default {
   },
 
   methods: {
+    isAttachmentMigrated (attachment) {
+      return !attachment.url.includes('twilio')
+    },
+
     getCommunicationCampaignName () {
       const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {

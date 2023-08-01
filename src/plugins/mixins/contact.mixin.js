@@ -405,7 +405,7 @@ export default {
       // update contact in inbox's group of contacts/tasks
       if (!_.isEmpty(newCommunication)) {
         this.$VueEvent.fire('inbox_contact_updated', {
-          contact: updatedContact,
+          contact: contactEvent,
           communication: newCommunication
         })
       }
