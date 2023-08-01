@@ -636,7 +636,6 @@ export default {
       if (this.profile.sleep_mode) {
         return
       }
-      console.log('handleDesktopHighSmsVolumeNotification', data)
       this.handleDesktopHighSmsVolumeNotification(data.incomingNumber, data.contact, data.direction)
     }
 

@@ -116,7 +116,6 @@ export default {
           }
         })
         .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
-          console.log('high_sms_volume_LOG', event)
           const incomingNumber = event.incoming_number
           const contact = event.contact
           const direction = event.direction
