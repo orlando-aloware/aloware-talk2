@@ -64,7 +64,7 @@
                     class="message-text"
                     v-html="$options.filters.nl2br(message, false)">
               </span>
-              <span v-if="id === 'sms' && attachment"
+              <span v-if="id === 'sms' && attachment && !message"
                     class="message-text">
                 Inbound MMS
               </span>
