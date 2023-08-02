@@ -212,12 +212,12 @@
         <span class="font-weight-bold text-sm">Tags</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ name: 'Tags' }"
-           :ripple="false"
-           icon="img:app-icons/menu/tags_gray.svg"
+    <q-btn icon="img:app-icons/menu/tags_gray.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
+           :to="{ name: 'Tags' }"
+           :ripple="false"
            v-show="!isActive('Tags')"
            flat>
       <q-tooltip anchor="center right"
