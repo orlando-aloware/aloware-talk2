@@ -286,7 +286,7 @@ export default {
     },
 
     addTasks () {
-      let payload = {
+      const payload = {
         user_id: this.userId,
         direction: this.direction,
         prevent_duplicates: this.conversion.includes('prevent_duplicates'),

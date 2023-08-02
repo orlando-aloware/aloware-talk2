@@ -183,7 +183,7 @@ export default {
     enrollContacts () {
       this.loading = true
 
-      let payload = {
+      const payload = {
         model: 'tag'
       }
       let xhr = null

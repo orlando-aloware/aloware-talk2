@@ -157,17 +157,7 @@ export default {
     },
 
     promptMessage () {
-      let msg = 'Deleting '
-
-      if (!this.isBulk) {
-        msg += `<span class='font-italic font-weight-bold'>${this.tagName}</span> tag`
-      } else {
-        msg += 'tag(s)'
-      }
-
-      msg += ` will remove it from all contacts and communications. Continue?`
-
-      return msg
+      return 'Deleting ' + (!this.isBulk ? `<span class='font-italic font-weight-bold'>${this.tagName}</span> tag` : 'tag(s)') + ` will remove it from all contacts and communications. Continue?`
     },
 
     formName () {

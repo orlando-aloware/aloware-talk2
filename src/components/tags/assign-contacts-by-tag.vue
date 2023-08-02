@@ -185,9 +185,7 @@ export default {
     assignContacts () {
       this.loading = true
 
-      let msg = `Are you sure you want the contacts under `
-      msg += (this.isBulk) ? `these tags` : 'this tag'
-      msg += ` to be assigned to this ${this.tabNameLabel}?`
+      const msg = `Are you sure you want the contacts under ` + (this.isBulk ? `these tags` : 'this tag') + ` to be assigned to this ${this.tabNameLabel}?`
 
       this.$bvModal.msgBoxConfirm(msg, {
         title: 'Event Confirmation',
@@ -208,7 +206,7 @@ export default {
     },
 
     assign () {
-      let payload = {
+      const payload = {
         assign_contacts_to: this.tabName,
         user_id: this.userId,
         ring_group_id: this.ringGroupId,
