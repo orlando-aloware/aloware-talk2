@@ -39,14 +39,16 @@
         <label class="label mt-2 mb-1 text-weight-bold">
           Direction
         </label>
-        <b-form-radio-group class="w-100"
-                            button-variant="outline-primary"
-                            name="radio-btn-outline"
-                            size="sm"
-                            buttons
-                            :options="directionOptions"
-                            v-model="direction">
-        </b-form-radio-group>
+        <q-btn-toggle class="custom-toggle-button"
+                      toggle-color="primary active"
+                      color="transparent"
+                      text-color="grey-90"
+                      no-caps
+                      dense
+                      spread
+                      unelevated
+                      :options="directionOptions"
+                      v-model="direction" />
 
         <hr>
 
@@ -270,10 +272,10 @@ export default {
       return [
         {
           value: ImportConstants.BOTTOM,
-          text: 'Bottom'
+          label: 'Bottom'
         }, {
           value: ImportConstants.TOP,
-          text: 'Top'
+          label: 'Top'
         }
       ]
     }
