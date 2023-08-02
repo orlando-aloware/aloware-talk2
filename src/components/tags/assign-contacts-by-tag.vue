@@ -1,8 +1,8 @@
 <template>
   <b-modal id="tag-assign-contact-modal"
            modal-class="tags__modal"
-           centered
            size="md"
+           centered
            v-model="openModal"
            @hide="closeModalPrompt">
     <b-overlay no-wrap

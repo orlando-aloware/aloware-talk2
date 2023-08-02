@@ -5,8 +5,8 @@
            v-model="openModal"
            @hide="closeModalPrompt"
            @show="openTagForm">
-    <b-overlay no-wrap
-               rounded="sm"
+    <b-overlay rounded="sm"
+               no-wrap
                :show="true"
                v-show="loading">
       <template #overlay>
@@ -42,7 +42,8 @@
                         class="color-picker">
               <template #button-content>
                 <i class="fa fa-square fa-2x"
-                  :style="{ color: tag.color }"></i>
+                   :style="{ color: tag.color }">
+                </i>
               </template>
 
               <b-dropdown-item :key="`color-${option}`"

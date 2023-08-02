@@ -66,7 +66,7 @@
 
         <!-- bulk actions -->
         <div class="row mx-0 relative-position"
-            v-if="hasRole('Company Admin')">
+             v-if="hasRole('Company Admin')">
           <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
                                  @reloadTags="getTags" />
         </div>

@@ -1,8 +1,8 @@
 <template>
   <b-modal id="tag-add-tag-contacts-to-pd"
            modal-class="tags__modal"
-           centered
            size="md"
+           centered
            v-model="openModal"
            @hide="closeModalPrompt">
     <b-overlay no-wrap

@@ -5,8 +5,8 @@
            centered
            v-model="openModal"
            @hide="closeModalPrompt">
-    <b-overlay no-wrap
-               rounded="sm"
+    <b-overlay rounded="sm"
+               no-wrap
                :show="true"
                v-show="loading">
       <template #overlay>

@@ -6,7 +6,7 @@
       </div>
       <div class="items">
         <a href="#"
-             @click.prevent="onMoveToTop">
+           @click.prevent="onMoveToTop">
           <i class="fa fa-chevron-up"/>
           Move to Top
         </a>

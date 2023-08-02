@@ -5,8 +5,8 @@
            centered
            v-model="openModal"
            @hide="closeModalPrompt">
-    <b-overlay no-wrap
-               rounded="sm"
+    <b-overlay rounded="sm"
+               no-wrap
                :show="true"
                v-show="loading">
       <template #overlay>
@@ -34,8 +34,8 @@
                        v-model="selectedPageSize"
                        @select="setSplitPageSize" />
     </div>
-    <p v-show="!allowSplit"
-       class="text-red text-11 mb-0 mt-1">
+    <p class="text-red text-11 mb-0 mt-1"
+       v-show="!allowSplit">
       Contact count is less than or equal to page size.
     </p>
 
