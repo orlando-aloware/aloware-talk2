@@ -12897,10 +12897,8 @@ h1.contact-list-name-label {
       }
 
       ul.dropdown-menu {
-        & {
-          text-align: center;
-          min-width: 20rem;
-        }
+        text-align: center;
+        min-width: 20rem;
 
         li {
           display: inline-block;

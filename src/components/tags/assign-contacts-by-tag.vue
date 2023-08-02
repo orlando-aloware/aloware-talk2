@@ -39,8 +39,8 @@
 
     <div class="py-4">
       <p class="mb-1">By default, this tool only distributes unassigned contacts.</p>
-      <b-form-checkbox v-model="distributeContacts"
-                       switch>
+      <b-form-checkbox switch
+                       v-model="distributeContacts">
         <span class="font-weight-bold">Also distribute assigned contacts</span>
       </b-form-checkbox>
     </div>

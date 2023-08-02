@@ -138,8 +138,8 @@ export default {
       }
 
       return this?.tag?.category === this.ContactTags &&
-              this?.tag?.contacts_count > 0 &&
-              !this.confirmDeleteWithContacts
+        this?.tag?.contacts_count > 0 &&
+        !this.confirmDeleteWithContacts
     },
 
     showConfirmDeleteInfo () {
@@ -148,8 +148,8 @@ export default {
       }
 
       return this?.tag?.category === this.ContactTags &&
-              this.isDeleteContacts === 'yes' &&
-              this.confirmDeleteWithContacts
+        this.isDeleteContacts === 'yes' &&
+        this.confirmDeleteWithContacts
     },
 
     equalsTagContactsCount () {
