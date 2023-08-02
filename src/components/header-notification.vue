@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-red-9 px-2 text-red-130 w-100 py-2 px-3 position-relative"
+  <div class="bg-yellow-12 px-2 w-100 py-2 px-3 position-relative"
        id="notification-container"
        v-if="isShow">
     <div class="d-flex">
@@ -7,6 +7,10 @@
         <strong :class="diagnosisClass">
           <i class="fa fa-exclamation-triangle"/>
           {{ firstDiagnosis }}
+          <template v-if="secondDiagnosis">
+              <br>
+              {{ secondDiagnosis }}
+          </template>
         </strong>
         <a target="_blank"
            class="text-red-130 text-decoration-underline"
@@ -96,6 +100,14 @@ export default {
       return 'We are having issues with your account and calls might not route at this time. Please contact support as soon as possible.'
     },
 
+    secondDiagnosis () {
+      if (this.diagnosis.length > 1 && this?.is10DlcError) {
+        return this.diagnosis[1]
+      }
+
+      return ''
+    },
+
     currentRouteName () {
       return this.$route.name
     },
@@ -118,6 +130,14 @@ export default {
 
     isClosable () {
       return this.diagnosis?.closable
+    },
+
+    is10DlcError () {
+      return this.issueCodes.includes(CompanyIssues.ISSUE_A2P_10DLC_NOT_REGISTERED) ||
+        this.issueCodes.includes(CompanyIssues.ISSUE_A2P_10DLC_INCOMPLETE) ||
+        this.issueCodes.includes(CompanyIssues.ISSUE_BRAND_REGISTRATION_FAILED) ||
+        this.issueCodes.includes(CompanyIssues.ISSUE_BRAND_NOT_REGISTERED) ||
+        this.issueCodes.includes(CompanyIssues.ISSUE_BRAND_REGISTRATION_FAILED_TCR_ZERO)
     }
   },
 
