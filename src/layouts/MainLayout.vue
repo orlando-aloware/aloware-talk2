@@ -911,6 +911,15 @@ export default {
       console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
     }
 
+    this.mainListeners.bulkContactsDeleted = (event) => {
+      if ('success' in event && !event.success) {
+        this.$generalNotification(event.message, 'error')
+        return
+      }
+
+      this.$generalNotification(event.message)
+    }
+
     this.mainListeners.contactListBulkCreated = (event) => {
       // Save the event to vuex
       this.storeBulkActionNotification(event)
@@ -1179,6 +1188,7 @@ export default {
       this.$VueEvent.listen('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
+      this.$VueEvent.listen('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
       this.$VueEvent.listen('contact_list_bulk_created', this.mainListeners.contactListBulkCreated)
     },
 
@@ -1207,6 +1217,7 @@ export default {
       this.$VueEvent.stop('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.stop('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.stop('hide_mobile_footer', this.mainListeners.hideMobileFooter)
+      this.$VueEvent.stop('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
     },
 
     checkSuspended (data, isUser = false) {
@@ -1413,6 +1424,7 @@ export default {
         this.getDispositionStatuses()
         this.getCallDispositions()
         this.getLeadSources()
+        this.getMyQueueList()
       })
     },
 
@@ -2455,6 +2467,7 @@ export default {
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
     ...mapActions('powerDialer', [
       'setFinishedPowerDialerSession',
+      'getMyQueueList',
       'storeBulkActionNotification'
     ]),
     ...mapActions([
