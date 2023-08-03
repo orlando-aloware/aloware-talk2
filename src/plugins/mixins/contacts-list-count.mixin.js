@@ -10,6 +10,7 @@ export default {
       countSource: null,
       contactsListCountListeners: {},
       fetchCount: 0,
+      fetchCountTimeout: null,
       bulkActions: ['bulk-created', 'bulk-deleted'],
       STATIC
     }
@@ -29,6 +30,14 @@ export default {
 
     this.contactsListCountListeners.getListCount = (data) => {
       this.fetchCount = 0
+      this.processGetListCount(data)
+    }
+
+    this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
+  },
+
+  methods: {
+    processGetListCount (data) {
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
       const isStaticList = listId !== null && this.lists?.[listId] && this.lists[listId]?.type === STATIC
@@ -38,6 +47,7 @@ export default {
       const clear = data?.clear ?? false
 
       this.setIsDatatableCountLoading(true)
+      clearTimeout(this.fetchCountTimeout)
 
       this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
         .then(response => {
@@ -59,8 +69,8 @@ export default {
             isInvalidCount) {
             this.fetchCount++
 
-            setTimeout(() => {
-              this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
+            this.fetchCountTimeout = setTimeout(() => {
+              this.processGetListCount(data)
             }, 5000)
 
             if (this.fetchCount < 5) {
@@ -122,12 +132,8 @@ export default {
 
           this.setIsDatatableCountLoading(false)
         })
-    }
+    },
 
-    this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
-  },
-
-  methods: {
     getListDataCount (data, skipCancelToken = false, isStaticList = false, listId = null) {
       if (!skipCancelToken) {
         this.countSource.cancel('Loading of contacts list count operation is canceled by the user.')
@@ -255,20 +261,9 @@ export default {
         return false
       }
 
-      const eventCount = event.count
+      let estimatedCount = this.selectedList.contactCount
 
-      const currentTotalCount = this.selectedList.contactCount
-      let estimatedCount = currentTotalCount
-
-      switch (eventName) {
-        case 'bulk-created':
-          estimatedCount = estimatedCount + eventCount
-          break
-        case 'bulk-deleted':
-          estimatedCount = estimatedCount - eventCount
-      }
-
-      return count !== estimatedCount
+      return count === estimatedCount && event.count > 0
     },
 
     ...mapActions('contacts', [

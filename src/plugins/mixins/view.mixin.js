@@ -190,7 +190,7 @@ export default {
         let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
         params.event = {
           name: 'bulk-created',
-          count: event.count
+          count: event.items_count
         }
         this.onFetch(params, false, true)
       }
