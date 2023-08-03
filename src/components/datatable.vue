@@ -3,6 +3,7 @@
        :class="[paginated ? 'paginated overflow-x-hidden w-100' : '']"
        @mousemove="$emit('onMouseMove', $event)"
        @mouseleave="$emit('onMouseLeave', $event)">
+
     <div ref="scrollableArea"
          :class="scrollableAreaClasses"
          @scroll="handleScroll">
@@ -17,6 +18,7 @@
                      :list="fixedColumns"
                      :move="onCheckMove"
                      @change="onOrderChanged">
+
             <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
                 :key="column.name"
                 :data-column-id="column.name"
@@ -32,6 +34,7 @@
                        type="checkbox"
                        :class="checkAllClass"
                        :disabled="isDisabledCheckAll"
+                       :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
                 <span class="checkmark"
                       :class="checkAllClass"/>
@@ -66,13 +69,16 @@
                   {{ column.label }}
                 </div>
               </template>
+
             </th>
           </draggable>
         </thead>
+
         <tbody>
           <slot name="tbody" />
         </tbody>
       </table>
+
       <b-overlay class="table-more-rows-spinner"
                  rounded="sm"
                  :show="isLoadingMore"
@@ -86,13 +92,14 @@
       <template v-if="hasEmptySlot">
         <slot name="empty" />
       </template>
+
       <div class="empty-state"
            v-else-if="!hasEmptySlot && isEmpty &&  !isLoading">
         <div class="h5 px-2 text-center">{{ defaultPlaceholderMessage }}</div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-center flex-grow-0 overflow-x-hidden"
+    <div class="d-flex justify-content-center border-top flex-grow-0 overflow-x-hidden"
          style="min-height: 56px;"
          v-if="paginated">
       <q-pagination class="table-pagination"
@@ -100,12 +107,13 @@
                     boundary-links
                     direction-links
                     dense
-                    v-model="paginationPage"
                     :max="lastPage"
                     :max-pages="maxPaginationPages"
                     :ellipses="false"
-                    :boundary-numbers="false">
+                    :boundary-numbers="false"
+                    v-model="paginationPage">
       </q-pagination>
+
       <q-select class="mt-2 q-select-pager"
                 option-value="value"
                 option-label="label"
@@ -114,8 +122,8 @@
                 emit-value
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`"
-                v-model="perPage">
-      </q-select>
+                v-model="perPage" />
+
     </div>
   </div>
 </template>
@@ -211,6 +219,11 @@ export default {
     totalRows: {
       type: Number,
       default: 0
+    },
+
+    isSelectedAll: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -247,6 +260,12 @@ export default {
 
     fixedColumns () {
       const newItems = this.$jsonClone(this.columns)
+
+      // does not need to reference contacts
+      if (!['Contacts', 'Power Dialer'].includes(this.$route.name)) {
+        return newItems
+      }
+
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
       for (const index in newItems) {

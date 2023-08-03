@@ -55,10 +55,11 @@
         <div class="items"
              v-if="!isAddView">
           <a href=""
+             class="text-danger"
              :disabled="disabledDelete"
              v-if="hasDeletePermission"
              @click="onDelete">
-            <i class="fa fa-trash text-primary"/>
+            <i class="fa fa-trash text-danger"/>
             Delete
           </a>
         </div>

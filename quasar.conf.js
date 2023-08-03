@@ -46,7 +46,7 @@ module.exports = function (/* ctx */) {
       'roboto-font',
       'material-icons',
       'material-icons-outlined',
-      'fontawesome-v5'
+      'fontawesome-v6'
     ],
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
@@ -76,7 +76,10 @@ module.exports = function (/* ctx */) {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /node_modules/
+          exclude: /node_modules/,
+          options: {
+            fix: true
+          }
         })
 
         if (process.env.APP_ENV !== 'local') {

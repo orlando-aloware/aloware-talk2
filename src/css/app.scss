@@ -1575,6 +1575,10 @@ i.option-separator {
   background: $danger;
 }
 
+.badge-grey {
+  background: $grey;
+}
+
 .badge-grey-80 {
   background: $grey-80;
 }
@@ -7701,6 +7705,11 @@ button.grey-90 {
 .bulk-action-menu {
   background: white;
 
+  &__power-dialer,
+  &__tags {
+    margin-left: 40px !important;
+    margin-top: 2px !important;
+  }
 
   .menu-actions {
     min-height: 35px !important;
@@ -8082,7 +8091,8 @@ span.mention {
   }
 
   button.bg-transparent:hover {
-    .task-count {
+    .task-count,
+    .badge-active-count {
       background: transparent;
     }
   }
@@ -8097,9 +8107,8 @@ span.mention {
     }
 
     &:not(.active) {
-      color: transparent !important;
-
-      .task-count {
+      .task-count,
+      .badge-active-count {
         background: $grey-70 !important;
         color: $grey-90 !important;
       }
@@ -8112,11 +8121,13 @@ span.mention {
       text-align: center;
       font-family: 'Inter', sans-serif !important;
 
-      .task-status-name {
+      .task-status-name,
+      .toggle-button-name {
         margin-top: -2px;
       }
 
-      .task-count {
+      .task-count,
+      .badge-active-count {
         background: rgba(255, 255, 255, 0.22);
         border-radius: 5px;
         font-size: 10px;
@@ -10331,7 +10342,8 @@ screen and (max-width: 956px) {
 }
 
 .filter-toggle-button,
-.contacts-options-dropdown {
+.contacts-options-dropdown,
+.tags-table {
   .dropdown-menu {
     border-radius: 8px;
     padding: 6px 6px;
@@ -12864,4 +12876,127 @@ h1.contact-list-name-label {
   padding: 8px;
   border-radius: 8px;
   height: unset !important;
+}
+
+.tags {
+  &__modal {
+    .modal-header,
+    .modal-footer {
+      border: none
+    }
+
+    .modal-body {
+      padding-bottom: 0
+    }
+  }
+
+  &__tabs {
+    &.q-btn-group--spread {
+      & > .q-btn-item {
+        flex: inherit;
+        flex-grow: 1;
+        min-width: 200px;
+      }
+    }
+  }
+
+  &__helper {
+    &__popover {
+      .popover-header {
+        background-color: #fff;
+        border-bottom: none;
+        font-weight: 500;
+      }
+    }
+  }
+
+  &__form {
+    .color-picker {
+      .dropdown-toggle::after {
+        margin-left: 0.5em;
+        vertical-align: 0.5em;
+      }
+
+      ul.dropdown-menu {
+        text-align: center;
+        min-width: 20rem;
+
+        li {
+          display: inline-block;
+        }
+      }
+
+      a.dropdown-item {
+        padding: 0
+      }
+
+      span.color-pick.selected::after {
+        content: "\2713";
+        color: #fff;
+        font-size: medium;
+        vertical-align: super;
+        margin-left: -25px;
+        padding-right: 10px;
+      }
+    }
+  }
+}
+
+.tree-selector {
+  &.vue-treeselect--focused {
+    .vue-treeselect__control {
+      border-color: $primary !important;
+      border-width: 2px;
+      box-shadow: none !important;
+      transform: scale3d(1, 1, 1)
+    }
+  }
+
+  .vue-treeselect__control {
+    height: 40px;
+    padding: 2px 5px;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.64);
+    border: 1px solid rgba(0, 0, 0, 0.24);
+
+    &.vue-treeselect--open {
+      border-color: rgba(0, 0, 0, 0.24);
+    }
+
+    .vue-treeselect__single-value {
+      font-size: 14px;
+      color: $black;
+    }
+  }
+
+  .vue-treeselect__menu {
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.80);
+
+    .vue-treeselect__list-item {
+      transition: color 0.3s, background-color 0.3s;
+
+      .vue-treeselect__option {
+        padding: 3px 5px;
+        border-radius: 5px;
+        margin: 2px 0;
+
+        &.vue-treeselect__option--selected {
+          background: $primary;
+          color: $white;
+          font-weight: normal;
+        }
+
+        &.vue-treeselect__option--highlight:not(.vue-treeselect__option--selected) {
+          background: $grey-60;
+          color: $grey-100;
+        }
+
+        .vue-treeselect__label {
+          white-space: inherit;
+        }
+      }
+    }
+
+  }
 }
