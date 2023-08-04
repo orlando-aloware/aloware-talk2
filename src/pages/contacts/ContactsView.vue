@@ -1004,12 +1004,15 @@ export default {
   },
 
   mounted () {
+    // clear the selected contacts
     this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 
+    // an  actual list is loaded (contact/list URL)
     if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
       this.loadList(this.$route.params.id)
     }
 
+    // index page or default list is loaded
     if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
       this.setData(this.id)
       this.setSelectedList({ id: this.id, name: this.name, type: this.type })
@@ -1027,6 +1030,7 @@ export default {
     this.$VueEvent.listen('shouldUpdateListCount', () => {
       if (this.list.type === this.ContactListTypes.DYNAMIC) {
         this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
+
         return
       }
 
@@ -1041,8 +1045,11 @@ export default {
       })
     })
 
-    this.viewListeners.setDataCount = _.debounce((filters) => {
-      this.setDataCount(filters)
+    this.viewListeners.setDataCount = _.debounce((data) => {
+      const event = data.event
+      const filters = data.filters
+      const clear = data?.clear ?? false
+      this.setDataCount(filters, event, false, clear)
     }, 100)
 
     this.viewListeners.updateHasFilterChanges = () => {
@@ -1260,7 +1267,7 @@ export default {
             if (this.list.type === this.ContactListTypes.DYNAMIC) {
               this.setDataCount({
                 filter_groups: this.currentListFilters
-              }, true)
+              }, null, true)
               return
             }
 
@@ -1278,7 +1285,7 @@ export default {
                   is_conjunction: true
                 }
               ]
-            }, true)
+            }, null, true)
           })
           .catch((_err) => {
             console.log(_err)
@@ -1604,10 +1611,12 @@ export default {
       })
     },
 
-    setDataCount (data, updatePinned = false) {
+    setDataCount (data, event = null, updatePinned = false, clear = false) {
       const fireData = {
         data: { filters: data },
         id: this.id,
+        event: event,
+        clear: clear,
         thenFunctions: {
           setSelectedListContactCount: 'response.data.count'
         }
@@ -1657,6 +1666,7 @@ export default {
       if (this.$route.params.id === 'unsaved') {
         this.$VueEvent.fire('get-list-count', {
           data: { filters: JSON.stringify(this.list.filters) },
+          clear: true,
           thenFunctions: {
             'setSelectedListContactCount': {
               count: 'response.data.count'

@@ -355,6 +355,12 @@ export default {
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
         })
+        .listen('.bulk_contacts.deleted', (event) => {
+          window.VueEvent.fire('bulk_contacts_deleted', event)
+        })
+        .listen('.bulk_tags.deleted', (event) => {
+          window.VueEvent.fire('bulk_tags_deleted', event)
+        })
         // .listen('.export.created', (event) => {
         //   console.log('created export event :>> ', event)
         //   window.VueEvent.fire('export_event_updates', event)
@@ -471,6 +477,10 @@ export default {
           this.$VueEvent.fire('tag_created', event.tag)
         })
         .listen('.tag.updated', (event) => {
+          if (event.tag.name.includes('_deleted_')) {
+            return
+          }
+
           this.updateTag(event.tag)
           this.$VueEvent.fire('tag_updated', event.tag)
         })

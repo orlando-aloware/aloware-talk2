@@ -10,6 +10,8 @@ export default {
       countSource: null,
       contactsListCountListeners: {},
       fetchCount: 0,
+      fetchCountTimeout: null,
+      bulkActions: ['bulk-created', 'bulk-deleted'],
       STATIC
     }
   },
@@ -17,7 +19,8 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'pinnedLists',
-      'lists'
+      'lists',
+      'selectedList'
     ])
   },
 
@@ -27,21 +30,47 @@ export default {
 
     this.contactsListCountListeners.getListCount = (data) => {
       this.fetchCount = 0
+      this.processGetListCount(data)
+    }
+
+    this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
+  },
+
+  methods: {
+    processGetListCount (data) {
       const skipCancelToken = get(data, 'skipCancelToken', false)
       const listId = get(data, 'id', null)
       const isStaticList = listId !== null && this.lists?.[listId] && this.lists[listId]?.type === STATIC
+      // bulk event data
+      const event = data?.event
+      // flag needed for checking if it's a new search/filter
+      const clear = data?.clear ?? false
 
       this.setIsDatatableCountLoading(true)
+      clearTimeout(this.fetchCountTimeout)
 
       this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
         .then(response => {
-          // we have to re-fetch the count if count is less than
-          // current contacts fetched
-          if (this.contactsData && this.contactsData?.data.length > 0 &&
-            response.data.count < this.contactsData.data.length) {
+          const count = response.data.count
+          const currentTotalCount = this.selectedList.contactCount
+          // check if the count is not what we're expecting or
+          // is not the latest count due to redshift delay
+          const isInvalidCountWithoutEvent = isEmpty(event) &&
+            count < currentTotalCount && !clear
+          const isInvalidCountWithEvent = !isEmpty(event) &&
+            this.isFromBulkActionInvalidCount(event, count)
+          const isInvalidCount = isInvalidCountWithoutEvent ||
+            isInvalidCountWithEvent
+
+          // we have to re-fetch the count if count is not correct
+          if (!this.$route.path.includes('/add') && this.contactsData &&
+            this.contactsData?.data.length > 0 &&
+            listId === this.selectedList.id &&
+            isInvalidCount) {
             this.fetchCount++
-            setTimeout(() => {
-              this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
+
+            this.fetchCountTimeout = setTimeout(() => {
+              this.processGetListCount(data)
             }, 5000)
 
             if (this.fetchCount < 5) {
@@ -73,7 +102,7 @@ export default {
               list: {
                 id: listId
               },
-              count: response.data.count
+              count: count
             })
           }
 
@@ -103,12 +132,8 @@ export default {
 
           this.setIsDatatableCountLoading(false)
         })
-    }
+    },
 
-    this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
-  },
-
-  methods: {
     getListDataCount (data, skipCancelToken = false, isStaticList = false, listId = null) {
       if (!skipCancelToken) {
         this.countSource.cancel('Loading of contacts list count operation is canceled by the user.')
@@ -227,6 +252,18 @@ export default {
         params.includes('response.')
         ? get(response, params.replace('response.', ''), 0)
         : params
+    },
+
+    isFromBulkActionInvalidCount (event, count) {
+      const eventName = event.name
+
+      if (!this.bulkActions.includes(eventName)) {
+        return false
+      }
+
+      let estimatedCount = this.selectedList.contactCount
+
+      return count === estimatedCount && event.count > 0
     },
 
     ...mapActions('contacts', [

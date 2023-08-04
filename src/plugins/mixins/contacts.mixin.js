@@ -170,6 +170,10 @@ export default {
           path = this.apiEndpoint(this.id === 'my-queue')
         }
 
+        if (!path) {
+          return
+        }
+
         let params = {
           page: nextPage,
           search: this.search,
@@ -263,11 +267,21 @@ export default {
           return `api/v2/power-dialer-lists/my-queue/items`
 
         default:
+          if (this.id === 'in-queue') {
+            return ''
+          }
+
           return `api/v2/power-dialer-lists/${this.id === 'all' ? 'my-queue' : this.id}/items`
       }
     },
 
     debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
+      const endpoint = this.apiEndpoint(queued)
+
+      if (!endpoint) {
+        return
+      }
+
       const axiosUniqueId = Date.now().toString(36) + Math.random().toString(36).substring(2)
       this.addAxiosUniqueId(axiosUniqueId)
 
@@ -280,7 +294,7 @@ export default {
       }
 
       if (this.$route.name === 'Power Dialer') {
-        this.SET_FILTERED_ENDPOINT(this.apiEndpoint(queued))
+        this.SET_FILTERED_ENDPOINT(endpoint)
       }
 
       // my contacts toggle is not applicable in "Unassigned Contacts" list
@@ -295,7 +309,11 @@ export default {
       // use the same query string to update the list count
       // eslint-disable-next-line camelcase
       const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', countQueryString)
+      this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
+        event: params.event,
+        clear: clear,
+        filters: countQueryString
+      })
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
@@ -331,7 +349,7 @@ export default {
       this.setIsDatatableSelectedAll(false)
 
       return this.$axios
-        .get(this.apiEndpoint(queued), {
+        .get(endpoint, {
           params: queryString,
           paramsSerializer: qs.stringify,
           cancelToken: this.listContactsSource.token
@@ -361,7 +379,7 @@ export default {
             this.$VueEvent.fire('contactsListSidebarDataLoaded', data.data)
           }
 
-          if (this.apiEndpoint(queued).includes('my-queue')) {
+          if (endpoint.includes('my-queue')) {
             // TODOs: Use vuex for storing filtered power dialer contact lists
             this.updateMyQueueListData(data)
           }
@@ -399,6 +417,13 @@ export default {
 
     fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
       let params = this.$jsonClone(data)
+      const event = params?.event
+
+      // remove the event property as we don't need it at this point
+      if (params?.event) {
+        delete params.event
+      }
+
       let eventListId = null
 
       if (typeof this.getCleanedListId !== 'undefined') {
@@ -447,6 +472,8 @@ export default {
         params.order = order
       }
 
+      // add the event back
+      params.event = event
       this.isLoading = true
 
       // for power dialer list contacts fetching
