@@ -762,7 +762,7 @@ export default {
       const totalContacts = total || 0
       const postfix = totalContacts > 1 ? 's' : ''
 
-      return `${this.listItemsTotalContacts} of ${totalContacts} Contact${postfix}`
+      return `${this.$options.filters.numFormat(this.listItemsTotalContacts)} of ${this.$options.filters.numFormat(totalContacts)} Contact${postfix}`
     },
 
     activeList () {
