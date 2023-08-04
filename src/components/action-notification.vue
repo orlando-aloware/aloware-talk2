@@ -55,6 +55,15 @@
               {{ runningDateTime }}
             </small>
           </div>
+
+          <!-- caller location -->
+          <div class="d-flex flex-grow-1 align-items-baseline w-100"
+               v-if="communication && contact">
+            <span class="mr-auto text-white pr-1 text-sm">
+              {{ location }}
+            </span>
+          </div>
+
           <div class="text-grey-81 message-body text-break d-flex w-100">
             <div class="flex-grow-1 d-flex align-items-center w-100">
               <component class="message-icon mr-1"
@@ -85,6 +94,7 @@
             </div>
           </div>
         </div>
+
         <div class="d-flex justify-content-center align-items-center call-actions"
              :class="[isCall && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
@@ -494,6 +504,14 @@ export default {
         this.isCall && this.getSource ? 'mt-2' : '',
         this.id === 'system' ? 'system-update' : ''
       ]
+    },
+
+    location () {
+      const city = this.communication.city || this.contact.cnam_city || 'Unknown city'
+      const state = this.communication.state || this.contact.cnam_state || null
+      const country = this.communication.country || this.contact.cnam_country || null
+
+      return city + (state ? ', ' + state : '') + (country ? ' - ' + country : '')
     }
   },
 
