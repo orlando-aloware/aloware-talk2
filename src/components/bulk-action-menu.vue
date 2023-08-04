@@ -40,8 +40,10 @@
       </div>
       <div class="items"
            v-if="hasPermissionTo('archive contact')">
-        <a href="" @click="onDelete">
-          <i class="fa fa-trash"></i>
+        <a href=""
+           class="text-danger"
+           @click="onDelete">
+          <i class="fa fa-trash text-danger"></i>
           Delete
         </a>
       </div>
