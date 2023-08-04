@@ -35,7 +35,7 @@
     <template slot="options">
       <div class="d-flex align-items-center">
         <div class="selected-contacts text-muted mr-2">
-          {{ selectedAllCount }} Selected Contact
+          {{ selectedAllCount | numFormat }} Selected Contact
         </div>
         <compact-btn class="mr-2"
                      variant="primary"
