@@ -507,11 +507,11 @@ export default {
     },
 
     location () {
-      const city = this.communication.city || this.contact.cnam_city || 'Unknown city'
+      const city = this.communication.city || this.contact.cnam_city || null
       const state = this.communication.state || this.contact.cnam_state || null
       const country = this.communication.country || this.contact.cnam_country || null
 
-      return city + (state ? ', ' + state : '') + (country ? ' - ' + country : '')
+      return `${city || ''} ${city && state ? ', ' : ''} ${state || ''} ${state && country ? ' - ' : ''} ${country || ''}`
     }
   },
 
