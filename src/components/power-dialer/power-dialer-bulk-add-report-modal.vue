@@ -56,10 +56,6 @@ export default {
     fullReport: {}
   }),
 
-  created () {
-    this.buildReport()
-  },
-
   computed: {
     ...mapState([
       'integrationPDImportSummaries'
@@ -153,13 +149,14 @@ export default {
     },
 
     buildReport () {
+      this.fullReport = cloneDeep(this.statusReport)
+
       if (isEmpty(this.fullReport)) {
         return
       }
 
-      this.fullReport = cloneDeep(this.statusReport)
       const id = this.$route.params.id
-      const integrationReport = cloneDeep(this.integrationPDImportSummaries[id])
+      const integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
       // remove null/undefined values in object
       const failReport = omitBy(this.fullReport.fail, isNil)
 
