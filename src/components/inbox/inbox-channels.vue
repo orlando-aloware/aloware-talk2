@@ -218,7 +218,11 @@ export default {
     filterType: {
       type: String,
       required: false,
-      default: 'call'
+      default () {
+        return ['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId
+          ? 'all'
+          : 'call'
+      }
     },
 
     channel: {
@@ -417,28 +421,10 @@ export default {
 
       if (this.$route.params.channel === 'all-communications') {
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-        defaultFilterModel.filter = {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          direction: Filters.DEFAULT_STATE.filter.direction,
-          answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-          min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-          transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-          callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-          tags: Filters.DEFAULT_STATE.filter.tags,
-          call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-          users: Filters.DEFAULT_STATE.filter.users,
-          workflows: Filters.DEFAULT_STATE.filter.workflows,
-          broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          creator_type: Filters.DEFAULT_STATE.filter.creator_type
+        defaultFilterModel.filter = { ...Filters.DEFAULT_STATE.filter }
+
+        if (this.$route.query?.tagId) {
+          defaultFilterModel.filter.tags = [+this.$route.query.tagId]
         }
 
         return defaultFilterModel
@@ -703,6 +689,16 @@ export default {
   },
 
   mounted () {
+    // check for url parameter filter to preselect and load
+    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId) {
+      this.setInboxShowMyContacts(false)
+      this.filter = this.channelDefaultFilterModel.filter
+      this.updateChannelChangedFilterFields({
+        name: 'tags',
+        value: this.channelDefaultFilterModel.filter.tags
+      })
+    }
+
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
       if (this.$route.params.channel === 'mentions') {
         this.filter.page = this.nextPage
@@ -774,26 +770,28 @@ export default {
     const generalChannelRoutes = ['Inbox Channel', 'Inbox Contact']
     const communicationsChannelRoutes = ['Inbox Contact', 'Inbox Contact Communication']
 
-    if (inboxChannelRoutes.includes(this.$route.name) && this.$route.params.channel !== 'inbox') {
-      this.getCommunications(this.filter, () => {
-        const isGeneralChannelRoutesOrMentions = generalChannelRoutes.includes(this.$route.name) ||
-          ['mentions'].includes(this.$route.params.channel)
-
-        if (isGeneralChannelRoutesOrMentions && communicationsChannelRoutes.includes(this.$route.name)) {
-          let communication = null
-
-          if (this.$route.name === 'Inbox Contact Communication') {
-            communication = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
-          } else {
-            communication = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
-          }
-
-          if (communication) {
-            this.setSelectedCommunication(communication)
-          }
-        }
-      })
+    if (!inboxChannelRoutes.includes(this.$route.name) || this.$route.params.channel === 'inbox') {
+      return
     }
+
+    this.getCommunications(this.filter, () => {
+      const isGeneralChannelRoutesOrMentions = generalChannelRoutes.includes(this.$route.name) ||
+        ['mentions'].includes(this.$route.params.channel)
+
+      if (isGeneralChannelRoutesOrMentions && communicationsChannelRoutes.includes(this.$route.name)) {
+        let communication = null
+
+        if (this.$route.name === 'Inbox Contact Communication') {
+          communication = this.communications.find(item => item.mention_subject_id.toString() === this.$route.params.communicationId.toString())
+        } else {
+          communication = this.communications.find(item => item.id.toString() === this.$route.params.communicationId.toString())
+        }
+
+        if (communication) {
+          this.setSelectedCommunication(communication)
+        }
+      }
+    })
   },
 
   methods: {
@@ -809,7 +807,8 @@ export default {
       'toggleFilterModelForm',
       'toggleFilterDialog',
       'setIsInboxFiltersLoaded',
-      'updateChannelChangedFilterFields'
+      'updateChannelChangedFilterFields',
+      'setInboxShowMyContacts'
     ]),
 
     onResetFilters () {

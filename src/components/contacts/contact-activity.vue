@@ -99,24 +99,33 @@
              v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <q-img
-              class="border-rounded img-fluid d-block r-2x mb-1"
-              :src="attachment.url"
-              width="320px"
-              fit="fill"
-              native-context-menu
-            >
-              <template v-slot:error>
-                <div class="absolute-full flex flex-center bg-negative text-white">
-                  Error!
-                </div>
-              </template>
-              <template v-slot:default>
-                <download-button buttonStyle="top: 8px; left: 8px"
-                                 :filename="attachment.name"
-                                 :attachment-url="attachment.url"/>
-              </template>
-            </q-img>
+            <template v-if="isAttachmentImage(attachment.mime_type)">
+              <q-img
+                v-if="isAttachmentMigrated(attachment)"
+                class="border-rounded img-fluid d-block r-2x mb-1"
+                :src="attachment.url"
+                width="320px"
+                fit="fill"
+                native-context-menu>
+                <template v-slot:error>
+                  <div class="absolute-full flex flex-center bg-negative text-white">
+                    Error!
+                  </div>
+                </template>
+                <template v-slot:default>
+                  <download-button buttonStyle="top: 8px; left: 8px"
+                                   :filename="attachment.name"
+                                   :attachment-url="attachment.url"/>
+                </template>
+              </q-img>
+              <img
+                v-if="!isAttachmentMigrated(attachment)"
+                :key="index"
+                class="img-fluid d-block r-2x"
+                :class="index > 0 ? 'mb-1' : ''"
+                height="320px"
+                src="/assets/images/loading.svg"/>
+            </template>
 
             <div v-if="isAttachmentAudio(attachment.mime_type)">
               <audio style="height: 25px;width: 300px;margin-top: 10px;"
@@ -706,6 +715,13 @@ export default {
       }).then(res => {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = true
+
+        // if contact has no unreads anymore, refresh inbox result
+        const contact = res.data.contact
+        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
+        if (hasUnreads < 1) {
+          this.$VueEvent.fire('fetchInbox')
+        }
       }).catch(err => {
         this.$handleErrors(err.response)
       })
@@ -717,6 +733,12 @@ export default {
       }).then(res => {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = false
+
+        // if contact has no unreads before, refresh inbox result
+        const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
+        if (oldTotalUnreads < 1) {
+          this.$VueEvent.fire('fetchInbox')
+        }
       }).catch(err => {
         this.$handleErrors(err.response)
       })
@@ -798,6 +820,10 @@ export default {
       }
 
       return { name: '' }
+    },
+
+    isAttachmentMigrated (attachment) {
+      return !attachment.url.includes('twilio')
     },
 
     isAttachmentImage (mimeType) {

@@ -1,6 +1,6 @@
 <template>
   <div class="inbox-wrapper border-right">
-    <div class="mobile-header align-items-center justify-content-between pr-3"
+    <div class="mobile-header align-items-center justify-content-between pr-3 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
         <back-button @click="back"/>
@@ -11,14 +11,14 @@
       <profile class="p-0"
                :hide-profile-info="true"/>
     </div>
-    <div class="inbox-side border-top-0 flex-shrink-0 h-100">
+    <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
-        <div>
-          <div class="inbox-side__nav">
+        <div class="h-100">
+          <div class="inbox-side__nav h-100">
             <inbox-nav-list :closed="closed"
-                            :openCount="taskCounts.open"
-                            :pendingCount="taskCounts.pending"
+                            :openCount="inboxTaskCounts.open"
+                            :pendingCount="inboxTaskCounts.pending"
                             :value.sync="active"
                             v-model="active"
                             @active="newActive"
@@ -29,17 +29,19 @@
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
+        <!-- Inbox Tab (Inbox/Inbox View) UI -->
         <inbox-tab :search-text="searchText"
-                   v-if="!activeChannel || activeChannel.value === 'inbox'"
-                   @itemSelected="onItemSelected"/>
+                   v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
+                   @itemSelected="onItemSelected" />
+
+        <!-- Channels (Communications) UI -->
         <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
-                        :filter-type="activeChannel.type"
-                        :answer-status="activeChannel.answerStatus"
-                        :channel="activeChannel.value"
+                        :filter-type="activeChannel?.type"
+                        :answer-status="activeChannel?.answerStatus"
+                        :channel="activeChannel?.value"
                         :search-text="searchText"
                         :sort="sort"
-                        v-if="activeChannel && !['inbox'].includes(activeChannel.value)">
-        </inbox-channels>
+                        v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
       </div>
     </div>
   </div>
@@ -83,7 +85,13 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['activeChannel', 'communications', 'taskCounts', 'items']),
+    ...mapState('inbox', [
+      'activeChannel',
+      'communications',
+      'taskCounts',
+      'inboxTaskCounts',
+      'items'
+    ]),
 
     ...mapState(['isMobile']),
 
@@ -208,7 +216,9 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (to.name.includes('Inbox') && to.name !== 'Inbox') {
+      const redirectingToInbox = (to.name.includes('Inbox') && to.name !== 'Inbox') || from.name === 'Inbox View'
+
+      if (redirectingToInbox) {
         this.onLoadShowTasks = true
       }
 

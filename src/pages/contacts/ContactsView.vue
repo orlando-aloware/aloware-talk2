@@ -999,10 +999,12 @@ export default {
   },
 
   mounted () {
+    // an  actual list is loaded (contact/list URL)
     if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
       this.loadList(this.$route.params.id)
     }
 
+    // index page or default list is loaded
     if (this.$route.name === 'Contacts' && ['Contacts', 'Default Contacts List'].includes(this.$route.meta.page)) {
       this.setData(this.id)
       this.setSelectedList({ id: this.id, name: this.name, type: this.type })

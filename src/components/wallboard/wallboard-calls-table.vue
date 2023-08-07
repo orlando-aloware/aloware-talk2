@@ -133,7 +133,7 @@
                     <router-link class="mb-1"
                                  :to="{ path: `/contacts/${call.contact_id}` }"
                                  v-if="call.contact">
-                      {{ call.contact.name | capitalize }}
+                      {{ call.contact.name | ucwords }}
                     </router-link>
 
                     <!-- lead number -->
@@ -370,7 +370,7 @@
       <template #empty>
         <div class="empty-state"
              v-if="calls.length === 0">
-          <div class="h5">
+          <div class="h5 px-2 text-center">
             No {{ $route.params.id }} calls found based on the current filters
           </div>
         </div>
@@ -602,7 +602,7 @@ export default {
     },
 
     getLocation (communication) {
-      return communication.city + ((communication.city && communication.state) ? ', ' : '') + communication.state
+      return (communication.city || '') + ((communication.city && communication.state) ? ', ' : '') + (communication.state || '')
     },
 
     setExpandedItem (index) {

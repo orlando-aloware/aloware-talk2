@@ -181,6 +181,46 @@ export default {
     tags: {
       get (params) {
         return window.axios.get(`${suffixV1}tag`, params)
+      },
+
+      create (params) {
+        return window.axios.post(`${suffixV1}tag`, params)
+      },
+
+      update (id, params) {
+        return window.axios.patch(`${suffixV1}tag/${id}`, params)
+      },
+
+      delete (id, params) {
+        return window.axios.delete(`${suffixV1}tag/${id}`, params)
+      },
+
+      count (params = {}) {
+        return window.axios.get(`${suffixV1}tags/count`, { params })
+      },
+
+      bulkDelete (params) {
+        return window.axios.delete(`${suffixV1}tags/bulk-delete`, params)
+      },
+
+      split (id, params) {
+        return window.axios.post(`${suffixV1}tags/${id}/split`, params)
+      },
+
+      assignContactsTo (id, params) {
+        return window.axios.post(`${suffixV1}tags/${id}/assign-contacts-to`, params)
+      },
+
+      bulkAssignContactsTo (params) {
+        return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
+      },
+
+      addTasksToUserPowerDialer (id, params) {
+        return window.axios.post(`${suffixV1}tags/${id}/add-to-user-power-dialer`, params)
+      },
+
+      bulkAddTasksToUserPowerDialer (params) {
+        return window.axios.post(`${suffixV1}tags/bulk-add-to-user-power-dialer`, params)
       }
     },
 
@@ -322,26 +362,35 @@ export default {
       }
 
     },
+
     automations: {
       workflows: {
         enroll (workflowId, params) {
           return window.axios.post(`${suffixV1}automations/workflows/${workflowId}/sequence-contacts`, params)
+        },
+
+        bulkEnroll (workflowId, params) {
+          return window.axios.post(`${suffixV1}automations/workflows/${workflowId}/bulk-tags-sequence-contacts`, params)
         }
       }
     },
+
     users: {
       withAccessToContact (contactId) {
         return window.axios.get(`${suffixV1}user/get-users-with-access-to-contact?contact_id=${contactId}`)
       },
+
       setDefaultLogin (userId, params) {
         return window.axios.patch(`${suffixV1}user/${userId}/set-default-app`, params)
       },
+
       setAgentStatus (userId, status) {
         return window.axios.post(`${suffixV1}user/${userId}/agent-status`, {
           agent_status: status
         })
       }
     },
+
     reports: {
       communications: {
         get (params) {
@@ -349,40 +398,51 @@ export default {
         }
       }
     },
+
     user: {
       getById (id) {
         return window.axios.get(`${suffixV1}user/${id}`)
       },
+
       update (id, params) {
         return window.axios.put(`${suffixV1}user/${id}`, params)
       },
+
       diagnosis (id) {
         return window.axios.get(`${suffixV1}diagnosis/user/${id}`)
       },
+
       uploadMissedCallVM (id, params) {
         return window.axios.post(`${suffixV1}user/${id}/missed-call-voicemail`, params)
       },
+
       deleteMissedCallVM (id) {
         return window.axios.delete(`${suffixV1}user/${id}/missed-call-voicemail`)
       }
     },
+
     communication: {
       forceTerminate (id) {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
+
       forceDequeue (id) {
         return window.axios.post(`${suffixV1}communication/${id}/force-dequeue`)
       },
+
       get (id) {
         return window.axios.get(`${suffixV1}communication/${id}`)
       },
+
       delete (id) {
         return window.axios.delete(`${suffixV1}communication/${id}`)
       },
+
       reportIssue (id, data) {
         return window.axios.post(`${suffixV1}communications/${id}/report-issue`, data)
       }
     },
+
     statics: {
       get (companyId) {
         return window.axios.get('/get-statics', {
@@ -392,56 +452,68 @@ export default {
         })
       }
     },
+
     library: {
       voicemailDrop: {
         get (params) {
           return window.axios.get(`${suffixV1}voicemail-drop`, params)
         },
+
         create (params) {
           return window.axios.post(`${suffixV1}voicemail-drop`, params)
         },
+
         delete (id) {
           return window.axios.delete(`${suffixV1}voicemail-drop/${id}`)
         }
       }
     },
+
     profile: {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
       }
     },
+
     urlShortener: {
       generate (text) {
         return window.axios.post('/api/v1/url-shortener/urls/parse', { text })
       },
+
       domains () {
         return window.axios.get(`${suffixV1}url-shortener/domains`)
       }
     },
+
     alohabot: {
       getContactSession (id) {
         return window.axios.get(`${suffixV1}bots/contact/${id}/session`)
       },
+
       disengageContact (id, params) {
         return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
       }
     },
+
     contactCenter: {
       summary: {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/summary-report`, params)
         }
       },
+
       liveCalls: {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/live-calls`, params)
         }
       },
+
       parkedCalls: {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/parked-calls`, params)
         }
       },
+
       queuedCalls: {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
@@ -449,6 +521,7 @@ export default {
       }
     }
   },
+
   V2: {
     contacts: {
       get (id, sourceToken = null) {
@@ -472,15 +545,19 @@ export default {
 
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
       },
+
       counts (params, cancelTokenSource) {
         return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
-      inboxCounts () {
-        return window.axios.get(`/api/v2/contacts/inbox-counts`)
+
+      inboxCounts (params) {
+        return window.axios.get(`/api/v2/contacts/inbox-counts`, params)
       },
+
       taskStatusUpdate (id, params) {
         return window.axios.put(`/api/v2/contacts/${id}/task-status`, params)
       },
+
       async listExport (id, params = {}) {
         let defaultList = null
         Object.entries(DEFAULT_PINNED_LIST).forEach(([key, value]) => {
@@ -500,35 +577,50 @@ export default {
         })
       }
     },
+
     contactFolders: {
       list () {
         return window.axios.get(`${suffixV2}contact-folders`)
       },
+
       delete (id) {
         return window.axios.delete(`${suffixV2}contact-folders/${id}`)
       }
     },
+
     powerDialerFolders: {
-      list () {
-        return window.axios.get(`${suffixV2}power-dialer-folders`)
+      list (params = {}) {
+        return window.axios.get(`${suffixV2}power-dialer-folders`, {
+          params: params
+        })
       },
+
       delete (id) {
         return window.axios.delete(`${suffixV2}power-dialer-folders/${id}`)
       }
     },
+
     powerDialerListItem: {
       add (params = {}) {
         return window.axios.post(`${suffixV2}power-dialer-list-items`, params)
       }
     },
+
     powerDialer: {
       async listExport (id, params = {}) {
         params.contact_list_id = id
         return window.axios.get(`api/v2/power-dialer-lists/export-csv`, {
           params: params
         })
+      },
+
+      userMyQueue (params = {}) {
+        return window.axios.get(`api/v2/power-dialer-lists/my-queue`, {
+          params: params
+        })
       }
     },
+
     contactListItem: {
       addContact (contactListId, contacts = []) {
         return window.axios.post(`${suffixV2}contact-list-items`, {
@@ -537,8 +629,8 @@ export default {
         })
       }
     },
-    integrations: {
 
+    integrations: {
       hubspot: {
         importList (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-hubspot-list/${target}`, params)
@@ -564,32 +656,39 @@ export default {
         return window.axios.get(`${suffixV2}contacts-list/public`)
       }
     },
+
     filters: {
       get () {
         return window.axios.get(`${suffixV2}contacts/filters`)
       }
     },
+
     mentions: {
       get (params) {
         return window.axios.get(`${suffixV2}mentions`, params)
       }
     },
+
     inbox: {
       filters: {
         get (params) {
           return window.axios.get(`${suffixV2}filters`, { params: params })
         },
+
         save (params) {
           return window.axios.post(`${suffixV2}filters`, params)
         },
+
         update (filterId, params) {
           return window.axios.put(`${suffixV2}filters/${filterId}`, params)
         },
+
         delete (filterId) {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
       }
     },
+
     users: {
       get (params) {
         return window.axios.get(`${suffixV2}users`, { params })

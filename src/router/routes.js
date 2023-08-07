@@ -16,6 +16,7 @@ const WallboardOverview = () => import('pages/wallboard/WallboardOverview.vue')
 const WallboardAgents = () => import('pages/wallboard/WallboardAgents.vue')
 const WallboardCalls = () => import('pages/wallboard/WallboardCalls.vue')
 const Calendar = () => import('src/pages/calendar/Calendar.vue')
+const Tags = () => import('pages/tags/Tags.vue')
 const Stats = () => import('pages/stats/Stats.vue')
 const Settings = () => import('pages/Settings.vue')
 const Account = () => import('pages/Account.vue')
@@ -102,6 +103,22 @@ const routes = [
             path: 'channels/:channel',
             name: 'Inbox Channel',
             component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status',
+            name: 'Inbox View',
+            component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status/contacts/:id',
+            name: 'Inbox View Contact Task',
+            component: Contact,
             meta: {
               title: 'Communications'
             }
@@ -304,6 +321,14 @@ const routes = [
         component: Calendar,
         meta: {
           title: 'Calendar'
+        }
+      },
+      {
+        path: 'tags',
+        name: 'Tags',
+        component: Tags,
+        meta: {
+          title: 'Tags'
         }
       },
       {

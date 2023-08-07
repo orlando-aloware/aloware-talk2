@@ -13,6 +13,7 @@ import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
 import wallboard from './wallboard'
+import tagsModule from './tags'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
 
@@ -37,7 +38,8 @@ export default function (/* { ssrContext } */) {
       powerDialer,
       settings,
       wallboard,
-      cache
+      cache,
+      tagsModule
     },
 
     state: {
@@ -249,6 +251,7 @@ export default function (/* { ssrContext } */) {
       defaultDateFilter: null,
       sessionPhoneExpansion: '',
       notificationAudio: null,
+      fishinModeNotificationAudio: null,
       loadingParkedCalls: false,
       parkedCalls: [],
       suspended: false,
@@ -537,6 +540,7 @@ export default function (/* { ssrContext } */) {
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
           commit('wallboard/RESET_VUEX', null, { root: true })
+          commit('tagsModule/RESET_VUEX', null, { root: true })
         }
       },
 
@@ -742,6 +746,10 @@ export default function (/* { ssrContext } */) {
 
       setNotificationAudio ({ commit }) {
         commit('SET_NOTIFICATION_AUDIO')
+      },
+
+      setFishingModeNotificationAudio ({ commit }) {
+        commit('SET_FISHING_MODE_NOTIFICATION_AUDIO')
       },
 
       setLoadingParkedCalls ({ commit }, value) {
@@ -1437,6 +1445,11 @@ export default function (/* { ssrContext } */) {
 
       SET_NOTIFICATION_AUDIO (state) {
         state.notificationAudio = new Audio(process.env.API_URL + '/static/ivr/default-communication-notification.mp3')
+      },
+
+      SET_FISHING_MODE_NOTIFICATION_AUDIO (state) {
+        state.fishinModeNotificationAudio = new Audio(process.env.API_URL + '/static/ivr/incoming.mp3')
+        state.fishinModeNotificationAudio.loop = true
       },
 
       SET_LOADING_PARKED_CALLS (state, value) {

@@ -1,11 +1,13 @@
 <template>
   <div class="contacts-filter-sidebar"
        v-if="show">
-    <b-overlay class="full-width"
+    <b-overlay class="full-width h-100"
                spinner-variant="success"
                spinner-type="grow"
                rounded="sm">
-      <b-card class="filter-container">
+      <b-card class="filter-container h-100"
+              header-class="flex-grow-0"
+              body-class="flex-grow-1">
         <template #header>
           <div class="d-flex justify-content-between">
             <div class="d-inline-flex">
@@ -27,140 +29,136 @@
             </b-button>
           </div>
         </template>
-        <div class="">
-          <div>
-            <!-- Using slots -->
-            <div class="filter-contents step-1 pt-2 pr-1"
-                 v-if="step === 1">
-              <compact-btn variant="primary"
-                           customClass="px-4 add-filters m-2"
-                           v-if="isEmptyListFilters"
-                           @clicked="toAddFiltersStep">
-                <i class="material-icons mr-1 add-icon">add</i> Add a Filter
-              </compact-btn>
-              <div class="textual-filters"
-                   v-else>
-                <template v-for="(group, groupIndex) in visibleListFilters">
-                  <div class="d-flex full-width mb-2"
-                       :key="`group-remove-${groupIndex}`">
-                    <div class="font-weight-bold group-conjunction"
-                         v-if="groupIndex >= 1">
-                      OR
-                    </div>
-                    <compact-btn class="py-0 delete-group-filter ml-auto"
-                                 v-if="!hasDefault(group)"
-                                 @clicked="onDeleteGroupFilter(groupIndex)">
-                      Remove
-                    </compact-btn>
-                  </div>
-                  <b-card class="p-1 mb-2"
-                          :key="groupIndex">
-                    <template v-for="(filterItems, key, index) in group.filters">
-                      <template v-for="(filter, filterItemIndex) in filterItems">
-                        <b-card class="mb-2 filter-item"
-                                role="button"
-                                :class="[isDefault(filter) ? 'cursor-default' : '']"
-                                :key="`filter-item-${key}-${filterItemIndex}`"
-                                @click="selectFilterByKey(filter, groupIndex, filterItemIndex, group.is_conjunction)">
-                          <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
-                            Not
-                          </span>
-                          <span class="filter-name">{{ filter.label }}</span>
-                          <span class="text-lowercase"
-                                v-if="filter.operator">
-                            &nbsp;{{ filter.operator }}
-                          </span>
-                          <span class="font-weight-bold">
-                            {{ getFormattedFilterSummary(filter, key) }}
-                          </span>
-                          <compact-btn class="py-0 delete-filter"
-                                       v-if="!isDefault(filter)"
-                                       @clicked="onDeleteFilter(groupIndex, key, filterItemIndex)">
-                            <i class="fa fa-trash"></i>
-                            <q-tooltip>
-                              Remove this condition
-                            </q-tooltip>
-                          </compact-btn>
-                          <q-tooltip v-if="isDefault(filter)">
-                            This is a default filter for this list and cannot be modified.
-                          </q-tooltip>
-                        </b-card>
-                        <div class="mb-2 font-weight-bold"
-                             :key="`filter-${filter.key}-${filterItemIndex}`"
-                             v-if="isShowAndLabel(groupIndex, index, filter.key, filterItemIndex)">
-                          AND
-                        </div>
-                      </template>
-                    </template>
-                    <compact-btn variant="outlined-light"
-                                 customClass="add-filters with-border conjunction-button"
-                                 @clicked="toAddFiltersStep(groupIndex)">
-                      AND
-                    </compact-btn>
-                  </b-card>
-                </template>
-                <compact-btn variant="outlined-light"
-                             customClass="mb-2 add-filters with-border conjunction-button"
-                             @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, null, false)">
+        <!-- Using slots -->
+        <div class="filter-contents step-1 pt-2 pr-1 h-100"
+             v-if="step === 1">
+          <compact-btn variant="primary"
+                       customClass="px-4 add-filters m-2"
+                       v-if="isEmptyListFilters"
+                       @clicked="toAddFiltersStep">
+            <i class="material-icons mr-1 add-icon">add</i> Add a Filter
+          </compact-btn>
+          <div class="textual-filters"
+               v-else>
+            <template v-for="(group, groupIndex) in visibleListFilters">
+              <div class="d-flex full-width mb-2"
+                   :key="`group-remove-${groupIndex}`">
+                <div class="font-weight-bold group-conjunction"
+                     v-if="groupIndex >= 1">
                   OR
+                </div>
+                <compact-btn class="py-0 delete-group-filter ml-auto"
+                             v-if="!hasDefault(group)"
+                             @clicked="onDeleteGroupFilter(groupIndex)">
+                  Remove
                 </compact-btn>
               </div>
-              <p class="px-2 pt-2"
-                 v-if="unsavedList && isEmptyListFilters">
-                To save list, add at least 1 filter
-              </p>
-            </div>
-            <div class="filter-contents step-2 p-2"
-                 v-else-if="step === 2">
-              <div class="mb-3">
-                <h6 class="contact-prop-label mb-1">Contact properties</h6>
-                <search placeholder="Search"
-                        @search="searchFilter"/>
-              </div>
-              <b-list-group class="filter-list">
-                <b-list-group-item class="filter-divider">
-                  All properties
-                </b-list-group-item>
-                <div v-for="filter in filterGroups"
-                     :key="filter">
-                  <b-list-group-item class="filter-divider pt-3"
-                                     v-if="filterByGroup(filter).filters.length > 0">
-                    {{ filterByGroup(filter).label }}
-                  </b-list-group-item>
-                  <b-list-group-item class="filter-list-item"
-                                     v-for="filter in filterByGroup(filter).filters"
-                                     :key="filter.key"
-                                     @click="selectFilter(filter)">
-                    {{ filter.label }}
-                  </b-list-group-item>
-                </div>
-                <div>
-                  <b-list-group-item class="filter-divider pt-3"
-                                     v-if="filterByGroup().filters.length > 0">
-                    Custom
-                  </b-list-group-item>
-                  <b-list-group-item class="filter-list-item"
-                                     v-for="filter in filterByGroup().filters"
-                                     :key="filter.key"
-                                     @click="selectFilter(filter)">
-                    {{ filter.label }}
-                  </b-list-group-item>
-                </div>
-
-              </b-list-group>
-            </div>
-            <div class="filter-contents step-3 p-2 pr-1"
-                 v-else-if="step === 3">
-              <span class="filter-label">{{ selectedFilter.label }}</span>
-              <contacts-filter-types ref="contact-filter-types"
-                                     :filter="selectedFilter"
-                                     :filterGroupIndex="filterGroupIndex"
-                                     :filterGroupItemIndex="filterGroupItemIndex"
-                                     :filterConjunction="filterConjunction"
-                                     @filtersApplied="filtersApplied">
-              </contacts-filter-types>
-            </div>
+              <b-card class="p-1 mb-2"
+                      :key="groupIndex">
+                <template v-for="(filterItems, key, index) in group.filters">
+                  <template v-for="(filter, filterItemIndex) in filterItems">
+                    <b-card class="mb-2 filter-item"
+                            role="button"
+                            :class="[isDefault(filter) ? 'cursor-default' : '']"
+                            :key="`filter-item-${key}-${filterItemIndex}`"
+                            @click="selectFilterByKey(filter, groupIndex, filterItemIndex, group.is_conjunction)">
+                      <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
+                        Not
+                      </span>
+                      <span class="filter-name">{{ filter.label }}</span>
+                      <span class="text-lowercase"
+                            v-if="filter.operator">
+                        &nbsp;{{ filter.operator }}
+                      </span>
+                      <span class="font-weight-bold">
+                        {{ getFormattedFilterSummary(filter, key) }}
+                      </span>
+                      <compact-btn class="py-0 delete-filter"
+                                   v-if="!isDefault(filter)"
+                                   @clicked="onDeleteFilter(groupIndex, key, filterItemIndex)">
+                        <i class="fa fa-trash"></i>
+                        <q-tooltip>
+                          Remove this condition
+                        </q-tooltip>
+                      </compact-btn>
+                      <q-tooltip v-if="isDefault(filter)">
+                        This is a default filter for this list and cannot be modified.
+                      </q-tooltip>
+                    </b-card>
+                    <div class="mb-2 font-weight-bold"
+                         :key="`filter-${filter.key}-${filterItemIndex}`"
+                         v-if="isShowAndLabel(groupIndex, index, filter.key, filterItemIndex)">
+                      AND
+                    </div>
+                  </template>
+                </template>
+                <compact-btn variant="outlined-light"
+                             customClass="add-filters with-border conjunction-button"
+                             @clicked="toAddFiltersStep(groupIndex)">
+                  AND
+                </compact-btn>
+              </b-card>
+            </template>
+            <compact-btn variant="outlined-light"
+                         customClass="mb-2 add-filters with-border conjunction-button"
+                         @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, null, false)">
+              OR
+            </compact-btn>
           </div>
+          <p class="px-2 pt-2"
+             v-if="unsavedList && isEmptyListFilters">
+            To save list, add at least 1 filter
+          </p>
+        </div>
+        <div class="filter-contents step-2 p-2 h-100 d-flex flex-column"
+             v-else-if="step === 2">
+          <div class="mb-3 flex-grow-0">
+            <h6 class="contact-prop-label mb-1">Contact properties</h6>
+            <search placeholder="Search"
+                    @search="searchFilter"/>
+          </div>
+          <b-list-group class="filter-list flex-grow-1">
+            <b-list-group-item class="filter-divider">
+              All properties
+            </b-list-group-item>
+            <div v-for="filter in filterGroups"
+                 :key="filter">
+              <b-list-group-item class="filter-divider pt-3"
+                                 v-if="filterByGroup(filter).filters.length > 0">
+                {{ filterByGroup(filter).label }}
+              </b-list-group-item>
+              <b-list-group-item class="filter-list-item"
+                                 v-for="filter in filterByGroup(filter).filters"
+                                 :key="filter.key"
+                                 @click="selectFilter(filter)">
+                {{ filter.label }}
+              </b-list-group-item>
+            </div>
+            <div>
+              <b-list-group-item class="filter-divider pt-3"
+                                 v-if="filterByGroup().filters.length > 0">
+                Custom
+              </b-list-group-item>
+              <b-list-group-item class="filter-list-item"
+                                 v-for="filter in filterByGroup().filters"
+                                 :key="filter.key"
+                                 @click="selectFilter(filter)">
+                {{ filter.label }}
+              </b-list-group-item>
+            </div>
+
+          </b-list-group>
+        </div>
+        <div class="filter-contents step-3 p-2 pr-1 h-100"
+             v-else-if="step === 3">
+          <span class="filter-label">{{ selectedFilter.label }}</span>
+          <contacts-filter-types ref="contact-filter-types"
+                                 :filter="selectedFilter"
+                                 :filterGroupIndex="filterGroupIndex"
+                                 :filterGroupItemIndex="filterGroupItemIndex"
+                                 :filterConjunction="filterConjunction"
+                                 @filtersApplied="filtersApplied">
+          </contacts-filter-types>
         </div>
       </b-card>
     </b-overlay>

@@ -1,8 +1,9 @@
 <template>
-  <div class="d-flex flex-column"
-       :class="[paginated ? 'paginated' : '']"
+  <div class="d-flex flex-column h-100"
+       :class="[paginated ? 'paginated overflow-x-hidden w-100' : '']"
        @mousemove="$emit('onMouseMove', $event)"
        @mouseleave="$emit('onMouseLeave', $event)">
+
     <div ref="scrollableArea"
          :class="scrollableAreaClasses"
          @scroll="handleScroll">
@@ -17,6 +18,7 @@
                      :list="fixedColumns"
                      :move="onCheckMove"
                      @change="onOrderChanged">
+
             <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
                 :key="column.name"
                 :data-column-id="column.name"
@@ -29,6 +31,7 @@
                 <input ref="dataTableCheckAll"
                        class="data-table-check-all"
                        type="checkbox"
+                       :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
                 <span class="checkmark"/>
               </label>
@@ -62,13 +65,16 @@
                   {{ column.label }}
                 </div>
               </template>
+
             </th>
           </draggable>
         </thead>
+
         <tbody>
           <slot name="tbody" />
         </tbody>
       </table>
+
       <b-overlay class="table-more-rows-spinner"
                  rounded="sm"
                  :show="isLoadingMore"
@@ -82,25 +88,28 @@
       <template v-if="hasEmptySlot">
         <slot name="empty" />
       </template>
+
       <div class="empty-state"
            v-else-if="!hasEmptySlot && isEmpty &&  !isLoading">
-        <div class="h5">{{ defaultPlaceholderMessage }}</div>
+        <div class="h5 px-2 text-center">{{ defaultPlaceholderMessage }}</div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-center"
+    <div class="d-flex justify-content-center border-top flex-grow-0 overflow-x-hidden"
+         style="min-height: 56px;"
          v-if="paginated">
       <q-pagination class="table-pagination"
-                    padding="0 15px"
+                    padding="0 5px"
                     boundary-links
                     direction-links
                     dense
-                    v-model="paginationPage"
                     :max="lastPage"
                     :max-pages="maxPaginationPages"
                     :ellipses="false"
-                    :boundary-numbers="false">
+                    :boundary-numbers="false"
+                    v-model="paginationPage">
       </q-pagination>
+
       <q-select class="mt-2 q-select-pager"
                 option-value="value"
                 option-label="label"
@@ -109,8 +118,8 @@
                 emit-value
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`"
-                v-model="perPage">
-      </q-select>
+                v-model="perPage" />
+
     </div>
   </div>
 </template>
@@ -206,6 +215,11 @@ export default {
     startOrder: {
       type: Object,
       required: false
+    },
+
+    isSelectedAll: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -242,6 +256,12 @@ export default {
 
     fixedColumns () {
       const newItems = this.$jsonClone(this.columns)
+
+      // does not need to reference contacts
+      if (!['Contacts', 'Power Dialer'].includes(this.$route.name)) {
+        return newItems
+      }
+
       // now, check if columns have order, label, maxWidth or minWidth property, or
       // check if column is required then update sortable.
       for (const index in newItems) {
@@ -276,8 +296,7 @@ export default {
     },
 
     scrollableAreaClasses () {
-      const isDefault = this.$route.name === 'Contacts' || this.$route.name === 'Contact'
-      const optScroll = `scrollableArea ${!isDefault ? 'scroll-type-1' : ''} position-relative `
+      const optScroll = `scrollableArea position-relative `
       const scrollableClass = `${this.isScrollable ? optScroll : ''}d-flex flex-column h-100 w-100 flex-grow-1`
       const mobileClass = this.isMobile ? 'mobile-scrollableArea' : ''
 
@@ -385,7 +404,11 @@ export default {
         return
       }
 
-      if ((element.srcElement.clientHeight + element.srcElement.scrollTop) >= element.srcElement.offsetHeight) {
+      const adjustmentHeight = 48
+      const elementScrollHeight = element.srcElement.scrollHeight - adjustmentHeight
+      const currentScrollHeight = element.srcElement.clientHeight + element.srcElement.scrollTop
+
+      if (currentScrollHeight >= elementScrollHeight) {
         this.lastScrollTop = element.srcElement.scrollTop
         this.onVisibilityChanged(true)
 
@@ -514,10 +537,8 @@ export default {
   },
 
   mounted () {
-    if (this.$refs.scrollableArea) {
-      this.lastScrollTop = this.$refs.scrollableArea.scrollTop
-      this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
-    }
+    this.lastScrollTop = this.$refs.scrollableArea.scrollTop
+    this.$refs.scrollableArea.addEventListener('scroll', this.onScroll)
 
     // apply a custom starting order if defined
     if (this.startOrder) {
@@ -534,7 +555,11 @@ export default {
   beforeDestroy () {
     clearTimeout(this.scrollTimeout)
     this.resetScroll()
-    this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
+
+    if (this.$refs.scrollableArea) {
+      this.$refs.scrollableArea.removeEventListener('scroll', this.onScroll)
+    }
+
     document.removeEventListener('mouseup', this.onResizerMouseUp)
     document.removeEventListener('mousemove', this.onResizeMouseMove)
   },

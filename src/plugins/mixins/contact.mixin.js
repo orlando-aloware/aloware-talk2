@@ -405,7 +405,7 @@ export default {
       // update contact in inbox's group of contacts/tasks
       if (!_.isEmpty(newCommunication)) {
         this.$VueEvent.fire('inbox_contact_updated', {
-          contact: updatedContact,
+          contact: contactEvent,
           communication: newCommunication
         })
       }
@@ -853,6 +853,7 @@ export default {
 
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
+          this.$VueEvent.fire('fetchInbox')
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false

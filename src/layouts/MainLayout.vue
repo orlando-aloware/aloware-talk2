@@ -6,19 +6,21 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="page h-100">
-      <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"/>
-      <q-layout class="page-layout"
+      <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
                 :class="pageLayoutHeightClass"
-                :height="'100%'">
-        <div class="h-100"
+                style="min-height: 0 !important;">
+        <div class="h-100 position-relative"
              :class="headerContainerClass">
-          <q-header class="page-header bg-white text-black no-box-shadow"
-                    v-if="isShowAppHeader">
-            <app-header @toggleSidebar="toggleSidebar"/>
+          <q-header class="page-header bg-white text-black no-box-shadow position-absolute"
+                    :class="pageHeaderClass"
+                    v-if="showHeader">
+            <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"
+                                  @shown="onShowMobileLiveCallBar"/>
+            <app-header v-if="isShowAppHeader"
+                        @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container :style="`${!isShowAppHeader ? 'padding-top: 0 !important;' : ''}`"
-                            :class="pageContainerClasses">
+          <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
                 <transition :name="transitionName"
@@ -59,7 +61,7 @@
             <dialer v-if="authenticated && !suspended"/>
           </q-page-container>
         </div>
-        <q-drawer class="h-100 sidebar-wrapper d-block"
+        <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
                   content-class="sidebar"
                   :breakpoint="0"
                   :width="64"
@@ -72,7 +74,7 @@
             </app-sidebar>
           </q-list>
         </q-drawer>
-        <q-drawer class="mobile-phone-drawer position-relative"
+        <q-drawer class="mobile-phone-drawer position-relative h-100 overflow-hidden"
                   ref="mobilePhone"
                   side="right"
                   bordered
@@ -90,7 +92,7 @@
                         :title-only="true"/>
           </q-header>
           <phone :isMobile="isMobile"
-                 :class="{ 'hidden': mobilePhoneDrawer }"
+                 :class="{ 'hide': !mobilePhoneDrawer }"
                  @onPhoneVisible="onPhoneVisible">
           </phone>
           <dialer-form ref="dialerForm"
@@ -100,7 +102,7 @@
                        v-if="isMobile">
           </dialer-form>
         </q-drawer>
-        <app-footer class="page-footer row d-block w-100 m-0 px-1"
+        <app-footer class="page-footer row d-block w-100 m-0 px-1 flex-grow-0"
                     ref="appFooter"
                     v-if="authenticated && !isWidget && !loading && isMobile && !suspended && showMobileFooter"
                     @toggleMobilePhone="toggleMobilePhone">
@@ -340,6 +342,8 @@ export default {
       isElectronEventsStarted: false,
       isMainEventsStarted: false,
       showMobileFooter: false,
+      showHeader: true,
+      mobileLiveCallBarShown: false,
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin
@@ -487,6 +491,10 @@ export default {
 
       return this.authenticated && !this.isWidget && !this.loading &&
         this.showContactsHeader && !this.suspended && showForMobile
+    },
+    pageHeaderClass () {
+      return !this.isShowAppHeader || !this.mobileLiveCallBarShown
+        ? 'h-auto' : ''
     }
   },
 
@@ -499,6 +507,7 @@ export default {
     }
 
     this.setNotificationAudio()
+    this.setFishingModeNotificationAudio()
 
     if (this.$route.name === 'Phone' && !this.isMobile) {
       this.$router.replace({ path: '/' })
@@ -902,6 +911,15 @@ export default {
       console.log(' %c EXPORT EVENT DELETE : ', 'background: red; color: #fff;', task)
     }
 
+    this.mainListeners.bulkContactsDeleted = (event) => {
+      if ('success' in event && !event.success) {
+        this.$generalNotification(event.message, 'error')
+        return
+      }
+
+      this.$generalNotification(event.message)
+    }
+
     // new in-app fax notification
     // this.$VueEvent.listen('new_in_app_fax', (communication) => {
     //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
@@ -986,12 +1004,6 @@ export default {
 
     if (!this.isMobile) {
       this.setShowContactsHeader(true)
-    }
-
-    if (this.$route.name.includes('Inbox')) {
-      setTimeout(() => {
-        this.$VueEvent.fire('inbox_route_name_change')
-      }, 1000)
     }
 
     this.resetPowerDialerSession(this.$route)
@@ -1161,6 +1173,7 @@ export default {
       this.$VueEvent.listen('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
+      this.$VueEvent.listen('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
     },
 
     stopMainEvents () {
@@ -1188,6 +1201,7 @@ export default {
       this.$VueEvent.stop('export_event_update', this.mainListeners.exportEventUpdate)
       this.$VueEvent.stop('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.stop('hide_mobile_footer', this.mainListeners.hideMobileFooter)
+      this.$VueEvent.stop('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
     },
 
     checkSuspended (data, isUser = false) {
@@ -1394,6 +1408,7 @@ export default {
         this.getDispositionStatuses()
         this.getCallDispositions()
         this.getLeadSources()
+        this.getMyQueueList()
       })
     },
 
@@ -2320,7 +2335,7 @@ export default {
       // don't close the phone yet!
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.isPhoneVisible = true
-        this.mobilePhoneDrawer = true
+        this.mobilePhoneDrawer = false
       }
 
       if (typeof this.$refs.appFooter !== 'undefined') {
@@ -2406,6 +2421,10 @@ export default {
       this.$bvModal.hide('missed-call-modal')
     },
 
+    onShowMobileLiveCallBar (value) {
+      this.mobileLiveCallBarShown = value
+    },
+
     beforeUnload () {
       this.stopElectronEvents()
       this.stopMainEvents()
@@ -2430,7 +2449,10 @@ export default {
     },
 
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
-    ...mapActions('powerDialer', ['setFinishedPowerDialerSession']),
+    ...mapActions('powerDialer', [
+      'setFinishedPowerDialerSession',
+      'getMyQueueList'
+    ]),
     ...mapActions([
       'resetVuex',
       'setUsage',
@@ -2464,6 +2486,7 @@ export default {
       'setEnableAudio',
       'setDefaultDateFilter',
       'setNotificationAudio',
+      'setFishingModeNotificationAudio',
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
@@ -2489,21 +2512,23 @@ export default {
       'setLiveContacts',
       'updateLiveContactLastCommProperties',
       'setIsInboxFiltersLoaded',
-      'gettingTasksList'
+      'gettingTasksList',
+      'setInboxShowMyContacts'
     ])
   },
 
   watch: {
-    '$q.screen.lt.lg': function () {
+    '$q.screen.lt.lg': function (value) {
       if (typeof this.$refs.mobilePhone === 'undefined') {
         return
       }
 
-      if (!this.$q.screen.lt.lg) {
+      if (!value) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
       }
     },
+
     $route (to, from) {
       // logout action
       if (to.name === 'Login' && !storage.local.getItem('api_token')) {
@@ -2516,21 +2541,32 @@ export default {
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
 
-      if (!(from.name === 'Contacts' && this.$route.name === 'Contact') &&
-        !(from.name === 'Contact' && this.$route.name === 'Contacts') &&
+      const fromContactsToContact = (from.name === 'Contacts' && this.$route.name === 'Contact')
+      const fromContactToContacts = (from.name === 'Contact' && this.$route.name === 'Contacts')
+      const notToPDorPDSession = (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session')
+      if (!fromContactsToContact &&
+        !fromContactToContacts &&
         to.name !== from.name &&
-        (to.name !== 'Power Dialer' && to.name !== 'Power Dialer Session')) {
+        notToPDorPDSession) {
         this.resetVuex(['contacts', 'non-cache'])
       }
 
+      // reset search if contact is changed
       if (from.name === 'Contacts' && to.name === 'Contacts' && from.params.id !== to.params.id) {
         this.resetSearch()
       }
 
-      if (!(from.name === 'Inbox' && this.$route.name === 'Inbox Contact') &&
-        !(from.name === 'Inbox Contact' && this.$route.name === 'Inbox') &&
+      const fromInboxToInboxContact = (from.name === 'Inbox' && this.$route.name === 'Inbox Contact')
+      const fromInboxContactToInbox = (from.name === 'Inbox Contact' && this.$route.name === 'Inbox')
+      if (!fromInboxToInboxContact &&
+        !fromInboxContactToInbox &&
         to.name !== from.name) {
         this.resetVuex(['inbox', 'non-cache'])
+      }
+
+      // reset My Contacts toggle to default
+      if (from.name === 'Inbox View' && from.name !== to.name) {
+        this.setInboxShowMyContacts(false)
       }
 
       if (to.name === 'Stats' && !this.metricsDataLoaded) {
@@ -2557,21 +2593,7 @@ export default {
         this.mobilePhoneDrawer = true
       }
 
-      const inboxStatus = _.get(this.$route, 'params.status', null)
-
-      if (inboxStatus) {
-        setTimeout(() => {
-          this.$VueEvent.fire('inbox_route_change')
-        }, 1000)
-      }
-
-      if (to.name.includes('Inbox')) {
-        setTimeout(() => {
-          this.$VueEvent.fire('inbox_route_name_change')
-        }, 1000)
-      }
-
-      if (to.name === 'Inbox' && !from.name.includes('Inbox')) {
+      if (to.name === 'Inbox' && from.name.includes('Inbox')) {
         this.setIsInboxFiltersLoaded(false)
         this.gettingTasksList(true)
       }
@@ -2627,6 +2649,11 @@ export default {
       if (!val) {
         this.setShowContactsHeader(true)
         this.mobilePhoneDrawer = false
+        this.showHeader = false
+
+        setTimeout(() => {
+          this.showHeader = true
+        }, 10)
       }
 
       if (!val && this.$route.name === 'Phone') {

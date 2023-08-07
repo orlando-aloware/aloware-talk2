@@ -1,6 +1,7 @@
 <template>
   <div class="wallboard__body">
-    <div :class="['overview', `overview--${viewMode}`]">
+    <div class="overflow-y-scroll"
+         :class="['overview', `overview--${viewMode}`]">
       <wallboard-overview-header />
       <transition-group name="list-fade"
                         class="overview__body"

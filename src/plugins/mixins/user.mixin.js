@@ -1,10 +1,15 @@
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../../constants/answer-types'
 import _ from 'lodash'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   computed: {
-    ...mapState(['users'])
+    ...mapState(['users']),
+
+    isJobNimbus () {
+      return this.profile.company_id === 1261
+    }
   },
 
   methods: {
@@ -63,6 +68,10 @@ export default {
         default:
           return 'No Name (' + user.phone_number + ')'
       }
+    },
+
+    isCompanyPartOfAlowareDemoCompanies (companyId) {
+      return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
     }
   }
 }

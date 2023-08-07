@@ -198,6 +198,35 @@
       </q-tooltip>
     </q-btn>
 
+    <q-btn class="nav-icons w-100"
+           padding="none"
+           align="left"
+           icon="img:app-icons/menu/tags_active.svg"
+           flat
+           :to="{ name: 'Tags' }"
+           :ripple="false"
+           v-show="isActive('Tags')">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Tags</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn icon="img:app-icons/menu/tags_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           :to="{ name: 'Tags' }"
+           :ripple="false"
+           v-show="!isActive('Tags')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Tags</span>
+      </q-tooltip>
+    </q-btn>
+
     <q-btn :to="{ name: 'Stats' }"
            :ripple="false"
            icon="img:app-icons/menu/stats_active.svg"
@@ -518,7 +547,7 @@ export default {
         return true
       }
 
-      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication'].includes(this.$route.name) && name === 'Inbox') {
+      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
         return true
       }
 

@@ -18,10 +18,12 @@ export default {
       'communicationNotifiedDesktop',
       'voicemailNotifiedDesktop',
       'contactNotifiedDesktop',
+      'fishinModeNotificationAudio',
       'appointmentNotifiedDesktop',
       'reminderNotifiedDesktop',
       'notificationAudio'
-    ])
+    ]),
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {
@@ -43,12 +45,17 @@ export default {
       'setShowIncomingCallNotification'
     ]),
 
-    playAudio () {
+    playAudio (shouldPlayFishingNotificationSound = false) {
       if (!this.enableAudio) {
         return
       }
 
-      const promise = this.notificationAudio.play()
+      let promise
+      if (shouldPlayFishingNotificationSound) {
+        promise = this.fishinModeNotificationAudio.play()
+      } else {
+        promise = this.notificationAudio.play()
+      }
 
       if (promise !== undefined) {
         promise.catch(err => {
@@ -57,6 +64,14 @@ export default {
           console.log(err)
         })
       }
+    },
+
+    stopAudio () {
+      if (!this.enableAudio) {
+        return
+      }
+
+      this.fishinModeNotificationAudio.pause()
     },
 
     processRemoveFromNotification (communication) {
@@ -96,6 +111,10 @@ export default {
 
       const callFishingQueue = { data: _.get(this.notifications, 'callFishing.queue', null) }
       callFishingQueue.data = callFishingQueue.data && callFishingQueue.data.constructor === Array && callFishingQueue.data.length
+
+      if (type === 'callFishing' && this.currentCompany.fishing_mode_notification_sound) {
+        this.stopAudio()
+      }
 
       if (
         (notificationCommId.data === communicationId &&
@@ -221,7 +240,7 @@ export default {
           }
           break
         case 'mention':
-          name.data = _.get(communication, 'mentioner_user.name', '')
+          name.data = _.get(communication, 'mentioner_user_name', '')
           contactId.data = _.get(communication, 'contact_id', null)
           communicationId.data = _.get(communication, 'mention_subject_id', null)
           message.data = _.get(communication, 'preview_text', '')

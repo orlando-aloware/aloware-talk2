@@ -64,6 +64,10 @@
                     class="message-text"
                     v-html="$options.filters.nl2br(message, false)">
               </span>
+              <span v-if="id === 'sms' && attachment && !message"
+                    class="message-text">
+                Inbound MMS
+              </span>
               <div class="message-text row has-ring-group"
                    v-else-if="isCall && campaignName && ringGroupName">
                 <div class="campaign-wrapper col-5">
@@ -79,13 +83,6 @@
                 {{ campaignName }}
               </span>
             </div>
-            <template v-if="id === 'sms' && attachment">
-              <q-img
-                :src="attachment"
-                class="attachment mr-2"
-                fit="cover"
-              />
-            </template>
           </div>
         </div>
         <div class="d-flex justify-content-center align-items-center call-actions"
@@ -233,6 +230,7 @@ export default {
 
   computed: {
     ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
+    ...mapState('cache', ['currentCompany']),
 
     isCall () {
       return ['incomingCall', 'callFishing'].includes(this.id)
@@ -562,7 +560,8 @@ export default {
       }
 
       this.isValidNotification = true
-      this.playAudio()
+      const shouldPlayFishingNotificationSound = this.id === 'callFishing' && this.currentCompany.fishing_mode_notification_sound
+      this.playAudio(shouldPlayFishingNotificationSound)
     },
 
     runDateTimeInterval () {

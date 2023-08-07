@@ -2,6 +2,7 @@ import Echo from 'laravel-echo'
 import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
+import * as ChannelType from 'src/constants/inbox-channels'
 
 export default {
   computed: {
@@ -348,6 +349,12 @@ export default {
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
         })
+        .listen('.bulk_contacts.deleted', (event) => {
+          window.VueEvent.fire('bulk_contacts_deleted', event)
+        })
+        .listen('.bulk_tags.deleted', (event) => {
+          window.VueEvent.fire('bulk_tags_deleted', event)
+        })
         // .listen('.export.created', (event) => {
         //   console.log('created export event :>> ', event)
         //   window.VueEvent.fire('export_event_updates', event)
@@ -388,6 +395,10 @@ export default {
           }
           if (event.contact) {
             event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
           }
           if (event.owner) {
             event.communication.owner = event.owner
@@ -405,6 +416,10 @@ export default {
           }
           if (event.contact) {
             event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
           }
           if (event.owner) {
             event.communication.owner = event.owner
@@ -456,6 +471,10 @@ export default {
           this.$VueEvent.fire('tag_created', event.tag)
         })
         .listen('.tag.updated', (event) => {
+          if (event.tag.name.includes('_deleted_')) {
+            return
+          }
+
           this.updateTag(event.tag)
           this.$VueEvent.fire('tag_updated', event.tag)
         })
@@ -540,6 +559,11 @@ export default {
           this.updateFilter(event.filter)
         })
         .listen('.filter.deleted', (event) => {
+          // for Inbox Filter Types
+          if (event.filter.type === ChannelType.CHANNEL_INBOX) {
+            this.$VueEvent.fire('filter_deleted', event.filter)
+          }
+
           if (this.filters.find((o) => {
             return o.id === event.filter.id
           })) {

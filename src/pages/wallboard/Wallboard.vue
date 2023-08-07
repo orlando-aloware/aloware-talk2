@@ -1,9 +1,11 @@
 <template>
-  <div class="wallboard"
+  <div class="wallboard d-flex w-100"
        v-if="authenticated">
-    <wallboard-sidebar/>
-    <wallboard-header/>
-    <router-view></router-view>
+    <wallboard-sidebar class="flex-grow-0"/>
+    <div class="d-flex flex-column h-100 flex-grow-1 overflow-hidden">
+      <wallboard-header class="flex-grow-0"/>
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
