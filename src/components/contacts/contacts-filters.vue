@@ -44,8 +44,8 @@
                   <div class="d-flex full-width mb-2"
                        :key="`group-remove-${groupIndex}`">
                     <div class="font-weight-bold group-conjunction"
-                         v-if="visibleListFilters.length >= 2 && groupIndex >= 1">
-                      {{ group.is_conjunction ? 'AND' : 'OR' }}
+                         v-if="groupIndex >= 1">
+                      OR
                     </div>
                     <compact-btn class="py-0 delete-group-filter ml-auto"
                                  v-if="!hasDefault(group)"
