@@ -272,7 +272,8 @@ export default function (/* { ssrContext } */) {
       },
       staticsLoaded: false,
       isCallDisposed: false,
-      isContactDisposed: false
+      isContactDisposed: false,
+      integrationPDImportSummaries: {}
     },
 
     getters: {
@@ -794,6 +795,14 @@ export default function (/* { ssrContext } */) {
 
       setIsContactDisposed ({ commit }, value) {
         commit('SET_IS_CONTACT_DISPOSED', value)
+      },
+
+      addIntegrationPDImportSummary ({ commit }, payload) {
+        commit('ADD_INTEGRATION_PD_IMPORT_SUMMARY', payload)
+      },
+
+      removeIntegrationPDImportSummary ({ commit }, id) {
+        commit('REMOVE_INTEGRATION_PD_IMPORT_SUMMARY', id)
       }
     },
 
@@ -1506,6 +1515,18 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_CONTACT_DISPOSED (state, value) {
         state.isContactDisposed = value
+      },
+
+      ADD_INTEGRATION_PD_IMPORT_SUMMARY (state, payload) {
+        state.integrationPDImportSummaries[payload.id] = payload.summary
+      },
+
+      REMOVE_INTEGRATION_PD_IMPORT_SUMMARY (state, id) {
+        if (!state.integrationPDImportSummaries?.[id]) {
+          return
+        }
+
+        delete state.integrationPDImportSummaries[id]
       },
 
       updateField

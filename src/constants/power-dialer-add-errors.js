@@ -19,3 +19,12 @@ export const PD_BULK_ADD_MESSAGES = {
   5: 'Invalid phone number(s)',
   6: 'International phone number(s)'
 }
+
+export const PD_INTEGRATION_IMPORT_MESSAGES = {
+  'missing_properties': 'Contact(s) with missing information',
+  'ignored_contacts': 'Ignored contact(s)',
+  'empty_phone_number': 'Contact(s) without phone number',
+  'contact_creation_failed': 'Contact(s) import failed',
+  'is_dnc': `DNC`,
+  'is_blocked': 'Contact(s) blocked'
+}

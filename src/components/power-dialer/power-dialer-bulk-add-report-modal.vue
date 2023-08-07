@@ -9,7 +9,7 @@
       <p class="m-0">Contacts added</p>
       <ul>
         <li>{{ addedFromContact }} tasks from contacts</li>
-        <li v-if="addedFromMultipleNumbers > 0">{{ addedFromMultipleNumbers }} tasks from multiple numbers</li>
+        <li v-if="hasAddedFromMultipleNumbers">{{ addedFromMultipleNumbers }} tasks from multiple numbers</li>
         <li v-if="hasAddedDuplicates">{{ addedDuplicates }} duplicates</li>
         <li v-if="hasAddedOwnContacts">{{ addedOwnContacts }} owned contacts</li>
         <li v-if="hasAddedInternationalPhoneNumbers">{{ addedInternationalPhoneNumbers }} international phone numbers</li>
@@ -17,10 +17,12 @@
       <template v-if="skipped.length > 0">
         <p class="m-0">Contacts not added/skipped</p>
         <ul>
-          <li v-for="(error, id) in skipped"
-              v-bind:key="id">
-            {{ error[1] }} {{ getErrorMessage(error[0]) }}
-          </li>
+          <template v-for="(error, id) in skipped">
+            <li v-if="isShowSkippedMessage(error[0], error[1])"
+                v-bind:key="id">
+              {{ error[1] }} {{ getErrorMessage(error[0]) }}
+            </li>
+          </template>
         </ul>
       </template>
       <p class="text-h5 font-weigh-bold">{{ totalTasksAdded }} Total tasks added to queue</p>
@@ -35,8 +37,9 @@
   </b-modal>
 </template>
 <script>
-import { PD_BULK_ADD_MESSAGES } from 'src/constants/power-dialer-add-errors'
-import { get } from 'lodash'
+import { PD_BULK_ADD_MESSAGES, PD_INTEGRATION_IMPORT_MESSAGES } from 'src/constants/power-dialer-add-errors'
+import { cloneDeep, get, isNil, isEmpty, omitBy } from 'lodash'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'PowerDialerBulkAddReportModal',
@@ -49,7 +52,19 @@ export default {
     }
   },
 
+  data: () => ({
+    fullReport: {}
+  }),
+
+  created () {
+    this.buildReport()
+  },
+
   computed: {
+    ...mapState([
+      'integrationPDImportSummaries'
+    ]),
+
     isOpen: {
       get () {
         return Object.keys(this.statusReport ?? {}).length > 0
@@ -61,49 +76,56 @@ export default {
     },
 
     selected () {
-      return this.statusReport?.info?.selected ?? 0
+      return this.fullReport?.info?.selected ?? 0
     },
 
     addedFromContact () {
-      return this.statusReport?.success?.total ?? 0
+      return this.fullReport?.success?.total ?? 0
     },
 
     addedFromMultipleNumbers () {
-      return this.statusReport?.success?.multiple_numbers ?? 0
+      return this.fullReport?.success?.multiple_numbers ?? 0
+    },
+
+    hasAddedFromMultipleNumbers () {
+      const flag = get(this.fullReport, 'success.multiple_numbers', false)
+
+      return this.$isNumeric(flag) ? true : flag
     },
 
     hasAddedDuplicates () {
-      const flag = get(this.statusReport, 'success.duplicates', false)
+      const flag = get(this.fullReport, 'success.duplicates', false)
 
       return this.$isNumeric(flag) ? true : flag
     },
 
     addedDuplicates () {
-      return this.statusReport?.success?.duplicates ?? 0
+      return this.fullReport?.success?.duplicates ?? 0
     },
 
     hasAddedOwnContacts () {
-      const flag = get(this.statusReport, 'success.own_contacts', false)
+      const flag = get(this.fullReport, 'success.own_contacts', false)
 
       return this.$isNumeric(flag) ? true : flag
     },
 
     addedOwnContacts () {
-      return this.statusReport?.success?.own_contacts ?? 0
+      return this.fullReport?.success?.own_contacts ?? 0
     },
 
     hasAddedInternationalPhoneNumbers () {
-      const flag = get(this.statusReport, 'success.international_phone_numbers', false)
+      const flag = get(this.fullReport, 'success.international_phone_numbers', false)
 
       return this.$isNumeric(flag) ? true : flag
     },
 
     addedInternationalPhoneNumbers () {
-      return this.statusReport?.success?.international_phone_numbers ?? 0
+      return this.fullReport?.success?.international_phone_numbers ?? 0
     },
 
     skipped () {
-      let errors = this.statusReport?.fail ?? {}
+      let errors = this.fullReport?.fail ?? {}
+
       return Object.entries(errors)
     },
 
@@ -113,8 +135,58 @@ export default {
   },
 
   methods: {
-    getErrorMessage (errorNumber) {
-      return PD_BULK_ADD_MESSAGES[errorNumber]
+    ...mapActions([
+      'removeIntegrationPDImportSummary'
+    ]),
+
+    isShowSkippedMessage (index, value) {
+      return this.$isNumeric(index) ||
+        (!this.$isNumeric(index) && value && this.getErrorMessage(index))
+    },
+
+    getErrorMessage (index) {
+      if (this.$isNumeric(index)) {
+        return PD_BULK_ADD_MESSAGES[index]
+      }
+
+      return PD_INTEGRATION_IMPORT_MESSAGES[index]
+    },
+
+    buildReport () {
+      if (isEmpty(this.fullReport)) {
+        return
+      }
+
+      this.fullReport = cloneDeep(this.statusReport)
+      const id = this.$route.params.id
+      const integrationReport = cloneDeep(this.integrationPDImportSummaries[id])
+      // remove null/undefined values in object
+      const failReport = omitBy(this.fullReport.fail, isNil)
+
+      this.fullReport.fail = {
+        ...integrationReport,
+        ...failReport
+      }
+
+      const createdContactsCount = integrationReport?.created_contacts_count ?? 0
+      const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
+      const totalSelected = createdContactsCount + updatedContactsCount
+
+      // update the total selected contacts to the correct total count
+      this.fullReport.info.selected = totalSelected
+
+      // clean-up
+      this.removeIntegrationPDImportSummary(id)
+    }
+  },
+
+  watch: {
+    isOpen (value) {
+      if (!value) {
+        return
+      }
+
+      this.buildReport()
     }
   }
 }

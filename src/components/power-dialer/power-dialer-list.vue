@@ -52,6 +52,10 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'addIntegrationPDImportSummary'
+    ]),
+
     ...mapActions('contacts', ['foldersLoaded']),
 
     onCloseIntegrationImportDialog (data = {}) {
@@ -72,7 +76,10 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch(() => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
+          this.$generalNotification(
+            'Unable to load folders please try again.',
+            'error'
+          )
         })
     },
 
@@ -89,7 +96,10 @@ export default {
       }
 
       this.reloadFolders()
-      this.$generalNotification('An error prevented the list from being imported. Please, try again later.', 'error')
+      this.$generalNotification(
+        'An error prevented the list from being imported. Please, try again later.',
+        'error'
+      )
     },
 
     handleImportFinishedEvent (event) {
@@ -105,9 +115,18 @@ export default {
       }
 
       this.reloadFolders()
-      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
-        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
+      this.addIntegrationPDImportSummary({
+        id: event.contact_list.id,
+        summary: event?.summary ?? []
       })
+      this.$generalNotification(
+        'Success! Integration list imported to Power Dialer.',
+        'redirect',
+        0,
+        false,
+        {
+          path: `/power-dialer/list/${event.contact_list.id}/in-queue`
+        })
     }
   },
 
@@ -118,6 +137,13 @@ export default {
       },
       deep: true
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_zoho')
+    this.$VueEvent.stop('contact_list_import_pipedrive')
+    this.$VueEvent.stop('contact_list_import_failed')
   }
 }
 </script>
