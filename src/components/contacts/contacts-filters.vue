@@ -94,6 +94,7 @@
                 </template>
                 <compact-btn variant="outlined-light"
                              customClass="add-filters with-border conjunction-button"
+                             v-if="!isMaxInnerFiltersReached(group.filters)"
                              @clicked="toAddFiltersStep(groupIndex)">
                   AND
                 </compact-btn>
@@ -101,6 +102,7 @@
             </template>
             <compact-btn variant="outlined-light"
                          customClass="mb-2 add-filters with-border conjunction-button"
+                         v-if="!isMaxOuterFiltersReached"
                          @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, null, false)">
               OR
             </compact-btn>
@@ -208,7 +210,9 @@ export default {
         GROUP_CONTACT_LOCATION,
         GROUP_CONTACT_RELEVANCE,
         GROUP_CONTACT_COMM_METADATA
-      }
+      },
+      maxOuterFilters: 3, // OR
+      maxInnerFilters: 3 // AND
     }
   },
 
@@ -240,6 +244,10 @@ export default {
 
     isEmptyListFilters () {
       return isEmpty(this.visibleListFilters)
+    },
+
+    isMaxOuterFiltersReached () {
+      return this.visibleListFilters.length >= this.maxOuterFilters
     },
 
     filterByGroup () {
@@ -306,6 +314,10 @@ export default {
   },
 
   methods: {
+    isMaxInnerFiltersReached (filtersGroup) {
+      return Object.keys(filtersGroup).map(filter => filtersGroup[filter].length).reduce((acc, value) => acc + value, 0) >= this.maxInnerFilters
+    },
+
     getFilters () {
       if (this.hasPermissionTo('list filter')) {
         this.loadingFilters = true
