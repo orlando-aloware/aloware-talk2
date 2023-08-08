@@ -23,7 +23,7 @@
           </li>
         </ul>
       </template>
-      <p class="text-h5 font-weigh-bold">{{ totalTasksAdded }} Total tasks added to queue</p>
+      <p class="text-h5 font-weigh-bold">{{ totalTasksAdded }} Total {{ fixMessage('task(s)', totalTasksAdded) }} added to queue</p>
     </div>
     <template slot="modal-footer">
       <button class="btn btn-block mt-0 mr-2"
@@ -147,13 +147,9 @@ export default {
         return message
       }
 
-      if (value > 1) {
-        message = message.replace('(s)', 's')
-      } else {
-        message = message.replace('(s)', '')
-      }
+      const postfix = value > 1 ? 's' : ''
 
-      return message
+      return message.replace('(s)', postfix)
     },
 
     buildReport () {
