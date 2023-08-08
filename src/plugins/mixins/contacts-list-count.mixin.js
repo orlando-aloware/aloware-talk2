@@ -69,11 +69,11 @@ export default {
             isInvalidCount) {
             this.fetchCount++
 
-            this.fetchCountTimeout = setTimeout(() => {
-              this.processGetListCount(data)
-            }, 5000)
-
             if (this.fetchCount < 5) {
+              this.fetchCountTimeout = setTimeout(() => {
+                this.processGetListCount(data)
+              }, 5000)
+
               return
             }
           }
