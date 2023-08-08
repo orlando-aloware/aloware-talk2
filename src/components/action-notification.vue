@@ -58,7 +58,7 @@
 
           <!-- caller location -->
           <div class="d-flex flex-grow-1 align-items-baseline w-100"
-               v-if="communication && contact">
+               v-if="location">
             <span class="mr-auto text-white pr-1 text-sm">
               {{ location }}
             </span>
@@ -505,9 +505,17 @@ export default {
     },
 
     location () {
+      if (!this.communication || !this.contact) {
+        return false
+      }
+
       const city = this.communication.city || this.contact.cnam_city || null
       const state = this.communication.state || this.contact.cnam_state || null
       const country = this.communication.country || this.contact.cnam_country || null
+
+      if (!city && !state && !country) {
+        return false
+      }
 
       return `${city || ''} ${city && state ? ', ' : ''} ${state || ''} ${state && country ? ' - ' : ''} ${country || ''}`
     }
