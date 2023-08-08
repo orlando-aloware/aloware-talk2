@@ -5,24 +5,22 @@
            no-close-on-esc
            v-model="isOpen">
     <div class="container">
-      <p class="text-h5">{{ selected }} contact(s) selected</p>
-      <p class="m-0">Contacts added</p>
+      <p class="text-h5">{{ selected }} {{ fixMessage('contact(s)', selected) }} selected</p>
+      <p class="m-0">{{ fixMessage('Contact(s)', addedFromContact) }} added</p>
       <ul>
-        <li>{{ addedFromContact }} tasks from contacts</li>
-        <li v-if="hasAddedFromMultipleNumbers">{{ addedFromMultipleNumbers }} tasks from multiple numbers</li>
-        <li v-if="hasAddedDuplicates">{{ addedDuplicates }} duplicates</li>
-        <li v-if="hasAddedOwnContacts">{{ addedOwnContacts }} owned contacts</li>
-        <li v-if="hasAddedInternationalPhoneNumbers">{{ addedInternationalPhoneNumbers }} international phone numbers</li>
+        <li>{{ addedFromContact }} {{ fixMessage('task(s)', addedFromContact) }} from {{ fixMessage('contact(s)', selected) }}</li>
+        <li v-if="hasAddedFromMultipleNumbers">{{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers</li>
+        <li v-if="hasAddedDuplicates">{{ addedDuplicates }} duplicate phone {{ fixMessage('number(s)', addedDuplicates) }}</li>
+        <li v-if="hasAddedOwnContacts">{{ addedOwnContacts }} owned {{ fixMessage('contact(s)', addedOwnContacts) }}</li>
+        <li v-if="hasAddedInternationalPhoneNumbers">{{ addedInternationalPhoneNumbers }} international phone {{ fixMessage('number(s)', addedInternationalPhoneNumbers) }}</li>
       </ul>
       <template v-if="skipped.length > 0">
         <p class="m-0">Contacts not added/skipped</p>
         <ul>
-          <template v-for="(error, id) in skipped">
-            <li v-if="isShowSkippedMessage(error[0], error[1])"
-                v-bind:key="id">
-              {{ error[1] }} {{ getErrorMessage(error[0]) }}
-            </li>
-          </template>
+          <li v-for="(error, id) in skipped"
+              v-bind:key="id">
+            {{ error[1] }} {{ getErrorMessage(error[0], error[1]) }}
+          </li>
         </ul>
       </template>
       <p class="text-h5 font-weigh-bold">{{ totalTasksAdded }} Total tasks added to queue</p>
@@ -120,9 +118,10 @@ export default {
     },
 
     skipped () {
-      let errors = this.fullReport?.fail ?? {}
+      let skippedItems = this.fullReport?.fail ?? {}
+      skippedItems = Object.entries(skippedItems)
 
-      return Object.entries(errors)
+      return skippedItems
     },
 
     totalTasksAdded () {
@@ -135,17 +134,26 @@ export default {
       'removeIntegrationPDImportSummary'
     ]),
 
-    isShowSkippedMessage (index, value) {
-      return this.$isNumeric(index) ||
-        (!this.$isNumeric(index) && value && this.getErrorMessage(index))
-    },
-
-    getErrorMessage (index) {
+    getErrorMessage (index, value) {
       if (this.$isNumeric(index)) {
-        return PD_BULK_ADD_MESSAGES[index]
+        return this.fixMessage(PD_BULK_ADD_MESSAGES[index], value)
       }
 
-      return PD_INTEGRATION_IMPORT_MESSAGES[index]
+      return this.fixMessage(PD_INTEGRATION_IMPORT_MESSAGES[index], value)
+    },
+
+    fixMessage (message, value) {
+      if (!message) {
+        return message
+      }
+
+      if (value > 1) {
+        message = message.replace('(s)', 's')
+      } else {
+        message = message.replace('(s)', '')
+      }
+
+      return message
     },
 
     buildReport () {
@@ -157,13 +165,6 @@ export default {
 
       const id = this.$route.params.id
       const integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
-      // remove null/undefined values in object
-      const failReport = omitBy(this.fullReport.fail, isNil)
-
-      this.fullReport.fail = {
-        ...integrationReport,
-        ...failReport
-      }
 
       const createdContactsCount = integrationReport?.created_contacts_count ?? 0
       const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
@@ -171,6 +172,22 @@ export default {
 
       // update the total selected contacts to the correct total count
       this.fullReport.info.selected = totalSelected
+
+      // remove reports having no message or with 0 value
+      Object.keys(integrationReport).forEach(key => {
+        const reportMessage = this.fixMessage(PD_INTEGRATION_IMPORT_MESSAGES[key], integrationReport[key])
+        if (isEmpty(reportMessage) || integrationReport[key] === 0) {
+          delete integrationReport[key]
+        }
+      })
+
+      // remove null/undefined values in object
+      const failReport = omitBy(this.fullReport.fail, isNil)
+
+      this.fullReport.fail = {
+        ...integrationReport,
+        ...failReport
+      }
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
