@@ -19,7 +19,7 @@
     </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
-      <div class="d-flex flex-row align-items-start">
+      <div class="d-flex flex-row align-items-center">
         <b-badge v-if="id === 'callFishing' && queueCount > 1"
                  class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
@@ -96,7 +96,6 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center call-actions"
-             :class="[isCall && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -501,7 +500,6 @@ export default {
 
     notificationIconClasses () {
       return [
-        this.isCall && this.getSource ? 'mt-2' : '',
         this.id === 'system' ? 'system-update' : ''
       ]
     },
