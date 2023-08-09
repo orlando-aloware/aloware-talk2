@@ -753,7 +753,8 @@
               <b-col>
                 <div v-if="!isEditingNote"
                      class="align-items-center">
-                  <div class="notes mt-1" v-html="communication.notes"></div>
+                  <div class="notes mt-1"
+                       v-html="$options.filters.nl2br(communication.notes)"/>
                   <b-link href="#"
                           class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
                           @click="onEditNote">
