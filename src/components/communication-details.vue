@@ -5,17 +5,18 @@
              sm="12"
              class="pl-0 pr-0">
 
-        <q-card flat bordered class="communication-details-card bg-grey-1">
+        <q-card flat
+                bordered
+                class="communication-details-card bg-grey-1">
           <q-card-section class="pb-0">
             <div class="d-flex justify-content-between header">
               <div class="fs-14 mt-1 header-title">Communication Info</div>
 
               <div class="d-flex header-btn-wrapper">
-                <communication-report-issue
-                  :communication-id="communication.id"></communication-report-issue>
-                <b-button v-if="hasPermissionTo('archive communication')"
-                          variant="danger"
+                <communication-report-issue :communication-id="communication.id"/>
+                <b-button variant="danger"
                           size="sm"
+                          v-if="hasPermissionTo('archive communication')"
                           @click="onArchive">
                   Archive
                 </b-button>
@@ -41,20 +42,19 @@
           </q-card-section>
 
           <!--ATTACHMENTS-->
-          <q-card-section v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
-                          class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0"
+                          v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
 
             <div v-if="communication.attachments && communication.attachments.length > 0">
               <div v-for="(attachment, index) in communication.attachments"
                    :key="index">
                 <template v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
-                  <q-img
-                    v-if="isAttachmentMigrated(attachment)"
-                    class="img-fluid d-block r-2x br-8"
-                    height="300px"
-                    native-context-menu
-                    :class="index > 0 ? 'mb-1' : ''"
-                    :src="attachment.url">
+                  <q-img class="img-fluid d-block r-2x br-8"
+                         height="300px"
+                         native-context-menu
+                         :class="index > 0 ? 'mb-1' : ''"
+                         :src="attachment.url"
+                         v-if="isAttachmentMigrated(attachment)">
                     <template v-slot:error>
                       <div class="absolute-full flex flex-center bg-negative text-white">
                         Error!
@@ -66,12 +66,11 @@
                                        :attachment-url="attachment.url"/>
                     </template>
                   </q-img>
-                  <img
-                    v-if="!isAttachmentMigrated(attachment)"
-                    class="img-fluid d-block r-2x br-8"
-                    :class="index > 0 ? 'mb-1' : ''"
-                    height="300px"
-                    src="/assets/images/loading.svg"/>
+                  <img class="img-fluid d-block r-2x br-8"
+                       height="300px"
+                       src="/assets/images/loading.svg"
+                       :class="index > 0 ? 'mb-1' : ''"
+                       v-if="!isAttachmentMigrated(attachment)"/>
                 </template>
 
                 <div v-if="attachment.mime_type && isAttachmentAudio(attachment.mime_type)">
@@ -101,11 +100,11 @@
               </div>
             </div>
 
-            <div v-if="communication.body"
-                 class="fs-13 my-2">
+            <div class="fs-13 my-2"
+                 v-if="communication.body">
               <span class="text-muted"
-                v-if="communication.type !== CommunicationTypes.SMS"
-                v-html="$options.filters.nl2br(communication.body)">
+                    v-if="communication.type !== CommunicationTypes.SMS"
+                    v-html="$options.filters.nl2br(communication.body)">
               </span>
               <span class="text-muted fs-14 font-weight-light-bold"
                     v-else>
@@ -134,8 +133,7 @@
                 <q-item-label>Contact: </q-item-label>
               </b-col>
               <b-col>
-                <router-link
-                  :to="{ name: 'Contact', params: { id: communication.contact.id }}">
+                <router-link :to="{ name: 'Contact', params: { id: communication.contact.id }}">
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
 
@@ -218,7 +216,9 @@
             <div v-if="[CommunicationTypes.CALL].includes(communication.type)">
               <b-form-row>
                 <b-col class="pl-0 pr-0">
-                  <q-item-label class="mt-2">Target Users <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>: </q-item-label>
+                  <q-item-label class="mt-2">
+                    Target Users <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>:
+                  </q-item-label>
                 </b-col>
                 <b-col>
                   <target-users-tree class="w-100"
@@ -239,16 +239,14 @@
                         :state="communication.rejected_by_app"
                         :name="rejectionToIcon(communication.rejected_by_app)"
                         v-if="communication.rejected_by_app !== 0">
-                  <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    max-width="150px">
+                  <q-tooltip anchor="top middle"
+                             self="bottom middle"
+                             max-width="150px">
                     {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                   </q-tooltip>
                 </q-icon>
                 <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
-                  <router-link
-                    :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
+                  <router-link :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
                       <span class="text-black"
                             :title="getUserName(getUser(communication.user_id))">
                         <q-tooltip class="item"
@@ -262,9 +260,9 @@
                   </router-link>
                 </div>
                 <div v-else>
-                    <span class="text-greyish">
-                      -
-                    </span>
+                  <span class="text-greyish">
+                    -
+                  </span>
                 </div>
               </b-col>
             </b-form-row>
@@ -277,15 +275,14 @@
                 </b-col>
                 <b-col>
                   <ul class="list list-unstyled inset mb-0">
-                    <li v-for="(attemptingUser, index) in communication.attempting_users"
+                    <li class="pb-1"
                         :key="attemptingUser + '-user-' + index"
-                        class="pb-1">
-                      <router-link
-                        :to="{ name: 'User Activity', params: { userId: getUser(attemptingUser).id }}">
-                                        <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
-                                              :title="getUserName(getUser(attemptingUser))">
-                                            {{ getUserName(getUser(attemptingUser)) }}
-                                        </span>
+                        v-for="(attemptingUser, index) in communication.attempting_users">
+                      <router-link :to="{ name: 'User Activity', params: { userId: getUser(attemptingUser).id }}">
+                        <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
+                              :title="getUserName(getUser(attemptingUser))">
+                          {{ getUserName(getUser(attemptingUser)) }}
+                        </span>
                       </router-link>
                     </li>
                   </ul>
@@ -444,8 +441,8 @@
             </div>
           </q-card-section>
 
-          <q-card-section v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
-                          class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0"
+                          v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
 
             <!--LINE-->
             <b-form-row v-if="communication.campaign_id">
@@ -454,13 +451,11 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link
-                    :to="{ name: 'Line Activity', params: { campaignId: communication.campaign_id }}"
-                    v-if="usedCampaign">
-                    <q-tooltip
-                      anchor="top middle"
-                      self="bottom middle"
-                      max-width="150px">
+                  <router-link :to="{ name: 'Line Activity', params: { campaignId: communication.campaign_id }}"
+                               v-if="usedCampaign">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
                       Click for more info
                     </q-tooltip>
                     {{ usedCampaign.name }}
@@ -479,13 +474,11 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link
-                    :to="{ name: 'Ring Group Activity', params: { ringGroupId: communication.ring_group_id }}"
-                    v-if="usedRingGroup && !usedRingGroup?.call_waiting">
-                    <q-tooltip
-                      anchor="top middle"
-                      self="bottom middle"
-                      max-width="150px">
+                  <router-link :to="{ name: 'Ring Group Activity', params: { ringGroupId: communication.ring_group_id }}"
+                               v-if="usedRingGroup && !usedRingGroup?.call_waiting">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
                       Click for more info
                     </q-tooltip>
                     {{ usedRingGroup.name }}
@@ -509,13 +502,11 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link
-                    :to="{ name: 'Sequence Activity', params: { sequenceId: communication.workflow_id }}"
-                    v-if="useSequence">
-                    <q-tooltip
-                      anchor="top middle"
-                      self="bottom middle"
-                      max-width="150px">
+                  <router-link :to="{ name: 'Sequence Activity', params: { sequenceId: communication.workflow_id }}"
+                               v-if="useSequence">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
                       Click for more info
                     </q-tooltip>
                     {{ useSequence.name }}
@@ -534,13 +525,11 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link
-                    :to="{ name: 'Broadcast Activity', params: { broadcastId: communication.broadcast_id }}"
-                    v-if="useBroadCast">
-                    <q-tooltip
-                      anchor="top middle"
-                      self="bottom middle"
-                      max-width="150px">
+                  <router-link :to="{ name: 'Broadcast Activity', params: { broadcastId: communication.broadcast_id }}"
+                               v-if="useBroadCast">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
                       Click for more info
                     </q-tooltip>
                     {{ useBroadCast.name }}
@@ -559,15 +548,12 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link
-                    v-for="(userId, index) in communication.transfer_prior_user_ids"
-                    :key="userId + '-user-' + index"
-                    :to="{ name: 'User Activity', params: {userId: userId }}">
-
-                    <q-tooltip
-                      anchor="top middle"
-                      self="bottom middle"
-                      max-width="150px">
+                  <router-link :to="{ name: 'User Activity', params: {userId: userId }}"
+                               :key="userId + '-user-' + index"
+                               v-for="(userId, index) in communication.transfer_prior_user_ids">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
                       {{ getUserName(getUser(userId)) }}
                     </q-tooltip>
                     {{ getUserName(getUser(userId)) }}
@@ -583,15 +569,12 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link
-                    v-for="(userId, index) in communication.transfer_target_user_ids"
-                    :key="userId + '-user-' + index"
-                    :to="{ name: 'User Activity', params: {userId: userId }}">
-
-                    <q-tooltip
-                      anchor="top middle"
-                      self="bottom middle"
-                      max-width="150px">
+                  <router-link :to="{ name: 'User Activity', params: {userId: userId }}"
+                               :key="userId + '-user-' + index"
+                               v-for="(userId, index) in communication.transfer_target_user_ids">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
                       {{ getUserName(getUser(userId)) }}
                     </q-tooltip>
                     {{ getUserName(getUser(userId)) }}
@@ -688,11 +671,10 @@
               <b-col>
                 <div class="d-flex align-items-center"
                      v-if="communication.has_recording">
-                  <communication-audio :communication="communication"
+                  <communication-audio class="mb-2"
+                                       :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
-                                       :uniqueId="communication.id + '1'"
-                                       class="mb-2">
-                  </communication-audio>
+                                       :uniqueId="communication.id + '1'"/>
                 </div>
                 <div class="d-flex align-items-center"
                      v-else>
@@ -709,11 +691,10 @@
               <b-col>
                 <div class="d-flex align-items-center"
                      v-if="communication.has_voicemail">
-                  <communication-audio :communication="communication"
+                  <communication-audio class="mb-2"
+                                       :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
-                                       :uniqueId="communication.id + '2'"
-                                       class="mb-2">
-                  </communication-audio>
+                                       :uniqueId="communication.id + '2'"/>
                 </div>
                 <div class="d-flex align-items-center"
                      v-else>
@@ -724,17 +705,17 @@
           </q-card-section>
 
           <!--FILES HERE-->
-          <q-card-section v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
-                          class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0"
+                          v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>Files: </q-item-label>
               </b-col>
 
               <b-col>
-                <div v-for="(attachment, index) in communication.attachments"
+                <div class="text-dark-greenish w-100"
                      :key="index"
-                     class="text-dark-greenish w-100">
+                     v-for="(attachment, index) in communication.attachments">
                   <download-button is-simple
                                    show-file-name
                                    :filename="attachment.name"
@@ -751,8 +732,8 @@
                 <q-item-label>Notes: </q-item-label>
               </b-col>
               <b-col>
-                <div v-if="!isEditingNote"
-                     class="align-items-center">
+                <div class="align-items-center"
+                     v-if="!isEditingNote">
                   <div class="notes mt-1"
                        v-html="$options.filters.nl2br(communication.notes)"/>
                   <b-link href="#"
@@ -765,12 +746,11 @@
                     </slot>
                   </b-link>
                 </div>
-                <div v-if="isEditingNote"
-                     class="d-flex align-items-center">
+                <div class="d-flex align-items-center"
+                     v-if="isEditingNote">
                   <communication-note ref="communicationNotes"
                                       :communication="communication"
-                                      @notesBlurred="isEditingNote = false">
-                  </communication-note>
+                                      @notesBlurred="isEditingNote = false"/>
                 </div>
               </b-col>
             </b-form-row>
@@ -805,16 +785,15 @@
           </q-card-section>
 
           <!--CALL DISPOSITION-->
-          <q-card-section v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode"
-                          class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0"
+                          v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode">
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label class="mt-3 custom-item-label">Call Disposition: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <call-disposition-selector
-                    :communication="communication"></call-disposition-selector>
+                  <call-disposition-selector :communication="communication"/>
                 </div>
               </b-col>
             </b-form-row>
@@ -824,9 +803,8 @@
       <b-col md="8"
              class="pr-0 ring-group-snapshot-wrapper"
              v-if="communication && communication.type === CommunicationTypes.CALL">
-          <ring-group-snapshot :communication="communication"
-                               :ring-group="usedRingGroup">
-          </ring-group-snapshot>
+        <ring-group-snapshot :communication="communication"
+                              :ring-group="usedRingGroup"/>
       </b-col>
     </b-row>
   </div>
