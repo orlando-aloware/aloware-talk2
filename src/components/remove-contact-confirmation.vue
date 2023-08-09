@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import _, { isEmpty } from 'lodash'
+import { chunk, get, isEmpty } from 'lodash'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
@@ -175,7 +175,7 @@ export default {
             this.contactToRemove.id
           break
         case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
-          const contactId = _.get(this.contactToRemove, 'id', null)
+          const contactId = get(this.contactToRemove, 'id', null)
 
           if (!contactId || contactId === 'undefined') {
             console.log('Failed to remove contact: Missing contact id!')
@@ -233,15 +233,12 @@ export default {
       }
 
       this.isBusy = true
-      const ids = this.selectedContacts[this.listId]
+      let ids = this.selectedContacts[this.listId]
         .map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+      ids = chunk(ids, 50)
 
       if (this.isDatatableSelectedAll) {
         params.selected_all = true
-      } else if (this.isContactsRoute) {
-        params.contacts = ids
-      } else {
-        params.contact_list_items = ids
       }
 
       if (!isEmpty(this.currentListFilters)) {
@@ -261,19 +258,47 @@ export default {
         }
       }
 
-      return this.$axios
+      const isChunked = !params.selected_all && ids.length > 0
+      this.processRequest(url, params, isChunked, ids)
+    },
+
+    processRequest (url, params, isChunked = false, chunkedContactIds = []) {
+      if (chunkedContactIds.length > 0 && this.isContactsRoute) {
+        params.contacts = chunkedContactIds[0]
+      } else if (chunkedContactIds.length) {
+        params.contact_list_items = chunkedContactIds[0]
+      }
+
+      this.$axios
         .delete(url, { data: params })
-        .then((res) => {
-          this.$emit('contactsRemoved', this.selectedList)
-          this.$generalNotification(res.data.message)
+        .then(res => {
+          if (isChunked) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
+
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(url, params, hasMoreChunks, chunkedContactIds)
+            }
+          }
+
+          if (!isChunked) {
+            this.$emit('contactsRemoved', this.selectedList)
+            this.$generalNotification(res.data.message)
+          }
         })
         .catch((_err) => {
-          this.$generalNotification('Unable to remove contacts please try again.', 'error')
+          if (!isChunked) {
+            this.$generalNotification('Unable to remove contacts please try again.', 'error')
+          }
         }).finally(() => {
-          this.contactsToDelete = null
-          this.isBusy = false
-          this.removeContactClose()
-          this.$bvModal.hide('remove-contact-confirmation-dialog')
+          if (!isChunked) {
+            this.contactsToDelete = null
+            this.isBusy = false
+            this.removeContactClose()
+            this.$bvModal.hide('remove-contact-confirmation-dialog')
+          }
         })
     },
 
