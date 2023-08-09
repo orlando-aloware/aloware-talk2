@@ -103,7 +103,7 @@
             <compact-btn variant="outlined-light"
                          customClass="mb-2 add-filters with-border conjunction-button"
                          v-if="!isMaxOuterFiltersReached"
-                         @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, null, false)">
+                         @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, false, false)">
               OR
             </compact-btn>
           </div>
