@@ -197,6 +197,7 @@ import VisibilitySelector from 'components/generic-selectors/visibility-selector
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
+import _ from 'lodash'
 
 import SettingsMap from 'components/settings/settings-map'
 
@@ -241,7 +242,7 @@ export default {
       this.user.campaign_id = campaignId
     },
 
-    onUpdateFields (value, prop) {
+    onUpdateFields: _.debounce(function (value, prop) {
       this.user[prop] = value
       this.updateChangedUserProperties({
         name: prop,
@@ -289,7 +290,8 @@ export default {
           value: this.userClone.selected_user_ids
         })
       }
-    }
+      this.$emit('onSave')
+    }, 2000)
   }
 }
 </script>

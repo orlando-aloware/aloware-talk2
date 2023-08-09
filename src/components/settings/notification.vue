@@ -534,6 +534,7 @@ export default {
         this.user.mentions_text_notifs = this.textNotifications && this.myMentions
       }
       this.updateFormValidity()
+      this.$emit('onSave')
     },
 
     onChangeCustomNotificationPhoneNumber () {

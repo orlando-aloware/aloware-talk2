@@ -301,6 +301,10 @@ export default {
       this.selectedId = option.id
     },
 
+    removeAtIndex (index) {
+      console.log({ index })
+    },
+
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {

@@ -24,7 +24,7 @@
               required
               v-model.trim="$v.user.first_name.$model"
               :state = "validateState('first_name')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'first_name')">
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'first_name')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.first_name.required">Enter your first name.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.first_name.maxLength">First name must not exceed 191 characters</b-form-invalid-feedback>
@@ -42,7 +42,7 @@
               type="text"
               placeholder="Last Name"
               required
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'last_name')">
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'last_name')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.last_name.required">Enter your last name.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.last_name.maxLength">First name must not exceed 191 characters</b-form-invalid-feedback>
@@ -64,7 +64,7 @@
               placeholder="Enter something..."
               rows="3"
               max-rows="6"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'description')"
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'description')"
             ></b-form-textarea>
           </b-form-group>
         </b-col>
@@ -83,7 +83,7 @@
               required
               v-model.trim="$v.user.email.$model"
               :state="validateState('email')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'email')">
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'email')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.email.required">Enter your email address.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.email.email">Enter a valid email address.</b-form-invalid-feedback>
@@ -143,7 +143,7 @@
               autocomplete="off"
               :state="validateState('password_confirmation')"
               v-model.trim="$v.user.password_confirmation.$model"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'password_confirmation')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">Password did not match.</b-form-invalid-feedback>
           </b-form-group>
@@ -199,7 +199,7 @@
 
           <b-form-group label="" >
             <answer-type-selector v-model="user.answer_by"
-                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'answer_by')">
+                                  @select="(eventPayload) => onUpdateSettings(eventPayload, 'answer_by')">
             </answer-type-selector>
           </b-form-group>
         </b-col>
@@ -219,7 +219,7 @@
                 v-model="user.phone_number_as_backup"
                 :value="true"
                 :unchecked-value="false"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'phone_number_as_backup')">
+                @change="(eventPayload) => onUpdateSettings(eventPayload, 'phone_number_as_backup')">
                 Use a phone number as backup.
               </b-form-checkbox>
             </b-form-group>
@@ -240,7 +240,7 @@
               placeholder="(123) 456-7890"
               v-model.trim="$v.user.phone_number.$model"
               :state="validateState('phone_number')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'phone_number')">
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'phone_number')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
           </b-form-group>
@@ -261,7 +261,7 @@
                 v-model="user.respect_agent_status"
                 :value="true"
                 :unchecked-value="false"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'respect_agent_status')"
+                @change="(eventPayload) => onUpdateSettings(eventPayload, 'respect_agent_status')"
               >
                 Respect agent availability status
               </b-form-checkbox>
@@ -443,6 +443,7 @@ import {
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
+import _ from 'lodash'
 
 export default {
   name: 'profile',
@@ -578,7 +579,28 @@ export default {
       }
 
       this.updateFormValidity()
-    }
+    },
+
+    onUpdateSettings: _.debounce(function (value, prop) {
+      if (prop === 'password_confirmation') {
+        if (this.user[prop].length >= 6 && this.user[prop] === this.user.password) {
+          this.updateChangedUserProperties({
+            name: 'password_confirmation',
+            value: value
+          })
+          this.$emit('onSave')
+        }
+        return
+      }
+
+      this.user[prop] = value
+      this.updateChangedUserProperties({
+        name: prop,
+        value: value
+      })
+      this.updateFormValidity()
+      this.$emit('onSave')
+    }, 2000)
   },
 
   mounted () {

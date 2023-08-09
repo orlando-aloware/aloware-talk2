@@ -44,7 +44,7 @@
                           :days="user.operating_hours"
                           :time-increment="timeIncrement"
                           :switch-width="75"
-                          @updated-hours="(eventPayload) => onUpdateFields(eventPayload, 'operating_hours')">
+                          @updated-hours="(eventPayload) => onUpdateWorkingHours(eventPayload, 'operating_hours')">
           </business-hours>
         </b-col>
       </b-form-row>
@@ -542,7 +542,7 @@ export default {
     fileUploaded (file) {
       this.user.missed_calls_settings.voicemail_file = file['file_name']
     },
-    onUpdateFields (value, prop) {
+    onUpdateFields: _.debounce(function (value, prop) {
       if (!['disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'missed_calls_settings.missed_call_handling_mode', 'operating_states_limit.us', 'operating_states_limit.ca', 'missedCallHandlingMode', 'operatingHours'].includes(prop)) {
         const newValue = value || this.user[prop]
         this.user[prop] = newValue
@@ -629,7 +629,17 @@ export default {
       }
 
       this.updateFormValidity()
-    },
+      this.$emit('onSave')
+    }, 2000),
+    onUpdateWorkingHours: _.debounce(function (value, prop) {
+      const key = Object.keys(value)[0]
+      this.updateChangedUserProperties({
+        name: 'operating_hours.' + key,
+        value: value[key]
+      })
+
+      this.$emit('onSave')
+    }, 4000),
     resetDisableGeoRouting (value) {
       // If the form is saved without operating_states_limits for any country, return to disabled
       let country = (this.user.country || 'us').toLowerCase()

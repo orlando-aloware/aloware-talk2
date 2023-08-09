@@ -61,7 +61,8 @@ export default {
     },
 
     isVisible () {
-      return this.changedUserProperties.length > 0
+      // return this.changedUserProperties.length > 0
+      return false
     }
   },
 
@@ -100,11 +101,18 @@ export default {
 
       return Promise.all([
         this.saveChanges()
-      ]).finally(() => {
-        this.resetChangedUserProperties()
-        this.isBusy = false
-        this.$generalNotification('Your changes has been saved.')
-      })
+      ])
+        .then(response => {
+          this.$generalNotification('Setting has been updated successfully.')
+        })
+        .catch(error => {
+          const message = error.response.data.hasOwnProperty('error') ? error.response.data.error : 'Your changes couldn\'t been saved'
+          this.$generalNotification(message, 'error')
+        })
+        .finally(() => {
+          this.resetChangedUserProperties()
+          this.isBusy = false
+        })
     },
 
     saveChanges () {

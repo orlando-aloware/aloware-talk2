@@ -144,6 +144,7 @@ import { aclMixin, settingsMixin } from 'src/plugins/mixins'
 import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
 import { required } from 'vuelidate/lib/validators'
+import _ from 'lodash'
 
 export default {
   name: 'outbound-call',
@@ -225,7 +226,7 @@ export default {
     campaignSelected (campaignId) {
       this.user.campaign_id = campaignId
     },
-    onUpdateFields (value, prop) {
+    onUpdateFields: _.debounce(function (value, prop) {
       this.user[prop] = value
       this.updateChangedUserProperties({
         name: prop,
@@ -245,7 +246,8 @@ export default {
       }
 
       this.updateFormValidity()
-    }
+      this.$emit('onSave')
+    }, 3000)
   },
 
   mounted () {

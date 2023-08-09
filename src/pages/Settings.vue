@@ -12,24 +12,24 @@
                  md="12">
             <general-information :statics="statics"
                                  v-if="!$route.params.tab || $route.params.tab === 'general-information'"/>
-            <profile :user="user"
+            <profile :user="user" @onSave="handleSave"
                      v-if="$route.params.tab === 'profile' && !isLoading"/>
-            <notification-settings :user="user"
+            <notification-settings :user="user" @onSave="handleSave"
                                    v-if="$route.params.tab === 'notification' && !isLoading"/>
-            <personalization :user="user"
+            <personalization :user="user" @onSave="handleSave"
                              v-if="$route.params.tab === 'personalization' && !isLoading"/>
-            <visibility :user="user"
+            <visibility :user="user" @onSave="handleSave"
                         v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"/>
-            <inbound-call :user="user"
+            <inbound-call :user="user" @onSave="handleSave"
                           :statics="statics"
                           v-if="$route.params.tab === 'inbound-call' && !isLoading"/>
-            <outbound-call :user="user"
+            <outbound-call :user="user" @onSave="handleSave"
                            v-if="$route.params.tab === 'outbound-call' && !isLoading"/>
             <diagnosis :user="user"
                        v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
             <sms-templates :user="user"
                            v-if="$route.params.tab === 'sms-templates' && !isLoading"/>
-            <settings-save-bar :user="user"/>
+            <settings-save-bar :user="user" ref="settingsSaveBarRef"/>
           </b-col>
         </b-row>
       </div>
@@ -142,6 +142,10 @@ export default {
         name: 'Settings'
       })
       this.onLoadShowSettings = false
+    },
+
+    handleSave () {
+      this.$refs.settingsSaveBarRef.onSave()
     }
   },
 
