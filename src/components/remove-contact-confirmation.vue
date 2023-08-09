@@ -233,7 +233,8 @@ export default {
       }
 
       this.isBusy = true
-      const ids = this.selectedContacts[this.listId].map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+      const ids = this.selectedContacts[this.listId]
+        .map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
 
       if (this.isDatatableSelectedAll) {
         params.selected_all = true
@@ -244,7 +245,20 @@ export default {
       }
 
       if (!isEmpty(this.currentListFilters)) {
-        params.filter_groups = this.currentListFilters
+        const allFilters = this.$jsonClone(this.currentListFilters)
+
+        Object.keys(allFilters).forEach(index => {
+          // include all other filters
+          if (!this.$isNumeric(index)) {
+            params[index] = allFilters[index]
+            delete allFilters[index]
+          }
+        })
+
+        if (!isEmpty(allFilters)) {
+          // include the filter groups
+          params.filter_groups = allFilters
+        }
       }
 
       return this.$axios
