@@ -395,7 +395,7 @@ Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
-  if (window._.isEmpty(message.trim())) {
+  if (!message || window._.isEmpty(message.trim())) {
     return
   }
 

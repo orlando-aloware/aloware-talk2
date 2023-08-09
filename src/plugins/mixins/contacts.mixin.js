@@ -282,6 +282,12 @@ export default {
         return
       }
 
+      const event = params?.event
+
+      if (event) {
+        delete params.event
+      }
+
       const axiosUniqueId = Date.now().toString(36) + Math.random().toString(36).substring(2)
       this.addAxiosUniqueId(axiosUniqueId)
 
@@ -310,7 +316,7 @@ export default {
       // eslint-disable-next-line camelcase
       const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
-        event: params.event,
+        event: event,
         clear: clear,
         filters: countQueryString
       })
@@ -420,7 +426,7 @@ export default {
       const event = params?.event
 
       // remove the event property as we don't need it at this point
-      if (params?.event) {
+      if (event) {
         delete params.event
       }
 

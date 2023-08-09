@@ -43,6 +43,7 @@
           Add Selected Contacts
         </compact-btn>
         <compact-btn variant="outlined-light"
+                     :disabled="clicked"
                      @clicked="onCancel">
           Cancel
         </compact-btn>
