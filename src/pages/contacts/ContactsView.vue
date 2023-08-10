@@ -997,7 +997,7 @@ export default {
     cleanedCurrentListFilters () {
       const currentFilters = _.isEmpty(this.currentListFilters)
         ? {}
-        : this.currentListFilters
+        : this.$jsonClone(this.currentListFilters)
 
       return currentFilters
     }
@@ -1029,7 +1029,11 @@ export default {
 
     this.$VueEvent.listen('shouldUpdateListCount', () => {
       if (this.list.type === this.ContactListTypes.DYNAMIC) {
-        this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
+        this.setDataCount(
+          !_.isEmpty(this.currentListFilters)
+            ? this.currentListFilters
+            : this.list.filters
+        )
 
         return
       }
@@ -1613,7 +1617,9 @@ export default {
 
     setDataCount (data, event = null, updatePinned = false, clear = false) {
       const fireData = {
-        data: { filters: data },
+        data: {
+          filters: this.$jsonClone(data)
+        },
         id: this.id,
         event: event,
         clear: clear,

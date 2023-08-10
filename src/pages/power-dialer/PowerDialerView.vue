@@ -1108,7 +1108,7 @@ export default {
     init (loadList = true) {
       this.resetFilters(true)
       this.$VueEvent.fire('clearContacts')
-      this.initialListFilters = this.currentListFilters
+      this.initialListFilters = this.$jsonClone(this.currentListFilters)
 
       if (loadList) {
         this.loadList(this.selectedListId)

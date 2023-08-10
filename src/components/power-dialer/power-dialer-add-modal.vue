@@ -222,7 +222,7 @@ export default {
       }
 
       if (!isEmpty(this.currentListFilters)) {
-        params.filter_groups = this.currentListFilters
+        params.filter_groups = this.$jsonClone(this.currentListFilters)
       }
 
       if (this.where === 'scheduled') {

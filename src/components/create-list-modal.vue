@@ -195,7 +195,7 @@ export default {
         include_all_contacts: this.isAllContactsSelected
       }
 
-      const clonedCurrentListFilters = { ...this.currentListFilters }
+      const clonedCurrentListFilters = this.$jsonClone(this.currentListFilters)
 
       // remove contact_lists filter since we are creating dynamic one
       if (clonedCurrentListFilters?.contact_lists) {

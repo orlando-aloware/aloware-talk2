@@ -311,7 +311,9 @@ export default {
             loading: false
           }
 
-          const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          const params = typeof this.currentListFilters === 'string'
+            ? {}
+            : this.$jsonClone(this.currentListFilters)
           this.fetch(params, false, true)
           this.$generalNotification('Contacts was successfully removed.')
         })

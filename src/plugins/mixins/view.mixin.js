@@ -187,7 +187,9 @@ export default {
           })
         }
 
-        let params = typeof this.currentListFilters === 'string' ? {} : this.$jsonClone(this.currentListFilters)
+        let params = typeof this.currentListFilters === 'string'
+          ? {}
+          : this.$jsonClone(this.currentListFilters)
         params.event = {
           name: 'bulk-created',
           count: event.items_count

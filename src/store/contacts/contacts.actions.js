@@ -128,7 +128,7 @@ export default {
     commit('SET_FILTERS', filters)
   },
   setCurrentListFilters: ({ commit }, filters) => {
-    commit('SET_CURRENT_LIST_FILTERS', filters)
+    commit('SET_CURRENT_LIST_FILTERS', JSON.parse(JSON.stringify(filters)))
   },
 
   setContact: ({ commit }, contact) => {
