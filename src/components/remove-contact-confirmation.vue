@@ -258,7 +258,7 @@ export default {
         }
       }
 
-      const isChunked = !params.selected_all && ids.length > 0
+      const isChunked = !params?.selected_all && ids.length > 0
       this.processRequest(url, params, isChunked, ids)
     },
 
@@ -281,12 +281,12 @@ export default {
             if (chunkedContactIds.length > 0) {
               this.processRequest(url, params, hasMoreChunks, chunkedContactIds)
             }
+
+            return
           }
 
-          if (!isChunked) {
-            this.$emit('contactsRemoved', this.selectedList)
-            this.$generalNotification(res.data.message)
-          }
+          this.$emit('contactsRemoved', this.selectedList)
+          this.$generalNotification(res.data.message)
         })
         .catch((_err) => {
           if (!isChunked) {

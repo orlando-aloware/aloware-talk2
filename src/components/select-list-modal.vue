@@ -66,7 +66,7 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import SelectListTreeFolder from 'src/components/select-list-tree-folder/select-list-tree-folder'
 import Search from 'src/components/search'
-import { isEmpty } from 'lodash'
+import { chunk, isEmpty } from 'lodash'
 
 export default {
   inject: [
@@ -108,6 +108,57 @@ export default {
       this.setSelectListSearchValue(searchValue)
     },
 
+    processRequest (params, isChunked = false, chunkedContactIds = []) {
+      if (chunkedContactIds.length > 0) {
+        params.contacts = chunkedContactIds[0]
+      }
+
+      const url = `/api/v2/contacts-list/${this.selectedStaticList.id}/items`
+      this.$axios
+        .post(url, params)
+        .then((response) => {
+          if (isChunked) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
+
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(params, hasMoreChunks, chunkedContactIds)
+            }
+
+            return
+          }
+
+          const message = response.data.message
+
+          this.$router.push(`/contacts/list/${this.selectedStaticList.id}`)
+
+          this.selectListClose()
+
+          this.$generalNotification(message)
+
+          this.loadFolders()
+        })
+        .catch((error) => {
+          if (!isChunked) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: null,
+              loading: false
+            })
+
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+          }
+        })
+        .finally(() => {
+          if (!isChunked) {
+            this.isLoading = false
+          }
+        })
+    },
+
     processSubmit () {
       this.isLoading = true
 
@@ -115,9 +166,10 @@ export default {
 
       if (this.isDatatableSelectedAll) {
         params.selected_all = true
-      } else {
-        params.contacts = this.selectedContacts[this.selectedList.id].map(item => item.id)
       }
+
+      let ids = this.selectedContacts[this.selectedList.id].map(item => item.id)
+      ids = chunk(ids, 50)
 
       if (!isEmpty(this.currentListFilters)) {
         params.filter_groups = this.currentListFilters
@@ -131,32 +183,8 @@ export default {
         })
       }
 
-      this.$axios
-        .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, params)
-        .then((response) => {
-          const message = response.data.message
-
-          this.$router.push(`/contacts/list/${this.selectedStaticList.id}`)
-
-          this.selectListClose()
-
-          this.$generalNotification(message)
-
-          this.loadFolders()
-        })
-        .catch((error) => {
-          this.$VueEvent.fire('addContactsProgress', {
-            id: null,
-            loading: false
-          })
-
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
+      const isChunked = !params?.selected_all && ids.length > 0
+      this.processRequest(params, isChunked, ids)
     },
 
     onSubmit () {

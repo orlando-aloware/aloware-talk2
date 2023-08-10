@@ -101,7 +101,7 @@ import {
   FROM_FOLDERS,
   FROM_BULK_MENU
 } from 'src/constants/contacts-list-create-mode'
-import { isEmpty } from 'lodash'
+import { chunk, isEmpty } from 'lodash'
 
 export default {
   inject: [
@@ -231,27 +231,82 @@ export default {
         params.selected_all = true
       }
 
-      if (!isEmpty(this.currentListFilters)) {
-        params.filter_groups = this.currentListFilters
+      // we have to use the dynamic list's filters if the source list
+      // is of type DYNAMIC
+      if (this.isDefault && this.selectedList.type === this.ContactListTypes.DYNAMIC &&
+        !isEmpty(this.currentListFilters)) {
+        const allFilters = this.$jsonClone(this.currentListFilters)
+
+        Object.keys(allFilters).forEach(index => {
+          // include all other filters
+          if (!this.$isNumeric(index)) {
+            params[index] = allFilters[index]
+            delete allFilters[index]
+          }
+        })
+
+        if (!isEmpty(allFilters)) {
+          // include the filter groups
+          params.filter_groups = allFilters
+        }
+      } else {
+        // else, list is of type STATIC. Just pass the contacts list id filter
+        params.filter_groups = [
+          {
+            'filters': {
+              'contact_lists': [
+                {
+                  value: [this.selectedList.id],
+                  operator: 1
+                }
+              ]
+            }
+          }
+        ]
       }
 
       return params
     },
 
-    processSubmit (skipListLoading = false) {
-      this.isLoading = true
-      const params = this.getParams()
+    processRequest (url = null, params, isChunked = false, chunkedContactIds = [], listId = null, message = null, skipListLoading = false) {
+      const apiUrl = !url ? this.listsEndpoint : url
+
+      if (chunkedContactIds.length > 0) {
+        params.contacts = chunkedContactIds[0]
+      }
 
       this.$axios
-        .post(this.listsEndpoint, params)
+        .post(apiUrl, params)
         .then((response) => {
-          const message = response.data.message
-          const id = response.data?.id || response.data?.data?.id
+          let message = null
+          let id = null
+
+          if (!url) {
+            message = response?.data?.message
+            id = response?.data?.id || response?.data?.data?.id
+          }
+
+          // recover the id for bulk add contacts with chunked contacts
+          id = !id && this.$isNumeric(listId) ? listId : id
+
+          if (isChunked && this.isDefault) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
+
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(`/api/v2/contacts-list/${id}/items`, params, hasMoreChunks, chunkedContactIds, id, message, skipListLoading)
+            }
+
+            return
+          }
+
           const newStaticListWithContacts = isEmpty(params.contact_folder_id) &&
             !isEmpty(params.contacts)
 
           // skip list's loading view too if we're sending contact ids
-          if (!skipListLoading && !newStaticListWithContacts) {
+          if (this.isDefault && !skipListLoading && !newStaticListWithContacts) {
             this.$VueEvent.fire('addContactsProgress', {
               id: id,
               loading: true
@@ -271,19 +326,33 @@ export default {
           this.loadFolders()
         })
         .catch((error) => {
-          this.$VueEvent.fire('addContactsProgress', {
-            id: null,
-            loading: false
-          })
+          if (!isChunked) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: null,
+              loading: false
+            })
 
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.errorMsg = message
-          this.$generalNotification(message, 'error')
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.errorMsg = message
+            this.$generalNotification(message, 'error')
+          }
         })
         .finally(() => {
-          this.isLoading = false
+          if (!isChunked) {
+            this.isLoading = false
+          }
         })
+    },
+
+    processSubmit (skipListLoading = false) {
+      this.isLoading = true
+      const params = this.getParams()
+      let ids = params?.contacts ?? []
+      ids = chunk(ids, 50)
+
+      const isChunked = !params?.selected_all && ids.length > 0
+      this.processRequest(null, params, isChunked, ids, null, null, skipListLoading)
     },
 
     onSubmit () {
