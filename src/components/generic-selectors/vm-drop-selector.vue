@@ -149,6 +149,9 @@ export default {
   created () {
     this.fetchVmDropFiles().then(() => {
       this.options = this.vmDropAlphabeticalOrder
+      if (this.$isNumeric(this.value)) {
+        this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === this.value))
+      }
     })
   },
 
@@ -193,13 +196,13 @@ export default {
   },
 
   watch: {
-    value () {
+    value (value) {
       this.selectedId = this.value
     },
 
-    selectedId (val) {
+    selectedId (value) {
       if (this.selectedId !== this.value) {
-        this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === val))
+        this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === value))
       }
 
       this.showInputPlaceholder()

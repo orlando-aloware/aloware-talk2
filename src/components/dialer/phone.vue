@@ -250,10 +250,10 @@
             <div class="dummy bg-dark w-100 height-36"></div>
             <div class="phone-avatar">
               <avatar class="contact-avatar"
-                      v-if="!isCallAdding && !isCallAdded"
                       width="50"
                       height="50"
-                      :name="contactName">
+                      :name="contactName"
+                      v-if="!isCallAdding && !isCallAdded">
               </avatar>
               <participants-icon v-else />
             </div>
@@ -1165,8 +1165,7 @@
                   <div class="d-flex">
                     <vm-drop-selector class="w-100"
                                       v-model="vmDropId"
-                                      @change="changeVmDrop">
-                    </vm-drop-selector>
+                                      @change="changeVmDrop"/>
                   </div>
                   <div class="d-flex">
                     <b-button variant="primary"
@@ -1224,7 +1223,7 @@
 </template>
 <script>
 import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   communicationInfoMixin,
   notificationMixin,
@@ -1447,6 +1446,10 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('powerDialer', [
+      'sessionSettings'
+    ]),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -2626,6 +2629,13 @@ export default {
 
     'dialer.contact': function () {
       this.setupContactLocalTime()
+
+      // use the selected vm drop in the session settings form
+      // in the power dialer list page
+      if (this.$route?.meta?.title === 'Power Dialer Sessions' &&
+        this.sessionSettings.vm_drop_id) {
+        this.vmDropId = this.sessionSettings.vm_drop_id
+      }
     },
 
     isCallCompleted () {
