@@ -2635,6 +2635,8 @@ export default {
       if (this.$route?.meta?.title === 'Power Dialer Sessions' &&
         this.sessionSettings.vm_drop_id) {
         this.vmDropId = this.sessionSettings.vm_drop_id
+      } else {
+        this.vmDropId = null
       }
     },
 
