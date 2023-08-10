@@ -58,7 +58,7 @@ export const SESSION_SETTINGS_ALL_FORMS = [
         items: []
       },
       {
-        name: 'setVmDropShortcuts',
+        name: 'vm_drop_id',
         label: 'Set VM Drop Shortcuts',
         type: 'select',
         items: []

@@ -202,11 +202,12 @@
                     </div>
                   </div>
 
-                  <SessionsForm :disabled="isCompanyScope"
-                                :flagged="dialog"
-                                v-model="filterSelectedItem"
-                                @valid-form="disabled = false"
-                                @invalid-form="disabled = true"/>
+                  <start-dial-sessions-form :disabled="isCompanyScope"
+                                            :flagged="dialog"
+                                            :settings="filterSelectedItem"
+                                            @updateSettings='onUpdateSettings'
+                                            @valid-form="disabled = false"
+                                            @invalid-form="disabled = true"/>
                 </q-card>
               </q-card-section>
             </q-card-section>
@@ -310,7 +311,7 @@
 <script>
 import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-import SessionsForm from './start-dial-sessions-form'
+import StartDialSessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
@@ -338,7 +339,7 @@ export default {
   },
 
   components: {
-    SessionsForm,
+    StartDialSessionsForm,
     PhoneIcon,
     CheckIcon,
     SettingIcon
@@ -739,6 +740,10 @@ export default {
       return [
         backgroundClass
       ]
+    },
+
+    onUpdateSettings (settings) {
+      this.selectedItem = settings
     }
   },
 

@@ -11,10 +11,9 @@
         <div class="col-6 pl-3"
              :key="cform.name"
              v-for="cform in form.children">
-          <label
-            class="label mb-1">
+          <label class="label mb-1">
             {{ cform.label }}
-            </label>
+          </label>
 
           <q-select class="generic-selector-2 dial-sessions__form__metric-options"
                     option-value="value"
@@ -93,8 +92,8 @@
           <VmDropSelector class="w-100 dial-sessions__form__vm-drop-selector"
                           :disable="disabled"
                           v-model="resources[cform.name]"
-                          v-else-if="cform.name === 'setVmDropShortcuts'"
-                          @change="{}">
+                          v-else-if="cform.name === 'vm_drop_id'"
+                          @change="onUpdateVmDrop">
           </VmDropSelector>
 
           <p v-else-if="cform.name === 'skip_outside_daytime_hours'">
@@ -137,12 +136,12 @@ import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import OrderSelector from 'components/generic-selectors/session-order-selector.vue'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
-import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 
 export default {
   name: 'StartDialSessionsForm',
+
   props: {
-    value: {
+    settings: {
       type: Object,
       default: () => {
         return {
@@ -150,23 +149,23 @@ export default {
         }
       }
     },
+
     name: {
       type: String,
       default: ''
     },
+
     disabled: {
       type: Boolean,
       default: false
     },
+
     flagged: {
       type: Boolean,
       default: false
     }
   },
-  model: {
-    prop: 'value',
-    event: 'change'
-  },
+
   components: {
     WarmupPeriodSelector,
     LineSelector,
@@ -176,6 +175,14 @@ export default {
     CallDispositionSelector,
     OrderSelector
   },
+
+  data () {
+    return {
+      selectWidth: 0,
+      resources: this.value
+    }
+  },
+
   async mounted () {
     // Temporary disabled
     // if (isEmpty(this.sessionSettings)) {
@@ -184,105 +191,99 @@ export default {
     //   this.resources = Object.assign({}, this.sessionSettings)
     // }
   },
+
   computed: {
     ...mapFields('powerDialer', [
       'metrics'
     ]),
+
     ...mapState('inbox', [
       'channelChangedFilterFields'
     ]),
+
     ...mapGetters('contacts', [
       'contact'
     ]),
+
     ...mapGetters('powerDialer', [
       'defaultSettings',
       'sessionSettings'
     ]),
-    resourceObj: {
-      get () {
-        return this.resources
-      },
-      set (obj) {
-        this.resources.name = null
-        this.resources.campaign_id = null
-        this.resources.skip_outside_daytime_hours = true
-        this.resources.warmup_period_in_seconds = 0
-        this.resources.script_id = null
-        this.resources.metric_options = []
-        this.resources.call_disposition_ids = []
-        this.resources.contact_disposition_ids = []
-        this.resources.is_company_scope = null
-        this.resources.order = POWER_DIALER_ORDER.default
-        return this.resources
-      }
-    },
+
     warmUpPeriods () {
       let values = []
       values = [WARM_UP_PERIOD_LIST]
+
       for (let i = 1; i <= 10; i++) {
         values.push(`${i * 5} seconds`)
       }
+
       return values
     },
+
     forms () {
       return SESSION_SETTINGS_ALL_FORMS
     },
+
     defaultValues () {
       return DEFAULT_SETTING_VALUES
-    },
-    localValue: {
-      get () {
-        return this.value
-      },
-      set (val) {
-        this.$emit('change', val)
-      }
     }
   },
+
   methods: {
     ...mapActions('powerDialer', [
       'setDefaultSettings',
       'getSessionMetricsOptions'
     ]),
+
     onLineFilterChange (value, prop) {
       this.resources.campaign_id = value
     },
+
     isChanged (property) {
       let item = this.channelChangedFilterFields.find(item => item.property === property)
       return !!item
     },
+
     onShowMetricsMenu () {
       this.selectWidth = this.$refs.metric_options[0].$el.offsetWidth
     },
+
     onShowWarmUpMenu () {
       this.selectWidth = this.$refs.warmup_period_in_seconds[0].$el.offsetWidth
+    },
+
+    onUpdateVmDrop (value) {
+      this.resources['vm_drop_id'] = value.id
     }
   },
+
   watch: {
     resources: {
-      handler (val) {
-        this.setDefaultSettings(val)
-        if (val?.campaign_id?.toString().length > 0 && val?.warmup_period_in_seconds?.toString().length > 0) {
+      deep: true,
+      handler (value) {
+        this.setDefaultSettings(value)
+
+        if (value?.campaign_id?.toString().length > 0 &&
+          value?.warmup_period_in_seconds?.toString().length > 0) {
           this.$emit('valid-form', true)
-        } else {
-          this.$emit('invalid-form', true)
+          this.$emit('updateSettings', value)
+
+          return
         }
-      },
-      deep: true
+
+        this.$emit('invalid-form', true)
+      }
     },
-    value (val) {
-      this.resources = val
+
+    settings (value) {
+      this.resources = value
     },
-    flagged (val) {
-      if (val) {
+
+    flagged (value) {
+      if (value) {
         this.resources.skip_outside_daytime_hours = 1
       }
-    }
-  },
-  data () {
-    return {
-      selectWidth: 0,
-      resources: this.value
     }
   }
 }
