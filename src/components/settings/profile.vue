@@ -219,7 +219,7 @@
                 v-model="user.phone_number_as_backup"
                 :value="true"
                 :unchecked-value="false"
-                @change="(eventPayload) => onUpdateSettings(eventPayload, 'phone_number_as_backup')">
+                @change="(eventPayload) => onUpdateFields(eventPayload, 'phone_number_as_backup')">
                 Use a phone number as backup.
               </b-form-checkbox>
             </b-form-group>
@@ -571,11 +571,12 @@ export default {
 
       // reset phone number when backup routing is disabled
       if (prop === 'phone_number_as_backup' && !this.user[prop]) {
-        this.user.phone_number = this.userClone.phone_number
+        this.user.phone_number = false
         this.updateChangedUserProperties({
           name: 'phone_number',
-          value: this.userClone.phone_number
+          value: false
         })
+        this.$emit('onSave')
       }
 
       this.updateFormValidity()

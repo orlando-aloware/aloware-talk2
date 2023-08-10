@@ -22,7 +22,7 @@
           <b-form-group label="" class="w-50">
             <extension-selector v-model="user.extension"
                                 :disable="false"
-                                @select="(eventPayload) => onUpdateFields(eventPayload, 'extension')">
+                                @select="(eventPayload) => onUpdateSettings(eventPayload, 'extension')">
             </extension-selector>
           </b-form-group>
         </b-col>
@@ -152,7 +152,7 @@
                 v-model="user.operating_states_limit.us"
                 :options="states.us"
                 :aria-describedby="ariaDescribedby"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'operating_states_limit.us')">
+                @change="(eventPayload) => onUpdateSettings(eventPayload, 'operating_states_limit.us')">
               </b-form-checkbox-group>
               <br>
               <br>
@@ -162,7 +162,7 @@
                   v-model="checkAllUS"
                   :value="true"
                   :unchecked-value="false"
-                  @change="(eventPayload) => onUpdateFields(eventPayload, 'checkAllUS')">
+                  @change="(eventPayload) => onUpdateSettings(eventPayload, 'checkAllUS')">
                   Check All
                 </b-form-checkbox>
               </b-form-group>
@@ -176,7 +176,7 @@
                 v-model="user.operating_states_limit.ca"
                 :options="states.ca"
                 :aria-describedby="ariaDescribedby"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'operating_states_limit.ca')">
+                @change="(eventPayload) => onUpdateSettings(eventPayload, 'operating_states_limit.ca')">
               </b-form-checkbox-group>
 
               <br>
@@ -187,7 +187,7 @@
                   v-model="checkAllCA"
                   :value="true"
                   :unchecked-value="false"
-                  @change="(eventPayload) => onUpdateFields(eventPayload, 'checkAllCA')">
+                  @change="(eventPayload) => onUpdateSettings(eventPayload, 'checkAllCA')">
                   Check All
                 </b-form-checkbox>
               </b-form-group>
@@ -210,7 +210,7 @@
                 :value="true"
                 :unchecked-value="false"
                 :disabled="!hasRole(['Company Admin', 'Company Agent'])"
-                @change="(eventPayload) => onUpdateFields(eventPayload, 'disableAreaCodeRouting')">
+                @change="(eventPayload) => onUpdateSettings(eventPayload, 'disableAreaCodeRouting')">
                 Do not enable area code routing for this user
               </b-form-checkbox>
             </b-form-group>
@@ -227,7 +227,7 @@
                                    :generic-styling="false"
                                    :use-chips="true"
                                    :multiple="true"
-                                   @select="(eventPayload) => onUpdateFields(eventPayload, 'operating_area_codes_limit')">
+                                   @select="(eventPayload) => onUpdateSettings(eventPayload, 'operating_area_codes_limit')">
             </us-area-code-selector>
           </b-form-group>
         </b-col>
@@ -271,7 +271,7 @@
               id="ta-text-follow up"
               v-model.trim="$v.user.missed_call_message.$model"
               :state="validateState('missed_call_message')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'missed_call_message')"
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'missed_call_message')"
             ></b-form-textarea>
 
             <b-form-invalid-feedback v-if="!$v.user.missed_call_message.required">Please provide a missed call message.</b-form-invalid-feedback>
@@ -341,7 +341,7 @@
                              id="ta-user-completed-call-message"
                              v-model.trim="$v.user.completed_call_message_caller.$model"
                              :state="validateState('completed_call_message_caller')"
-                             @input="(eventPayload) => onUpdateFields(eventPayload, 'completed_call_message_caller')"
+                             @input="(eventPayload) => onUpdateSettings(eventPayload, 'completed_call_message_caller')"
             ></b-form-textarea>
             <b-form-invalid-feedback v-if="!$v.user.completed_call_message_caller.required">Please provide a completed call message to the caller.</b-form-invalid-feedback>
 
@@ -542,8 +542,8 @@ export default {
     fileUploaded (file) {
       this.user.missed_calls_settings.voicemail_file = file['file_name']
     },
-    onUpdateFields: _.debounce(function (value, prop) {
-      if (!['disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'missed_calls_settings.missed_call_handling_mode', 'operating_states_limit.us', 'operating_states_limit.ca', 'missedCallHandlingMode', 'operatingHours'].includes(prop)) {
+    onUpdateFields (value, prop) {
+      if (!['should_message_if_missed', 'should_message_caller_if_completed', 'disableGeoRouting', 'disableAreaCodeRouting', 'checkAllUS', 'checkAllCA', 'operating_hours', 'missed_calls_settings.missed_call_handling_mode', 'operating_states_limit.us', 'operating_states_limit.ca', 'missedCallHandlingMode', 'operatingHours'].includes(prop)) {
         const newValue = value || this.user[prop]
         this.user[prop] = newValue
         this.updateChangedUserProperties({
@@ -583,6 +583,9 @@ export default {
             name: 'operating_states_limit.ca',
             value: []
           })
+        }
+        if (value) {
+          this.$emit('onSave')
         }
       }
 
@@ -628,9 +631,40 @@ export default {
         // })
       }
 
+      if (prop === 'should_message_caller_if_completed' && value === 0) {
+        if (this.user['completed_call_message_caller'].length) {
+          this.user[prop] = value
+          this.user['completed_call_message_caller'] = ''
+          this.updateChangedUserProperties({
+            name: 'should_message_caller_if_completed',
+            value: value
+          })
+          this.updateChangedUserProperties({
+            name: 'completed_call_message_caller',
+            value: ''
+          })
+          this.$emit('onSave')
+        }
+      }
+
+      if (prop === 'should_message_if_missed' && !value) {
+        if (this.user['missed_call_message'].length) {
+          this.user[prop] = value
+          this.user['missed_call_message'] = ''
+          this.updateChangedUserProperties({
+            name: 'should_message_if_missed',
+            value: value
+          })
+          this.updateChangedUserProperties({
+            name: 'missed_call_message',
+            value: ''
+          })
+          this.$emit('onSave')
+        }
+      }
+
       this.updateFormValidity()
-      this.$emit('onSave')
-    }, 2000),
+    },
     onUpdateWorkingHours: _.debounce(function (value, prop) {
       const key = Object.keys(value)[0]
       this.updateChangedUserProperties({
@@ -640,6 +674,15 @@ export default {
 
       this.$emit('onSave')
     }, 4000),
+    onUpdateSettings: _.debounce(function (value, prop) {
+      this.user[prop] = value
+      this.updateChangedUserProperties({
+        name: prop,
+        value: value
+      })
+      this.updateFormValidity()
+      this.$emit('onSave')
+    }, 2000),
     resetDisableGeoRouting (value) {
       // If the form is saved without operating_states_limits for any country, return to disabled
       let country = (this.user.country || 'us').toLowerCase()

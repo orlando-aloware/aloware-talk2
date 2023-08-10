@@ -553,7 +553,7 @@ export default {
   },
 
   mounted () {
-    this.shouldObserve = !!this.user.observing_campaigns.length
+    this.shouldObserve = !!this.user.observing_campaigns
 
     this.setCustomNotificationPhoneNumber = !!this.user.notification_phone_number
 

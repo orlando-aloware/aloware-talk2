@@ -61,7 +61,6 @@ export default {
     },
 
     isVisible () {
-      // return this.changedUserProperties.length > 0
       return false
     }
   },

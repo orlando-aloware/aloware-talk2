@@ -48,7 +48,7 @@
                            :use-input="true"
                            :generic-styling="false"
                            :generic-multiselect="false"
-                           @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')">
+                           @change="(eventPayload) => onUpdateSettings(eventPayload, 'default_outbound_campaign_id')">
             </line-selector>
             <b-form-invalid-feedback v-if="!$v.user.default_outbound_campaign_id.required">Please select an outbound line.</b-form-invalid-feedback>
           </b-form-group>
@@ -113,7 +113,7 @@
               v-model.trim="$v.user.secondary_phone_number.$model"
               :state="validateState('secondary_phone_number')"
               :disabled="user.role_name && user.read_only_access"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'secondary_phone_number')">
+              @input="(eventPayload) => onUpdateSettings(eventPayload, 'secondary_phone_number')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.secondary_phone_number.required">Enter secondary phone number.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.secondary_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
@@ -226,7 +226,7 @@ export default {
     campaignSelected (campaignId) {
       this.user.campaign_id = campaignId
     },
-    onUpdateFields: _.debounce(function (value, prop) {
+    onUpdateFields (value, prop) {
       this.user[prop] = value
       this.updateChangedUserProperties({
         name: prop,
@@ -246,8 +246,35 @@ export default {
       }
 
       this.updateFormValidity()
+
+      if (prop === 'enabled_two_legged_outbound' && !value) {
+        this.user['secondary_phone_number'] = ''
+        this.updateChangedUserProperties({
+          name: 'secondary_phone_number',
+          value: ''
+        })
+        this.$emit('onSave')
+      }
+
+      if (prop === 'outbound_calling_selector' && value !== 1) {
+        this.user['default_outbound_campaign_id'] = null
+        this.updateChangedUserProperties({
+          name: 'default_outbound_campaign_id',
+          value: null
+        })
+        this.$emit('onSave')
+      }
+      // this.$emit('onSave')
+    },
+    onUpdateSettings: _.debounce(function (value, prop) {
+      this.user[prop] = value
+      this.updateChangedUserProperties({
+        name: prop,
+        value: value
+      })
+      this.updateFormValidity()
       this.$emit('onSave')
-    }, 3000)
+    }, 2000)
   },
 
   mounted () {
