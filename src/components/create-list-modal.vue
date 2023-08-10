@@ -299,6 +299,8 @@ export default {
               this.processRequest(`/api/v2/contacts-list/${id}/items`, params, hasMoreChunks, chunkedContactIds, id, message, skipListLoading)
 
               return
+            } else {
+              isChunked = false
             }
           }
 

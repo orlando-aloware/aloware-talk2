@@ -282,6 +282,8 @@ export default {
               this.processRequest(url, params, hasMoreChunks, chunkedContactIds)
 
               return
+            } else {
+              isChunked = false
             }
           }
 
