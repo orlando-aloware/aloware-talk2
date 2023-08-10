@@ -87,7 +87,7 @@
 </template>
 
 <script>
-
+import { chunk } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 import { aclMixin } from 'src/plugins/mixins'
@@ -244,16 +244,7 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want to move ${this.checkedCount} contacts to top?`, {
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'Cancel',
-        centered: true
-      }).then(confirm => {
-        if (confirm) {
-          this.onMoveContacts(MOVE_CONTACTS_DIRECTION.top)
-        }
-      })
+      this.processMove(MOVE_CONTACTS_DIRECTION.top)
     },
 
     onMoveToBottom () {
@@ -261,26 +252,47 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want to move ${this.checkedCount} contacts to bottom?`, {
+      this.processMove(MOVE_CONTACTS_DIRECTION.bottom, 'bottom')
+    },
+
+    processMove (direction, text = 'top') {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to move ${this.checkedCount} contacts to ${text}?`, {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
         centered: true
       }).then(confirm => {
         if (confirm) {
-          this.onMoveContacts(MOVE_CONTACTS_DIRECTION.bottom)
+          let ids = this.selectedContactIds
+          ids = chunk(ids, 50)
+
+          const isChunked = ids.length > 0
+          this.onMoveContacts(ids, isChunked, direction)
         }
       })
     },
 
-    async onMoveContacts (direction = MOVE_CONTACTS_DIRECTION.top) {
+    async onMoveContacts (chunkedContactIds = [], isChunked = false, direction = MOVE_CONTACTS_DIRECTION.top) {
       const res = await this.moveContactItems({
         id: this.isMyQueue ? this.myQueue.id : this.id,
         params: {
-          contact_list_item_ids: this.selectedContactIds,
+          contact_list_item_ids: chunkedContactIds[0],
           direction: direction
         }
       })
+
+      if (isChunked) {
+        // remove the used set of contact ids
+        chunkedContactIds.splice(0, 1)
+        const hasMoreChunks = chunkedContactIds.length > 1
+
+        // process the next set of contact ids
+        if (chunkedContactIds.length > 0) {
+          await this.onMoveContacts(chunkedContactIds, hasMoreChunks, direction)
+
+          return
+        }
+      }
 
       this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 

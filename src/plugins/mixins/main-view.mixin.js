@@ -46,7 +46,16 @@ export default {
     }
 
     this.mainViewListeners.setListSelectedContacts = (data) => {
-      Vue.set(this.selectedContacts, data.id, data.contacts.map(item => ({ id: item.id })))
+      Vue.set(
+        this.selectedContacts,
+        data.id,
+        data.contacts.map(
+          item => ({
+            'id': item.id,
+            'contact_list_item_id': item.contact_list_item_id
+          })
+        )
+      )
     }
 
     this.$VueEvent.listen('addContactsProgress', this.mainViewListeners.addContactsProgress)

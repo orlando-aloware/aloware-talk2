@@ -297,9 +297,9 @@ export default {
             // process the next set of contact ids
             if (chunkedContactIds.length > 0) {
               this.processRequest(`/api/v2/contacts-list/${id}/items`, params, hasMoreChunks, chunkedContactIds, id, message, skipListLoading)
-            }
 
-            return
+              return
+            }
           }
 
           const newStaticListWithContacts = isEmpty(params.contact_folder_id) &&

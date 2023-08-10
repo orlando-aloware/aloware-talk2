@@ -280,9 +280,9 @@ export default {
             // process the next set of contact ids
             if (chunkedContactIds.length > 0) {
               this.processRequest(url, params, hasMoreChunks, chunkedContactIds)
-            }
 
-            return
+              return
+            }
           }
 
           this.$emit('contactsRemoved', this.selectedList)

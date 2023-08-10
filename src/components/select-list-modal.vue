@@ -125,9 +125,9 @@ export default {
             // process the next set of contact ids
             if (chunkedContactIds.length > 0) {
               this.processRequest(params, hasMoreChunks, chunkedContactIds)
-            }
 
-            return
+              return
+            }
           }
 
           const message = response.data.message
