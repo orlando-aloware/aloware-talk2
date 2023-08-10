@@ -804,7 +804,7 @@
              class="pr-0 ring-group-snapshot-wrapper"
              v-if="communication && communication.type === CommunicationTypes.CALL">
         <ring-group-snapshot :communication="communication"
-                              :ring-group="usedRingGroup"/>
+                             :ring-group="usedRingGroup"/>
       </b-col>
     </b-row>
   </div>
