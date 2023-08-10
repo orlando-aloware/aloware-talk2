@@ -573,7 +573,7 @@ export default {
     this.calculateTotalPages()
 
     this.$VueEvent.listen('broadcasts_created', (broadcast) => {
-      this.UPDATE_BROADCAST(broadcast)
+      this.ADD_BROADCAST(broadcast)
     })
 
     this.$VueEvent.listen('broadcasts_updated', (broadcast) => {
@@ -729,6 +729,7 @@ export default {
     ]),
 
     ...mapMutations('broadcast', [
+      'ADD_BROADCAST',
       'DELETE_BROADCAST',
       'UPDATE_BROADCAST'
     ]),
@@ -841,6 +842,8 @@ export default {
         await this.deleteBroadcast(broadcast.id)
           .then(res => {
             deletedCount++
+
+            this.DELETE_BROADCAST(broadcast)
           })
           .catch(err => {
             console.error('Broadcast could not be deleted', {

@@ -1,6 +1,10 @@
 import * as BroadcastDefault from 'src/constants/broadcast-default'
 
 export default {
+  ADD_BROADCAST (state, broadcast) {
+    state.broadcasts.unshift(broadcast)
+  },
+
   DELETE_BROADCAST (state, broadcast) {
     const index = state.broadcasts.findIndex(b => b.id === broadcast.id)
 
@@ -22,8 +26,6 @@ export default {
 
     if (index >= 0) {
       state.broadcasts.splice(index, 1, broadcast)
-    } else {
-      state.broadcasts.unshift(broadcast)
     }
   },
 
