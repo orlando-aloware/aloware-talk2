@@ -44,6 +44,10 @@ export default {
   props: {
     user: {
       required: true
+    },
+    hidden: {
+      required: true,
+      default: false
     }
   },
 
@@ -61,7 +65,7 @@ export default {
     },
 
     isVisible () {
-      return false
+      return !this.hidden
     }
   },
 

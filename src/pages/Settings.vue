@@ -29,7 +29,7 @@
                        v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
             <sms-templates :user="user"
                            v-if="$route.params.tab === 'sms-templates' && !isLoading"/>
-            <settings-save-bar :user="user" ref="settingsSaveBarRef"/>
+            <settings-save-bar :user="user" :hidden="true" ref="settingsSaveBarRef"/>
           </b-col>
         </b-row>
       </div>
