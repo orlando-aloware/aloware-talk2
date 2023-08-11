@@ -420,15 +420,15 @@ export default {
       }
 
       if (this.$route.params.channel === 'all-communications') {
-        const filteredBroadcasts = this.$route.query?.broadcastIds
-          ? typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
-          : Filters.DEFAULT_STATE.filter.broadcasts
-
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
         defaultFilterModel.filter = { ...Filters.DEFAULT_STATE.filter }
 
         if (this.$route.query?.tagId) {
           defaultFilterModel.filter.tags = [+this.$route.query.tagId]
+        }
+
+        if (this.$route.query?.broadcastIds) {
+          defaultFilterModel.filter.broadcasts = typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
         }
 
         return defaultFilterModel
