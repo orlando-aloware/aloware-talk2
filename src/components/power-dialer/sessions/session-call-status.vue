@@ -192,7 +192,7 @@
                no-wrap
                outline
                no-caps
-               :disabled="!statusCallConnected"
+               :disabled="isRecordDisabled"
                @click="onToggleRecording">
 
           <StopIcon class="mr-2"
@@ -319,6 +319,7 @@ import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
@@ -529,6 +530,12 @@ export default {
 
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
+    },
+
+    isRecordDisabled () {
+      return this.statusCallConnected ||
+        this.profile.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER ||
+        (this.profile.company.force_outbound_recording && this.profile.company.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER)
     },
 
     isCallCompleted () {

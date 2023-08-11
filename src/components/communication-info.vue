@@ -218,19 +218,31 @@
             <template
               v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <template v-for="(image, index) in communication.attachments">
-                <q-img
-                  class="img-fluid d-block r-2x"
-                  v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0"
-                  :class="index > 0 ? 'mb-1' : ''"
-                  :key="index"
-                  height="200px"
-                  :src="image.url">
-                  <template v-slot:error>
-                    <div class="absolute-full flex flex-center bg-negative text-white">
-                      Error!
-                    </div>
-                  </template>
-                </q-img>
+                <template v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
+                  <q-img
+                    v-if="isAttachmentMigrated(image)"
+                    class="img-fluid d-block r-2x"
+                    :key="index"
+                    :class="index > 0 ? 'mb-1' : ''"
+                    height="200px"
+                    :src="image.url">
+                    <template v-slot:loading>
+                      <q-spinner-gears />
+                    </template>
+                    <template v-slot:error>
+                      <div class="absolute-full flex flex-center bg-negative text-white">
+                        Error!
+                      </div>
+                    </template>
+                  </q-img>
+                  <img
+                    v-if="!isAttachmentMigrated(image)"
+                    :key="index"
+                    class="img-fluid d-block r-2x"
+                    :class="index > 0 ? 'mb-1' : ''"
+                    height="200px"
+                    src="/assets/images/loading.svg"/>
+                </template>
               </template>
 
               <div v-if="communication.body">
@@ -997,6 +1009,10 @@ export default {
         activityClass.data += ' collapsed-has-notes'
       }
       this.activityExpansionClass = [activityClass.data]
+    },
+
+    isAttachmentMigrated (attachment) {
+      return !attachment.url.includes('twilio')
     },
 
     getCampaign (id) {

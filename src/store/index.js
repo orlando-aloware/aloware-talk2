@@ -14,6 +14,7 @@ import powerDialer from './power-dialer'
 import settings from './settings'
 import broadcast from './broadcast'
 import wallboard from './wallboard'
+import tagsModule from './tags'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -40,7 +41,8 @@ export default function (/* { ssrContext } */) {
       settings,
       broadcast,
       wallboard,
-      cache
+      cache,
+      tagsModule
     },
 
     state: {
@@ -538,6 +540,7 @@ export default function (/* { ssrContext } */) {
           commit('settings/RESET_VUEX', null, { root: true })
           commit('cache/RESET_VUEX', null, { root: true })
           commit('wallboard/RESET_VUEX', null, { root: true })
+          commit('tagsModule/RESET_VUEX', null, { root: true })
           commit('broadcast/RESET_VUEX', null, { root: true })
         }
       },

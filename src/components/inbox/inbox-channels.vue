@@ -218,7 +218,11 @@ export default {
     filterType: {
       type: String,
       required: false,
-      default: 'call'
+      default () {
+        return ['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId
+          ? 'all'
+          : 'call'
+      }
     },
 
     channel: {
@@ -421,28 +425,10 @@ export default {
           : Filters.DEFAULT_STATE.filter.broadcasts
 
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-        defaultFilterModel.filter = {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          direction: Filters.DEFAULT_STATE.filter.direction,
-          answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-          min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-          transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-          callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-          tags: Filters.DEFAULT_STATE.filter.tags,
-          call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-          users: Filters.DEFAULT_STATE.filter.users,
-          workflows: Filters.DEFAULT_STATE.filter.workflows,
-          broadcasts: filteredBroadcasts,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          creator_type: Filters.DEFAULT_STATE.filter.creator_type
+        defaultFilterModel.filter = { ...Filters.DEFAULT_STATE.filter }
+
+        if (this.$route.query?.tagId) {
+          defaultFilterModel.filter.tags = [+this.$route.query.tagId]
         }
 
         return defaultFilterModel
@@ -707,6 +693,16 @@ export default {
   },
 
   mounted () {
+    // check for url parameter filter to preselect and load
+    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId) {
+      this.setInboxShowMyContacts(false)
+      this.filter = this.channelDefaultFilterModel.filter
+      this.updateChannelChangedFilterFields({
+        name: 'tags',
+        value: this.channelDefaultFilterModel.filter.tags
+      })
+    }
+
     if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.broadcastIds) {
       this.filter = this.channelDefaultFilterModel.filter
       this.updateChannelChangedFilterFields({
