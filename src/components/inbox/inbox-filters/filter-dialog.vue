@@ -93,7 +93,7 @@
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
-                     :default-filter-model="defaultFilterModel"
+                     :default-filter-model="toLoadDefaultFilterModel"
                      :filter="filter">
         </filter-form>
         <div class="container d-flex justify-content-end mt-3 action-option-container">
@@ -292,6 +292,19 @@ export default {
       return nonViewEditMode || viewEditMode
         ? this.selectedFilter.name
         : 'New (Untitled)'
+    },
+
+    toLoadDefaultFilterModel () {
+      if (this.isFilterDialogForView) {
+        return {
+          name: '',
+          type: ChannelType.CHANNEL_INBOX,
+          filter: { ...Filters.DEFAULT_STATE.filter },
+          scope: 'user'
+        }
+      }
+
+      return this.defaultFilterModel
     }
   },
 
@@ -397,7 +410,7 @@ export default {
     onShow () {
       this.personalFilters = []
       this.companyFilters = []
-      this.filterFields = Object.keys(this.defaultFilterModel.filter)
+      this.filterFields = Object.keys(this.toLoadDefaultFilterModel.filter)
       this.getFilters()
 
       if (this.selectedFilter) {
@@ -408,7 +421,7 @@ export default {
 
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
-        this.filter = { ...this.defaultFilterModel.filter }
+        this.filter = { ...this.toLoadDefaultFilterModel.filter }
       }
 
       // fill in the value for the newly added filter in case it's not yet included
@@ -428,7 +441,7 @@ export default {
           this.setSelectedFilter(null)
         }
 
-        this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
+        this.filter = _.pick(this.toLoadDefaultFilterModel.filter, this.filterFields)
         this.applyFilter()
       }
     },
