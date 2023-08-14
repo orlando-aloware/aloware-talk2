@@ -245,7 +245,6 @@ export default {
         file_name: item.uploaded_file.uuid,
         name: item.name
       }).then(() => {
-        this.$refs['vm-drop'].enable()
         this.$refs['vm-drop'].hideLoading()
       }).catch(err => {
         console.log(err)
