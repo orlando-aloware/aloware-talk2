@@ -246,9 +246,11 @@ export default {
         name: item.name
       }).then(() => {
         this.$refs['vm-drop'].enable()
+        this.$refs['vm-drop'].hideLoading()
       }).catch(err => {
         console.log(err)
         this.$refs['vm-drop'].enable()
+        this.$refs['vm-drop'].hideLoading()
       })
     }
   },
