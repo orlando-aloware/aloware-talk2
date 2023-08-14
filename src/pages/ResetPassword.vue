@@ -53,12 +53,15 @@
             </div>
           </div>
           <div class="field mt-4 pt-1 text-left">
+            <div id="recaptcha-element"
+                 class="g-recaptcha pb-2"/>
             <q-btn
               label="Reset Password"
               class="button"
               color="positive"
               type="submit"
               style="width: 190px; height: 50px;"
+              :disable="loading || disabledSubmit"
               :loading="loading"/>
           </div>
         </form>
@@ -93,7 +96,11 @@
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import { mapActions, mapState } from 'vuex'
-import { guestMixin, guestFormsMixin } from 'boot/mixins'
+import {
+  guestMixin,
+  guestFormsMixin,
+  recaptchaMixin
+} from 'boot/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -101,7 +108,8 @@ export default {
 
   mixins: [
     guestMixin,
-    guestFormsMixin
+    guestFormsMixin,
+    recaptchaMixin
   ],
 
   components: { LoginLargeScreensInfo },

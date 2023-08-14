@@ -1,8 +1,8 @@
 <template>
-  <div
-    class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
+  <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
     <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-      <img :src="appLogo" class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"/>
+      <img class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"
+           :src="appLogo"/>
       <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1">
         Login
       </div>
@@ -11,31 +11,29 @@
             @submit.prevent="submit">
         <div class="field pb-2">
           <div class="control has-icons-left">
-            <q-input outlined
-                     class="input rectangle"
+            <q-input class="input rectangle"
                      type="email"
                      label="Email"
                      autocomplete="username"
+                     outlined
+                     required
                      v-model="user.email"
-                     @keyup.enter="goToNextInput"
-                     required/>
+                     @keyup.enter="goToNextInput"/>
           </div>
         </div>
         <div class="field">
           <div class="control has-icons-left">
-            <q-input outlined
-                     :type="isPwd ? 'password' : 'text'"
-                     class="input rectangle"
+            <q-input class="input rectangle"
                      label="Password"
-                     v-model="user.password"
                      autocomplete="current-password"
-                     required>
+                     outlined
+                     required
+                     :type="isPwd ? 'password' : 'text'"
+                     v-model="user.password">
               <template v-slot:append>
-                <q-icon
-                  :name="isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
-                />
+                <q-icon class="cursor-pointer"
+                        :name="isPwd ? 'visibility_off' : 'visibility'"
+                        @click="isPwd = !isPwd"/>
               </template>
             </q-input>
           </div>
@@ -50,18 +48,18 @@
           <q-checkbox class="checkbox pl-1 remember-me"
                       label="Remember me"
                       color="positive"
-                      v-model="user.remember_me">
-          </q-checkbox>
+                      v-model="user.remember_me"/>
         </div>
         <div class="field mt-2 text-left">
-          <q-btn
-            label="Login"
-            class="button"
-            color="positive"
-            type="submit"
-            style="width: 148px; height: 50px;"
-            :disable="loading"
-            :loading="loading"/>
+          <div id="recaptcha-element"
+               class="g-recaptcha pb-2"/>
+          <q-btn label="Login"
+                 class="button"
+                 color="positive"
+                 type="submit"
+                 style="width: 148px; height: 50px;"
+                 :disable="loading || disabledSubmit"
+                 :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1">
           Don’t have an account?
@@ -70,7 +68,7 @@
             Book a demo now!
           </a>
         </div>
-        <div class=" field text-left pt-3 mt-1">
+        <div class="field text-left pt-3 mt-1">
           <b-link href="https://support.aloware.com/en/articles/5456128-aloware-authentication-issues"
                   class="cursor-pointer field text-left text-decoration-none"
                   target="_blank">
@@ -84,14 +82,19 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, guestFormsMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  guestFormsMixin,
+  recaptchaMixin
+} from 'src/plugins/mixins'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   mixins: [
     aclMixin,
-    guestFormsMixin
+    guestFormsMixin,
+    recaptchaMixin
   ],
 
   name: 'login-form',
@@ -115,7 +118,6 @@ export default {
         remember_me: !!this.$q.platform.is.electron,
         recaptcha_response: null
       },
-      siteKey: process.env.RECAPTCHA_SITE_KEY,
       loading: false,
       sb: null,
       deviceInfo: null,
@@ -124,14 +126,6 @@ export default {
   },
 
   methods: {
-    onVerify (response) {
-      this.user.recaptcha_response = response
-    },
-
-    onExpired () {
-      this.user.recaptcha_response = null
-    },
-
     getLoginParams () {
       return {
         email: this.user.email,
@@ -143,6 +137,7 @@ export default {
     async submit () {
       try {
         this.loading = true
+
         const response = await this.login({
           ...this.getLoginParams()
         })
@@ -159,13 +154,15 @@ export default {
 
     onLoginError (err) {
       this.loading = false
+
       if (err.response?.status !== 401) {
         console.log(err)
         this.$handleErrors(err.response)
-      } else {
-        // show notification
-        this.$generalNotification(err.response?.data?.error, 'error')
+        return
       }
+
+      // show notification
+      this.$generalNotification(err.response?.data?.error, 'error')
     },
 
     async onLoginSuccess ({ data: { data } }) {
@@ -182,13 +179,14 @@ export default {
       // redirect to Alo classic for agents
       if (this.shouldRedirectToClassic && !this.$q.platform.is.electron) {
         location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
-      } else {
-        const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
-        await this.$router.push(String(redirectPath))
-        await this.redirectTimeout()
-
-        this.resetUser()
+        return
       }
+
+      const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
+      await this.$router.push(String(redirectPath))
+      await this.redirectTimeout()
+
+      this.resetUser()
     },
 
     redirectTimeout () {
@@ -211,7 +209,9 @@ export default {
       if (!this.$refs.myForm || !this.$refs.myForm.$el || !this.$refs.myForm.$el.elements) {
         return
       }
+
       const next = $event.target.tabIndex
+
       if (next < this.$refs.myForm.$el.elements.length) {
         this.$refs.myForm.$el.elements[next + 1].focus()
       }
