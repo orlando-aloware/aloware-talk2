@@ -13,7 +13,7 @@
             outlined
             dense
             :options="options"
-            :placeholder="placeholderText"
+            :placeholder="placeholder"
             :loading="loadingVmDrops"
             :disable="disable || loadingVmDrops"
             :class="[ prepend ? 'with-prepend' : '', genericSelector ? 'padded-container' : '', highlighted ? highlightedClass : '' ]"
@@ -54,6 +54,7 @@
 import { mapGetters } from 'vuex'
 import _ from 'lodash'
 import { selectorMixin } from 'src/plugins/mixins'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'vm-drop-selector',
@@ -94,10 +95,9 @@ export default {
       required: false
     },
 
-    placeholder: {
-      type: String,
-      required: false,
-      default: 'Select a voicemail'
+    showPlaceholder: {
+      type: Boolean,
+      default: true
     },
 
     highlighted: {
@@ -125,12 +125,21 @@ export default {
   computed: {
     ...mapGetters('auth', ['profile']),
 
-    placeholderText () {
-      if (this.selectedId) {
+    placeholder () {
+      if (!this.showPlaceholder) {
         return ''
       }
 
-      return this.placeholder
+      switch (true) {
+        case this.multiple && this.selectedId.length < 1:
+          return 'Select voicemails'
+        case !this.multiple && !this.selectedId:
+          return 'Select a voicemail'
+        case this.multiple && this.selectedId.length > 0:
+        case !this.multiple && this.selectedId:
+        default:
+          return ''
+      }
     },
 
     vmDropAlphabeticalOrder () {
@@ -149,25 +158,28 @@ export default {
   created () {
     this.fetchVmDropFiles().then(() => {
       this.options = this.vmDropAlphabeticalOrder
-      if (this.$isNumeric(this.value)) {
+      if (!this.multiple && this.$isNumeric(this.value)) {
         this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === this.value))
+        return
       }
+
+      this.$emit('change', this.value)
     })
   },
 
   methods: {
     fetchVmDropFiles () {
-      this.loadingVmDrop = true
-      return this.$axios.get('/api/v1/voicemail-drop', {
+      this.loadingVmDrops = true
+      return API.V1.library.voicemailDrop.get({
         params: {
           user_id: this.profile.id
         }
       }).then(res => {
-        this.loadingVmDrop = false
+        this.loadingVmDrops = false
         this.vmDrops = res.data
         return Promise.resolve()
       }).catch(err => {
-        this.loadingVmDrop = false
+        this.loadingVmDrops = false
         console.log(err)
         return Promise.reject()
       })
@@ -197,12 +209,16 @@ export default {
 
   watch: {
     value (value) {
-      this.selectedId = this.value
+      this.selectedId = value
     },
 
     selectedId (value) {
       if (this.selectedId !== this.value) {
-        this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === value))
+        if (!this.multiple) {
+          this.$emit('change', this.vmDrops.find(vmDrop => vmDrop.id === value))
+        } else {
+          this.$emit('change', value)
+        }
       }
 
       this.showInputPlaceholder()

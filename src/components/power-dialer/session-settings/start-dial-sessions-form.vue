@@ -46,55 +46,58 @@
             </template>
           </q-select>
 
-          <LineSelector :multiple="false"
-                        :use-chips="true"
-                        :disable="disabled"
-                        :generic-styling="false"
-                        :generic-multiselect="false"
-                        :force-remove-missing-values="true"
-                        v-model="resources[cform.name]"
-                        v-else-if="cform.name === 'campaign_id'"
-                        @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></LineSelector>
+          <line-selector :multiple="false"
+                         :use-chips="true"
+                         :disable="disabled"
+                         :generic-styling="false"
+                         :generic-multiselect="false"
+                         :force-remove-missing-values="true"
+                         v-model="resources[cform.name]"
+                         v-else-if="cform.name === 'campaign_id'"
+                         @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></line-selector>
 
-          <ScriptSelector class="w-100 dial-sessions__form__script-selector"
-                          :class="[resources[cform.name] ? 'populated': '']"
-                          :disable="disabled"
-                          :clearable="true"
-                          v-else-if="cform.name === 'script_id'"
-                          v-model="resources[cform.name]"/>
+          <script-selector class="w-100 dial-sessions__form__script-selector"
+                           :class="[resources[cform.name] ? 'populated': '']"
+                           :disable="disabled"
+                           :clearable="true"
+                           v-else-if="cform.name === 'script_id'"
+                           v-model="resources[cform.name]"/>
 
-          <OrderSelector class="generic-selector-2 dial-sessions__form__order-selector"
-                         v-else-if="cform.name === 'order'"
-                         v-model="resources[cform.name]" />
+          <order-selector class="generic-selector-2 dial-sessions__form__order-selector"
+                          v-else-if="cform.name === 'order'"
+                          v-model="resources[cform.name]" />
 
-          <CallDispositionSelector class="pb-3 dial-sessions__form__call-disposition-selector"
-                                   :multiple="true"
-                                   :highlighted="isChanged('call_dispositions')"
-                                   :disable="disabled"
-                                   v-else-if="cform.name === 'call_disposition_ids'"
-                                   v-model="resources[cform.name]"
-                                   @change="{}">
-          </CallDispositionSelector>
+          <call-disposition-selector class="pb-3 dial-sessions__form__call-disposition-selector"
+                                     :multiple="true"
+                                     :highlighted="isChanged('call_dispositions')"
+                                     :disable="disabled"
+                                     v-else-if="cform.name === 'call_disposition_ids'"
+                                     v-model="resources[cform.name]"
+                                     @change="{}">
+          </call-disposition-selector>
 
-          <ContactDispositionSelector class="pb-3 dial-sessions__form__contact-disposition-selector"
-                                      custom-class="padded-container-1 generic-selector-1"
-                                      :generic-styling="false"
-                                      :multiple="true"
-                                      :use-chips="true"
-                                      :outlined="true"
-                                      :disable="disabled"
-                                      :show-placeholder="true"
-                                      v-else-if="cform.name === 'contact_disposition_ids'"
-                                      v-model="resources[cform.name]"
-                                      @change="{}">
-          </ContactDispositionSelector>
+          <contact-disposition-selector class="pb-3 dial-sessions__form__contact-disposition-selector"
+                                        custom-class="padded-container-1 generic-selector-1"
+                                        :generic-styling="false"
+                                        :multiple="true"
+                                        :use-chips="true"
+                                        :outlined="true"
+                                        :disable="disabled"
+                                        :show-placeholder="true"
+                                        v-else-if="cform.name === 'contact_disposition_ids'"
+                                        v-model="resources[cform.name]"
+                                        @change="{}">
+          </contact-disposition-selector>
 
-          <VmDropSelector class="w-100 dial-sessions__form__vm-drop-selector"
-                          :disable="disabled"
-                          v-model="resources[cform.name]"
-                          v-else-if="cform.name === 'vm_drop_id'"
-                          @change="onUpdateVmDrop">
-          </VmDropSelector>
+          <vm-drop-selector class="w-100 dial-sessions__form__vm-drop-selector"
+                            :use-chips="true"
+                            :multiple="true"
+                            :show-placeholder="true"
+                            :disable="disabled"
+                            v-model="resources[cform.name]"
+                            v-else-if="cform.name === 'vm_drop_ids'"
+                            @change="onUpdateVmDrop">
+          </vm-drop-selector>
 
           <p v-else-if="cform.name === 'skip_outside_daytime_hours'">
             <q-toggle size="md"
@@ -105,10 +108,10 @@
                       v-model="resources[cform.name]" />
           </p>
 
-          <WarmupPeriodSelector class="dial-sessions__form__warmup-period-selector"
-                                :disable="disabled"
-                                v-else-if="cform.name === 'warmup_period_in_seconds'"
-                                v-model="resources[cform.name]"/>
+          <warmup-period-selector class="dial-sessions__form__warmup-period-selector"
+                                  :disable="disabled"
+                                  v-else-if="cform.name === 'warmup_period_in_seconds'"
+                                  v-model="resources[cform.name]"/>
 
           <q-select class="generic-selector-2"
                     outlined
@@ -179,7 +182,7 @@ export default {
   data () {
     return {
       selectWidth: 0,
-      resources: this.value
+      resources: this.settings
     }
   },
 
@@ -254,7 +257,7 @@ export default {
     },
 
     onUpdateVmDrop (value) {
-      this.resources['vm_drop_id'] = value.id
+      this.resources['vm_drop_ids'] = value
     }
   },
 

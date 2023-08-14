@@ -58,7 +58,7 @@ export const SESSION_SETTINGS_ALL_FORMS = [
         items: []
       },
       {
-        name: 'vm_drop_id',
+        name: 'vm_drop_ids',
         label: 'Set VM Drop Shortcuts',
         type: 'select',
         items: []
@@ -79,5 +79,6 @@ export const DEFAULT_SETTING_VALUES = {
   skip_outside_daytime_hours: 1,
   user_id: null,
   warmup_period_in_seconds: 0,
-  order: 1
+  order: 1,
+  vm_drop_ids: []
 }

@@ -7,39 +7,40 @@
     </div>
     <div class="t-menu pb-2"
          v-show="!sessionPaused">
-      <ChipsEllipsis initiallyDisabled
-                     headerLabel="CALL DISPOSITION"
-                     headerClass="t-menu__header no-border t-dense d-flex align-items-center"
-                     ref="callDispositionSelector"
-                     identity="call-disposition"
-                     default-label="No Call Dispositions"
-                     :list-items="filteredCallDispositions"
-                     :selected-item="callDisposition"
-                     :display-count="4"
-                     :forced="isHighlightedCallDisposition"
-                     @on-selected-item="onSelectedCallDisposition" />
-      <ChipsEllipsis headerLabel="CONTACT DISPOSITION"
-                     headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
-                     ref="contactDispositionSelector"
-                     identity="contact-disposition"
-                     default-label="No Contact Dispositions"
-                     :list-items="filteredContactDispositions"
-                     :selected-item="contactDisposition"
-                     :display-count="6"
-                     :forced="isHighlightedContactDisposition"
-                     @on-selected-item="onSelectedContactDisposition" />
+      <chips-ellipsis initiallyDisabled
+                      headerLabel="CALL DISPOSITION"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      ref="callDispositionSelector"
+                      identity="call-disposition"
+                      default-label="No Call Dispositions"
+                      :list-items="filteredCallDispositions"
+                      :selected-item="callDisposition"
+                      :display-count="4"
+                      :forced="isHighlightedCallDisposition"
+                      @on-selected-item="onSelectedCallDisposition" />
+      <chips-ellipsis headerLabel="CONTACT DISPOSITION"
+                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
+                      ref="contactDispositionSelector"
+                      identity="contact-disposition"
+                      default-label="No Contact Dispositions"
+                      :list-items="filteredContactDispositions"
+                      :selected-item="contactDisposition"
+                      :display-count="6"
+                      :forced="isHighlightedContactDisposition"
+                      @on-selected-item="onSelectedContactDisposition" />
       <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
         <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
           VOICEMAIL
         </div>
       </div>
       <div class="d-flex t-menu__content over-flow px-3 pb-0">
-        <ChipsEllipsis @on-selected-item="onSelectedContactDisposition"
-                          :list-items="[]"
-                          :selected-item="''"
-                          :display-count="6"
-                          identity="contact-disposition"
-                          default-label="No Voicemail" />
+        <chips-ellipsis ref="vm-drop"
+                        identity="vm-drop"
+                        default-label="No Voicemail"
+                        initiallyDisabled
+                        :list-items="voicemails"
+                        :display-count="3"
+                        @on-selected-item="onVmDrop"/>
       </div>
     </div>
   </q-card>
@@ -54,6 +55,8 @@ import {
   dispositionsMixin,
   dispositionsOptionsMixin
 } from 'src/plugins/mixins'
+import API from 'src/plugins/api/api'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'SessionCallDisposition',
@@ -69,13 +72,18 @@ export default {
 
   data () {
     return {
-      voicemail: []
+      voicemails: [],
+      loadingSendVmDrop: false
     }
   },
 
   computed: {
     ...mapFields('powerDialer', [
       'sessionPaused'
+    ]),
+
+    ...mapState('auth', [
+      'profile'
     ]),
 
     ...mapState([
@@ -88,7 +96,8 @@ export default {
     ]),
 
     ...mapGetters('powerDialer', [
-      'sessionLoader'
+      'sessionLoader',
+      'sessionSettings'
     ]),
 
     isContactNotDisposed () {
@@ -96,12 +105,24 @@ export default {
 
       return this.currentCompany && this.currentCompany.force_contact_disposition &&
         !hasContactDisposition
+    },
+
+    isCallCompleted () {
+      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     }
+  },
+
+  created () {
+    this.getVmDrops()
   },
 
   mounted () {
     this.sessionPaused = false
     this.initCallDisposition()
+
+    if (!this.dialer.communication) {
+      this.$refs['vm-drop'].disable()
+    }
   },
 
   methods: {
@@ -114,6 +135,16 @@ export default {
       'setDialerContact',
       'setDialerCommunication'
     ]),
+
+    getVmDrops () {
+      API.V1.library.voicemailDrop.get({
+        params: {
+          user_id: this.profile.id
+        }
+      }).then(res => {
+        this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+      })
+    },
 
     async onSelectedCallDisposition (data) {
       const communicationId = get(this.dialer, 'communication.id', null)
@@ -195,6 +226,25 @@ export default {
       }
 
       this.$refs.callDispositionSelector.enable()
+    },
+
+    onVmDrop (item) {
+      if (!this.dialer.communication || this.isCallCompleted || !item) {
+        return
+      }
+
+      this.$refs['vm-drop'].disable()
+
+      API.V1.dialer.sendVmDrop({
+        communication_id: this.dialer.communication.id,
+        file_name: item.uploaded_file.uuid,
+        name: item.name
+      }).then(() => {
+        this.$refs['vm-drop'].enable()
+      }).catch(err => {
+        console.log(err)
+        this.$refs['vm-drop'].enable()
+      })
     }
   },
 
@@ -213,8 +263,15 @@ export default {
       this.initCallDisposition()
     },
 
-    'dialer.communication': function () {
+    'dialer.communication': function (communication) {
       this.initCallDisposition()
+
+      if (!communication) {
+        this.$refs['vm-drop'].disable()
+        return
+      }
+
+      this.$refs['vm-drop'].enable()
     }
   }
 }

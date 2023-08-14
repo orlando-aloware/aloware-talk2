@@ -410,7 +410,8 @@ export default {
         skip_outside_daytime_hours: 1,
         user_id: null,
         warmup_period_in_seconds: 0,
-        order: POWER_DIALER_ORDER.default
+        order: POWER_DIALER_ORDER.default,
+        vm_drop_ids: []
       }
     },
 
@@ -437,7 +438,6 @@ export default {
   },
 
   async mounted () {
-    // await this.setSessionSettingGroup()
     this.selectedItem = this.defaultValues
   },
 

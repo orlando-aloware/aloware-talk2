@@ -1223,7 +1223,7 @@
 </template>
 <script>
 import _ from 'lodash'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import {
   communicationInfoMixin,
   notificationMixin,
@@ -1279,6 +1279,7 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'phone',
@@ -1446,10 +1447,6 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
-
-    ...mapGetters('powerDialer', [
-      'sessionSettings'
-    ]),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -2309,11 +2306,11 @@ export default {
 
       this.loadingSendVmDrop = true
 
-      this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
+      API.V1.dialer.sendVmDrop({
         communication_id: this.dialer.communication.id,
         file_name: this.vmDrop.uploaded_file.uuid,
         name: this.vmDrop.name
-      }).then(res => {
+      }).then(() => {
         this.vmDrop = null
         this.vmDropId = null
         this.loadingSendVmDrop = false
@@ -2629,15 +2626,7 @@ export default {
 
     'dialer.contact': function () {
       this.setupContactLocalTime()
-
-      // use the selected vm drop in the session settings form
-      // in the power dialer list page
-      if (this.$route?.meta?.title === 'Power Dialer Sessions' &&
-        this.sessionSettings.vm_drop_id) {
-        this.vmDropId = this.sessionSettings.vm_drop_id
-      } else {
-        this.vmDropId = null
-      }
+      this.vmDropId = null
     },
 
     isCallCompleted () {
