@@ -25,7 +25,7 @@
               </compact-btn>
               <compact-btn customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            borderless
-                           @clicked="toggleFilterDialog(true)">
+                           @clicked="onClickAppliedFilterButton">
                 <q-tooltip anchor="top middle"
                            self="center middle"
                            v-if="appliedFilter">
@@ -810,7 +810,8 @@ export default {
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
-      'setFilterDialogForView'
+      'setFilterDialogForView',
+      'setIsEditingView'
     ]),
 
     onResetFilters () {
@@ -1265,6 +1266,12 @@ export default {
       }
 
       return params
+    },
+
+    onClickAppliedFilterButton () {
+      this.setFilterDialogForView(false)
+      this.setIsEditingView(false)
+      this.toggleFilterDialog(true)
     }
   },
 
