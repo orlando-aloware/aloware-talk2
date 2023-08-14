@@ -109,6 +109,10 @@ export default {
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+    },
+
+    isVmDropReady () {
+      return !isEmpty(this.dialer.communication) && !this.isCallCompleted
     }
   },
 
@@ -120,7 +124,7 @@ export default {
     this.sessionPaused = false
     this.initCallDisposition()
 
-    if (!this.dialer.communication) {
+    if (!this.isVmDropReady) {
       this.$refs['vm-drop'].disable()
     }
   },
@@ -229,7 +233,7 @@ export default {
     },
 
     onVmDrop (item) {
-      if (!this.dialer.communication || this.isCallCompleted || !item) {
+      if (!this.isVmDropReady || !item) {
         return
       }
 
@@ -266,12 +270,12 @@ export default {
     'dialer.communication': function (communication) {
       this.initCallDisposition()
 
-      if (!communication) {
-        this.$refs['vm-drop'].disable()
+      if (this.isVmDropReady) {
+        this.$refs['vm-drop'].enable()
         return
       }
 
-      this.$refs['vm-drop'].enable()
+      this.$refs['vm-drop'].disable()
     }
   }
 }
