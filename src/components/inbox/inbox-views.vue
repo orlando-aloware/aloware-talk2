@@ -69,6 +69,7 @@
 import Search from 'src/components/search.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { inboxMixin } from 'src/plugins/mixins'
+import { CHANNEL_INBOX } from 'src/constants/inbox-channels'
 
 export default {
   components: {
@@ -118,7 +119,11 @@ export default {
     ]),
 
     filteredViews () {
-      return this.views.filter(view => view.name.toUpperCase().includes(this.search.toUpperCase()))
+      return this.views.filter(view => {
+        if (view.type === CHANNEL_INBOX) {
+          return view.name.toUpperCase().includes(this.search.toUpperCase())
+        }
+      })
     }
   },
 

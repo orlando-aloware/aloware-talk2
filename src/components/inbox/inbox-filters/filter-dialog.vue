@@ -93,7 +93,7 @@
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
-                     :default-filter-model="toLoadDefaultFilterModel"
+                     :default-filter-model="loadedDefaultFilterModel"
                      :filter="filter">
         </filter-form>
         <div class="container d-flex justify-content-end mt-3 action-option-container">
@@ -282,7 +282,7 @@ export default {
     isSaveAsNewDisabled () {
       return this.isNonViewCreateModeUnchanged ||
         this.isViewCreateModeUnchanged ||
-        this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS
+        (!this.isFilterDialogForView && this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS)
     },
 
     filterFormDisplayName () {
@@ -294,7 +294,7 @@ export default {
         : 'New (Untitled)'
     },
 
-    toLoadDefaultFilterModel () {
+    loadedDefaultFilterModel () {
       if (this.isFilterDialogForView) {
         return {
           name: '',
@@ -410,7 +410,7 @@ export default {
     onShow () {
       this.personalFilters = []
       this.companyFilters = []
-      this.filterFields = Object.keys(this.toLoadDefaultFilterModel.filter)
+      this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)
       this.getFilters()
 
       if (this.selectedFilter) {
@@ -421,7 +421,7 @@ export default {
 
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
-        this.filter = { ...this.toLoadDefaultFilterModel.filter }
+        this.filter = { ...this.loadedDefaultFilterModel.filter }
       }
 
       // fill in the value for the newly added filter in case it's not yet included
@@ -441,7 +441,7 @@ export default {
           this.setSelectedFilter(null)
         }
 
-        this.filter = _.pick(this.toLoadDefaultFilterModel.filter, this.filterFields)
+        this.filter = _.pick(this.loadedDefaultFilterModel.filter, this.filterFields)
         this.applyFilter()
       }
     },
@@ -490,15 +490,15 @@ export default {
       ]
 
       for (const item in this.filter) {
-        if (item === 'answer_status' && this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
+        if (item === 'answer_status' && this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
           continue
         }
 
-        const hasField = (this.filterFields.includes(item) && this.defaultFilterModel.filter.hasOwnProperty(item))
+        const hasField = (this.filterFields.includes(item) && this.loadedDefaultFilterModel.filter.hasOwnProperty(item))
 
         // for boolean fields change tracking
         if (props.includes(item) &&
-          +this.filter[item] !== +this.defaultFilterModel.filter[item] &&
+          +this.filter[item] !== +this.loadedDefaultFilterModel.filter[item] &&
           hasField) {
           this.updateChannelChangedFilterFields({
             name: item,
@@ -510,7 +510,7 @@ export default {
 
         // for non-boolean fields change tracking
         if (!this.booleanFields.includes(item) &&
-          JSON.stringify(this.filter[item]) !== JSON.stringify(this.defaultFilterModel.filter[item]) &&
+          JSON.stringify(this.filter[item]) !== JSON.stringify(this.loadedDefaultFilterModel.filter[item]) &&
           hasField) {
           this.updateChannelChangedFilterFields({
             name: item,
@@ -526,7 +526,7 @@ export default {
 
         this.updateFilter(this.selectedFilter, {
           filter: this.filter,
-          type: this.defaultFilterModel.type,
+          type: this.loadedDefaultFilterModel.type,
           name: this.selectedFilter.name
         }).then(res => {
           this.isUpdatingFilter = false
@@ -614,7 +614,7 @@ export default {
         params = { ...params, scope: scope }
       }
 
-      if (this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
+      if (this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
         params.type = ChannelType.CHANNEL_CALLS
       }
 
@@ -624,9 +624,13 @@ export default {
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
           const filter = { ...this.selectedFilter }
           filter.filter = { ...this.filter }
+
           this.setSelectedFilter(filter)
-          this.setAppliedFilter(filter)
-          this.setChannelClonedFilter(filter.filter)
+
+          if (this.defaultFilterModel.filter.type === params.type) {
+            this.setAppliedFilter(filter)
+            this.setChannelClonedFilter(filter.filter)
+          }
         }
 
         if (!updatedFilter.is_on_company) {
@@ -639,6 +643,7 @@ export default {
             fireEvent = true
           }
 
+          // update the pinned view if it is pinned
           if (pinnedViewIndex >= 0) {
             this.pinnedViews[pinnedViewIndex].filter = updatedFilter
             this.setPinnedViews([...this.pinnedViews])

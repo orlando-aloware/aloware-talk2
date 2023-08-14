@@ -326,7 +326,8 @@ export default {
       'channelChangedFilterFields',
       'appliedFilter',
       'hasMoreCommunications',
-      'inboxShowMyContacts'
+      'inboxShowMyContacts',
+      'isFilterDialogForView'
     ]),
 
     nextPage () {
@@ -808,7 +809,8 @@ export default {
       'toggleFilterDialog',
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
-      'setInboxShowMyContacts'
+      'setInboxShowMyContacts',
+      'setFilterDialogForView'
     ]),
 
     onResetFilters () {
@@ -878,7 +880,14 @@ export default {
     },
 
     onCreateNewFilter (filter) {
-      this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.channelDefaultFilterModel.type }
+      let filterType = this.channelDefaultFilterModel.type
+
+      if (this.isFilterDialogForView) {
+        filterType = ChannelType.CHANNEL_INBOX
+        this.setFilterDialogForView(true)
+      }
+
+      this.newFilterModel = { ...this.newFilterModel, filter: filter, type: filterType }
       this.toggleFilterModelForm(true)
     },
 

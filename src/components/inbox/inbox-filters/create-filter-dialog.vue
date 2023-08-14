@@ -96,8 +96,7 @@ export default {
   computed: {
     ...mapState('inbox', [
       'isFilterModelFormShown',
-      'isFilterDialogForView',
-      'isEditingView'
+      'isFilterDialogForView'
     ]),
 
     isOpen: {
@@ -161,17 +160,18 @@ export default {
       this.$v.filter.$reset()
       this.filter.name = ''
       this.filter.scope = 'user'
-      this.toggleFilterModelForm()
+
+      if (!this.isFilterDialogForView) {
+        this.toggleFilterModelForm()
+      }
     },
 
     onHide () {
       this.toggleFilterModelForm()
 
       if (this.isFilterDialogForView) {
-        this.setIsEditingView(false)
-        this.setFilterDialogForView(false)
-        this.toggleFilterDialog(false)
         this.$VueEvent.fire('openInboxViewPopup')
+        this.toggleFilterDialog(false)
         return
       }
 
@@ -197,28 +197,30 @@ export default {
         return
       }
 
+      const filterType = this.isFilterDialogForView
+        ? ChannelType.CHANNEL_INBOX
+        : (this.filterModel.type === ChannelType.CHANNEL_RECORDINGS
+          ? ChannelType.CHANNEL_CALLS
+          : this.filterModel.type)
+
       this.isCreating = true
       this.filter = {
         ...this.filter,
-        type: this.filterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.filterModel.type,
+        type: filterType,
         filter: this.filterModel.filter }
 
       return talk2Api.V2.inbox.filters.save(this.filter)
         .then(response => {
+          if (filterType === ChannelType.CHANNEL_INBOX) {
+            this.setFilterDialogForView(true)
+          }
+
           this.isCreating = false
           this.$VueEvent.fire('channel_filter_created', response.data.filter)
           this.$emit('created', response.data.filter)
-          this.$nextTick(function () {
-            this.onHide()
-          })
+          this.onHide()
         }).catch(error => {
-          const errors = error.response.data.errors
-          const keys = Object.keys(errors)
-
-          if (keys && keys.length > 0) {
-            this.$generalNotification(errors[keys[0]], 'error')
-          }
-
+          this.$handleErrors(error.response)
           this.isCreating = false
         })
     }
@@ -226,12 +228,6 @@ export default {
 
   mounted () {
     this.toggleFilterModelForm()
-  },
-
-  watch: {
-    isFilterModelFormShown: function (value) {
-      this.open = value
-    }
   }
 }
 </script>
