@@ -54,13 +54,15 @@
           </q-checkbox>
         </div>
         <div class="field mt-2 text-left">
+          <div id="recaptcha-element"
+               class="pb-2"/>
           <q-btn
             label="Login"
             class="button"
             color="positive"
             type="submit"
             style="width: 148px; height: 50px;"
-            :disable="loading"
+            :disable="loading || disabledSubmit"
             :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1">
@@ -84,14 +86,19 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, guestFormsMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  guestFormsMixin,
+  recaptchaMixin
+} from 'src/plugins/mixins'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   mixins: [
     aclMixin,
-    guestFormsMixin
+    guestFormsMixin,
+    recaptchaMixin
   ],
 
   name: 'login-form',
@@ -115,7 +122,6 @@ export default {
         remember_me: !!this.$q.platform.is.electron,
         recaptcha_response: null
       },
-      siteKey: process.env.RECAPTCHA_SITE_KEY,
       loading: false,
       sb: null,
       deviceInfo: null,

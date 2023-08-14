@@ -32,12 +32,15 @@
             </div>
           </div>
           <div class="field mt-4 pt-1 text-left">
+            <div id="recaptcha-element"
+                 class="pb-2"/>
             <q-btn
               label="Reset Password"
               class="v"
               color="positive"
               type="submit"
               style="width: 190px; height: 50px;"
+              :disabled="loading || disabledSubmit"
               :loading="loading"/>
           </div>
           <div class="description-sm field text-left pt-3 mt-1">
@@ -80,14 +83,19 @@
 
 <script>
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
-import { guestMixin, guestFormsMixin } from '../boot/mixins'
+import {
+  guestMixin,
+  guestFormsMixin,
+  recaptchaMixin
+} from '../boot/mixins'
 
 export default {
   name: 'forgot-password',
 
   mixins: [
     guestMixin,
-    guestFormsMixin
+    guestFormsMixin,
+    recaptchaMixin
   ],
 
   components: { LoginLargeScreensInfo },
