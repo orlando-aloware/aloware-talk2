@@ -146,7 +146,12 @@ export default {
           user_id: this.profile.id
         }
       }).then(res => {
-        this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+        if (!isEmpty(this.sessionSettings.vm_drop_ids)) {
+          this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+          return
+        }
+
+        this.voicemails = res.data
       })
     },
 
