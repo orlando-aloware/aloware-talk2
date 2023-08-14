@@ -131,11 +131,11 @@ export default {
       }
 
       switch (true) {
-        case this.multiple && this.selectedId.length < 1:
+        case this.multiple && this.selectedId?.length < 1:
           return 'Select voicemails'
         case !this.multiple && !this.selectedId:
           return 'Select a voicemail'
-        case this.multiple && this.selectedId.length > 0:
+        case this.multiple && this.selectedId?.length > 0:
         case !this.multiple && this.selectedId:
         default:
           return ''
