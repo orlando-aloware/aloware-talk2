@@ -96,7 +96,8 @@ export default {
   computed: {
     ...mapState('inbox', [
       'isFilterModelFormShown',
-      'isFilterDialogForView'
+      'isFilterDialogForView',
+      'activeChannel'
     ]),
 
     isOpen: {
@@ -175,7 +176,9 @@ export default {
         return
       }
 
-      this.toggleFilterDialog(true)
+      if (this.activeChannel.value !== 'mentions') {
+        this.toggleFilterDialog(true)
+      }
     },
 
     onShow () {
