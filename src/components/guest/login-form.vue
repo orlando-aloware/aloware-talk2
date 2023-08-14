@@ -52,7 +52,7 @@
         </div>
         <div class="field mt-2 text-left">
           <div id="recaptcha-element"
-               class="pb-2"/>
+               class="g-recaptcha pb-2"/>
           <q-btn label="Login"
                  class="button"
                  color="positive"

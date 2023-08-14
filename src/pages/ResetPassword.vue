@@ -54,7 +54,7 @@
           </div>
           <div class="field mt-4 pt-1 text-left">
             <div id="recaptcha-element"
-                 class="pb-2"/>
+                 class="g-recaptcha pb-2"/>
             <q-btn
               label="Reset Password"
               class="button"
