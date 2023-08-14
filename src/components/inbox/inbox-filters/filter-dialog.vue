@@ -180,7 +180,8 @@ export default {
       'appliedFilter',
       'inboxShowMyContacts',
       'pinnedViews',
-      'isEditingView'
+      'isEditingView',
+      'activeChannel'
     ]),
 
     isOpen: {
@@ -358,7 +359,9 @@ export default {
   },
 
   created () {
-    this.setSelectedFilter(null)
+    if (!this.appliedFilter) {
+      this.setSelectedFilter(null)
+    }
   },
 
   mounted () {

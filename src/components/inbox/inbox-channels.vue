@@ -176,7 +176,8 @@ import { mapActions, mapState } from 'vuex'
 import {
   aclMixin,
   dateMixin,
-  visibilityMixin
+  visibilityMixin,
+  inboxMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/inbox/channel-tasks/task-list'
@@ -192,6 +193,7 @@ import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
+import { STATUS_OPEN } from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox-channels',
@@ -199,7 +201,8 @@ export default {
   mixins: [
     aclMixin,
     dateMixin,
-    visibilityMixin
+    visibilityMixin,
+    inboxMixin
   ],
 
   components: {
@@ -861,6 +864,27 @@ export default {
     },
 
     onApplyFilter (filter) {
+      if (this.isFilterDialogForView) {
+        // change actively selected channel
+        this.setSelectedFilter(this.appliedFilter)
+        this.currentTask = STATUS_OPEN
+        this.loadContactTasks()
+
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: this.appliedFilter.id,
+            status: this.statusText,
+            channel: 'view'
+          }
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+        return
+      }
+
       this.filter = filter
 
       if (this.$route.params.channel === 'recordings') {
@@ -877,6 +901,7 @@ export default {
         }
       }
 
+      this.setChannelClonedFilter(this.filter)
       this.getCommunications(this.filter)
     },
 
