@@ -7,12 +7,12 @@
     </div>
     <div class="t-menu pb-2"
          v-show="!sessionPaused">
-      <chips-ellipsis initiallyDisabled
-                      headerLabel="CALL DISPOSITION"
+      <chips-ellipsis headerLabel="CALL DISPOSITION"
                       headerClass="t-menu__header no-border t-dense d-flex align-items-center"
                       ref="callDispositionSelector"
                       identity="call-disposition"
                       default-label="No Call Dispositions"
+                      initiallyDisabled
                       :list-items="filteredCallDispositions"
                       :selected-item="callDisposition"
                       :display-count="4"
@@ -28,20 +28,15 @@
                       :display-count="6"
                       :forced="isHighlightedContactDisposition"
                       @on-selected-item="onSelectedContactDisposition" />
-      <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
-        <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
-          VOICEMAIL
-        </div>
-      </div>
-      <div class="d-flex t-menu__content over-flow px-3 pb-0">
-        <chips-ellipsis ref="vm-drop"
-                        identity="vm-drop"
-                        default-label="No Voicemail"
-                        initiallyDisabled
-                        :list-items="voicemails"
-                        :display-count="3"
-                        @on-selected-item="onVmDrop"/>
-      </div>
+      <chips-ellipsis headerLabel="VOICEMAIL"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      ref="vm-drop"
+                      identity="vm-drop"
+                      default-label="No Voicemail"
+                      initiallyDisabled
+                      :list-items="voicemails"
+                      :display-count="3"
+                      @on-selected-item="onVmDrop"/>
     </div>
   </q-card>
 </template>
@@ -112,7 +107,8 @@ export default {
     },
 
     isVmDropReady () {
-      return !isEmpty(this.dialer.communication) && !this.isCallCompleted
+      const isCallConnected = !this.isCallCompleted || this.dialer.currentStatus === 'CALL_CONNECTED'
+      return !isEmpty(this.dialer.communication) && isCallConnected
     }
   },
 
