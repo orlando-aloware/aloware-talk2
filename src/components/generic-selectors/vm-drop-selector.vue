@@ -130,8 +130,11 @@ export default {
         return ''
       }
 
+      const selectedLength = Array.isArray(this.selectedId)
+        ? this.selectedId.length : 0
+
       switch (true) {
-        case this.multiple && this.selectedId?.length < 1:
+        case this.multiple && selectedLength < 1:
           return 'Select voicemails'
         case !this.multiple && !this.selectedId:
           return 'Select a voicemail'

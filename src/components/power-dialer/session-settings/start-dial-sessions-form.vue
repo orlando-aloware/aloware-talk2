@@ -186,15 +186,6 @@ export default {
     }
   },
 
-  async mounted () {
-    // Temporary disabled
-    // if (isEmpty(this.sessionSettings)) {
-    //   this.resources = this.defaultSettings || DEFAULT_SETTING_VALUES
-    // } else {
-    //   this.resources = Object.assign({}, this.sessionSettings)
-    // }
-  },
-
   computed: {
     ...mapFields('powerDialer', [
       'metrics'
