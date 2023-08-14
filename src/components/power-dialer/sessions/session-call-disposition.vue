@@ -28,20 +28,19 @@
                      :display-count="6"
                      :forced="isHighlightedContactDisposition"
                      @on-selected-item="onSelectedContactDisposition" />
-      <!--div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
+      <div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
         <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
           VOICEMAIL
         </div>
       </div>
-      <div class="d-flex t-menu__content over-flow px-3 pb-0"-->
-        <!-- <VmDropSelector /> -->
-        <!--ChipsEllipsis @on-selected-item="onSelectedContactDisposition"
+      <div class="d-flex t-menu__content over-flow px-3 pb-0">
+        <ChipsEllipsis @on-selected-item="onSelectedContactDisposition"
                           :list-items="[]"
                           :selected-item="''"
                           :display-count="6"
                           identity="contact-disposition"
                           default-label="No Voicemail" />
-      </div-->
+      </div>
     </div>
   </q-card>
 </template>
