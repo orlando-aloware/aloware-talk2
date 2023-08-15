@@ -38,10 +38,6 @@ export default {
       script.async = true
       script.defer = true
       document.head.appendChild(script)
-    },
-
-    onCaptchaVerified () {
-      this.disabledSubmit = false
     }
   }
 }
