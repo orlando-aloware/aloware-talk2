@@ -139,7 +139,7 @@ export default {
       }
 
       if (!this.$q.platform.is.electron) {
-        this.user.recaptchaResponse = null
+        this.user.recaptcha_response = null
       }
     },
 
@@ -151,7 +151,7 @@ export default {
       this.disabledSubmit = false
 
       if (!this.$q.platform.is.electron) {
-        this.user.recaptchaResponse = response
+        this.user.recaptcha_response = response
       }
     }
   }
