@@ -98,18 +98,18 @@
         </filter-form>
         <div class="container d-flex justify-content-end mt-3 action-option-container">
           <div>
-            <compact-btn class="mr-3 btn-tertiary"
+            <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
                          @clicked="onResetFilter">
               Reset
             </compact-btn>
-            <compact-btn class="btn-secondary"
+            <compact-btn class="btn-primary"
                          :disabled="isSaveAsNewDisabled"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
-            <compact-btn variant="primary"
-                         class="ml-3"
+            <compact-btn variant="success"
+                         class="ml-2"
                          :disabled="isUpdatingFilter"
                          v-if="!isFilterDialogForView || (isFilterDialogForView && isEditingView)"
                          @clicked="onApply">
