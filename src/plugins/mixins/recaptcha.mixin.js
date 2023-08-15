@@ -12,18 +12,23 @@ export default {
   },
 
   mounted () {
-    this.disabledSubmit = true
+    if (!this.$q.platform.is.electron) {
+      this.disabledSubmit = true
 
-    window.recaptchaOnloadCallback = () => {
-      if (document.querySelector('#recaptcha-element')) {
-        window.grecaptcha.render('recaptcha-element', {
-          sitekey: this.siteKey,
-          callback: this.onCaptchaVerified
-        })
+      window.recaptchaOnloadCallback = () => {
+        if (document.querySelector('#recaptcha-element')) {
+          window.grecaptcha.render('recaptcha-element', {
+            sitekey: this.siteKey,
+            callback: this.onCaptchaVerified
+          })
+        }
       }
+
+      this.loadRecaptchaScript()
+      return
     }
 
-    this.loadRecaptchaScript()
+    this.disabledSubmit = false
   },
 
   methods: {
@@ -33,10 +38,6 @@ export default {
       script.async = true
       script.defer = true
       document.head.appendChild(script)
-    },
-
-    onCaptchaVerified () {
-      this.disabledSubmit = false
     }
   }
 }

@@ -137,10 +137,22 @@ export default {
       this.user = {
         email: null
       }
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptcha_response = null
+      }
     },
 
     closeDialog () {
       this.success = false
+    },
+
+    onCaptchaVerified (response) {
+      this.disabledSubmit = false
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptcha_response = response
+      }
     }
   }
 }

@@ -58,6 +58,7 @@ const login = async ({ commit }, {
   email,
   password,
   rememberMe,
+  recaptchaResponse = null,
   isMobile = false,
   deviceInfo = null
 }) => {
@@ -68,6 +69,11 @@ const login = async ({ commit }, {
     is_mobile: isMobile,
     device_info: deviceInfo
   }
+
+  if (recaptchaResponse) {
+    params.recaptcha_response = recaptchaResponse
+  }
+
   try {
     commit('SET_LOADING', true)
 
@@ -202,10 +208,21 @@ const register = async ({ commit }, payload) => {
   }
 }
 
-const forgotPass = async ({ commit }, { email }) => {
+const forgotPass = async ({ commit }, {
+  email,
+  recaptchaResponse = null
+}) => {
   try {
+    const params = {
+      email: email
+    }
+
+    if (recaptchaResponse) {
+      params.recaptcha_response = recaptchaResponse
+    }
+
     commit('SET_LOADING', true)
-    await window.axios.post('/forgot', { email })
+    await window.axios.post('/forgot', params)
     commit('SET_LOADING', false)
   } catch (err) {
     commit('SET_LOADING', false)
@@ -215,7 +232,13 @@ const forgotPass = async ({ commit }, { email }) => {
 
 const resetPass = async ({ commit }, payload) => {
   try {
-    const { email, password, passwordConfirmation, token } = payload
+    const {
+      email,
+      password,
+      passwordConfirmation,
+      token,
+      recaptchaResponse = null
+    } = payload
 
     const params = {
       email: email,
@@ -223,6 +246,11 @@ const resetPass = async ({ commit }, payload) => {
       password_confirmation: passwordConfirmation,
       token: token
     }
+
+    if (recaptchaResponse) {
+      params.recaptcha_response = recaptchaResponse
+    }
+
     commit('SET_LOADING', true)
     await window.axios.post('/reset', params)
     commit('SET_LOADING', false)

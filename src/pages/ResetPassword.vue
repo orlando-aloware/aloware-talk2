@@ -232,7 +232,13 @@ export default {
 
     resetUser () {
       this.user = {
-        email: null
+        email: null,
+        password: null,
+        password_confirmation: null
+      }
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptcha_response = null
       }
     },
 
@@ -247,6 +253,14 @@ export default {
       const next = $event.target.tabIndex
       if (next < this.$refs.myForm.$el.elements.length) {
         this.$refs.myForm.$el.elements[next + 1].focus()
+      }
+    },
+
+    onCaptchaVerified (response) {
+      this.disabledSubmit = false
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptcha_response = response
       }
     },
 
