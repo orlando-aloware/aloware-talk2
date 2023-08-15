@@ -133,7 +133,7 @@ export default {
       }
 
       if (!this.$q.platform.is.electron) {
-        params.recaptcha_response = this.user.recaptcha_response
+        params.recaptchaResponse = this.user.recaptchaResponse
       }
 
       return params
@@ -210,7 +210,7 @@ export default {
       }
 
       if (!this.$q.platform.is.electron) {
-        this.user.recaptcha_response = null
+        this.user.recaptchaResponse = null
       }
     },
 
@@ -230,7 +230,7 @@ export default {
       this.disabledSubmit = false
 
       if (!this.$q.platform.is.electron) {
-        this.user.recaptcha_response = response
+        this.user.recaptchaResponse = response
       }
     },
 
