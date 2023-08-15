@@ -869,20 +869,34 @@ export default {
         this.setSelectedFilter(this.appliedFilter)
         this.currentTask = STATUS_OPEN
         this.loadContactTasks()
+        const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+
+        if (pinnedIndex > 0) {
+          this.$router.push({
+            name: 'Inbox View',
+            params: {
+              viewId: this.appliedFilter.id,
+              status: this.statusText,
+              channel: 'view'
+            }
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
+
+          return
+        }
 
         this.$router.push({
-          name: 'Inbox View',
+          name: 'Inbox Channel Task Status',
           params: {
-            viewId: this.appliedFilter.id,
-            status: this.statusText,
-            channel: 'view'
+            channel: 'inbox',
+            status: 'open'
           }
         }).catch(err => {
           console.log(err)
           this.$handleErrors(err.response)
         })
-
-        return
       }
 
       this.filter = filter

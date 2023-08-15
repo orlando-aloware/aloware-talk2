@@ -287,10 +287,10 @@ export default {
     },
 
     filterFormDisplayName () {
-      const nonViewEditMode = (!this.isFilterDialogForView && this.selectedFilter)
+      const nonViewEditMode = !this.isFilterDialogForView
       const viewEditMode = (this.isFilterDialogForView && this.isEditingView)
 
-      return nonViewEditMode || viewEditMode
+      return (nonViewEditMode || viewEditMode) && this.selectedFilter
         ? this.selectedFilter.name
         : 'New (Untitled)'
     },
