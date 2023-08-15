@@ -46,57 +46,52 @@
                           v-if="typeAcceptAttachment">
 
             <div v-if="communication.attachments && communication.attachments.length > 0">
-              <div v-for="(attachment, index) in communication.attachments"
-                   :key="index">
-                <template v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
-                  <q-img class="img-fluid d-block r-2x br-8"
-                         height="300px"
-                         native-context-menu
-                         :class="index > 0 ? 'mb-1' : ''"
-                         :src="attachment.url"
-                         v-if="isAttachmentMigrated(attachment)">
-                    <template v-slot:error>
-                      <div class="absolute-full flex flex-center bg-negative text-white">
-                        Error!
-                      </div>
-                    </template>
-                    <template v-slot:default>
-                      <download-button buttonStyle="top: 8px; left: 8px"
-                                       :filename="attachment.name"
-                                       :attachment-url="attachment.url"/>
-                    </template>
-                  </q-img>
-                  <img class="img-fluid d-block r-2x br-8"
+              <div :key="index"
+                   v-for="(attachment, index) in communication.attachments">
+                <q-img class="img-fluid d-block r-2x br-8"
                        height="300px"
-                       src="/assets/images/loading.svg"
+                       native-context-menu
                        :class="index > 0 ? 'mb-1' : ''"
-                       v-if="!isAttachmentMigrated(attachment)"/>
+                       :src="attachment.url"
+                       v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
+                  <template v-slot:error>
+                    <div class="absolute-full flex flex-center bg-negative text-white">
+                      Error!
+                    </div>
+                  </template>
+                  <template v-slot:default>
+                    <download-button buttonStyle="top: 8px; left: 8px"
+                                     :filename="attachment.name"
+                                     :attachment-url="attachment.url"/>
+                  </template>
+                </q-img>
+
+                <template v-if="attachment.mime_type">
+                  <div v-if="isAttachmentAudio(attachment.mime_type)">
+                    <audio class="audio-player"
+                           controls>
+                      <source :src="attachment.url"
+                              :type="attachment.mime_type">
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+
+                  <div v-if="isAttachmentVideo(attachment.mime_type)">
+                    <video width="320"
+                           class="rounded"
+                           controls>
+                      <source :src="attachment.url"
+                              :type="attachment.mime_type">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+
+                  <download-button is-simple-attachment
+                                   :filename="attachment.name"
+                                   :attachment-url="attachment.url"
+                                   v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
+                  </download-button>
                 </template>
-
-                <div v-if="attachment.mime_type && isAttachmentAudio(attachment.mime_type)">
-                  <audio class="audio-player"
-                         controls>
-                    <source :src="attachment.url"
-                            :type="attachment.mime_type">
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
-
-                <div v-if="attachment.mime_type && isAttachmentVideo(attachment.mime_type)">
-                  <video width="320"
-                         class="rounded"
-                         controls>
-                    <source :src="attachment.url"
-                            :type="attachment.mime_type">
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-
-                <download-button is-simple-attachment
-                                 :filename="attachment.name"
-                                 :attachment-url="attachment.url"
-                                 v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
-                </download-button>
               </div>
             </div>
 
@@ -986,10 +981,6 @@ export default {
   },
 
   methods: {
-    isAttachmentMigrated (attachment) {
-      return !attachment.url.includes('twilio')
-    },
-
     getCommunicationCampaignName () {
       const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
       if (!communicationIncomingNumber) {
