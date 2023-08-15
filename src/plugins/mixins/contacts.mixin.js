@@ -380,7 +380,7 @@ export default {
 
             // alert the user that some error happened
             if (!this.$axios.isCancel(err)) {
-              this.$generalNotification('The selected filters took too long to apply. Please change your selected filters.')
+              this.$generalNotification('The selected filters took too long to apply. Please change your selected filters.', 'error')
             }
           }
 
