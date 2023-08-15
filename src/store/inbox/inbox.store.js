@@ -108,6 +108,7 @@ export default function () {
     pinnedViews: [],
     inboxPersonalFilters: [],
     inboxCompanyFilters: [],
-    isEditingView: false
+    isEditingView: false,
+    showViewsList: false
   }
 }

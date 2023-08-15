@@ -88,7 +88,8 @@ export default {
   methods: {
     ...mapActions('inbox', [
       'setActiveChannel',
-      'setTaskCount'
+      'setTaskCount',
+      'setShowViewsList'
     ]),
 
     setChannel (routeChanged = false) {
@@ -118,6 +119,10 @@ export default {
     onItemSelected (routeData) {
       this.contactId = routeData.params.id
       this.$router.push(routeData)
+    },
+
+    onWindowResize () {
+      this.setShowViewsList(false)
     }
   },
 
@@ -147,6 +152,16 @@ export default {
       this.loadContactTasks(false)
       this.fetchTaskCounts()
     })
+
+    window.addEventListener('resize', this.onWindowResize)
+  },
+
+  unmounted () {
+    window.removeEventListener('resize', this.onWindowResize)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.onWindowResize)
   },
 
   watch: {

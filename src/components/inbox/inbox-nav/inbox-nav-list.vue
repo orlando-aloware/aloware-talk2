@@ -112,7 +112,8 @@ export default {
       'pinnedViews',
       'inboxPersonalFilters',
       'inboxCompanyFilters',
-      'isEditingView'
+      'isEditingView',
+      'showViewsList'
     ]),
 
     ...mapGetters('inbox', [
@@ -157,8 +158,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact'
-      ],
-      showViewsList: false
+      ]
     }
   },
 
@@ -215,7 +215,8 @@ export default {
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setInboxPersonalFilters',
-      'setInboxCompanyFilters'
+      'setInboxCompanyFilters',
+      'setShowViewsList'
     ]),
 
     onItemClicked (nextActive) {
@@ -338,11 +339,11 @@ export default {
     },
 
     onShowViewsList () {
-      this.showViewsList = !this.showViewsList
+      this.setShowViewsList(true)
     },
 
     onCloseViewsList () {
-      this.showViewsList = false
+      this.setShowViewsList(false)
     },
 
     resetFilter () {

@@ -374,7 +374,8 @@ export default {
       'setChannelClonedFilter',
       'setInboxShowMyContacts',
       'setPinnedViews',
-      'setFilterDialogForView'
+      'setFilterDialogForView',
+      'setShowViewsList'
     ]),
 
     hideModal () {
@@ -395,6 +396,7 @@ export default {
     },
 
     onShow () {
+      this.setShowViewsList(false)
       this.personalFilters = []
       this.companyFilters = []
       this.filterFields = Object.keys(this.defaultFilterModel.filter)
