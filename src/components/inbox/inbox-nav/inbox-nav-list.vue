@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-nav-list h-100 overflow-y-scroll overflow-x-hidden"
+  <div class="inbox-nav-list h-100 overflow-x-hidden"
        :class="{'inbox-nav-list--closed': closed}">
     <nav-item v-for="item in items"
               :key="item.name"
