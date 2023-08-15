@@ -43,6 +43,11 @@
                 v-for="(view, index) in pinnedViews"
                 @click="onItemClicked" />
 
+        <div class="py-4 text-center text-13"
+            v-if="pinnedViews.length < 1">
+          <span>No Pinned Views</span>
+        </div>
+
       <inbox-views target="#edit-views-icon"
                    :show="showViewsList"
                    :views="allInboxFilters"
