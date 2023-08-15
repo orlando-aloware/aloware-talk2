@@ -43,7 +43,7 @@
 
           <!--ATTACHMENTS-->
           <q-card-section class="pt-0 pb-0"
-                          v-if="[CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                          v-if="typeAcceptAttachment">
 
             <div v-if="communication.attachments && communication.attachments.length > 0">
               <div v-for="(attachment, index) in communication.attachments"
@@ -442,7 +442,7 @@
           </q-card-section>
 
           <q-card-section class="pt-0 pb-0"
-                          v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                          v-if="typeHaveLine">
 
             <!--LINE-->
             <b-form-row v-if="communication.campaign_id">
@@ -706,7 +706,7 @@
 
           <!--FILES HERE-->
           <q-card-section class="pt-0 pb-0"
-                          v-if="[CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
+                          v-if="typeHaveAttachments">
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label>Files: </q-item-label>
@@ -786,7 +786,7 @@
 
           <!--CALL DISPOSITION-->
           <q-card-section class="pt-0 pb-0"
-                          v-if="communication.type === CommunicationTypes.CALL && currentCompany && callDispositions &&  callDispositions.length > 0 && !dialerMode">
+                          v-if="isCallAndHaveCallDisposition">
             <b-form-row>
               <b-col class="pl-0 pr-0">
                 <q-item-label class="mt-3 custom-item-label">Call Disposition: </q-item-label>
@@ -960,6 +960,28 @@ export default {
         default:
           return text + 'was'
       }
+    },
+
+    typeAcceptAttachment () {
+      return [CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(this.communication.type)
+    },
+
+    typeHaveLine () {
+      return ![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(this.communication.type)
+    },
+
+    typeHaveAttachments () {
+      return [CommunicationTypes.FAX, CommunicationTypes.EMAIL].includes(this.communication.type) &&
+        this.communication.attachments &&
+        this.communication.attachments.length > 0
+    },
+
+    isCallAndHaveCallDisposition () {
+      return this.communication.type === CommunicationTypes.CALL &&
+        this.currentCompany &&
+        this.callDispositions &&
+        this.callDispositions.length > 0 &&
+        !this.dialerMode
     }
   },
 
