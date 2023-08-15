@@ -115,8 +115,7 @@ export default {
       user: {
         email: null,
         password: null,
-        remember_me: !!this.$q.platform.is.electron,
-        recaptcha_response: null
+        remember_me: !!this.$q.platform.is.electron
       },
       loading: false,
       sb: null,
@@ -127,11 +126,17 @@ export default {
 
   methods: {
     getLoginParams () {
-      return {
+      let params = {
         email: this.user.email,
         password: this.user.password,
         rememberMe: this.user.remember_me
       }
+
+      if (!this.$q.platform.is.electron) {
+        params.recaptchaResponse = this.user.recaptchaResponse
+      }
+
+      return params
     },
 
     async submit () {
@@ -203,6 +208,10 @@ export default {
         password: null,
         remember_me: !!this.$q.platform.is.electron
       }
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptchaResponse = null
+      }
     },
 
     goToNextInput ($event) {
@@ -214,6 +223,14 @@ export default {
 
       if (next < this.$refs.myForm.$el.elements.length) {
         this.$refs.myForm.$el.elements[next + 1].focus()
+      }
+    },
+
+    onCaptchaVerified (response) {
+      this.disabledSubmit = false
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptchaResponse = response
       }
     },
 
