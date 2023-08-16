@@ -1,7 +1,7 @@
 <template>
   <div>
     <hr class="nav-item-separator"
-        v-if="value === 'voicemails'"/>
+        v-if="value === 'voicemails' || label === 'Channels'"/>
     <a class="inbox-nav-item mx-2 px-1"
        href="/"
        :class="navItemClass"

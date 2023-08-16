@@ -3607,7 +3607,7 @@ i.option-separator {
     padding-top: 10px;
 
     .nav-item-separator {
-      margin: 20px 17px;
+      margin: 15px;
       border-color: $grey-60 !important;
     }
   }
@@ -7236,10 +7236,13 @@ table.datatable {
 }
 
 .inbox-nav-item-group-header {
-  padding: 10px 5px 10px 10px !important;
+  padding: 10px 5px 10px 7px !important;
   color: #666666;
   letter-spacing: 1px;
   font-size: 10px;
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .inbox-nav-item {
@@ -7277,14 +7280,11 @@ table.datatable {
   &__icon,
   &__label,
   .count-label {
-    height: 21px !important;
-    display: flex;
-    align-items: center;
-    line-height: 20px !important;
+    line-height: 1;
   }
 
   &__icon {
-    padding-right: 10px;
+    padding-right: 5px;
   }
 
   &__label {
@@ -9113,7 +9113,7 @@ screen and (max-width: 956px) {
   }
   .inbox-side {
     &__left {
-      max-width: 160px;
+      max-width: 120px;
 
       .count-label {
         margin-left: 10px;
@@ -9168,28 +9168,13 @@ screen and (max-width: 956px) {
     &:not(.inbox-side-mobile-full-width) {
       .inbox-side {
         &__left {
-          max-width: 35px;
-
           .header,
-          .inbox-nav-item__label,
           .count-label {
             display: none;
           }
 
-          .inbox-nav-list div:nth-child(2) {
-            height: 30px;
-          }
-
           .inbox-nav-item {
             margin: 0 0 !important;
-
-            &__icon {
-              padding: 0 0 !important;
-            }
-          }
-
-          .inbox-nav-item-group-header {
-            opacity: 0;
           }
         }
       }

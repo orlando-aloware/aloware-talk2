@@ -19,7 +19,7 @@
     <hr>
 
     <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isJobNimbus">
-      <nav-item class="nav-list-group-title d-flex align-items-center justify-content-between"
+      <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
                 label="Views"
@@ -43,7 +43,7 @@
                 v-for="(view, index) in pinnedViews"
                 @click="onItemClicked" />
 
-        <div class="py-4 text-center text-13 text-word-wrap"
+        <div class="py-3 text-center text-13 text-word-wrap"
             v-if="pinnedViews.length < 1">
           <span>No Pinned Views</span>
         </div>
