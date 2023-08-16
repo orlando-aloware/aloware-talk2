@@ -57,7 +57,8 @@
           </div>
 
           <!-- caller location -->
-          <div class="d-flex flex-grow-1 align-items-baseline w-100">
+          <div class="d-flex flex-grow-1 align-items-baseline w-100"
+               v-if="location">
             <span class="mr-auto text-white pr-1 text-sm">
               {{ location }}
             </span>
@@ -505,7 +506,7 @@ export default {
 
     location () {
       if (!this.communication || !this.contact) {
-        return 'Unknown Location'
+        return false
       }
 
       let city = this.communication.city || this.contact.cnam_city || null
