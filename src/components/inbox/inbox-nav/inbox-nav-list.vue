@@ -1,7 +1,7 @@
 <template>
   <div class="inbox-nav-list h-100 overflow-x-hidden"
        :class="{'inbox-nav-list--closed': closed}">
-    <nav-item v-for="item in items"
+    <nav-item v-for="item in navListItems"
               :key="item.name"
               :label="item.label"
               :value="item.value"
@@ -103,7 +103,7 @@ export default {
 
   computed: {
     ...mapState('inbox', [
-      'items',
+      'navListItems',
       'activeChannel',
       'selectedFilter',
       'appliedFilter',
@@ -245,7 +245,7 @@ export default {
       }
 
       this.active = nextActive
-      const channel = this.items.find(item => item.value === nextActive)
+      const channel = this.navListItems.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
       // redirect page to Channel
@@ -368,7 +368,7 @@ export default {
           const viewId = val.split('-')[1]
           activeChannel = this.getPinnedViewChannel(viewId)
         } else {
-          activeChannel = this.items.find(item => item.value === val)
+          activeChannel = this.navListItems.find(item => item.value === val)
         }
 
         this.$emit('active', activeChannel)

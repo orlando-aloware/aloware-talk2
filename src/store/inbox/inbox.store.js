@@ -12,7 +12,7 @@ export default function () {
       icon: 'inbox',
       disabled: false
     },
-    items: [
+    navListItems: [
       {
         label: 'Inbox',
         value: 'inbox',
