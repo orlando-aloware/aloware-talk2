@@ -49,7 +49,6 @@
         </div>
 
       <inbox-views target="#edit-views-icon"
-                   :show="showViewsList"
                    :views="allInboxFilters"
                    @closed="onCloseViewsList"/>
     </div>
@@ -112,8 +111,7 @@ export default {
       'pinnedViews',
       'inboxPersonalFilters',
       'inboxCompanyFilters',
-      'isEditingView',
-      'showViewsList'
+      'isEditingView'
     ]),
 
     ...mapGetters('inbox', [
