@@ -260,7 +260,8 @@ export default {
                   operator: 1
                 }
               ]
-            }
+            },
+            is_conjunction: true
           }
         ]
       }

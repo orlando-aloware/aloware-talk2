@@ -456,7 +456,7 @@ import {
   avatarMixin,
   addViewMixin
 } from 'src/plugins/mixins'
-import { isEqual, isEmpty, pickBy } from 'lodash'
+import { isEqual, isEmpty, chunk, pickBy } from 'lodash'
 
 export default {
   components: {
@@ -695,19 +695,37 @@ export default {
         })
     },
 
-    processAddSelectedContacts () {
-      this.clicked = true
-      this.closeFilters()
+    processRequest (params, isChunked = false, chunkedContactIds = []) {
+      if (chunkedContactIds.length > 0) {
+        params.contacts = chunkedContactIds[0]
+      }
 
       return this.$axios
-        .post(this.addItemEndpoint, this.attachedParams())
+        .post(this.addItemEndpoint, params)
         .then((res) => {
+          if (isChunked) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
+
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(params, hasMoreChunks, chunkedContactIds)
+
+              return
+            } else {
+              isChunked = false
+            }
+          }
+
           this.setShouldUpdateSelectedListContactCount(true)
 
-          this.$VueEvent.fire('addContactsProgress', {
-            id: this.contactList.id,
-            loading: true
-          })
+          if (this.isDatatableSelectedAll) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: this.contactList.id,
+              loading: true
+            })
+          }
 
           this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
           this.clicked = false
@@ -715,11 +733,42 @@ export default {
           this.$generalNotification(res.data.message)
         })
         .catch((err) => {
-          this.clicked = false
-          const { message, html } = extractErrorMessage(err)
-          console.log(html)
-          this.$generalNotification(message, 'error')
+          if (!isChunked) {
+            this.clicked = false
+            const { message, html } = extractErrorMessage(err)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+          }
         })
+    },
+
+    processAddSelectedContacts () {
+      this.clicked = true
+      this.closeFilters()
+
+      let params = {
+        contact_list_id: parseInt(this.contactList.id)
+      }
+      let ids = []
+
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+      } else {
+        // we only submit needed contact properties which has values
+        ids = this.selectedContacts[this.selectedList.id].map(item => pickBy({
+          id: item.id,
+          incoming_number_id: item?.incoming_number_id,
+          contact_phone_number_id: item?.contact_phone_number_id
+        }, i => ![undefined, null].includes(i)))
+        ids = chunk(ids, 50)
+      }
+
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.$jsonClone(this.currentListFilters)
+      }
+
+      const isChunked = !params?.selected_all && ids.length > 0
+      this.processRequest(params, isChunked, ids)
     },
 
     addSelectedContacts () {
@@ -737,29 +786,6 @@ export default {
           this.processAddSelectedContacts()
         }
       })
-    },
-
-    attachedParams () {
-      let params = {
-        contact_list_id: parseInt(this.contactList.id)
-      }
-
-      if (this.isDatatableSelectedAll) {
-        params.selected_all = true
-      } else {
-        // we only submit needed contact properties which has values
-        params.contacts = this.checked.map(item => pickBy({
-          id: item.id,
-          incoming_number_id: item?.incoming_number_id,
-          contact_phone_number_id: item?.contact_phone_number_id
-        }, i => ![undefined, null].includes(i)))
-      }
-
-      if (!isEmpty(this.currentListFilters)) {
-        params.filter_groups = this.$jsonClone(this.currentListFilters)
-      }
-
-      return params
     },
 
     getSelectedContacts () {

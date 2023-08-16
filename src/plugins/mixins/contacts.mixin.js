@@ -754,10 +754,6 @@ export default {
               }
             }
           }
-
-          if (!this.isPowerDialer && contactIndex !== -1 && contactIndex !== null) {
-            listData.data.splice(contactIndex, 1)
-          }
         }
       }
 

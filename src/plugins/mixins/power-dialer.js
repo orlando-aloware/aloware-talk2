@@ -8,8 +8,8 @@ export default {
       filterParams: {
         'page': 1,
         'per_page': 25,
-        'filter_groups[0][filters][contact_lists][value][0]': 18,
-        'filter_groups[0][filters][contact_lists][operator]': 1,
+        'filter_groups[0][filters][contact_lists][0][value][0]': 18,
+        'filter_groups[0][filters][contact_lists][0][operator]': 1,
         'filter_groups[0][is_conjunction]': true,
         'order': 'desc'
       }

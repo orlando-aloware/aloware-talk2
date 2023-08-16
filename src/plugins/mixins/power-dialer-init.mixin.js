@@ -72,10 +72,12 @@ export default {
             })
 
             let filters = {
-              contact_lists: {
-                operator: OPERATORS.IS_ANY_OF,
-                value: [stringId]
-              }
+              contact_lists: [
+                {
+                  operator: OPERATORS.IS_ANY_OF,
+                  value: [stringId]
+                }
+              ]
             }
 
             this.setCurrentListFilters(filters)

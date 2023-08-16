@@ -165,16 +165,52 @@ export default {
       this.isLoading = true
 
       let params = {}
+      let ids = []
 
       if (this.isDatatableSelectedAll) {
         params.selected_all = true
+      } else {
+        ids = this.selectedContacts[this.selectedList.id].map(item => item.id)
+        ids = chunk(ids, 50)
       }
 
-      let ids = this.selectedContacts[this.selectedList.id].map(item => item.id)
-      ids = chunk(ids, 50)
+      // we have to use the dynamic list's filters if the source list
+      // is of type DYNAMIC
+      if (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
+        !isEmpty(this.currentListFilters)) {
+        const allFilters = this.$jsonClone(this.currentListFilters)
 
-      if (!isEmpty(this.currentListFilters)) {
-        params.filter_groups = this.$jsonClone(this.currentListFilters)
+        Object.keys(allFilters).forEach(index => {
+          // include all other filters
+          if (!this.$isNumeric(index)) {
+            params[index] = allFilters[index]
+            delete allFilters[index]
+          }
+        })
+
+        if (!isEmpty(allFilters)) {
+          // include the filter groups
+          params.filter_groups = allFilters
+        }
+      } else {
+        // else, list is of type STATIC. Just pass the contacts list id filter
+        params.filter_groups = [
+          {
+            'filters': {
+              'contact_lists': [
+                {
+                  value: [this.selectedList.id],
+                  operator: 1
+                }
+              ]
+            },
+            is_conjunction: true
+          }
+        ]
+      }
+
+      if (this.selectedList.id === 'all') {
+        delete params.filter_groups
       }
 
       // only show list's loading view if all contacts were selected

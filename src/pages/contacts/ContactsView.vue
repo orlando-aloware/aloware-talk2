@@ -1040,10 +1040,12 @@ export default {
 
       this.setDataCount({
         filters: {
-          contact_lists: {
-            operator: OPERATORS.IS_ANY_OF,
-            value: [this.list.id]
-          }
+          contact_lists: [
+            {
+              operator: OPERATORS.IS_ANY_OF,
+              value: [this.list.id]
+            }
+          ]
         },
         is_conjunction: true
       })
@@ -1142,10 +1144,12 @@ export default {
       const listFilter = typeof this.list.filters === 'string' ? JSON.parse(this.list.filters) : this.list.filters
 
       const filters = this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
-        contact_lists: {
-          operator: OPERATORS.IS_ANY_OF,
-          value: [stringId]
-        }
+        contact_lists: [
+          {
+            operator: OPERATORS.IS_ANY_OF,
+            value: [stringId]
+          }
+        ]
       }
 
       this.setCurrentListFilters(filters)
