@@ -3339,6 +3339,10 @@ i.option-separator {
   word-break: break-all;
 }
 
+.text-word-wrap {
+  overflow-wrap: break-word;
+}
+
 .auto-size {
   width: auto;
   height: auto;
