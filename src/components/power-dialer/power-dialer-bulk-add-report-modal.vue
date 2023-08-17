@@ -37,7 +37,7 @@
 <script>
 import { PD_BULK_ADD_MESSAGES, PD_INTEGRATION_IMPORT_MESSAGES } from 'src/constants/power-dialer-add-errors'
 import { cloneDeep, get, isNil, isEmpty, omitBy } from 'lodash'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'PowerDialerBulkAddReportModal',
@@ -57,6 +57,10 @@ export default {
   computed: {
     ...mapState([
       'integrationPDImportSummaries'
+    ]),
+
+    ...mapGetters('contacts', [
+      'selectedList'
     ]),
 
     isOpen: {
@@ -161,6 +165,9 @@ export default {
 
       const id = this.$route.params.id
       const integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
+      console.log('selectedList: ', this.selectedList)
+      console.log('id: ', id)
+      console.log('integrationReport: ', integrationReport)
 
       const createdContactsCount = integrationReport?.created_contacts_count ?? 0
       const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
