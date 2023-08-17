@@ -517,11 +517,6 @@ export default {
         return 'Unknown Location'
       }
 
-      // dont show tollfree location
-      if (city === 'tollfree') {
-        city = null
-      }
-
       return `${city || ''}${city && state ? ', ' : ''}${state || ''}${state && country ? ' - ' : ''} ${country || ''}`
     }
   },
