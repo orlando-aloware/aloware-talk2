@@ -101,6 +101,12 @@ export const isQueuedCall = (communication) => {
   return true
 }
 
+export const checkIsNumeric = (value) => {
+  let regex = /^-{0,1}\d*\.{0,1}\d+$/
+
+  return regex.test(value)
+}
+
 export const mergeObjectsAndAddValues = (obj1, obj2) => {
   const result = JSON.parse(JSON.stringify(obj1))
 
@@ -111,7 +117,11 @@ export const mergeObjectsAndAddValues = (obj1, obj2) => {
         continue
       }
 
-      result[key] = (obj1[key] || 0) + obj2[key]
+      const value = (obj1[key] || 0)
+
+      if (checkIsNumeric(value) && checkIsNumeric(obj2[key])) {
+        result[key] = value + obj2[key]
+      }
     }
   }
 
