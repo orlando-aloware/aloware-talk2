@@ -95,53 +95,55 @@
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND))
            && (communication.body || communication.attachments)">
-        <div class=""
-             v-if="communication.attachments && communication.attachments.length > 0">
+        <div v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <q-img
-              class="border-rounded img-fluid d-block r-2x mb-1"
-              :src="attachment.url"
-              width="320px"
-              fit="fill"
-              native-context-menu
-            >
-              <template v-slot:error>
-                <div class="absolute-full flex flex-center bg-negative text-white">
-                  Error!
-                </div>
+            <template v-if="attachment.mime_type">
+              <template v-if="isAttachmentImage(attachment.mime_type)">
+                <q-img
+                  class="border-rounded img-fluid d-block r-2x mb-1"
+                  :src="attachment.url"
+                  width="320px"
+                  fit="fill"
+                  native-context-menu>
+                  <template v-slot:error>
+                    <div class="absolute-full flex flex-center bg-negative text-white">
+                      Error!
+                    </div>
+                  </template>
+                  <template v-slot:default>
+                    <download-button buttonStyle="top: 8px; left: 8px"
+                                     :filename="attachment.name"
+                                     :attachment-url="attachment.url"/>
+                  </template>
+                </q-img>
               </template>
-              <template v-slot:default>
-                <download-button buttonStyle="top: 8px; left: 8px"
-                                 :filename="attachment.name"
-                                 :attachment-url="attachment.url"/>
-              </template>
-            </q-img>
 
-            <div v-if="isAttachmentAudio(attachment.mime_type)">
-              <audio style="height: 25px;width: 300px;margin-top: 10px;"
-                     controls>
-                <source :src="attachment.url"
-                        :type="attachment.mime_type">
-                Your browser does not support the audio element.
-              </audio>
-            </div>
+              <div v-if="isAttachmentAudio(attachment.mime_type)">
+                <audio style="height: 25px;width: 300px;margin-top: 10px;"
+                       controls>
+                  <source :src="attachment.url"
+                          :type="attachment.mime_type">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
 
-            <div v-if="isAttachmentVideo(attachment.mime_type)">
-              <video width="320"
-                     class="border-rounded"
-                     controls>
-                <source :src="attachment.url"
-                        :type="attachment.mime_type">
-                Your browser does not support the video tag.
-              </video>
-            </div>
+              <div v-if="isAttachmentVideo(attachment.mime_type)">
+                <video width="320"
+                       class="border-rounded"
+                       controls>
+                  <source :src="attachment.url"
+                          :type="attachment.mime_type">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
 
-            <download-button is-simple-attachment
-                             :filename="attachment.name"
-                             :attachment-url="attachment.url"
-                             v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
-            </download-button>
+              <download-button is-simple-attachment
+                               :filename="attachment.name"
+                               :attachment-url="attachment.url"
+                               v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
+              </download-button>
+            </template>
           </div>
         </div>
 
@@ -811,6 +813,10 @@ export default {
       }
 
       return { name: '' }
+    },
+
+    isAttachmentMigrated (attachment) {
+      return !attachment.url.includes('twilio')
     },
 
     isAttachmentImage (mimeType) {
