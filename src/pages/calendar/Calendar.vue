@@ -137,7 +137,7 @@ import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import moment from 'moment'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
 
 export default {
@@ -258,6 +258,8 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['setProfile']),
+
     onDateSelected (date) {
       this.gotoDate = date
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
@@ -398,9 +400,10 @@ export default {
     },
 
     updateTimeFormat () {
-      const payload = Object.assign(this.profile, { time_format: this.timeFormat })
+      const payload = Object.assign({ ...this.profile }, { time_format: this.timeFormat })
       api.V1.user.update(this.profile.id, payload)
-        .then(() => {
+        .then(res => {
+          this.setProfile(res.data)
           this.$refs.scheduler.reInit(this.gotoDate, this.view)
         })
     }
