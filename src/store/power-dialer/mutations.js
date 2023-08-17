@@ -246,6 +246,8 @@ export default {
   STORE_BULK_ACTION_NOTIFICATION (state, value) {
     if (isEmpty(state.bulkAddContactsNotification?.[value.contact_list_id])) {
       state.bulkAddContactsNotification[value.contact_list_id] = value
+      console.log('value: ', value)
+      console.log('state.bulkAddContactsNotification: ', JSON.parse(JSON.stringify(state.bulkAddContactsNotification)))
 
       return
     }
@@ -254,6 +256,8 @@ export default {
       state.bulkAddContactsNotification[value.contact_list_id],
       value
     )
+    console.log('value: ', value)
+    console.log('state.bulkAddContactsNotification: ', JSON.parse(JSON.stringify(state.bulkAddContactsNotification)))
   },
 
   CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
