@@ -123,7 +123,8 @@
                               <q-item dense
                                       clickable
                                       v-close-popup
-                                      @click="onDeleteRequest(setting.id)">
+                                      v-show="isDeleteAllowed(setting.user_id)"
+                                      @click="onDeleteRequest(setting.id, setting.user_id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
                                     <i class="fa fa-trash-alt mr-2"/>
@@ -165,7 +166,7 @@
                              color="primary"
                              unelevated
                              no-caps
-                             :disabled="saveDisabled"
+                             :disabled="!isAllowSave"
                              v-if="!hasSelectedTemporarySetting"
                              @click="updateSelectedSetting">
                         Save
@@ -318,9 +319,14 @@ import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
 import { isEqual } from 'lodash'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'StartDialSessionsSettings',
+
+  mixins: [
+    aclMixin
+  ],
 
   props: {
     list: {
@@ -347,6 +353,10 @@ export default {
 
   computed: {
     ...mapState(['dialer']),
+
+    ...mapState('auth', [
+      'profile'
+    ]),
 
     ...mapFields('powerDialer', [
       'sessionSettings',
@@ -434,6 +444,10 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
+    },
+
+    isAllowSave () {
+      return !this.saveDisabled && this.selectedItem.user_id === this.profile.id
     }
   },
 
@@ -644,9 +658,11 @@ export default {
       this.$emit('on-update-session-metrics')
     },
 
-    onDeleteRequest (id) {
-      this.newSetting = true
-      this.deleteId = id
+    onDeleteRequest (id, userId) {
+      if (this.isDeleteAllowed(userId)) {
+        this.newSetting = true
+        this.deleteId = id
+      }
     },
 
     onRename (data) {
@@ -744,6 +760,10 @@ export default {
 
     onUpdateSettings (settings) {
       this.selectedItem = settings
+    },
+
+    isDeleteAllowed (userId) {
+      return this.isAdmin || userId === this.profile.id
     }
   },
 
