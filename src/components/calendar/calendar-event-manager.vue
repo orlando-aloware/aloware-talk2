@@ -172,7 +172,7 @@
         </b-col>
       </b-row>
 
-      <b-row v-if="isAppointment && mode === 'add'">
+      <b-row v-if="isAppointment">
         <b-col>
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
@@ -498,7 +498,7 @@ export default {
 
   mounted () {
     // Preset sms reminder text
-    this.setSmsReminderFields()
+    this.setDefaultSmsReminderFields()
 
     this.sms_reminder_fields.enabled = this.profile.company.sms_reminder_enabled
   },
@@ -535,8 +535,12 @@ export default {
       }
       this.schedule = _.clone(this.originalSchedule)
 
-      if (sched.is_past) {
-        this.resetSmsReminder()
+      this.resetSmsReminder()
+
+      if (sched.sms_reminders) {
+        this.setSmsReminderFields(sched.sms_reminders)
+      } else {
+        this.sms_reminder_fields.enabled = false
       }
 
       this.showManager = true
@@ -657,6 +661,10 @@ export default {
         if (contactId != null && eventId != null) {
           this.loading = true
 
+          if (this.isAppointment && this.sms_reminder_fields.enabled) {
+            this.schedule.sms_reminder = this.sms_reminder_fields
+          }
+
           let postData = _.cloneDeep(this.schedule)
           postData.called_from = this.calledFrom
           postData.user_timezone = window.timezone
@@ -736,10 +744,10 @@ export default {
         this.sms_reminder_fields.time = '09:00'
       }
 
-      this.setSmsReminderFields()
+      this.setDefaultSmsReminderFields()
     },
 
-    setSmsReminderFields () {
+    setDefaultSmsReminderFields () {
       this.sms_reminder_fields.body = this.profile.company.sms_reminder_default_text || ''
 
       // use personal line or default campaign_id
@@ -755,6 +763,17 @@ export default {
       // update frequency if its set in account config
       if (this.profile.company.sms_reminder_default_send_before_days) {
         this.sms_reminder_fields.frequencies = this.profile.company.sms_reminder_default_send_before_days.split(',').map(v => +v)
+      }
+    },
+
+    setSmsReminderFields (smsReminder) {
+      this.sms_reminder_fields = {
+        ...this.sms_reminder_fields,
+        enabled: true,
+        body: smsReminder.body,
+        campaign_id: smsReminder.campaign_id,
+        frequencies: smsReminder.frequencies.map(frequency => +frequency),
+        time: smsReminder.time
       }
     },
 
@@ -779,7 +798,7 @@ export default {
         time: '10:00'
       }
 
-      this.setSmsReminderFields()
+      this.setDefaultSmsReminderFields()
     },
 
     dateSelected (value) {
