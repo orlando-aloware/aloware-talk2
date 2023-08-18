@@ -52,20 +52,22 @@
                          :generic-styling="false"
                          :generic-multiselect="false"
                          :force-remove-missing-values="true"
-                         v-model="resources[cform.name]"
                          v-else-if="cform.name === 'campaign_id'"
-                         @change="(eventPayload) => onLineFilterChange(eventPayload, 'campaigns')"></line-selector>
+                         v-model="resources[cform.name]"
+                         @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <script-selector class="w-100 dial-sessions__form__script-selector"
                            :class="[resources[cform.name] ? 'populated': '']"
                            :disable="disabled"
                            :clearable="true"
                            v-else-if="cform.name === 'script_id'"
-                           v-model="resources[cform.name]"/>
+                           v-model="resources[cform.name]"
+                           @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
-          <order-selector class="generic-selector-2 dial-sessions__form__order-selector"
+          <session-order-selector class="generic-selector-2 dial-sessions__form__order-selector"
                           v-else-if="cform.name === 'order'"
-                          v-model="resources[cform.name]" />
+                          v-model="resources[cform.name]"
+                          @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <call-disposition-selector class="pb-3 dial-sessions__form__call-disposition-selector"
                                      :multiple="true"
@@ -73,8 +75,7 @@
                                      :disable="disabled"
                                      v-else-if="cform.name === 'call_disposition_ids'"
                                      v-model="resources[cform.name]"
-                                     @change="{}">
-          </call-disposition-selector>
+                                     @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <contact-disposition-selector class="pb-3 dial-sessions__form__contact-disposition-selector"
                                         custom-class="padded-container-1 generic-selector-1"
@@ -86,8 +87,7 @@
                                         :show-placeholder="true"
                                         v-else-if="cform.name === 'contact_disposition_ids'"
                                         v-model="resources[cform.name]"
-                                        @change="{}">
-          </contact-disposition-selector>
+                                        @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <vm-drop-selector class="w-100 dial-sessions__form__vm-drop-selector"
                             :use-chips="true"
@@ -96,8 +96,7 @@
                             :disable="disabled"
                             v-model="resources[cform.name]"
                             v-else-if="cform.name === 'vm_drop_ids'"
-                            @change="onUpdateVmDrop">
-          </vm-drop-selector>
+                            @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <p v-else-if="cform.name === 'skip_outside_daytime_hours'">
             <q-toggle size="md"
@@ -111,15 +110,8 @@
           <warmup-period-selector class="dial-sessions__form__warmup-period-selector"
                                   :disable="disabled"
                                   v-else-if="cform.name === 'warmup_period_in_seconds'"
-                                  v-model="resources[cform.name]"/>
-
-          <q-select class="generic-selector-2"
-                    outlined
-                    dense
-                    :options="[]"
-                    v-else
-                    v-model="resources[cform.name]" />
-
+                                  v-model="resources[cform.name]"
+                                  @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
         </div>
       </div>
     </div>
@@ -136,7 +128,7 @@ import ScriptSelector from 'components/generic-selectors/session-scripts-selecto
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import ContactDispositionSelector from 'components/generic-selectors/contact-disposition-selector'
 import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-import OrderSelector from 'components/generic-selectors/session-order-selector.vue'
+import SessionOrderSelector from 'components/generic-selectors/session-order-selector.vue'
 import { SESSION_SETTINGS_ALL_FORMS, DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
 
@@ -176,7 +168,7 @@ export default {
     ContactDispositionSelector,
     VmDropSelector,
     CallDispositionSelector,
-    OrderSelector
+    SessionOrderSelector
   },
 
   data () {
@@ -230,8 +222,13 @@ export default {
       'getSessionMetricsOptions'
     ]),
 
-    onLineFilterChange (value, prop) {
-      this.resources.campaign_id = value
+    onSettingsChange (value, prop) {
+      if (Array.isArray(value)) {
+        this.resources[prop] = value.map(item => this.$isNumeric(item) ? item : item.id)
+        return
+      }
+
+      this.resources[prop] = value
     },
 
     isChanged (property) {
@@ -245,10 +242,6 @@ export default {
 
     onShowWarmUpMenu () {
       this.selectWidth = this.$refs.warmup_period_in_seconds[0].$el.offsetWidth
-    },
-
-    onUpdateVmDrop (value) {
-      this.resources['vm_drop_ids'] = value
     }
   },
 

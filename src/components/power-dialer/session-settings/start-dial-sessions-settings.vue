@@ -103,6 +103,7 @@
                                  flat
                                  outline
                                  dense
+                                 v-show="isRenameAllowed(setting.user_id) || isDeleteAllowed(setting.user_id)"
                                  @click="hoveredMenu = setting.id">
                             <i class="fa fa-ellipsis-h"/>
                           </q-btn>
@@ -112,6 +113,7 @@
                               <q-item dense
                                       clickable
                                       v-close-popup
+                                      v-show="isRenameAllowed(setting.user_id)"
                                       @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
@@ -176,7 +178,7 @@
                              color="primary"
                              unelevated
                              no-caps
-                             :disabled="disabled"
+                             :disabled="isBusy || newSetting"
                              v-if="hasSelectedTemporarySetting"
                              @click="newSetting = true">
                         Save As New
@@ -318,7 +320,7 @@ import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
-import { isEqual } from 'lodash'
+import { isEmpty, isEqual } from 'lodash'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -404,7 +406,7 @@ export default {
     },
 
     filterSelectedItem () {
-      if (this.selectedItem?.id) {
+      if (!isEmpty(this.selectedItem)) {
         return this.selectedItem
       }
 
@@ -601,15 +603,15 @@ export default {
 
     async saveAsNew () {
       this.loading = true
-      const newSettings = { ...this.filterSelectedItem }
+      let newSettings = { ...this.selectedItem }
       newSettings.name = this.newSettingName
       newSettings.is_company_scope = 0
       newSettings.id = null
       newSettings.contact_list_id = null
       this.isBusy = true
 
-      const collection = this.removeEmptyParams(newSettings)
-      const res = await this.createDialerSessionSetting(collection)
+      newSettings = this.removeEmptyParams(newSettings)
+      const res = await this.createDialerSessionSetting(newSettings)
 
       if (res.isAxiosError) {
         console.log({ res })
@@ -634,8 +636,11 @@ export default {
     async updateSelectedSetting () {
       this.saveDisabled = true
 
+      let params = this.removeEmptyParams(this.selectedItem)
+      params = this.fixEmptyMultipleSelectors(params)
+
       const res = await this.updateDialerSessionSetting(
-        this.removeEmptyParams(this.selectedItem)
+        params
       )
 
       if (res?.data) {
@@ -762,8 +767,26 @@ export default {
       this.selectedItem = settings
     },
 
+    isRenameAllowed (userId) {
+      return this.isAdmin || userId === this.profile.id
+    },
+
     isDeleteAllowed (userId) {
       return this.isAdmin || userId === this.profile.id
+    },
+
+    fixEmptyMultipleSelectors (settings) {
+      let newSettings = this.$jsonClone(settings)
+
+      const keys = Object.keys(DEFAULT_SETTING_VALUES)
+
+      keys.forEach((key) => {
+        if (Array.isArray(DEFAULT_SETTING_VALUES[key]) && isEmpty(newSettings[key])) {
+          newSettings[key] = []
+        }
+      })
+
+      return newSettings
     }
   },
 
