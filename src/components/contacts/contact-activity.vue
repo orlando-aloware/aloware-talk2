@@ -522,6 +522,11 @@ export default {
 
     statusClass () {
       return [this.communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']
+    },
+
+    isTaskStatusLogsDisabled () {
+      return this.currentCompany.hasOwnProperty('task_status_logs') &&
+        !this.currentCompany.task_status_logs
     }
   },
 
@@ -530,6 +535,7 @@ export default {
     this.getRelativeDateTimeInterval = setInterval(this.getRelativeDateTime, 10000)
     this.getDateTimePassed()
     this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, 10000)
+    this.updateExcludedAudits()
   },
 
   beforeDestroy () {
@@ -883,6 +889,21 @@ export default {
 
     showAuthor (audit) {
       return !['text_authorized', 'is_opted_out'].includes(audit.property)
+    },
+
+    updateExcludedAudits () {
+      if (this.isTaskStatusLogsDisabled) {
+        this.excluded_audits.push('contact_task_status')
+        return
+      }
+      this.removeTaskStatusFromExcludedAudits()
+    },
+
+    removeTaskStatusFromExcludedAudits () {
+      const toRemove = this.excluded_audits.indexOf('contact_task_status')
+      if (toRemove !== -1) {
+        this.excluded_audits.splice(toRemove, 1)
+      }
     }
   }
 }
