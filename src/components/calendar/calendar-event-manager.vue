@@ -172,7 +172,7 @@
         </b-col>
       </b-row>
 
-      <b-row v-if="isAppointment">
+      <b-row v-if="isAppointment && !schedule.is_past">
         <b-col>
           <h6 class="form-title">SMS Reminder</h6>
         </b-col>
