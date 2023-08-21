@@ -12,18 +12,18 @@
                  md="12">
             <general-information :statics="statics"
                                  v-if="!$route.params.tab || $route.params.tab === 'general-information'"/>
-            <profile :user="user" @onSave="handleSave"
+            <profile :user="user"
                      v-if="$route.params.tab === 'profile' && !isLoading"/>
-            <notification-settings :user="user" @onSave="handleSave"
+            <notification-settings :user="user"
                                    v-if="$route.params.tab === 'notification' && !isLoading"/>
-            <personalization :user="user" @onSave="handleSave"
+            <personalization :user="user"
                              v-if="$route.params.tab === 'personalization' && !isLoading"/>
-            <visibility :user="user" @onSave="handleSave"
+            <visibility :user="user"
                         v-if="$route.params.tab === 'visibility' && hasRole('Company Admin') && !isLoading"/>
-            <inbound-call :user="user" @onSave="handleSave"
+            <inbound-call :user="user"
                           :statics="statics"
                           v-if="$route.params.tab === 'inbound-call' && !isLoading"/>
-            <outbound-call :user="user" @onSave="handleSave"
+            <outbound-call :user="user"
                            v-if="$route.params.tab === 'outbound-call' && !isLoading"/>
             <diagnosis :user="user"
                        v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
@@ -33,6 +33,15 @@
           </b-col>
         </b-row>
       </div>
+      <b-modal id="bv-modal-example" hide-footer>
+        <template #modal-title>
+          Using <code>$bvModal</code> Methods
+        </template>
+        <div class="d-block text-center">
+          <h3>You have unsaved settings changes. This action may cause your settings changes to be lost. Do you wish to continue?</h3>
+        </div>
+        <b-button class="mt-3" block @click="$bvModal.hide('bv-modal-example')">Close Me</b-button>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -101,7 +110,8 @@ export default {
   data () {
     return {
       isLoading: false,
-      onLoadShowSettings: false
+      onLoadShowSettings: false,
+      changedProperties: {}
     }
   },
 
@@ -144,8 +154,8 @@ export default {
       this.onLoadShowSettings = false
     },
 
-    handleSave () {
-      this.$refs.settingsSaveBarRef.onSave()
+    resetChangedProperties () {
+      this.changedProperties = {}
     }
   },
 
@@ -176,6 +186,45 @@ export default {
       if (to.name !== 'Settings' && to.name.toLowerCase().includes('settings')) {
         this.onLoadShowSettings = true
       }
+    },
+
+    'changedUserProperties': function (oldVal, newVal) {
+      if (oldVal.length === newVal.length) this.changedProperties = newVal
+    }
+  },
+
+  beforeRouteUpdate (to, from, next) {
+    let changed = this.changedProperties
+    if (changed.length > 0) {
+      const msg = 'This action may cause your settings changes to be lost. Do you wish to continue?'
+      const title = 'You have unsaved settings'
+      this.$bvModal.msgBoxConfirm(msg, {
+        title: title,
+        size: 'md',
+        noCloseOnBackdrop: true,
+        noCloseOnEsc: true,
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        footerClass: 'p-2',
+        hideHeaderClose: false,
+        centered: true
+      }).then(value => {
+        if (value) {
+          this.resetUserChanges()
+          this.resetChangedProperties()
+          next()
+        } else {
+          this.resetUserChanges()
+          this.resetChangedProperties()
+          next(false)
+        }
+      }).catch(err => {
+        console.error(err)
+        next(false)
+      })
+    } else {
+      next()
     }
   }
 }

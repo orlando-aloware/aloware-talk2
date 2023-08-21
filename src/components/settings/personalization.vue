@@ -164,7 +164,6 @@ export default {
         name: prop,
         value: value
       })
-      this.$emit('onSave')
     }
   }
 }

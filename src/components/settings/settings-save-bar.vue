@@ -44,10 +44,6 @@ export default {
   props: {
     user: {
       required: true
-    },
-    hidden: {
-      required: true,
-      default: false
     }
   },
 
@@ -65,7 +61,7 @@ export default {
     },
 
     isVisible () {
-      return !this.hidden
+      return this.changedUserProperties.length > 0
     }
   },
 
@@ -104,18 +100,11 @@ export default {
 
       return Promise.all([
         this.saveChanges()
-      ])
-        .then(response => {
-          this.$generalNotification('Setting has been updated successfully.')
-        })
-        .catch(error => {
-          const message = error.response.data.hasOwnProperty('error') ? error.response.data.error : 'Your changes couldn\'t been saved'
-          this.$generalNotification(message, 'error')
-        })
-        .finally(() => {
-          this.resetChangedUserProperties()
-          this.isBusy = false
-        })
+      ]).finally(() => {
+        this.resetChangedUserProperties()
+        this.isBusy = false
+        this.$generalNotification('Your changes has been saved.')
+      })
     },
 
     saveChanges () {
