@@ -25,8 +25,7 @@
           </span>
 
           <q-btn class="mt-2 d-block"
-                 href="https://support.aloware.com"
-                 target="_blank"
+                 @click="showIntercom"
                  type="a"
                  color="primary"
                  unelevated
@@ -79,6 +78,12 @@ export default {
     noClose (event) {
       if (event) {
         event.stopPropagation()
+      }
+    },
+
+    showIntercom (event) {
+      if (window.Intercom) {
+        window.Intercom('show')
       }
     }
   },
