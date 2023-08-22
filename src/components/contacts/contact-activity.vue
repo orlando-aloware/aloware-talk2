@@ -896,12 +896,14 @@ export default {
         this.excluded_audits.push('contact_task_status')
         return
       }
+
       this.removeTaskStatusFromExcludedAudits()
     },
 
     removeTaskStatusFromExcludedAudits () {
-      if (this.excluded_audits.indexOf('contact_task_status') !== -1) {
-        this.excluded_audits.splice(this.excluded_audits.indexOf('contact_task_status'), 1)
+      const indexToRemove = this.excluded_audits.indexOf('contact_task_status')
+      if (indexToRemove !== -1) {
+        this.excluded_audits.splice(indexToRemove, 1)
       }
     }
   }
