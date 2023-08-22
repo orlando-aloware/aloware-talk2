@@ -900,8 +900,7 @@ export default {
     },
 
     removeTaskStatusFromExcludedAudits () {
-      const toRemove = this.excluded_audits.indexOf('contact_task_status')
-      if (toRemove !== -1) {
+      if (this.excluded_audits.indexOf('contact_task_status') !== -1) {
         this.excluded_audits.splice(toRemove, 1)
       }
     }
