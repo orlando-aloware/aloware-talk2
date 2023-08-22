@@ -224,6 +224,7 @@ export default {
             attachment: firstAttachment.data,
             type: 'sms',
             contactId: communication.contact.id,
+            messageIcon: 'error-icon',
             communicationId: communication.id,
             campaignId: campaignId.data
           }
