@@ -103,7 +103,7 @@ export default {
       ]).finally(() => {
         this.resetChangedUserProperties()
         this.isBusy = false
-        this.$generalNotification('Your changes has been saved.')
+        this.$generalNotification('Settings have been updated successfully')
       })
     },
 
