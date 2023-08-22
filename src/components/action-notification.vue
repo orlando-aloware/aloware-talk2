@@ -19,7 +19,7 @@
     </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
-      <div class="d-flex flex-row align-items-start">
+      <div class="d-flex flex-row align-items-center">
         <b-badge v-if="id === 'callFishing' && queueCount > 1"
                  class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
@@ -55,6 +55,15 @@
               {{ runningDateTime }}
             </small>
           </div>
+
+          <!-- caller location -->
+          <div class="d-flex flex-grow-1 align-items-baseline w-100"
+               v-if="location">
+            <span class="mr-auto text-white pr-1 text-sm">
+              {{ location }}
+            </span>
+          </div>
+
           <div class="text-grey-81 message-body text-break d-flex w-100">
             <div class="flex-grow-1 d-flex align-items-center w-100">
               <component class="message-icon mr-1"
@@ -85,8 +94,8 @@
             </div>
           </div>
         </div>
+
         <div class="d-flex justify-content-center align-items-center call-actions"
-             :class="[isCall && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -491,9 +500,24 @@ export default {
 
     notificationIconClasses () {
       return [
-        this.isCall && this.getSource ? 'mt-2' : '',
         this.id === 'system' ? 'system-update' : ''
       ]
+    },
+
+    location () {
+      if (!this.communication || !this.contact) {
+        return false
+      }
+
+      let city = this.communication.city || this.contact.cnam_city || null
+      const state = this.communication.state || this.contact.cnam_state || null
+      const country = this.communication.country || this.contact.cnam_country || null
+
+      if (!city && !state && !country) {
+        return 'Unknown Location'
+      }
+
+      return `${city || ''}${city && state ? ', ' : ''}${state || ''}${state && country ? ' - ' : ''} ${country || ''}`
     }
   },
 

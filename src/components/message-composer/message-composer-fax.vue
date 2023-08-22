@@ -8,7 +8,7 @@
             <i class="far fa-file-pdf media-icon"></i>
           </div>
           <p class="ellipsis mt-1 text-center">{{ messageComposer.fax.filename }}</p>
-          <b-button pill size="sm" class="btn-remove-attachments" @click="onRemoveFile"> <i class="fa fa-times"></i> </b-button>
+          <b-button pill size="sm" class="btn-remove-attachments" @click="onRemoveFile"><i class="fa fa-times"></i></b-button>
         </div>
       </div>
     </div>
@@ -53,9 +53,9 @@
     <div class="pt-2 d-flex justify-between">
       <div></div>
       <q-btn color="primary"
-               class="message-composer-send-button"
-               :disable="isSending || !validFax"
-               @click="send">
+             class="message-composer-send-button"
+             :disable="isSending || !validFax"
+             @click="send">
         <template slot="default">
           <q-spinner-bars v-if="isSending"
                           class="mr-1"
@@ -113,7 +113,7 @@ export default {
       this.isUploading = true
       const formData = new FormData()
       formData.append('file', file)
-      talk2Api.V1.lines.pdfUpload(
+      talk2Api.V1.lines.faxUpload(
         this.selectedLine.id,
         formData,
         {
@@ -121,13 +121,12 @@ export default {
             this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
           }.bind(this)
         }
-      )
-        .then(response => {
-          this.setMessageComposerFaxFilename(response.data.file_name)
-          this.$refs.faxForm.reset()
-        }).finally(() => {
-          this.isUploading = false
-        })
+      ).then(response => {
+        this.setMessageComposerFaxFilename(response.data.file_name)
+        this.$refs.faxForm.reset()
+      }).finally(() => {
+        this.isUploading = false
+      })
     },
     sendCallback () {
       this.resetMessageComposerFax()

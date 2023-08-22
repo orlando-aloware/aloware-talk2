@@ -218,7 +218,6 @@ import {
 } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
-import * as CompanyImportance from 'src/constants/importance-label'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import EmailIcon from 'components/icons/email-icon'
 import VideoConferenceIcon from 'components/icons/video-conference-icon'
@@ -291,8 +290,7 @@ export default {
       showEditForm: false,
       isProcessingDNC: false,
       isProcessingBlock: false,
-      isVideoConferenceLinkSending: false,
-      CompanyImportance
+      isVideoConferenceLinkSending: false
     }
   },
 
