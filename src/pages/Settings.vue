@@ -215,8 +215,12 @@ export default {
           this.resetChangedProperties()
           next()
         } else {
-          this.resetUserChanges()
-          this.resetChangedProperties()
+          changed.forEach(element => {
+            const prop = element.property
+            const value = element.value
+            this.user[prop] = value
+            this.onUpdateFields(value, prop)
+          })
           next(false)
         }
       }).catch(err => {
