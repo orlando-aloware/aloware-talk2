@@ -29,19 +29,10 @@
                        v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
             <sms-templates :user="user"
                            v-if="$route.params.tab === 'sms-templates' && !isLoading"/>
-            <settings-save-bar :user="user" :hidden="true" ref="settingsSaveBarRef"/>
+            <settings-save-bar :user="user"/>
           </b-col>
         </b-row>
       </div>
-      <b-modal id="bv-modal-example" hide-footer>
-        <template #modal-title>
-          Using <code>$bvModal</code> Methods
-        </template>
-        <div class="d-block text-center">
-          <h3>You have unsaved settings changes. This action may cause your settings changes to be lost. Do you wish to continue?</h3>
-        </div>
-        <b-button class="mt-3" block @click="$bvModal.hide('bv-modal-example')">Close Me</b-button>
-      </b-modal>
     </div>
   </div>
 </template>

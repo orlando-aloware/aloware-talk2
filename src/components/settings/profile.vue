@@ -1,6 +1,5 @@
 <template>
   <b-container>
-
     <b-form autocomplete="off">
       <b-form-row>
         <b-col sm="12" md="12">
@@ -571,12 +570,11 @@ export default {
 
       // reset phone number when backup routing is disabled
       if (prop === 'phone_number_as_backup' && !this.user[prop]) {
-        this.user.phone_number = false
+        this.user.phone_number = this.userClone.phone_number
         this.updateChangedUserProperties({
           name: 'phone_number',
-          value: false
+          value: this.userClone.phone_number
         })
-        this.$emit('onSave')
       }
 
       this.updateFormValidity()
