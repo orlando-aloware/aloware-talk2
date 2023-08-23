@@ -45,6 +45,7 @@ export default {
       }
 
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
+        console.log('intercom', window.Intercom)
         if (window.Intercom) {
           window.Intercom('boot', {
             alignment: 'left',
