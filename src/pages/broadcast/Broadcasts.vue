@@ -215,6 +215,10 @@
                 </span>
               </td>
               <td :key="`c-${colIndex}`"
+                  v-else-if="col.name === 'engagement_rate'">
+                {{ getEngagement(row[col.field]) }}
+              </td>
+              <td :key="`c-${colIndex}`"
                   v-else-if="col.name == 'target_group'">
                 <template v-if="row['tag']">
                   <i class="fa fa-circle"
@@ -819,6 +823,10 @@ export default {
       }
 
       return found
+    },
+
+    getEngagement (engagement) {
+      return engagement === 0 ? '-' : engagement + '%'
     },
 
     onPopupHide () {
