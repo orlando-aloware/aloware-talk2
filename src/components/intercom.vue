@@ -35,7 +35,6 @@ export default {
 
   methods: {
     setup (newRoute = false) {
-      console.trace(newRoute)
       // @custom for The Moderate Genius Reseller & SimpSocial
       if (this.currentCompany && [2132, 357].includes(this.currentCompany.reseller_id)) {
         return
@@ -46,7 +45,6 @@ export default {
       }
 
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
-        console.log('intercom', window.Intercom)
         if (window.Intercom) {
           window.Intercom('boot', {
             alignment: 'left',
@@ -123,8 +121,6 @@ export default {
     },
 
     processSetup (newRoute = false) {
-      console.trace(newRoute)
-      console.log(this.hasReporterAccess, this.isWhiteLabel, this.profile, process.env.APP_ENV)
       if (!this.hasReporterAccess &&
         !this.isWhiteLabel &&
         this.profile &&
