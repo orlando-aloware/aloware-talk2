@@ -646,10 +646,10 @@
               </b-col>
             </b-form-row>
 
-            <!--SENT BY-->
+            <!--SENT TO-->
             <b-form-row v-if="getUser(communication.user_id) && communication.type === CommunicationTypes.SMS">
               <b-col class="pl-0 pr-0">
-                <q-item-label>Sent by: </q-item-label>
+                <q-item-label>Sent to: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
