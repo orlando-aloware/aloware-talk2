@@ -377,6 +377,11 @@ export default {
           if (!_.isEmpty(this.appliedFiltersPreviousFilters)) {
             this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
             this.$VueEvent.fire('updateHasFilterChanges')
+
+            // alert the user that some error happened
+            if (!this.$axios.isCancel(err)) {
+              this.$generalNotification('The selected filters took too long to apply. Please change your selected filters.', 'error')
+            }
           }
 
           const fetchCancelledWithNoFetchInProgress = this.$axios.isCancel(err) &&

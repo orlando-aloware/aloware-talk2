@@ -3,7 +3,7 @@
     <div class="align-items-center"
          v-if="!isEditingNote">
       <div class="notes mt-1"
-           v-html="communication.notes"/>
+           v-html="$options.filters.nl2br(communication.notes)"/>
       <a href="#"
          class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
          @click.prevent="onEditNote(true)">

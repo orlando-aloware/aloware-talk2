@@ -8047,13 +8047,6 @@ span.mention {
 .notes-body {
   p {
     display: -webkit-box;
-    /*-webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;*/
-    br {
-      display: none !important;
-    }
 
     .mention,
     .mention-tag {
