@@ -13095,13 +13095,17 @@ h1.contact-list-name-label {
     }
 
     &__view {
-      max-width: 500px;
+      max-width: calc(100% - 550px);
       flex-grow: 1;
       margin-right: 15px;
       display: flex;
       flex-direction: column;
 
       @media (min-width: 1425px) {
+        max-width: calc(100% - 750px);
+      }
+
+      @media (min-width: 1900px) {
         max-width: 1000px;
       }
 
