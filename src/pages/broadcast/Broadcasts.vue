@@ -1021,6 +1021,10 @@ export default {
 
     broadcastFilter (data) {
       this.onPaginationChanged({ page: 1, per_page: this.pagination.perPage })
+    },
+
+    filteredBroadcasts () {
+      this.calculateTotalPages()
     }
   }
 }
