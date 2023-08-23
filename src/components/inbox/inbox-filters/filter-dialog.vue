@@ -10,9 +10,10 @@
            @hidden="onHidden"
            @show="onShow"
            @shown="onShown">
-    <div class="modal-body-wrapper d-flex">
+    <div class="modal-body-wrapper"
+         :class="isFilterDialogForView ? 'd-sm-flex' : 'd-flex'">
       <div class="left-column-wrapper"
-           v-if="!this.isFilterDialogForView">
+           v-if="!isFilterDialogForView">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-3">
@@ -73,7 +74,7 @@
       </div>
 
       <div class="flex-grow-1 right-column-wrapper">
-        <div class="container d-flex justify-content-between mb-3 action-option-container">
+        <div class="d-flex justify-content-between mb-3 px-3">
           <q-input class="view-filter-name mb-0 w-50"
                    ref="viewName"
                    debounce="500"
@@ -96,7 +97,7 @@
                      :default-filter-model="defaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="container d-flex justify-content-end mt-3 action-option-container">
+        <div class="d-flex justify-content-end my-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
@@ -104,14 +105,14 @@
               Reset
             </compact-btn>
             <compact-btn class="btn-primary"
+                         :class="isViewEditModeOrNonView ? 'mr-2' : ''"
                          :disabled="isSaveAsNewDisabled"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
             <compact-btn variant="success"
-                         class="ml-2"
                          :disabled="isUpdatingFilter"
-                         v-if="!isFilterDialogForView || (isFilterDialogForView && isEditingView)"
+                         v-if="isViewEditModeOrNonView"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
@@ -180,6 +181,7 @@ export default {
       'appliedFilter',
       'inboxShowMyContacts',
       'pinnedViews',
+      'isFilterDialogForView',
       'isEditingView'
     ]),
 
@@ -292,6 +294,10 @@ export default {
       return nonViewEditMode || viewEditMode
         ? this.selectedFilter.name
         : 'New (Untitled)'
+    },
+
+    isViewEditModeOrNonView () {
+      return !this.isFilterDialogForView || (this.isFilterDialogForView && this.isEditingView)
     }
   },
 
