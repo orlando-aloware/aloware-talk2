@@ -282,6 +282,9 @@
                    @hide="onPopupHide()">
       <q-card>
         <q-card-section>
+          <i class="fa-sharp fa-solid fa-xmark fa-xl position-absolute"
+             style="right: 15px; top: 25px; cursor: pointer"
+             @click="onCancelPopup"/>
           <template v-if="popupAction === 'delete'">
             <span class="text-h6">
               Delete broadcast
@@ -293,24 +296,16 @@
               Are you sure you want to delete <span class="text-bold">{{ popupActionList.length }}</span> broadcasts?
             </p>
             <div class="d-flex">
-              <q-btn class="px-1 flex-grow-1 broadcasts-cancel-button"
-                     color="white"
-                     text-color="black"
-                     unelevated
-                     @click="onCancelPopup">
-                <span class="px-2">Cancel</span>
-              </q-btn>
-              <q-btn class="ml-3 flex-grow-1"
-                     color="danger"
-                     unelevated
-                     :loading="popupLoadingAction"
-                     @click="onDeleteBroadcast(popupActionList)">
-                <span class="px-2">Delete</span>
-              </q-btn>
+              <compact-btn custom-class="btn-block align-center p-3"
+                           variant="danger"
+                           :disabled="popupLoadingAction"
+                           @clicked="onDeleteBroadcast(popupActionList)">
+                <span class="w-100">Delete</span>
+              </compact-btn>
             </div>
           </template>
           <template v-if="popupAction === 'rename'">
-            <div class="text-h6">
+            <div class="broadcast-proxy-modal-title">
               Rename broadcast
             </div>
             <div class="mt-2 text-muted">
@@ -319,20 +314,12 @@
             <q-input outlined
                      v-model="popupRename"/>
             <div class="d-flex">
-              <q-btn class="px-1 flex-grow-1"
-                     color="white"
-                     text-color="black"
-                     unelevated
-                     @click="onCancelPopup">
-                <span class="px-2">Cancel</span>
-              </q-btn>
-              <q-btn class="ml-3 flex-grow-1"
-                     color="primary"
-                     unelevated
-                     :loading="popupLoadingAction"
-                     @click="renameBroadcast(popupActionList)">
-                <span class="px-2">Save</span>
-              </q-btn>
+              <compact-btn custom-class="btn-block align-center p-3 mt-3"
+                           variant="primary"
+                           :disabled="popupLoadingAction"
+                           @clicked="renameBroadcast(popupActionList)">
+                <span class="w-100">Save</span>
+              </compact-btn>
             </div>
           </template>
           <template v-if="['play', 'pause'].includes(popupAction)">
@@ -349,20 +336,12 @@
               Scheduled tasks such as calls or messages will NOT go out.
             </p>
             <div class="d-flex">
-              <q-btn class="px-1 flex-grow-1 broadcasts-cancel-button"
-                     color="white"
-                     text-color="black"
-                     unelevated
-                     @click="onCancelPopup">
-                <span class="px-2">Cancel</span>
-              </q-btn>
-              <q-btn class="ml-3 flex-grow-1"
-                     unelevated
-                     :color="popupAction === 'play' ? 'primary' : 'warning'"
-                     :loading="popupLoadingAction"
-                     @click="toggleBroadcastStatus(popupActionList)">
-                <span class="px-2">{{ popupAction === 'play' ? 'Resume' : 'Pause' }}</span>
-              </q-btn>
+              <compact-btn custom-class="btn-block align-center p-3"
+                           :variant="popupAction === 'play' ? 'primary' : 'warning'"
+                           :disabled="popupLoadingAction"
+                           @clicked="toggleBroadcastStatus(popupActionList)">
+                <span class="w-100">{{ popupAction === 'play' ? 'Resume' : 'Pause' }}</span>
+              </compact-btn>
             </div>
           </template>
         </q-card-section>
