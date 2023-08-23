@@ -116,6 +116,12 @@ export default {
             this.$VueEvent.fire('new_in_app_call', event.communication)
           }
         })
+        .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
+          const incomingNumber = event.incoming_number
+          const contact = event.contact
+          const direction = event.direction
+          this.$VueEvent.fire('desktop_high_sms_volume', { incomingNumber, contact, direction })
+        })
         .listen('.user.in-app.communication.answered_call', (event) => {
           const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
           if (campaign) {

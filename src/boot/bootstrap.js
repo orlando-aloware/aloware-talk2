@@ -235,7 +235,6 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
     Vue,
     dsn: process.env.SENTRY_DSN_PUBLIC,
     environment: process.env.APP_ENV,
-    integrations: [new Sentry.BrowserTracing()],
     tracingOptions: {
       trackComponents: true
     },
@@ -261,6 +260,23 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'NetworkError',
       'Navigation cancelled from',
       'Blocked a frame with origin'
+    ],
+
+    // This sets the sample rate to be 10%. You may want this to be 100% while
+    // in development and sample at a lower rate in production
+    replaysSessionSampleRate: 0.1,
+
+    // If the entire session is not sampled, use the below sample rate to sample
+    // sessions when an error occurs.
+    replaysOnErrorSampleRate: 1.0,
+
+    integrations: [
+      new Sentry.BrowserTracing(),
+      new Sentry.Replay({
+        // Additional SDK configuration goes in here, for example:
+        maskAllText: true,
+        blockAllMedia: true
+      })
     ]
   })
 
