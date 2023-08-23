@@ -35,6 +35,7 @@ export default {
 
   methods: {
     setup (newRoute = false) {
+      console.trace(newRoute)
       // @custom for The Moderate Genius Reseller & SimpSocial
       if (this.currentCompany && [2132, 357].includes(this.currentCompany.reseller_id)) {
         return
@@ -122,6 +123,8 @@ export default {
     },
 
     processSetup (newRoute = false) {
+      console.trace(newRoute)
+      console.log(this.hasReporterAccess, this.isWhiteLabel, this.profile, process.env.APP_ENV)
       if (!this.hasReporterAccess &&
         !this.isWhiteLabel &&
         this.profile &&
