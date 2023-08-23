@@ -38,7 +38,7 @@ pipeline {
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
 
-                //println "${text}"
+                println "${text}"
               }
             }
         }
