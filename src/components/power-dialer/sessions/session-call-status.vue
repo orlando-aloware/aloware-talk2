@@ -330,7 +330,6 @@ import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as CompanyImportance from 'src/constants/importance-label'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
@@ -377,8 +376,7 @@ export default {
       loadingUnhold: false,
       isRedialClicked: false,
       isProcessingDNC: false,
-      redialedTask: {},
-      CompanyImportance
+      redialedTask: {}
     }
   },
 

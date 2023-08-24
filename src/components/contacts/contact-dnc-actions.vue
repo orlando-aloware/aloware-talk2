@@ -19,7 +19,7 @@
       </i>
     </b-button>
 
-    <b-button v-if="hasRole('Company Admin') && contact.is_dnc && currentCompany && [CompanyImportance.IMPORTANCE_RESTRICTED, CompanyImportance.IMPORTANCE_C_LEVEL].includes(currentCompany.importance)"
+    <b-button v-if="hasRole('Company Admin') && contact.is_dnc && currentCompany && currentCompany.undnc_enabled"
               variant="light"
               size="sm"
               class="custom-action-button"
@@ -49,7 +49,6 @@
 
 import { aclMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import * as CompanyImportance from 'src/constants/importance-label'
 import talk2Api from 'src/plugins/api/api'
 import ContactUndncModal from 'components/contacts/contact-undnc-modal'
 
@@ -71,7 +70,6 @@ export default {
       isProcessingDNC: false,
       isProcessingBlock: false,
       showUnDncModal: false,
-      CompanyImportance,
       reason: ''
     }
   },
