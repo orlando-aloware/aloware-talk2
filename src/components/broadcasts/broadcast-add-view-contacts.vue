@@ -67,7 +67,6 @@
       <!-- Filters option -->
       <transition name="slide-left">
         <contacts-filters class="broadcast-add__contacts__filters"
-                          no-close-button
                           v-if="optionSelected === 'filter'"
                           @filtersUpdated="onFiltersUpdated"/>
       </transition>
