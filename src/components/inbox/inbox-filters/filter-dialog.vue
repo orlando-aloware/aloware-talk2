@@ -73,7 +73,7 @@
         </div>
       </div>
 
-      <div class="flex-grow-1 right-column-wrapper">
+      <div class="flex-grow-1 right-column-wrapper w-50">
         <div class="d-flex justify-content-between mb-3 px-3">
           <q-input class="view-filter-name mb-0 w-50"
                    ref="viewName"
@@ -97,7 +97,7 @@
                      :default-filter-model="defaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="d-flex justify-content-end my-3 px-3">
+        <div class="d-flex justify-content-end mt-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
