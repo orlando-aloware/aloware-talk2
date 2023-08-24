@@ -59,7 +59,7 @@
 
       <b-col sm="12" md="6">
         <b-button block class="bg-grey-70 text-black border-0"
-                  @click="onHide">
+                  @click="onHide(true)">
           Cancel
         </b-button>
       </b-col>
@@ -167,10 +167,15 @@ export default {
       }
     },
 
-    onHide () {
+    onHide (cancelled = false) {
       this.toggleFilterModelForm()
 
       if (this.isFilterDialogForView) {
+        if (cancelled) {
+          this.toggleFilterDialog(true)
+          return
+        }
+
         this.$VueEvent.fire('openInboxViewPopup')
         this.toggleFilterDialog(false)
         return

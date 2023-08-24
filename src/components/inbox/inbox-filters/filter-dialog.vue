@@ -403,7 +403,9 @@ export default {
 
     onHidden () {
       this.toggleFilterDialog()
-      this.setFilterDialogForView(false)
+
+      const isForView = this.isFilterModelFormShown && this.isFilterDialogForView
+      this.setFilterDialogForView(isForView)
     },
 
     onHide () {
