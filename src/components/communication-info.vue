@@ -757,7 +757,7 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body overflow-auto text-break"
          v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isActiveCall">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
