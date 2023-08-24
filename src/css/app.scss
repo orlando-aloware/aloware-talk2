@@ -7461,7 +7461,7 @@ table.datatable {
     border-right: 1px solid $grey-60;
     padding-right: 10px;
     padding-left: 10px;
-    max-width: 50%;
+    max-width: 25%;
 
     .filter-group-title {
       font-size: 12px;
@@ -7480,7 +7480,7 @@ table.datatable {
       span:not(.check-icon) {
         font-size: 13px;
         color: $grey-100;
-        width: 20vw;
+        width: 95%;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
