@@ -83,12 +83,26 @@
             <div class="d-flex justify-content-center w-100 px-1 options"
                  :class="[broadcastFilter === 5 ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
-                  All
+                  Stopped
                 </span>
                 <div class="text-center broadcast-count ml-1"
                      v-if="broadcastCounts[4] > 0">
                   <span>
                     {{ broadcastCounts[4] | numberPlusFormatter(99) }}
+                  </span>
+                </div>
+            </div>
+          </template>
+          <template v-slot:six>
+            <div class="d-flex justify-content-center w-100 px-1 options"
+                 :class="[broadcastFilter === 6 ? 'text-white' : 'text-grey-90']">
+                <span class="text-left broadcast-filter-name">
+                  All
+                </span>
+                <div class="text-center broadcast-count ml-1"
+                     v-if="broadcastCounts[5] > 0">
+                  <span>
+                    {{ broadcastCounts[5] | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
@@ -507,7 +521,7 @@ export default {
   data: () => ({
     loading: false,
     broadcastsSearchText: '',
-    broadcastFilter: 5,
+    broadcastFilter: 6,
     broadcastFilterOptions: [
       {
         value: 1,
@@ -532,6 +546,11 @@ export default {
       {
         value: 5,
         slot: 'five',
+        filter: BroadcastStatuses.STATUS_STOPPED
+      },
+      {
+        value: 6,
+        slot: 'six',
         filter: null
       }
     ],
@@ -669,6 +688,7 @@ export default {
         this.getCount(BroadcastStatuses.STATUS_ENROLLING),
         this.getCount(BroadcastStatuses.STATUS_DONE),
         this.getCount(BroadcastStatuses.STATUS_PAUSED),
+        this.getCount(BroadcastStatuses.STATUS_STOPPED),
         this.broadcasts.length
       ]
     },
