@@ -21,12 +21,13 @@
             <div class="filter-items cursor-pointer position-relative"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>New (Untitled)
+              <div>
+                <span>New (Untitled)</span>
                 <span class="position-absolute check-icon"
                       v-if="!selectedFilter">
                   <check-o-icon color="#040404" />
                 </span>
-              </span>
+              </div>
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
@@ -73,7 +74,8 @@
         </div>
       </div>
 
-      <div class="flex-grow-1 right-column-wrapper w-50">
+      <div class="flex-grow-1 right-column-wrapper"
+          :class="!isFilterDialogForView ? 'w-50' : ''">
         <div class="d-flex justify-content-between mb-3 px-3">
           <q-input class="view-filter-name mb-0 w-50"
                    ref="viewName"
@@ -97,7 +99,7 @@
                      :default-filter-model="defaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="d-flex justify-content-end mt-3 px-3">
+        <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"

@@ -7480,7 +7480,7 @@ table.datatable {
       span:not(.check-icon) {
         font-size: 13px;
         color: $grey-100;
-        width: 8vw;
+        width: 20vw;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -7488,7 +7488,7 @@ table.datatable {
       }
 
       span.position-absolute.check-icon {
-        right: 20px;
+        right: 10px;
         top: 5px;
       }
 
