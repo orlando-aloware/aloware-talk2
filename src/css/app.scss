@@ -13031,6 +13031,10 @@ h1.contact-list-name-label {
       .datatable {
         padding-left: 0 !important;
 
+        .sorted-column {
+          padding-left: 28px !important;
+        }
+
         tr {
           min-height: 50px;
           height: 50px;
