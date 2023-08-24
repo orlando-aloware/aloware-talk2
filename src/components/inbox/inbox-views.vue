@@ -93,7 +93,7 @@ export default {
 
     triggers: {
       type: String,
-      default: 'focus hover'
+      default: 'focus'
     },
 
     views: {
