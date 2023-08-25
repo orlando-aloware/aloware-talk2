@@ -175,7 +175,8 @@ export default {
     onHide () {
       this.toggleFilterModelForm()
 
-      if ((this.isFilterDialogForView && this.isCancelled) || this.activeChannel.value !== 'mentions') {
+      const nonViewChannel = !this.isFilterDialogForView && this.activeChannel.value !== 'mentions'
+      if ((this.isFilterDialogForView && this.isCancelled) || nonViewChannel) {
         this.toggleFilterDialog(true)
         return
       }
@@ -220,7 +221,8 @@ export default {
 
       return talk2Api.V2.inbox.filters.save(this.filter)
         .then(response => {
-          if (filterType === ChannelType.CHANNEL_INBOX) {
+          console.log(this.isFilterDialogForView)
+          if (this.isFilterDialogForView && filterType === ChannelType.CHANNEL_INBOX) {
             this.setFilterDialogForView(true)
           }
 
