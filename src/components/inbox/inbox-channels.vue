@@ -865,13 +865,15 @@ export default {
 
     onApplyFilter (filter) {
       if (this.isFilterDialogForView) {
+        this.currentTask = STATUS_OPEN
+
         // change actively selected channel
         this.setSelectedFilter(this.appliedFilter)
-        this.currentTask = STATUS_OPEN
         this.loadContactTasks()
-        const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+        this.fetchTaskCounts()
 
-        if (pinnedIndex > 0) {
+        const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+        if (pinnedIndex >= 0) {
           this.$router.push({
             name: 'Inbox View',
             params: {
@@ -897,6 +899,8 @@ export default {
           console.log(err)
           this.$handleErrors(err.response)
         })
+
+        return
       }
 
       this.filter = filter

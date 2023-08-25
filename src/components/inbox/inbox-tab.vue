@@ -221,6 +221,7 @@ import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dia
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
+import { STATUS_OPEN } from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox-tab',
@@ -264,7 +265,8 @@ export default {
       'activeChannel',
       'pinnedViews',
       'contacts',
-      'channelClonedFilter'
+      'channelClonedFilter',
+      'isFilterDialogForView'
     ]),
 
     ...mapState('contacts', [
@@ -674,6 +676,26 @@ export default {
       this.setChannelClonedFilter(this.filter)
       this.loadContactTasks()
       this.fetchTaskCounts()
+
+      // if a pinned view is edited, redirect to inbox view route
+      if (this.isFilterDialogForView) {
+        this.currentTask = STATUS_OPEN
+
+        const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+        if (pinnedIndex > 0) {
+          this.$router.push({
+            name: 'Inbox View',
+            params: {
+              viewId: this.appliedFilter.id,
+              status: this.statusText,
+              channel: 'view'
+            }
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
+        }
+      }
     },
 
     onCreateNewFilter (filter) {
@@ -894,9 +916,10 @@ export default {
   },
 
   created () {
-    if (this.$route.name !== 'Inbox View') {
+    if (this.$route.name !== 'Inbox View' && !this.isFilterDialogForView) {
       this.resetFilter()
     }
+
     this.toggleFilterDialog(false)
   },
 
