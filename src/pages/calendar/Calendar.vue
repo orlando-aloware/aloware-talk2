@@ -62,6 +62,19 @@
                   options-selected-class="text-primary"
                   color="primary"
                   option-value="id"
+                  option-label="format"
+                  input-debounce="0"
+                  emit-value
+                  map-options
+                  dense
+                  outlined
+                  :options="timeFormats"
+                  v-model="timeFormat"
+                  @input="updateTimeFormat" />
+        <q-select class="mr-2"
+                  options-selected-class="text-primary"
+                  color="primary"
+                  option-value="id"
                   option-label="name"
                   input-debounce="0"
                   emit-value
@@ -69,8 +82,7 @@
                   dense
                   outlined
                   :options="views"
-                  v-model="view">
-        </q-select>
+                  v-model="view" />
         <helper/>
       </div>
     </div>
@@ -125,6 +137,8 @@ import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import moment from 'moment'
+import { mapActions, mapState } from 'vuex'
+import api from 'src/plugins/api/api'
 
 export default {
   name: 'Calendar',
@@ -165,12 +179,19 @@ export default {
         { 'id': 'month', name: 'Month' },
         { 'id': 'week', name: 'Week' }
       ],
+      timeFormat: 1,
+      timeFormats: [
+        { id: 1, format: 'AM/PM' },
+        { id: 2, format: '24-hour' }
+      ],
       cancel_token: this.$axios.CancelToken,
       source: null
     }
   },
 
   computed: {
+    ...mapState('auth', ['profile']),
+
     currentDate () {
       let d = ''
       const m = moment(this.gotoDate)
@@ -227,6 +248,8 @@ export default {
   },
 
   mounted () {
+    this.timeFormat = this.profile.time_format
+
     if ('communication_id' in this.$route.query) {
       this.$axios.get('/api/v1/calendar/events/show/' + this.$route.query.communication_id + '/communication').then(res => {
         this.editSchedule(res.data)
@@ -235,6 +258,8 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['setProfile']),
+
     onDateSelected (date) {
       this.gotoDate = date
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
@@ -372,6 +397,15 @@ export default {
 
     viewChange (mode) {
       this.view = mode
+    },
+
+    updateTimeFormat () {
+      const payload = Object.assign({ ...this.profile }, { time_format: this.timeFormat })
+      api.V1.user.update(this.profile.id, payload)
+        .then(res => {
+          this.setProfile(res.data)
+          this.$refs.scheduler.reInit(this.gotoDate, this.view)
+        })
     }
   },
 

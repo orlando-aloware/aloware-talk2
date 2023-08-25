@@ -95,62 +95,55 @@
            :class="[communication.direction === CommunicationDirection.INBOUND ? 'align-items-start' : 'align-items-end']"
            v-if="(communication.type === CommunicationTypes.SMS || (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND))
            && (communication.body || communication.attachments)">
-        <div class=""
-             v-if="communication.attachments && communication.attachments.length > 0">
+        <div v-if="communication.attachments && communication.attachments.length > 0">
           <div v-for="(attachment, index) in communication.attachments"
                :key="index">
-            <template v-if="isAttachmentImage(attachment.mime_type)">
-              <q-img
-                v-if="isAttachmentMigrated(attachment)"
-                class="border-rounded img-fluid d-block r-2x mb-1"
-                :src="attachment.url"
-                width="320px"
-                fit="fill"
-                native-context-menu>
-                <template v-slot:error>
-                  <div class="absolute-full flex flex-center bg-negative text-white">
-                    Error!
-                  </div>
-                </template>
-                <template v-slot:default>
-                  <download-button buttonStyle="top: 8px; left: 8px"
-                                   :filename="attachment.name"
-                                   :attachment-url="attachment.url"/>
-                </template>
-              </q-img>
-              <img
-                v-if="!isAttachmentMigrated(attachment)"
-                :key="index"
-                class="img-fluid d-block r-2x"
-                :class="index > 0 ? 'mb-1' : ''"
-                height="320px"
-                src="/assets/images/loading.svg"/>
+            <template v-if="attachment.mime_type">
+              <template v-if="isAttachmentImage(attachment.mime_type)">
+                <q-img
+                  class="border-rounded img-fluid d-block r-2x mb-1"
+                  :src="attachment.url"
+                  width="320px"
+                  fit="fill"
+                  native-context-menu>
+                  <template v-slot:error>
+                    <div class="absolute-full flex flex-center bg-negative text-white">
+                      Error!
+                    </div>
+                  </template>
+                  <template v-slot:default>
+                    <download-button buttonStyle="top: 8px; left: 8px"
+                                     :filename="attachment.name"
+                                     :attachment-url="attachment.url"/>
+                  </template>
+                </q-img>
+              </template>
+
+              <div v-if="isAttachmentAudio(attachment.mime_type)">
+                <audio style="height: 25px;width: 300px;margin-top: 10px;"
+                       controls>
+                  <source :src="attachment.url"
+                          :type="attachment.mime_type">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+
+              <div v-if="isAttachmentVideo(attachment.mime_type)">
+                <video width="320"
+                       class="border-rounded"
+                       controls>
+                  <source :src="attachment.url"
+                          :type="attachment.mime_type">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              <download-button is-simple-attachment
+                               :filename="attachment.name"
+                               :attachment-url="attachment.url"
+                               v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
+              </download-button>
             </template>
-
-            <div v-if="isAttachmentAudio(attachment.mime_type)">
-              <audio style="height: 25px;width: 300px;margin-top: 10px;"
-                     controls>
-                <source :src="attachment.url"
-                        :type="attachment.mime_type">
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-
-            <div v-if="isAttachmentVideo(attachment.mime_type)">
-              <video width="320"
-                     class="border-rounded"
-                     controls>
-                <source :src="attachment.url"
-                        :type="attachment.mime_type">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-
-            <download-button is-simple-attachment
-                             :filename="attachment.name"
-                             :attachment-url="attachment.url"
-                             v-if="attachment.mime_type && (isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type))">
-            </download-button>
           </div>
         </div>
 
@@ -529,6 +522,11 @@ export default {
 
     statusClass () {
       return [this.communication.direction === CommunicationDirection.OUTBOUND ? 'ml-1' : 'mr-1']
+    },
+
+    isTaskStatusLogsDisabled () {
+      return this.currentCompany.hasOwnProperty('task_status_logs') &&
+        !this.currentCompany.task_status_logs
     }
   },
 
@@ -537,6 +535,7 @@ export default {
     this.getRelativeDateTimeInterval = setInterval(this.getRelativeDateTime, 10000)
     this.getDateTimePassed()
     this.getDateTimePassedInterval = setInterval(this.getDateTimePassed, 10000)
+    this.updateExcludedAudits()
   },
 
   beforeDestroy () {
@@ -890,6 +889,22 @@ export default {
 
     showAuthor (audit) {
       return !['text_authorized', 'is_opted_out'].includes(audit.property)
+    },
+
+    updateExcludedAudits () {
+      if (this.isTaskStatusLogsDisabled) {
+        this.excluded_audits.push('contact_task_status')
+        return
+      }
+
+      this.removeTaskStatusFromExcludedAudits()
+    },
+
+    removeTaskStatusFromExcludedAudits () {
+      const indexToRemove = this.excluded_audits.indexOf('contact_task_status')
+      if (indexToRemove !== -1) {
+        this.excluded_audits.splice(indexToRemove, 1)
+      }
     }
   }
 }

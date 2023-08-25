@@ -6,6 +6,7 @@
 <script>
 import Scheduler from 'dhtmlx-scheduler'
 import moment from 'moment'
+import { mapState } from 'vuex'
 
 export default {
   name: 'scheduler',
@@ -21,7 +22,11 @@ export default {
     }
   },
 
-  mounted: function () {
+  computed: {
+    ...mapState('auth', ['profile'])
+  },
+
+  mounted () {
     Scheduler.skin = 'material'
     Scheduler.config.header = [
       'today',
@@ -41,7 +46,7 @@ export default {
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
-    Scheduler.config.hour_date = '%g %A'
+    Scheduler.config.hour_date = this.profile.time_format === 1 ? '%g:%i %A' : '%G:%i'
     Scheduler.config.dblclick_create = false
     Scheduler.config.details_on_dblclick = false
     Scheduler.config.drag_event_body = false
@@ -93,7 +98,8 @@ export default {
     }
 
     Scheduler.templates.event_date = function (date) {
-      return moment(date).format('HH:mm')
+      const formatFunc = Scheduler.date.date_to_str(Scheduler.config.hour_date)
+      return formatFunc(date)
     }
 
     Scheduler.templates.event_bar_text = function (start, end, event) {
@@ -166,6 +172,13 @@ export default {
 
     updateCurrentDate (date) {
       this.$emit('update-current-date', date)
+    },
+
+    reInit (date, view) {
+      Scheduler.config.hour_date = this.profile.time_format === 1 ? '%g:%i %A' : '%G:%i'
+
+      Scheduler.init(this.$refs.scheduler, date, view)
+      Scheduler.parse(this.$props.events)
     }
   }
 }
