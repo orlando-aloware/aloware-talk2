@@ -15,7 +15,7 @@
   <b-form @submit.prevent="onSubmit">
     <b-form-row>
       <b-col sm="12" md="12" class="mb-3">
-        <span class="text-bold fs-20">Create New Filter</span>
+        <span class="text-bold fs-20">Create New {{ dialogTitleLabel }}</span>
       </b-col>
       <b-col sm="12" md="12">
         <b-form-group
@@ -59,7 +59,7 @@
 
       <b-col sm="12" md="6">
         <b-button block class="bg-grey-70 text-black border-0"
-                  @click="onHide(true)">
+                  @click="onCancel">
           Cancel
         </b-button>
       </b-col>
@@ -108,6 +108,10 @@ export default {
       set (isOpen) {
         return isOpen
       }
+    },
+
+    dialogTitleLabel () {
+      return this.isFilterDialogForView ? 'View' : 'Filter'
     }
   },
 
@@ -140,7 +144,8 @@ export default {
         scope: 'user'
       },
       selectWidth: 0,
-      ChannelType
+      ChannelType,
+      isCancelled: false
     }
   },
 
@@ -167,22 +172,17 @@ export default {
       }
     },
 
-    onHide (cancelled = false) {
+    onHide () {
       this.toggleFilterModelForm()
 
-      if (this.isFilterDialogForView) {
-        if (cancelled) {
-          this.toggleFilterDialog(true)
-          return
-        }
-
-        this.$VueEvent.fire('openInboxViewPopup')
-        this.toggleFilterDialog(false)
+      if ((this.isFilterDialogForView && this.isCancelled) || this.activeChannel.value !== 'mentions') {
+        this.toggleFilterDialog(true)
         return
       }
 
-      if (this.activeChannel.value !== 'mentions') {
-        this.toggleFilterDialog(true)
+      if (this.isFilterDialogForView && !this.isCancelled) {
+        this.$VueEvent.fire('openInboxViewPopup')
+        this.toggleFilterDialog(false)
       }
     },
 
@@ -199,6 +199,7 @@ export default {
     },
 
     onSubmit () {
+      this.isCancelled = false
       this.$v.$touch()
 
       if (this.$v.$invalid) {
@@ -231,6 +232,11 @@ export default {
           this.$handleErrors(error.response)
           this.isCreating = false
         })
+    },
+
+    onCancel () {
+      this.isCancelled = true
+      this.onHide()
     }
   },
 
