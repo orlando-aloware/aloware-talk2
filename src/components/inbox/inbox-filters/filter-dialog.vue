@@ -236,7 +236,7 @@ export default {
     },
 
     filterHasChanges () {
-      const filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.defaultFilterModel.filter
+      const filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.loadedDefaultFilterModel.filter
 
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
