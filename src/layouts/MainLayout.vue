@@ -615,12 +615,13 @@ export default {
     // })
 
     this.mainListeners.newInAppCall = (communication) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+
+      if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
 
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
       const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
       communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         ? 'missed call'
