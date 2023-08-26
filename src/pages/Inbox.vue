@@ -158,10 +158,10 @@ export default {
     isLoadedPinnedViews (value) {
       if (value && this.$route.name === 'Inbox View') {
         this.setChannel()
-
-        // get counts for inbox
-        this.fetchInboxTaskCounts()
       }
+
+      // get counts for inbox
+      this.fetchInboxTaskCounts()
     }
   }
 }
