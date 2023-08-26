@@ -1,7 +1,8 @@
 <template>
   <div class="inbox-nav-list h-100 overflow-x-hidden"
        :class="{'inbox-nav-list--closed': closed}">
-    <nav-item v-for="item in navListItems"
+    <nav-item badge-value="20"
+              badge-color="danger"
               :key="item.name"
               :label="item.label"
               :value="item.value"
@@ -12,8 +13,7 @@
               :badge="true"
               :openCount="openCount"
               :pending-count="pendingCount"
-              badge-value="20"
-              badge-color="danger"
+              v-for="item in navListItems"
               @click="onItemClicked" />
 
     <hr>
@@ -44,7 +44,7 @@
                 @click="onItemClicked" />
 
         <div class="py-3 text-center text-13 text-word-wrap"
-            v-if="pinnedViews.length < 1">
+             v-if="pinnedViews.length < 1">
           <span>No Pinned Views</span>
         </div>
 

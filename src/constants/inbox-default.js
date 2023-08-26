@@ -98,5 +98,7 @@ export const DEFAULT_STATE = {
   isInboxFiltersLoaded: true,
   pinnedViews: [],
   inboxPersonalFilters: [],
-  inboxCompanyFilters: []
+  inboxCompanyFilters: [],
+  isEditingView: false,
+  showViewsList: false
 }

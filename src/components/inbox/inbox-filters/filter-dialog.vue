@@ -75,7 +75,7 @@
       </div>
 
       <div class="flex-grow-1 right-column-wrapper"
-          :class="!isFilterDialogForView ? 'w-50' : ''">
+           :class="!isFilterDialogForView ? 'w-50' : ''">
         <div class="d-flex justify-content-between mb-3 px-3">
           <q-input class="view-filter-name mb-0 w-50"
                    ref="viewName"
