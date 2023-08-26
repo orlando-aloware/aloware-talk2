@@ -1,44 +1,42 @@
 <template>
-  <b-modal
-    id="create-filter-modal"
-    size="md"
-    modal-class="confirm-dialog"
-    hide-header-close
-    hide-header
-    hide-footer
-    ref="create-filter-modal"
-    v-model="isOpen"
-    @show="onShow"
-    @shown="onShown"
-    @hide="onHide"
-    @hidden="onHidden">
+  <b-modal id="create-filter-modal"
+           size="md"
+           modal-class="confirm-dialog"
+           ref="create-filter-modal"
+           hide-header-close
+           hide-header
+           hide-footer
+           v-model="isOpen"
+           @show="onShow"
+           @shown="onShown"
+           @hide="onHide"
+           @hidden="onHidden">
   <b-form @submit.prevent="onSubmit">
     <b-form-row>
-      <b-col sm="12" md="12" class="mb-3">
+      <b-col sm="12"
+             md="12"
+             class="mb-3">
         <span class="text-bold fs-20">Create New {{ dialogTitleLabel }}</span>
       </b-col>
-      <b-col sm="12" md="12">
-        <b-form-group
-          label="Filter Name"
-          class="form-label"
+      <b-col sm="12"
+             md="12">
+        <b-form-group label="Filter Name"
+                      class="form-label"
         >
-          <b-form-input
-            ref="filterNameInput"
-            size="md"
-            type="text"
-            placeholder="Name"
-            v-model.trim="$v.filter.name.$model"
-            :state = "validateState('name')"
-          ></b-form-input>
+          <b-form-input ref="filterNameInput"
+                        size="md"
+                        type="text"
+                        placeholder="Name"
+                        :state = "validateState('name')"
+                        v-model.trim="$v.filter.name.$model" />
           <b-form-invalid-feedback v-if="!$v.filter.name.required">Enter filter name</b-form-invalid-feedback>
         </b-form-group>
       </b-col>
 
-      <b-col sm="12" md="12">
-        <b-form-group
-          label="Filter Type"
-          class="form-label"
-        >
+      <b-col sm="12"
+             md="12">
+        <b-form-group label="Filter Type"
+                      class="form-label">
           <q-select color="primary"
                     ref="filterTypeSelect"
                     option-value="value"
@@ -48,27 +46,31 @@
                     map-options
                     outlined
                     dense
-                    v-model="filter.scope"
                     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
                     :options="scopeOptions"
                     :disable="true"
+                    v-model="filter.scope"
                     @popup-show="onFilterTypeShowMenu">
           </q-select>
         </b-form-group>
       </b-col>
 
-      <b-col sm="12" md="6">
-        <b-button block class="bg-grey-70 text-black border-0"
+      <b-col sm="12"
+             md="6">
+        <b-button class="bg-grey-70 text-black border-0"
+                  block
                   @click="onCancel">
           Cancel
         </b-button>
       </b-col>
-      <b-col sm="12" md="6">
-        <b-button block
-                  type="submit"
+      <b-col sm="12"
+             md="6">
+        <b-button type="submit"
                   variant="primary"
+                  block
                   :disabled="isCreating">
-          <q-spinner-bars v-if="isCreating" color="white" />
+          <q-spinner-bars color="white"
+                          v-if="isCreating" />
           {{ isCreating ? 'Creating filter...' : 'Create' }}
         </b-button>
       </b-col>
@@ -221,7 +223,6 @@ export default {
 
       return talk2Api.V2.inbox.filters.save(this.filter)
         .then(response => {
-          console.log(this.isFilterDialogForView)
           if (this.isFilterDialogForView && filterType === ChannelType.CHANNEL_INBOX) {
             this.setFilterDialogForView(true)
           }

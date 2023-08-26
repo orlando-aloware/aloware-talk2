@@ -883,6 +883,9 @@ export default {
         this.setSelectedFilter(this.appliedFilter)
         this.setFilterDialogForView(true)
         this.setIsEditingView(true)
+      } else {
+        this.setFilterDialogForView(false)
+        this.setIsEditingView(false)
       }
 
       this.toggleFilterDialog(true)

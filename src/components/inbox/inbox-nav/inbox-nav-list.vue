@@ -172,11 +172,6 @@ export default {
           }
         })
     }
-
-    // listen to filter updates to update the inbox views dialog selection
-    this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
-      this.setInboxPersonalFilters(personalFilters)
-    })
   },
 
   mounted () {
@@ -333,7 +328,7 @@ export default {
     },
 
     onShowViewsList () {
-      this.showViewsList = !this.showViewsList
+      this.showViewsList = true
     },
 
     onCloseViewsList () {

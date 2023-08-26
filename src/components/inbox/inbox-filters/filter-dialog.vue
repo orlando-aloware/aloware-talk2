@@ -181,7 +181,8 @@ export default {
       'inboxShowMyContacts',
       'pinnedViews',
       'isEditingView',
-      'activeChannel'
+      'activeChannel',
+      'inboxPersonalFilters'
     ]),
 
     isOpen: {
@@ -373,9 +374,16 @@ export default {
         return
       }
 
-      this.personalFilters.push(filter)
+      // add to personal filters of currently selected channel
+      if (filter.type === this.defaultFilterModel.type) {
+        this.personalFilters.push(filter)
+      }
 
-      this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
+      // update inbox views popup list
+      const exists = this.inboxPersonalFilters.find(item => +item.id === +filter.id)
+      if (filter.type === ChannelType.CHANNEL_INBOX && !exists) {
+        this.inboxPersonalFilters.push(filter)
+      }
     })
   },
 
@@ -390,7 +398,8 @@ export default {
       'setChannelClonedFilter',
       'setInboxShowMyContacts',
       'setPinnedViews',
-      'setFilterDialogForView'
+      'setFilterDialogForView',
+      'setInboxPersonalFilters'
     ]),
 
     hideModal () {
@@ -639,24 +648,25 @@ export default {
         }
 
         if (!updatedFilter.is_on_company) {
-          const index = this.personalFilters.findIndex(item => item.id === filter.id)
+          const personalFiltersIndex = this.personalFilters.findIndex(item => item.id === filter.id)
+          const inboxPersonalFiltersIndex = this.inboxPersonalFilters.findIndex(item => item.id === filter.id)
           const pinnedViewIndex = this.pinnedViews.findIndex(view => +view.filter_id === +filter.id)
-          let fireEvent = false
 
-          if (index >= 0) {
-            this.personalFilters[index] = updatedFilter
-            fireEvent = true
+          // update personal filters based on actively selected channel
+          if (personalFiltersIndex >= 0 && updatedFilter.type === this.loadedDefaultFilterModel.type) {
+            this.personalFilters[personalFiltersIndex] = updatedFilter
+          }
+
+          // update inbox personal filters loaded in inbox views list
+          if (inboxPersonalFiltersIndex >= 0 && updatedFilter.type === ChannelType.CHANNEL_INBOX) {
+            this.inboxPersonalFilters[inboxPersonalFiltersIndex] = updatedFilter
+            this.setInboxPersonalFilters([...this.inboxPersonalFilters])
           }
 
           // update the pinned view if it is pinned
           if (pinnedViewIndex >= 0) {
             this.pinnedViews[pinnedViewIndex].filter = updatedFilter
             this.setPinnedViews([...this.pinnedViews])
-            fireEvent = true
-          }
-
-          if (fireEvent) {
-            this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
           }
         }
       })
@@ -679,9 +689,23 @@ export default {
         }
 
         if (!filter.is_on_company) {
-          this.personalFilters = this.personalFilters.filter(item => item.id !== filter.id)
+          // update the personal filters of currently selected channel
+          if (filter.type === this.defaultFilterModel.type) {
+            this.personalFilters = this.personalFilters.filter(item => item.id !== filter.id)
+          }
 
-          this.$VueEvent.fire('personalFiltersUpdated', this.personalFilters)
+          // update inbox views popup list
+          if (filter.type === ChannelType.CHANNEL_INBOX) {
+            const inboxPersonalFilters = this.inboxPersonalFilters.filter(item => item.id !== filter.id)
+            this.setInboxPersonalFilters(inboxPersonalFilters)
+          }
+
+          // update the pinned view if it is pinned
+          const pinnedViewIndex = this.pinnedViews.findIndex(view => +view.filter_id === +filter.id)
+          if (pinnedViewIndex >= 0) {
+            this.pinnedViews.splice(pinnedViewIndex, 1)
+            this.setPinnedViews(this.pinnedViews)
+          }
         }
       })
     },
