@@ -134,7 +134,13 @@ export default {
       }
     }
 
+    this.listeners.contactListBulkCreated = (event) => {
+      this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
+    }
+
     this.$VueEvent.listen('endWrapUp', this.listeners.endWrapUp)
+    this.$VueEvent.stop('contact_list_bulk_created', this.listeners.contactListBulkCreated)
+    this.$VueEvent.listen('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   },
 
   async mounted () {
@@ -338,6 +344,7 @@ export default {
   beforeDestroy () {
     this.powerDialerTaskFilters.in_queue = []
     this.$VueEvent.stop('endWrapUp', this.listeners.endWrapUp)
+    this.$VueEvent.stop('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   }
 }
 </script>

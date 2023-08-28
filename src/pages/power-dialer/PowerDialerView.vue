@@ -111,11 +111,11 @@
                                    v-if="isAdmin"
                                    @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"/>
+
                     Export as CSV
                   </b-dropdown-item>
                   <b-dropdown-item href="#"
                                    :disabled="taskAddAndClearingDisabled"
-                                   v-if="isMyQueue"
                                    @click="onClearList">
                     <i class="fa fa-trash-alt mr-1 text-red"/>
                     <span class="text-red">Clear</span>
@@ -125,12 +125,6 @@
                                v-if="taskAddAndClearingDisabled">
                       Clearing of task is currently disabled.
                     </q-tooltip>
-                  </b-dropdown-item>
-                  <b-dropdown-item href="#"
-                                   v-else
-                                   @click="onRemoveList">
-                    <i class="fa fa-trash-alt mr-1 text-red"/>
-                    <span class="text-red">Delete</span>
                   </b-dropdown-item>
                 </b-dropdown>
 

@@ -1,10 +1,12 @@
 <template>
   <div v-if="authenticated"
        class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+
     <div v-show="!hasSessions"
          class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
       <power-dialer-sidebar @fetchMyQueueData="onFetchMyQueueData" />
     </div>
+
     <div class="px-0 mb-0 main flex-1 h-100"
          :class="mainClass">
       <!-- Router Here -->
@@ -32,8 +34,8 @@
                    @on-list-update="updateList"
                    @on-my-queue-list="myQueueList">
       </router-view>
-      <router-view v-if="isPowerDialerSession">
-      </router-view>
+
+      <router-view v-if="isPowerDialerSession" />
     </div>
 
     <template v-if="!hasSessions">
