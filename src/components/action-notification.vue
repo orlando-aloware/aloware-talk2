@@ -620,6 +620,7 @@ export default {
       }
 
       this.clearDateTimeInterval()
+      this.stopNotificationListeners()
 
       if (this.id !== 'callFishing' ||
         (this.id === 'callFishing' &&
@@ -814,12 +815,16 @@ export default {
       const queue = this.callFishingQueue.find(queue => queue?.communicationId === communicationId)
 
       return !isEmpty(queue)
+    },
+
+    stopNotificationListeners () {
+      this.$VueEvent.stop('update_communication', this.notificationListeners[this.id].updateCommunication)
     }
   },
 
   beforeDestroy () {
     this.clearDateTimeInterval()
-    this.$VueEvent.stop('update_communication', this.notificationListeners[this.id].updateCommunication)
+    this.stopNotificationListeners()
   }
 }
 </script>
