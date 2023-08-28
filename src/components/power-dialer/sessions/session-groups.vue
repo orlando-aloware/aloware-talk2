@@ -94,6 +94,13 @@
                                     caption>
                         {{ itm.company_name }}
                       </q-item-label>
+                      <q-item-label lines="2"
+                                    caption>
+                        <span>
+                          <i class="fa fa-globe"></i>
+                          {{ itm.timezone }}
+                        </span>
+                      </q-item-label>
                     </q-item-section>
                     <q-item-section class="t-item-icon"
                                     side
