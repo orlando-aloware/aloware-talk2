@@ -540,6 +540,11 @@ export default {
         if (isCallNotInProgressOrIncoming && this.isCommunicationInCallFishingQueue(communication.id)) {
           this.removeFromCallFishingQueue(communication.id)
         }
+
+        // close the notification
+        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id) {
+          this.processRemoveFromNotification(communication)
+        }
       }
     }
 
