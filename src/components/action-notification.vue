@@ -547,8 +547,6 @@ export default {
         }
       }
     }
-
-    this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
   },
 
   methods: {
@@ -559,8 +557,18 @@ export default {
       'removeFromCallFishingQueue'
     ]),
 
+    startNotificationListeners () {
+      this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
+    },
+
+    stopNotificationListeners () {
+      this.$VueEvent.stop('update_communication', this.notificationListeners[this.id].updateCommunication)
+    },
+
     onShow () {
       this.isValidNotification = false
+      this.stopNotificationListeners()
+      this.startNotificationListeners()
     },
 
     autoClose () {
@@ -815,10 +823,6 @@ export default {
       const queue = this.callFishingQueue.find(queue => queue?.communicationId === communicationId)
 
       return !isEmpty(queue)
-    },
-
-    stopNotificationListeners () {
-      this.$VueEvent.stop('update_communication', this.notificationListeners[this.id].updateCommunication)
     }
   },
 
