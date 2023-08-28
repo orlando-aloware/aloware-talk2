@@ -14,6 +14,7 @@
 
       <div class="broadcast-add__message__sms__composer-body">
         <message-composer-sms :max-attachments="1"
+                              :max-characters="maxSmsBodyLength"
                               :reset-on-load="false"
                               :use-send-button="false"
                               :is-broadcast="true"/>

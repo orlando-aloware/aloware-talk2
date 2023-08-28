@@ -122,6 +122,7 @@
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
                :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
+               @input="imposeCharactersLimit"
                @keydown="onKeyDown"
                @blur="onBlur">
       </q-input>
@@ -258,6 +259,11 @@ export default {
     },
 
     maxAttachments: {
+      type: Number,
+      default: null
+    },
+
+    maxCharacters: {
       type: Number,
       default: null
     },
@@ -695,6 +701,22 @@ export default {
 
     onInput (input) {
       this.$emit('messageChanged', input)
+    },
+
+    async imposeCharactersLimit (value) {
+      if (!this.maxCharacters) {
+        return
+      }
+
+      // Cleanup string from unwanted encoding - quotes
+      value = this.$options.filters.cleanStringToUTF8(value.toString())
+
+      // force reinstatement of maxlength (if bypassed)
+      if (value && value.length > this.maxCharacters) {
+        await this.$nextTick()
+
+        this.messageComposer.sms.body = value.substr(0, this.maxCharacters)
+      }
     }
   },
 
