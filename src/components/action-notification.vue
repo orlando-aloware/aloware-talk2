@@ -196,6 +196,7 @@ import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'action-notification',
@@ -233,7 +234,8 @@ export default {
     return {
       runningDateTime: null,
       runningDateTimeInterval: null,
-      isValidNotification: false
+      isValidNotification: false,
+      notificationListeners: {}
     }
   },
 
@@ -382,10 +384,6 @@ export default {
       return this.queue.length + 1
     },
 
-    isCommunicationInCallFishingQueue () {
-      return !isEmpty(this.callFishingQueue.find(queue => get(queue, 'communicationId', null) === this.communicationId))
-    },
-
     getSource () {
       if (!this.communication) {
         return ''
@@ -518,23 +516,34 @@ export default {
       }
 
       return `${city || ''}${city && state ? ', ' : ''}${state || ''}${state && country ? ' - ' : ''} ${country || ''}`
+    },
+
+    incomingCallStatuses () {
+      return [
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
+        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW
+      ]
     }
   },
 
   created () {
-    this.$VueEvent.listen('update_communication', (data) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
-        return
-      }
+    this.notificationListeners[this.id] = {
+      updateCommunication: (communication) => {
+        if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+          return
+        }
 
-      if (![
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW
-      ].includes(data.current_status2) && this.isCommunicationInCallFishingQueue) {
-        this.removeFromCallFishingQueue(data.id)
+        const isCallNotInProgressOrIncoming = communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+          !this.incomingCallStatuses.includes(communication.current_status2)
+
+        if (isCallNotInProgressOrIncoming && this.isCommunicationInCallFishingQueue(communication.id)) {
+          this.removeFromCallFishingQueue(communication.id)
+        }
       }
-    })
+    }
+
+    this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
   },
 
   methods: {
@@ -543,7 +552,6 @@ export default {
       'setShowPhone',
       'clearCallFishingQueue',
       'removeFromCallFishingQueue'
-      // 'setShowIncomingCallNotification'
     ]),
 
     onShow () {
@@ -554,7 +562,7 @@ export default {
       this.runDateTimeInterval()
 
       if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
-          !this.isCommunicationInCallFishingQueue) ||
+          !this.isCommunicationInCallFishingQueue()) ||
         (this.id === 'incomingCall' && document.getElementById('incomingCall') &&
           isEmpty(this.dialer.call))
       ) {
@@ -791,11 +799,22 @@ export default {
           path: `/contacts/${this.contactId}`
         })
       }
+    },
+
+    isCommunicationInCallFishingQueue (communicationId = null) {
+      if (!communicationId) {
+        communicationId = this.communicationId
+      }
+
+      const queue = this.callFishingQueue.find(queue => queue?.communicationId === communicationId)
+
+      return !isEmpty(queue)
     }
   },
 
   beforeDestroy () {
     this.clearDateTimeInterval()
+    this.$VueEvent.stop('update_communication', this.notificationListeners[this.id].updateCommunication)
   }
 }
 </script>
