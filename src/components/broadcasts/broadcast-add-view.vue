@@ -176,6 +176,7 @@ export default {
             campaign: this.campaign,
             contactsLength: this.contactsLength,
             date: this.date,
+            isScheduled: this.time.time === 'scheduled',
             source: this.source,
             throttle: this.throttle.name,
             type: this.type,

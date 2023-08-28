@@ -32,9 +32,10 @@
     <div class="broadcast-add__preview__row">
       <div class="broadcast-add__preview__row__label">Schedule</div>
       <div class="broadcast-add__preview__row__field">
-        Send at {{ scheduleText }}
+        {{ scheduleText }}
         <b-badge class="ml-2"
-                 variant="light">
+                 variant="light"
+                 v-if="isScheduled">
           {{ companyTimezone }}
         </b-badge>
       </div>
@@ -82,6 +83,12 @@ export default {
     date: {
       type: String,
       required: true
+    },
+
+    isScheduled: {
+      type: Boolean,
+      required: false,
+      default: false
     },
 
     source: {
@@ -140,11 +147,15 @@ export default {
     },
 
     scheduleText () {
+      if (!this.isScheduled) {
+        return 'Send now'
+      }
+
       const format = window.moment().format('YYYY-MM-DD') === this.date.substr(0, 10)
         ? 'hh:mm a'
         : 'MM/DD/YYYY hh:mm a'
 
-      return window.moment(this.date).format(format)
+      return 'Send at ' + window.moment(this.date).format(format)
     },
 
     companyTimezone () {
