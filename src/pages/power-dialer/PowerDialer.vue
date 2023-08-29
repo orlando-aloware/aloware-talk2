@@ -279,6 +279,10 @@ export default {
     this.$VueEvent.listen('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
     this.$VueEvent.listen('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
     this.$VueEvent.listen('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
+    this.$VueEvent.listen('fetchPowerDialerListItems', () => {
+      this.isLoading = true
+      this.loadList(this.selectedListId)
+    })
   },
 
   methods: {

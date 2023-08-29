@@ -111,7 +111,6 @@
                                    v-if="isAdmin"
                                    @click="exportAsCsv">
                     <i class="fa fa-file-csv mr-1"/>
-
                     Export as CSV
                   </b-dropdown-item>
                   <b-dropdown-item href="#"
@@ -666,10 +665,6 @@ export default {
     }
 
     this.init()
-
-    this.$VueEvent.listen('fetchPowerDialerListItems', () => {
-      this.loadList(this.selectedListId)
-    })
   },
 
   computed: {
