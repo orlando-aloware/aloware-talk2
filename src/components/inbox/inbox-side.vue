@@ -90,7 +90,7 @@ export default {
       'communications',
       'taskCounts',
       'inboxTaskCounts',
-      'items'
+      'navListItems'
     ]),
 
     ...mapState(['isMobile']),
@@ -191,7 +191,7 @@ export default {
       this.onLoadShowTasks = false
 
       if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
-        const channel = this.items.find(item => item.value === 'inbox')
+        const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
     },
@@ -223,7 +223,7 @@ export default {
       }
 
       if (to.name === 'Inbox') {
-        const channel = this.items.find(item => item.value === 'inbox')
+        const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
 
