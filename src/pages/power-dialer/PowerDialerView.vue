@@ -666,6 +666,10 @@ export default {
     }
 
     this.init()
+
+    this.$VueEvent.listen('fetchPowerDialerListItems', () => {
+      this.loadList(this.selectedListId)
+    })
   },
 
   computed: {
