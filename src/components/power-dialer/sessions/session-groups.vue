@@ -63,16 +63,16 @@
               <q-list class="px-2 pb-2"
                       v-if="group.length > 0"
                       @mouseleave="onLeave">
-                <template v-for="(itm, i) in group">
+                <template v-for="(taskItem, i) in group">
                   <q-item class="t-expansion-panel px-2"
-                          :class="groupItemGetClass(key, itm)"
+                          :class="groupItemGetClass(key, taskItem)"
                           :key="`acc-item-${i}`"
-                          v-if="itm">
+                          v-if="taskItem">
                     <div class="py-2">
                       <q-avatar size="30px"
                                 color="grey"
-                                v-if="getInitials(itm.name)">
-                        {{ getInitials(itm.name) }}
+                                v-if="getInitials(taskItem.name)">
+                        {{ getInitials(taskItem.name) }}
                       </q-avatar>
                       <q-avatar size="30px"
                                 color="grey"
@@ -84,28 +84,28 @@
                     </div>
                     <q-item-section class="pl-2">
                       <q-item-label>
-                        {{ fetchName(itm) }}
+                        {{ fetchName(taskItem) }}
                       </q-item-label>
                       <q-item-label lines="2"
                                     caption>
-                        {{ itm.phone_number | fixPhone('NATIONAL', true) }}
+                        {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
                       </q-item-label>
                       <q-item-label lines="2"
                                     caption>
-                        {{ itm.company_name }}
+                        {{ taskItem.company_name }}
                       </q-item-label>
                       <q-item-label lines="2"
                                     caption>
                         <span>
                           <i class="fa fa-globe"></i>
-                          {{ itm.timezone }}
+                          {{ taskItem.timezone }}
                         </span>
                       </q-item-label>
                     </q-item-section>
                     <q-item-section class="t-item-icon"
                                     side
                                     top
-                                    v-if="!itm.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'">
+                                    v-if="!taskItem.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'">
                       <q-avatar color="red"
                                 size="md">
                         <PhoneIcon color="white"/>
