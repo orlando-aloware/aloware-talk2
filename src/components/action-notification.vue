@@ -185,6 +185,7 @@ import { get, isEmpty } from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import {
   mentionsMixin,
+  notificationQueueMixin,
   notificationMixin,
   visibilityMixin,
   aclMixin
@@ -194,15 +195,14 @@ import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'action-notification',
 
   mixins: [
     notificationMixin,
+    notificationQueueMixin,
     mentionsMixin,
     visibilityMixin,
     aclMixin
@@ -518,35 +518,21 @@ export default {
       return `${city || ''}${city && state ? ', ' : ''}${state || ''}${state && country ? ' - ' : ''} ${country || ''}`
     },
 
-    incomingCallStatuses () {
-      return [
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW
-      ]
+    notificationQueue () {
+      return this.notifications?.[this.id]?.queue
     }
   },
 
   created () {
     this.notificationListeners[this.id] = {
       updateCommunication: (communication) => {
-        const isCallNotInProgressOrIncoming = communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-          !this.incomingCallStatuses.includes(communication.current_status2)
-
-        // remove call fishing notification from notification queue if
-        // current notification's communication is not the same with
-        // the event's communication so that the notification doesn't show up
-        // (brought from notification queue) when the current notification closes.
-        if (this.communicationId !== communication.id &&
-          isCallNotInProgressOrIncoming &&
-          this.isCommunicationInCallFishingQueue(communication.id)) {
-          this.removeFromCallFishingQueue(communication.id)
-          this.removeFromCallFishingNotificationQueue(communication.id)
-        }
+        this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
 
         if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
           return
         }
+
+        const isCallNotInProgressOrIncoming = this.isCallNotInProgressOrIncoming(communication.disposition_status2, communication.current_status2)
 
         if (isCallNotInProgressOrIncoming && this.isCommunicationInCallFishingQueue(communication.id)) {
           this.removeFromCallFishingQueue(communication.id)
@@ -824,16 +810,24 @@ export default {
           path: `/contacts/${this.contactId}`
         })
       }
-    },
+    }
+  },
 
-    isCommunicationInCallFishingQueue (communicationId = null) {
-      if (!communicationId) {
-        communicationId = this.communicationId
+  watch: {
+    notificationQueue: {
+      deep: true,
+      handler: function (newValue, oldValue) {
+        if (!newValue) {
+          return
+        }
+
+        const difference = oldValue?.filter(x => !newValue.includes(x))
+        const communication = difference?.[0]?.communication
+
+        if (communication) {
+          this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
+        }
       }
-
-      const queue = this.callFishingQueue.find(queue => queue?.communicationId === communicationId)
-
-      return !isEmpty(queue)
     }
   },
 

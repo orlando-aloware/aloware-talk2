@@ -492,6 +492,9 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   return this.$q.notify(options)
 }
 
+window.actionNotificationUnqueuedIntervals = {}
+window.actionNotificationQueuedIntervals = {}
+
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {
   const settings = {
     title: window._.get(notificationData, 'title', null),
@@ -531,8 +534,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   // if call is still on-going and fishing mode active, we queue the notification
   if (settings.type === 'callFishing' &&
     this.$store.state.notifications[settings.type].communicationId &&
-    this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
-    this.$store.state.notifications[settings.type].contactId !== settings.contactId) {
+    this.$store.state.notifications[settings.type].communicationId !== settings.communicationId) {
     let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
     queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
     const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
@@ -560,29 +562,71 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
   data.data = settings
 
-  if (!document.getElementById(settings.type)) {
-    this.$store.commit('SET_NOTIFICATIONS', data)
-    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
-    this.$bvToast.show(settings.type)
+  let unqueuedCounter = 0
+  let queue = null
+
+  if (settings.type !== 'callFishing') {
+    queue = this.$store.state.notifications?.[settings.type]?.queue?.find(queue => queue.communicationId === settings.communicationId)
+  }
+
+  // if notification is unqueued, then we can show the notification
+  if (!queue) {
+    clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+    window.actionNotificationUnqueuedIntervals[settings.type] = setInterval(() => {
+      // we have to make sure there's no notification (by settings type) currently showing
+      if (!document.getElementById(settings.type)) {
+        this.$store.commit('SET_NOTIFICATIONS', data)
+
+        if (settings.type === 'callFishing') {
+          this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+        }
+
+        this.$bvToast.show(settings.type)
+
+        clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+      }
+
+      unqueuedCounter++
+
+      if (unqueuedCounter > 120) {
+        clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+      }
+    }, 500)
 
     return
   }
 
-  let counter = 0
-  let notificationInterval = null
+  let queuedCounter = 0
+  clearInterval(window.actionNotificationQueuedIntervals?.[settings.type])
 
-  notificationInterval = setInterval(() => {
-    if (!document.getElementById(settings.type)) {
-      this.$store.commit('SET_NOTIFICATIONS', data)
-      settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
-      this.$bvToast.show(settings.type)
-      clearInterval(notificationInterval)
+  window.actionNotificationQueuedIntervals[settings.type] = setInterval(() => {
+    queue = this.$store.state.notifications?.[settings.type]?.queue?.find(queue => queue.communicationId === settings.communicationId)
+
+    // if call is not queued in our call fishing notification queue,
+    // then we no longer need to continue to wait for notification availability
+    if (!queue) {
+      clearInterval(window.actionNotificationQueuedIntervals[settings.type])
+
+      return
     }
 
-    counter++
+    if (!document.getElementById(settings.type)) {
+      this.$store.commit('SET_NOTIFICATIONS', data)
 
-    if (counter > 120) {
-      clearInterval(notificationInterval)
+      if (settings.type === 'callFishing') {
+        this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+      }
+
+      this.$bvToast.show(settings.type)
+      clearInterval(window.actionNotificationQueuedIntervals[settings.type])
+
+      return
+    }
+
+    queuedCounter++
+
+    if (queuedCounter > 120) {
+      clearInterval(window.actionNotificationQueuedIntervals[settings.type])
     }
   }, 500)
 }, 100)
