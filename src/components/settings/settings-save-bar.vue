@@ -3,7 +3,7 @@
        :class="contentClass"
        v-if="isVisible">
     <span class="label">
-      You've changed {{ changedUserProperties.length }} property
+      You've changed {{ numberOfChangedProperties }} {{ numberOfChangedProperties > 1 ? 'properties' : 'property' }}
     </span>
     <div class="w-auto"
          :class="actionButtonsClass">
@@ -62,6 +62,10 @@ export default {
 
     isVisible () {
       return this.changedUserProperties.length > 0
+    },
+
+    numberOfChangedProperties () {
+      return this.changedUserProperties.length
     }
   },
 
