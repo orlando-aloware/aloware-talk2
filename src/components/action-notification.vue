@@ -530,12 +530,23 @@ export default {
   created () {
     this.notificationListeners[this.id] = {
       updateCommunication: (communication) => {
+        const isCallNotInProgressOrIncoming = communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
+          !this.incomingCallStatuses.includes(communication.current_status2)
+
+        // remove call fishing notification from notification queue if
+        // current notification's communication is not the same with
+        // the event's communication so that the notification doesn't show up
+        // (brought from notification queue) when the current notification closes.
+        if (this.communicationId !== communication.id &&
+          isCallNotInProgressOrIncoming &&
+          this.isCommunicationInCallFishingQueue(communication.id)) {
+          this.removeFromCallFishingQueue(communication.id)
+          this.removeFromCallFishingNotificationQueue(communication.id)
+        }
+
         if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
           return
         }
-
-        const isCallNotInProgressOrIncoming = communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-          !this.incomingCallStatuses.includes(communication.current_status2)
 
         if (isCallNotInProgressOrIncoming && this.isCommunicationInCallFishingQueue(communication.id)) {
           this.removeFromCallFishingQueue(communication.id)
