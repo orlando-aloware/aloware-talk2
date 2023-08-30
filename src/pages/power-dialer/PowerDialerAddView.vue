@@ -107,7 +107,7 @@
     <template slot="actions">
       <bulk-action-menu class="pb-3"
                         :id="filteredSelectedListId"
-                        :total-rows="totalRows"
+                        :total-rows="totalRows - contactDCNCount"
                         :checked-count="selectedAllCount"
                         :is-loading-more="isLoadingMore"
                         :is-loading="isLoading"
@@ -712,7 +712,8 @@ export default {
       listName: '',
       myContacts: false,
       openPDModal: false,
-      contactCount: 0
+      contactCount: 0,
+      contactDCNCount: 0
     }
   },
 
@@ -917,6 +918,50 @@ export default {
 
     onLoadMore () {
       this.$emit('loadMore')
+    },
+
+    getContactsCountWithoutDNC () {
+      // get the current filters
+      let filterGroups = this.$parent.buildQueryString({}).filter_groups
+
+      // add the DNC filter in every filter group if some filter exists, or just add it once otherwise
+      if (filterGroups) {
+        filterGroups = filterGroups.map(filterGroup => {
+          filterGroup.filters.dnc_option = [
+            {
+              value: 2,
+              operator: 1
+            }
+          ]
+
+          return filterGroup
+        })
+      } else {
+        filterGroups = [
+          {
+            filters: {
+              dnc_option: [
+                {
+                  value: 2,
+                  operator: 1
+                }
+              ]
+            }
+          }
+        ]
+      }
+
+      // build the filter structure
+      const filters = {
+        filters: {
+          filter_groups: filterGroups,
+          my_contacts: this.$parent.showMyContactsViewBased || undefined,
+          list_id: undefined,
+          search: this.$parent.search || undefined
+        }
+      }
+
+      return this.$parent.getListDataCount(filters, false, false)
     }
   },
 
@@ -925,6 +970,17 @@ export default {
       if (this.$route.name === 'Power Dialer') {
         this.loadList(id)
       }
+    },
+
+    async totalRows (value) {
+      if (!this.$route.path.includes('/add')) {
+        return
+      }
+
+      // get the count considering the current filters + DNC
+      const response = await this.getContactsCountWithoutDNC()
+
+      this.contactDCNCount = response.data?.count || 0
     }
   }
 }

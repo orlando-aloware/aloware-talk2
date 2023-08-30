@@ -143,6 +143,10 @@ export default {
     },
 
     selectedAllCount () {
+      if (this.isSelectedAll && this.contactDCNCount > 0) {
+        return this.totalRows - this.contactDCNCount
+      }
+
       if (this.isSelectedAll && this.checked.length < this.fixedContactsData.data.length) {
         return this.totalRows - (this.fixedContactsData.data.length - this.checked.length)
       }
