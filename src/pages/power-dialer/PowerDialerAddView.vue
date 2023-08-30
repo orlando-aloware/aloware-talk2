@@ -112,7 +112,13 @@
                         :is-loading-more="isLoadingMore"
                         :is-loading="isLoading"
                         v-if="filteredSelectedListId"
-                        @onSelectedAll="onSelectedAll"/>
+                        @onSelectedAll="onSelectedAll">
+        <template #checkall-tooltip>
+          <q-tooltip>
+            This action will not select DNC (Do Not Contact) contacts
+          </q-tooltip>
+        </template>
+      </bulk-action-menu>
     </template>
 
     <template slot="table">
@@ -390,7 +396,7 @@
 
         <template #checkall-tooltip>
           <q-tooltip>
-            This action will not select the DNC (Do Not Contact) contacts
+            This action will not select DNC (Do Not Contact) contacts
           </q-tooltip>
         </template>
       </datatable>

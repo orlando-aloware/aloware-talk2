@@ -72,6 +72,7 @@
          v-if="!isAllSelected && checkedCount < totalRows && !isDatatableCountLoading"
          @click.prevent="onClickAll">
           Select all {{ totalRows | numFormat }} contacts.
+          <slot name="checkall-tooltip"/>
       </a>
       <a href=""
          v-if="isAllSelected && !isDatatableCountLoading"
