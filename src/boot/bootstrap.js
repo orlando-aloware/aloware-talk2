@@ -244,12 +244,7 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
     replaysOnErrorSampleRate: 1.0,
 
     integrations: [
-      new Sentry.BrowserTracing(),
-      new Sentry.Replay({
-        // Additional SDK configuration goes in here, for example:
-        maskAllText: true,
-        blockAllMedia: true
-      })
+      new Sentry.BrowserTracing()
     ]
   })
 
