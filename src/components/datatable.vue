@@ -37,7 +37,9 @@
                        :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
                 <span class="checkmark"
-                      :class="checkAllClass"/>
+                      :class="checkAllClass">
+                  <slot name="checkall-tooltip"/>
+                </span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
                 <div class="move-icon-drag-container"

@@ -387,6 +387,12 @@
             </template>
           </tr>
         </template>
+
+        <template #checkall-tooltip>
+          <q-tooltip>
+            This action will not select the DNC (Do Not Contact) contacts
+          </q-tooltip>
+        </template>
       </datatable>
 
       <b-popover triggers="hover"
