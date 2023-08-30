@@ -821,7 +821,7 @@ export default {
           return
         }
 
-        const difference = oldValue?.filter(x => !newValue.includes(x))
+        const difference = oldValue?.filter(queue => !newValue.includes(queue))
         const communication = difference?.[0]?.communication
 
         if (communication) {
