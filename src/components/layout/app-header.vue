@@ -36,15 +36,7 @@
         Refresh
       </compact-btn>
 
-      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading"
-                   v-if="isInInboxPage"
-                   @clicked="refreshInbox">
-        <refresh-icon />
-        Refresh
-      </compact-btn>
-
-      <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
+      <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
@@ -66,7 +58,7 @@
           </q-item-section>
         </q-item>
 
-        <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'" />
+        <profile :hideProfileInfo="$q.screen.width < 450 && ['Inbox', 'Contacts', 'Stats'].includes($route.name)" />
 
         <phone v-if="!titleOnly" />
 
@@ -434,10 +426,6 @@ export default {
       if (this.dialer.error.code === 31208) {
         window.open('https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208')
       }
-    },
-
-    refreshInbox () {
-      this.$VueEvent.fire('fetchInbox')
     }
   },
 

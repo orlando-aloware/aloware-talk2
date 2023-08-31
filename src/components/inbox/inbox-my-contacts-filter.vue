@@ -1,22 +1,37 @@
 <template>
-  <div class="pl-3 d-inline-flex"
+  <div class="d-inline-flex align-items-center"
        v-if="isShown">
-    <b-form-checkbox class="mt-2 cursor-pointer"
+    <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
+                 :disabled="isInboxRefreshBtnLoading"
+                 @clicked="refreshInbox">
+      <refresh-icon />
+      Refresh
+    </compact-btn>
+
+    <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                      size="sm"
                      switch
-                     :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
-                     :disabled="!isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts"
+                     :class="myContactsToggleClass"
+                     :disabled="myContactsToggleEnabled"
                      v-model="inboxShowMyContactsFilter">
+      <q-tooltip>Toggle My Contacts</q-tooltip>
     </b-form-checkbox>
-    <label class="text-primary mt-2 cursor-pointer text-nowrap"
-           :class="{ disabled: !isInboxFiltersLoaded || isGettingTasksList || isFetchingContacts }"
-           @click="myContactsFilterChange">My Contacts</label>
+    <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
+           :class="myContactsToggleClass"
+           @click="myContactsFilterChange">
+      <span class="label-my-contacts"
+            v-if="$q.screen.width > 300">
+        My Contacts
+      </span>
+    </label>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
+import CompactBtn from 'components/compact-btn'
+import RefreshIcon from 'components/icons/refresh-icon'
 
 export default {
   name: 'inbox-my-contacts-filter',
@@ -25,18 +40,32 @@ export default {
     inboxRoutesMixin
   ],
 
+  components: {
+    CompactBtn,
+    RefreshIcon
+  },
+
   computed: {
     ...mapState('inbox', [
       'inboxShowMyContacts',
       'isInboxFiltersLoaded',
       'isGettingTasksList',
-      'isFetchingContacts'
+      'isFetchingContacts',
+      'isInboxRefreshBtnLoading'
     ]),
 
     isShown () {
       return this.$route.name === 'Inbox' ||
         (this.$route?.meta?.title === 'Communications' &&
           this.$route.params.channel !== 'mentions')
+    },
+
+    myContactsToggleClass () {
+      return { disabled: this.myContactsToggleEnabled }
+    },
+
+    myContactsToggleEnabled () {
+      return !this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts
     }
   },
 
@@ -52,7 +81,8 @@ export default {
 
   methods: {
     ...mapActions('inbox', [
-      'setInboxShowMyContacts'
+      'setInboxShowMyContacts',
+      'setIsInboxRefreshBtnLoading'
     ]),
 
     myContactsFilterChange () {
@@ -73,6 +103,11 @@ export default {
 
       // for inbox channels
       this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
+    },
+
+    refreshInbox () {
+      this.setIsInboxRefreshBtnLoading(true)
+      this.$VueEvent.fire('fetchInbox')
     }
   },
 

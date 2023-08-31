@@ -9736,7 +9736,7 @@ screen and (max-width: 956px) {
     padding-left: 10px;
     border-bottom: 1px solid $grey-60;
 
-    span {
+    span:not(.label-my-contacts) {
       color: $grey-92;
       font-size: 18px;
       font-weight: 600;
@@ -10260,7 +10260,7 @@ screen and (max-width: 956px) {
 .stats-refresh-btn {
   height: 32px;
   font-size: $f-size-body-sm;
-  margin-left: 27px;
+  margin-left: 15px;
   font-size: $f-size-h5;
   font-weight: 500;
 
