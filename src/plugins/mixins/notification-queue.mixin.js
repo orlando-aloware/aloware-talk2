@@ -37,7 +37,7 @@ export default {
 
       // remove call fishing notification from queues if
       // current notification's communication is not the same with
-      // the event's communication so that the notification doesn't show up
+      // the event's communication so that a new notification doesn't show up
       // (brought from notification queue) when the current notification closes.
       if (this.communicationId !== commId &&
         isCallNotInProgressOrIncoming &&
