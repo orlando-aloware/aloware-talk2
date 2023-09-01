@@ -18,6 +18,7 @@ import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
 import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
 import log from 'electron-log'
+import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
@@ -567,6 +568,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   // if notification is unqueued, then we can show the notification
   if (!queue) {
     clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+
     window.actionNotificationUnqueuedIntervals[settings.type] = setInterval(() => {
       // we have to make sure there's no notification (by settings type) currently showing
       if (!document.getElementById(settings.type)) {
@@ -583,10 +585,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
       unqueuedCounter++
 
-      if (unqueuedCounter > 120) {
+      if (unqueuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
         clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
       }
-    }, 500)
+    }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 
     return
   }
@@ -620,10 +622,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
     queuedCounter++
 
-    if (queuedCounter > 120) {
+    if (queuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
       clearInterval(window.actionNotificationQueuedIntervals[settings.type])
     }
-  }, 500)
+  }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
@@ -686,7 +688,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     autoHideDelay: '30000',
     isStatus: true
   })
-}, 500)
+}, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 
 Vue.prototype.$jsonClone = (value) => {
   if (value) {
