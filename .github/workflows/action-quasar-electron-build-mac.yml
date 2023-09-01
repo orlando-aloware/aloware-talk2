@@ -20,7 +20,8 @@ jobs:
     strategy:
       matrix:
         os: [ 'macos-latest' ]
-        node-version: [ '18.x' ]
+        node-version: [ '14.x' ]
+        npm-version: [ '6.x' ]
 
     steps:
       - name: Check out Git repository
@@ -42,7 +43,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Update NPM
-        run: npm install -g npm
+        run: npm install -g npm@${{ matrix.npm-version }}
 
       - name: Node version
         run: node --version
