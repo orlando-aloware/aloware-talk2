@@ -1,6 +1,6 @@
 <template>
   <q-toolbar class="page-header"
-             :class="{ 'pl-3 pr-3': !noPadding }">
+             :class="{ 'pl-2 pr-2': !noPadding }">
     <div class="d-flex h-100 align-items-center">
       <back-button class="mobile-back-btn-global-header"
                    v-if="['Contact', 'Settings Tab'].includes($route.name)"

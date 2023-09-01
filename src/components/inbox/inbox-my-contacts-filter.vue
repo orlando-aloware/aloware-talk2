@@ -14,12 +14,13 @@
                      :class="myContactsToggleClass"
                      :disabled="myContactsToggleEnabled"
                      v-model="inboxShowMyContactsFilter">
-      <q-tooltip>Toggle My Contacts</q-tooltip>
+      <q-tooltip content-class="bg-grey-light11">Toggle My Contacts</q-tooltip>
     </b-form-checkbox>
     <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
            :class="myContactsToggleClass"
            @click="myContactsFilterChange">
       <span class="label-my-contacts"
+            :class="{ hidden: $q.screen.width < 390 }"
             v-if="$q.screen.width > 300">
         My Contacts
       </span>
