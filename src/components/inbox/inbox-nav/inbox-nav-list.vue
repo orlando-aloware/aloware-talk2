@@ -1,7 +1,8 @@
 <template>
-  <div class="inbox-nav-list h-100 overflow-y-scroll overflow-x-hidden"
+  <div class="inbox-nav-list h-100 overflow-x-hidden"
        :class="{'inbox-nav-list--closed': closed}">
-    <nav-item v-for="item in items"
+    <nav-item badge-value="20"
+              badge-color="danger"
               :key="item.name"
               :label="item.label"
               :value="item.value"
@@ -12,14 +13,13 @@
               :badge="true"
               :openCount="openCount"
               :pending-count="pendingCount"
-              badge-value="20"
-              badge-color="danger"
+              v-for="item in navListItems"
               @click="onItemClicked" />
 
     <hr>
 
     <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isJobNimbus">
-      <nav-item class="nav-list-group-title d-flex align-items-center justify-content-between"
+      <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
                 label="Views"
@@ -43,8 +43,12 @@
                 v-for="(view, index) in pinnedViews"
                 @click="onItemClicked" />
 
+        <div class="py-3 text-center text-13 text-word-wrap"
+             v-if="pinnedViews.length < 1">
+          <span>No Pinned Views</span>
+        </div>
+
       <inbox-views target="#edit-views-icon"
-                   :show="showViewsList"
                    :views="allInboxFilters"
                    @closed="onCloseViewsList"/>
     </div>
@@ -99,7 +103,7 @@ export default {
 
   computed: {
     ...mapState('inbox', [
-      'items',
+      'navListItems',
       'activeChannel',
       'selectedFilter',
       'appliedFilter',
@@ -152,8 +156,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact'
-      ],
-      showViewsList: false
+      ]
     }
   },
 
@@ -205,7 +208,8 @@ export default {
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setInboxPersonalFilters',
-      'setInboxCompanyFilters'
+      'setInboxCompanyFilters',
+      'setShowViewsList'
     ]),
 
     onItemClicked (nextActive) {
@@ -236,7 +240,7 @@ export default {
       }
 
       this.active = nextActive
-      const channel = this.items.find(item => item.value === nextActive)
+      const channel = this.navListItems.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
       // redirect page to Channel
@@ -328,11 +332,11 @@ export default {
     },
 
     onShowViewsList () {
-      this.showViewsList = true
+      this.setShowViewsList(true)
     },
 
     onCloseViewsList () {
-      this.showViewsList = false
+      this.setShowViewsList(false)
     },
 
     resetFilter () {
@@ -359,7 +363,7 @@ export default {
           const viewId = val.split('-')[1]
           activeChannel = this.getPinnedViewChannel(viewId)
         } else {
-          activeChannel = this.items.find(item => item.value === val)
+          activeChannel = this.navListItems.find(item => item.value === val)
         }
 
         this.$emit('active', activeChannel)

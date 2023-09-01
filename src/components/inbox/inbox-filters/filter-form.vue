@@ -7,16 +7,18 @@
           <b-form-row class="mt-2 quick-access">
             <b-col sm="12"
                    md="6">
-              <b-form-group class="form-label"
-                            :label="dateRangeLabel">
-                <div class="last-engagement-tooltip-wrapper"
-                     v-if="isInboxOrAllComms || isFilterDialogForView">
-                  <information-circle-icon color="#2F80ED"/>
-                  <q-tooltip  anchor="top middle"
-                              self="center middle">
-                    <span class="text-13">Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)</span>
-                  </q-tooltip>
-                </div>
+              <b-form-group class="form-label">
+                <template v-slot:label>
+                  <span>{{ dateRangeLabel }}</span>
+                  <span class="pl-1"
+                        v-if="isInboxOrAllComms || isFilterDialogForView">
+                    <information-circle-icon color="#2F80ED"/>
+                    <q-tooltip anchor="top middle"
+                               self="center middle">
+                      <span class="text-13">Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)</span>
+                    </q-tooltip>
+                  </span>
+                </template>
 
                 <date-range-picker ref="picker"
                                    :class="[dateHasChanges ? 'daterange-picker-highlighted' : '']"
@@ -254,16 +256,17 @@
           <b-form-row class="mt-2">
             <b-col sm="12"
                      md="6">
-              <b-form-group class="form-label"
-                              label="Last Engagement Date Period">
-                <div class="last-engagement-dynamic-tooltip-wrapper"
-                     v-if="isInboxOrInboxViews">
-                  <information-circle-icon color="#2F80ED"/>
-                  <q-tooltip  anchor="top middle"
-                              self="center middle">
-                    <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
-                  </q-tooltip>
-                </div>
+              <b-form-group class="form-label">
+                <template v-slot:label>
+                  <span>Last Engagement Date Period</span>
+                  <span class="pl-1">
+                    <information-circle-icon color="#2F80ED"/>
+                    <q-tooltip anchor="top middle"
+                               self="center middle">
+                      <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
+                    </q-tooltip>
+                  </span>
+                </template>
                 <q-select class="q-user-selector q-basic-selector"
                           options-selected-class="text-primary"
                           color="primary"
@@ -300,27 +303,29 @@
             <b-col sm="12"
                    md="6"
                    v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
-              <b-form-group class="form-label"
-                            label="Communication Owners">
-                <div class="comm-owner-filter-tooltip-wrapper">
-                  <information-circle-icon color="#2F80ED"/>
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    <div class="text-13">
-                      <p class="font-weight-bold">Who is the communication owner?</p>
-                      <p class="font-weight-bold mb-0">For outbound communication:</p>
-                      <p class="mb-0">Calls, SMS, fax & emails:</p>
-                      <p><ul><li>The agent that sent the communication</li></ul></p>
+              <b-form-group class="form-label">
+                <template v-slot:label>
+                  <span>Communication Owners</span>
+                  <span class="pl-1">
+                    <information-circle-icon color="#2F80ED"/>
+                    <q-tooltip anchor="top middle"
+                               self="center middle">
+                      <div class="text-13">
+                        <p class="font-weight-bold">Who is the communication owner?</p>
+                        <p class="font-weight-bold mb-0">For outbound communication:</p>
+                        <p class="mb-0">Calls, SMS, fax & emails:</p>
+                        <p><ul><li>The agent that sent the communication</li></ul></p>
 
-                      <p class="font-weight-bold mb-0">For inbound communication:</p>
-                      <p class="mb-0">Calls:</p>
-                      <p><ul><li>The agent that answered the call</li></ul></p>
+                        <p class="font-weight-bold mb-0">For inbound communication:</p>
+                        <p class="mb-0">Calls:</p>
+                        <p><ul><li>The agent that answered the call</li></ul></p>
 
-                      <p class="mb-0">SMS, fax & email:</p>
-                      <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
-                    </div>
-                  </q-tooltip>
-                </div>
+                        <p class="mb-0">SMS, fax & email:</p>
+                        <p><ul><li>The most recently assigned contact owner owns all of these inbound communications</li></ul></p>
+                      </div>
+                    </q-tooltip>
+                  </span>
+                </template>
                 <user-selector custom-placeholder="Select Communication Owners"
                                :force-remove-missing-values="true"
                                :generic-styling="false"

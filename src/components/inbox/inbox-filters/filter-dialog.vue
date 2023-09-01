@@ -10,9 +10,10 @@
            @hidden="onHidden"
            @show="onShow"
            @shown="onShown">
-    <div class="modal-body-wrapper d-flex">
+    <div class="modal-body-wrapper"
+         :class="isFilterDialogForView ? 'd-sm-flex' : 'd-flex'">
       <div class="left-column-wrapper"
-           v-if="!this.isFilterDialogForView">
+           v-if="!isFilterDialogForView">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
         <div class="mt-3">
@@ -20,12 +21,13 @@
             <div class="filter-items cursor-pointer position-relative"
                  v-bind:class="{ 'active' : !selectedFilter }"
                  @click="onSelectFilter(null)">
-              <span>New (Untitled)
+              <div>
+                <span>New (Untitled)</span>
                 <span class="position-absolute check-icon"
                       v-if="!selectedFilter">
                   <check-o-icon color="#040404" />
                 </span>
-              </span>
+              </div>
             </div>
           </div>
           <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
@@ -72,8 +74,9 @@
         </div>
       </div>
 
-      <div class="flex-grow-1 right-column-wrapper">
-        <div class="container d-flex justify-content-between mb-3 action-option-container">
+      <div class="flex-grow-1 right-column-wrapper"
+           :class="!isFilterDialogForView ? 'w-50' : ''">
+        <div class="d-flex justify-content-between mb-3 px-3">
           <q-input class="view-filter-name mb-0 w-50"
                    ref="viewName"
                    debounce="500"
@@ -96,22 +99,22 @@
                      :default-filter-model="loadedDefaultFilterModel"
                      :filter="filter">
         </filter-form>
-        <div class="container d-flex justify-content-end mt-3 action-option-container">
+        <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
-            <compact-btn class="mr-3 btn-tertiary"
+            <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
                          @clicked="onResetFilter">
               Reset
             </compact-btn>
-            <compact-btn class="btn-secondary"
+            <compact-btn class="btn-primary"
+                         :class="isViewEditModeOrNonView ? 'mr-2' : ''"
                          :disabled="isSaveAsNewDisabled"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
-            <compact-btn variant="primary"
-                         class="ml-3"
+            <compact-btn variant="success"
                          :disabled="isUpdatingFilter"
-                         v-if="!isFilterDialogForView || (isFilterDialogForView && isEditingView)"
+                         v-if="isViewEditModeOrNonView"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
@@ -180,6 +183,7 @@ export default {
       'appliedFilter',
       'inboxShowMyContacts',
       'pinnedViews',
+      'isFilterDialogForView',
       'isEditingView',
       'activeChannel',
       'inboxPersonalFilters'
@@ -296,6 +300,10 @@ export default {
         : 'New (Untitled)'
     },
 
+    isViewEditModeOrNonView () {
+      return !this.isFilterDialogForView || (this.isFilterDialogForView && this.isEditingView)
+    },
+
     loadedDefaultFilterModel () {
       if (this.isFilterDialogForView) {
         return {
@@ -399,6 +407,7 @@ export default {
       'setInboxShowMyContacts',
       'setPinnedViews',
       'setFilterDialogForView',
+      'setFilterDialogForView',
       'setInboxPersonalFilters'
     ]),
 
@@ -422,6 +431,7 @@ export default {
     },
 
     onShow () {
+      this.setShowViewsList(false)
       this.personalFilters = []
       this.companyFilters = []
       this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)

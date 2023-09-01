@@ -18,7 +18,7 @@ export default {
       'communicationNotifiedDesktop',
       'voicemailNotifiedDesktop',
       'contactNotifiedDesktop',
-      'fishinModeNotificationAudio',
+      'fishingModeNotificationAudio',
       'appointmentNotifiedDesktop',
       'reminderNotifiedDesktop',
       'notificationAudio'
@@ -52,7 +52,7 @@ export default {
 
       let promise
       if (shouldPlayFishingNotificationSound) {
-        promise = this.fishinModeNotificationAudio.play()
+        promise = this.fishingModeNotificationAudio.play()
       } else {
         promise = this.notificationAudio.play()
       }
@@ -71,7 +71,7 @@ export default {
         return
       }
 
-      this.fishinModeNotificationAudio.pause()
+      this.fishingModeNotificationAudio.pause()
     },
 
     processRemoveFromNotification (communication) {
@@ -224,6 +224,7 @@ export default {
             attachment: firstAttachment.data,
             type: 'sms',
             contactId: communication.contact.id,
+            messageIcon: 'error-icon',
             communicationId: communication.id,
             campaignId: campaignId.data
           }
