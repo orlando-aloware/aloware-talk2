@@ -569,11 +569,11 @@
             <div class="form-horizontal pt-1 mb-3 pb-2 border-bottom"
                  v-if="[CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <label class="form-control-label mb-1">Notes</label>
-              <div class="d-flex flex-column justify-content-center pb-2 w-100"
+              <div class="d-flex flex-column justify-content-center pb-2 w-100 overflow-auto text-break"
                    v-if="communication.type === CommunicationTypes.APPOINTMENT && communication.engagement_data.appointment_note">
                 {{ communication.engagement_data.appointment_note }}
               </div>
-              <div class="d-flex flex-column justify-content-center pb-2 w-100"
+              <div class="d-flex flex-column justify-content-center pb-2 w-100 overflow-auto text-break"
                    v-else-if="communication.type === CommunicationTypes.REMINDER && communication.engagement_data.reminder_note">
                 {{ communication.engagement_data.reminder_note }}
               </div>
@@ -757,7 +757,7 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body"
+    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body overflow-auto text-break"
          v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isActiveCall">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
