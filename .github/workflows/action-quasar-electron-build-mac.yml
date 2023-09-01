@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '14.x' ]
-        npm-version: [ '6.x' ]
+        npm-version: [ '9.x' ]
 
     steps:
       - name: Check out Git repository
