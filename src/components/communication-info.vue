@@ -914,6 +914,10 @@ export default {
         {
           label: 'Cancelled',
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED
+        },
+        {
+          label: 'Missed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_MISSED
         }
       ],
       reminderOptions: [

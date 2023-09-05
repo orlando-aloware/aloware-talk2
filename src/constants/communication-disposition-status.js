@@ -24,6 +24,8 @@ export const DISPOSITION_STATUS_APPOINTMENT_ATTENDED_NEW = 'attended'
 export const DISPOSITION_STATUS_APPOINTMENT_CANCELED_NEW = 'canceled'
 // set appointment status
 export const DISPOSITION_STATUS_APPOINTMENT_SET_NEW = 'set'
+// set appointment status
+export const DISPOSITION_STATUS_APPOINTMENT_MISSED_NEW = 'missed'
 // Call is still going on.
 export const DISPOSITION_STATUS_INPROGRESS_NEW = 1
 // call is abandoned without ringing target.
@@ -49,3 +51,4 @@ export const DISPOSITION_STATUS_MISSED_AND_VOICEMAIL_NEW = 13
 export const DISPOSITION_STATUS_APPOINTMENT_ATTENDED = 9
 export const DISPOSITION_STATUS_APPOINTMENT_CANCELED = 10
 export const DISPOSITION_STATUS_APPOINTMENT_SET = 11
+export const DISPOSITION_STATUS_APPOINTMENT_MISSED = 13
