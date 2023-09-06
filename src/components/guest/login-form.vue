@@ -165,7 +165,7 @@ export default {
     onLoginError (err) {
       this.loading = false
 
-      if (err.response?.data?.type === 9) {
+      if (err.response?.data?.type === 10) {
         this.magicLink = true
         this.error = err.response.data.error
         return
