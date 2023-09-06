@@ -3,7 +3,8 @@
         <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
             <img class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"
                  :src="appLogo"/>
-            <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1">
+            <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1"
+                 v-if="!magicLink">
                 Login
             </div>
             <form class="login-form w-100 px-2"
