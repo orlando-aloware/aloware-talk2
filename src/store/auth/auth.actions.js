@@ -6,17 +6,18 @@ const check = async ({ commit }, payload) => {
   const preventRedirect = get(payload, 'preventRedirect', false)
 
   try {
-    if (storage.local.getItem('api_token') === null) {
-      return Promise.reject('unauthorized')
+    // check if we have api token
+    if (storage.local.getItem('api_token') !== null) {
+      window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
     }
-
-    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
     commit('SET_LOADING', true)
 
     const response = await window.axios.post('/get-auth-user', {
       device_info: null
     })
+
+    storage.local.setItem('api_token', response.data.user.api_token)
 
     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
