@@ -30,7 +30,7 @@ export default {
 
   computed: {
     computedStyle () {
-      return { width: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
+      return { 'min-width': `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     },
 
     avatarText () {
