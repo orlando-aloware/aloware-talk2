@@ -80,9 +80,20 @@
             </form>
             <div class="text-center"
                  v-else>
-                <h4 class="text-black">2FA email sent</h4>
+                <h3 class="text-black">2FA Email Sent</h3>
                 <p v-html="error"></p>
-                <h4 class="text-black">Go check your email!</h4>
+                <div class="mb-2">
+                    <security-code v-model="token"
+                                   ref="securityCode"
+                                   class="mb-2"
+                                   @completed="verifyToken">
+                    </security-code>
+                    <small v-if="verificationMessage.length > 0"
+                           :class="'text-' + verificationMessageType">
+                        {{ verificationMessage }}
+                    </small>
+                </div>
+                <h3 class="text-black">Go check your email!</h3>
             </div>
         </div>
     </div>
@@ -91,10 +102,13 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
+import SecurityCode from 'components/guest/security-code'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
+  components: { SecurityCode },
+
   mixins: [
     aclMixin,
     guestFormsMixin,
@@ -126,11 +140,26 @@ export default {
       deviceInfo: null,
       isPwd: true,
       magicLink: false,
-      error: null
+      error: null,
+      token: '',
+      resendingValidation: false,
+      verificationMessageType: 'success',
+      verificationMessage: '',
+      verificationRequestSent: false
     }
   },
 
   methods: {
+    verifyToken () {
+      window.axios.post(`verify-token/${this.token}`).then(res => {
+        window.location.reload()
+      }).catch(err => {
+        console.log(err)
+        this.verificationMessage = err.response.data.message
+        this.verificationMessageType = 'danger'
+      })
+    },
+
     getLoginParams () {
       let params = {
         email: this.user.email,
