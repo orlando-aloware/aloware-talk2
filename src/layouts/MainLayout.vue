@@ -1406,7 +1406,6 @@ export default {
         }
 
         this.getRingGroups()
-        this.fetchBroadcasts()
         this.getTemplates()
 
         this.getCampaigns()
@@ -2532,9 +2531,6 @@ export default {
       'setIsInboxFiltersLoaded',
       'gettingTasksList',
       'setInboxShowMyContacts'
-    ]),
-    ...mapActions('broadcast', [
-      'fetchBroadcasts'
     ])
   },
 

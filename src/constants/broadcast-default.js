@@ -1,4 +1,7 @@
 export const DEFAULT_STATE = {
   broadcasts: [],
-  isBroadcastsLoading: false
+  broadcastsCount: 0,
+  isBroadcastsLoading: false,
+  search: null,
+  status: 'all'
 }

@@ -1,6 +1,9 @@
 export default function () {
   return {
     broadcasts: [],
-    isBroadcastsLoading: false
+    broadcastsCount: 0,
+    isBroadcastsLoading: false,
+    search: null,
+    status: 'all'
   }
 }

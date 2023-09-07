@@ -501,8 +501,8 @@ export default {
       enable (id) {
         return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
       },
-      get (id = null) {
-        return window.axios.get(`${suffixV1}broadcasts` + (id ? `/${id}` : ''))
+      get (params = {}) {
+        return window.axios.get(`${suffixV1}broadcasts`, { params })
       },
       sendBulkMessage (params) {
         return window.axios.post(`${suffixV1}broadcasts/send-bulk-messages`, params)

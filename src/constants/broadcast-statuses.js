@@ -1,10 +1,10 @@
 // Newly created broadcast
-export const STATUS_NEW = 1
+export const STATUS_NEW = 'new'
 // Contact enrollment started
-export const STATUS_ENROLLING = 2
+export const STATUS_ENROLLING = 'enrolling'
 // Broadcast paused
-export const STATUS_PAUSED = 3
+export const STATUS_PAUSED = 'paused'
 // broadcast done
-export const STATUS_DONE = 4
+export const STATUS_DONE = 'sent'
 // broadcast stopped by user
-export const STATUS_STOPPED = 5
+export const STATUS_STOPPED = 'stopped'

@@ -17,8 +17,25 @@ export default {
     state.broadcasts = broadcasts
   },
 
+  SET_BROADCASTS_COUNT (state, count) {
+    state.broadcastsCount = count
+  },
+
   SET_BROADCASTS_LOADING (state, payload) {
     state.isBroadcastsLoading = payload
+  },
+
+  SET_SEARCH (state, search) {
+    state.search = search
+  },
+
+  SET_STATUS (state, status) {
+    // fix that sometimes is sent, sometimes is done
+    if (status === 'sent') {
+      status = 'done'
+    }
+
+    state.status = status
   },
 
   UPDATE_BROADCAST (state, broadcast) {

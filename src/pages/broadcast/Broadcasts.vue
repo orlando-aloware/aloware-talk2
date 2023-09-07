@@ -3,7 +3,7 @@
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
-               v-show="loading">
+               v-show="loading || isBroadcastsLoading">
       <template #overlay>
         <q-spinner-bars color="primary"
                         size="40px" />
@@ -25,84 +25,84 @@
                       v-model="broadcastFilter">
           <template v-slot:one>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                 :class="[broadcastFilter === 1 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 'new' ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   New
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                      v-if="broadcastCounts[0] > 0">
+                      v-if="broadcastCounts.new > 0">
                   <span>
-                    {{ broadcastCounts[0] | numberPlusFormatter(99) }}
+                    {{ broadcastCounts.new | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
           </template>
           <template v-slot:two>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                 :class="[broadcastFilter === 2 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 'enrolling' ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Enrolling
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts[1] > 0">
+                     v-if="broadcastCounts.enrolling > 0">
                   <span>
-                    {{ broadcastCounts[1] | numberPlusFormatter(99) }}
+                    {{ broadcastCounts.enrolling | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
           </template>
           <template v-slot:three>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                 :class="[broadcastFilter === 3 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 'sent' ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Sent
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts[2] > 0">
+                     v-if="broadcastCounts.done > 0">
                   <span>
-                    {{ broadcastCounts[2] | numberPlusFormatter(99) }}
+                    {{ broadcastCounts.done | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
           </template>
           <template v-slot:four>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                 :class="[broadcastFilter === 4 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 'paused' ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Paused
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts[3] > 0">
+                     v-if="broadcastCounts.paused > 0">
                   <span>
-                    {{ broadcastCounts[3] | numberPlusFormatter(99) }}
+                    {{ broadcastCounts.paused | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
           </template>
           <template v-slot:five>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                 :class="[broadcastFilter === 5 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 'stopped' ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   Stopped
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts[4] > 0">
+                     v-if="broadcastCounts.stopped > 0">
                   <span>
-                    {{ broadcastCounts[4] | numberPlusFormatter(99) }}
+                    {{ broadcastCounts.stopped | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
           </template>
           <template v-slot:six>
             <div class="d-flex justify-content-center w-100 px-1 options"
-                 :class="[broadcastFilter === 6 ? 'text-white' : 'text-grey-90']">
+                 :class="[broadcastFilter === 'all' ? 'text-white' : 'text-grey-90']">
                 <span class="text-left broadcast-filter-name">
                   All
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts[5] > 0">
+                     v-if="broadcastCounts.all > 0">
                   <span>
-                    {{ broadcastCounts[5] | numberPlusFormatter(99) }}
+                    {{ broadcastCounts.all | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
@@ -188,14 +188,15 @@
                  :showPagination="true"
                  :lastPage="pagination.totalPages"
                  :currentPage="pagination.currentPage"
-                 :total-rows="visibleBroadcasts?.length ?? 0"
+                 :total-rows="broadcastsCount"
                  :loading="loading"
+                 :is-scrollable="false"
                  @sort="onSortTable"
                  @reordered="onColumnsReordered"
                  @paginated="onPaginationChanged">
         <template slot="tbody">
           <tr :key="rowIndex"
-              v-for="(row, rowIndex) in visibleBroadcasts">
+              v-for="(row, rowIndex) in broadcasts">
             <template v-for="(col, colIndex) in broadcastsColumns">
               <td class="datatable-row__checkbox"
                   :key="`c-${colIndex}`"
@@ -524,34 +525,28 @@ export default {
     broadcastFilter: 6,
     broadcastFilterOptions: [
       {
-        value: 1,
         slot: 'one',
-        filter: BroadcastStatuses.STATUS_NEW
+        value: BroadcastStatuses.STATUS_NEW
       },
       {
-        value: 2,
         slot: 'two',
-        filter: BroadcastStatuses.STATUS_ENROLLING
+        value: BroadcastStatuses.STATUS_ENROLLING
       },
       {
-        value: 3,
         slot: 'three',
-        filter: BroadcastStatuses.STATUS_DONE
+        value: BroadcastStatuses.STATUS_DONE
       },
       {
-        value: 4,
         slot: 'four',
-        filter: BroadcastStatuses.STATUS_PAUSED
+        value: BroadcastStatuses.STATUS_PAUSED
       },
       {
-        value: 5,
         slot: 'five',
-        filter: BroadcastStatuses.STATUS_STOPPED
+        value: BroadcastStatuses.STATUS_STOPPED
       },
       {
-        value: 6,
         slot: 'six',
-        filter: null
+        value: 'all'
       }
     ],
     broadcastsColumns,
@@ -576,7 +571,10 @@ export default {
   }),
 
   async mounted () {
-    await this.fetchBroadcasts()
+    await this.fetchBroadcasts({
+      page: this.pagination.currentPage,
+      perPage: this.pagination.perPage
+    })
 
     this.calculateTotalPages()
 
@@ -595,12 +593,16 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
+    ...mapState('broadcast', [
+      'isBroadcastsLoading'
+    ]),
     ...mapGetters('broadcast', {
-      broadcasts: 'getBroadcasts'
+      broadcasts: 'getBroadcasts',
+      broadcastsCount: 'getBroadcastsCount'
     }),
 
     isBroadcastsTableEmpty () {
-      return this.broadcastCounts[this.broadcastFilter - 1] === 0
+      return this.broadcasts.length === 0
     },
 
     orderedBroadcasts () {
@@ -647,50 +649,15 @@ export default {
       })
     },
 
-    filteredBroadcasts () {
-      const filter = this.broadcastFilterOptions[this.broadcastFilter - 1]?.filter
-      const text = this.broadcastsSearchText.toLowerCase()
-
-      if (!filter && !text) {
-        return this.orderedBroadcasts
-      }
-
-      return this.orderedBroadcasts.filter(broadcast => {
-        let matchText = true
-        let matchType = true
-
-        if (text) {
-          let broadcastName = broadcast.name.toLowerCase()
-
-          matchText = (broadcast.id + '').includes(text) || broadcastName.includes(text)
-        }
-
-        if (filter) {
-          matchType = broadcast.status === filter
-        }
-
-        return matchText && matchType
-      })
-    },
-
-    visibleBroadcasts () {
-      const { perPage, currentPage } = this.pagination
-      const paginationStart = perPage * (currentPage - 1)
-      const paginationEnd = (perPage * currentPage)
-
-      return this.filteredBroadcasts
-        .slice(paginationStart, paginationEnd)
-    },
-
     broadcastCounts () {
-      return [
-        this.getCount(BroadcastStatuses.STATUS_NEW),
-        this.getCount(BroadcastStatuses.STATUS_ENROLLING),
-        this.getCount(BroadcastStatuses.STATUS_DONE),
-        this.getCount(BroadcastStatuses.STATUS_PAUSED),
-        this.getCount(BroadcastStatuses.STATUS_STOPPED),
-        this.broadcasts.length
-      ]
+      return {
+        new: this.getCount(BroadcastStatuses.STATUS_NEW),
+        enrolling: this.getCount(BroadcastStatuses.STATUS_ENROLLING),
+        done: this.getCount(BroadcastStatuses.STATUS_DONE),
+        paused: this.getCount(BroadcastStatuses.STATUS_PAUSED),
+        stopped: this.getCount(BroadcastStatuses.STATUS_STOPPED),
+        all: this.broadcastsCount
+      }
     },
 
     contextMenuTarget () {
@@ -740,6 +707,8 @@ export default {
     ...mapMutations('broadcast', [
       'ADD_BROADCAST',
       'DELETE_BROADCAST',
+      'SET_SEARCH',
+      'SET_STATUS',
       'UPDATE_BROADCAST'
     ]),
 
@@ -809,7 +778,7 @@ export default {
     },
 
     getCount (filter) {
-      return this.broadcasts.filter(broadcast => broadcast.status === filter).length
+      return this.broadcasts.filter(broadcast => broadcast.status_name.toLowerCase() === filter).length
     },
 
     getThrottling (messagePerMinute) {
@@ -1027,16 +996,17 @@ export default {
     onPaginationChanged ({ page, per_page: perPage }) {
       this.pagination.currentPage = page
       this.pagination.perPage = perPage
-      this.calculateTotalPages()
+
+      this.fetchBroadcasts({ page, perPage })
     },
 
     calculateTotalPages () {
-      if (this.filteredBroadcasts.length === 0) {
+      if (this.broadcasts.length === 0) {
         this.pagination.totalPages = 1
         return
       }
 
-      this.pagination.totalPages = Math.ceil(this.filteredBroadcasts.length / this.pagination.perPage)
+      this.pagination.totalPages = Math.ceil(this.broadcastsCount / this.pagination.perPage)
     }
   },
 
@@ -1046,11 +1016,19 @@ export default {
     },
 
     broadcastFilter (data) {
-      this.onPaginationChanged({ page: 1, per_page: this.pagination.perPage })
+      this.SET_STATUS(data)
+      this.fetchBroadcasts({
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage
+      })
     },
 
-    filteredBroadcasts () {
-      this.calculateTotalPages()
+    broadcastsSearchText (search) {
+      this.SET_SEARCH(search)
+      this.fetchBroadcasts({
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage
+      })
     }
   }
 }
