@@ -78,11 +78,11 @@
                     </b-link>
                 </div>
             </form>
-            <div class="text-center"
+            <div class="login-form w-100 px-5 text-center"
                  v-else>
-                <h3 class="text-black">2FA Email Sent</h3>
+                <h2 class="text-black mb-3">2FA Email Sent</h2>
                 <p v-html="error"></p>
-                <div class="mb-2">
+                <div>
                     <security-code v-model="token"
                                    ref="securityCode"
                                    class="mb-2"
@@ -93,7 +93,7 @@
                         {{ verificationMessage }}
                     </small>
                 </div>
-                <h3 class="text-black">Go check your email!</h3>
+                <h3 class="text-black mt-3">Go check your email!</h3>
             </div>
         </div>
     </div>
@@ -153,7 +153,7 @@ export default {
     verifyToken () {
       window.axios.post(`verify-token/${this.token}`).then(res => {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
-        storage.local.setItem('api_token', res.data.meta.api_token)
+        storage.local.setItem('api_token', res.data.meta.token)
         const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
         window.location.href = redirectPath
       }).catch(err => {
