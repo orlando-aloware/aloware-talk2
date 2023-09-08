@@ -522,7 +522,7 @@ export default {
   data: () => ({
     loading: false,
     broadcastsSearchText: '',
-    broadcastFilter: 6,
+    broadcastFilter: 'all',
     broadcastFilterOptions: [
       {
         slot: 'one',
