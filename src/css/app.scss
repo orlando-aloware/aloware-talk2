@@ -12995,10 +12995,16 @@ h1.contact-list-name-label {
     overflow-y: scroll;
 
     &__graph {
+      padding: 0px 10px;
+
       .custom-toggle-button {
         button[aria-pressed="true"]:hover {
           background: lighten(#4caf50, 10%) !important;
         }
+      }
+
+      .highcharts-scrollbar {
+        display: none;
       }
     }
 
