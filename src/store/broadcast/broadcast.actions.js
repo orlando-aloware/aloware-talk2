@@ -3,6 +3,9 @@ import API from 'src/plugins/api/api'
 export default {
   /**
    * Delete broadcast
+   *
+   * @param {Integer} id - broadcast ID
+   * @returns Promise
    */
   async deleteBroadcast ({ commit }, id) {
     try {
@@ -19,8 +22,15 @@ export default {
 
   /**
    * Fetch broadcasts
+   *
+   * @param {Object} obj
+   * @param {Integer} obj.page - page number
+   * @param {Integer} obj.perPage - records to be retrieved
+   * @param {String} obj.order - asc / desc
+   * @param {String} obj.orderBy - order field
+   * @returns Promise
    */
-  async fetchBroadcasts ({ commit, state }, { page, perPage }) {
+  async fetchBroadcasts ({ commit, state }, { page, perPage, order, orderBy }) {
     try {
       if (state.isBroadcastsLoading) {
         return
@@ -29,8 +39,8 @@ export default {
       commit('SET_BROADCASTS_LOADING', true)
 
       const res = await API.V1.broadcasts.get({
-        order_by: 'id',
-        order: 'desc',
+        order_by: orderBy || 'id',
+        order: order || 'desc',
         per_page: perPage || 10,
         page: page || 1,
         search_text: state.search,

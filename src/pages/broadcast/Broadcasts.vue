@@ -1,7 +1,8 @@
 <template>
   <div class="broadcasts__home position-relative d-flex flex-column h-100">
-    <b-overlay class="h-100 w-100 position-absolute"
+    <b-overlay class="broadcasts__home__loading-overlay"
                rounded="sm"
+               :style="`margin-top: ${notificationHeight}px`"
                :show="true"
                v-show="loading || isBroadcastsLoading">
       <template #overlay>
@@ -29,12 +30,6 @@
                 <span class="text-left broadcast-filter-name">
                   New
                 </span>
-                <div class="text-center broadcast-count ml-1"
-                      v-if="broadcastCounts.new > 0">
-                  <span>
-                    {{ broadcastCounts.new | numberPlusFormatter(99) }}
-                  </span>
-                </div>
             </div>
           </template>
           <template v-slot:two>
@@ -43,12 +38,6 @@
                 <span class="text-left broadcast-filter-name">
                   Enrolling
                 </span>
-                <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts.enrolling > 0">
-                  <span>
-                    {{ broadcastCounts.enrolling | numberPlusFormatter(99) }}
-                  </span>
-                </div>
             </div>
           </template>
           <template v-slot:three>
@@ -57,12 +46,6 @@
                 <span class="text-left broadcast-filter-name">
                   Sent
                 </span>
-                <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts.done > 0">
-                  <span>
-                    {{ broadcastCounts.done | numberPlusFormatter(99) }}
-                  </span>
-                </div>
             </div>
           </template>
           <template v-slot:four>
@@ -71,12 +54,6 @@
                 <span class="text-left broadcast-filter-name">
                   Paused
                 </span>
-                <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts.paused > 0">
-                  <span>
-                    {{ broadcastCounts.paused | numberPlusFormatter(99) }}
-                  </span>
-                </div>
             </div>
           </template>
           <template v-slot:five>
@@ -85,12 +62,6 @@
                 <span class="text-left broadcast-filter-name">
                   Stopped
                 </span>
-                <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts.stopped > 0">
-                  <span>
-                    {{ broadcastCounts.stopped | numberPlusFormatter(99) }}
-                  </span>
-                </div>
             </div>
           </template>
           <template v-slot:six>
@@ -100,9 +71,9 @@
                   All
                 </span>
                 <div class="text-center broadcast-count ml-1"
-                     v-if="broadcastCounts.all > 0">
+                     v-if="broadcastsCount > 0">
                   <span>
-                    {{ broadcastCounts.all | numberPlusFormatter(99) }}
+                    {{ broadcastsCount | numberPlusFormatter(99) }}
                   </span>
                 </div>
             </div>
@@ -567,14 +538,12 @@ export default {
       totalPages: 1,
       currentPage: 1
     },
-    sort: null
+    sort: null,
+    notificationHeight: 0
   }),
 
   async mounted () {
-    await this.fetchBroadcasts({
-      page: this.pagination.currentPage,
-      perPage: this.pagination.perPage
-    })
+    await this.getBroadcasts()
 
     this.calculateTotalPages()
 
@@ -589,6 +558,9 @@ export default {
     this.$VueEvent.listen('broadcasts_deleted', (broadcast) => {
       this.DELETE_BROADCAST(broadcast)
     })
+
+    // set notification height if it exists
+    setTimeout(() => { this.checkNotification() }, 2000)
   },
 
   computed: {
@@ -603,61 +575,6 @@ export default {
 
     isBroadcastsTableEmpty () {
       return this.broadcasts.length === 0
-    },
-
-    orderedBroadcasts () {
-      const broadcasts = this.broadcasts
-
-      if (!this.sort) {
-        return broadcasts
-      }
-
-      return broadcasts.sort((a, b) => {
-        if (!this.sort.orderBy) {
-          return 0
-        }
-
-        let aOrderBy = a[this.sort.orderBy]
-        let bOrderBy = b[this.sort.orderBy]
-
-        if (this.sort.orderBy === 'campaign_id') {
-          aOrderBy = this.getCampaign(aOrderBy)?.name
-          bOrderBy = this.getCampaign(bOrderBy)?.name
-
-          if (aOrderBy && !bOrderBy) {
-            return -1
-          } else if (!aOrderBy && bOrderBy) {
-            return 1
-          }
-        }
-
-        if (aOrderBy === bOrderBy) {
-          return 0
-        }
-
-        let comparison = aOrderBy > bOrderBy ? 1 : -1
-
-        if (typeof aOrderBy === 'string' && typeof bOrderBy === 'string') {
-          comparison = aOrderBy.localeCompare(bOrderBy)
-        }
-
-        if (this.sort.order !== 'asc') {
-          comparison = comparison * -1
-        }
-
-        return comparison
-      })
-    },
-
-    broadcastCounts () {
-      return {
-        new: this.getCount(BroadcastStatuses.STATUS_NEW),
-        enrolling: this.getCount(BroadcastStatuses.STATUS_ENROLLING),
-        done: this.getCount(BroadcastStatuses.STATUS_DONE),
-        paused: this.getCount(BroadcastStatuses.STATUS_PAUSED),
-        stopped: this.getCount(BroadcastStatuses.STATUS_STOPPED),
-        all: this.broadcastsCount
-      }
     },
 
     contextMenuTarget () {
@@ -730,6 +647,8 @@ export default {
 
     onSortTable (sort) {
       this.sort = sort
+
+      this.getBroadcasts()
     },
 
     onContextMenuShow (row) {
@@ -775,10 +694,6 @@ export default {
 
     getContextMenuTargetElementId (row) {
       return `context-menu-btn-${row.id}`
-    },
-
-    getCount (filter) {
-      return this.broadcasts.filter(broadcast => broadcast.status_name.toLowerCase() === filter).length
     },
 
     getThrottling (messagePerMinute) {
@@ -997,38 +912,49 @@ export default {
       this.pagination.currentPage = page
       this.pagination.perPage = perPage
 
-      this.fetchBroadcasts({ page, perPage })
+      this.getBroadcasts()
     },
 
     calculateTotalPages () {
-      if (this.broadcasts.length === 0) {
+      if (this.broadcasts?.length === 0) {
         this.pagination.totalPages = 1
         return
       }
 
       this.pagination.totalPages = Math.ceil(this.broadcastsCount / this.pagination.perPage)
+    },
+
+    getBroadcasts () {
+      return this.fetchBroadcasts({
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage,
+        order: this.sort?.order,
+        orderBy: this.sort?.orderBy
+      })
+    },
+
+    checkNotification () {
+      const notification = document.querySelector('#notification-container')
+
+      if (notification) {
+        this.notificationHeight = notification.getBoundingClientRect().height
+      }
     }
   },
 
   watch: {
-    broadcasts (data) {
+    broadcasts () {
       this.calculateTotalPages()
     },
 
     broadcastFilter (data) {
       this.SET_STATUS(data)
-      this.fetchBroadcasts({
-        page: this.pagination.currentPage,
-        perPage: this.pagination.perPage
-      })
+      this.getBroadcasts()
     },
 
     broadcastsSearchText (search) {
       this.SET_SEARCH(search)
-      this.fetchBroadcasts({
-        page: this.pagination.currentPage,
-        perPage: this.pagination.perPage
-      })
+      this.getBroadcasts()
     }
   }
 }

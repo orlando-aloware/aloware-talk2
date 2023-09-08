@@ -12994,6 +12994,15 @@ h1.contact-list-name-label {
   &__home {
     overflow-y: scroll;
 
+    &__loading-overlay {
+      position: fixed !important;
+      width: calc(100% - 64px);
+      height: calc(100% - 62px);
+      top: 62px;
+      left: 64px;
+      z-index: 9999;
+    }
+
     &__graph {
       padding: 0px 10px;
 
