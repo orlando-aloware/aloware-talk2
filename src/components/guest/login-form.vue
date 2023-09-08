@@ -86,6 +86,7 @@
                     <security-code v-model="token"
                                    ref="securityCode"
                                    class="mb-2"
+                                   @input="clearError"
                                    @completed="verifyToken">
                     </security-code>
                     <small v-if="verificationMessage.length > 0"
@@ -155,12 +156,18 @@ export default {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
         storage.local.setItem('api_token', res.data.meta.token)
         const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
+        this.clearError()
         window.location.href = redirectPath
       }).catch(err => {
         console.log(err)
         this.verificationMessage = err.response.data.message
         this.verificationMessageType = 'danger'
       })
+    },
+
+    clearError () {
+      this.verificationMessageType = 'success'
+      this.verificationMessage = ''
     },
 
     getLoginParams () {
