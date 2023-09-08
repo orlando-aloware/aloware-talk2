@@ -89,10 +89,10 @@
                                    @input="clearError"
                                    @completed="verifyToken">
                     </security-code>
-                    <small v-if="verificationMessage.length > 0"
-                           :class="'text-' + verificationMessageType">
+                    <p v-if="verificationMessage.length > 0"
+                       :class="'text-' + verificationMessageType">
                         {{ verificationMessage }}
-                    </small>
+                    </p>
                 </div>
                 <h3 class="text-black mt-3">Go check your email!</h3>
             </div>
