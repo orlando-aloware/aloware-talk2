@@ -469,6 +469,7 @@
             <b-list-group class="w-100 border-bottom">
               <b-list-group-item class="d-flex align-items-center border-0 pl-0 pr-0">
                 <avatar class="contact-avatar"
+                        :useMinWidth="true"
                         width="40"
                         height="40"
                         :name="contact.name"

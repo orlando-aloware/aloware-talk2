@@ -30,7 +30,7 @@ export default {
 
   computed: {
     computedStyle () {
-      return { 'min-width': `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
+      return { [this.useMinWidth ? 'min-width' : 'width']: `${this.width}px`, height: `${this.height}px`, ...this.avatarStyle() }
     },
 
     avatarText () {
@@ -65,6 +65,11 @@ export default {
     },
 
     sequenceIcon: {
+      type: Boolean,
+      default: false
+    },
+
+    useMinWidth: {
       type: Boolean,
       default: false
     }
