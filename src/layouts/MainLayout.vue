@@ -979,6 +979,13 @@ export default {
       })
     }
 
+    const urlParams = new URLSearchParams(window.location.search)
+    const isImpersonated = Number(urlParams.get('is_impersonated'))
+    if (isImpersonated === 1) {
+      this.clear()
+      storage.local.setItem('impersonate', true)
+    }
+
     if (this.authenticated) {
       this.initAuth()
       this.fetchAllParkedCalls()
@@ -2526,7 +2533,8 @@ export default {
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      clear: 'clear'
     }),
     ...mapActions('stats', [
       'setAvailableMetrics',

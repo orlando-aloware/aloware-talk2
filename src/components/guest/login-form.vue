@@ -78,11 +78,23 @@
                     </b-link>
                 </div>
             </form>
-            <div class="text-center"
+            <div class="login-form w-100 px-5 text-center"
                  v-else>
-                <h4 class="text-black">2FA email sent</h4>
+                <h2 class="text-black mb-3">2FA Email Sent</h2>
                 <p v-html="error"></p>
-                <h4 class="text-black">Go check your email!</h4>
+                <div>
+                    <security-code v-model="token"
+                                   ref="securityCode"
+                                   class="mb-2"
+                                   @input="clearError"
+                                   @completed="verifyToken">
+                    </security-code>
+                    <p v-if="verificationMessage.length > 0"
+                       :class="'text-' + verificationMessageType">
+                        {{ verificationMessage }}
+                    </p>
+                </div>
+                <h3 class="text-black mt-3">Go check your email!</h3>
             </div>
         </div>
     </div>
@@ -91,10 +103,13 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
+import SecurityCode from 'components/guest/security-code'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
+  components: { SecurityCode },
+
   mixins: [
     aclMixin,
     guestFormsMixin,
@@ -126,11 +141,35 @@ export default {
       deviceInfo: null,
       isPwd: true,
       magicLink: false,
-      error: null
+      error: null,
+      token: '',
+      resendingValidation: false,
+      verificationMessageType: 'success',
+      verificationMessage: '',
+      verificationRequestSent: false
     }
   },
 
   methods: {
+    verifyToken () {
+      window.axios.post(`verify-token/${this.token}`).then(res => {
+        storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
+        storage.local.setItem('api_token', res.data.meta.token)
+        const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
+        this.clearError()
+        window.location.href = redirectPath
+      }).catch(err => {
+        console.log(err)
+        this.verificationMessage = err.response.data.message
+        this.verificationMessageType = 'danger'
+      })
+    },
+
+    clearError () {
+      this.verificationMessageType = 'success'
+      this.verificationMessage = ''
+    },
+
     getLoginParams () {
       let params = {
         email: this.user.email,
