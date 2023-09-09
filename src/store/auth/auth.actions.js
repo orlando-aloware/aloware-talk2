@@ -6,18 +6,17 @@ const check = async ({ commit }, payload) => {
   const preventRedirect = get(payload, 'preventRedirect', false)
 
   try {
-    // check if we have api token
-    if (storage.local.getItem('api_token') !== null) {
-      window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
+    if (storage.local.getItem('api_token') === null) {
+      return Promise.reject('unauthorized')
     }
+
+    window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
     commit('SET_LOADING', true)
 
     const response = await window.axios.post('/get-auth-user', {
       device_info: null
     })
-
-    storage.local.setItem('api_token', response.data.user.api_token)
 
     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
@@ -29,7 +28,7 @@ const check = async ({ commit }, payload) => {
 
     if (!preventRedirect &&
       (!response.data.user.enabled ||
-      !response.data.user.company.enabled) &&
+        !response.data.user.company.enabled) &&
       window.location.href.indexOf('/suspended') === -1) {
       window.location.href = '/suspended'
     }
@@ -80,7 +79,10 @@ const login = async ({ commit }, {
 
     const response = await window.axios.post('/login', params)
 
-    const { meta, data } = response.data
+    const {
+      meta,
+      data
+    } = response.data
 
     storage.local.setItem('shared_cookie', meta.hashed_token)
 
@@ -124,7 +126,10 @@ const getCookieUser = async ({ commit }) => {
 
     const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
 
-    const { meta, data } = response.data
+    const {
+      meta,
+      data
+    } = response.data
 
     if (!data.company.talk_enabled) {
       commit('SET_LOADING', false)
@@ -263,7 +268,10 @@ const resetPass = async ({ commit }, payload) => {
 
 const impersonate = async ({ commit }, payload) => {
   try {
-    const { userId, company } = payload
+    const {
+      userId,
+      company
+    } = payload
 
     commit('SET_LOADING', true)
 
