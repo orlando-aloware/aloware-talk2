@@ -3,7 +3,7 @@
     <b-button variant="primary"
               size="sm"
               class="mr-1 btn-block"
-              @click="contactTroughIntercom">
+              @click="showIntercom">
       Report Issue
     </b-button>
     <b-modal
@@ -127,9 +127,6 @@ export default {
         this.$generalNotification(`Error while submitting report. Please try again.`, 'error')
         console.log(err)
       })
-    },
-    contactTroughIntercom () {
-      this.showIntercom()
     }
   }
 }

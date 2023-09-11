@@ -25,7 +25,7 @@
           </span>
 
           <q-btn class="mt-2 d-block"
-                 @click="contactTroughIntercom"
+                 @click="showIntercom"
                  type="a"
                  color="primary"
                  unelevated
@@ -84,10 +84,6 @@ export default {
       if (event) {
         event.stopPropagation()
       }
-    },
-
-    contactTroughIntercom () {
-      this.showIntercom()
     }
   },
 
