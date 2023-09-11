@@ -73,12 +73,12 @@
 
 import * as CustomerIssues from 'src/constants/customer-issues'
 import talk2Api from 'src/plugins/api/api'
-import IntercomMixin from 'src/plugins/mixins/intercom.mixin'
+import intercomMixin from 'src/plugins/mixins/intercom.mixin'
 export default {
   name: 'communication-report-issue',
 
   mixins: [
-    IntercomMixin
+    intercomMixin
   ],
 
   props: {

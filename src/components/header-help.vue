@@ -42,11 +42,11 @@
 <script>
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
-import IntercomMixin from 'src/plugins/mixins/intercom.mixin'
+import intercomMixin from 'src/plugins/mixins/intercom.mixin'
 
 export default {
   mixins: [
-    IntercomMixin
+    intercomMixin
   ],
 
   data () {
