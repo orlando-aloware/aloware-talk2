@@ -25,7 +25,7 @@
           </span>
 
           <q-btn class="mt-2 d-block"
-                 @click="showIntercom"
+                 @click="contactTroughIntercom"
                  type="a"
                  color="primary"
                  unelevated
@@ -42,8 +42,13 @@
 <script>
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
+import IntercomMixin from 'src/plugins/mixins/intercom.mixin'
 
 export default {
+  mixins: [
+    IntercomMixin
+  ],
+
   data () {
     return {
       env: null,
@@ -81,10 +86,8 @@ export default {
       }
     },
 
-    showIntercom (event) {
-      if (window.Intercom) {
-        window.Intercom('show')
-      }
+    contactTroughIntercom () {
+      this.showIntercom()
     }
   },
 

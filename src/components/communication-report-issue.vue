@@ -3,7 +3,7 @@
     <b-button variant="primary"
               size="sm"
               class="mr-1 btn-block"
-              @click="showIntercom">
+              @click="contactTroughIntercom">
       Report Issue
     </b-button>
     <b-modal
@@ -73,8 +73,13 @@
 
 import * as CustomerIssues from 'src/constants/customer-issues'
 import talk2Api from 'src/plugins/api/api'
+import IntercomMixin from 'src/plugins/mixins/intercom.mixin'
 export default {
   name: 'communication-report-issue',
+
+  mixins: [
+    IntercomMixin
+  ],
 
   props: {
     communicationId: {
@@ -123,10 +128,8 @@ export default {
         console.log(err)
       })
     },
-    showIntercom (event) {
-      if (window.Intercom) {
-        window.Intercom('show')
-      }
+    contactTroughIntercom () {
+      this.showIntercom()
     }
   }
 }
