@@ -199,7 +199,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_TRAFFIC_BLOCKED:
           return 'SMS traffic was blocked by Twilio.'
         case CommunicationRejectionReasons.REJECTION_REASON_NOT_MESSAGING_ENABLED:
-          return 'Phone number was not messaging enabled.'
+          return 'Contact phone number was not messaging enabled.'
         case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_DELETED:
           return 'Line was deleted.'
         case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_PAUSED:
