@@ -151,14 +151,15 @@
     <div class="broadcasts__home__table flex-grow-1">
       <datatable class="h-100"
                  ref="broadcastsTable"
-                 :stickyHeaders="true"
+                 use-empty-slot
+                 :sticky-headers="true"
                  :columns="broadcastsColumns"
-                 :isEmpty="isBroadcastsTableEmpty"
-                 :showSelectAll="false"
+                 :is-empty="isBroadcastsTableEmpty"
+                 :show-select-all="false"
                  :paginated="true"
-                 :showPagination="true"
-                 :lastPage="pagination.totalPages"
-                 :currentPage="pagination.currentPage"
+                 :show-pagination="true"
+                 :last-page="pagination.totalPages"
+                 :current-page="pagination.currentPage"
                  :total-rows="broadcastsCount"
                  :loading="loading"
                  :is-scrollable="false"
@@ -265,6 +266,12 @@
               </td>
             </template>
           </tr>
+        </template>
+        <template #empty>
+          <div class="empty-state"
+               v-if="isBroadcastsTableEmpty && !loading">
+            <div class="h5 px-2 text-center">No data</div>
+          </div>
         </template>
       </datatable>
     </div>
