@@ -1,13 +1,14 @@
 <template>
   <b-popover custom-class="inbox-views"
-             boundary="body"
+             boundary="viewport"
+             boundary-padding="5"
              :target="target"
-             :show="show"
+             :show="showViewsList"
              :placement="placement"
              :triggers="triggers"
              @hidden="onClosed">
     <div class="d-flex flex-column"
-         style="height: 350px; width: 350px;">
+         style="max-height: 350px; max-width: 350px;">
       <search class="py-1"
               placeholder="Search Views"
               :border="false"
@@ -92,12 +93,7 @@ export default {
 
     triggers: {
       type: String,
-      default: 'focus hover'
-    },
-
-    show: {
-      type: Boolean,
-      default: false
+      default: 'focus'
     },
 
     views: {
@@ -110,7 +106,8 @@ export default {
   computed: {
     ...mapState('inbox', [
       'pinnedViews',
-      'isFilterDialogShown'
+      'isFilterDialogShown',
+      'showViewsList'
     ]),
 
     ...mapGetters('inbox', [

@@ -1,7 +1,8 @@
 <template>
   <div>
     <hr class="nav-item-separator"
-        v-if="value === 'voicemails'"/>
+        v-if="value === 'voicemails' || label === 'Channels'"/>
+
     <a class="inbox-nav-item mx-2 px-1"
        href="/"
        :class="navItemClass"
@@ -19,7 +20,7 @@
                 :isActive="isActive"
                 v-if="icon !== 'view'"/>
         </div>
-        <div class="inbox-nav-item__label h-100  text-truncate">
+        <div class="inbox-nav-item__label h-100 text-truncate">
           <q-tooltip>
             {{ label }}
           </q-tooltip>

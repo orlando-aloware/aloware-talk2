@@ -226,6 +226,7 @@ import {
   htmlMixin,
   webrtcMixin,
   notificationMixin,
+  notificationQueueMixin,
   broadcastMixin,
   parkCallMixin,
   visibilityMixin,
@@ -290,6 +291,7 @@ export default {
     htmlMixin,
     aclMixin,
     notificationMixin,
+    notificationQueueMixin,
     broadcastMixin,
     parkCallMixin,
     visibilityMixin,
@@ -493,6 +495,7 @@ export default {
       return this.authenticated && !this.isWidget && !this.loading &&
         this.showContactsHeader && !this.suspended && showForMobile
     },
+
     pageHeaderClass () {
       return !this.isShowAppHeader || !this.mobileLiveCallBarShown
         ? 'h-auto' : ''
@@ -713,6 +716,8 @@ export default {
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
       const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
+
+      this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
 
       // update unowned parked call contact's last communication
       if (isCommunicationHasUnownedContact && parkedCallFound) {
@@ -2521,7 +2526,8 @@ export default {
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      clear: 'clear'
     }),
     ...mapActions('stats', [
       'setAvailableMetrics',

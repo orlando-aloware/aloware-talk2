@@ -115,5 +115,8 @@ export default {
   },
   setIsEditingView: ({ commit }, value) => {
     commit('SET_IS_EDITING_VIEW', value)
+  },
+  setShowViewsList: ({ commit }, value = false) => {
+    commit('SET_SHOW_VIEWS_LIST', value)
   }
 }
