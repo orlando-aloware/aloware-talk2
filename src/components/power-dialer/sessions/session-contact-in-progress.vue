@@ -21,14 +21,14 @@
             {{ fullName }}
           </q-item-label>
           <q-item-label caption lines="2">
-            {{ activeTask.phone_number | fixPhone('NATIONAL', true) }}
+            {{ activeTask?.phone_number | fixPhone('NATIONAL', true) }}
           </q-item-label>
           <q-item-label caption lines="2">
-            {{ activeTask.company_name }}
+            {{ activeTask?.company_name }}
           </q-item-label>
           <q-item-label caption lines="2">
             <i class="fa fa-globe"></i>
-            {{ activeTask.timezone }}
+            {{ activeTask?.timezone }}
           </q-item-label>
         </q-item-section>
 

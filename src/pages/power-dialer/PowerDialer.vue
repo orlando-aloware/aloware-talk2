@@ -274,15 +274,17 @@ export default {
       this.powerDialerListAddRemoveContactsProgress = data
     }
 
+    this.powerDialerListeners.fetchPowerDialerListItems = () => {
+      this.isLoading = true
+      this.loadList(this.selectedListId)
+    }
+
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
     this.$VueEvent.listen('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
     this.$VueEvent.listen('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
     this.$VueEvent.listen('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
     this.$VueEvent.listen('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
-    this.$VueEvent.listen('fetchPowerDialerListItems', () => {
-      this.isLoading = true
-      this.loadList(this.selectedListId)
-    })
+    this.$VueEvent.listen('fetchPowerDialerListItems', this.powerDialerListeners.fetchPowerDialerListItems)
   },
 
   methods: {
@@ -459,6 +461,7 @@ export default {
       this.$VueEvent.stop('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
       this.$VueEvent.stop('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
       this.$VueEvent.stop('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
+      this.$VueEvent.stop('fetchPowerDialerListItems', this.powerDialerListeners.fetchPowerDialerListItems)
     }
   },
 
