@@ -44,7 +44,8 @@ export default {
         per_page: perPage || 10,
         page: page || 1,
         search_text: state.search,
-        status: state.status
+        status: state.status,
+        paginate: true
       })
 
       commit('SET_BROADCASTS', res.data.data)
