@@ -62,7 +62,7 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
-import { isEmpty, parseInt } from 'lodash'
+import { isEmpty, parseInt, debounce } from 'lodash'
 
 export default {
   name: 'broadcast-contacts-preview',
@@ -128,6 +128,13 @@ export default {
         default:
           return 'No contacts found'
       }
+    },
+
+    allFilters () {
+      return {
+        ...this.defaultFilters,
+        ...this.currentFilters
+      }
     }
   },
 
@@ -139,8 +146,15 @@ export default {
       page: 1,
       per_page: 25,
       sort: 'last_engagement_at',
-      order: 'desc'
-    }
+      order: 'desc',
+      filters: {
+        dnc_option: {
+          value: 5, // only contacts without dnc
+          operator: 1 // is equal to
+        }
+      }
+    },
+    currentFilters: {}
   }),
 
   created () {
@@ -152,7 +166,9 @@ export default {
   },
 
   methods: {
-    init () {
+    init: debounce(function () {
+      this.currentFilters = {}
+
       switch (true) {
         case !isEmpty(this.list):
           this.setContactsListFilter()
@@ -166,14 +182,14 @@ export default {
           this.setIntegrationHubspot()
           break
       }
-    },
+    }, 100),
 
     getContacts () {
       const cancelToken = window.axios.CancelToken
       const source = cancelToken.source()
 
       // load contacts based on filters
-      return API.V2.contacts.list(this.defaultFilters, source.token)
+      return API.V2.contacts.list(this.allFilters, source.token)
         .then(({ data }) => {
           // only set contacts if it's not integration
           if (isEmpty(this.integration)) {
@@ -192,7 +208,7 @@ export default {
     },
 
     getContactsCount () {
-      return API.V2.contacts.counts(this.defaultFilters)
+      return API.V2.contacts.counts(this.allFilters)
         .then(({ data }) => {
           this.contactsLength = parseInt(data.count)
 
@@ -222,11 +238,11 @@ export default {
     },
 
     setContactsListFilter () {
-      this.defaultFilters.list_id = this.list.id
+      this.currentFilters.list_id = this.list.id
     },
 
     setContactsFilters () {
-      this.defaultFilters.filter_groups = this.filters
+      this.currentFilters.filter_groups = this.filters
     },
 
     async setIntegrationHubspot () {

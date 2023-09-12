@@ -212,6 +212,9 @@ export default {
     },
 
     onContactListSelected (list) {
+      // reset list object
+      this.reset()
+
       switch (list.type) {
         // for static lists, just add the list ID in the params
         case ContactListTypes.STATIC:
