@@ -101,8 +101,7 @@ export default {
   data () {
     return {
       isLoading: false,
-      onLoadShowSettings: false,
-      changedProperties: {}
+      onLoadShowSettings: false
     }
   },
 
@@ -145,8 +144,35 @@ export default {
       this.onLoadShowSettings = false
     },
 
-    resetChangedProperties () {
-      this.changedProperties = {}
+    unsavedSettingsAlert (to, from, next, changed) {
+      if (changed.length > 0) {
+        const msg = 'This action may cause your settings changes to be lost. Do you wish to continue?'
+        const title = 'You have unsaved settings'
+        this.$bvModal.msgBoxConfirm(msg, {
+          title: title,
+          size: 'md',
+          noCloseOnBackdrop: true,
+          noCloseOnEsc: true,
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          footerClass: 'p-2',
+          hideHeaderClose: false,
+          centered: true
+        }).then(value => {
+          if (value) {
+            this.resetUserChanges()
+            next()
+          } else {
+            next(false)
+          }
+        }).catch(err => {
+          console.error(err)
+          next(false)
+        })
+      } else {
+        next()
+      }
     }
   },
 
@@ -177,44 +203,15 @@ export default {
       if (to.name !== 'Settings' && to.name.toLowerCase().includes('settings')) {
         this.onLoadShowSettings = true
       }
-    },
-
-    'changedUserProperties': function (oldVal, newVal) {
-      if (oldVal.length === newVal.length) this.changedProperties = newVal
     }
   },
 
   beforeRouteUpdate (to, from, next) {
-    let changed = this.changedProperties
-    if (changed.length > 0) {
-      const msg = 'This action may cause your settings changes to be lost. Do you wish to continue?'
-      const title = 'You have unsaved settings'
-      this.$bvModal.msgBoxConfirm(msg, {
-        title: title,
-        size: 'md',
-        noCloseOnBackdrop: true,
-        noCloseOnEsc: true,
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'No',
-        footerClass: 'p-2',
-        hideHeaderClose: false,
-        centered: true
-      }).then(value => {
-        if (value) {
-          this.resetUserChanges()
-          this.resetChangedProperties()
-          next()
-        } else {
-          next(false)
-        }
-      }).catch(err => {
-        console.error(err)
-        next(false)
-      })
-    } else {
-      next()
-    }
+    this.unsavedSettingsAlert(to, from, next, this.changedUserProperties)
+  },
+
+  beforeRouteLeave (to, from, next) {
+    this.unsavedSettingsAlert(to, from, next, this.changedUserProperties)
   }
 }
 </script>
