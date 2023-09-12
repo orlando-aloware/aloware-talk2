@@ -79,6 +79,7 @@ import CheckOIcon from 'src/components/icons/check-o-icon.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { integrationMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
@@ -211,9 +212,19 @@ export default {
     },
 
     onContactListSelected (list) {
-      this.source.list = {
-        id: list.id,
-        name: list.name
+      switch (list.type) {
+        // for static lists, just add the list ID in the params
+        case ContactListTypes.STATIC:
+          this.source.list = {
+            id: list.id,
+            name: list.name
+          }
+          break
+
+        // for dynamic lists, destructure the filters
+        case ContactListTypes.DYNAMIC:
+          this.source.filters = list.filters
+          break
       }
     },
 
