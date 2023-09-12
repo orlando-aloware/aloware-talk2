@@ -206,6 +206,7 @@ export const DEFAULT_STATE = {
   defaultDateFilter: null,
   sessionPhoneExpansion: '',
   notificationAudio: null,
+  fishingModeNotificationAudio: null,
   loadingParkedCalls: false,
   parkedCalls: [],
   suspended: false,

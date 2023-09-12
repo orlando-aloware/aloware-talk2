@@ -226,6 +226,7 @@ import {
   htmlMixin,
   webrtcMixin,
   notificationMixin,
+  notificationQueueMixin,
   broadcastMixin,
   parkCallMixin,
   visibilityMixin,
@@ -290,6 +291,7 @@ export default {
     htmlMixin,
     aclMixin,
     notificationMixin,
+    notificationQueueMixin,
     broadcastMixin,
     parkCallMixin,
     visibilityMixin,
@@ -492,6 +494,7 @@ export default {
       return this.authenticated && !this.isWidget && !this.loading &&
         this.showContactsHeader && !this.suspended && showForMobile
     },
+
     pageHeaderClass () {
       return !this.isShowAppHeader || !this.mobileLiveCallBarShown
         ? 'h-auto' : ''
@@ -615,12 +618,13 @@ export default {
     // })
 
     this.mainListeners.newInAppCall = (communication) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+
+      if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
         return
       }
 
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
       const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
       communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         ? 'missed call'
@@ -711,6 +715,8 @@ export default {
       const parkedCall = _.get(this.dialer, 'parkedCall', null)
       const isCommunicationHasUnownedContact = this.isNotOwned(communication.contact.user_id)
       const parkedCallFound = this.parkedCalls.find(comm => comm.id === communication.id)
+
+      this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
 
       // update unowned parked call contact's last communication
       if (isCommunicationHasUnownedContact && parkedCallFound) {
@@ -970,6 +976,13 @@ export default {
         color: 'white',
         textColor: 'black'
       })
+    }
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const isImpersonated = Number(urlParams.get('is_impersonated'))
+    if (isImpersonated === 1) {
+      this.clear()
+      storage.local.setItem('impersonate', true)
     }
 
     if (this.authenticated) {
@@ -2517,7 +2530,8 @@ export default {
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      clear: 'clear'
     }),
     ...mapActions('stats', [
       'setAvailableMetrics',

@@ -3344,6 +3344,10 @@ i.option-separator {
   word-break: break-all;
 }
 
+.text-word-wrap {
+  overflow-wrap: break-word;
+}
+
 .auto-size {
   width: auto;
   height: auto;
@@ -3608,7 +3612,7 @@ i.option-separator {
     padding-top: 10px;
 
     .nav-item-separator {
-      margin: 20px 17px;
+      margin: 15px;
       border-color: $grey-60 !important;
     }
   }
@@ -7237,10 +7241,13 @@ table.datatable {
 }
 
 .inbox-nav-item-group-header {
-  padding: 10px 5px 10px 10px !important;
+  padding: 10px 5px 10px 7px !important;
   color: #666666;
   letter-spacing: 1px;
   font-size: 10px;
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .inbox-nav-item {
@@ -7278,14 +7285,11 @@ table.datatable {
   &__icon,
   &__label,
   .count-label {
-    height: 21px !important;
-    display: flex;
-    align-items: center;
-    line-height: 20px !important;
+    line-height: 1;
   }
 
   &__icon {
-    padding-right: 10px;
+    padding-right: 5px;
   }
 
   &__label {
@@ -7458,11 +7462,10 @@ table.datatable {
   }
 
   .left-column-wrapper {
-
     border-right: 1px solid $grey-60;
     padding-right: 10px;
     padding-left: 10px;
-    max-width: 50%;
+    width: 25%;
 
     .filter-group-title {
       font-size: 12px;
@@ -7472,7 +7475,6 @@ table.datatable {
     }
 
     .filter-items {
-
       margin: 5px 0;
       padding: 7px 12px;
       line-height: 1.2;
@@ -7481,7 +7483,7 @@ table.datatable {
       span:not(.check-icon) {
         font-size: 13px;
         color: $grey-100;
-        width: 8vw;
+        width: 95%;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -7489,7 +7491,7 @@ table.datatable {
       }
 
       span.position-absolute.check-icon {
-        right: 20px;
+        right: 10px;
         top: 5px;
       }
 
@@ -9110,7 +9112,7 @@ screen and (max-width: 956px) {
   }
   .inbox-side {
     &__left {
-      max-width: 160px;
+      max-width: 120px;
 
       .count-label {
         margin-left: 10px;
@@ -9165,28 +9167,13 @@ screen and (max-width: 956px) {
     &:not(.inbox-side-mobile-full-width) {
       .inbox-side {
         &__left {
-          max-width: 35px;
-
           .header,
-          .inbox-nav-item__label,
           .count-label {
             display: none;
           }
 
-          .inbox-nav-list div:nth-child(2) {
-            height: 30px;
-          }
-
           .inbox-nav-item {
             margin: 0 0 !important;
-
-            &__icon {
-              padding: 0 0 !important;
-            }
-          }
-
-          .inbox-nav-item-group-header {
-            opacity: 0;
           }
         }
       }

@@ -206,5 +206,8 @@ export default {
   },
   SET_IS_EDITING_VIEW (state, value) {
     state.isEditingView = value
+  },
+  SET_SHOW_VIEWS_LIST (state, value) {
+    state.showViewsList = value
   }
 }
