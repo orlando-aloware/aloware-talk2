@@ -44,6 +44,14 @@
         Refresh
       </compact-btn>
 
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
+                   :disabled="loading"
+                   v-if="isInPowerDialerPage"
+                   @clicked="refreshPowerDialerListItems">
+        <refresh-icon />
+        Refresh
+      </compact-btn>
+
       <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
@@ -335,6 +343,10 @@ export default {
       return this.$route.name === 'Inbox' ||
           path.includes('inbox') ||
           path.includes('channels')
+    },
+
+    isInPowerDialerPage () {
+      return this.$route.name === 'Power Dialer' && this.$route.meta?.id !== 'power-dialer-session'
     }
   },
 
@@ -447,6 +459,10 @@ export default {
 
     refreshInbox () {
       this.$VueEvent.fire('fetchInbox')
+    },
+
+    refreshPowerDialerListItems () {
+      this.$VueEvent.fire('fetchPowerDialerListItems')
     }
   },
 

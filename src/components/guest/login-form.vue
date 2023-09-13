@@ -155,9 +155,8 @@ export default {
       window.axios.post(`verify-token/${this.token}`).then(res => {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
         storage.local.setItem('api_token', res.data.meta.token)
-        const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
         this.clearError()
-        window.location.href = redirectPath
+        window.location.reload()
       }).catch(err => {
         console.log(err)
         this.verificationMessage = err.response.data.message
