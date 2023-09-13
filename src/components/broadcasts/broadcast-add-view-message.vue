@@ -140,7 +140,7 @@ export default {
     isValid () {
       switch (this.type) {
         case 'sms':
-          return (this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
+          return this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0
         case 'rvm':
           return !!this.rvm?.file_name
         default:
