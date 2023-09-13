@@ -182,7 +182,7 @@ export default {
 
       const time = this.time === 'now'
         ? this.companyDate.format('HH:mm:ss')
-        : (this.schedule.time + ':00')
+        : this.schedule.time
 
       return time >= this.currentCompany.broadcast_open && time <= this.currentCompany.broadcast_close
     }
@@ -217,7 +217,7 @@ export default {
     },
 
     onTimeSelected (time) {
-      this.schedule.time = time
+      this.schedule.time = window.moment(this.schedule.date + ' ' + time).format('HH:mm')
     },
 
     onCampaignSelected (campaign) {
