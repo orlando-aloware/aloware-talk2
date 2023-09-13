@@ -166,17 +166,12 @@ export default {
             return
           }
           next(false)
-          } else {
-            next(false)
-          }
         }).catch(err => {
           console.error(err)
           next(false)
         })
-        
         return
       }
-      
       next()
     }
   },
