@@ -722,7 +722,7 @@ export default {
     },
 
     getEngagement (engagement) {
-      return engagement === 0 ? '-' : engagement + '%'
+      return engagement > 0 ? engagement + '%' : '-'
     },
 
     onPopupHide () {
