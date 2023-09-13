@@ -91,7 +91,7 @@ import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import API from 'src/plugins/api/api'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -265,6 +265,12 @@ export default {
   }),
 
   methods: {
+    ...mapActions('contacts', [
+      'setMessageComposerSmsBody',
+      'setMessageComposerSmsGif',
+      'setMessageComposerAttachments'
+    ]),
+
     mainComponentChanged (state) {
       this.isMainComponentValid = state
     },
@@ -427,6 +433,14 @@ export default {
           this.$handleErrors(err.response)
         })
     }
+  },
+
+  beforeDestroy () {
+    // clean ups
+    this.setMessageComposerSmsBody('')
+    this.setMessageComposerSmsGif('')
+    this.setMessageComposerAttachments([])
+    this.rmv = null
   }
 }
 </script>
