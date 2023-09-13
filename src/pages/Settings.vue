@@ -163,6 +163,9 @@ export default {
           if (value) {
             this.resetUserChanges()
             next()
+            return
+          }
+          next(false)
           } else {
             next(false)
           }
