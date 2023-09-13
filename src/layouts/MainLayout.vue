@@ -2526,7 +2526,8 @@ export default {
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      clear: 'clear'
     }),
     ...mapActions('stats', [
       'setAvailableMetrics',

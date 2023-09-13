@@ -29,5 +29,6 @@ export const VALID_NA_COUNTRIES = [
 
 export const VALID_ENG_COUNTRIES = [
   'GB',
-  'AU'
+  'AU',
+  'IE'
 ]
