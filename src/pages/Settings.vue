@@ -170,9 +170,11 @@ export default {
           console.error(err)
           next(false)
         })
-      } else {
-        next()
+        
+        return
       }
+      
+      next()
     }
   },
 
