@@ -64,13 +64,15 @@
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
-            <b-link class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
-                    target="_blank"
-                    :href="updatesLink">
+            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
-            </b-link>
+              <AnnounceKit style="position: fixed;"
+                           catchClick=".ak-trigger"
+                           :user="currentUser"
+                           :widget="akWidgetUrl" />
+            </div>
           </q-item-section>
         </q-item>
 
@@ -177,6 +179,8 @@ import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
+import * as storage from 'src/plugins/helpers/storage'
+import AnnounceKit from 'announcekit-vue'
 
 export default {
   name: 'app-header',
@@ -205,7 +209,8 @@ export default {
     CompactBtn,
     RefreshIcon,
     HeaderHelp,
-    InboxMyContactsFilter
+    InboxMyContactsFilter,
+    AnnounceKit
   },
 
   props: {
@@ -296,6 +301,10 @@ export default {
 
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
+    },
+
+    akWidgetUrl () {
+      return storage.local.getItem('ak_widget_url')
     },
 
     currentUser () {
