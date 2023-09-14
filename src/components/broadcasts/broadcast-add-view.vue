@@ -61,7 +61,12 @@
                     :is-open="outsideBusinessHoursDialog.open"
                     @close="onOutsideBusinessHoursDialogClosed">
       <template #content>
-        {{ outsideBusinessHoursDialog.message }}
+        <p>
+          Unable to send bulk message since the current time is outside of your account's defined Broadcast Business Hours - <b>{{ broadcastOperatingHoursText }} {{ companyTimezone }}</b>.
+        </p>
+        <p>
+          Schedule this message to be send on <b>({{ nextScheduledDay }})</b> at <b>{{ nextScheduledHour.format('h:mm A') }}</b>?
+        </p>
       </template>
 
       <template #footer>
@@ -92,10 +97,15 @@ import CompactBtn from 'components/compact-btn.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import API from 'src/plugins/api/api'
 import { mapGetters, mapState, mapActions } from 'vuex'
+import { companyTimezone } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view',
+
+  mixins: [
+    companyTimezone
+  ],
 
   components: {
     BroadcastAddCards,
@@ -238,6 +248,17 @@ export default {
         default:
           throw new Error('Invalid step ' + this.currentStep.id)
       }
+    },
+
+    nextScheduledDay () {
+      // add one day if selected time is greater than opening hours
+      const days = this.time?.schedule?.time > this.companyBroadcastOpenDate.format('HH:mm') ? 1 : 0
+
+      return window.moment(this.time?.schedule?.date).add(days, 'd').format('MM/DD/YYYY')
+    },
+
+    nextScheduledHour () {
+      return this.companyBroadcastOpenDate.add(1, 'd')
     }
   },
 
@@ -259,8 +280,7 @@ export default {
     isRestrictedTime: false,
     acceptedOutsideBusinessHours: false,
     outsideBusinessHoursDialog: {
-      open: false,
-      message: 'You are trying to send outside the restricted time. Are you sure that you have the consent of all the recipients?'
+      open: false
     }
   }),
 
@@ -318,6 +338,11 @@ export default {
     onOutsideBusinessHoursDialogConfirmed () {
       this.acceptedOutsideBusinessHours = true
       this.outsideBusinessHoursDialog.open = false
+
+      // update scheduled time properly
+      this.time.schedule.date = this.nextScheduledDay
+      this.time.schedule.time = this.nextScheduledHour.format('HH:mm')
+      this.date = this.time.schedule.date + ' ' + this.time.schedule.time
 
       this.next()
     },
