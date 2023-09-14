@@ -167,7 +167,7 @@ import MailOpenIcon from 'components/icons/mail-open-icon'
 import EllipsisIcon from 'components/icons/ellipsis-icon'
 import BackButton from 'components/back-button'
 import Profile from 'components/profile'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
   name: 'contact-activities-header',
 
@@ -233,6 +233,11 @@ export default {
   },
 
   methods: {
+    ...mapActions('inbox', [
+      'setLoadingPendingTaskCount',
+      'setLoadingOpenTaskCount'
+    ]),
+
     onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
       this.nextStat = status
@@ -272,6 +277,8 @@ export default {
   },
   watch: {
     'contact.task_status': function () {
+      this.setLoadingPendingTaskCount(true)
+      this.setLoadingOpenTaskCount(true)
       this.$VueEvent.fire('contact_task_status_updated', this.contact)
       this.isUpdatingStatus = false
       this.nextStat = null

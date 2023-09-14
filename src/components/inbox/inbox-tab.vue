@@ -411,7 +411,7 @@ export default {
       'setAppliedFilter',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
-      'setLoadingPendingTaskCount',
+      'setLoadingOpenTaskCount',
       'setOpenTaskCount',
       'setPendingTaskCount',
       'updateChannelChangedFilterFields',
@@ -1093,11 +1093,20 @@ export default {
 
       if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
         this.setPendingTaskCount(this.taskCounts.pending - 1)
+        if (contact.task_status === ContactTaskStatus.STATUS_OPEN) {
+          this.setOpenTaskCount(this.taskCounts.open + 1)
+        }
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
         this.setOpenTaskCount(this.taskCounts.open - 1)
+        if (contact.task_status === ContactTaskStatus.STATUS_PENDING) {
+          this.setOpenTaskCount(this.taskCounts.pending + 1)
+        }
       }
+
+      this.setLoadingPendingTaskCount(false)
+      this.setLoadingOpenTaskCount(false)
 
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {

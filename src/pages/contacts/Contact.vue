@@ -284,8 +284,7 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
+      if (['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
     }
