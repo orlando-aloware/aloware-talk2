@@ -408,7 +408,7 @@ ipcMain.on('restart_app', () => {
 
 ipcMain.on('quit_app', () => {
   isQuiting = true
-  autoUpdater.quit()
+  app.quit()
 })
 
 ipcMain.on('restore_app', () => {

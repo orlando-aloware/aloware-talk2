@@ -20,7 +20,7 @@ export default {
         if (window.timezone) {
           return this.$moment.tz(window.timezone)
         } else {
-          return this.$moment.local()
+          return this.$moment.locale()
         }
       }
     }
