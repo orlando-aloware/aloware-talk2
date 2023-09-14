@@ -26,48 +26,19 @@
 
 <script>
 import PencilOIcon from 'src/components/icons/pencil-o-icon.vue'
-import { aclMixin, classicMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import { aclMixin, classicMixin, companyTimezone } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-time-restriction-alert',
 
   mixins: [
     aclMixin,
-    classicMixin
+    classicMixin,
+    companyTimezone
   ],
 
   components: {
     PencilOIcon
-  },
-
-  computed: {
-    ...mapState('cache', [
-      'currentCompany'
-    ]),
-
-    broadcastOperatingHoursText () {
-      const open = this.getCurrentDate + ' ' + this.currentCompany.broadcast_open
-      const close = this.getCurrentDate + ' ' + this.currentCompany.broadcast_close
-
-      return window.moment(open).format('h:mm A') + ' - ' + window.moment(close).format('h:mm A')
-    },
-
-    getCurrentDate () {
-      return this.companyDate.format('MM/DD/YYYY')
-    },
-
-    companyDate () {
-      return window.moment(this.utcDate).tz(this.currentCompany.timezone)
-    },
-
-    utcDate () {
-      return window.moment().tz('UTC')
-    },
-
-    companyTimezone () {
-      return window.moment().tz(this.currentCompany.timezone).format('z')
-    }
   }
 }
 </script>
