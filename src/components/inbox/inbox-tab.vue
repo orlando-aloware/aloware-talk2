@@ -1105,6 +1105,10 @@ export default {
         }
       }
 
+      if (this.currentTask === ContactTaskStatus.STATUS_CLOSED && contact.task_status === ContactTaskStatus.STATUS_OPEN) {
+        this.setOpenTaskCount(this.taskCounts.open + 1)
+      }
+
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
         this.fetchTaskCounts()
