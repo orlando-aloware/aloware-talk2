@@ -277,8 +277,6 @@ export default {
   },
   watch: {
     'contact.task_status': function () {
-      this.setLoadingPendingTaskCount(true)
-      this.setLoadingOpenTaskCount(true)
       this.$VueEvent.fire('contact_task_status_updated', this.contact)
       this.isUpdatingStatus = false
       this.nextStat = null
