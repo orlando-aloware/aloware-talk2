@@ -506,7 +506,9 @@ export default {
       query.filter_groups = []
 
       // initial filter for static contact lists
-      if (this.list && this.list.type === ContactListTypes.STATIC) {
+      if (this.$route.name === 'Contact' && this.selectedList?.type === ContactListTypes.STATIC) {
+        query.list_id = this.selectedList.id
+      } else if (this.list && this.list.type === ContactListTypes.STATIC) {
         query.list_id = this.id
       }
 
