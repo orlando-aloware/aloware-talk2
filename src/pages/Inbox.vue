@@ -150,7 +150,6 @@ export default {
       }
 
       this.loadContactTasks(false)
-      this.fetchTaskCounts()
     })
 
     window.addEventListener('resize', this.onWindowResize)
