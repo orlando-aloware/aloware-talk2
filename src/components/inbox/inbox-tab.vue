@@ -473,11 +473,11 @@ export default {
       }
     },
 
-    resetList () {
+    resetList (loadCount = true, showLoading = true) {
       this.setContacts([])
       this.page = 1
       this.isLoaded = false
-      this.loadContactTasks()
+      this.loadContactTasks(loadCount, showLoading)
 
       if (!this.$route.params.id) {
         this.setSelectedContact({})
@@ -1270,6 +1270,11 @@ export default {
       }
 
       if (!['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View'].includes(this.$route.name)) {
+        return
+      }
+
+      if (['Inbox Channel Task Status'].includes(this.$route.name)) {
+        this.resetList(false, true)
         return
       }
 
