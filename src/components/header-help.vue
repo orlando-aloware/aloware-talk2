@@ -25,8 +25,7 @@
           </span>
 
           <q-btn class="mt-2 d-block"
-                 href="https://support.aloware.com"
-                 target="_blank"
+                 @click="showIntercom"
                  type="a"
                  color="primary"
                  unelevated
@@ -43,8 +42,13 @@
 <script>
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
+import intercomMixin from 'src/plugins/mixins/intercom.mixin'
 
 export default {
+  mixins: [
+    intercomMixin
+  ],
+
   data () {
     return {
       env: null,
