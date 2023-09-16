@@ -166,6 +166,7 @@ export default {
 
         // identify the api endpoint when list is passed or
         // currently in contact page and previousPage flag is Power Dialer
+        // (coming from Power Dialer page)
         if (list || this.isInContactPageFromPowerDialer) {
           path = this.apiEndpoint(this.myQueueId !== null)
         }
@@ -249,7 +250,8 @@ export default {
 
     apiEndpoint (queued) {
       // use power dialer list items path if currently in Contact page
-      // and previousPage flag is Power Dialer when fetching more contacts
+      // and previousPage flag is Power Dialer (coming from Power Dialer page)
+      // when fetching more contacts
       if (this.isInContactPageFromPowerDialer) {
         let id = this.selectedPdList?.id
         id = !id ? 'my-queue' : id
