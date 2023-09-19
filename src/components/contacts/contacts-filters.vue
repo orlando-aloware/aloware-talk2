@@ -211,8 +211,8 @@ export default {
         GROUP_CONTACT_RELEVANCE,
         GROUP_CONTACT_COMM_METADATA
       },
-      maxOuterFilters: 3, // OR
-      maxInnerFilters: 3 // AND
+      maxOuterFilters: 5, // OR
+      maxInnerFilters: 5 // AND
     }
   },
 
