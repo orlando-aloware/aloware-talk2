@@ -50,7 +50,7 @@ export default {
       } else if (!this.resource.first_name && this.resource.last_name) {
         return `${this.resource.last_name}`.trim()
       } else if (this.resource.first_name && !this.resource.last_name) {
-        return `${this.rResource.first_name}`.trim()
+        return `${this.resource.first_name}`.trim()
       }
       return ''
     }
