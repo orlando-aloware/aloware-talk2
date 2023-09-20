@@ -268,7 +268,7 @@
           </tr>
         </template>
         <template #empty>
-          <div class="empty-state"
+          <div class="broadcasts__home__table--empty"
                v-if="isBroadcastsTableEmpty && !loading">
             <div class="h5 px-2 text-center">No data</div>
           </div>
