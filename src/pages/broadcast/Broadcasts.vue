@@ -12,7 +12,7 @@
     </b-overlay>
     <div class="row align-items-center justify-content-between px-3 my-2 w-100">
       <div class="col-3">
-        <search placeholder="Search name, id"
+        <search placeholder="Search name"
                 :search="broadcastsSearchText"
                 @search="val => broadcastsSearchText = val"/>
       </div>
