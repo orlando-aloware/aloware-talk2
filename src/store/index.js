@@ -800,11 +800,13 @@ export default function (/* { ssrContext } */) {
       async fetchContactsLists ({ commit }) {
         const lists = []
         let res = null
+        let page = 1
 
         do {
-          res = await API.V2.contactList.get({ visible_only: true, size: 100 })
+          res = await API.V2.contactList.get({ visible_only: true, size: 100, page })
 
           lists.push(...res.data.data)
+          page++
         } while (res.data.next_page_url)
 
         commit('SET_CONTACTS_LISTS', lists)
