@@ -36,7 +36,7 @@
 
             <td :key="column.name"
                 v-else-if="column.name === 'phone_number'">
-              {{ contact.phone_number | fixPhone('NATIONAL', true) }}
+              {{ contact.phone_number | fixPhone('NATIONAL', true, false, true) }}
             </td>
 
             <td :key="column.name"
