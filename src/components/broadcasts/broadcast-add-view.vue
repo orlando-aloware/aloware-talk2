@@ -252,9 +252,9 @@ export default {
 
     nextScheduledDay () {
       // add one day if selected time is greater than opening hours
-      const days = this.time?.schedule?.time > this.companyBroadcastOpenDate.format('HH:mm') ? 1 : 0
+      const days = window.moment(this.date).format('HH:mm') > this.companyBroadcastOpenDate.format('HH:mm') ? 1 : 0
 
-      return window.moment(this.time?.schedule?.date).add(days, 'd').format('MM/DD/YYYY')
+      return window.moment(this.date).add(days, 'd').format('MM/DD/YYYY')
     },
 
     nextScheduledHour () {
