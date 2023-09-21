@@ -77,12 +77,6 @@ export default {
   methods: {
     ...mapActions('settings', ['resetChangedUserProperties', 'setUserClone', 'setUser', 'setFormValidity']),
     onItemClicked (nextActive) {
-      if (this.changedUserProperties.length > 0) {
-        this.setUser({ ...this.userClone })
-        this.resetChangedUserProperties()
-        this.setFormValidity(true)
-      }
-
       this.active = nextActive
       const tab = this.items.find(item => item.value === nextActive)
       this.$router.push({

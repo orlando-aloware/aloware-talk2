@@ -978,13 +978,6 @@ export default {
       })
     }
 
-    const urlParams = new URLSearchParams(window.location.search)
-    const isImpersonated = Number(urlParams.get('is_impersonated'))
-    if (isImpersonated === 1) {
-      this.clear()
-      storage.local.setItem('impersonate', true)
-    }
-
     if (this.authenticated) {
       this.initAuth()
       this.fetchAllParkedCalls()
