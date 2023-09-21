@@ -1289,11 +1289,10 @@ export default {
       console.log('Creating new dynamic list...')
 
       // debugger
-      const params = this.unsavedList.params
-      console.log(params)
-      params.filters = Object.values(this.currentListFilters)
-      console.log(params)
-      
+      let params = this.unsavedList.params
+      let currentFilters = this.findFilters(this.currentListFilters)
+      params.filters = [currentFilters]
+
       return this.$axios
         .post('/api/v2/contacts-list', params)
         .then((response) => {
@@ -1317,6 +1316,15 @@ export default {
         .finally(() => {
           this.isUpdatingList = false
         })
+    },
+
+    findFilters (listFilters) {
+      for (const key in listFilters) {
+        if (listFilters[key].hasOwnProperty('filters')) {
+          return listFilters[key]
+        }
+      }
+      return null
     },
 
     loadFolders () {
