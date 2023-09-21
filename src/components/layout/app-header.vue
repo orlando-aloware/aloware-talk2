@@ -44,6 +44,14 @@
         Refresh
       </compact-btn>
 
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
+                   :disabled="loading"
+                   v-if="isInPowerDialerPage"
+                   @clicked="refreshPowerDialerListItems">
+        <refresh-icon />
+        Refresh
+      </compact-btn>
+
       <a href="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
          target="_blank"
          v-if="$route.name === 'Broadcasts'">
@@ -52,14 +60,6 @@
           Check the article how to use the Broadcast
         </q-tooltip>
       </a>
-
-      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading"
-                   v-if="isInPowerDialerPage"
-                   @clicked="refreshPowerDialerListItems">
-        <refresh-icon />
-        Refresh
-      </compact-btn>
 
       <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
     </div>
