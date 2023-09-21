@@ -219,7 +219,8 @@ export default {
       this.filter = {
         ...this.filter,
         type: filterType,
-        filter: this.filterModel.filter }
+        filter: this.filterModel.filter
+      }
 
       return talk2Api.V2.inbox.filters.save(this.filter)
         .then(response => {

@@ -926,6 +926,7 @@ export default {
     onCreateNewFilter (filter) {
       let filterType = this.channelDefaultFilterModel.type
 
+      // making sure to save the filter type (inbox) when it's created from "Create View"
       if (this.isFilterDialogForView) {
         filterType = ChannelType.CHANNEL_INBOX
         this.setFilterDialogForView(true)

@@ -187,7 +187,7 @@ export default {
     })
 
     this.$VueEvent.listen('openInboxViewPopup', () => {
-      this.showViewsList = true
+      this.setShowViewsList(true)
     })
 
     this.$VueEvent.listen('filter_deleted', (filter) => {
