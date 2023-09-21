@@ -22,6 +22,7 @@
                use-empty-slot
                :is-empty="contacts.length === 0"
                :columns="columns"
+               :use-full-height="false"
                v-if="!loading">
       <template slot="tbody">
         <tr class="datatable-row"

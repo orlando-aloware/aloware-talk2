@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column h-100"
-       :class="[paginated ? 'paginated overflow-x-hidden w-100' : '']"
+  <div class="d-flex flex-column"
+       :class="[paginated ? 'paginated overflow-x-hidden w-100' : '', { 'h-100': useFullHeight }]"
        @mousemove="$emit('onMouseMove', $event)"
        @mouseleave="$emit('onMouseLeave', $event)">
 
@@ -225,6 +225,11 @@ export default {
     isSelectedAll: {
       type: Boolean,
       default: false
+    },
+
+    useFullHeight: {
+      type: Boolean,
+      default: true
     }
   },
 
