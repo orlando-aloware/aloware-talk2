@@ -164,7 +164,10 @@ export default {
           order = 'desc'
         }
 
-        if (list) {
+        // identify the api endpoint when list is passed or
+        // currently in contact page and previousPage flag is Power Dialer
+        // (coming from Power Dialer page)
+        if (list || this.isInContactPageFromPowerDialer) {
           path = this.apiEndpoint(this.myQueueId !== null)
         }
 
@@ -246,6 +249,16 @@ export default {
     },
 
     apiEndpoint (queued) {
+      // use power dialer list items path if currently in Contact page
+      // and previousPage flag is Power Dialer (coming from Power Dialer page)
+      // when fetching more contacts
+      if (this.isInContactPageFromPowerDialer) {
+        let id = this.selectedPdList?.id
+        id = !id ? 'my-queue' : id
+
+        return `api/v2/power-dialer-lists/${id}/items`
+      }
+
       if (!this.isPowerDialer) {
         return 'api/v2/contacts'
       }
@@ -506,7 +519,14 @@ export default {
       query.filter_groups = []
 
       // initial filter for static contact lists
-      if (this.list && this.list.type === ContactListTypes.STATIC) {
+      if (this.$route?.query?.previousPage === 'Power Dialer' && this.selectedPdList?.type === ContactListTypes.STATIC) {
+        // use id from currently selected pd list
+        query.list_id = this.selectedPdList.id
+      } else if (this.$route.name === 'Contact' && this.selectedList?.type === ContactListTypes.STATIC) {
+        // use id from currently selected contacts list
+        query.list_id = this.selectedList.id
+      } else if (this.list && this.list.type === ContactListTypes.STATIC) {
+        // use id from currently selected contacts list derived from route
         query.list_id = this.id
       }
 
@@ -969,6 +989,15 @@ export default {
     ...mapFields('powerDialer', [
       'myQueue'
     ]),
+
+    ...mapState('powerDialer', [
+      'selectedPdList',
+      'myQueue'
+    ]),
+
+    isInContactPageFromPowerDialer () {
+      return this.$route.name === 'Contact' && this.$route?.query?.previousPage === 'Power Dialer'
+    },
 
     id () {
       if (['Contacts List', 'Public Contacts List', 'Default Contacts List'].includes(this.$route.meta.page)) {

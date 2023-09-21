@@ -469,6 +469,7 @@
             <b-list-group class="w-100 border-bottom">
               <b-list-group-item class="d-flex align-items-center border-0 pl-0 pr-0">
                 <avatar class="contact-avatar"
+                        :useMinWidth="true"
                         width="40"
                         height="40"
                         :name="contact.name"
@@ -477,7 +478,7 @@
                 <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
                   <div class="mr-auto">
                     <p class="contact-name mb-1">
-                      <span class="d-inline-flex text-truncate">{{ contactName }}</span>
+                      <span class="d-inline-flex">{{ contactName }}</span>
                       <q-btn class="text-size-rg d-inline-flex ml-1"
                              color="black"
                              icon="o_info"

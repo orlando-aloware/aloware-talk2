@@ -1,9 +1,11 @@
 <template>
-  <h1 class="contact-list-name-label">{{ title }}
+  <h1 class="contact-list-name-label">
+    {{ title }}
     <q-tooltip anchor="bottom middle"
                self="center middle">
       {{ title }}
-    </q-tooltip></h1>
+    </q-tooltip>
+  </h1>
 </template>
 
 <script>
@@ -16,14 +18,16 @@ export default {
   computed: {
     ...mapGetters('contacts', ['selectedList']),
     ...mapState('contacts', ['search']),
+
     previousPage () {
-      return get(this.$route.query, 'previousPage', null)
+      return get(this.$route?.query, 'previousPage', null)
     },
 
     title () {
-      if (this.previousPage === 'PowerDialer') {
+      if (this.previousPage === 'Power Dialer') {
         return 'Power Dialer'
       }
+
       return this.search && this.search.length > 0 ? 'Search results' : this.selectedList.name
     }
   }
