@@ -1290,8 +1290,10 @@ export default {
 
       // debugger
       const params = this.unsavedList.params
+      console.log(params)
       params.filters = Object.values(this.currentListFilters)
-
+      console.log(params)
+      
       return this.$axios
         .post('/api/v2/contacts-list', params)
         .then((response) => {
