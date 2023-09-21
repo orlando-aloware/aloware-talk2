@@ -340,6 +340,7 @@ export default {
       this.outsideBusinessHoursDialog.open = false
 
       // update scheduled time properly
+      this.time.time = 'scheduled'
       this.time.schedule.date = this.nextScheduledDay
       this.time.schedule.time = this.nextScheduledHour.format('HH:mm')
       this.date = this.time.schedule.date + ' ' + this.time.schedule.time
