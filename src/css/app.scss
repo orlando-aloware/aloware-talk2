@@ -13119,6 +13119,7 @@ h1.contact-list-name-label {
       margin-right: 15px;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
 
       @media (min-width: 1425px) {
         max-width: calc(100% - 750px);
@@ -13387,7 +13388,6 @@ h1.contact-list-name-label {
 
       &__details {
         flex-grow: 1;
-        overflow: hidden;
         border-radius: 8px;
 
         .contacts-preview {
