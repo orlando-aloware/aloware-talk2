@@ -408,7 +408,8 @@ export default {
       'setPinnedViews',
       'setFilterDialogForView',
       'setFilterDialogForView',
-      'setInboxPersonalFilters'
+      'setInboxPersonalFilters',
+      'setShowViewsList'
     ]),
 
     hideModal () {
