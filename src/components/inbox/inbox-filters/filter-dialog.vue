@@ -20,7 +20,7 @@
           <div class="mb-4">
             <div class="filter-items cursor-pointer position-relative"
                  v-bind:class="{ 'active' : !selectedFilter }"
-                 @click="onSelectFilter(null)">
+                 @click="setToNewFilter">
               <div>
                 <span>New (Untitled)</span>
                 <span class="position-absolute check-icon"
@@ -438,8 +438,16 @@ export default {
       this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)
       this.getFilters()
 
-      if (this.selectedFilter) {
+      if (this.appliedFilter) {
+        this.filter = { ...this.appliedFilter.filter }
+      } else if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter }
+      } else if (this.filterHasChanges) {
+        let withChangedFilterFields = { ...this.loadedDefaultFilterModel.filter }
+        this.channelChangedFilterFields.forEach(item => {
+          withChangedFilterFields[item.property] = item.value
+        })
+        this.filter = withChangedFilterFields
       } else {
         this.filter = _.pick(this.value, this.filterFields)
       }
@@ -460,15 +468,7 @@ export default {
 
     onShown () {
       this.refreshTagSelector()
-
-      if (!this.appliedFilter) {
-        if (!this.isFilterDialogForView || (this.isFilterDialogForView && !this.isEditingView)) {
-          this.setSelectedFilter(null)
-        }
-
-        this.filter = _.pick(this.loadedDefaultFilterModel.filter, this.filterFields)
-        this.applyFilter()
-      }
+      this.applyFilter()
     },
 
     refreshTagSelector () {
@@ -482,7 +482,7 @@ export default {
       }
     },
 
-    onResetFilter: function () {
+    onResetFilter () {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
       const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
@@ -763,6 +763,11 @@ export default {
       this.setSelectedFilter(filter)
       this.viewName = null
       this.$refs['viewName'].blur()
+    },
+
+    setToNewFilter () {
+      this.onResetFilter()
+      this.onSelectFilter(null)
     }
   },
 
