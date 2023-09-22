@@ -1238,6 +1238,7 @@ export default {
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
         let currentFilters = this.findFilters(this.currentListFilters)
+
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
           .then((res) => {
@@ -1320,7 +1321,6 @@ export default {
 
     findFilters (listFilters) {
       let list = []
-      console.log('listFilters', listFilters)
       for (const key in listFilters) {
         if (listFilters[key] !== null && typeof listFilters[key] === 'object' && listFilters[key].hasOwnProperty('filters')) {
           list.push(listFilters[key])
