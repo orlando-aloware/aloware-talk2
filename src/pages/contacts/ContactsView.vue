@@ -1237,9 +1237,9 @@ export default {
 
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
-
+        let currentFilters = this.findFilters(this.currentListFilters)
         return this.$axios
-          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
+          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)
@@ -1291,7 +1291,7 @@ export default {
       // debugger
       let params = this.unsavedList.params
       let currentFilters = this.findFilters(this.currentListFilters)
-      params.filters = [currentFilters]
+      params.filters = currentFilters
 
       return this.$axios
         .post('/api/v2/contacts-list', params)
@@ -1319,12 +1319,14 @@ export default {
     },
 
     findFilters (listFilters) {
+      let list = []
+      console.log('listFilters', listFilters)
       for (const key in listFilters) {
-        if (listFilters[key].hasOwnProperty('filters')) {
-          return listFilters[key]
+        if (listFilters[key] !== null && typeof listFilters[key] === 'object' && listFilters[key].hasOwnProperty('filters')) {
+          list.push(listFilters[key])
         }
       }
-      return null
+      return list
     },
 
     loadFolders () {
