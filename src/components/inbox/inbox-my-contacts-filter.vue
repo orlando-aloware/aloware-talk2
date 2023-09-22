@@ -4,8 +4,8 @@
     <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
                  :disabled="isInboxRefreshBtnLoading"
                  @clicked="refreshInbox">
-      <refresh-icon />
-      Refresh
+      <refresh-icon :class="$q.screen.width < 450 ? 'm-0': ''"/>
+      {{ refreshButtonLabel }}
     </compact-btn>
 
     <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
@@ -67,6 +67,10 @@ export default {
 
     myContactsToggleEnabled () {
       return !this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts
+    },
+
+    refreshButtonLabel () {
+      return this.$q.screen.width < 450 ? '' : 'Refresh'
     }
   },
 
