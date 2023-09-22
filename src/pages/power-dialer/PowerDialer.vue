@@ -1,10 +1,12 @@
 <template>
   <div v-if="authenticated"
        class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+
     <div v-show="!hasSessions"
          class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
       <power-dialer-sidebar @fetchMyQueueData="onFetchMyQueueData" />
     </div>
+
     <div class="px-0 mb-0 main flex-1 h-100"
          :class="mainClass">
       <!-- Router Here -->
@@ -32,8 +34,8 @@
                    @on-list-update="updateList"
                    @on-my-queue-list="myQueueList">
       </router-view>
-      <router-view v-if="isPowerDialerSession">
-      </router-view>
+
+      <router-view v-if="isPowerDialerSession" />
     </div>
 
     <template v-if="!hasSessions">
@@ -272,11 +274,17 @@ export default {
       this.powerDialerListAddRemoveContactsProgress = data
     }
 
+    this.powerDialerListeners.fetchPowerDialerListItems = () => {
+      this.isLoading = true
+      this.loadList(this.selectedListId)
+    }
+
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
     this.$VueEvent.listen('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
     this.$VueEvent.listen('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
     this.$VueEvent.listen('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
     this.$VueEvent.listen('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
+    this.$VueEvent.listen('fetchPowerDialerListItems', this.powerDialerListeners.fetchPowerDialerListItems)
   },
 
   methods: {
@@ -453,6 +461,7 @@ export default {
       this.$VueEvent.stop('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
       this.$VueEvent.stop('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
       this.$VueEvent.stop('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
+      this.$VueEvent.stop('fetchPowerDialerListItems', this.powerDialerListeners.fetchPowerDialerListItems)
     }
   },
 
