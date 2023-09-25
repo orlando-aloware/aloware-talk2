@@ -215,13 +215,15 @@ export default {
       // reset list object
       this.reset()
 
+      this.source.list = {
+        id: list.id,
+        name: list.name
+      }
+
       switch (list.type) {
         // for static lists, just add the list ID in the params
         case ContactListTypes.STATIC:
-          this.source.list = {
-            id: list.id,
-            name: list.name
-          }
+          this.source.list.type = 'static'
           break
 
         // for dynamic lists, destructure the filters
@@ -235,7 +237,9 @@ export default {
             filters = keys.map(key => list.filters[key])
           }
 
-          this.source.filters = filters
+          this.source.list.type = 'dynamic'
+          this.source.list.filters = filters
+
           break
       }
     },

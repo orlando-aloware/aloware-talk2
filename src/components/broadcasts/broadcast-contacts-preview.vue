@@ -239,7 +239,15 @@ export default {
     },
 
     setContactsListFilter () {
-      this.currentFilters.list_id = this.list.id
+      switch (this.list.type) {
+        case 'static':
+          this.currentFilters.list_id = this.list.id
+          break
+
+        case 'dynamic':
+          this.currentFilters.filter_groups = this.list.filters
+          break
+      }
     },
 
     setContactsFilters () {
