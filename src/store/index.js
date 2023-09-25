@@ -56,6 +56,7 @@ export default function (/* { ssrContext } */) {
       ringGroups: [],
       workflows: [],
       changelogs: [],
+      broadcasts: [],
       dispositionStatuses: [],
       callDispositions: [],
       templates: [],
@@ -452,6 +453,10 @@ export default function (/* { ssrContext } */) {
 
       setCallDispositions ({ commit }, callDispositions) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
+      },
+
+      setBroadcasts ({ commit }, broadcasts) {
+        commit('SET_BROADCASTS', broadcasts)
       },
 
       setTemplates ({ commit }, templates) {
@@ -1060,6 +1065,10 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.templates.splice(state.templates.indexOf(found), 1)
         }
+      },
+
+      SET_BROADCASTS (state, broadcasts) {
+        state.broadcasts = broadcasts
       },
 
       NEW_FILTER (state, filter) {

@@ -312,6 +312,7 @@ export default {
       loadingCallDispositionStatuses: false,
       loadingScripts: false,
       loadingTemplates: false,
+      loadingBroadcasts: false,
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
@@ -1412,6 +1413,7 @@ export default {
         }
 
         this.getRingGroups()
+        this.getBroadcasts()
         this.getTemplates()
 
         this.getCampaigns()
@@ -2490,6 +2492,7 @@ export default {
       'setDispositionStatuses',
       'setCallDispositions',
       'setTemplates',
+      'setBroadcasts',
       'setDialerToken',
       'setDialerCall',
       'setDialerCommunication',
