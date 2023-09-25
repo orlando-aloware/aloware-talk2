@@ -40,15 +40,17 @@
           <q-item class="contact-info-wrapper"
                   dense
                   v-if="hideProfileInfo">
-            <span class="text-regular _600 user-full-name w-100">{{ profile.full_name }}
-              <half-moon-icon v-if="profile.sleep_mode"
-                              color="#9B51E0"
-                              class="focus-mode-icon"
-                              width="12"
-                              height="12">
-              </half-moon-icon>
-            </span>
-            <span class="text-xs user-company-name w-100">{{ profile.company_name }}</span>
+            <div class="d-flex flex-column">
+              <span class="text-regular _600 user-full-name w-100">{{ profile.full_name }}
+                <half-moon-icon v-if="profile.sleep_mode"
+                                color="#9B51E0"
+                                class="focus-mode-icon"
+                                width="12"
+                                height="12">
+                </half-moon-icon>
+              </span>
+              <span class="text-xs user-company-name w-100">{{ profile.company_name }}</span>
+            </div>
           </q-item>
 
           <q-separator class="mt-3 mb-1"
@@ -60,7 +62,7 @@
               <span>
                 {{ userPersonalLine.name }}
               </span>
-              <span class="text-grey-90">
+              <span class="text-grey-90 text-sm">
                 Number: {{ userPersonalLine.incoming_number | fixPhone('NATIONAL', true, false, true) }}
               </span>
             </div>
