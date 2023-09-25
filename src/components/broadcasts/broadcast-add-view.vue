@@ -65,7 +65,7 @@
           Unable to send bulk message since the current time is outside of your account's defined Broadcast Business Hours - <b>{{ broadcastOperatingHoursText }} {{ companyTimezone }}</b>.
         </p>
         <p>
-          Schedule this message to be send on <b>({{ nextScheduledDay }})</b> at <b>{{ nextScheduledHour.format('h:mm A') }}</b>?
+          Schedule this message to be sent on <b>({{ nextScheduledDay }})</b> at <b>{{ nextScheduledHour.format('h:mm A') }}</b>?
         </p>
       </template>
 
