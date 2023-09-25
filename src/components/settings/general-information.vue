@@ -14,11 +14,11 @@
       <div v-if="!statics.whitelabel">
         <b-form-row class="mt-3 general-settings-app-block">
           <b-col sm="12" md="12">
-            <div class="d-inline-flex">
-              <h5 class="mt-2"> Have you considered using Aloware app on your smartphone 📱? </h5>
+            <div class="d-inline-flex align-items-center">
+              <h5 :class="[$q.screen.width < 450 ? 'w-100' : '']"> Have you considered using Aloware app on your smartphone 📱? </h5>
               <b-button href="https://aloware.com/apps"
                         variant="outline-success"
-                        class="ml-2"
+                        class="ml-sm-2"
                         target="_blank"
                         size="sm">Get the App
               </b-button>

@@ -68,7 +68,7 @@
           </q-item-section>
         </q-item>
 
-        <profile :hideProfileInfo="$q.screen.width < 450 && ['Inbox', 'Contacts', 'Stats'].includes($route.name)" />
+        <profile :hideProfileInfo="$q.screen.width < 450" />
 
         <phone v-if="!titleOnly" />
 
