@@ -1074,7 +1074,8 @@ export default {
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded',
-      'setPreviouslySavedListId'
+      'setPreviouslySavedListId',
+      'setPreviousListFilters'
     ]),
 
     onSearch (searchText) {
@@ -1244,7 +1245,9 @@ export default {
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)
-            this.initialListFilters = this.currentListFilters
+            this.setCurrentListFilters(currentFilters)
+            this.initialListFilters = currentFilters
+            this.setPreviousListFilters(currentFilters)
             this.updateFilterHasChanges()
             this.isUpdatingList = false
             this.$generalNotification('Changes to contact list has been saved.')
