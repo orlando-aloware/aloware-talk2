@@ -286,6 +286,7 @@ export default {
 
   methods: {
     ...mapActions('contacts', [
+      'setCurrentListFilters',
       'setMessageComposerSmsBody',
       'setMessageComposerSmsGif',
       'setMessageComposerAttachments'
@@ -447,6 +448,8 @@ export default {
 
       API.V1.broadcasts[method](bulkMessage)
         .then(() => {
+          this.setCurrentListFilters({})
+
           this.$emit('loading', false)
 
           this.$generalNotification('We have put your bulk message campaign on our outbound queue. Please wait a few minutes for us to send your messages.', 'success')
@@ -466,6 +469,7 @@ export default {
     this.setMessageComposerSmsBody('')
     this.setMessageComposerSmsGif('')
     this.setMessageComposerAttachments([])
+    this.setCurrentListFilters({})
     this.rmv = null
   }
 }
