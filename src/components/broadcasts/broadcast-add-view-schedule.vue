@@ -66,6 +66,14 @@
     <div class="broadcast-add__schedule__row">
       <div class="broadcast-add__schedule__row__label">
         From
+        <a target="_blank"
+           :href="getComplianceURL()"
+           v-if="campaign.max_mps <= 0.25">
+          <information-circle-icon class="ml-2 cursor-pointer"/>
+          <q-tooltip>
+            To increase your MPS rate, please register your line cliking on this button
+          </q-tooltip>
+        </a>
       </div>
       <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector v-model="campaign.id"
@@ -76,6 +84,12 @@
     <div class="broadcast-add__schedule__row">
       <div class="broadcast-add__schedule__row__label">
         Throttling
+        <span>
+          <information-circle-icon class="ml-2 cursor-pointer"/>
+          <q-tooltip>
+            This is an hourly throttling limit on your bulk message campaign.
+          </q-tooltip>
+        </span>
       </div>
       <div class="broadcast-add__schedule__row__fields">
         <throttle-selector :campaign="campaign"
@@ -89,8 +103,9 @@
 import BroadcastTimeRestrictionAlert from 'src/components/broadcasts/broadcast-time-restriction-alert'
 import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import DateSelector from 'src/components/date-selector.vue'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
-import { companyTimezone } from 'src/plugins/mixins'
+import { classicMixin, companyTimezone } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
 
@@ -98,12 +113,14 @@ export default {
   name: 'broadcast-add-view-schedule',
 
   mixins: [
+    classicMixin,
     companyTimezone
   ],
 
   components: {
     BroadcastTimeRestrictionAlert,
     ContactLineSelector,
+    InformationCircleIcon,
     DateSelector,
     ThrottleSelector
   },

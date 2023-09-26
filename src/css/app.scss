@@ -13223,7 +13223,6 @@ h1.contact-list-name-label {
 
                 &__composer-header,
                 &__composer-footer {
-                  text-align: right;
                   margin: 5px 0px;
                 }
 
@@ -13236,6 +13235,11 @@ h1.contact-list-name-label {
 
                 &__composer-header {
                   text-align: right;
+                }
+
+                &__composer-footer {
+                  display: flex;
+                  justify-content: space-between;
                 }
 
                 &__label-preview {

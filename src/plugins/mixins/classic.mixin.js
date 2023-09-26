@@ -22,6 +22,10 @@ export default {
 
     getBroadcastSettingURL () {
       return process.env.API_URL + '/account?tab=settings#broadcasts_business_hours'
+    },
+
+    getComplianceURL () {
+      return process.env.API_URL + '/account?tab=compliance'
     }
   }
 }

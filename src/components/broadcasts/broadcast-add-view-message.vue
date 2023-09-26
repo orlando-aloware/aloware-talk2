@@ -21,12 +21,21 @@
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
-        <span class="mr-4">
-          Message parts: {{ messagePartCount }} / {{ baseLine }}
-        </span>
-        <span>
-          Message(s): {{ messageCount }}
-        </span>
+        <div style="z-index: 10">
+          <information-circle-icon class="ml-2 cursor-pointer"/>
+          <q-tooltip>
+            This is the text message you want to send to the selected group of contacts.<br>
+            If the user has no contact name or 'Aloware Contact' as the name, then the variable will be blank.
+          </q-tooltip>
+        </div>
+        <div>
+          <span class="mr-4">
+            Message parts: {{ messagePartCount }} / {{ baseLine }}
+          </span>
+          <span>
+            Message(s): {{ messageCount }}
+          </span>
+        </div>
       </div>
 
       <div class="broadcast-add__message__sms__label-preview">
@@ -85,6 +94,7 @@
 import AudioRecorder from 'components/audio-recorder'
 import CloseIcon from 'src/components/icons/close-icon.vue'
 import FileUploader from 'components/file-uploader'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
@@ -102,6 +112,7 @@ export default {
     AudioRecorder,
     CloseIcon,
     FileUploader,
+    InformationCircleIcon,
     MessageComposerSms,
     MessageComposerSmsPreview,
     Waveform
