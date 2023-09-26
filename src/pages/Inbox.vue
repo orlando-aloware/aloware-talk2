@@ -99,7 +99,8 @@ export default {
         if (this.inboxViewsRoutes.includes(this.$route.name) && this.isLoadedPinnedViews) {
           channel = this.getPinnedViewChannel(this.$route.params.viewId)
         } else {
-          channel = this.navListItems.find(item => item.value === this.$route.params.channel)
+          const routeChannel = this.$route.params?.channel ?? 'inbox' // default fallback
+          channel = this.navListItems.find(item => item.value === routeChannel)
         }
 
         this.setActiveChannel(channel)

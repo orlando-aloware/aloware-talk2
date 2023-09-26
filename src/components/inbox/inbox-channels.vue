@@ -769,7 +769,8 @@ export default {
       'Inbox Channel',
       'Inbox Contact Communication',
       'Inbox Contact',
-      'Inbox Channel Task Status', 'Inbox Contact Task'
+      'Inbox Channel Task Status',
+      'Inbox Contact Task'
     ]
     const generalChannelRoutes = ['Inbox Channel', 'Inbox Contact']
     const communicationsChannelRoutes = ['Inbox Contact', 'Inbox Contact Communication']
