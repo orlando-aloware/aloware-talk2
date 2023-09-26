@@ -24,13 +24,6 @@ export default {
     messageMixin
   ],
 
-  props: {
-    contact: {
-      required: true,
-      type: Object
-    }
-  },
-
   computed: {
     ...mapState('cache', [
       'currentCompany'
@@ -46,7 +39,7 @@ export default {
     ]),
 
     text () {
-      return this.translateMessage(this.messageComposer.sms.body, this.contact, this.selectedLine, this.profile)
+      return this.translateMessage(this.messageComposer.sms.body, this.selectedLine, this.profile)
     },
 
     baseUrl () {

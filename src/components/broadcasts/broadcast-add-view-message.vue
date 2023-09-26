@@ -34,7 +34,7 @@
       </div>
 
       <div :class="['broadcast-add__message__sms__preview', { 'broadcast-add__message__sms__preview--empty': smsBodyLength === 0 }]">
-        <message-composer-sms-preview :contact="contact"/>
+        <message-composer-sms-preview />
       </div>
     </div>
 
@@ -108,11 +108,6 @@ export default {
   },
 
   props: {
-    contact: {
-      type: Object,
-      required: false
-    },
-
     contactsLength: {
       type: Number,
       default: 0

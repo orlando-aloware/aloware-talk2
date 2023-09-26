@@ -1,37 +1,31 @@
-// import { COUNTRIES } from 'src/constants/countries'
-import AreaCodes from 'src/us-area-code-state.json'
 import { isEmpty } from 'lodash'
 
 export default {
   methods: {
-    translateMessage (message, contact = {}, campaign = {}, user = {}) {
-      let translated = message
-
+    translateMessage (message, campaign = {}, user = {}) {
       // contact variables
-      if (!isEmpty(contact)) {
-        translated = translated
-          .replace(/\[FirstName\]/g, contact.first_name || '')
-          .replace(/\[LastName\]/g, contact.last_name || '')
-          .replace(/\[FullName\]/g, contact.name || '')
-          .replace(/\[Email\]/g, contact.email || '')
-          .replace(/\[Website\]/g, contact.website || '')
-          .replace(/\[Address\]/g, contact.address || '')
-          .replace(/\[CompanyName\]/g, contact.company_name || '')
-          .replace(/\[ContactNotes\]/g, contact.notes || '')
-          .replace(/\[OwnerName\]/g, contact.user?.name || '')
-          .replace(/\[OwnerFirstName\]/g, contact.user?.first_name || '')
-          .replace(/\[OwnerLastName\]/g, contact.user?.last_name || '')
-          .replace(/\[LeadNumber\]/g, this.$options.filters.fixPhone(this.contact.phone_number, 'INTERNATIONAL'))
-          .replace(/\[City\]/g, contact.cnam_city || '')
-          .replace(/\[State\]/g, contact.cnam_state || '')
-          .replace(/\[FullState\]/g, AreaCodes.find(a => a.state_code === this.contact.cnam_state)?.state_name)
-          .replace(/\[ZipCode\]/g, contact.cnam_zipcode || '')
-          .replace(/\[Country\]/g, contact.cnam_country || '')
-          .replace(/\[DateOfBirth\]/g, contact.date_of_birth ? window.moment(this.contact.date_of_birth).format('MM/DD/YYYY') : '')
-          .replace(/\[ContactId\]/g, contact.id)
-          .replace(/\[CSF1\]/g, contact.csf1 || '')
-          .replace(/\[CSF2\]/g, contact.csf2 || '')
-      }
+      let translated = message
+        .replace(/\[FirstName\]/g, 'John')
+        .replace(/\[LastName\]/g, 'Doe')
+        .replace(/\[FullName\]/g, 'John Doe')
+        .replace(/\[Email\]/g, 'john.doe@aloware.com')
+        .replace(/\[Website\]/g, 'www.apple.com')
+        .replace(/\[Address\]/g, 'One Infinite Loop')
+        .replace(/\[CompanyName\]/g, 'Apple Inc')
+        .replace(/\[ContactNotes\]/g, 'contact notes')
+        .replace(/\[OwnerName\]/g, 'Zack Lee')
+        .replace(/\[OwnerFirstName\]/g, 'Zack')
+        .replace(/\[OwnerLastName\]/g, 'Lee')
+        .replace(/\[LeadNumber\]/g, '(855) 256-2001')
+        .replace(/\[City\]/g, 'Los Angeles')
+        .replace(/\[State\]/g, 'CA')
+        .replace(/\[FullState\]/g, 'California')
+        .replace(/\[ZipCode\]/g, '00012')
+        .replace(/\[Country\]/g, 'US')
+        .replace(/\[DateOfBirth\]/g, '02/25/1990')
+        .replace(/\[ContactId\]/g, '1234')
+        .replace(/\[CSF1\]/g, 'CSF1')
+        .replace(/\[CSF2\]/g, 'CSF2')
 
       // campaign variables
       if (!isEmpty(campaign)) {

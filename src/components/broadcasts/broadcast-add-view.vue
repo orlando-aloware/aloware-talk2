@@ -53,7 +53,6 @@
                  ref="footerComponent"
                  v-bind="footerComponentProps"
                  @input="footerComponentChanged"
-                 @contact-preview="onContactPreview"
                  @contacts-length="onContactsLength"/>
     </div>
 
@@ -170,7 +169,6 @@ export default {
           return { defaultSource: this.source }
         case 2:
           return {
-            contact: this.contactPreview,
             contactsLength: this.contactsLength,
             rvm: this.rvm
           }
@@ -182,7 +180,6 @@ export default {
           }
         case 4:
           return {
-            contact: this.contactPreview,
             campaign: this.campaign,
             contactsLength: this.contactsLength,
             date: this.date,
@@ -267,7 +264,6 @@ export default {
     isMainComponentValid: false,
     isFooterComponentValid: false,
     source: {},
-    contactPreview: {},
     contactsLength: 0,
     type: 'sms', // sms, voicemail
     rvm: null,
@@ -379,10 +375,6 @@ export default {
 
       this.direction = 'left'
       this.$emit('back')
-    },
-
-    onContactPreview (contact) {
-      this.contactPreview = contact
     },
 
     onContactsLength (count) {

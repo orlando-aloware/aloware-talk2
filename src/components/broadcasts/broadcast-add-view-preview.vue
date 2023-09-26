@@ -19,7 +19,7 @@
       <div class="broadcast-add__preview__row__field">
         <div class="broadcast-add__preview__row__field__sms-preview"
              v-if="type === 'sms'">
-          <message-composer-sms-preview :contact="contact"/>
+          <message-composer-sms-preview />
         </div>
         <div class="broadcast-add__preview__row__field__rvm-preview"
              v-else-if="type === 'rvm'">
@@ -70,11 +70,6 @@ export default {
   },
 
   props: {
-    contact: {
-      type: Object,
-      required: true
-    },
-
     campaign: {
       type: Object,
       required: true

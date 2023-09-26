@@ -197,10 +197,6 @@ export default {
             this.contacts = data.data
           }
 
-          if (data.data.length) {
-            this.$emit('contact-preview', data.data[0])
-          }
-
           return Promise.resolve()
         })
         .catch(err => {
