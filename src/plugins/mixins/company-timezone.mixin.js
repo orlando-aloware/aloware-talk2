@@ -27,7 +27,7 @@ export default {
     },
 
     companyTimezone () {
-      return window.moment().tz(this.currentCompany.timezone).format('z')
+      return window.moment().tz(this.currentCompany.timezone)
     }
   }
 }

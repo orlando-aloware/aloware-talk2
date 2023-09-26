@@ -36,7 +36,7 @@
         <b-badge class="ml-2"
                  variant="light"
                  v-if="isScheduled">
-          {{ companyTimezone }}
+          {{ companyTimezone.format('z') }}
         </b-badge>
       </div>
     </div>
@@ -53,11 +53,16 @@
 <script>
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
+import { companyTimezone } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-preview',
+
+  mixins: [
+    companyTimezone
+  ],
 
   components: {
     MessageComposerSmsPreview,
@@ -156,10 +161,6 @@ export default {
         : 'MM/DD/YYYY hh:mm a'
 
       return 'Send at ' + window.moment(this.date).format(format)
-    },
-
-    companyTimezone () {
-      return window.moment().tz(this.currentCompany.timezone).format('z')
     },
 
     rvmUrl () {

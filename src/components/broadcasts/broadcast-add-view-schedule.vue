@@ -42,7 +42,7 @@
                   <b-badge class="mr-2 position-absolute"
                            style="right: -50px; top: 15px"
                            variant="light">
-                    {{ companyTimezone }}
+                    {{ companyTimezone.format('z') }}
                   </b-badge>
                 </div>
               </div>
@@ -58,7 +58,7 @@
         <b>{{ sendTimeLabel }}</b>
         <b-badge class="ml-2"
                  variant="light">
-          {{ companyTimezone }}
+          {{ companyTimezone.format('z') }}
         </b-badge>
       </div>
     </div>
@@ -90,11 +90,16 @@ import BroadcastTimeRestrictionAlert from 'src/components/broadcasts/broadcast-t
 import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import DateSelector from 'src/components/date-selector.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
+import { companyTimezone } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-schedule',
+
+  mixins: [
+    companyTimezone
+  ],
 
   components: {
     BroadcastTimeRestrictionAlert,
@@ -147,18 +152,6 @@ export default {
       return this.schedule.date + ' ' + this.schedule.time
     },
 
-    companyTimezone () {
-      return window.moment().tz(this.currentCompany.timezone).format('z')
-    },
-
-    companyDate () {
-      return window.moment(this.utcDate).tz(this.currentCompany.timezone)
-    },
-
-    utcDate () {
-      return window.moment().tz('UTC')
-    },
-
     sendTimeLabel () {
       return 'Send ' + (this.time === 'now'
         ? `today at ` + this.companyDate.format('hh:mm a')
@@ -208,6 +201,9 @@ export default {
 
     if (this.propTime?.schedule) {
       this.schedule = this.propTime.schedule
+    } else {
+      this.schedule.date = this.companyTimezone.format('MM/DD/YYYY')
+      this.schedule.time = this.companyTimezone.format('HH:mm')
     }
   },
 

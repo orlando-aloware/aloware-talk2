@@ -62,7 +62,7 @@
                     @close="onOutsideBusinessHoursDialogClosed">
       <template #content>
         <p>
-          Unable to send bulk message since the current time is outside of your account's defined Broadcast Business Hours - <b>{{ broadcastOperatingHoursText }} {{ companyTimezone }}</b>.
+          Unable to send bulk message since the current time is outside of your account's defined Broadcast Business Hours - <b>{{ broadcastOperatingHoursText }} {{ companyTimezone.format('z') }}</b>.
         </p>
         <p>
           Schedule this message to be sent on <b>({{ nextScheduledDay }})</b> at <b>{{ nextScheduledHour.format('h:mm A') }}</b>?

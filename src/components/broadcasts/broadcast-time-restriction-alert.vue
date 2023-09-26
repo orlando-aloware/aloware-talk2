@@ -9,7 +9,7 @@
 
       <b-badge class="mr-2"
                variant="light">
-        {{ companyTimezone }}
+        {{ companyTimezone.format('z') }}
       </b-badge>
 
       <a target="_blank"
