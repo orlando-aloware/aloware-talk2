@@ -458,6 +458,13 @@ const broadcastsColumns = [
     draggable: true
   },
   {
+    name: 'date_created',
+    label: 'Date Created',
+    field: 'created_at',
+    sortable: false,
+    draggable: true
+  },
+  {
     name: '',
     label: '',
     field: 'actions',
