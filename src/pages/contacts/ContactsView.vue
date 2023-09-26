@@ -1238,7 +1238,7 @@ export default {
 
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
-        let currentFilters = this.findFilters(this.currentListFilters)
+        const currentFilters = this.findFilters(this.currentListFilters)
 
         return this.$axios
           .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
@@ -1294,7 +1294,7 @@ export default {
 
       // debugger
       let params = this.unsavedList.params
-      let currentFilters = this.findFilters(this.currentListFilters)
+      const currentFilters = this.findFilters(this.currentListFilters)
       params.filters = currentFilters
 
       return this.$axios
