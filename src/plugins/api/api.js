@@ -514,7 +514,7 @@ export default {
         return window.axios.put(`${suffixV1}broadcasts/${id}`, broadcast)
       },
       toggleStatus (id) {
-        return window.axios.post('/api/v1/broadcasts/' + id + '/toggle-active')
+        return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
       }
     },
     contactCenter: {

@@ -2,7 +2,11 @@ import * as BroadcastDefault from 'src/constants/broadcast-default'
 
 export default {
   ADD_BROADCAST (state, broadcast) {
-    state.broadcasts.unshift(broadcast)
+    const index = state.broadcasts.findIndex(b => b.id === broadcast.id)
+
+    if (index === -1) {
+      state.broadcasts.unshift(broadcast)
+    }
   },
 
   DELETE_BROADCAST (state, broadcast) {
