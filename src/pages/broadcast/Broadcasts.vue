@@ -189,6 +189,12 @@
                                        :text="row['status_name']" />
               </td>
               <td :key="`c-${colIndex}`"
+                  class="sorted-column"
+                  v-else-if="col.name === 'scheduled_time'">
+                <relative-time humanized
+                               :from-time="row[col.field]" />
+              </td>
+              <td :key="`c-${colIndex}`"
                    class="sorted-column"
                   v-else-if="col.name == 'throttle_limit'">
                   {{ getThrottling(row[col.field]) }}
@@ -359,6 +365,7 @@ import BroadcastStatusPill from 'src/components/broadcasts/broadcast-status-pill
 import CommunicationActivityGraph from 'src/components/communication-activity-graph.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import CompactBtn from 'components/compact-btn.vue'
+import RelativeTime from 'src/components/relative-time.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
@@ -386,6 +393,13 @@ const broadcastsColumns = [
     label: 'Status',
     field: 'status',
     sortable: true,
+    draggable: true
+  },
+  {
+    name: 'scheduled_time',
+    label: 'Scheduled Time',
+    field: 'run_at',
+    sortable: false,
     draggable: true
   },
   {
@@ -490,7 +504,8 @@ export default {
     CommunicationActivityGraph,
     EllipseIcon,
     DeleteRedIcon,
-    CompactBtn
+    CompactBtn,
+    RelativeTime
   },
 
   mixins: [
