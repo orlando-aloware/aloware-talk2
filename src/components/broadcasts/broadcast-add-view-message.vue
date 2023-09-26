@@ -268,8 +268,11 @@ export default {
       this.$emit('type-updated', type)
     },
 
-    price (price) {
-      this.$emit('price-updated', price)
+    price: {
+      immediate: true,
+      handler (price) {
+        this.$emit('price-updated', price)
+      }
     }
   }
 }
