@@ -68,7 +68,7 @@
           </q-item-section>
         </q-item>
 
-        <profile :hideProfileInfo="$q.screen.width < 450" />
+        <profile :hideProfileInfo="isMobileTransitionWidth" />
 
         <phone v-if="!titleOnly" />
 
@@ -362,11 +362,15 @@ export default {
     },
 
     hideRefreshLabelClass () {
-      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? 'm-0' : ''
+      return this.isMobileTransitionWidth ? 'm-0' : ''
     },
 
     refreshButtonLabel () {
-      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? '' : 'Refresh'
+      return this.isMobileTransitionWidth ? '' : 'Refresh'
+    },
+
+    isMobileTransitionWidth () {
+      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH
     }
   },
 
