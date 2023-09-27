@@ -212,7 +212,7 @@ export default {
         GROUP_CONTACT_COMM_METADATA
       },
       maxOuterFilters: 3, // OR
-      maxInnerFilters: 3 // AND
+      maxInnerFilters: 5 // AND
     }
   },
 
