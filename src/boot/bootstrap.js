@@ -18,6 +18,7 @@ import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
 import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
 import log from 'electron-log'
+import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
@@ -27,6 +28,7 @@ storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
 storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
+storage.local.setItem('ak_widget_url', process.env.AK_WIDGET_URL)
 storage.local.setItem('aloware_demo_companies', Object.values(process.env.DEMO_COMPANY_IDS).join(','))
 
 Vue.use(infiniteScroll)
@@ -244,12 +246,7 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
     replaysOnErrorSampleRate: 1.0,
 
     integrations: [
-      new Sentry.BrowserTracing(),
-      new Sentry.Replay({
-        // Additional SDK configuration goes in here, for example:
-        maskAllText: true,
-        blockAllMedia: true
-      })
+      new Sentry.BrowserTracing()
     ]
   })
 
@@ -492,6 +489,9 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   return this.$q.notify(options)
 }
 
+window.actionNotificationUnqueuedIntervals = {}
+window.actionNotificationQueuedIntervals = {}
+
 Vue.prototype.$actionNotification = window._.debounce(function (notificationData) {
   const settings = {
     title: window._.get(notificationData, 'title', null),
@@ -531,8 +531,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
   // if call is still on-going and fishing mode active, we queue the notification
   if (settings.type === 'callFishing' &&
     this.$store.state.notifications[settings.type].communicationId &&
-    this.$store.state.notifications[settings.type].communicationId !== settings.communicationId &&
-    this.$store.state.notifications[settings.type].contactId !== settings.contactId) {
+    this.$store.state.notifications[settings.type].communicationId !== settings.communicationId) {
     let queue = window._.get(this.$store.state.notifications, `${settings.type}.queue`, [])
     queue = !queue ? [] : JSON.parse(JSON.stringify(queue))
     const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
@@ -560,31 +559,74 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
 
   data.data = settings
 
-  if (!document.getElementById(settings.type)) {
-    this.$store.commit('SET_NOTIFICATIONS', data)
-    settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
-    this.$bvToast.show(settings.type)
+  let unqueuedCounter = 0
+  let queue = null
+
+  if (settings.type !== 'callFishing') {
+    queue = this.$store.state.notifications?.[settings.type]?.queue?.find(queue => queue.communicationId === settings.communicationId)
+  }
+
+  // if notification is unqueued, then we can show the notification
+  if (!queue) {
+    clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+
+    window.actionNotificationUnqueuedIntervals[settings.type] = setInterval(() => {
+      // we have to make sure there's no notification (by settings type) currently showing
+      if (!document.getElementById(settings.type)) {
+        this.$store.commit('SET_NOTIFICATIONS', data)
+
+        if (settings.type === 'callFishing') {
+          this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+        }
+
+        this.$bvToast.show(settings.type)
+
+        clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+      }
+
+      unqueuedCounter++
+
+      if (unqueuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
+        clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
+      }
+    }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 
     return
   }
 
-  let counter = 0
-  let notificationInterval = null
+  let queuedCounter = 0
+  clearInterval(window.actionNotificationQueuedIntervals?.[settings.type])
 
-  notificationInterval = setInterval(() => {
+  window.actionNotificationQueuedIntervals[settings.type] = setInterval(() => {
+    queue = this.$store.state.notifications?.[settings.type]?.queue?.find(queue => queue.communicationId === settings.communicationId)
+
+    // if call is not queued in our call fishing notification queue,
+    // then we no longer need to continue to wait for notification availability
+    if (!queue) {
+      clearInterval(window.actionNotificationQueuedIntervals[settings.type])
+
+      return
+    }
+
     if (!document.getElementById(settings.type)) {
       this.$store.commit('SET_NOTIFICATIONS', data)
-      settings.type === 'callFishing' && this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+
+      if (settings.type === 'callFishing') {
+        this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
+      }
+
       this.$bvToast.show(settings.type)
-      clearInterval(notificationInterval)
+      clearInterval(window.actionNotificationQueuedIntervals[settings.type])
+
+      return
     }
 
-    counter++
+    queuedCounter++
 
-    if (counter > 120) {
-      clearInterval(notificationInterval)
+    if (queuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
+      clearInterval(window.actionNotificationQueuedIntervals[settings.type])
     }
-  }, 500)
+  }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
@@ -647,7 +689,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     autoHideDelay: '30000',
     isStatus: true
   })
-}, 500)
+}, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 
 Vue.prototype.$jsonClone = (value) => {
   if (value) {

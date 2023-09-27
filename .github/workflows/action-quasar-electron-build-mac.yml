@@ -21,6 +21,7 @@ jobs:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '14.x' ]
+        npm-version: [ '9.x' ]
 
     steps:
       - name: Check out Git repository
@@ -42,7 +43,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Update NPM
-        run: npm install -g npm
+        run: npm install -g npm@${{ matrix.npm-version }}
 
       - name: Node version
         run: node --version
@@ -80,6 +81,7 @@ jobs:
           ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
           ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
+          ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
           ENV_AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
@@ -115,6 +117,9 @@ jobs:
           # macOS code signing certificate
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+
+          # AnnounceKit
+          AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
 
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}

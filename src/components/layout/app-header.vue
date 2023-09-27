@@ -44,6 +44,14 @@
         Refresh
       </compact-btn>
 
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
+                   :disabled="loading"
+                   v-if="isInPowerDialerPage"
+                   @clicked="refreshPowerDialerListItems">
+        <refresh-icon />
+        Refresh
+      </compact-btn>
+
       <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
@@ -56,13 +64,15 @@
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
-            <b-link class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
-                    target="_blank"
-                    :href="updatesLink">
+            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
-            </b-link>
+              <AnnounceKit style="position: fixed;"
+                           catchClick=".ak-trigger"
+                           :user="currentUser"
+                           :widget="akWidgetUrl" />
+            </div>
           </q-item-section>
         </q-item>
 
@@ -169,6 +179,8 @@ import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
+import * as storage from 'src/plugins/helpers/storage'
+import AnnounceKit from 'announcekit-vue'
 
 export default {
   name: 'app-header',
@@ -197,7 +209,8 @@ export default {
     CompactBtn,
     RefreshIcon,
     HeaderHelp,
-    InboxMyContactsFilter
+    InboxMyContactsFilter,
+    AnnounceKit
   },
 
   props: {
@@ -290,6 +303,10 @@ export default {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
     },
 
+    akWidgetUrl () {
+      return storage.local.getItem('ak_widget_url')
+    },
+
     currentUser () {
       if (!this.profile) {
         return {}
@@ -326,6 +343,10 @@ export default {
       return this.$route.name === 'Inbox' ||
           path.includes('inbox') ||
           path.includes('channels')
+    },
+
+    isInPowerDialerPage () {
+      return this.$route.name === 'Power Dialer' && this.$route.meta?.id !== 'power-dialer-session'
     }
   },
 
@@ -438,6 +459,10 @@ export default {
 
     refreshInbox () {
       this.$VueEvent.fire('fetchInbox')
+    },
+
+    refreshPowerDialerListItems () {
+      this.$VueEvent.fire('fetchPowerDialerListItems')
     }
   },
 

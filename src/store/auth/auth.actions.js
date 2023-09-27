@@ -28,7 +28,7 @@ const check = async ({ commit }, payload) => {
 
     if (!preventRedirect &&
       (!response.data.user.enabled ||
-      !response.data.user.company.enabled) &&
+        !response.data.user.company.enabled) &&
       window.location.href.indexOf('/suspended') === -1) {
       window.location.href = '/suspended'
     }
@@ -79,7 +79,10 @@ const login = async ({ commit }, {
 
     const response = await window.axios.post('/login', params)
 
-    const { meta, data } = response.data
+    const {
+      meta,
+      data
+    } = response.data
 
     storage.local.setItem('shared_cookie', meta.hashed_token)
 
@@ -123,7 +126,10 @@ const getCookieUser = async ({ commit }) => {
 
     const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
 
-    const { meta, data } = response.data
+    const {
+      meta,
+      data
+    } = response.data
 
     if (!data.company.talk_enabled) {
       commit('SET_LOADING', false)
@@ -262,7 +268,10 @@ const resetPass = async ({ commit }, payload) => {
 
 const impersonate = async ({ commit }, payload) => {
   try {
-    const { userId, company } = payload
+    const {
+      userId,
+      company
+    } = payload
 
     commit('SET_LOADING', true)
 

@@ -197,14 +197,25 @@ export default {
     },
 
     onContactSelected (contact) {
-      this.$router.push({
+      const routeParams = {
         name: 'Contact',
         params: {
           id: contact.id
         }
-      }).catch(err => {
-        console.log(err)
-      })
+      }
+
+      // we need to pass previous page flag if it exists
+      // in our current route to maintain the flag
+      if (this.$route?.query?.previousPage) {
+        routeParams.query = {
+          previousPage: this.$route.query.previousPage
+        }
+      }
+
+      this.$router.push(routeParams)
+        .catch(err => {
+          console.log(err)
+        })
     },
 
     onRemoveContacts () {
