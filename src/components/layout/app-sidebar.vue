@@ -447,7 +447,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled"
+           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled && isDemoCompany"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -466,7 +466,7 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled)"
+           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -480,7 +480,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled)"
+           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -562,6 +562,8 @@ export default {
 
     ...mapState(['statics', 'staticsLoaded']),
 
+    ...mapState('cache', ['currentCompany']),
+
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -579,6 +581,10 @@ export default {
         default:
           return 'img:app-icons/menu/logo_white.svg'
       }
+    },
+
+    isDemoCompany () {
+      return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
     }
   },
 
