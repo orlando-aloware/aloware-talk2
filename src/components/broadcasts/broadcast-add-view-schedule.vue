@@ -66,14 +66,12 @@
     <div class="broadcast-add__schedule__row">
       <div class="broadcast-add__schedule__row__label">
         From
-        <a target="_blank"
-           :href="getComplianceURL()"
-           v-if="campaign.max_mps <= 0.25">
-          <information-circle-icon class="ml-2 cursor-pointer"/>
+        <span>
+          <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
-            To increase your MPS rate, please register your line cliking on this button
+            The line you want to send the bulk messages campaign from.
           </q-tooltip>
-        </a>
+        </span>
       </div>
       <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector v-model="campaign.id"
@@ -84,12 +82,17 @@
     <div class="broadcast-add__schedule__row">
       <div class="broadcast-add__schedule__row__label">
         Throttling
-        <span>
+        <a target="_blank"
+           :href="campaign.max_mps <= 0.25 ? getComplianceURL() : '#'">
           <information-circle-icon class="ml-2 cursor-pointer"/>
           <q-tooltip>
-            This is an hourly throttling limit on your bulk message campaign.
+            This is an hourly throttling limit on your bulk message campaign.<br>
+            Throttling comes directly from the carrier based on brand trust score.<br>
+            <span v-if="campaign.max_mps <= 0.25">
+              To increase your MPS rate, please register your line cliking on this button.
+            </span>
           </q-tooltip>
-        </span>
+        </a>
       </div>
       <div class="broadcast-add__schedule__row__fields">
         <throttle-selector :campaign="campaign"

@@ -22,7 +22,7 @@
 
       <div class="broadcast-add__message__sms__composer-footer">
         <div style="z-index: 10">
-          <information-circle-icon class="ml-2 cursor-pointer"/>
+          <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
             This is the text message you want to send to the selected group of contacts.<br>
             If the user has no contact name or 'Aloware Contact' as the name, then the variable will be blank.
