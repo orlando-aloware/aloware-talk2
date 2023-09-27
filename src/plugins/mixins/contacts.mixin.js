@@ -284,7 +284,7 @@ export default {
       }
     },
 
-    debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false) {
+    debouncedFetch (params = {}, isContactModule = true, queued = false, clear = false, isSearch = false, skipCountRequest = false) {
       const endpoint = this.apiEndpoint(queued)
 
       if (!endpoint) {
@@ -321,14 +321,16 @@ export default {
       this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
       const queryString = this.buildQueryString(params, isContactModule)
 
-      // use the same query string to update the list count
-      // eslint-disable-next-line camelcase
-      const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
-      this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
-        event: event,
-        clear: clear,
-        filters: countQueryString
-      })
+      if (!skipCountRequest) {
+        // use the same query string to update the list count
+        // eslint-disable-next-line camelcase
+        const countQueryString = (({ filter_groups, search, list_id, my_contacts }) => ({ filter_groups, search, list_id, my_contacts }))(queryString)
+        this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
+          event: event,
+          clear: clear,
+          filters: countQueryString
+        })
+      }
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
       this.listContactsSource = this.listContactsCancelToken.source()
@@ -435,7 +437,7 @@ export default {
         })
     },
 
-    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false) {
+    fetch (data = {}, hasOrder = true, clear = false, isLoading = false, fromRefresh = false, skipCountRequest = false) {
       let params = this.$jsonClone(data)
       const event = params?.event
 
@@ -516,7 +518,7 @@ export default {
       }
 
       // contacts list contacts fetching
-      this.processFetch(params, true, false, clear, isSearch)
+      this.processFetch(params, true, false, clear, isSearch, skipCountRequest)
     },
 
     buildQueryString (params, isContactModule = true) {
@@ -825,9 +827,10 @@ export default {
       this.$VueEvent.stop('onLoadMoreContacts', this.listeners.onLoadMoreContacts)
       this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
       this.$VueEvent.stop('contactUpdated', this.listeners.contactUpdated)
+      this.$VueEvent.stop('decreaseContactsCountFromCurrentList', this.listeners.decreaseContactsCountFromCurrentList)
     },
 
-    initiateFetch (data, fromRefresh = false) {
+    initiateFetch (data, fromRefresh = false, skipCountRequest = false) {
       this.appliedFiltersPreviousFilters = _.get(data, 'previousFilters', null)
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
       fetchData.params = _.get(data, 'params', {})
@@ -838,7 +841,7 @@ export default {
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.my_contacts', this.showMyContactsViewBased)
 
-      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh)
+      this.fetch(fetchData.params, fetchData.hasOrder, fetchData.clear, fetchData.isLoading, fromRefresh, skipCountRequest)
     },
 
     startEvents () {
@@ -849,9 +852,10 @@ export default {
 
       this.listeners.fetchContacts = (data) => {
         const fromRefresh = _.get(data, 'fromRefresh', false)
+        const skipCountRequest = _.get(data, 'skipCountRequest', false)
         this.fromContactFilters = false
         data = fromRefresh ? {} : data
-        this.initiateFetch(data, fromRefresh)
+        this.initiateFetch(data, fromRefresh, skipCountRequest)
       }
 
       this.listeners.clearContacts = () => {
@@ -900,12 +904,18 @@ export default {
         this.hasContactsListChanges = true
       }
 
+      this.listeners.decreaseContactsCountFromCurrentList = ({ count }) => {
+        // manually decrease the total count from the current list
+        this.setSelectedListContactCount(this.selectedList.contactCount - count)
+      }
+
       this.$VueEvent.listen('filteredFetchContacts', this.listeners.filteredFetchContacts)
       this.$VueEvent.listen('fetchContacts', this.listeners.fetchContacts)
       this.$VueEvent.listen('clearContacts', this.listeners.clearContacts)
       this.$VueEvent.listen('onLoadMoreContacts', this.listeners.onLoadMoreContacts)
       this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
       this.$VueEvent.listen('contactUpdated', this.listeners.contactUpdated)
+      this.$VueEvent.listen('decreaseContactsCountFromCurrentList', this.listeners.decreaseContactsCountFromCurrentList)
     },
 
     getListData () {
