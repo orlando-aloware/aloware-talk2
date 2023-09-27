@@ -204,7 +204,7 @@ export default {
       }
 
       if (this.where === 'scheduled') {
-        params.future_scheduled_time = this.schedule.toISOString().substr(0, 10)
+        params.future_scheduled_time = this.schedule.toISOString().slice(0, 19).replace('T', ' ')
       }
 
       return params
