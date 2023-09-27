@@ -1041,8 +1041,7 @@ export default {
     ]),
 
     ...mapState('powerDialer', [
-      'selectedPdList',
-      'myQueue'
+      'selectedPdList'
     ]),
 
     isInContactPageFromPowerDialer () {
