@@ -196,8 +196,9 @@ export default {
         data: payload
       })
         .then(() => {
-          this.$VueEvent.fire('fetchContacts', { clear: true })
-          this.$VueEvent.fire('shouldUpdateListCount')
+          this.$VueEvent.fire('fetchContacts', { clear: true, skipCountRequest: true })
+          this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+
           this.$generalNotification('Contact was successfully removed.')
         })
         .catch((_err) => {
@@ -288,7 +289,8 @@ export default {
           }
 
           this.$emit('contactsRemoved', this.selectedList)
-          this.$generalNotification(res.data.message)
+          this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+          this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {
           if (!isChunked) {
