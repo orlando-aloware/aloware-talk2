@@ -1325,7 +1325,7 @@ export default {
     findFilters (listFilters) {
       let list = []
       // Looks through listFilters and retrieves only elements that contain filters.
-      // Tipically any filter element in the filters group is an object with the 'filters' property
+      // Typically any filter element in the filters group is an object with the 'filters' property
       // Any other items are excluded from the resulting list.
       // Examples of elements that are excluded: 'sort', 'order', 'search'.
       for (const key in listFilters) {
