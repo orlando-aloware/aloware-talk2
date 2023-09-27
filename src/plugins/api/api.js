@@ -233,8 +233,8 @@ export default {
         return window.axios.post(`${suffixV1}uploaded-files/${lineId}`, params, events)
       },
 
-      pdfUpload (lineId, params, events) {
-        return window.axios.post(`${suffixV1}campaign/${lineId}/upload/pdf`, params, events)
+      faxUpload (lineId, params, events) {
+        return window.axios.post(`${suffixV1}campaign/${lineId}/upload/fax`, params, events)
       },
 
       sendFax (lineId, contactId, params) {

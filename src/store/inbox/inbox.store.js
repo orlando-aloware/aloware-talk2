@@ -12,7 +12,7 @@ export default function () {
       icon: 'inbox',
       disabled: false
     },
-    items: [
+    navListItems: [
       {
         label: 'Inbox',
         value: 'inbox',
@@ -108,6 +108,8 @@ export default function () {
     pinnedViews: [],
     inboxPersonalFilters: [],
     inboxCompanyFilters: [],
-    isEditingView: false
+    isEditingView: false,
+    showViewsList: false,
+    isInboxRefreshBtnLoading: false
   }
 }

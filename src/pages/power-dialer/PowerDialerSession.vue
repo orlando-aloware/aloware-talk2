@@ -134,7 +134,13 @@ export default {
       }
     }
 
+    this.listeners.contactListBulkCreated = (event) => {
+      this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, false, true)
+    }
+
     this.$VueEvent.listen('endWrapUp', this.listeners.endWrapUp)
+    this.$VueEvent.stop('contact_list_bulk_created', this.listeners.contactListBulkCreated)
+    this.$VueEvent.listen('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   },
 
   async mounted () {
@@ -175,7 +181,7 @@ export default {
       )
     },
 
-    fetchTasks (status, isNextPage = false) {
+    fetchTasks (status, isNextPage = false, refreshData = false) {
       if (status) {
         const taskType = { data: '' }
         switch (status) {
@@ -213,7 +219,7 @@ export default {
             this.powerDialerTaskFilters[taskType.data] = JSON.parse(JSON.stringify(res.data))
             delete this.powerDialerTaskFilters[taskType.data].data
 
-            if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+            if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
               this.pagesFetched += 1
               this.powerDialerTaskFilters[taskType.data].current_page = this.pagesFetched
               // const inQueueTaskIds = this.powerDialerTasks[taskType.data].map(task => task.contact_list_item_id)
@@ -338,6 +344,7 @@ export default {
   beforeDestroy () {
     this.powerDialerTaskFilters.in_queue = []
     this.$VueEvent.stop('endWrapUp', this.listeners.endWrapUp)
+    this.$VueEvent.stop('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <q-toolbar class="page-header"
-             :class="{ 'pl-3 pr-3': !noPadding }">
+             :class="{ 'pl-2 pr-2': !noPadding }">
     <div class="d-flex h-100 align-items-center">
       <back-button class="mobile-back-btn-global-header"
                    v-if="['Contact', 'Settings Tab'].includes($route.name)"
@@ -14,7 +14,7 @@
       </router-link>
       <h1 v-if="isMainTitle">{{ $route.meta && $route.meta.title ? $route.meta.title : $route.name }}</h1>
       <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
-      <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ $route.params.tab.replace('-', ' ') | ucwords }}</h1>
+      <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
       <inbox-list-navigation v-if="(['Inbox', 'Inbox Contact Task'].includes($route.name) || ['/channels/inbox/open', '/channels/inbox/pending', '/channels/inbox/closed'].includes($route.path)) && !titleOnly" />
@@ -24,27 +24,27 @@
                    :disabled="loading"
                    v-if="$route.name === 'Stats' && !titleOnly"
                    @clicked="refreshMetricGroup">
-        <refresh-icon />
-        Refresh
+        <refresh-icon :class="hideRefreshLabelClass"/>
+        {{ refreshButtonLabel }}
       </compact-btn>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    :disabled="loading || contactsRefreshIsDisabled"
                    v-if="$route.name === 'Contacts'"
                    @clicked="refreshContacts">
-        <refresh-icon />
-        Refresh
+        <refresh-icon :class="hideRefreshLabelClass"/>
+        {{ refreshButtonLabel }}
       </compact-btn>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    :disabled="loading"
-                   v-if="isInInboxPage"
-                   @clicked="refreshInbox">
-        <refresh-icon />
-        Refresh
+                   v-if="isInPowerDialerPage"
+                   @clicked="refreshPowerDialerListItems">
+        <refresh-icon :class="hideRefreshLabelClass"/>
+        {{ refreshButtonLabel }}
       </compact-btn>
 
-      <inbox-my-contacts-filter v-if="!isMobile || !$q.screen.lt.md"/>
+      <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
@@ -56,17 +56,19 @@
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
-            <b-link class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer"
-                    target="_blank"
-                    :href="updatesLink">
+            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
               <span class="fa fa-bullhorn changelog-trigger pointer"
                     style="font-size: 1.2rem">
               </span>
-            </b-link>
+              <AnnounceKit style="position: fixed;"
+                           catchClick=".ak-trigger"
+                           :user="currentUser"
+                           :widget="akWidgetUrl" />
+            </div>
           </q-item-section>
         </q-item>
 
-        <profile :hideProfileInfo="$q.screen.width < 450 && $route.name === 'Contacts'" />
+        <profile :hideProfileInfo="isMobileTransitionWidth" />
 
         <phone v-if="!titleOnly" />
 
@@ -169,6 +171,9 @@ import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
+import * as storage from 'src/plugins/helpers/storage'
+import AnnounceKit from 'announcekit-vue'
+import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'app-header',
@@ -197,7 +202,8 @@ export default {
     CompactBtn,
     RefreshIcon,
     HeaderHelp,
-    InboxMyContactsFilter
+    InboxMyContactsFilter,
+    AnnounceKit
   },
 
   props: {
@@ -290,6 +296,10 @@ export default {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
     },
 
+    akWidgetUrl () {
+      return storage.local.getItem('ak_widget_url')
+    },
+
     currentUser () {
       if (!this.profile) {
         return {}
@@ -326,6 +336,41 @@ export default {
       return this.$route.name === 'Inbox' ||
           path.includes('inbox') ||
           path.includes('channels')
+    },
+
+    isInPowerDialerPage () {
+      return this.$route.name === 'Power Dialer' && this.$route.meta?.id !== 'power-dialer-session'
+    },
+
+    settingsTabHeaderName () {
+      if (!['Settings Tab'].includes(this.$route.name)) {
+        return this.$route.name
+      }
+
+      let tab = this.$route.params.tab.replace('-', ' ')
+
+      // specially formatted header name(s)
+      if (['sms templates'].includes(tab)) {
+        return 'SMS Templates'
+      }
+
+      if (['general information'].includes(tab)) {
+        return 'General'
+      }
+
+      return this.$options.filters.ucwords(tab)
+    },
+
+    hideRefreshLabelClass () {
+      return this.isMobileTransitionWidth ? 'm-0' : ''
+    },
+
+    refreshButtonLabel () {
+      return this.isMobileTransitionWidth ? '' : 'Refresh'
+    },
+
+    isMobileTransitionWidth () {
+      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH
     }
   },
 
@@ -436,8 +481,8 @@ export default {
       }
     },
 
-    refreshInbox () {
-      this.$VueEvent.fire('fetchInbox')
+    refreshPowerDialerListItems () {
+      this.$VueEvent.fire('fetchPowerDialerListItems')
     }
   },
 

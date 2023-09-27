@@ -19,7 +19,7 @@
     </button>
     <div class="notification-body-wrapper"
          @click="onNotificationClick">
-      <div class="d-flex flex-row align-items-start">
+      <div class="d-flex flex-row align-items-center">
         <b-badge v-if="id === 'callFishing' && queueCount > 1"
                  class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
                  variant="danger"
@@ -55,6 +55,15 @@
               {{ runningDateTime }}
             </small>
           </div>
+
+          <!-- caller location -->
+          <div class="d-flex flex-grow-1 align-items-baseline w-100"
+               v-if="location">
+            <span class="mr-auto text-white pr-1 text-sm">
+              {{ location }}
+            </span>
+          </div>
+
           <div class="text-grey-81 message-body text-break d-flex w-100">
             <div class="flex-grow-1 d-flex align-items-center w-100">
               <component class="message-icon mr-1"
@@ -85,8 +94,8 @@
             </div>
           </div>
         </div>
+
         <div class="d-flex justify-content-center align-items-center call-actions"
-             :class="[isCall && getSource ? 'mt-2' : '']"
              v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
@@ -176,6 +185,7 @@ import { get, isEmpty } from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import {
   mentionsMixin,
+  notificationQueueMixin,
   notificationMixin,
   visibilityMixin,
   aclMixin
@@ -185,7 +195,6 @@ import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 
 export default {
@@ -193,6 +202,7 @@ export default {
 
   mixins: [
     notificationMixin,
+    notificationQueueMixin,
     mentionsMixin,
     visibilityMixin,
     aclMixin
@@ -224,7 +234,8 @@ export default {
     return {
       runningDateTime: null,
       runningDateTimeInterval: null,
-      isValidNotification: false
+      isValidNotification: false,
+      notificationListeners: {}
     }
   },
 
@@ -373,10 +384,6 @@ export default {
       return this.queue.length + 1
     },
 
-    isCommunicationInCallFishingQueue () {
-      return !isEmpty(this.callFishingQueue.find(queue => get(queue, 'communicationId', null) === this.communicationId))
-    },
-
     getSource () {
       if (!this.communication) {
         return ''
@@ -491,26 +498,52 @@ export default {
 
     notificationIconClasses () {
       return [
-        this.isCall && this.getSource ? 'mt-2' : '',
         this.id === 'system' ? 'system-update' : ''
       ]
+    },
+
+    location () {
+      if (!this.communication || !this.contact) {
+        return false
+      }
+
+      let city = this.communication.city || this.contact.cnam_city || null
+      const state = this.communication.state || this.contact.cnam_state || null
+      const country = this.communication.country || this.contact.cnam_country || null
+
+      if (!city && !state && !country) {
+        return 'Unknown Location'
+      }
+
+      return `${city || ''}${city && state ? ', ' : ''}${state || ''}${state && country ? ' - ' : ''} ${country || ''}`
+    },
+
+    notificationQueue () {
+      return this.notifications?.[this.id]?.queue
     }
   },
 
   created () {
-    this.$VueEvent.listen('update_communication', (data) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
-        return
-      }
+    this.notificationListeners[this.id] = {
+      updateCommunication: (communication) => {
+        this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
 
-      if (![
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
-        CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW
-      ].includes(data.current_status2) && this.isCommunicationInCallFishingQueue) {
-        this.removeFromCallFishingQueue(data.id)
+        if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+          return
+        }
+
+        const isCallNotInProgressOrIncoming = this.isCallNotInProgressOrIncoming(communication.disposition_status2, communication.current_status2)
+
+        if (isCallNotInProgressOrIncoming && this.isCommunicationInCallFishingQueue(communication.id)) {
+          this.removeFromCallFishingQueue(communication.id)
+        }
+
+        // close the notification
+        if (isCallNotInProgressOrIncoming && this.communicationId === communication.id) {
+          this.processRemoveFromNotification(communication)
+        }
       }
-    })
+    }
   },
 
   methods: {
@@ -519,18 +552,27 @@ export default {
       'setShowPhone',
       'clearCallFishingQueue',
       'removeFromCallFishingQueue'
-      // 'setShowIncomingCallNotification'
     ]),
+
+    startNotificationListeners () {
+      this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
+    },
+
+    stopNotificationListeners () {
+      this.$VueEvent.stop('update_communication', this.notificationListeners[this.id].updateCommunication)
+    },
 
     onShow () {
       this.isValidNotification = false
+      this.stopNotificationListeners()
+      this.startNotificationListeners()
     },
 
     autoClose () {
       this.runDateTimeInterval()
 
       if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
-          !this.isCommunicationInCallFishingQueue) ||
+          !this.isCommunicationInCallFishingQueue()) ||
         (this.id === 'incomingCall' && document.getElementById('incomingCall') &&
           isEmpty(this.dialer.call))
       ) {
@@ -583,6 +625,7 @@ export default {
       }
 
       this.clearDateTimeInterval()
+      this.stopNotificationListeners()
 
       if (this.id !== 'callFishing' ||
         (this.id === 'callFishing' &&
@@ -770,8 +813,27 @@ export default {
     }
   },
 
+  watch: {
+    notificationQueue: {
+      deep: true,
+      handler: function (newValue, oldValue) {
+        if (!newValue) {
+          return
+        }
+
+        const difference = oldValue?.filter(queue => !newValue.includes(queue))
+        const communication = difference?.[0]?.communication
+
+        if (communication) {
+          this.removeQueuedNotification(communication.id, communication.disposition_status2, communication.current_status2)
+        }
+      }
+    }
+  },
+
   beforeDestroy () {
     this.clearDateTimeInterval()
+    this.stopNotificationListeners()
   }
 }
 </script>

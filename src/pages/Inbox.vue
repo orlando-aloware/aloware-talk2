@@ -51,7 +51,7 @@ export default {
     ]),
 
     ...mapState('inbox', [
-      'items'
+      'navListItems'
     ]),
 
     isMobileContactActive () {
@@ -88,7 +88,9 @@ export default {
   methods: {
     ...mapActions('inbox', [
       'setActiveChannel',
-      'setTaskCount'
+      'setTaskCount',
+      'setShowViewsList',
+      'setIsInboxRefreshBtnLoading'
     ]),
 
     setChannel (routeChanged = false) {
@@ -98,7 +100,7 @@ export default {
         if (this.inboxViewsRoutes.includes(this.$route.name) && this.isLoadedPinnedViews) {
           channel = this.getPinnedViewChannel(this.$route.params.viewId)
         } else {
-          channel = this.items.find(item => item.value === this.$route.params.channel)
+          channel = this.navListItems.find(item => item.value === this.$route.params.channel)
         }
 
         this.setActiveChannel(channel)
@@ -106,7 +108,7 @@ export default {
       }
 
       if (this.$route.name === 'Inbox' && !this.activeChannel) {
-        const channel = this.items.find(item => item.value === 'inbox')
+        const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
 
@@ -118,6 +120,10 @@ export default {
     onItemSelected (routeData) {
       this.contactId = routeData.params.id
       this.$router.push(routeData)
+    },
+
+    onWindowResize () {
+      this.setShowViewsList(false)
     }
   },
 
@@ -146,7 +152,18 @@ export default {
 
       this.loadContactTasks(false)
       this.fetchTaskCounts()
+      this.setIsInboxRefreshBtnLoading(false)
     })
+
+    window.addEventListener('resize', this.onWindowResize)
+  },
+
+  unmounted () {
+    window.removeEventListener('resize', this.onWindowResize)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.onWindowResize)
   },
 
   watch: {

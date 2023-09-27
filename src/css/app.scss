@@ -3339,6 +3339,10 @@ i.option-separator {
   word-break: break-all;
 }
 
+.text-word-wrap {
+  overflow-wrap: break-word;
+}
+
 .auto-size {
   width: auto;
   height: auto;
@@ -3603,7 +3607,7 @@ i.option-separator {
     padding-top: 10px;
 
     .nav-item-separator {
-      margin: 20px 17px;
+      margin: 15px;
       border-color: $grey-60 !important;
     }
   }
@@ -5098,10 +5102,8 @@ i.option-separator {
 
 .compact-button {
   height: 24px;
-  padding: 0;
   line-height: 24px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding: 0 8px;
   font-size: 12px;
   display: inline-flex;
   align-items: center;
@@ -7232,10 +7234,13 @@ table.datatable {
 }
 
 .inbox-nav-item-group-header {
-  padding: 10px 5px 10px 10px !important;
+  padding: 10px 5px 10px 7px !important;
   color: #666666;
   letter-spacing: 1px;
   font-size: 10px;
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .inbox-nav-item {
@@ -7273,14 +7278,11 @@ table.datatable {
   &__icon,
   &__label,
   .count-label {
-    height: 21px !important;
-    display: flex;
-    align-items: center;
-    line-height: 20px !important;
+    line-height: 1;
   }
 
   &__icon {
-    padding-right: 10px;
+    padding-right: 5px;
   }
 
   &__label {
@@ -7453,11 +7455,10 @@ table.datatable {
   }
 
   .left-column-wrapper {
-
     border-right: 1px solid $grey-60;
     padding-right: 10px;
     padding-left: 10px;
-    max-width: 50%;
+    width: 25%;
 
     .filter-group-title {
       font-size: 12px;
@@ -7467,7 +7468,6 @@ table.datatable {
     }
 
     .filter-items {
-
       margin: 5px 0;
       padding: 7px 12px;
       line-height: 1.2;
@@ -7476,7 +7476,7 @@ table.datatable {
       span:not(.check-icon) {
         font-size: 13px;
         color: $grey-100;
-        width: 8vw;
+        width: 95%;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -7484,7 +7484,7 @@ table.datatable {
       }
 
       span.position-absolute.check-icon {
-        right: 20px;
+        right: 10px;
         top: 5px;
       }
 
@@ -8043,13 +8043,6 @@ span.mention {
 .notes-body {
   p {
     display: -webkit-box;
-    /*-webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;*/
-    br {
-      display: none !important;
-    }
 
     .mention,
     .mention-tag {
@@ -8573,7 +8566,7 @@ span.mention {
     .q-item {
       padding: 0 17px 0 16px !important;
       font-size: $f-size-body !important;
-      height: 33px !important;
+      min-height: 33px !important;
 
       .rounded-badge {
         margin-right: 14px !important;
@@ -9109,7 +9102,7 @@ screen and (max-width: 956px) {
   }
   .inbox-side {
     &__left {
-      max-width: 160px;
+      max-width: 120px;
 
       .count-label {
         margin-left: 10px;
@@ -9164,28 +9157,13 @@ screen and (max-width: 956px) {
     &:not(.inbox-side-mobile-full-width) {
       .inbox-side {
         &__left {
-          max-width: 35px;
-
           .header,
-          .inbox-nav-item__label,
           .count-label {
             display: none;
           }
 
-          .inbox-nav-list div:nth-child(2) {
-            height: 30px;
-          }
-
           .inbox-nav-item {
             margin: 0 0 !important;
-
-            &__icon {
-              padding: 0 0 !important;
-            }
-          }
-
-          .inbox-nav-item-group-header {
-            opacity: 0;
           }
         }
       }
@@ -9756,7 +9734,7 @@ screen and (max-width: 956px) {
     padding-left: 10px;
     border-bottom: 1px solid $grey-60;
 
-    span {
+    span:not(.label-my-contacts) {
       color: $grey-92;
       font-size: 18px;
       font-weight: 600;
@@ -10280,7 +10258,7 @@ screen and (max-width: 956px) {
 .stats-refresh-btn {
   height: 32px;
   font-size: $f-size-body-sm;
-  margin-left: 27px;
+  margin-left: 15px;
   font-size: $f-size-h5;
   font-weight: 500;
 
@@ -12978,4 +12956,9 @@ h1.contact-list-name-label {
     }
 
   }
+}
+
+.g-recaptcha {
+  transform: scale(0.8);
+  transform-origin: 0 0;
 }
