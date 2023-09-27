@@ -21,10 +21,14 @@
             {{ fullName }}
           </q-item-label>
           <q-item-label caption lines="2">
-            {{ phone_number | fixPhone('NATIONAL', true) }}
+            {{ activeTask?.phone_number | fixPhone('NATIONAL', true) }}
           </q-item-label>
           <q-item-label caption lines="2">
-            {{ company_name }}
+            {{ activeTask?.company_name }}
+          </q-item-label>
+          <q-item-label caption lines="2">
+            <i class="fa fa-globe"></i>
+            {{ activeTask?.timezone }}
           </q-item-label>
         </q-item-section>
 
@@ -63,18 +67,23 @@ import { avatarMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'SessionContactInProgress',
+
   mixins: [
     avatarMixin
   ],
+
   components: {
     PhoneIcon
   },
+
   computed: {
     ...mapFields('powerDialer', [
       'activeTask',
       'hasActiveTask'
     ]),
+
     ...mapState(['dialer']),
+
     isNoName () {
       const firstName = this.activeTask?.first_name
       const lastName = this.activeTask?.last_name
@@ -82,30 +91,22 @@ export default {
       return isEmpty(firstName) &&
         isEmpty(lastName)
     },
+
     fullName () {
       return this.isNoName
         ? `No Name`
         : `${this.activeTask?.first_name || ''} ${this.activeTask?.last_name || ''}`
     },
-    firstname () {
-      return this.activeTask?.first_name
-    },
-    lastname () {
-      return this.activeTask?.last_name
-    },
-    phone_number () {
-      return this.activeTask?.phone_number
-    },
-    company_name () {
-      return this.activeTask?.company_name
-    },
+
     activeTaskId () {
       return this.activeTask?.id
     },
+
     statusCallConnected () {
       return this.dialer.currentStatus === 'CALL_CONNECTED'
     }
   },
+
   methods: {
     endCurrentCall () {
       this.$VueEvent.fire('hangupCall')

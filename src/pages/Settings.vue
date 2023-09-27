@@ -142,6 +142,37 @@ export default {
         name: 'Settings'
       })
       this.onLoadShowSettings = false
+    },
+
+    unsavedSettingsAlert (to, from, next, changed) {
+      if (changed.length > 0) {
+        const msg = 'This action may cause your settings changes to be lost. Do you wish to continue?'
+        const title = 'You have unsaved settings'
+        this.$bvModal.msgBoxConfirm(msg, {
+          title: title,
+          size: 'md',
+          noCloseOnBackdrop: true,
+          noCloseOnEsc: true,
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          footerClass: 'p-2',
+          hideHeaderClose: false,
+          centered: true
+        }).then(value => {
+          if (value) {
+            this.resetUserChanges()
+            next()
+            return
+          }
+          next(false)
+        }).catch(err => {
+          console.error(err)
+          next(false)
+        })
+        return
+      }
+      next()
     }
   },
 
@@ -173,6 +204,14 @@ export default {
         this.onLoadShowSettings = true
       }
     }
+  },
+
+  beforeRouteUpdate (to, from, next) {
+    this.unsavedSettingsAlert(to, from, next, this.changedUserProperties)
+  },
+
+  beforeRouteLeave (to, from, next) {
+    this.unsavedSettingsAlert(to, from, next, this.changedUserProperties)
   }
 }
 </script>

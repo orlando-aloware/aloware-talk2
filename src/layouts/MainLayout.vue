@@ -23,12 +23,7 @@
           <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
-                <transition :name="transitionName"
-                            mode="out-in">
-                  <!-- <keep-alive> -->
-                  <router-view></router-view>
-                  <!-- </keep-alive> -->
-                </transition>
+                <router-view></router-view>
               </template>
               <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
                    v-else-if="loading && !suspended">
@@ -2543,7 +2538,8 @@ export default {
     ]),
     ...mapActions('auth', {
       logoutUser: 'logout',
-      check: 'check'
+      check: 'check',
+      clear: 'clear'
     }),
     ...mapActions('stats', [
       'setAvailableMetrics',
