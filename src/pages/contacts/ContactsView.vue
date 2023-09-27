@@ -1074,7 +1074,8 @@ export default {
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded',
-      'setPreviouslySavedListId'
+      'setPreviouslySavedListId',
+      'setPreviousListFilters'
     ]),
 
     onSearch (searchText) {
@@ -1237,13 +1238,16 @@ export default {
 
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
+        const currentFilters = this.findFilters(this.currentListFilters)
 
         return this.$axios
-          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: this.currentListFilters })
+          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)
-            this.initialListFilters = this.currentListFilters
+            this.setCurrentListFilters(currentFilters)
+            this.initialListFilters = currentFilters
+            this.setPreviousListFilters(currentFilters)
             this.updateFilterHasChanges()
             this.isUpdatingList = false
             this.$generalNotification('Changes to contact list has been saved.')
@@ -1290,8 +1294,8 @@ export default {
 
       // debugger
       let params = this.unsavedList.params
-      let currentFilters = this.findFilters(this.currentListFilters)
-      params.filters = [currentFilters]
+      const currentFilters = this.findFilters(this.currentListFilters)
+      params.filters = currentFilters
 
       return this.$axios
         .post('/api/v2/contacts-list', params)
@@ -1319,12 +1323,17 @@ export default {
     },
 
     findFilters (listFilters) {
+      let list = []
+      // Looks through listFilters and retrieves only elements that contain filters.
+      // Typically any filter element in the filters group is an object with the 'filters' property
+      // Any other items are excluded from the resulting list.
+      // Examples of elements that are excluded: 'sort', 'order', 'search'.
       for (const key in listFilters) {
-        if (listFilters[key].hasOwnProperty('filters')) {
-          return listFilters[key]
+        if (listFilters[key] !== null && typeof listFilters[key] === 'object' && listFilters[key].hasOwnProperty('filters')) {
+          list.push(listFilters[key])
         }
       }
-      return null
+      return list
     },
 
     loadFolders () {
