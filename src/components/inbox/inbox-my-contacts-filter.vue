@@ -33,6 +33,7 @@ import { mapActions, mapState } from 'vuex'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
+import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'inbox-my-contacts-filter',
@@ -70,7 +71,7 @@ export default {
     },
 
     refreshButtonLabel () {
-      return this.$q.screen.width < 450 ? '' : 'Refresh'
+      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? '' : 'Refresh'
     }
   },
 

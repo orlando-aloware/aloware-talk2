@@ -173,6 +173,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import * as storage from 'src/plugins/helpers/storage'
 import AnnounceKit from 'announcekit-vue'
+import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'app-header',
@@ -361,11 +362,11 @@ export default {
     },
 
     hideRefreshLabelClass () {
-      return this.$q.screen.width < 450 ? 'm-0' : ''
+      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? 'm-0' : ''
     },
 
     refreshButtonLabel () {
-      return this.$q.screen.width < 450 ? '' : 'Refresh'
+      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? '' : 'Refresh'
     }
   },
 

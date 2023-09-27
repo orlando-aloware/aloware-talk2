@@ -15,7 +15,7 @@
         <b-form-row class="mt-3 general-settings-app-block">
           <b-col sm="12" md="12">
             <div class="d-inline-flex align-items-center">
-              <h5 :class="[$q.screen.width < 450 ? 'w-100' : '']"> Have you considered using Aloware app on your smartphone 📱? </h5>
+              <h5 :class="mobileHeaderTransitionWidthClass"> Have you considered using Aloware app on your smartphone 📱? </h5>
               <b-button href="https://aloware.com/apps"
                         variant="outline-success"
                         class="ml-sm-2"
@@ -149,6 +149,7 @@
 import { mapGetters, mapState } from 'vuex'
 import InputGroupWithCopy from 'components/input-group-with-copy'
 import * as AnswerTypes from 'src/constants/answer-types'
+import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'general-information',
@@ -166,7 +167,11 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState(['ringGroups'])
+    ...mapState(['ringGroups']),
+
+    mobileHeaderTransitionWidthClass () {
+      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? 'w-100' : ''
+    }
   },
 
   data () {

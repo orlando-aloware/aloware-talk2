@@ -14,11 +14,11 @@
           <q-item-section class="contact-info-wrapper"
                           v-if="!hideProfileInfo">
             <q-item-label class="text-regular _600 user-full-name">{{ profile.full_name }}
-              <half-moon-icon v-if="profile.sleep_mode"
-                              color="#9B51E0"
+              <half-moon-icon color="#9B51E0"
                               class="focus-mode-icon"
                               width="12"
-                              height="12">
+                              height="12"
+                              v-if="profile.sleep_mode">
               </half-moon-icon>
             </q-item-label>
             <q-item-label class="text-regular _500 user-company-name text-right">{{ profile.company_name }}</q-item-label>
@@ -42,11 +42,11 @@
                   v-if="hideProfileInfo">
             <div class="d-flex flex-column">
               <span class="text-regular _600 user-full-name w-100">{{ profile.full_name }}
-                <half-moon-icon v-if="profile.sleep_mode"
-                                color="#9B51E0"
+                <half-moon-icon color="#9B51E0"
                                 class="focus-mode-icon"
                                 width="12"
-                                height="12">
+                                height="12"
+                                v-if="profile.sleep_mode">
                 </half-moon-icon>
               </span>
               <span class="text-xs user-company-name w-100">{{ profile.company_name }}</span>
