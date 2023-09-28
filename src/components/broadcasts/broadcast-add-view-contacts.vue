@@ -48,7 +48,7 @@
                     dense
                     outlined
                     hide-bottom-space
-                    :placeholder="!source.integration.name ? 'Select a integration' : ''"
+                    :placeholder="!source.integration.name ? 'Select an integration' : ''"
                     :options="integrationsEnabled"
                     v-model="source.integration.name">
           </q-select>
