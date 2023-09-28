@@ -47,10 +47,22 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'attachments',
-  components: { UploadIcon },
+
+  components: {
+    UploadIcon
+  },
+
+  props: {
+    isBroadcast: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   computed: {
     ...mapGetters('contacts', ['selectedLine'])
   },
+
   data () {
     return {
       isUploading: false,
@@ -61,19 +73,26 @@ export default {
       hasError: false
     }
   },
+
   methods: {
     onDrop (e) {
       this.selectedFiles = e.dataTransfer.files
     },
+
     onAdded () {
       this.selectedFiles = event.target.files
     },
+
     onUpload (file) {
       const formData = new FormData()
       formData.append('file', file)
       this.isUploading = true
 
       this.files.push(file)
+
+      if (this.isBroadcast) {
+        formData.append('is_broadcast', true)
+      }
 
       talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, {
         onUploadProgress: function (progressEvent) {
@@ -101,16 +120,19 @@ export default {
         this.$handleErrors(error.response)
       })
     },
+
     emitFileUploaded () {
       this.$nextTick(() => {
         this.$emit('attachmentUploaded', this.uploadedFiles)
         this.$root.$emit('bv::hide::popover', 'attachment-popover')
       })
     },
+
     onBrowse () {
       this.$refs.file.click()
     }
   },
+
   watch: {
     selectedFiles: function () {
       if (this.selectedFiles) {

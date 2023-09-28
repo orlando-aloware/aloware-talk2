@@ -943,9 +943,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'broadcasts', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('inbox', ['liveContacts', 'contacts']),
+    ...mapState('broadcast', ['broadcasts']),
 
     hasSMSReminder () {
       if (this.$refs['sms-reminder']) {

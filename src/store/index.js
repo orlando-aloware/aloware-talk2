@@ -12,8 +12,10 @@ import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import settings from './settings'
+import broadcast from './broadcast'
 import wallboard from './wallboard'
 import tagsModule from './tags'
+import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
 
@@ -37,6 +39,7 @@ export default function (/* { ssrContext } */) {
       stats,
       powerDialer,
       settings,
+      broadcast,
       wallboard,
       cache,
       tagsModule
@@ -53,10 +56,10 @@ export default function (/* { ssrContext } */) {
       ringGroups: [],
       workflows: [],
       changelogs: [],
+      broadcasts: [],
       dispositionStatuses: [],
       callDispositions: [],
       templates: [],
-      broadcasts: [],
       filters: [],
       firstLogin: false,
       userStatus: false,
@@ -257,6 +260,7 @@ export default function (/* { ssrContext } */) {
       suspended: false,
       showProFeatureDialog: false,
       leadSources: [],
+      contactsLists: [],
       statics: {
         domain: null,
         favicon: null,
@@ -278,6 +282,7 @@ export default function (/* { ssrContext } */) {
     getters: {
       notifications: (state) => state.notifications,
       breadcrumbs: (state) => state.breadcrumbs,
+      contactsLists: (state) => state.contactsLists,
       getField
     },
 
@@ -450,12 +455,12 @@ export default function (/* { ssrContext } */) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
       },
 
-      setTemplates ({ commit }, templates) {
-        commit('SET_TEMPLATES', templates)
-      },
-
       setBroadcasts ({ commit }, broadcasts) {
         commit('SET_BROADCASTS', broadcasts)
+      },
+
+      setTemplates ({ commit }, templates) {
+        commit('SET_TEMPLATES', templates)
       },
 
       newTag ({ commit }, tag) {
@@ -541,6 +546,7 @@ export default function (/* { ssrContext } */) {
           commit('cache/RESET_VUEX', null, { root: true })
           commit('wallboard/RESET_VUEX', null, { root: true })
           commit('tagsModule/RESET_VUEX', null, { root: true })
+          commit('broadcast/RESET_VUEX', null, { root: true })
         }
       },
 
@@ -794,6 +800,23 @@ export default function (/* { ssrContext } */) {
 
       setIsContactDisposed ({ commit }, value) {
         commit('SET_IS_CONTACT_DISPOSED', value)
+      },
+
+      async fetchContactsLists ({ commit }) {
+        const lists = []
+        let res = null
+        let page = 1
+
+        do {
+          res = await API.V2.contactList.get({ visible_only: true, size: 100, page })
+
+          lists.push(...res.data.data)
+          page++
+        } while (res.data.next_page_url)
+
+        commit('SET_CONTACTS_LISTS', lists)
+
+        return Promise.resolve()
       }
     },
 
@@ -1506,6 +1529,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_CONTACT_DISPOSED (state, value) {
         state.isContactDisposed = value
+      },
+
+      SET_CONTACTS_LISTS (state, lists) {
+        state.contactsLists = lists
       },
 
       updateField
