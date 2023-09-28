@@ -243,7 +243,7 @@ export default {
         case 4:
           return this.isMainComponentValid
         default:
-          throw new Error('Invalid step ' + this.currentStep.id)
+          throw new Error(`Invalid step ${this.currentStep.id}`)
       }
     },
 
@@ -340,7 +340,7 @@ export default {
       this.time.time = 'scheduled'
       this.time.schedule.date = this.nextScheduledDay
       this.time.schedule.time = this.nextScheduledHour.format('HH:mm')
-      this.date = this.time.schedule.date + ' ' + this.time.schedule.time
+      this.date = `${this.time.schedule.date} ${this.time.schedule.time}`
 
       this.next()
     },
