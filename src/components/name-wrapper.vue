@@ -47,11 +47,16 @@ export default {
     name () {
       if (this.resource.first_name && this.resource.last_name) {
         return `${this.resource.first_name} ${this.resource.last_name}`.trim()
-      } else if (!this.resource.first_name && this.resource.last_name) {
+      }
+
+      if (!this.resource.first_name && this.resource.last_name) {
         return `${this.resource.last_name}`.trim()
-      } else if (this.resource.first_name && !this.resource.last_name) {
+      }
+
+      if (this.resource.first_name && !this.resource.last_name) {
         return `${this.resource.first_name}`.trim()
       }
+
       return ''
     }
   },

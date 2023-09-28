@@ -364,6 +364,7 @@ export default {
             if (min === undefined || min > date) {
               min = date
             }
+
             if (max === undefined || max < date) {
               max = date
             }

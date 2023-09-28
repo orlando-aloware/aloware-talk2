@@ -442,13 +442,13 @@
       </q-tooltip>
     </q-btn-->
 
-    <q-btn :ripple="false"
-           icon="img:app-icons/menu/broadcast_gray.svg"
+    <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled && isDemoCompany"
            flat
+           :ripple="false"
+           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled && isDemoCompany"
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
                rounded
@@ -460,28 +460,28 @@
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ path: '/broadcasts' }"
-           :ripple="false"
-           icon="img:app-icons/menu/broadcast_active.svg"
+    <q-btn icon="img:app-icons/menu/broadcast_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany"
-           flat>
+           flat
+           :to="{ path: '/broadcasts' }"
+           :ripple="false"
+           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ path: '/broadcasts' }"
-           :ripple="false"
-           icon="img:app-icons/menu/broadcast_gray.svg"
+    <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany"
-           flat>
+           flat
+           :to="{ path: '/broadcasts' }"
+           :ripple="false"
+           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">

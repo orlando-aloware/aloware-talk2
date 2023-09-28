@@ -8,8 +8,8 @@
       <div class="broadcasts__add__view__form__content">
         <transition mode="out-in"
                     :name="`horizontal-slide-${direction}`">
-          <component :is="mainComponent"
-                     ref="mainComponent"
+          <component ref="mainComponent"
+                     :is="mainComponent"
                      v-bind="mainComponentProps"
                      @input="mainComponentChanged"
                      @source-updated="onSourceUpdated"
@@ -49,8 +49,8 @@
 
     <div class="broadcasts__add__view__details"
          v-if="footerComponent">
-      <component :is="footerComponent"
-                 ref="footerComponent"
+      <component ref="footerComponent"
+                 :is="footerComponent"
                  v-bind="footerComponentProps"
                  @input="footerComponentChanged"
                  @contacts-length="onContactsLength"/>
