@@ -203,7 +203,7 @@ export default {
         case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || !isEmpty(this.source.filters) || isIntegrationHubspot):
           return 'broadcast-contacts-preview'
         // if integrations, enabled only for HubSpot
-        case (this.currentStep.id === 2 || this.currentStep.id === 3 || this.currentStep.id === 4) && (isIntegration ? isIntegrationHubspot : true):
+        case [2, 3, 4].includes(this.currentStep.id) && (isIntegration ? isIntegrationHubspot : true):
           return 'broadcast-add-cards'
         default:
           return null

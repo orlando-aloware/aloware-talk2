@@ -60,8 +60,8 @@
         <b-card class="flex-grow-1"
                 title="Upload an audio file">
           <file-uploader accepted-file-types=".mp3, .wav"
-                        :upload-url="vmDropUploadUrl"
-                        @fileUploaded="vmFileUploaded">
+                         :upload-url="vmDropUploadUrl"
+                         @fileUploaded="vmFileUploaded">
             <template slot="description">
               <div class="text-center mt-2 notice">
                 <p class="mb-0">Supports MP3/WAV only.</p>
