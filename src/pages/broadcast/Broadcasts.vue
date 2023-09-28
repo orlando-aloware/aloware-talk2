@@ -182,25 +182,25 @@
                   <span class="checkmark"/>
                 </label>
               </td>
-              <td :key="`c-${colIndex}`"
-                  class="sorted-column"
+              <td class="sorted-column"
+                  :key="`c-${colIndex}`"
                   v-else-if="col.name == 'status'">
                 <broadcast-status-pill :status="row[col.field]"
                                        :text="row['status_name']" />
               </td>
-              <td :key="`c-${colIndex}`"
-                  class="sorted-column"
+              <td class="sorted-column"
+                  :key="`c-${colIndex}`"
                   v-else-if="col.name === 'scheduled_time'">
                 <relative-time humanized
                                :from-time="row[col.field]" />
               </td>
-              <td :key="`c-${colIndex}`"
-                   class="sorted-column"
+              <td class="sorted-column"
+                  :key="`c-${colIndex}`"
                   v-else-if="col.name == 'throttle_limit'">
-                  {{ getThrottling(row[col.field]) }}
+                {{ getThrottling(row[col.field]) }}
               </td>
-              <td :key="`c-${colIndex}`"
-                  class="sorted-column"
+              <td class="sorted-column"
+                  :key="`c-${colIndex}`"
                   v-else-if="col.name == 'campaign_id'">
                 <span v-if="getCampaign(row[col.field])">
                   {{ getCampaign(row[col.field]).name }}
@@ -210,13 +210,13 @@
                   -
                 </span>
               </td>
-              <td :key="`c-${colIndex}`"
-                  class="sorted-column"
+              <td class="sorted-column"
+                  :key="`c-${colIndex}`"
                   v-else-if="col.name === 'engagement_rate'">
                 {{ getEngagement(row[col.field]) }}
               </td>
-              <td :key="`c-${colIndex}`"
-                  class="sorted-column"
+              <td class="sorted-column"
+                  :key="`c-${colIndex}`"
                   v-else-if="col.name == 'target_group'">
                 <template v-if="row['tag']">
                   <i class="fa fa-circle"
@@ -255,7 +255,7 @@
                         </template>
                         <template v-else>
                           <img class="mr-2"
-                              :src="`app-icons/menu/${item.icon}`" />
+                               :src="`app-icons/menu/${item.icon}`" />
                         </template>
                         <span :class="[item.name === 'delete' ? 'text-danger' : '']">
                           {{ item.label }}
