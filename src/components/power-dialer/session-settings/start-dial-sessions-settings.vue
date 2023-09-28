@@ -272,7 +272,7 @@
                     size="sm"
                     :disabled="isBusy || isBusy"
                     v-close-popup
-                    @click="newSetting = false">
+                    @click="cancelNewSetting()">
             Cancel
           </b-button>
           <b-button variant="danger"
@@ -617,6 +617,7 @@ export default {
         console.log({ res })
         this.$generalNotification(res.response.data.message ?? 'Dialer session setting could not be saved', 'error')
 
+        this.newSettingName = ''
         this.loading = false
         this.isBusy = false
         return
@@ -628,9 +629,11 @@ export default {
         this.$generalNotification('Dialer session setting has been saved.')
       }
 
+      this.newSettingName = ''
       this.newSetting = false
       this.loading = false
       this.isBusy = false
+      this.resetSettings()
     },
 
     async updateSelectedSetting () {
@@ -730,7 +733,8 @@ export default {
         skip_outside_daytime_hours: 1,
         user_id: null,
         warmup_period_in_seconds: 0,
-        order: POWER_DIALER_ORDER.default
+        order: POWER_DIALER_ORDER.default,
+        vm_drop_ids: []
       }
 
       if (this.sessionSettings?.id && isExistingList) {
@@ -739,6 +743,10 @@ export default {
 
       this.selectedItemId = this.list?.dialer_session_id
       this.setDefaultSettings(params)
+    },
+
+    resetSettings () {
+      this.selectedItem = this.$jsonClone(this.temporarySetting)
     },
 
     removeEmptyParams (params) {
@@ -787,6 +795,11 @@ export default {
       })
 
       return newSettings
+    },
+
+    cancelNewSetting () {
+      this.newSettingName = ''
+      this.newSetting = false
     }
   },
 
@@ -810,9 +823,9 @@ export default {
         if (fetchedSettings?.id) {
           this.selectedItem = fetchedSettings
         } else if (this.temporarySetting?.id) {
-          this.selectedItem = this.temporarySetting
+          this.selectedItem = this.$jsonClone(this.temporarySetting)
         } else {
-          this.selectedItem = this.filterSelectedItem
+          this.selectedItem = this.$jsonClone(this.filterSelectedItem)
         }
 
         this.activeList = this.list

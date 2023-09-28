@@ -36,6 +36,7 @@
                       initiallyDisabled
                       :list-items="voicemails"
                       :display-count="3"
+                      :is-empty="isVoicemailEmpty"
                       @on-selected-item="onVmDrop"/>
     </div>
   </q-card>
@@ -109,6 +110,10 @@ export default {
     isVmDropReady () {
       const isCallConnected = !this.isCallCompleted || this.dialer.currentStatus === 'CALL_CONNECTED'
       return !isEmpty(this.dialer.communication) && isCallConnected
+    },
+
+    isVoicemailEmpty () {
+      return isEmpty(this.voicemails)
     }
   },
 
@@ -142,12 +147,11 @@ export default {
           user_id: this.profile.id
         }
       }).then(res => {
-        if (!isEmpty(this.sessionSettings.vm_drop_ids)) {
-          this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+        if (isEmpty(this.sessionSettings.vm_drop_ids)) {
           return
         }
 
-        this.voicemails = res.data
+        this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
       })
     },
 
