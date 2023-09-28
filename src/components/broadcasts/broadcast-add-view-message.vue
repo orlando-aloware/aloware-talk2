@@ -180,6 +180,8 @@ export default {
     },
 
     baseLine () {
+      // having ASCII characters means that carriers will consider more than 70 characters 1 message/segment/part
+      // otherwise, every 160 characters will be considered 1 message/segment/part
       return this.hasMoreThanAscii ? 70 : 160
     },
 

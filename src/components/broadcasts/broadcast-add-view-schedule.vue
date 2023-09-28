@@ -83,12 +83,12 @@
       <div class="broadcast-add__schedule__row__label">
         Throttling
         <a target="_blank"
-           :href="campaign.max_mps <= 0.25 ? getComplianceURL() : '#'">
+           :href="campaign.max_mps <= mpsLimit ? getComplianceURL() : '#'">
           <information-circle-icon class="ml-2 cursor-pointer"/>
           <q-tooltip>
             This is an hourly throttling limit on your bulk message campaign.<br>
             Throttling comes directly from the carrier based on brand trust score.<br>
-            <span v-if="campaign.max_mps <= 0.25">
+            <span v-if="campaign.max_mps <= mpsLimit">
               To increase your MPS rate, please register your line cliking on this button.
             </span>
           </q-tooltip>
@@ -169,12 +169,12 @@ export default {
         return null
       }
 
-      return this.schedule.date + ' ' + this.schedule.time
+      return `${this.schedule.date} ${this.schedule.time}`
     },
 
     sendTimeLabel () {
       return 'Send ' + (this.time === 'now'
-        ? `today at ` + this.companyDate.format('hh:mm a')
+        ? `today at ${this.companyDate.format('hh:mm a')}`
         : 'message at ' + window.moment(this.schedule.date + ' ' + this.schedule.time).format('MM/DD/YYYY hh:mm a'))
     },
 
@@ -183,7 +183,7 @@ export default {
         return false
       }
 
-      const scheduledDate = this.schedule.date + ' ' + this.schedule.time
+      const scheduledDate = `${this.schedule.date} ${this.schedule.time}`
 
       return window.moment(scheduledDate).isBefore(this.companyDate)
     },
@@ -208,7 +208,8 @@ export default {
       time: null
     },
     campaign: {},
-    throttle: null
+    throttle: null,
+    mpsLimit: 0.25
   }),
 
   created () {
