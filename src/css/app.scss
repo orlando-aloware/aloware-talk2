@@ -2485,6 +2485,14 @@ i.option-separator {
     height: 32px;
   }
 
+  .gohighlevel-btn {
+    content: url(/integrations/ghl-icon.png);
+    margin-right: 20px;
+    line-height: 48px;
+    width: 32px;
+    height: 32px;
+  }
+
   .data-value {
     max-width: 177px;
     display: inline-block;
@@ -13014,7 +13022,7 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-        
+
         &.paused {
           border-color: $warning;
         }
