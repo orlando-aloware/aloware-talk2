@@ -221,10 +221,14 @@ export default {
     exportAsCsv () {
       let id = null
       let module = null
+      let filters = []
 
       if (this.$route.name === 'Contacts') {
         id = this.list.id
         module = 'contacts'
+        if (this.list.hasOwnProperty('filters')) {
+          filters = this.list.filters
+        }
       }
 
       if (this.$route.name === 'Power Dialer') {
@@ -247,6 +251,7 @@ export default {
 
       talk2Api.V2[module].listExport(id, {
         headers: JSON.stringify(headers),
+        filters: JSON.stringify(filters),
         my_contacts: +this.showMyContacts
       })
         .catch(() => {

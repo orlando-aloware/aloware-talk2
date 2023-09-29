@@ -573,6 +573,11 @@ export default {
       // update initial list filters with new set of currently selected filters
       this.initialListFilters = this.$jsonClone(this.currentListFilters)
 
+      this.updateContactsListFilter({
+        id: this.selectedList.id,
+        filters: this.currentListFilters
+      })
+
       this.$emit('filtersApplied')
 
       // update the results with new query
@@ -783,6 +788,7 @@ export default {
     ...mapActions('contacts', [
       'setCurrentListFilters',
       'setShowMyContacts',
+      'updateContactsListFilter',
       'setListContactsLoaded'
     ])
   },
