@@ -161,7 +161,6 @@
                  :current-page="pagination.currentPage"
                  :total-rows="broadcastsCount"
                  :loading="loading"
-                 :is-scrollable="false"
                  @sort="onSortTable"
                  @reordered="onColumnsReordered"
                  @paginated="onPaginationChanged">
