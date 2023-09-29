@@ -13005,6 +13005,11 @@ h1.contact-list-name-label {
         order: 1;
         flex-grow: 1;
         width: 100%;
+        overflow-x: auto;
+
+        .custom-toggle-button {
+          min-width: 500px;
+        }
       }
 
       &__new-button {
