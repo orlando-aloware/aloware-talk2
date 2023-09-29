@@ -13570,3 +13570,19 @@ h1.contact-list-name-label {
     }
   }
 }
+
+.activity-graph {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    row-gap: 10px;
+    margin-top: 10px;
+
+    @media(min-width: 785px) {
+      flex-direction: row;
+      margin-top: 0px;
+    }
+  }
+}
