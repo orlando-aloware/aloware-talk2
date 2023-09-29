@@ -109,6 +109,7 @@ export default function () {
     inboxPersonalFilters: [],
     inboxCompanyFilters: [],
     isEditingView: false,
-    showViewsList: false
+    showViewsList: false,
+    isInboxRefreshBtnLoading: false
   }
 }

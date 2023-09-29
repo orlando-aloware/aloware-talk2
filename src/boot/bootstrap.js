@@ -13,6 +13,15 @@ import VueWaveSurfer from 'vue-wave-surfer'
 import * as storage from 'src/plugins/helpers/storage'
 import CountriesAndTimezones from 'countries-and-timezones'
 import infiniteScroll from 'vue-infinite-scroll'
+import loadStock from 'highcharts/modules/stock'
+import loadExporting from 'highcharts/modules/exporting'
+import loadOfflineExporting from 'highcharts/modules/offline-exporting'
+import loadSunburst from 'highcharts/modules/sunburst'
+import loadMap from 'highcharts/modules/map'
+import loadDrilldown from 'highcharts/modules/drilldown'
+import VueHighcharts from 'vue-highcharts'
+import Highcharts from 'highcharts'
+import HighchartsThemes from './HighchartsTheme'
 import { Screen, Platform } from 'quasar'
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
@@ -21,6 +30,23 @@ import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
+
+loadStock(Highcharts)
+loadExporting(Highcharts)
+loadOfflineExporting(Highcharts)
+loadSunburst(Highcharts)
+loadMap(Highcharts)
+loadDrilldown(Highcharts)
+Highcharts.theme = HighchartsThemes.themes.future
+
+Highcharts.setOptions(Highcharts.theme)
+Highcharts.setOptions({
+  chart: {
+    style: {
+      fontFamily: ['Quicksand', '-apple-system', 'system-ui', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
+    }
+  }
+})
 
 // local storage
 storage.local.setItem('api_url', process.env.API_URL)
@@ -38,6 +64,7 @@ Vue.use(PortalVue)
 Vue.use(VueWaveSurfer)
 Vue.use(Vuelidate)
 Vue.use(BusinessHours)
+Vue.use(VueHighcharts, { Highcharts })
 
 window.Bowser = Bowser
 window.timezone = 'Intl' in window

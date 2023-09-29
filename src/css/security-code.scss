@@ -7,9 +7,10 @@
 
   &-wrapper {
     display: inline-block;
-    margin: auto;
+    margin: 0px -45px;
     min-width: 240px;
     text-align: center;
+
     @media only screen and (max-device-width: 736px) {
       max-width: 320px;
     }
@@ -19,8 +20,8 @@
       display: inline-block;
       margin-right: 10px;
       float: left;
+
       @media only screen and (max-device-width: 736px) {
-        float: none;
         margin-right: 4px;
       }
 

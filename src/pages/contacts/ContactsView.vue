@@ -1,7 +1,9 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled"
+                   :no-header="simpleTable"
                    v-if="list">
-    <template slot="title">
+    <template slot="title"
+              v-if="!simpleTable">
       <div class="d-flex flex-column">
         <div class="pr-2 contacts__title d-flex align-items-center">
           <back-button class="p-0"
@@ -37,8 +39,11 @@
         </div>
       </div>
     </template>
+    <template slot="title"
+              v-if="simpleTable">
+    </template>
     <template slot="options"
-              v-if="!isStartState">
+              v-if="!isStartState && !simpleTable">
       <compact-btn variant="primary"
                    :class="`${isUnsavedList ? 'hidden' : ''}`"
                    :disabled="isDisabledAddFiltersButton"
@@ -48,7 +53,8 @@
       </compact-btn>
     </template>
 
-    <template slot="actions">
+    <template slot="actions"
+              v-if="!simpleTable">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search class="width-260"
@@ -251,7 +257,8 @@
         </b-dropdown>
       </div>
     </template>
-    <template slot="actions">
+    <template slot="actions"
+              v-if="!simpleTable">
       <bulk-action-menu :id="id"
                         v-if="checked.length > 0"
                         @onSetAllContactsSelected="onCheckAllItemsFromTheList" />
@@ -617,10 +624,12 @@
         </span>
       </b-popover>
     </template>
-    <template slot="filters">
+    <template slot="filters"
+              v-if="!simpleTable">
       <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
     </template>
-    <template slot="footer">
+    <template slot="footer"
+              v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
     </template>
   </contacts-screen>
@@ -764,6 +773,11 @@ export default {
     filtersCount: {
       type: Number,
       default: 0
+    },
+
+    simpleTable: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -817,7 +831,7 @@ export default {
     ]),
 
     fixedContactsData () {
-      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
+      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData) && this.$parent.$data.contactsData !== undefined) {
         return this.$parent.$data.contactsData
       }
 

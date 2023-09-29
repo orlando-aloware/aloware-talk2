@@ -1,0 +1,166 @@
+<template>
+  <div class="broadcast-add broadcast-add__preview">
+    <div class="broadcast-add__preview__row">
+      <div class="broadcast-add__preview__row__label">To</div>
+      <div class="broadcast-add__preview__row__field">
+        {{ sourceText }} {{ contactsText }}
+      </div>
+    </div>
+
+    <div class="broadcast-add__preview__row">
+      <div class="broadcast-add__preview__row__label">From</div>
+      <div class="broadcast-add__preview__row__field">
+        {{ campaignText }}
+      </div>
+    </div>
+
+    <div class="broadcast-add__preview__row">
+      <div class="broadcast-add__preview__row__label">Message</div>
+      <div class="broadcast-add__preview__row__field">
+        <div class="broadcast-add__preview__row__field__sms-preview"
+             v-if="type === 'sms'">
+          <message-composer-sms-preview />
+        </div>
+        <div class="broadcast-add__preview__row__field__rvm-preview"
+             v-else-if="type === 'rvm'">
+          <waveform unique-id="broadcast-rvm-preview"
+                    :remote-url="rvmUrl" />
+        </div>
+      </div>
+    </div>
+
+    <div class="broadcast-add__preview__row">
+      <div class="broadcast-add__preview__row__label">Schedule</div>
+      <div class="broadcast-add__preview__row__field">
+        {{ scheduleText }}
+        <b-badge class="ml-2"
+                 variant="light"
+                 v-if="isScheduled">
+          {{ companyTimezone.format('z') }}
+        </b-badge>
+      </div>
+    </div>
+
+    <div class="broadcast-add__preview__row">
+      <div class="broadcast-add__preview__row__label">Throttling</div>
+      <div class="broadcast-add__preview__row__field">
+        {{ throttle }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
+import Waveform from 'src/components/waveform.vue'
+import { companyTimezone } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import { isEmpty } from 'lodash'
+
+export default {
+  name: 'broadcast-add-view-preview',
+
+  mixins: [
+    companyTimezone
+  ],
+
+  components: {
+    MessageComposerSmsPreview,
+    Waveform
+  },
+
+  props: {
+    campaign: {
+      type: Object,
+      required: true
+    },
+
+    contactsLength: {
+      type: Number,
+      required: true
+    },
+
+    date: {
+      type: String,
+      required: true
+    },
+
+    isScheduled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    source: {
+      type: Object,
+      required: true
+    },
+
+    throttle: {
+      type: String,
+      required: true
+    },
+
+    type: {
+      type: String,
+      required: true
+    },
+
+    rvm: {
+      type: Object,
+      required: false
+    }
+  },
+
+  computed: {
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
+    isValid () {
+      return true
+    },
+
+    sourceText () {
+      switch (true) {
+        case !isEmpty(this.source.list):
+          return this.source.list.name
+        case !isEmpty(this.source.filters):
+          return 'Custom filters'
+        case !isEmpty(this.source.integration):
+          return this.source.integration.list.name
+        default:
+          return ''
+      }
+    },
+
+    campaignText () {
+      return `${this.campaign.name} (${this.campaign.incoming_number})`
+    },
+
+    contactsText () {
+      if (!this.contactsLength) {
+        return ''
+      }
+
+      return '(' + this.contactsLength + (this.contactsLength === 1 ? ' Contact' : ' Contacts') + ')'
+    },
+
+    scheduleText () {
+      if (!this.isScheduled) {
+        return 'Send now'
+      }
+
+      const format = window.moment().format('YYYY-MM-DD') === this.date.substr(0, 10)
+        ? 'hh:mm a'
+        : 'MM/DD/YYYY hh:mm a'
+
+      return 'Send at ' + window.moment(this.date).format(format)
+    },
+
+    rvmUrl () {
+      return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm.file_name}`
+    }
+  }
+}
+</script>

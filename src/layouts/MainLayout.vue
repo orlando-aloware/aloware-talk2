@@ -23,12 +23,7 @@
           <q-page-container :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
-                <transition :name="transitionName"
-                            mode="out-in">
-                  <!-- <keep-alive> -->
-                  <router-view></router-view>
-                  <!-- </keep-alive> -->
-                </transition>
+                <router-view></router-view>
               </template>
               <div class="d-flex justify-content-center align-items-center text-center text-black h-100"
                    v-else-if="loading && !suspended">
@@ -499,6 +494,10 @@ export default {
     pageHeaderClass () {
       return !this.isShowAppHeader || !this.mobileLiveCallBarShown
         ? 'h-auto' : ''
+    },
+
+    isDemoCompany () {
+      return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
     }
   },
 
@@ -1021,6 +1020,11 @@ export default {
     }
 
     this.resetPowerDialerSession(this.$route)
+
+    // temporary
+    if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+      this.$router.push({ path: '/' })
+    }
   },
 
   mounted () {
@@ -2640,6 +2644,11 @@ export default {
       }
 
       this.resetPowerDialerSession(to)
+
+      // temporary
+      if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+        this.$router.back()
+      }
     },
 
     authenticated (newVal, oldVal) {
