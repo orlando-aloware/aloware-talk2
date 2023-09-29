@@ -463,14 +463,6 @@ const routes = [
           title: 'Email'
         },
         component: EmailBlast
-      },
-      {
-        path: 'broadcasts',
-        name: 'Broadcasts',
-        meta: {
-          title: 'Broadcasts'
-        },
-        component: Broadcasts
       }
     ]
   },
