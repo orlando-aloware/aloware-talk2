@@ -87,6 +87,7 @@ import { mapState } from 'vuex'
 import { selectorMixin, integrationMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import talk2Api from 'src/plugins/api/api'
+import { debounce } from 'lodash'
 
 export default {
   name: 'integration-list-selector',
@@ -206,7 +207,7 @@ export default {
   },
 
   methods: {
-    getListsOfEnabledIntegration () {
+    getListsOfEnabledIntegration: debounce(function () {
       this.lists = []
 
       switch (this.integration?.toLowerCase()) {
@@ -219,7 +220,7 @@ export default {
         case 'pipedrive':
           return this.getPipedriveFilters()
       }
-    },
+    }, 500),
 
     getHubspotLists (offset = 0) {
       this.isLoading = true

@@ -494,7 +494,29 @@ export default {
         return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
       }
     },
-
+    broadcasts: {
+      delete (id) {
+        return window.axios.delete(`${suffixV1}broadcasts/${id}`)
+      },
+      enable (id) {
+        return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
+      },
+      get (params = {}) {
+        return window.axios.get(`${suffixV1}broadcasts`, { params })
+      },
+      sendBulkMessage (params) {
+        return window.axios.post(`${suffixV1}broadcasts/send-bulk-messages`, params)
+      },
+      sendBulkRvm (params) {
+        return window.axios.post(`${suffixV1}broadcasts/send-bulk-rvm`, params)
+      },
+      update (id, broadcast) {
+        return window.axios.put(`${suffixV1}broadcasts/${id}`, broadcast)
+      },
+      toggleStatus (id) {
+        return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
+      }
+    },
     contactCenter: {
       summary: {
         get (params) {
@@ -657,7 +679,9 @@ export default {
 
     },
     contactList: {
-      get () {},
+      get (params) {
+        return window.axios.get(`${suffixV2}contacts-list`, { params })
+      },
       public () {
         return window.axios.get(`${suffixV2}contacts-list/public`)
       }
