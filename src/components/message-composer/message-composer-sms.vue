@@ -122,6 +122,7 @@
                placeholder="Type your message"
                v-model="messageComposer.sms.body"
                :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
+               @input="imposeCharactersLimit"
                @keydown="onKeyDown"
                @blur="onBlur">
       </q-input>
@@ -160,6 +161,8 @@
     <div class="d-flex justify-content-between"
          @dragover.prevent>
       <message-composer-options :campaign-id="campaignId"
+                                :max-attachments="maxAttachments"
+                                :is-broadcast="isBroadcast"
                                 @gifSelected="gifSelected"
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
@@ -175,6 +178,7 @@
           :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
           :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
           :menu-offset="[0, 6]"
+          v-if="useSendButton"
           @click="onSend"
         >
           <template slot="label">
@@ -242,6 +246,31 @@ export default {
 
     campaignId: {
       required: false
+    },
+
+    useSendButton: {
+      type: Boolean,
+      default: true
+    },
+
+    resetOnLoad: {
+      type: Boolean,
+      default: true
+    },
+
+    maxAttachments: {
+      type: Number,
+      default: null
+    },
+
+    maxCharacters: {
+      type: Number,
+      default: null
+    },
+
+    isBroadcast: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -668,12 +697,36 @@ export default {
           }
         })
       this.urlShortenerDialog = false
+    },
+
+    onInput (input) {
+      this.$emit('messageChanged', input)
+    },
+
+    async imposeCharactersLimit (value) {
+      if (!this.maxCharacters) {
+        return
+      }
+
+      // Cleanup string from unwanted encoding - quotes
+      value = this.$options.filters.cleanStringToUTF8(value.toString())
+
+      // force reinstatement of maxlength (if bypassed)
+      if (value && value.length > this.maxCharacters) {
+        await this.$nextTick()
+
+        this.messageComposer.sms.body = value.substr(0, this.maxCharacters)
+      }
     }
   },
 
   mounted () {
     this.getDomains()
-    this.resetMessageComposerSms()
+
+    if (this.resetOnLoad) {
+      this.resetMessageComposerSms()
+    }
+
     if (this.messageComposer.mode === 'sms') {
       this.focusInput()
     }
@@ -681,6 +734,7 @@ export default {
 
   watch: {
     'messageComposer.sms.body': function (value) {
+      this.$emit('messageChanged', value)
       this.setMessageComposerSmsBody(value)
     }
   },

@@ -2,7 +2,7 @@
   <div class="message-options">
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            :disabled="isDisabled">
+            :disabled="isDisabled || !canAddMoreAttachments">
       <q-menu content-class="mx-height-500"
               ref="giphyMenu"
               :offset="[0,5]">
@@ -19,11 +19,12 @@
 
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            :disabled="!selectedLine || isDisabled">
+            :disabled="!selectedLine || isDisabled || !canAddMoreAttachments">
       <q-menu ref="attachmentMenu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
-          <attachments @attachmentUploaded="onAttachmentUploaded"></attachments>
+          <attachments :is-broadcast="isBroadcast"
+                       @attachmentUploaded="onAttachmentUploaded"/>
         </div>
       </q-menu>
       <attachment-icon></attachment-icon>
@@ -126,6 +127,16 @@ export default {
   props: {
     campaignId: {
       required: true
+    },
+
+    maxAttachments: {
+      type: Number,
+      default: null
+    },
+
+    isBroadcast: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -168,6 +179,16 @@ export default {
 
     isDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
+    },
+
+    canAddMoreAttachments () {
+      if (!this.maxAttachments) {
+        return true
+      }
+
+      const hasGif = this.messageComposer.sms.gif_url !== ''
+
+      return ((hasGif ? 1 : 0) + this.messageComposer.sms.attachments.length) < this.maxAttachments
     }
   },
 
