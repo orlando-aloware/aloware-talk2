@@ -12988,6 +12988,46 @@ h1.contact-list-name-label {
       z-index: 9999;
     }
 
+    &__header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      flex-wrap: wrap;
+      row-gap: 10px;
+
+      &__search {
+        order: 2;
+      }
+
+      &__status {
+        order: 1;
+        flex-grow: 1;
+        width: 100%;
+      }
+
+      &__new-button {
+        order: 3;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      @media(min-width: 1024px) {
+        &__search {
+          order: 1;
+        }
+
+        &__status {
+          order: 2;
+          width: auto;
+          flex-grow: 0;
+          margin-bottom: 0px;
+          width: 50%;
+        }
+      }
+    }
+
     &__graph {
       padding: 0px 10px;
 

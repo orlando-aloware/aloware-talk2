@@ -10,14 +10,14 @@
                         size="40px" />
       </template>
     </b-overlay>
-    <div class="row align-items-center justify-content-between px-3 my-2 w-100">
-      <div class="col-3">
+    <div class="broadcasts__home__header px-3 my-2">
+      <div class="broadcasts__home__header__search">
         <search placeholder="Search name"
                 :search="broadcastsSearchText"
                 @search="val => broadcastsSearchText = val"/>
       </div>
-      <div class="col-6">
-        <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
+      <div class="broadcasts__home__header__status">
+        <q-btn-toggle class="custom-toggle-button"
                       no-caps
                       spread
                       unelevated
@@ -80,9 +80,8 @@
           </template>
         </q-btn-toggle>
       </div>
-      <div class="col-2 d-flex justify-content-end">
-        <compact-btn class="mr-2"
-                     variant="primary"
+      <div class="broadcasts__home__header__new-button">
+        <compact-btn variant="primary"
                      v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
                      @clicked="$router.push({ path: '/broadcasts/new' })">
           <plus-icon class="mr-1"
