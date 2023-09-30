@@ -442,12 +442,6 @@ export default {
         this.filter = { ...this.appliedFilter.filter }
       } else if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter }
-      } else if (this.filterHasChanges) {
-        let withChangedFilterFields = { ...this.loadedDefaultFilterModel.filter }
-        this.channelChangedFilterFields.forEach(item => {
-          withChangedFilterFields[item.property] = item.value
-        })
-        this.filter = withChangedFilterFields
       } else {
         this.filter = _.pick(this.value, this.filterFields)
       }
@@ -768,6 +762,7 @@ export default {
     setToNewFilter () {
       this.onResetFilter()
       this.onSelectFilter(null)
+      this.setAppliedFilter(null)
     }
   },
 

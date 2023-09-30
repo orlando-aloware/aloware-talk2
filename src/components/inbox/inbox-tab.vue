@@ -379,9 +379,11 @@ export default {
 
     changedFilterFieldCount () {
       const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
+
       if (dateFieldIndex >= 0) {
         return this.channelChangedFilterFields.length - 1
       }
+
       return this.channelChangedFilterFields.length
     }
   },

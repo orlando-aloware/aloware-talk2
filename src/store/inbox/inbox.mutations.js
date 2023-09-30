@@ -107,24 +107,6 @@ export default {
   },
 
   UPDATE_CHANNEL_CHANGED_FILTER_FIELDS: (state, { name, value }) => {
-    // compensate comparing of array/object values
-    const comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
-    const comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
-
-    if (comparatorA === comparatorB) {
-      state.channelChangedFilterFields = [...state.channelChangedFilterFields].filter(item => item.property !== name)
-      return
-    }
-
-    const found = { data: null }
-    found.data = state.channelChangedFilterFields.find(item => item.property === name)
-    found.data = found.data ? state.channelChangedFilterFields.indexOf(found.data) : null
-
-    if (found.data !== -1 && found.data !== null) {
-      Vue.set(state.channelChangedFilterFields[found.data], 'value', value)
-      return
-    }
-
     state.channelChangedFilterFields.push({ property: name, value: value })
   },
   RESET_CHANNEL_CHANGED_FILTER_FIELDS: (state) => {
