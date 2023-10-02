@@ -589,7 +589,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       if (unqueuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
         clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
       }
-    }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+    }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
     return
   }
@@ -626,7 +626,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     if (queuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
       clearInterval(window.actionNotificationQueuedIntervals[settings.type])
     }
-  }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+  }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
@@ -689,7 +689,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     autoHideDelay: '30000',
     isStatus: true
   })
-}, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+}, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
 Vue.prototype.$jsonClone = (value) => {
   if (value) {
