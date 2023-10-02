@@ -679,25 +679,41 @@ export default {
       this.loadContactTasks()
       this.fetchTaskCounts()
 
-      // if a pinned view is edited, redirect to inbox view route
-      if (this.isFilterDialogForView) {
-        this.currentTask = STATUS_OPEN
-
-        const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
-        if (pinnedIndex > 0) {
-          this.$router.push({
-            name: 'Inbox View',
-            params: {
-              viewId: this.appliedFilter.id,
-              status: this.statusText,
-              channel: 'view'
-            }
-          }).catch(err => {
-            console.log(err)
-            this.$handleErrors(err.response)
-          })
-        }
+      // no redirection needed for non-view
+      if (!this.isFilterDialogForView) {
+        return
       }
+
+      // if a pinned view is edited, redirect to inbox view route. otherwise, to inbox
+      this.currentTask = STATUS_OPEN
+
+      const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+      if (pinnedIndex >= 0) {
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: this.appliedFilter.id,
+            status: this.statusText,
+            channel: 'view'
+          }
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+        return
+      }
+
+      this.$router.push({
+        name: 'Inbox Channel Task Status',
+        params: {
+          channel: 'inbox',
+          status: 'open'
+        }
+      }).catch(err => {
+        console.log(err)
+        this.$handleErrors(err.response)
+      })
     },
 
     onCreateNewFilter (filter) {

@@ -241,7 +241,7 @@ export default {
     },
 
     filterHasChanges () {
-      const filterIdentifier = this.selectedFilter ? this.selectedFilter.filter : this.loadedDefaultFilterModel.filter
+      const filterIdentifier = this.isFilterUpdateMode ? this.selectedFilter.filter : this.loadedDefaultFilterModel.filter
 
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
@@ -302,6 +302,10 @@ export default {
 
     isViewEditModeOrNonView () {
       return !this.isFilterDialogForView || (this.isFilterDialogForView && this.isEditingView)
+    },
+
+    isFilterUpdateMode () {
+      return (!this.isFilterDialogForView && this.selectedFilter) || (this.isFilterDialogForView && this.isEditingView)
     },
 
     loadedDefaultFilterModel () {
@@ -438,17 +442,15 @@ export default {
       this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)
       this.getFilters()
 
-      if (this.appliedFilter) {
-        this.filter = { ...this.appliedFilter.filter }
-      } else if (this.selectedFilter) {
-        this.filter = { ...this.selectedFilter.filter }
-      } else {
-        this.filter = _.pick(this.value, this.filterFields)
-      }
-
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
+      } else if (this.selectedFilter) {
+        this.filter = { ...this.selectedFilter.filter }
+      } else if (this.appliedFilter) {
+        this.filter = { ...this.appliedFilter.filter }
+      } else {
+        this.filter = _.pick(this.value, this.filterFields)
       }
 
       // fill in the value for the newly added filter in case it's not yet included
@@ -716,7 +718,9 @@ export default {
     },
 
     applyFilter () {
-      if (!this.selectedFilter) {
+      const isCreateViewWithActiveFilter = (this.selectedFilter || this.appliedFilter) && this.isFilterDialogForView && !this.isEditingView
+
+      if (!this.selectedFilter || isCreateViewWithActiveFilter) {
         return
       }
 
@@ -769,7 +773,7 @@ export default {
   watch: {
     '$route.params.channel' (route) {
       // do not reset selected filter for inbox views
-      if (!route || route === 'view') {
+      if (!route || ['view', 'inbox'].includes(route)) {
         return
       }
 
