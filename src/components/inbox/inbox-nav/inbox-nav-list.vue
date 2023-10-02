@@ -266,6 +266,11 @@ export default {
           status: 'open'
         }
       }).catch(err => {
+        //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
+        if (this.$route.name === 'Inbox' || this.$route.params.channel === 'inbox') {
+          this.loadContactTasks()
+        }
+
         console.log(err)
         this.$handleErrors(err.response)
       })
