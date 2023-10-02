@@ -177,6 +177,10 @@ import CompactBtn from 'components/compact-btn.vue'
 import { GROUP_CONTACT_COMM_METADATA, GROUP_CONTACT_LOCATION, GROUP_CONTACT_RELEVANCE, GROUP_PRIMARY_INFO } from 'src/constants/contact-filter-groups'
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+const DEFAULT_PINNED_LIST_IDS = Object.keys(DEFAULT_PINNED_LIST).map(
+  (i) => DEFAULT_PINNED_LIST[i].id
+)
 
 export default {
 
@@ -443,6 +447,13 @@ export default {
     },
 
     generateListFilters () {
+      if (DEFAULT_PINNED_LIST_IDS.includes(this.selectedList.id)) {
+        this.updateContactsListFilter({
+          id: this.selectedList.id,
+          filters: []
+        })
+      }
+
       const filterGroups = this.$jsonClone(this.currentListFilters)
 
       for (const groupIndex in filterGroups) {
