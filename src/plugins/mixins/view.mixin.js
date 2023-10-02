@@ -226,9 +226,6 @@ export default {
       if (this.$route.name === 'Contacts') {
         id = this.list.id
         module = 'contacts'
-        if (this.list.hasOwnProperty('filters')) {
-          filters = this.list.filters
-        }
       }
 
       if (this.$route.name === 'Power Dialer') {
@@ -239,6 +236,10 @@ export default {
       if (id === null) {
         this.$generalNotification('Failed to export. Missing id.', 'error')
         return
+      }
+
+      if (this.list.hasOwnProperty('filters')) {
+        filters = this.list.filters
       }
 
       const headers = this.filteredColumns.map((item) => {
