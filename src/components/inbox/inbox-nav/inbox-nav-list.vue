@@ -111,7 +111,8 @@ export default {
       'pinnedViews',
       'inboxPersonalFilters',
       'inboxCompanyFilters',
-      'isEditingView'
+      'isEditingView',
+      'isFilterDialogForView'
     ]),
 
     ...mapGetters('inbox', [
@@ -380,9 +381,6 @@ export default {
       if (state || !this.appliedFilter) {
         return
       }
-
-      // when filter dialog is closed
-      this.setFilterDialogForView(false)
 
       if (!this.$route.params.hasOwnProperty('viewId')) {
         return
