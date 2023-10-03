@@ -1,52 +1,51 @@
 <template>
   <div id="activity-graph"
+       class="activity-graph"
        v-if="graphCanLoad">
-    <div class="row">
-      <div class="col-12 d-flex justify-content-between align-items-center">
-        <div>
-          <span class="call-log-head"
-                v-if="filter.from_date">
-            Communications
-            from <strong>{{ filter.from_date | fixFullDateLocal }}</strong>
-            to <strong>{{ filter.to_date | fixFullDateLocal }}</strong>
-          </span>
-          <span class="call-log-head"
-                v-if="!filter.from_date">
-            Communications
-            <strong>All Time</strong>
-          </span>
-        </div>
+    <div class="activity-graph__header">
+      <div>
+        <span class="call-log-head"
+              v-if="filter.from_date">
+          Communications
+          from <strong>{{ filter.from_date | fixFullDateLocal }}</strong>
+          to <strong>{{ filter.to_date | fixFullDateLocal }}</strong>
+        </span>
+        <span class="call-log-head"
+              v-if="!filter.from_date">
+          Communications
+          <strong>All Time</strong>
+        </span>
+      </div>
 
-        <div class="d-flex align-items-center">
-          <strong>Chart type:</strong>
-          <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
-                        toggle-color="green"
-                        no-caps
-                        spread
-                        unelevated
-                        dense
-                        :options="chartOptions"
-                        v-model="chartType">
-            <template v-slot:one>
-              <span class="text-grey-90 px-3"
-                    :class="[chartType === 'spline' ? 'text-white' : 'text-grey-90']">
-                {{ chartOptions[0].labelValue }}
-              </span>
-            </template>
-            <template v-slot:two>
-              <span class="text-grey-90 px-3"
-                    :class="[chartType === 'areaspline' ? 'text-white' : 'text-grey-90']">
-                {{ chartOptions[1].labelValue }}
-              </span>
-            </template>
-            <template v-slot:three>
-              <span class="text-grey-90 px-3"
-                    :class="[chartType === 'column' ? 'text-white' : 'text-grey-90']">
-                {{ chartOptions[2].labelValue }}
-              </span>
-            </template>
-          </q-btn-toggle>
-        </div>
+      <div class="d-flex align-items-center">
+        <strong>Chart type:</strong>
+        <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
+                      toggle-color="green"
+                      no-caps
+                      spread
+                      unelevated
+                      dense
+                      :options="chartOptions"
+                      v-model="chartType">
+          <template v-slot:one>
+            <span class="text-grey-90 px-3"
+                  :class="[chartType === 'spline' ? 'text-white' : 'text-grey-90']">
+              {{ chartOptions[0].labelValue }}
+            </span>
+          </template>
+          <template v-slot:two>
+            <span class="text-grey-90 px-3"
+                  :class="[chartType === 'areaspline' ? 'text-white' : 'text-grey-90']">
+              {{ chartOptions[1].labelValue }}
+            </span>
+          </template>
+          <template v-slot:three>
+            <span class="text-grey-90 px-3"
+                  :class="[chartType === 'column' ? 'text-white' : 'text-grey-90']">
+              {{ chartOptions[2].labelValue }}
+            </span>
+          </template>
+        </q-btn-toggle>
       </div>
     </div>
     <div class="placeholder w-100 d-flex justify-content-center"
