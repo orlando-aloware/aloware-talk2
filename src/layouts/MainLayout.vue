@@ -494,6 +494,10 @@ export default {
     pageHeaderClass () {
       return !this.isShowAppHeader || !this.mobileLiveCallBarShown
         ? 'h-auto' : ''
+    },
+
+    isDemoCompany () {
+      return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
     }
   },
 
@@ -1016,6 +1020,11 @@ export default {
     }
 
     this.resetPowerDialerSession(this.$route)
+
+    // temporary
+    if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+      this.$router.push({ path: '/' })
+    }
   },
 
   mounted () {
@@ -2635,6 +2644,11 @@ export default {
       }
 
       this.resetPowerDialerSession(to)
+
+      // temporary
+      if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+        this.$router.back()
+      }
     },
 
     authenticated (newVal, oldVal) {

@@ -431,6 +431,10 @@ export default {
           defaultFilterModel.filter.tags = [+this.$route.query.tagId]
         }
 
+        if (this.$route.query?.broadcastIds) {
+          defaultFilterModel.filter.broadcasts = typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
+        }
+
         return defaultFilterModel
       }
 
@@ -701,6 +705,16 @@ export default {
         name: 'tags',
         value: this.channelDefaultFilterModel.filter.tags
       })
+    }
+
+    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.broadcastIds) {
+      this.filter = this.channelDefaultFilterModel.filter
+      this.updateChannelChangedFilterFields({
+        name: 'broadcasts',
+        value: this.channelDefaultFilterModel.filter.broadcasts
+      })
+      this.onApplyFilter(this.channelDefaultFilterModel.filter)
+      this.setInboxShowMyContacts(false)
     }
 
     this.$VueEvent.listen('load_and_navigate_channel', (lastNavigatedIndex) => {
