@@ -172,6 +172,82 @@ export default {
     }
   },
 
+  data () {
+    return {
+      isRenaming: false,
+      isDeletingFilter: false,
+      isUpdatingFilter: false,
+      isGettingFilters: false,
+      personalFilters: [],
+      companyFilters: [],
+      filterToEdit: null,
+      filter: {},
+      clonedFilter: {},
+      filterFields: [
+        'campaigns',
+        'ring_groups',
+        'direction',
+        'answer_status',
+        'min_talk_time',
+        'transfer_type',
+        'callback_status',
+        'tags',
+        'call_dispositions',
+        'first_time_only',
+        'untagged_only',
+        'exclude_automated_communications',
+        'incoming_numbers',
+        'users',
+        'workflows',
+        'contact_owner',
+        'my_contact',
+        'from_date',
+        'to_date',
+        'creator_type',
+        'dynamic_engagement_date_range',
+        'has_unread'
+      ],
+      inputTimeout: null,
+      booleanFields: [
+        'first_time_only',
+        'exclude_automated_communications',
+        'untagged_only',
+        'my_contact',
+        'has_unread'
+      ],
+      ChannelType,
+      viewName: null
+    }
+  },
+
+  created () {
+    if (!this.appliedFilter) {
+      this.setSelectedFilter(null)
+    }
+  },
+
+  mounted () {
+    this.toggleFilterDialog()
+
+    this.$VueEvent.listen('channel_filter_created', filter => {
+      if (filter.is_on_company) {
+        this.companyFilters.push(filter)
+        return
+      }
+
+      // add to personal filters of currently selected channel
+      if (filter.type === this.defaultFilterModel.type) {
+        this.personalFilters.push(filter)
+      }
+
+      // update inbox views popup list
+      const exists = this.inboxPersonalFilters.find(item => +item.id === +filter.id)
+      if (filter.type === ChannelType.CHANNEL_INBOX && !exists) {
+        this.inboxPersonalFilters.push(filter)
+      }
+    })
+  },
+
   computed: {
     ...mapState('inbox', [
       'channelChangedFilterFields',
@@ -227,17 +303,6 @@ export default {
       }
 
       return 'Calls & Recordings Filters'
-    },
-
-    selectedFilterHasChanges () {
-      if (!this.selectedFilter || !this.selectedFilterClone) {
-        return false
-      }
-
-      const filterStringified = JSON.stringify(this.$options.filters.sortObjectByKey(this.filter))
-      const selectedFilterStringified = JSON.stringify(this.$options.filters.sortObjectByKey(this.selectedFilterClone.filter))
-
-      return filterStringified !== selectedFilterStringified
     },
 
     filterHasChanges () {
@@ -322,83 +387,6 @@ export default {
     }
   },
 
-  data () {
-    return {
-      isRenaming: false,
-      isDeletingFilter: false,
-      isUpdatingFilter: false,
-      isGettingFilters: false,
-      selectedFilterClone: null,
-      personalFilters: [],
-      companyFilters: [],
-      filterToEdit: null,
-      filter: {},
-      clonedFilter: {},
-      filterFields: [
-        'campaigns',
-        'ring_groups',
-        'direction',
-        'answer_status',
-        'min_talk_time',
-        'transfer_type',
-        'callback_status',
-        'tags',
-        'call_dispositions',
-        'first_time_only',
-        'untagged_only',
-        'exclude_automated_communications',
-        'incoming_numbers',
-        'users',
-        'workflows',
-        'contact_owner',
-        'my_contact',
-        'from_date',
-        'to_date',
-        'creator_type',
-        'dynamic_engagement_date_range',
-        'has_unread'
-      ],
-      inputTimeout: null,
-      booleanFields: [
-        'first_time_only',
-        'exclude_automated_communications',
-        'untagged_only',
-        'my_contact',
-        'has_unread'
-      ],
-      ChannelType,
-      viewName: null
-    }
-  },
-
-  created () {
-    if (!this.appliedFilter) {
-      this.setSelectedFilter(null)
-    }
-  },
-
-  mounted () {
-    this.toggleFilterDialog()
-
-    this.$VueEvent.listen('channel_filter_created', filter => {
-      if (filter.is_on_company) {
-        this.companyFilters.push(filter)
-        return
-      }
-
-      // add to personal filters of currently selected channel
-      if (filter.type === this.defaultFilterModel.type) {
-        this.personalFilters.push(filter)
-      }
-
-      // update inbox views popup list
-      const exists = this.inboxPersonalFilters.find(item => +item.id === +filter.id)
-      if (filter.type === ChannelType.CHANNEL_INBOX && !exists) {
-        this.inboxPersonalFilters.push(filter)
-      }
-    })
-  },
-
   methods: {
     ...mapActions('inbox', [
       'toggleFilterModelForm',
@@ -421,16 +409,20 @@ export default {
     },
 
     onHidden () {
+      const isForCreateView = this.isFilterModelFormShown && this.isFilterDialogForView
+      this.setFilterDialogForView(isForCreateView)
+
       // reset selected filter to applied filter when applicable
       // selected filter can be changed in "View" edit mode
-      if (this.appliedFilter) {
+      if (!this.isFilterDialogForView && this.appliedFilter) {
         this.setSelectedFilter(this.appliedFilter)
       }
 
-      this.toggleFilterDialog()
+      if (!this.isFilterDialogForView && !this.appliedFilter && this.channelChangedFilterFields.length) {
+        this.setSelectedFilter(null)
+      }
 
-      const isForCreateView = this.isFilterModelFormShown && this.isFilterDialogForView
-      this.setFilterDialogForView(isForCreateView)
+      this.toggleFilterDialog()
     },
 
     onHide () {
@@ -447,12 +439,16 @@ export default {
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
+        console.log('create view', this.filter)
       } else if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter }
+        console.log('selected filter', this.filter)
       } else if (this.appliedFilter) {
         this.filter = { ...this.appliedFilter.filter }
+        console.log('applied filter', this.filter)
       } else {
         this.filter = _.pick(this.value, this.filterFields)
+        console.log('default', this.filter)
       }
 
       // fill in the value for the newly added filter in case it's not yet included
@@ -689,12 +685,10 @@ export default {
       this.isDeletingFilter = true
 
       return talk2Api.V2.inbox.filters.delete(filter.id).then(res => {
-        this.selectedFilterClone = { ...this.selectedFilter }
         this.isDeletingFilter = false
 
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
           this.setSelectedFilter(null)
-          this.selectedFilterClone = null
         }
 
         if (!filter.is_on_company) {

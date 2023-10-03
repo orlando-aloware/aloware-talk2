@@ -185,7 +185,7 @@
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
                      @onResetFilter="onResetFilter"
-                     v-model="channelClonedFilter" />
+                     v-model="filter" />
 
       <create-filter-dialog :filter-model="newFilterModel" />
     </div>
