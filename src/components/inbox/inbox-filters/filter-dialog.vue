@@ -417,14 +417,16 @@ export default {
     ]),
 
     hideModal () {
-      if (this.appliedFilter) {
-        this.setSelectedFilter(this.appliedFilter)
-      }
-
       this.$refs.inboxChannelFilterModal.hide()
     },
 
     onHidden () {
+      // reset selected filter to applied filter when applicable
+      // selected filter can be changed in "View" edit mode
+      if (this.appliedFilter) {
+        this.setSelectedFilter(this.appliedFilter)
+      }
+
       this.toggleFilterDialog()
 
       const isForCreateView = this.isFilterModelFormShown && this.isFilterDialogForView
