@@ -31,7 +31,7 @@
           <td><s>Canceled Appointment</s></td>
         </tr>
         <tr>
-          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-13"></i></td>
+          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-14"></i></td>
           <td>Missed Appointment</td>
         </tr>
         <tr>
