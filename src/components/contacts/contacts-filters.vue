@@ -736,7 +736,6 @@ export default {
       'closeFilters',
       'setCurrentListFilters',
       'updateContactsListFilter',
-      'updateContactsExportListFilter',
       'setListContactsLoaded'
     ]),
 
