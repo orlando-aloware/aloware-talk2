@@ -35,7 +35,11 @@
   </b-modal>
 </template>
 <script>
-import { PD_BULK_ADD_MESSAGES, PD_INTEGRATION_IMPORT_MESSAGES } from 'src/constants/power-dialer-add-errors'
+import {
+  DUPLICATED,
+  PD_BULK_ADD_MESSAGES,
+  PD_INTEGRATION_IMPORT_MESSAGES
+} from 'src/constants/power-dialer-add-errors'
 import { cloneDeep, get, isNil, isEmpty, omitBy } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
@@ -164,17 +168,32 @@ export default {
       }
 
       const id = this.$route.params.id
-      const integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
-      console.log('selectedList: ', this.selectedList)
-      console.log('id: ', id)
-      console.log('integrationReport: ', integrationReport)
+      let integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
+
+      if (isEmpty(integrationReport)) {
+        integrationReport = {
+          is_dnc: 0,
+          is_blocked: 0,
+          total_selected: 0
+        }
+      }
+
+      integrationReport.is_dnc += this.fullReport?.extra?.is_dnc || 0
+      integrationReport.is_blocked += this.fullReport?.extra?.is_blocked || 0
+      integrationReport.total_selected += this.fullReport?.extra?.total_selected || 0
 
       const createdContactsCount = integrationReport?.created_contacts_count ?? 0
       const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
-      const totalSelected = createdContactsCount + updatedContactsCount
+      const selected = integrationReport?.total_selected ?? 0
+      const totalSelected = createdContactsCount + updatedContactsCount + selected
 
       // update the total selected contacts to the correct total count
       this.fullReport.info.selected = totalSelected
+      const duplicates = this.fullReport?.fail?.[DUPLICATED]
+
+      if (this.$isNumeric(duplicates)) {
+        this.fullReport.fail[DUPLICATED] += (integrationReport?.duplicates || 0)
+      }
 
       // remove reports having no message or with 0 value
       Object.keys(integrationReport).forEach(key => {
