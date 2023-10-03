@@ -442,6 +442,53 @@
       </q-tooltip>
     </q-btn-->
 
+    <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100 disabled"
+           flat
+           :ripple="false"
+           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled && isDemoCompany"
+           @click="toggleProFeatureDialog(true)">
+      <q-badge floating
+               rounded
+               color="orange">
+      </q-badge>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Broadcasts</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn icon="img:app-icons/menu/broadcast_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           flat
+           :to="{ path: '/broadcasts' }"
+           :ripple="false"
+           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Broadcasts</span>
+      </q-tooltip>
+    </q-btn>
+    <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
+           align="center"
+           padding="none"
+           class="nav-icons w-100"
+           flat
+           :to="{ path: '/broadcasts' }"
+           :ripple="false"
+           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Broadcasts</span>
+      </q-tooltip>
+    </q-btn>
+
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_active.svg"
@@ -515,6 +562,8 @@ export default {
 
     ...mapState(['statics', 'staticsLoaded']),
 
+    ...mapState('cache', ['currentCompany']),
+
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -532,6 +581,10 @@ export default {
         default:
           return 'img:app-icons/menu/logo_white.svg'
       }
+    },
+
+    isDemoCompany () {
+      return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
     }
   },
 

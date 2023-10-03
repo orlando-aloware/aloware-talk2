@@ -284,8 +284,7 @@ export default {
       this.$axios
         .patch(`/api/v2/${this.endpointUrl}/${this.resourceId}`, {
           id: this.resourceId,
-          headers: this.currentColumns,
-          filters: [] // TODO: use a
+          headers: this.currentColumns
         })
         .then(() => {
           this.$generalNotification('Columns were successfully saved!')

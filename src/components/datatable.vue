@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column h-100"
-       :class="[paginated ? 'paginated overflow-x-hidden w-100' : '']"
+  <div class="d-flex flex-column"
+       :class="[paginated ? 'paginated overflow-x-hidden w-100' : '', { 'h-100': useFullHeight }]"
        @mousemove="$emit('onMouseMove', $event)"
        @mouseleave="$emit('onMouseLeave', $event)">
 
@@ -27,7 +27,7 @@
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
               <label class="custom-checkbox-container check-all"
-                     v-if="column.name === 'checkbox'">
+                     v-if="column.name === 'checkbox' && showSelectAll">
                 <input ref="dataTableCheckAll"
                        class="data-table-check-all"
                        type="checkbox"
@@ -187,6 +187,11 @@ export default {
       default: true
     },
 
+    showSelectAll: {
+      type: Boolean,
+      default: true
+    },
+
     totalRows: {
       type: Number,
       default: 0
@@ -220,6 +225,11 @@ export default {
     isSelectedAll: {
       type: Boolean,
       default: false
+    },
+
+    useFullHeight: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -296,8 +306,8 @@ export default {
     },
 
     scrollableAreaClasses () {
-      const optScroll = `scrollableArea position-relative `
-      const scrollableClass = `${this.isScrollable ? optScroll : ''}d-flex flex-column h-100 w-100 flex-grow-1`
+      const optScroll = `scrollableArea `
+      const scrollableClass = `${this.isScrollable ? optScroll : ''} position-relative d-flex flex-column h-100 w-100 flex-grow-1`
       const mobileClass = this.isMobile ? 'mobile-scrollableArea' : ''
 
       return [

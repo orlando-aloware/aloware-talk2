@@ -1,6 +1,6 @@
 <template>
   <div class="h-100 d-flex flex-column">
-    <div class="mobile-header align-items-center justify-content-between pr-3 flex-grow-0"
+    <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="$q.screen.lt.md">
       <div class="mobile-header-labels h-100 align-items-center justify-content-start">
         <back-button @click="$emit('back')"/>

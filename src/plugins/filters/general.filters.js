@@ -638,6 +638,59 @@ const fullShortDate = (date) => {
   return window.moment(date).format('MMM D, YYYY')
 }
 
+/**
+ * Clean Microsoft encodes
+ * @param {String} string
+ * @returns String
+ */
+const cleanMicrosoftEncodedQuotes = (string) => {
+  string = string.replace(String.fromCharCode(145), "'")
+  string = string.replace(String.fromCharCode(146), "'")
+  string = string.replace(String.fromCharCode(147), '"')
+  string = string.replace(String.fromCharCode(148), '"')
+  string = string.replace(String.fromCharCode(151), '-')
+  string = string.replace(String.fromCharCode(8216), "'")
+  string = string.replace(String.fromCharCode(8217), "'")
+  string = string.replace(String.fromCharCode(8220), '"')
+  string = string.replace(String.fromCharCode(8221), '"')
+
+  return string
+}
+
+/**
+ * Clean Smart encodes
+ * @param {String} string
+ * @returns String
+ */
+const cleanSmartEncodedQuotes = (string) => {
+  string = string.replace('\xC2\xAB', '"')
+  string = string.replace('\xC2\xBB', '"')
+  string = string.replace('\xE2\x80\x98', "'")
+  string = string.replace('\xE2\x80\x99', "'")
+  string = string.replace('\xE2\x80\x9A', "'")
+  string = string.replace('\xE2\x80\x9B', "'")
+  string = string.replace('\xE2\x80\x9C', '"')
+  string = string.replace('\xE2\x80\x9D', '"')
+  string = string.replace('\xE2\x80\x9E', '"')
+  string = string.replace('\xE2\x80\x9F', '"')
+  string = string.replace('\xE2\x80\xB9', "'")
+  string = string.replace('\xE2\x80\xBA', "'")
+
+  return string
+}
+
+/**
+ * Clean string to UTF8
+ * @param {String} string
+ * @returns String
+ */
+const cleanStringToUTF8 = (string) => {
+  string = cleanMicrosoftEncodedQuotes(string)
+  string = cleanSmartEncodedQuotes(string)
+
+  return string
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixPhone,
@@ -673,7 +726,8 @@ export default ({ Vue }) => {
     sortObjectByKey,
     objAlphabeticalOrder,
     fullDuration,
-    fullShortDate
+    fullShortDate,
+    cleanStringToUTF8
   }
 
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))

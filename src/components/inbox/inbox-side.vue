@@ -1,6 +1,6 @@
 <template>
   <div class="inbox-wrapper border-right">
-    <div class="mobile-header align-items-center justify-content-between pr-3 flex-grow-0"
+    <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
         <back-button @click="back"/>
