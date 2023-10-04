@@ -36,7 +36,6 @@ export default {
     ...mapGetters('contacts', [
       'messageComposer',
       'selectedLine',
-      'isOptoutActive',
       'messageBodyWithOptout'
     ]),
 
