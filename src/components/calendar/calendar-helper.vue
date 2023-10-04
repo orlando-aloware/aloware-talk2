@@ -53,6 +53,10 @@
           <td class="pr-2"><i class="fas fa-square event-color-type-13 status-5"></i></td>
           <td><s>Canceled Reminder</s></td>
         </tr>
+        <tr>
+          <td class="pr-2"><i class="fas fa-square event-color-type-13 status-3"></i></td>
+          <td>Missed Reminder</td>
+        </tr>
       </table>
     </b-popover>
   </div>

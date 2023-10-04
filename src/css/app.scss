@@ -12269,6 +12269,10 @@ h1.contact-list-name-label {
     color: $canceled-reminder;
   }
 
+  &.status-3 {
+    color: $missed-appointment;
+  }
+
   &.is_past {
     color: $past-reminder;
   }
@@ -12313,6 +12317,10 @@ h1.contact-list-name-label {
   &.status-5 {
     background-color: $canceled-reminder;
     text-decoration: line-through;
+  }
+
+  &.status-3 {
+    background-color: $missed-appointment;
   }
 
   &.is_past {

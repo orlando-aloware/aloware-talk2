@@ -459,6 +459,10 @@ export default {
         {
           label: 'Cancelled',
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
+        },
+        {
+          label: 'Missed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         }
       ]
     },
