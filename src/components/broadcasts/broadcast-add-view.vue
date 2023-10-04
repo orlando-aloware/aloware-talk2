@@ -145,7 +145,8 @@ export default {
     ]),
 
     ...mapGetters('contacts', [
-      'messageComposer'
+      'messageComposer',
+      'messageBodyWithOptout'
     ]),
 
     mainComponent () {
@@ -391,7 +392,7 @@ export default {
         campaign_id: this.campaign.id,
         run_at_date: this.date.substr(0, 10),
         run_at_time: this.date.substr(11, 10),
-        message_body: this.messageComposer.sms.body,
+        message_body: this.messageBodyWithOptout,
         throttle_limit: this.throttle.value,
         accept_outside_business_hours: this.acceptedOutsideBusinessHours,
         is_scheduled: this.time.time === 'scheduled'
