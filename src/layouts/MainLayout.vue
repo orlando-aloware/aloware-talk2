@@ -2625,7 +2625,7 @@ export default {
         this.mobilePhoneDrawer = true
       }
 
-      // fix the mobile screen top padding
+      // fixed the mobile screen top padding
       // excluding inbox default page in smaller screen
       const isPhonePage = from.name === 'Phone' || this.mobilePhoneDrawer
       const isSmallMobileInbox = this.$route.name.includes('Inbox') && this.$q.screen.lt.md
