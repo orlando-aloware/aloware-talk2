@@ -35,11 +35,13 @@ export default {
 
     ...mapGetters('contacts', [
       'messageComposer',
-      'selectedLine'
+      'selectedLine',
+      'isOptoutActive',
+      'messageBodyWithOptout'
     ]),
 
     text () {
-      return this.translateMessage(this.messageComposer.sms.body, this.selectedLine, this.profile)
+      return this.translateMessage(this.messageBodyWithOptout, this.selectedLine, this.profile)
     },
 
     baseUrl () {
