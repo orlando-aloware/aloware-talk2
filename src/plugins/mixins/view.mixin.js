@@ -247,6 +247,8 @@ export default {
 
       talk2Api.V2[module].listExport(id, {
         headers: JSON.stringify(headers),
+        filters: JSON.stringify(this.currentListFilters),
+        search: this.search,
         my_contacts: +this.showMyContacts
       })
         .catch(() => {
