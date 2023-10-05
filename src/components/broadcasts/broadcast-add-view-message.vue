@@ -31,7 +31,7 @@
         <div class="d-flex items-center">
           <q-checkbox class="pr-4"
                       v-model="isOptoutActiveComputed"
-                      label=".Add opt-out phrase for this message"
+                      label="Add opt-out phrase for this message"
                       size="xs"/>
           <span class="mr-4">
             Message parts: {{ messagePartCount }} / {{ baseLine }}
@@ -263,6 +263,7 @@ export default {
 
     // type setup
     this.type = this.rvm ? 'rvm' : 'sms'
+    this.setIsOptoutActive(true)
   },
 
   methods: {
