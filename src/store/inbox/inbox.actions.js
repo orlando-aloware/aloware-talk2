@@ -118,5 +118,8 @@ export default {
   },
   setShowViewsList: ({ commit }, value = false) => {
     commit('SET_SHOW_VIEWS_LIST', value)
+  },
+  setIsInboxRefreshBtnLoading: ({ commit }, value = false) => {
+    commit('SET_IS_INBOX_REFRESH_BTN_LOADING', value)
   }
 }

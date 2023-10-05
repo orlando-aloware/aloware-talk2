@@ -18,6 +18,14 @@ export default {
 
     getWorkflowURL (workflowId) {
       return process.env.API_URL + `/sequences2/manager/${workflowId}`
+    },
+
+    getBroadcastSettingURL () {
+      return process.env.API_URL + '/account?tab=settings#broadcasts_business_hours'
+    },
+
+    getComplianceURL () {
+      return process.env.API_URL + '/account?tab=compliance'
     }
   }
 }

@@ -1,7 +1,9 @@
 <template>
   <contacts-screen :loading="isLoadingDisabled"
+                   :no-header="simpleTable"
                    v-if="list">
-    <template slot="title">
+    <template slot="title"
+              v-if="!simpleTable">
       <div class="d-flex flex-column">
         <div class="pr-2 contacts__title d-flex align-items-center">
           <back-button class="p-0"
@@ -37,8 +39,11 @@
         </div>
       </div>
     </template>
+    <template slot="title"
+              v-if="simpleTable">
+    </template>
     <template slot="options"
-              v-if="!isStartState">
+              v-if="!isStartState && !simpleTable">
       <compact-btn variant="primary"
                    :class="`${isUnsavedList ? 'hidden' : ''}`"
                    :disabled="isDisabledAddFiltersButton"
@@ -48,7 +53,8 @@
       </compact-btn>
     </template>
 
-    <template slot="actions">
+    <template slot="actions"
+              v-if="!simpleTable">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search class="width-260"
@@ -271,7 +277,8 @@
         </b-dropdown>
       </div>
     </template>
-    <template slot="actions">
+    <template slot="actions"
+              v-if="!simpleTable">
       <bulk-action-menu :id="id"
                         :total-rows="totalRows"
                         :checked-count="selectedAllCount"
@@ -638,10 +645,12 @@
         </span>
       </b-popover>
     </template>
-    <template slot="filters">
+    <template slot="filters"
+              v-if="!simpleTable">
       <contacts-filters @filtersUpdated="updateFilterHasChanges"/>
     </template>
-    <template slot="footer">
+    <template slot="footer"
+              v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
     </template>
   </contacts-screen>
@@ -779,6 +788,11 @@ export default {
     filtersCount: {
       type: Number,
       default: 0
+    },
+
+    simpleTable: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -831,7 +845,7 @@ export default {
     ]),
 
     fixedContactsData () {
-      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData)) {
+      if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData) && this.$parent.$data.contactsData !== undefined) {
         return this.$parent.$data.contactsData
       }
 
@@ -1092,7 +1106,8 @@ export default {
       'updateContactsList',
       'updateContactsListFilter',
       'setListContactsLoaded',
-      'setPreviouslySavedListId'
+      'setPreviouslySavedListId',
+      'setPreviousListFilters'
     ]),
 
     onSearch (searchText) {
@@ -1248,17 +1263,20 @@ export default {
 
       if (_.isEmpty(this.unsavedList)) {
         console.log('Updating existing dynamic list...')
+        const currentFilters = this.findFilters(this.currentListFilters)
 
         const params = {
           filters: _.pickBy(this.currentListFilters)
         }
 
         return this.$axios
-          .put('/api/v2/contacts-list/' + this.selectedList.id, params)
+          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)
-            this.initialListFilters = this.currentListFilters
+            this.setCurrentListFilters(currentFilters)
+            this.initialListFilters = currentFilters
+            this.setPreviousListFilters(currentFilters)
             this.updateFilterHasChanges()
             this.isUpdatingList = false
             this.$generalNotification('Changes to contact list has been saved.')
@@ -1305,8 +1323,8 @@ export default {
 
       // debugger
       let params = this.unsavedList.params
-      let currentFilters = this.findFilters(this.currentListFilters)
-      params.filters = [currentFilters]
+      const currentFilters = this.findFilters(this.currentListFilters)
+      params.filters = currentFilters
 
       return this.$axios
         .post('/api/v2/contacts-list', params)
@@ -1334,12 +1352,17 @@ export default {
     },
 
     findFilters (listFilters) {
+      let list = []
+      // Looks through listFilters and retrieves only elements that contain filters.
+      // Typically any filter element in the filters group is an object with the 'filters' property
+      // Any other items are excluded from the resulting list.
+      // Examples of elements that are excluded: 'sort', 'order', 'search'.
       for (const key in listFilters) {
-        if (listFilters[key].hasOwnProperty('filters')) {
-          return listFilters[key]
+        if (listFilters[key] !== null && typeof listFilters[key] === 'object' && listFilters[key].hasOwnProperty('filters')) {
+          list.push(listFilters[key])
         }
       }
-      return null
+      return list
     },
 
     loadFolders () {
