@@ -1270,7 +1270,7 @@ export default {
         }
 
         return this.$axios
-          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
+          .put('/api/v2/contacts-list/' + this.selectedList.id, params)
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)

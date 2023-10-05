@@ -228,11 +228,6 @@ export default {
       required: false
     },
 
-    totalRows: {
-      type: Number,
-      default: 0
-    },
-
     isSelectedAll: {
       type: Boolean,
       default: false
