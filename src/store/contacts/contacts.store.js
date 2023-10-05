@@ -218,7 +218,7 @@ export default function () {
     isAddPowerDialerOpen: false,
     isEnrollSequenceOpen: false,
     isAddReminderOpen: false,
-    isOptoutActive: true,
+    isOptoutActive: false,
     optoutText: ' Text STOP to unsubscribe',
     changingSelectedContact: false,
     smsTemplateModal: {
