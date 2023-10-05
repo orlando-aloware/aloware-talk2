@@ -9,6 +9,7 @@
              ref="smsMessageBody"
              input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
              type="textarea"
+             :readonly="true"
              :value="text"/>
   </div>
 </template>
