@@ -167,7 +167,12 @@
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
-      <div>
+      <div class="d-flex items-end">
+        <div v-if="isOptoutActive"
+             class="text-sm text-grey-80"
+             :class="{ 'mr-2': useSendButton }">
+          [{{ optoutText.trim() }}]
+        </div>
         <q-btn-dropdown
           split
           class="message-composer-send-dropdown-button"
@@ -278,7 +283,9 @@ export default {
     ...mapGetters('contacts', [
       'contact',
       'messageComposer',
-      'selectedLine'
+      'selectedLine',
+      'isOptoutActive',
+      'optoutText'
     ]),
 
     ...mapState('contacts', [
