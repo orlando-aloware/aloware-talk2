@@ -13014,7 +13014,7 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-        
+
         &.paused {
           border-color: $warning;
         }
@@ -13250,6 +13250,7 @@ h1.contact-list-name-label {
                   border-radius: 8px;
                   padding: 10px;
                   transition: all .3s;
+                  min-height: 58px;
 
                   textarea {
                     color: $white;
