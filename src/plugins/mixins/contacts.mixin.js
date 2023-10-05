@@ -830,13 +830,16 @@ export default {
       this.$VueEvent.stop('decreaseContactsCountFromCurrentList', this.listeners.decreaseContactsCountFromCurrentList)
     },
 
-    initiateFetch (data, fromRefresh = false, skipCountRequest = false) {
+    initiateFetch (data) {
       this.appliedFiltersPreviousFilters = _.get(data, 'previousFilters', null)
       const fetchData = { hasOrder: null, params: null, clear: null, isLoading: null }
       fetchData.params = _.get(data, 'params', {})
       fetchData.hasOrder = _.get(data, 'hasOrder', true)
       fetchData.clear = _.get(data, 'clear', false)
       fetchData.isLoading = _.get(data, 'isLoading', false)
+
+      const fromRefresh = _.get(data, 'fromRefresh', false)
+      const skipCountRequest = _.get(data, 'skipCountRequest', false)
 
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.my_contacts', this.showMyContactsViewBased)
@@ -851,11 +854,8 @@ export default {
       }
 
       this.listeners.fetchContacts = (data) => {
-        const fromRefresh = _.get(data, 'fromRefresh', false)
-        const skipCountRequest = _.get(data, 'skipCountRequest', false)
         this.fromContactFilters = false
-        data = fromRefresh ? {} : data
-        this.initiateFetch(data, fromRefresh, skipCountRequest)
+        this.initiateFetch(data)
       }
 
       this.listeners.clearContacts = () => {
