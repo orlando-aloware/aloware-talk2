@@ -124,7 +124,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['isMobile']),
+    ...mapState([
+      'isMobile',
+      'isDatatableSelectedAll'
+    ]),
 
     ...mapFields('powerDialer', [
       'activeMetrics',
@@ -314,10 +317,17 @@ export default {
 
       this.isBusy = true
       const ids = this.selectedContacts[this.listId].map(contact => contact.contact_list_item_id)
-      const params = { contact_list_items: ids }
+      const data = {
+        params: {
+          contact_list_items: ids
+        },
+        data: {
+          selected_all: this.isDatatableSelectedAll
+        }
+      }
 
       return this.$axios
-        .delete(url.data, { params: params })
+        .delete(url.data, data)
         .then(() => {
           this.listAddRemoveContactsProgress = {
             id: null,

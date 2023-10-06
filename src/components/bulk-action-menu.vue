@@ -200,7 +200,7 @@ export default {
     },
 
     hasDeletePermission () {
-      return this.isContacts && this.hasPermissionTo('archive contact')
+      return this.hasPermissionTo('archive contact')
     }
   },
 
