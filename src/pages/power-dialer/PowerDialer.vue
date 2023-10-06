@@ -319,9 +319,7 @@ export default {
       const ids = this.selectedContacts[this.listId].map(contact => contact.contact_list_item_id)
       const data = {
         params: {
-          contact_list_items: ids
-        },
-        data: {
+          contact_list_items: ids,
           selected_all: this.isDatatableSelectedAll
         }
       }
