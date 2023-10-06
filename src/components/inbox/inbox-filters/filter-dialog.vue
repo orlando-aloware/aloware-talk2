@@ -488,11 +488,7 @@ export default {
     },
 
     onApply () {
-      // if we're populating the dialog with the current filters,
-      // we shouldn't reset to default
-      if (!this.isFilterDialogShowFilters) {
-        this.resetChannelChangedFilterFields()
-      }
+      this.resetChannelChangedFilterFields()
 
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
 
