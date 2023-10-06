@@ -177,6 +177,7 @@ export default {
       'channelChangedFilterFields',
       'selectedFilter',
       'isFilterDialogShown',
+      'isFilterDialogShowFilters',
       'isFilterDialogForView',
       'channelClonedFilter',
       'isFilterModelFormShown',
@@ -379,6 +380,7 @@ export default {
       'updateChannelChangedFilterFields',
       'resetChannelChangedFilterFields',
       'toggleFilterDialog',
+      'toggleFilterDialogWithFilters',
       'setChannelClonedFilter',
       'setInboxShowMyContacts',
       'setPinnedViews',
@@ -396,6 +398,7 @@ export default {
 
     onHidden () {
       this.toggleFilterDialog()
+      this.toggleFilterDialogWithFilters()
       this.setFilterDialogForView(false)
     },
 
@@ -412,6 +415,10 @@ export default {
 
       if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter }
+      } else if (this.isFilterDialogShowFilters) {
+        // use the current filters when the filters dialog button is clicked
+        // to populate the selected filters
+        this.filter = { ...this.channelClonedFilter }
       } else {
         this.filter = _.pick(this.value, this.filterFields)
       }
@@ -427,7 +434,11 @@ export default {
         this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
       }
 
-      this.setChannelClonedFilter(this.filter)
+      // no need to re-set the channel cloned filters
+      // when we're populating the dialog with the current filters
+      if (!this.isFilterDialogShowFilters) {
+        this.setChannelClonedFilter(this.filter)
+      }
     },
 
     onShown () {
@@ -438,7 +449,12 @@ export default {
           this.setSelectedFilter(null)
         }
 
-        this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
+        // if we're populating the dialog with the current filters,
+        // we shouldn't reset to default
+        if (!this.isFilterDialogShowFilters) {
+          this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
+        }
+
         this.applyFilter()
       }
     },
@@ -472,7 +488,12 @@ export default {
     },
 
     onApply () {
-      this.resetChannelChangedFilterFields()
+      // if we're populating the dialog with the current filters,
+      // we shouldn't reset to default
+      if (!this.isFilterDialogShowFilters) {
+        this.resetChannelChangedFilterFields()
+      }
+
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
 
       if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {

@@ -309,12 +309,26 @@ export default {
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
 
-      if (filter && filter?.campaigns && filter.campaigns.length) {
-        this.filters = {
-          ...this.filters,
-          'lines': [
+      // add the line filter if there is
+      if (filter && filter?.campaigns) {
+        let filterParam = null
+
+        // line filter's value can be single and multiple
+        if (filter.campaigns?.constructor.name === 'Array' && filter.campaigns.length) {
+          filterParam = [
             { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
           ]
+        } else if (filter.campaigns?.constructor.name === 'Number') {
+          filterParam = [
+            { value: [filter.campaigns], operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+
+        if (!isEmpty(filterParam)) {
+          this.filters = {
+            ...this.filters,
+            'lines': filterParam
+          }
         }
       }
 
