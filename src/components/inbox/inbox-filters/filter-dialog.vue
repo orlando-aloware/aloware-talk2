@@ -293,9 +293,10 @@ export default {
     filterFormDisplayName () {
       const nonViewEditMode = (!this.isFilterDialogForView && this.selectedFilter)
       const viewEditMode = (this.isFilterDialogForView && this.isEditingView)
+      const filterName = this.selectedFilter?.name ?? 'New (Untitled)'
 
       return nonViewEditMode || viewEditMode
-        ? this.selectedFilter.name
+        ? filterName
         : 'New (Untitled)'
     },
 
@@ -535,6 +536,7 @@ export default {
 
       // save filter changes
       const userScope = (this.selectedFilter?.scope === 'user' || !+this.selectedFilter?.is_on_company)
+
       if (this.selectedFilter && userScope && this.filterHasChanges) {
         this.isUpdatingFilter = true
 
