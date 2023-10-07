@@ -44,12 +44,14 @@
                 v-if="prepend">
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
-      <template v-slot:option="{ itemProps, opt }">
-        <q-item v-bind="itemProps" v-close-popup @click.native="selectOption(opt)">
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps"
+                v-close-popup
+                v-on="scope.itemEvents">
           <q-item-section>
-            <q-item-label>{{ opt.name }}</q-item-label>
+            <q-item-label>{{ scope.opt.name }}</q-item-label>
           </q-item-section>
-          <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging)" side>
+          <q-item-section v-if="isMessagingBlocked(scope.opt, checkBlockedMessaging)" side>
             <q-badge color="red">!</q-badge>
           </q-item-section>
         </q-item>
@@ -297,10 +299,6 @@ export default {
   },
 
   methods: {
-    selectOption (option) {
-      this.selectedId = option.id
-    },
-
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
