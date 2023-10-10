@@ -4,7 +4,7 @@
          :src="attachment"
          v-if="attachment">
     <span class="q-input-composer text-white"
-         v-html="text" />
+          v-html="text"/>
   </div>
 </template>
 

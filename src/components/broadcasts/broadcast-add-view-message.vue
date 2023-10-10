@@ -21,7 +21,8 @@
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
-        <div class="d-flex items-center" style="z-index: 10">
+        <div class="d-flex items-center"
+             style="z-index: 10">
           <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
             This is the text message you want to send to the selected group of contacts.<br>
@@ -30,9 +31,9 @@
         </div>
         <div class="d-flex items-center">
           <q-checkbox class="pr-4"
-                      v-model="isOptoutActiveComputed"
                       label="Add opt-out phrase for this message"
-                      size="xs"/>
+                      size="xs"
+                      v-model="isOptoutActiveComputed"/>
           <span class="mr-4">
             Message parts: {{ messagePartCount }} / {{ baseLine }}
           </span>

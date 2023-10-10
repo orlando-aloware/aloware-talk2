@@ -168,9 +168,9 @@
                                 @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
       <div class="d-flex items-end">
-        <div v-if="isOptoutActive"
-             class="text-sm text-grey-80"
-             :class="{ 'mr-2': useSendButton }">
+        <div class="text-sm text-grey-80"
+             :class="{ 'mr-2': useSendButton }"
+             v-if="isOptoutActive">
           [{{ optoutText.trim() }}]
         </div>
         <q-btn-dropdown
