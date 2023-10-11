@@ -120,6 +120,10 @@ export default {
 
     ...mapState(['isMobile']),
 
+    ...mapGetters('contacts', [
+      'isAllContactsSelected'
+    ]),
+
     mainClass () {
       if (this.$route.name === 'Contact') {
         return 'w-100'
@@ -219,7 +223,9 @@ export default {
     },
 
     onRemoveContacts () {
-      this.$VueEvent.fire('fetchContacts', { clear: true, skipCountRequest: true })
+      if (!this.isAllContactsSelected) {
+        this.$VueEvent.fire('fetchContacts', { clear: true })
+      }
     }
   },
 

@@ -72,7 +72,8 @@ export default {
       'removeContactActionType',
       'selectedList',
       'isBulkDelete',
-      'listItems'
+      'listItems',
+      'isAllContactsSelected'
     ]),
 
     ...mapState('contacts', [
@@ -196,8 +197,11 @@ export default {
         data: payload
       })
         .then(() => {
-          this.$VueEvent.fire('fetchContacts', { clear: true, skipCountRequest: true })
-          this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+          if (this.isAllContactsSelected) {
+            this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+          } else {
+            this.$VueEvent.fire('fetchContacts', { clear: true })
+          }
 
           this.$generalNotification('Contact was successfully removed.')
         })
