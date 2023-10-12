@@ -89,7 +89,8 @@ export default {
     ...mapActions('inbox', [
       'setActiveChannel',
       'setTaskCount',
-      'setShowViewsList'
+      'setShowViewsList',
+      'setIsInboxRefreshBtnLoading'
     ]),
 
     setChannel (routeChanged = false) {
@@ -150,6 +151,8 @@ export default {
       }
 
       this.loadContactTasks(false)
+      this.fetchTaskCounts()
+      this.setIsInboxRefreshBtnLoading(false)
     })
 
     window.addEventListener('resize', this.onWindowResize)
