@@ -13059,7 +13059,7 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-        
+
         &.paused {
           border-color: $warning;
         }
@@ -13589,5 +13589,11 @@ h1.contact-list-name-label {
       flex-direction: row;
       margin-top: 0px;
     }
+  }
+}
+
+.download-dropdown {
+  .q-btn-dropdown__arrow {
+    display: none;
   }
 }
