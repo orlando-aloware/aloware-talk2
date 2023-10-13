@@ -192,6 +192,7 @@ export default {
 
       if (isNotValidFilenameExtension || hasNoMimeType) {
         this.onMissingExtensionOpenBrowserTab()
+        return
       }
 
       this.isLoading = true
