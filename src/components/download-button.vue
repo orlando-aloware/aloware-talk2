@@ -22,25 +22,7 @@
                     :loading="isLoading"
                     :disabled="isLoading"
                     v-if="!isSimple && !isSimpleAttachment && !hasFilenameExtension">
-      <q-list>
-        <q-item class="p-2"
-                clickable
-                v-close-popup
-                @click="onDownload(true)">
-          <q-item-section>
-            <q-item-label>Direct download</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-item class="p-2"
-                clickable
-                v-close-popup
-                @click="onMissingExtensionOpenBrowserTab()">
-          <q-item-section>
-            <q-item-label>Open in a new browser tab</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <portal-target :name="`${downloadDropdownList}-${communicationId}`"/>
     </q-btn-dropdown>
     <div class="d-flex align-items-center"
          v-if="isSimple && !isSimpleAttachment">
@@ -77,25 +59,7 @@
         <download-icon height="16"
                        width="16">
         </download-icon>
-        <q-list>
-          <q-item class="p-2"
-                  clickable
-                  v-close-popup
-                  @click="onDownload(true)">
-            <q-item-section>
-              <q-item-label>Direct download</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item class="p-2"
-                  clickable
-                  v-close-popup
-                  @click="onMissingExtensionOpenBrowserTab()">
-            <q-item-section>
-              <q-item-label>Open in a new browser tab</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <portal-target :name="`${downloadDropdownList}-${communicationId}`"/>
       </q-btn-dropdown>
     </div>
     <a role="button"
@@ -109,6 +73,27 @@
         </p>
       </div>
     </a>
+    <portal :to="`${downloadDropdownList}-${communicationId}`">
+      <q-list>
+        <q-item class="p-2"
+                clickable
+                v-close-popup
+                @click="onDownload(true)">
+          <q-item-section>
+            <q-item-label>Direct download</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item class="p-2"
+                clickable
+                v-close-popup
+                @click="onOpenBrowserTab(false)">
+          <q-item-section>
+            <q-item-label>Open in a new browser tab</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </portal>
   </div>
 </template>
 
@@ -129,6 +114,11 @@ export default {
   },
 
   props: {
+    communicationId: {
+      type: Number,
+      required: true
+    },
+
     attachmentUrl: {
       type: String,
       default: ''
@@ -206,7 +196,7 @@ export default {
       const hasNoMimeType = fixFilenameExtension && !this.fileMimeType
 
       if (isNotValidFilenameExtension || hasNoMimeType) {
-        this.onMissingExtensionOpenBrowserTab()
+        this.onOpenBrowserTab(true)
         return
       }
 
@@ -248,8 +238,9 @@ export default {
         })
     },
 
-    onMissingExtensionOpenBrowserTab () {
-      const win = window.open(`${this.attachmentUrl}?force_download=1`, '_blank')
+    onOpenBrowserTab (isMissingExtension = false) {
+      const url = `${this.attachmentUrl} ${(isMissingExtension ? '?force_download=1' : '')}`
+      const win = window.open(url, '_blank')
       win.focus()
     }
   }

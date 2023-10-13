@@ -673,6 +673,7 @@
                             class="text-dark-greenish w-100">
                         <download-button is-simple
                                          show-file-name
+                                         :communication-id="communication.id"
                                          :filename="attachment.name"
                                          :file-mime-type="attachment.mime_type"
                                          :attachment-url="attachment.url"/>
