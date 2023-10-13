@@ -388,7 +388,7 @@ Vue.prototype.$handleRouteError = (error) => {
   }
 }
 
-Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') => {
+Vue.prototype.$downloadFileWithUuid = async function (uuid, filename, type = 'common') {
   if (!uuid) {
     this.$generalNotification('Failed to download file, missing UUID', 'error')
   }
@@ -415,7 +415,7 @@ Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') =>
     })
 }
 
-Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
+Vue.prototype.$downloadFileWithUrl = async function (url, filename, type = 'common') {
   if (!url) {
     this.$generalNotification('Failed to download file, missing URL', 'error')
   }
