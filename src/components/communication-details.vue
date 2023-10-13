@@ -62,6 +62,7 @@
                   <template v-slot:default>
                     <download-button buttonStyle="top: 8px; left: 8px"
                                      :filename="attachment.name"
+                                     :file-mime-type="attachment.mime_type"
                                      :attachment-url="attachment.url"/>
                   </template>
                 </q-img>
@@ -88,6 +89,7 @@
 
                   <download-button is-simple-attachment
                                    :filename="attachment.name"
+                                   :file-mime-type="attachment.mime_type"
                                    :attachment-url="attachment.url"
                                    v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
                   </download-button>
@@ -719,6 +721,7 @@
                   <download-button is-simple
                                    show-file-name
                                    :filename="attachment.name"
+                                   :file-mime-type="attachment.mime_type"
                                    :attachment-url="attachment.url"/>
                 </div>
               </b-col>

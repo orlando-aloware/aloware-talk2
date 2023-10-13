@@ -674,6 +674,7 @@
                         <download-button is-simple
                                          show-file-name
                                          :filename="attachment.name"
+                                         :file-mime-type="attachment.mime_type"
                                          :attachment-url="attachment.url"/>
                       </div>
                     </div>
