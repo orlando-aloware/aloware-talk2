@@ -22,7 +22,25 @@
                     :loading="isLoading"
                     :disabled="isLoading"
                     v-if="!isSimple && !isSimpleAttachment && !hasFilenameExtension">
-      <portal-target name="downloadDropdownList"/>
+      <q-list>
+        <q-item class="p-2"
+                clickable
+                v-close-popup
+                @click="onDownload(true)">
+          <q-item-section>
+            <q-item-label>Direct download</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item class="p-2"
+                clickable
+                v-close-popup
+                @click="onMissingExtensionOpenBrowserTab()">
+          <q-item-section>
+            <q-item-label>Open in a new browser tab</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
     </q-btn-dropdown>
     <div class="d-flex align-items-center"
          v-if="isSimple && !isSimpleAttachment">
@@ -59,7 +77,25 @@
         <download-icon height="16"
                        width="16">
         </download-icon>
-        <portal-target name="downloadDropdownList"/>
+        <q-list>
+          <q-item class="p-2"
+                  clickable
+                  v-close-popup
+                  @click="onDownload(true)">
+            <q-item-section>
+              <q-item-label>Direct download</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item class="p-2"
+                  clickable
+                  v-close-popup
+                  @click="onMissingExtensionOpenBrowserTab()">
+            <q-item-section>
+              <q-item-label>Open in a new browser tab</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
       </q-btn-dropdown>
     </div>
     <a role="button"
@@ -73,27 +109,6 @@
         </p>
       </div>
     </a>
-    <portal to="downloadDropdownList">
-      <q-list>
-        <q-item class="p-2"
-                clickable
-                v-close-popup
-                @click="onDownload(true)">
-          <q-item-section>
-            <q-item-label>Direct download</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-item class="p-2"
-                clickable
-                v-close-popup
-                @click="onMissingExtensionOpenBrowserTab()">
-          <q-item-section>
-            <q-item-label>Open in a new browser tab</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </portal>
   </div>
 </template>
 
