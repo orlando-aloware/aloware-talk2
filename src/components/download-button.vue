@@ -239,7 +239,7 @@ export default {
     },
 
     onOpenBrowserTab (isMissingExtension = false) {
-      const url = `${this.attachmentUrl} ${(isMissingExtension ? '?force_download=1' : '')}`
+      const url = `${this.attachmentUrl}${(isMissingExtension ? '?force_download=1' : '')}`
       const win = window.open(url, '_blank')
       win.focus()
     }
