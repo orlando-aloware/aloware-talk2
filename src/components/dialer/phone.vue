@@ -1281,6 +1281,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import API from 'src/plugins/api/api'
+import { VM_DROP_ENABLE_DELAY } from 'src/constants/delays'
 
 export default {
   name: 'phone',
@@ -2646,14 +2647,14 @@ export default {
       // add 3 seconds delay to make sure vm drop won't fail if requested
       // due to phone is still ringing.
       if (value) {
-        this.setTimeout(() => {
-          this.isVmDropDisabled = value
-        }, 3000)
+        setTimeout(() => {
+          this.isVmDropDisabled = !value
+        }, VM_DROP_ENABLE_DELAY)
 
         return
       }
 
-      this.isVmDropDisabled = value
+      this.isVmDropDisabled = !value
     }
   },
 

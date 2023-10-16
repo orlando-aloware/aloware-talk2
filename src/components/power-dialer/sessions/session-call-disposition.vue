@@ -53,6 +53,7 @@ import {
 } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import { VM_DROP_ENABLE_DELAY } from 'src/constants/delays'
 
 export default {
   name: 'SessionCallDisposition',
@@ -69,8 +70,7 @@ export default {
   data () {
     return {
       voicemails: [],
-      loadingSendVmDrop: false,
-      delay: 3000
+      loadingSendVmDrop: false
     }
   },
 
@@ -276,16 +276,16 @@ export default {
 
     'dialer.communication': function (communication) {
       // add 3 seconds delay to consistent with vm drop delay
-      this.setTimeout(() => {
+      setTimeout(() => {
         this.initCallDisposition()
-      }, this.delay)
+      }, VM_DROP_ENABLE_DELAY)
 
       if (this.isVmDropReady) {
         // add 3 seconds delay to make sure vm drop won't fail if requested
         // due to phone is still ringing.
-        this.setTimeout(() => {
+        setTimeout(() => {
           this.$refs['vm-drop'].enable()
-        }, this.delay)
+        }, VM_DROP_ENABLE_DELAY)
 
         return
       }
