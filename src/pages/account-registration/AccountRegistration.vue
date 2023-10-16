@@ -1,8 +1,8 @@
 <template>
-  <div class="account-registration">
-    <div class="col-lg-8 col-md-8 col-sm-12">
+  <div class="account-registration row">
+    <div class="col-xl-8 col-md-12 col-sm-12">
       <div class="absolute-top q-pt-xl q-px-xl">
-        <img src="app-icons/menu/logo_dark.svg" alt="Logo">
+        <img src="app-icons/menu/logo_dark.svg" alt="Logo" />
       </div>
       <div class="stepper__container">
         <q-stepper
@@ -20,244 +20,483 @@
             :name="1"
             :done="step > 1"
           >
-            <h4 class="text-h4 text-weight-bold">
-              Welcome to Aloware!
-            </h4>
-            <p class="text-body1">
-              We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going
-            </p>
-
-            <div class="flex justify-center col-10 pt-4">
-              <div class="col-5 pr-4">
-                <label class="flex mb-1 text-weight-medium">
-                  First Name
-                </label>
-                <q-input
-                  placeholder="Type your first name"
-                  rounded
-                  outlined
-                  v-model="form.first_name"
-                />
-              </div>
-
-              <div class="col-5 pl-4">
-                <label class="flex mb-1 text-weight-medium">
-                  Last Name
-                </label>
-                <q-input
-                  placeholder="Type your last name"
-                  rounded
-                  outlined
-                  v-model="form.last_name"
-                />
-              </div>
+            <div class="stepper__content__header">
+              <h4 class="text-h4 text-weight-bold">Welcome to Aloware!</h4>
+              <p class="text-body1 w-65">
+                We are thrilled for you to better communicate with your
+                customers today. In these 4 simple steps, we need important
+                information to get you going
+              </p>
             </div>
 
-            <div class="flex justify-center col-10 pt-3">
-              <div class="col-5 pr-4">
-                <label class="flex mb-1 text-weight-medium">
-                  Email Address
-                </label>
-                <q-input
-                  placeholder="youremail@domain.com"
-                  type="email"
-                  rounded
-                  outlined
-                  :rules="[validateEmail]"
-                  v-model="form.email"
-                />
-              </div>
-
-              <div class="col-5 pl-4">
-                <label class="flex mb-1 text-weight-medium">
-                  Phone Number
-                </label>
-                <q-input
-                  placeholder="+1 222 333 4444"
-                  mask="+# ### ### ####"
-                  rounded
-                  outlined
-                  :rules="[validatePhoneNumber]"
-                  v-model="form.phone_number"
-                />
-              </div>
-            </div>
-
-            <div class="flex justify-center col-10 pt-3">
-              <div class="col-5 pr-4">
-                <label class="flex mb-1 text-weight-medium">
-                  Job Title
-                </label>
-                <q-input
-                  placeholder="Ex. CEO, CTO, Product Director"
-                  rounded
-                  outlined
-                  v-model="form.job_title"
-                />
-              </div>
-              <div class="col-5" />
-            </div>
-
-            <div class="flex justify-center col-10 pt-3">
-              <div class="col-5 pr-4">
-                <h4 class="text-h5 text-weight-bold">
-                  Password
-                </h4>
-              </div>
-              <div class="col-5" />
-            </div>
-
-            <div class="flex justify-center col-10 pt-3">
-              <div class="col-5 pr-4 pb-5">
-                <label class="flex mb-1 text-weight-medium">
-                  Create a Password
-                </label>
-                <q-input
-                  placeholder="Type here"
-                  rounded
-                  outlined
-                  bottom-slots
-                  :type="show_password ? 'text' : 'password'"
-                  v-model="form.password"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      class="cursor-pointer"
-                      :name="show_password ? 'visibility_off' : 'visibility'"
-                      @click="show_password = !show_password"
+            <div class="stepper__content">
+              <div class="min-w-100">
+                <div class="flex justify-center pt-4 q-row">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pr-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      First Name
+                    </label>
+                    <q-input
+                      placeholder="Type your first name"
+                      rounded
+                      outlined
+                      v-model="form.first_name"
                     />
-                  </template>
+                  </div>
 
-                  <template
-                    v-slot:hint
-                    v-if="form.password">
-                    <ul class="flex pl-1 text-weight-regular password-hint">
-                      <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordLength(form.password))"
-                          :name="iconForValidation(validatePasswordLength(form.password))">
-                        </q-icon>
-                        8 characters long
-                      </li>
-                      <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordCases(form.password))"
-                          :name="iconForValidation(validatePasswordCases(form.password))">
-                        </q-icon>
-                        Must contain upper and lower case letters
-                      </li>
-                      <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
-                          :name="iconForValidation(validatePasswordDigit(form.password))">
-                        </q-icon>
-                        Include at least one numerical digit
-                      </li>
-                    </ul>
-                  </template>
-                </q-input>
-              </div>
-              <div class="col-5 pl-4 pb-5">
-                <label class="flex mb-1 text-weight-medium">
-                  Repeat your Password
-                </label>
-                <q-input
-                  placeholder="Type your password again"
-                  rounded
-                  outlined
-                  bottom-slots
-                  :type="show_password ? 'text' : 'password'"
-                  v-model="form.repeat_password"
-                >
-                  <template v-slot:append>
-                    <q-icon
-                      class="cursor-pointer"
-                      :name="show_password ? 'visibility_off' : 'visibility'"
-                      @click="show_password = !show_password"
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Last Name
+                    </label>
+                    <q-input
+                      placeholder="Type your last name"
+                      rounded
+                      outlined
+                      v-model="form.last_name"
                     />
-                  </template>
+                  </div>
+                </div>
 
-                  <template v-slot:hint
-                    v-if="form.password.length > 0">
-                    <ul class="flex pl-1 text-weight-regular password-hint">
-                      <li>
+                <div class="flex justify-center pt-4 q-row">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Email Address
+                    </label>
+                    <q-input
+                      placeholder="youremail@domain.com"
+                      type="email"
+                      rounded
+                      outlined
+                      :rules="[validateEmail]"
+                      v-model="form.email"
+                    />
+                  </div>
+
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Phone Number
+                    </label>
+                    <q-input
+                      placeholder="+1 222 333 4444"
+                      mask="+# ### ### ####"
+                      rounded
+                      outlined
+                      :rules="[validatePhoneNumber]"
+                      v-model="form.phone_number"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-center pt-4 q-row">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Job Title
+                    </label>
+                    <q-input
+                      placeholder="Ex. CEO, CTO, Product Director"
+                      rounded
+                      outlined
+                      v-model="form.job_title"
+                    />
+                  </div>
+                  <div class="col-5" />
+                </div>
+
+                <div class="flex justify-center pt-4 q-row">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <h4 class="text-h5 text-weight-bold">Password</h4>
+                  </div>
+                  <div class="col-5" />
+                </div>
+
+                <div class="flex justify-center  pt-4 q-row">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Create a Password
+                    </label>
+                    <q-input
+                      placeholder="Type here"
+                      rounded
+                      outlined
+                      bottom-slots
+                      :type="show_password ? 'text' : 'password'"
+                      v-model="form.password"
+                    >
+                      <template v-slot:append>
                         <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordMatch(form.repeat_password))"
-                          :name="iconForValidation(validatePasswordMatch(form.repeat_password))">
-                        </q-icon>
-                        {{ validatePasswordMatch(form.repeat_password) ? 'The passwords match' : 'The passwords doesn\'t match' }}
-                      </li>
-                    </ul>
-                  </template>
-                </q-input>
+                          class="cursor-pointer"
+                          :name="show_password ? 'visibility_off' : 'visibility'"
+                          @click="show_password = !show_password"
+                        />
+                      </template>
+
+                      <template
+                        v-slot:hint
+                        v-if="form.password">
+                        <ul class="flex pl-1 text-weight-regular password-hint">
+                          <li>
+                            <q-icon
+                              class="q-mr-xs"
+                              :class="getPasswordRuleClass(validatePasswordLength(form.password))"
+                              :name="iconForValidation(validatePasswordLength(form.password))"
+                            >
+                            </q-icon>
+                            8 characters long
+                          </li>
+                          <li>
+                            <q-icon
+                              class="q-mr-xs"
+                              :class="getPasswordRuleClass(validatePasswordCases(form.password))"
+                              :name="iconForValidation(validatePasswordCases(form.password))"
+                            >
+                            </q-icon>
+                            Must contain upper and lower case letters
+                          </li>
+                          <li>
+                            <q-icon
+                              class="q-mr-xs"
+                              :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
+                              :name="iconForValidation(validatePasswordDigit(form.password))"
+                            >
+                            </q-icon>
+                            Include at least one numerical digit
+                          </li>
+                        </ul>
+                      </template>
+                    </q-input>
+                  </div>
+                  <div class="col-5 pl-4 pb-5">
+                    <label class="flex mb-1 text-weight-medium">
+                      Repeat your Password
+                    </label>
+                    <q-input
+                      placeholder="Type your password again"
+                      rounded
+                      outlined
+                      bottom-slots
+                      :type="show_password ? 'text' : 'password'"
+                      v-model="form.repeat_password"
+                    >
+                      <template v-slot:append>
+                        <q-icon
+                          class="cursor-pointer"
+                          :name="
+                            show_password ? 'visibility_off' : 'visibility'
+                          "
+                          @click="show_password = !show_password"
+                        />
+                      </template>
+
+                      <template v-slot:hint v-if="form.password.length > 0">
+                        <ul class="flex pl-1 text-weight-regular password-hint">
+                          <li>
+                            <q-icon
+                              class="q-mr-xs"
+                              :class="getPasswordRuleClass(validatePasswordMatch(form.repeat_password))"
+                              :name="iconForValidation(validatePasswordMatch(form.repeat_password))"
+                            >
+                            </q-icon>
+                            {{
+                              validatePasswordMatch(form.repeat_password)
+                                ? 'The passwords match'
+                                : "The passwords doesn't match"
+                            }}
+                          </li>
+                        </ul>
+                      </template>
+                    </q-input>
+                  </div>
+                </div>
               </div>
+
+              <!-- <div class="flex justify-center ">
+                <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                  <ul class="flex mb-1 pl-3 text-weight-regular password-hint">
+                    <li>
+                      <q-icon
+                        class="q-mr-xs"
+                        :class="getPasswordRuleClass(validatePasswordLength(form.password))"
+                        :name="iconForValidation(validatePasswordLength(form.password))">
+                      </q-icon>
+                      8 characters long
+                    </li>
+                    <li>
+                      <q-icon
+                        class="q-mr-xs"
+                        :class="getPasswordRuleClass(validatePasswordCases(form.password))"
+                        :name="iconForValidation(validatePasswordCases(form.password))">
+                      </q-icon>
+                      Must contain upper and lower case letters
+                    </li>
+                    <li>
+                      <q-icon
+                        class="q-mr-xs"
+                        :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
+                        :name="iconForValidation(validatePasswordDigit(form.password))">
+                      </q-icon>
+                      Include at least one numerical digit
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                  <ul class="flex mb-1 pl-4 text-weight-regular password-hint">
+                    <li>
+                      <q-icon
+                        class="q-mr-xs"
+                        :class="getPasswordRuleClass(validatePasswordLength(form.password))"
+                        :name="iconForValidation(validatePasswordLength(form.password))">
+                      </q-icon>
+                      The passwords doesn't match
+                    </li>
+                  </ul>
+                </div>
+              </div> -->
             </div>
-
-            <!-- <div class="flex justify-center col-10">
-              <div class="col-5 pr-4">
-                <ul class="flex mb-1 pl-3 text-weight-regular password-hint">
-                  <li>
-                    <q-icon
-                      class="q-mr-xs"
-                      :class="getPasswordRuleClass(validatePasswordLength(form.password))"
-                      :name="iconForValidation(validatePasswordLength(form.password))">
-                    </q-icon>
-                    8 characters long
-                  </li>
-                  <li>
-                    <q-icon
-                      class="q-mr-xs"
-                      :class="getPasswordRuleClass(validatePasswordCases(form.password))"
-                      :name="iconForValidation(validatePasswordCases(form.password))">
-                    </q-icon>
-                    Must contain upper and lower case letters
-                  </li>
-                  <li>
-                    <q-icon
-                      class="q-mr-xs"
-                      :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
-                      :name="iconForValidation(validatePasswordDigit(form.password))">
-                    </q-icon>
-                    Include at least one numerical digit
-                  </li>
-                </ul>
-              </div>
-
-              <div class="col-5 pr-4">
-                <ul class="flex mb-1 pl-4 text-weight-regular password-hint">
-                  <li>
-                    <q-icon
-                      class="q-mr-xs"
-                      :class="getPasswordRuleClass(validatePasswordLength(form.password))"
-                      :name="iconForValidation(validatePasswordLength(form.password))">
-                    </q-icon>
-                    The passwords doesn't match
-                  </li>
-                </ul>
-              </div>
-            </div> -->
           </q-step>
 
           <q-step
             title="Your Business"
             prefix="2"
             :name="2"
-            :done="step > 2"
-          >
-            <h4 class="text-h4 text-weight-bold">
-              Welcome to Aloware!
-            </h4>
-            <p class="text-body1">
-              We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going
-            </p>
+            :done="step > 2">
+            <div class="stepper__content__header">
+              <h4 class="text-h4 text-weight-bold">Your Business</h4>
+              <p class="text-body1">
+                Great! Now, we need important information to verify your
+                business.
+              </p>
+            </div>
+
+            <div class="stepper__content">
+              <div class="min-w-100">
+                <div class="flex justify-center  pt-4">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Business Name
+                    </label>
+                    <q-input
+                      placeholder="Aloware Inc."
+                      rounded
+                      outlined
+                      v-model="form.business_name"
+                    />
+                  </div>
+
+                  <div class="col-5 pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Business Type
+                    </label>
+                    <q-select
+                      placeholder="Select"
+                      rounded
+                      outlined
+                      map-options
+                      option-label="value"
+                      option-value="value"
+                      :options="businessTypes"
+                      v-model="form.business_type"
+                    />
+                    <div class="flex items-center">
+                      <label class="flex mb-1 text-weight-bold pl-3 pr-4">
+                        Company Status
+                      </label>
+                      <q-btn-toggle
+                        class="toggle-border"
+                        toggle-color="primary"
+                        color="white"
+                        text-color="#4F4F4F"
+                        spread
+                        no-caps
+                        unelevated
+                        dense
+                        rounded
+                        :options="[
+                          { label: 'Private', value: 'private' },
+                          { label: 'Public', value: 'public' }
+                        ]"
+                        v-model="form.company_status"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex justify-center  pt-4">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Business ID Type
+                    </label>
+                    <q-select
+                      placeholder="Select"
+                      rounded
+                      outlined
+                      map-options
+                      option-label="label"
+                      option-value="value"
+                      :options="businessIdTypes"
+                      v-model="form.business_id_type"
+                    />
+                  </div>
+
+                  <div class="col-5 pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Business Registration Number
+                    </label>
+                    <q-input
+                      placeholder="Ex: C1234567"
+                      rounded
+                      outlined
+                      v-model="form.business_registration_number"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-center  pt-4">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Region of Operation
+                    </label>
+                    <q-select
+                      placeholder="Select"
+                      rounded
+                      outlined
+                      map-options
+                      option-label="label"
+                      option-value="value"
+                      :options="regionsOfOperations"
+                      v-model="form.region_of_operation"
+                    />
+                  </div>
+
+                  <div class="col-5 pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Website URL
+                    </label>
+                    <q-input
+                      placeholder="Ex: yourcompany.com"
+                      rounded
+                      outlined
+                      v-model="form.website_url"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-center  pt-4 q-row">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <h4 class="text-h5 text-weight-bold">Business Address</h4>
+                  </div>
+                  <div class="col-5" />
+                </div>
+
+                <div class="flex justify-center  pt-4">
+                  <div class="col-10">
+                    <label class="flex mb-1 text-weight-medium"> Street </label>
+                    <q-input
+                      placeholder="Ex:"
+                      rounded
+                      outlined
+                      v-model="form.business_address.street"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-center pt-4">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      State/Province/Region
+                    </label>
+                    <q-input
+                      placeholder="Ex: California"
+                      rounded
+                      outlined
+                      v-model="form.business_address.state"
+                    />
+                  </div>
+
+                  <div class="col-5 pl-4">
+                    <label class="flex mb-1 text-weight-medium"> City </label>
+                    <q-input
+                      placeholder="Ex: Los Angeles"
+                      rounded
+                      outlined
+                      v-model="form.business_address.city"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-center pt-4">
+                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Country
+                    </label>
+                    <q-input
+                      placeholder="Ex: United States"
+                      rounded
+                      outlined
+                      v-model="form.business_address.country"
+                    />
+                  </div>
+
+                  <div class="col-5 pl-4">
+                    <label class="flex mb-1 text-weight-medium">
+                      Postal Code
+                    </label>
+                    <q-input
+                      placeholder="Ex: 11223"
+                      rounded
+                      outlined
+                      bottom-slots
+                      v-model="form.business_address.zip_code"
+                    >
+                      <template
+                        v-slot:hint
+                        v-if="form.business_address.zip_code.length">
+                        <div class="zipcode-hint">
+                          <q-icon
+                            class="q-mr-xs"
+                            :class="getZipCodeRuleClass(validateZipCode(form.business_address.zip_code))"
+                            :name="iconForValidation(validateZipCode(form.business_address.zip_code))"
+                          >
+                          </q-icon>
+                            {{
+                              validateZipCode(form.business_address.zip_code)
+                                ? 'The Postal Code is valid'
+                                : 'Please enter a valid Postal Code'
+                            }}
+                        </div>
+                      </template>
+                    </q-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </q-step>
+
+          <q-step
+            title="Confirmation"
+            prefix="3"
+            :name="3"
+            :done="step > 2">
+            <div class="min-h-60 flex items-center">
+              <div>
+                <img
+                  src="app-icons/misc/clock.svg"
+                  alt="clock" />
+                <h4 class="text-h4 text-weight-bold">
+                  Verification
+                </h4>
+                <p class="text-body1 w-65">
+                  Thanks for sending us your information. We are reviewing it now.
+                  Once validated, we will send you an email with instructions for
+                  logging into your account.
+                </p>
+              </div>
+            </div>
           </q-step>
 
           <template v-slot:navigation>
             <q-stepper-navigation
+              v-if="step === 1 || step === 2"
               class="flex w-100"
               :class="{
                 'justify-end': step === 1,
@@ -281,47 +520,115 @@
                 class="q-mx-xl account-registration-action-btn"
                 color="primary"
                 size="md"
+                label="Next"
                 rounded
                 dense
                 no-caps
                 unelevated
                 :disabled="isNextButtonDisabled"
-                :label="step === 2 ? 'Submit' : 'Next'"
                 @click="$refs.stepper.next()"
+                v-if="step === 1"
+              />
+              <q-btn
+                class="q-mx-xl account-registration-action-btn"
+                color="primary"
+                size="md"
+                label="Submit"
+                rounded
+                dense
+                no-caps
+                unelevated
+                :disabled="isNextButtonDisabled"
+                @click="submit"
+                v-if="step === 2"
               />
             </q-stepper-navigation>
           </template>
         </q-stepper>
       </div>
     </div>
-    <div class="banner col-lg-4 col-md-4">
+    <div class="banner col-xl-4 q-xl-show q-md-hide q-sm-hide">
+      <div class="text-center items-center align-center">
+        <img
+          :src="getBannerImageSrc()"
+          alt="phone" />
+        <div class="card text-center">
+          <h3 class="mb-4 mt-4">{{ getBannerTitle() }}</h3>
+          <p v-html="getBannerDescription()" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import businessTypes from '../../constants/account-registration-business-types'
+import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
+import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
+
 export default {
   name: 'account-registration',
   data () {
     return {
       step: 1,
       form: {
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone_number: '',
-        job_title: '',
-        password: '',
-        repeat_password: ''
+        first_name: 'Jeff',
+        last_name: 'Bruchado',
+        email: 'jeff@gmail.com',
+        phone_number: '+1 222 333 4444',
+        job_title: 'CTO',
+        password: 'SomeText!2',
+        repeat_password: 'SomeText!2',
+
+        business_name: 'Aloware Inc.',
+        business_type: 'Partnership',
+        company_status: 'public',
+        business_id_type: 'BIN',
+        business_registration_number: 'C1234567',
+        region_of_operation: 'USA_AND_CANADA',
+        website_url: 'aloware.com',
+        business_address: {
+          street: 'Fifth Avenue',
+          state: 'San Francisco',
+          city: 'California',
+          country: 'United States',
+          zip_code: '11223'
+        }
       },
+      // form: {
+      //   first_name: '',
+      //   last_name: '',
+      //   email: '',
+      //   phone_number: '',
+      //   job_title: '',
+      //   password: '',
+      //   repeat_password: '',
+      //   business_name: '',
+      //   business_type: '',
+      //   company_status: 'public',
+      //   business_id_type: '',
+      //   business_registration_number: '',
+      //   region_of_operation: '',
+      //   website_url: '',
+      //   business_address: {
+      //     street: '',
+      //     state: '',
+      //     city: '',
+      //     country: '',
+      //     zip_code: ''
+      //   }
+      // },
       password_validation: [],
-      show_password: false
+      show_password: false,
+      businessTypes,
+      businessIdTypes,
+      regionsOfOperations
     }
   },
 
   computed: {
     isNextButtonDisabled () {
-      return this.step === 1 && !this.validateFirstStepFieldsFilled()
+      return (this.step === 1 && !this.validateFirstStepFieldsFilled()) || (this.step === 2 && !this.validateSecondStepFieldsFilled())
     }
   },
 
@@ -358,6 +665,11 @@ export default {
       this.updateValidationState('match', this.validatePasswordMatch(this.form.password))
     },
 
+    validateZipCode (zip) {
+      const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
+      return zipRegex.test(zip)
+    },
+
     iconForValidation (isValid) {
       return isValid ? 'check' : 'close'
     },
@@ -379,7 +691,8 @@ export default {
     },
 
     validateFirstStepFieldsFilled () {
-      return this.form.first_name.length &&
+      return (
+        this.form.first_name.length &&
         this.form.last_name.length &&
         this.validateEmail(this.form.email) === true &&
         this.validatePhoneNumber(this.form.phone_number) === true &&
@@ -387,54 +700,103 @@ export default {
         this.form.password.length &&
         this.form.repeat_password.length &&
         this.password_validation.length === 4
+      )
+    },
+
+    validateSecondStepFieldsFilled () {
+      return (
+        this.form.business_name.length &&
+        this.form.business_type &&
+        this.form.business_id_type &&
+        this.form.business_registration_number.length &&
+        this.form.region_of_operation &&
+        this.form.website_url.length &&
+        this.form.business_address.street.length &&
+        this.form.business_address.state.length &&
+        this.form.business_address.city.length &&
+        this.form.business_address.country.length &&
+        this.validateZipCode(this.form.business_address.zip_code)
+      )
     },
 
     getPasswordRuleClass (rule) {
       return rule ? 'text-green' : 'text-red'
+    },
+
+    getZipCodeRuleClass (rule) {
+      return rule ? 'text-green' : 'text-red'
+    },
+
+    getBannerImageSrc () {
+      switch (this.step) {
+        case 1:
+          return '/images/woman-agent.png'
+        case 2:
+          return '/images/man-agent.png'
+        case 3:
+          return '/images/woman-agent-in-call.png'
+        default:
+          return '/images/woman-agent.png'
+      }
+    },
+
+    getBannerTitle () {
+      switch (this.step) {
+        case 1:
+          return 'Your customers prefer text'
+        case 2:
+          return 'Supercharge your sales team'
+        case 3:
+          return 'Measure the metrics that matter'
+        default:
+          return 'Your customers prefer text'
+      }
+    },
+
+    getBannerDescription () {
+      switch (this.step) {
+        case 1:
+          return 'Research (and common sense!) shows that people look at their texts within 3 minutes, and open <span class="text-weight-bold">97% of messages</span> they receive.<br>Be where it matters most: their inbox. 📥'
+        case 2:
+          return 'Make <span class="text-weight-bold">300+ calls daily</span> with our AI-driven power dialer. Scale up text campaigns with smart sequence builder.<br>Your CRM has the fuel, Aloware brings the fire. 🚀'
+        case 3:
+          return 'Gain visibility into the metrics that matter to your business with advanced <span class="text-weight-bold">reporting, pre-built</span>, and <span class="text-weight-bold">customizable dashboards</span>. 📊'
+        default:
+          return 'Texting is the most preferred communication channel for customers. With Aloware, you can text your customers from your business phone number.'
+      }
+    },
+
+    submit () {
+      console.log('submit', this.form)
+      this.step++
     }
+  },
+
+  created () {
+    this.validateAllPasswordRules()
   }
 }
 </script>
 
 <style lang="scss">
+@import 'src/css/breakpoints.scss';
+
 .account-registration {
   display: flex;
   height: 100vh;
 
-  @media (max-width: 600px) {
-    .q-stepper__header {
-      max-width: 100%;
-    }
-
-    .stepper__container {
-      display: flex;
-      text-align: -webkit-center;
-    }
-  }
-
-  @media (min-width: 600px) and (max-width: 1024px) {
-    .stepper__container {
-      display: flex;
-      text-align: -webkit-center;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .q-stepper__header {
-      max-width: 600px !important;
-    }
-
-    .stepper__container {
-      display: flex;
-      text-align: -webkit-center;
-      padding-left: 4vh;
-    }
-  }
-
-  .row.q-input
-  .q-field__control
-  .q-field__native {
+  // Base Styles
+  .row.q-input .q-field__control .q-field__native {
     height: 35px !important;
+  }
+
+  .q-field--auto-height .q-field__control,
+  .q-field--auto-height .q-field__native {
+    min-height: 35px !important;
+  }
+
+  .toggle-border {
+    border: 1px solid #256eff;
   }
 
   .q-stepper__dot {
@@ -445,10 +807,6 @@ export default {
   .stepper__container {
     display: flex;
     text-align: -webkit-center;
-  }
-
-  &-form-container {
-
   }
 
   .text-h4 {
@@ -465,11 +823,60 @@ export default {
     margin-top: 28px;
   }
 
+  .password-hint {
+    ul {
+      padding-top: 10px;
+    }
+
+    li {
+      list-style: none;
+      font-size: 14px;
+      color: #000000;
+      margin-top: 4px;
+    }
+  }
+
+  .zipcode-hint {
+    padding-top: 4px;
+    font-size: 14px;
+    color: #000000;
+  }
+
+  .banner {
+    align-items: center;
+    background: linear-gradient(240deg, #0037ff2a 0%, #22ff001c 100%);
+    height: 100vh;
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+
+      > h3 {
+        font-family: Inter;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 24px;
+      }
+
+      > p {
+        font-family: Inter;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 24px;
+        text-align: center;
+        padding: 0 24px 10px 24px;
+      }
+    }
+  }
+
+  &-form-container {
+    // Base styles for form-container can be added here
+  }
+
   &-action-btn {
     .row.q-field,
     .row.q-field__control-container,
     .row.q-field__control,
-    .row.q-field__control-container,
     .row.q-notification__wrapper,
     .row.q-notification__content,
     .row.q-btn__wrapper,
@@ -486,21 +893,134 @@ export default {
     }
   }
 
-  .password-hint {
-    ul {
-      padding-top: 10px;
+  // Stepper Container Details
+  .stepper__container {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+
+    .q-stepper__header,
+    .stepper__content__header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: white;
     }
 
-    li {
-      list-style: none;
-      font-size: 14px;
-      color: #000000;
-      margin-top: 4px;
+    .stepper__content {
+      overflow-y: auto;
+      flex-grow: 1;
+      height: 60vh;
+      padding-bottom: 130px;
+    }
+
+    .q-stepper__nav {
+      position: sticky;
+      bottom: 0;
+      background-color: white;
+      padding: 0 16px 16px;
+      z-index: 10;
     }
   }
 
-  .banner {
-    background: linear-gradient(240deg, #0037ff2a 0%, #22ff001c 100%);
+  // Breakpoints
+  @include screen('xs') {
+    .banner {
+      display: none !important;
+    }
+
+    .q-stepper__header {
+      max-width: 100%;
+    }
+    .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+    }
+  }
+
+  @include screen('sm') {
+    .banner {
+      display: none !important;
+    }
+
+    .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+    }
+  }
+
+  @include screen('md') {
+    .banner {
+      display: none !important;
+    }
+
+    .min-w-100 {
+      // width: 100vh !important;
+    }
+
+    .q-stepper__header {
+      max-width: 600px !important;
+    }
+
+    .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+      padding-left: 4vh;
+    }
+  }
+
+  @include screen('lg') {
+    .banner {
+      display: none !important;
+    }
+  }
+
+  @include screen('xl') {
+    .banner {
+      display: flex !important;
+    }
+  }
+
+  @include screen('xs') {
+    .q-stepper__header {
+      max-width: 100%;
+    }
+    .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+    }
+  }
+
+  @include screen('sm') {
+    .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+    }
+  }
+
+  @include screen('md') {
+    .min-w-100 {
+      // width: 100vh !important;
+    }
+
+    .q-stepper__header {
+      max-width: 600px !important;
+    }
+
+    .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+      padding-left: 4vh;
+    }
+  }
+
+  // Miscellaneous Classes
+  .w-65 {
+    width: 65%;
+  }
+
+  .min-h-60 {
+    min-height: 60vh;
   }
 }
 </style>
