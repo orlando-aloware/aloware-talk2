@@ -190,6 +190,9 @@ export default {
         if (showAlert) {
           this.$generalNotification('Contact has been successfully synced.')
         }
+      }).catch((err) => {
+        console.error(err)
+        this.isSyncing = false
       })
     }
 
