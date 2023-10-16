@@ -69,7 +69,8 @@ export default {
   data () {
     return {
       voicemails: [],
-      loadingSendVmDrop: false
+      loadingSendVmDrop: false,
+      delay: 3000
     }
   },
 
@@ -274,10 +275,18 @@ export default {
     },
 
     'dialer.communication': function (communication) {
-      this.initCallDisposition()
+      // add 3 seconds delay to consistent with vm drop delay
+      this.setTimeout(() => {
+        this.initCallDisposition()
+      }, this.delay)
 
       if (this.isVmDropReady) {
-        this.$refs['vm-drop'].enable()
+        // add 3 seconds delay to make sure vm drop won't fail if requested
+        // due to phone is still ringing.
+        this.setTimeout(() => {
+          this.$refs['vm-drop'].enable()
+        }, this.delay)
+
         return
       }
 

@@ -1419,6 +1419,7 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
+      isVmDropDisabled: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1489,8 +1490,8 @@ export default {
       return !this.devMode && this.isCallCompleted
     },
 
-    isVmDropDisabled () {
-      return !this.devMode && this.isCallCompleted
+    canVmDrop () {
+      return (this.dialer.communication && !this.isCallCompleted) || this.devMode
     },
 
     isHoldDisabled () {
@@ -2639,6 +2640,20 @@ export default {
       if (['add', 'dialpad', 'transfer'].includes(value)) {
         this.openExpansion(value)
       }
+    },
+
+    canVmDrop (value) {
+      // add 3 seconds delay to make sure vm drop won't fail if requested
+      // due to phone is still ringing.
+      if (value) {
+        this.setTimeout(() => {
+          this.isVmDropDisabled = value
+        }, 3000)
+
+        return
+      }
+
+      this.isVmDropDisabled = value
     }
   },
 
