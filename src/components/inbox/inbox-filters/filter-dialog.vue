@@ -447,16 +447,12 @@ export default {
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
-        console.log('create view', this.filter)
       } else if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter }
-        console.log('selected filter', this.filter)
       } else if (this.appliedFilter) {
         this.filter = { ...this.appliedFilter.filter }
-        console.log('applied filter', this.filter)
       } else {
         this.filter = _.pick(this.value, this.filterFields)
-        console.log('default', this.filter)
       }
 
       // fill in the value for the newly added filter in case it's not yet included
