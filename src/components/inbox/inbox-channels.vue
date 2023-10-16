@@ -327,6 +327,7 @@ export default {
       'activeChannel',
       'communications',
       'channelChangedFilterFields',
+      'selectedFilter',
       'appliedFilter',
       'hasMoreCommunications',
       'inboxShowMyContacts',
@@ -671,18 +672,15 @@ export default {
     }
 
     this.listeners.inboxLoadCommunications = (showMyContacts) => {
-      this.filter = this.filterMyContacts(this.filter, showMyContacts)
-
       if (this.filter.cursor !== undefined) {
         delete this.filter.cursor
       }
 
-      if (showMyContacts) {
-        this.filter.contact_owner = []
-        this.updateChannelChangedFilterFields({
-          name: 'contact_owner',
-          value: []
-        })
+      // only when both have it, update the saved filters
+      // when my contacts is toggled
+      if (this.selectedFilter && this.appliedFilter) {
+        this.$VueEvent.fire('my_contacts_update_filter')
+        return
       }
 
       this.isLoaded = false

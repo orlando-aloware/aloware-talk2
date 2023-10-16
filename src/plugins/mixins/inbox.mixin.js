@@ -336,7 +336,7 @@ export default {
         }
       }
 
-      if (filter && filter?.contact_owner && filter.contact_owner.length && !filter.my_contact) {
+      if (filter && filter?.contact_owner && filter.contact_owner.length && !this.inboxShowMyContacts) {
         this.filters = {
           ...this.filters,
           'contact_owner': [
@@ -345,11 +345,9 @@ export default {
         }
       }
 
-      if (filter && filter?.my_contact && filter.my_contact) {
-        query.my_contact = filter.my_contact
-      }
+      query.my_contact = this.inboxShowMyContacts
 
-      if ((filter && filter?.my_contact && filter.my_contact) || this.inboxShowMyContacts) {
+      if (query.my_contact) {
         this.filters = {
           ...this.filters,
           'contact_owner': [

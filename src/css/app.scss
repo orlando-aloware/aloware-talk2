@@ -7461,9 +7461,13 @@ table.datatable {
 
   .left-column-wrapper {
     border-right: 1px solid $grey-60;
-    padding-right: 10px;
     padding-left: 10px;
     width: 25%;
+
+    .left-column-wrapper-scrollable {
+      max-height: 85vh;
+      overflow: auto;
+    }
 
     .filter-group-title {
       font-size: 12px;
@@ -13059,7 +13063,7 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-        
+
         &.paused {
           border-color: $warning;
         }

@@ -259,6 +259,7 @@ export default {
       'hasMoreContacts',
       'isFetchingContacts',
       'channelChangedFilterFields',
+      'selectedFilter',
       'appliedFilter',
       'isLoadingOpenTaskCount',
       'isLoadingPendingTaskCount',
@@ -1233,14 +1234,11 @@ export default {
         return
       }
 
-      this.filter.my_contact = +showMyContacts // convert boolean to numeric
-
-      if (showMyContacts) {
-        this.filter.contact_owner = []
-        this.updateChannelChangedFilterFields({
-          name: 'contact_owner',
-          value: []
-        })
+      // only when both have it, update the saved filters
+      // when my contacts is toggled
+      if (this.selectedFilter && this.appliedFilter) {
+        this.$VueEvent.fire('my_contacts_update_filter')
+        return
       }
 
       this.loadContactTasks(true)
@@ -1280,6 +1278,10 @@ export default {
 
   watch: {
     $route (to, from) {
+      if (from.name === 'Inbox View' && to.name !== 'Inbox View') {
+        this.resetFilter()
+      }
+
       // load contacts if not inbox view related route
       if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
         this.loadContactTasks(false)

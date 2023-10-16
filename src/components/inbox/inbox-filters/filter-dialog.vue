@@ -16,59 +16,61 @@
            v-if="!isFilterDialogForView">
         <span class="filter-type-description">{{ channelFilterName }}</span>
 
-        <div class="mt-3">
-          <div class="mb-4">
-            <div class="filter-items cursor-pointer position-relative"
-                 v-bind:class="{ 'active' : !selectedFilter }"
-                 @click="setToNewFilter">
-              <div>
-                <span>New (Untitled)</span>
-                <span class="position-absolute check-icon"
-                      v-if="!selectedFilter">
-                  <check-o-icon color="#040404" />
-                </span>
+        <div class="mt-2">
+          <div class="left-column-wrapper-scrollable">
+            <div class="mb-4">
+              <div class="filter-items cursor-pointer position-relative"
+                   v-bind:class="{ 'active' : !selectedFilter }"
+                   @click="setToNewFilter">
+                <div>
+                  <span>New (Untitled)</span>
+                  <span class="position-absolute check-icon"
+                        v-if="!selectedFilter">
+                    <check-o-icon color="#040404" />
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
-          <div class="saved-filters">
-            <q-skeleton type="rect"
-                        v-if="isGettingFilters" />
-            <p class="text-muted fs-12 empty-filter-placeholder pl-2"
-               v-show="!isGettingFilters"
-               v-if="personalFilters.length < 1">
-              None
-            </p>
-            <filter-list-items :key="item.id"
-                               :filter="item"
-                               v-for="item in personalFilters"
-                               @filterSelected="onSelectFilter"
-                               @filterRename="onRenameFilter"
-                               @filterDelete="(e) => onDeleteFilter(e, item)">
-            </filter-list-items>
-          </div>
-          <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
-          <div class="saved-filters">
-            <q-skeleton type="rect"
-                        v-if="isGettingFilters" />
-            <p class="text-muted fs-12 empty-filter-placeholder pl-2"
-               v-show="!isGettingFilters"
-               v-if="companyFilters.length < 1">
-              None
-            </p>
+            <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
+            <div class="saved-filters">
+              <q-skeleton type="rect"
+                          v-if="isGettingFilters" />
+              <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+                 v-show="!isGettingFilters"
+                 v-if="personalFilters.length < 1">
+                None
+              </p>
+              <filter-list-items :key="item.id"
+                                 :filter="item"
+                                 v-for="item in personalFilters"
+                                 @filterSelected="onSelectFilter"
+                                 @filterRename="onRenameFilter"
+                                 @filterDelete="(e) => onDeleteFilter(e, item)">
+              </filter-list-items>
+            </div>
+            <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
+            <div class="saved-filters">
+              <q-skeleton type="rect"
+                          v-if="isGettingFilters" />
+              <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+                 v-show="!isGettingFilters"
+                 v-if="companyFilters.length < 1">
+                None
+              </p>
 
-            <div class="filter-items cursor-pointer"
-                 :class="getFilterItemClass(item)"
-                 :key="item.id"
-                 v-for="item in companyFilters"
-                 @click="onSelectFilter(item)">
-              <span>
-                <q-tooltip anchor="top middle"
-                           self="center middle">
+              <div class="filter-items cursor-pointer"
+                   :class="getFilterItemClass(item)"
+                   :key="item.id"
+                   v-for="item in companyFilters"
+                   @click="onSelectFilter(item)">
+                <span>
+                  <q-tooltip anchor="top middle"
+                             self="center middle">
+                    {{ item.name }}
+                  </q-tooltip>
                   {{ item.name }}
-                </q-tooltip>
-                {{ item.name }}
-              </span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -245,6 +247,12 @@ export default {
       if (filter.type === ChannelType.CHANNEL_INBOX && !exists) {
         this.inboxPersonalFilters.push(filter)
       }
+    })
+
+    this.$VueEvent.listen('my_contacts_update_filter', () => {
+      this.filter = { ...this.appliedFilter.filter }
+      this.filter.my_contact = +this.inboxShowMyContacts
+      this.onApply(true)
     })
   },
 
@@ -493,7 +501,7 @@ export default {
       this.setChannelClonedFilter(this.filter)
     },
 
-    onApply () {
+    onApply (skipChangedFields = false) {
       this.resetChannelChangedFilterFields()
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
 
@@ -501,46 +509,53 @@ export default {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
       }
 
-      const props = [
+      const booleanProps = [
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
         'has_unread'
       ]
+      const excludeProps = [
+        'my_contact'
+      ]
 
-      for (const item in this.filter) {
-        if (item === 'answer_status' && this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
-          continue
-        }
+      if (!skipChangedFields) {
+        for (const item in this.filter) {
+          if (item === 'answer_status' && this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
+            continue
+          }
 
-        const hasField = (this.filterFields.includes(item) && this.loadedDefaultFilterModel.filter.hasOwnProperty(item))
+          const hasField = (this.filterFields.includes(item) && this.loadedDefaultFilterModel.filter.hasOwnProperty(item))
 
-        // for boolean fields change tracking
-        if (props.includes(item) &&
-          +this.filter[item] !== +this.loadedDefaultFilterModel.filter[item] &&
-          hasField) {
-          this.updateChannelChangedFilterFields({
-            name: item,
-            value: +this.filter[item]
-          })
+          // for boolean fields change tracking
+          if (booleanProps.includes(item) &&
+            +this.filter[item] !== +this.loadedDefaultFilterModel.filter[item] &&
+            hasField) {
+            this.updateChannelChangedFilterFields({
+              name: item,
+              value: +this.filter[item]
+            })
 
-          continue
-        }
+            continue
+          }
 
-        // for non-boolean fields change tracking
-        if (!this.booleanFields.includes(item) &&
-          JSON.stringify(this.filter[item]) !== JSON.stringify(this.loadedDefaultFilterModel.filter[item]) &&
-          hasField) {
-          this.updateChannelChangedFilterFields({
-            name: item,
-            value: this.filter[item]
-          })
+          // for non-boolean fields change tracking
+          const filterItem = JSON.stringify(this.filter[item])
+          const loadedFilterItem = JSON.stringify(this.loadedDefaultFilterModel.filter[item])
+          if (!this.booleanFields.includes(item) && filterItem !== loadedFilterItem &&
+            hasField && !excludeProps.includes(item)) {
+            this.updateChannelChangedFilterFields({
+              name: item,
+              value: this.filter[item]
+            })
+          }
         }
       }
 
       // save filter changes
       const userScope = (this.selectedFilter?.scope === 'user' || !+this.selectedFilter?.is_on_company)
-      if (this.selectedFilter && userScope && this.filterHasChanges) {
+      const hasSelectedFilterChanges = this.selectedFilter && userScope && this.filterHasChanges
+      if (hasSelectedFilterChanges) {
         this.isUpdatingFilter = true
 
         this.updateFilter(this.selectedFilter, {
@@ -782,6 +797,8 @@ export default {
   },
 
   beforeDestroy () {
+    this.$VueEvent.stop('channel_filter_created')
+    this.$VueEvent.stop('my_contacts_update_filter')
     clearTimeout(this.inputTimeout)
   }
 }
