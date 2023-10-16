@@ -84,10 +84,10 @@
                     tabindex="0"
                     block
                     @click="syncGHL">
-            <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
+            <i class="fa fa-sync-alt"
+               v-if="!isSyncing"/>
             <q-spinner-bars v-if="isSyncing"
-                            color="white">
-            </q-spinner-bars>
+                            color="white"/>
             {{ isSyncing ? 'Syncing...' : 'Sync with GoHighLevel' }}
             <q-tooltip anchor="center start"
                        self="center left"

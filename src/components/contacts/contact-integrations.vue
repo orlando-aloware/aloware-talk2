@@ -12,10 +12,10 @@
                          :contact="contact"/>
 
     <integration-pipedrive v-if="isPipedriveEnabled"
-                         :contact="contact"/>
+                           :contact="contact"/>
 
     <integration-gohighlevel v-if="isGHLEnabled"
-                           :contact="contact"/>
+                             :contact="contact"/>
 
     <contact-crm-links :contact="contact"/>
   </b-card>
