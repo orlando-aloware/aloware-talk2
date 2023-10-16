@@ -476,9 +476,14 @@
             title="Confirmation"
             prefix="3"
             :name="3"
-            :done="step > 2">
+            :done="isSubmitted">
             <div class="min-h-60 flex items-center">
-              <div>
+              <div v-if="!isSubmitted">
+                <div
+                  id="recaptcha-element"
+                  class="g-recaptcha pb-2"/>
+              </div>
+              <div v-else>
                 <img
                   src="app-icons/misc/clock.svg"
                   alt="clock" />
@@ -496,7 +501,7 @@
 
           <template v-slot:navigation>
             <q-stepper-navigation
-              v-if="step === 1 || step === 2"
+              v-if="(step === 1 || step === 2 || step === 3) && !isSubmitted"
               class="flex w-100"
               :class="{
                 'justify-end': step === 1,
@@ -527,7 +532,7 @@
                 unelevated
                 :disabled="isNextButtonDisabled"
                 @click="$refs.stepper.next()"
-                v-if="step === 1"
+                v-if="step < 3"
               />
               <q-btn
                 class="q-mx-xl account-registration-action-btn"
@@ -540,7 +545,7 @@
                 unelevated
                 :disabled="isNextButtonDisabled"
                 @click="submit"
-                v-if="step === 2"
+                v-if="step === 3"
               />
             </q-stepper-navigation>
           </template>
@@ -562,12 +567,14 @@
 </template>
 
 <script>
+import { recaptchaMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
 
 export default {
   name: 'account-registration',
+  mixins: [recaptchaMixin],
   data () {
     return {
       step: 1,
@@ -620,6 +627,7 @@ export default {
       // },
       password_validation: [],
       show_password: false,
+      isSubmitted: false,
       businessTypes,
       businessIdTypes,
       regionsOfOperations
@@ -628,13 +636,23 @@ export default {
 
   computed: {
     isNextButtonDisabled () {
-      return (this.step === 1 && !this.validateFirstStepFieldsFilled()) || (this.step === 2 && !this.validateSecondStepFieldsFilled())
+      return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
+        (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
+        (this.step === 3 && this.disabledSubmit)
+    },
+    shouldShowStepperNavigation () {
+      return (this.step === 1 || this.step === 2 || this.step === 3) && !this.isSubmitted
     }
   },
 
   watch: {
     'form.password' () {
       this.validateAllPasswordRules()
+    },
+    step (newStep) {
+      if (newStep === 3 && !this.$q.platform.is.electron) {
+        this.initRecaptcha()
+      }
     }
   },
 
@@ -766,9 +784,37 @@ export default {
       }
     },
 
+    onCaptchaVerified (response) {
+      this.disabledSubmit = false
+
+      if (!this.$q.platform.is.electron) {
+        this.user.recaptchaResponse = response
+      }
+    },
+
+    initRecaptcha () {
+      if (!this.$q.platform.is.electron) {
+        this.disabledSubmit = true
+
+        window.recaptchaOnloadCallback = () => {
+          if (document.querySelector('#recaptcha-element')) {
+            window.grecaptcha.render('recaptcha-element', {
+              sitekey: this.siteKey,
+              callback: this.onCaptchaVerified
+            })
+          }
+        }
+
+        this.loadRecaptchaScript()
+        return
+      }
+
+      this.disabledSubmit = false
+    },
+
     submit () {
       console.log('submit', this.form)
-      this.step++
+      this.isSubmitted = true
     }
   },
 
