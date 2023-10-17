@@ -1,7 +1,11 @@
 <template>
   <div class="stepper__content__header">
+    <img
+      :src="icon"
+      alt="icon"
+      v-if="icon"/>
     <h4 class="text-h4 text-weight-bold">{{ title }}</h4>
-    <p class="text-body1 w-65">
+    <p class="text-body1">
       {{ description }}
     </p>
   </div>
@@ -16,6 +20,10 @@ export default {
       default: ''
     },
     description: {
+      type: String,
+      default: ''
+    },
+    icon: {
       type: String,
       default: ''
     }
