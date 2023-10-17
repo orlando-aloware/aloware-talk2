@@ -1,0 +1,28 @@
+<template>
+  <div class="stepper__content__header">
+    <h4 class="text-h4 text-weight-bold">{{ title }}</h4>
+    <p class="text-body1 w-65">
+      {{ description }}
+    </p>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'StepHeader',
+  props: {
+    title: {
+      type: String,
+      default: ''
+    },
+    description: {
+      type: String,
+      default: ''
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+
+</style>
