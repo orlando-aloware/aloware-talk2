@@ -300,6 +300,10 @@ export default {
   },
 
   methods: {
+    selectOption (option) {
+      this.selectedId = option.id
+    },
+
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
