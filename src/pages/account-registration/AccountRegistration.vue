@@ -136,7 +136,7 @@
                       label="Repeat your Password"
                       placeholder="Type your password again"
                       is-password
-                      v-model="form.repeat_password"
+                      v-model="form.password_confirmation"
                     >
                       <template
                         v-slot:hint
@@ -145,12 +145,12 @@
                           <li>
                             <q-icon
                               class="q-mr-xs"
-                              :class="getPasswordRuleClass(validatePasswordMatch(form.repeat_password))"
-                              :name="iconForValidation(validatePasswordMatch(form.repeat_password))"
+                              :class="getPasswordRuleClass(validatePasswordMatch(form.password_confirmation))"
+                              :name="iconForValidation(validatePasswordMatch(form.password_confirmation))"
                             >
                             </q-icon>
                             {{
-                              validatePasswordMatch(form.repeat_password)
+                              validatePasswordMatch(form.password_confirmation)
                                 ? 'The passwords match'
                                 : "The passwords doesn't match"
                             }}
@@ -177,116 +177,106 @@
 
             <div class="stepper__content">
               <div class="min-w-100">
-                <div class="flex justify-center  pt-4">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Business Name
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="Business Name"
                       placeholder="Aloware Inc."
-                      rounded
-                      outlined
-                      v-model="form.business_name"
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      v-model="form.legal_name"
                     />
-                  </div>
 
-                  <div class="col-5 pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Business Type
-                    </label>
-                    <q-select
-                      placeholder="Select"
-                      rounded
-                      outlined
-                      map-options
-                      option-label="value"
-                      option-value="value"
-                      :options="businessTypes"
-                      v-model="form.business_type"
-                    />
-                    <div class="flex items-center">
-                      <label class="flex mb-1 text-weight-bold pl-3 pr-4">
-                        Company Status
-                      </label>
-                      <q-btn-toggle
-                        class="toggle-border"
-                        toggle-color="primary"
-                        color="white"
-                        text-color="#4F4F4F"
-                        spread
-                        no-caps
-                        unelevated
-                        dense
-                        rounded
-                        :options="[
-                          { label: 'Private', value: 'private' },
-                          { label: 'Public', value: 'public' }
-                        ]"
-                        v-model="form.company_status"
+                    <div class="col-5 pr-0 pl-0">
+                      <select-field
+                        label="Business Type"
+                        option-label="value"
+                        option-value="value"
+                        col-md="col-md-12"
+                        :paddingClasses="isLargeScreen ? 'q-pr-0 q-pl-0' : ''"
+                        :options="businessTypes"
+                        v-model="form.business_type"
                       />
+                      <div class="flex items-center">
+                        <label class="flex mb-1 text-weight-bold pl-3 pr-4">
+                          Company Status
+                        </label>
+                        <q-btn-toggle
+                          class="toggle-border"
+                          toggle-color="primary"
+                          color="white"
+                          text-color="#4F4F4F"
+                          spread
+                          no-caps
+                          unelevated
+                          dense
+                          rounded
+                          :options="[
+                            { label: 'Private', value: 1 },
+                            { label: 'Public', value: 2 }
+                          ]"
+                          v-model="form.company_status"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </template>
+                </input-group>
 
-                <div class="flex justify-center  pt-4">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Business ID Type
-                    </label>
-                    <q-select
-                      placeholder="Select"
-                      rounded
-                      outlined
-                      map-options
+                <input-group>
+                  <template v-slot:content>
+                    <select-field
+                      label="Business ID Type"
                       option-label="label"
                       option-value="value"
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       :options="businessIdTypes"
-                      v-model="form.business_id_type"
+                      v-model="form.business_registration_identifier"
                     />
-                  </div>
 
-                  <div class="col-5 pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Business Registration Number
-                    </label>
-                    <q-input
+                    <input-field
+                      label="Business Registration Number"
                       placeholder="Ex: C1234567"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       v-model="form.business_registration_number"
                     />
-                  </div>
-                </div>
+                  </template>
+                </input-group>
 
-                <div class="flex justify-center  pt-4">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Region of Operation
-                    </label>
-                    <q-select
-                      placeholder="Select"
-                      rounded
-                      outlined
-                      map-options
+                <input-group>
+                  <template v-slot:content>
+                    <select-field
+                      label="Region of Operation"
                       option-label="label"
                       option-value="value"
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       :options="regionsOfOperations"
-                      v-model="form.region_of_operation"
+                      v-model="form.business_regions_of_operation"
                     />
-                  </div>
 
-                  <div class="col-5 pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Website URL
-                    </label>
-                    <q-input
+                    <input-field
+                      label="Website URL"
                       placeholder="Ex: yourcompany.com"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       v-model="form.website_url"
                     />
-                  </div>
-                </div>
+                  </template>
+                </input-group>
+
+                <input-group>
+                  <template v-slot:content>
+                    <select-field
+                      label="Business Industry"
+                      option-label="name"
+                      option-value="value"
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      :options="businessIndustries"
+                      v-model="form.business_industry"
+                    />
+
+                    <div
+                      class="col-5"
+                      v-if="isLargeScreen"/>
+                  </template>
+                </input-group>
 
                 <div class="flex justify-center  pt-4 q-row">
                   <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
@@ -295,86 +285,81 @@
                   <div class="col-5" />
                 </div>
 
-                <div class="flex justify-center  pt-4">
-                  <div class="col-10">
-                    <label class="flex mb-1 text-weight-medium"> Street </label>
-                    <q-input
-                      placeholder="Ex:"
-                      rounded
-                      outlined
-                      v-model="form.business_address.street"
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="Street"
+                      placeholder="Ex: Fifth Avenue"
+                      col-md="col-md-10"
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      v-model="form.street"
                     />
-                  </div>
-                </div>
+                  </template>
+                </input-group>
 
-                <div class="flex justify-center pt-4">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      State/Province/Region
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="State/Province/Region"
                       placeholder="Ex: California"
-                      rounded
-                      outlined
-                      v-model="form.business_address.state"
+                      v-model="form.region"
                     />
-                  </div>
 
-                  <div class="col-5 pl-4">
-                    <label class="flex mb-1 text-weight-medium"> City </label>
-                    <q-input
+                    <input-field
+                      label="City"
                       placeholder="Ex: Los Angeles"
-                      rounded
-                      outlined
-                      v-model="form.business_address.city"
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      v-model="form.city"
                     />
-                  </div>
-                </div>
+                  </template>
+                </input-group>
 
-                <div class="flex justify-center pt-4">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Country
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <!-- <input-field
+                      label="legal_country"
                       placeholder="Ex: United States"
-                      rounded
-                      outlined
-                      v-model="form.business_address.country"
-                    />
-                  </div>
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      v-model="form.legal_country"
+                    /> -->
 
-                  <div class="col-5 pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Postal Code
-                    </label>
-                    <q-input
+                    <select-field
+                      label="Country"
+                      placeholder="Ex: United States"
+                      option-label="name"
+                      option-value="id"
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      :options="countries"
+                      v-model="form.legal_country"
+                    />
+
+                    <input-field
+                      label="Postal Code"
                       placeholder="Ex: 11223"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       bottom-slots
-                      v-model="form.business_address.zip_code"
+                      v-model="form.postal_code"
                     >
                       <template
                         v-slot:hint
-                        v-if="form.business_address.zip_code.length">
+                        v-if="form.postal_code.length">
                         <div class="zipcode-hint">
                           <q-icon
                             class="q-mr-xs"
-                            :class="getZipCodeRuleClass(validateZipCode(form.business_address.zip_code))"
-                            :name="iconForValidation(validateZipCode(form.business_address.zip_code))"
+                            :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
+                            :name="iconForValidation(validateZipCode(form.postal_code))"
                           >
                           </q-icon>
                             {{
-                              validateZipCode(form.business_address.zip_code)
+                              validateZipCode(form.postal_code)
                                 ? 'The Postal Code is valid'
                                 : 'Please enter a valid Postal Code'
                             }}
                         </div>
                       </template>
-                    </q-input>
-                  </div>
-                </div>
+                    </input-field>
+                  </template>
+                </input-group>
               </div>
             </div>
           </q-step>
@@ -402,7 +387,7 @@
                       color="primary"
                       label="I agree to Terms and Conditions and fair use."
                       dense
-                      v-model="form.accepted_terms_and_conditions"
+                      v-model="form.agreed_to_terms"
                     />
                     <div
                       id="recaptcha-element"
@@ -491,16 +476,19 @@ import { recaptchaMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
+import businessIndustries from '../../constants/account-registration-business-industries'
 import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
+import SelectField from 'src/components/account-registration/select-field.vue'
 
 export default {
   name: 'account-registration',
   components: {
     StepHeader,
     InputGroup,
-    InputField
+    InputField,
+    SelectField
   },
   mixins: [recaptchaMixin],
   data () {
@@ -513,23 +501,23 @@ export default {
         phone_number: '+1 222 333 4444',
         job_title: 'CTO',
         password: 'SomeText!2',
-        repeat_password: 'SomeText!2',
+        password_confirmation: 'SomeText!2',
 
-        business_name: 'Aloware Inc.',
+        legal_name: 'Aloware Inc.',
         business_type: 'Partnership',
-        company_status: 'public',
-        business_id_type: 'BIN',
+        company_status: 1,
+        business_registration_identifier: 'BIN',
         business_registration_number: 'C1234567',
-        region_of_operation: 'USA_AND_CANADA',
+        business_regions_of_operation: 'USA_AND_CANADA',
+        business_industry: 'Software',
         website_url: 'aloware.com',
-        business_address: {
-          street: 'Fifth Avenue',
-          state: 'San Francisco',
-          city: 'California',
-          country: 'United States',
-          zip_code: '11223'
-        },
-        accepted_terms_and_conditions: false
+        street: 'Fifth Avenue',
+        region: 'San Francisco',
+        city: 'California',
+        legal_country: 'US',
+        postal_code: '11223',
+        agreed_to_terms: false,
+        timezone: 'America/Los_Angeles'
       },
       // form: {
       //   first_name: '',
@@ -538,29 +526,29 @@ export default {
       //   phone_number: '',
       //   job_title: '',
       //   password: '',
-      //   repeat_password: '',
-      //   business_name: '',
+      //   password_confirmation: '',
+      //   legal_name: '',
       //   business_type: '',
-      //   company_status: 'public',
-      //   business_id_type: '',
+      //   company_status: 1,
+      //   business_registration_identifier: '',
       //   business_registration_number: '',
-      //   region_of_operation: '',
+      //   business_regions_of_operation: '',
       //   website_url: '',
-      //   business_address: {
-      //     street: '',
-      //     state: '',
-      //     city: '',
-      //     country: '',
-      //     zip_code: ''
-      //   },
-      //   accepted_terms_and_conditions: false
+      //   street: '',
+      //   region: '',
+      //   city: '',
+      //   legal_country: '',
+      //   postal_code: '',
+      //   agreed_to_terms: false
+      //   timezone: 'America/Los_Angeles'
       // },
       password_validation: [],
       show_password: false,
       isSubmitted: false,
       businessTypes,
       businessIdTypes,
-      regionsOfOperations
+      regionsOfOperations,
+      businessIndustries
     }
   },
 
@@ -568,13 +556,30 @@ export default {
     isNextButtonDisabled () {
       return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
         (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
-        (this.step === 3 && (this.disabledSubmit || !this.form.accepted_terms_and_conditions))
+        (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms))
     },
     shouldShowStepperNavigation () {
       return (this.step === 1 || this.step === 2 || this.step === 3) && !this.isSubmitted
     },
     isLargeScreen () {
       return this.$q.screen.width > 767
+    },
+    countries () {
+      const countries = window.CountriesAndTimezones.getAllCountries()
+
+      // first exclude US & CA, and then extract only id, name fields of the countries
+      const countriesArr = Object.values(countries)
+        .filter(({ id }) => id !== 'US' && id !== 'CA')
+        .map(({ id, name }) => {
+          return { id, name }
+        })
+
+      // add US & CA to the top and return
+      return [
+        { id: 'US', name: 'United States' },
+        { id: 'CA', name: 'Canada' },
+        ...countriesArr
+      ]
     }
   },
 
@@ -586,6 +591,9 @@ export default {
       if (newStep === 3 && !this.$q.platform.is.electron) {
         this.initRecaptcha()
       }
+    },
+    'form.legal_country' () {
+      this.setTimezone()
     }
   },
 
@@ -649,24 +657,25 @@ export default {
         this.validatePhoneNumber(this.form.phone_number) === true &&
         this.form.job_title.length &&
         this.form.password.length &&
-        this.form.repeat_password.length &&
+        this.form.password_confirmation.length &&
         this.password_validation.length === 4
       )
     },
 
     validateSecondStepFieldsFilled () {
       return (
-        this.form.business_name.length &&
+        this.form.legal_name.length &&
         this.form.business_type &&
-        this.form.business_id_type &&
+        this.form.business_registration_identifier &&
         this.form.business_registration_number.length &&
-        this.form.region_of_operation &&
+        this.form.business_regions_of_operation &&
+        this.form.business_industry &&
         this.form.website_url.length &&
-        this.form.business_address.street.length &&
-        this.form.business_address.state.length &&
-        this.form.business_address.city.length &&
-        this.form.business_address.country.length &&
-        this.validateZipCode(this.form.business_address.zip_code)
+        this.form.street.length &&
+        this.form.region.length &&
+        this.form.city.length &&
+        this.form.legal_country &&
+        this.validateZipCode(this.form.postal_code)
       )
     },
 
@@ -717,6 +726,12 @@ export default {
       }
     },
 
+    setTimezone () {
+      const country = this.form.legal_country
+      const timezone = window.CountriesAndTimezones.getTimezonesForCountry(country.id)[0]
+      this.form.timezone = timezone.name
+    },
+
     onCaptchaVerified (response) {
       console.log('onCaptchaVerified', response)
       this.disabledSubmit = false
@@ -727,8 +742,18 @@ export default {
     },
 
     submit () {
-      console.log('submit', this.form)
       this.isSubmitted = true
+
+      const payload = {
+        ...this.form,
+        business_type: this.form.business_type.value,
+        business_registration_identifier: this.form.business_registration_identifier.value,
+        business_regions_of_operation: this.form.business_regions_of_operation.value,
+        business_industry: this.form.business_industry.value,
+        legal_country: this.form.legal_country.id
+      }
+
+      console.log('submit', payload)
     }
   },
 
@@ -841,9 +866,11 @@ export default {
   }
 
   .zipcode-hint {
-    padding-top: 4px;
+    padding-top: 0;
+    padding-left: 10px;
     font-size: 14px;
     color: #000000;
+    text-align: left;
   }
 
   .banner {
