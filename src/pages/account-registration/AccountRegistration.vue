@@ -20,14 +20,10 @@
             :name="1"
             :done="step > 1"
           >
-            <div class="stepper__content__header">
-              <h4 class="text-h4 text-weight-bold">Welcome to Aloware!</h4>
-              <p class="text-body1 w-65">
-                We are thrilled for you to better communicate with your
-                customers today. In these 4 simple steps, we need important
-                information to get you going
-              </p>
-            </div>
+            <step-header
+              title="Welcome to Aloware!"
+              description="We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going"
+            />
 
             <div class="stepper__content">
               <div class="min-w-100">
@@ -260,13 +256,11 @@
             prefix="2"
             :name="2"
             :done="step > 2">
-            <div class="stepper__content__header">
-              <h4 class="text-h4 text-weight-bold">Your Business</h4>
-              <p class="text-body1">
-                Great! Now, we need important information to verify your
-                business.
-              </p>
-            </div>
+
+            <step-header
+              title="Your Business"
+              description="Great! Now, we need important information to verify your business."
+            />
 
             <div class="stepper__content">
               <div class="min-w-100">
@@ -479,12 +473,10 @@
             :done="isSubmitted">
             <div class="min-h-60 flex items-center">
               <div v-if="!isSubmitted">
-                <div class="stepper__content__header">
-                  <h4 class="text-h4 text-weight-bold">Confirmation</h4>
-                  <p class="text-body1 w-65">
-                    Please read our Terms and Conditions before proceeding. By checking the boxes below, you indicate that you have read, understood, and agree to the Terms and Conditions.
-                  </p>
-                </div>
+                <step-header
+                  title="Confirmation"
+                  description="Please read our Terms and Conditions before proceeding. By checking the boxes below, you indicate that you have read, understood, and agree to the Terms and Conditions."
+                />
                 <iframe
                   sandbox="allow-same-origin"
                   class="terms-iframe mt-2 mb-2"
@@ -593,9 +585,13 @@ import { recaptchaMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
+import StepHeader from 'src/components/account-registration/step-header.vue'
 
 export default {
   name: 'account-registration',
+  components: {
+    StepHeader
+  },
   mixins: [recaptchaMixin],
   data () {
     return {
@@ -646,7 +642,8 @@ export default {
       //     city: '',
       //     country: '',
       //     zip_code: ''
-      //   }
+      //   },
+      //   accepted_terms_and_conditions: false
       // },
       password_validation: [],
       show_password: false,
