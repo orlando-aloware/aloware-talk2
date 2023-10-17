@@ -310,26 +310,10 @@ export default {
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
 
       // add the line filter if there is
-      if (filter && filter?.campaigns) {
-        let filterParam = null
-
-        // line filter's value can be single and multiple
-        if (filter.campaigns?.constructor.name === 'Array' && filter.campaigns.length) {
-          filterParam = [
-            { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
-          ]
-        } else if (filter.campaigns?.constructor.name === 'Number') {
-          filterParam = [
-            { value: [filter.campaigns], operator: OPERATORS.IS_ANY_OF }
-          ]
-        }
-
-        if (!isEmpty(filterParam)) {
-          this.filters = {
-            ...this.filters,
-            'lines': filterParam
-          }
-        }
+      if (filter && !isEmpty(filter?.campaigns)) {
+        this.filters.lines = [
+          { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
+        ]
       }
 
       if (filter && filter?.ring_groups && filter.ring_groups.length) {
