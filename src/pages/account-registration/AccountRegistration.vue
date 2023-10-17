@@ -479,9 +479,31 @@
             :done="isSubmitted">
             <div class="min-h-60 flex items-center">
               <div v-if="!isSubmitted">
-                <div
-                  id="recaptcha-element"
-                  class="g-recaptcha pb-2"/>
+                <div class="stepper__content__header">
+                  <h4 class="text-h4 text-weight-bold">Confirmation</h4>
+                  <p class="text-body1 w-65">
+                    Please read our Terms and Conditions before proceeding. By checking the boxes below, you indicate that you have read, understood, and agree to the Terms and Conditions.
+                  </p>
+                </div>
+                <iframe
+                  sandbox="allow-same-origin"
+                  class="terms-iframe mt-2 mb-2"
+                  src="https://aloware.com/terms-and-conditions?embedded=1">
+                </iframe>
+                <div class="accept-box">
+                  <div>
+                    <q-checkbox
+                      class="mb-4 pl-2"
+                      color="primary"
+                      label="I agree to Terms and Conditions and fair use."
+                      dense
+                      v-model="form.accepted_terms_and_conditions"
+                    />
+                    <div
+                      id="recaptcha-element"
+                      class="g-recaptcha pb-2"/>
+                  </div>
+                </div>
               </div>
               <div v-else>
                 <img
@@ -600,7 +622,8 @@ export default {
           city: 'California',
           country: 'United States',
           zip_code: '11223'
-        }
+        },
+        accepted_terms_and_conditions: false
       },
       // form: {
       //   first_name: '',
@@ -638,7 +661,7 @@ export default {
     isNextButtonDisabled () {
       return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
         (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
-        (this.step === 3 && this.disabledSubmit)
+        (this.step === 3 && (this.disabledSubmit || !this.form.accepted_terms_and_conditions))
     },
     shouldShowStepperNavigation () {
       return (this.step === 1 || this.step === 2 || this.step === 3) && !this.isSubmitted
@@ -785,31 +808,12 @@ export default {
     },
 
     onCaptchaVerified (response) {
+      console.log('onCaptchaVerified', response)
       this.disabledSubmit = false
 
       if (!this.$q.platform.is.electron) {
         this.user.recaptchaResponse = response
       }
-    },
-
-    initRecaptcha () {
-      if (!this.$q.platform.is.electron) {
-        this.disabledSubmit = true
-
-        window.recaptchaOnloadCallback = () => {
-          if (document.querySelector('#recaptcha-element')) {
-            window.grecaptcha.render('recaptcha-element', {
-              sitekey: this.siteKey,
-              callback: this.onCaptchaVerified
-            })
-          }
-        }
-
-        this.loadRecaptchaScript()
-        return
-      }
-
-      this.disabledSubmit = false
     },
 
     submit () {
@@ -1067,6 +1071,50 @@ export default {
 
   .min-h-60 {
     min-height: 60vh;
+  }
+
+  .terms-iframe {
+    border: 0;
+    width: 100%;
+    height: 30vh; /* Default iframe height */
+    padding-bottom: 20px;
+  }
+
+  @include screen('xs') {
+    .terms-iframe {
+      height: 30vh;
+    }
+  }
+
+  @include screen('sm') {
+    .terms-iframe {
+      height: 30vh;
+      padding-right: 3rem;
+      padding-left: 3rem;
+    }
+  }
+
+  @include screen('md') {
+    .terms-iframe {
+      height: 30vh;
+      padding-right: 3rem;
+      padding-left: 3rem;
+    }
+  }
+
+  @include screen('lg') {
+    .terms-iframe {
+      height: 30vh;
+      padding-right: 3rem;
+      padding-left: 3rem;
+    }
+  }
+
+  .accept-box {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 2.8rem;
   }
 }
 </style>
