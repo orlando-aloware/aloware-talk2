@@ -27,76 +27,59 @@
 
             <div class="stepper__content">
               <div class="min-w-100">
-                <div class="flex justify-center pt-4 q-row">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pr-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      First Name
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="First Name"
                       placeholder="Type your first name"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       v-model="form.first_name"
                     />
-                  </div>
 
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Last Name
-                    </label>
-                    <q-input
+                    <input-field
+                      label="Last Name"
                       placeholder="Type your last name"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       v-model="form.last_name"
                     />
-                  </div>
-                </div>
+                  </template>
+                </input-group>
 
-                <div class="flex justify-center pt-4 q-row">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Email Address
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="Email Address"
                       placeholder="youremail@domain.com"
                       type="email"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       :rules="[validateEmail]"
                       v-model="form.email"
                     />
-                  </div>
 
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Phone Number
-                    </label>
-                    <q-input
+                    <input-field
+                      label="Phone Number"
                       placeholder="+1 222 333 4444"
                       mask="+# ### ### ####"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       :rules="[validatePhoneNumber]"
                       v-model="form.phone_number"
                     />
-                  </div>
-                </div>
+                  </template>
+                </input-group>
 
-                <div class="flex justify-center pt-4 q-row">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Job Title
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="Job Title"
                       placeholder="Ex. CEO, CTO, Product Director"
-                      rounded
-                      outlined
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       v-model="form.job_title"
                     />
-                  </div>
-                  <div class="col-5" />
-                </div>
+                    <div
+                      class="col-5"
+                      v-if="isLargeScreen"/>
+                  </template>
+                </input-group>
 
                 <div class="flex justify-center pt-4 q-row">
                   <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
@@ -105,31 +88,19 @@
                   <div class="col-5" />
                 </div>
 
-                <div class="flex justify-center  pt-4 q-row">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <label class="flex mb-1 text-weight-medium">
-                      Create a Password
-                    </label>
-                    <q-input
+                <input-group>
+                  <template v-slot:content>
+                    <input-field
+                      label="Create a Password"
                       placeholder="Type here"
-                      rounded
-                      outlined
-                      bottom-slots
-                      :type="show_password ? 'text' : 'password'"
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      is-password
                       v-model="form.password"
                     >
-                      <template v-slot:append>
-                        <q-icon
-                          class="cursor-pointer"
-                          :name="show_password ? 'visibility_off' : 'visibility'"
-                          @click="show_password = !show_password"
-                        />
-                      </template>
-
                       <template
                         v-slot:hint
                         v-if="form.password">
-                        <ul class="flex pl-1 text-weight-regular password-hint">
+                        <ul class="text-left pl-2 text-weight-regular password-hint">
                           <li>
                             <q-icon
                               class="q-mr-xs"
@@ -159,32 +130,18 @@
                           </li>
                         </ul>
                       </template>
-                    </q-input>
-                  </div>
-                  <div class="col-5 pl-4 pb-5">
-                    <label class="flex mb-1 text-weight-medium">
-                      Repeat your Password
-                    </label>
-                    <q-input
+                    </input-field>
+
+                    <input-field
+                      label="Repeat your Password"
                       placeholder="Type your password again"
-                      rounded
-                      outlined
-                      bottom-slots
-                      :type="show_password ? 'text' : 'password'"
+                      is-password
                       v-model="form.repeat_password"
                     >
-                      <template v-slot:append>
-                        <q-icon
-                          class="cursor-pointer"
-                          :name="
-                            show_password ? 'visibility_off' : 'visibility'
-                          "
-                          @click="show_password = !show_password"
-                        />
-                      </template>
-
-                      <template v-slot:hint v-if="form.password.length > 0">
-                        <ul class="flex pl-1 text-weight-regular password-hint">
+                      <template
+                        v-slot:hint
+                        v-if="form.password.length > 0">
+                        <ul class="text-left pl-2 text-weight-regular password-hint">
                           <li>
                             <q-icon
                               class="q-mr-xs"
@@ -200,54 +157,10 @@
                           </li>
                         </ul>
                       </template>
-                    </q-input>
-                  </div>
-                </div>
+                    </input-field>
+                  </template>
+                </input-group>
               </div>
-
-              <!-- <div class="flex justify-center ">
-                <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                  <ul class="flex mb-1 pl-3 text-weight-regular password-hint">
-                    <li>
-                      <q-icon
-                        class="q-mr-xs"
-                        :class="getPasswordRuleClass(validatePasswordLength(form.password))"
-                        :name="iconForValidation(validatePasswordLength(form.password))">
-                      </q-icon>
-                      8 characters long
-                    </li>
-                    <li>
-                      <q-icon
-                        class="q-mr-xs"
-                        :class="getPasswordRuleClass(validatePasswordCases(form.password))"
-                        :name="iconForValidation(validatePasswordCases(form.password))">
-                      </q-icon>
-                      Must contain upper and lower case letters
-                    </li>
-                    <li>
-                      <q-icon
-                        class="q-mr-xs"
-                        :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
-                        :name="iconForValidation(validatePasswordDigit(form.password))">
-                      </q-icon>
-                      Include at least one numerical digit
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                  <ul class="flex mb-1 pl-4 text-weight-regular password-hint">
-                    <li>
-                      <q-icon
-                        class="q-mr-xs"
-                        :class="getPasswordRuleClass(validatePasswordLength(form.password))"
-                        :name="iconForValidation(validatePasswordLength(form.password))">
-                      </q-icon>
-                      The passwords doesn't match
-                    </li>
-                  </ul>
-                </div>
-              </div> -->
             </div>
           </q-step>
 
@@ -498,17 +411,10 @@
                 </div>
               </div>
               <div v-else>
-                <img
-                  src="app-icons/misc/clock.svg"
-                  alt="clock" />
-                <h4 class="text-h4 text-weight-bold">
-                  Verification
-                </h4>
-                <p class="text-body1 w-65">
-                  Thanks for sending us your information. We are reviewing it now.
-                  Once validated, we will send you an email with instructions for
-                  logging into your account.
-                </p>
+                <step-header
+                  title="Verification"
+                  description="Thanks for sending us your information. We are reviewing it now. Once validated, we will send you an email with instructions for logging into your account."
+                  icon="app-icons/misc/clock.svg"/>
               </div>
             </div>
           </q-step>
@@ -586,11 +492,15 @@ import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
 import StepHeader from 'src/components/account-registration/step-header.vue'
+import InputGroup from 'src/components/account-registration/input-group.vue'
+import InputField from 'src/components/account-registration/input-field.vue'
 
 export default {
   name: 'account-registration',
   components: {
-    StepHeader
+    StepHeader,
+    InputGroup,
+    InputField
   },
   mixins: [recaptchaMixin],
   data () {
@@ -662,6 +572,9 @@ export default {
     },
     shouldShowStepperNavigation () {
       return (this.step === 1 || this.step === 2 || this.step === 3) && !this.isSubmitted
+    },
+    isLargeScreen () {
+      return this.$q.screen.width > 767
     }
   },
 
@@ -857,17 +770,61 @@ export default {
   }
 
   .text-h4 {
-    font-size: 2.5rem !important;
+    font-size: 2.5rem;
+  }
+
+  @include screen('xs') {
+    .text-h4 {
+      font-size: 20px;
+    }
+  }
+
+  @include screen('sm') {
+    .text-h4 {
+      font-size: 20px;
+    }
+  }
+
+  @include screen('md') {
+    .text-h4 {
+      font-size: 2.5rem;
+    }
   }
 
   .text-h5 {
     text-align: start;
+
     font-size: 1.25rem !important;
   }
 
   .text-body1 {
-    font-size: 1.25rem !important;
+    font-size: 1.25rem;
     margin-top: 28px;
+    width: 65%;
+  }
+
+  @include screen('xs') {
+    .text-body1 {
+      font-size: 14px;
+      margin-top: 10px;
+      width: 100%;
+    }
+  }
+
+  @include screen('sm') {
+    .text-body1 {
+      font-size: 14px;
+      margin-top: 10px;
+      width: 100%;
+    }
+  }
+
+  @include screen('md') {
+    .text-body1 {
+      font-size: 1.25rem;
+      margin-top: 28px;
+      width: 65%;
+    }
   }
 
   .password-hint {
@@ -967,21 +924,35 @@ export default {
       background-color: white;
       padding: 0 16px 16px;
       z-index: 10;
+
+      @include screen('xs') {
+        padding: 0 16px 0;
+      }
+
+      @include screen('sm') {
+        padding: 0 16px 0;
+
+      }
     }
   }
 
-  // Breakpoints
   @include screen('xs') {
     .banner {
       display: none !important;
     }
 
-    .q-stepper__header {
-      max-width: 100%;
-    }
     .stepper__container {
       display: flex;
       text-align: -webkit-center;
+
+      .q-stepper__header,
+      .stepper__content__header {
+        max-width: 100%;
+        position: relative;
+        z-index: 10;
+        background-color: white;
+        font-size: 10px
+      }
     }
   }
 
@@ -993,6 +964,20 @@ export default {
     .stepper__container {
       display: flex;
       text-align: -webkit-center;
+
+      .stepper__container {
+      display: flex;
+      text-align: -webkit-center;
+
+      .q-stepper__header,
+      .stepper__content__header {
+        max-width: 100%;
+        position: relative;
+        z-index: 10;
+        background-color: white;
+        font-size: 10px;
+      }
+    }
     }
   }
 
