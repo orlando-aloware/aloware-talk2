@@ -1,10 +1,12 @@
 <template>
   <div class="stepper__content__header">
     <img
-      :src="icon"
       alt="icon"
+      :src="icon"
       v-if="icon"/>
-    <h4 class="text-h4 text-weight-bold">{{ title }}</h4>
+    <h4 class="text-h4 text-weight-bold">
+      {{ title }}
+    </h4>
     <p class="text-body1">
       {{ description }}
     </p>
