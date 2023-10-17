@@ -13597,3 +13597,16 @@ h1.contact-list-name-label {
     display: none;
   }
 }
+
+#maitre-inline-button {
+  border: 1px solid #D8D8D8 !important;
+  text-transform: none !important;
+  padding: 0 14px 0 10px !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  line-height: 2.25em !important;
+}
+
+#maitre-inline-button::after {
+  content: "\1F381";
+}
