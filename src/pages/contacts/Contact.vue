@@ -281,6 +281,7 @@ export default {
     this.initListeners()
 
     this.contactComponentListeners.contactTaskStatusUpdated = (contact) => {
+      console.log('this.contactComponentListeners.contactTaskStatusUpdated', contact, this.$route.name)
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
