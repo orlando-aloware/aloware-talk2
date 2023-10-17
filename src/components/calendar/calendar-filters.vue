@@ -132,9 +132,11 @@ export default {
         [CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW]: 'Completed Reminder',
         [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW]: 'Cancelled Reminder',
         [CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW]: 'Pending Reminder',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW]: 'Missed Reminder',
         [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED]: 'Cancelled Appointment',
-        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET]: 'Appointment Set',
-        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED]: 'Appointment Completed',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET]: 'Set Appointment',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED]: 'Completed Appointment',
+        [CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_MISSED]: 'Missed Appointment',
         0: 'All'
       }
 
@@ -144,7 +146,8 @@ export default {
         data.push(
           CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED,
           CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_SET,
-          CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED
+          CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_ATTENDED,
+          CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_MISSED
         )
       }
 
@@ -152,7 +155,8 @@ export default {
         data.push(
           CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW,
           CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW,
-          CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW
+          CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW,
+          CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         )
       }
 
