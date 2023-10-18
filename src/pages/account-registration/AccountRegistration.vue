@@ -733,7 +733,6 @@ export default {
     },
 
     onCaptchaVerified (response) {
-      console.log('onCaptchaVerified', response)
       this.disabledSubmit = false
 
       if (!this.$q.platform.is.electron) {
