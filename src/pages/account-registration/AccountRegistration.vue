@@ -449,7 +449,7 @@
                 no-caps
                 unelevated
                 :disabled="isNextButtonDisabled"
-                @click="submit"
+                @click="onSubmit"
                 v-if="step === 3"
               />
             </q-stepper-navigation>
@@ -545,6 +545,7 @@ export default {
       password_validation: [],
       show_password: false,
       isSubmitted: false,
+      isLoading: false,
       businessTypes,
       businessIdTypes,
       regionsOfOperations,
@@ -556,7 +557,8 @@ export default {
     isNextButtonDisabled () {
       return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
         (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
-        (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms))
+        (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms)) ||
+        this.isLoading
     },
     shouldShowStepperNavigation () {
       return (this.step === 1 || this.step === 2 || this.step === 3) && !this.isSubmitted
@@ -591,9 +593,6 @@ export default {
       if (newStep === 3 && !this.$q.platform.is.electron) {
         this.initRecaptcha()
       }
-    },
-    'form.legal_country' () {
-      this.setTimezone()
     }
   },
 
@@ -727,9 +726,12 @@ export default {
     },
 
     setTimezone () {
-      const country = this.form.legal_country
-      const timezone = window.CountriesAndTimezones.getTimezonesForCountry(country.id)[0]
-      this.form.timezone = timezone.name
+      // const country = this.form.legal_country
+      // const timezone = window.CountriesAndTimezones.getTimezonesForCountry(country.id)[0]
+      // this.form.timezone = timezone.name
+      this.form.timezone = 'Intl' in window
+        ? new Intl.DateTimeFormat().resolvedOptions().timeZone
+        : 'America/Los_Angeles'
     },
 
     onCaptchaVerified (response) {
@@ -740,8 +742,12 @@ export default {
       }
     },
 
-    submit () {
-      this.isSubmitted = true
+    getPreSignUpData () {
+      this.isLoading = true
+    },
+
+    onSubmit () {
+      this.isLoading = true
 
       const payload = {
         ...this.form,
@@ -753,11 +759,24 @@ export default {
       }
 
       console.log('submit', payload)
+
+      this.$axios.post('/api/admin/company-registration', payload)
+        .then((res) => {
+          this.isSubmitted = true
+          this.$generalNotification('Your information has been submitted. We will contact you shortly.')
+        })
+        .catch((err) => {
+          this.$handleErrors(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
     }
   },
 
   created () {
     this.validateAllPasswordRules()
+    this.setTimezone()
   }
 }
 </script>
@@ -960,6 +979,24 @@ export default {
 
       }
     }
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px !important;
+    max-height: 397px !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #256EFF !important;
+    border-radius: 6px !important;
+    &:hover {
+      background-color: #256EFF !important;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #E0E0E0 !important;
+    border-radius: 6px !important;
   }
 
   @include screen('xs') {
