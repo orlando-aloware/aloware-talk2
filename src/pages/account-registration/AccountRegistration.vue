@@ -183,7 +183,7 @@
                       label="Business Name"
                       placeholder="Aloware Inc."
                       :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      v-model="form.legal_name"
+                      v-model="form.company_name"
                     />
 
                     <div class="col-5 pr-0 pl-0">
@@ -316,13 +316,6 @@
 
                 <input-group>
                   <template v-slot:content>
-                    <!-- <input-field
-                      label="legal_country"
-                      placeholder="Ex: United States"
-                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      v-model="form.legal_country"
-                    /> -->
-
                     <select-field
                       label="Country"
                       placeholder="Ex: United States"
@@ -497,12 +490,12 @@ export default {
       // form: {
       //   first_name: 'Jeff',
       //   last_name: 'Bruchado',
-      //   email: 'jeff@gmail.com',
-      //   phone_number: '+1 222 333 4444',
-      //   job_title: 'CTO',
+      //   email: 'jefferson@aloware.com',
+      //   phone_number: '48996461911',
+      //   job_title: 'Software Engineer',
       //   password: 'SomeText!2',
       //   password_confirmation: 'SomeText!2',
-      //   legal_name: 'Aloware Inc.',
+      //   company_name: 'Aloware Inc.',
       //   business_type: 'Partnership',
       //   company_status: 1,
       //   business_registration_identifier: 'BIN',
@@ -526,7 +519,7 @@ export default {
         job_title: '',
         password: '',
         password_confirmation: '',
-        legal_name: '',
+        company_name: '',
         business_type: '',
         company_status: 1,
         business_registration_identifier: '',
@@ -612,8 +605,12 @@ export default {
     },
 
     validatePhoneNumber (phone) {
-      const phoneRegex = /^\+\d{1} \d{3} \d{3} \d{4}$/
-      return phoneRegex.test(phone) || 'Invalid phone number'
+      const formattedPhone = this.$options.filters.fixPhone(phone, 'E164', true)
+
+      if (!formattedPhone || formattedPhone === phone || formattedPhone === '-') {
+        return 'Invalid phone number'
+      }
+      return true
     },
 
     validateAllPasswordRules () {
@@ -663,7 +660,7 @@ export default {
 
     validateSecondStepFieldsFilled () {
       return (
-        this.form.legal_name.length &&
+        this.form.company_name.length &&
         this.form.business_type &&
         this.form.business_registration_identifier &&
         this.form.business_registration_number.length &&
@@ -751,11 +748,23 @@ export default {
 
       const payload = {
         ...this.form,
+        pre_signup_id: this.$route.params.pre_signup_id,
+        phone_number: this.$options.filters.fixPhone(this.form.phone_number, 'E164', true),
         business_type: this.form.business_type.value,
         business_registration_identifier: this.form.business_registration_identifier.value,
         business_regions_of_operation: this.form.business_regions_of_operation.value,
         business_industry: this.form.business_industry.value,
-        legal_country: this.form.legal_country.id
+
+        country: this.form.legal_country.id,
+        legal_country: this.form.legal_country.id,
+        legal_name: this.form.company_name,
+
+        auth_rep_first_name: this.form.first_name,
+        auth_rep_last_name: this.form.last_name,
+        auth_rep_email: this.form.email,
+        auth_rep_phone_number: this.$options.filters.fixPhone(this.form.phone_number, 'E164', true),
+        auth_rep_business_title: this.form.job_title,
+        auth_rep_job_position: this.form.job_title
       }
 
       console.log('submit', payload)
