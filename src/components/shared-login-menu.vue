@@ -91,7 +91,7 @@ export default {
     },
 
     alowareTalk () {
-      return `Talk`
+      return `${this.statics.name} Talk`
     },
 
     whiteLabelText () {
