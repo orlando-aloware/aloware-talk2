@@ -421,7 +421,7 @@ export default {
 
     validateSecondStepFieldsFilled () {
       return (
-        this.form.company_name.length &&
+        this.form.legal_name.length &&
         this.form.business_type &&
         this.form.business_registration_identifier &&
         this.form.business_registration_number.length &&
