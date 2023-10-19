@@ -268,7 +268,7 @@
                 class="q-mx-xl account-registration-action-btn"
                 color="primary"
                 size="md"
-                label="Create Account"
+                label="Create my Account"
                 rounded
                 dense
                 no-caps
