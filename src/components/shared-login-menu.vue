@@ -83,15 +83,17 @@ export default {
     },
 
     alowareClassic () {
+      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
+
       if (this.profile.company.force_talk) {
         return `Admin`
       }
 
-      return `Classic`
+      return `${whiteLabel} Classic`
     },
 
     alowareTalk () {
-      return `Talk`
+      return `${this.statics.name} Talk`
     },
 
     whiteLabelText () {
