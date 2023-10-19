@@ -85,6 +85,10 @@ export default {
 
   created () {
     this.dialerListeners.updateCommunication = (data) => {
+      console.log('in updateCommunication data.current_status2: ', data?.current_status2)
+      console.log('CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW: ', CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW)
+      console.log('this.dialer.communication.id: ', this.dialer.communication?.id)
+      console.log('data.id: ', data?.id)
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
@@ -381,6 +385,7 @@ export default {
   methods: {
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
       this.$VueEvent.listen('forceEndWrapUp', this.dialerListeners.forceEndWrapUp)
@@ -411,6 +416,7 @@ export default {
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
       this.$VueEvent.stop('forceEndWrapUp', this.dialerListeners.forceEndWrapUp)
