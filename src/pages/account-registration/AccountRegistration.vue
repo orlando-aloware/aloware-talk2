@@ -334,9 +334,6 @@ export default {
         (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms)) ||
         this.isLoading
     },
-    shouldShowStepperNavigation () {
-      return (this.step === 1 || this.step === 2 || this.step === 3) && !this.isSubmitted
-    },
     isLargeScreen () {
       return this.$q.screen.width > 767
     }
