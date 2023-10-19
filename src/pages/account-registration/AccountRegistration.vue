@@ -169,191 +169,8 @@
             prefix="2"
             :name="2"
             :done="step > 2">
-
-            <step-header
-              title="Your Business"
-              description="Great! Now, we need important information to verify your business."
-            />
-
             <div class="stepper__content">
-              <div class="min-w-100">
-                <input-group>
-                  <template v-slot:content>
-                    <input-field
-                      label="Business Name"
-                      placeholder="Aloware Inc."
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      v-model="form.company_name"
-                    />
-
-                    <div class="col-5 pr-0 pl-0">
-                      <select-field
-                        label="Business Type"
-                        option-label="value"
-                        option-value="value"
-                        col-md="col-md-12"
-                        :paddingClasses="isLargeScreen ? 'q-pr-0 q-pl-0' : ''"
-                        :options="businessTypes"
-                        v-model="form.business_type"
-                      />
-                      <div class="flex items-center">
-                        <label class="flex mb-1 text-weight-bold pl-3 pr-4">
-                          Company Status
-                        </label>
-                        <q-btn-toggle
-                          class="toggle-border"
-                          toggle-color="primary"
-                          color="white"
-                          text-color="#4F4F4F"
-                          spread
-                          no-caps
-                          unelevated
-                          dense
-                          rounded
-                          :options="[
-                            { label: 'Private', value: 1 },
-                            { label: 'Public', value: 2 }
-                          ]"
-                          v-model="form.company_status"
-                        />
-                      </div>
-                    </div>
-                  </template>
-                </input-group>
-
-                <input-group>
-                  <template v-slot:content>
-                    <select-field
-                      label="Business ID Type"
-                      option-label="label"
-                      option-value="value"
-                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      :options="businessIdTypes"
-                      v-model="form.business_registration_identifier"
-                    />
-
-                    <input-field
-                      label="Business Registration Number"
-                      placeholder="Ex: C1234567"
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      v-model="form.business_registration_number"
-                    />
-                  </template>
-                </input-group>
-
-                <input-group>
-                  <template v-slot:content>
-                    <select-field
-                      label="Region of Operation"
-                      option-label="label"
-                      option-value="value"
-                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      :options="regionsOfOperations"
-                      v-model="form.business_regions_of_operation"
-                    />
-
-                    <input-field
-                      label="Website URL"
-                      placeholder="Ex: yourcompany.com"
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      v-model="form.website_url"
-                    />
-                  </template>
-                </input-group>
-
-                <input-group>
-                  <template v-slot:content>
-                    <select-field
-                      label="Business Industry"
-                      option-label="name"
-                      option-value="value"
-                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      :options="businessIndustries"
-                      v-model="form.business_industry"
-                    />
-
-                    <div
-                      class="col-5"
-                      v-if="isLargeScreen"/>
-                  </template>
-                </input-group>
-
-                <div class="flex justify-center  pt-4 q-row">
-                  <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
-                    <h4 class="text-h5 text-weight-bold">Business Address</h4>
-                  </div>
-                  <div class="col-5" />
-                </div>
-
-                <input-group>
-                  <template v-slot:content>
-                    <input-field
-                      label="Street"
-                      placeholder="Ex: Fifth Avenue"
-                      col-md="col-md-10"
-                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      v-model="form.street"
-                    />
-                  </template>
-                </input-group>
-
-                <input-group>
-                  <template v-slot:content>
-                    <input-field
-                      label="State/Province/Region"
-                      placeholder="Ex: California"
-                      v-model="form.region"
-                    />
-
-                    <input-field
-                      label="City"
-                      placeholder="Ex: Los Angeles"
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      v-model="form.city"
-                    />
-                  </template>
-                </input-group>
-
-                <input-group>
-                  <template v-slot:content>
-                    <select-field
-                      label="Country"
-                      placeholder="Ex: United States"
-                      option-label="name"
-                      option-value="id"
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      :options="countries"
-                      v-model="form.legal_country"
-                    />
-
-                    <input-field
-                      label="Postal Code"
-                      placeholder="Ex: 11223"
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      bottom-slots
-                      v-model="form.postal_code"
-                    >
-                      <template
-                        v-slot:hint
-                        v-if="form.postal_code.length">
-                        <div class="zipcode-hint">
-                          <q-icon
-                            class="q-mr-xs"
-                            :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
-                            :name="iconForValidation(validateZipCode(form.postal_code))"
-                          >
-                          </q-icon>
-                            {{
-                              validateZipCode(form.postal_code)
-                                ? 'The Postal Code is valid'
-                                : 'Please enter a valid Postal Code'
-                            }}
-                        </div>
-                      </template>
-                    </input-field>
-                  </template>
-                </input-group>
-              </div>
+              <business-information-form ref="businessInformationForm"/>
             </div>
           </q-step>
 
@@ -419,24 +236,40 @@
                 @click="$refs.stepper.previous()"
                 v-if="step > 1"
               />
+              <div>
+                <q-btn
+                  class="q-mr-xs account-registration-action-btn"
+                  color="#62666E"
+                  size="md"
+                  label="Skip for now"
+                  rounded
+                  dense
+                  no-caps
+                  unelevated
+                  flat
+                  @click="skipForNow()"
+                  v-if="step === 2"
+                />
+                <q-btn
+                  class="q-mr-xl account-registration-action-btn"
+                  color="primary"
+                  size="md"
+                  label="Next"
+                  rounded
+                  dense
+                  no-caps
+                  unelevated
+                  :disabled="isNextButtonDisabled"
+                  @click="$refs.stepper.next()"
+                  v-if="step < 3"
+                />
+              </div>
+
               <q-btn
                 class="q-mx-xl account-registration-action-btn"
                 color="primary"
                 size="md"
-                label="Next"
-                rounded
-                dense
-                no-caps
-                unelevated
-                :disabled="isNextButtonDisabled"
-                @click="$refs.stepper.next()"
-                v-if="step < 3"
-              />
-              <q-btn
-                class="q-mx-xl account-registration-action-btn"
-                color="primary"
-                size="md"
-                label="Submit"
+                label="Create Account"
                 rounded
                 dense
                 no-caps
@@ -450,21 +283,12 @@
         </q-stepper>
       </div>
     </div>
-    <div class="banner col-xl-4 q-xl-show q-md-hide q-sm-hide">
-      <div class="text-center items-center align-center">
-        <img
-          :src="getBannerImageSrc()"
-          alt="phone" />
-        <div class="card text-center">
-          <h3 class="mb-4 mt-4">{{ getBannerTitle() }}</h3>
-          <p v-html="getBannerDescription()" />
-        </div>
-      </div>
-    </div>
+    <banner :current-step="step" />
   </div>
 </template>
 
 <script>
+import { mapActions, mapState, mapGetters } from 'vuex'
 import { recaptchaMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
@@ -473,7 +297,8 @@ import businessIndustries from '../../constants/account-registration-business-in
 import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
-import SelectField from 'src/components/account-registration/select-field.vue'
+import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
+import Banner from 'src/components/account-registration/banner.vue'
 
 export default {
   name: 'account-registration',
@@ -481,60 +306,13 @@ export default {
     StepHeader,
     InputGroup,
     InputField,
-    SelectField
+    BusinessInformationForm,
+    Banner
   },
   mixins: [recaptchaMixin],
   data () {
     return {
       step: 1,
-      // form: {
-      //   first_name: 'Jeff',
-      //   last_name: 'Bruchado',
-      //   email: 'jefferson@aloware.com',
-      //   phone_number: '48996461911',
-      //   job_title: 'Software Engineer',
-      //   password: 'SomeText!2',
-      //   password_confirmation: 'SomeText!2',
-      //   company_name: 'Aloware Inc.',
-      //   business_type: 'Partnership',
-      //   company_status: 1,
-      //   business_registration_identifier: 'BIN',
-      //   business_registration_number: 'C1234567',
-      //   business_regions_of_operation: 'USA_AND_CANADA',
-      //   business_industry: 'Software',
-      //   website_url: 'aloware.com',
-      //   street: 'Fifth Avenue',
-      //   region: 'San Francisco',
-      //   city: 'California',
-      //   legal_country: 'US',
-      //   postal_code: '11223',
-      //   agreed_to_terms: false,
-      //   timezone: 'America/Los_Angeles'
-      // },
-      form: {
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone_number: '',
-        job_title: '',
-        password: '',
-        password_confirmation: '',
-        company_name: '',
-        business_type: '',
-        company_status: 1,
-        business_registration_identifier: '',
-        business_registration_number: '',
-        business_regions_of_operation: '',
-        business_industry: '',
-        website_url: '',
-        street: '',
-        region: '',
-        city: '',
-        legal_country: '',
-        postal_code: '',
-        agreed_to_terms: false,
-        timezone: 'America/Los_Angeles'
-      },
       password_validation: [],
       show_password: false,
       isSubmitted: false,
@@ -547,6 +325,9 @@ export default {
   },
 
   computed: {
+    ...mapState('accountRegistration', ['form']),
+    ...mapGetters('accountRegistration', ['getBusinessInformationFieldsValue']),
+
     isNextButtonDisabled () {
       return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
         (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
@@ -558,23 +339,6 @@ export default {
     },
     isLargeScreen () {
       return this.$q.screen.width > 767
-    },
-    countries () {
-      const countries = window.CountriesAndTimezones.getAllCountries()
-
-      // first exclude US & CA, and then extract only id, name fields of the countries
-      const countriesArr = Object.values(countries)
-        .filter(({ id }) => id !== 'US' && id !== 'CA')
-        .map(({ id, name }) => {
-          return { id, name }
-        })
-
-      // add US & CA to the top and return
-      return [
-        { id: 'US', name: 'United States' },
-        { id: 'CA', name: 'Canada' },
-        ...countriesArr
-      ]
     }
   },
 
@@ -590,6 +354,7 @@ export default {
   },
 
   methods: {
+    ...mapActions('accountRegistration', ['setBusinessInformationFieldsEmpty']),
     updateValidationState (rule, isValid) {
       const index = this.password_validation.indexOf(rule)
       if (isValid && index === -1) {
@@ -679,56 +444,13 @@ export default {
       return rule ? 'text-green' : 'text-red'
     },
 
-    getZipCodeRuleClass (rule) {
-      return rule ? 'text-green' : 'text-red'
-    },
-
-    getBannerImageSrc () {
-      switch (this.step) {
-        case 1:
-          return '/images/woman-agent.png'
-        case 2:
-          return '/images/man-agent.png'
-        case 3:
-          return '/images/woman-agent-in-call.png'
-        default:
-          return '/images/woman-agent.png'
-      }
-    },
-
-    getBannerTitle () {
-      switch (this.step) {
-        case 1:
-          return 'Your customers prefer text'
-        case 2:
-          return 'Supercharge your sales team'
-        case 3:
-          return 'Measure the metrics that matter'
-        default:
-          return 'Your customers prefer text'
-      }
-    },
-
-    getBannerDescription () {
-      switch (this.step) {
-        case 1:
-          return 'Research (and common sense!) shows that people look at their texts within 3 minutes, and open <span class="text-weight-bold">97% of messages</span> they receive.<br>Be where it matters most: their inbox. 📥'
-        case 2:
-          return 'Make <span class="text-weight-bold">300+ calls daily</span> with our AI-driven power dialer. Scale up text campaigns with smart sequence builder.<br>Your CRM has the fuel, Aloware brings the fire. 🚀'
-        case 3:
-          return 'Gain visibility into the metrics that matter to your business with advanced <span class="text-weight-bold">reporting, pre-built</span>, and <span class="text-weight-bold">customizable dashboards</span>. 📊'
-        default:
-          return 'Texting is the most preferred communication channel for customers. With Aloware, you can text your customers from your business phone number.'
-      }
-    },
-
     setTimezone () {
       // const country = this.form.legal_country
       // const timezone = window.CountriesAndTimezones.getTimezonesForCountry(country.id)[0]
       // this.form.timezone = timezone.name
-      this.form.timezone = 'Intl' in window
-        ? new Intl.DateTimeFormat().resolvedOptions().timeZone
-        : 'America/Los_Angeles'
+
+      const timezone = 'Intl' in window ? new Intl.DateTimeFormat().resolvedOptions().timeZone : ''
+      this.form.timezone = timezone || 'America/Los_Angeles'
     },
 
     onCaptchaVerified (response) {
@@ -743,6 +465,11 @@ export default {
       this.isLoading = true
     },
 
+    skipForNow () {
+      this.setBusinessInformationFieldsEmpty()
+      this.$refs.stepper.next()
+    },
+
     onSubmit () {
       this.isLoading = true
 
@@ -750,21 +477,7 @@ export default {
         ...this.form,
         pre_signup_id: this.$route.params.pre_signup_id,
         phone_number: this.$options.filters.fixPhone(this.form.phone_number, 'E164', true),
-        business_type: this.form.business_type.value,
-        business_registration_identifier: this.form.business_registration_identifier.value,
-        business_regions_of_operation: this.form.business_regions_of_operation.value,
-        business_industry: this.form.business_industry.value,
-
-        country: this.form.legal_country.id,
-        legal_country: this.form.legal_country.id,
-        legal_name: this.form.company_name,
-
-        auth_rep_first_name: this.form.first_name,
-        auth_rep_last_name: this.form.last_name,
-        auth_rep_email: this.form.email,
-        auth_rep_phone_number: this.$options.filters.fixPhone(this.form.phone_number, 'E164', true),
-        auth_rep_business_title: this.form.job_title,
-        auth_rep_job_position: this.form.job_title
+        ...this.getBusinessInformationFieldsValue
       }
 
       console.log('submit', payload)
