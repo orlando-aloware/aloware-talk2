@@ -27,8 +27,9 @@
 
 <script>
 
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'SessionContactPageCrm',
@@ -79,6 +80,11 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'setContact',
+      'setContactClone'
+    ]),
+
     getMappedUrlParams (params) {
       const agentName = this.profile.name
       const leadNumber = this.contact.phone_number
@@ -149,6 +155,22 @@ export default {
       }
 
       return mappedParams
+    }
+  },
+  watch: {
+    contact: {
+      deep: true,
+      handler (newValue, oldValue) {
+        const oldHubspotLink = this.getHubspotContactLink(oldValue)
+        const newHubspotLink = this.getHubspotContactLink(newValue)
+
+        // if it's the same contact (contact was immediately redialed)
+        // but hubspot link is gone, reuse the old contact.
+        if (oldValue?.id === newValue?.id && isEmpty(newHubspotLink) && !isEmpty(oldHubspotLink)) {
+          this.setContact(oldValue)
+          this.setContactClone(oldValue)
+        }
+      }
     }
   }
 }
