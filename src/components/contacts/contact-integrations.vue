@@ -12,7 +12,10 @@
                          :contact="contact"/>
 
     <integration-pipedrive v-if="isPipedriveEnabled"
-                         :contact="contact"/>
+                           :contact="contact"/>
+
+    <integration-gohighlevel v-if="isGHLEnabled"
+                             :contact="contact"/>
 
     <contact-crm-links :contact="contact"/>
   </b-card>
@@ -23,6 +26,7 @@ import { mapState } from 'vuex'
 import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
 import IntegrationPipedrive from 'src/components/integrations/integration-pipedrive'
 import ContactCrmLinks from 'components/contacts/contact-crm-links'
+import IntegrationGohighlevel from 'components/integrations/integration-gohighlevel.vue'
 
 export default {
   name: 'contact-integrations',
@@ -40,7 +44,7 @@ export default {
     }
   },
 
-  components: { ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive },
+  components: { IntegrationGohighlevel, ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
@@ -59,7 +63,8 @@ export default {
         !this.currentCompany.stripe_integration_enabled &&
         !this.currentCompany.zoho_integration_enabled &&
         !this.currentCompany.helpscout_integration_enabled &&
-        !this.currentCompany.guesty_integration_enabled
+        !this.currentCompany.guesty_integration_enabled &&
+        !this.currentCompany.gohighlevel_integration_enabled
     },
 
     isHubspotEnabled () {
@@ -69,6 +74,10 @@ export default {
     isPipedriveEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.pipedrive_integration_enabled)
+    },
+
+    isGHLEnabled () {
+      return this.currentCompany && this.currentCompany.gohighlevel_integration_enabled
     },
 
     isZohoEnabled () {

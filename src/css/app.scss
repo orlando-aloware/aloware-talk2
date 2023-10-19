@@ -2485,6 +2485,14 @@ i.option-separator {
     height: 32px;
   }
 
+  .gohighlevel-btn {
+    content: url(/integrations/ghl-icon.png);
+    margin-right: 20px;
+    line-height: 48px;
+    width: 32px;
+    height: 32px;
+  }
+
   .data-value {
     max-width: 177px;
     display: inline-block;
@@ -12247,6 +12255,10 @@ h1.contact-list-name-label {
     color: $canceled-appointment;
   }
 
+  &.status-14 {
+    color: $missed-appointment;
+  }
+
   &.is_past {
     color: $past-appointment;
   }
@@ -12263,6 +12275,10 @@ h1.contact-list-name-label {
 
   &.status-5 {
     color: $canceled-reminder;
+  }
+
+  &.status-3 {
+    color: $missed-appointment;
   }
 
   &.is_past {
@@ -12286,6 +12302,10 @@ h1.contact-list-name-label {
     text-decoration: line-through;
   }
 
+  &.status-14 {
+    background-color: $missed-appointment;
+  }
+
   &.is_past {
     background-color: $past-appointment;
   }
@@ -12305,6 +12325,10 @@ h1.contact-list-name-label {
   &.status-5 {
     background-color: $canceled-reminder;
     text-decoration: line-through;
+  }
+
+  &.status-3 {
+    background-color: $missed-appointment;
   }
 
   &.is_past {
@@ -13596,4 +13620,19 @@ h1.contact-list-name-label {
   .q-btn-dropdown__arrow {
     display: none;
   }
+}
+
+#maitre-inline-button {
+  border: 1px solid #D8D8D8 !important;
+  text-transform: none !important;
+  padding: 8px 14px 7px 10px !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+#maitre-inline-button::after {
+  content: "\1F381";
+  padding-left: 6px;
 }

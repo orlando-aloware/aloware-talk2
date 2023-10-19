@@ -55,6 +55,14 @@
 
       <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
+
+    <div class="ml-auto d-block h-100" v-if='isCompanyPartOfAlowareDemoCompanies(profile.company_id)'>
+      <div class="d-flex h-100 align-items-center justify-content-end ml-1">
+        <div class='bridge-menu-wrapper'>
+          <div id='referralhero-inline-button'></div>
+        </div>
+      </div>
+    </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
@@ -159,7 +167,8 @@ import {
   aclMixin,
   avatarMixin,
   goBackMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -192,7 +201,8 @@ export default {
     aclMixin,
     avatarMixin,
     goBackMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    userMixin
   ],
 
   components: {
