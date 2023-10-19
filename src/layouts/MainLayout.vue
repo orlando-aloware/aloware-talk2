@@ -20,7 +20,8 @@
             <app-header v-if="isShowAppHeader"
                         @toggleSidebar="toggleSidebar"/>
           </q-header>
-          <q-page-container :class="pageContainerClasses">
+          <q-page-container ref="page-container"
+                            :class="pageContainerClasses">
             <section class="main-content section h-100">
               <template v-if="!loading || suspended">
                 <router-view></router-view>
@@ -2622,6 +2623,18 @@ export default {
 
       if (this.isMobile && !this.mobilePhoneDrawer && to.name === 'Phone') {
         this.mobilePhoneDrawer = true
+      }
+
+      // padding top for mobile screen
+      // excluding inbox default page in smaller screen
+      const isPhonePage = from.name === 'Phone' || this.mobilePhoneDrawer
+      const isSmallMobileInbox = this.$route.name.includes('Inbox') && this.$q.screen.lt.md
+      if (this.isMobile && isPhonePage && !isSmallMobileInbox) {
+        setTimeout(() => {
+          if (this.$refs['page-container'].$el.style.paddingTop === '0px') {
+            this.$refs['page-container'].$el.style.paddingTop = '58px'
+          }
+        }, 50)
       }
 
       if (to.name === 'Inbox' && from.name.includes('Inbox')) {

@@ -31,6 +31,10 @@
           <td><s>Canceled Appointment</s></td>
         </tr>
         <tr>
+          <td class="pr-2"><i class="fas fa-square event-color-type-12 status-14"></i></td>
+          <td>Missed Appointment</td>
+        </tr>
+        <tr>
           <td colspan="2"><hr/></td>
         </tr>
         <tr>
@@ -48,6 +52,10 @@
         <tr>
           <td class="pr-2"><i class="fas fa-square event-color-type-13 status-5"></i></td>
           <td><s>Canceled Reminder</s></td>
+        </tr>
+        <tr>
+          <td class="pr-2"><i class="fas fa-square event-color-type-13 status-3"></i></td>
+          <td>Missed Reminder</td>
         </tr>
       </table>
     </b-popover>
