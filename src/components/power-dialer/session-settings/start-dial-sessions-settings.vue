@@ -172,6 +172,10 @@
                              v-if="!hasSelectedTemporarySetting"
                              @click="updateSelectedSetting">
                         Save
+                        <q-tooltip anchor="center right"
+                                   v-if='!this.saveDisabled && !this.isSettingsOwner'>
+                          Selected settings is owned by another user.
+                        </q-tooltip>
                       </q-btn>
                       <q-btn class="px-3 py-0 ml-2"
                              size="sm"
@@ -448,9 +452,13 @@ export default {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
     },
 
+    isSettingsOwner () {
+      return this.selectedItem.user_id === this.profile.id
+    },
+
     isAllowSave () {
       return this.saveDisabled ||
-        (!this.saveDisabled && this.selectedItem.user_id === this.profile.id)
+        (!this.saveDisabled && this.isSettingsOwner)
     }
   },
 
