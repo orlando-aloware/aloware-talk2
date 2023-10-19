@@ -207,9 +207,8 @@
               </div>
               <div v-else>
                 <step-header
-                  title="Verification"
-                  description="Thanks for sending us your information. We are reviewing it now. Once validated, we will send you an email with instructions for logging into your account."
-                  icon="app-icons/misc/clock.svg"/>
+                  title="Success!"
+                  description="Your information has been submitted. Please check your email for further instructions."/>
               </div>
             </div>
           </q-step>
