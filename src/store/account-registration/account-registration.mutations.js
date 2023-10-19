@@ -1,0 +1,17 @@
+export default {
+  SET_BUSINESS_INFORMATION_FIELDS_EMPTY (state) {
+    state.form.company_name = ''
+    state.form.business_type = ''
+    state.form.company_status = null
+    state.form.business_registration_identifier = ''
+    state.form.business_registration_number = ''
+    state.form.business_regions_of_operation = ''
+    state.form.business_industry = ''
+    state.form.website_url = ''
+    state.form.street = ''
+    state.form.region = ''
+    state.form.city = ''
+    state.form.legal_country = ''
+    state.form.postal_code = ''
+  }
+}
