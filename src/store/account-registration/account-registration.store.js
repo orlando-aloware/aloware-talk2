@@ -61,7 +61,8 @@ export default function () {
       legal_country: '',
       postal_code: '',
       agreed_to_terms: false,
-      timezone: 'America/Los_Angeles'
+      timezone: 'America/Los_Angeles',
+      kyc_filled: 1
     }
   }
 }

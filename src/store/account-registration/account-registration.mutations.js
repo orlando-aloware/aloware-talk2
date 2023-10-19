@@ -13,5 +13,6 @@ export default {
     state.form.city = ''
     state.form.legal_country = ''
     state.form.postal_code = ''
+    state.form.kyc_filled = 0
   }
 }
