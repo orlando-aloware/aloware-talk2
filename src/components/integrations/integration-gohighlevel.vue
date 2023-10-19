@@ -144,7 +144,7 @@ export default {
     ...mapState(['statics']),
 
     contactLink () {
-      if (!this.contactIntegrationDataLoaded) {
+      if (!this.contactIntegrationDataLoaded || Object.keys(this.integrationData).length === 0) {
         return
       }
 
