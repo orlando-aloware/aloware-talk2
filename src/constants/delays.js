@@ -1,1 +1,0 @@
-export const VM_DROP_ENABLE_DELAY = 5000

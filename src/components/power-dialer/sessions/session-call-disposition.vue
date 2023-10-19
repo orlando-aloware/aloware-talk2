@@ -52,8 +52,7 @@ import {
   dispositionsOptionsMixin
 } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import { VM_DROP_ENABLE_DELAY } from 'src/constants/delays'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'SessionCallDisposition',
@@ -104,13 +103,12 @@ export default {
         !hasContactDisposition
     },
 
-    isCallCompleted () {
-      return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+    isCallIInProgress () {
+      return this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
     },
 
     isVmDropReady () {
-      const isCallConnected = !this.isCallCompleted || this.dialer.currentStatus === 'CALL_CONNECTED'
-      return !isEmpty(this.dialer.communication) && isCallConnected
+      return !isEmpty(this.dialer.communication) && this.isCallIInProgress
     },
 
     isVoicemailEmpty () {
@@ -275,17 +273,10 @@ export default {
     },
 
     'dialer.communication': function (communication) {
-      // add 3 seconds delay to consistent with vm drop delay
-      setTimeout(() => {
-        this.initCallDisposition()
-      }, VM_DROP_ENABLE_DELAY)
+      this.initCallDisposition()
 
       if (this.isVmDropReady) {
-        // add 3 seconds delay to make sure vm drop won't fail if requested
-        // due to phone is still ringing.
-        setTimeout(() => {
-          this.$refs['vm-drop'].enable()
-        }, VM_DROP_ENABLE_DELAY)
+        this.$refs['vm-drop'].enable()
 
         return
       }

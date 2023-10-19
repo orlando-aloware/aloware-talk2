@@ -1281,7 +1281,6 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import API from 'src/plugins/api/api'
-import { VM_DROP_ENABLE_DELAY } from 'src/constants/delays'
 
 export default {
   name: 'phone',
@@ -1420,7 +1419,6 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
-      isVmDropDisabled: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1453,6 +1451,10 @@ export default {
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
+    },
+
+    isCallIInProgress () {
+      return this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
     },
 
     isHangupDisabled () {
@@ -1491,8 +1493,8 @@ export default {
       return !this.devMode && this.isCallCompleted
     },
 
-    canVmDrop () {
-      return (this.dialer.communication && !this.isCallCompleted) || this.devMode
+    isVmDropDisabled () {
+      return !this.devMode && !this.isCallIInProgress
     },
 
     isHoldDisabled () {
@@ -2641,20 +2643,6 @@ export default {
       if (['add', 'dialpad', 'transfer'].includes(value)) {
         this.openExpansion(value)
       }
-    },
-
-    canVmDrop (value) {
-      // add 3 seconds delay to make sure vm drop won't fail if requested
-      // due to phone is still ringing.
-      if (value) {
-        setTimeout(() => {
-          this.isVmDropDisabled = !value
-        }, VM_DROP_ENABLE_DELAY)
-
-        return
-      }
-
-      this.isVmDropDisabled = !value
     }
   },
 
