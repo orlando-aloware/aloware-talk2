@@ -56,7 +56,7 @@
       <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
 
-    <div class="ml-auto d-block h-100" v-if='isCompanyPartOfAlowareDemoCompanies(profile.company_id)'>
+    <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
         <div class='bridge-menu-wrapper'>
           <div id='referralhero-inline-button'></div>
