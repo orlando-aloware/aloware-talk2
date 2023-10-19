@@ -174,12 +174,10 @@ export default {
         ids = chunk(ids, 50)
       }
 
-      // we have to use the dynamic list's filters if the source list
-      // is of type DYNAMIC
-      if (this.selectedList.type === this.ContactListTypes.DYNAMIC &&
-        !isEmpty(this.currentListFilters)) {
-        const allFilters = this.$jsonClone(this.currentListFilters)
+      const allFilters = this.$jsonClone(this.currentListFilters)
 
+      // we have to use the dynamic list's filters deconstructed if the source list is DYNAMIC
+      if (this.selectedStaticList.type === this.ContactListTypes.DYNAMIC && !isEmpty(allFilters)) {
         Object.keys(allFilters).forEach(index => {
           // include all other filters
           if (!this.$isNumeric(index)) {
@@ -188,29 +186,11 @@ export default {
           }
         })
 
-        if (!isEmpty(allFilters)) {
-          // include the filter groups
-          params.filter_groups = allFilters
-        }
-      } else {
-        // else, list is of type STATIC. Just pass the contacts list id filter
-        params.filter_groups = [
-          {
-            'filters': {
-              'contact_lists': [
-                {
-                  value: [this.selectedList.id],
-                  operator: 1
-                }
-              ]
-            },
-            is_conjunction: true
-          }
-        ]
-      }
-
-      if (this.selectedList.id === 'all') {
-        delete params.filter_groups
+        // include the filter groups
+        params.filter_groups = allFilters
+      } else if (!isEmpty(allFilters)) {
+        // just pass the filters if list is STATIC
+        params.filter_groups = allFilters
       }
 
       // only show list's loading view if all contacts were selected
