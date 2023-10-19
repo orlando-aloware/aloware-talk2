@@ -15,6 +15,7 @@ import settings from './settings'
 import broadcast from './broadcast'
 import wallboard from './wallboard'
 import tagsModule from './tags'
+import accountRegistration from './account-registration'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -42,7 +43,8 @@ export default function (/* { ssrContext } */) {
       broadcast,
       wallboard,
       cache,
-      tagsModule
+      tagsModule,
+      accountRegistration
     },
 
     state: {
