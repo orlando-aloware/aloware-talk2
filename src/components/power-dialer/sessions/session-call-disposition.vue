@@ -104,10 +104,11 @@ export default {
     },
 
     isCallIInProgress () {
-      return this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+      return this.dialer?.communication?.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
     },
 
     isVmDropReady () {
+      console.log('this.isCallIInProgress: ', this.isCallIInProgress)
       return !isEmpty(this.dialer.communication) && this.isCallIInProgress
     },
 

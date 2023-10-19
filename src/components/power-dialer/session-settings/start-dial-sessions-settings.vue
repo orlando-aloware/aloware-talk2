@@ -449,7 +449,8 @@ export default {
     },
 
     isAllowSave () {
-      return !this.saveDisabled && this.selectedItem.user_id === this.profile.id
+      return this.saveDisabled ||
+        (!this.saveDisabled && this.selectedItem.user_id === this.profile.id)
     }
   },
 
