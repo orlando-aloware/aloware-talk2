@@ -180,12 +180,18 @@ export default {
 
         this.$VueEvent.fire('pauseWrapUp', this.isNotDisposed)
         this.onCallDisposed(data.id)
-        this.$refs.callDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('callDispositionSelector')) {
+          this.$refs.callDispositionSelector.hideLoading()
+        }
       }).catch((err) => {
         console.log(err)
         this.$handleErrors(err.response)
         this.onCallDisposed(this.callDisposition)
-        this.$refs.callDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('callDispositionSelector')) {
+          this.$refs.callDispositionSelector.hideLoading()
+        }
       })
     },
 
@@ -218,22 +224,31 @@ export default {
 
         this.$VueEvent.fire('pauseWrapUp', this.isNotDisposed)
         this.onContactDisposed(data.id)
-        this.$refs.contactDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('contactDispositionSelector')) {
+          this.$refs.contactDispositionSelector.hideLoading()
+        }
       }).catch((err) => {
         console.log(err)
         this.$handleErrors(err.response)
         this.onContactDisposed(this.contactDisposition)
-        this.$refs.contactDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('contactDispositionSelector')) {
+          this.$refs.contactDispositionSelector.hideLoading()
+        }
       })
     },
 
     initCallDisposition () {
-      if (isEmpty(this.dialer.communication)) {
+      if (isEmpty(this.dialer.communication) &&
+        this.isReferenceAvailable('callDispositionSelector')) {
         this.$refs.callDispositionSelector.disable()
         return
       }
 
-      this.$refs.callDispositionSelector.enable()
+      if (this.isReferenceAvailable('callDispositionSelector')) {
+        this.$refs.callDispositionSelector.enable()
+      }
     },
 
     onVmDrop (item) {
@@ -254,6 +269,10 @@ export default {
         this.$refs['vm-drop'].enable()
         this.$refs['vm-drop'].hideLoading()
       })
+    },
+
+    isReferenceAvailable (referenceId) {
+      return !isEmpty(this.$refs?.[referenceId])
     }
   },
 
