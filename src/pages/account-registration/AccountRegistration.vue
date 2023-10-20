@@ -405,9 +405,10 @@ export default {
     },
 
     validatePhoneNumber (phone) {
-      const formattedPhone = this.$options.filters.fixPhone(phone, 'E164', true)
+      const cleanedPhone = phone.replace(/[^\d]/g, '')
+      const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
 
-      if (!formattedPhone || formattedPhone === phone || formattedPhone === '-') {
+      if (!formattedPhone || formattedPhone === cleanedPhone || formattedPhone === '-') {
         return 'Invalid phone number'
       }
       return true
