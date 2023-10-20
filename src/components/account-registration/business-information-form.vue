@@ -9,10 +9,10 @@
       <input-group>
         <template v-slot:content>
           <input-field
-            label="Business Name"
+            label="Business Legal Name"
             placeholder="Aloware Inc."
             :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-            v-model="form.company_name"
+            v-model="form.legal_name"
           />
 
           <div class="col-5 pr-0 pl-0">
@@ -182,6 +182,71 @@
           </input-field>
         </template>
       </input-group>
+
+      <div class="flex justify-center  pt-4 q-row">
+        <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+          <h4 class="text-h5 text-weight-bold">Authorized Representative Information</h4>
+        </div>
+        <div class="col-5" />
+      </div>
+
+      <input-group>
+        <template v-slot:content>
+          <input-field
+            label="First Name"
+            placeholder="Type here"
+            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            v-model="form.auth_rep_first_name"
+          />
+
+          <input-field
+            label="Last Name"
+            placeholder="Type here"
+            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            v-model="form.auth_rep_last_name"
+          />
+        </template>
+      </input-group>
+
+      <input-group>
+        <template v-slot:content>
+          <input-field
+            label="Email"
+            placeholder="email@domain.com"
+            type="email"
+            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :rules="[validateEmail]"
+            v-model="form.auth_rep_email"
+          />
+
+          <input-field
+            label="Phone Number"
+            placeholder="+1 222 333 4444"
+            mask="+# ### ### ####"
+            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :rules="[validatePhoneNumber]"
+            v-model="form.auth_rep_phone_number"
+          />
+        </template>
+      </input-group>
+
+      <input-group>
+        <template v-slot:content>
+          <input-field
+            label="Business Title"
+            placeholder="Type here"
+            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            v-model="form.auth_rep_business_title"
+          />
+
+          <input-field
+            label="Job Position"
+            placeholder="Ex. CEO, CTO, Product Director"
+            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            v-model="form.auth_rep_job_position"
+          />
+        </template>
+      </input-group>
     </div>
   </div>
 </template>
@@ -249,6 +314,18 @@ export default {
     validateZipCode (zip) {
       const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
       return zipRegex.test(zip)
+    },
+    validatePhoneNumber (phone) {
+      const formattedPhone = this.$options.filters.fixPhone(phone, 'E164', true)
+
+      if (!formattedPhone || formattedPhone === phone || formattedPhone === '-') {
+        return 'Invalid phone number'
+      }
+      return true
+    },
+    validateEmail (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return emailRegex.test(email) || 'Invalid email address'
     },
     iconForValidation (isValid) {
       return isValid ? 'check' : 'close'
