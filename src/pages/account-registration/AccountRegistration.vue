@@ -69,15 +69,29 @@
 
                 <input-group>
                   <template v-slot:content>
-                    <input-field
+                    <!-- <input-field
                       label="Job Title"
                       placeholder="Ex. CEO, CTO, Product Director"
                       :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       v-model="form.job_title"
+                    /> -->
+
+                    <select-field
+                      label="Country"
+                      placeholder="Ex: United States"
+                      option-label="name"
+                      option-value="id"
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      :options="countries"
+                      v-model="form.country"
                     />
-                    <div
-                      class="col-5"
-                      v-if="isLargeScreen"/>
+
+                    <input-field
+                      label="Business Name"
+                      placeholder="Ex. Aloware Inc."
+                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      v-model="form.company_name"
+                    />
                   </template>
                 </input-group>
 
@@ -195,7 +209,7 @@
                     <q-checkbox
                       class="mb-4 pl-2"
                       color="primary"
-                      label="I agree to Terms and Conditions and fair use."
+                      label="I agree to Terms and Conditions, and Acceptable Use Policy."
                       dense
                       v-model="form.agreed_to_terms"
                     />
@@ -296,6 +310,7 @@ import businessIndustries from '../../constants/account-registration-business-in
 import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
+import SelectField from 'src/components/account-registration/select-field.vue'
 import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
 
@@ -305,6 +320,7 @@ export default {
     StepHeader,
     InputGroup,
     InputField,
+    SelectField,
     BusinessInformationForm,
     Banner
   },
@@ -335,11 +351,31 @@ export default {
     },
     isLargeScreen () {
       return this.$q.screen.width > 767
+    },
+    countries () {
+      const countries = window.CountriesAndTimezones.getAllCountries()
+
+      // first exclude US & CA, and then extract only id, name fields of the countries
+      const countriesArr = Object.values(countries)
+        .filter(({ id }) => id !== 'US' && id !== 'CA')
+        .map(({ id, name }) => {
+          return { id, name }
+        })
+
+      // add US & CA to the top and return
+      return [
+        { id: 'US', name: 'United States' },
+        { id: 'CA', name: 'Canada' },
+        ...countriesArr
+      ]
     }
   },
 
   watch: {
     'form.password' () {
+      this.validateAllPasswordRules()
+    },
+    'form.password_confirmation' () {
       this.validateAllPasswordRules()
     },
     step (newStep) {
@@ -378,7 +414,7 @@ export default {
       this.updateValidationState('length', this.validatePasswordLength(this.form.password))
       this.updateValidationState('cases', this.validatePasswordCases(this.form.password))
       this.updateValidationState('digit', this.validatePasswordDigit(this.form.password))
-      this.updateValidationState('match', this.validatePasswordMatch(this.form.password))
+      this.updateValidationState('match', this.validatePasswordMatch(this.form.password_confirmation))
     },
 
     validateZipCode (zip) {
@@ -412,7 +448,9 @@ export default {
         this.form.last_name.length &&
         this.validateEmail(this.form.email) === true &&
         this.validatePhoneNumber(this.form.phone_number) === true &&
-        this.form.job_title.length &&
+        this.form.country &&
+        this.form.company_name.length &&
+        // this.form.job_title.length &&
         this.form.password.length &&
         this.form.password_confirmation.length &&
         this.password_validation.length === 4
@@ -432,7 +470,13 @@ export default {
         this.form.region.length &&
         this.form.city.length &&
         this.form.legal_country &&
-        this.validateZipCode(this.form.postal_code)
+        this.validateZipCode(this.form.postal_code) &&
+        this.form.auth_rep_first_name.length &&
+        this.form.auth_rep_last_name.length &&
+        this.validateEmail(this.form.auth_rep_email) === true &&
+        this.validatePhoneNumber(this.form.auth_rep_phone_number) === true &&
+        this.form.auth_rep_business_title &&
+        this.form.auth_rep_job_position
       )
     },
 
