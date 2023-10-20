@@ -146,7 +146,7 @@
       <input-group>
         <template v-slot:content>
           <select-field
-            label="Country"
+            label="Legal Country"
             placeholder="Ex: United States"
             option-label="name"
             option-value="id"
