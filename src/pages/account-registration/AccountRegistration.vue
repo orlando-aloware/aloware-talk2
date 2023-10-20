@@ -277,7 +277,7 @@
                   unelevated
                   :disabled="isNextButtonDisabled"
                   v-if="step < 3"
-                  @click="$refs.stepper.next()"
+                  @click="nextStep"
                 />
               </div>
 
@@ -319,6 +319,7 @@ import Banner from 'src/components/account-registration/banner.vue'
 
 export default {
   name: 'account-registration',
+
   components: {
     StepHeader,
     InputGroup,
@@ -327,10 +328,12 @@ export default {
     BusinessInformationForm,
     Banner
   },
+
   mixins: [
     recaptchaMixin,
     maskMixin
   ],
+
   data () {
     return {
       step: 1,
@@ -355,9 +358,11 @@ export default {
         (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms)) ||
         this.isLoading
     },
+
     isLargeScreen () {
       return this.$q.screen.width > 767
     },
+
     countries () {
       const countries = window.CountriesAndTimezones.getAllCountries()
 
@@ -385,9 +390,11 @@ export default {
     'form.password' () {
       this.validateAllPasswordRules()
     },
+
     'form.password_confirmation' () {
       this.validateAllPasswordRules()
     },
+
     step (newStep) {
       if (newStep === 3 && !this.$q.platform.is.electron) {
         this.initRecaptcha()
@@ -396,7 +403,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('accountRegistration', ['setBusinessInformationFieldsEmpty']),
+    ...mapActions('accountRegistration', [
+      'setBusinessInformationFieldsEmpty',
+      'setKycFilled'
+    ]),
+
     updateValidationState (rule, isValid) {
       const index = this.password_validation.indexOf(rule)
       if (isValid && index === -1) {
@@ -527,6 +538,14 @@ export default {
 
     getPreSignUpData () {
       this.isLoading = true
+    },
+
+    nextStep () {
+      if (this.step === 2) {
+        this.setKycFilled()
+      }
+
+      this.$refs.stepper.next()
     },
 
     skipForNow () {

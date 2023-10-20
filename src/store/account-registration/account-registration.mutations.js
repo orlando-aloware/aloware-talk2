@@ -14,5 +14,9 @@ export default {
     state.form.legal_country = ''
     state.form.postal_code = ''
     state.form.kyc_filled = 0
+  },
+
+  SET_KYC_FILLED (state) {
+    state.form.kyc_filled = 1
   }
 }
