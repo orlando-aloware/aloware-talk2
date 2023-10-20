@@ -265,19 +265,23 @@ import businessIndustries from '../../constants/account-registration-business-in
 
 export default {
   name: 'BusinessInformationForm',
+
   mixins: [maskMixin],
+
   components: {
     StepHeader,
     InputGroup,
     InputField,
     SelectField
   },
+
   props: {
     shouldShowSubmitButton: {
       type: Boolean,
       default: true
     }
   },
+
   data () {
     return {
       businessTypes,
@@ -286,17 +290,22 @@ export default {
       businessIndustries
     }
   },
+
   computed: {
     ...mapState('accountRegistration', ['form']),
+
     isLargeScreen () {
       return this.$q.screen.width > 767
     },
+
     paddingLeftClasses () {
       return this.isLargeScreen ? 'q-pl-4' : ''
     },
+
     paddingRightClasses () {
       return this.isLargeScreen ? 'q-pr-4' : ''
     },
+
     countries () {
       const countries = window.CountriesAndTimezones.getAllCountries()
 
@@ -314,18 +323,23 @@ export default {
         ...countriesArr
       ]
     },
+
     phoneMask () {
       return this.getMaskByCountry(this.form.auth_rep_phone_number)
     }
   },
+
   methods: {
     getZipCodeRuleClass (rule) {
       return rule ? 'text-green' : 'text-red'
     },
+
     validateZipCode (zip) {
       const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
+
       return zipRegex.test(zip)
     },
+
     validatePhoneNumber (phone) {
       const cleanedPhone = phone.replace(/[^\d]/g, '')
       const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
@@ -333,15 +347,20 @@ export default {
       if (!formattedPhone || formattedPhone === cleanedPhone || formattedPhone === '-') {
         return 'Invalid phone number'
       }
+
       return true
     },
+
     validateEmail (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
       return emailRegex.test(email) || 'Invalid email address'
     },
+
     iconForValidation (isValid) {
       return isValid ? 'check' : 'close'
     },
+
     onSubmit () {
       this.$emit('submit', this.form)
     }
