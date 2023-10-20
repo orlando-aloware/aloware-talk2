@@ -222,7 +222,7 @@
           <input-field
             label="Phone Number"
             placeholder="+1 222 333 4444"
-            mask="+# ### ### ####"
+            :mask="phoneMask"
             :paddingClasses="paddingLeftClasses"
             :rules="[validatePhoneNumber]"
             v-model="form.auth_rep_phone_number"
@@ -253,6 +253,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { maskMixin } from 'src/plugins/mixins'
 import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
@@ -264,6 +265,7 @@ import businessIndustries from '../../constants/account-registration-business-in
 
 export default {
   name: 'BusinessInformationForm',
+  mixins: [maskMixin],
   components: {
     StepHeader,
     InputGroup,
@@ -311,6 +313,9 @@ export default {
         { id: 'CA', name: 'Canada' },
         ...countriesArr
       ]
+    },
+    phoneMask () {
+      return this.getMaskByCountry(this.form.auth_rep_phone_number)
     }
   },
   methods: {

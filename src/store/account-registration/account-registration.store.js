@@ -5,7 +5,7 @@ export default function () {
     //   first_name: 'Jeff',
     //   last_name: 'Bruchado',
     //   email: 'jefferson@aloware.com',
-    //   phone_number: '48996461911',
+    //   phone_number: '+55 48 9 9646-1911',
     //   country: {
     //     id: 'US',
     //     name: 'United States'
@@ -51,7 +51,7 @@ export default function () {
     //   auth_rep_first_name: 'Eleonor',
     //   auth_rep_last_name: 'Somosot',
     //   auth_rep_email: 'eleonor@aloware.com',
-    //   auth_rep_phone_number: '48996461911',
+    //   auth_rep_phone_number: '+1 4244071998',
     //   auth_rep_business_title: 'Dev',
     //   auth_rep_job_position: 'Other',
 

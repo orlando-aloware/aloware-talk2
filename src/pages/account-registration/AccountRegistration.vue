@@ -62,7 +62,7 @@
                     <input-field
                       label="Phone Number"
                       placeholder="+1 222 333 4444"
-                      mask="+# ### ### ####"
+                      :mask="phoneMask"
                       :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       :rules="[validatePhoneNumber]"
                       v-model="form.phone_number"
@@ -305,7 +305,7 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex'
-import { recaptchaMixin } from 'src/plugins/mixins'
+import { recaptchaMixin, maskMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
@@ -327,7 +327,10 @@ export default {
     BusinessInformationForm,
     Banner
   },
-  mixins: [recaptchaMixin],
+  mixins: [
+    recaptchaMixin,
+    maskMixin
+  ],
   data () {
     return {
       step: 1,
@@ -371,6 +374,10 @@ export default {
         { id: 'CA', name: 'Canada' },
         ...countriesArr
       ]
+    },
+
+    phoneMask () {
+      return this.getMaskByCountry(this.form.phone_number)
     }
   },
 
@@ -497,6 +504,19 @@ export default {
       this.form.timezone = timezone || 'America/Los_Angeles'
     },
 
+    selectCountryBasedInTimezone () {
+      const timezone = this.form.timezone
+      const countries = window.CountriesAndTimezones.getAllCountries()
+      const country = Object.values(countries).find(({ timezones }) => timezones.includes(timezone))
+
+      if (country) {
+        this.form.country = {
+          id: country.id,
+          name: country.name
+        }
+      }
+    },
+
     onCaptchaVerified (response) {
       this.disabledSubmit = false
 
@@ -521,6 +541,7 @@ export default {
         ...this.form,
         pre_signup_id: this.$route.params.pre_signup_id,
         phone_number: this.$options.filters.fixPhone(this.form.phone_number, 'E164', true),
+        auth_rep_phone_number: this.$options.filters.fixPhone(this.form.auth_rep_phone_number, 'E164', true),
         ...this.getBusinessInformationFieldsValue
       }
 
@@ -543,6 +564,7 @@ export default {
   created () {
     this.validateAllPasswordRules()
     this.setTimezone()
+    this.selectCountryBasedInTimezone()
   }
 }
 </script>
