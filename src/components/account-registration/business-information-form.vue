@@ -11,7 +11,7 @@
           <input-field
             label="Business Legal Name"
             placeholder="Aloware Inc."
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.legal_name"
           />
 
@@ -56,7 +56,7 @@
             label="Business ID Type"
             option-label="label"
             option-value="value"
-            :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+            :paddingClasses="paddingRightClasses"
             :options="businessIdTypes"
             v-model="form.business_registration_identifier"
           />
@@ -64,7 +64,7 @@
           <input-field
             label="Business Registration Number"
             placeholder="Ex: C1234567"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.business_registration_number"
           />
         </template>
@@ -76,7 +76,7 @@
             label="Region of Operation"
             option-label="label"
             option-value="value"
-            :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+            :paddingClasses="paddingRightClasses"
             :options="regionsOfOperations"
             v-model="form.business_regions_of_operation"
           />
@@ -84,7 +84,7 @@
           <input-field
             label="Website URL"
             placeholder="Ex: yourcompany.com"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.website_url"
           />
         </template>
@@ -96,7 +96,7 @@
             label="Business Industry"
             option-label="name"
             option-value="value"
-            :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+            :paddingClasses="paddingRightClasses"
             :options="businessIndustries"
             v-model="form.business_industry"
           />
@@ -120,7 +120,7 @@
             label="Street"
             placeholder="Ex: Fifth Avenue"
             col-md="col-md-10"
-            :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+            :paddingClasses="paddingRightClasses"
             v-model="form.street"
           />
         </template>
@@ -137,7 +137,7 @@
           <input-field
             label="City"
             placeholder="Ex: Los Angeles"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.city"
           />
         </template>
@@ -150,7 +150,7 @@
             placeholder="Ex: United States"
             option-label="name"
             option-value="id"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             :options="countries"
             v-model="form.legal_country"
           />
@@ -158,8 +158,8 @@
           <input-field
             label="Postal Code"
             placeholder="Ex: 11223"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
             bottom-slots
+            :paddingClasses="paddingLeftClasses"
             v-model="form.postal_code"
           >
             <template
@@ -195,14 +195,14 @@
           <input-field
             label="First Name"
             placeholder="Type here"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.auth_rep_first_name"
           />
 
           <input-field
             label="Last Name"
             placeholder="Type here"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.auth_rep_last_name"
           />
         </template>
@@ -214,7 +214,7 @@
             label="Email"
             placeholder="email@domain.com"
             type="email"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             :rules="[validateEmail]"
             v-model="form.auth_rep_email"
           />
@@ -223,7 +223,7 @@
             label="Phone Number"
             placeholder="+1 222 333 4444"
             mask="+# ### ### ####"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             :rules="[validatePhoneNumber]"
             v-model="form.auth_rep_phone_number"
           />
@@ -235,14 +235,14 @@
           <input-field
             label="Business Title"
             placeholder="Type here"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.auth_rep_business_title"
           />
 
           <input-field
             label="Job Position"
             placeholder="Ex. CEO, CTO, Product Director"
-            :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+            :paddingClasses="paddingLeftClasses"
             v-model="form.auth_rep_job_position"
           />
         </template>
@@ -288,6 +288,12 @@ export default {
     ...mapState('accountRegistration', ['form']),
     isLargeScreen () {
       return this.$q.screen.width > 767
+    },
+    paddingLeftClasses () {
+      return this.isLargeScreen ? 'q-pl-4' : ''
+    },
+    paddingRightClasses () {
+      return this.isLargeScreen ? 'q-pr-4' : ''
     },
     countries () {
       const countries = window.CountriesAndTimezones.getAllCountries()
@@ -336,7 +342,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>
