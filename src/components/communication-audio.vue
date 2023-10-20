@@ -10,6 +10,7 @@
           </waveform>
           <download-button v-if="fileUuid"
                            is-simple
+                           :communication-id="communication.id"
                            :filename="filename"
                            :file-uuid="fileUuid"/>
         </div>

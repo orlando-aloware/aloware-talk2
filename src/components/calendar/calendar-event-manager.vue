@@ -234,7 +234,7 @@
 
       <b-row v-if="mode === 'edit'">
         <b-col cols="12"
-               lg="4">
+               lg="6">
           <b-form-group label="Status">
             <div class="text-center pb-1 b-b">
               <q-btn-toggle class="border w-100"
@@ -438,6 +438,10 @@ export default {
         {
           label: 'Cancelled',
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED
+        },
+        {
+          label: 'Missed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_MISSED
         }
       ]
     },
@@ -455,6 +459,10 @@ export default {
         {
           label: 'Cancelled',
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
+        },
+        {
+          label: 'Missed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         }
       ]
     },

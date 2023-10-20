@@ -673,7 +673,9 @@
                             class="text-dark-greenish w-100">
                         <download-button is-simple
                                          show-file-name
+                                         :communication-id="communication.id"
                                          :filename="attachment.name"
+                                         :file-mime-type="attachment.mime_type"
                                          :attachment-url="attachment.url"/>
                       </div>
                     </div>
@@ -914,6 +916,10 @@ export default {
         {
           label: 'Cancelled',
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_CANCELED
+        },
+        {
+          label: 'Missed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_APPOINTMENT_MISSED
         }
       ],
       reminderOptions: [
@@ -928,6 +934,10 @@ export default {
         {
           label: 'Cancelled',
           value: CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW
+        },
+        {
+          label: 'Missed',
+          value: CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
         }
       ],
       activityExpansionClass: [],
