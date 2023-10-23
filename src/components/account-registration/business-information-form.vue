@@ -278,7 +278,7 @@ export default {
   props: {
     shouldShowSubmitButton: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
 

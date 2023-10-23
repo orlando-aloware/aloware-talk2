@@ -10,8 +10,8 @@
       :rules="rules"
       :type="fieldType"
       :mask="mask"
-      @input="emitUpdateEvent"
       :value="innerValue"
+      @input="emitUpdateEvent"
     >
       <template
         v-if="isPassword"
@@ -29,6 +29,8 @@
 
 <script>
 export default {
+  name: 'InputField',
+
   props: {
     label: {
       type: String,
@@ -67,26 +69,31 @@ export default {
       default: false
     }
   },
+
   data () {
     return {
       show_password: false,
       innerValue: this.value
     }
   },
+
   computed: {
     fieldType () {
       return this.isPassword && !this.show_password ? 'password' : this.type
     }
   },
+
   methods: {
     toggleVisibility () {
       this.show_password = !this.show_password
     },
+
     emitUpdateEvent (value) {
       this.innerValue = value
       this.$emit('input', this.innerValue)
     }
   },
+
   watch: {
     value (value) {
       this.innerValue = value

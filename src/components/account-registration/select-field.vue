@@ -20,6 +20,7 @@
 <script>
 export default {
   name: 'SelectField',
+
   props: {
     label: {
       type: String,
@@ -53,15 +54,18 @@ export default {
       default: 'value'
     }
   },
+
   data () {
     return {
       innerValue: this.value
     }
   },
+
   watch: {
     value (newValue) {
       this.innerValue = newValue
     },
+
     innerValue (newValue) {
       this.$emit('input', newValue)
     }

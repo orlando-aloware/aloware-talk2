@@ -16,6 +16,7 @@
 <script>
 export default {
   name: 'StepHeader',
+
   props: {
     title: {
       type: String,
@@ -32,7 +33,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-
-</style>
