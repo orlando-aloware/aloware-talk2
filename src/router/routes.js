@@ -470,7 +470,8 @@ const routes = [
         path: '/account-registration/:pre_signup_id?',
         name: 'Account Registration',
         meta: {
-          title: 'Account Registration'
+          title: 'Account Registration',
+          isGuest: true
         },
         component: AccountRegistration
       }
