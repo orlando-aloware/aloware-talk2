@@ -31,6 +31,7 @@ const EmailBlast = () => import('pages/EmailBlast.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
+const BusinessInformation = () => import('pages/account-registration/BusinessInformation.vue')
 
 const routes = [
   {
@@ -469,8 +470,7 @@ const routes = [
         path: '/account-registration/:pre_signup_id?',
         name: 'Account Registration',
         meta: {
-          title: 'Account Registration',
-          isGuest: true
+          title: 'Account Registration'
         },
         component: AccountRegistration
       }
