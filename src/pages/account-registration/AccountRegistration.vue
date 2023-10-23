@@ -423,13 +423,17 @@ export default {
     },
 
     validatePhoneNumber (phone) {
-      const cleanedPhone = phone.replace(/[^\d]/g, '')
+      const cleanedPhone = this.getCleanedPhoneNumber(phone)
       const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
 
       if (!formattedPhone || formattedPhone === cleanedPhone || formattedPhone === '-') {
         return 'Invalid phone number'
       }
       return true
+    },
+
+    getCleanedPhoneNumber (phone) {
+      return phone.replace(/[^\d]/g, '')
     },
 
     validateAllPasswordRules () {
@@ -559,8 +563,8 @@ export default {
       const payload = {
         ...this.form,
         pre_signup_id: this.$route.params.pre_signup_id,
-        phone_number: this.$options.filters.fixPhone(this.form.phone_number, 'E164', true),
-        auth_rep_phone_number: this.$options.filters.fixPhone(this.form.auth_rep_phone_number, 'E164', true),
+        phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.phone_number), 'E164', true),
+        auth_rep_phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.auth_rep_phone_number), 'E164', true),
         ...this.getBusinessInformationFieldsValue
       }
 
