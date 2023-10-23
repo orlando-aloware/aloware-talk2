@@ -97,6 +97,7 @@ export default {
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
+        console.log('in updateCommunication data.current_status2: ', data?.current_status2)
 
         const user = this.getUser(this.dialer.communication.added_user_id)
 
