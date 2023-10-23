@@ -104,11 +104,6 @@ export default {
         !hasContactDisposition
     },
 
-    isVmDropReady () {
-      console.log('this.isCallInProgressStatus: ', this.isCallInProgressStatus)
-      return !isEmpty(this.dialer.communication) && this.isCallInProgressStatus
-    },
-
     isVoicemailEmpty () {
       return isEmpty(this.voicemails)
     }
@@ -122,7 +117,7 @@ export default {
     this.sessionPaused = false
     this.initCallDisposition()
 
-    if (!this.isVmDropReady) {
+    if (!this.isCallInProgressStatus) {
       this.$refs['vm-drop'].disable()
     }
   },
@@ -250,7 +245,7 @@ export default {
     },
 
     onVmDrop (item) {
-      if (!this.isVmDropReady || !item) {
+      if (!this.isCallInProgressStatus || !item) {
         return
       }
 
@@ -291,8 +286,10 @@ export default {
 
     'dialer.communication': function (communication) {
       this.initCallDisposition()
+    },
 
-      if (this.isVmDropReady) {
+    isCallInProgressStatus (value) {
+      if (value) {
         this.$refs['vm-drop'].enable()
 
         return
