@@ -2,9 +2,9 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import { mapState } from 'vuex'
 
 export default {
-  data: {
+  data: () => ({
     isCallInProgressStatus: false
-  },
+  }),
 
   computed: {
     ...mapState(['dialer'])
