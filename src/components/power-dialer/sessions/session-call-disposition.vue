@@ -48,6 +48,7 @@ import { mapState, mapGetters, mapActions } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
 import { get, isEmpty } from 'lodash'
 import {
+  dialerCommunicationMixin,
   dispositionsMixin,
   dispositionsOptionsMixin
 } from 'src/plugins/mixins'
@@ -59,7 +60,8 @@ export default {
 
   mixins: [
     dispositionsMixin,
-    dispositionsOptionsMixin
+    dispositionsOptionsMixin,
+    dialerCommunicationMixin
   ],
 
   components: {
@@ -103,13 +105,9 @@ export default {
         !hasContactDisposition
     },
 
-    isCallIInProgress () {
-      return this.dialer?.communication?.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
-    },
-
     isVmDropReady () {
-      console.log('this.isCallIInProgress: ', this.isCallIInProgress)
-      return !isEmpty(this.dialer.communication) && this.isCallIInProgress
+      console.log('this.isCallInProgressStatus: ', this.isCallInProgressStatus)
+      return !isEmpty(this.dialer.communication) && this.isCallInProgressStatus
     },
 
     isVoicemailEmpty () {

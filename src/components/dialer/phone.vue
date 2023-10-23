@@ -1229,7 +1229,8 @@ import {
   communicationInfoMixin,
   notificationMixin,
   dispositionsMixin,
-  agentMixin
+  agentMixin,
+  dialerCommunicationMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1334,7 +1335,8 @@ export default {
     communicationInfoMixin,
     notificationMixin,
     dispositionsMixin,
-    agentMixin
+    agentMixin,
+    dialerCommunicationMixin
   ],
 
   props: {
@@ -1453,10 +1455,6 @@ export default {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
     },
 
-    isCallIInProgress () {
-      return this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
-    },
-
     isHangupDisabled () {
       return this.isCallCompleted
     },
@@ -1494,7 +1492,7 @@ export default {
     },
 
     isVmDropDisabled () {
-      return !this.devMode && !this.isCallIInProgress
+      return !this.devMode && !this.isCallInProgressStatus
     },
 
     isHoldDisabled () {
