@@ -85,14 +85,20 @@ export default {
 
   created () {
     this.dialerListeners.updateCommunication = (data) => {
+      console.log('in updateCommunication data.current_status2: ', data?.current_status2)
+      console.log('CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW: ', CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW)
+      console.trace('this.dialer.communication.id: ', this.dialer.communication?.id)
+      console.log('data.id: ', data?.id)
       if (!this.checkCommunicationMatchesUserAccessibility(data)) {
         return
       }
 
+      console.log(`this.dialer.communication === this.dialer.communication.id === data.id: ${this.dialer.communication.id} === ${data.id}`)
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
+        console.log('data: ', this.$jsonClone(data))
 
         const user = this.getUser(this.dialer.communication.added_user_id)
 
