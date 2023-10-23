@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "Aloware Agent Interface",
   "productName": "Aloware Talk",
   "author": "Aloware <support@aloware.com>",
@@ -30,7 +30,7 @@
     "@riophae/vue-treeselect": "^0.4.0",
     "@sentry/vue": "^7.47.0",
     "@sentry/webpack-plugin": "^1.20.0",
-    "@twilio/voice-sdk": "^2.1.2",
+    "@twilio/voice-sdk": "^2.8",
     "announcekit-vue": "^2.3.0",
     "axios": "^0.22.0",
     "bootstrap": "^4.6.1",

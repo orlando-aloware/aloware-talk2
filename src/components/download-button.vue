@@ -22,7 +22,7 @@
                     :loading="isLoading"
                     :disabled="isLoading"
                     v-if="!isSimple && !isSimpleAttachment && !hasFilenameExtension">
-      <portal-target :name="`${downloadDropdownList}-${communicationId}`"/>
+      <portal-target :name="`downloadDropdownList-${communicationId}`"/>
     </q-btn-dropdown>
     <div class="d-flex align-items-center"
          v-if="isSimple && !isSimpleAttachment">
@@ -59,7 +59,7 @@
         <download-icon height="16"
                        width="16">
         </download-icon>
-        <portal-target :name="`${downloadDropdownList}-${communicationId}`"/>
+        <portal-target :name="`downloadDropdownList-${communicationId}`"/>
       </q-btn-dropdown>
     </div>
     <a role="button"
@@ -73,7 +73,7 @@
         </p>
       </div>
     </a>
-    <portal :to="`${downloadDropdownList}-${communicationId}`">
+    <portal :to="`downloadDropdownList-${communicationId}`">
       <q-list>
         <q-item class="p-2"
                 clickable
