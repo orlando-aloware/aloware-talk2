@@ -70,27 +70,6 @@ export default {
         .listen('.user.status.updated', (event) => {
           this.setUserStatus(event.status)
         })
-        .listen('.webrtc.communication.updated', (event) => {
-          let communication = event.communication
-          if (event.tags) {
-            communication.tags = event.tags
-            communication.tag_ids = event.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            communication.contact = event.contact
-          }
-          if (event.owner) {
-            communication.owner = event.owner
-          }
-          if (event.contact_tags && communication && communication.contact) {
-            communication.contact.tags = event.contact_tags
-          }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            communication.campaign = campaign
-          }
-          this.$VueEvent.fire('webrtc_update_communication', communication)
-        })
         .listen('.user.in-app.contact.contact_assigned', (event) => {
           if (event.tags) {
             event.contact.tags = event.tags
