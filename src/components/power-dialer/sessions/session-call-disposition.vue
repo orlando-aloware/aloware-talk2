@@ -53,7 +53,6 @@ import {
   dispositionsOptionsMixin
 } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'SessionCallDisposition',
