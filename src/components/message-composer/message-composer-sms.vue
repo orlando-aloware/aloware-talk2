@@ -175,7 +175,7 @@
           size="sm"
           padding="0px 12px"
           :ripple="false"
-          :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
+          :disable="isSendTextDisabled"
           :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
           :menu-offset="[0, 6]"
           v-if="useSendButton"
@@ -224,9 +224,16 @@ import ApplicationPlaceholder from 'components/message-composer/file-placeholder
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import {
+  kycMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'message-composer-sms',
+
+  mixins: [
+    kycMixin
+  ],
 
   components: {
     MessageComposerOptions,
@@ -317,6 +324,11 @@ export default {
         default:
           return 'Send Text'
       }
+    },
+
+    isSendTextDisabled () {
+      const phoneNumber = this.messageComposer.sms.phone_number
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.enabledToTextNumber(phoneNumber)
     }
   },
 

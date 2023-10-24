@@ -60,7 +60,7 @@
                            color="positive"
                            type="submit"
                            style="width: 148px; height: 50px;"
-                           :disable="loading || disabledSubmit"
+                           :disable="false"
                            :loading="loading"/>
                 </div>
                 <div class="description-sm field text-left pt-3 mt-1">
@@ -176,9 +176,9 @@ export default {
         rememberMe: this.user.remember_me
       }
 
-      if (!this.$q.platform.is.electron) {
+      /* if (!this.$q.platform.is.electron) {
         params.recaptchaResponse = this.user.recaptchaResponse
-      }
+      } */
 
       return params
     },
@@ -262,9 +262,9 @@ export default {
         remember_me: !!this.$q.platform.is.electron
       }
 
-      if (!this.$q.platform.is.electron) {
+      /* if (!this.$q.platform.is.electron) {
         this.user.recaptchaResponse = null
-      }
+      } */
     },
 
     goToNextInput ($event) {
@@ -280,11 +280,11 @@ export default {
     },
 
     onCaptchaVerified (response) {
-      this.disabledSubmit = false
+      /* this.disabledSubmit = false
 
       if (!this.$q.platform.is.electron) {
         this.user.recaptchaResponse = response
-      }
+      } */
     },
 
     ...mapActions('cache', [

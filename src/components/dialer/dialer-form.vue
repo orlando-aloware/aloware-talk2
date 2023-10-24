@@ -187,7 +187,15 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  contactMixin,
+  contactV2AttributesMixin,
+  selectorMixin,
+  timezoneCheckMixin,
+  visibilityMixin,
+  kycMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
@@ -198,7 +206,8 @@ export default {
     timezoneCheckMixin,
     visibilityMixin,
     aclMixin,
-    selectorMixin
+    selectorMixin,
+    kycMixin
   ],
 
   components: {
@@ -273,11 +282,11 @@ export default {
     },
 
     callDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber)
     },
 
     sendDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
     },
 
     dialerFormClass () {

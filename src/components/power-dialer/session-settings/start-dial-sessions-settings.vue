@@ -4,7 +4,7 @@
            color="success"
            no-caps
            unelevated
-           :disabled="disabledTrigger"
+           :disabled="disabledTrigger || callDisabled"
            v-if="defaultTrigger"
            @click="dialPreparation">
       <PhoneIcon class="mr-2"
@@ -317,9 +317,16 @@ import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
 import { isEqual } from 'lodash'
+import {
+  kycMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'StartDialSessionsSettings',
+
+  mixins: [
+    kycMixin
+  ],
 
   props: {
     list: {
@@ -432,6 +439,10 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
+    },
+
+    callDisabled () {
+      return !this.enabledToCallNumber()
     }
   },
 

@@ -85,7 +85,7 @@
                     Select Contacts & Add to List
                   </b-dropdown-item>
                   <b-dropdown-item href="#"
-                                   :disabled="taskAddAndClearingDisabled"
+                                   :disabled="taskAddAndClearingDisabled || !canCreateContacts"
                                    v-b-modal:create-contact-modal>
                     <i class="fa fa-plus mr-1"/>
                     {{ createContactToListText }}
@@ -543,7 +543,8 @@ import {
   viewMixin,
   avatarMixin,
   powerDialerMixin,
-  powerDialerInitMixin
+  powerDialerInitMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
 
@@ -629,7 +630,8 @@ export default {
     powerDialerInitMixin,
     aclMixin,
     viewMixin,
-    avatarMixin
+    avatarMixin,
+    kycMixin
   ],
 
   inject: [
@@ -861,6 +863,10 @@ export default {
 
     showMobileFilters () {
       return this.$q.screen.width <= PD_MAX_FILTER_LG
+    },
+
+    canCreateContacts () {
+      return this.enabledToCreateContacts()
     }
   },
 

@@ -210,6 +210,7 @@
             Select Existing Contacts & Add to List
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           :disabled="!canCreateContacts"
                            @click="onShowCreateContact">
             <plus-icon color="#62666E"></plus-icon>
             Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
@@ -670,7 +671,8 @@ import {
   aclMixin,
   viewMixin,
   contactsListFiltersMixin,
-  simpsocialMixin
+  simpsocialMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -684,7 +686,8 @@ export default {
     aclMixin,
     viewMixin,
     contactsListFiltersMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    kycMixin
   ],
 
   inject: [
@@ -941,6 +944,10 @@ export default {
 
     canAddContacts () {
       return this.list.type === ContactListTypes.STATIC && this.isEditable
+    },
+
+    canCreateContacts () {
+      return this.enabledToCreateContacts()
     },
 
     fixedColumns () {
@@ -1361,6 +1368,9 @@ export default {
     },
 
     onShowCreateContact (e) {
+      if (!this.enabledToCreateContacts()) {
+        return
+      }
       this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
       e.stopImmediatePropagation()
     },
