@@ -262,6 +262,7 @@ export default function (/* { ssrContext } */) {
       suspended: false,
       showProFeatureDialog: false,
       leadSources: [],
+      kycFilledStatus: false,
       contactsLists: [],
       statics: {
         domain: null,
@@ -786,6 +787,10 @@ export default function (/* { ssrContext } */) {
 
       setLeadSources ({ commit }, leadSources) {
         commit('SET_LEAD_SOURCES', leadSources)
+      },
+
+      setKycFilledStatus ({ commit }, value) {
+        commit('SET_KYC_FILLED_STATUS', value)
       },
 
       setStatics ({ commit }, statics) {
@@ -1515,6 +1520,10 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
+      },
+
+      SET_KYC_FILLED_STATUS (state, value) {
+        state.kycFilledStatus = value
       },
 
       SET_STATICS (state, statics) {
