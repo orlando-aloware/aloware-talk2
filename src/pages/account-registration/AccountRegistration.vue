@@ -305,7 +305,7 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex'
-import { recaptchaMixin, maskMixin } from 'src/plugins/mixins'
+import { guestMixin, recaptchaMixin, maskMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
@@ -330,6 +330,7 @@ export default {
   },
 
   mixins: [
+    guestMixin,
     recaptchaMixin,
     maskMixin
   ],
