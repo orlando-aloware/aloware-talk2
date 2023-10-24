@@ -49,7 +49,7 @@ export default {
     },
 
     onBackToPreviousRoute () {
-      this.$router.go(-1)
+      this.$router.push({ name: 'Inbox' })
     },
 
     onSubmit () {
