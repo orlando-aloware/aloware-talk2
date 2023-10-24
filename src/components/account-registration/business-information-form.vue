@@ -8,7 +8,7 @@
 
     <div
       class="min-w-100"
-      :class="shouldShowActionButtons ? 'h-60 overflow-auto q-pt-xl q-pb-xl' : ''">
+      :class="shouldShowActionButtons ? 'h-55 overflow-auto q-pt-xl q-pb-xl' : ''">
       <input-group>
         <template v-slot:content>
           <input-field
