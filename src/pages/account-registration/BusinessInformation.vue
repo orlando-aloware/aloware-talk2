@@ -54,7 +54,7 @@ export default {
 
     onSubmit () {
       this.isLoading = true
-      const preSignupId = this.$route.params.pre_signup_id
+      const preSignupId = this.$route.params.company_id
 
       const payload = {
         ...this.getBusinessInformationFieldsValue,

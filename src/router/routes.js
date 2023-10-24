@@ -476,7 +476,7 @@ const routes = [
         component: AccountRegistration
       },
       {
-        path: '/business-information-registration/:pre_signup_id?',
+        path: '/business-information-registration/:company_id?',
         name: 'Business Information',
         meta: {
           title: 'Business Information'
