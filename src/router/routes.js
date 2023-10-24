@@ -31,6 +31,7 @@ const EmailBlast = () => import('pages/EmailBlast.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
+const BusinessInformation = () => import('pages/account-registration/BusinessInformation.vue')
 
 const routes = [
   {
@@ -473,6 +474,15 @@ const routes = [
           isGuest: true
         },
         component: AccountRegistration
+      },
+      {
+        path: '/business-information-registration/:pre_signup_id?',
+        name: 'Business Information',
+        meta: {
+          title: 'Business Information',
+          isGuest: true
+        },
+        component: BusinessInformation
       }
     ]
   },
