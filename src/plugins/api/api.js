@@ -165,6 +165,10 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
       },
 
+      syncGHL (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-gohighlevel`)
+      },
+
       bulkSaveCustomAttributes (contactId, params) {
         return window.axios.patch(`${suffixV1}contact-attributes/${contactId}`, params)
       },

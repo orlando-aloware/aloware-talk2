@@ -25,7 +25,7 @@
               </compact-btn>
               <compact-btn customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            borderless
-                           @clicked="toggleFilterDialog(true)">
+                           @clicked="processToggleFilter(true)">
                 <q-tooltip anchor="top middle"
                            self="center middle"
                            v-if="appliedFilter">
@@ -820,10 +820,16 @@ export default {
       'setHasMoreCommunications',
       'toggleFilterModelForm',
       'toggleFilterDialog',
+      'toggleFilterDialogWithFilters',
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts'
     ]),
+
+    processToggleFilter (value) {
+      this.toggleFilterDialog(value)
+      this.toggleFilterDialogWithFilters(value)
+    },
 
     onResetFilters () {
       this.resetFilters()
@@ -873,6 +879,7 @@ export default {
 
     onApplyFilter (filter) {
       this.filter = filter
+      this.setChannelClonedFilter(this.filter)
 
       if (this.$route.params.channel === 'recordings') {
         this.filter.answer_status = 'recorded'
