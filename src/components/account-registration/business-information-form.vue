@@ -2,10 +2,13 @@
   <div>
     <step-header
       title="Your Business"
-      description="Great! Now, we need important information to verify your business."
+      :description="headerDescription"
+      :class="shouldShowActionButtons ? 'q-pt-xl q-mx-6' : ''"
     />
 
-    <div class="min-w-100">
+    <div
+      class="min-w-100"
+      :class="shouldShowActionButtons ? 'h-70 overflow-auto q-pt-xl q-pb-xl' : ''">
       <input-group>
         <template v-slot:content>
           <input-field
@@ -248,6 +251,49 @@
         </template>
       </input-group>
     </div>
+    <div v-if="shouldShowActionButtons">
+      <div class="flex justify-between pt-4">
+        <q-btn
+          class="q-mx-xl account-registration-action-btn"
+          color="primary"
+          label="Back"
+          size="md"
+          outline
+          dense
+          rounded
+          no-caps
+          unelevated
+          @click="backToDashboard"
+        />
+        <div>
+          <q-btn
+            class="q-mr-xs account-registration-action-btn"
+            color="#62666E"
+            size="md"
+            label="Skip for now"
+            rounded
+            dense
+            no-caps
+            unelevated
+            flat
+            @click="skipForNow"
+          />
+
+          <q-btn
+            class="q-mr-xl account-registration-action-btn"
+            color="primary"
+            size="md"
+            label="Next"
+            rounded
+            dense
+            no-caps
+            unelevated
+            :disabled="isNextButtonDisabled"
+            @click="onSubmit"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -276,7 +322,12 @@ export default {
   },
 
   props: {
-    shouldShowSubmitButton: {
+    shouldShowActionButtons: {
+      type: Boolean,
+      default: false
+    },
+
+    isLoading: {
       type: Boolean,
       default: false
     }
@@ -326,12 +377,45 @@ export default {
 
     phoneMask () {
       return this.getMaskByCountry(this.form.auth_rep_phone_number)
+    },
+
+    headerDescription () {
+      return !this.shouldShowActionButtons
+        ? 'Great! Now, we need important information to verify your business.'
+        : 'Welcome back! We need important information to verify your business.'
+    },
+
+    isNextButtonDisabled () {
+      return !this.validateFieldsFilled() || this.isLoading
     }
   },
 
   methods: {
     getZipCodeRuleClass (rule) {
       return rule ? 'text-green' : 'text-red'
+    },
+
+    validateFieldsFilled () {
+      return (
+        this.form.legal_name.length &&
+        this.form.business_type &&
+        this.form.business_registration_identifier &&
+        this.form.business_registration_number.length &&
+        this.form.business_regions_of_operation &&
+        this.form.business_industry &&
+        this.form.website_url.length &&
+        this.form.street.length &&
+        this.form.region.length &&
+        this.form.city.length &&
+        this.form.legal_country &&
+        this.validateZipCode(this.form.postal_code) &&
+        this.form.auth_rep_first_name.length &&
+        this.form.auth_rep_last_name.length &&
+        this.validateEmail(this.form.auth_rep_email) === true &&
+        this.validatePhoneNumber(this.form.auth_rep_phone_number) === true &&
+        this.form.auth_rep_business_title &&
+        this.form.auth_rep_job_position
+      )
     },
 
     validateZipCode (zip) {
@@ -359,6 +443,14 @@ export default {
 
     iconForValidation (isValid) {
       return isValid ? 'check' : 'close'
+    },
+
+    backToDashboard () {
+      this.$emit('back-to-dashboard')
+    },
+
+    skipForNow () {
+      this.$emit('skip-for-now')
     },
 
     onSubmit () {
