@@ -1,0 +1,85 @@
+<template>
+  <div class="account-registration row">
+    <div class="col-xl-8 col-md-12 col-sm-12">
+      <div class="absolute-top q-pt-xl q-px-xl">
+        <img src="app-icons/menu/logo_dark.svg" alt="Logo" />
+      </div>
+      <div class="stepper__container">
+        <business-information-form
+          ref="businessInformationForm"
+          :should-show-action-buttons="true"
+          :is-loading="isLoading"
+          @submit="onSubmit"
+          @back-to-dashboard="onBackToPreviousRoute"
+          @skip-for-now="onBackToPreviousRoute"
+        />
+      </div>
+    </div>
+    <banner :current-step="1" />
+  </div>
+</template>
+
+<script>
+import { mapGetters, mapState } from 'vuex'
+import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
+import Banner from 'src/components/account-registration/banner.vue'
+
+export default {
+  name: 'BusinessInformation',
+
+  components: {
+    BusinessInformationForm,
+    Banner
+  },
+
+  data () {
+    return {
+      isLoading: false
+    }
+  },
+
+  computed: {
+    ...mapState('accountRegistration', ['form']),
+    ...mapGetters('accountRegistration', ['getBusinessInformationFieldsValue'])
+  },
+
+  methods: {
+    getCleanedPhoneNumber (phone) {
+      return phone.replace(/[^\d]/g, '')
+    },
+
+    onBackToPreviousRoute () {
+      this.$router.go(-1)
+    },
+
+    onSubmit () {
+      this.isLoading = true
+      const preSignupId = this.$route.params.pre_signup_id
+
+      const payload = {
+        ...this.getBusinessInformationFieldsValue,
+        pre_signup_id: preSignupId,
+        auth_rep_phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.auth_rep_phone_number), 'E164', true),
+        kyc_filled: 1
+      }
+
+      console.log('submit', payload)
+
+      this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
+        .then((res) => {
+          this.isSubmitted = true
+          this.$generalNotification('The Business information has been submitted.')
+          this.$router.push({ name: 'Inbox' })
+        })
+        .catch((err) => {
+          this.$handleErrors(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped></style>
