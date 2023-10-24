@@ -14016,12 +14016,16 @@ h1.contact-list-name-label {
     padding-left: 2.8rem;
   }
 
-  .h-70 {
-    height: 70vh;
+  .h-60 {
+    height: 60vh;
   }
 
   .q-mx-6 {
     margin-left: 3.3rem !important;
     margin-right: 3.3rem !important;
+  }
+
+  .logo {
+    z-index: 11;
   }
 }

@@ -479,8 +479,7 @@ const routes = [
         path: '/business-information-registration/:pre_signup_id?',
         name: 'Business Information',
         meta: {
-          title: 'Business Information',
-          isGuest: true
+          title: 'Business Information'
         },
         component: BusinessInformation
       }

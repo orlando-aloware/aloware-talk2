@@ -1,7 +1,7 @@
 <template>
   <div class="account-registration row">
     <div class="col-xl-8 col-md-12 col-sm-12">
-      <div class="absolute-top q-pt-xl q-px-xl">
+      <div class="logo absolute-top q-pt-xl q-px-xl">
         <img src="app-icons/menu/logo_dark.svg" alt="Logo" />
       </div>
       <div class="stepper__container">
