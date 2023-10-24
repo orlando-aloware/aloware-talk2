@@ -211,6 +211,8 @@
       </Modal>
 
       <pro-feature-dialog/>
+
+      <kyc-fill-dialog :show="shouldShowKycFillDialog"/>
     </div>
   </div>
 </template>
@@ -256,6 +258,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
 import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
+import KycFillDialog from 'components/kyc-fill-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
@@ -279,6 +282,7 @@ export default {
     Dialer,
     Phone,
     ProFeatureDialog,
+    KycFillDialog,
     Modal
   },
 
@@ -312,6 +316,7 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
+      loadingKycFilledStatus: true,
       isWidget: false,
       transitionName: null,
       prevHeight: 0,
@@ -364,7 +369,8 @@ export default {
       'showPhone',
       'suspended',
       'parkedCalls',
-      'leadSources'
+      'leadSources',
+      'kycFilledStatus'
     ]),
 
     ...mapState('auth', [
@@ -499,6 +505,15 @@ export default {
 
     isDemoCompany () {
       return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
+    },
+
+    shouldShowKycFillDialog () {
+      const isAuthenticated = !this.isGuest && this.authenticated
+
+      return isAuthenticated &&
+             !this.kycFilledStatus &&
+             !this.loadingKycFilledStatus &&
+             !this.$router.currentRoute.name.includes('Business Information')
     }
   },
 
@@ -1430,6 +1445,7 @@ export default {
         this.getCallDispositions()
         this.getLeadSources()
         this.getMyQueueList()
+        this.getKycFilledStatus()
       })
     },
 
@@ -1876,6 +1892,25 @@ export default {
           console.log(err)
 
           return Promise.reject()
+        })
+    },
+
+    getKycFilledStatus () {
+      this.loadingKycFilledStatus = true
+
+      return this.$axios
+        .get(`/api/admin/company-registration/kyc-filled-status/${this.currentCompany.id}`)
+        .then(res => {
+          this.setKycFilledStatus(res.data?.kyc_filled_status)
+          this.loadingKycFilledStatus = false
+
+          return Promise.resolve()
+        }).catch(err => {
+          console.error(err)
+
+          return Promise.reject()
+        }).finally(() => {
+          this.loadingKycFilledStatus = false
         })
     },
 
@@ -2521,6 +2556,7 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
+      'setKycFilledStatus',
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded'
