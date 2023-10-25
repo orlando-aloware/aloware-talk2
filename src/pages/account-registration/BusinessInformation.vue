@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
 
@@ -46,6 +46,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setKycFilled']),
+
     getCleanedPhoneNumber (phone) {
       return phone.replace(/[^\d]/g, '')
     },
@@ -71,6 +73,10 @@ export default {
       this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
         .then((res) => {
           this.isSubmitted = true
+          this.setKycFilled({
+            kyc_filled_status: true
+          })
+
           this.$generalNotification('The Business information has been submitted.')
           this.$router.push({ name: 'Inbox' })
         })
