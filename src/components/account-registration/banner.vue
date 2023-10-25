@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     getBannerImageSrc () {
-      switch (this.step) {
+      switch (this.currentStep) {
         case 1:
           return '/images/woman-agent.png'
         case 2:
@@ -36,7 +36,7 @@ export default {
     },
 
     getBannerTitle () {
-      switch (this.step) {
+      switch (this.currentStep) {
         case 1:
           return 'Your customers prefer text'
         case 2:
