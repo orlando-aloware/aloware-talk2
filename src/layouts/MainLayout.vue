@@ -370,7 +370,8 @@ export default {
       'suspended',
       'parkedCalls',
       'leadSources',
-      'kycFilledStatus'
+      'kycFilledStatus',
+      'isPresignup'
     ]),
 
     ...mapState('auth', [
@@ -511,6 +512,7 @@ export default {
       const isAuthenticated = !this.isGuest && this.authenticated
 
       return isAuthenticated &&
+             this.isPresignup &&
              !this.kycFilledStatus &&
              !this.loadingKycFilledStatus &&
              !this.$router.currentRoute.name.includes('Business Information')
@@ -1901,7 +1903,7 @@ export default {
       return this.$axios
         .get(`/api/admin/company-registration/kyc-filled-status/${this.currentCompany.id}`)
         .then(res => {
-          this.setKycFilledStatus(res.data?.kyc_filled_status)
+          this.setKycFilled(res.data)
           this.loadingKycFilledStatus = false
 
           return Promise.resolve()
@@ -2556,7 +2558,7 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
-      'setKycFilledStatus',
+      'setKycFilled',
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded'
