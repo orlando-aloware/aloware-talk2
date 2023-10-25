@@ -39,6 +39,7 @@ export default {
   },
 
   computed: {
+    ...mapState('auth', ['profile']),
     ...mapState('accountRegistration', ['form']),
     ...mapGetters('accountRegistration', ['getBusinessInformationFieldsValue'])
   },
@@ -60,7 +61,8 @@ export default {
         ...this.getBusinessInformationFieldsValue,
         pre_signup_id: preSignupId,
         auth_rep_phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.auth_rep_phone_number), 'E164', true),
-        kyc_filled: 1
+        kyc_filled: 1,
+        user_id: this.profile.id
       }
 
       console.log('submit', payload)
