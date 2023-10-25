@@ -13697,7 +13697,7 @@ h1.contact-list-name-label {
   .text-body1 {
     font-size: 1.25rem;
     margin-top: 28px;
-    width: 65%;
+    width: 82%;
   }
 
   @include screen('xs') {
@@ -13720,7 +13720,7 @@ h1.contact-list-name-label {
     .text-body1 {
       font-size: 1.25rem;
       margin-top: 28px;
-      width: 65%;
+      width: 82%;
     }
   }
 
@@ -13813,8 +13813,37 @@ h1.contact-list-name-label {
     .stepper__content {
       overflow-y: auto;
       flex-grow: 1;
-      height: 60vh;
-      padding-bottom: 130px;
+      height: 56vh;
+    }
+
+    @media (min-height: 720px) {
+      .stepper__content {
+        height: 50vh;
+      }
+    }
+
+    @media (min-height: 900px) {
+      .stepper__content {
+        height: 56vh;
+      }
+    }
+
+    .business-information__form {
+      overflow-y: auto;
+      flex-grow: 1;
+      height: 56vh;
+    }
+
+    @media (min-height: 720px) {
+      .business-information__form {
+        height: 66vh;
+      }
+    }
+
+    @media (min-height: 900px) {
+      .business-information__form {
+        height: 72vh;
+      }
     }
 
     .q-stepper__nav {
@@ -14027,5 +14056,15 @@ h1.contact-list-name-label {
 
   .logo {
     z-index: 11;
+  }
+
+  .phone-row {
+    display: flex;
+    height: 35px;
+    width: 100%;
+
+    > .col-md-4 {
+      flex-grow: 1;
+    }
   }
 }

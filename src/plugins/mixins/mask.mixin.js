@@ -1,40 +1,39 @@
 export default {
   methods: {
-    getMaskByCountry (phone) {
-      const matched = phone.match(/^\+(\d{1,3})/)
-      const countryCode = matched ? matched[1] : null
+    getMaskByCountry (countryCode) {
+      console.log('getMaskByCountry', countryCode)
 
       switch (countryCode) {
         case '1': // USA and Canada
-          return '+# ### ### ####'
+          return '### ### ####'
         case '55': // Brazil
-          return '+## ## # ####-####'
+          return '## # ####-####'
         case '44': // United Kingdom
-          return '+## ## #### ####'
+          return '## #### ####'
         case '33': // France
-          return '+## # ## ## ## ##'
+          return '# ## ## ## ##'
         case '61': // Australia
-          return '+## # #### ####'
+          return '# #### ####'
         case '91': // India
-          return '+## #### ######'
+          return '#### ######'
         case '49': // Germany
-          return '+## ### ########'
+          return '### ########'
         case '7': // Russia
-          return '+# ### ###-##-##'
+          return '### ###-##-##'
         case '81': // Japan
-          return '+## # #### ####'
+          return '# #### ####'
         case '27': // South Africa
-          return '+## ## ### ####'
+          return '## ### ####'
         case '52': // Mexico
-          return '+## # ### ####'
+          return '# ### ####'
         case '34': // Spain
-          return '+## # ## ## ## ##'
+          return '# ## ## ## ##'
         case '39': // Italy
-          return '+## ### #######'
+          return '### #######'
         case '86': // China
-          return '+## ### #### ####'
+          return '### #### ####'
         default: // Generic fallback
-          return '+###########################'
+          return '#########################'
       }
     }
   }

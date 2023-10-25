@@ -6,6 +6,7 @@
       </div>
       <div class="stepper__container">
         <business-information-form
+          class="business-information__form"
           ref="businessInformationForm"
           :should-show-action-buttons="true"
           :is-loading="isLoading"
