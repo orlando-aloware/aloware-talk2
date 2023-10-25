@@ -59,14 +59,12 @@
                       v-model="form.email"
                     />
 
-                    <input-field
+                    <phone-number-field
                       label="Phone Number"
-                      placeholder="+1 222 333 4444"
-                      :mask="phoneMask"
-                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      placeholder="222 333 4444"
                       :rules="[validatePhoneNumber]"
-                      v-model="form.phone_number"
-                    />
+                      :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      v-model="form.phone_number"/>
                   </template>
                 </input-group>
 
@@ -186,7 +184,7 @@
             prefix="2"
             :name="2"
             :done="step > 2">
-            <div class="stepper__content">
+            <div class="business-information__form">
               <business-information-form/>
             </div>
           </q-step>
@@ -314,6 +312,7 @@ import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
 import SelectField from 'src/components/account-registration/select-field.vue'
+import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
 
@@ -325,6 +324,7 @@ export default {
     InputGroup,
     InputField,
     SelectField,
+    PhoneNumberField,
     BusinessInformationForm,
     Banner
   },
@@ -345,7 +345,8 @@ export default {
       businessTypes,
       businessIdTypes,
       regionsOfOperations,
-      businessIndustries
+      businessIndustries,
+      phoneCode: '+1'
     }
   },
 
@@ -383,7 +384,7 @@ export default {
     },
 
     phoneMask () {
-      return this.getMaskByCountry(this.form.phone_number)
+      return this.getMaskByCountry(this.phoneCode.replace('+', ''))
     }
   },
 
