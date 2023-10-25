@@ -152,6 +152,9 @@ export default _.merge({
     ...mapState('auth', ['profile']),
     viewOnly () {
       return this.isViewOnlyAccess()
+    },
+    currentKycStatus () {
+      return this.getStatus()
     }
   }
 })

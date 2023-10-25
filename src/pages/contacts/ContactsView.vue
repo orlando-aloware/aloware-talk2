@@ -186,7 +186,13 @@
                           v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
+        <block-tooltip placement="left"
+                       triggers="hover focus"
+                       target="contacts-create-popover"
+                       task="contacts.create">
+        </block-tooltip>
         <b-dropdown text="Add Contacts"
+                    id="contacts-create-popover"
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
@@ -202,7 +208,6 @@
                style="margin-top: 2px;" />
           </template>
           <b-dropdown-item href="#"
-                           :disabled="!canAddContacts"
                            v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
                            @click="onAddContactsToList">
             <search-icon color="#62666E">
@@ -663,6 +668,7 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import {
@@ -715,7 +721,8 @@ export default {
     CompactBtn,
     ContactsScreen,
     Datatable,
-    ImportContactsModal
+    ImportContactsModal,
+    BlockTooltip
   },
 
   props: {
@@ -1334,7 +1341,7 @@ export default {
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          console.log(html)
+          console.log(error)
           this.errorMsg = message
           this.$generalNotification(message, 'error')
         })
@@ -1368,11 +1375,10 @@ export default {
     },
 
     onShowCreateContact (e) {
-      if (!this.enabledToCreateContacts()) {
-        return
+      if (this.enabledToCreateContacts()) {
+        this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
+        e.stopImmediatePropagation()  
       }
-      this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
-      e.stopImmediatePropagation()
     },
 
     onAddContactsToList () {
@@ -1765,4 +1771,3 @@ export default {
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
   }
 }
-</script>
