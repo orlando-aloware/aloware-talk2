@@ -222,14 +222,12 @@
             v-model="form.auth_rep_email"
           />
 
-          <input-field
+          <phone-number-field
             label="Phone Number"
-            placeholder="+1 222 333 4444"
-            :mask="phoneMask"
+            placeholder="222 333 4444"
             :paddingClasses="paddingLeftClasses"
             :rules="[validatePhoneNumber]"
-            v-model="form.auth_rep_phone_number"
-          />
+            v-model="form.auth_rep_phone_number"/>
         </template>
       </input-group>
 
@@ -304,6 +302,7 @@ import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
 import SelectField from 'src/components/account-registration/select-field.vue'
+import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
@@ -318,7 +317,8 @@ export default {
     StepHeader,
     InputGroup,
     InputField,
-    SelectField
+    SelectField,
+    PhoneNumberField
   },
 
   props: {
