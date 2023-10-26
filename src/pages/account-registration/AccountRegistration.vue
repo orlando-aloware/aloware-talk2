@@ -101,6 +101,8 @@
                       placeholder="Ex: United States"
                       option-label="name"
                       option-value="id"
+                      ref="country-input"
+                      :rules="[validateFieldError('country')]"
                       :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                       :options="countries"
                       v-model="form.country"
