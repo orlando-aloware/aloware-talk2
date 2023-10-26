@@ -84,6 +84,12 @@ export default {
         case 'text':
           text = 'text messages'
           break
+        case 'sms.template':
+          text = 'create sms templates'
+          break
+        case 'broadcasts.create':
+          text = 'create broadcasts'
+          break
       }
 
       return text

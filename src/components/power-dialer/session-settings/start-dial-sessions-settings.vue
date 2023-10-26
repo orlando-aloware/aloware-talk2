@@ -1,23 +1,31 @@
 <template>
   <div class="t-session-settings">
-    <q-btn class="start-dial-button p-0"
-           color="success"
-           no-caps
-           unelevated
-           :disabled="disabledTrigger || callDisabled"
-           v-if="defaultTrigger"
-           @click="dialPreparation">
-      <PhoneIcon class="mr-2"
-                 color="white"
-                 height="12"
-                 width="12" />
-      <div class="button-label">
-        Start Dialing
-        <q-tooltip v-if="disabledTrigger">
-          To start dialing, a minimum of one (1) contact item in the list is required.
-        </q-tooltip>
-      </div>
-    </q-btn>
+    <block-tooltip v-if="callDisabled"
+                   placement="left"
+                   triggers="hover focus"
+                   target="pd-call-popover"
+                   task="call">
+    </block-tooltip>
+    <div v-if="defaultTrigger"
+         id="pd-call-popover">
+      <q-btn class="start-dial-button p-0"
+            color="success"
+            no-caps
+            unelevated
+            :disabled="disabledTrigger || callDisabled"
+            @click="dialPreparation">
+        <PhoneIcon class="mr-2"
+                  color="white"
+                  height="12"
+                  width="12" />
+        <div class="button-label">
+          Start Dialing
+          <q-tooltip v-if="disabledTrigger">
+            To start dialing, a minimum of one (1) contact item in the list is required.
+          </q-tooltip>
+        </div>
+      </q-btn>
+    </div>
     <q-btn no-caps
            unelevated
            @click="dialPreparation"
@@ -316,6 +324,7 @@ import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import { isEqual } from 'lodash'
 import {
   kycMixin
@@ -348,7 +357,8 @@ export default {
     SessionsForm,
     PhoneIcon,
     CheckIcon,
-    SettingIcon
+    SettingIcon,
+    BlockTooltip
   },
 
   computed: {

@@ -18,12 +18,20 @@
              sm="12"
              md="12"
              :class="horizontalPaddingClass">
-        <b-button variant="primary"
-                  size="sm"
-                  :disabled="viewOnly"
-                  @click="onAdd('user')">
-          <i class="fa fa-plus mr-1"/> New Template
-        </b-button>
+        <block-tooltip v-if="viewOnly"
+                  placement="left"
+                  triggers="hover focus"
+                  target="sms-template-popover"
+                  task="sms.template">
+        </block-tooltip>
+        <div id="sms-template-popover">
+          <b-button variant="primary"
+                    size="sm"
+                    :disabled="viewOnly"
+                    @click="onAdd('user')">
+            <i class="fa fa-plus mr-1"/> New Template
+          </b-button>
+        </div>
       </b-col>
     </b-row>
 
@@ -106,12 +114,19 @@ import SmsTemplateModal from 'components/sms-template-modal'
 import talk2Api from 'src/plugins/api/api'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import PencilOIcon from 'components/icons/pencil-o-icon'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import { settingsLayoutMixin, kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'sms-templates',
 
-  components: { PencilOIcon, TrashOIcon, SmsTemplateModal, Datatable },
+  components: {
+    PencilOIcon,
+    TrashOIcon,
+    SmsTemplateModal,
+    Datatable,
+    BlockTooltip
+  },
 
   mixins: [
     settingsLayoutMixin,

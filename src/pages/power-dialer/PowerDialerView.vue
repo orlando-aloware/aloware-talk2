@@ -55,7 +55,8 @@
             </b-col>
             <b-col class="p-0">
               <div class="d-flex float-right">
-                <block-tooltip placement="left"
+                <block-tooltip v-if="!canCreateContacts"
+                               placement="left"
                                triggers="hover focus"
                                target="contacts-create-popover"
                                task="contacts.create">
