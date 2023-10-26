@@ -14,8 +14,11 @@
           <input-field
             label="Business Legal Name"
             placeholder="Aloware Inc."
+            ref="legal_name-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('legal_name')]"
             v-model="form.legal_name"
+            @input="cleanFieldError('legal_name')"
           />
 
           <div class="col-5 pr-0 pl-0">
@@ -60,6 +63,7 @@
             option-label="label"
             option-value="value"
             :paddingClasses="paddingRightClasses"
+            :rules="[validateFieldError('business_registration_identifier')]"
             :options="businessIdTypes"
             v-model="form.business_registration_identifier"
           />
@@ -67,8 +71,11 @@
           <input-field
             label="Business Registration Number"
             placeholder="Ex: C1234567"
+            ref="business_registration_number-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('business_registration_number')]"
             v-model="form.business_registration_number"
+            @input="cleanFieldError('business_registration_number')"
           />
         </template>
       </input-group>
@@ -87,8 +94,11 @@
           <input-field
             label="Website URL"
             placeholder="Ex: yourcompany.com"
+            ref="website_url-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('website_url')]"
             v-model="form.website_url"
+            @input="cleanFieldError('website_url')"
           />
         </template>
       </input-group>
@@ -99,6 +109,7 @@
             label="Business Industry"
             option-label="name"
             option-value="value"
+            ref="business_industry-input"
             :paddingClasses="paddingRightClasses"
             :options="businessIndustries"
             v-model="form.business_industry"
@@ -123,8 +134,11 @@
             label="Street"
             placeholder="Ex: Fifth Avenue"
             col-md="col-md-10"
+            ref="street-input"
             :paddingClasses="paddingRightClasses"
+            :rules="[validateFieldError('street')]"
             v-model="form.street"
+            @input="cleanFieldError('street')"
           />
         </template>
       </input-group>
@@ -134,14 +148,21 @@
           <input-field
             label="State/Province/Region"
             placeholder="Ex: California"
+            ref="region-input"
+            :paddingClasses="paddingRightClasses"
+            :rules="[validateFieldError('region')]"
             v-model="form.region"
+            @input="cleanFieldError('region')"
           />
 
           <input-field
             label="City"
             placeholder="Ex: Los Angeles"
+            ref="city-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('city')]"
             v-model="form.city"
+            @input="cleanFieldError('city')"
           />
         </template>
       </input-group>
@@ -161,14 +182,19 @@
           <input-field
             label="Postal Code"
             placeholder="Ex: 11223"
+            ref="postal_code-input"
             bottom-slots
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('postal_code')]"
             v-model="form.postal_code"
+            @input="cleanFieldError('postal_code')"
           >
             <template
               v-slot:hint
               v-if="form.postal_code.length">
-              <div class="zipcode-hint">
+              <div
+                class="zipcode-hint"
+                :class="validateFieldError('postal_code') ? 'negative-top' : ''">
                 <q-icon
                   class="q-mr-xs"
                   :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
@@ -198,15 +224,21 @@
           <input-field
             label="First Name"
             placeholder="Type here"
+            ref="auth_rep_first_name-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('auth_rep_first_name')]"
             v-model="form.auth_rep_first_name"
+            @input="cleanFieldError('auth_rep_first_name')"
           />
 
           <input-field
             label="Last Name"
             placeholder="Type here"
+            ref="auth_rep_last_name-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('auth_rep_last_name')]"
             v-model="form.auth_rep_last_name"
+            @input="cleanFieldError('auth_rep_last_name')"
           />
         </template>
       </input-group>
@@ -217,17 +249,22 @@
             label="Email"
             placeholder="email@domain.com"
             type="email"
+            ref="auth_rep_email-input"
             :paddingClasses="paddingLeftClasses"
-            :rules="[validateEmail]"
+            :rules="[validateEmail, validateFieldError('auth_rep_email')]"
             v-model="form.auth_rep_email"
+            @input="cleanFieldError('auth_rep_email')"
           />
 
           <phone-number-field
             label="Phone Number"
             placeholder="222 333 4444"
+            ref="auth_rep_phone_number-input"
             :paddingClasses="paddingLeftClasses"
-            :rules="[validatePhoneNumber]"
-            v-model="form.auth_rep_phone_number"/>
+            :rules="[validatePhoneNumber, validateFieldError('auth_rep_phone_number')]"
+            v-model="form.auth_rep_phone_number"
+            @input="cleanFieldError('auth_rep_phone_number')"
+          />
         </template>
       </input-group>
 
@@ -236,15 +273,21 @@
           <input-field
             label="Business Title"
             placeholder="Type here"
+            ref="auth_rep_business_title-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('auth_rep_business_title')]"
             v-model="form.auth_rep_business_title"
+            @input="cleanFieldError('auth_rep_business_title')"
           />
 
           <input-field
             label="Job Position"
             placeholder="Ex. CEO, CTO, Product Director"
+            ref="auth_rep_job_position-input"
             :paddingClasses="paddingLeftClasses"
+            :rules="[validateFieldError('auth_rep_job_position')]"
             v-model="form.auth_rep_job_position"
+            @input="cleanFieldError('auth_rep_job_position')"
           />
         </template>
       </input-group>
@@ -296,7 +339,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { maskMixin } from 'src/plugins/mixins'
 import StepHeader from 'src/components/account-registration/step-header.vue'
 import InputGroup from 'src/components/account-registration/input-group.vue'
@@ -343,7 +386,10 @@ export default {
   },
 
   computed: {
-    ...mapState('accountRegistration', ['form']),
+    ...mapState('accountRegistration', [
+      'form',
+      'fieldErrors'
+    ]),
 
     isLargeScreen () {
       return this.$q.screen.width > 767
@@ -391,8 +437,33 @@ export default {
   },
 
   methods: {
+    ...mapActions('accountRegistration', [
+      'cleanFieldError'
+    ]),
+
     getZipCodeRuleClass (rule) {
       return rule ? 'text-green' : 'text-red'
+    },
+
+    verifyFieldErrors () {
+      this.$nextTick(() => {
+        Object.keys(this.fieldErrors).forEach(field => {
+          const fieldRef = `${field}-input`
+
+          if (this.$refs[fieldRef]) {
+            this.$refs[fieldRef].validate()
+          }
+        })
+      })
+    },
+
+    validateFieldError (fieldName) {
+      return () => {
+        if (this.fieldErrors && this.fieldErrors[fieldName]) {
+          return this.fieldErrors[fieldName][0]
+        }
+        return true
+      }
     },
 
     validateFieldsFilled () {
@@ -456,6 +527,10 @@ export default {
     onSubmit () {
       this.$emit('submit', this.form)
     }
+  },
+
+  mounted () {
+    this.verifyFieldErrors()
   }
 }
 </script>
