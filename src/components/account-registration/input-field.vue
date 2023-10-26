@@ -4,6 +4,7 @@
       {{ label }}
     </label>
     <q-input
+      ref="inputRef"
       rounded
       outlined
       :placeholder="placeholder"
@@ -91,6 +92,12 @@ export default {
     emitUpdateEvent (value) {
       this.innerValue = value
       this.$emit('input', this.innerValue)
+    },
+
+    validate () {
+      if (this.$refs.inputRef && typeof this.$refs.inputRef.validate === 'function') {
+        return this.$refs.inputRef.validate()
+      }
     }
   },
 
