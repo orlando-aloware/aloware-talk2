@@ -1,11 +1,53 @@
 export default function () {
   return {
+    fieldErrors: {},
+    form: {
+      // Account Registration/Creation
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone_number: '',
+      country: '',
+      company_name: '',
+      password: '',
+      password_confirmation: '',
+
+      // Business Information
+      legal_name: '',
+      business_type: '',
+      company_status: 1,
+      business_registration_identifier: '',
+      other_identifier: '',
+      business_registration_number: '',
+      business_regions_of_operation: '',
+      business_industry: '',
+      website_url: '',
+
+      // Address Information
+      street: '',
+      region: '',
+      city: '',
+      legal_country: '',
+      postal_code: '',
+
+      // Authorized representative information
+      auth_rep_first_name: '',
+      auth_rep_last_name: '',
+      auth_rep_email: '',
+      auth_rep_phone_number: '',
+      auth_rep_business_title: '',
+      auth_rep_job_position: '',
+
+      agreed_to_terms: false,
+      timezone: 'America/Los_Angeles',
+      kyc_filled: 1
+    }
     // form: {
     //   // Account Registration/Creation
     //   first_name: 'Jeff',
     //   last_name: 'Bruchado',
     //   email: 'jefferson@aloware.com',
-    //   phone_number: '+55 48 9 9646-1911',
+    //   phone_number: '4244071998',
     //   country: {
     //     id: 'US',
     //     name: 'United States'
@@ -59,47 +101,5 @@ export default function () {
     //   timezone: 'America/Los_Angeles',
     //   kyc_filled: 1
     // }
-
-    form: {
-      // Account Registration/Creation
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone_number: '',
-      country: '',
-      company_name: '',
-      password: '',
-      password_confirmation: '',
-
-      // Business Information
-      legal_name: '',
-      business_type: '',
-      company_status: 1,
-      business_registration_identifier: '',
-      other_identifier: '',
-      business_registration_number: '',
-      business_regions_of_operation: '',
-      business_industry: '',
-      website_url: '',
-
-      // Address Information
-      street: '',
-      region: '',
-      city: '',
-      legal_country: '',
-      postal_code: '',
-
-      // Authorized representative information
-      auth_rep_first_name: '',
-      auth_rep_last_name: '',
-      auth_rep_email: '',
-      auth_rep_phone_number: '',
-      auth_rep_business_title: '',
-      auth_rep_job_position: '',
-
-      agreed_to_terms: false,
-      timezone: 'America/Los_Angeles',
-      kyc_filled: 1
-    }
   }
 }

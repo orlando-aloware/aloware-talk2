@@ -5,5 +5,13 @@ export default {
 
   setKycFilled ({ commit }) {
     commit('SET_KYC_FILLED')
+  },
+
+  setFieldErrors ({ commit }, errors) {
+    commit('SET_FIELD_ERRORS', errors)
+  },
+
+  cleanFieldError ({ commit }, field) {
+    commit('CLEAN_FIELD_ERROR', field)
   }
 }
