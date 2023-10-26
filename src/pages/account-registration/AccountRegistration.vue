@@ -35,16 +35,30 @@
                     <input-field
                       label="First Name"
                       placeholder="Type your first name"
+                      ref="first_name-input"
                       :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      :rules="[validateFieldError('first_name')]"
                       v-model="form.first_name"
-                    />
+                      @input="cleanFieldError('first_name')"
+                    >
+                      <template v-slot:hint v-if="fieldErrors.first_name">
+                        {{ fieldErrors.first_name[0] }}
+                      </template>
+                    </input-field>
 
                     <input-field
                       label="Last Name"
                       placeholder="Type your last name"
+                      ref="last_name-input"
                       :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                      :rules="[validateFieldError('last_name')]"
                       v-model="form.last_name"
-                    />
+                      @input="cleanFieldError('last_name')"
+                    >
+                      <template v-slot:hint v-if="fieldErrors.last_name">
+                        <span>{{ fieldErrors.last_name[0] }}</span>
+                      </template>
+                    </input-field>
                   </template>
                 </input-group>
 
@@ -54,17 +68,22 @@
                       label="Email Address"
                       placeholder="youremail@domain.com"
                       type="email"
+                      ref="email-input"
                       :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      :rules="[validateEmail]"
+                      :rules="[validateEmail, validateFieldError('email')]"
                       v-model="form.email"
+                      @input="cleanFieldError('email')"
                     />
 
                     <phone-number-field
                       label="Phone Number"
                       placeholder="222 333 4444"
-                      :rules="[validatePhoneNumber]"
+                      ref="phone_number-input"
+                      :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
                       :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                      v-model="form.phone_number"/>
+                      v-model="form.phone_number"
+                      @input="cleanFieldError('phone_number')"
+                    />
                   </template>
                 </input-group>
 
@@ -90,8 +109,11 @@
                     <input-field
                       label="Business Name"
                       placeholder="Ex. Aloware Inc."
+                      ref="company_name-input"
                       :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                      :rules="[validateFieldError('company_name')]"
                       v-model="form.company_name"
+                      @input="cleanFieldError('company_name')"
                     />
                   </template>
                 </input-group>
@@ -108,14 +130,18 @@
                     <input-field
                       label="Create a Password"
                       placeholder="Type here"
+                      ref="password-input"
                       is-password
+                      :rules="[validateFieldError('password')]"
                       :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
                       v-model="form.password"
+                      @input="cleanFieldError('password')"
                     >
                       <template
                         v-slot:hint
                         v-if="form.password">
-                        <ul class="text-left pl-2 text-weight-regular password-hint">
+                        <ul class="text-left pl-2 text-weight-regular password-hint"
+                            :class="validateFieldError('password') ? 'negative-top' : ''">
                           <li>
                             <q-icon
                               class="q-mr-xs"
@@ -349,13 +375,16 @@ export default {
       businessTypes,
       businessIdTypes,
       regionsOfOperations,
-      businessIndustries,
-      phoneCode: '+1'
+      businessIndustries
     }
   },
 
   computed: {
-    ...mapState('accountRegistration', ['form']),
+    ...mapState('accountRegistration', [
+      'form',
+      'fieldErrors'
+    ]),
+
     ...mapGetters('accountRegistration', ['getBusinessInformationFieldsValue']),
 
     isNextButtonDisabled () {
@@ -385,10 +414,6 @@ export default {
         { id: 'CA', name: 'Canada' },
         ...countriesArr
       ]
-    },
-
-    phoneMask () {
-      return this.getMaskByCountry(this.phoneCode.replace('+', ''))
     }
   },
 
@@ -405,13 +430,19 @@ export default {
       if (newStep === 3 && !this.$q.platform.is.electron) {
         this.initRecaptcha()
       }
+
+      if (newStep === 1 || newStep === 2) {
+        this.verifyFieldErrors()
+      }
     }
   },
 
   methods: {
     ...mapActions('accountRegistration', [
       'setBusinessInformationFieldsEmpty',
-      'setKycFilled'
+      'setKycFilled',
+      'setFieldErrors',
+      'cleanFieldError'
     ]),
 
     updateValidationState (rule, isValid) {
@@ -421,6 +452,61 @@ export default {
       } else if (!isValid && index !== -1) {
         this.password_validation.splice(index, 1)
       }
+    },
+
+    verifyFieldErrors () {
+      this.$nextTick(() => {
+        Object.keys(this.fieldErrors).forEach(field => {
+          const fieldRef = `${field}-input`
+
+          if (this.$refs[fieldRef]) {
+            this.$refs[fieldRef].validate()
+          }
+        })
+      })
+    },
+
+    validateFieldError (fieldName) {
+      return () => {
+        if (this.fieldErrors && this.fieldErrors[fieldName]) {
+          return this.fieldErrors[fieldName][0]
+        }
+        return true
+      }
+    },
+
+    moveToStepWithFieldErrors () {
+      const stepFieldsReference = {
+        first_name: 1,
+        last_name: 1,
+        email: 1,
+        phone_number: 1,
+        company_name: 1,
+        job_title: 1,
+        password: 1,
+        password_confirmation: 1,
+        legal_name: 2,
+        business_type: 2,
+        business_registration_identifier: 2,
+        business_registration_number: 2,
+        business_regions_of_operation: 2,
+        business_industry: 2,
+        website_url: 2,
+        street: 2,
+        region: 2,
+        city: 2,
+        legal_country: 2,
+        postal_code: 2,
+        auth_rep_first_name: 2,
+        auth_rep_last_name: 2,
+        auth_rep_email: 2,
+        auth_rep_phone_number: 2,
+        auth_rep_business_title: 2,
+        auth_rep_job_position: 2
+      }
+
+      const step = stepFieldsReference[Object.keys(this.fieldErrors)[0]]
+      this.$refs.stepper.goTo(step)
     },
 
     validateEmail (email) {
@@ -579,10 +665,17 @@ export default {
       this.$axios.post('/api/admin/company-registration', payload)
         .then((res) => {
           this.isSubmitted = true
-          this.$generalNotification('Your information has been submitted. We will contact you shortly.')
+          this.$generalNotification('Your information has been submitted. Please check your email for further instructions.')
+          this.$router.push({ name: 'Login' })
         })
         .catch((err) => {
-          this.$handleErrors(err)
+          if (err.response && err.response.data && err.response.data.errors) {
+            this.setFieldErrors(err.response.data.errors)
+            this.verifyFieldErrors()
+          }
+
+          this.$handleErrors(err?.response)
+          this.moveToStepWithFieldErrors()
         })
         .finally(() => {
           this.isLoading = false
@@ -594,6 +687,10 @@ export default {
     this.validateAllPasswordRules()
     this.setTimezone()
     this.selectCountryBasedInTimezone()
+  },
+
+  mounted () {
+    this.verifyFieldErrors()
   }
 }
 </script>
