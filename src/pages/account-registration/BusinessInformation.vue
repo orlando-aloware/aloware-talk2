@@ -47,6 +47,10 @@ export default {
 
   methods: {
     ...mapActions(['setKycFilled']),
+    ...mapActions('accountRegistration', [
+      'setBusinessInformationFieldsEmpty',
+      'setFieldErrors'
+    ]),
 
     getCleanedPhoneNumber (phone) {
       return phone.replace(/[^\d]/g, '')
@@ -81,7 +85,12 @@ export default {
           this.$router.push({ name: 'Inbox' })
         })
         .catch((err) => {
-          this.$handleErrors(err)
+          if (err.response && err.response.data && err.response.data.errors) {
+            this.setFieldErrors(err.response.data.errors)
+            this.$refs.businessInformationForm.verifyFieldErrors()
+          }
+
+          this.$handleErrors(err?.response)
         })
         .finally(() => {
           this.isLoading = false
