@@ -4,9 +4,11 @@
       {{ label }}
     </label>
     <q-select
+      ref="selectRef"
       rounded
       outlined
       map-options
+      :rules="rules"
       :placeholder="placeholder"
       :option-label="optionLabel"
       :option-value="optionValue"
@@ -52,12 +54,24 @@ export default {
     optionValue: {
       type: String,
       default: 'value'
+    },
+    rules: {
+      type: Array,
+      default: () => []
     }
   },
 
   data () {
     return {
       innerValue: this.value
+    }
+  },
+
+  methods: {
+    validate () {
+      if (this.$refs.selectRef && typeof this.$refs.selectRef.validate === 'function') {
+        return this.$refs.selectRef.validate()
+      }
     }
   },
 
