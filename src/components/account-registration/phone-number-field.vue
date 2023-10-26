@@ -16,9 +16,10 @@
       </q-input>
       <q-input
         class="col-md-10 pl-2"
+        ref="inputRef"
+        type="text"
         rounded
         outlined
-        type="text"
         :placeholder="placeholder"
         :rules="rules"
         :mask="phoneMask"
@@ -89,10 +90,15 @@ export default {
   },
 
   methods: {
-
     emitUpdateEvent (value) {
       this.innerValue = value
       this.$emit('input', this.innerValue)
+    },
+
+    validate () {
+      if (this.$refs.inputRef && typeof this.$refs.inputRef.validate === 'function') {
+        return this.$refs.inputRef.validate()
+      }
     }
   },
 
