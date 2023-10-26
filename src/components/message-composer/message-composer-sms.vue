@@ -335,12 +335,6 @@ export default {
     },
 
     isSendTextDisabled () {
-      console.log('isSendTextDisabled')
-      console.log(!this.validSms)
-      console.log(this.isTCPAApprovedTextNotAuthorized)
-      console.log(this.generatingShortUrl)
-      console.log(this.isDisabled)
-      console.log(!this.canTextToNumber)
       return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 

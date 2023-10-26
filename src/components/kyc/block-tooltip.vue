@@ -1,5 +1,6 @@
 <template>
-  <b-popover :triggers="triggers"
+  <b-popover v-if="customMessage"
+             :triggers="triggers"
              :target="target"
              :placement="placement"
              boundary="window"
@@ -56,6 +57,9 @@ export default {
       let message = ''
 
       switch (status) {
+        case KycLogs.KYC_STATUS_NONE:
+          message = ''
+          break
         case KycLogs.KYC_STATUS_ZERO:
           message = `You need to <u>submit important info</u> about your business to unlock access to ${action}`
           break

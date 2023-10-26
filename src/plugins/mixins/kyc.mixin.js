@@ -38,6 +38,10 @@ export default _.merge({
 
       status = this.getStatus(status, source)
 
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
+
       return KycLogs.CREATE_CONTACTS_ALLOWED.includes(status)
     },
 
@@ -51,6 +55,10 @@ export default _.merge({
 
       status = this.getStatus(status, source)
 
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
+
       return KycLogs.IMPORT_CONTACTS_ALLOWED.includes(status)
     },
 
@@ -63,6 +71,10 @@ export default _.merge({
       }
 
       status = this.getStatus(status, source)
+
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
 
       if (phone === source.phone_number) {
         return KycLogs.ONESELF_CALLS_ALLOWED.includes(status)
@@ -81,6 +93,10 @@ export default _.merge({
 
       status = this.getStatus(status, source)
 
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
+
       if (phone === source.phone_number) {
         return KycLogs.ONESELF_TEXTS_ALLOWED.includes(status)
       }
@@ -98,6 +114,10 @@ export default _.merge({
 
       status = this.getStatus(status, source)
 
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
+
       return KycLogs.SINGLE_TEST_NUMBER_PURCHASED_ALLOWED.includes(status)
     },
 
@@ -110,6 +130,10 @@ export default _.merge({
       }
 
       status = this.getStatus(status, source)
+
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
 
       return KycLogs.BUY_NEW_NUMBERS_ALLOWED.includes(status)
     },
@@ -124,6 +148,10 @@ export default _.merge({
 
       status = this.getStatus(status, source)
 
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
+
       return KycLogs.VISIT_INTEGRATIONS_ALLOWED.includes(status)
     },
 
@@ -137,6 +165,10 @@ export default _.merge({
 
       status = this.getStatus(status, source)
 
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
+
       return KycLogs.SKIP_TRIAL_ALLOWED.includes(status)
     },
 
@@ -149,6 +181,10 @@ export default _.merge({
       }
 
       status = this.getStatus(status, source)
+
+      if (status === KycLogs.KYC_STATUS_NONE) {
+        return true
+      }
 
       return KycLogs.VIEW_ONLY_ALLOWED.includes(status)
     }
