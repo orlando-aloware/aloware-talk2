@@ -1,8 +1,6 @@
 export default {
   methods: {
     getMaskByCountry (countryCode) {
-      console.log('getMaskByCountry', countryCode)
-
       switch (countryCode) {
         case '1': // USA and Canada
           return '### ### ####'
