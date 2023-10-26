@@ -200,11 +200,15 @@
                   title="Confirmation"
                   description="Please read our Terms and Conditions before proceeding. By checking the boxes below, you indicate that you have read, understood, and agree to the Terms and Conditions."
                 />
-                <iframe
-                  sandbox="allow-same-origin"
-                  class="terms-iframe mt-2 mb-2"
-                  src="https://aloware.com/terms-and-conditions?embedded=1">
-                </iframe>
+                <div class="q-mt-xl q-mb-xl">
+                  <a class="text-primary text-weight-bold text-h5"
+                     href="https://aloware.com/terms-and-conditions"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                     Terms and conditions, and Acceptable Use Policy
+                  </a>
+                </div>
+
                 <div class="accept-box">
                   <div>
                     <q-checkbox
