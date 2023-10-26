@@ -7,9 +7,7 @@
              ref="popover">
     <template>
       <span class="d-flex align-items-center contact-tags-item text-white">
-        <span>
-          {{ customText }}
-        </span>
+        <span v-html="customMessage"></span>
       </span>
     </template>
   </b-popover>
@@ -52,20 +50,28 @@ export default {
   },
 
   computed: {
-    customText () {
+    customMessage () {
       const status = this.currentKycStatus
-      let base = ''
-      if (status === KycLogs.STATUS_KYC_0) {
-        base = 'You need to submit important info about your business to unlock access to ' + this.textForTask
+      const action = this.textForTask
+      let message = ''
+
+      switch (status) {
+        case KycLogs.KYC_STATUS_ZERO:
+          message = `You need to <u>submit important info</u> about your business to unlock access to ${action}`
+          break
+        case KycLogs.KYC_STATUS_DEFINITELY_REJECTED:
+          message = `You need to <u>submit again the info</u> about your business to ${action}`
+          break
+        case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING:
+          message = `The ${action} isn't available on trial. please <u>Contact Us</u> to upgrade today!`
+          break
+        default:
+          // For KYC_STATUS_APPROVED_FOR_SELF_CALLING and KYC_STATUS_APPROVED_FOR_CALLING_ONLY
+          message = `Your account is not yet verified to ${action}, you can reach out to our support to remove the restriction`
+          break
       }
-      if (status === KycLogs.STATUS_REJECTED_FRAUD) {
-        base = 'You need to submit again the info about your business to ' + this.textForTask
-      }
-      if (status === KycLogs.STATUS_VERIFIED_RESTRICTED) {
-        base = 'Your account is not yet verified to ' + this.textForTask
-        base += ', you can reach out to our support to remove the restriction'
-      }
-      return base
+
+      return message
     },
 
     textForTask () {
@@ -107,10 +113,6 @@ export default {
   },
 
   methods: {
-
-  },
-
-  watch: {
 
   }
 }
