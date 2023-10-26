@@ -27,11 +27,14 @@
               option-label="value"
               option-value="value"
               col-md="col-md-12"
+              ref="business_type-input"
+              :rules="[validateFieldError('business_type')]"
               :paddingClasses="isLargeScreen ? 'q-pr-0 q-pl-0' : ''"
               :options="businessTypes"
               v-model="form.business_type"
             />
-            <div class="flex items-center">
+            <div class="flex items-center"
+                 :class="validateFieldError('business_type') ? '' : 'negative-top'">
               <label class="flex mb-1 text-weight-bold pl-3 pr-4">
                 Company Status
               </label>
@@ -62,8 +65,9 @@
             label="Business ID Type"
             option-label="label"
             option-value="value"
-            :paddingClasses="paddingRightClasses"
+            ref="business_registration_identifier-input"
             :rules="[validateFieldError('business_registration_identifier')]"
+            :paddingClasses="paddingRightClasses"
             :options="businessIdTypes"
             v-model="form.business_registration_identifier"
           />
@@ -86,6 +90,8 @@
             label="Region of Operation"
             option-label="label"
             option-value="value"
+            ref="business_regions_of_operation-input"
+            :rules="[validateFieldError('business_regions_of_operation')]"
             :paddingClasses="paddingRightClasses"
             :options="regionsOfOperations"
             v-model="form.business_regions_of_operation"
@@ -110,6 +116,7 @@
             option-label="name"
             option-value="value"
             ref="business_industry-input"
+            :rules="[validateFieldError('business_industry')]"
             :paddingClasses="paddingRightClasses"
             :options="businessIndustries"
             v-model="form.business_industry"
@@ -174,6 +181,8 @@
             placeholder="Ex: United States"
             option-label="name"
             option-value="id"
+            ref="legal_country-input"
+            :rules="[validateFieldError('legal_country')]"
             :paddingClasses="paddingLeftClasses"
             :options="countries"
             v-model="form.legal_country"
@@ -450,7 +459,7 @@ export default {
         Object.keys(this.fieldErrors).forEach(field => {
           const fieldRef = `${field}-input`
 
-          if (this.$refs[fieldRef]) {
+          if (this.$refs[fieldRef] && this.$refs[fieldRef].validate) {
             this.$refs[fieldRef].validate()
           }
         })
