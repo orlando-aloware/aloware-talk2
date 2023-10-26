@@ -1,60 +1,69 @@
 <template>
-  <div v-if="authenticated"
-       class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+  <div>
+    <div v-if="authenticated && shouldShowPowerDialer"
+        class="contacts mx-0 content-row d-flex overflow-hidden h-100">
 
-    <div v-show="!hasSessions"
-         class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
-      <power-dialer-sidebar @fetchMyQueueData="onFetchMyQueueData" />
+      <div v-show="!hasSessions"
+          class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
+        <power-dialer-sidebar @fetchMyQueueData="onFetchMyQueueData" />
+      </div>
+
+      <div class="px-0 mb-0 main flex-1 h-100"
+          :class="mainClass">
+        <!-- Router Here -->
+        <router-view :list="list"
+                    :is-loading-disabled="isLoadingDisabled"
+                    :is-start-state="isStartState"
+                    :is-editable="isEditable"
+                    :search="search"
+                    :is-my-contacts-view="isMyContactsView"
+                    :is-loading="isComponentLoading"
+                    :columns="columns"
+                    :is-empty="isEmpty"
+                    :is-loading-more="isLoadingMore"
+                    :filters-count="filtersCount"
+                    :selected-list-id="filteredId"
+                    :add-contacts-in-progress-data="powerDialerListAddRemoveContactsProgress"
+                    :onFetch="fetch"
+                    v-if="!isPowerDialerSession"
+                    @search="onSearch"
+                    @checkboxChanged="onFetchMyContacts"
+                    @sort="onSortByField"
+                    @paginated="onPaginate"
+                    @loadMore="beforeOnLoadMore(selectedList)"
+                    @onFiltersCount="getFiltersCount"
+                    @on-list-update="updateList"
+                    @on-my-queue-list="myQueueList">
+        </router-view>
+
+        <router-view v-if="isPowerDialerSession" />
+      </div>
+
+      <template v-if="!hasSessions">
+        <move-dialog :is-contact-module-type="false" />
+        <create-dialog />
+        <column-headers :predefined-id="myQueueId"
+                      :previousRelations="previousRelations"
+                      v-if="isActive" />
+        <remove-list-modal v-if="isActive"
+                        @on-clear-list="onClear" />
+        <remove-list-confirmation v-if="isActive" />
+        <remove-contact :is-contact-module-type="false"
+                      v-if="isActive"
+                      @on-remove="onRemove"/>
+        <remove-contact-confirmation v-if="isActive"
+                                  @contactsRemoved="updateList" />
+        <remove-folder-dialog :is-contact-module-type="false" />
+        <create-list-modal :is-default="false" />
+      </template>
     </div>
-
-    <div class="px-0 mb-0 main flex-1 h-100"
-         :class="mainClass">
-      <!-- Router Here -->
-      <router-view :list="list"
-                   :is-loading-disabled="isLoadingDisabled"
-                   :is-start-state="isStartState"
-                   :is-editable="isEditable"
-                   :search="search"
-                   :is-my-contacts-view="isMyContactsView"
-                   :is-loading="isComponentLoading"
-                   :columns="columns"
-                   :is-empty="isEmpty"
-                   :is-loading-more="isLoadingMore"
-                   :filters-count="filtersCount"
-                   :selected-list-id="filteredId"
-                   :add-contacts-in-progress-data="powerDialerListAddRemoveContactsProgress"
-                   :onFetch="fetch"
-                   v-if="!isPowerDialerSession"
-                   @search="onSearch"
-                   @checkboxChanged="onFetchMyContacts"
-                   @sort="onSortByField"
-                   @paginated="onPaginate"
-                   @loadMore="beforeOnLoadMore(selectedList)"
-                   @onFiltersCount="getFiltersCount"
-                   @on-list-update="updateList"
-                   @on-my-queue-list="myQueueList">
-      </router-view>
-
-      <router-view v-if="isPowerDialerSession" />
-    </div>
-
-    <template v-if="!hasSessions">
-      <move-dialog :is-contact-module-type="false" />
-      <create-dialog />
-      <column-headers :predefined-id="myQueueId"
-                     :previousRelations="previousRelations"
-                     v-if="isActive" />
-      <remove-list-modal v-if="isActive"
-                       @on-clear-list="onClear" />
-      <remove-list-confirmation v-if="isActive" />
-      <remove-contact :is-contact-module-type="false"
-                     v-if="isActive"
-                     @on-remove="onRemove"/>
-      <remove-contact-confirmation v-if="isActive"
-                                 @contactsRemoved="updateList" />
-      <remove-folder-dialog :is-contact-module-type="false" />
-      <create-list-modal :is-default="false" />
-    </template>
+    <upgrade-now image-link="/assets/images/PowerDialer.svg"
+                text="PowerDialer is not included in your current plan. To use it, please contact us to upgrade today!"
+                title-text="PowerDialer"
+                kb-link="https://support.aloware.com/en/articles/5987054-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
+                class="mt-5"
+                v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
+    </upgrade-now>
   </div>
 </template>
 
@@ -71,6 +80,7 @@ import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
 import RemoveContact from 'components/remove-contact'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation'
+import UpgradeNow from 'components/upgrade-now.vue'
 import ColumnHeaders from 'components/column-headers'
 import {
   powerDialerMixin,
@@ -99,7 +109,8 @@ export default {
     RemoveContact,
     RemoveContactConfirmation,
     RemoveFolderDialog,
-    CreateListModal
+    CreateListModal,
+    UpgradeNow
   },
 
   mixins: [

@@ -162,15 +162,136 @@ export default _.merge({
       } else {
         return source.user_roles.includes(roles)
       }
+    },
+
+    isBlockedFrom (permissions) {
+      let blockedAccess = []
+
+      switch (this.usage.plan.use_case) {
+        case 'iPro':
+          blockedAccess = [
+            'line cnam',
+            'line triggers',
+            'line advanced settings',
+            'line external forwarding',
+            'ring group advanced queue settings',
+            'integrations sequences api',
+            'integrations number lookup api',
+            'integrations sms api',
+            'integrations rvm api',
+            'integrations two-legged call api',
+            'integrations hubspot workflows',
+            'barge & whisper'
+          ]
+          break
+        case 'uPro':
+          // @todo
+          blockedAccess = [
+          ]
+          break
+        case 'xPro':
+          // @todo
+          blockedAccess = [
+          ]
+          break
+      }
+
+      if (Array.isArray(permissions)) {
+        for (let permission of permissions) {
+          if (blockedAccess.includes(permission)) {
+            return true
+          }
+        }
+        return false
+      } else {
+        return blockedAccess.includes(permissions)
+      }
+    },
+
+    shouldShowUpgradeNow () {
+      return !this.isSimpSocial()
     }
   },
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState('cache', ['currentCompany']),
     hasReporterAccess () {
       return this.profile && this.profile.read_only_access
     },
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
+    },
+    /**
+     * Decides if the Broadcast should be shown.
+     *
+     * @return {boolean}
+     */
+    shouldShowBroadcast () {
+      if (this.currentCompany.bulk_sms_enabled || this.currentCompany.bulk_rvm_enabled) {
+        return true
+      }
+
+      return false
+    },
+
+    /**
+     * Decides if the Sequences should be shown.
+     *
+     * @return {boolean}
+     */
+    shouldShowSequences () {
+      if (this.currentCompany.automation_enabled) {
+        return true
+      }
+
+      return false
+    },
+
+    shouldSeeSequences () {
+      if (!this.hasPermissionTo('view workflow')) {
+        return false
+      }
+
+      if (!this.hasRole('Company Admin')) {
+        return false
+      }
+
+      if (this.hasReporterAccess) {
+        return false
+      }
+
+      if (this.currentCompany && this.currentCompany.reseller_id === 357 && !this.hasRole('Billing Admin')) {
+        return false
+      }
+
+      return true
+    },
+
+    /**
+     * Decides if the Calendar should be shown.
+     *
+     * @return {boolean}
+     */
+    shouldShowCalendar () {
+      if (this.currentCompany.calendar_enabled) {
+        return true
+      }
+
+      return false
+    },
+
+    /**
+     * Decides if the PowerDialer should be shown.
+     *
+     * @return {boolean}
+     */
+    shouldShowPowerDialer () {
+      if (this.currentCompany.auto_dialer_enabled) {
+        return true
+      }
+
+      return false
     }
+
   }
 }, goBackMixin)

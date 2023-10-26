@@ -1,130 +1,139 @@
 <template>
-  <div class="calendar position-relative h-100 d-flex flex-column">
-    <b-overlay class="h-100 w-100 position-absolute"
-               rounded="sm"
-               :show="true"
-               v-show="loading">
-      <template #overlay>
-        <q-spinner-bars color="primary"
-                        size="40px" />
-      </template>
-    </b-overlay>
+  <div>
+    <div v-if="shouldShowCalendar" class="calendar position-relative h-100 d-flex flex-column">
+      <b-overlay class="h-100 w-100 position-absolute"
+                rounded="sm"
+                :show="true"
+                v-show="loading">
+        <template #overlay>
+          <q-spinner-bars color="primary"
+                          size="40px" />
+        </template>
+      </b-overlay>
 
-    <!-- header -->
-    <div class="calendar__header flex-grow-0">
-      <div class="calendar__header__action-left">
-        <b-button size="sm"
-                  variant="light"
-                  class="btn-white btn-calendar-prev-next btn-contact-prev-next"
-                  @click.prevent="changeDirection('subtract')">
-          <i class="material-icons">keyboard_arrow_left</i>
-          <q-tooltip anchor="top middle">
-            Previous {{ view }}
-          </q-tooltip>
-        </b-button>
-        <date-selector date-only
-                       noValueToCustomElem
-                       :value="gotoDate"
-                       @dateSelected="onDateSelected">
+      <!-- header -->
+      <div class="calendar__header flex-grow-0">
+        <div class="calendar__header__action-left">
           <b-button size="sm"
                     variant="light"
-                    class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
-            <calendar-icon class="mr-2"/>
-            {{ currentDate }}
+                    class="btn-white btn-calendar-prev-next btn-contact-prev-next"
+                    @click.prevent="changeDirection('subtract')">
+            <i class="material-icons">keyboard_arrow_left</i>
             <q-tooltip anchor="top middle">
-              Select date
+              Previous {{ view }}
             </q-tooltip>
           </b-button>
-        </date-selector>
-        <b-button size="sm"
-                  variant="light"
-                  class="btn-white btn-calendar-prev-next btn-contact-prev-next"
-                  @click.prevent="changeDirection('add')">
-          <i class="material-icons">keyboard_arrow_right</i>
-          <q-tooltip anchor="top middle">
-            Next {{ view }}
-          </q-tooltip>
-        </b-button>
-        <b-button size="sm"
-                  variant="light"
-                  class="btn-white btn-rounded px-3 mx-2 btn-calendar-today"
-                  @click.prevent="changeDirection('today')">
-          Today
-          <q-tooltip anchor="top middle">
-            Go to today
-          </q-tooltip>
-        </b-button>
+          <date-selector date-only
+                        noValueToCustomElem
+                        :value="gotoDate"
+                        @dateSelected="onDateSelected">
+            <b-button size="sm"
+                      variant="light"
+                      class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
+              <calendar-icon class="mr-2"/>
+              {{ currentDate }}
+              <q-tooltip anchor="top middle">
+                Select date
+              </q-tooltip>
+            </b-button>
+          </date-selector>
+          <b-button size="sm"
+                    variant="light"
+                    class="btn-white btn-calendar-prev-next btn-contact-prev-next"
+                    @click.prevent="changeDirection('add')">
+            <i class="material-icons">keyboard_arrow_right</i>
+            <q-tooltip anchor="top middle">
+              Next {{ view }}
+            </q-tooltip>
+          </b-button>
+          <b-button size="sm"
+                    variant="light"
+                    class="btn-white btn-rounded px-3 mx-2 btn-calendar-today"
+                    @click.prevent="changeDirection('today')">
+            Today
+            <q-tooltip anchor="top middle">
+              Go to today
+            </q-tooltip>
+          </b-button>
+        </div>
+        <div class="calendar__header__action-right">
+          <filters :filters="convertedFilters"
+                  @save="onSaveFilters"/>
+          <q-select class="mx-2"
+                    options-selected-class="text-primary"
+                    color="primary"
+                    option-value="id"
+                    option-label="format"
+                    input-debounce="0"
+                    emit-value
+                    map-options
+                    dense
+                    outlined
+                    :options="timeFormats"
+                    v-model="timeFormat"
+                    @input="updateTimeFormat" />
+          <q-select class="mr-2"
+                    options-selected-class="text-primary"
+                    color="primary"
+                    option-value="id"
+                    option-label="name"
+                    input-debounce="0"
+                    emit-value
+                    map-options
+                    dense
+                    outlined
+                    :options="views"
+                    v-model="view" />
+          <helper/>
+        </div>
       </div>
-      <div class="calendar__header__action-right">
-        <filters :filters="convertedFilters"
-                 @save="onSaveFilters"/>
-        <q-select class="mx-2"
-                  options-selected-class="text-primary"
-                  color="primary"
-                  option-value="id"
-                  option-label="format"
-                  input-debounce="0"
-                  emit-value
-                  map-options
-                  dense
-                  outlined
-                  :options="timeFormats"
-                  v-model="timeFormat"
-                  @input="updateTimeFormat" />
-        <q-select class="mr-2"
-                  options-selected-class="text-primary"
-                  color="primary"
-                  option-value="id"
-                  option-label="name"
-                  input-debounce="0"
-                  emit-value
-                  map-options
-                  dense
-                  outlined
-                  :options="views"
-                  v-model="view" />
-        <helper/>
-      </div>
-    </div>
 
-    <!-- scheduler -->
-    <div class="scheduler d-flex flex-column flex-grow-1 h-100 overflow-hidden-y">
-      <div class="scheduler__header flex-grow-0">
-        <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
-          <tr v-if="view === 'week'">
-            <td :class="d.today ? 'today': ''"
-                v-for="d in formattedWeekDays"
-                :key="d.dayOfWeek">
-                <span class="day-of-week">{{ d.dayOfWeek }}</span>
-                <span class="day">{{ d.day }}</span>
-            </td>
-            <td style="width: 20px"></td>
-          </tr>
+      <!-- scheduler -->
+      <div class="scheduler d-flex flex-column flex-grow-1 h-100 overflow-hidden-y">
+        <div class="scheduler__header flex-grow-0">
+          <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
+            <tr v-if="view === 'week'">
+              <td :class="d.today ? 'today': ''"
+                  v-for="d in formattedWeekDays"
+                  :key="d.dayOfWeek">
+                  <span class="day-of-week">{{ d.dayOfWeek }}</span>
+                  <span class="day">{{ d.day }}</span>
+              </td>
+              <td style="width: 20px"></td>
+            </tr>
 
-          <tr v-if="view === 'month'">
-            <td v-for="d in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
-                :key="d">
-              <span class="day-of-week">{{d}}</span>
-            </td>
-          </tr>
-        </table>
+            <tr v-if="view === 'month'">
+              <td v-for="d in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
+                  :key="d">
+                <span class="day-of-week">{{d}}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="flex-grow-1 h-100 overflow-hidden-y"
+            :class="['scheduler__body', view]">
+          <scheduler ref="scheduler"
+                    :class="['actual-scheduler h-100', view + '-view']"
+                    :events="events"
+                    @edit-schedule="editSchedule"
+                    @add-schedule="addSchedule"
+                    @render-events="renderFromEvent"
+                    @update-current-date="updateCurrentDate"
+                    @view-change="viewChange">
+          </scheduler>
+        </div>
       </div>
-      <div class="flex-grow-1 h-100 overflow-hidden-y"
-           :class="['scheduler__body', view]">
-        <scheduler ref="scheduler"
-                   :class="['actual-scheduler h-100', view + '-view']"
-                   :events="events"
-                   @edit-schedule="editSchedule"
-                   @add-schedule="addSchedule"
-                   @render-events="renderFromEvent"
-                   @update-current-date="updateCurrentDate"
-                   @view-change="viewChange">
-        </scheduler>
-      </div>
+      <manager ref="manager"
+              @render-schedule="renderSchedule">
+      </manager>
     </div>
-    <manager ref="manager"
-             @render-schedule="renderSchedule">
-    </manager>
+    <upgrade-now image-link="/assets/images/Calendar.svg"
+                 text="Calendar is not included in your current plan. To use it, please contact us to upgrade today!"
+                 title-text="Calendar"
+                 kb-link="https://support.aloware.com/en/articles/6797909-the-aloware-talk-calendar"
+                 class="mt-5"
+                 v-if="!shouldShowCalendar && shouldShowUpgradeNow">
+    </upgrade-now>
   </div>
 </template>
 
@@ -136,9 +145,11 @@ import Filters from '../../components/calendar/calendar-filters.vue'
 import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
+import UpgradeNow from '../../components/upgrade-now.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Calendar',
@@ -149,8 +160,13 @@ export default {
     Filters,
     Helper,
     Manager,
-    Scheduler
+    Scheduler,
+    UpgradeNow
   },
+
+  mixins: [
+    aclMixin
+  ],
 
   data () {
     return {
