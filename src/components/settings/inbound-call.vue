@@ -21,7 +21,7 @@
 
           <b-form-group label="" class="w-50">
             <extension-selector v-model="user.extension"
-                                :disabled="viewOnly"
+                                :disable="viewOnly"
                                 @select="(eventPayload) => onUpdateFields(eventPayload, 'extension')">
             </extension-selector>
           </b-form-group>

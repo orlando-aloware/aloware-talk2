@@ -192,7 +192,6 @@
                        task="contacts.create">
         </block-tooltip>
         <b-dropdown text="Add Contacts"
-                    id="contacts-create-popover"
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                     toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
@@ -207,19 +206,22 @@
             <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
                style="margin-top: 2px;" />
           </template>
-          <b-dropdown-item href="#"
-                           v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
-                           @click="onAddContactsToList">
-            <search-icon color="#62666E">
-            </search-icon>
-            Select Existing Contacts & Add to List
-          </b-dropdown-item>
-          <b-dropdown-item href="#"
-                           :disabled="!canCreateContacts"
-                           @click="onShowCreateContact">
-            <plus-icon color="#62666E"></plus-icon>
-            Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
-          </b-dropdown-item>
+          <div id="contacts-create-popover">
+            <b-dropdown-item href="#"
+                            :disabled="!canAddContacts"
+                            v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
+                            @click="onAddContactsToList">
+              <search-icon color="#62666E">
+              </search-icon>
+              Select Existing Contacts & Add to List
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                            :disabled="!canCreateContacts"
+                            @click="onShowCreateContact">
+              <plus-icon color="#62666E"></plus-icon>
+              Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
+            </b-dropdown-item>
+          </div>
         </b-dropdown>
 
         <contact-create-modal :id="createContactModalId"
@@ -1341,7 +1343,7 @@ export default {
         })
         .catch((error) => {
           const { message, html } = extractErrorMessage(error)
-          console.log(error)
+          console.log(html)
           this.errorMsg = message
           this.$generalNotification(message, 'error')
         })
@@ -1375,10 +1377,8 @@ export default {
     },
 
     onShowCreateContact (e) {
-      if (this.enabledToCreateContacts()) {
-        this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
-        e.stopImmediatePropagation()  
-      }
+      this.$root.$emit('bv::show::modal', this.createContactModalId, e.target)
+      e.stopImmediatePropagation()
     },
 
     onAddContactsToList () {
@@ -1771,3 +1771,4 @@ export default {
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
   }
 }
+</script>

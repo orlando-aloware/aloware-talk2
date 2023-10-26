@@ -1,5 +1,6 @@
 <template>
   <div class="row no-wrap pt-3 pb-3 width-380 dialer-wrapper"
+       id="dialer-popover"
        :class="dialerFormClass">
     <div class="loading-container"
          v-if="isMakingCall">
@@ -13,73 +14,68 @@
       <b-tabs class="dialer-tabs"
               pills
               vertical>
-        <block-tooltip placement="bottomleft"
+        <block-tooltip placement="left"
                        triggers="hover focus"
-                       target="calls-popover"
-                       task="calls">
-        </block-tooltip>
-        <block-tooltip placement="bottomleft"
-                       triggers="hover focus"
-                       target="texts-popover"
-                       task="texts">
+                       target="dialer-popover"
+                       :show.sync="blockTooltipHandler.show"
+                       :task="blockTooltipHandler.task">
         </block-tooltip>
         <b-tab title="Call"
-               :active="mode === 'call'"
-
-               @click="setMode('call')">
+              :active="mode === 'call'"
+              @click="setMode('call')">
           <b-form-group class="mb-1"
                         :invalid-feedback="invalidCampaign"
                         :state="validCampaign">
             <line-selector class="line-selector"
-                           prepend="From:"
-                           specificClass="dialer-line-selector"
-                           :disable="defaultOutboundCampaignId && mode === 'call'"
-                           :generic-multiselect="false"
-                           v-model="campaignId"
-                           @change="changeCampaignId">
+                          prepend="From:"
+                          specificClass="dialer-line-selector"
+                          :disable="defaultOutboundCampaignId && mode === 'call'"
+                          :generic-multiselect="false"
+                          v-model="campaignId"
+                          @change="changeCampaignId">
             </line-selector>
           </b-form-group>
 
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
-               v-if="mode === 'call'">
+              v-if="mode === 'call'">
             <b-form-group class="mb-0"
                           :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumberSearch">
               <contact-phone-number-search class="width-190"
-                                           id="calls-popover"
-                                           ref="callContactPhoneNumberSearch"
-                                           :no_prepend="true"
-                                           v-model="phoneNumber"
-                                           @change="phoneNumberChanged"
-                                           @keyup.enter.native="onCall"
-                                           @searchResults="onPhoneNumberSearch">
+                                          id="calls-popover"
+                                          ref="callContactPhoneNumberSearch"
+                                          :no_prepend="true"
+                                          v-model="phoneNumber"
+                                          @change="phoneNumberChanged"
+                                          @keyup.enter.native="onCall"
+                                          @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
             <q-btn icon="img:app-icons/dialer/call_btn.svg"
-                   size="32px"
-                   class="icon-btn auto-size height-32"
-                   align="right"
-                   padding="none"
-                   rounded
-                   flat
-                   :ripple="true"
-                   :disable="callDisabled"
-                   @click="onCall">
+                  size="32px"
+                  class="icon-btn auto-size height-32"
+                  align="right"
+                  padding="none"
+                  rounded
+                  flat
+                  :ripple="true"
+                  :disable="callDisabled"
+                  @click="onCall">
             </q-btn>
           </div>
 
           <div class="dialer-contact-info width-190"
-               v-if="contactId">
+              v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
-                 v-if="contactId">
+                v-if="contactId">
               <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
-                   v-if="currentLocalTime">
+                  v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
               </div>
             </div>
             <p class="text-size-sm text-grey-80 _400 mb-1"
-               v-if="contactId && companyName">
+              v-if="contactId && companyName">
               {{ companyName }}
             </p>
             <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
@@ -88,51 +84,50 @@
           </div>
         </b-tab>
         <b-tab title="Message"
-               :active="mode === 'text'"
-
-               @click="setMode('text')">
+              :active="mode === 'text'"
+              @click="setMode('text')">
           <b-form-group class="mb-1"
                         :invalid-feedback="invalidCampaign"
                         :state="validCampaign">
             <line-selector class="line-selector"
-                           prepend="From:"
-                           check-blocked-messaging
-                           :generic-multiselect="false"
-                           :use-only-actives="true"
-                           v-model="campaignId"
-                           @change="changeCampaignId">
+                          prepend="From:"
+                          check-blocked-messaging
+                          :generic-multiselect="false"
+                          :use-only-actives="true"
+                          v-model="campaignId"
+                          @change="changeCampaignId">
             </line-selector>
             <div v-if="isMessagingBlocked(selectedCampaign, true)" class="compliance-badge mb-2">
               {{ selectedCampaign.blocked_messaging_information['reason'] }}
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
-               v-if="mode === 'text'">
+              v-if="mode === 'text'">
             <b-form-group class="mb-0 w-100"
                           :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumberSearch">
               <contact-phone-number-search ref="textContactPhoneNumberSearch"
-                                           id="texts-popover"
-                                           v-model="phoneNumber"
-                                           @change="phoneNumberChanged"
-                                           @keyup.enter.native="sendText"
-                                           @searchResults="onPhoneNumberSearch">
+                                          id="texts-popover"
+                                          v-model="phoneNumber"
+                                          @change="phoneNumberChanged"
+                                          @keyup.enter.native="sendText"
+                                          @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
           </div>
 
           <div class="dialer-contact-info w-100"
-               v-if="contactId">
+              v-if="contactId">
             <div class="text-size-sm text-grey-80 _400 mb-0 d-flex justify-content-between"
-                 v-if="contactId">
+                v-if="contactId">
               <div class="d-inline-flex text-left">{{ isMobile ? contactName : $options.filters.truncate(contactName, 15) }}</div>
               <div class="d-inline-flex text-right"
-                   v-if="currentLocalTime">
+                  v-if="currentLocalTime">
                 ~{{ currentLocalTime }}
               </div>
             </div>
             <p class="text-size-sm text-grey-80 _400 mb-1"
-               v-if="contactId && companyName">
+              v-if="contactId && companyName">
               {{ companyName }}
             </p>
             <div v-if="!contactId && validPhoneNumber && phoneNumber && !loadingContact">
@@ -145,11 +140,11 @@
               <template #append>
                 <b-input-group-text class="bg-white border-left-0 align-items-end">
                   <q-btn class="height-16 no-q-btn-focus"
-                         padding="none"
-                         flat
-                         :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign, true)"
-                         :ripple="false"
-                         @click="sendText">
+                        padding="none"
+                        flat
+                        :disable="sendDisabled || isSending || isMessagingBlocked(selectedCampaign, true)"
+                        :ripple="false"
+                        @click="sendText">
                     <send-text-icon :width="isMobile ? 18 : 16"
                                     :height="isMobile ? 18: 16"
                                     :color="sendTextColor">
@@ -158,10 +153,10 @@
                 </b-input-group-text>
               </template>
               <b-form-textarea class="textarea-no-auto-shrink text-size-sm _400 border-right-0 overflow-hidden pl-2 pr-2 border-half-rounded"
-                               placeholder="Text Message..."
-                               rows="2"
-                               max-rows="3"
-                               v-model="textMessage">
+                              placeholder="Text Message..."
+                              rows="2"
+                              max-rows="3"
+                              v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
           </div>
@@ -257,7 +252,11 @@ export default {
       isMakingCall: false,
       isSending: false,
       hasPhoneNumberSearchResults: false,
-      previousOutboundCallingMode: null
+      previousOutboundCallingMode: null,
+      blockTooltipHandler: {
+        task: 'call',
+        show: false
+      }
     }
   },
 
@@ -471,6 +470,7 @@ export default {
 
     setMode (mode) {
       this.mode = mode
+      this.blockTooltipHandler.task = mode
     },
 
     onCall () {
@@ -544,6 +544,15 @@ export default {
 
     onPhoneNumberSearch (value) {
       this.hasPhoneNumberSearchResults = value
+    },
+
+    showBlockTooltip () {
+      this.blockTooltipHandler.show = true
+    },
+
+    hideBlockTooltip () {
+      console.log('hideBlockTooltip')
+      this.blockTooltipHandler.show = false
     }
   },
 

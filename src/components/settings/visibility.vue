@@ -21,7 +21,7 @@
 
           <b-form-group label="" >
             <visibility-selector v-model="user.contacts_visibility"
-                                 :disabled="viewOnly"
+                                 :disable="viewOnly"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'contacts_visibility')">
             </visibility-selector>
           </b-form-group>
@@ -50,7 +50,7 @@
           <b-form-group label="" >
             <visibility-selector v-model="user.communications_visibility"
                                  :is-contact-access-type="false"
-                                 :disabled="viewOnly"
+                                 :disable="viewOnly"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'communications_visibility')">
             </visibility-selector>
           </b-form-group>

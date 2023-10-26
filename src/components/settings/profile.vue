@@ -208,6 +208,7 @@
 
           <b-form-group label="" >
             <answer-type-selector v-model="user.answer_by"
+                                  :disable="viewOnly"
                                   @select="(eventPayload) => onUpdateFields(eventPayload, 'answer_by')">
             </answer-type-selector>
           </b-form-group>

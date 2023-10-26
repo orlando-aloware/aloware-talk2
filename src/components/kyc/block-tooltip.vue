@@ -78,10 +78,10 @@ export default {
         case 'contacts.import':
           text = 'import contacts'
           break
-        case 'calls':
+        case 'call':
           text = 'call numbers beside yours'
           break
-        case 'texts':
+        case 'text':
           text = 'text messages'
           break
       }
