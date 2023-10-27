@@ -894,7 +894,7 @@ export default {
       this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.pre_signup_id}`)
         .then((res) => {
           if (res.headers['content-type'] !== 'application/json') {
-            return
+            return this.$router.push({ name: 'Login' })
           }
 
           this.setPreFilledData(res.data)
