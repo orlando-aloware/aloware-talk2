@@ -664,7 +664,7 @@ export default {
 
       console.log('submit', payload)
 
-      this.$axios.post('/api/admin/company-registration', payload)
+      this.$axios.post('/api/company-registration', payload)
         .then((res) => {
           this.isSubmitted = true
           this.$generalNotification('Your information has been submitted. Please check your email for further instructions.')
