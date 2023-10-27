@@ -10,13 +10,13 @@
         </div>
         <p class="info-text">{{ text }}</p>
         <div class="flex-row mb-4 mt-3">
-            <el-button v-if="kbLink"
+            <span v-if="kbLink"
                        size="large"
                        type="text"
                        class="cursor-pointer el-button learn-more-text mr-2"
                        @click="openKnowledgeBaseLink">
                 Learn More
-            </el-button>
+            </span>
             <b-button pill
                       variant="primary"
                       class="cursor-pointer el-button ml-2"
@@ -84,7 +84,7 @@ export default {
     },
 
     checkClick () {
-      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://aloware.com/get-demo/'
+      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://meetings.hubspot.com/joe264/ssu-get-demo'
 
       if (this.defaultClick) {
         window.open(defaultLink, '_blank')

@@ -30,6 +30,8 @@ const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
 const EmailBlast = () => import('pages/EmailBlast.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
+const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
+const BusinessInformation = () => import('pages/account-registration/BusinessInformation.vue')
 
 const routes = [
   {
@@ -463,6 +465,23 @@ const routes = [
           title: 'Email'
         },
         component: EmailBlast
+      },
+      {
+        path: '/account-registration/:pre_signup_id?',
+        name: 'Account Registration',
+        meta: {
+          title: 'Account Registration',
+          isGuest: true
+        },
+        component: AccountRegistration
+      },
+      {
+        path: '/business-information-registration/:company_id?',
+        name: 'Business Information',
+        meta: {
+          title: 'Business Information'
+        },
+        component: BusinessInformation
       }
     ]
   },

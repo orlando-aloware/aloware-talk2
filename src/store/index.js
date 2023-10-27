@@ -15,6 +15,7 @@ import settings from './settings'
 import broadcast from './broadcast'
 import wallboard from './wallboard'
 import tagsModule from './tags'
+import accountRegistration from './account-registration'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -42,7 +43,8 @@ export default function (/* { ssrContext } */) {
       broadcast,
       wallboard,
       cache,
-      tagsModule
+      tagsModule,
+      accountRegistration
     },
 
     state: {
@@ -260,6 +262,8 @@ export default function (/* { ssrContext } */) {
       suspended: false,
       showProFeatureDialog: false,
       leadSources: [],
+      kycFilledStatus: false,
+      isPresignup: true,
       contactsLists: [],
       statics: {
         domain: null,
@@ -784,6 +788,10 @@ export default function (/* { ssrContext } */) {
 
       setLeadSources ({ commit }, leadSources) {
         commit('SET_LEAD_SOURCES', leadSources)
+      },
+
+      setKycFilled ({ commit }, value) {
+        commit('SET_KYC_FILLED', value)
       },
 
       setStatics ({ commit }, statics) {
@@ -1513,6 +1521,11 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
+      },
+
+      SET_KYC_FILLED (state, value) {
+        state.kycFilledStatus = value?.kyc_filled_status ? value.kyc_filled_status : state.kycFilledStatus
+        state.isPresignup = value?.is_presignup ? value.is_presignup : state.isPresignup
       },
 
       SET_STATICS (state, statics) {

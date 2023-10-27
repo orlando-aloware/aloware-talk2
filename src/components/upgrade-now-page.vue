@@ -1,6 +1,6 @@
 <template>
   <div class="upgrade-now no-select"
-       v-if="!isSimpSocial">
+       v-if="!isSimpsocial">
       <h3 class="title-text mt-2">{{ titleText }}</h3>
       <div class="flex-row mb-4 mt-2">
           <div class="col-12 col-md-10 offset-md-1">
@@ -14,14 +14,14 @@
           {{ extraText }}
       </p>
       <div class="flex-row mb-4 mt-3">
-          <el-button
+          <span
               v-if="kbLink"
               size="large"
               type="text"
               class="cursor-pointer el-button learn-more-text mr-2"
               @click="openKnowledgeBaseLink">
               Learn More
-          </el-button>
+          </span>
           <b-button pill
                     variant="primary"
                     class="cursor-pointer el-button ml-2"
@@ -93,7 +93,7 @@ export default {
     },
 
     checkClick () {
-      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://aloware.com/get-demo/'
+      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://meetings.hubspot.com/joe264/ssu-get-demo'
 
       if (this.defaultClick) {
         window.open(defaultLink, '_blank')

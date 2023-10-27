@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <div v-if="shouldShowCalendar" class="calendar position-relative h-100 d-flex flex-column">
+  <div class="position-relative h-100">
+    <div v-if="shouldShowCalendar"
+         class="calendar d-flex h-100 flex-column">
       <b-overlay class="h-100 w-100 position-absolute"
                 rounded="sm"
                 :show="true"
@@ -128,12 +129,12 @@
       </manager>
     </div>
     <upgrade-now-page image-link="/assets/images/Calendar.svg"
-                  text="Simplify your appointment scheduling and receive timely reminders with Calendar"
-                  extra-text="Upgrade today to unlock this feature"
-                  title-text="Calendar"
-                  kb-link="https://support.aloware.com/en/articles/6797909-the-aloware-talk-calendar"
-                  class="mt-5"
-                  v-if="!shouldShowCalendar && shouldShowUpgradeNow">
+                      text="Simplify your appointment scheduling and receive timely reminders with Calendar"
+                      extra-text="Upgrade today to unlock this feature"
+                      title-text="Calendar"
+                      kb-link="https://support.aloware.com/en/articles/6797909-the-aloware-talk-calendar"
+                      class="mt-5"
+                      v-if="!shouldShowCalendar && shouldShowUpgradeNow">
     </upgrade-now-page>
   </div>
 </template>
@@ -146,7 +147,7 @@ import Filters from '../../components/calendar/calendar-filters.vue'
 import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
-import UpgradeNowPage from '../../components/upgrade-now-page.vue'
+import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
@@ -154,6 +155,10 @@ import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Calendar',
+
+  mixins: [
+    aclMixin
+  ],
 
   components: {
     CalendarIcon,
@@ -164,10 +169,6 @@ export default {
     Scheduler,
     UpgradeNowPage
   },
-
-  mixins: [
-    aclMixin
-  ],
 
   data () {
     return {

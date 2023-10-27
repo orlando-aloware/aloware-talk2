@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div v-if="shouldShowBroadcast" class="broadcasts__home position-relative d-flex flex-column h-100">
+    <div v-if="shouldShowBroadcast"
+         class="broadcasts__home position-relative d-flex flex-column h-100">
       <b-overlay class="broadcasts__home__loading-overlay"
                 rounded="sm"
                 :style="`margin-top: ${notificationHeight}px`"
@@ -81,8 +82,16 @@
             </template>
           </q-btn-toggle>
         </div>
-        <div class="broadcasts__home__header__new-button">
+        <block-tooltip v-if="viewOnly"
+                      placement="left"
+                      triggers="hover focus"
+                      target="broadcast-popover"
+                      task="broadcasts.create">
+        </block-tooltip>
+        <div id="broadcast-popover"
+            class="broadcasts__home__header__new-button">
           <compact-btn variant="primary"
+                      :disabled="viewOnly"
                       v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
                       @clicked="$router.push({ path: '/broadcasts/new' })">
             <plus-icon class="mr-1"
@@ -374,11 +383,12 @@ import CommunicationActivityGraph from 'src/components/communication-activity-gr
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import CompactBtn from 'components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
-import UpgradeNowPage from 'src/components/upgrade-now-page.vue'
+import BlockTooltip from 'components/kyc/block-tooltip'
+import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { COLUMNS } from 'src/constants/broadcast/home-columns'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcasts',
@@ -393,11 +403,13 @@ export default {
     DeleteRedIcon,
     CompactBtn,
     RelativeTime,
+    BlockTooltip,
     UpgradeNowPage
   },
 
   mixins: [
-    aclMixin
+    aclMixin,
+    kycMixin
   ],
 
   data: () => ({
@@ -484,6 +496,10 @@ export default {
 
     isBroadcastsTableEmpty () {
       return this.broadcasts.length === 0
+    },
+
+    viewOnly () {
+      return this.isViewOnlyAccess()
     },
 
     contextMenuTarget () {
