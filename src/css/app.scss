@@ -13804,7 +13804,7 @@ h1.contact-list-name-label {
   .stepper__container {
     display: flex;
     flex-direction: column;
-    height: 80vh;
+    height: 90vh !important;
 
     .q-stepper__header,
     .stepper__content__header {
@@ -13823,6 +13823,16 @@ h1.contact-list-name-label {
     @media (min-height: 720px) {
       .stepper__content {
         height: 50vh;
+      }
+
+      .stepper__container {
+        height: 70vh !important;
+      }
+    }
+
+    @media (min-height: 800px) {
+      .stepper__container {
+        height: 90vh !important;
       }
     }
 
@@ -13916,18 +13926,18 @@ h1.contact-list-name-label {
       text-align: -webkit-center;
 
       .stepper__container {
-      display: flex;
-      text-align: -webkit-center;
+        display: flex;
+        text-align: -webkit-center;
 
-      .q-stepper__header,
-      .stepper__content__header {
-        max-width: 100%;
-        position: relative;
-        z-index: 10;
-        background-color: white;
-        font-size: 10px;
+        .q-stepper__header,
+        .stepper__content__header {
+          max-width: 100%;
+          position: relative;
+          z-index: 10;
+          background-color: white;
+          font-size: 10px;
+        }
       }
-    }
     }
   }
 
@@ -14043,9 +14053,9 @@ h1.contact-list-name-label {
   }
 
   .accept-box {
-    width: 100%;
+    width: 80%;
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
     padding-left: 2.8rem;
   }
 
@@ -14070,5 +14080,19 @@ h1.contact-list-name-label {
     > .col-md-4 {
       flex-grow: 1;
     }
+  }
+
+  #recaptcha-element {
+    position: relative;
+    right: -32%;
+  }
+
+  .q-field--disabled
+  .q-field__control > div,
+  .q-field--disabled
+  .q-field__control > div * {
+    background: #D8D8D8;
+    color: #040404;
+    border-radius: 20px;
   }
 }
