@@ -893,6 +893,10 @@ export default {
 
       this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.pre_signup_id}`)
         .then((res) => {
+          if (res.headers['content-type'] !== 'application/json') {
+            return
+          }
+
           this.setPreFilledData(res.data)
           this.setPreFilledFieldsDisabled()
           this.selectCountryBasedInTimezone()
