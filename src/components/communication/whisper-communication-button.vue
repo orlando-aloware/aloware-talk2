@@ -1,13 +1,36 @@
 <template>
-  <span class="cursor-pointer"
-        v-if="userCanBargeAndWhisper(communication)"
-        @click="dialog">
-    <ear-icon height="22"
-              width="22"/>
-    <q-tooltip>
-      Whisper
-    </q-tooltip>
-  </span>
+  <div>
+    <span v-if="isBlockedFrom('barge & whisper')"
+        class="cursor-pointer">
+      <b-popover target="whisper-popover"
+                triggers="hover"
+                placement="top"
+                custom-class="btn-primary"
+                delay="100">
+        <span class="text-white">
+          The whisper option is not included in your current plan, to use it, you have
+          to upgrade to one of our plans that offers it!
+          <u @click="openKnowledgeBaseLink"
+            class="cursor-pointer">Read more</u>
+          or
+          <u @click="checkClick"
+            class="cursor-pointer">Request Plan Upgrade</u>
+        </span>
+      </b-popover>
+      <ear-icon id="whisper-popover"
+                height="22"
+                width="22"/>
+    </span>
+    <span v-if="!isBlockedFrom('barge & whisper') && userCanBargeAndWhisper(communication)"
+          class="cursor-pointer"
+          @click="dialog">
+      <ear-icon height="22"
+                width="22"/>
+      <q-tooltip>
+        Whisper
+      </q-tooltip>
+    </span>
+  </div>
 </template>
 
 <script>
@@ -31,6 +54,11 @@ export default {
     communication: {
       type: Object,
       required: true
+    },
+    defaultClick: {
+      type: Boolean,
+      default: true,
+      required: false
     }
   },
 
@@ -52,6 +80,20 @@ export default {
       this.$VueEvent.fire('make_new_call', {
         phone_number: `whisper:${this.communication.id}`
       })
+    },
+
+    openKnowledgeBaseLink () {
+      window.open('https://support.aloware.com/en/articles/5743991-sentry-mode-barge-whisper-in-admin', '_blank')
+    },
+
+    checkClick () {
+      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://aloware.com/get-demo/'
+
+      if (this.defaultClick) {
+        window.open(defaultLink, '_blank')
+      } else {
+        this.$emit('click')
+      }
     }
   }
 }
