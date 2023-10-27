@@ -1,14 +1,225 @@
 <template>
   <div class="account-registration row">
     <div class="col-xl-8 col-md-12 col-sm-12">
-      <div class="absolute-top q-pt-xl q-px-xl">
+      <div class="logo absolute-top q-pt-xl q-px-xl">
         <img
           src="app-icons/menu/logo_dark.svg"
           alt="Logo"
         />
       </div>
-      <div class="stepper__container">
-        <q-stepper
+      <div class="stepper__container pt-60">
+        <step-header
+          title="Welcome to Aloware!"
+          description="We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going"
+        />
+
+        <div class="stepper__content">
+          <div class="min-w-100">
+            <input-group>
+              <template v-slot:content>
+                <input-field
+                  label="First Name"
+                  placeholder="Type your first name"
+                  ref="first_name-input"
+                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                  :rules="[validateFieldError('first_name')]"
+                  :disabled="checkIfFieldIsPreFilled('first_name')"
+                  v-model="form.first_name"
+                  @input="cleanFieldError('first_name')"
+                >
+                  <template v-slot:hint v-if="fieldErrors.first_name">
+                    {{ fieldErrors.first_name[0] }}
+                  </template>
+                </input-field>
+
+                <input-field
+                  label="Last Name"
+                  placeholder="Type your last name"
+                  ref="last_name-input"
+                  :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                  :rules="[validateFieldError('last_name')]"
+                  :disabled="checkIfFieldIsPreFilled('last_name')"
+                  v-model="form.last_name"
+                  @input="cleanFieldError('last_name')"
+                >
+                  <template v-slot:hint v-if="fieldErrors.last_name">
+                    <span>{{ fieldErrors.last_name[0] }}</span>
+                  </template>
+                </input-field>
+              </template>
+            </input-group>
+
+            <input-group>
+              <template v-slot:content>
+                <input-field
+                  label="Email Address"
+                  placeholder="youremail@domain.com"
+                  type="email"
+                  ref="email-input"
+                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                  :rules="[validateEmail, validateFieldError('email')]"
+                  :disabled="checkIfFieldIsPreFilled('email')"
+                  v-model="form.email"
+                  @input="cleanFieldError('email')"
+                />
+
+                <phone-number-field
+                  label="Phone Number"
+                  placeholder="222 333 4444"
+                  ref="phone_number-input"
+                  :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
+                  :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                  :disabled="checkIfFieldIsPreFilled('phone_number')"
+                  v-model="form.phone_number"
+                  @input="cleanFieldError('phone_number')"
+                />
+              </template>
+            </input-group>
+
+            <input-group>
+              <template v-slot:content>
+                <select-field
+                  label="Country"
+                  placeholder="Ex: United States"
+                  option-label="name"
+                  option-value="id"
+                  ref="country-input"
+                  :rules="[validateFieldError('country')]"
+                  :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                  :options="countries"
+                  v-model="form.country"
+                />
+
+                <input-field
+                  label="Business Name"
+                  placeholder="Ex. Aloware Inc."
+                  ref="company_name-input"
+                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                  :rules="[validateFieldError('company_name')]"
+                  :disabled="checkIfFieldIsPreFilled('company_name')"
+                  v-model="form.company_name"
+                  @input="cleanFieldError('company_name')"
+                />
+              </template>
+            </input-group>
+
+            <div class="flex justify-center pt-4 q-row">
+              <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
+                <h4 class="text-h5 text-weight-bold">Password</h4>
+              </div>
+              <div class="col-5" />
+            </div>
+
+            <input-group>
+              <template v-slot:content>
+                <input-field
+                  label="Create a Password"
+                  placeholder="Type here"
+                  ref="password-input"
+                  is-password
+                  :rules="[validateFieldError('password')]"
+                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                  v-model="form.password"
+                  @input="cleanFieldError('password')"
+                >
+                  <template
+                    v-slot:hint
+                    v-if="form.password">
+                    <ul class="text-left pl-2 text-weight-regular password-hint"
+                        :class="validateFieldError('password') ? 'negative-top' : ''">
+                      <li>
+                        <q-icon
+                          class="q-mr-xs"
+                          :class="getPasswordRuleClass(validatePasswordLength(form.password))"
+                          :name="iconForValidation(validatePasswordLength(form.password))"
+                        >
+                        </q-icon>
+                        8 characters long
+                      </li>
+                      <li>
+                        <q-icon
+                          class="q-mr-xs"
+                          :class="getPasswordRuleClass(validatePasswordCases(form.password))"
+                          :name="iconForValidation(validatePasswordCases(form.password))"
+                        >
+                        </q-icon>
+                        Must contain upper and lower case letters
+                      </li>
+                      <li>
+                        <q-icon
+                          class="q-mr-xs"
+                          :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
+                          :name="iconForValidation(validatePasswordDigit(form.password))"
+                        >
+                        </q-icon>
+                        Include at least one numerical digit
+                      </li>
+                    </ul>
+                  </template>
+                </input-field>
+
+                <input-field
+                  label="Repeat your Password"
+                  placeholder="Type your password again"
+                  is-password
+                  v-model="form.password_confirmation"
+                >
+                  <template
+                    v-slot:hint
+                    v-if="form.password?.length > 0">
+                    <ul class="text-left pl-2 text-weight-regular password-hint">
+                      <li>
+                        <q-icon
+                          class="q-mr-xs"
+                          :class="getPasswordRuleClass(validatePasswordMatch(form.password_confirmation))"
+                          :name="iconForValidation(validatePasswordMatch(form.password_confirmation))"
+                        >
+                        </q-icon>
+                        {{
+                          validatePasswordMatch(form.password_confirmation)
+                            ? 'The passwords match'
+                            : "The passwords doesn't match"
+                        }}
+                      </li>
+                    </ul>
+                  </template>
+                </input-field>
+              </template>
+            </input-group>
+
+            <div class="accept-box">
+              <div>
+                <q-checkbox
+                  class="mb-4 q-pr-xs"
+                  color="primary"
+                  dense
+                  v-model="form.agreed_to_terms"
+                >
+                  I agree to
+                  <a
+                    class="text-weight-bold"
+                    href="https://aloware.com/terms-and-conditions"
+                    target="_blank" rel="noopener noreferrer">
+                    Terms and Conditions
+                  </a>
+                  , and
+                  <a
+                    class="text-weight-bold"
+                    href="https://aloware.com/terms-and-conditions"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    Acceptable Use Policy.
+                  </a>
+                </q-checkbox>
+                <div
+                  id="recaptcha-element"
+                  class="g-recaptcha pb-2"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <q-stepper
           class="q-pl-lg-xl q-pt-lg"
           color="primary"
           ref="stepper"
@@ -89,13 +300,6 @@
 
                 <input-group>
                   <template v-slot:content>
-                    <!-- <input-field
-                      label="Job Title"
-                      placeholder="Ex. CEO, CTO, Product Director"
-                      :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                      v-model="form.job_title"
-                    /> -->
-
                     <select-field
                       label="Country"
                       placeholder="Ex: United States"
@@ -326,10 +530,29 @@
               />
             </q-stepper-navigation>
           </template>
-        </q-stepper>
+        </q-stepper> -->
+
+        <div class="flex justify-end pt-4 q-mx-md">
+          <div class="q-mx-xl">
+            <q-btn
+              class="q-mx-xl account-registration-action-btn"
+              color="primary"
+              size="md"
+              label="Create my Account"
+              rounded
+              dense
+              no-caps
+              unelevated
+              :disabled="isNextButtonDisabled"
+              @click="onSubmit"
+            />
+          </div>
+        </div>
       </div>
     </div>
     <banner :current-step="step" />
+
+    <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </div>
 </template>
 
@@ -345,8 +568,9 @@ import InputGroup from 'src/components/account-registration/input-group.vue'
 import InputField from 'src/components/account-registration/input-field.vue'
 import SelectField from 'src/components/account-registration/select-field.vue'
 import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
-import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
+// import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
+import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
 
 export default {
   name: 'account-registration',
@@ -357,8 +581,9 @@ export default {
     InputField,
     SelectField,
     PhoneNumberField,
-    BusinessInformationForm,
-    Banner
+    // BusinessInformationForm,
+    Banner,
+    UserAlreadyHaveAccountDialog
   },
 
   mixins: [
@@ -377,7 +602,9 @@ export default {
       businessTypes,
       businessIdTypes,
       regionsOfOperations,
-      businessIndustries
+      businessIndustries,
+      preFilledData: {},
+      shouldRedirectToLogin: false
     }
   },
 
@@ -444,7 +671,8 @@ export default {
       'setBusinessInformationFieldsEmpty',
       'setKycFilled',
       'setFieldErrors',
-      'cleanFieldError'
+      'cleanFieldError',
+      'setPreFilledData'
     ]),
 
     updateValidationState (rule, isValid) {
@@ -531,6 +759,11 @@ export default {
     },
 
     validateAllPasswordRules () {
+      if (!this.form.password) {
+        this.password_validation = []
+        return
+      }
+
       this.updateValidationState('length', this.validatePasswordLength(this.form.password))
       this.updateValidationState('cases', this.validatePasswordCases(this.form.password))
       this.updateValidationState('digit', this.validatePasswordDigit(this.form.password))
@@ -547,6 +780,10 @@ export default {
     },
 
     validatePasswordLength (val) {
+      if (!val) {
+        return false
+      }
+
       return val.length >= 8
     },
 
@@ -564,35 +801,35 @@ export default {
 
     validateFirstStepFieldsFilled () {
       return (
-        this.form.first_name.length &&
-        this.form.last_name.length &&
+        this.form.first_name?.length &&
+        this.form.last_name?.length &&
         this.validateEmail(this.form.email) === true &&
         this.validatePhoneNumber(this.form.phone_number) === true &&
         this.form.country &&
-        this.form.company_name.length &&
+        this.form.company_name?.length &&
         // this.form.job_title.length &&
-        this.form.password.length &&
-        this.form.password_confirmation.length &&
-        this.password_validation.length === 4
+        this.form.password?.length &&
+        this.form.password_confirmation?.length &&
+        this.password_validation?.length === 4
       )
     },
 
     validateSecondStepFieldsFilled () {
       return (
-        this.form.legal_name.length &&
+        this.form.legal_name?.length &&
         this.form.business_type &&
         this.form.business_registration_identifier &&
-        this.form.business_registration_number.length &&
+        this.form.business_registration_number?.length &&
         this.form.business_regions_of_operation &&
         this.form.business_industry &&
-        this.form.website_url.length &&
-        this.form.street.length &&
-        this.form.region.length &&
-        this.form.city.length &&
+        this.form.website_url?.length &&
+        this.form.street?.length &&
+        this.form.region?.length &&
+        this.form.city?.length &&
         this.form.legal_country &&
         this.validateZipCode(this.form.postal_code) &&
-        this.form.auth_rep_first_name.length &&
-        this.form.auth_rep_last_name.length &&
+        this.form.auth_rep_first_name?.length &&
+        this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&
         this.validatePhoneNumber(this.form.auth_rep_phone_number) === true &&
         this.form.auth_rep_business_title &&
@@ -614,6 +851,10 @@ export default {
     },
 
     selectCountryBasedInTimezone () {
+      if (this.form.country) {
+        return
+      }
+
       const timezone = this.form.timezone
       const countries = window.CountriesAndTimezones.getAllCountries()
       const country = Object.values(countries).find(({ timezones }) => timezones.includes(timezone))
@@ -634,10 +875,6 @@ export default {
       }
     },
 
-    getPreSignUpData () {
-      this.isLoading = true
-    },
-
     nextStep () {
       if (this.step === 2) {
         this.setKycFilled()
@@ -649,6 +886,39 @@ export default {
     skipForNow () {
       this.setBusinessInformationFieldsEmpty()
       this.$refs.stepper.next()
+    },
+
+    getPreSignupDetails () {
+      this.isLoading = true
+
+      this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.pre_signup_id}`)
+        .then((res) => {
+          this.setPreFilledData(res.data)
+          this.setPreFilledFieldsDisabled()
+          this.selectCountryBasedInTimezone()
+
+          if (res.data?.company_id) {
+            this.shouldRedirectToLogin = true
+          }
+        })
+        .catch((err) => {
+          this.$handleErrors(err?.response)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
+    setPreFilledFieldsDisabled () {
+      Object.keys(this.form).forEach(field => {
+        if (this.form[field]) {
+          this.preFilledData[field] = this.form[field]
+        }
+      })
+    },
+
+    checkIfFieldIsPreFilled (field) {
+      return Boolean(this.preFilledData[field])
     },
 
     onSubmit () {
@@ -664,7 +934,7 @@ export default {
 
       console.log('submit', payload)
 
-      this.$axios.post('/api/company-registration', payload)
+      this.$axios.post('/api/admin/company-registration', payload)
         .then((res) => {
           this.isSubmitted = true
           this.$generalNotification('Your information has been submitted. Please check your email for further instructions.')
@@ -677,7 +947,6 @@ export default {
           }
 
           this.$handleErrors(err?.response)
-          this.moveToStepWithFieldErrors()
         })
         .finally(() => {
           this.isLoading = false
@@ -691,8 +960,10 @@ export default {
     this.selectCountryBasedInTimezone()
   },
 
-  mounted () {
+  async mounted () {
+    this.setBusinessInformationFieldsEmpty()
     this.verifyFieldErrors()
+    await this.getPreSignupDetails()
   }
 }
 </script>
