@@ -57,13 +57,14 @@
         <create-list-modal :is-default="false" />
       </template>
     </div>
-    <upgrade-now image-link="/assets/images/PowerDialer.svg"
-                text="PowerDialer is not included in your current plan. To use it, please contact us to upgrade today!"
-                title-text="PowerDialer"
-                kb-link="https://support.aloware.com/en/articles/5987054-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
-                class="mt-5"
-                v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
-    </upgrade-now>
+    <upgrade-now-page image-link="/assets/images/PowerDialer.svg"
+                      text="Boost your sales team’s productivity! Power Dialer automatically calls contacts one by one from a list so agents have less idle time."
+                      extra-text="Upgrade today to unlock this feature"
+                      title-text="Power Dialer"
+                      kb-link="https://support.aloware.com/en/articles/5987054-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
+                      class="mt-5"
+                      v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
+    </upgrade-now-page>
   </div>
 </template>
 
@@ -80,7 +81,7 @@ import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
 import RemoveContact from 'components/remove-contact'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation'
-import UpgradeNow from 'components/upgrade-now.vue'
+import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import ColumnHeaders from 'components/column-headers'
 import {
   powerDialerMixin,
@@ -110,7 +111,7 @@ export default {
     RemoveContactConfirmation,
     RemoveFolderDialog,
     CreateListModal,
-    UpgradeNow
+    UpgradeNowPage
   },
 
   mixins: [

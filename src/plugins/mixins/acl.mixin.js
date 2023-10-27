@@ -215,6 +215,7 @@ export default _.merge({
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
+    ...mapState(['usage']),
     hasReporterAccess () {
       return this.profile && this.profile.read_only_access
     },

@@ -127,13 +127,14 @@
               @render-schedule="renderSchedule">
       </manager>
     </div>
-    <upgrade-now image-link="/assets/images/Calendar.svg"
-                 text="Calendar is not included in your current plan. To use it, please contact us to upgrade today!"
-                 title-text="Calendar"
-                 kb-link="https://support.aloware.com/en/articles/6797909-the-aloware-talk-calendar"
-                 class="mt-5"
-                 v-if="!shouldShowCalendar && shouldShowUpgradeNow">
-    </upgrade-now>
+    <upgrade-now-page image-link="/assets/images/Calendar.svg"
+                  text="Simplify your appointment scheduling and receive timely reminders with Calendar"
+                  extra-text="Upgrade today to unlock this feature"
+                  title-text="Calendar"
+                  kb-link="https://support.aloware.com/en/articles/6797909-the-aloware-talk-calendar"
+                  class="mt-5"
+                  v-if="!shouldShowCalendar && shouldShowUpgradeNow">
+    </upgrade-now-page>
   </div>
 </template>
 
@@ -145,7 +146,7 @@ import Filters from '../../components/calendar/calendar-filters.vue'
 import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
-import UpgradeNow from '../../components/upgrade-now.vue'
+import UpgradeNowPage from '../../components/upgrade-now-page.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
@@ -161,7 +162,7 @@ export default {
     Helper,
     Manager,
     Scheduler,
-    UpgradeNow
+    UpgradeNowPage
   },
 
   mixins: [

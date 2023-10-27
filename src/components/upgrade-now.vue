@@ -29,10 +29,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { simpsocialMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'upgrade-now',
+
+  mixins: [
+    simpsocialMixin,
+    userMixin
+  ],
 
   props: {
     text: {
@@ -70,7 +75,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('cache', ['isSimpSocial'])
+
   },
 
   methods: {
@@ -79,8 +84,10 @@ export default {
     },
 
     checkClick () {
+      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://aloware.com/get-demo/'
+
       if (this.defaultClick) {
-        window.open('https://aloware.com/get-demo/', '_blank')
+        window.open(defaultLink, '_blank')
       } else {
         this.$emit('click')
       }

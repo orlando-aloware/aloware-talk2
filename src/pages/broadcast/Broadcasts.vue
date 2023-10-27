@@ -352,13 +352,14 @@
         </q-card>
       </q-popup-proxy>
     </div>
-    <upgrade-now image-link="/assets/images/Broadcast.svg"
-              text="Broadcast is not included in your current plan. To use it, please contact us to upgrade today!"
-              title-text="Broadcast"
-              kb-link="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
-              class="mt-5"
-              v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
-    </upgrade-now>
+    <upgrade-now-page image-link="/assets/images/Broadcast.svg"
+                      text="Scale your outreach with the click of a button. Send captivating SMS campaigns to many contacts at once via Broadcast."
+                      extra-text="Upgrade today to unlock this feature"
+                      title-text="Broadcast"
+                      kb-link="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
+                      class="mt-5"
+                      v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
+    </upgrade-now-page>
   </div>
 </template>
 
@@ -373,7 +374,7 @@ import CommunicationActivityGraph from 'src/components/communication-activity-gr
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import CompactBtn from 'components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
-import UpgradeNow from 'src/components/upgrade-now.vue'
+import UpgradeNowPage from 'src/components/upgrade-now-page.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { COLUMNS } from 'src/constants/broadcast/home-columns'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
@@ -392,7 +393,7 @@ export default {
     DeleteRedIcon,
     CompactBtn,
     RelativeTime,
-    UpgradeNow
+    UpgradeNowPage
   },
 
   mixins: [
