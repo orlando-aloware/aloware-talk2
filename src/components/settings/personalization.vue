@@ -52,7 +52,7 @@
           <b-form-group label="">
             <b-form-checkbox switch
                              v-model="user.go_to_available_after_login"
-                             :disabled="currentCompany && currentCompany.force_users_always_available"
+                             :disabled="currentCompany && currentCompany.force_users_always_available || viewOnly"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'go_to_available_after_login')">
               Enable available by default, but allow manual changes
             </b-form-checkbox>
@@ -105,6 +105,7 @@
           >
             <b-form-checkbox switch
                              v-model="user.url_shortener_enabled"
+                             :disabled="viewOnly"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'url_shortener_enabled')">
               Enable URL Shortener
             </b-form-checkbox>
@@ -120,13 +121,13 @@
 import WrapUpSelector from 'components/generic-selectors/wrap-up-selector'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin } from 'src/plugins/mixins'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'personalization',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, kycMixin],
 
   components: {
     WrapUpSelector,
