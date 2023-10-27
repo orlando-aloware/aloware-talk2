@@ -316,7 +316,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
-      loadingKycFilledStatus: true,
       isWidget: false,
       transitionName: null,
       prevHeight: 0,
@@ -369,9 +368,7 @@ export default {
       'showPhone',
       'suspended',
       'parkedCalls',
-      'leadSources',
-      'kycFilledStatus',
-      'isPresignup'
+      'leadSources'
     ]),
 
     ...mapState('auth', [
@@ -512,9 +509,7 @@ export default {
       const isAuthenticated = !this.isGuest && this.authenticated
 
       return isAuthenticated &&
-             this.isPresignup &&
-             !this.kycFilledStatus &&
-             !this.loadingKycFilledStatus &&
+             this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
     }
   },
@@ -1447,7 +1442,6 @@ export default {
         this.getCallDispositions()
         this.getLeadSources()
         this.getMyQueueList()
-        this.getKycFilledStatus()
       })
     },
 
@@ -1894,25 +1888,6 @@ export default {
           console.log(err)
 
           return Promise.reject()
-        })
-    },
-
-    getKycFilledStatus () {
-      this.loadingKycFilledStatus = true
-
-      return this.$axios
-        .get(`/api/admin/company-registration/kyc-filled-status/${this.currentCompany.id}`)
-        .then(res => {
-          this.setKycFilled(res.data)
-          this.loadingKycFilledStatus = false
-
-          return Promise.resolve()
-        }).catch(err => {
-          console.error(err)
-
-          return Promise.reject()
-        }).finally(() => {
-          this.loadingKycFilledStatus = false
         })
     },
 
@@ -2558,7 +2533,6 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
-      'setKycFilled',
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded'
