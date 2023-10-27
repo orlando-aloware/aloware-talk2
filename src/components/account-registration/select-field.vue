@@ -13,6 +13,7 @@
       :option-label="optionLabel"
       :option-value="optionValue"
       :options="options"
+      :disabled="disabled"
       v-model="innerValue"
     />
     <slot name="hint"></slot>
@@ -58,6 +59,10 @@ export default {
     rules: {
       type: Array,
       default: () => []
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
 

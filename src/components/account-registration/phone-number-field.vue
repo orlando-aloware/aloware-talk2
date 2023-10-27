@@ -11,6 +11,7 @@
         placeholder="+1"
         mask="+###"
         type="text"
+        :disable="disabled"
         v-model="countryCode"
       >
       </q-input>
@@ -24,6 +25,7 @@
         :rules="rules"
         :mask="phoneMask"
         :value="innerValue"
+        :disable="disabled"
         @input="emitUpdateEvent"
       >
       </q-input>
@@ -71,6 +73,10 @@ export default {
       default: 'text'
     },
     isPassword: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }
