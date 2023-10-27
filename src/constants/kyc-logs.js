@@ -1,16 +1,16 @@
-// KYC form not submitted, aka “clicking around“
-export const KYC_STATUS_ZERO = 0
-
-export const KYC_STATUS_DEFINITELY_REJECTED = 1
-
-export const KYC_STATUS_APPROVED_FOR_SELF_CALLING = 2
-
-export const KYC_STATUS_APPROVED_FOR_CALLING_ONLY = 3
-
-export const KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING = 4
-
 // Companies no applying for KYC
-export const KYC_STATUS_NONE = 5
+export const KYC_STATUS_NONE = 0
+
+// KYC form not submitted, aka “clicking around“
+export const KYC_STATUS_ZERO = 1
+
+export const KYC_STATUS_DEFINITELY_REJECTED = 2
+
+export const KYC_STATUS_APPROVED_FOR_SELF_CALLING = 3
+
+export const KYC_STATUS_APPROVED_FOR_CALLING_ONLY = 4
+
+export const KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING = 5
 
 export const ONESELF_CALLS_ALLOWED = [
   KYC_STATUS_ZERO,
