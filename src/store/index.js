@@ -262,7 +262,6 @@ export default function (/* { ssrContext } */) {
       suspended: false,
       showProFeatureDialog: false,
       leadSources: [],
-      kycFilledStatus: false,
       isPresignup: true,
       contactsLists: [],
       statics: {
@@ -788,10 +787,6 @@ export default function (/* { ssrContext } */) {
 
       setLeadSources ({ commit }, leadSources) {
         commit('SET_LEAD_SOURCES', leadSources)
-      },
-
-      setKycFilled ({ commit }, value) {
-        commit('SET_KYC_FILLED', value)
       },
 
       setStatics ({ commit }, statics) {
@@ -1521,11 +1516,6 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
-      },
-
-      SET_KYC_FILLED (state, value) {
-        state.kycFilledStatus = value?.kyc_filled_status ? value.kyc_filled_status : state.kycFilledStatus
-        state.isPresignup = value?.is_presignup ? value.is_presignup : state.isPresignup
       },
 
       SET_STATICS (state, statics) {
