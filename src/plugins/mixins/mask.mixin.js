@@ -3,7 +3,7 @@ export default {
     getMaskByCountry (countryCode) {
       switch (countryCode) {
         case '1': // USA and Canada
-          return '### ### ####'
+          return '### ### ########'
         case '55': // Brazil
           return '## # ####-####'
         case '44': // United Kingdom

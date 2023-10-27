@@ -40,7 +40,7 @@ export default function () {
 
       agreed_to_terms: false,
       timezone: 'America/Los_Angeles',
-      kyc_filled: 1
+      kyc_filled: 0
     }
     // form: {
     //   // Account Registration/Creation

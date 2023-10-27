@@ -38,5 +38,15 @@ export default {
 
       return acc
     }, {})
+  },
+
+  SET_PRE_FILLED_DATA (state, data) {
+    Object.keys(data).forEach(key => {
+      state.form[key] = data[key]
+    })
+
+    if (data.business_name) {
+      state.form.company_name = data.business_name
+    }
   }
 }

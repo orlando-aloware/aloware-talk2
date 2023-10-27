@@ -13,5 +13,9 @@ export default {
 
   cleanFieldError ({ commit }, field) {
     commit('CLEAN_FIELD_ERROR', field)
+  },
+
+  setPreFilledData ({ commit }, data) {
+    commit('SET_PRE_FILLED_DATA', data)
   }
 }

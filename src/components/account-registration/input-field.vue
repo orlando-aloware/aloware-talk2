@@ -12,6 +12,7 @@
       :type="fieldType"
       :mask="mask"
       :value="innerValue"
+      :disable="disabled"
       @input="emitUpdateEvent"
     >
       <template
@@ -66,6 +67,10 @@ export default {
       default: ''
     },
     isPassword: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }
