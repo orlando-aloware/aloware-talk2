@@ -74,7 +74,7 @@ export default {
 
       console.log('submit', payload)
 
-      this.$axios.patch(`/api/company-registration/${preSignupId}`, payload)
+      this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
         .then((res) => {
           this.isSubmitted = true
           this.setKycFilled({
