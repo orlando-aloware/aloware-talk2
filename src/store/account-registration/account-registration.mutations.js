@@ -48,5 +48,9 @@ export default {
     if (data.business_name) {
       state.form.company_name = data.business_name
     }
+
+    if (data.password) {
+      state.form.password = ''
+    }
   }
 }
