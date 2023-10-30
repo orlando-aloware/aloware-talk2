@@ -55,6 +55,15 @@
 
       <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
+
+    <div class="ml-auto d-block h-100"
+         v-if="!isSimpsocial">
+      <div class="d-flex h-100 align-items-center justify-content-end ml-1">
+        <div class='bridge-menu-wrapper'>
+          <div id='referralhero-inline-button'></div>
+        </div>
+      </div>
+    </div>
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
@@ -157,9 +166,11 @@ import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   aclMixin,
+  simpsocialMixin,
   avatarMixin,
   goBackMixin,
-  contactsListFiltersMixin
+  contactsListFiltersMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -190,9 +201,11 @@ export default {
 
   mixins: [
     aclMixin,
+    simpsocialMixin,
     avatarMixin,
     goBackMixin,
-    contactsListFiltersMixin
+    contactsListFiltersMixin,
+    userMixin
   ],
 
   components: {

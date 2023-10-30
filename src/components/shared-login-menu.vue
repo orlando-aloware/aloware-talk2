@@ -6,7 +6,7 @@
            class="q-btn-standard"
            @click="onGoToClassic">
 
-        <i class="fas fa-arrow-right"></i>  <span>{{ alowareClassic }}</span>
+        <span>{{ alowareClassic }}</span>
     </q-btn>
     <q-btn-dropdown
       v-else
@@ -18,7 +18,7 @@
     >
 
       <template slot="label">
-        <i class="fas fa-arrow-right"></i>  <span>{{ alowareClassic }}</span>
+        <span>{{ alowareClassic }}</span>
         <hr role="separator" aria-orientation="vertical" class="q-separator ml-2 margin-auto position-relative q-separator q-separator--vertical">
       </template>
 
@@ -83,13 +83,11 @@ export default {
     },
 
     alowareClassic () {
-      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
-
       if (this.profile.company.force_talk) {
-        return `${whiteLabel}Admin`
+        return `Admin`
       }
 
-      return `${whiteLabel} Classic`
+      return `Classic`
     },
 
     alowareTalk () {
