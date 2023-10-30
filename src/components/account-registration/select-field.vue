@@ -8,12 +8,13 @@
       rounded
       outlined
       map-options
+      :class="{ 'disabled': disabled }"
       :rules="rules"
       :placeholder="placeholder"
       :option-label="optionLabel"
       :option-value="optionValue"
       :options="options"
-      :disabled="disabled"
+      :disable="disabled"
       v-model="innerValue"
     />
     <slot name="hint"></slot>

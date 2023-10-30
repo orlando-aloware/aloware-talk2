@@ -14095,4 +14095,12 @@ h1.contact-list-name-label {
     color: #040404;
     border-radius: 20px;
   }
+  .q-field--outlined.q-field--with-bottom.disabled {
+    > div {
+      background: #D8D8D8;
+      color: #040404;
+      border-radius: 20px;
+      opacity: 100%
+    }
+  }
 }
