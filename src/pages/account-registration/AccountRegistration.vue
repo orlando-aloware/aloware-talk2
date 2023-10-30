@@ -87,6 +87,7 @@
                   :rules="[validateFieldError('country')]"
                   :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                   :options="countries"
+                  :disabled="checkIfFieldIsPreFilled('country')"
                   v-model="form.country"
                 />
 
@@ -850,14 +851,26 @@ export default {
       this.form.timezone = timezone || 'America/Los_Angeles'
     },
 
+    selectCountryBasedInPreFilledData () {
+      const countries = this.countries
+      const matchedCountry = Object.values(countries).find(({ id }) => id === this.form.country)
+
+      if (matchedCountry) {
+        this.form.country = {
+          id: matchedCountry.id,
+          name: matchedCountry.name
+        }
+      }
+    },
+
     selectCountryBasedInTimezone () {
       if (this.form.country) {
-        return
+        return this.selectCountryBasedInPreFilledData()
       }
 
       const timezone = this.form.timezone
-      const countries = window.CountriesAndTimezones.getAllCountries()
-      const country = Object.values(countries).find(({ timezones }) => timezones.includes(timezone))
+      const countries = this.countries
+      const country = Object.values(countries).find(({ timezones }) => timezones?.includes(timezone))
 
       if (country) {
         this.form.country = {
@@ -865,6 +878,14 @@ export default {
           name: country.name
         }
       }
+    },
+
+    formatPhoneNumber () {
+      if (!this.form?.country?.id) {
+        return
+      }
+
+      this.form.phone_number = this.$options.filters.fixPhone(this.form.phone_number, 'E164', true, false, this.form.country.id)
     },
 
     onCaptchaVerified (response) {
@@ -900,6 +921,7 @@ export default {
           this.setPreFilledData(res.data)
           this.setPreFilledFieldsDisabled()
           this.selectCountryBasedInTimezone()
+          this.formatPhoneNumber()
 
           if (res.data?.company_id) {
             this.shouldRedirectToLogin = true
@@ -907,6 +929,7 @@ export default {
         })
         .catch((err) => {
           this.$handleErrors(err?.response)
+          this.$router.push({ name: 'Login' })
         })
         .finally(() => {
           this.isLoading = false
