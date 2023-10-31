@@ -10,7 +10,7 @@
       style="width: 635px">
       <q-card-section>
         <div class="text-h6">
-          Welcome back, {{ userFullName }}! 🎉
+          Welcome, {{ userFullName }}! 🎉
         </div>
 
         <div class="text-body2 q-pt-lg">
@@ -26,6 +26,7 @@
         class="bg-white q-pb-lg"
         align="center">
         <q-btn
+          class="text-regular"
           label="Remind me later"
           text-color="grey"
           v-close-popup
@@ -33,7 +34,8 @@
           @click="changeShowedKycDialog">
         </q-btn>
         <q-btn
-          label="Submit Info"
+          class="text-regular"
+          label="Submit info"
           color="primary"
           text-color="white"
           rounded
