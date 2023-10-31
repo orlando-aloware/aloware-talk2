@@ -22,7 +22,7 @@ export default _.merge({
       }
 
       if (!status) {
-        status = KycLogs.KYC_STATUS_NONE
+        status = KycLogs.KYC_STATUS_ZERO
       }
 
       return status
@@ -177,13 +177,13 @@ export default _.merge({
       // if user is logged out of the system when session expires
       source = this.getSource(source)
       if (!source) {
-        return false
+        return true
       }
 
       status = this.getStatus(status, source)
 
       if (status === KycLogs.KYC_STATUS_NONE) {
-        return true
+        return false
       }
 
       return KycLogs.VIEW_ONLY_ALLOWED.includes(status)
@@ -191,6 +191,7 @@ export default _.merge({
   },
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState('cache', ['currentCompany']),
     viewOnly () {
       return this.isViewOnlyAccess()
     },
