@@ -68,6 +68,7 @@
     "vue-at": "^2.5.0-beta",
     "vue-bootstrap-typeahead": "^0.2.6",
     "vue-business-hours": "git+https://github.com/aloware/vue-business-hours.git",
+    "vue-cookies": "^1.8.3",
     "vue-countup-v2": "^4.0.0",
     "vue-ctk-date-time-picker": "^2.5.0",
     "vue-custom-scrollbar": "^1.4.3",
