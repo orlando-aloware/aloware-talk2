@@ -104,7 +104,7 @@
               </template>
             </input-group>
 
-            <div class="flex justify-center pt-4 q-row">
+            <div class="flex justify-center pt-2 q-row">
               <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
                 <h4 class="text-h5 text-weight-bold">Password</h4>
               </div>
@@ -191,7 +191,7 @@
             <div class="accept-box">
               <div>
                 <q-checkbox
-                  class="mb-4 q-pr-xs"
+                  class="mb-3 q-pr-xs"
                   color="primary"
                   dense
                   v-model="form.agreed_to_terms"
@@ -533,7 +533,7 @@
           </template>
         </q-stepper> -->
 
-        <div class="flex justify-end pt-4 q-mx-md">
+        <div class="form-actions q-mx-lg">
           <div class="q-mx-xl">
             <q-btn
               class="q-mx-xl account-registration-action-btn"
