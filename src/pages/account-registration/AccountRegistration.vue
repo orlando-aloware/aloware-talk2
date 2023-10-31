@@ -104,7 +104,7 @@
               </template>
             </input-group>
 
-            <div class="flex justify-center pt-4 q-row">
+            <div class="flex justify-center pt-2 q-row">
               <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
                 <h4 class="text-h5 text-weight-bold">Password</h4>
               </div>
@@ -191,7 +191,7 @@
             <div class="accept-box">
               <div>
                 <q-checkbox
-                  class="mb-4 q-pr-xs"
+                  class="mb-3 q-pr-xs"
                   color="primary"
                   dense
                   v-model="form.agreed_to_terms"
@@ -533,7 +533,7 @@
           </template>
         </q-stepper> -->
 
-        <div class="flex justify-end pt-4 q-mx-md">
+        <div class="form-actions q-mx-lg">
           <div class="q-mx-xl">
             <q-btn
               class="q-mx-xl account-registration-action-btn"
@@ -552,8 +552,6 @@
       </div>
     </div>
     <banner :current-step="step" />
-
-    <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </div>
 </template>
 
@@ -571,7 +569,6 @@ import SelectField from 'src/components/account-registration/select-field.vue'
 import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 // import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
-import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
 
 export default {
   name: 'account-registration',
@@ -583,8 +580,7 @@ export default {
     SelectField,
     PhoneNumberField,
     // BusinessInformationForm,
-    Banner,
-    UserAlreadyHaveAccountDialog
+    Banner
   },
 
   mixins: [
@@ -673,7 +669,8 @@ export default {
       'setKycFilled',
       'setFieldErrors',
       'cleanFieldError',
-      'setPreFilledData'
+      'setPreFilledData',
+      'setShouldRedirectToLogin'
     ]),
 
     updateValidationState (rule, isValid) {
@@ -924,7 +921,8 @@ export default {
           this.formatPhoneNumber()
 
           if (res.data?.company_id) {
-            this.shouldRedirectToLogin = true
+            this.setShouldRedirectToLogin(true)
+            this.$router.push({ name: 'Login' })
           }
         })
         .catch((err) => {

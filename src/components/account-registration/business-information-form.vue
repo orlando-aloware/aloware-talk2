@@ -7,8 +7,8 @@
     />
 
     <div
-      class="min-w-100"
-      :class="shouldShowActionButtons ? 'h-55 overflow-auto q-pt-xl q-pb-xl' : ''">
+      class="business-information__container min-w-100"
+      :class="shouldShowActionButtons ? 'overflow-auto q-pt-xl q-pb-xl' : ''">
       <input-group>
         <template v-slot:content>
           <input-field
@@ -301,20 +301,10 @@
         </template>
       </input-group>
     </div>
-    <div v-if="shouldShowActionButtons">
-      <div class="flex justify-between pt-4">
-        <q-btn
-          class="q-mx-xl account-registration-action-btn"
-          color="primary"
-          label="Back"
-          size="md"
-          outline
-          dense
-          rounded
-          no-caps
-          unelevated
-          @click="backToDashboard"
-        />
+    <div
+      class="business-information-actions"
+      v-if="shouldShowActionButtons">
+      <div class="flex justify-end w-100 pt-4">
         <div>
           <q-btn
             class="q-mr-xs account-registration-action-btn"

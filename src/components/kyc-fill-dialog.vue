@@ -7,10 +7,10 @@
   >
     <q-card
       class="bg-white text-black text-center q-pt-lg"
-      style="width: 635px">
+      style="width: 635px; border-radius: 30px">
       <q-card-section>
         <div class="text-h6">
-          Welcome back, {{ userFullName }}! 🎉
+          Welcome, {{ userFullName }}! 🎉
         </div>
 
         <div class="text-body2 q-pt-lg">
@@ -26,13 +26,16 @@
         class="bg-white q-pb-lg"
         align="center">
         <q-btn
+          class="text-regular"
           label="Remind me later"
           text-color="grey"
           v-close-popup
-          flat>
+          flat
+          @click="changeShowedKycDialog">
         </q-btn>
         <q-btn
-          label="Submit Info"
+          class="text-regular"
+          label="Submit info"
           color="primary"
           text-color="white"
           rounded
@@ -78,6 +81,10 @@ export default {
         name: 'Business Information',
         params: { company_id: this.currentCompany.id }
       })
+    },
+
+    changeShowedKycDialog () {
+      this.$emit('change-showed-kyc-dialog', true)
     }
   }
 }

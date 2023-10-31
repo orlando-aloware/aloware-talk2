@@ -1,5 +1,6 @@
 export default function () {
   return {
+    shouldRedirectToLogin: false,
     fieldErrors: {},
     form: {
       // Account Registration/Creation

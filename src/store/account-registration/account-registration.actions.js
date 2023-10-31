@@ -17,5 +17,9 @@ export default {
 
   setPreFilledData ({ commit }, data) {
     commit('SET_PRE_FILLED_DATA', data)
+  },
+
+  setShouldRedirectToLogin ({ commit }, value) {
+    commit('SET_SHOULD_REDIRECT_TO_LOGIN', value)
   }
 }
