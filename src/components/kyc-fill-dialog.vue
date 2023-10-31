@@ -7,7 +7,7 @@
   >
     <q-card
       class="bg-white text-black text-center q-pt-lg"
-      style="width: 635px">
+      style="width: 635px; border-radius: 30px">
       <q-card-section>
         <div class="text-h6">
           Welcome, {{ userFullName }}! 🎉
