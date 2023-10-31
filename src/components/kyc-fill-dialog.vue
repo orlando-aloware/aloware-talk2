@@ -18,7 +18,7 @@
         </div>
 
         <div class="text-body2 q-pt-lg">
-          It's easy, you just need to submit some important information about you business and then you're ready to <strong>explore even more</strong>! 🤩
+          It's easy, you just need to submit some important information about your business and then you're ready to <strong>explore even more</strong>! 🤩
         </div>
       </q-card-section>
 
