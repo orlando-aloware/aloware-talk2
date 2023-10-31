@@ -29,7 +29,8 @@
           label="Remind me later"
           text-color="grey"
           v-close-popup
-          flat>
+          flat
+          @click="changeShowedKycDialog">
         </q-btn>
         <q-btn
           label="Submit Info"
@@ -78,6 +79,10 @@ export default {
         name: 'Business Information',
         params: { company_id: this.currentCompany.id }
       })
+    },
+
+    changeShowedKycDialog () {
+      this.$emit('change-showed-kyc-dialog', true)
     }
   }
 }

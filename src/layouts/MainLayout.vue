@@ -212,7 +212,9 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog"/>
+      <kyc-fill-dialog
+        :show="shouldShowKycFillDialog"
+        @change-showed-kyc-dialog="changeShowedKycDialog"/>
     </div>
   </div>
 </template>
@@ -349,7 +351,8 @@ export default {
       mobileLiveCallBarShown: false,
       CommunicationTypes,
       MetricOptionGroups,
-      AppDefaultLogin
+      AppDefaultLogin,
+      showedKycDialog: false
     }
   },
 
@@ -509,6 +512,7 @@ export default {
       const isAuthenticated = !this.isGuest && this.authenticated
 
       return isAuthenticated &&
+             !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
     }
@@ -2466,6 +2470,10 @@ export default {
 
     onShowMobileLiveCallBar (value) {
       this.mobileLiveCallBarShown = value
+    },
+
+    changeShowedKycDialog (value) {
+      this.showedKycDialog = value
     },
 
     beforeUnload () {
