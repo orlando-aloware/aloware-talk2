@@ -552,8 +552,6 @@
       </div>
     </div>
     <banner :current-step="step" />
-
-    <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </div>
 </template>
 
@@ -571,7 +569,6 @@ import SelectField from 'src/components/account-registration/select-field.vue'
 import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 // import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
-import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
 
 export default {
   name: 'account-registration',
@@ -583,8 +580,7 @@ export default {
     SelectField,
     PhoneNumberField,
     // BusinessInformationForm,
-    Banner,
-    UserAlreadyHaveAccountDialog
+    Banner
   },
 
   mixins: [
@@ -673,7 +669,8 @@ export default {
       'setKycFilled',
       'setFieldErrors',
       'cleanFieldError',
-      'setPreFilledData'
+      'setPreFilledData',
+      'setShouldRedirectToLogin'
     ]),
 
     updateValidationState (rule, isValid) {
@@ -924,7 +921,8 @@ export default {
           this.formatPhoneNumber()
 
           if (res.data?.company_id) {
-            this.shouldRedirectToLogin = true
+            this.setShouldRedirectToLogin(true)
+            this.$router.push({ name: 'Login' })
           }
         })
         .catch((err) => {

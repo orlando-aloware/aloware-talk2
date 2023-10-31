@@ -52,5 +52,9 @@ export default {
     if (data.password) {
       state.form.password = ''
     }
+  },
+
+  SET_SHOULD_REDIRECT_TO_LOGIN (state, value) {
+    state.shouldRedirectToLogin = value
   }
 }
