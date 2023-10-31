@@ -808,7 +808,9 @@ export default {
         // this.form.job_title.length &&
         this.form.password?.length &&
         this.form.password_confirmation?.length &&
-        this.password_validation?.length === 4
+        this.password_validation?.length === 4 &&
+        this.form.agreed_to_terms &&
+        !this.disabledSubmit // recaptcha
       )
     },
 
