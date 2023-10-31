@@ -185,7 +185,9 @@ export default {
       const createdContactsCount = integrationReport?.created_contacts_count ?? 0
       const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
       const selected = integrationReport?.total_selected ?? 0
-      const totalSelected = createdContactsCount + updatedContactsCount + selected
+
+      let totalSelected = createdContactsCount + updatedContactsCount
+      totalSelected = selected > totalSelected ? selected : totalSelected
 
       // update the total selected contacts to the correct total count
       this.fullReport.info.selected = totalSelected
