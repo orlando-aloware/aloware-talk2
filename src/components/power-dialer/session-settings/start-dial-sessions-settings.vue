@@ -168,7 +168,7 @@
                              color="primary"
                              unelevated
                              no-caps
-                             :disabled="!isAllowSave"
+                             :disabled="!isSaveAllowed"
                              v-if="!hasSelectedTemporarySetting"
                              @click="updateSelectedSetting">
                         Save
@@ -276,7 +276,7 @@
                     size="sm"
                     :disabled="isBusy || isBusy"
                     v-close-popup
-                    @click="cancelNewSetting()">
+                    @click="cancelNewSetting">
             Cancel
           </b-button>
           <b-button variant="danger"
@@ -456,7 +456,7 @@ export default {
       return this.selectedItem.user_id === this.profile.id
     },
 
-    isAllowSave () {
+    isSaveAllowed () {
       return this.saveDisabled ||
         (!this.saveDisabled && this.isSettingsOwner)
     }

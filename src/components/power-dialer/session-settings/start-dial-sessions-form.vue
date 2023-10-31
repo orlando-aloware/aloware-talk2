@@ -65,9 +65,9 @@
                            @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <session-order-selector class="generic-selector-2 dial-sessions__form__order-selector"
-                          v-else-if="cform.name === 'order'"
-                          v-model="resources[cform.name]"
-                          @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
+                                  v-else-if="cform.name === 'order'"
+                                  v-model="resources[cform.name]"
+                                  @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
 
           <call-disposition-selector class="pb-3 dial-sessions__form__call-disposition-selector"
                                      :multiple="true"

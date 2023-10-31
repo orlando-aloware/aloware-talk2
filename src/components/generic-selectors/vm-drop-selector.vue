@@ -133,16 +133,15 @@ export default {
       const selectedLength = Array.isArray(this.selectedId)
         ? this.selectedId.length : 0
 
-      switch (true) {
-        case this.multiple && selectedLength < 1:
-          return 'Select voicemails'
-        case !this.multiple && !this.selectedId:
-          return 'Select a voicemail'
-        case this.multiple && this.selectedId?.length > 0:
-        case !this.multiple && this.selectedId:
-        default:
-          return ''
+      if (this.multiple && selectedLength < 1) {
+        return 'Select voicemails'
       }
+
+      if (!this.multiple && !this.selectedId) {
+        return 'Select a voicemail'
+      }
+
+      return ''
     },
 
     vmDropAlphabeticalOrder () {
