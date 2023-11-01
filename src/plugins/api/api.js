@@ -545,6 +545,12 @@ export default {
           return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
         }
       }
+    },
+
+    dialer: {
+      sendVmDrop (params) {
+        return window.axios.post(`${suffixV1}dialer/play-prerecorded-voicemail`, params)
+      }
     }
   },
 

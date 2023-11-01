@@ -250,10 +250,10 @@
             <div class="dummy bg-dark w-100 height-36"></div>
             <div class="phone-avatar">
               <avatar class="contact-avatar"
-                      v-if="!isCallAdding && !isCallAdded"
                       width="50"
                       height="50"
-                      :name="contactName">
+                      :name="contactName"
+                      v-if="!isCallAdding && !isCallAdded">
               </avatar>
               <participants-icon v-else />
             </div>
@@ -1166,8 +1166,7 @@
                   <div class="d-flex">
                     <vm-drop-selector class="w-100"
                                       v-model="vmDropId"
-                                      @change="changeVmDrop">
-                    </vm-drop-selector>
+                                      @change="changeVmDrop"/>
                   </div>
                   <div class="d-flex">
                     <b-button variant="primary"
@@ -1230,7 +1229,8 @@ import {
   communicationInfoMixin,
   notificationMixin,
   dispositionsMixin,
-  agentMixin
+  agentMixin,
+  dialerCommunicationMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1281,6 +1281,7 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'phone',
@@ -1334,7 +1335,8 @@ export default {
     communicationInfoMixin,
     notificationMixin,
     dispositionsMixin,
-    agentMixin
+    agentMixin,
+    dialerCommunicationMixin
   ],
 
   props: {
@@ -1490,7 +1492,7 @@ export default {
     },
 
     isVmDropDisabled () {
-      return !this.devMode && this.isCallCompleted
+      return !this.devMode && !this.isCallInProgressStatus
     },
 
     isHoldDisabled () {
@@ -2307,11 +2309,11 @@ export default {
 
       this.loadingSendVmDrop = true
 
-      this.$axios.post('/api/v1/dialer/play-prerecorded-voicemail', {
+      API.V1.dialer.sendVmDrop({
         communication_id: this.dialer.communication.id,
         file_name: this.vmDrop.uploaded_file.uuid,
         name: this.vmDrop.name
-      }).then(res => {
+      }).then(() => {
         this.vmDrop = null
         this.vmDropId = null
         this.loadingSendVmDrop = false
@@ -2627,6 +2629,7 @@ export default {
 
     'dialer.contact': function () {
       this.setupContactLocalTime()
+      this.vmDropId = null
     },
 
     isCallCompleted () {

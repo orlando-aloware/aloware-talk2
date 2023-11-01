@@ -90,7 +90,7 @@ export default {
       this.order = value
     },
     order () {
-      this.$emit('input', this.order)
+      this.$emit('change', this.order)
     }
   }
 }
