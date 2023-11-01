@@ -53,7 +53,7 @@ export default {
           title: 'Master Bulk SMS with Aloware Broadcast 💬',
           cookieName: 'broadcasts4',
           videoUrl: 'https://www.youtube.com/embed/nSAAyHLAnk4?si=PW_Mod_FJtO8jcFY',
-          learnMoreLink: null,
+          learnMoreLink: 'https://support.aloware.com/en/articles/5783932-aloware-broadcast',
           notes: 'Dive deep into Aloware\'s Bulk SMS feature, perfect for boosting your marketing campaigns.#SuperchargeYourOutreach. </br></br> 📱 Explore the power of Aloware\'s Bulk SMS Broadcast: a game-changer for your marketing strategies.'
         },
         'Tags': {
