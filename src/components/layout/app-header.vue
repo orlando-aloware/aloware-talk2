@@ -56,6 +56,8 @@
       <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
 
+    <tutorial-video-button />
+
     <div class="ml-auto d-block h-100"
          v-if="!isSimpsocial">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
@@ -194,6 +196,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import * as storage from 'src/plugins/helpers/storage'
 import AnnounceKit from 'announcekit-vue'
+import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
@@ -227,7 +230,8 @@ export default {
     HeaderHelp,
     InboxMyContactsFilter,
     AnnounceKit,
-    InformationCircleIcon
+    InformationCircleIcon,
+    TutorialVideoButton
   },
 
   props: {

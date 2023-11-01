@@ -1,3 +1,5 @@
+import { KYC_STATUS_NONE } from '../../constants/kyc-status'
+
 export default {
   loading (state) {
     return state.loading
@@ -10,5 +12,8 @@ export default {
   },
   user (state) {
     return { profile: state.profile, authenticated: state.authenticated }
+  },
+  isCompanyKYC (state) {
+    return state.profile?.company?.kyc_status && state.profile?.company?.kyc_status !== KYC_STATUS_NONE
   }
 }

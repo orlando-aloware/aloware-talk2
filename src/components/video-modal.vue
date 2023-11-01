@@ -13,7 +13,6 @@
     <slot name="activator"
           v-else
           @click="openModal" />
-
     <div class="video-modal"
          v-if="showModal">
       <div class="overlay"
