@@ -5,6 +5,7 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
+    <trial-banner v-if="isTrial"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -271,6 +272,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   MAX_SCREEN_WIDTH_MOBILE_HEADER
 } from 'src/constants/viewport-sizes'
+import TrialBanner from 'components/trial-banner.vue'
 
 export default {
   name: 'MyLayout',
@@ -285,7 +287,8 @@ export default {
     Phone,
     ProFeatureDialog,
     KycFillDialog,
-    Modal
+    Modal,
+    TrialBanner
   },
 
   mixins: [
@@ -515,6 +518,12 @@ export default {
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
+    },
+
+    isTrial () {
+      const isAuthenticated = !this.isGuest && this.authenticated
+
+      return isAuthenticated && this.profile?.company?.is_trial
     }
   },
 
