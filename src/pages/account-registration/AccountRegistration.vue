@@ -557,7 +557,7 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex'
-import { guestMixin, recaptchaMixin, maskMixin } from 'src/plugins/mixins'
+import { aclMixin, guestMixin, recaptchaMixin, maskMixin } from 'src/plugins/mixins'
 import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
@@ -569,6 +569,7 @@ import SelectField from 'src/components/account-registration/select-field.vue'
 import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 // import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'account-registration',
@@ -584,6 +585,7 @@ export default {
   },
 
   mixins: [
+    aclMixin,
     guestMixin,
     recaptchaMixin,
     maskMixin
@@ -601,11 +603,13 @@ export default {
       regionsOfOperations,
       businessIndustries,
       preFilledData: {},
-      shouldRedirectToLogin: false
+      shouldRedirectToLogin: false,
+      recaptchaResponse: null
     }
   },
 
   computed: {
+    ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('accountRegistration', [
       'form',
       'fieldErrors'
@@ -671,6 +675,17 @@ export default {
       'cleanFieldError',
       'setPreFilledData',
       'setShouldRedirectToLogin'
+    ]),
+
+    ...mapActions('auth', ['login']),
+
+    ...mapActions('cache', [
+      'setCurrentCompany'
+    ]),
+
+    ...mapActions([
+      'resetVuex',
+      'setUsage'
     ]),
 
     updateValidationState (rule, isValid) {
@@ -891,7 +906,7 @@ export default {
       this.disabledSubmit = false
 
       if (!this.$q.platform.is.electron) {
-        this.user.recaptchaResponse = response
+        this.recaptchaResponse = response
       }
     },
 
@@ -948,6 +963,22 @@ export default {
       return Boolean(this.preFilledData[field])
     },
 
+    async onLoginSuccess ({ data: { data } }) {
+      const { usage, company } = data
+
+      this.resetVuex(['all'])
+      this.setCurrentCompany(company)
+      this.setUsage(usage)
+
+      storage.local.setItem('company_id', company.id)
+
+      this.loading = false
+
+      const redirectPath = String(this.$route.query.redirect || '/')
+
+      await this.$router.push(redirectPath)
+    },
+
     onSubmit () {
       this.isLoading = true
 
@@ -962,10 +993,10 @@ export default {
       console.log('submit', payload)
 
       this.$axios.post('/api/admin/company-registration', payload)
-        .then((res) => {
+        .then(async (res) => {
           this.isSubmitted = true
-          this.$generalNotification('Your information has been submitted. Please check your email for further instructions.')
-          this.$router.push({ name: 'Login' })
+
+          this.$generalNotification('Your information has been submitted.')
         })
         .catch((err) => {
           if (err.response && err.response.data && err.response.data.errors) {
@@ -975,7 +1006,21 @@ export default {
 
           this.$handleErrors(err?.response)
         })
-        .finally(() => {
+        .finally(async () => {
+          if (this.isSubmitted) {
+            const response = await this.login({
+              email: this.form.email,
+              password: this.form.password,
+              rememberMe: false,
+              isMobile: true,
+              recaptchaResponse: this.recaptchaResponse,
+              deviceInfo: null,
+              requestedFrom: 'bypass'
+            })
+
+            await this.onLoginSuccess(response)
+          }
+
           this.isLoading = false
         })
     }
