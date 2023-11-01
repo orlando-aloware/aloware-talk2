@@ -251,8 +251,9 @@ export default {
       handler (value) {
         this.setDefaultSettings(value)
 
-        if (value?.campaign_id?.toString().length > 0 &&
-          value?.warmup_period_in_seconds?.toString().length > 0) {
+        // check if campaign_id and warmup_period_in_seconds are not empty
+        if (this.$isNumeric(value?.campaign_id) &&
+          this.$isNumeric(value?.warmup_period_in_seconds)) {
           this.$emit('valid-form', true)
           this.$emit('updateSettings', value)
 

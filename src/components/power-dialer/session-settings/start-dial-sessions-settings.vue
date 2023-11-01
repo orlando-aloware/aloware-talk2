@@ -103,7 +103,7 @@
                                  flat
                                  outline
                                  dense
-                                 v-show="isRenameAllowed(setting.user_id) || isDeleteAllowed(setting.user_id)"
+                                 v-show="isActionAllowed(setting.user_id)"
                                  @click="hoveredMenu = setting.id">
                             <i class="fa fa-ellipsis-h"/>
                           </q-btn>
@@ -113,7 +113,7 @@
                               <q-item dense
                                       clickable
                                       v-close-popup
-                                      v-show="isRenameAllowed(setting.user_id)"
+                                      v-show="isActionAllowed(setting.user_id)"
                                       @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
@@ -125,7 +125,7 @@
                               <q-item dense
                                       clickable
                                       v-close-popup
-                                      v-show="isDeleteAllowed(setting.user_id)"
+                                      v-show="isActionAllowed(setting.user_id)"
                                       @click="onDeleteRequest(setting.id, setting.user_id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
@@ -182,7 +182,7 @@
                              color="primary"
                              unelevated
                              no-caps
-                             :disabled="isBusy || newSetting"
+                             :disabled="!isSaveAsNewAllowed"
                              v-if="hasSelectedTemporarySetting"
                              @click="newSetting = true">
                         Save As New
@@ -457,8 +457,12 @@ export default {
     },
 
     isSaveAllowed () {
-      return this.saveDisabled ||
-        (!this.saveDisabled && this.isSettingsOwner)
+      return !this.disabled && !this.saveDisabled &&
+        this.isSettingsOwner
+    },
+
+    isSaveAsNewAllowed () {
+      return !this.isBusy && !this.newSetting && !this.disabled
     }
   },
 
@@ -676,7 +680,7 @@ export default {
     },
 
     onDeleteRequest (id, userId) {
-      if (this.isDeleteAllowed(userId)) {
+      if (this.isActionAllowed(userId)) {
         this.newSetting = true
         this.deleteId = id
       }
@@ -784,11 +788,7 @@ export default {
       this.selectedItem = settings
     },
 
-    isRenameAllowed (userId) {
-      return this.isAdmin || userId === this.profile.id
-    },
-
-    isDeleteAllowed (userId) {
+    isActionAllowed (userId) {
       return this.isAdmin || userId === this.profile.id
     },
 
