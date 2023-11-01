@@ -71,7 +71,7 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     userFullName () {
-      return `${this.profile.first_name} ${this.profile.last_name}` || ''
+      return `${this.profile?.first_name} ${this.profile?.last_name}` || ''
     }
   },
 
