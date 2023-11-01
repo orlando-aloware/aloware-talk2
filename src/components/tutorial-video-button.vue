@@ -28,8 +28,8 @@ export default {
       return [
         'Inbox',
         'Wallboard',
-        'Broadcasts'
-        // 'Tags'
+        'Broadcasts',
+        'Tags'
       ].includes(this.$route.name)
     },
 
@@ -55,14 +55,14 @@ export default {
           videoUrl: 'https://www.youtube.com/embed/nSAAyHLAnk4?si=PW_Mod_FJtO8jcFY',
           learnMoreLink: null,
           notes: 'Dive deep into Aloware\'s Bulk SMS feature, perfect for boosting your marketing campaigns.#SuperchargeYourOutreach. </br></br> 📱 Explore the power of Aloware\'s Bulk SMS Broadcast: a game-changer for your marketing strategies.'
+        },
+        'Tags': {
+          title: '🏷️ Mastering Aloware Tags: Organize Your Contacts Effectively',
+          cookieName: 'tags',
+          videoUrl: 'https://www.youtube.com/embed/VUYVx0XGeLc?si=EgN3EQJBGay15kGz',
+          learnMoreLink: 'https://support.aloware.com/en/articles/8234361-tags-in-aloware-talk-organize-your-contacts-with-ease',
+          notes: '🌟 <strong>Tags = Your Ultimate Categorizer! </br></br> 🌟 Like Lists, but leveled up! Place the same person everywhere. </br></br> Bonus? Enroll a whole Tag audience in a sequence. </br></br> Plus, new contacts? They flash in with a fresh tag stamped with their upload date. 🚀'
         }
-        // 'Tags': {
-        //   title: '',
-        //   cookieName: 'tags',
-        //   videoUrl: '',
-        //   learnMoreLink: 'https://support.aloware.com/en/articles/8234361-tags-in-aloware-talk-organize-your-contacts-with-ease',
-        //   notes: '🌟 <strong>Tags</strong> = Your Ultimate Categorizer! </br></br> 🌟 Like Lists, but leveled up! Place the same person everywhere. </br></br> Bonus? Enroll a whole Tag audience in a sequence. </br></br> Plus, new contacts? They flash in with a fresh tag stamped with their upload date. 🚀'
-        // }
       }
 
       return data[this.$route.name]
