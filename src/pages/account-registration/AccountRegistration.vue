@@ -1011,8 +1011,6 @@ export default {
             const response = await this.login({
               email: this.form.email,
               password: this.form.password,
-              rememberMe: false,
-              isMobile: true,
               recaptchaResponse: this.recaptchaResponse,
               deviceInfo: null,
               requestedFrom: 'bypass'

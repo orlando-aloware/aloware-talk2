@@ -3,12 +3,16 @@
     <button class="activator-button"
             type="icon"
             plain
+            v-if="shouldShowDefaultActivator"
             @click="openModal">
       <div class="activator-icon">
         <video-camera-icon />
       </div>
     </button>
 
+    <slot name="activator"
+          v-else
+          @click="openModal" />
     <div class="video-modal"
          v-if="showModal">
       <div class="overlay"
@@ -76,6 +80,11 @@ export default {
     learnMoreLink: {
       type: String,
       default: null
+    },
+
+    shouldShowDefaultActivator: {
+      type: Boolean,
+      default: true
     }
   },
 

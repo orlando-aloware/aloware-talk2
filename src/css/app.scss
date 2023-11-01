@@ -14149,3 +14149,58 @@ h1.contact-list-name-label {
     padding: 0px 5rem;
   }
 }
+
+.trial-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #256EFF1F;
+  height: 55px;
+
+  .trial--text {
+    margin: 0px;
+    font-size: 16px;
+    font-weight: 700 !important;
+    line-height: 19px;
+    letter-spacing: 0em;
+    text-align: left;
+    margin-right: 30px;
+  }
+
+  .button-index {
+    z-index: 1 !important;
+
+    .block {
+      padding-right: 16px;
+      padding-left: 16px;
+    }
+
+    & > a {
+      color: #256EFF;
+      font-size: 14px;
+      line-height: 19px;
+      letter-spacing: 0em;
+      text-align: center;
+      text-decoration: none;
+
+      &:hover {
+        color: #256EFF;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .demo--button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0em;
+
+    > img {
+      margin-right: 10px;
+    }
+  }
+}
