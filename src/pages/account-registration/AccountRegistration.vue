@@ -657,9 +657,13 @@ export default {
 
     updateValidationState (rule, isValid) {
       const index = this.password_validation.indexOf(rule)
+      
       if (isValid && index === -1) {
         this.password_validation.push(rule)
-      } else if (!isValid && index !== -1) {
+        return
+      }
+      
+      if (!isValid && index !== -1) {
         this.password_validation.splice(index, 1)
       }
     },
