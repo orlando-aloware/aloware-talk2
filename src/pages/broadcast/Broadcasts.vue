@@ -3,10 +3,10 @@
     <div v-if="shouldShowBroadcast"
          class="broadcasts__home position-relative d-flex flex-column h-100">
       <b-overlay class="broadcasts__home__loading-overlay"
-                rounded="sm"
-                :style="`margin-top: ${notificationHeight}px`"
-                :show="true"
-                v-show="loading || isBroadcastsLoading">
+                 rounded="sm"
+                 :style="`margin-top: ${notificationHeight}px`"
+                 :show="true"
+                 v-show="loading || isBroadcastsLoading">
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px" />
@@ -36,7 +36,7 @@
             </template>
             <template v-slot:two>
               <div class="d-flex justify-content-center w-100 px-1 options"
-                  :class="[broadcastFilter === 'enrolling' ? 'text-white' : 'text-grey-90']">
+                   :class="[broadcastFilter === 'enrolling' ? 'text-white' : 'text-grey-90']">
                   <span class="text-left broadcast-filter-name">
                     Enrolling
                   </span>
@@ -44,7 +44,7 @@
             </template>
             <template v-slot:three>
               <div class="d-flex justify-content-center w-100 px-1 options"
-                  :class="[broadcastFilter === 'sent' ? 'text-white' : 'text-grey-90']">
+                   :class="[broadcastFilter === 'sent' ? 'text-white' : 'text-grey-90']">
                   <span class="text-left broadcast-filter-name">
                     Sent
                   </span>
@@ -52,7 +52,7 @@
             </template>
             <template v-slot:four>
               <div class="d-flex justify-content-center w-100 px-1 options"
-                  :class="[broadcastFilter === 'paused' ? 'text-white' : 'text-grey-90']">
+                   :class="[broadcastFilter === 'paused' ? 'text-white' : 'text-grey-90']">
                   <span class="text-left broadcast-filter-name">
                     Paused
                   </span>
@@ -60,7 +60,7 @@
             </template>
             <template v-slot:five>
               <div class="d-flex justify-content-center w-100 px-1 options"
-                  :class="[broadcastFilter === 'stopped' ? 'text-white' : 'text-grey-90']">
+                   :class="[broadcastFilter === 'stopped' ? 'text-white' : 'text-grey-90']">
                   <span class="text-left broadcast-filter-name">
                     Stopped
                   </span>
@@ -68,12 +68,12 @@
             </template>
             <template v-slot:six>
               <div class="d-flex justify-content-center w-100 px-1 options"
-                  :class="[broadcastFilter === 'all' ? 'text-white' : 'text-grey-90']">
+                   :class="[broadcastFilter === 'all' ? 'text-white' : 'text-grey-90']">
                   <span class="text-left broadcast-filter-name">
                     All
                   </span>
                   <div class="text-center broadcast-count ml-1"
-                      v-if="broadcastsCount > 0">
+                       v-if="broadcastsCount > 0">
                     <span>
                       {{ broadcastsCount | numberPlusFormatter(99) }}
                     </span>
@@ -83,19 +83,19 @@
           </q-btn-toggle>
         </div>
         <block-tooltip v-if="viewOnly"
-                      placement="left"
-                      triggers="hover focus"
-                      target="broadcast-popover"
-                      task="broadcasts.create">
+                       placement="left"
+                       triggers="hover focus"
+                       target="broadcast-popover"
+                       task="broadcasts.create">
         </block-tooltip>
         <div id="broadcast-popover"
             class="broadcasts__home__header__new-button">
           <compact-btn variant="primary"
-                      :disabled="viewOnly"
-                      v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
-                      @clicked="$router.push({ path: '/broadcasts/new' })">
+                       :disabled="viewOnly"
+                       v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
+                       @clicked="$router.push({ path: '/broadcasts/new' })">
             <plus-icon class="mr-1"
-                      color="white"/>
+                       color="white"/>
             New Bulk Message
           </compact-btn>
         </div>
@@ -119,28 +119,28 @@
             <ellipse-icon />
           </template>
           <b-dropdown-item href=""
-                          :disabled="!shouldAllowContextMenuBulk('activity')"
-                          @click.prevent="bulkShowActivity">
+                           :disabled="!shouldAllowContextMenuBulk('activity')"
+                           @click.prevent="bulkShowActivity">
             <img class="mr-2"
-                :src="'app-icons/menu/context-menu-activity.svg'"/>
+                 :src="'app-icons/menu/context-menu-activity.svg'"/>
             <span>
               Activity
             </span>
           </b-dropdown-item>
           <b-dropdown-item href=""
-                          :disabled="!shouldAllowContextMenuBulk('pause')"
-                          v-if="!shouldAllowContextMenuBulk('play') && shouldAllowContextMenuBulk('pause')"
-                          @click.prevent="bulkPause">
+                           :disabled="!shouldAllowContextMenuBulk('pause')"
+                           v-if="!shouldAllowContextMenuBulk('play') && shouldAllowContextMenuBulk('pause')"
+                           @click.prevent="bulkPause">
             <img class="mr-2"
-                :src="'app-icons/menu/context-menu-pause.svg'"/>
+                 :src="'app-icons/menu/context-menu-pause.svg'"/>
             <span>
               Pause
             </span>
           </b-dropdown-item>
           <b-dropdown-item href=""
-                          :disabled="!shouldAllowContextMenuBulk('play')"
-                          v-if="!shouldAllowContextMenuBulk('pause') && shouldAllowContextMenuBulk('play')"
-                          @click.prevent="bulkPlay">
+                           :disabled="!shouldAllowContextMenuBulk('play')"
+                           v-if="!shouldAllowContextMenuBulk('pause') && shouldAllowContextMenuBulk('play')"
+                           @click.prevent="bulkPlay">
             <img class="mr-2"
                 :src="'app-icons/menu/context-menu-play.svg'"/>
             <span>
@@ -148,8 +148,8 @@
             </span>
           </b-dropdown-item>
           <b-dropdown-item href=""
-                          :disabled="!shouldAllowContextMenuBulk('delete')"
-                          @click.prevent="bulkDelete">
+                           :disabled="!shouldAllowContextMenuBulk('delete')"
+                           @click.prevent="bulkDelete">
             <delete-red-icon />
             <span class="text-danger">
               Delete
@@ -159,21 +159,21 @@
       </div>
       <div class="broadcasts__home__table flex-grow-1">
         <datatable class="h-100"
-                  ref="broadcastsTable"
-                  use-empty-slot
-                  :sticky-headers="true"
-                  :columns="COLUMNS"
-                  :is-empty="isBroadcastsTableEmpty"
-                  :show-select-all="false"
-                  :paginated="true"
-                  :show-pagination="true"
-                  :last-page="pagination.totalPages"
-                  :current-page="pagination.currentPage"
-                  :total-rows="broadcastsCount"
-                  :loading="loading"
-                  @sort="onSortTable"
-                  @reordered="onColumnsReordered"
-                  @paginated="onPaginationChanged">
+                   ref="broadcastsTable"
+                   use-empty-slot
+                   :sticky-headers="true"
+                   :columns="COLUMNS"
+                   :is-empty="isBroadcastsTableEmpty"
+                   :show-select-all="false"
+                   :paginated="true"
+                   :show-pagination="true"
+                   :last-page="pagination.totalPages"
+                   :current-page="pagination.currentPage"
+                   :total-rows="broadcastsCount"
+                   :loading="loading"
+                   @sort="onSortTable"
+                   @reordered="onColumnsReordered"
+                   @paginated="onPaginationChanged">
           <template slot="tbody">
             <tr :key="rowIndex"
                 v-for="(row, rowIndex) in broadcasts">
@@ -183,10 +183,10 @@
                     v-if="col.name == 'checkbox'">
                   <label class="custom-checkbox-container">
                     <input type="checkbox"
-                          class="checker"
-                          :value="row.id"
-                          :checked="checked.find(item => item.id === row.id) || isAllChecked"
-                          @change="onCheckerClicked(row)"/>
+                           class="checker"
+                           :value="row.id"
+                           :checked="checked.find(item => item.id === row.id) || isAllChecked"
+                           @change="onCheckerClicked(row)"/>
                     <span class="checkmark"/>
                   </label>
                 </td>
@@ -194,13 +194,13 @@
                     :key="`c-${colIndex}`"
                     v-else-if="col.name == 'status'">
                   <broadcast-status-pill :status="row[col.field]"
-                                        :text="row['status_name']" />
+                                         :text="row['status_name']" />
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
                     v-else-if="col.name === 'scheduled_time'">
                   <relative-time humanized
-                                :from-time="row[col.field]" />
+                                 :from-time="row[col.field]" />
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
@@ -228,7 +228,7 @@
                     v-else-if="col.name == 'target_group'">
                   <template v-if="row['tag']">
                     <i class="fa fa-circle"
-                      :style="`color: ${row['tag']?.color}; font-size:36%; position: relative; top: -3px;`" />
+                       :style="`color: ${row['tag']?.color}; font-size:36%; position: relative; top: -3px;`" />
                     <span class="tag_name">
                       {{ row['tag']?.name }}
                     </span>
@@ -240,7 +240,7 @@
                 <td :key="`c-${colIndex}`"
                     v-else-if="col.field == 'actions'">
                   <div class="context-menu"
-                      :class="[isSelectedRow(row) ? 'keep-visible' : '']">
+                       :class="[isSelectedRow(row) ? 'keep-visible' : '']">
                     <b-dropdown class="position-absolute"
                                 size="sm"
                                 right
@@ -252,18 +252,18 @@
                         <ellipse-icon/>
                       </template>
                       <b-dropdown-item dense
-                                      clickable
-                                      :key="id"
-                                      :disabled="!shouldAllowContextMenuButton(item, row)"
-                                      v-for="(item, id) in contextMenuListItemsForSelectedRow"
-                                      @click="onContextMenuButtonClicked(item, row)">
+                                       clickable
+                                       :key="id"
+                                       :disabled="!shouldAllowContextMenuButton(item, row)"
+                                       v-for="(item, id) in contextMenuListItemsForSelectedRow"
+                                       @click="onContextMenuButtonClicked(item, row)">
                         <div class="d-flex align-items-center">
                           <template v-if="item.name === 'delete'">
                             <delete-red-icon class="mr-2" />
                           </template>
                           <template v-else>
                             <img class="mr-2"
-                                :src="`app-icons/menu/${item.icon}`" />
+                                 :src="`app-icons/menu/${item.icon}`" />
                           </template>
                           <span :class="[item.name === 'delete' ? 'text-danger' : '']">
                             {{ item.label }}
@@ -283,21 +283,21 @@
           </template>
           <template #empty>
             <div class="broadcasts__home__table--empty"
-                v-if="isBroadcastsTableEmpty && !loading">
+                 v-if="isBroadcastsTableEmpty && !loading">
               <div class="h5 px-2 text-center">No data</div>
             </div>
           </template>
         </datatable>
       </div>
       <q-popup-proxy no-parent-event
-                    :target="contextMenuTarget ?? true"
-                    v-model="popupOpen"
-                    @hide="onPopupHide()">
+                     :target="contextMenuTarget ?? true"
+                     v-model="popupOpen"
+                     @hide="onPopupHide()">
         <q-card>
           <q-card-section>
             <i class="fa-sharp fa-solid fa-xmark fa-xl position-absolute"
-              style="right: 15px; top: 25px; cursor: pointer"
-              @click="onCancelPopup"/>
+               style="right: 15px; top: 25px; cursor: pointer"
+               @click="onCancelPopup"/>
             <template v-if="popupAction === 'delete'">
               <span class="text-h6">
                 Delete broadcast
@@ -310,9 +310,9 @@
               </p>
               <div class="d-flex">
                 <compact-btn custom-class="btn-block align-center p-3"
-                            variant="danger"
-                            :disabled="popupLoadingAction"
-                            @clicked="onDeleteBroadcast(popupActionList)">
+                             variant="danger"
+                             :disabled="popupLoadingAction"
+                             @clicked="onDeleteBroadcast(popupActionList)">
                   <span class="w-100">Delete</span>
                 </compact-btn>
               </div>
@@ -325,12 +325,12 @@
                 Name
               </div>
               <q-input outlined
-                      v-model="popupRename"/>
+                       v-model="popupRename"/>
               <div class="d-flex">
                 <compact-btn custom-class="btn-block align-center p-3 mt-3"
-                            variant="primary"
-                            :disabled="popupLoadingAction"
-                            @clicked="renameBroadcast(popupActionList)">
+                             variant="primary"
+                             :disabled="popupLoadingAction"
+                             @clicked="renameBroadcast(popupActionList)">
                   <span class="w-100">Save</span>
                 </compact-btn>
               </div>
@@ -350,9 +350,9 @@
               </p>
               <div class="d-flex">
                 <compact-btn custom-class="btn-block align-center p-3"
-                            :variant="popupAction === 'play' ? 'primary' : 'warning'"
-                            :disabled="popupLoadingAction"
-                            @clicked="toggleBroadcastStatus(popupActionList)">
+                             :variant="popupAction === 'play' ? 'primary' : 'warning'"
+                             :disabled="popupLoadingAction"
+                             @clicked="toggleBroadcastStatus(popupActionList)">
                   <span class="w-100">{{ popupAction === 'play' ? 'Resume' : 'Pause' }}</span>
                 </compact-btn>
               </div>

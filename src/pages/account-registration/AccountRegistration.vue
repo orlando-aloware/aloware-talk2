@@ -2,47 +2,41 @@
   <div class="account-registration row">
     <div class="col-xl-8 col-md-12 col-sm-12">
       <div class="logo absolute-top q-pt-xl q-px-xl">
-        <img
-          src="app-icons/menu/logo_dark.svg"
-          alt="Logo"
-        />
+        <img src="app-icons/menu/logo_dark.svg"
+             alt="Logo" />
       </div>
       <div class="stepper__container pt-60">
-        <step-header
-          title="Welcome to Aloware!"
-          description="We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going"
-        />
+        <step-header title="Welcome to Aloware!"
+                     description="We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going" />
 
         <div class="stepper__content">
           <div class="min-w-100">
             <input-group>
               <template v-slot:content>
-                <input-field
-                  label="First Name"
-                  placeholder="Type your first name"
-                  ref="first_name-input"
-                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                  :rules="[validateFieldError('first_name')]"
-                  :disabled="checkIfFieldIsPreFilled('first_name')"
-                  v-model="form.first_name"
-                  @input="cleanFieldError('first_name')"
-                >
-                  <template v-slot:hint v-if="fieldErrors.first_name">
+                <input-field label="First Name"
+                             placeholder="Type your first name"
+                             ref="first_name-input"
+                             :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                             :rules="[validateFieldError('first_name')]"
+                             :disabled="checkIfFieldIsPreFilled('first_name')"
+                             v-model="form.first_name"
+                             @input="cleanFieldError('first_name')">
+                  <template v-slot:hint
+                            v-if="fieldErrors.first_name">
                     {{ fieldErrors.first_name[0] }}
                   </template>
                 </input-field>
 
-                <input-field
-                  label="Last Name"
-                  placeholder="Type your last name"
-                  ref="last_name-input"
-                  :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                  :rules="[validateFieldError('last_name')]"
-                  :disabled="checkIfFieldIsPreFilled('last_name')"
-                  v-model="form.last_name"
-                  @input="cleanFieldError('last_name')"
-                >
-                  <template v-slot:hint v-if="fieldErrors.last_name">
+                <input-field label="Last Name"
+                             placeholder="Type your last name"
+                             ref="last_name-input"
+                             :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                             :rules="[validateFieldError('last_name')]"
+                             :disabled="checkIfFieldIsPreFilled('last_name')"
+                             v-model="form.last_name"
+                             @input="cleanFieldError('last_name')">
+                  <template v-slot:hint
+                            v-if="fieldErrors.last_name">
                     <span>{{ fieldErrors.last_name[0] }}</span>
                   </template>
                 </input-field>
@@ -51,56 +45,48 @@
 
             <input-group>
               <template v-slot:content>
-                <input-field
-                  label="Email Address"
-                  placeholder="youremail@domain.com"
-                  type="email"
-                  ref="email-input"
-                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                  :rules="[validateEmail, validateFieldError('email')]"
-                  :disabled="checkIfFieldIsPreFilled('email')"
-                  v-model="form.email"
-                  @input="cleanFieldError('email')"
-                />
+                <input-field label="Email Address"
+                             placeholder="youremail@domain.com"
+                             type="email"
+                             ref="email-input"
+                             :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                             :rules="[validateEmail, validateFieldError('email')]"
+                             :disabled="checkIfFieldIsPreFilled('email')"
+                             v-model="form.email"
+                             @input="cleanFieldError('email')" />
 
-                <phone-number-field
-                  label="Phone Number"
-                  placeholder="222 333 4444"
-                  ref="phone_number-input"
-                  :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
-                  :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                  :disabled="checkIfFieldIsPreFilled('phone_number')"
-                  v-model="form.phone_number"
-                  @input="cleanFieldError('phone_number')"
-                />
+                <phone-number-field label="Phone Number"
+                                    placeholder="222 333 4444"
+                                    ref="phone_number-input"
+                                    :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
+                                    :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                                    :disabled="checkIfFieldIsPreFilled('phone_number')"
+                                    v-model="form.phone_number"
+                                    @input="cleanFieldError('phone_number')" />
               </template>
             </input-group>
 
             <input-group>
               <template v-slot:content>
-                <select-field
-                  label="Country"
-                  placeholder="Ex: United States"
-                  option-label="name"
-                  option-value="id"
-                  ref="country-input"
-                  :rules="[validateFieldError('country')]"
-                  :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
-                  :options="countries"
-                  :disabled="checkIfFieldIsPreFilled('country')"
-                  v-model="form.country"
-                />
+                <select-field label="Country"
+                              placeholder="Ex: United States"
+                              option-label="name"
+                              option-value="id"
+                              ref="country-input"
+                              :rules="[validateFieldError('country')]"
+                              :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
+                              :options="countries"
+                              :disabled="checkIfFieldIsPreFilled('country')"
+                              v-model="form.country" />
 
-                <input-field
-                  label="Business Name"
-                  placeholder="Ex. Aloware Inc."
-                  ref="company_name-input"
-                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                  :rules="[validateFieldError('company_name')]"
-                  :disabled="checkIfFieldIsPreFilled('company_name')"
-                  v-model="form.company_name"
-                  @input="cleanFieldError('company_name')"
-                />
+                <input-field label="Business Name"
+                             placeholder="Ex. Aloware Inc."
+                             ref="company_name-input"
+                             :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                             :rules="[validateFieldError('company_name')]"
+                             :disabled="checkIfFieldIsPreFilled('company_name')"
+                             v-model="form.company_name"
+                             @input="cleanFieldError('company_name')" />
               </template>
             </input-group>
 
@@ -113,45 +99,36 @@
 
             <input-group>
               <template v-slot:content>
-                <input-field
-                  label="Create a Password"
-                  placeholder="Type here"
-                  ref="password-input"
-                  is-password
-                  :rules="[validateFieldError('password')]"
-                  :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
-                  v-model="form.password"
-                  @input="cleanFieldError('password')"
-                >
-                  <template
-                    v-slot:hint
-                    v-if="form.password">
+                <input-field label="Create a Password"
+                             placeholder="Type here"
+                             ref="password-input"
+                             is-password
+                             :rules="[validateFieldError('password')]"
+                             :paddingClasses="isLargeScreen ? 'q-pr-4' : ''"
+                             v-model="form.password"
+                             @input="cleanFieldError('password')">
+                  <template v-slot:hint
+                            v-if="form.password">
                     <ul class="text-left pl-2 text-weight-regular password-hint"
                         :class="validateFieldError('password') ? 'negative-top' : ''">
                       <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordLength(form.password))"
-                          :name="iconForValidation(validatePasswordLength(form.password))"
-                        >
+                        <q-icon class="q-mr-xs"
+                                :class="getPasswordRuleClass(validatePasswordLength(form.password))"
+                                :name="iconForValidation(validatePasswordLength(form.password))">
                         </q-icon>
                         8 characters long
                       </li>
                       <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordCases(form.password))"
-                          :name="iconForValidation(validatePasswordCases(form.password))"
-                        >
+                        <q-icon class="q-mr-xs"
+                                :class="getPasswordRuleClass(validatePasswordCases(form.password))"
+                                :name="iconForValidation(validatePasswordCases(form.password))">
                         </q-icon>
                         Must contain upper and lower case letters
                       </li>
                       <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
-                          :name="iconForValidation(validatePasswordDigit(form.password))"
-                        >
+                        <q-icon class="q-mr-xs"
+                                :class="getPasswordRuleClass(validatePasswordDigit(form.password))"
+                                :name="iconForValidation(validatePasswordDigit(form.password))">
                         </q-icon>
                         Include at least one numerical digit
                       </li>
@@ -159,22 +136,17 @@
                   </template>
                 </input-field>
 
-                <input-field
-                  label="Repeat your Password"
-                  placeholder="Type your password again"
-                  is-password
-                  v-model="form.password_confirmation"
-                >
-                  <template
-                    v-slot:hint
-                    v-if="form.password?.length > 0">
+                <input-field label="Repeat your Password"
+                             placeholder="Type your password again"
+                             is-password
+                             v-model="form.password_confirmation">
+                  <template v-slot:hint
+                            v-if="form.password?.length > 0">
                     <ul class="text-left pl-2 text-weight-regular password-hint">
                       <li>
-                        <q-icon
-                          class="q-mr-xs"
-                          :class="getPasswordRuleClass(validatePasswordMatch(form.password_confirmation))"
-                          :name="iconForValidation(validatePasswordMatch(form.password_confirmation))"
-                        >
+                        <q-icon class="q-mr-xs"
+                                :class="getPasswordRuleClass(validatePasswordMatch(form.password_confirmation))"
+                                :name="iconForValidation(validatePasswordMatch(form.password_confirmation))">
                         </q-icon>
                         {{
                           validatePasswordMatch(form.password_confirmation)
@@ -190,31 +162,26 @@
 
             <div class="accept-box">
               <div>
-                <q-checkbox
-                  class="mb-3 q-pr-xs"
-                  color="primary"
-                  dense
-                  v-model="form.agreed_to_terms"
-                >
+                <q-checkbox class="mb-3 q-pr-xs"
+                            color="primary"
+                            dense
+                            v-model="form.agreed_to_terms">
                   I agree to
-                  <a
-                    class="text-weight-bold"
-                    href="https://aloware.com/terms-and-conditions"
-                    target="_blank" rel="noopener noreferrer">
+                  <a class="text-weight-bold"
+                     href="https://aloware.com/terms-and-conditions"
+                     target="_blank" rel="noopener noreferrer">
                     Terms and Conditions
                   </a>
                   , and
-                  <a
-                    class="text-weight-bold"
-                    href="https://aloware.com/terms-and-conditions"
-                    target="_blank"
-                    rel="noopener noreferrer">
+                  <a class="text-weight-bold"
+                     href="https://aloware.com/terms-and-conditions"
+                     target="_blank"
+                     rel="noopener noreferrer">
                     Acceptable Use Policy.
                   </a>
                 </q-checkbox>
-                <div
-                  id="recaptcha-element"
-                  class="g-recaptcha pb-2"/>
+                <div id="recaptcha-element"
+                     class="g-recaptcha pb-2" />
               </div>
             </div>
           </div>

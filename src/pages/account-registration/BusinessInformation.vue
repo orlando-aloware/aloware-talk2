@@ -5,15 +5,13 @@
         <img src="app-icons/menu/logo_dark.svg" alt="Logo" />
       </div>
       <div class="stepper__container">
-        <business-information-form
-          class="business-information__form"
-          ref="businessInformationForm"
-          :should-show-action-buttons="true"
-          :is-loading="isLoading"
-          @submit="onSubmit"
-          @back-to-dashboard="onBackToPreviousRoute"
-          @skip-for-now="onBackToPreviousRoute"
-        />
+        <business-information-form class="business-information__form"
+                                   ref="businessInformationForm"
+                                   :should-show-action-buttons="true"
+                                   :is-loading="isLoading"
+                                   @submit="onSubmit"
+                                   @back-to-dashboard="onBackToPreviousRoute"
+                                   @skip-for-now="onBackToPreviousRoute" />
       </div>
     </div>
     <banner :current-step="1" />
