@@ -685,6 +685,7 @@ export default {
         if (this.fieldErrors && this.fieldErrors[fieldName]) {
           return this.fieldErrors[fieldName][0]
         }
+        
         return true
       }
     },
