@@ -1,13 +1,10 @@
 <template>
-  <q-dialog
-    transition-show="scale"
-    transition-hide="scale"
-    persistent
-    v-model="show"
-  >
-    <q-card
-      class="bg-white text-black text-center q-pt-lg"
-      style="width: 635px">
+  <q-dialog transition-show="scale"
+            transition-hide="scale"
+            persistent
+            v-model="show">
+    <q-card class="bg-white text-black text-center q-pt-lg"
+            style="width: 635px">
       <q-card-section>
         <div class="text-h5">
           Welcome!! 🎉
@@ -22,16 +19,14 @@
         </div>
       </q-card-section>
 
-      <q-card-actions
-        class="bg-white q-pb-lg"
-        align="center">
-        <q-btn
-          label="Go to Login"
-          color="primary"
-          text-color="white"
-          rounded
-          @click="openLoginPage"
-          v-close-popup>
+      <q-card-actions class="bg-white q-pb-lg"
+                      text-align="center">
+        <q-btn label="Go to Login"
+               color="primary"
+               text-color="white"
+               rounded
+               @click="openLoginPage"
+               v-close-popup>
         </q-btn>
       </q-card-actions>
     </q-card>
