@@ -281,7 +281,10 @@
 
             <b-form-invalid-feedback v-if="!$v.user.missed_call_message.required">Please provide a missed call message.</b-form-invalid-feedback>
 
-            <b-button size="sm" variant="primary" class="mt-2" :disabled="viewOnly">
+            <b-button size="sm"
+                      variant="primary"
+                      class="mt-2"
+                      :disabled="viewOnly">
               <q-menu content-class="mx-height-300"
                       ref="templatesMenu"
                       :offset="[0,5]">
@@ -294,7 +297,10 @@
                                    :width="16" ></calendar-today-icon> Templates
             </b-button>
 
-            <b-button size="sm" variant="primary" class="mt-2 ml-2" :disabled="viewOnly">
+            <b-button size="sm"
+                      variant="primary"
+                      class="mt-2 ml-2"
+                      :disabled="viewOnly">
               <q-menu content-class="mx-height-300"
                       ref="variablesMenu"
                       :offset="[0,5]">

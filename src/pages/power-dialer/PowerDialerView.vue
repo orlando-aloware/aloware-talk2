@@ -85,15 +85,15 @@
                   </template>
                   <div id="contacts-create-popover">
                     <b-dropdown-item href="#"
-                                    :disabled="taskAddAndClearingDisabled"
-                                    @click="onAddContactsToList">
-                      <i class="fa fa-search mr-1"/>
+                                     :disabled="taskAddAndClearingDisabled"
+                                     @click="onAddContactsToList">
+                      <i class="fa fa-search mr-1" />
                       Select Contacts & Add to List
                     </b-dropdown-item>
                     <b-dropdown-item href="#"
-                                    :disabled="taskAddAndClearingDisabled || !canCreateContacts"
-                                    v-b-modal:create-contact-modal>
-                      <i class="fa fa-plus mr-1"/>
+                                     :disabled="taskAddAndClearingDisabled || !canCreateContacts"
+                                     v-b-modal:create-contact-modal>
+                      <i class="fa fa-plus mr-1" />
                       {{ createContactToListText }}
                     </b-dropdown-item>
                   </div>

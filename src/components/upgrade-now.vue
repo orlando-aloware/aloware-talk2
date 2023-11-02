@@ -10,11 +10,11 @@
         </div>
         <p class="info-text">{{ text }}</p>
         <div class="flex-row mb-4 mt-3">
-            <span v-if="kbLink"
-                       size="large"
-                       type="text"
-                       class="cursor-pointer el-button learn-more-text mr-2"
-                       @click="openKnowledgeBaseLink">
+            <span size="large"
+                  type="text"
+                  class="cursor-pointer el-button learn-more-text mr-2"
+                  v-if="kbLink"
+                  @click="openKnowledgeBaseLink">
                 Learn More
             </span>
             <b-button pill
@@ -45,29 +45,35 @@ export default {
       default: 'This is not included in your current plan. To use it, please contact us to upgrade today!',
       required: false
     },
+
     buttonText: {
       type: String,
       default: 'Request a Plan Upgrade',
       required: false
     },
+
     kbLink: {
       type: String,
       required: false
     },
+
     defaultClick: {
       type: Boolean,
       default: true,
       required: false
     },
+
     disabled: {
       type: Boolean,
       default: false,
       required: false
     },
+
     titleText: {
       type: String,
       required: true
     },
+
     imageLink: {
       type: String,
       required: true

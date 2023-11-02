@@ -1,9 +1,8 @@
 <template>
   <div class="banner col-xl-4 q-xl-show q-md-hide q-sm-hide">
     <div class="text-center items-center align-center">
-      <img
-        :src="getBannerImageSrc()"
-        alt="phone" />
+      <img alt="phone"
+           :src="getBannerImageSrc()" />
       <div class="card text-center">
         <h3 class="mb-4 mt-4">{{ getBannerTitle() }}</h3>
         <p v-html="getBannerDescription()" />
@@ -15,12 +14,14 @@
 <script>
 export default {
   name: 'Banner',
+
   props: {
     currentStep: {
       type: Number,
       default: 1
     }
   },
+
   methods: {
     getBannerImageSrc () {
       switch (this.currentStep) {

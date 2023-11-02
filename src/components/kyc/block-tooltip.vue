@@ -1,11 +1,11 @@
 <template>
-  <b-popover v-if="customMessage"
+  <b-popover boundary="window"
+             custom-class="btn-primary"
+             ref="popover"
              :triggers="triggers"
              :target="target"
              :placement="placement"
-             boundary="window"
-             custom-class="btn-primary"
-             ref="popover">
+             v-if="customMessage">
     <template>
       <span class="d-flex align-items-center contact-tags-item text-white">
         <span v-html="customMessage"></span>
@@ -26,28 +26,42 @@ export default {
     kycMixin
   ],
 
+  components: {
+
+  },
+
   props: {
     placement: {
       required: true,
       type: String,
       default: 'top'
     },
+
     triggers: {
       required: true,
       type: String,
       default: 'click'
     },
+
     target: {
       required: true,
       type: String
     },
+
     task: {
       required: true,
       type: String
     }
   },
 
-  components: {
+  data () {
+    return {
+      tab: 'inbox',
+      parkedCallQueue: []
+    }
+  },
+
+  mounted () {
 
   },
 
@@ -139,16 +153,6 @@ export default {
 
       return text
     }
-  },
-  data () {
-    return {
-      tab: 'inbox',
-      parkedCallQueue: []
-    }
-  },
-
-  mounted () {
-
   },
 
   methods: {

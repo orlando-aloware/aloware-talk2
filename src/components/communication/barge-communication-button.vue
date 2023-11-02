@@ -3,27 +3,27 @@
     <span v-if="isBlockedFrom('barge & whisper')"
         class="cursor-pointer">
       <b-popover target="barge-popover"
-                triggers="hover"
-                placement="top"
-                custom-class="btn-primary"
-                delay="100">
+                 triggers="hover"
+                 placement="top"
+                 custom-class="btn-primary"
+                 delay="100">
         <span class="text-white">
           The barge option is not included in your current plan, to use it, you have
           to upgrade to one of our plans that offers it!
-          <u @click="openKnowledgeBaseLink"
-            class="cursor-pointer">Read more</u>
+          <u class="cursor-pointer"
+             @click="openKnowledgeBaseLink">Read more</u>
           or
-          <u @click="checkClick"
-            class="cursor-pointer">Request Plan Upgrade</u>
+          <u class="cursor-pointer"
+             @click="checkClick">Request Plan Upgrade</u>
         </span>
       </b-popover>
       <volume-high-icon id="barge-popover"
                         height="22"
                         width="22"/>
     </span>
-    <span v-if="!isBlockedFrom('barge & whisper') && userCanBargeAndWhisper(communication)"
-          class="cursor-pointer"
-          @click="dialog">
+    <span class="cursor-pointer"
+          @click="dialog"
+          v-if="!isBlockedFrom('barge & whisper') && userCanBargeAndWhisper(communication)">
       <volume-high-icon height="22"
                         width="22"/>
       <q-tooltip>
@@ -55,6 +55,7 @@ export default {
       type: Object,
       required: true
     },
+
     defaultClick: {
       type: Boolean,
       default: true,

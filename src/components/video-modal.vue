@@ -107,6 +107,7 @@ export default {
       this.showModal = false
       this.$cookies.set(this.cookieName, 'viewed') // Set cookie to expire in 1 day
     },
+
     openModal () {
       this.showModal = true
     }

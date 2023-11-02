@@ -1,7 +1,7 @@
 <template>
   <div>
-
-    <b-form-row class="mt-4" v-if="voicemailDropFiles.length > 0">
+    <b-form-row class="mt-4"
+                v-if="voicemailDropFiles.length > 0">
       <b-col sm="12" md="12">
         <b-table-simple :fields="table.fields">
           <b-thead>
@@ -53,8 +53,8 @@
             <i class="fa fa-plus"></i> Add
           </b-button>
           <b-button variant="danger"
-                    :disabled="viewOnly"
                     class="ml-2"
+                    :disabled="viewOnly"
                     @click="removeUploadedFile">
             <i class="fa fa-times"></i> Remove
           </b-button>
@@ -69,9 +69,9 @@
           </audio-recorder>
 
           <b-card title="Upload an audio file"
-                  :disabled="viewOnly"
                   header-tag="header"
-                  footer-tag="footer">
+                  footer-tag="footer"
+                  :disabled="viewOnly">
             <file-uploader accepted-file-types=".mp3, .wav"
                            :upload-url="vmDropUploadUrl"
                            @fileUploaded="fileUploaded">

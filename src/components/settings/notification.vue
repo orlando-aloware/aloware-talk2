@@ -218,9 +218,9 @@
             class="mb-3"
             value-field="value"
             text-field="title"
-            v-model="user.reminders_options"
             :disabled="viewOnly"
             :options="reminderOptions"
+            v-model="user.reminders_options"
             @change="(eventPayload) => onUpdateFields(eventPayload, 'reminders_options')">
           </b-form-checkbox-group>
         </b-col>
@@ -300,8 +300,8 @@
 
           <b-form-group label="" :id="`${SettingsMap.mobileNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="mobileNotifications"
                              :disabled="viewOnly"
+                             v-model="mobileNotifications"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'mobileNotifications')">
               Mobile
             </b-form-checkbox>
@@ -309,8 +309,8 @@
 
           <b-form-group label="" :id="`${SettingsMap.emailNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="emailNotifications"
                              :disabled="viewOnly"
+                             v-model="emailNotifications"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'emailNotifications')">
               Email
             </b-form-checkbox>
@@ -318,8 +318,8 @@
 
           <b-form-group label="" :id="`${SettingsMap.textNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
-                             v-model="textNotifications"
                              :disabled="viewOnly"
+                             v-model="textNotifications"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'textNotifications')">
               Text Message
             </b-form-checkbox>
@@ -331,22 +331,21 @@
             <b-form-checkbox switch
                              :value="true"
                              :unchecked-value="false"
-                             v-model="setCustomNotificationPhoneNumber"
                              :disabled="viewOnly"
+                             v-model="setCustomNotificationPhoneNumber"
                              @change="onChangeCustomNotificationPhoneNumber">
               Send text to custom number
             </b-form-checkbox>
           </b-form-group>
-          <b-form-group v-if="textNotifications && setCustomNotificationPhoneNumber"
-                        class="form-label">
-            <b-form-input
-              type="text"
-              ref="notificationPhoneNumberInput"
-              placeholder="(123) 456-7890"
-              v-model.trim="$v.user.notification_phone_number.$model"
-              :disabled="viewOnly"
-              :state="validateState('notification_phone_number')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'notification_phone_number')">
+          <b-form-group class="form-label"
+                        v-if="textNotifications && setCustomNotificationPhoneNumber">
+            <b-form-input type="text"
+                          ref="notificationPhoneNumberInput"
+                          placeholder="(123) 456-7890"
+                          :disabled="viewOnly"
+                          :state="validateState('notification_phone_number')"
+                          v-model.trim="$v.user.notification_phone_number.$model"
+                          @input="(eventPayload) => onUpdateFields(eventPayload, 'notification_phone_number')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter phone number.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>

@@ -213,9 +213,8 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog
-        :show="shouldShowKycFillDialog"
-        @change-showed-kyc-dialog="changeShowedKycDialog"/>
+      <kyc-fill-dialog :show="shouldShowKycFillDialog"
+                       @change-showed-kyc-dialog="changeShowedKycDialog" />
     </div>
   </div>
 </template>

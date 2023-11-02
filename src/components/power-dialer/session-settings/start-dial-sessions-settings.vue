@@ -1,23 +1,23 @@
 <template>
   <div class="t-session-settings">
-    <block-tooltip v-if="callDisabled"
-                   placement="left"
+    <block-tooltip placement="left"
                    triggers="hover focus"
                    target="pd-call-popover"
-                   task="call">
+                   task="call"
+                   v-if="callDisabled">
     </block-tooltip>
-    <div v-if="defaultTrigger"
-         id="pd-call-popover">
+    <div id="pd-call-popover"
+         v-if="defaultTrigger">
       <q-btn class="start-dial-button p-0"
-            color="success"
-            no-caps
-            unelevated
-            :disabled="disabledTrigger || callDisabled"
-            @click="dialPreparation">
+             color="success"
+             no-caps
+             unelevated
+             :disabled="disabledTrigger || callDisabled"
+             @click="dialPreparation">
         <PhoneIcon class="mr-2"
-                  color="white"
-                  height="12"
-                  width="12" />
+                   color="white"
+                   height="12"
+                   width="12" />
         <div class="button-label">
           Start Dialing
           <q-tooltip v-if="disabledTrigger">
@@ -97,8 +97,8 @@
                         </q-item-section>
                         <q-item-section side
                                         v-if="hovered !== setting.id || settingCategory.name === 'company'">
-                          <CheckIcon v-if="isSessionValid(setting)"
-                                     class="mr-2" />
+                          <CheckIcon class="mr-2"
+                                     v-if="isSessionValid(setting)" />
                         </q-item-section>
                         <q-item-section class="pl-0"
                                         side
@@ -112,7 +112,7 @@
                                  outline
                                  dense
                                  @click="hoveredMenu = setting.id">
-                            <i class="fa fa-ellipsis-h"/>
+                            <i class="fa fa-ellipsis-h" />
                           </q-btn>
                           <q-menu anchor="top right"
                                   self="top left">
@@ -123,7 +123,7 @@
                                       @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
-                                    <i class="fa fa-pencil-alt mr-2"/>
+                                    <i class="fa fa-pencil-alt mr-2" />
                                     Rename
                                   </div>
                                 </q-item-section>
@@ -134,7 +134,7 @@
                                       @click="onDeleteRequest(setting.id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
-                                    <i class="fa fa-trash-alt mr-2"/>
+                                    <i class="fa fa-trash-alt mr-2" />
                                     Delete
                                   </div>
                                 </q-item-section>
@@ -256,16 +256,16 @@
           </div>
           <q-input outlined
                    :placeholder="updateObj.name"
-                   v-model="newSettingName"
-                   v-else-if="updateObj"
                    :error="errorMessage != null"
-                   :error-message="errorMessage"/>
+                   :error-message="errorMessage"
+                   v-model="newSettingName"
+                   v-else-if="updateObj" />
           <q-input placeholder="New Settings Name"
                    outlined
-                   v-model="newSettingName"
-                   v-else
                    :error="errorMessage != null"
-                   :error-message="errorMessage"/>
+                   :error-message="errorMessage"
+                   v-model="newSettingName"
+                   v-else />
         </q-card-section>
 
         <q-card-actions class="px-3 pb-3"
