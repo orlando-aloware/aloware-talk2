@@ -1,59 +1,51 @@
 <template>
   <div>
-    <step-header
-      title="Your Business"
-      :description="headerDescription"
-      :class="shouldShowActionButtons ? 'q-pt-xl q-mx-6' : ''"
-    />
+    <step-header title="Your Business"
+                 :description="headerDescription"
+                 :class="shouldShowActionButtons ? 'q-pt-xl q-mx-6' : ''" />
 
-    <div
-      class="business-information__container min-w-100"
-      :class="shouldShowActionButtons ? 'overflow-auto q-pt-xl q-pb-xl' : ''">
+    <div class="business-information__container min-w-100"
+         :class="shouldShowActionButtons ? 'overflow-auto q-pt-xl q-pb-xl' : ''">
+
       <input-group>
         <template v-slot:content>
-          <input-field
-            label="Business Legal Name"
-            placeholder="Aloware Inc."
-            ref="legal_name-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('legal_name')]"
-            v-model="form.legal_name"
-            @input="cleanFieldError('legal_name')"
-          />
+          <input-field label="Business Legal Name"
+                       placeholder="Aloware Inc."
+                       ref="legal_name-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('legal_name')]"
+                       v-model="form.legal_name"
+                       @input="cleanFieldError('legal_name')" />
 
           <div class="col-5 pr-0 pl-0">
-            <select-field
-              label="Business Type"
-              option-label="value"
-              option-value="value"
-              col-md="col-md-12"
-              ref="business_type-input"
-              :rules="[validateFieldError('business_type')]"
-              :paddingClasses="isLargeScreen ? 'q-pr-0 q-pl-0' : ''"
-              :options="businessTypes"
-              v-model="form.business_type"
-            />
+            <select-field label="Business Type"
+                          option-label="value"
+                          option-value="value"
+                          col-md="col-md-12"
+                          ref="business_type-input"
+                          :rules="[validateFieldError('business_type')]"
+                          :paddingClasses="isLargeScreen ? 'q-pr-0 q-pl-0' : ''"
+                          :options="businessTypes"
+                          v-model="form.business_type" />
             <div class="flex items-center"
                  :class="validateFieldError('business_type') ? '' : 'negative-top'">
               <label class="flex mb-1 text-weight-bold pl-3 pr-4">
                 Company Status
               </label>
-              <q-btn-toggle
-                class="toggle-border"
-                toggle-color="primary"
-                color="white"
-                text-color="#4F4F4F"
-                spread
-                no-caps
-                unelevated
-                dense
-                rounded
-                :options="[
-                  { label: 'Private', value: 1 },
-                  { label: 'Public', value: 2 }
-                ]"
-                v-model="form.company_status"
-              />
+              <q-btn-toggle class="toggle-border"
+                            toggle-color="primary"
+                            color="white"
+                            text-color="#4F4F4F"
+                            spread
+                            no-caps
+                            unelevated
+                            dense
+                            rounded
+                            :options="[
+                              { label: 'Private', value: 1 },
+                              { label: 'Public', value: 2 }
+                            ]"
+                            v-model="form.company_status" />
             </div>
           </div>
         </template>
@@ -61,70 +53,59 @@
 
       <input-group>
         <template v-slot:content>
-          <select-field
-            label="Business ID Type"
-            option-label="label"
-            option-value="value"
-            ref="business_registration_identifier-input"
-            :rules="[validateFieldError('business_registration_identifier')]"
-            :paddingClasses="paddingRightClasses"
-            :options="businessIdTypes"
-            v-model="form.business_registration_identifier"
-          />
+          <select-field label="Business ID Type"
+                        option-label="label"
+                        option-value="value"
+                        ref="business_registration_identifier-input"
+                        :rules="[validateFieldError('business_registration_identifier')]"
+                        :paddingClasses="paddingRightClasses"
+                        :options="businessIdTypes"
+                        v-model="form.business_registration_identifier" />
 
-          <input-field
-            label="Business Registration Number"
-            placeholder="Ex: C1234567"
-            ref="business_registration_number-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('business_registration_number')]"
-            v-model="form.business_registration_number"
-            @input="cleanFieldError('business_registration_number')"
-          />
+          <input-field label="Business Registration Number"
+                       placeholder="Ex: C1234567"
+                       ref="business_registration_number-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('business_registration_number')]"
+                       v-model="form.business_registration_number"
+                       @input="cleanFieldError('business_registration_number')" />
         </template>
       </input-group>
 
       <input-group>
         <template v-slot:content>
-          <select-field
-            label="Region of Operation"
-            option-label="label"
-            option-value="value"
-            ref="business_regions_of_operation-input"
-            :rules="[validateFieldError('business_regions_of_operation')]"
-            :paddingClasses="paddingRightClasses"
-            :options="regionsOfOperations"
-            v-model="form.business_regions_of_operation"
-          />
+          <select-field label="Region of Operation"
+                        option-label="label"
+                        option-value="value"
+                        ref="business_regions_of_operation-input"
+                        :rules="[validateFieldError('business_regions_of_operation')]"
+                        :paddingClasses="paddingRightClasses"
+                        :options="regionsOfOperations"
+                        v-model="form.business_regions_of_operation" />
 
-          <input-field
-            label="Website URL"
-            placeholder="Ex: yourcompany.com"
-            ref="website_url-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('website_url')]"
-            v-model="form.website_url"
-            @input="cleanFieldError('website_url')"
-          />
+          <input-field label="Website URL"
+                       placeholder="Ex: yourcompany.com"
+                       ref="website_url-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('website_url')]"
+                       v-model="form.website_url"
+                       @input="cleanFieldError('website_url')" />
         </template>
       </input-group>
 
       <input-group>
         <template v-slot:content>
-          <select-field
-            label="Business Industry"
-            option-label="name"
-            option-value="value"
-            ref="business_industry-input"
-            :rules="[validateFieldError('business_industry')]"
-            :paddingClasses="paddingRightClasses"
-            :options="businessIndustries"
-            v-model="form.business_industry"
-          />
+          <select-field label="Business Industry"
+                        option-label="name"
+                        option-value="value"
+                        ref="business_industry-input"
+                        :rules="[validateFieldError('business_industry')]"
+                        :paddingClasses="paddingRightClasses"
+                        :options="businessIndustries"
+                        v-model="form.business_industry" />
 
-          <div
-            class="col-5"
-            v-if="isLargeScreen"/>
+          <div class="col-5"
+               v-if="isLargeScreen" />
         </template>
       </input-group>
 
@@ -137,78 +118,64 @@
 
       <input-group>
         <template v-slot:content>
-          <input-field
-            label="Street"
-            placeholder="Ex: Fifth Avenue"
-            col-md="col-md-10"
-            ref="street-input"
-            :paddingClasses="paddingRightClasses"
-            :rules="[validateFieldError('street')]"
-            v-model="form.street"
-            @input="cleanFieldError('street')"
-          />
+          <input-field label="Street"
+                       placeholder="Ex: Fifth Avenue"
+                       col-md="col-md-10"
+                       ref="street-input"
+                       :paddingClasses="paddingRightClasses"
+                       :rules="[validateFieldError('street')]"
+                       v-model="form.street"
+                       @input="cleanFieldError('street')" />
         </template>
       </input-group>
 
       <input-group>
         <template v-slot:content>
-          <input-field
-            label="State/Province/Region"
-            placeholder="Ex: California"
-            ref="region-input"
-            :paddingClasses="paddingRightClasses"
-            :rules="[validateFieldError('region')]"
-            v-model="form.region"
-            @input="cleanFieldError('region')"
-          />
+          <input-field label="State/Province/Region"
+                       placeholder="Ex: California"
+                       ref="region-input"
+                       :paddingClasses="paddingRightClasses"
+                       :rules="[validateFieldError('region')]"
+                       v-model="form.region"
+                       @input="cleanFieldError('region')" />
 
-          <input-field
-            label="City"
-            placeholder="Ex: Los Angeles"
-            ref="city-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('city')]"
-            v-model="form.city"
-            @input="cleanFieldError('city')"
-          />
+          <input-field label="City"
+                       placeholder="Ex: Los Angeles"
+                       ref="city-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('city')]"
+                       v-model="form.city"
+                       @input="cleanFieldError('city')" />
         </template>
       </input-group>
 
       <input-group>
         <template v-slot:content>
-          <select-field
-            label="Legal Country"
-            placeholder="Ex: United States"
-            option-label="name"
-            option-value="id"
-            ref="legal_country-input"
-            :rules="[validateFieldError('legal_country')]"
-            :paddingClasses="paddingLeftClasses"
-            :options="countries"
-            v-model="form.legal_country"
-          />
+          <select-field label="Legal Country"
+                        placeholder="Ex: United States"
+                        option-label="name"
+                        option-value="id"
+                        ref="legal_country-input"
+                        :rules="[validateFieldError('legal_country')]"
+                        :paddingClasses="paddingLeftClasses"
+                        :options="countries"
+                        v-model="form.legal_country" />
 
-          <input-field
-            label="Postal Code"
-            placeholder="Ex: 11223"
-            ref="postal_code-input"
-            bottom-slots
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('postal_code')]"
-            v-model="form.postal_code"
-            @input="cleanFieldError('postal_code')"
-          >
-            <template
-              v-slot:hint
-              v-if="form.postal_code.length">
-              <div
-                class="zipcode-hint"
-                :class="validateFieldError('postal_code') ? 'negative-top' : ''">
-                <q-icon
-                  class="q-mr-xs"
-                  :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
-                  :name="iconForValidation(validateZipCode(form.postal_code))"
-                >
+          <input-field label="Postal Code"
+                       placeholder="Ex: 11223"
+                       ref="postal_code-input"
+                       bottom-slots
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('postal_code')]"
+                       v-model="form.postal_code"
+                       @input="cleanFieldError('postal_code')">
+            <template v-slot:hint
+                      v-if="form.postal_code.length">
+              <div class="zipcode-hint"
+                   :class="validateFieldError('postal_code') ? 'negative-top' : ''">
+                <q-icon class="q-mr-xs"
+                        :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
+                        :name="iconForValidation(validateZipCode(form.postal_code))">
                 </q-icon>
                   {{
                     validateZipCode(form.postal_code)
@@ -230,107 +197,91 @@
 
       <input-group>
         <template v-slot:content>
-          <input-field
-            label="First Name"
-            placeholder="Type here"
-            ref="auth_rep_first_name-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('auth_rep_first_name')]"
-            v-model="form.auth_rep_first_name"
-            @input="cleanFieldError('auth_rep_first_name')"
-          />
+          <input-field label="First Name"
+                        placeholder="Type here"
+                        ref="auth_rep_first_name-input"
+                        :paddingClasses="paddingLeftClasses"
+                        :rules="[validateFieldError('auth_rep_first_name')]"
+                        v-model="form.auth_rep_first_name"
+                        @input="cleanFieldError('auth_rep_first_name')" />
 
-          <input-field
-            label="Last Name"
-            placeholder="Type here"
-            ref="auth_rep_last_name-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('auth_rep_last_name')]"
-            v-model="form.auth_rep_last_name"
-            @input="cleanFieldError('auth_rep_last_name')"
-          />
+          <input-field label="Last Name"
+                       placeholder="Type here"
+                       ref="auth_rep_last_name-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('auth_rep_last_name')]"
+                       v-model="form.auth_rep_last_name"
+                       @input="cleanFieldError('auth_rep_last_name')" />
         </template>
       </input-group>
 
       <input-group>
         <template v-slot:content>
-          <input-field
-            label="Email"
-            placeholder="email@domain.com"
-            type="email"
-            ref="auth_rep_email-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateEmail, validateFieldError('auth_rep_email')]"
-            v-model="form.auth_rep_email"
-            @input="cleanFieldError('auth_rep_email')"
-          />
+          <input-field label="Email"
+                       placeholder="email@domain.com"
+                       type="email"
+                       ref="auth_rep_email-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateEmail, validateFieldError('auth_rep_email')]"
+                       v-model="form.auth_rep_email"
+                       @input="cleanFieldError('auth_rep_email')" />
 
-          <phone-number-field
-            label="Phone Number"
-            placeholder="222 333 4444"
-            ref="auth_rep_phone_number-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validatePhoneNumber, validateFieldError('auth_rep_phone_number')]"
-            v-model="form.auth_rep_phone_number"
-            @input="cleanFieldError('auth_rep_phone_number')"
-          />
+          <phone-number-field label="Phone Number"
+                              placeholder="222 333 4444"
+                              ref="auth_rep_phone_number-input"
+                              :paddingClasses="paddingLeftClasses"
+                              :rules="[validatePhoneNumber, validateFieldError('auth_rep_phone_number')]"
+                              v-model="form.auth_rep_phone_number"
+                              @input="cleanFieldError('auth_rep_phone_number')" />
         </template>
       </input-group>
 
       <input-group>
         <template v-slot:content>
-          <input-field
-            label="Business Title"
-            placeholder="Type here"
-            ref="auth_rep_business_title-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('auth_rep_business_title')]"
-            v-model="form.auth_rep_business_title"
-            @input="cleanFieldError('auth_rep_business_title')"
-          />
+          <input-field label="Business Title"
+                       placeholder="Type here"
+                       ref="auth_rep_business_title-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('auth_rep_business_title')]"
+                       v-model="form.auth_rep_business_title"
+                       @input="cleanFieldError('auth_rep_business_title')" />
 
-          <input-field
-            label="Job Position"
-            placeholder="Ex. CEO, CTO, Product Director"
-            ref="auth_rep_job_position-input"
-            :paddingClasses="paddingLeftClasses"
-            :rules="[validateFieldError('auth_rep_job_position')]"
-            v-model="form.auth_rep_job_position"
-            @input="cleanFieldError('auth_rep_job_position')"
-          />
+          <input-field label="Job Position"
+                       placeholder="Ex. CEO, CTO, Product Director"
+                       ref="auth_rep_job_position-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('auth_rep_job_position')]"
+                       v-model="form.auth_rep_job_position"
+                       @input="cleanFieldError('auth_rep_job_position')" />
         </template>
       </input-group>
     </div>
-    <div
-      class="business-information-actions"
-      v-if="shouldShowActionButtons">
+
+    <div class="business-information-actions"
+         v-if="shouldShowActionButtons">
       <div class="flex justify-end w-100 pt-4">
         <div>
-          <q-btn
-            class="q-mr-xs account-registration-action-btn"
-            color="#62666E"
-            size="md"
-            label="Skip for now"
-            rounded
-            dense
-            no-caps
-            unelevated
-            flat
-            @click="skipForNow"
-          />
+          <q-btn class="q-mr-xs account-registration-action-btn"
+                 color="#62666E"
+                 size="md"
+                 label="Skip for now"
+                 rounded
+                 dense
+                 no-caps
+                 unelevated
+                 flat
+                @click="skipForNow" />
 
-          <q-btn
-            class="q-mr-xl account-registration-action-btn"
-            color="primary"
-            size="md"
-            label="Next"
-            rounded
-            dense
-            no-caps
-            unelevated
-            :disabled="isNextButtonDisabled"
-            @click="onSubmit"
-          />
+          <q-btn class="q-mr-xl account-registration-action-btn"
+                 color="primary"
+                 size="md"
+                 label="Next"
+                 rounded
+                 dense
+                 no-caps
+                 unelevated
+                 :disabled="isNextButtonDisabled"
+                 @click="onSubmit" />
         </div>
       </div>
     </div>
