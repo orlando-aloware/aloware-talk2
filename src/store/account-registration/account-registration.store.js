@@ -40,6 +40,7 @@ export default function () {
       auth_rep_job_position: '',
 
       agreed_to_terms: false,
+      agreed_on_sms_fees: false,
       timezone: 'America/Los_Angeles',
       kyc_filled: 0
     }
