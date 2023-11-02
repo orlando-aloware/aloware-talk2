@@ -96,7 +96,7 @@ export default {
         return { remainingDays: 0, totalTrialDays: 0 }
       }
 
-      // Convertendo para o formato ISO
+      // Converting to ISO format
       trialStartDate = trialStartDate.replace(' ', 'T') + 'Z'
       trialEndDate = trialEndDate.replace(' ', 'T') + 'Z'
 
