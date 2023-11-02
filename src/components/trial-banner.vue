@@ -86,7 +86,8 @@ export default {
     },
 
     trialText () {
-      return `Welcome, ${this.profile.first_name}, you have ${this.calculateTrialDaysInfo(this.profile?.company?.subscription?.trial_start, this.profile?.company?.subscription?.trial_end).remainingDays} days left until your ${this.calculateTrialDaysInfo(this.profile?.company?.subscription?.trial_start, this.profile?.company?.subscription?.trial_end).totalTrialDays}-day trial account expires.`
+      const dayNoun = this.currentCompany.trial_remaining_days > 1 ? 'days' : 'day'
+      return `Welcome, ${this.profile.first_name}, you have ${this.currentCompany.trial_days} ${dayNoun} left until your ${this.currentCompany.trial_remaining_days}-day trial account expires.`
     }
   },
 
