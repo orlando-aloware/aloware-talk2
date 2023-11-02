@@ -198,12 +198,12 @@
       <input-group>
         <template v-slot:content>
           <input-field label="First Name"
-                        placeholder="Type here"
-                        ref="auth_rep_first_name-input"
-                        :paddingClasses="paddingLeftClasses"
-                        :rules="[validateFieldError('auth_rep_first_name')]"
-                        v-model="form.auth_rep_first_name"
-                        @input="cleanFieldError('auth_rep_first_name')" />
+                       placeholder="Type here"
+                       ref="auth_rep_first_name-input"
+                       :paddingClasses="paddingLeftClasses"
+                       :rules="[validateFieldError('auth_rep_first_name')]"
+                       v-model="form.auth_rep_first_name"
+                       @input="cleanFieldError('auth_rep_first_name')" />
 
           <input-field label="Last Name"
                        placeholder="Type here"
@@ -270,7 +270,7 @@
                  no-caps
                  unelevated
                  flat
-                @click="skipForNow" />
+                 @click="skipForNow" />
 
           <q-btn class="q-mr-xl account-registration-action-btn"
                  color="primary"
