@@ -3,9 +3,9 @@
     <div v-if="shouldShowCalendar"
          class="calendar d-flex h-100 flex-column">
       <b-overlay class="h-100 w-100 position-absolute"
-                rounded="sm"
-                :show="true"
-                v-show="loading">
+                 rounded="sm"
+                 :show="true"
+                 v-show="loading">
         <template #overlay>
           <q-spinner-bars color="primary"
                           size="40px" />
@@ -25,9 +25,9 @@
             </q-tooltip>
           </b-button>
           <date-selector date-only
-                        noValueToCustomElem
-                        :value="gotoDate"
-                        @dateSelected="onDateSelected">
+                         noValueToCustomElem
+                         :value="gotoDate"
+                         @dateSelected="onDateSelected">
             <b-button size="sm"
                       variant="light"
                       class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
@@ -59,7 +59,7 @@
         </div>
         <div class="calendar__header__action-right">
           <filters :filters="convertedFilters"
-                  @save="onSaveFilters"/>
+                   @save="onSaveFilters"/>
           <q-select class="mx-2"
                     options-selected-class="text-primary"
                     color="primary"
@@ -95,8 +95,8 @@
           <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
             <tr v-if="view === 'week'">
               <td :class="d.today ? 'today': ''"
-                  v-for="d in formattedWeekDays"
-                  :key="d.dayOfWeek">
+                  :key="d.dayOfWeek"
+                  v-for="d in formattedWeekDays">
                   <span class="day-of-week">{{ d.dayOfWeek }}</span>
                   <span class="day">{{ d.day }}</span>
               </td>
@@ -104,28 +104,28 @@
             </tr>
 
             <tr v-if="view === 'month'">
-              <td v-for="d in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
-                  :key="d">
+              <td :key="d"
+                  v-for="d in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']">
                 <span class="day-of-week">{{d}}</span>
               </td>
             </tr>
           </table>
         </div>
         <div class="flex-grow-1 h-100 overflow-hidden-y"
-            :class="['scheduler__body', view]">
+             :class="['scheduler__body', view]">
           <scheduler ref="scheduler"
-                    :class="['actual-scheduler h-100', view + '-view']"
-                    :events="events"
-                    @edit-schedule="editSchedule"
-                    @add-schedule="addSchedule"
-                    @render-events="renderFromEvent"
-                    @update-current-date="updateCurrentDate"
-                    @view-change="viewChange">
+                     :class="['actual-scheduler h-100', view + '-view']"
+                     :events="events"
+                     @edit-schedule="editSchedule"
+                     @add-schedule="addSchedule"
+                     @render-events="renderFromEvent"
+                     @update-current-date="updateCurrentDate"
+                     @view-change="viewChange">
           </scheduler>
         </div>
       </div>
       <manager ref="manager"
-              @render-schedule="renderSchedule">
+               @render-schedule="renderSchedule">
       </manager>
     </div>
     <upgrade-now-page image-link="/assets/images/Calendar.svg"

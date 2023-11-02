@@ -4,36 +4,36 @@
         class="contacts mx-0 content-row d-flex overflow-hidden h-100">
 
       <div v-show="!hasSessions"
-          class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
+           class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
         <power-dialer-sidebar @fetchMyQueueData="onFetchMyQueueData" />
       </div>
 
       <div class="px-0 mb-0 main flex-1 h-100"
-          :class="mainClass">
+           :class="mainClass">
         <!-- Router Here -->
         <router-view :list="list"
-                    :is-loading-disabled="isLoadingDisabled"
-                    :is-start-state="isStartState"
-                    :is-editable="isEditable"
-                    :search="search"
-                    :is-my-contacts-view="isMyContactsView"
-                    :is-loading="isComponentLoading"
-                    :columns="columns"
-                    :is-empty="isEmpty"
-                    :is-loading-more="isLoadingMore"
-                    :filters-count="filtersCount"
-                    :selected-list-id="filteredId"
-                    :add-contacts-in-progress-data="powerDialerListAddRemoveContactsProgress"
-                    :onFetch="fetch"
-                    v-if="!isPowerDialerSession"
-                    @search="onSearch"
-                    @checkboxChanged="onFetchMyContacts"
-                    @sort="onSortByField"
-                    @paginated="onPaginate"
-                    @loadMore="beforeOnLoadMore(selectedList)"
-                    @onFiltersCount="getFiltersCount"
-                    @on-list-update="updateList"
-                    @on-my-queue-list="myQueueList">
+                     :is-loading-disabled="isLoadingDisabled"
+                     :is-start-state="isStartState"
+                     :is-editable="isEditable"
+                     :search="search"
+                     :is-my-contacts-view="isMyContactsView"
+                     :is-loading="isComponentLoading"
+                     :columns="columns"
+                     :is-empty="isEmpty"
+                     :is-loading-more="isLoadingMore"
+                     :filters-count="filtersCount"
+                     :selected-list-id="filteredId"
+                     :add-contacts-in-progress-data="powerDialerListAddRemoveContactsProgress"
+                     :onFetch="fetch"
+                     v-if="!isPowerDialerSession"
+                     @search="onSearch"
+                     @checkboxChanged="onFetchMyContacts"
+                     @sort="onSortByField"
+                     @paginated="onPaginate"
+                     @loadMore="beforeOnLoadMore(selectedList)"
+                     @onFiltersCount="getFiltersCount"
+                     @on-list-update="updateList"
+                     @on-my-queue-list="myQueueList">
         </router-view>
 
         <router-view v-if="isPowerDialerSession" />
@@ -43,16 +43,16 @@
         <move-dialog :is-contact-module-type="false" />
         <create-dialog />
         <column-headers :predefined-id="myQueueId"
-                      :previousRelations="previousRelations"
-                      v-if="isActive" />
-        <remove-list-modal v-if="isActive"
-                        @on-clear-list="onClear" />
+                        :previousRelations="previousRelations"
+                        v-if="isActive" />
+        <remove-list-modal @on-clear-list="onClear"
+                           v-if="isActive" />
         <remove-list-confirmation v-if="isActive" />
         <remove-contact :is-contact-module-type="false"
-                      v-if="isActive"
-                      @on-remove="onRemove"/>
+                        v-if="isActive"
+                        @on-remove="onRemove" />
         <remove-contact-confirmation v-if="isActive"
-                                  @contactsRemoved="updateList" />
+                                     @contactsRemoved="updateList" />
         <remove-folder-dialog :is-contact-module-type="false" />
         <create-list-modal :is-default="false" />
       </template>

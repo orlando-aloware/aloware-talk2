@@ -28,7 +28,7 @@
                         v-model="broadcastFilter">
             <template v-slot:one>
               <div class="d-flex justify-content-center w-100 px-1 options"
-                  :class="[broadcastFilter === 'new' ? 'text-white' : 'text-grey-90']">
+                   :class="[broadcastFilter === 'new' ? 'text-white' : 'text-grey-90']">
                   <span class="text-left broadcast-filter-name">
                     New
                   </span>
