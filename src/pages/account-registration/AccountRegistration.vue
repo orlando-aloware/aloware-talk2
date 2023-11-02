@@ -148,11 +148,7 @@
                                 :class="getPasswordRuleClass(validatePasswordMatch(form.password_confirmation))"
                                 :name="iconForValidation(validatePasswordMatch(form.password_confirmation))">
                         </q-icon>
-                        {{
-                          validatePasswordMatch(form.password_confirmation)
-                            ? 'The passwords match'
-                            : "The passwords doesn't match"
-                        }}
+                        {{ passwordMatchText }}
                       </li>
                     </ul>
                   </template>
@@ -611,6 +607,12 @@ export default {
         { id: 'CA', name: 'Canada' },
         ...countriesArr
       ]
+    },
+
+    passwordMatchText () {
+      return this.form.password_confirmation === this.form.password
+        ? 'The passwords match'
+        : "The passwords doesn't match"
     }
   },
 
