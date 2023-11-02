@@ -728,9 +728,11 @@ export default {
       const cleanedPhone = this.getCleanedPhoneNumber(phone)
       const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
 
+      // if the phone number is empty or invalid
       if (!formattedPhone || formattedPhone === cleanedPhone || formattedPhone === '-') {
         return 'Invalid phone number'
       }
+
       return true
     },
 
