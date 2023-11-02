@@ -6,20 +6,19 @@
 
     <div class="d-flex align-items-center">
       <p class="trial--text">Call Support: (855) 256-2001</p>
-      <video-modal
-        ref="videoModal"
-        title="📞 Explore Aloware Talk | Your Complete Guide"
-        cookieName="inbox"
-        videoUrl="https://www.youtube.com/embed/OmBIUrq-HC4?si=_74OeNHYRSssrfYR"
-        learnMoreLink="https://support.aloware.com/en/articles/6637395-aloware-talk-basics"
-        notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
-        :should-show-default-activator="false">
+      <video-modal ref="videoModal"
+                   title="📞 Explore Aloware Talk | Your Complete Guide"
+                   cookieName="inbox"
+                   videoUrl="https://www.youtube.com/embed/OmBIUrq-HC4?si=_74OeNHYRSssrfYR"
+                   learnMoreLink="https://support.aloware.com/en/articles/6637395-aloware-talk-basics"
+                   notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
+                   :should-show-default-activator="false">
         <template v-slot:activator>
           <div class="button-index q-mr-lg demo--button"
-              @click="openWatchGuideVideo">
+               @click="openWatchGuideVideo">
             <img src="/icons/film.svg"/>
-            <a @click="openWatchGuideVideo"
-               target="_blank">
+            <a target="_blank"
+               @click="openWatchGuideVideo">
                 Watch Guide Video
             </a>
           </div>
@@ -34,25 +33,23 @@
         </a>
       </div>
       <div class="button-index">
-        <q-btn
-          class="q-mr-lg"
-          color="primary"
-          size="md"
-          label="Finish Registration"
-          rounded
-          dense
-          no-caps
-          unelevated
-          :disabled="kycFilled"
-          @click="onOpenFinishRegistration"
-        />
+        <q-btn class="q-mr-lg"
+               color="primary"
+               size="md"
+               label="Finish Registration"
+               rounded
+               dense
+               no-caps
+               unelevated
+               :disabled="kycFilled"
+               @click="onOpenFinishRegistration" />
       </div>
       <div class="button-index">
         <compact-btn customClass="fs-24 _500 position-relative not-focusable q-ml-lg text-red-130"
                      borderless
                      @click="closeBanner">
           <i class="fs-24 fa fa-times cursor-pointer"
-            :style="{ 'color': '#256EFF' }"/>
+             :style="{ 'color': '#256EFF' }" />
         </compact-btn>
       </div>
     </div>

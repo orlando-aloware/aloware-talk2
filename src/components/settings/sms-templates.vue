@@ -18,18 +18,18 @@
              sm="12"
              md="12"
              :class="horizontalPaddingClass">
-        <block-tooltip v-if="viewOnly"
-                  placement="left"
-                  triggers="hover focus"
-                  target="sms-template-popover"
-                  task="sms.template">
+        <block-tooltip placement="left"
+                       triggers="hover focus"
+                       target="sms-template-popover"
+                       task="sms.template"
+                       v-if="viewOnly">
         </block-tooltip>
         <div id="sms-template-popover">
           <b-button variant="primary"
                     size="sm"
                     :disabled="viewOnly"
                     @click="onAdd('user')">
-            <i class="fa fa-plus mr-1"/> New Template
+            <i class="fa fa-plus mr-1" /> New Template
           </b-button>
         </div>
       </b-col>
