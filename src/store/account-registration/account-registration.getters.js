@@ -20,7 +20,7 @@ export default {
       auth_rep_last_name: state.form.auth_rep_last_name,
       auth_rep_email: state.form.auth_rep_email,
       auth_rep_business_title: state.form.auth_rep_business_title,
-      auth_rep_job_position: state.form.auth_rep_job_position
+      auth_rep_job_position: state.form.auth_rep_job_position?.value
     }
   }
 }
