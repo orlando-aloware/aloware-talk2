@@ -186,7 +186,7 @@ export default _.merge({
         return false
       }
 
-      return KycLogs.VIEW_ONLY_ALLOWED.includes(status)
+      return KycLogs.VIEW_ONLY_ALLOWED.includes(status) && this.currentCompany.is_trial
     }
   },
   computed: {
@@ -197,6 +197,10 @@ export default _.merge({
     },
     currentKycStatus () {
       return this.getStatus()
+    },
+    isDisabled () {
+      const status = this.getStatus()
+      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany.is_trial
     }
   }
 })

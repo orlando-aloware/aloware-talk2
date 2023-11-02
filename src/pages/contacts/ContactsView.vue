@@ -186,11 +186,11 @@
                           v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
-        <block-tooltip placement="left"
-                       triggers="hover focus"
+        <block-tooltip v-if="!canCreateContacts"
+                       placement="left"
+                       triggers="click"
                        target="contacts-create-popover"
-                       task="contacts.create"
-                       v-if="!canCreateContacts">
+                       task="contacts.create">
         </block-tooltip>
         <b-dropdown text="Add Contacts"
                     variant="light"
