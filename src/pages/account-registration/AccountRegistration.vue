@@ -158,24 +158,41 @@
 
             <div class="accept-box">
               <div>
-                <q-checkbox class="mb-3 q-pr-xs"
-                            color="primary"
-                            dense
-                            v-model="form.agreed_to_terms">
-                  I agree to
-                  <a class="text-weight-bold"
-                     href="https://aloware.com/terms-and-conditions"
-                     target="_blank" rel="noopener noreferrer">
-                    Terms and Conditions
-                  </a>
-                  , and
-                  <a class="text-weight-bold"
-                     href="https://aloware.com/terms-and-conditions"
-                     target="_blank"
-                     rel="noopener noreferrer">
-                    Acceptable Use Policy.
-                  </a>
-                </q-checkbox>
+                <div class="carrier-fees">
+                  <q-checkbox class="mb-3"
+                              color="primary"
+                              dense
+                              v-model="form.agreed_on_sms_fees">
+                    I agree to
+                    <a class="text-weight-bold"
+                       href="https://support.aloware.com/en/articles/5059467-carrier-fees-for-at-t-verizon-and-t-mobile"
+                       target="_blank" rel="noopener noreferrer">
+                      Notice on Carrier Fees for SMS and MMS
+                    </a>
+                  </q-checkbox>
+                </div>
+
+                <div>
+                  <q-checkbox class="mb-3 q-pr-xs"
+                              color="primary"
+                              dense
+                              v-model="form.agreed_to_terms">
+                    I agree to
+                    <a class="text-weight-bold"
+                       href="https://aloware.com/terms-and-conditions"
+                       target="_blank" rel="noopener noreferrer">
+                      Terms and Conditions
+                    </a>
+                    , and
+                    <a class="text-weight-bold"
+                       href="https://aloware.com/terms-and-conditions"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                      Acceptable Use Policy.
+                    </a>
+                  </q-checkbox>
+                </div>
+
                 <div id="recaptcha-element"
                      class="g-recaptcha pb-2" />
               </div>
@@ -481,6 +498,7 @@ export default {
         this.form.password_confirmation?.length &&
         this.password_validation?.length === 4 &&
         this.form.agreed_to_terms &&
+        this.form.agreed_on_sms_fees &&
         !this.disabledSubmit // recaptcha
       )
     },
