@@ -181,7 +181,7 @@
                         padding="0px 12px"
                         :ripple="false"
                         :disable="isSendTextDisabled"
-                        :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
+                        :disable-dropdown="isSendTextDisabled"
                         :menu-offset="[0, 6]"
                         v-if="useSendButton"
                         @click="onSend">
