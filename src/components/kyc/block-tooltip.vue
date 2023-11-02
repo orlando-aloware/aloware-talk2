@@ -80,10 +80,10 @@ export default {
           message = ''
           break
         case KycLogs.KYC_STATUS_ZERO:
-          message = `You need to <a class="text-white" href="${link}" target="_blank"><u>submit important info</u></a> about your business to unlock access to ${action}`
+          message = `You need to <a href="${link}"><u>submit important info</u></a> about your business to unlock access to ${action}`
           break
         case KycLogs.KYC_STATUS_DEFINITELY_REJECTED:
-          message = `You need to <a class="text-white" href="${link}" target="_blank"><u>submit again the info</u></a> about your business to ${action}`
+          message = `You need to <a href="${link}"><u>submit again the info</u></a> about your business to ${action}`
           break
         case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING:
           message = `The ${action} isn't available on trial. please contact us to upgrade today!`
@@ -137,6 +137,9 @@ export default {
         case 'ring-group.operations':
           text = 'ring group operations'
           break
+        case 'line.operations':
+          text = 'line operations'
+          break
         case 'line.create':
           text = 'create line'
           break
@@ -148,6 +151,15 @@ export default {
           break
         case 'export':
           text = 'export data'
+          break
+        case 'integrations':
+          text = 'integrations'
+          break
+        case 'integrations.api':
+          text = 'integrations API access'
+          break
+        case 'trial.skip':
+          text = 'skip trial and subscribe'
           break
       }
 

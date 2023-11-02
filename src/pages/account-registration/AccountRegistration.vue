@@ -1,5 +1,15 @@
 <template>
   <div class="account-registration row">
+    <div class="loading-overlay"
+         v-if="isLoading">
+      <div>
+        <img class="loading-icon"
+           alt="Loading"
+           src="/assets/images/loading.svg"/>
+        <p class="loading-text">{{ loadingText }}</p>
+      </div>
+    </div>
+
     <div class="col-xl-8 col-md-12 col-sm-12">
       <div class="logo absolute-top q-pt-xl q-px-xl">
         <img src="app-icons/menu/logo_dark.svg"
@@ -7,7 +17,7 @@
       </div>
       <div class="stepper__container pt-60">
         <step-header title="Welcome to Aloware!"
-                     description="We are thrilled for you to better communicate with your customers today. In these 4 simple steps, we need important information to get you going" />
+                     description="We are thrilled for you to better communicate with your customers today. Set your password and create your account" />
 
         <div class="stepper__content">
           <div class="min-w-100">
@@ -158,24 +168,41 @@
 
             <div class="accept-box">
               <div>
-                <q-checkbox class="mb-3 q-pr-xs"
-                            color="primary"
-                            dense
-                            v-model="form.agreed_to_terms">
-                  I agree to
-                  <a class="text-weight-bold"
-                     href="https://aloware.com/terms-and-conditions"
-                     target="_blank" rel="noopener noreferrer">
-                    Terms and Conditions
-                  </a>
-                  , and
-                  <a class="text-weight-bold"
-                     href="https://aloware.com/terms-and-conditions"
-                     target="_blank"
-                     rel="noopener noreferrer">
-                    Acceptable Use Policy.
-                  </a>
-                </q-checkbox>
+                <div class="carrier-fees">
+                  <q-checkbox class="mb-3"
+                              color="primary"
+                              dense
+                              v-model="form.agreed_on_sms_fees">
+                    I agree to
+                    <a class="text-weight-bold"
+                       href="https://support.aloware.com/en/articles/5059467-carrier-fees-for-at-t-verizon-and-t-mobile"
+                       target="_blank" rel="noopener noreferrer">
+                      Notice on Carrier Fees for SMS and MMS
+                    </a>
+                  </q-checkbox>
+                </div>
+
+                <div>
+                  <q-checkbox class="mb-3 q-pr-xs"
+                              color="primary"
+                              dense
+                              v-model="form.agreed_to_terms">
+                    I agree to
+                    <a class="text-weight-bold"
+                       href="https://aloware.com/terms-and-conditions"
+                       target="_blank" rel="noopener noreferrer">
+                      Terms and Conditions
+                    </a>
+                    , and
+                    <a class="text-weight-bold"
+                       href="https://aloware.com/terms-and-conditions"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                      Acceptable Use Policy.
+                    </a>
+                  </q-checkbox>
+                </div>
+
                 <div id="recaptcha-element"
                      class="g-recaptcha pb-2" />
               </div>
@@ -245,14 +272,15 @@ export default {
       password_validation: [],
       show_password: false,
       isSubmitted: false,
-      isLoading: false,
+      isLoading: true,
       businessTypes,
       businessIdTypes,
       regionsOfOperations,
       businessIndustries,
       preFilledData: {},
       shouldRedirectToLogin: false,
-      recaptchaResponse: null
+      recaptchaResponse: null,
+      loadingText: 'Please wait while we are creating your account...'
     }
   },
 
@@ -344,12 +372,12 @@ export default {
 
     updateValidationState (rule, isValid) {
       const index = this.password_validation.indexOf(rule)
-      
+
       if (isValid && index === -1) {
         this.password_validation.push(rule)
         return
       }
-      
+
       if (!isValid && index !== -1) {
         this.password_validation.splice(index, 1)
       }
@@ -372,7 +400,7 @@ export default {
         if (this.fieldErrors && this.fieldErrors[fieldName]) {
           return this.fieldErrors[fieldName][0]
         }
-        
+
         return true
       }
     },
@@ -486,6 +514,7 @@ export default {
         this.form.password_confirmation?.length &&
         this.password_validation?.length === 4 &&
         this.form.agreed_to_terms &&
+        this.form.agreed_on_sms_fees &&
         !this.disabledSubmit // recaptcha
       )
     },
@@ -581,8 +610,14 @@ export default {
       this.$refs.stepper.next()
     },
 
+    cleanLoadingState () {
+      this.isLoading = false
+      this.loadingText = ''
+    },
+
     getPreSignupDetails () {
       this.isLoading = true
+      this.loadingText = 'Please wait while we are loading your information...'
 
       this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.pre_signup_id}`)
         .then((res) => {
@@ -605,7 +640,7 @@ export default {
           this.$router.push({ name: 'Login' })
         })
         .finally(() => {
-          this.isLoading = false
+          this.cleanLoadingState()
         })
     },
 
@@ -639,6 +674,7 @@ export default {
 
     onSubmit () {
       this.isLoading = true
+      this.loadingText = 'Please wait while we are creating your account...'
 
       const payload = {
         ...this.form,
@@ -666,6 +702,8 @@ export default {
         })
         .finally(async () => {
           if (this.isSubmitted) {
+            this.loadingText = 'Almost done...'
+
             const response = await this.login({
               email: this.form.email,
               password: this.form.password,
@@ -677,7 +715,7 @@ export default {
             await this.onLoginSuccess(response)
           }
 
-          this.isLoading = false
+          this.cleanLoadingState()
         })
     }
   },

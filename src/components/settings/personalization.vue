@@ -52,7 +52,7 @@
           <b-form-group label="">
             <b-form-checkbox switch
                              v-model="user.go_to_available_after_login"
-                             :disabled="currentCompany && currentCompany.force_users_always_available || viewOnly"
+                             :disabled="(currentCompany && currentCompany.force_users_always_available) || viewOnly"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'go_to_available_after_login')">
               Enable available by default, but allow manual changes
             </b-form-checkbox>

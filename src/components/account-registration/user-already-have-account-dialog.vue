@@ -19,7 +19,7 @@
         </div>
       </q-card-section>
 
-      <q-card-actions class="bg-white q-pb-lg"
+      <q-card-actions class="flex justify-content-center bg-white q-pb-lg"
                       text-align="center">
         <q-btn label="Go to Login"
                color="primary"
