@@ -1,13 +1,10 @@
 <template>
-  <q-dialog
-    transition-show="scale"
-    transition-hide="scale"
-    persistent
-    v-model="show"
-  >
-    <q-card
-      class="bg-white text-black text-center q-pt-lg"
-      style="width: 635px; border-radius: 30px">
+  <q-dialog transition-show="scale"
+            transition-hide="scale"
+            persistent
+            v-model="show">
+    <q-card class="bg-white text-black text-center q-pt-lg"
+            style="width: 635px; border-radius: 30px">
       <q-card-section>
         <div class="text-h6">
           Welcome, {{ userFullName }}! 🎉
@@ -22,25 +19,22 @@
         </div>
       </q-card-section>
 
-      <q-card-actions
-        class="bg-white q-pb-lg"
-        align="center">
-        <q-btn
-          class="text-regular"
-          label="Remind me later"
-          text-color="grey"
-          v-close-popup
-          flat
-          @click="changeShowedKycDialog">
+      <q-card-actions class="bg-white q-pb-lg"
+                      align="center">
+        <q-btn class="text-regular"
+               label="Remind me later"
+               text-color="grey"
+               v-close-popup
+               flat
+               @click="changeShowedKycDialog">
         </q-btn>
-        <q-btn
-          class="text-regular"
-          label="Submit info"
-          color="primary"
-          text-color="white"
-          rounded
-          @click="openKycBusinessRegistration"
-          v-close-popup>
+        <q-btn class="text-regular"
+               label="Submit info"
+               color="primary"
+               text-color="white"
+               rounded
+               @click="openKycBusinessRegistration"
+               v-close-popup>
         </q-btn>
       </q-card-actions>
     </q-card>
