@@ -1,7 +1,7 @@
 <template>
   <div class="trial-banner" v-if="!shouldShow">
     <div>
-      <p class="trial--text">Welcome, {{ profile.first_name }}, you have {{ calculateTrialDaysInfo(profile?.company?.subscription?.trial_start, profile?.company?.subscription?.trial_end).remainingDays }} days left until your {{ calculateTrialDaysInfo(profile?.company?.subscription?.trial_start, profile?.company?.subscription?.trial_end).totalTrialDays }}-day trial account expires.</p>
+      <p class="trial--text">{{ trialText }}</p>
     </div>
 
     <div class="d-flex align-items-center">
@@ -83,6 +83,10 @@ export default {
 
     kycFilled () {
       return this.profile?.company?.kyc_filled
+    },
+
+    trialText () {
+      return `Welcome, ${this.profile.first_name}, you have ${this.calculateTrialDaysInfo(this.profile?.company?.subscription?.trial_start, this.profile?.company?.subscription?.trial_end).remainingDays} days left until your ${this.calculateTrialDaysInfo(this.profile?.company?.subscription?.trial_start, this.profile?.company?.subscription?.trial_end).totalTrialDays}-day trial account expires.`
     }
   },
 
@@ -92,7 +96,7 @@ export default {
         return { remainingDays: 0, totalTrialDays: 0 }
       }
 
-      // Convertendo para o formato ISO
+      // Converting to ISO format
       trialStartDate = trialStartDate.replace(' ', 'T') + 'Z'
       trialEndDate = trialEndDate.replace(' ', 'T') + 'Z'
 
