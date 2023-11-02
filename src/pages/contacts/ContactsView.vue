@@ -186,11 +186,11 @@
                           v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
-        <block-tooltip v-if="!canCreateContacts"
-                       placement="left"
+        <block-tooltip placement="left"
                        triggers="hover focus"
                        target="contacts-create-popover"
-                       task="contacts.create">
+                       task="contacts.create"
+                       v-if="!canCreateContacts">
         </block-tooltip>
         <b-dropdown text="Add Contacts"
                     variant="light"
@@ -209,16 +209,16 @@
           </template>
           <div id="contacts-create-popover">
             <b-dropdown-item href="#"
-                            :disabled="!canAddContacts"
-                            v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
-                            @click="onAddContactsToList">
+                             :disabled="!canAddContacts"
+                             v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
+                             @click="onAddContactsToList">
               <search-icon color="#62666E">
               </search-icon>
               Select Existing Contacts & Add to List
             </b-dropdown-item>
             <b-dropdown-item href="#"
-                            :disabled="!canCreateContacts"
-                            @click="onShowCreateContact">
+                             :disabled="!canCreateContacts"
+                             @click="onShowCreateContact">
               <plus-icon color="#62666E"></plus-icon>
               Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
             </b-dropdown-item>
