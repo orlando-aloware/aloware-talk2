@@ -4,30 +4,26 @@
       {{ label }}
     </label>
     <div class="phone-row">
-      <q-input
-        class="col-md-2"
-        rounded
-        outlined
-        placeholder="+1"
-        mask="+###"
-        type="text"
-        :disable="disabled"
-        v-model="countryCode"
-      >
+      <q-input class="col-md-2"
+               rounded
+               outlined
+               placeholder="+1"
+               mask="+###"
+               type="text"
+               :disable="disabled"
+               v-model="countryCode">
       </q-input>
-      <q-input
-        class="col-md-10 pl-2"
-        ref="inputRef"
-        type="text"
-        rounded
-        outlined
-        :placeholder="placeholder"
-        :rules="rules"
-        :mask="phoneMask"
-        :value="innerValue"
-        :disable="disabled"
-        @input="emitUpdateEvent"
-      >
+      <q-input class="col-md-10 pl-2"
+               ref="inputRef"
+               type="text"
+               rounded
+               outlined
+               :placeholder="placeholder"
+               :rules="rules"
+               :mask="phoneMask"
+               :value="innerValue"
+               :disable="disabled"
+               @input="emitUpdateEvent">
       </q-input>
     </div>
 
@@ -48,34 +44,42 @@ export default {
       type: String,
       required: true
     },
+
     placeholder: {
       type: String,
       required: true
     },
+
     value: {
       type: String,
       default: ''
     },
+
     colMd: {
       type: String,
       default: 'col-md-5'
     },
+
     paddingClasses: {
       type: String,
       default: ''
     },
+
     rules: {
       type: Array,
       default: () => []
     },
+
     type: {
       type: String,
       default: 'text'
     },
+
     isPassword: {
       type: Boolean,
       default: false
     },
+
     disabled: {
       type: Boolean,
       default: false

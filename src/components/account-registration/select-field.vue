@@ -3,20 +3,18 @@
     <label class="flex mb-1 text-weight-medium">
       {{ label }}
     </label>
-    <q-select
-      ref="selectRef"
-      rounded
-      outlined
-      map-options
-      :class="{ 'disabled': disabled }"
-      :rules="rules"
-      :placeholder="placeholder"
-      :option-label="optionLabel"
-      :option-value="optionValue"
-      :options="options"
-      :disable="disabled"
-      v-model="innerValue"
-    />
+    <q-select ref="selectRef"
+              rounded
+              outlined
+              map-options
+              :class="{ 'disabled': disabled }"
+              :rules="rules"
+              :placeholder="placeholder"
+              :option-label="optionLabel"
+              :option-value="optionValue"
+              :options="options"
+              :disable="disabled"
+              v-model="innerValue" />
     <slot name="hint"></slot>
   </div>
 </template>
@@ -30,37 +28,46 @@ export default {
       type: String,
       required: true
     },
+
     placeholder: {
       type: String,
       default: 'Select'
     },
+
     value: {
       default: null
     },
+
     colMd: {
       type: String,
       default: 'col-md-5'
     },
+
     paddingClasses: {
       type: String,
       default: ''
     },
+
     options: {
       type: Array,
       required: true
     },
+
     optionLabel: {
       type: String,
       default: 'label'
     },
+
     optionValue: {
       type: String,
       default: 'value'
     },
+
     rules: {
       type: Array,
       default: () => []
     },
+
     disabled: {
       type: Boolean,
       default: false

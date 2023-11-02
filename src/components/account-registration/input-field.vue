@@ -3,26 +3,21 @@
     <label class="flex mb-1 text-weight-medium">
       {{ label }}
     </label>
-    <q-input
-      ref="inputRef"
-      rounded
-      outlined
-      :placeholder="placeholder"
-      :rules="rules"
-      :type="fieldType"
-      :mask="mask"
-      :value="innerValue"
-      :disable="disabled"
-      @input="emitUpdateEvent"
-    >
-      <template
-        v-if="isPassword"
-        v-slot:append>
-        <q-icon
-          class="cursor-pointer"
-          :name="show_password ? 'visibility_off' : 'visibility'"
-          @click="toggleVisibility"
-        />
+    <q-input ref="inputRef"
+             rounded
+             outlined
+             :placeholder="placeholder"
+             :rules="rules"
+             :type="fieldType"
+             :mask="mask"
+             :value="innerValue"
+             :disable="disabled"
+             @input="emitUpdateEvent">
+      <template v-slot:append
+                v-if="isPassword">
+        <q-icon class="cursor-pointer"
+                :name="show_password ? 'visibility_off' : 'visibility'"
+                @click="toggleVisibility" />
       </template>
     </q-input>
     <slot name="hint"></slot>
@@ -38,38 +33,47 @@ export default {
       type: String,
       required: true
     },
+
     placeholder: {
       type: String,
       required: true
     },
+
     value: {
       type: String,
       default: ''
     },
+
     colMd: {
       type: String,
       default: 'col-md-5'
     },
+
     paddingClasses: {
       type: String,
       default: ''
     },
+
     rules: {
       type: Array,
       default: () => []
     },
+
     type: {
       type: String,
       default: 'text'
     },
+
     mask: {
       type: String,
       default: ''
     },
+
     isPassword: {
       type: Boolean,
       default: false
     },
+
     disabled: {
       type: Boolean,
       default: false
