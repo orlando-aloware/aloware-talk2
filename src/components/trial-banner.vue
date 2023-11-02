@@ -87,7 +87,7 @@ export default {
 
     trialText () {
       const dayNoun = this.currentCompany.trial_remaining_days > 1 ? 'days' : 'day'
-      return `Welcome, ${this.profile.first_name}, you have ${this.currentCompany.trial_days} ${dayNoun} left until your ${this.currentCompany.trial_remaining_days}-day trial account expires.`
+      return `Welcome, ${this.profile.first_name}, you have ${this.currentCompany.trial_remaining_days} ${dayNoun} left until your ${this.currentCompany.trial_days}-day trial account expires.`
     }
   },
 
