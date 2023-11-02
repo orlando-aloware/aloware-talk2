@@ -14144,9 +14144,28 @@ h1.contact-list-name-label {
   .business-information-actions {
     display: flex;
     position: absolute;
-    bottom: 85px;
+    top: calc(100vh - 20vh);
     width: 100%;
     padding: 0px 5rem;
+  }
+
+  @media (min-height: 480px) {
+    .business-information-actions {
+      top: calc(100vh - 40vh);
+    }
+  }
+
+  @media (min-height: 720px) {
+    .business-information-actions {
+      top: calc(100vh - 25vh);
+    }
+  }
+
+  @media (min-height: 900px) {
+    .business-information-actions {
+      top: calc(100vh - 22vh);
+      height: 65vh;
+    }
   }
 }
 
