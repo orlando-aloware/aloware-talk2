@@ -104,8 +104,8 @@
             label=""
           >
             <b-form-checkbox switch
-                             v-model="user.url_shortener_enabled"
                              :disabled="viewOnly"
+                             v-model="user.url_shortener_enabled"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'url_shortener_enabled')">
               Enable URL Shortener
             </b-form-checkbox>
