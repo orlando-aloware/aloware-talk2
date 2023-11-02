@@ -246,13 +246,15 @@
                        v-model="form.auth_rep_business_title"
                        @input="cleanFieldError('auth_rep_business_title')" />
 
-          <input-field label="Job Position"
-                       placeholder="Ex. CEO, CTO, Product Director"
-                       ref="auth_rep_job_position-input"
-                       :paddingClasses="paddingLeftClasses"
-                       :rules="[validateFieldError('auth_rep_job_position')]"
-                       v-model="form.auth_rep_job_position"
-                       @input="cleanFieldError('auth_rep_job_position')" />
+          <select-field label="Job Position"
+                        placeholder="Ex. CEO, CTO, Product Director"
+                        option-label="value"
+                        option-value="value"
+                        ref="auth_rep_job_position-input"
+                        :rules="[validateFieldError('auth_rep_job_position')]"
+                        :paddingClasses="paddingRightClasses"
+                        :options="businessTitle"
+                        v-model="form.auth_rep_job_position" />
         </template>
       </input-group>
     </div>
@@ -300,6 +302,7 @@ import businessTypes from '../../constants/account-registration-business-types'
 import businessIdTypes from '../../constants/account-registration-business-registration-identifiers'
 import regionsOfOperations from '../../constants/account-registration-business-regions-of-operations'
 import businessIndustries from '../../constants/account-registration-business-industries'
+import businessTitle from '../../constants/account-registration-business-title'
 
 export default {
   name: 'BusinessInformationForm',
@@ -331,7 +334,8 @@ export default {
       businessTypes,
       businessIdTypes,
       regionsOfOperations,
-      businessIndustries
+      businessIndustries,
+      businessTitle
     }
   },
 
