@@ -14,6 +14,7 @@
 <script>
 export default {
   name: 'Banner',
+
   props: {
     currentStep: {
       type: Number,
