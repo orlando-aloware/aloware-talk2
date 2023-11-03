@@ -14199,42 +14199,97 @@ h1.contact-list-name-label {
   }
 }
 
+// .trial-banner {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   padding: 0 20px;
+//   background-color: #256EFF1F;
+//   height: 55px;
+
+//   .trial--text {
+//     margin: 0px;
+//     font-size: 16px;
+//     font-weight: 700 !important;
+//     line-height: 19px;
+//     letter-spacing: 0em;
+//     text-align: left;
+//     margin-right: 30px;
+//   }
+
+//   .button-index {
+//     z-index: 1 !important;
+
+//     .block {
+//       padding-right: 16px;
+//       padding-left: 16px;
+//     }
+
+//     & > a {
+//       color: #256EFF;
+//       font-size: 14px;
+//       line-height: 19px;
+//       letter-spacing: 0em;
+//       text-align: center;
+//       text-decoration: none;
+
+//       &:hover {
+//         color: #256EFF;
+//         text-decoration: underline;
+//       }
+//     }
+//   }
+
+//   .demo--button {
+//     display: flex;
+//     align-items: center;
+//     cursor: pointer;
+//     font-size: 14px;
+//     font-weight: 500;
+//     letter-spacing: 0em;
+
+//     > img {
+//       margin-right: 10px;
+//     }
+//   }
+// }
+
 .trial-banner {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 1rem;
   background-color: #256EFF1F;
-  height: 55px;
+
+  .left-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
   .trial--text {
-    margin: 0px;
-    font-size: 16px;
+    margin: 0;
+    font-size: 1rem;
     font-weight: 700 !important;
-    line-height: 19px;
-    letter-spacing: 0em;
-    text-align: left;
-    margin-right: 30px;
+    margin-right: 2rem;
   }
 
   .button-index {
     z-index: 1 !important;
+    margin-right: 1rem;
 
     .block {
-      padding-right: 16px;
-      padding-left: 16px;
+      padding-right: 20px;
+      padding-left: 20px;
+      min-width: 170px;
     }
 
     & > a {
       color: #256EFF;
-      font-size: 14px;
-      line-height: 19px;
-      letter-spacing: 0em;
-      text-align: center;
+      font-size: 0.875rem;
       text-decoration: none;
 
       &:hover {
-        color: #256EFF;
         text-decoration: underline;
       }
     }
@@ -14244,12 +14299,27 @@ h1.contact-list-name-label {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0em;
+    font-size: 0.875rem;
 
     > img {
-      margin-right: 10px;
+      margin-right: 0.5rem;
+    }
+  }
+
+  @media only screen and (max-width: 1280px) {
+    .trial-banner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .left-content {
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .left-content > .trial--text {
+      flex: 1 0 100%;
     }
   }
 }
