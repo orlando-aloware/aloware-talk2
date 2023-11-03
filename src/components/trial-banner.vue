@@ -92,38 +92,6 @@ export default {
   },
 
   methods: {
-    calculateTrialDaysInfo (trialStartDate, trialEndDate) {
-      if (!trialStartDate || !trialEndDate) {
-        return { remainingDays: 0, totalTrialDays: 0 }
-      }
-
-      // Converting to ISO format
-      trialStartDate = trialStartDate.replace(' ', 'T') + 'Z'
-      trialEndDate = trialEndDate.replace(' ', 'T') + 'Z'
-
-      const trialStart = new Date(trialStartDate)
-      const trialEnd = new Date(trialEndDate)
-      const today = new Date()
-
-      if (trialStart > today) {
-        const totalTrialTime = Math.abs(trialEnd - trialStart)
-        const totalTrialDays = Math.ceil(totalTrialTime / (1000 * 60 * 60 * 24))
-        return { remainingDays: totalTrialDays, totalTrialDays: totalTrialDays }
-      }
-
-      if (trialEnd < today) {
-        return { remainingDays: 0, totalTrialDays: 0 }
-      }
-
-      const diffTime = Math.abs(trialEnd - today)
-      const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-      const totalTrialTime = Math.abs(trialEnd - trialStart)
-      const totalTrialDays = Math.ceil(totalTrialTime / (1000 * 60 * 60 * 24))
-
-      return { remainingDays: remainingDays, totalTrialDays: totalTrialDays }
-    },
-
     closeBanner () {
       this.shouldShow = true
     },
