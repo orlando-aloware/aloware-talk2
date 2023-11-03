@@ -262,6 +262,10 @@ export default {
           this.isCreating = false
           this.hideModal()
         })
+        .catch(err => {
+          this.isCreating = false
+          this.$handleErrors(err.response)
+        })
     },
 
     onLineSelected (lineId) {
