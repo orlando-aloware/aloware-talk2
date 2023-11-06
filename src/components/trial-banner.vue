@@ -79,9 +79,9 @@
                @click="onOpenFinishRegistration" />
       </div>
       <div class="button-index">
-        <compact-btn customClass="fs-24 _500 position-relative not-focusable q-ml-lg text-red-130"
+        <compact-btn customClass="fs-24 _500 position-relative not-focusable text-red-130"
                      borderless
-                     @click="closeBanner">
+                     @clicked="closeBanner">
           <i class="fs-24 fa fa-times cursor-pointer"
              :style="{ 'color': '#256EFF' }" />
         </compact-btn>
@@ -93,12 +93,14 @@
 <script>
 import { mapState } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
+import CompactBtn from 'components/compact-btn'
 
 export default {
   name: 'TrialBanner',
 
   components: {
-    VideoModal
+    VideoModal,
+    CompactBtn
   },
 
   data () {
