@@ -173,12 +173,14 @@
                               color="primary"
                               dense
                               v-model="form.agreed_on_sms_fees">
-                    I agree to
-                    <a class="text-weight-bold"
-                       href="https://support.aloware.com/en/articles/5059467-carrier-fees-for-at-t-verizon-and-t-mobile"
-                       target="_blank" rel="noopener noreferrer">
-                      Notice on Carrier Fees for SMS and MMS
-                    </a>
+                    <template slot="default">
+                      I agree to
+                      <a class="text-weight-bold"
+                         @click="openLink('https://support.aloware.com/en/articles/5059467-carrier-fees-for-at-t-verizon-and-t-mobile')">
+                        Notice on Carrier Fees for SMS and MMS
+                      </a>
+                    </template>
+
                   </q-checkbox>
                 </div>
 
@@ -187,19 +189,18 @@
                               color="primary"
                               dense
                               v-model="form.agreed_to_terms">
-                    I agree to
-                    <a class="text-weight-bold"
-                       href="https://aloware.com/terms-and-conditions"
-                       target="_blank" rel="noopener noreferrer">
-                      Terms and Conditions
-                    </a>
-                    , and
-                    <a class="text-weight-bold"
-                       href="https://aloware.com/terms-and-conditions"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                      Acceptable Use Policy.
-                    </a>
+                    <template slot="default">
+                      I agree to
+                      <a class="text-weight-bold"
+                         @click="openLink('https://aloware.com/terms-and-conditions')">
+                        Terms and Conditions,
+                      </a>
+                      and
+                      <a class="text-weight-bold"
+                         @click="openLink('https://aloware.com/terms-and-conditions')">
+                        Acceptable Use Policy.
+                      </a>
+                    </template>
                   </q-checkbox>
                 </div>
 
@@ -654,6 +655,10 @@ export default {
 
     checkIfFieldIsPreFilled (field) {
       return Boolean(this.preFilledData[field])
+    },
+
+    openLink (link) {
+      window.open(link, '_blank')
     },
 
     async onLoginSuccess ({ data: { data } }) {

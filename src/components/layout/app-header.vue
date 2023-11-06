@@ -59,7 +59,7 @@
     <tutorial-video-button />
 
     <div class="ml-auto d-block h-100"
-         v-if="!isSimpsocial">
+         v-if="!isSimpsocial && !isTrial">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
         <div class='bridge-menu-wrapper'>
           <div id='referralhero-inline-button'></div>
@@ -72,7 +72,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <header-help />
+        <header-help v-if="!isTrial" />
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
@@ -399,6 +399,12 @@ export default {
 
     isMobileTransitionWidth () {
       return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH
+    },
+
+    isTrial () {
+      const isAuthenticated = !this.isGuest && this.authenticated
+
+      return isAuthenticated && this.profile?.company?.is_trial
     }
   },
 

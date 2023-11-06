@@ -373,7 +373,8 @@ export default {
       'showPhone',
       'suspended',
       'parkedCalls',
-      'leadSources'
+      'leadSources',
+      'isIntroVideoVisible'
     ]),
 
     ...mapState('auth', [
@@ -514,6 +515,7 @@ export default {
       const isAuthenticated = !this.isGuest && this.authenticated
 
       return isAuthenticated &&
+             this.isIntroVideoVisible === null &&
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')

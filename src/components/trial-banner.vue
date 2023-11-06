@@ -11,7 +11,8 @@
                      videoUrl="https://www.youtube.com/embed/OmBIUrq-HC4?si=_74OeNHYRSssrfYR"
                      learnMoreLink="https://support.aloware.com/en/articles/6637395-aloware-talk-basics"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
-                     :should-show-default-activator="false">
+                     :should-show-default-activator="false"
+                     :should-show-in-first-visit="false">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -43,7 +44,8 @@
                      videoUrl="https://www.youtube.com/embed/OmBIUrq-HC4?si=_74OeNHYRSssrfYR"
                      learnMoreLink="https://support.aloware.com/en/articles/6637395-aloware-talk-basics"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
-                     :should-show-default-activator="false">
+                     :should-show-default-activator="false"
+                     :should-show-in-first-visit="false">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -68,7 +70,7 @@
         <q-btn class="q-mr-lg"
                color="primary"
                size="md"
-               label="Finish Registration"
+               label="Unlock trial experience"
                rounded
                dense
                no-caps
@@ -77,9 +79,9 @@
                @click="onOpenFinishRegistration" />
       </div>
       <div class="button-index">
-        <compact-btn customClass="fs-24 _500 position-relative not-focusable q-ml-lg text-red-130"
+        <compact-btn customClass="fs-24 _500 position-relative not-focusable text-red-130"
                      borderless
-                     @click="closeBanner">
+                     @clicked="closeBanner">
           <i class="fs-24 fa fa-times cursor-pointer"
              :style="{ 'color': '#256EFF' }" />
         </compact-btn>
@@ -91,12 +93,14 @@
 <script>
 import { mapState } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
+import CompactBtn from 'components/compact-btn'
 
 export default {
   name: 'TrialBanner',
 
   components: {
-    VideoModal
+    VideoModal,
+    CompactBtn
   },
 
   data () {
