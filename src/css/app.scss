@@ -14348,7 +14348,17 @@ h1.contact-list-name-label {
       width: 24px;
       height: 24px;
     }
+
+    &-outline__button {
+      border-radius: 4px;
+
+      .q-btn__wrapper {
+        padding-left: 6px;
+        padding-right: 6px
+      }
+    }
   }
+
   .video-modal {
     position: fixed;
     top: 0;
