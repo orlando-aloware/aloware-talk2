@@ -70,7 +70,7 @@
         <q-btn class="q-mr-lg"
                color="primary"
                size="md"
-               label="Finish Registration"
+               label="Unlock trial experience"
                rounded
                dense
                no-caps
