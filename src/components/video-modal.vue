@@ -1,15 +1,13 @@
 <template>
   <div class="video-modal-section d-flex align-items-center">
-    <button class="activator-button"
-            type="icon"
-            plain
-            v-if="shouldShowDefaultActivator"
-            @click="openModal">
-      <div class="activator-icon">
-        <video-camera-icon />
-      </div>
-    </button>
-
+    <q-btn class="activator-outline__button height-32 mr-2"
+           color="primary"
+           outline
+           no-caps
+           @click="openModal"
+           v-if="shouldShowDefaultActivator">
+      Open Tutorial Video 🤩
+    </q-btn>
     <slot name="activator"
           v-else
           @click="openModal" />
@@ -47,15 +45,10 @@
 
 <script>
 import VueCookies from 'vue-cookies'
-import VideoCameraIcon from './icons/video-camera-icon.vue'
 import { mapActions } from 'vuex'
 
 export default {
   name: 'video-modal',
-
-  components: {
-    VideoCameraIcon
-  },
 
   props: {
     title: {
