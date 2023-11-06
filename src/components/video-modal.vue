@@ -48,6 +48,7 @@
 <script>
 import VueCookies from 'vue-cookies'
 import VideoCameraIcon from './icons/video-camera-icon.vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'video-modal',
@@ -85,6 +86,11 @@ export default {
     shouldShowDefaultActivator: {
       type: Boolean,
       default: true
+    },
+
+    shouldShowInFirstVisit: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -97,15 +103,21 @@ export default {
   created () {
     this.$cookies = VueCookies
 
-    if (!this.$cookies.get(this.cookieName)) {
+    if (!this.$cookies.get(this.cookieName) && this.shouldShowInFirstVisit) {
       this.showModal = true
+      return this.setIsIntroVideoVisible(true)
     }
+
+    return this.setIsIntroVideoVisible(null)
   },
 
   methods: {
+    ...mapActions(['setIsIntroVideoVisible']),
+
     closeModal () {
       this.showModal = false
       this.$cookies.set(this.cookieName, 'viewed') // Set cookie to expire in 1 day
+      this.setIsIntroVideoVisible(null)
     },
 
     openModal () {
