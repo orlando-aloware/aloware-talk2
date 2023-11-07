@@ -197,7 +197,7 @@
                       </a>
                       and
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/terms-and-conditions')">
+                         @click="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
                         Acceptable Use Policy.
                       </a>
                     </template>
