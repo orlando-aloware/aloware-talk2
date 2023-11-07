@@ -80,10 +80,10 @@ export default {
           message = ''
           break
         case KycLogs.KYC_STATUS_ZERO:
-          message = `You need to <a href="${link}"><u>submit important info</u></a> about your business to unlock access to ${action}`
+          message = `You need to <a href="${link}"><u class="text-white">submit important info</u></a> about your business to unlock access to ${action}`
           break
         case KycLogs.KYC_STATUS_DEFINITELY_REJECTED:
-          message = `You need to <a href="${link}"><u>submit again the info</u></a> about your business to ${action}`
+          message = `You need to <a href="${link}"><u class="text-white">submit again the info</u></a> about your business to ${action}`
           break
         case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING:
           message = `The ${action} isn't available on trial. please contact us to upgrade today!`
@@ -160,6 +160,9 @@ export default {
           break
         case 'trial.skip':
           text = 'skip trial and subscribe'
+          break
+        case 'calendar':
+          text = 'calendar'
           break
       }
 

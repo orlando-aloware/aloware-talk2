@@ -80,7 +80,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isActive('Power Dialer') && !profile.auto_dialer_enabled"
+           v-show="!currentCompany.is_trial && !isActive('Power Dialer') && !profile.auto_dialer_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -99,7 +99,7 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
+           v-show="!currentCompany.is_trial && isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -113,7 +113,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Power Dialer') && profile.auto_dialer_enabled"
+           v-show="!currentCompany.is_trial && !isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -156,7 +156,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isActive('Calendar') && !profile.calendar_enabled"
+           v-show="!currentCompany.is_trial && !isActive('Calendar') && !profile.calendar_enabled"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -175,7 +175,7 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Calendar') && profile.calendar_enabled"
+           v-show="!currentCompany.is_trial && isActive('Calendar') && profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -189,7 +189,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isActive('Calendar') && profile.calendar_enabled"
+           v-show="!currentCompany.is_trial && !isActive('Calendar') && profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"

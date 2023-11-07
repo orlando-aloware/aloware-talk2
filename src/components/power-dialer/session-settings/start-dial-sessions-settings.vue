@@ -1,7 +1,7 @@
 <template>
   <div class="t-session-settings">
     <block-tooltip placement="left"
-                   triggers="hover focus"
+                   triggers="click"
                    target="pd-call-popover"
                    task="call"
                    v-if="callDisabled">

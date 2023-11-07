@@ -22,7 +22,7 @@ export default _.merge({
       }
 
       if (!status) {
-        status = KycLogs.KYC_STATUS_ZERO
+        status = KycLogs.KYC_STATUS_NONE
       }
 
       return status

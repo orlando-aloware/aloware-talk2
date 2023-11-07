@@ -57,7 +57,7 @@
               <div class="d-flex float-right">
                 <block-tooltip v-if="!canCreateContacts"
                                placement="left"
-                               triggers="hover focus"
+                               triggers="click"
                                target="contacts-create-popover"
                                task="contacts.create">
                 </block-tooltip>
@@ -90,9 +90,16 @@
                       <i class="fa fa-search mr-1" />
                       Select Contacts & Add to List
                     </b-dropdown-item>
-                    <b-dropdown-item href="#"
-                                     :disabled="taskAddAndClearingDisabled || !canCreateContacts"
+                    <b-dropdown-item v-if="canCreateContacts"
+                                     href="#"
+                                     :disabled="taskAddAndClearingDisabled"
                                      v-b-modal:create-contact-modal>
+                      <i class="fa fa-plus mr-1" />
+                      {{ createContactToListText }}
+                    </b-dropdown-item>
+                    <b-dropdown-item v-else
+                                     href="#"
+                                     disabled>
                       <i class="fa fa-plus mr-1" />
                       {{ createContactToListText }}
                     </b-dropdown-item>

@@ -88,16 +88,15 @@ export default {
     },
 
     checkClick () {
-
       if (this.defaultClick) {
         const defaultLink = (this.isModGen)
-           ? 'https://moderategeni.us/aloware-info'
-           : 'https://aloware.com/get-demo/'
+          ? 'https://moderategeni.us/aloware-info'
+          : 'https://aloware.com/get-demo/'
 
         window.open(defaultLink, '_blank')
         return
       }
-      
+
       this.$emit('click')
     }
   }
