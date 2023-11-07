@@ -467,7 +467,7 @@ const routes = [
         component: EmailBlast
       },
       {
-        path: '/account-registration/:verfication_token?',
+        path: '/account-registration/:verification_token?',
         name: 'Account Registration',
         meta: {
           title: 'Account Registration',
