@@ -4,6 +4,7 @@
     <q-btn v-if="isAdmin"
            outline
            class="q-btn-standard"
+           :href="classicUrl"
            @click="onGoToClassic">
 
         <span>{{ alowareClassic }}</span>
@@ -96,6 +97,10 @@ export default {
 
     whiteLabelText () {
       return this.statics.whitelabel ? '' : 'Aloware '
+    },
+
+    classicUrl () {
+      return process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
     }
   },
 
@@ -109,7 +114,7 @@ export default {
   methods: {
     ...mapActions('auth', ['setProfile']),
     onGoToClassic () {
-      window.location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
+      window.location.href = this.classicUrl
     },
 
     updateDefaultLogin () {
