@@ -1,6 +1,7 @@
 export default {
   getBusinessInformationFieldsValue (state) {
     return {
+      pre_signup_id: state.data.pre_signup_id,
       legal_name: state.form.legal_name,
       business_type: state.form.business_type?.value,
       company_status: state.form.company_status,
