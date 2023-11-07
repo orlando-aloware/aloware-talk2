@@ -13,7 +13,7 @@
             flat>
       <b-overlay :show="loading > 0">
         <div>
-          You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+          You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
         </div>
 
         <hr>
