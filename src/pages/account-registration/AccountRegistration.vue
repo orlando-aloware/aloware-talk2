@@ -620,7 +620,7 @@ export default {
       this.isLoading = true
       this.loadingText = 'Please wait while we are loading your information...'
 
-      this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.pre_signup_id}`)
+      this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.verification_token}`)
         .then((res) => {
           if (res.headers['content-type'] !== 'application/json') {
             return this.$router.push({ name: 'Login' })
@@ -683,13 +683,11 @@ export default {
 
       const payload = {
         ...this.form,
-        pre_signup_id: this.$route.params.pre_signup_id,
+        verification_token: this.$route.params.verification_token,
         phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.phone_number), 'E164', true),
         auth_rep_phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.auth_rep_phone_number), 'E164', true),
         ...this.getBusinessInformationFieldsValue
       }
-
-      console.log('submit', payload)
 
       this.$axios.post('/api/admin/company-registration', payload)
         .then(async (res) => {
