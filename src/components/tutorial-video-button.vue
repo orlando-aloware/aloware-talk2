@@ -42,10 +42,17 @@ export default {
           learnMoreLink: 'https://support.aloware.com/en/articles/6637395-aloware-talk-basics',
           notes: '🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊'
         },
+        'Contacts': {
+          title: '📇 Unveil the Contacts Tab in Aloware!',
+          cookieName: 'contacts',
+          videoUrl: 'https://www.youtube.com/embed/U5l4PMXOpSM?si=sAnahiyuAASpWrP0',
+          learnMoreLink: '',
+          notes: 'Discover, organize, and optimize your network. </br></br>The Contacts Tab is your gateway to streamlined connections. </br></br>Delve in and direct your networking journey to triumph with every contact!'
+        },
         'Wallboard': {
           title: '🚀 Mastering Aloware Wallboard: Elevate Your Contact Center Insights',
           cookieName: 'wallboard',
-          videoUrl: 'https://www.youtube.com/embed/D2w_cctKdzo?si=col2kI_PNMXjZSjj',
+          videoUrl: 'https://www.youtube.com/embed/WU2R7haxbDQ?si=86mi9-Mmdz8E8Srv',
           learnMoreLink: 'https://support.aloware.com/en/articles/5743991-sentry-mode-barge-whisper-in-admin',
           notes: '🚀 Amplify your insights with <strong>Aloware Wallboard!</strong> </br></br> 🌟 Visualize, track, and dominate. Dive into real-time data like never before. </br></br> Your dashboard revolution starts here!'
         },
@@ -59,9 +66,16 @@ export default {
         'Tags': {
           title: '🏷️ Mastering Aloware Tags: Organize Your Contacts Effectively',
           cookieName: 'tags',
-          videoUrl: 'https://www.youtube.com/embed/VUYVx0XGeLc?si=EgN3EQJBGay15kGz',
+          videoUrl: 'https://www.youtube.com/embed/I68fcqIrW7E?si=QtbTTk2vzauPqpAd',
           learnMoreLink: 'https://support.aloware.com/en/articles/8234361-tags-in-aloware-talk-organize-your-contacts-with-ease',
           notes: '🌟 <strong>Tags = Your Ultimate Categorizer! </br></br> 🌟 Like Lists, but leveled up! Place the same person everywhere. </br></br> Bonus? Enroll a whole Tag audience in a sequence. </br></br> Plus, new contacts? They flash in with a fresh tag stamped with their upload date. 🚀'
+        },
+        'Communication': {
+          title: '📞 Embrace the Communications in Aloware! 🚀',
+          cookieName: 'communication',
+          videoUrl: 'https://www.youtube.com/embed/Ys8VmtVLbQI?si=Gy6OBY13JtwrQ9m9',
+          learnMoreLink: '',
+          notes: `Connect, converse, and conquer your business communications. </br></br>The Aloware Communications Tab is your command center for interaction excellence. </br></br>Click in and command your conversations to success!`
         }
       }
 
