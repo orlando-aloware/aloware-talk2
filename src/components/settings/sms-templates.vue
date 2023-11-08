@@ -19,7 +19,7 @@
              md="12"
              :class="horizontalPaddingClass">
         <block-tooltip placement="left"
-                       triggers="hover focus"
+                       triggers="click"
                        target="sms-template-popover"
                        task="sms.template"
                        v-if="viewOnly">

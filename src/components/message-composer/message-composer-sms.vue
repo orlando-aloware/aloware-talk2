@@ -168,7 +168,7 @@
                                 @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
       <block-tooltip placement="top"
-                     triggers="hover focus"
+                     triggers="click"
                      target="message-sms-popover"
                      task="text"
                      v-if="!canTextToNumber">

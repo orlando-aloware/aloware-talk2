@@ -84,7 +84,7 @@
         </div>
         <block-tooltip v-if="viewOnly"
                        placement="left"
-                       triggers="hover focus"
+                       triggers="click"
                        target="broadcast-popover"
                        task="broadcasts.create">
         </block-tooltip>
