@@ -1,8 +1,27 @@
 import _ from 'lodash'
 import * as KycLogs from '../../constants/kyc-logs'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default _.merge({
+  computed: {
+    ...mapState('auth', ['profile']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapGetters('auth', ['profile']),
+
+    viewOnly () {
+      return this.isViewOnlyAccess()
+    },
+
+    currentKycStatus () {
+      return this.getStatus()
+    },
+
+    isDisabled () {
+      const status = this.getStatus()
+      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany.is_trial
+    }
+  },
+
   methods: {
     getSource (source = null) {
       // this has been added to provide us with a way to check if user is logged in
@@ -16,7 +35,7 @@ export default _.merge({
     },
 
     getStatus (status = null, source = null) {
-      // Gets the KYC status from the compay
+      // Gets the KYC status from the company
       if (source) {
         status = source?.company?.kyc_status
       }
@@ -62,46 +81,47 @@ export default _.merge({
       return KycLogs.IMPORT_CONTACTS_ALLOWED.includes(status)
     },
 
-    enabledToCallNumber (phone, status = null, source = null) {
+    enabledToCallNumber (phone) {
       // this has been added to provide us with a way to check kyc status in beforeRouteEnter
       // if user is logged out of the system when session expires
-      source = this.getSource(source)
-      if (!source) {
+      // source = this.getSource(source)
+
+      if (!this?.auth) {
         return false
       }
 
-      status = this.getStatus(status, source)
-
-      if (status === KycLogs.KYC_STATUS_NONE) {
+      if (this.currentCompany.kyc_status === KycLogs.KYC_STATUS_NONE) {
         return true
       }
 
-      if (phone === source.phone_number) {
-        return KycLogs.ONESELF_CALLS_ALLOWED.includes(status)
+      phone = this.$options.filters.fixPhone(phone)
+
+      if (phone === this.auth.profile.phone_number) {
+        return KycLogs.ONESELF_CALLS_ALLOWED.includes(this.currentCompany.kyc_status)
       }
 
-      return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(status)
+      return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(this.currentCompany.kyc_status)
     },
 
-    enabledToTextNumber (phone, status = null, source = null) {
+    enabledToTextNumber (phone) {
       // this has been added to provide us with a way to check kyc status in beforeRouteEnter
       // if user is logged out of the system when session expires
-      source = this.getSource(source)
-      if (!source) {
+      // source = this.getSource(source)
+      if (!this?.auth) {
         return false
       }
 
-      status = this.getStatus(status, source)
-
-      if (status === KycLogs.KYC_STATUS_NONE) {
+      if (this.currentCompany.kyc_status === KycLogs.KYC_STATUS_NONE) {
         return true
       }
 
-      if (phone === source.phone_number) {
-        return KycLogs.ONESELF_TEXTS_ALLOWED.includes(status)
+      phone = this.$options.filters.fixPhone(phone)
+
+      if (phone === this.auth.profile.phone_number) {
+        return KycLogs.ONESELF_TEXTS_ALLOWED.includes(this.currentCompany.kyc_status)
       }
 
-      return KycLogs.TEXTS_TO_OTHERS_ALLOWED.includes(status)
+      return KycLogs.TEXTS_TO_OTHERS_ALLOWED.includes(this.currentCompany.kyc_status)
     },
 
     singleTestNumberPurchased (status = null, source = null) {
@@ -187,20 +207,6 @@ export default _.merge({
       }
 
       return KycLogs.VIEW_ONLY_ALLOWED.includes(status) && this.currentCompany.is_trial
-    }
-  },
-  computed: {
-    ...mapState('auth', ['profile']),
-    ...mapState('cache', ['currentCompany']),
-    viewOnly () {
-      return this.isViewOnlyAccess()
-    },
-    currentKycStatus () {
-      return this.getStatus()
-    },
-    isDisabled () {
-      const status = this.getStatus()
-      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany.is_trial
     }
   }
 })
