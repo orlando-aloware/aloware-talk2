@@ -425,7 +425,7 @@ export default {
         this.form.legal_name.length &&
         this.form.business_type &&
         this.form.business_registration_identifier &&
-        this.form.business_registration_number.length &&
+        this.form.business_registration_number?.length &&
         this.form.business_regions_of_operation &&
         this.form.business_industry &&
         this.form.website_url.length &&
