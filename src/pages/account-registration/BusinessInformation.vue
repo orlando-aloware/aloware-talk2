@@ -69,8 +69,6 @@ export default {
         user_id: this.profile.id
       }
 
-      console.log('submit', payload)
-
       this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
         .then((res) => {
           this.isSubmitted = true

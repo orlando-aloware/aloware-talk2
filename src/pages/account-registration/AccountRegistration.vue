@@ -689,8 +689,6 @@ export default {
         ...this.getBusinessInformationFieldsValue
       }
 
-      console.log('submit', payload)
-
       this.$axios.post('/api/admin/company-registration', payload)
         .then(async (res) => {
           this.isSubmitted = true
