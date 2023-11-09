@@ -59,7 +59,7 @@
     <tutorial-video-button />
 
     <div class="ml-auto d-block h-100"
-         v-if="!isSimpsocial && !isTrial">
+         v-if="!isSimpsocial && !isTrialKYC">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
         <div class='bridge-menu-wrapper'>
           <div id='referralhero-inline-button'></div>
@@ -72,7 +72,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <header-help v-if="!isTrial" />
+        <header-help v-if="!isTrialKYC" />
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
@@ -172,7 +172,8 @@ import {
   avatarMixin,
   goBackMixin,
   contactsListFiltersMixin,
-  userMixin
+  userMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -208,7 +209,8 @@ export default {
     avatarMixin,
     goBackMixin,
     contactsListFiltersMixin,
-    userMixin
+    userMixin,
+    kycMixin
   ],
 
   components: {
@@ -399,12 +401,6 @@ export default {
 
     isMobileTransitionWidth () {
       return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH
-    },
-
-    isTrial () {
-      const isAuthenticated = !this.isGuest && this.authenticated
-
-      return isAuthenticated && this.profile?.company?.is_trial
     }
   },
 

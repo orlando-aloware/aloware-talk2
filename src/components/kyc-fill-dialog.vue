@@ -71,6 +71,8 @@ export default {
 
   methods: {
     openKycBusinessRegistration () {
+      this.changeShowedKycDialog()
+
       this.$router.push({
         name: 'Business Information',
         params: { company_id: this.currentCompany.id }

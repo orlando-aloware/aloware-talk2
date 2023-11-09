@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center pt-2 q-row">
+  <div class="flex justify-center pt-1 q-row">
     <slot name="content"></slot>
   </div>
 </template>

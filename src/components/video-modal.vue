@@ -1,6 +1,6 @@
 <template>
   <div class="video-modal-section d-flex align-items-center">
-    <q-btn class="activator-outline__button height-32 mr-2"
+    <q-btn class="activator-outline__button height-35 mr-2"
            color="primary"
            outline
            no-caps
