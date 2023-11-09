@@ -354,7 +354,8 @@ export default {
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin,
-      showedKycDialog: false
+      showedKycDialog: false,
+      isFirstLoading: true
     }
   },
 
@@ -516,6 +517,7 @@ export default {
 
       return isAuthenticated &&
              this.isIntroVideoVisible === null &&
+             !this.isFirstLoading &&
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
@@ -1098,6 +1100,10 @@ export default {
     // online / offline
     window.addEventListener('online', this.updateOnlineStatus)
     window.addEventListener('offline', this.updateOnlineStatus)
+
+    setTimeout(() => {
+      this.isFirstLoading = false
+    }, 2000)
   },
 
   methods: {

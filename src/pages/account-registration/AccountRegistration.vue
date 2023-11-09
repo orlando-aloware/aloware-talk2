@@ -205,7 +205,7 @@
                 </div>
 
                 <div id="recaptcha-element"
-                     class="g-recaptcha pb-2" />
+                     class="g-recaptcha" />
               </div>
             </div>
           </div>
