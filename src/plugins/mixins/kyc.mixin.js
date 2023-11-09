@@ -40,7 +40,7 @@ export default _.merge({
         status = source?.company?.kyc_status
       }
 
-      if (!status) {
+      if (!source?.company?.is_trial || !status) {
         status = KycLogs.KYC_STATUS_NONE
       }
 
@@ -90,17 +90,19 @@ export default _.merge({
         return false
       }
 
-      if (this.currentCompany.kyc_status === KycLogs.KYC_STATUS_NONE) {
+      const source = this.getSource()
+      const status = this.getStatus(null, source)
+      if (status === KycLogs.KYC_STATUS_NONE) {
         return true
       }
 
       phone = this.$options.filters.fixPhone(phone)
 
       if (phone === this.auth.profile.phone_number) {
-        return KycLogs.ONESELF_CALLS_ALLOWED.includes(this.currentCompany.kyc_status)
+        return KycLogs.ONESELF_CALLS_ALLOWED.includes(status)
       }
 
-      return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(this.currentCompany.kyc_status)
+      return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(status)
     },
 
     enabledToTextNumber (phone) {
@@ -111,17 +113,19 @@ export default _.merge({
         return false
       }
 
-      if (this.currentCompany.kyc_status === KycLogs.KYC_STATUS_NONE) {
+      const source = this.getSource()
+      const status = this.getStatus(null, source)
+      if (status === KycLogs.KYC_STATUS_NONE) {
         return true
       }
 
       phone = this.$options.filters.fixPhone(phone)
 
       if (phone === this.auth.profile.phone_number) {
-        return KycLogs.ONESELF_TEXTS_ALLOWED.includes(this.currentCompany.kyc_status)
+        return KycLogs.ONESELF_TEXTS_ALLOWED.includes(status)
       }
 
-      return KycLogs.TEXTS_TO_OTHERS_ALLOWED.includes(this.currentCompany.kyc_status)
+      return KycLogs.TEXTS_TO_OTHERS_ALLOWED.includes(status)
     },
 
     singleTestNumberPurchased (status = null, source = null) {
