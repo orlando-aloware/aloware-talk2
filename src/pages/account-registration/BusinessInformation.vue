@@ -44,7 +44,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setKycFilled']),
     ...mapActions('accountRegistration', [
       'setBusinessInformationFieldsEmpty',
       'setFieldErrors'
@@ -75,9 +74,6 @@ export default {
       this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
         .then((res) => {
           this.isSubmitted = true
-          this.setKycFilled({
-            kyc_filled_status: true
-          })
 
           this.$generalNotification('The Business information has been submitted.')
           this.$router.push({ name: 'Inbox' })
