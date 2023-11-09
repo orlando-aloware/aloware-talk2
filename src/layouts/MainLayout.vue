@@ -5,7 +5,7 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <trial-banner v-if="isTrial"/>
+    <trial-banner v-if="isTrialKYC"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -232,7 +232,8 @@ import {
   visibilityMixin,
   unownedContactTaskMixin,
   agentMixin,
-  contactV2AttributesMixin
+  contactV2AttributesMixin,
+  kycMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -301,7 +302,8 @@ export default {
     visibilityMixin,
     unownedContactTaskMixin,
     agentMixin,
-    contactV2AttributesMixin
+    contactV2AttributesMixin,
+    kycMixin
   ],
 
   data () {
@@ -521,12 +523,6 @@ export default {
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
-    },
-
-    isTrial () {
-      const isAuthenticated = !this.isGuest && this.authenticated
-
-      return isAuthenticated && this.profile?.company?.is_trial
     }
   },
 

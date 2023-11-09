@@ -100,7 +100,7 @@
               </template>
             </input-group>
 
-            <div class="flex justify-center pt-2 q-row">
+            <div class="flex justify-center q-row">
               <div class="col-xs-12 col-md-5 q-pl-none q-pr-none q-lg-pl-4">
                 <h4 class="text-h5 text-weight-bold">Password</h4>
               </div>
