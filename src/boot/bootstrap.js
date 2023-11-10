@@ -28,6 +28,7 @@ import { Vuelidate } from 'vuelidate'
 import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
 import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
+import VCalendar from 'v-calendar'
 
 Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
 
@@ -65,6 +66,7 @@ Vue.use(VueWaveSurfer)
 Vue.use(Vuelidate)
 Vue.use(BusinessHours)
 Vue.use(VueHighcharts, { Highcharts })
+Vue.use(VCalendar)
 
 window.Bowser = Bowser
 window.timezone = 'Intl' in window
