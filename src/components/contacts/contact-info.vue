@@ -1,26 +1,26 @@
 <template>
-  <b-card class="border-0 contact-info-wrapper">
-    <b-media class="min-w-0">
-      <template #aside>
-        <q-item-section avatar>
-          <avatar class="contact-avatar"
-                  width="40"
-                  height="40"
-                  :name="contact.name">
-          </avatar>
-        </q-item-section>
-      </template>
+    <b-card class="border-0 contact-info-wrapper">
+        <b-media class="min-w-0">
+            <template #aside>
+                <q-item-section avatar>
+                    <avatar class="contact-avatar"
+                            width="40"
+                            height="40"
+                            :name="contact.name">
+                    </avatar>
+                </q-item-section>
+            </template>
 
-      <div class="d-flex justify-content-between relative-position w-100">
-        <div class="w-100 d-grid">
-          <div class="mt-1 mb-0 contact-name-wrapper">
-            <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ contactName }}
-            </q-tooltip>
-            <h2 class="contact-name pb-1">{{ contactName }}</h2>
-          </div>
-          <p class="contact-phone">
+            <div class="d-flex justify-content-between relative-position w-100">
+                <div class="w-100 d-grid">
+                    <div class="mt-1 mb-0 contact-name-wrapper">
+                        <q-tooltip anchor="top middle"
+                                   self="center middle">
+                            {{ contactName }}
+                        </q-tooltip>
+                        <h2 class="contact-name pb-1">{{ contactName }}</h2>
+                    </div>
+                    <p class="contact-phone">
             <span v-if="contact.phone_number !== '0'">
               <span class="contact-primary-phone">{{ contact.phone_number | fixPhone }}</span>
 
@@ -54,149 +54,150 @@
                 DNC
               </b-badge>
             </span>
-            <span v-else>
+                        <span v-else>
               Phone number unavailable
             </span>
-          </p>
-          <div class="flex mb-4">
+                    </p>
+                    <div class="flex mb-4">
             <span class="material-icons">
                 schedule
             </span>
-            <digital-clock class="ml-2"
-                           :timezone="contact.timezone">
-            </digital-clock>
-          </div>
+                        <digital-clock class="ml-2"
+                                       :timezone="contact.timezone">
+                        </digital-clock>
+                    </div>
+                </div>
+                <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
+                          size="sm"
+                          variant="light"
+                          @click="onOpenEditForm">
+                    <pencil-o-icon/>
+                </b-button>
+                <q-menu content-class="mx-height-300"
+                        no-focus
+                        no-parent-event
+                        :offset="[300, -122]"
+                        v-model="showEditForm">
+                    <div class="row no-wrap q-pa-md">
+                        <contact-name-form @close="onCloseEditForm"></contact-name-form>
+                    </div>
+                </q-menu>
+            </div>
+        </b-media>
+        <div class="d-inline-flex flex-wrap contact-action-button">
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      @click="callContact">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Call
+                </q-tooltip>
+                <call-icon/>
+            </b-button>
+
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      :disabled="isProcessingBlock"
+                      v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
+                      @click="blockContact">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Block
+                </q-tooltip>
+                <i class="fa fa-lock"
+                   v-if="!isProcessingBlock">
+                </i>
+                <q-spinner-bars class="mr-1"
+                                color="blue"
+                                v-if="isProcessingBlock"/>
+            </b-button>
+
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      :disabled="isProcessingBlock"
+                      v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
+                      @click="unBlockContact">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Unblock
+                </q-tooltip>
+                <q-spinner-bars class="mr-1"
+                                color="blue"
+                                v-if="isProcessingBlock"/>
+                <i class="fa fa-lock-open"
+                   v-if="!isProcessingBlock">
+                </i>
+            </b-button>
+
+            <contact-dnc-actions class="mr-2 my-1"
+                                 :contact="contact"></contact-dnc-actions>
+
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      :disabled="contact.is_dnc"
+                      @click="addAppointmentOpen(true)">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Add appointment
+                </q-tooltip>
+                <calendar-icon/>
+            </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      :disabled="contact.is_dnc"
+                      @click="addReminderOpen(true)">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Add reminder
+                </q-tooltip>
+                <timer-icon></timer-icon>
+            </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      @click="openPowerDialerModal">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Add to power dialer
+                </q-tooltip>
+                <add-call-icon/>
+            </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      :disabled="!isSimpSocialIntegrationEnabled"
+                      v-if="isSimpsocial"
+                      @click="openEmailBlast">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Email
+                </q-tooltip>
+                <email-icon width="16"/>
+            </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      :disabled="isVideoConferenceLinkSending"
+                      v-if="isSimpsocial"
+                      @click="openVideoConference">
+                <q-tooltip anchor="bottom middle"
+                           self="center middle">
+                    Video Conference
+                </q-tooltip>
+                <video-conference-icon width="16"/>
+            </b-button>
         </div>
-        <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
-                  size="sm"
-                  variant="light"
-                  @click="onOpenEditForm">
-          <pencil-o-icon />
-        </b-button>
-        <q-menu content-class="mx-height-300"
-                no-focus
-                no-parent-event
-                :offset="[300, -122]"
-                v-model="showEditForm">
-          <div class="row no-wrap q-pa-md">
-            <contact-name-form @close="onCloseEditForm"></contact-name-form>
-          </div>
-        </q-menu>
-      </div>
-    </b-media>
-    <div class="d-inline-flex flex-wrap contact-action-button">
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                @click="callContact">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Call
-        </q-tooltip>
-        <call-icon />
-      </b-button>
-
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="isProcessingBlock"
-                v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
-                @click="blockContact">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Block
-        </q-tooltip>
-        <i class="fa fa-lock"
-           v-if="!isProcessingBlock">
-        </i>
-        <q-spinner-bars class="mr-1"
-                        color="blue"
-                        v-if="isProcessingBlock"/>
-      </b-button>
-
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="isProcessingBlock"
-                v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
-                @click="unBlockContact">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Unblock
-        </q-tooltip>
-        <q-spinner-bars class="mr-1"
-                        color="blue"
-                        v-if="isProcessingBlock"/>
-        <i class="fa fa-lock-open"
-           v-if="!isProcessingBlock">
-        </i>
-      </b-button>
-
-      <contact-dnc-actions class="mr-2 my-1"
-                           :contact="contact"></contact-dnc-actions>
-
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="contact.is_dnc"
-                @click="addAppointmentOpen(true)">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Add appointment
-        </q-tooltip>
-        <calendar-icon />
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="contact.is_dnc"
-                @click="addReminderOpen(true)">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Add reminder
-        </q-tooltip>
-        <timer-icon></timer-icon>
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                @click="openPowerDialerModal">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Add to power dialer
-        </q-tooltip>
-        <add-call-icon />
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="!isSimpSocialIntegrationEnabled"
-                v-if="isSimpsocial"
-                @click="openEmailBlast">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Email
-        </q-tooltip>
-        <email-icon width="16" />
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="isVideoConferenceLinkSending"
-                v-if="isSimpsocial"
-                @click="openVideoConference">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle">
-          Video Conference
-        </q-tooltip>
-        <video-conference-icon width="16"/>
-      </b-button>
-    </div>
-    <appointment-form-modal :contact="contact"></appointment-form-modal>
-    <contact-add-reminder-modal></contact-add-reminder-modal>
-    <power-dialer-add-modal :params="addPowerDialerParams"
-                            :redirect="false"></power-dialer-add-modal>
-  </b-card>
+        <appointment-form-modal :contact="contact"></appointment-form-modal>
+        <contact-add-reminder-modal></contact-add-reminder-modal>
+        <power-dialer-add-modal :params="addPowerDialerParams"
+                                :redirect="false">
+        </power-dialer-add-modal>
+    </b-card>
 </template>
 
 <script>
@@ -211,11 +212,7 @@ import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
-import {
-  aclMixin,
-  simpsocialMixin,
-  timezoneCheckMixin
-} from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
