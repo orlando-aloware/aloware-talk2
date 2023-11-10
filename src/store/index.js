@@ -15,6 +15,7 @@ import settings from './settings'
 import broadcast from './broadcast'
 import wallboard from './wallboard'
 import tagsModule from './tags'
+import accountRegistration from './account-registration'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -42,7 +43,8 @@ export default function (/* { ssrContext } */) {
       broadcast,
       wallboard,
       cache,
-      tagsModule
+      tagsModule,
+      accountRegistration
     },
 
     state: {
@@ -260,6 +262,7 @@ export default function (/* { ssrContext } */) {
       suspended: false,
       showProFeatureDialog: false,
       leadSources: [],
+      isPresignup: true,
       contactsLists: [],
       statics: {
         domain: null,
@@ -276,7 +279,8 @@ export default function (/* { ssrContext } */) {
       },
       staticsLoaded: false,
       isCallDisposed: false,
-      isContactDisposed: false
+      isContactDisposed: false,
+      isIntroVideoVisible: false
     },
 
     getters: {
@@ -817,6 +821,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_CONTACTS_LISTS', lists)
 
         return Promise.resolve()
+      },
+
+      setIsIntroVideoVisible ({ commit }, value) {
+        commit('SET_IS_INTRO_VIDEO_VISIBLE', value)
       }
     },
 
@@ -1534,6 +1542,10 @@ export default function (/* { ssrContext } */) {
 
       SET_CONTACTS_LISTS (state, lists) {
         state.contactsLists = lists
+      },
+
+      SET_IS_INTRO_VIDEO_VISIBLE (state, value) {
+        state.isIntroVideoVisible = value
       },
 
       updateField

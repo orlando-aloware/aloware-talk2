@@ -1,5 +1,6 @@
 <template>
   <div class="row no-wrap pt-3 pb-3 width-380 dialer-wrapper"
+       id="dialer-popover"
        :class="dialerFormClass">
     <div class="loading-container"
          v-if="isMakingCall">
@@ -13,6 +14,12 @@
       <b-tabs class="dialer-tabs"
               pills
               vertical>
+        <block-tooltip placement="left"
+                       triggers="click"
+                       target="dialer-popover"
+                       :show.sync="blockTooltipHandler.show"
+                       :task="blockTooltipHandler.task">
+        </block-tooltip>
         <b-tab title="Call"
                :active="mode === 'call'"
                @click="setMode('call')">
@@ -28,12 +35,14 @@
                            @change="changeCampaignId">
             </line-selector>
           </b-form-group>
+
           <div class="d-inline-flex align-items-center justify-content-between dialer w-100"
                v-if="mode === 'call'">
             <b-form-group class="mb-0"
                           :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumberSearch">
               <contact-phone-number-search class="width-190"
+                                           id="calls-popover"
                                            ref="callContactPhoneNumberSearch"
                                            :no_prepend="true"
                                            v-model="phoneNumber"
@@ -98,6 +107,7 @@
                           :invalid-feedback="invalidPhoneNumber"
                           :state="validPhoneNumberSearch">
               <contact-phone-number-search ref="textContactPhoneNumberSearch"
+                                           id="texts-popover"
                                            v-model="phoneNumber"
                                            @change="phoneNumberChanged"
                                            @keyup.enter.native="sendText"
@@ -187,7 +197,16 @@ import LineSelector from 'components/generic-selectors/line-selector'
 import SendTextIcon from 'components/icons/send-text-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import MobileParkedCall from 'components/dialer/mobile-parked-call'
-import { aclMixin, contactMixin, contactV2AttributesMixin, selectorMixin, timezoneCheckMixin, visibilityMixin } from 'src/plugins/mixins'
+import BlockTooltip from 'components/kyc/block-tooltip'
+import {
+  aclMixin,
+  contactMixin,
+  contactV2AttributesMixin,
+  selectorMixin,
+  timezoneCheckMixin,
+  visibilityMixin,
+  kycMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'dialer-form',
@@ -198,14 +217,16 @@ export default {
     timezoneCheckMixin,
     visibilityMixin,
     aclMixin,
-    selectorMixin
+    selectorMixin,
+    kycMixin
   ],
 
   components: {
     MobileParkedCall,
     ContactPhoneNumberSearch,
     LineSelector,
-    SendTextIcon
+    SendTextIcon,
+    BlockTooltip
   },
 
   props: {
@@ -231,7 +252,11 @@ export default {
       isMakingCall: false,
       isSending: false,
       hasPhoneNumberSearchResults: false,
-      previousOutboundCallingMode: null
+      previousOutboundCallingMode: null,
+      blockTooltipHandler: {
+        task: 'call',
+        show: false
+      }
     }
   },
 
@@ -273,11 +298,15 @@ export default {
     },
 
     callDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId
+      console.log('currentKycStatus', this.currentKycStatus)
+      console.log('this.enabledToCallNumber(this.phoneNumber)', this.enabledToCallNumber(this.phoneNumber))
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber)
     },
 
     sendDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage
+      console.log('currentKycStatus', this.currentKycStatus)
+      console.log('this.enabledToTextNumber(this.phoneNumber)', this.enabledToTextNumber(this.phoneNumber))
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
     },
 
     dialerFormClass () {
@@ -445,6 +474,7 @@ export default {
 
     setMode (mode) {
       this.mode = mode
+      this.blockTooltipHandler.task = mode
     },
 
     onCall () {
@@ -518,6 +548,15 @@ export default {
 
     onPhoneNumberSearch (value) {
       this.hasPhoneNumberSearchResults = value
+    },
+
+    showBlockTooltip () {
+      this.blockTooltipHandler.show = true
+    },
+
+    hideBlockTooltip () {
+      console.log('hideBlockTooltip')
+      this.blockTooltipHandler.show = false
     }
   },
 

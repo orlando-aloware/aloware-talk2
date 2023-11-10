@@ -167,20 +167,24 @@
                                 @attachmentUploaded="attachmentUploaded"
                                 @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
-      <div>
-        <q-btn-dropdown
-          split
-          class="message-composer-send-dropdown-button"
-          color="primary"
-          size="sm"
-          padding="0px 12px"
-          :ripple="false"
-          :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
-          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
-          :menu-offset="[0, 6]"
-          v-if="useSendButton"
-          @click="onSend"
-        >
+      <block-tooltip placement="top"
+                     triggers="click"
+                     target="message-sms-popover"
+                     task="text"
+                     v-if="!canTextToNumber">
+      </block-tooltip>
+      <div id="message-sms-popover">
+        <q-btn-dropdown split
+                        class="message-composer-send-dropdown-button"
+                        color="primary"
+                        size="sm"
+                        padding="0px 12px"
+                        :ripple="false"
+                        :disable="isSendTextDisabled"
+                        :disable-dropdown="isSendTextDisabled"
+                        :menu-offset="[0, 6]"
+                        v-if="useSendButton"
+                        @click="onSend">
           <template slot="label">
             <q-spinner-bars v-if="isSending || generatingShortUrl"
                             class="mr-1"
@@ -197,10 +201,9 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-tooltip v-if="isTCPAApprovedTextNotAuthorized"
-                   anchor="top middle"
+        <q-tooltip anchor="top middle"
                    self="center middle"
-        >
+                   v-if="isTCPAApprovedTextNotAuthorized">
           <span class="text-black-dk">
             This number cannot be texted based on TCPA enforcement.
           </span>
@@ -223,10 +226,18 @@ import VideoPlaceholder from 'components/message-composer/file-placeholders/vide
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import {
+  kycMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'message-composer-sms',
+
+  mixins: [
+    kycMixin
+  ],
 
   components: {
     MessageComposerOptions,
@@ -235,7 +246,8 @@ export default {
     VideoPlaceholder,
     ImagePlaceholder,
     SmsTemplateModal,
-    ScheduledMessage
+    ScheduledMessage,
+    BlockTooltip
   },
 
   props: {
@@ -317,6 +329,15 @@ export default {
         default:
           return 'Send Text'
       }
+    },
+
+    isSendTextDisabled () {
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+    },
+
+    canTextToNumber () {
+      const phoneNumber = this.messageComposer.sms.phone_number
+      return this.enabledToTextNumber(phoneNumber)
     }
   },
 

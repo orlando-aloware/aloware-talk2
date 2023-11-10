@@ -335,7 +335,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         message.data = response?.data?.error ?? 'Requested resource not found.'
         break
       case 400:
-        message.data = response.data.error
+        message.data = response.data.error || response.data.message
         break
       case 422:
         message.data = ''
