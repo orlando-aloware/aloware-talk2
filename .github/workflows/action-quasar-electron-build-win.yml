@@ -58,7 +58,7 @@ jobs:
           architecture: 'x64'
 
       - name: Install dependencies & Quasar
-        run: npm install && npm install -g @quasar/cli
+        run: yarn install && yarn global add @quasar/cli
 
       - name: Make dotenv file
         uses: ozaytsev86/create-env-file@v1
