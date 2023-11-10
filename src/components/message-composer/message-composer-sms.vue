@@ -334,10 +334,8 @@ export default {
     },
 
     canTextToNumber () {
-      return true
-
-      // const phoneNumber = this.messageComposer.sms.phone_number
-      // return this.enabledToTextNumber(phoneNumber)
+      const phoneNumber = this.messageComposer.sms.phone_number
+      return this.enabledToTextNumber(phoneNumber)
     }
   },
 
