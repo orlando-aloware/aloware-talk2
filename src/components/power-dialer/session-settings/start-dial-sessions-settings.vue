@@ -469,7 +469,7 @@ export default {
     callDisabled () {
       return !this.enabledToCallNumber()
     },
-    
+
     isSettingsOwner () {
       return this.selectedItem.user_id === this.profile.id
     },
