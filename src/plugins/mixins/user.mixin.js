@@ -7,8 +7,14 @@ export default {
   computed: {
     ...mapState(['users']),
 
+    ...mapState('cache', ['currentCompany']),
+
     isJobNimbus () {
       return this.profile.company_id === 1261
+    },
+
+    isModGen () {
+      return this.currentCompany && this.currentCompany.reseller_id === 2132
     }
   },
 
