@@ -7,10 +7,6 @@ on:
         description: Dev or Prod
         default: Dev
         required: true
-      version:
-        description: Bump Version
-        default: 1.0.0
-        required: true
 
 jobs:
   build:
@@ -20,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ 'macos-latest' ]
-        node-version: [ '14.x' ]
+        node-version: [ '16.x' ]
         npm-version: [ '9.x' ]
 
     steps:
@@ -33,7 +29,6 @@ jobs:
 
       - name: Build details
         run: |
-          echo "Version: ${{ github.event.inputs.version }}"
           echo "Environment: ${{ github.event.inputs.environment }}"
           echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
 
