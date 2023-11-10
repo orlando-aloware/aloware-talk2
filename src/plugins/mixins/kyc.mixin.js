@@ -16,11 +16,9 @@ export default _.merge({
     },
 
     isDisabled () {
-      return false
-
-      // const source = this.getSource()
-      // const status = this.getStatus(null, source)
-      // return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
+      const source = this.getSource()
+      const status = this.getStatus(null, source)
+      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
     }
   },
 
@@ -88,7 +86,7 @@ export default _.merge({
       // if user is logged out of the system when session expires
       // source = this.getSource(source)
 
-      if (!this?.auth) {
+      if (!this.profile) {
         return false
       }
 
@@ -100,7 +98,7 @@ export default _.merge({
 
       phone = this.$options.filters.fixPhone(phone)
 
-      if (phone === this.auth.profile.phone_number) {
+      if (phone === this.profile.phone_number) {
         return KycLogs.ONESELF_CALLS_ALLOWED.includes(status)
       }
 
@@ -111,7 +109,7 @@ export default _.merge({
       // this has been added to provide us with a way to check kyc status in beforeRouteEnter
       // if user is logged out of the system when session expires
       // source = this.getSource(source)
-      if (!this?.auth) {
+      if (!this.profile) {
         return false
       }
 
@@ -123,7 +121,7 @@ export default _.merge({
 
       phone = this.$options.filters.fixPhone(phone)
 
-      if (phone === this.auth.profile.phone_number) {
+      if (phone === this.profile.phone_number) {
         return KycLogs.ONESELF_TEXTS_ALLOWED.includes(status)
       }
 
