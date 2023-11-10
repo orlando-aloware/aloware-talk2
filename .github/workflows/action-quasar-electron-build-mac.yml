@@ -59,7 +59,7 @@ jobs:
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
       - name: Install dependencies & Quasar
-        run: npm install && yarn global add @quasar/cli
+        run: yarn install && yarn global add @quasar/cli
 
       - name: Make dotenv file
         uses: ozaytsev86/create-env-file@v1
@@ -86,7 +86,7 @@ jobs:
           file-name: .env.prod
 
       - name: Build/release Electron mac app
-        run: npm run deploy-mac
+        run: quasar build -d -m electron -T mac -b builder -P always
         env:
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
