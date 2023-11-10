@@ -1,12 +1,11 @@
 import _ from 'lodash'
 import * as KycLogs from '../../constants/kyc-logs'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 export default _.merge({
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
-    ...mapGetters('auth', ['profile']),
 
     viewOnly () {
       return this.isViewOnlyAccess()
@@ -17,9 +16,11 @@ export default _.merge({
     },
 
     isDisabled () {
-      const source = this.getSource()
-      const status = this.getStatus(null, source)
-      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
+      return false
+
+      // const source = this.getSource()
+      // const status = this.getStatus(null, source)
+      // return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
     }
   },
 
