@@ -62,14 +62,14 @@
                               v-for="option in whereOptions">
                     {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
                 </b-form-radio>
-                <v-date-picker mode="dateTime"
-                               title-position="left"
-                               color="blue"
-                               :min-date="new Date()"
-                               :masks="masks"
-                               :popover="popover_config"
-                               v-model="schedule"
-                               v-if="where === 'scheduled'">
+                <date-picker mode="dateTime"
+                             title-position="left"
+                             color="blue"
+                             :min-date="new Date()"
+                             :masks="masks"
+                             :popover="popover_config"
+                             v-model="schedule"
+                             v-if="where === 'scheduled'">
                     <template v-slot="{ inputValue, inputEvents }">
                         <div class="ml-4 text-sm">
                             <small class="text-grey">
@@ -82,7 +82,7 @@
                                    v-on="inputEvents"/>
                         </div>
                     </template>
-                </v-date-picker>
+                </date-picker>
 
                 <b-button class="btn-block mt-4"
                           variant="primary"
@@ -116,6 +116,7 @@
 </template>
 
 <script>
+import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -129,6 +130,7 @@ export default {
   name: 'power-dialer-add-modal',
 
   components: {
+    DatePicker,
     InformationCircleIcon
   },
 
