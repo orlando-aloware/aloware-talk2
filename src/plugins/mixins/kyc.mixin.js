@@ -15,14 +15,9 @@ export default _.merge({
       return this.getStatus()
     },
 
-    isDisabled () {
+    isTrialKYC () {
       const source = this.getSource()
       const status = this.getStatus(null, source)
-      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
-    },
-
-    isTrialKYC () {
-      const status = this.getStatus()
       return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
     }
   },
