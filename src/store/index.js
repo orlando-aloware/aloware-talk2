@@ -851,7 +851,8 @@ export default function (/* { ssrContext } */) {
         } else if (communication && !communication.tags) {
           communication.tag_ids = []
         }
-        state.dialer.communication = communication
+
+        Vue.set(state.dialer, 'communication', communication)
       },
 
       SET_DIALER_DEAL (state, dealId) {
