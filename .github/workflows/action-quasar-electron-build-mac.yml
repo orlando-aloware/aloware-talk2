@@ -86,7 +86,7 @@ jobs:
           file-name: .env.prod
 
       - name: Build/release Electron mac app
-        run: npm run deploy-mac
+        run: quasar build -d -m electron -T mac -b builder -P always
         env:
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
