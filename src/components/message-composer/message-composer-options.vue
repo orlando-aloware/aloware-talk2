@@ -2,7 +2,7 @@
   <div class="message-options">
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            :disabled="isDisabled || !canAddMoreAttachments">
+            :disabled="isTextingDisabled || !canAddMoreAttachments">
       <q-menu content-class="mx-height-500"
               ref="giphyMenu"
               :offset="[0,5]">
@@ -19,7 +19,7 @@
 
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            :disabled="!selectedLine || isDisabled || !canAddMoreAttachments">
+            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments">
       <q-menu ref="attachmentMenu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
@@ -35,7 +35,7 @@
 
     <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
             href="#"
-            :disabled="isDisabled">
+            :disabled="isTextingDisabled">
       <q-menu content-class="mx-height-300"
               ref="templatesMenu"
               :offset="[0,5]">
@@ -51,7 +51,7 @@
 
     <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
             href="#"
-            :disabled="isDisabled">
+            :disabled="isTextingDisabled">
       <q-menu content-class="mx-height-300"
               ref="variablesMenu"
               :offset="[0,5]">
@@ -177,7 +177,7 @@ export default {
       'contact'
     ]),
 
-    isDisabled () {
+    isTextingDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
     },
 
