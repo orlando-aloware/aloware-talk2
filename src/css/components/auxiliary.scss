@@ -437,6 +437,41 @@ iframe > html {
   }
 }
 
+@media screen and (max-height: 699px) {
+  .hubspot-iframe-container,
+  .referrizer-iframe-container {
+    height: 80vh;
+  }
+}
+
+@media screen and (min-height: 700px) and (max-height: 899px) {
+  .hubspot-iframe-container,
+  .referrizer-iframe-container {
+    height: 60vh;
+  }
+}
+
+@media screen and (min-height: 900px) {
+  .hubspot-iframe-container,
+  .referrizer-iframe-container {
+    height: 50vh;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .hubspot-iframe-container,
+  .referrizer-iframe-container {
+    height: 30vh;
+  }
+}
+
+@media screen and (min-width: 900px) and (min-height: 500px) {
+  .hubspot-iframe-container,
+  .referrizer-iframe-container {
+    height: 50vh;
+  }
+}
+
 .session-settings-sidebar {
   .q-item__section {
     max-width: 135px;
