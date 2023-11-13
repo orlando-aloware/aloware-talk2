@@ -22,10 +22,6 @@ export default _.merge({
   },
 
   methods: {
-    getUserProfile () {
-      return this.profile
-    },
-
     skipRestrictions (kycStatus) {
       return kycStatus === KycLogs.KYC_STATUS_NONE
     },
@@ -62,10 +58,9 @@ export default _.merge({
         return true
       }
 
-      const profile = this.getUserProfile()
       phone = this.$options.filters.fixPhone(phone)
 
-      if (phone === profile?.phone_number) {
+      if (phone === this.profile?.phone_number) {
         return KycLogs.ONESELF_CALLS_ALLOWED.includes(kycStatus)
       }
 
@@ -79,10 +74,9 @@ export default _.merge({
         return true
       }
 
-      const profile = this.getUserProfile()
       phone = this.$options.filters.fixPhone(phone)
 
-      if (phone === profile?.phone_number) {
+      if (phone === this.profile?.phone_number) {
         return KycLogs.ONESELF_TEXTS_ALLOWED.includes(kycStatus)
       }
 
