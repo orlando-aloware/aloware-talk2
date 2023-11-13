@@ -13193,6 +13193,18 @@ h1.contact-list-name-label {
       }
     }
 
+    &__contacts-filters {
+      transition: all 0.5s;
+      position: absolute;
+      right: 0px;
+      margin-top: -15px;
+      width: 300px;
+
+      @media (min-width: 1425px) {
+        width: 400px;
+      }
+    }
+
     &__view {
       max-width: calc(100% - 550px);
       flex-grow: 1;
@@ -13280,17 +13292,17 @@ h1.contact-list-name-label {
                 margin-top: 25px;
               }
 
-              &__filters {
-                transition: all 0.5s;
-                position: fixed;
-                right: 0px;
-                top: 60px;
-                width: 300px;
+              // &__filters {
+              //   transition: all 0.5s;
+              //   position: fixed;
+              //   right: 0px;
+              //   top: 60px;
+              //   width: 300px;
 
-                @media (min-width: 1425px) {
-                  width: 400px;
-                }
-              }
+              //   @media (min-width: 1425px) {
+              //     width: 400px;
+              //   }
+              // }
             }
 
             &__message {
