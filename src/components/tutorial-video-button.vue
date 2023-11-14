@@ -38,7 +38,7 @@ export default {
         'Inbox': {
           title: '📞 Explore Aloware Talk | Your Complete Guide',
           cookieName: 'inbox',
-          videoUrl: 'https://www.youtube.com/embed/OmBIUrq-HC4?si=ALcnWYDmg2jh1xzx',
+          videoUrl: 'https://www.youtube.com/embed/1YjuDUF53iQ?si=uJqAQe2WeqNIPJE6',
           learnMoreLink: 'https://support.aloware.com/en/articles/6637395-aloware-talk-basics',
           notes: '🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊'
         },
