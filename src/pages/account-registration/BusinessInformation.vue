@@ -22,6 +22,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'BusinessInformation',
@@ -69,7 +70,7 @@ export default {
         user_id: this.profile.id
       }
 
-      this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
+      API.V1.accountRegistration.update({ preSignupId }, payload)
         .then((res) => {
           this.isSubmitted = true
 
