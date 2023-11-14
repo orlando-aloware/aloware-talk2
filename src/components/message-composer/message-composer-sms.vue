@@ -167,11 +167,11 @@
                                       @attachmentUploaded="attachmentUploaded"
                                       @templateSelected="templateSelected"
                                       @variableSelected="variableSelected"/>
-            <block-tooltip placement="top"
-                           triggers="click"
+            <block-tooltip v-if="!canTextToNumber"
+                           placement="top"
+                           triggers="hover"
                            target="message-sms-popover"
-                           task="text"
-                           v-if="!canTextToNumber">
+                           task="text">
             </block-tooltip>
             <div id="message-sms-popover">
                 <q-btn-dropdown split

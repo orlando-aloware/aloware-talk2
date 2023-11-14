@@ -298,14 +298,10 @@ export default {
     },
 
     callDisabled () {
-      console.log('currentKycStatus', this.currentKycStatus)
-      console.log('this.enabledToCallNumber(this.phoneNumber)', this.enabledToCallNumber(this.phoneNumber))
       return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber)
     },
 
     sendDisabled () {
-      console.log('currentKycStatus', this.currentKycStatus)
-      console.log('this.enabledToTextNumber(this.phoneNumber)', this.enabledToTextNumber(this.phoneNumber))
       return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
     },
 
