@@ -247,6 +247,7 @@ import SelectField from 'src/components/account-registration/select-field.vue'
 import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 import Banner from 'src/components/account-registration/banner.vue'
 import * as storage from 'src/plugins/helpers/storage'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'account-registration',
@@ -620,7 +621,7 @@ export default {
       this.isLoading = true
       this.loadingText = 'Please wait while we are loading your information...'
 
-      this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.verification_token}`)
+      API.V1.accountRegistration.getPreSignupDetails({ verification_token: this.$route.params.verification_token })
         .then((res) => {
           if (res.headers['content-type'] !== 'application/json') {
             return this.$router.push({ name: 'Login' })
@@ -664,6 +665,8 @@ export default {
     async onLoginSuccess ({ data: { data } }) {
       const { usage, company } = data
 
+      await this.verifyCompanyIsReadyToLogin(company.id)
+
       this.resetVuex(['all'])
       this.setCurrentCompany(company)
       this.setUsage(usage)
@@ -675,6 +678,23 @@ export default {
       const redirectPath = String(this.$route.query.redirect || '/')
 
       await this.$router.push(redirectPath)
+    },
+
+    async verifyCompanyIsReadyToLogin (companyId) {
+      let companySetupComplete = false
+      this.loadingText = 'Almost done...'
+
+      while (!companySetupComplete) {
+        const companyInfo = await API.V1.company.get({ id: companyId })
+
+        if (companyInfo.data?.is_setup) {
+          companySetupComplete = true
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 3000))
+        }
+      }
+
+      return companySetupComplete
     },
 
     onSubmit () {
@@ -689,7 +709,7 @@ export default {
         ...this.getBusinessInformationFieldsValue
       }
 
-      this.$axios.post('/api/admin/company-registration', payload)
+      API.V1.accountRegistration.save(payload)
         .then(async (res) => {
           this.isSubmitted = true
 
@@ -705,7 +725,7 @@ export default {
         })
         .finally(async () => {
           if (this.isSubmitted) {
-            this.loadingText = 'Almost done...'
+            this.loadingText = 'Please wait while we are logging you in...'
 
             const response = await this.login({
               email: this.form.email,
