@@ -73,27 +73,28 @@ export default {
     },
 
     resetAgentStatus (forceStatus = false) {
-      const agentStatus = { data: null }
+      let agentStatus = null
+
       switch (this.oldAgentStatus) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
-          agentStatus.data = AgentStatus.AGENT_STATUS_OFFLINE
+          agentStatus = AgentStatus.AGENT_STATUS_OFFLINE
           break
         case AgentStatus.AGENT_STATUS_ON_BREAK:
-          agentStatus.data = AgentStatus.AGENT_STATUS_ON_BREAK
+          agentStatus = AgentStatus.AGENT_STATUS_ON_BREAK
           break
         case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
-          agentStatus.data = AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS
+          agentStatus = AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS
           break
         default:
-          agentStatus.data = AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
+          agentStatus = AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
           break
       }
       console.log('old agent status [reset]: ', this.oldAgentStatus)
       console.log('current agent status [reset]: ', this.profile.agent_status)
-      console.log('new agent status [reset]: ', agentStatus.data)
+      console.log('new agent status [reset]: ', agentStatus)
       // check status
-      if (this.profile.agent_status !== agentStatus.data) {
-        this.changeAgentStatus(agentStatus.data, forceStatus)
+      if (this.profile.agent_status !== agentStatus) {
+        this.changeAgentStatus(agentStatus, forceStatus)
       }
     },
 
@@ -101,10 +102,12 @@ export default {
       if (!this.authenticated) {
         return
       }
+
       if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
         console.log('Setting old agent status [api]: ', val)
         this.setOldAgentStatus(val)
       }
+
       console.log('Changing agent status [api]: ', val)
 
       // make sure that the session is valid
@@ -114,11 +117,13 @@ export default {
           agent_status: val
         }).then(({ data }) => {
           this.loadingAgentStatus = false
+
           if (forceStatus && val !== data.agent_status) {
             console.log(`Requested Agent status value (${val}) and API response value (${data.agent_status}) is not the same. Retrying request...`)
             this.changeAgentStatus(val, forceStatus)
             return
           }
+
           this.setAgentStatus(data.agent_status)
           this.$VueEvent.fire('user_updated', data)
           console.log('Changed agent status [api]: ', data.agent_status)
@@ -129,9 +134,10 @@ export default {
           // check if we have found the communication after 3 retries
           if (changeAgentStatusTry > 3) {
             this.loadingAgentStatus = false
-          } else {
-            this.changeAgentStatus(val, forceStatus, changeAgentStatusTry)
+            return
           }
+
+          this.changeAgentStatus(val, forceStatus, changeAgentStatusTry)
         })
       }
     }, 500),

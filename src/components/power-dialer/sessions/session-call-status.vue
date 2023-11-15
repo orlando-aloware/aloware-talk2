@@ -1133,11 +1133,7 @@ export default {
           if (this.skipWrapUp) {
             // we need to clear the wrap-up (set agent status to available)
             // after the session ended
-            if (this.powerDialerTasks.in_queue.length === 0) {
-              this.$VueEvent.fire('forceEndWrapUp')
-            } else { // just end the wrap-up
-              this.$VueEvent.fire('endWrapUp')
-            }
+            this.$VueEvent.fire('endWrapUp')
 
             this.wrapUp = false
             this.skipWrapUp = false
