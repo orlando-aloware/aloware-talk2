@@ -9,8 +9,9 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    isJobNimbus () {
-      return this.profile.company_id === 1261
+    isInboxViewsEnabledCompany () {
+      const companyIds = [1261, 1568] // JobNimbus, Cardone Ventures
+      return companyIds.includes(this.profile.company_id)
     },
 
     isModGen () {

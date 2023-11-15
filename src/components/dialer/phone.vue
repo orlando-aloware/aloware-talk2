@@ -1276,6 +1276,8 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
+import * as InboundCallRecordingModes from 'src/constants/inbound-call-recording-modes'
+import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
@@ -1521,7 +1523,7 @@ export default {
     },
 
     isRecordingDisabled () {
-      return this.isCallCompleted || this.isBargingOrWhispering
+      return this.isCallCompleted || this.isBargingOrWhispering || this.isAccountForcedAlwaysRecordInbound || this.isAccountForcedAlwaysRecordOutbound
     },
 
     isCallAdded () {
@@ -1868,6 +1870,16 @@ export default {
     isPhoneExpansionAvailable () {
       return (this.devMode || !this.isCallCompleted) &&
         (this.contact || this.hasCallFishingCommunication) && this.expansionEnabled
+    },
+
+    isAccountForcedAlwaysRecordInbound () {
+      return this.dialer.communication.direction === CommunicationDirection.INBOUND &&
+        this.currentCompany.inbound_call_recording_mode === InboundCallRecordingModes.INBOUND_CALL_RECORDING_MODE_ALWAYS
+    },
+
+    isAccountForcedAlwaysRecordOutbound () {
+      return this.dialer.communication.direction === CommunicationDirection.OUTBOUND &&
+        this.currentCompany.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS
     }
   },
 
