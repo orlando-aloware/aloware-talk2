@@ -664,9 +664,9 @@ export default {
 
     async onLoginSuccess ({ data: { data } }) {
       const { usage, company } = data
-
       await this.verifyCompanyIsReadyToLogin(company.id)
 
+      this.loadingText = 'Almost done...'
       this.resetVuex(['all'])
       this.setCurrentCompany(company)
       this.setUsage(usage)
@@ -682,7 +682,7 @@ export default {
 
     async verifyCompanyIsReadyToLogin (companyId) {
       let companySetupComplete = false
-      this.loadingText = 'Almost done...'
+      this.loadingText = 'Please wait while we are logging you in...'
 
       while (!companySetupComplete) {
         const companyInfo = await API.V1.company.get({ id: companyId })
@@ -699,7 +699,7 @@ export default {
 
     onSubmit () {
       this.isLoading = true
-      this.loadingText = 'Please wait while we are creating your account...'
+      this.loadingText = 'Please wait while we are sending your information...'
 
       const payload = {
         ...this.form,
@@ -725,14 +725,15 @@ export default {
         })
         .finally(async () => {
           if (this.isSubmitted) {
-            this.loadingText = 'Please wait while we are logging you in...'
+            this.loadingText = 'Your account is being created...'
 
             const response = await this.login({
               email: this.form.email,
               password: this.form.password,
               recaptchaResponse: this.recaptchaResponse,
               deviceInfo: null,
-              requestedFrom: 'bypass'
+              requestedFrom: 'bypass',
+              skipSetAuthenticated: true
             })
 
             await this.onLoginSuccess(response)
