@@ -213,8 +213,7 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog"
-                       @change-showed-kyc-dialog="changeShowedKycDialog" />
+      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
     </div>
   </div>
 </template>
@@ -356,7 +355,6 @@ export default {
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin,
-      showedKycDialog: false,
       isFirstLoading: true
     }
   },
@@ -377,7 +375,8 @@ export default {
       'suspended',
       'parkedCalls',
       'leadSources',
-      'isIntroVideoVisible'
+      'isIntroVideoVisible',
+      'showedKycDialog'
     ]),
 
     ...mapState('auth', [
@@ -2483,10 +2482,6 @@ export default {
 
     onShowMobileLiveCallBar (value) {
       this.mobileLiveCallBarShown = value
-    },
-
-    changeShowedKycDialog (value) {
-      this.showedKycDialog = value
     },
 
     beforeUnload () {
