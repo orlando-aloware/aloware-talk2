@@ -14,6 +14,6 @@ export default {
     return { profile: state.profile, authenticated: state.authenticated }
   },
   isCompanyKYC (state) {
-    return state.profile?.company?.kyc_status && state.profile?.company?.kyc_status !== KYC_STATUS_NONE
+    return process.env.KYC_SSU_ENABLED && (state.profile?.company?.kyc_status && state.profile?.company?.kyc_status !== KYC_STATUS_NONE)
   }
 }
