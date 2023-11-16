@@ -537,7 +537,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { simpsocialMixin } from 'src/plugins/mixins'
+import { simpsocialMixin, kycMixin } from 'src/plugins/mixins'
 import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
@@ -556,7 +556,10 @@ export default {
     }
   },
 
-  mixins: [simpsocialMixin],
+  mixins: [
+    simpsocialMixin,
+    kycMixin
+  ],
 
   computed: {
     ...mapState('auth', ['profile']),
