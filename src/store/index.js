@@ -280,7 +280,8 @@ export default function (/* { ssrContext } */) {
       staticsLoaded: false,
       isCallDisposed: false,
       isContactDisposed: false,
-      isIntroVideoVisible: false
+      isIntroVideoVisible: false,
+      showedKycDialog: false
     },
 
     getters: {
@@ -825,6 +826,10 @@ export default function (/* { ssrContext } */) {
 
       setIsIntroVideoVisible ({ commit }, value) {
         commit('SET_IS_INTRO_VIDEO_VISIBLE', value)
+      },
+
+      setShowedKycDialog ({ commit }, value) {
+        commit('SET_SHOWED_KYC_DIALOG', value)
       }
     },
 
@@ -1546,6 +1551,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_INTRO_VIDEO_VISIBLE (state, value) {
         state.isIntroVideoVisible = value
+      },
+
+      SET_SHOWED_KYC_DIALOG (state, value) {
+        state.showedKycDialog = value
       },
 
       updateField
