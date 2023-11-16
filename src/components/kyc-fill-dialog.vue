@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'KycFillDialog',
@@ -70,6 +70,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setShowedKycDialog']),
+
     openKycBusinessRegistration () {
       this.changeShowedKycDialog()
 
@@ -80,7 +82,7 @@ export default {
     },
 
     changeShowedKycDialog () {
-      this.$emit('change-showed-kyc-dialog', true)
+      this.setShowedKycDialog(true)
     }
   }
 }
