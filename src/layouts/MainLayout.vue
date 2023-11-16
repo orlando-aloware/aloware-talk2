@@ -5,7 +5,7 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <trial-banner v-if="isTrialKYC"/>
+    <trial-banner v-if="isTrialKYC && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -213,8 +213,7 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog"
-                       @change-showed-kyc-dialog="changeShowedKycDialog" />
+      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
     </div>
   </div>
 </template>
@@ -356,7 +355,6 @@ export default {
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin,
-      showedKycDialog: false,
       isFirstLoading: true
     }
   },
@@ -377,7 +375,8 @@ export default {
       'suspended',
       'parkedCalls',
       'leadSources',
-      'isIntroVideoVisible'
+      'isIntroVideoVisible',
+      'showedKycDialog'
     ]),
 
     ...mapState('auth', [
@@ -474,10 +473,9 @@ export default {
     },
 
     isShowPage () {
-      const isAuthenticated = !this.isGuest && this.authenticated
       const isUnauthenticated = this.isGuest && !this.authenticated
 
-      return isAuthenticated || isUnauthenticated || this.suspended
+      return this.isAuthenticated || isUnauthenticated || this.suspended
     },
 
     headerContainerClass () {
@@ -515,14 +513,16 @@ export default {
     },
 
     shouldShowKycFillDialog () {
-      const isAuthenticated = !this.isGuest && this.authenticated
-
-      return isAuthenticated &&
+      return this.isAuthenticated &&
              this.isIntroVideoVisible === null &&
              !this.isFirstLoading &&
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
+    },
+
+    isAuthenticated () {
+      return !this.isGuest && this.authenticated
     }
   },
 
@@ -2482,10 +2482,6 @@ export default {
 
     onShowMobileLiveCallBar (value) {
       this.mobileLiveCallBarShown = value
-    },
-
-    changeShowedKycDialog (value) {
-      this.showedKycDialog = value
     },
 
     beforeUnload () {
