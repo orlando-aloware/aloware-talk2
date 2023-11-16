@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-100">
     <div v-if="authenticated && shouldShowPowerDialer"
         class="contacts mx-0 content-row d-flex overflow-hidden h-100">
 
