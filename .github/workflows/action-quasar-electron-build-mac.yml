@@ -2,8 +2,8 @@ name: Deploy macOS
 
 on:
   push:
-    branches:
-      - hotfix/build
+    tags:
+      - '*'
   workflow_dispatch:
     inputs:
       environment:
