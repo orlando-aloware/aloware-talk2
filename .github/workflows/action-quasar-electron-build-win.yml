@@ -77,6 +77,8 @@ jobs:
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
           ENV_RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
           ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+          ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
+          ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
           file-name: .env.prod
 
       - name: Build/release Electron win app
@@ -130,3 +132,8 @@ jobs:
 
           # Demo Company Ids
           DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+
+          # Moderate Genius
+          HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
+          # All others
+          HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
