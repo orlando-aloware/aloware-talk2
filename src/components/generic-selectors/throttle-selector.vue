@@ -59,7 +59,7 @@ export default {
       const options = []
 
       // @custom for SimpSocial resold accounts and Bluepen Funding and for Teli lines
-      if (this.isSimpSocial || this.currentCompany.id === 444 || this.campaign.has_messaging_service) {
+      if (this.isSimpSocial || this.currentCompany.id === 444) {
         options.push(...[
           {
             id: 1,
