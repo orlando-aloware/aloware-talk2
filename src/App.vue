@@ -25,7 +25,7 @@
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
 
-    <custom-scripts v-if="isLoggedIn"/>
+    <custom-scripts v-show="isLoggedIn"/>
     <intercom v-if="isLoggedIn && staticsLoaded && !statics.whitelabel && !isAloware"/>
   </div>
 </template>

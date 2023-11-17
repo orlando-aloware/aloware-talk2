@@ -27,7 +27,7 @@ export default {
 
   methods: {
     setup () {
-      if (!this.currentCompany) {
+      if (!this.currentCompany || this.currentCompany.id !== this.profile?.company_id) {
         return
       }
 
@@ -61,6 +61,10 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
+      if (!this.isAloware && !this.isModGenius) {
+        return
+      }
+
       api.V1.profile.getHubspotConversationsVisitorToken()
         .then((res) => {
           if (window?.HubSpotConversations) {
@@ -84,15 +88,42 @@ export default {
         window.HubSpotConversations.widget.refresh()
         window.HubSpotConversations.widget.load()
       }
+    },
+
+    remove () {
+      if (!window?.HubSpotConversations?.widget) {
+        return
+      }
+
+      window.HubSpotConversations.widget.remove()
+      document.querySelector('#hs-script-loader').remove()
+    },
+
+    refresh () {
+      if (this.authenticated) {
+        this.setup()
+        return
+      }
+
+      this.remove()
     }
   },
 
   watch: {
-    authenticated (value) {
-      if (value) {
-        this.initiateHubspotConversationsWithUserDetails()
+    authenticated () {
+      this.refresh()
+    },
+
+    currentCompany: {
+      deep: true,
+      handler () {
+        this.refresh()
       }
     }
+  },
+
+  beforeDestroy () {
+    this.remove()
   }
 }
 </script>
