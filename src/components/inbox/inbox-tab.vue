@@ -1007,6 +1007,7 @@ export default {
     }
 
     this.listeners.updateInboxCommunication = (communication) => {
+      console.log('this.listeners.updateInboxCommunication', communication)
       if (!communication.contact_id || this.isSearch) {
         return
       }
@@ -1083,7 +1084,7 @@ export default {
           this.setSelectedContact(contacts[contactIndex])
         }
       }
-
+      console.log('this.listeners.updateInboxCommunication contactTaskToRemove', contactTaskToRemove)
       if (contactTaskToRemove) {
         this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
       }
