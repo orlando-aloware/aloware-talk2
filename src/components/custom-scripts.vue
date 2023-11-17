@@ -27,7 +27,7 @@ export default {
 
   methods: {
     setup () {
-      if (!this.currentCompany || this.currentCompany?.id !== this.profile.company_id ||
+      if (!this.currentCompany || this.currentCompany?.id !== this.profile?.company_id ||
         !this.authenticated || window?.HubSpotConversations) {
         return
       }
