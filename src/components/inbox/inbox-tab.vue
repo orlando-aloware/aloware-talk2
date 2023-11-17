@@ -1091,7 +1091,7 @@ export default {
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
-      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask) {
+      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || this.currentTask === contact.task_status) {
         return
       }
 
