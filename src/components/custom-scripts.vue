@@ -27,7 +27,7 @@ export default {
 
   methods: {
     setup () {
-      if (!this.currentCompany || this.currentCompany.id !== this.profile.company.id) {
+      if (!this.currentCompany || this.currentCompany.id !== this.profile?.company_id) {
         return
       }
 
@@ -61,7 +61,7 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
-      if (!this.isAloware) {
+      if (!this.isAloware && !this.isModGenius) {
         return
       }
 
