@@ -1086,9 +1086,9 @@ export default {
       }
       console.log('this.listeners.updateInboxCommunication contactTaskToRemove', contactTaskToRemove)
       console.log('this.listeners.updateInboxCommunication this.currentTask', this.currentTask)
-      if (contactTaskToRemove) {
+      /* if (contactTaskToRemove) {
         this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
-      }
+      } */
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
