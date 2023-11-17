@@ -1085,12 +1085,15 @@ export default {
         }
       }
       console.log('this.listeners.updateInboxCommunication contactTaskToRemove', contactTaskToRemove)
+      console.log('this.listeners.updateInboxCommunication this.currentTask', this.currentTask)
       if (contactTaskToRemove) {
         this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
       }
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
+      console.log('this.listeners.contactTaskStatusUpdated this.currentTask', this.currentTask)
+      console.log('this.listeners.contactTaskStatusUpdated contact.task_status', contact.task_status)
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || this.currentTask === contact.task_status) {
         return
       }
