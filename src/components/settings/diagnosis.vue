@@ -20,6 +20,7 @@
              sm="12">
         <b-button size="sm"
                   variant="success"
+                  :disabled="viewOnly"
                   @click="diagnose">
           <i class="fa fa-redo"
              v-if="!isDiagnosing"/>
@@ -156,7 +157,7 @@ import * as AgentStatusLabels from 'src/constants/agent-status-labels'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import OutboundCallOIcon from 'components/icons/outbound-call-o-icon'
 import InboundCallOIcon from 'components/icons/inbound-call-o-icon'
-import { settingsLayoutMixin } from 'src/plugins/mixins'
+import { settingsLayoutMixin, kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'diagnosis',
@@ -164,7 +165,8 @@ export default {
   components: { InboundCallOIcon, OutboundCallOIcon },
 
   mixins: [
-    settingsLayoutMixin
+    settingsLayoutMixin,
+    kycMixin
   ],
 
   props: {

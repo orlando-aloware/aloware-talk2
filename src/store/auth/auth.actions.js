@@ -60,8 +60,11 @@ const login = async ({ commit }, {
   rememberMe,
   recaptchaResponse = null,
   isMobile = false,
-  deviceInfo = null
+  deviceInfo = null,
+  requestedFrom = null
 }) => {
+  const config = {}
+
   const params = {
     email: email,
     password: password,
@@ -74,10 +77,16 @@ const login = async ({ commit }, {
     params.recaptcha_response = recaptchaResponse
   }
 
+  if (requestedFrom) {
+    config.headers = {
+      'requested-from': requestedFrom
+    }
+  }
+
   try {
     commit('SET_LOADING', true)
 
-    const response = await window.axios.post('/login', params)
+    const response = await window.axios.post('/login', params, config)
 
     const {
       meta,

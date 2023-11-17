@@ -165,6 +165,10 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
       },
 
+      syncGHL (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-gohighlevel`)
+      },
+
       bulkSaveCustomAttributes (contactId, params) {
         return window.axios.patch(`${suffixV1}contact-attributes/${contactId}`, params)
       },
@@ -472,6 +476,10 @@ export default {
     profile: {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
+      },
+
+      getHubspotConversationsVisitorToken () {
+        return window.axios.get(`${suffixV1}profile/hubspot-visitor-token`)
       }
     },
 
@@ -540,6 +548,12 @@ export default {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
         }
+      }
+    },
+
+    dialer: {
+      sendVmDrop (params) {
+        return window.axios.post(`${suffixV1}dialer/play-prerecorded-voicemail`, params)
       }
     }
   },

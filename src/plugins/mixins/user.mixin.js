@@ -7,8 +7,15 @@ export default {
   computed: {
     ...mapState(['users']),
 
-    isJobNimbus () {
-      return this.profile.company_id === 1261
+    ...mapState('cache', ['currentCompany']),
+
+    isInboxViewsEnabledCompany () {
+      const companyIds = [1261, 1568] // JobNimbus, Cardone Ventures
+      return companyIds.includes(this.profile.company_id)
+    },
+
+    isModGen () {
+      return this.currentCompany && this.currentCompany.reseller_id === 2132
     }
   },
 

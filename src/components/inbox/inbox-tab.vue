@@ -405,6 +405,7 @@ export default {
   methods: {
     ...mapActions('inbox', [
       'toggleFilterDialog',
+      'toggleFilterDialogWithFilters',
       'resetChannelChangedFilterFields',
       'toggleFilterModelForm',
       'setSelectedFilter',
@@ -865,6 +866,7 @@ export default {
       }
 
       this.toggleFilterDialog(true)
+      this.toggleFilterDialogWithFilters(true)
     },
 
     startInboxListeners () {
