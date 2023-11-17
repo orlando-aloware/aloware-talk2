@@ -170,7 +170,7 @@
                        v-model="form.postal_code"
                        @input="cleanFieldError('postal_code')">
             <template v-slot:hint
-                      v-if="form.postal_code.length">
+                      v-if="form.postal_code?.length">
               <div class="zipcode-hint"
                    :class="validateFieldError('postal_code') ? 'negative-top' : ''">
                 <q-icon class="q-mr-xs"
@@ -422,20 +422,20 @@ export default {
 
     validateFieldsFilled () {
       return (
-        this.form.legal_name.length &&
+        this.form.legal_name?.length &&
         this.form.business_type &&
         this.form.business_registration_identifier &&
         this.form.business_registration_number?.length &&
         this.form.business_regions_of_operation &&
         this.form.business_industry &&
-        this.form.website_url.length &&
-        this.form.street.length &&
-        this.form.region.length &&
-        this.form.city.length &&
+        this.form.website_url?.length &&
+        this.form.street?.length &&
+        this.form.region?.length &&
+        this.form.city?.length &&
         this.form.legal_country &&
         this.validateZipCode(this.form.postal_code) &&
-        this.form.auth_rep_first_name.length &&
-        this.form.auth_rep_last_name.length &&
+        this.form.auth_rep_first_name?.length &&
+        this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&
         this.validatePhoneNumber(this.form.auth_rep_phone_number) === true &&
         this.form.auth_rep_business_title &&
