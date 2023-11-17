@@ -89,7 +89,7 @@ export default {
 
   watch: {
     authenticated (value) {
-      if (value && this.isAloware) {
+      if (value) {
         this.initiateHubspotConversationsWithUserDetails()
       }
     }
