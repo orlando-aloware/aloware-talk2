@@ -234,9 +234,6 @@ export default {
 
   methods: {
     onUpdateTaskStatus (status) {
-      console.log('onUpdateTaskStatus')
-      console.log('status', status)
-      console.log('this.contact', this.contact)
       this.isUpdatingStatus = true
       this.nextStat = status
       talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
@@ -246,8 +243,6 @@ export default {
 
         const contact = { ...this.contact }
         const key = { data: null }
-        console.log('res.data', res.data)
-        console.log('contact', contact)
         for (key.data in res.data) {
           if (typeof contact[key.data] !== 'undefined') {
             contact[key.data] = res.data[key.data]
@@ -277,8 +272,6 @@ export default {
   },
   watch: {
     'contact.task_status': function () {
-      console.log('watch.contact.task_status')
-      console.log('this.contact', this.contact)
       this.$VueEvent.fire('contact_task_status_updated', this.contact)
       this.isUpdatingStatus = false
       this.nextStat = null

@@ -536,7 +536,6 @@ export default {
     },
 
     async onItemRemoved (contact, callback, loadCount = true) {
-      console.log('onItemRemoved', contact, callback, loadCount)
       // avoid request in duplicity when task is moved to open
       const isOpen = [ContactTaskStatus.STATUS_OPEN].includes(contact.task_status)
 
@@ -765,7 +764,6 @@ export default {
 
     processNewCommunicationEvent (data, communication) {
       const contact = this.$jsonClone(data)
-      console.log('processNewCommunicationEvent', data, communication)
       // add the last_communication in contact
       // and remove the contact in the communication
       const newCommunication = this.$jsonClone(communication)
@@ -1007,7 +1005,6 @@ export default {
     }
 
     this.listeners.updateInboxCommunication = (communication) => {
-      console.log('this.listeners.updateInboxCommunication', communication)
       if (!communication.contact_id || this.isSearch) {
         return
       }
@@ -1084,16 +1081,13 @@ export default {
           this.setSelectedContact(contacts[contactIndex])
         }
       }
-      console.log('this.listeners.updateInboxCommunication contactTaskToRemove', contactTaskToRemove)
-      console.log('this.listeners.updateInboxCommunication this.currentTask', this.currentTask)
+
       /* if (contactTaskToRemove) {
         this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
       } */
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
-      console.log('this.listeners.contactTaskStatusUpdated this.currentTask', this.currentTask)
-      console.log('this.listeners.contactTaskStatusUpdated contact.task_status', contact.task_status)
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || !contact || this.currentTask === contact.task_status) {
         return
       }
@@ -1115,7 +1109,7 @@ export default {
       if (this.currentTask === ContactTaskStatus.STATUS_CLOSED && contact.task_status === ContactTaskStatus.STATUS_OPEN) {
         this.setOpenTaskCount(this.taskCounts.open + 1)
       }
-      console.log('this.listeners.contactTaskStatusUpdated', contact, this.$route.name, this.currentTask)
+
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
         this.fetchTaskCounts()
@@ -1254,7 +1248,6 @@ export default {
   watch: {
     $route (to, from) {
       // load contacts if not inbox view related route
-      console.log('watch: $route', from, to)
       if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
         this.loadContactTasks(false)
         this.fetchTaskCounts()
@@ -1314,14 +1307,11 @@ export default {
     },
 
     '$route.name': function (value) {
-      console.log('$route.name', value)
       if (['Inbox'].includes(value)) {
         this.searchText = ''
         this.isSearch = false
         this.currentTask = ContactTaskStatus.STATUS_OPEN
         this.resetList()
-        console.log('this.previousRoute', this.previousRoute)
-        console.log('this.previousRoute.params.status', this.previousRoute.params.status)
         if (this.previousRoute && this.previousRoute.params.status === 'pending') {
           this.setLoadingPendingTaskCount(true)
           this.getContactsCountByTaskStatus(ContactTaskStatus.STATUS_PENDING)
