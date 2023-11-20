@@ -1,15 +1,14 @@
 name: Deploy Windows
 
 on:
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
     inputs:
       environment:
         description: Dev or Prod
         default: Dev
-        required: true
-      version:
-        description: Bump Version
-        default: 1.0.0
         required: true
 
 jobs:
@@ -20,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ 'macos-latest' ]
-        node-version: [ '14.x' ]
+        node-version: [ '16.x' ]
         npm-version: [ '9.x' ]
 
     steps:
@@ -33,7 +32,6 @@ jobs:
 
       - name: Build details
         run: |
-          echo "Version: ${{ github.event.inputs.version }}"
           echo "Environment: ${{ github.event.inputs.environment }}"
           echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
 
@@ -58,7 +56,7 @@ jobs:
           architecture: 'x64'
 
       - name: Install dependencies & Quasar
-        run: npm install && npm install -g @quasar/cli
+        run: yarn install && yarn global add @quasar/cli
 
       - name: Make dotenv file
         uses: ozaytsev86/create-env-file@v1
@@ -82,10 +80,12 @@ jobs:
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
           ENV_RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
           ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+          ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
+          ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
           file-name: .env.prod
 
       - name: Build/release Electron win app
-        run: npm run deploy-win
+        run: quasar build -d -m electron -T win -b builder -P always
         env:
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
@@ -135,3 +135,8 @@ jobs:
 
           # Demo Company Ids
           DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+
+          # Moderate Genius
+          HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
+          # All others
+          HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}

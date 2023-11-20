@@ -2,6 +2,7 @@
   <section class="row w-100 h-100 mx-0">
     <login-large-screens-info class="col-7 px-0" />
     <login-form class="col-12 col-lg-5 px-0" />
+    <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </section>
 </template>
 
@@ -12,16 +13,19 @@ import LoginForm from 'components/guest/login-form'
 import { mapActions, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
+import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
 
 export default {
   name: 'login',
 
   mixins: [guestMixin, aclMixin],
 
-  components: { LoginForm, LoginLargeScreensInfo },
+  components: { LoginForm, LoginLargeScreensInfo, UserAlreadyHaveAccountDialog },
 
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState('accountRegistration', ['shouldRedirectToLogin']),
+
     shouldRedirectToClassic () {
       const urlParams = new URLSearchParams(window.location.search)
       const fromClassic = Number(urlParams.get('from_classic'))

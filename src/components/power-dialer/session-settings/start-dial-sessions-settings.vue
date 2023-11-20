@@ -1,23 +1,31 @@
 <template>
   <div class="t-session-settings">
-    <q-btn class="start-dial-button p-0"
-           color="success"
-           no-caps
-           unelevated
-           :disabled="disabledTrigger"
-           v-if="defaultTrigger"
-           @click="dialPreparation">
-      <PhoneIcon class="mr-2"
-                 color="white"
-                 height="12"
-                 width="12" />
-      <div class="button-label">
-        Start Dialing
-        <q-tooltip v-if="disabledTrigger">
-          To start dialing, a minimum of one (1) contact item in the list is required.
-        </q-tooltip>
-      </div>
-    </q-btn>
+    <block-tooltip placement="left"
+                   triggers="click"
+                   target="pd-call-popover"
+                   task="call"
+                   v-if="callDisabled">
+    </block-tooltip>
+    <div id="pd-call-popover"
+         v-if="defaultTrigger">
+      <q-btn class="start-dial-button p-0"
+             color="success"
+             no-caps
+             unelevated
+             :disabled="disabledTrigger || callDisabled"
+             @click="dialPreparation">
+        <PhoneIcon class="mr-2"
+                   color="white"
+                   height="12"
+                   width="12" />
+        <div class="button-label">
+          Start Dialing
+          <q-tooltip v-if="disabledTrigger">
+            To start dialing, a minimum of one (1) contact item in the list is required.
+          </q-tooltip>
+        </div>
+      </q-btn>
+    </div>
     <q-btn no-caps
            unelevated
            @click="dialPreparation"
@@ -89,8 +97,8 @@
                         </q-item-section>
                         <q-item-section side
                                         v-if="hovered !== setting.id || settingCategory.name === 'company'">
-                          <CheckIcon v-if="isSessionValid(setting)"
-                                     class="mr-2" />
+                          <CheckIcon class="mr-2"
+                                     v-if="isSessionValid(setting)" />
                         </q-item-section>
                         <q-item-section class="pl-0"
                                         side
@@ -105,7 +113,7 @@
                                  dense
                                  v-show="isActionAllowed(setting.user_id)"
                                  @click="hoveredMenu = setting.id">
-                            <i class="fa fa-ellipsis-h"/>
+                            <i class="fa fa-ellipsis-h" />
                           </q-btn>
                           <q-menu anchor="top right"
                                   self="top left">
@@ -117,7 +125,7 @@
                                       @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
-                                    <i class="fa fa-pencil-alt mr-2"/>
+                                    <i class="fa fa-pencil-alt mr-2" />
                                     Rename
                                   </div>
                                 </q-item-section>
@@ -129,7 +137,7 @@
                                       @click="onDeleteRequest(setting.id, setting.user_id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
-                                    <i class="fa fa-trash-alt mr-2"/>
+                                    <i class="fa fa-trash-alt mr-2" />
                                     Delete
                                   </div>
                                 </q-item-section>
@@ -256,16 +264,16 @@
           </div>
           <q-input outlined
                    :placeholder="updateObj.name"
-                   v-model="newSettingName"
-                   v-else-if="updateObj"
                    :error="errorMessage != null"
-                   :error-message="errorMessage"/>
+                   :error-message="errorMessage"
+                   v-model="newSettingName"
+                   v-else-if="updateObj" />
           <q-input placeholder="New Settings Name"
                    outlined
-                   v-model="newSettingName"
-                   v-else
                    :error="errorMessage != null"
-                   :error-message="errorMessage"/>
+                   :error-message="errorMessage"
+                   v-model="newSettingName"
+                   v-else />
         </q-card-section>
 
         <q-card-actions class="px-3 pb-3"
@@ -324,13 +332,18 @@ import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import { isEmpty, isEqual } from 'lodash'
-import { aclMixin } from 'src/plugins/mixins'
+import {
+  kycMixin,
+  aclMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'StartDialSessionsSettings',
 
   mixins: [
+    kycMixin,
     aclMixin
   ],
 
@@ -354,7 +367,8 @@ export default {
     StartDialSessionsForm,
     PhoneIcon,
     CheckIcon,
-    SettingIcon
+    SettingIcon,
+    BlockTooltip
   },
 
   computed: {
@@ -450,6 +464,10 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
+    },
+
+    callDisabled () {
+      return !this.enabledToCallNumber()
     },
 
     isSettingsOwner () {

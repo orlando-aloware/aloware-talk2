@@ -57,7 +57,12 @@
             </b-col>
             <b-col class="p-0">
               <div class="d-flex float-right">
-
+                <block-tooltip v-if="!canCreateContacts"
+                               placement="left"
+                               triggers="click"
+                               target="contacts-create-popover"
+                               task="contacts.create">
+                </block-tooltip>
                 <b-dropdown class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                             toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                             text="Add Contacts"
@@ -80,18 +85,27 @@
                       Clearing of task is currently disabled.
                     </q-tooltip>
                   </template>
-                  <b-dropdown-item href="#"
-                                   :disabled="taskAddAndClearingDisabled"
-                                   @click="onAddContactsToList">
-                    <i class="fa fa-search mr-1"/>
-                    Select Contacts & Add to List
-                  </b-dropdown-item>
-                  <b-dropdown-item href="#"
-                                   :disabled="taskAddAndClearingDisabled"
-                                   v-b-modal:create-contact-modal>
-                    <i class="fa fa-plus mr-1"/>
-                    {{ createContactToListText }}
-                  </b-dropdown-item>
+                  <div id="contacts-create-popover">
+                    <b-dropdown-item href="#"
+                                     :disabled="taskAddAndClearingDisabled"
+                                     @click="onAddContactsToList">
+                      <i class="fa fa-search mr-1" />
+                      Select Contacts & Add to List
+                    </b-dropdown-item>
+                    <b-dropdown-item v-if="canCreateContacts"
+                                     href="#"
+                                     :disabled="taskAddAndClearingDisabled"
+                                     v-b-modal:create-contact-modal>
+                      <i class="fa fa-plus mr-1" />
+                      {{ createContactToListText }}
+                    </b-dropdown-item>
+                    <b-dropdown-item v-else
+                                     href="#"
+                                     disabled>
+                      <i class="fa fa-plus mr-1" />
+                      {{ createContactToListText }}
+                    </b-dropdown-item>
+                  </div>
                 </b-dropdown>
 
                 <contact-create-modal @created="onContactCreated"/>
@@ -538,6 +552,7 @@ import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import PowerDialerBulkActionMenu from 'src/components/power-dialer-bulk-action-menu'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import talk2Api from 'src/plugins/api/api'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEqual, get, isEmpty } from 'lodash'
@@ -546,7 +561,8 @@ import {
   viewMixin,
   avatarMixin,
   powerDialerMixin,
-  powerDialerInitMixin
+  powerDialerInitMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
 
@@ -632,7 +648,8 @@ export default {
     powerDialerInitMixin,
     aclMixin,
     viewMixin,
-    avatarMixin
+    avatarMixin,
+    kycMixin
   ],
 
   inject: [
@@ -651,6 +668,7 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     PowerDialerBulkActionMenu,
+    BlockTooltip,
     PowerDialerBulkAddReportModal
   },
 
@@ -866,6 +884,10 @@ export default {
 
     showMobileFilters () {
       return this.$q.screen.width <= PD_MAX_FILTER_LG
+    },
+
+    canCreateContacts () {
+      return this.enabledToCreateContacts()
     }
   },
 
