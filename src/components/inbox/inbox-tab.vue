@@ -264,7 +264,8 @@ export default {
       'activeChannel',
       'pinnedViews',
       'contacts',
-      'channelClonedFilter'
+      'channelClonedFilter',
+      'inboxTaskCounts'
     ]),
 
     ...mapState('contacts', [
@@ -1094,22 +1095,25 @@ export default {
 
       if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
         this.setPendingTaskCount(this.taskCounts.pending - 1)
+        this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)
         if (contact.task_status === ContactTaskStatus.STATUS_OPEN) {
           this.setOpenTaskCount(this.taskCounts.open + 1)
-          this.setInboxOpenTaskCount(this.taskCounts.open + 1)
+          this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
         }
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
         this.setOpenTaskCount(this.taskCounts.open - 1)
+        this.setInboxOpenTaskCount(this.inboxTaskCounts.open - 1)
         if (contact.task_status === ContactTaskStatus.STATUS_PENDING) {
           this.setPendingTaskCount(this.taskCounts.pending + 1)
-          this.setInboxPendingTaskCount(this.taskCounts.pending + 1)
+          this.setInboxPendingTaskCount(this.inboxTaskCounts.pending + 1)
         }
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_CLOSED && contact.task_status === ContactTaskStatus.STATUS_OPEN) {
         this.setOpenTaskCount(this.taskCounts.open + 1)
+        this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
       }
 
       // prevent duplicate task status count request when Contact component is active
