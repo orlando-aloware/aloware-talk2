@@ -415,6 +415,8 @@ export default {
       'setLoadingOpenTaskCount',
       'setOpenTaskCount',
       'setPendingTaskCount',
+      'setInboxOpenTaskCount',
+      'setInboxPendingTaskCount',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
       'setFilterDialogForView',
@@ -1094,6 +1096,7 @@ export default {
         this.setPendingTaskCount(this.taskCounts.pending - 1)
         if (contact.task_status === ContactTaskStatus.STATUS_OPEN) {
           this.setOpenTaskCount(this.taskCounts.open + 1)
+          this.setInboxOpenTaskCount(this.taskCounts.open + 1)
         }
       }
 
@@ -1101,6 +1104,7 @@ export default {
         this.setOpenTaskCount(this.taskCounts.open - 1)
         if (contact.task_status === ContactTaskStatus.STATUS_PENDING) {
           this.setPendingTaskCount(this.taskCounts.pending + 1)
+          this.setInboxPendingTaskCount(this.taskCounts.pending + 1)
         }
       }
 
