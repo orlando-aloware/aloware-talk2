@@ -18,7 +18,7 @@
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isJobNimbus">
+    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isInboxViewsEnabledCompany">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -162,7 +162,7 @@ export default {
   },
 
   created () {
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isJobNimbus) {
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getFilters()
         .then(() => {
           if (this.$route.params?.viewId) {

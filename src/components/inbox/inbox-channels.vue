@@ -823,12 +823,18 @@ export default {
       'setHasMoreCommunications',
       'toggleFilterModelForm',
       'toggleFilterDialog',
+      'toggleFilterDialogWithFilters',
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
       'setFilterDialogForView',
       'setIsEditingView'
     ]),
+
+    processToggleFilter (value) {
+      this.toggleFilterDialog(value)
+      this.toggleFilterDialogWithFilters(value)
+    },
 
     onResetFilters () {
       this.resetFilters()

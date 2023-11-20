@@ -97,6 +97,7 @@ export const DEFAULT_STATE = {
   channelChangedFilterFields: [],
   isFilterModelFormShown: false,
   isFilterDialogShown: false,
+  isFilterDialogShowFilters: false,
   isFilterDialogForView: false,
   selectedFilter: null,
   appliedFilter: null,

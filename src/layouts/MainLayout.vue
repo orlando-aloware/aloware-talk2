@@ -5,6 +5,7 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
+    <trial-banner v-if="isTrialKYC && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -211,6 +212,8 @@
       </Modal>
 
       <pro-feature-dialog/>
+
+      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
     </div>
   </div>
 </template>
@@ -228,7 +231,8 @@ import {
   visibilityMixin,
   unownedContactTaskMixin,
   agentMixin,
-  contactV2AttributesMixin
+  contactV2AttributesMixin,
+  kycMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -256,6 +260,7 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
 import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
+import KycFillDialog from 'components/kyc-fill-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
@@ -266,6 +271,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   MAX_SCREEN_WIDTH_MOBILE_HEADER
 } from 'src/constants/viewport-sizes'
+import TrialBanner from 'components/trial-banner.vue'
 
 export default {
   name: 'MyLayout',
@@ -279,7 +285,9 @@ export default {
     Dialer,
     Phone,
     ProFeatureDialog,
-    Modal
+    KycFillDialog,
+    Modal,
+    TrialBanner
   },
 
   mixins: [
@@ -293,7 +301,8 @@ export default {
     visibilityMixin,
     unownedContactTaskMixin,
     agentMixin,
-    contactV2AttributesMixin
+    contactV2AttributesMixin,
+    kycMixin
   ],
 
   data () {
@@ -345,7 +354,8 @@ export default {
       mobileLiveCallBarShown: false,
       CommunicationTypes,
       MetricOptionGroups,
-      AppDefaultLogin
+      AppDefaultLogin,
+      isFirstLoading: true
     }
   },
 
@@ -364,7 +374,9 @@ export default {
       'showPhone',
       'suspended',
       'parkedCalls',
-      'leadSources'
+      'leadSources',
+      'isIntroVideoVisible',
+      'showedKycDialog'
     ]),
 
     ...mapState('auth', [
@@ -461,10 +473,9 @@ export default {
     },
 
     isShowPage () {
-      const isAuthenticated = !this.isGuest && this.authenticated
       const isUnauthenticated = this.isGuest && !this.authenticated
 
-      return isAuthenticated || isUnauthenticated || this.suspended
+      return this.isAuthenticated || isUnauthenticated || this.suspended
     },
 
     headerContainerClass () {
@@ -499,6 +510,19 @@ export default {
 
     isDemoCompany () {
       return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
+    },
+
+    shouldShowKycFillDialog () {
+      return this.isAuthenticated &&
+             this.isIntroVideoVisible === null &&
+             !this.isFirstLoading &&
+             !this.showedKycDialog &&
+             this.profile?.company?.kyc_filled === false &&
+             !this.$router.currentRoute.name.includes('Business Information')
+    },
+
+    isAuthenticated () {
+      return !this.isGuest && this.authenticated
     }
   },
 
@@ -1072,6 +1096,10 @@ export default {
     // online / offline
     window.addEventListener('online', this.updateOnlineStatus)
     window.addEventListener('offline', this.updateOnlineStatus)
+
+    setTimeout(() => {
+      this.isFirstLoading = false
+    }, 2000)
   },
 
   methods: {

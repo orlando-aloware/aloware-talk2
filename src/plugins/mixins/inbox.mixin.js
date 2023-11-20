@@ -309,13 +309,11 @@ export default {
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
 
-      if (filter && filter?.campaigns && filter.campaigns.length) {
-        this.filters = {
-          ...this.filters,
-          'lines': [
-            { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
-          ]
-        }
+      // add the line filter if there is
+      if (filter && !isEmpty(filter?.campaigns)) {
+        this.filters.lines = [
+          { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
+        ]
       }
 
       if (filter && filter?.ring_groups && filter.ring_groups.length) {

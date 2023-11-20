@@ -18,11 +18,20 @@
              sm="12"
              md="12"
              :class="horizontalPaddingClass">
-        <b-button variant="primary"
-                  size="sm"
-                  @click="onAdd('user')">
-          <i class="fa fa-plus mr-1"/> New Template
-        </b-button>
+        <block-tooltip placement="left"
+                       triggers="click"
+                       target="sms-template-popover"
+                       task="sms.template"
+                       v-if="viewOnly">
+        </block-tooltip>
+        <div id="sms-template-popover">
+          <b-button variant="primary"
+                    size="sm"
+                    :disabled="viewOnly"
+                    @click="onAdd('user')">
+            <i class="fa fa-plus mr-1" /> New Template
+          </b-button>
+        </div>
       </b-col>
     </b-row>
 
@@ -73,6 +82,7 @@
                   <div>
                     <b-button size="sm"
                               variant="primary"
+                              :disabled="viewOnly"
                               @click="onEdit(template)">
 
                       <pencil-o-icon color="#FFF"/>
@@ -80,6 +90,7 @@
                     <b-button size="sm"
                               variant="danger"
                               class="ml-1"
+                              :disabled="viewOnly"
                               @click="onDelete(template)">
 
                       <trash-o-icon color="#FFF"/>
@@ -103,15 +114,23 @@ import SmsTemplateModal from 'components/sms-template-modal'
 import talk2Api from 'src/plugins/api/api'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import PencilOIcon from 'components/icons/pencil-o-icon'
-import { settingsLayoutMixin } from 'src/plugins/mixins'
+import BlockTooltip from 'components/kyc/block-tooltip'
+import { settingsLayoutMixin, kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'sms-templates',
 
-  components: { PencilOIcon, TrashOIcon, SmsTemplateModal, Datatable },
+  components: {
+    PencilOIcon,
+    TrashOIcon,
+    SmsTemplateModal,
+    Datatable,
+    BlockTooltip
+  },
 
   mixins: [
-    settingsLayoutMixin
+    settingsLayoutMixin,
+    kycMixin
   ],
 
   props: {

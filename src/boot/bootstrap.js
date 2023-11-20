@@ -22,14 +22,19 @@ import loadDrilldown from 'highcharts/modules/drilldown'
 import VueHighcharts from 'vue-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsThemes from './HighchartsTheme'
-import { Screen, Platform } from 'quasar'
+import { Platform, Screen } from 'quasar'
 import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
-import { VALID_NA_COUNTRIES, VALID_ENG_COUNTRIES } from 'src/constants/valid-countries'
+import { VALID_ENG_COUNTRIES, VALID_NA_COUNTRIES } from 'src/constants/valid-countries'
 import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 
-Screen.setSizes({ sm: 300, md: 605, lg: 1000, xl: 2000 })
+Screen.setSizes({
+  sm: 300,
+  md: 605,
+  lg: 1000,
+  xl: 2000
+})
 
 loadStock(Highcharts)
 loadExporting(Highcharts)
@@ -335,7 +340,7 @@ Vue.prototype.$handleErrors = function (response, title = null) {
         message.data = response?.data?.error ?? 'Requested resource not found.'
         break
       case 400:
-        message.data = response.data.error
+        message.data = response.data.error || response.data.message
         break
       case 422:
         message.data = ''
@@ -388,7 +393,7 @@ Vue.prototype.$handleRouteError = (error) => {
   }
 }
 
-Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') => {
+Vue.prototype.$downloadFileWithUuid = async function (uuid, filename, type = 'common') {
   if (!uuid) {
     this.$generalNotification('Failed to download file, missing UUID', 'error')
   }
@@ -415,7 +420,7 @@ Vue.prototype.$downloadFileWithUuid = async (uuid, filename, type = 'common') =>
     })
 }
 
-Vue.prototype.$downloadFileWithUrl = async (url, filename, type = 'common') => {
+Vue.prototype.$downloadFileWithUrl = async function (url, filename, type = 'common') {
   if (!url) {
     this.$generalNotification('Failed to download file, missing URL', 'error')
   }

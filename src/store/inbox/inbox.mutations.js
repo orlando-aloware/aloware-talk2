@@ -107,6 +107,27 @@ export default {
   },
 
   UPDATE_CHANNEL_CHANGED_FILTER_FIELDS: (state, { name, value }) => {
+    // compensate comparing of array/object values
+    const comparatorA = typeof state.channelClonedFilter[name] === 'object' ? JSON.stringify(state.channelClonedFilter[name]) : state.channelClonedFilter[name]
+    const comparatorB = typeof value === 'object' ? JSON.stringify(value) : value
+
+    // we only exclude already selected filters if
+    // we're not showing populating the currently selected filters
+    // in the filter dialog
+    if (!state.isFilterDialogShown && comparatorA === comparatorB) {
+      state.channelChangedFilterFields = [...state.channelChangedFilterFields].filter(item => item.property !== name)
+      return
+    }
+
+    const found = { data: null }
+    found.data = state.channelChangedFilterFields.find(item => item.property === name)
+    found.data = found.data ? state.channelChangedFilterFields.indexOf(found.data) : null
+
+    if (found.data !== -1 && found.data !== null) {
+      Vue.set(state.channelChangedFilterFields[found.data], 'value', value)
+      return
+    }
+
     state.channelChangedFilterFields.push({ property: name, value: value })
   },
   RESET_CHANNEL_CHANGED_FILTER_FIELDS: (state) => {
@@ -117,6 +138,9 @@ export default {
   },
   TOGGLE_FILTER_DIALOG: (state, isShown = false) => {
     state.isFilterDialogShown = isShown
+  },
+  TOGGLE_FILTER_DIALOG_WITH_FILTERS: (state, value = false) => {
+    state.isFilterDialogShowFilters = value
   },
   SET_FILTER_DIALOG_FOR_VIEW: (state, value = false) => {
     state.isFilterDialogForView = value

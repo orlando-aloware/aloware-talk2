@@ -1,5 +1,6 @@
 <template>
   <b-card header-tag="header"
+          :disabled="viewOnly"
           footer-tag="footer"
           title="Record an audio file"
   >
@@ -77,10 +78,13 @@
 <script>
 
 import Microphone from '@gkt/microphone'
+import { kycMixin } from 'src/plugins/mixins'
 import _ from 'lodash'
 
 export default {
   name: 'audio-recorder',
+
+  mixins: [ kycMixin ],
 
   props: {
     uploadUrl: {

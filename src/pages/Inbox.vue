@@ -129,7 +129,7 @@ export default {
   },
 
   created () {
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isJobNimbus) {
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getPinnedViews()
     }
 
