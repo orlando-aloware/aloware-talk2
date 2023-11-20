@@ -36,7 +36,6 @@
 </template>
 <script>
 import {
-  DUPLICATED,
   PD_BULK_ADD_MESSAGES,
   PD_INTEGRATION_IMPORT_MESSAGES
 } from 'src/constants/power-dialer-add-errors'
@@ -191,11 +190,6 @@ export default {
 
       // update the total selected contacts to the correct total count
       this.fullReport.info.selected = totalSelected
-      const duplicates = this.fullReport?.fail?.[DUPLICATED]
-
-      if (this.$isNumeric(duplicates)) {
-        this.fullReport.fail[DUPLICATED] += (integrationReport?.duplicates || 0)
-      }
 
       // remove reports having no message or with 0 value
       Object.keys(integrationReport).forEach(key => {
