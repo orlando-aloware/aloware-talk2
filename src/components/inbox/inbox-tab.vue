@@ -764,6 +764,7 @@ export default {
 
     processNewCommunicationEvent (data, communication) {
       const contact = this.$jsonClone(data)
+
       // add the last_communication in contact
       // and remove the contact in the communication
       const newCommunication = this.$jsonClone(communication)
@@ -1081,14 +1082,11 @@ export default {
           this.setSelectedContact(contacts[contactIndex])
         }
       }
-
-      /* if (contactTaskToRemove) {
-        this.listeners.contactTaskStatusUpdated(contactTaskToRemove)
-      } */
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
-      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || !contact || this.currentTask === contact.task_status) {
+      const sameStatus = this.currentTask === contact.task_status
+      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || !contact || sameStatus) {
         return
       }
 
