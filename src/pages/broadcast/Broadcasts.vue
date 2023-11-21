@@ -273,6 +273,11 @@
                     </b-dropdown>
                   </div>
                 </td>
+                <td class="sorted-column"
+                    :key="`c-${colIndex}`"
+                    v-else-if="col.name === 'date_created'">
+                  {{ row[col.field] | fixDateTime }}
+                </td>
                 <td :key="`c-${colIndex}`"
                     :class="col.draggable ? 'sorted-column' : ''"
                     v-else>
