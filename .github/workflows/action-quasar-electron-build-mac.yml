@@ -146,6 +146,9 @@ jobs:
           # Demo Company Ids
           DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
 
+          # SSU/KYC enablement
+          KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
+
           # Moderate Genius
           HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           # All others
