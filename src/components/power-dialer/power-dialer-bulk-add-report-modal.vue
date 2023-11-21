@@ -23,7 +23,7 @@
           </li>
         </ul>
       </template>
-      <p class="text-h5 font-weigh-bold">{{ totalTasksAdded }} Total {{ fixMessage('task(s)', totalTasksAdded) }} added to queue</p>
+      <p class="text-h5 font-weigh-bold">{{ addedFromContact }} Total {{ fixMessage('task(s)', addedFromContact) }} added to queue</p>
     </div>
     <template slot="modal-footer">
       <button class="btn btn-block mt-0 mr-2"
@@ -129,10 +129,6 @@ export default {
       skippedItems = Object.entries(skippedItems)
 
       return skippedItems
-    },
-
-    totalTasksAdded () {
-      return this.addedFromContact + this.addedFromMultipleNumbers
     }
   },
 
@@ -180,6 +176,14 @@ export default {
       integrationReport.is_dnc += this.fullReport?.extra?.is_dnc || 0
       integrationReport.is_blocked += this.fullReport?.extra?.is_blocked || 0
       integrationReport.total_selected += this.fullReport?.extra?.total_selected || 0
+
+      const integrationSettings = integrationReport?.settings || {}
+      const integrationDuplicates = integrationReport?.duplicates || 0
+      const duplicatePhoneNumbers = this.fullReport?.success?.duplicates ?? 0
+
+      if (!integrationSettings?.prevent_duplicates && integrationDuplicates > duplicatePhoneNumbers) {
+        this.fullReport.success.duplicates = integrationReport.duplicates
+      }
 
       const createdContactsCount = integrationReport?.created_contacts_count ?? 0
       const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
