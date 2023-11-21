@@ -12,7 +12,8 @@
                      learnMoreLink="https://support.aloware.com/en/articles/6637395-aloware-talk-basics"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false">
+                     :should-show-in-first-visit="false"
+                     v-if="isNotSimpsocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -45,7 +46,8 @@
                      learnMoreLink="https://support.aloware.com/en/articles/6637395-aloware-talk-basics"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false">
+                     :should-show-in-first-visit="false"
+                     v-if="isNotSimpsocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -91,7 +93,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { simpsocialMixin } from 'src/plugins/mixins'
+import { mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
 
@@ -102,6 +105,10 @@ export default {
     VideoModal,
     CompactBtn
   },
+
+  mixins: [
+    simpsocialMixin
+  ],
 
   data () {
     return {
@@ -116,6 +123,8 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('auth', ['isTrial']),
 
     kycFilled () {
       return this.profile?.company?.kyc_filled

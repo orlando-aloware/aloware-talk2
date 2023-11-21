@@ -5,10 +5,11 @@
                :notes="routeTutorialData.notes"
                :video-url="routeTutorialData.videoUrl"
                :learn-more-link="routeTutorialData.learnMoreLink"
-               v-if="isCompanyKYC && doesRouteHasTutorial"/>
+               v-if="doesRouteHasTutorial && isNotSimpsocial && isTrial"/>
 </template>
 
 <script>
+import { simpsocialMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 import VideoModal from './video-modal.vue'
 
@@ -19,9 +20,14 @@ export default {
     VideoModal
   },
 
+  mixins: [
+    simpsocialMixin
+  ],
+
   computed: {
     ...mapGetters('auth', [
-      'isCompanyKYC'
+      'isCompanyKYC',
+      'isTrial'
     ]),
 
     doesRouteHasTutorial () {
