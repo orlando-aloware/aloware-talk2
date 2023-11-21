@@ -738,8 +738,10 @@ export default {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = false
 
+        console.log('markAsUnread this.contact', this.contact)
         // if contact has no unreads before, refresh inbox result
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
+        console.log('markAsUnread oldTotalUnreads', oldTotalUnreads)
         if (oldTotalUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
         }

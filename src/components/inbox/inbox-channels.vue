@@ -751,6 +751,8 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
+      console.log('event contact_updated')
+      console.log('event contact_updated data', data)
       const communications = [...this.communications]
       const channels = [
         'calls',
@@ -759,7 +761,8 @@ export default {
         'voicemails',
         'recordings'
       ]
-
+      console.log('event contact_updated communications', communications)
+      console.log('event contact_updated this.$route.params.channel', this.$route.params.channel)
       if (channels.includes(this.$route.params.channel)) {
         if (this.$route.params.channel === 'mentions') {
           communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
