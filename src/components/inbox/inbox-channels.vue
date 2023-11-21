@@ -663,6 +663,7 @@ export default {
       })
 
       // set updated communications
+      console.log('this.listeners.markContactCommunicationsAllAsRead this.communications', this.communications)
       this.setCommunications(this.communications)
     }
 
@@ -962,6 +963,7 @@ export default {
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
+            console.log('getCommunications this.communications', this.communications)
             this.setCommunications(response.data.data)
             this.currentPage = response.data.current_page
             this.setHasMoreCommunications(response.data.next_page_url)
@@ -1041,6 +1043,8 @@ export default {
 
       return api.get({ params: params })
         .then(response => {
+          console.log('loadMoreCommunications this.communications', this.communications)
+          console.log('loadMoreCommunications response.data.data', response.data.data)
           this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
           this.setHasMoreCommunications(response.data.next_page_url)
