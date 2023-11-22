@@ -12,23 +12,7 @@ export default {
   },
 
   mounted () {
-    if (!this.$q.platform.is.electron) {
-      this.disabledSubmit = true
-
-      window.recaptchaOnloadCallback = () => {
-        if (document.querySelector('#recaptcha-element')) {
-          window.grecaptcha.render('recaptcha-element', {
-            sitekey: this.siteKey,
-            callback: this.onCaptchaVerified
-          })
-        }
-      }
-
-      this.loadRecaptchaScript()
-      return
-    }
-
-    this.disabledSubmit = false
+    this.initRecaptcha()
   },
 
   methods: {
@@ -38,6 +22,26 @@ export default {
       script.async = true
       script.defer = true
       document.head.appendChild(script)
+    },
+
+    initRecaptcha () {
+      if (!this.$q.platform.is.electron) {
+        this.disabledSubmit = true
+
+        window.recaptchaOnloadCallback = () => {
+          if (document.querySelector('#recaptcha-element')) {
+            window.grecaptcha.render('recaptcha-element', {
+              sitekey: this.siteKey,
+              callback: this.onCaptchaVerified
+            })
+          }
+        }
+
+        this.loadRecaptchaScript()
+        return
+      }
+
+      this.disabledSubmit = false
     }
   }
 }

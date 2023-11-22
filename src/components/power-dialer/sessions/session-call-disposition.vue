@@ -7,41 +7,37 @@
     </div>
     <div class="t-menu pb-2"
          v-show="!sessionPaused">
-      <ChipsEllipsis initiallyDisabled
-                     headerLabel="CALL DISPOSITION"
-                     headerClass="t-menu__header no-border t-dense d-flex align-items-center"
-                     ref="callDispositionSelector"
-                     identity="call-disposition"
-                     default-label="No Call Dispositions"
-                     :list-items="filteredCallDispositions"
-                     :selected-item="callDisposition"
-                     :display-count="4"
-                     :forced="isHighlightedCallDisposition"
-                     @on-selected-item="onSelectedCallDisposition" />
-      <ChipsEllipsis headerLabel="CONTACT DISPOSITION"
-                     headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
-                     ref="contactDispositionSelector"
-                     identity="contact-disposition"
-                     default-label="No Contact Dispositions"
-                     :list-items="filteredContactDispositions"
-                     :selected-item="contactDisposition"
-                     :display-count="6"
-                     :forced="isHighlightedContactDisposition"
-                     @on-selected-item="onSelectedContactDisposition" />
-      <!--div class="t-menu__header t-dense d-flex align-items-center no-border pt-0">
-        <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
-          VOICEMAIL
-        </div>
-      </div>
-      <div class="d-flex t-menu__content over-flow px-3 pb-0"-->
-        <!-- <VmDropSelector /> -->
-        <!--ChipsEllipsis @on-selected-item="onSelectedContactDisposition"
-                          :list-items="[]"
-                          :selected-item="''"
-                          :display-count="6"
-                          identity="contact-disposition"
-                          default-label="No Voicemail" />
-      </div-->
+      <chips-ellipsis headerLabel="CALL DISPOSITION"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      ref="callDispositionSelector"
+                      identity="call-disposition"
+                      default-label="No Call Dispositions"
+                      initiallyDisabled
+                      :list-items="filteredCallDispositions"
+                      :selected-item="callDisposition"
+                      :display-count="4"
+                      :forced="isHighlightedCallDisposition"
+                      @on-selected-item="onSelectedCallDisposition" />
+      <chips-ellipsis headerLabel="CONTACT DISPOSITION"
+                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
+                      ref="contactDispositionSelector"
+                      identity="contact-disposition"
+                      default-label="No Contact Dispositions"
+                      :list-items="filteredContactDispositions"
+                      :selected-item="contactDisposition"
+                      :display-count="6"
+                      :forced="isHighlightedContactDisposition"
+                      @on-selected-item="onSelectedContactDisposition" />
+      <chips-ellipsis headerLabel="VOICEMAIL"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      ref="vm-drop"
+                      identity="vm-drop"
+                      default-label="No Voicemail"
+                      initiallyDisabled
+                      :list-items="voicemails"
+                      :display-count="3"
+                      :is-empty="isVoicemailEmpty"
+                      @on-selected-item="onVmDrop"/>
     </div>
   </q-card>
 </template>
@@ -52,16 +48,19 @@ import { mapState, mapGetters, mapActions } from 'vuex'
 import ChipsEllipsis from 'components/chips-ellipsis'
 import { get, isEmpty } from 'lodash'
 import {
+  dialerCommunicationMixin,
   dispositionsMixin,
   dispositionsOptionsMixin
 } from 'src/plugins/mixins'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'SessionCallDisposition',
 
   mixins: [
     dispositionsMixin,
-    dispositionsOptionsMixin
+    dispositionsOptionsMixin,
+    dialerCommunicationMixin
   ],
 
   components: {
@@ -70,13 +69,18 @@ export default {
 
   data () {
     return {
-      voicemail: []
+      voicemails: [],
+      loadingSendVmDrop: false
     }
   },
 
   computed: {
     ...mapFields('powerDialer', [
       'sessionPaused'
+    ]),
+
+    ...mapState('auth', [
+      'profile'
     ]),
 
     ...mapState([
@@ -89,7 +93,8 @@ export default {
     ]),
 
     ...mapGetters('powerDialer', [
-      'sessionLoader'
+      'sessionLoader',
+      'sessionSettings'
     ]),
 
     isContactNotDisposed () {
@@ -97,12 +102,24 @@ export default {
 
       return this.currentCompany && this.currentCompany.force_contact_disposition &&
         !hasContactDisposition
+    },
+
+    isVoicemailEmpty () {
+      return isEmpty(this.voicemails)
     }
+  },
+
+  created () {
+    this.getVmDrops()
   },
 
   mounted () {
     this.sessionPaused = false
     this.initCallDisposition()
+
+    if (!this.isCallInProgressStatus) {
+      this.$refs['vm-drop'].disable()
+    }
   },
 
   methods: {
@@ -115,6 +132,20 @@ export default {
       'setDialerContact',
       'setDialerCommunication'
     ]),
+
+    getVmDrops () {
+      API.V1.library.voicemailDrop.get({
+        params: {
+          user_id: this.profile.id
+        }
+      }).then(res => {
+        if (isEmpty(this.sessionSettings.vm_drop_ids)) {
+          return
+        }
+
+        this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+      })
+    },
 
     async onSelectedCallDisposition (data) {
       const communicationId = get(this.dialer, 'communication.id', null)
@@ -142,12 +173,18 @@ export default {
 
         this.$VueEvent.fire('pauseWrapUp', this.isNotDisposed)
         this.onCallDisposed(data.id)
-        this.$refs.callDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('callDispositionSelector')) {
+          this.$refs.callDispositionSelector.hideLoading()
+        }
       }).catch((err) => {
         console.log(err)
         this.$handleErrors(err.response)
         this.onCallDisposed(this.callDisposition)
-        this.$refs.callDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('callDispositionSelector')) {
+          this.$refs.callDispositionSelector.hideLoading()
+        }
       })
     },
 
@@ -180,22 +217,55 @@ export default {
 
         this.$VueEvent.fire('pauseWrapUp', this.isNotDisposed)
         this.onContactDisposed(data.id)
-        this.$refs.contactDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('contactDispositionSelector')) {
+          this.$refs.contactDispositionSelector.hideLoading()
+        }
       }).catch((err) => {
         console.log(err)
         this.$handleErrors(err.response)
         this.onContactDisposed(this.contactDisposition)
-        this.$refs.contactDispositionSelector.hideLoading()
+
+        if (this.isReferenceAvailable('contactDispositionSelector')) {
+          this.$refs.contactDispositionSelector.hideLoading()
+        }
       })
     },
 
     initCallDisposition () {
-      if (isEmpty(this.dialer.communication)) {
+      if (isEmpty(this.dialer.communication) &&
+        this.isReferenceAvailable('callDispositionSelector')) {
         this.$refs.callDispositionSelector.disable()
         return
       }
 
-      this.$refs.callDispositionSelector.enable()
+      if (this.isReferenceAvailable('callDispositionSelector')) {
+        this.$refs.callDispositionSelector.enable()
+      }
+    },
+
+    onVmDrop (item) {
+      if (!this.isCallInProgressStatus || !item) {
+        return
+      }
+
+      this.$refs['vm-drop'].disable()
+
+      API.V1.dialer.sendVmDrop({
+        communication_id: this.dialer.communication.id,
+        file_name: item.uploaded_file.uuid,
+        name: item.name
+      }).then(() => {
+        this.$refs['vm-drop'].hideLoading()
+      }).catch(err => {
+        console.log(err)
+        this.$refs['vm-drop'].enable()
+        this.$refs['vm-drop'].hideLoading()
+      })
+    },
+
+    isReferenceAvailable (referenceId) {
+      return !isEmpty(this.$refs?.[referenceId])
     }
   },
 
@@ -214,8 +284,18 @@ export default {
       this.initCallDisposition()
     },
 
-    'dialer.communication': function () {
+    'dialer.communication': function (communication) {
       this.initCallDisposition()
+    },
+
+    isCallInProgressStatus (value) {
+      if (value) {
+        this.$refs['vm-drop'].enable()
+
+        return
+      }
+
+      this.$refs['vm-drop'].disable()
     }
   }
 }

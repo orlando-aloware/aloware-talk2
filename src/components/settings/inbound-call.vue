@@ -21,7 +21,7 @@
 
           <b-form-group label="" class="w-50">
             <extension-selector v-model="user.extension"
-                                :disable="false"
+                                :disable="viewOnly"
                                 @select="(eventPayload) => onUpdateFields(eventPayload, 'extension')">
             </extension-selector>
           </b-form-group>
@@ -44,6 +44,7 @@
                           :days="user.operating_hours"
                           :time-increment="timeIncrement"
                           :switch-width="75"
+                          :disabled="viewOnly"
                           @updated-hours="(eventPayload) => onUpdateFields(eventPayload, 'operating_hours')">
           </business-hours>
         </b-col>
@@ -64,6 +65,7 @@
                 v-model="missedCallHandlingMode"
                 :options="options"
                 :aria-describedby="ariaDescribedby"
+                :disabled="viewOnly"
                 @input="(eventPayload) => onUpdateFields(eventPayload, 'missedCallHandlingMode')">
               </b-form-radio-group>
             </b-form-group>
@@ -138,6 +140,7 @@
               v-model="disableGeoRouting"
               :value="true"
               :unchecked-value="false"
+              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'disableGeoRouting')">
               Do not enable geo-routing for this user
             </b-form-checkbox>
@@ -248,6 +251,7 @@
               v-model="user.should_message_if_missed"
               :value="true"
               :unchecked-value="false"
+              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'should_message_if_missed')">
               If the call is missed, send a text message to this agent.
             </b-form-checkbox>
@@ -269,6 +273,7 @@
               rows="3"
               max-rows="6"
               id="ta-text-follow up"
+              :disabled="viewOnly"
               v-model.trim="$v.user.missed_call_message.$model"
               :state="validateState('missed_call_message')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'missed_call_message')"
@@ -276,7 +281,10 @@
 
             <b-form-invalid-feedback v-if="!$v.user.missed_call_message.required">Please provide a missed call message.</b-form-invalid-feedback>
 
-            <b-button size="sm" variant="primary" class="mt-2">
+            <b-button size="sm"
+                      variant="primary"
+                      class="mt-2"
+                      :disabled="viewOnly">
               <q-menu content-class="mx-height-300"
                       ref="templatesMenu"
                       :offset="[0,5]">
@@ -289,7 +297,10 @@
                                    :width="16" ></calendar-today-icon> Templates
             </b-button>
 
-            <b-button size="sm" variant="primary" class="mt-2 ml-2">
+            <b-button size="sm"
+                      variant="primary"
+                      class="mt-2 ml-2"
+                      :disabled="viewOnly">
               <q-menu content-class="mx-height-300"
                       ref="variablesMenu"
                       :offset="[0,5]">
@@ -319,6 +330,7 @@
               v-model="user.should_message_caller_if_completed"
               :value="1"
               :unchecked-value="0"
+              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'should_message_caller_if_completed')">
               If the call is completed, send a text message to the caller.
             </b-form-checkbox>
@@ -392,13 +404,13 @@ import AudioRecorder from 'components/audio-recorder'
 import talk2Api from 'src/plugins/api/api'
 import FileUploader from 'components/file-uploader'
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, settingsMixin } from 'src/plugins/mixins'
+import { aclMixin, settingsMixin, kycMixin } from 'src/plugins/mixins'
 import SettingsMap from 'components/settings/settings-map'
 import { required } from 'vuelidate/lib/validators'
 export default {
   name: 'inbound-call',
 
-  mixins: [aclMixin, settingsMixin],
+  mixins: [aclMixin, settingsMixin, kycMixin],
 
   components: { FileUploader, AudioRecorder, UsAreaCodeSelector, VariableIcon, Variables, CalendarTodayIcon, MessageTemplates, ExtensionSelector },
 

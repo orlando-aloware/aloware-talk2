@@ -381,6 +381,7 @@ export default {
   methods: {
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.listen('endWrapUp', this.dialerListeners.endWrapUp)
       this.$VueEvent.listen('forceEndWrapUp', this.dialerListeners.forceEndWrapUp)
@@ -411,6 +412,7 @@ export default {
 
     stopDialerEvents () {
       this.$VueEvent.stop('update_communication', this.dialerListeners.updateCommunication)
+      this.$VueEvent.stop('webrtc_update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.stop('reconnectDialer', this.dialerListeners.reconnectDialer)
       this.$VueEvent.stop('endWrapUp', this.dialerListeners.endWrapUp)
       this.$VueEvent.stop('forceEndWrapUp', this.dialerListeners.forceEndWrapUp)

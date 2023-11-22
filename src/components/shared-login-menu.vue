@@ -4,9 +4,10 @@
     <q-btn v-if="isAdmin"
            outline
            class="q-btn-standard"
+           :href="classicUrl"
            @click="onGoToClassic">
 
-        <i class="fas fa-arrow-right"></i>  <span>{{ alowareClassic }}</span>
+        <span>{{ alowareClassic }}</span>
     </q-btn>
     <q-btn-dropdown
       v-else
@@ -18,7 +19,7 @@
     >
 
       <template slot="label">
-        <i class="fas fa-arrow-right"></i>  <span>{{ alowareClassic }}</span>
+        <span>{{ alowareClassic }}</span>
         <hr role="separator" aria-orientation="vertical" class="q-separator ml-2 margin-auto position-relative q-separator q-separator--vertical">
       </template>
 
@@ -83,13 +84,11 @@ export default {
     },
 
     alowareClassic () {
-      const whiteLabel = this.statics.whitelabel ? '' : 'Aloware '
-
       if (this.profile.company.force_talk) {
-        return `${whiteLabel}Admin`
+        return `Admin`
       }
 
-      return `${whiteLabel} Classic`
+      return `Classic`
     },
 
     alowareTalk () {
@@ -98,6 +97,10 @@ export default {
 
     whiteLabelText () {
       return this.statics.whitelabel ? '' : 'Aloware '
+    },
+
+    classicUrl () {
+      return process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
     }
   },
 
@@ -111,7 +114,7 @@ export default {
   methods: {
     ...mapActions('auth', ['setProfile']),
     onGoToClassic () {
-      window.location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
+      window.location.href = this.classicUrl
     },
 
     updateDefaultLogin () {

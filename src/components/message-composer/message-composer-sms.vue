@@ -1,149 +1,149 @@
 <template>
-  <div class="pt-2 message-composer-text-wrapper"
-       :disabled="isDisabled || isTCPAApprovedTextNotAuthorized">
-    <div class="file-dropper position-absolute"
-         v-cloak
-         @paste.prevent="onPaste"
-         @drop.prevent="onDrop"
-         @dragover.prevent>
-    </div>
-    <div @dragover.prevent
-         @drop.prevent="onDrop"
-         @paste="onPaste">
-      <div class="mb-2 d-inline-flex media-preview-wrapper">
-        <div v-for="(file, index) in filesOnQueue"
-             :key="index"
-             class="media-preview">
-          <div v-if="file.type.includes('audio')"
-               class="audio-thumbnail-wrapper">
-            <audio-placeholder :file="file"
-                               @remove="onRemoveFileInQueue">
-            </audio-placeholder>
-          </div>
-          <div v-if="file.type.includes('pdf')"
-               class="pdf-thumbnail-wrapper">
-              <application-placeholder :file="file"
-                                       @remove="onRemoveFileInQueue">
-              </application-placeholder>
-          </div>
-          <div v-if="file.type.includes('video')"
-               class="video-thumbnail-wrapper">
-            <video-placeholder :file="file"
-                               @remove="onRemoveFileInQueue">
-            </video-placeholder>
-          </div>
-          <div v-if="file.type.includes('image')">
-            <image-placeholder :file="file"
-                               @remove="onRemoveFileInQueue">
-            </image-placeholder>
-          </div>
+    <div class="pt-2 message-composer-text-wrapper"
+         :disabled="isDisabled || isTCPAApprovedTextNotAuthorized">
+        <div class="file-dropper position-absolute"
+             v-cloak
+             @paste.prevent="onPaste"
+             @drop.prevent="onDrop"
+             @dragover.prevent>
         </div>
+        <div @dragover.prevent
+             @drop.prevent="onDrop"
+             @paste="onPaste">
+            <div class="mb-2 d-inline-flex media-preview-wrapper">
+                <div v-for="(file, index) in filesOnQueue"
+                     :key="index"
+                     class="media-preview">
+                    <div v-if="file.type.includes('audio')"
+                         class="audio-thumbnail-wrapper">
+                        <audio-placeholder :file="file"
+                                           @remove="onRemoveFileInQueue">
+                        </audio-placeholder>
+                    </div>
+                    <div v-if="file.type.includes('pdf')"
+                         class="pdf-thumbnail-wrapper">
+                        <application-placeholder :file="file"
+                                                 @remove="onRemoveFileInQueue">
+                        </application-placeholder>
+                    </div>
+                    <div v-if="file.type.includes('video')"
+                         class="video-thumbnail-wrapper">
+                        <video-placeholder :file="file"
+                                           @remove="onRemoveFileInQueue">
+                        </video-placeholder>
+                    </div>
+                    <div v-if="file.type.includes('image')">
+                        <image-placeholder :file="file"
+                                           @remove="onRemoveFileInQueue">
+                        </image-placeholder>
+                    </div>
+                </div>
 
-        <div v-if="messageComposer.sms.gif_url"
-               class="media-preview">
-            <img class="img-preview"
-                 :src="messageComposer.sms.gif_url"/>
-            <b-button size="sm"
-                      class="btn-remove-attachments"
-                      @click="removeMessageGif"
-                      pill>
-              <i class="fa fa-times"></i>
-            </b-button>
-          </div>
+                <div v-if="messageComposer.sms.gif_url"
+                     class="media-preview">
+                    <img class="img-preview"
+                         :src="messageComposer.sms.gif_url"/>
+                    <b-button size="sm"
+                              class="btn-remove-attachments"
+                              @click="removeMessageGif"
+                              pill>
+                        <i class="fa fa-times"></i>
+                    </b-button>
+                </div>
 
-        <div v-for="attachment of messageComposer.sms.attachments"
-               :key="attachment.id"
-               class="media-preview">
-            <div v-if="attachment.mimetype.includes('audio')"
-                 class="audio-thumbnail-wrapper">
-              <div class="text-center media-icon-wrapper mt-2">
-                <i class="fa fa-microphone media-icon"></i>
-              </div>
-              <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
-              <b-button size="sm"
-                        class="btn-remove-attachments"
-                        @click="removeAttachment(attachment)"
-                        pill>
-                <i class="fa fa-times"></i>
-              </b-button>
+                <div v-for="attachment of messageComposer.sms.attachments"
+                     :key="attachment.id"
+                     class="media-preview">
+                    <div v-if="attachment.mimetype.includes('audio')"
+                         class="audio-thumbnail-wrapper">
+                        <div class="text-center media-icon-wrapper mt-2">
+                            <i class="fa fa-microphone media-icon"></i>
+                        </div>
+                        <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
+                        <b-button size="sm"
+                                  class="btn-remove-attachments"
+                                  @click="removeAttachment(attachment)"
+                                  pill>
+                            <i class="fa fa-times"></i>
+                        </b-button>
+                    </div>
+                    <div v-if="attachment.mimetype.includes('pdf')"
+                         class="pdf-thumbnail-wrapper">
+                        <div class="text-center media-icon-wrapper mt-2">
+                            <i class="far fa-file-pdf media-icon"></i>
+                        </div>
+                        <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
+                        <b-button size="sm"
+                                  class="btn-remove-attachments"
+                                  @click="removeAttachment(attachment)"
+                                  pill>
+                            <i class="fa fa-times"></i>
+                        </b-button>
+                    </div>
+                    <div v-if="attachment.mimetype.includes('video')"
+                         class="video-thumbnail-wrapper">
+                        <b-embed type="video"
+                                 aspect="1by1">
+                            <source :src="getPreviewLink(attachment.uuid)"
+                                    :type="attachment.mimetype">
+                        </b-embed>
+                        <b-button size="sm"
+                                  variant="light"
+                                  class="btn-play"
+                                  pill>
+                            <i class="fa fa-play"></i>
+                        </b-button>
+                        <b-button size="sm"
+                                  class="btn-remove-attachments"
+                                  @click="removeAttachment(attachment)"
+                                  pill>
+                            <i class="fa fa-times"></i>
+                        </b-button>
+                    </div>
+                    <div v-if="attachment.mimetype.includes('image')">
+                        <img class="img-preview"
+                             :src="getPreviewLink(attachment.uuid)"/>
+                        <b-button size="sm"
+                                  class="btn-remove-attachments"
+                                  @click="removeAttachment(attachment)"
+                                  pill>
+                            <i class="fa fa-times"></i>
+                        </b-button>
+                    </div>
+                </div>
+
             </div>
-            <div v-if="attachment.mimetype.includes('pdf')"
-                 class="pdf-thumbnail-wrapper">
-              <div class="text-center media-icon-wrapper mt-2">
-                <i class="far fa-file-pdf media-icon"></i>
-              </div>
-              <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
-              <b-button size="sm"
-                        class="btn-remove-attachments"
-                        @click="removeAttachment(attachment)"
-                        pill>
-                <i class="fa fa-times"></i>
-              </b-button>
-            </div>
-            <div v-if="attachment.mimetype.includes('video')"
-                 class="video-thumbnail-wrapper">
-              <b-embed type="video"
-                       aspect="1by1">
-                <source :src="getPreviewLink(attachment.uuid)"
-                        :type="attachment.mimetype">
-              </b-embed>
-              <b-button size="sm"
-                        variant="light"
-                        class="btn-play"
-                        pill>
-                <i class="fa fa-play"></i>
-              </b-button>
-              <b-button size="sm"
-                        class="btn-remove-attachments"
-                        @click="removeAttachment(attachment)"
-                        pill>
-                <i class="fa fa-times"></i>
-              </b-button>
-            </div>
-            <div v-if="attachment.mimetype.includes('image')">
-              <img  class="img-preview"
-                    :src="getPreviewLink(attachment.uuid)"/>
-              <b-button size="sm"
-                        class="btn-remove-attachments"
-                        @click="removeAttachment(attachment)"
-                        pill>
-                <i class="fa fa-times"></i>
-              </b-button>
-            </div>
-          </div>
+            <q-input class="q-input-composer"
+                     borderless
+                     autogrow
+                     ref="smsMessageBody"
+                     input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
+                     type="textarea"
+                     placeholder="Type your message"
+                     v-model="messageComposer.sms.body"
+                     :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
+                     @input="imposeCharactersLimit"
+                     @keydown="onKeyDown"
+                     @blur="onBlur">
+            </q-input>
+            <q-dialog v-model="urlShortenerDialog"
+                      persistent
+                      transition-show="scale"
+                      transition-hide="scale">
+                <q-card flat
+                        style="width: 420px; max-width: 90vw;"
+                        class="pb-2 px-2">
+                    <q-card-section>
+                        <div class="text-h6">Long URL detected</div>
+                    </q-card-section>
 
-      </div>
-      <q-input class="q-input-composer"
-               borderless
-               autogrow
-               ref="smsMessageBody"
-               input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
-               type="textarea"
-               placeholder="Type your message"
-               v-model="messageComposer.sms.body"
-               :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
-               @input="imposeCharactersLimit"
-               @keydown="onKeyDown"
-               @blur="onBlur">
-      </q-input>
-      <q-dialog v-model="urlShortenerDialog"
-                persistent
-                transition-show="scale"
-                transition-hide="scale">
-        <q-card flat
-                style="width: 420px; max-width: 90vw;"
-                class="pb-2 px-2">
-          <q-card-section>
-            <div class="text-h6">Long URL detected</div>
-          </q-card-section>
+                    <q-card-section class="q-pt-none">
+                        Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
+                    </q-card-section>
 
-          <q-card-section class="q-pt-none">
-            Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
-          </q-card-section>
-
-          <q-checkbox v-model="urlShortenerDontAsk"
-                      class="pl-1"
-                      label="Don't ask me again" />
+                    <q-checkbox v-model="urlShortenerDontAsk"
+                                class="pl-1"
+                                label="Don't ask me again"/>
 
           <q-card-actions class="bg-white text-teal mt-2">
             <q-btn label="No"
@@ -206,15 +206,74 @@
                    anchor="top middle"
                    self="center middle"
         >
+                    <q-card-actions class="bg-white text-teal mt-2">
+                        <q-btn label="No"
+                               v-close-popup
+                               @click="closeUrlShortener"/>
+                        <q-btn color="blue"
+                               class="ml-auto"
+                               label="Yes"
+                               :loading="generatingShortUrl"
+                               @click="generateShortUrl(false)"/>
+                    </q-card-actions>
+                </q-card>
+            </q-dialog>
+        </div>
+        <div class="d-flex justify-content-between"
+             @dragover.prevent>
+            <message-composer-options :campaign-id="campaignId"
+                                      :max-attachments="maxAttachments"
+                                      :is-broadcast="isBroadcast"
+                                      @gifSelected="gifSelected"
+                                      @attachmentUploaded="attachmentUploaded"
+                                      @templateSelected="templateSelected"
+                                      @variableSelected="variableSelected"/>
+            <block-tooltip v-if="!canTextToNumber"
+                           placement="top"
+                           triggers="hover"
+                           target="message-sms-popover"
+                           task="text">
+            </block-tooltip>
+            <div id="message-sms-popover">
+                <q-btn-dropdown split
+                                class="message-composer-send-dropdown-button"
+                                color="primary"
+                                size="sm"
+                                padding="0px 12px"
+                                :ripple="false"
+                                :disable="isSendTextDisabled"
+                                :disable-dropdown="isSendTextDisabled"
+                                :menu-offset="[0, 6]"
+                                v-if="useSendButton"
+                                @click="onSend">
+                    <template slot="label">
+                        <q-spinner-bars v-if="isSending || generatingShortUrl"
+                                        class="mr-1"
+                                        color="white"/>
+                        {{ sendButtonText }}
+                    </template>
+                    <q-list class="message-composer-send-dropdown-button-list">
+                        <q-item clickable
+                                v-close-popup
+                                @click="showScheduleMessage">
+                            <q-item-section>
+                                <q-item-label>Schedule Send</q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-btn-dropdown>
+                <q-tooltip anchor="top middle"
+                           self="center middle"
+                           v-if="isTCPAApprovedTextNotAuthorized">
           <span class="text-black-dk">
             This number cannot be texted based on TCPA enforcement.
           </span>
-        </q-tooltip>
-      </div>
+                </q-tooltip>
+            </div>
+        </div>
+        <scheduled-message></scheduled-message>
+        <sms-template-modal></sms-template-modal>
     </div>
-    <scheduled-message></scheduled-message>
-    <sms-template-modal></sms-template-modal>
-  </div>
 </template>
 
 <script>
@@ -228,10 +287,16 @@ import VideoPlaceholder from 'components/message-composer/file-placeholders/vide
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'message-composer-sms',
+
+  mixins: [
+    kycMixin
+  ],
 
   components: {
     MessageComposerOptions,
@@ -240,7 +305,8 @@ export default {
     VideoPlaceholder,
     ImagePlaceholder,
     SmsTemplateModal,
-    ScheduledMessage
+    ScheduledMessage,
+    BlockTooltip
   },
 
   props: {
@@ -298,9 +364,9 @@ export default {
 
     validSms: function () {
       return ((this.messageComposer.sms.body && this.messageComposer.sms.body.trim().length > 0) || this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0) &&
-        this.selectedLine &&
-        this.messageComposer.sms.phone_number &&
-        this.messageComposer.sms.phone_number.length > 0
+                this.selectedLine &&
+                this.messageComposer.sms.phone_number &&
+                this.messageComposer.sms.phone_number.length > 0
     },
 
     messageBody () {
@@ -324,6 +390,15 @@ export default {
         default:
           return 'Send Text'
       }
+    },
+
+    isSendTextDisabled () {
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+    },
+
+    canTextToNumber () {
+      const phoneNumber = this.messageComposer.sms.phone_number
+      return this.enabledToTextNumber(phoneNumber)
     }
   },
 
@@ -431,7 +506,12 @@ export default {
     },
 
     onPaste (e) {
-      const index = { i: 0, item: null, file: null, found: false }
+      const index = {
+        i: 0,
+        item: null,
+        file: null,
+        found: false
+      }
 
       if (e.clipboardData.items.length) {
         for (index.i = 0; index.i < e.clipboardData.items.length; index.i++) {
@@ -460,7 +540,7 @@ export default {
 
     processDetectLongUrl (detected) {
       if (detected &&
-        !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
+                !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
         this.urlShortenerDialog = true
       }
 
@@ -469,11 +549,11 @@ export default {
       // and yes button is clicked) and there's no shortened URL generation
       // that is in-progress.
       if (detected &&
-        (this.urlShortenerDontAsk ||
-          this.isShortenedUrlRemembered) &&
-        this.profile.url_shortener_enabled &&
-        this.currentCompany.url_shortener_enabled &&
-        !this.generatingShortUrl) {
+                (this.urlShortenerDontAsk ||
+                    this.isShortenedUrlRemembered) &&
+                this.profile.url_shortener_enabled &&
+                this.currentCompany.url_shortener_enabled &&
+                !this.generatingShortUrl) {
         this.generateShortUrl()
       }
     },
@@ -642,10 +722,10 @@ export default {
       // - dont ask flag is false (used for skipping the URL shortener prompt
       //   to be able to send the message)
       if (!this.urlShortenerDontAskUntilSend &&
-        this.currentCompany &&
-        !this.currentCompany.is_whitelabel &&
-        this.currentCompany.url_shortener_enabled &&
-        this.profile.url_shortener_enabled) {
+                this.currentCompany &&
+                !this.currentCompany.is_whitelabel &&
+                this.currentCompany.url_shortener_enabled &&
+                this.profile.url_shortener_enabled) {
         const text = this.messageComposer.sms.body
         const matches = text ? text.match(/\bhttps?:\/\/\S+/gi) : []
         return matches ? matches.filter((url) => !url.includes(this.urlShortenerDomain)).length > 0 : false
@@ -656,7 +736,7 @@ export default {
     closeUrlShortener () {
       this.urlShortenerDontAskUntilSend = true
       if (this.urlShortenerDontAsk &&
-        this.profile.url_shortener_enabled) {
+                this.profile.url_shortener_enabled) {
         this.disableUrlShortener()
       }
     },
