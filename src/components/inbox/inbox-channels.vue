@@ -720,7 +720,7 @@ export default {
       } else {
         this.filter.cursor = this.nextPage
       }
-
+      console.log('load_and_navigate_channel')
       this.loadMoreCommunications(this.filter).then(() => {
         const communication = this.communications[lastNavigatedIndex + 1]
         this.setSelectedCommunication(communication)
@@ -1103,7 +1103,7 @@ export default {
           } else {
             this.filter.cursor = this.nextPage
           }
-
+          console.log('onTaskListBottomScroll')
           this.loadMoreCommunications(this.filter)
         }
       }, 66)
