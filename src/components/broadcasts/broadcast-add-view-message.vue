@@ -269,6 +269,7 @@ export default {
       // Return 0 if message is empty or length is 0
       if (!message || messageLength === 0) {
         this.base = 160
+        this.segments = 0
         return 0
       }
 
