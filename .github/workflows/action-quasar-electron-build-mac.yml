@@ -86,6 +86,7 @@ jobs:
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
           ENV_RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
           ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+          ENV_KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
           ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
           file-name: .env.prod
