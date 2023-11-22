@@ -964,8 +964,8 @@ export default {
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
-            console.log('getCommunications this.communications', this.communications)
-            console.log('setCommunications response.data.data', response.data.data)
+            console.trace('getCommunications this.communications', this.communications)
+            console.trace('setCommunications response.data.data', response.data.data)
             this.setCommunications(response.data.data)
             this.currentPage = response.data.current_page
             this.setHasMoreCommunications(response.data.next_page_url)
