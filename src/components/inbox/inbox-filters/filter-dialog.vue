@@ -434,7 +434,6 @@ export default {
 
       this.toggleFilterDialog()
       this.toggleFilterDialogWithFilters()
-      // this.setFilterDialogForView(false)
     },
 
     onHide () {
@@ -453,12 +452,12 @@ export default {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
       } else if (this.selectedFilter) {
         this.filter = { ...this.selectedFilter.filter }
+      } else if (this.appliedFilter) {
+        this.filter = { ...this.appliedFilter.filter }
       } else if (this.isFilterDialogShowFilters) {
         // use the current filters when the filters dialog button is clicked
         // to populate the selected filters
         this.filter = { ...this.channelClonedFilter }
-      } else if (this.appliedFilter) {
-        this.filter = { ...this.appliedFilter.filter }
       } else {
         this.filter = _.pick(this.value, this.filterFields)
       }
@@ -479,19 +478,19 @@ export default {
     onShown () {
       this.refreshTagSelector()
 
-      if (!this.appliedFilter) {
-        if (!this.isFilterDialogForView || (this.isFilterDialogForView && !this.isEditingView)) {
-          this.setSelectedFilter(null)
-        }
-
-        // if we're populating the dialog with the current filters,
-        // we shouldn't reset to default
-        if (!this.isFilterDialogShowFilters) {
-          this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
-        }
-
-        this.applyFilter()
-      }
+      // if (!this.appliedFilter) {
+      //   if (!this.isFilterDialogForView || (this.isFilterDialogForView && !this.isEditingView)) {
+      //     this.setSelectedFilter(null)
+      //   }
+      //
+      //   // if we're populating the dialog with the current filters,
+      //   // we shouldn't reset to default
+      //   if (!this.isFilterDialogShowFilters) {
+      //     this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
+      //   }
+      //
+      // }
+      this.applyFilter()
     },
 
     refreshTagSelector () {
