@@ -9,7 +9,7 @@
     <div class="broadcast-add__message__sms"
          v-if="type === 'sms'">
       <div class="broadcast-add__message__sms__composer-header">
-        Limit: {{ smsBodyLength }} / {{ maxSmsBodyLength }}
+        Limit: {{ smartEncodedMessageLength }} / {{ maxSmsBodyLength }}
       </div>
 
       <div class="broadcast-add__message__sms__composer-body">
@@ -17,6 +17,7 @@
                               :max-characters="maxSmsBodyLength"
                               :reset-on-load="false"
                               :use-send-button="false"
+                              @messageChanged="updateMessageInfo"
                               :is-broadcast="true"/>
       </div>
 
@@ -99,13 +100,14 @@ import MessageComposerSms from 'src/components/message-composer/message-composer
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, smsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-view-message',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    smsMixin
   ],
 
   components: {
@@ -170,31 +172,33 @@ export default {
     },
 
     smsBodyLength () {
-      return this.messageComposer.sms.body.length
+      return this.smartEncodedMessageLength
     },
 
     hasMoreThanAscii () {
-      return this.smsBodyLength > 0
-        ? [...this.messageComposer.sms.body].some(char => char.charCodeAt(0) > 127)
-        : false
+      if (this.smsBodyLength > 0) {
+        return this.hasUnicode
+      }
+
+      return false
     },
 
     baseLine () {
-      // having ASCII characters means that carriers will consider more than 70 characters 1 message/segment/part
-      // otherwise, every 160 characters will be considered 1 message/segment/part
-      return this.hasMoreThanAscii ? 70 : 160
+      return this.base
     },
 
     messagePartCount () {
-      return this.smsBodyLength > 0
-        ? this.smsBodyLength % this.baseLine
-        : 0
+      if (this.smsBodyLength > 0) {
+        const count = this.smartEncodedMessageLength % this.limit
+        return count === 0 ? this.base : count
+      }
+
+      return 0
     },
 
     messageCount () {
-      return this.smsBodyLength > 0
-        ? Math.ceil(this.smsBodyLength / this.baseLine)
-        : 0
+      // Return the number of segments
+      return this.segments
     },
 
     useMmsRate () {
@@ -256,6 +260,39 @@ export default {
 
     onRemoveRVM () {
       this.$emit('rvm-updated', null)
+    },
+
+    updateMessageInfo (message) {
+      this.messageLength(message)
+      const messageLength = this.smartEncodedMessageLength
+
+      // Return 0 if message is empty or length is 0
+      if (!message || messageLength === 0) {
+        this.base = 160
+        return 0
+      }
+
+      // Define characters per page based on the presence of Unicode
+      const charactersPerPage = this.hasUnicode ? [70, 64, 67] : [160, 146, 153]
+
+      // Determine segments and set the 'base' and 'limit' properties
+      if (messageLength <= charactersPerPage[0]) {
+        this.segments = 1
+        this.limit = charactersPerPage[0]
+        this.base = charactersPerPage[0]
+      } else if (messageLength <= charactersPerPage[0] + charactersPerPage[1]) {
+        this.segments = 2
+        this.limit = charactersPerPage[0]
+        this.base = charactersPerPage[1]
+      } else if (messageLength <= charactersPerPage[0] + charactersPerPage[1] + charactersPerPage[2]) {
+        this.segments = 3
+        this.limit = charactersPerPage[0] + charactersPerPage[1]
+        this.base = charactersPerPage[2]
+      } else {
+        this.segments = Math.ceil((messageLength - charactersPerPage[0] - charactersPerPage[1] - charactersPerPage[2]) / charactersPerPage[2]) + 3
+        this.base = charactersPerPage[2]
+        this.limit = charactersPerPage[2] * (this.segments - 3)
+      }
     }
   },
 
