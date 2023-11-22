@@ -898,7 +898,7 @@ export default {
           this.filter.mentioned_user_id = filter.users
         }
       }
-
+      console.log('onApplyFilter this.filter', this.filter)
       this.getCommunications(this.filter)
     },
 
@@ -964,6 +964,7 @@ export default {
           if (response) {
             this.gettingTasksList(false)
             console.log('getCommunications this.communications', this.communications)
+            console.log('setCommunications response.data.data', response.data.data)
             this.setCommunications(response.data.data)
             this.currentPage = response.data.current_page
             this.setHasMoreCommunications(response.data.next_page_url)
