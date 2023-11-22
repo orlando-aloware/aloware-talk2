@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img class="img-fluid"
+    <img class="img-fluid broadcast-add__message__sms__preview__image"
          :src="attachment"
          v-if="attachment">
     <span class="q-input-composer text-white"

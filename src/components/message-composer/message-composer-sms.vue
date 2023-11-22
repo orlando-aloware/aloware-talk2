@@ -145,67 +145,6 @@
                                 class="pl-1"
                                 label="Don't ask me again"/>
 
-          <q-card-actions class="bg-white text-teal mt-2">
-            <q-btn label="No"
-                   v-close-popup
-                   @click="closeUrlShortener" />
-            <q-btn color="blue"
-                   class="ml-auto"
-                   label="Yes"
-                   :loading="generatingShortUrl"
-                   @click="generateShortUrl(false)" />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-    </div>
-    <div class="d-flex justify-content-between"
-         @dragover.prevent>
-      <message-composer-options :campaign-id="campaignId"
-                                :max-attachments="maxAttachments"
-                                :is-broadcast="isBroadcast"
-                                @gifSelected="gifSelected"
-                                @attachmentUploaded="attachmentUploaded"
-                                @templateSelected="templateSelected"
-                                @variableSelected="variableSelected"/>
-      <div class="d-flex items-end">
-        <div class="text-sm text-grey-80"
-             :class="{ 'mr-2': useSendButton }"
-             v-if="isOptoutActive">
-          [{{ optoutText.trim() }}]
-        </div>
-        <q-btn-dropdown
-          split
-          class="message-composer-send-dropdown-button"
-          color="primary"
-          size="sm"
-          padding="0px 12px"
-          :ripple="false"
-          :disable="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
-          :disable-dropdown="!validSms || isTCPAApprovedTextNotAuthorized || generatingShortUrl || isDisabled"
-          :menu-offset="[0, 6]"
-          v-if="useSendButton"
-          @click="onSend"
-        >
-          <template slot="label">
-            <q-spinner-bars v-if="isSending || generatingShortUrl"
-                            class="mr-1"
-                            color="white" />
-            {{ sendButtonText }}
-          </template>
-          <q-list class="message-composer-send-dropdown-button-list">
-            <q-item clickable
-                    v-close-popup
-                    @click="showScheduleMessage">
-              <q-item-section>
-                <q-item-label>Schedule Send</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-        <q-tooltip v-if="isTCPAApprovedTextNotAuthorized"
-                   anchor="top middle"
-                   self="center middle"
-        >
                     <q-card-actions class="bg-white text-teal mt-2">
                         <q-btn label="No"
                                v-close-popup
@@ -228,47 +167,54 @@
                                       @attachmentUploaded="attachmentUploaded"
                                       @templateSelected="templateSelected"
                                       @variableSelected="variableSelected"/>
-            <block-tooltip v-if="!canTextToNumber"
-                           placement="top"
-                           triggers="hover"
-                           target="message-sms-popover"
-                           task="text">
-            </block-tooltip>
-            <div id="message-sms-popover">
-                <q-btn-dropdown split
-                                class="message-composer-send-dropdown-button"
-                                color="primary"
-                                size="sm"
-                                padding="0px 12px"
-                                :ripple="false"
-                                :disable="isSendTextDisabled"
-                                :disable-dropdown="isSendTextDisabled"
-                                :menu-offset="[0, 6]"
-                                v-if="useSendButton"
-                                @click="onSend">
-                    <template slot="label">
-                        <q-spinner-bars v-if="isSending || generatingShortUrl"
-                                        class="mr-1"
-                                        color="white"/>
-                        {{ sendButtonText }}
-                    </template>
-                    <q-list class="message-composer-send-dropdown-button-list">
-                        <q-item clickable
-                                v-close-popup
-                                @click="showScheduleMessage">
-                            <q-item-section>
-                                <q-item-label>Schedule Send</q-item-label>
-                            </q-item-section>
-                        </q-item>
-                    </q-list>
-                </q-btn-dropdown>
-                <q-tooltip anchor="top middle"
-                           self="center middle"
-                           v-if="isTCPAApprovedTextNotAuthorized">
-          <span class="text-black-dk">
-            This number cannot be texted based on TCPA enforcement.
-          </span>
-                </q-tooltip>
+            <div class="d-flex items-end">
+              <div class="text-sm text-grey-80"
+                  :class="{ 'mr-2': useSendButton }"
+                  v-if="isOptoutActive">
+                  [{{ optoutText.trim() }}]
+              </div>
+              <block-tooltip v-if="!canTextToNumber"
+                            placement="top"
+                            triggers="hover"
+                            target="message-sms-popover"
+                            task="text">
+              </block-tooltip>
+              <div id="message-sms-popover">
+                  <q-btn-dropdown split
+                                  class="message-composer-send-dropdown-button"
+                                  color="primary"
+                                  size="sm"
+                                  padding="0px 12px"
+                                  :ripple="false"
+                                  :disable="isSendTextDisabled"
+                                  :disable-dropdown="isSendTextDisabled"
+                                  :menu-offset="[0, 6]"
+                                  v-if="useSendButton"
+                                  @click="onSend">
+                      <template slot="label">
+                          <q-spinner-bars v-if="isSending || generatingShortUrl"
+                                          class="mr-1"
+                                          color="white"/>
+                          {{ sendButtonText }}
+                      </template>
+                      <q-list class="message-composer-send-dropdown-button-list">
+                          <q-item clickable
+                                  v-close-popup
+                                  @click="showScheduleMessage">
+                              <q-item-section>
+                                  <q-item-label>Schedule Send</q-item-label>
+                              </q-item-section>
+                          </q-item>
+                      </q-list>
+                  </q-btn-dropdown>
+                  <q-tooltip anchor="top middle"
+                            self="center middle"
+                            v-if="isTCPAApprovedTextNotAuthorized">
+                    <span class="text-black-dk">
+                      This number cannot be texted based on TCPA enforcement.
+                    </span>
+                  </q-tooltip>
+              </div>
             </div>
         </div>
         <scheduled-message></scheduled-message>

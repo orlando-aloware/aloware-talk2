@@ -13335,6 +13335,11 @@ h1.contact-list-name-label {
                   &--empty {
                     background-color: $grey-70;
                   }
+
+                  &__image {
+                    display: block;
+                    margin-bottom: 10px;
+                  }
                 }
               }
 
