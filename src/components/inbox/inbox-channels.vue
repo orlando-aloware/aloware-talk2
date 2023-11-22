@@ -756,7 +756,8 @@ export default {
       console.trace('event contact_updated data', data)
       console.trace('event contact_updated this.channelChangedFilterFields', this.channelChangedFilterFields)
       const comm = this.getCommunications(this.filter)
-      console.trace('event contact_updated comm', comm)
+      console.log('event contact_updated comm', comm)
+      console.log('event contact_updated this.filter', this.filter)
       const communications = [...this.communications]
       const channels = [
         'calls',
