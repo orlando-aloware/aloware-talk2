@@ -962,7 +962,7 @@ export default {
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
-
+      console.trace('getCommunications params', params)
       return api.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {

@@ -472,6 +472,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
+      'channelClonedFilter',
       'communications',
       'channelChangedFilterFields',
       'appliedFilter'
@@ -726,6 +727,7 @@ export default {
         this.communication.is_read = true
 
         console.log('markAsRead this.communications', this.communications)
+        console.log('markAsRead this.channelClonedFilter', this.channelClonedFilter)
         console.log('markAsRead this.channelChangedFilterFields', this.channelChangedFilterFields)
         // if contact has no unreads anymore, refresh inbox result
         const contact = res.data.contact
@@ -745,8 +747,8 @@ export default {
         this.$VueEvent.fire('contact_updated', res.data.contact)
         this.communication.is_read = false
 
-        console.log('markAsUnread this.contact', this.contact)
         console.log('markAsUnread this.communications', this.communications)
+        console.log('markAsUnread this.channelClonedFilter', this.channelClonedFilter)
         console.log('markAsUnread this.channelChangedFilterFields', this.channelChangedFilterFields)
         // if contact has no unreads before, refresh inbox result
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
