@@ -723,7 +723,9 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: true
       }).then(res => {
-        this.$VueEvent.fire('contact_updated', res.data.contact)
+        this.$nextTick(() => {
+          this.$VueEvent.fire('contact_updated', res.data.contact)
+        })
         this.communication.is_read = true
 
         console.log('markAsRead this.communications', this.communications)
@@ -744,7 +746,9 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: false
       }).then(res => {
-        this.$VueEvent.fire('contact_updated', res.data.contact)
+        this.$nextTick(() => {
+          this.$VueEvent.fire('contact_updated', res.data.contact)
+        })
         this.communication.is_read = false
 
         console.log('markAsUnread this.communications', this.communications)
