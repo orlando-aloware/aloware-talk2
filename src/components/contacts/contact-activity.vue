@@ -723,8 +723,13 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: true
       }).then(res => {
+        let data = res.data.contact
+        if (this.channelChangedFilterFields) {
+          data.communications = this.communications
+        }
+        console.log('markAsRead data', data)
         this.$nextTick(() => {
-          this.$VueEvent.fire('contact_updated', res.data.contact)
+          this.$VueEvent.fire('contact_updated', data)
         })
         this.communication.is_read = true
 
@@ -746,6 +751,11 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: false
       }).then(res => {
+        let data = res.data.contact
+        if (this.channelChangedFilterFields) {
+          data.communications = this.communications
+        }
+        console.log('markAsRead data', data)
         this.$nextTick(() => {
           this.$VueEvent.fire('contact_updated', res.data.contact)
         })

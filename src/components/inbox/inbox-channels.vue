@@ -752,13 +752,11 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      console.trace('event contact_updated')
-      console.trace('event contact_updated data', data)
-      console.trace('event contact_updated this.channelChangedFilterFields', this.channelChangedFilterFields)
-      const comm = this.getCommunications(this.filter)
-      console.log('event contact_updated comm', comm)
+      console.log('event contact_updated this.channelChangedFilterFields', this.channelChangedFilterFields)
       console.log('event contact_updated this.filter', this.filter)
-      const communications = [...this.communications]
+      const communications = (data?.communications?.length > 0)
+        ? [...data.communications]
+        : [...this.communications];
       const channels = [
         'calls',
         'messages',
@@ -766,8 +764,7 @@ export default {
         'voicemails',
         'recordings'
       ]
-      console.trace('event contact_updated communications', communications)
-      console.trace('event contact_updated this.$route.params.channel', this.$route.params.channel)
+      console.log('event contact_updated communications', communications)
       if (channels.includes(this.$route.params.channel)) {
         if (this.$route.params.channel === 'mentions') {
           communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
@@ -962,14 +959,14 @@ export default {
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
-      console.trace('getCommunications params', params)
+      console.log('getCommunications params', params)
       return api.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
-            console.trace('getCommunications this.communications', this.communications)
             console.trace('setCommunications response.data.data', response.data.data)
             this.setCommunications(response.data.data)
+            console.log('getCommunications this.communications', this.communications)
             this.currentPage = response.data.current_page
             this.setHasMoreCommunications(response.data.next_page_url)
             this.isLoaded = true
