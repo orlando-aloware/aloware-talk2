@@ -71,6 +71,7 @@
                                     :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
                                     :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                                     :disabled="checkIfFieldIsPreFilled('phone_number')"
+                                    :country-code="countryCode"
                                     v-model="form.phone_number"
                                     @input="cleanFieldError('phone_number')" />
               </template>
@@ -281,7 +282,8 @@ export default {
       preFilledData: {},
       shouldRedirectToLogin: false,
       recaptchaResponse: null,
-      loadingText: 'Please wait while we are creating your account...'
+      loadingText: 'Please wait while we are creating your account...',
+      countryCode: '+1'
     }
   },
 
@@ -562,6 +564,8 @@ export default {
           id: matchedCountry.id,
           name: matchedCountry.name
         }
+
+        this.countryCode = this.getCountryCodeByCountryId(matchedCountry.id)
       }
     },
 
