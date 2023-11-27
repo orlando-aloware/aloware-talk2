@@ -4,8 +4,8 @@
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side ref="inbox-side"
                   :class="inboxSideClasses"
-                  @itemSelected="onItemSelected">
-      </inbox-side>
+                  @itemSelected="onItemSelected" />
+
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
            v-if="isContactShow">
