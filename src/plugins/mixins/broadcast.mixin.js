@@ -546,6 +546,9 @@ export default {
             console.log('broadcast mixin this.communications', this.communications)
             console.log('broadcast mixin this.channelClonedFilter', this.channelClonedFilter)
             console.log('broadcast mixin this.channelChangedFilterFields', this.channelChangedFilterFields)
+            if (this.channelChangedFilterFields) {
+              event.contact.communications = this.communications
+            }
             this.$VueEvent.fire('contact_updated', event.contact)
           }
         })
