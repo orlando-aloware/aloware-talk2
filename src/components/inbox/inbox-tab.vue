@@ -1272,7 +1272,7 @@ export default {
 
   watch: {
     $route (to, from) {
-      if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
+      if (this.inboxViewsRoutes.includes(from.name) && !this.inboxChannelRoutes.includes(to.name)) {
         this.resetFilter()
       }
 
