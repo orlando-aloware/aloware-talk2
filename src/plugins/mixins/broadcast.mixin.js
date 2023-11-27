@@ -8,7 +8,13 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters'])
+    ...mapState(['campaigns', 'filters']),
+    ...mapState('inbox', [
+      'channelClonedFilter',
+      'communications',
+      'channelChangedFilterFields',
+      'appliedFilter'
+    ])
   },
   methods: {
     ...mapActions([
@@ -537,6 +543,9 @@ export default {
               event.contact.tags = event.tags
               event.contact.tag_ids = event.contact.tags.map((a) => a.id)
             }
+            console.log('broadcast mixin this.communications', this.communications)
+            console.log('broadcast mixin this.channelClonedFilter', this.channelClonedFilter)
+            console.log('broadcast mixin this.channelChangedFilterFields', this.channelChangedFilterFields)
             this.$VueEvent.fire('contact_updated', event.contact)
           }
         })
