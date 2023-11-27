@@ -10,10 +10,8 @@ export default {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['campaigns', 'filters']),
     ...mapState('inbox', [
-      'channelClonedFilter',
       'communications',
-      'channelChangedFilterFields',
-      'appliedFilter'
+      'channelChangedFilterFields'
     ])
   },
   methods: {
@@ -543,9 +541,6 @@ export default {
               event.contact.tags = event.tags
               event.contact.tag_ids = event.contact.tags.map((a) => a.id)
             }
-            console.log('broadcast mixin this.communications', this.communications)
-            console.log('broadcast mixin this.channelClonedFilter', this.channelClonedFilter)
-            console.log('broadcast mixin this.channelChangedFilterFields', this.channelChangedFilterFields)
             if (this.channelChangedFilterFields) {
               event.contact.communications = this.communications
             }

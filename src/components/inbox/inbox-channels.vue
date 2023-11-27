@@ -663,7 +663,6 @@ export default {
       })
 
       // set updated communications
-      console.log('this.listeners.markContactCommunicationsAllAsRead this.communications', this.communications)
       this.setCommunications(this.communications)
     }
 
@@ -720,7 +719,7 @@ export default {
       } else {
         this.filter.cursor = this.nextPage
       }
-      console.log('load_and_navigate_channel')
+
       this.loadMoreCommunications(this.filter).then(() => {
         const communication = this.communications[lastNavigatedIndex + 1]
         this.setSelectedCommunication(communication)
@@ -755,7 +754,6 @@ export default {
       console.trace('event contact_updated')
       console.log('event contact_updated data', data)
       console.log('event contact_updated this.channelChangedFilterFields', this.channelChangedFilterFields)
-      console.log('event contact_updated this.filter', this.filter)
       const communications = (data?.communications?.length > 0)
         ? [...data.communications]
         : [...this.communications]
@@ -901,7 +899,7 @@ export default {
           this.filter.mentioned_user_id = filter.users
         }
       }
-      console.log('onApplyFilter this.filter', this.filter)
+
       this.getCommunications(this.filter)
     },
 
@@ -961,14 +959,12 @@ export default {
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
-      console.log('getCommunications params', params)
+
       return api.get({ params: params, cancelToken: this.source.token })
         .then(response => {
           if (response) {
             this.gettingTasksList(false)
-            console.trace('setCommunications response.data.data', response.data.data)
             this.setCommunications(response.data.data)
-            console.log('getCommunications this.communications', this.communications)
             this.currentPage = response.data.current_page
             this.setHasMoreCommunications(response.data.next_page_url)
             this.isLoaded = true
@@ -1047,8 +1043,6 @@ export default {
 
       return api.get({ params: params })
         .then(response => {
-          console.log('loadMoreCommunications this.communications', this.communications)
-          console.log('loadMoreCommunications response.data.data', response.data.data)
           this.setCommunications([...this.communications, ...response.data.data])
           this.currentPage = response.data.current_page
           this.setHasMoreCommunications(response.data.next_page_url)
@@ -1106,7 +1100,7 @@ export default {
           } else {
             this.filter.cursor = this.nextPage
           }
-          console.log('onTaskListBottomScroll')
+
           this.loadMoreCommunications(this.filter)
         }
       }, 66)
