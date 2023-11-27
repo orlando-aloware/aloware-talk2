@@ -1,3 +1,5 @@
+import { COUNTRIES } from 'src/constants/countries'
+
 export default {
   methods: {
     getMaskByCountry (countryCode) {
@@ -30,8 +32,20 @@ export default {
           return '### #######'
         case '86': // China
           return '### #### ####'
+        case '502': // Guatemala
+          return '#### ################'
         default: // Generic fallback
           return '#########################'
+      }
+    },
+
+    getCountryCodeByCountryId (countryId) {
+      const country = COUNTRIES.find(country => country.code === countryId)
+
+      if (country) {
+        return country.countryCode
+      } else {
+        return '+1'
       }
     }
   }
