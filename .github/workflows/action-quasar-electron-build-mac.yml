@@ -74,18 +74,27 @@ jobs:
           ENV_API_REPORTING_URL: ${{ secrets.api_reporting_url }}
           ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
           ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
-          ENV_MIX_SENTRY_DSN_PUBLIC: ${{ secrets.mix_sentry_dsn_public }}
           ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
           ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
           ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
+          ENV_CSC_LINK: ${{ secrets.mac_certs }}
+          ENV_CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
           ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
+          ENV_API_KEY_ID: ${{ secrets.api_key_id }}
+          ENV_API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
           ENV_AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
           ENV_AWS_BUCKET_REGION: ${{ secrets.aws_bucket_region }}
+          ENV_SENTRY_DSN_PUBLIC: ${{ secrets.sentry_dsn_public }}
+          ENV_SENTRY_TRACES_SAMPLE_RATE: ${{ secrets.sentry_traces_sample_rate }}
+          ENV_SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
+          ENV_SENTRY_ORG: ${{ secrets.sentry_org }}
+          ENV_SENTRY_PROJECT: ${{ secrets.sentry_project }}
           ENV_RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
           ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+          ENV_KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
           ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
           file-name: .env.prod
@@ -145,6 +154,9 @@ jobs:
 
           # Demo Company Ids
           DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
+
+          # SSU/KYC enablement
+          KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
 
           # Moderate Genius
           HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
