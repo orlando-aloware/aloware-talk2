@@ -1263,14 +1263,6 @@ export default {
     // restart listeners
     this.stopInboxListeners()
     this.startInboxListeners()
-
-    // this.$VueEvent.listen('inbox_route_change', () => {
-    //   this.onRouteChange()
-    // })
-    //
-    // this.$VueEvent.listen('inbox_route_name_change', () => {
-    //   this.onRouteNameChange()
-    // })
   },
 
   beforeDestroy () {

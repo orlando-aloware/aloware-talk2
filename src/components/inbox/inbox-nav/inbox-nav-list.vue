@@ -157,7 +157,12 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact'
-      ]
+      ],
+      listeners: {
+        pinnedViewsEvents: null,
+        openInboxViewPopup: null,
+        deletedFilter: null
+      }
     }
   },
 
@@ -179,24 +184,25 @@ export default {
   },
 
   mounted () {
-    this.$VueEvent.listen('viewPinned', () => {
+    this.listeners.pinnedViewsEvents = () => {
       this.getPinnedViews()
-    })
+    }
 
-    this.$VueEvent.listen('viewUnpinned', () => {
-      this.getPinnedViews()
-    })
-
-    this.$VueEvent.listen('openInboxViewPopup', () => {
+    this.listeners.openInboxViewPopup = () => {
       this.setShowViewsList(true)
-    })
+    }
 
-    this.$VueEvent.listen('filter_deleted', (filter) => {
+    this.listeners.deletedFilter = (filter) => {
       const view = this.pinnedViews.find(view => +view.filter_id === +filter.id)
       if (view) {
         this.unpinView(view.id)
       }
-    })
+    }
+
+    this.$VueEvent.listen('viewPinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.listen('viewUnpinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.listen('openInboxViewPopup', this.listeners.openInboxViewPopup)
+    this.$VueEvent.listen('filter_deleted', this.listeners.deletedFilter)
   },
 
   methods: {
@@ -407,6 +413,13 @@ export default {
         })
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('viewPinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.stop('viewUnpinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.stop('openInboxViewPopup', this.listeners.openInboxViewPopup)
+    this.$VueEvent.stop('filter_deleted', this.listeners.deletedFilter)
   }
 }
 </script>
