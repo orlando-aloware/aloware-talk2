@@ -15,10 +15,10 @@
                     <span v-if="!openEdit">Add contacts to</span>
                     <div class="text-grey-90"
                          v-if="!openEdit">
-            <span class="title-icon">
-              <folder-static-icon/>
-            </span>
-                        {{ contactList.name }}
+                      <span class="title-icon">
+                        <folder-static-icon/>
+                      </span>
+                      {{ contactList.name }}
                     </div>
                     <text-popover :id="contactList.id"
                                   :editable="!isMyQueue"
