@@ -36,6 +36,7 @@
 </template>
 <script>
 import {
+  DUPLICATED,
   PD_BULK_ADD_MESSAGES,
   PD_INTEGRATION_IMPORT_MESSAGES
 } from 'src/constants/power-dialer-add-errors'
@@ -173,21 +174,33 @@ export default {
         }
       }
 
-      integrationReport.is_dnc += this.fullReport?.extra?.is_dnc || 0
-      integrationReport.is_blocked += this.fullReport?.extra?.is_blocked || 0
-      integrationReport.total_selected += this.fullReport?.extra?.total_selected || 0
+      const isDncFromImport = this.fullReport?.extra?.is_dnc || 0
+      const isBlockedFromImport = this.fullReport?.extra?.is_blocked || 0
 
-      const integrationSettings = integrationReport?.settings || {}
-      const integrationDuplicates = integrationReport?.duplicates || 0
-      const duplicatePhoneNumbers = this.fullReport?.success?.duplicates ?? 0
-
-      if (!integrationSettings?.prevent_duplicates && integrationDuplicates > duplicatePhoneNumbers) {
-        this.fullReport.success.duplicates = integrationReport.duplicates
+      if (isDncFromImport > integrationReport.is_dnc) {
+        integrationReport.is_dnc = isDncFromImport
       }
 
-      const createdContactsCount = integrationReport?.created_contacts_count ?? 0
-      const updatedContactsCount = integrationReport?.updated_contacts_count ?? 0
-      const selected = integrationReport?.total_selected ?? 0
+      if (isBlockedFromImport > integrationReport.is_blocked) {
+        integrationReport.is_blocked = isBlockedFromImport
+      }
+
+      integrationReport.total_selected += this.fullReport?.extra?.total_selected || 0
+
+      const creationSettings = this.fullReport?.extra?.settings || {}
+      const integrationDuplicates = integrationReport?.duplicates || 0
+      const duplicatePhoneNumbers = this.fullReport?.success?.duplicates || 0
+
+      if (!creationSettings?.prevent_duplicates) {
+        this.fullReport.success.duplicates = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
+      } else if (creationSettings?.prevent_duplicates) {
+        const duplicates = this.fullReport?.fail?.[DUPLICATED] || 0
+        this.fullReport.fail[DUPLICATED] = integrationReport.duplicates > duplicates ? integrationReport.duplicates : duplicates
+      }
+
+      const createdContactsCount = integrationReport?.created_contacts_count || 0
+      const updatedContactsCount = integrationReport?.updated_contacts_count || 0
+      const selected = integrationReport?.total_selected || 0
 
       let totalSelected = createdContactsCount + updatedContactsCount
       totalSelected = selected > totalSelected ? selected : totalSelected
