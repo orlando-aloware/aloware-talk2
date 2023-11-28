@@ -293,7 +293,14 @@ export default {
           }
 
           this.$emit('contactsRemoved', this.selectedList)
-          this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+
+          // avoid requesting the contacts again when is deletion all
+          if (this.isDatatableSelectedAll) {
+            this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+          } else {
+            this.$VueEvent.fire('fetchContacts', { clear: true })
+          }
+
           this.$generalNotification('Contacts was successfully removed.')
         })
         .catch((_err) => {
