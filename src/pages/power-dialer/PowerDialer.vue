@@ -297,9 +297,17 @@ export default {
       // try to remove the contact from the table
       if (index >= 0) {
         this.contactsData.data.splice(index, 1)
-        this.contactsData.total_items--
-        this.contactsData.total_queued--
-        this.contactsData.to--
+        if (this.contactsData.total_items > 0) {
+          this.contactsData.total_items--
+        }
+
+        if (this.contactsData.total_queued > 0) {
+          this.contactsData.total_queued--
+        }
+
+        if (this.contactsData.to > 0) {
+          this.contactsData.to--
+        }
         this.updateMyQueueListData(this.contactsData)
       }
 
