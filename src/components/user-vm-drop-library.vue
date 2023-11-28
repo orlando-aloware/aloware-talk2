@@ -1,7 +1,7 @@
 <template>
   <div>
-
-    <b-form-row class="mt-4" v-if="voicemailDropFiles.length > 0">
+    <b-form-row class="mt-4"
+                v-if="voicemailDropFiles.length > 0">
       <b-col sm="12" md="12">
         <b-table-simple :fields="table.fields">
           <b-thead>
@@ -53,7 +53,9 @@
             <i class="fa fa-plus"></i> Add
           </b-button>
           <b-button variant="danger"
-                    class="ml-2" @click="removeUploadedFile">
+                    class="ml-2"
+                    :disabled="viewOnly"
+                    @click="removeUploadedFile">
             <i class="fa fa-times"></i> Remove
           </b-button>
         </b-form-group>
@@ -66,7 +68,10 @@
                           @recordedAudioUploaded="applyVMDropAudioFile">
           </audio-recorder>
 
-          <b-card title="Upload an audio file" header-tag="header" footer-tag="footer">
+          <b-card title="Upload an audio file"
+                  header-tag="header"
+                  footer-tag="footer"
+                  :disabled="viewOnly">
             <file-uploader accepted-file-types=".mp3, .wav"
                            :upload-url="vmDropUploadUrl"
                            @fileUploaded="fileUploaded">
@@ -88,9 +93,12 @@
 import AudioRecorder from 'components/audio-recorder'
 import FileUploader from 'components/file-uploader'
 import talk2Api from 'src/plugins/api/api'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'user-vm-drop-library',
+
+  mixins: [ kycMixin ],
 
   components: { FileUploader, AudioRecorder },
 

@@ -25,9 +25,9 @@
           </q-item-section>
           <q-avatar v-if="profile"
                     size="34px"
-                    :style="avatarStyle(profile.name)">
+                    :style="avatarStyle(profile?.name)">
             <div class="avatar-initials">
-              {{ profile.name | fixName | initials }}
+              {{ profile?.name | fixName | initials }}
             </div>
             <q-badge :color="color(profile.agent_status)"
                      class="availability-status"
@@ -60,10 +60,10 @@
                   v-if="profile.campaign_id && campaigns.length">
             <div class="d-flex flex-column">
               <span>
-                {{ userPersonalLine.name }}
+                {{ userPersonalLine?.name }}
               </span>
               <span class="text-grey-90 text-sm">
-                Number: {{ userPersonalLine.incoming_number | fixPhone('NATIONAL', true, false, true) }}
+                Number: {{ userPersonalLine?.incoming_number | fixPhone('NATIONAL', true, false, true) }}
               </span>
             </div>
           </q-item>

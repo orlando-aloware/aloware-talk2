@@ -65,6 +65,7 @@
           </b-dropdown>
         </div>
         <div class="text-caption text-grey-6 text-weight-bold"
+             :class="emptyClass"
              v-else>
           {{ defaultLabel }}
         </div>
@@ -122,6 +123,11 @@ export default {
     },
 
     forced: {
+      type: Boolean,
+      default: false
+    },
+
+    isEmpty: {
       type: Boolean,
       default: false
     }
@@ -238,6 +244,14 @@ export default {
     isForcedAndNotDisposed () {
       return this.hasContent && !this.disabled && !this.loading &&
         this.forced && !this.selectedItem && this.selectedItem !== 0
+    },
+
+    emptyClass () {
+      const emptyClass = this.isEmpty ? 'p-1' : ''
+
+      return [
+        emptyClass
+      ]
     }
   },
 

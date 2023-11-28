@@ -4,7 +4,7 @@
     <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
       <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar sidebar-1"
            :class="`${sessionSidebarExpanded ? 'minimized' : ''}`">
-        <SessionSidebar />
+        <session-sidebar />
       </div>
       <div :class="`sessions-main-page px-0 mb-0 main flex-1 ${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 mb-0 h-100`"
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
@@ -12,7 +12,7 @@
           <!-- Session Header -->
           <div class="d-flex bg-white flex-grow-0">
             <div class="col-7 p-0 bordered-right">
-              <CallDisposition />
+              <session-call-disposition />
             </div>
             <div class="col-5 p-0">
               <session-call-status @on-redirect="redirectRoute"
@@ -21,7 +21,7 @@
             </div>
           </div>
           <!-- Session Main Page -->
-          <SessionContactPage class="flex-grow-1 overflow-hidden" />
+          <session-contact-page class="flex-grow-1 overflow-hidden" />
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
 import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
-import CallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
+import SessionCallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
 import SessionContactPage from 'src/components/power-dialer/sessions/session-contact-page'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
@@ -60,7 +60,7 @@ export default {
 
   components: {
     SessionSidebar,
-    CallDisposition,
+    SessionCallDisposition,
     SessionCallStatus,
     SessionContactPage,
     AppointmentFormModal,

@@ -313,7 +313,7 @@ export default {
 
     scrollableAreaClasses () {
       const optScroll = `scrollableArea `
-      const scrollableClass = `${this.isScrollable ? optScroll : ''} position-relative d-flex flex-column h-100 w-100 flex-grow-1`
+      const scrollableClass = `${this.isScrollable ? optScroll : ''} position-relative d-flex flex-column vh-100 w-100 flex-grow-1`
       const mobileClass = this.isMobile ? 'mobile-scrollableArea' : ''
 
       return [

@@ -56,7 +56,10 @@
       <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
     </div>
 
-    <div class="ml-auto d-block h-100" v-if='isCompanyPartOfAlowareDemoCompanies(profile.company_id)'>
+    <tutorial-video-button />
+
+    <div class="ml-auto d-block h-100"
+         v-if="!isSimpsocial && !isTrialKYC">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
         <div class='bridge-menu-wrapper'>
           <div id='referralhero-inline-button'></div>
@@ -69,7 +72,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <header-help />
+        <header-help v-if="!isTrialKYC" />
 
         <q-item v-if="!statics.whitelabel">
           <q-item-section class="nav-item dropdown">
@@ -165,10 +168,12 @@ import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   aclMixin,
+  simpsocialMixin,
   avatarMixin,
   goBackMixin,
   contactsListFiltersMixin,
-  userMixin
+  userMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -192,6 +197,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import * as storage from 'src/plugins/helpers/storage'
 import AnnounceKit from 'announcekit-vue'
+import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
@@ -199,10 +205,12 @@ export default {
 
   mixins: [
     aclMixin,
+    simpsocialMixin,
     avatarMixin,
     goBackMixin,
     contactsListFiltersMixin,
-    userMixin
+    userMixin,
+    kycMixin
   ],
 
   components: {
@@ -224,7 +232,8 @@ export default {
     HeaderHelp,
     InboxMyContactsFilter,
     AnnounceKit,
-    InformationCircleIcon
+    InformationCircleIcon,
+    TutorialVideoButton
   },
 
   props: {

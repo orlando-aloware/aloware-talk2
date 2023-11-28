@@ -476,6 +476,10 @@ export default {
     profile: {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
+      },
+
+      getHubspotConversationsVisitorToken () {
+        return window.axios.get(`${suffixV1}profile/hubspot-visitor-token`)
       }
     },
 
@@ -544,6 +548,12 @@ export default {
         get (params) {
           return window.axios.post(`${suffixV1}contact-center/queued-calls`, params)
         }
+      }
+    },
+
+    dialer: {
+      sendVmDrop (params) {
+        return window.axios.post(`${suffixV1}dialer/play-prerecorded-voicemail`, params)
       }
     }
   },

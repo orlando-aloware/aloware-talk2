@@ -1,118 +1,118 @@
 <template>
-  <b-modal dialog-class="modal-pd-add"
-           centered
-           hide-footer
-           no-close-on-backdrop
-           no-close-on-esc
-           v-model="isOpen"
-           @hidden="onHidden">
-    <template #modal-title>
-      <h2>Power Dialer Task Options</h2>
-    </template>
-    <q-card class="my-card"
-            flat>
-      <b-overlay :show="loading > 0">
-        <div>
-          You're converting <strong>{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
-        </div>
+    <b-modal dialog-class="modal-pd-add"
+             centered
+             hide-footer
+             no-close-on-backdrop
+             no-close-on-esc
+             v-model="isOpen"
+             @hidden="onHidden">
+        <template #modal-title>
+            <h2>Power Dialer Task Options</h2>
+        </template>
+        <q-card class="my-card"
+                flat>
+            <b-overlay :show="loading > 0">
+                <div>
+                    You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+                </div>
 
-        <hr>
+                <hr>
 
-        <label class="label mb-1 text-weight-bold">
-          Conversion Options
-        </label>
-        <b-form-checkbox class="mb-2"
-                         :value="option.value"
-                         :key="option.value"
-                         v-model="conversion"
-                         v-for="option in conversionOptions">
-          {{ option.text }}
-          <information-circle-icon color="#2F80ED"
-                                   v-if="option.helper"/>
-          <q-tooltip anchor="top middle"
-                     self="bottom middle"
-                     v-if="option.helper">
-            {{ option.helper }}
-          </q-tooltip>
-        </b-form-checkbox>
+                <label class="label mb-1 text-weight-bold">
+                    Conversion Options
+                </label>
+                <b-form-checkbox class="mb-2"
+                                 :value="option.value"
+                                 :key="option.value"
+                                 v-model="conversion"
+                                 v-for="option in conversionOptions">
+                    {{ option.text }}
+                    <information-circle-icon color="#2F80ED"
+                                             v-if="option.helper"/>
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               v-if="option.helper">
+                        {{ option.helper }}
+                    </q-tooltip>
+                </b-form-checkbox>
 
-        <label class="label mt-2 mb-1 text-weight-bold">
-          Direction
-        </label>
-        <q-btn-toggle class="custom-toggle-button"
-                      toggle-color="primary active"
-                      color="transparent"
-                      text-color="grey-90"
-                      no-caps
-                      dense
-                      spread
-                      unelevated
-                      :options="directionOptions"
-                      v-model="direction" />
+                <label class="label mt-2 mb-1 text-weight-bold">
+                    Direction
+                </label>
+                <q-btn-toggle class="custom-toggle-button"
+                              toggle-color="primary active"
+                              color="transparent"
+                              text-color="grey-90"
+                              no-caps
+                              dense
+                              spread
+                              unelevated
+                              :options="directionOptions"
+                              v-model="direction"/>
 
-        <hr>
+                <hr>
 
-        <label class="label mb-1 text-weight-bold">
-          Where do you want to add these tasks?
-        </label>
-        <b-form-radio class="mb-2"
-                      :value="option.value"
-                      :key="option.value"
-                      v-model="where"
-                      v-for="option in whereOptions">
-          {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
-        </b-form-radio>
-        <date-picker mode="dateTime"
-                     title-position="left"
-                     color="blue"
-                     :min-date="new Date()"
-                     :masks="masks"
-                     :popover="popover_config"
-                     v-model="schedule"
-                     v-if="where === 'scheduled'">
-            <template v-slot="{ inputValue, inputEvents }">
-                <div class="ml-4 text-sm">
-                  <small class="text-grey">
-                    Scheduled time:
-                  </small>
-                  <br>
-                  <input class="px-2 py-1 border rounded text-grey"
-                         style="width: 155px"
-                         :value="inputValue"
-                         v-on="inputEvents"/>
+                <label class="label mb-1 text-weight-bold">
+                    Where do you want to add these tasks?
+                </label>
+                <b-form-radio class="mb-2"
+                              :value="option.value"
+                              :key="option.value"
+                              v-model="where"
+                              v-for="option in whereOptions">
+                    {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
+                </b-form-radio>
+                <date-picker mode="dateTime"
+                             title-position="left"
+                             color="blue"
+                             :min-date="new Date()"
+                             :masks="masks"
+                             :popover="popover_config"
+                             v-model="schedule"
+                             v-if="where === 'scheduled'">
+                    <template v-slot="{ inputValue, inputEvents }">
+                        <div class="ml-4 text-sm">
+                            <small class="text-grey">
+                                Scheduled time:
+                            </small>
+                            <br>
+                            <input class="px-2 py-1 border rounded text-grey"
+                                   style="width: 155px"
+                                   :value="inputValue"
+                                   v-on="inputEvents"/>
+                        </div>
+                    </template>
+                </date-picker>
+
+                <b-button class="btn-block mt-4"
+                          variant="primary"
+                          size="sm"
+                          @click="save">
+                    Ok
+                </b-button>
+            </b-overlay>
+        </q-card>
+        <b-modal modal-class="confirm-dialog"
+                 title="Continue"
+                 centered
+                 v-model="confirm"
+                 @close="onHidden">
+            <div class="text-left">
+                <div class="text-dark">
+                    {{ confirm_message }}
+                </div>
+            </div>
+            <template slot="modal-footer">
+                <div class="d-flex w-100">
+                    <div class="flex-grow-1"></div>
+                    <button class="btn btn-sm btn-primary mr-2"
+                            @click="closeConfirmDialog">
+                        Continue
+                    </button>
                 </div>
             </template>
-        </date-picker>
-
-        <b-button class="btn-block mt-4"
-                  variant="primary"
-                  size="sm"
-                  @click="save">
-          Ok
-        </b-button>
-      </b-overlay>
-    </q-card>
-    <b-modal modal-class="confirm-dialog"
-             title="Continue"
-             centered
-             v-model="confirm"
-             @close="onHidden">
-      <div class="text-left">
-        <div class="text-dark">
-          {{ confirm_message }}
-        </div>
-      </div>
-      <template slot="modal-footer">
-        <div class="d-flex w-100">
-          <div class="flex-grow-1"></div>
-          <button class="btn btn-sm btn-primary mr-2"
-                  @click="closeConfirmDialog">
-            Continue
-          </button>
-        </div>
-      </template>
+        </b-modal>
     </b-modal>
-  </b-modal>
 </template>
 
 <script>
@@ -226,7 +226,7 @@ export default {
       }
 
       if (this.where === 'scheduled') {
-        params.future_scheduled_time = this.schedule.toISOString().substr(0, 10)
+        params.future_scheduled_time = this.schedule.toISOString().slice(0, 19).replace('T', ' ')
       }
 
       return params
@@ -362,7 +362,10 @@ export default {
 
       return this.getRequest()
         .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
+          const {
+            message,
+            html
+          } = extractErrorMessage(err)
           console.log(html)
           this.$generalNotification(message, 'error')
         })
@@ -418,7 +421,10 @@ export default {
             loading: false
           })
 
-          const { message, html } = extractErrorMessage(error)
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })

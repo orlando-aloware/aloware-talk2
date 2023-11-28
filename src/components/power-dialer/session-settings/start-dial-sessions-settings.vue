@@ -1,23 +1,31 @@
 <template>
   <div class="t-session-settings">
-    <q-btn class="start-dial-button p-0"
-           color="success"
-           no-caps
-           unelevated
-           :disabled="disabledTrigger"
-           v-if="defaultTrigger"
-           @click="dialPreparation">
-      <PhoneIcon class="mr-2"
-                 color="white"
-                 height="12"
-                 width="12" />
-      <div class="button-label">
-        Start Dialing
-        <q-tooltip v-if="disabledTrigger">
-          To start dialing, a minimum of one (1) contact item in the list is required.
-        </q-tooltip>
-      </div>
-    </q-btn>
+    <block-tooltip placement="left"
+                   triggers="click"
+                   target="pd-call-popover"
+                   task="call"
+                   v-if="callDisabled">
+    </block-tooltip>
+    <div id="pd-call-popover"
+         v-if="defaultTrigger">
+      <q-btn class="start-dial-button p-0"
+             color="success"
+             no-caps
+             unelevated
+             :disabled="disabledTrigger || callDisabled"
+             @click="dialPreparation">
+        <PhoneIcon class="mr-2"
+                   color="white"
+                   height="12"
+                   width="12" />
+        <div class="button-label">
+          Start Dialing
+          <q-tooltip v-if="disabledTrigger">
+            To start dialing, a minimum of one (1) contact item in the list is required.
+          </q-tooltip>
+        </div>
+      </q-btn>
+    </div>
     <q-btn no-caps
            unelevated
            @click="dialPreparation"
@@ -89,8 +97,8 @@
                         </q-item-section>
                         <q-item-section side
                                         v-if="hovered !== setting.id || settingCategory.name === 'company'">
-                          <CheckIcon v-if="isSessionValid(setting)"
-                                     class="mr-2" />
+                          <CheckIcon class="mr-2"
+                                     v-if="isSessionValid(setting)" />
                         </q-item-section>
                         <q-item-section class="pl-0"
                                         side
@@ -103,8 +111,9 @@
                                  flat
                                  outline
                                  dense
+                                 v-show="isActionAllowed(setting.user_id)"
                                  @click="hoveredMenu = setting.id">
-                            <i class="fa fa-ellipsis-h"/>
+                            <i class="fa fa-ellipsis-h" />
                           </q-btn>
                           <q-menu anchor="top right"
                                   self="top left">
@@ -112,10 +121,11 @@
                               <q-item dense
                                       clickable
                                       v-close-popup
+                                      v-show="isActionAllowed(setting.user_id)"
                                       @click="onRename(setting)">
                                 <q-item-section class="px-3">
                                   <div>
-                                    <i class="fa fa-pencil-alt mr-2"/>
+                                    <i class="fa fa-pencil-alt mr-2" />
                                     Rename
                                   </div>
                                 </q-item-section>
@@ -123,10 +133,11 @@
                               <q-item dense
                                       clickable
                                       v-close-popup
-                                      @click="onDeleteRequest(setting.id)">
+                                      v-show="isActionAllowed(setting.user_id)"
+                                      @click="onDeleteRequest(setting.id, setting.user_id)">
                                 <q-item-section class="px-3">
                                   <div class="text-red">
-                                    <i class="fa fa-trash-alt mr-2"/>
+                                    <i class="fa fa-trash-alt mr-2" />
                                     Delete
                                   </div>
                                 </q-item-section>
@@ -165,17 +176,21 @@
                              color="primary"
                              unelevated
                              no-caps
-                             :disabled="saveDisabled"
+                             :disabled="!isSaveAllowed"
                              v-if="!hasSelectedTemporarySetting"
                              @click="updateSelectedSetting">
                         Save
+                        <q-tooltip anchor="center right"
+                                   v-if='!this.saveDisabled && !this.isSettingsOwner'>
+                          Selected settings is owned by another user.
+                        </q-tooltip>
                       </q-btn>
                       <q-btn class="px-3 py-0 ml-2"
                              size="sm"
                              color="primary"
                              unelevated
                              no-caps
-                             :disabled="disabled"
+                             :disabled="!isSaveAsNewAllowed"
                              v-if="hasSelectedTemporarySetting"
                              @click="newSetting = true">
                         Save As New
@@ -202,11 +217,12 @@
                     </div>
                   </div>
 
-                  <SessionsForm :disabled="isCompanyScope"
-                                :flagged="dialog"
-                                v-model="filterSelectedItem"
-                                @valid-form="disabled = false"
-                                @invalid-form="disabled = true"/>
+                  <start-dial-sessions-form :disabled="isCompanyScope"
+                                            :flagged="dialog"
+                                            :settings="filterSelectedItem"
+                                            @updateSettings='onUpdateSettings'
+                                            @valid-form="disabled = false"
+                                            @invalid-form="disabled = true"/>
                 </q-card>
               </q-card-section>
             </q-card-section>
@@ -248,16 +264,16 @@
           </div>
           <q-input outlined
                    :placeholder="updateObj.name"
-                   v-model="newSettingName"
-                   v-else-if="updateObj"
                    :error="errorMessage != null"
-                   :error-message="errorMessage"/>
+                   :error-message="errorMessage"
+                   v-model="newSettingName"
+                   v-else-if="updateObj" />
           <q-input placeholder="New Settings Name"
                    outlined
-                   v-model="newSettingName"
-                   v-else
                    :error="errorMessage != null"
-                   :error-message="errorMessage"/>
+                   :error-message="errorMessage"
+                   v-model="newSettingName"
+                   v-else />
         </q-card-section>
 
         <q-card-actions class="px-3 pb-3"
@@ -268,7 +284,7 @@
                     size="sm"
                     :disabled="isBusy || isBusy"
                     v-close-popup
-                    @click="newSetting = false">
+                    @click="cancelNewSetting">
             Cancel
           </b-button>
           <b-button variant="danger"
@@ -310,16 +326,26 @@
 <script>
 import { mapGetters, mapActions, mapMutations, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
-import SessionsForm from './start-dial-sessions-form'
+import StartDialSessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import SettingIcon from 'components/icons/setting-o-icon'
-import { isEqual } from 'lodash'
+import BlockTooltip from 'components/kyc/block-tooltip'
+import { isEmpty, isEqual } from 'lodash'
+import {
+  kycMixin,
+  aclMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'StartDialSessionsSettings',
+
+  mixins: [
+    kycMixin,
+    aclMixin
+  ],
 
   props: {
     list: {
@@ -338,14 +364,19 @@ export default {
   },
 
   components: {
-    SessionsForm,
+    StartDialSessionsForm,
     PhoneIcon,
     CheckIcon,
-    SettingIcon
+    SettingIcon,
+    BlockTooltip
   },
 
   computed: {
     ...mapState(['dialer']),
+
+    ...mapState('auth', [
+      'profile'
+    ]),
 
     ...mapFields('powerDialer', [
       'sessionSettings',
@@ -397,7 +428,7 @@ export default {
     },
 
     filterSelectedItem () {
-      if (this.selectedItem?.id) {
+      if (!isEmpty(this.selectedItem)) {
         return this.selectedItem
       }
 
@@ -413,7 +444,8 @@ export default {
         skip_outside_daytime_hours: 1,
         user_id: null,
         warmup_period_in_seconds: 0,
-        order: POWER_DIALER_ORDER.default
+        order: POWER_DIALER_ORDER.default,
+        vm_drop_ids: []
       }
     },
 
@@ -436,11 +468,27 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
+    },
+
+    callDisabled () {
+      return !this.enabledToCallNumber()
+    },
+
+    isSettingsOwner () {
+      return this.selectedItem.user_id === this.profile.id
+    },
+
+    isSaveAllowed () {
+      return !this.disabled && !this.saveDisabled &&
+        this.isSettingsOwner
+    },
+
+    isSaveAsNewAllowed () {
+      return !this.isBusy && !this.newSetting && !this.disabled
     }
   },
 
   async mounted () {
-    // await this.setSessionSettingGroup()
     this.selectedItem = this.defaultValues
   },
 
@@ -590,20 +638,21 @@ export default {
 
     async saveAsNew () {
       this.loading = true
-      const newSettings = { ...this.filterSelectedItem }
+      let newSettings = { ...this.selectedItem }
       newSettings.name = this.newSettingName
       newSettings.is_company_scope = 0
       newSettings.id = null
       newSettings.contact_list_id = null
       this.isBusy = true
 
-      const collection = this.removeEmptyParams(newSettings)
-      const res = await this.createDialerSessionSetting(collection)
+      newSettings = this.removeEmptyParams(newSettings)
+      const res = await this.createDialerSessionSetting(newSettings)
 
       if (res.isAxiosError) {
         console.log({ res })
         this.$generalNotification(res.response.data.message ?? 'Dialer session setting could not be saved', 'error')
 
+        this.newSettingName = ''
         this.loading = false
         this.isBusy = false
         return
@@ -615,16 +664,21 @@ export default {
         this.$generalNotification('Dialer session setting has been saved.')
       }
 
+      this.newSettingName = ''
       this.newSetting = false
       this.loading = false
       this.isBusy = false
+      this.resetSettings()
     },
 
     async updateSelectedSetting () {
       this.saveDisabled = true
 
+      let params = this.removeEmptyParams(this.selectedItem)
+      params = this.fixEmptyMultipleSelectors(params)
+
       const res = await this.updateDialerSessionSetting(
-        this.removeEmptyParams(this.selectedItem)
+        params
       )
 
       if (res?.data) {
@@ -647,9 +701,11 @@ export default {
       this.$emit('on-update-session-metrics')
     },
 
-    onDeleteRequest (id) {
-      this.newSetting = true
-      this.deleteId = id
+    onDeleteRequest (id, userId) {
+      if (this.isActionAllowed(userId)) {
+        this.newSetting = true
+        this.deleteId = id
+      }
     },
 
     onRename (data) {
@@ -712,7 +768,8 @@ export default {
         skip_outside_daytime_hours: 1,
         user_id: null,
         warmup_period_in_seconds: 0,
-        order: POWER_DIALER_ORDER.default
+        order: POWER_DIALER_ORDER.default,
+        vm_drop_ids: []
       }
 
       if (this.sessionSettings?.id && isExistingList) {
@@ -721,6 +778,10 @@ export default {
 
       this.selectedItemId = this.list?.dialer_session_id
       this.setDefaultSettings(params)
+    },
+
+    resetSettings () {
+      this.selectedItem = this.$jsonClone(this.temporarySetting)
     },
 
     removeEmptyParams (params) {
@@ -743,6 +804,33 @@ export default {
       return [
         backgroundClass
       ]
+    },
+
+    onUpdateSettings (settings) {
+      this.selectedItem = settings
+    },
+
+    isActionAllowed (userId) {
+      return this.isAdmin || userId === this.profile.id
+    },
+
+    fixEmptyMultipleSelectors (settings) {
+      let newSettings = this.$jsonClone(settings)
+
+      const keys = Object.keys(DEFAULT_SETTING_VALUES)
+
+      keys.forEach((key) => {
+        if (Array.isArray(DEFAULT_SETTING_VALUES[key]) && isEmpty(newSettings[key])) {
+          newSettings[key] = []
+        }
+      })
+
+      return newSettings
+    },
+
+    cancelNewSetting () {
+      this.newSettingName = ''
+      this.newSetting = false
     }
   },
 
@@ -766,9 +854,9 @@ export default {
         if (fetchedSettings?.id) {
           this.selectedItem = fetchedSettings
         } else if (this.temporarySetting?.id) {
-          this.selectedItem = this.temporarySetting
+          this.selectedItem = this.$jsonClone(this.temporarySetting)
         } else {
-          this.selectedItem = this.filterSelectedItem
+          this.selectedItem = this.$jsonClone(this.filterSelectedItem)
         }
 
         this.activeList = this.list

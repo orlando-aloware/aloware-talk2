@@ -206,6 +206,12 @@
                           v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
+        <block-tooltip v-if="!canCreateContacts"
+                       placement="left"
+                       triggers="click"
+                       target="contacts-create-popover"
+                       task="contacts.create">
+        </block-tooltip>
         <b-dropdown text="Add Contacts"
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
@@ -221,19 +227,22 @@
             <i class="fa fa-chevron-down fs-12 filter-toggle-button d-flex align-items-center ml-2 text-grey-90"
                style="margin-top: 2px;" />
           </template>
-          <b-dropdown-item href="#"
-                           :disabled="!canAddContacts"
-                           v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
-                           @click="onAddContactsToList">
-            <search-icon color="#62666E">
-            </search-icon>
-            Select Existing Contacts & Add to List
-          </b-dropdown-item>
-          <b-dropdown-item href="#"
-                           @click="onShowCreateContact">
-            <plus-icon color="#62666E"></plus-icon>
-            Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
-          </b-dropdown-item>
+          <div id="contacts-create-popover">
+            <b-dropdown-item href="#"
+                             :disabled="!canAddContacts"
+                             v-b-tooltip.hover="{ placement: 'top', title: (!(list.type === ContactListTypes.STATIC && isEditable) ? 'Unable to modify Filters. Duplicate this list if you want to modify' : null), customClass: 'q-tooltip q-tooltip--style no-pointer-events' }"
+                             @click="onAddContactsToList">
+              <search-icon color="#62666E">
+              </search-icon>
+              Select Existing Contacts & Add to List
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                             :disabled="!canCreateContacts"
+                             @click="onShowCreateContact">
+              <plus-icon color="#62666E"></plus-icon>
+              Create New Contact {{ list.type === ContactListTypes.STATIC && !list.show_in_public_folder ? '& Add to List' : '' }}
+            </b-dropdown-item>
+          </div>
         </b-dropdown>
 
         <contact-create-modal :id="createContactModalId"
@@ -683,6 +692,7 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import {
@@ -691,7 +701,8 @@ import {
   aclMixin,
   viewMixin,
   contactsListFiltersMixin,
-  simpsocialMixin
+  simpsocialMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -705,7 +716,8 @@ export default {
     aclMixin,
     viewMixin,
     contactsListFiltersMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    kycMixin
   ],
 
   components: {
@@ -729,7 +741,8 @@ export default {
     CompactBtn,
     ContactsScreen,
     Datatable,
-    ImportContactsModal
+    ImportContactsModal,
+    BlockTooltip
   },
 
   props: {
@@ -946,6 +959,10 @@ export default {
 
     canAddContacts () {
       return this.list.type === ContactListTypes.STATIC && this.isEditable
+    },
+
+    canCreateContacts () {
+      return this.enabledToCreateContacts()
     },
 
     fixedColumns () {
