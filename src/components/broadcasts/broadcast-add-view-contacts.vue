@@ -63,20 +63,12 @@
                                    v-if="source.integration.name"
                                    @change="onIntegrationListChanged"/>
       </template>
-
-      <!-- Filters option -->
-      <transition name="slide-left">
-        <contacts-filters class="broadcast-add__contacts__filters"
-                          v-if="optionSelected === 'filter'"
-                          @filtersUpdated="onFiltersUpdated"/>
-      </transition>
     </div>
   </div>
 </template>
 
 <script>
 import CheckOIcon from 'src/components/icons/check-o-icon.vue'
-import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import ContactsListSelector from 'src/components/generic-selectors/contacts-list-selector.vue'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
@@ -93,7 +85,6 @@ export default {
 
   components: {
     CheckOIcon,
-    ContactsFilters,
     ContactsListSelector,
     IntegrationListSelector
   },
@@ -244,10 +235,6 @@ export default {
       }
     },
 
-    onFiltersUpdated () {
-      this.source.filters = this.currentListFilters
-    },
-
     onIntegrationListChanged (integration) {
       this.$set(this.source.integration, 'list', integration.list)
     },
@@ -277,6 +264,21 @@ export default {
       deep: true,
       handler (value) {
         this.$emit('source-updated', value)
+      }
+    },
+
+    currentListFilters: {
+      deep: true,
+      immediate: true,
+      handler (value) {
+        this.source.filters = value
+      }
+    },
+
+    optionSelected: {
+      immediate: true,
+      handler (value) {
+        this.$VueEvent.fire('toggle-contact-filters', value === 'filter')
       }
     }
   }
