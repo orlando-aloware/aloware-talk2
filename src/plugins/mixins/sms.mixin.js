@@ -8,7 +8,7 @@ export default {
       smartEncodedMessageLength: 0,
       segmentMaxChars: SMS.DEFAULT_SEGMENT_MAX_CHAR,
       segments: 0,
-      limit: 0,
+      segmentUsedChars: 0,
       hasUnicode: false
     }
   },
@@ -72,9 +72,9 @@ export default {
       // Define characters per page based on the presence of Unicode
       const charactersPerPage = this.hasUnicode ? SMS.UNICODE_SMS_PAGES : SMS.ASCII_SMS_PAGES
 
-      // Determine segments and set the 'segmentMaxChars' and 'limit' properties
+      // Determine segments and set the 'segmentMaxChars' and 'segmentUsedChars' properties
       // segmentMaxChars => segmentMaxChars is the number that shows current max characters for this segment
-      // limit => limit is the length of characters that we have for this segmen
+      // segmentUsedChars => segmentUsedChars is the length of characters that we have for this segmen
       /*
         for example if we already typed 170 characters:
 
