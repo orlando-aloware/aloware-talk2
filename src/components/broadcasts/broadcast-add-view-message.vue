@@ -17,7 +17,7 @@
                               :max-characters="maxSmsBodyLength"
                               :reset-on-load="false"
                               :use-send-button="false"
-                              @messageChanged="updateMessageInfo"
+                              @messageChanged="messageLength"
                               :is-broadcast="true"/>
       </div>
 
@@ -260,40 +260,6 @@ export default {
 
     onRemoveRVM () {
       this.$emit('rvm-updated', null)
-    },
-
-    updateMessageInfo (message) {
-      this.messageLength(message)
-      const messageLength = this.smartEncodedMessageLength
-
-      // Return 0 if message is empty or length is 0
-      if (!message || messageLength === 0) {
-        this.base = 160
-        this.segments = 0
-        return 0
-      }
-
-      // Define characters per page based on the presence of Unicode
-      const charactersPerPage = this.hasUnicode ? [70, 64, 67] : [160, 146, 153]
-
-      // Determine segments and set the 'base' and 'limit' properties
-      if (messageLength <= charactersPerPage[0]) {
-        this.segments = 1
-        this.limit = charactersPerPage[0]
-        this.base = charactersPerPage[0]
-      } else if (messageLength <= charactersPerPage[0] + charactersPerPage[1]) {
-        this.segments = 2
-        this.limit = charactersPerPage[0]
-        this.base = charactersPerPage[1]
-      } else if (messageLength <= charactersPerPage[0] + charactersPerPage[1] + charactersPerPage[2]) {
-        this.segments = 3
-        this.limit = charactersPerPage[0] + charactersPerPage[1]
-        this.base = charactersPerPage[2]
-      } else {
-        this.segments = Math.ceil((messageLength - charactersPerPage[0] - charactersPerPage[1] - charactersPerPage[2]) / charactersPerPage[2]) + 3
-        this.base = charactersPerPage[2]
-        this.limit = charactersPerPage[2] * (this.segments - 3)
-      }
     }
   },
 
