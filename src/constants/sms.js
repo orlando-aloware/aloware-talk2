@@ -1,5 +1,5 @@
 // source: https://www.twilio.com/docs/messaging/services/smart-encoding-char-list
-export const DEFAULT_BASE = 160
+export const DEFAULT_SEGMENT_MAX_CHAR = 160
 export const DEFAULT_SEGMENTS = 0
 export const UNICODE_SMS_PAGES = [70, 64, 67]
 export const ASCII_SMS_PAGES = [160, 146, 153]

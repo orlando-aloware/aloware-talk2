@@ -184,13 +184,13 @@ export default {
     },
 
     baseLine () {
-      return this.base
+      return this.segmentMaxChars
     },
 
     messagePartCount () {
       if (this.smsBodyLength > 0) {
-        const count = this.smartEncodedMessageLength % this.limit
-        return count === 0 ? this.base : count
+        const count = this.smartEncodedMessageLength % this.segmentUsedChars
+        return count === 0 ? this.segmentMaxChars : count
       }
 
       return 0

@@ -6,7 +6,7 @@ export default {
       hasReplaceableBySmartEncoding: false,
       smartEncodingExtraChars: 0,
       smartEncodedMessageLength: 0,
-      base: SMS.DEFAULT_BASE,
+      segmentMaxChars: SMS.DEFAULT_SEGMENT_MAX_CHAR,
       segments: 0,
       limit: 0,
       hasUnicode: false
@@ -23,6 +23,7 @@ export default {
         // if unicode number is over 127
         let charCode = char.charCodeAt(0)
         let isMoreThanAscii = charCode > 127
+
         if (isMoreThanAscii) {
           // change char to unicode
           // for example: e => 0064
@@ -31,8 +32,7 @@ export default {
             .toString(16)
             .padStart(4, '0')
 
-          let isReplaceableBySmartEncoding =
-          SMS.SMART_ENCODING_CHARS.includes(unicode)
+          let isReplaceableBySmartEncoding = SMS.SMART_ENCODING_CHARS.includes(unicode)
 
           // check if this UCS-2 character is replaceable with ASCII character
           if (!isReplaceableBySmartEncoding) {
@@ -64,31 +64,40 @@ export default {
 
       // Return 0 if message is empty or length is 0
       if (!message || messageLength === 0) {
-        this.base = SMS.DEFAULT_BASE
+        this.segmentMaxChars = SMS.DEFAULT_SEGMENT_MAX_CHAR
         this.segments = 0
         return 0
       }
 
       // Define characters per page based on the presence of Unicode
-      const charactersPerPage = this.hasUnicode ? SMS.UNICODE_SMS_PAGES : SMS.UNICODE_SMS_PAGES
+      const charactersPerPage = this.hasUnicode ? SMS.UNICODE_SMS_PAGES : SMS.ASCII_SMS_PAGES
 
-      // Determine segments and set the 'base' and 'limit' properties
+      // Determine segments and set the 'segmentMaxChars' and 'limit' properties
+      // segmentMaxChars => segmentMaxChars is the number that shows current max characters for this segment
+      // limit => limit is the length of characters that we have for this segmen
+      /*
+        for example if we already typed 170 characters:
+
+        Message part: 10 / 146
+        10 is segmentUsedChars
+        146 is segmentMaxChars
+      */
       if (messageLength <= charactersPerPage[0]) {
         this.segments = 1
-        this.limit = charactersPerPage[0]
-        this.base = charactersPerPage[0]
+        this.segmentUsedChars = charactersPerPage[0]
+        this.segmentMaxChars = charactersPerPage[0]
       } else if (messageLength <= charactersPerPage[0] + charactersPerPage[1]) {
         this.segments = 2
-        this.limit = charactersPerPage[0]
-        this.base = charactersPerPage[1]
+        this.segmentUsedChars = charactersPerPage[0]
+        this.segmentMaxChars = charactersPerPage[1]
       } else if (messageLength <= charactersPerPage[0] + charactersPerPage[1] + charactersPerPage[2]) {
         this.segments = 3
-        this.limit = charactersPerPage[0] + charactersPerPage[1]
-        this.base = charactersPerPage[2]
+        this.segmentUsedChars = charactersPerPage[0] + charactersPerPage[1]
+        this.segmentMaxChars = charactersPerPage[2]
       } else {
         this.segments = Math.ceil((messageLength - charactersPerPage[0] - charactersPerPage[1] - charactersPerPage[2]) / charactersPerPage[2]) + 3
-        this.base = charactersPerPage[2]
-        this.limit = charactersPerPage[2] * (this.segments - 3)
+        this.segmentMaxChars = charactersPerPage[2]
+        this.segmentUsedChars = charactersPerPage[2] * (this.segments - 3)
       }
     }
   }
