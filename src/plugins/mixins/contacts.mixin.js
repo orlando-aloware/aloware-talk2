@@ -327,7 +327,8 @@ export default {
       this.$VueEvent.fire('shouldUpdateListCountOnSearch', {
         event: event,
         clear: clear,
-        filters: countQueryString
+        filters: countQueryString,
+        skipCache: params.skipCache
       })
 
       this.listContactsSource.cancel('Loading of contacts operation is canceled by the user')
@@ -837,6 +838,8 @@ export default {
       fetchData.isLoading = _.get(data, 'isLoading', false)
 
       const fromRefresh = _.get(data, 'fromRefresh', false)
+
+      fetchData.params.skipCache = _.get(data, 'skipCache', false)
 
       // Keeps only user's contacts on list after fetching
       _.set(fetchData, 'params.my_contacts', this.showMyContactsViewBased)

@@ -1086,7 +1086,8 @@ export default {
       const event = data.event
       const filters = data.filters
       const clear = data?.clear ?? false
-      this.setDataCount(filters, event, false, clear)
+      const skipCache = data?.skipCache ?? false
+      this.setDataCount(filters, event, false, clear, skipCache)
     }, 100)
 
     this.viewListeners.updateHasFilterChanges = () => {
@@ -1669,7 +1670,7 @@ export default {
       })
     },
 
-    setDataCount (data, event = null, updatePinned = false, clear = false) {
+    setDataCount (data, event = null, updatePinned = false, clear = false, skipCache = false) {
       const fireData = {
         data: {
           filters: this.$jsonClone(data)
@@ -1677,6 +1678,7 @@ export default {
         id: this.id,
         event: event,
         clear: clear,
+        skipCache: skipCache,
         thenFunctions: {
           setSelectedListContactCount: 'response.data.count'
         }

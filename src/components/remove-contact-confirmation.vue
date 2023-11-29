@@ -200,7 +200,10 @@ export default {
           if (this.isAllContactsSelected) {
             this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
           } else {
-            this.$VueEvent.fire('fetchContacts', { clear: true })
+            this.$VueEvent.fire('fetchContacts', {
+              clear: true,
+              skipCache: true
+            })
           }
 
           this.$generalNotification('Contact was successfully removed.')
@@ -298,7 +301,10 @@ export default {
           if (this.isDatatableSelectedAll) {
             this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
           } else {
-            this.$VueEvent.fire('fetchContacts', { clear: true })
+            this.$VueEvent.fire('fetchContacts', {
+              clear: true,
+              skipCache: true
+            })
           }
 
           this.$generalNotification('Contacts was successfully removed.')

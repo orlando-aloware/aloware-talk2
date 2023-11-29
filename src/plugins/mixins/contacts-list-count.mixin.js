@@ -45,11 +45,12 @@ export default {
       const event = data?.event
       // flag needed for checking if it's a new search/filter
       const clear = data?.clear ?? false
+      const skipCache = data?.skipCache ?? false
 
       this.setIsDatatableCountLoading(true)
       clearTimeout(this.fetchCountTimeout)
 
-      this.getListDataCount(data.data, skipCancelToken, isStaticList, listId)
+      this.getListDataCount(data.data, skipCancelToken, isStaticList, listId, skipCache)
         .then(response => {
           const count = response.data.count
           const currentTotalCount = this.selectedList.contactCount
@@ -134,7 +135,7 @@ export default {
         })
     },
 
-    getListDataCount (data, skipCancelToken = false, isStaticList = false, listId = null) {
+    getListDataCount (data, skipCancelToken = false, isStaticList = false, listId = null, skipCache = false) {
       if (!skipCancelToken) {
         this.countSource.cancel('Loading of contacts list count operation is canceled by the user.')
         this.countSource = this.countCancelToken.source()
@@ -161,7 +162,10 @@ export default {
       const params = this.getQueryString(filters, true)
 
       return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
-        params: params,
+        params: {
+          skip_cache: skipCache,
+          ...params
+        },
         paramsSerializer: qs.stringify,
         cancelToken: this.countSource.token
       })
