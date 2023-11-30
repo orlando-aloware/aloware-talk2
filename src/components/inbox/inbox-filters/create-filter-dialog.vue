@@ -21,13 +21,12 @@
       <b-col sm="12"
              md="12">
         <b-form-group label="Filter Name"
-                      class="form-label"
-        >
+                      class="form-label">
           <b-form-input ref="filterNameInput"
                         size="md"
                         type="text"
                         placeholder="Name"
-                        :state = "validateState('name')"
+                        :state="validateState('name')"
                         v-model.trim="$v.filter.name.$model" />
           <b-form-invalid-feedback v-if="!$v.filter.name.required">Enter filter name</b-form-invalid-feedback>
         </b-form-group>
