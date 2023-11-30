@@ -30,6 +30,7 @@
                      @sort="onSortByField"
                      @paginated="onPaginate"
                      @loadMore="beforeOnLoadMore(selectedList)"
+                     @onSelectedCountChange="onSelectedCountChange"
                      @on-list-update="updateList"
                      @on-my-queue-list="myQueueList">
         </router-view>
