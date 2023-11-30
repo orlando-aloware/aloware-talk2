@@ -155,7 +155,7 @@
                                     <input type="checkbox"
                                            class="checker"
                                            :value="contact.id"
-                                           :checked="checkedItems.find(item => item.id === contact.id) || isAllContactsSelected"
+                                           :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
                                            @change="onCheckerClicked(contact)"/>
                                     <span class="checkmark"></span>
                                 </label>
