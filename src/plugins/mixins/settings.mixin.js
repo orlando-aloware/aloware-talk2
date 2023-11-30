@@ -6,7 +6,15 @@ import _ from 'lodash'
 export default {
 
   computed: {
-    ...mapState('settings', ['userClone'])
+    ...mapState('settings', ['userClone']),
+
+    isXmasEnabled () {
+      return process.env.XMAS_ENABLED && (this.statics?.xmas_enabled || false)
+    },
+
+    isXmasBannerEnabled () {
+      return process.env.XMAS_ENABLED && process.env.XMAS_BANNERS_ENABLED && (this.statics?.xmas_enabled || false)
+    }
   },
 
   data () {
