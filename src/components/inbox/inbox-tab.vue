@@ -514,7 +514,7 @@ export default {
       })
 
       // Inbox View
-      if (this.$route.name === 'Inbox View') {
+      if (this.inboxViewsRoutes.includes(this.$route.name)) {
         this.$router.push({
           name: 'Inbox View',
           params: {
@@ -951,7 +951,7 @@ export default {
     this.setContacts([])
     this.setStatus()
 
-    if (this.$route.name !== 'Inbox View') {
+    if (!this.inboxViewsRoutes.includes(this.$route.name)) {
       this.initInboxTaskRoute()
     }
 
@@ -1325,7 +1325,7 @@ export default {
         return
       }
 
-      if ((!this.isSearch && ['Inbox', 'Inbox View'].includes(this.previousRoute.name)) || this.$route.params.id) {
+      if ((!this.isSearch && ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.previousRoute.name)) || this.$route.params.id) {
         this.loadContactTasks()
       }
     },
