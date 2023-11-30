@@ -19,7 +19,7 @@ jobs:
     environment: 
       name: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'Dev' || github.event.inputs.environment }}
 
-      strategy:
+    strategy:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '16.x' ]
