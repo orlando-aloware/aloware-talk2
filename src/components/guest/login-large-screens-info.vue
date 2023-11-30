@@ -65,7 +65,7 @@ export default {
     },
 
     getUrlReviews () {
-      return process.env.URL_READ_REVIEWS || 'https://www.g2.com/products/aloware/testimonials/1045828'
+      return process.env.URL_READ_REVIEWS || 'https://www.g2.com/products/aloware/references/the-premier-cloud-contact-center-software-for-small-and-mid-sized-businesses'
     }
   },
 
