@@ -169,6 +169,7 @@ export default {
       this.filter.name = ''
       this.filter.scope = 'user'
 
+      // toggle form state only if it's not for View
       if (!this.isFilterDialogForView) {
         this.toggleFilterModelForm()
       }
@@ -177,12 +178,17 @@ export default {
     onHide () {
       this.toggleFilterModelForm()
 
+      // after hiding the create filter dialog, show regular filter dialog form for non-View channels.
+      // also show regular filter dialog form for View channel if it's cancelled
+      // "Mentions" channel is excluded because it's not a regular channel with filters
       const nonViewChannel = !this.isFilterDialogForView && this.activeChannel.value !== 'mentions'
       if ((this.isFilterDialogForView && this.isCancelled) || nonViewChannel) {
         this.toggleFilterDialog(true)
         return
       }
 
+      // after hiding the create filter dialog, show the popup wherein Views are listed
+      // only if it's for View channel and saving the new filter is not cancelled
       if (this.isFilterDialogForView && !this.isCancelled) {
         this.$VueEvent.fire('openInboxViewPopup')
         this.toggleFilterDialog(false)
@@ -224,6 +230,7 @@ export default {
 
       return talk2Api.V2.inbox.filters.save(this.filter)
         .then(response => {
+          // when saving a View filter, set the flag to true so that the filter dialog intended for View will be shown
           if (this.isFilterDialogForView && filterType === ChannelType.CHANNEL_INBOX) {
             this.setFilterDialogForView(true)
           }

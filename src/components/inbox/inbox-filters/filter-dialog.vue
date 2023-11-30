@@ -477,19 +477,6 @@ export default {
 
     onShown () {
       this.refreshTagSelector()
-
-      // if (!this.appliedFilter) {
-      //   if (!this.isFilterDialogForView || (this.isFilterDialogForView && !this.isEditingView)) {
-      //     this.setSelectedFilter(null)
-      //   }
-      //
-      //   // if we're populating the dialog with the current filters,
-      //   // we shouldn't reset to default
-      //   if (!this.isFilterDialogShowFilters) {
-      //     this.filter = _.pick(this.defaultFilterModel.filter, this.filterFields)
-      //   }
-      //
-      // }
       this.applyFilter()
     },
 

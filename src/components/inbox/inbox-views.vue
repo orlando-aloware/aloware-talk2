@@ -120,6 +120,8 @@ export default {
         if (view.type === CHANNEL_INBOX) {
           return view.name.toUpperCase().includes(this.search.toUpperCase())
         }
+
+        return false
       })
     }
   },
