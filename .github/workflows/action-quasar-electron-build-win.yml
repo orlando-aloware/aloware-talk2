@@ -14,7 +14,6 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    environment: ${{ env.DEPLOY_ENV }}
 
     strategy:
       matrix:
@@ -24,10 +23,9 @@ jobs:
 
     steps:
       - name: Set Environment Variable
-        id: set-env
         run: |
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/tags/"* ]; then
-            echo "DEPLOY_ENV=Dev" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=Prod" >> $GITHUB_ENV
           else
             echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           fi
