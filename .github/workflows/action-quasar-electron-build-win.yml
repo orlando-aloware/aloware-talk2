@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ env.DEPLOY_ENV }}
 
     strategy:
       matrix:
@@ -23,6 +23,15 @@ jobs:
         npm-version: [ '9.x' ]
 
     steps:
+      - name: Set Environment Variable
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/tags/"* ]; then
+            echo "DEPLOY_ENV=Dev" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          fi
+
       - name: Check out Git repository
         uses: actions/checkout@v3
 
@@ -32,7 +41,7 @@ jobs:
 
       - name: Build details
         run: |
-          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Environment: ${{ env.DEPLOY_ENV }}"
           echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
 
       - name: Install Node.js, NPM and Yarn
