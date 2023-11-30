@@ -1,4 +1,3 @@
-import { mapGetters } from 'vuex'
 import Vue from 'vue'
 
 export default {
@@ -22,8 +21,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters('powerDialer', ['myQueueId']),
-
     isMainView () {
       const isListPages = this.$route.name === 'Power Dialer' || this.$route.name === 'Contacts'
 
