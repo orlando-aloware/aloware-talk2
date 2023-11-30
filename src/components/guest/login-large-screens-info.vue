@@ -15,7 +15,7 @@
                 class="button px-2 fs-24 text-decoration-none font-weight-normal w-100"
                 color="positive"
                 type="submit"
-                href="https://www.g2.com/products/aloware/testimonials/1045828"
+                :href="getUrlReviews"
                 target="_blank"
                 style="max-width: 292px;"
                 no-caps
@@ -62,6 +62,10 @@ export default {
       return [
         this.xmasEnabled ? 'xmas-bg' : 'ai-bg'
       ]
+    },
+
+    getUrlReviews () {
+      return process.env.URL_READ_REVIEWS || 'https://www.g2.com/products/aloware/testimonials/1045828'
     }
   },
 

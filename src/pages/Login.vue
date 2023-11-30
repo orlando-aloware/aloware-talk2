@@ -1,6 +1,6 @@
 <template>
   <section class="row w-100 h-100 mx-0">
-    <login-large-screens-info class="col-7 px-0" />
+    <login-large-screens-info class="col-7 px-0" :xmasEnabled="isXmasEnabled" />
     <login-form class="col-12 col-lg-5 px-0" />
     <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </section>
@@ -25,6 +25,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('accountRegistration', ['shouldRedirectToLogin']),
+    ...mapState('statics'),
 
     shouldRedirectToClassic () {
       const urlParams = new URLSearchParams(window.location.search)
@@ -35,6 +36,10 @@ export default {
         fromClassic !== 1 &&
         !this.isAdmin &&
         !this.profile?.company?.force_talk
+    },
+
+    isXmasEnabled () {
+      return process.env.XMAS_ENABLED && process.env.XMAS_BANNERS_ENABLED && (this.statics?.xmas_enabled || false)
     }
   },
 

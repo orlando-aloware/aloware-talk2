@@ -67,7 +67,8 @@
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
-                         @toggleMode="toggleMode">
+                         @toggleMode="toggleMode"
+                         :xmasEnabled="isXmasEnabled">
             </app-sidebar>
           </q-list>
         </q-drawer>
@@ -376,7 +377,8 @@ export default {
       'parkedCalls',
       'leadSources',
       'isIntroVideoVisible',
-      'showedKycDialog'
+      'showedKycDialog',
+      'statics'
     ]),
 
     ...mapState('auth', [
@@ -400,6 +402,8 @@ export default {
     ...mapState('powerDialer', [
       'ongoingSession'
     ]),
+
+    ...mapState('xmasEnabled'),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
@@ -523,6 +527,10 @@ export default {
 
     isAuthenticated () {
       return !this.isGuest && this.authenticated
+    },
+
+    isXmasEnabled () {
+      return process.env.XMAS_ENABLED && (this.statics?.xmas_enabled || false)
     }
   },
 
