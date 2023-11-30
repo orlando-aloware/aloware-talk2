@@ -1,13 +1,20 @@
 <template>
   <section class="row w-100 h-100 mx-0">
-    <login-large-screens-info class="col-7 px-0" :xmasEnabled="isXmasEnabled" />
+    <login-large-screens-info
+      class="col-7 px-0"
+      :xmasEnabled="isXmasBannerEnabled"
+      />
     <login-form class="col-12 col-lg-5 px-0" />
     <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </section>
 </template>
 
 <script>
-import { guestMixin, aclMixin } from 'boot/mixins'
+import {
+  guestMixin,
+  aclMixin,
+  settingsMixin
+} from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
 import { mapActions, mapState } from 'vuex'
@@ -18,7 +25,11 @@ import UserAlreadyHaveAccountDialog from 'src/components/account-registration/us
 export default {
   name: 'login',
 
-  mixins: [guestMixin, aclMixin],
+  mixins: [
+    guestMixin,
+    aclMixin,
+    settingsMixin
+  ],
 
   components: { LoginForm, LoginLargeScreensInfo, UserAlreadyHaveAccountDialog },
 
@@ -36,10 +47,6 @@ export default {
         fromClassic !== 1 &&
         !this.isAdmin &&
         !this.profile?.company?.force_talk
-    },
-
-    isXmasEnabled () {
-      return process.env.XMAS_ENABLED && process.env.XMAS_BANNERS_ENABLED && (this.statics?.xmas_enabled || false)
     }
   },
 

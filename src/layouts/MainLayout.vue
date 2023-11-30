@@ -233,7 +233,8 @@ import {
   unownedContactTaskMixin,
   agentMixin,
   contactV2AttributesMixin,
-  kycMixin
+  kycMixin,
+  settingsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -303,7 +304,8 @@ export default {
     unownedContactTaskMixin,
     agentMixin,
     contactV2AttributesMixin,
-    kycMixin
+    kycMixin,
+    settingsMixin
   ],
 
   data () {
@@ -527,10 +529,6 @@ export default {
 
     isAuthenticated () {
       return !this.isGuest && this.authenticated
-    },
-
-    isXmasEnabled () {
-      return process.env.XMAS_ENABLED && (this.statics?.xmas_enabled || false)
     }
   },
 
