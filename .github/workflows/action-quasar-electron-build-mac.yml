@@ -15,9 +15,9 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
 
-    # Set the environment for the job based on the trigger
+    # Dynamically set the environment name
     environment: 
-      name: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'Dev' || github.event.inputs.environment }}
+      name: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) && 'Prod' || github.event.inputs.environment }}
 
     strategy:
       matrix:
@@ -26,6 +26,16 @@ jobs:
         npm-version: [ '9.x' ]
 
     steps:
+      - name: Set Dynamic Environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "DYNAMIC_ENV=Prod" >> $GITHUB_ENV
+          else
+            echo "DYNAMIC_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          fi
+          echo "Dynamic environment set to ${{ env.DYNAMIC_ENV }}"
+
       - name: Check out Git repository
         uses: actions/checkout@v3
 
@@ -35,7 +45,7 @@ jobs:
 
       - name: Build details
         run: |
-          echo "Environment: ${{ job.environment.name }}"
+          echo "Environment: ${{ env.DYNAMIC_ENV }}"
           echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
 
       - name: Install Node.js, NPM and Yarn
