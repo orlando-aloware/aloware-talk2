@@ -23,14 +23,11 @@ jobs:
 
     steps:
       - name: Set Environment Variable
-        id: set-env
         run: |
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/tags/"* ]; then
-            echo "deploy_env=Prod" >> $GITHUB_ENV
-            echo "::set-output name=deploy_env::Prod"
+            echo "DEPLOY_ENV=Prod" >> $GITHUB_ENV
           else
-            echo "deploy_env=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
-            echo "::set-output name=deploy_env::${{ github.event.inputs.environment }}"
+            echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           fi
 
       - name: Check out Git repository
@@ -42,7 +39,7 @@ jobs:
 
       - name: Build details
         run: |
-          echo "Environment: ${{ needs.build.outputs.deploy_env }}"
+          echo "Environment: ${{ env.DEPLOY_ENV }}"
           echo "Branch: ${{ steps.branch-name.outputs.current_branch }}"
 
       - name: Install Node.js, NPM and Yarn
