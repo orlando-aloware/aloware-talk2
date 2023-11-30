@@ -2,8 +2,8 @@
   <section class="row w-100 h-100 mx-0"
            :class="[success ? 'default-bg' : '']">
     <login-large-screens-info class="col-5 px-0"
-                              v-show="!success"
-                              :xmasEnabled="isXmasEnabled"/>
+                              :xmasEnabled="isXmasEnabled"
+                              v-show="!success"/>
     <div class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center"
          v-if="!success">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">

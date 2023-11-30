@@ -67,8 +67,8 @@
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
-                         @toggleMode="toggleMode"
-                         :xmasEnabled="isXmasEnabled">
+                         :xmasEnabled="isXmasEnabled"
+                         @toggleMode="toggleMode">
             </app-sidebar>
           </q-list>
         </q-drawer>
