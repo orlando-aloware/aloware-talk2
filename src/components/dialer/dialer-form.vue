@@ -15,7 +15,7 @@
               pills
               vertical>
         <block-tooltip placement="left"
-                       triggers="click"
+                       triggers="hover"
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
                        :task="blockTooltipHandler.task">
