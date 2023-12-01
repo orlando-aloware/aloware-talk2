@@ -118,8 +118,8 @@
 
       <input-group>
         <template v-slot:content>
-          <input-field label="Street"
-                       placeholder="Ex: Fifth Avenue"
+          <input-field label="Address"
+                       placeholder="Street address or P.O"
                        col-md="col-md-10"
                        ref="street-input"
                        :paddingClasses="paddingRightClasses"
