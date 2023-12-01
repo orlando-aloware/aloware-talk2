@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-100">
     <div v-if="shouldShowBroadcast"
          class="broadcasts__home position-relative d-flex flex-column h-100">
       <b-overlay class="broadcasts__home__loading-overlay"

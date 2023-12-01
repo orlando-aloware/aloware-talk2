@@ -275,7 +275,8 @@ export default function (/* { ssrContext } */) {
         name: null,
         path: null,
         referer: null,
-        whitelabel: false
+        whitelabel: false,
+        xmas_enabled: false
       },
       staticsLoaded: false,
       isCallDisposed: false,
