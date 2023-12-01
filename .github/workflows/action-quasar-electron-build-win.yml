@@ -102,6 +102,9 @@ jobs:
           ENV_KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
           ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
+          XMAS_ENABLED: ${{ secrets.xmas_enabled }}
+          XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
+          URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
           file-name: .env.prod
 
       - name: Build/release Electron win app
@@ -163,3 +166,10 @@ jobs:
           HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           # All others
           HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
+
+          # Xmas
+          XMAS_ENABLED: ${{ secrets.xmas_enabled }}
+          XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
+
+          # Reviews
+          URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
