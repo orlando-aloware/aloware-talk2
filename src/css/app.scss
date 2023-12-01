@@ -2350,6 +2350,13 @@ i.option-separator {
       margin: auto auto;
       display: block;
     }
+
+    & .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 2px;
+    }
   }
 }
 

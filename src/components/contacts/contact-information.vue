@@ -197,7 +197,7 @@
               pill
               v-if="hasExpanded"
               @click="onExpanded">
-      <i class="material-icons">{{ expanded ? 'expand_less' : 'expand_more' }}</i>
+      <i class="material-icons icon">{{ expanded ? 'expand_less' : 'expand_more' }}</i>
     </b-button>
   </b-card>
 </template>
