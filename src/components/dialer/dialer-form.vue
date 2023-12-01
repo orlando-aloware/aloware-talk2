@@ -18,7 +18,8 @@
                        triggers="hover"
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
-                       :task="blockTooltipHandler.task">
+                       :task="blockTooltipHandler.task"
+                       v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
                :active="mode === 'call'"
@@ -305,6 +306,10 @@ export default {
       return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
     },
 
+    isBlockTooltipPopoverEnabled () {
+      return !this.enabledToCallNumber(this.phoneNumber) || !this.enabledToTextNumber(this.phoneNumber)
+    },
+
     dialerFormClass () {
       const callClass = this.isMakingCall ? 'loading-cover-screen' : ''
       let modeClass = ''
@@ -551,7 +556,6 @@ export default {
     },
 
     hideBlockTooltip () {
-      console.log('hideBlockTooltip')
       this.blockTooltipHandler.show = false
     }
   },
