@@ -505,7 +505,11 @@ export default {
 
     refreshContacts () {
       this.initiateUpdateContactsListFilter()
-      this.$VueEvent.fire('fetchContacts', { fromRefresh: true, clear: true })
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
       this.$VueEvent.fire('fetchContactsLists')
     },
 
