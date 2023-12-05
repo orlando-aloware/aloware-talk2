@@ -490,7 +490,7 @@ export default {
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound bg-danger text-white text-left'
+        return 'outbound bg-primary text-grey-50 text-left'
       }
 
       return ''
