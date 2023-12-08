@@ -751,9 +751,6 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      console.trace('event contact_updated')
-      console.log('event contact_updated data', data)
-      console.log('event contact_updated this.channelChangedFilterFields', this.channelChangedFilterFields)
       const communications = (data?.communications?.length > 0)
         ? [...data.communications]
         : [...this.communications]
