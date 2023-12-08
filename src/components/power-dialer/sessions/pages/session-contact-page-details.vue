@@ -37,6 +37,19 @@
           </q-card-section>
         </q-card>
 
+        <q-card class="p-3 flex-grow-0 mb-2"
+                flat
+                v-if="isZohoEnabled && zohoLink">
+          <q-card-section class="p-0">
+            <b-link class="text-weight-medium text-decoration-none"
+                    target="_blank"
+                    :href="zohoLink">
+              <ZohoIcon />
+              <span class="session-integration-title ml-1">Open in Zoho</span>
+            </b-link>
+          </q-card-section>
+        </q-card>
+
         <DetailsContactInformation class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
                                    :resources="contact"
                                    v-if="contact" />
@@ -57,16 +70,18 @@ import DetailsScripts from './details-scripts'
 import DetailsContactInformation from './details-contact-information'
 import DetailsTools from './details-tools'
 import HubSpotIcon from 'components/icons/hubspot-icon'
-import { hubspotIntegrationMixin } from 'src/plugins/mixins'
+import { hubspotIntegrationMixin, zohoIntegrationMixin } from 'src/plugins/mixins'
+import ZohoIcon from 'components/icons/zoho-icon'
 
 export default {
   name: 'SessionContactPageDetails',
 
   mixins: [
-    hubspotIntegrationMixin
+    hubspotIntegrationMixin, zohoIntegrationMixin
   ],
 
   components: {
+    ZohoIcon,
     DetailsScripts,
     DetailsContactInformation,
     DetailsTools,
@@ -99,6 +114,10 @@ export default {
 
     hubspotLink () {
       return this.getHubspotContactLink(this.contact)
+    },
+
+    zohoLink () {
+      return this.getZohoContactLink(this.contact)
     }
   }
 }
