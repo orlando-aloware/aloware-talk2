@@ -761,7 +761,7 @@ export default {
         'voicemails',
         'recordings'
       ]
-      console.log('event contact_updated communications', communications)
+
       if (channels.includes(this.$route.params.channel)) {
         if (this.$route.params.channel === 'mentions') {
           communications.filter(item => item.mention_subject.contact && item.mention_subject.contact.id === data.id).forEach((value) => {
