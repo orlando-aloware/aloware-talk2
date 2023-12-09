@@ -138,8 +138,6 @@ export default {
   computed: {
     ...mapState(['statics']),
 
-    ...mapState('statics'),
-
     confirmPassword () {
       return [
         (val) => (val && val.length >= 6) || 'Password should have at least 6 characters',
