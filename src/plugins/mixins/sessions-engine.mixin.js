@@ -30,6 +30,7 @@ export default {
         id: task.contact_list_id,
         task_status: 1
       })
+      console.log('fetchInQueueTasks res.data.data', res.data.data)
       this.powerDialerTasks['in_queue'] = res.data.data
     },
     updateTaskStatus (task) {
