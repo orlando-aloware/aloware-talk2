@@ -36,7 +36,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('accountRegistration', ['shouldRedirectToLogin']),
-    ...mapState('statics'),
+    ...mapState(['statics']),
 
     shouldRedirectToClassic () {
       const urlParams = new URLSearchParams(window.location.search)

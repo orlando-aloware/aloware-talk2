@@ -405,7 +405,7 @@ export default {
       'ongoingSession'
     ]),
 
-    ...mapState('xmasEnabled'),
+    ...mapState(['xmasEnabled']),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
