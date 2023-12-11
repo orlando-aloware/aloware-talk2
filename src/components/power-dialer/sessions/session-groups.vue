@@ -470,7 +470,7 @@ export default {
         id: this.selectedList.id,
         task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
         per_page: this.itemsPerPage,
-        page: this.groupPageFilters[key]
+        page: this.powerDialerTaskFilters[key].current_page + 1
       })
 
       if (res.status === 200) {
@@ -515,6 +515,7 @@ export default {
     },
 
     hasMoreItems (group = [], key) {
+      console.trace('hasMoreItems', group, key, this.getTotalItem(key))
       if (group.length < this.itemsPerPage) {
         return false
       }
@@ -523,22 +524,21 @@ export default {
     },
 
     getTotalItem (key) {
+      if (!this.powerDialerTaskFilters[key]) {
+        return 0
+      }
+
       switch (key) {
         case 'in_queue':
-          console.log('this.powerDialerTasks', this.powerDialerTasks)
-          console.log('this.taskToCall', this.taskToCall)
-          const inQueue = get(this.powerDialerTasks, 'in_queue', null)
-          console.log('inQueue', inQueue)
-          console.log('inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length', inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length)
-          return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
+          return this.powerDialerTaskFilters[key].total_queued - 1 // 1 for in progress
         case 'called':
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
+          return this.powerDialerTaskFilters[key].total_called
         case 'failed':
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_failed : 0
+          return this.powerDialerTaskFilters[key].total_failed
         case 'scheduled':
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_scheduled : 0
+          return this.powerDialerTaskFilters[key].total_scheduled
         default:
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_items : 0
+          return this.powerDialerTaskFilters[key].total_items
       }
     },
 

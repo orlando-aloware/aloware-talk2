@@ -6,7 +6,9 @@
            :class="`${sessionSidebarExpanded ? 'minimized' : ''}`">
         <session-sidebar />
       </div>
-      <div :class="`sessions-main-page px-0 mb-0 main flex-1 ${sessionSidebarExpanded ? 'minimized' : ''} bg-grey-1 px-0 mb-0 h-100`"
+
+      <div class="sessions-main-page px-0 mb-0 main flex-1 bg-grey-1 px-0 mb-0 h-100"
+           :class="`${sessionSidebarExpanded ? 'minimized' : ''}`"
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
@@ -143,14 +145,9 @@ export default {
     this.$VueEvent.listen('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   },
 
-  async mounted () {
+  mounted () {
     this.resetPowerDialerTasks()
-
-    if (!this.myQueue) {
-      await this.getMyQueueList()
-    }
-
-    await this.fetchTasks()
+    this.fetchTasks()
   },
 
   methods: {
@@ -172,6 +169,8 @@ export default {
       delete params.name
       delete params.id
 
+      console.trace('getTaskByFilter', listId, params)
+
       return window.axios.get(
         `api/v2/power-dialer-lists/${listId}/items`,
         {
@@ -183,20 +182,21 @@ export default {
 
     fetchTasks (status, isNextPage = false, refreshData = false) {
       if (status) {
-        const taskType = { data: '' }
+        let taskType = 'in_queue'
+
         switch (status) {
           case AutoDialTaskStatus.STATUS_COMPLETED:
-            taskType.data = 'called'
+            taskType = 'called'
             break
           case AutoDialTaskStatus.STATUS_FAILED:
-            taskType.data = 'failed'
+            taskType = 'failed'
             break
           case AutoDialTaskStatus.STATUS_SCHEDULED:
-            taskType.data = 'scheduled'
+            taskType = 'scheduled'
             break
           case AutoDialTaskStatus.STATUS_QUEUED:
           default:
-            taskType.data = 'in_queue'
+            taskType = 'in_queue'
         }
 
         let params = {
@@ -205,41 +205,43 @@ export default {
         }
 
         params.page = isNextPage ? 2 : 1
-        const isInProgress = get(this.inProgressFetchTasks, taskType.data, false)
+        const isInProgress = get(this.inProgressFetchTasks, taskType, false)
 
-        // skip if there's an in-progress tasks fetch
+        // skip if there's an in-progress tasks fetching for the specific type
         if (isInProgress) {
           return
         }
 
-        this.inProgressFetchTasks[taskType.data] = true
+        this.inProgressFetchTasks[taskType] = true
+        console.trace('fetchTasks')
 
         this.getTaskByFilter(params)
           .then(res => {
-            this.powerDialerTaskFilters[taskType.data] = JSON.parse(JSON.stringify(res.data))
-            delete this.powerDialerTaskFilters[taskType.data].data
+            this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+            delete this.powerDialerTaskFilters[taskType].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
               this.pagesFetched += 1
-              this.powerDialerTaskFilters[taskType.data].current_page = this.pagesFetched
-              // const inQueueTaskIds = this.powerDialerTasks[taskType.data].map(task => task.contact_list_item_id)
-              // const uniqueData = res.data.data.filter(task => !inQueueTaskIds.includes(task.id))
-              this.powerDialerTasks[taskType.data].push(...res.data.data)
+              this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
+              this.powerDialerTasks[taskType].push(...res.data.data)
+              console.log('if..', this.powerDialerTaskFilters, this.powerDialerTasks)
             } else {
-              this.powerDialerTasks[taskType.data] = res.data.data
+              this.powerDialerTasks[taskType].data = res.data.data
+              console.log('else..', this.powerDialerTaskFilters, this.powerDialerTasks)
             }
 
-            if (this.powerDialerTasks.in_queue.length === 0 &&
-              status === AutoDialTaskStatus.STATUS_QUEUED) {
+            // no more queued tasks
+            if (this.powerDialerTasks.in_queue.length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.$VueEvent.fire('initiate_session_no_tasks')
             }
 
-            this.inProgressFetchTasks[taskType.data] = false
+            this.inProgressFetchTasks[taskType] = false
           })
 
         return
       }
 
+      // load non-queue tasks
       Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
         let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
 
@@ -330,10 +332,11 @@ export default {
       handler (newValue, oldValue) {
         const newContactListItemId = get(newValue, 'contact_list_item_id', null)
         const oldContactListItemId = get(oldValue, 'contact_list_item_id', null)
+        console.trace('activeTask watcher', newContactListItemId, oldContactListItemId)
 
         // check if current and previous active task are not the same,
         // then check if we can fetch more tasks
-        if (newContactListItemId !== oldContactListItemId) {
+        if (oldContactListItemId && newContactListItemId !== oldContactListItemId) {
           this.fetchQueuedTasks()
         }
       },
