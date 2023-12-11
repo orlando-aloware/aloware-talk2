@@ -266,6 +266,7 @@ export default {
     this.powerDialerListeners.contactListItemCreated = async (task) => {
       // console.log(` %c PUSHER caught: contact_list_item_created `, 'background:black;color:yellow;', task)
       // console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
+      console.log('this.powerDialerListeners.contactListItemCreated', this.powerDialerListeners.contactListItemCreated)
       if (this.hasSessions) {
         await this.fetchInQueueTasks(task)
       }
