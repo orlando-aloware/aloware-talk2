@@ -162,7 +162,7 @@ export default {
   },
 
   computed: {
-    ...mapState('statics')
+    ...mapState(['statics'])
   }
 }
 </script>
