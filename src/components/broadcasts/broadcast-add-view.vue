@@ -82,6 +82,30 @@
         </div>
       </template>
     </confirm-dialog>
+
+    <confirm-dialog id="optout-missing-dialog"
+                    :is-open="optoutMissingDialog.open"
+                    @close="optoutMissingDialog.open = false">
+      <template #content>
+        <p>
+          You have not added an opt-out phrase to your message. This is required by the FCC. Would you like to add one now?
+        </p>
+      </template>
+
+      <template #footer>
+        <div>
+          <button class="btn btn-sm btn-light mr-2"
+                  @click="onOptoutMissingDialogClosed">
+            No
+          </button>
+
+          <button class="btn btn-sm btn-primary"
+                  @click="onOptoutMissingDialogConfirmed">
+            Yes
+          </button>
+        </div>
+      </template>
+    </confirm-dialog>
   </div>
 </template>
 
@@ -146,7 +170,8 @@ export default {
 
     ...mapGetters('contacts', [
       'messageComposer',
-      'messageBodyWithOptout'
+      'messageBodyWithOptout',
+      'isOptoutActive'
     ]),
 
     mainComponent () {
@@ -278,6 +303,9 @@ export default {
     acceptedOutsideBusinessHours: false,
     outsideBusinessHoursDialog: {
       open: false
+    },
+    optoutMissingDialog: {
+      open: false
     }
   }),
 
@@ -286,7 +314,8 @@ export default {
       'setCurrentListFilters',
       'setMessageComposerSmsBody',
       'setMessageComposerSmsGif',
-      'setMessageComposerAttachments'
+      'setMessageComposerAttachments',
+      'setIsOptoutActive'
     ]),
 
     mainComponentChanged (state) {
@@ -350,10 +379,25 @@ export default {
       this.outsideBusinessHoursDialog.open = false
     },
 
+    onOptoutMissingDialogClosed () {
+      this.optoutMissingDialog.open = false
+    },
+
+    onOptoutMissingDialogConfirmed () {
+      this.optoutMissingDialog.open = false
+      this.setIsOptoutActive(true)
+    },
+
     next () {
       // send outside business hours confirmation
       if (this.currentStep.id === 3 && this.isRestrictedTime && !this.acceptedOutsideBusinessHours) {
         this.outsideBusinessHoursDialog.open = true
+
+        return
+      }
+
+      if (this.currentStep.id === 2 && this.type === 'sms' && !this.isOptoutActive) {
+        this.optoutMissingDialog.open = true
 
         return
       }

@@ -219,7 +219,7 @@ export default function () {
     isEnrollSequenceOpen: false,
     isAddReminderOpen: false,
     isOptoutActive: false,
-    optoutText: ' Text STOP to unsubscribe',
+    optoutText: ' Text STOP to unsubscribe.',
     changingSelectedContact: false,
     smsTemplateModal: {
       open: false,
