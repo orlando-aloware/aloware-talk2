@@ -222,6 +222,9 @@ export default _.merge({
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
     },
+    isSupervisor () {
+      return this.hasRole(Roles.COMPANY_SUPERVISOR)
+    },
     /**
      * Decides if the Broadcast should be shown.
      *
