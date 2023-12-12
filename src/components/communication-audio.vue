@@ -16,7 +16,10 @@
         </div>
       </div>
     </div>
-    <span class="text-grey-900" v-if="isDeleted">record was deleted</span>
+    <span class="text-grey-900"
+          v-if="isDeleted">
+      record was deleted
+    </span>
   </div>
 </template>
 
