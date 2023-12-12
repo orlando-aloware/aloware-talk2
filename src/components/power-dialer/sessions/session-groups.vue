@@ -516,11 +516,18 @@ export default {
 
     hasMoreItems (group = [], key) {
       console.trace('hasMoreItems', group, key, this.getTotalItem(key))
+      const hasMoreItemsToFetch = group.length < this.getTotalItem(key)
+
+      // if in_queue and has more items to fetch but currently displayed items is less than the itemsPerPage
+      if (key === 'in_queue' && hasMoreItemsToFetch && group.length === (this.itemsPerPage - 1)) {
+        return true
+      }
+
       if (group.length < this.itemsPerPage) {
         return false
       }
 
-      return group.length < this.getTotalItem(key)
+      return hasMoreItemsToFetch
     },
 
     getTotalItem (key) {
