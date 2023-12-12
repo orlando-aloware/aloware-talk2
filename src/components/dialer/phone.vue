@@ -593,11 +593,11 @@
             <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
                  v-if="dialer.communication">
               <label class="form-control-label text-grey-90"
-                     v-if="dialer.communication.has_recording || communication.recording_is_deleted">
+                     v-if="dialer.communication.has_recording || dialer.communication.recording_is_deleted">
                 Call Recording
               </label>
               <div class="d-flex align-items-center w-100"
-                   v-if="dialer.communication.has_recording || communication.recording_is_deleted">
+                   v-if="dialer.communication.has_recording || dialer.communication.recording_is_deleted">
                 <communication-audio :communication="dialer.communication"
                                      :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                      :uniqueId="dialer.communication.id + '1'">
