@@ -674,7 +674,7 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center"
-                     v-if="communication.has_recording">
+                     v-if="communication.has_recording || communication.recording_is_deleted">
                   <communication-audio class="mb-2"
                                        :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
