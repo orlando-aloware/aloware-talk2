@@ -219,6 +219,9 @@ export default _.merge({
     hasReporterAccess () {
       return this.profile && this.profile.read_only_access
     },
+    isAgent () {
+      return this.hasRole(Roles.COMPANY_AGENT)
+    },
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
     },
