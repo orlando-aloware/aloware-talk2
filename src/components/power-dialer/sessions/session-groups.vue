@@ -560,6 +560,18 @@ export default {
     getTotalItems (group) {
       return get(this.powerDialerTaskFilters[group], 'total_items', 0)
     }
+  },
+
+  watch: {
+    'powerDialerTasks.in_queue' (newValue, oldValue) {
+      console.log('watch powerDialerTasks.in_queue', newValue, oldValue)
+      console.trace('watch powerDialerTasks.in_queue')
+    },
+
+    filteredTasks (newValue, oldValue) {
+      console.log('watch filteredTasks', newValue, oldValue)
+      console.trace('watch filteredTasks')
+    }
   }
 }
 </script>
