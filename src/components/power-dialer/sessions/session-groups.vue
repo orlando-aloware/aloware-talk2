@@ -571,6 +571,11 @@ export default {
     filteredTasks (newValue, oldValue) {
       console.log('watch filteredTasks', newValue, oldValue)
       console.trace('watch filteredTasks')
+    },
+
+    powerDialerTasks (newValue, oldValue) {
+      console.log('watch powerDialerTasks', newValue, oldValue)
+      console.trace('watch powerDialerTasks')
     }
   }
 }
