@@ -51,8 +51,8 @@
         </q-card>
 
         <details-contact-information class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
-                                   :resources="contact"
-                                   v-if="contact" />
+                                     :resources="contact"
+                                     v-if="contact" />
       </div>
       <div class="col-4 p-1 px-2 h-100 overflow-y-scroll">
 
