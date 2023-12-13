@@ -2165,6 +2165,8 @@ export default {
     },
 
     endWrapUp () {
+      console.log('endWrapUp this.$route.name', this.$route.name)
+      console.trace('endWrapUp')
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
