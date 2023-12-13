@@ -19,9 +19,9 @@ export default {
     getZohoContactLink (contact) {
       if (contact?.integration_data?.zoho?.contact_id) {
         return contact?.integration_data?.zoho?.contact_link
-      } else {
-        return contact?.integration_data?.zoho?.lead_link
       }
+      
+      return contact?.integration_data?.zoho?.lead_link
     }
   }
 }
