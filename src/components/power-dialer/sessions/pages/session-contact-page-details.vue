@@ -19,7 +19,7 @@
           </q-card-section>
         </q-card>
 
-        <DetailsScripts class="flex-grow-1 h-100 overflow-hidden"
+        <details-scripts class="flex-grow-1 h-100 overflow-hidden"
                         :resources="scripts" />
       </div>
 
@@ -31,7 +31,7 @@
             <b-link class="text-weight-medium text-decoration-none"
                     target="_blank"
                     :href="hubspotLink">
-              <HubSpotIcon />
+              <hub-spot-icon />
               <span class="session-integration-title ml-1">Open in HubSpot</span>
             </b-link>
           </q-card-section>
@@ -44,19 +44,19 @@
             <b-link class="text-weight-medium text-decoration-none"
                     target="_blank"
                     :href="zohoLink">
-              <ZohoIcon />
+              <zoho-icon />
               <span class="session-integration-title ml-1">Open in Zoho</span>
             </b-link>
           </q-card-section>
         </q-card>
 
-        <DetailsContactInformation class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
+        <details-contact-information class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
                                    :resources="contact"
                                    v-if="contact" />
       </div>
       <div class="col-4 p-1 px-2 h-100 overflow-y-scroll">
 
-        <DetailsTools />
+        <details-tools />
       </div>
 
     </b-overlay>
