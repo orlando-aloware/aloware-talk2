@@ -31,7 +31,7 @@
             <b-link class="text-weight-medium text-decoration-none"
                     target="_blank"
                     :href="hubspotLink">
-              <hub-spot-icon />
+              <hubspot-icon />
               <span class="session-integration-title ml-1">Open in HubSpot</span>
             </b-link>
           </q-card-section>
@@ -69,7 +69,7 @@ import { mapGetters, mapState } from 'vuex'
 import DetailsScripts from './details-scripts'
 import DetailsContactInformation from './details-contact-information'
 import DetailsTools from './details-tools'
-import HubSpotIcon from 'components/icons/hubspot-icon'
+import HubspotIcon from 'components/icons/hubspot-icon'
 import { hubspotIntegrationMixin, zohoIntegrationMixin } from 'src/plugins/mixins'
 import ZohoIcon from 'components/icons/zoho-icon'
 
@@ -85,7 +85,7 @@ export default {
     DetailsScripts,
     DetailsContactInformation,
     DetailsTools,
-    HubSpotIcon
+    HubspotIcon
   },
 
   data () {
