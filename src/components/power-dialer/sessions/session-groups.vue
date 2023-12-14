@@ -529,15 +529,16 @@ export default {
 
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTaskFilters[key].total_queued - 1 // 1 for in progress
+          const inQueue = get(this.powerDialerTasks, 'in_queue', null)
+          return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
         case 'called':
-          return this.powerDialerTaskFilters[key].total_called
+          return this.powerDialerTaskFilters[key].total_called ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
-          return this.powerDialerTaskFilters[key].total_failed
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_failed : 0
         case 'scheduled':
-          return this.powerDialerTaskFilters[key].total_scheduled
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_scheduled : 0
         default:
-          return this.powerDialerTaskFilters[key].total_items
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_items : 0
       }
     },
 

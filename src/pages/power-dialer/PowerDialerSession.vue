@@ -145,9 +145,12 @@ export default {
     this.$VueEvent.listen('contact_list_bulk_created', this.listeners.contactListBulkCreated)
   },
 
-  mounted () {
+  async mounted () {
     this.resetPowerDialerTasks()
-    this.fetchTasks()
+    if (!this.myQueue) {
+      await this.getMyQueueList()
+    }
+    await this.fetchTasks()
   },
 
   methods: {
@@ -211,7 +214,6 @@ export default {
         }
 
         this.inProgressFetchTasks[taskType] = true
-        console.trace('fetchTasks')
 
         this.getTaskByFilter(params)
           .then(res => {
@@ -222,10 +224,8 @@ export default {
               this.pagesFetched += 1
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
-              console.log('if..', this.powerDialerTaskFilters, this.powerDialerTasks)
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
-              console.log('else..', this.powerDialerTaskFilters, this.powerDialerTasks)
             }
 
             // no more queued tasks
@@ -303,8 +303,6 @@ export default {
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
       const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
       const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
-      console.log('fetchQueuedTasks', powerDialerTaskInQueueTotalQueued, totalTasksInQueueWithActiveCall)
-      console.log('fetchQueuedTasks', this.totalTasksInQueue, powerDialerTaskInQueuePerPage)
       if (powerDialerTaskInQueueTotalQueued &&
         powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < powerDialerTaskInQueuePerPage) {
@@ -331,7 +329,6 @@ export default {
       handler (newValue, oldValue) {
         const newContactListItemId = get(newValue, 'contact_list_item_id', null)
         const oldContactListItemId = get(oldValue, 'contact_list_item_id', null)
-        console.trace('activeTask watcher', newContactListItemId, oldContactListItemId)
 
         // check if current and previous active task are not the same,
         // then check if we can fetch more tasks
