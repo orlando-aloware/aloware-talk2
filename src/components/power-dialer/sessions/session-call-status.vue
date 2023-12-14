@@ -324,7 +324,7 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep, get, _ } from 'lodash'
+import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -943,7 +943,22 @@ export default {
         this.taskToCall = cloneDeep(task)
 
         if (this.taskToCall) {
-          _.debounce(this.removeFirstInQueueTask(), 2000)
+          setTimeout(() => {
+            // Obtén la hora actual
+          const fechaActual = new Date();
+
+          // Obtiene las partes de la hora (hora, minutos, segundos)
+          const horas = fechaActual.getHours();
+          const minutos = fechaActual.getMinutes();
+          const segundos = fechaActual.getSeconds();
+
+          // Formatea la salida para asegurarte de que haya dos dígitos en minutos y segundos
+          const horaFormateada = `${horas}:${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+          // Imprime en la consola
+          console.log('Hora actual:', horaFormateada);
+            this.removeFirstInQueueTask()
+          }, 200)
         }
 
         this.activeTask = this.taskToCall
@@ -1317,6 +1332,19 @@ export default {
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
+          // Obtén la hora actual
+          const fechaActual = new Date();
+
+          // Obtiene las partes de la hora (hora, minutos, segundos)
+          const horas = fechaActual.getHours();
+          const minutos = fechaActual.getMinutes();
+          const segundos = fechaActual.getSeconds();
+
+          // Formatea la salida para asegurarte de que haya dos dígitos en minutos y segundos
+          const horaFormateada = `${horas}:${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+          // Imprime en la consola
+          console.log('Hora actual:', horaFormateada);
           this.removeFirstInQueueTask()
           this.processSession(true)
         }, 200)
