@@ -687,7 +687,7 @@ export default {
     },
 
     generateCustomAuditMessageWithNotes (communication) {
-      const notes = communication.notes ? ' (Reason: ' + communication.notes.replace(/\\"/g, '"') + ')' : ''
+      const notes = communication.notes ? ` (Reason: ${communication.notes.replace(/\\"/g, '"')})` : ''
       return this.generateCustomAuditMessage(communication) + notes
     },
 
