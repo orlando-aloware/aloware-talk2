@@ -1473,7 +1473,6 @@ export default {
     },
 
     wrapUp (value) {
-      console.log('wrapUp watch', value, this.skipWrapUp)
       if (value) {
         this.startWarmUpCountDown()
         return

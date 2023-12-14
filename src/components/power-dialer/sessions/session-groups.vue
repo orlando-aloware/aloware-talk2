@@ -515,18 +515,11 @@ export default {
     },
 
     hasMoreItems (group = [], key) {
-      const hasMoreItemsToFetch = group.length < this.getTotalItem(key)
-
-      // if in_queue and has more items to fetch but currently displayed items is less than the itemsPerPage
-      if (key === 'in_queue' && hasMoreItemsToFetch && group.length === (this.itemsPerPage - 1)) {
-        return true
-      }
-
       if (group.length < this.itemsPerPage) {
         return false
       }
 
-      return hasMoreItemsToFetch
+      return group.length < this.getTotalItem(key)
     },
 
     getTotalItem (key) {
@@ -558,23 +551,6 @@ export default {
 
     getTotalItems (group) {
       return get(this.powerDialerTaskFilters[group], 'total_items', 0)
-    }
-  },
-
-  watch: {
-    'powerDialerTasks.in_queue' (newValue, oldValue) {
-      console.log('watch powerDialerTasks.in_queue', newValue, oldValue)
-      console.trace('watch powerDialerTasks.in_queue')
-    },
-
-    filteredTasks (newValue, oldValue) {
-      console.log('watch filteredTasks', newValue, oldValue)
-      console.trace('watch filteredTasks')
-    },
-
-    powerDialerTasks (newValue, oldValue) {
-      console.log('watch powerDialerTasks', newValue, oldValue)
-      console.trace('watch powerDialerTasks')
     }
   }
 }

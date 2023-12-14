@@ -169,8 +169,6 @@ export default {
       delete params.name
       delete params.id
 
-      console.trace('getTaskByFilter', listId, params)
-
       return window.axios.get(
         `api/v2/power-dialer-lists/${listId}/items`,
         {
