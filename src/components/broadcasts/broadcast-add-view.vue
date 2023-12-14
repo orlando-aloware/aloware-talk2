@@ -386,6 +386,16 @@ export default {
 
     onOptoutMissingDialogConfirmed () {
       this.optoutMissingDialog.open = false
+      this.goToNextStep()
+      this.setIsOptoutActive(false)
+    },
+
+    goToNextStep () {
+      this.isMainComponentValid = false
+      this.isFooterComponentValid = false
+
+      this.direction = 'right'
+      this.$emit('next')
     },
 
     next () {
@@ -402,11 +412,7 @@ export default {
         return
       }
 
-      this.isMainComponentValid = false
-      this.isFooterComponentValid = false
-
-      this.direction = 'right'
-      this.$emit('next')
+      this.goToNextStep()
     },
 
     back () {

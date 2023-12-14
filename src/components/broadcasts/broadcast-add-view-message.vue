@@ -264,7 +264,6 @@ export default {
 
     // type setup
     this.type = this.rvm ? 'rvm' : 'sms'
-    this.setIsOptoutActive(true)
   },
 
   methods: {
