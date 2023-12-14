@@ -623,11 +623,11 @@
                 <div class="w-100"
                      v-if="communication.type === CommunicationTypes.CALL">
                   <label class="form-control-label"
-                         v-if="showAudio(communication)">
+                         v-if="communication.has_recording">
                     Call Recording
                   </label>
                   <div class="d-flex align-items-center w-100 mb-2 border-bottom"
-                       v-if="showAudio(communication)">
+                       v-if="communication.has_recording">
                     <communication-audio :communication="communication"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
