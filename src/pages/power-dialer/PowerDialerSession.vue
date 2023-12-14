@@ -305,7 +305,8 @@ export default {
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
       const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
       const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
-
+      console.log('fetchQueuedTasks', powerDialerTaskInQueueTotalQueued, totalTasksInQueueWithActiveCall)
+      console.log('fetchQueuedTasks', this.totalTasksInQueue, powerDialerTaskInQueuePerPage)
       if (powerDialerTaskInQueueTotalQueued &&
         powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < powerDialerTaskInQueuePerPage) {
