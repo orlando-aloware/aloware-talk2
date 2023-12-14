@@ -942,9 +942,9 @@ export default {
         this.loadingNext = true
         this.taskToCall = cloneDeep(task)
 
-        if (this.taskToCall) {
+        /* if (this.taskToCall) {
           this.removeFirstInQueueTask()
-        }
+        } */
 
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
