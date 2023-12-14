@@ -216,17 +216,25 @@ export default _.merge({
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     ...mapState(['usage']),
+
     hasReporterAccess () {
       return this.profile && this.profile.read_only_access
     },
+
     isAgent () {
       return this.hasRole(Roles.COMPANY_AGENT)
     },
+
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
     },
+
     isSupervisor () {
       return this.hasRole(Roles.COMPANY_SUPERVISOR)
+    },
+
+    isAdminOrSupervisor () {
+      return this.hasRole(Roles.COMPANY_ADMIN) || this.hasRole(Roles.COMPANY_SUPERVISOR)
     },
     /**
      * Decides if the Broadcast should be shown.
