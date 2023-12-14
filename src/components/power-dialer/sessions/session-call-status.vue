@@ -324,7 +324,7 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep, get } from 'lodash'
+import { isEmpty, cloneDeep, get, _ } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -942,9 +942,9 @@ export default {
         this.loadingNext = true
         this.taskToCall = cloneDeep(task)
 
-        /* if (this.taskToCall) {
-          this.removeFirstInQueueTask()
-        } */
+        if (this.taskToCall) {
+          _.debounce(this.removeFirstInQueueTask(), 2000)
+        }
 
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
