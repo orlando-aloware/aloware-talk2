@@ -147,9 +147,11 @@ export default {
 
   async mounted () {
     this.resetPowerDialerTasks()
+
     if (!this.myQueue) {
       await this.getMyQueueList()
     }
+
     await this.fetchTasks()
   },
 

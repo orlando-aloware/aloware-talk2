@@ -1314,7 +1314,7 @@ export default {
     onEndWrapUp () {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
-      console.log('onEndWrapUp', this.taskToCall, this.isSessionRunning)
+
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
           this.removeFirstInQueueTask()

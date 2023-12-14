@@ -532,7 +532,7 @@ export default {
           const inQueue = get(this.powerDialerTasks, 'in_queue', null)
           return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
         case 'called':
-          return this.powerDialerTaskFilters[key].total_called ? this.powerDialerTaskFilters[key].total_called : 0
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_failed : 0
         case 'scheduled':
