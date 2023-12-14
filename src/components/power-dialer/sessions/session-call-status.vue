@@ -903,7 +903,7 @@ export default {
       if (!this.isSessionRunning) {
         this.TOGGLE_SESSION_LOADER(true)
       }
-
+      console.log('initialize', this.toggleEnd, this.timerIsOver, this.allTasksAreSkipped)
       if (this.toggleEnd && this.timerIsOver) {
         this.reRoute()
         return
@@ -920,7 +920,7 @@ export default {
       }
 
       const task = get(this.powerDialerTasks.in_queue, '0', null)
-
+      console.log('initialize', this.activeTask, this.wrapUpSeconds, this.statusCallConnected, this.hasQueuedTaskLists)
       // skip assigning the next task if
       // there is still an active task and
       // wrap up seconds is indefinite
@@ -936,7 +936,7 @@ export default {
         this.reRoute()
         return
       }
-
+      console.log('initialize', this.statusOnACall, this.wrapUp, this.taskToCall)
       // process the next task if no in-progress call
       if (!this.statusOnACall && !this.wrapUp) {
         this.loadingNext = true
@@ -1314,7 +1314,7 @@ export default {
     onEndWrapUp () {
       this.wrapUp = false
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
-
+      console.log('onEndWrapUp', this.taskToCall, this.isSessionRunning)
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
           this.removeFirstInQueueTask()
@@ -1473,6 +1473,7 @@ export default {
     },
 
     wrapUp (value) {
+      console.log('wrapUp watch', value, this.skipWrapUp)
       if (value) {
         this.startWarmUpCountDown()
         return
