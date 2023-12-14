@@ -88,7 +88,7 @@
                     @close="optoutMissingDialog.open = false">
       <template #content>
         <p>
-          You have not added an opt-out phrase to your message. This is required by the FCC. Would you like to add one now?
+          You haven't included the mandatory opt-out message in the SMS as required by law. Are you sure you want to proceed without it?
         </p>
       </template>
 
@@ -96,12 +96,12 @@
         <div>
           <button class="btn btn-sm btn-light mr-2"
                   @click="onOptoutMissingDialogClosed">
-            No
+            No, I'll add it
           </button>
 
           <button class="btn btn-sm btn-primary"
                   @click="onOptoutMissingDialogConfirmed">
-            Yes
+            Yes, I want to proceed
           </button>
         </div>
       </template>
@@ -381,11 +381,11 @@ export default {
 
     onOptoutMissingDialogClosed () {
       this.optoutMissingDialog.open = false
+      this.setIsOptoutActive(true)
     },
 
     onOptoutMissingDialogConfirmed () {
       this.optoutMissingDialog.open = false
-      this.setIsOptoutActive(true)
     },
 
     next () {
