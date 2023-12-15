@@ -324,7 +324,7 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep, get, _ } from 'lodash'
+import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -759,7 +759,7 @@ export default {
       'removeFirstInQueueTask'
     ]),
 
-    processRemoveFirstInQueueTask: _.debounce(function() {
+    processRemoveFirstInQueueTask: debounce(function() {
       this.removeFirstInQueueTask()
     }, 500),
 
