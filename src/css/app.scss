@@ -7477,9 +7477,13 @@ table.datatable {
 
   .left-column-wrapper {
     border-right: 1px solid $grey-60;
-    padding-right: 10px;
     padding-left: 10px;
     width: 25%;
+
+    .left-column-wrapper-scrollable {
+      max-height: 85vh;
+      overflow: auto;
+    }
 
     .filter-group-title {
       font-size: 12px;
@@ -13077,6 +13081,36 @@ h1.contact-list-name-label {
       .highcharts-scrollbar {
         display: none;
       }
+
+      @media print {
+        .activity-graph {
+          background-color: white;
+          height: 100vh;
+          width: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1051;
+
+          &__header {
+            .chart-types {
+              display: none !important;
+            }
+          }
+
+          .highcharts-container {
+            svg {
+              width: 100vw !important;
+
+              .highcharts-legend-item {
+                text {
+                  font-size: 13px !important;
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     &__table {
@@ -13091,7 +13125,6 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-
 
         &.paused {
           border-color: $warning;

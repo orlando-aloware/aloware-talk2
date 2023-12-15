@@ -269,15 +269,15 @@ export const fixDate = (dt, format = 'YYYY-MM-DD') => {
  * @returns {string|*}
  */
 export const fixDateTime = (dt) => {
-  if (dt) {
-    if (window.timezone) {
-      return window.moment.utc(dt).tz(window.timezone).format('MM/DD h:mm:ssa')
-    } else {
-      return window.moment.utc(dt).local().format('MM/DD h:mma')
-    }
-  } else {
+  if (!dt) {
     return '-'
   }
+
+  if (window.timezone) {
+    return window.moment.utc(dt).tz(window.timezone).format('MM/DD/YYYY h:mm:ssa')
+  }
+
+  return window.moment.utc(dt).local().format('MM/DD/YYYY h:mma')
 }
 
 /**
