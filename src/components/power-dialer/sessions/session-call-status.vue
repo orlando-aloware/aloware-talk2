@@ -759,7 +759,7 @@ export default {
       'removeFirstInQueueTask'
     ]),
 
-    processRemoveFirstInQueueTask: debounce(function() {
+    processRemoveFirstInQueueTask: debounce(function () {
       this.removeFirstInQueueTask()
     }, 500),
 
