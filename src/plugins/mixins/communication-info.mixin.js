@@ -197,7 +197,7 @@ export default {
           }
           return `Cannot ${placeHolder} to an anonymous contact.`
         case CommunicationRejectionReasons.REJECTION_REASON_TRAFFIC_BLOCKED:
-          return 'SMS traffic was blocked by Twilio.'
+          return 'SMS traffic was blocked by carriers.'
         case CommunicationRejectionReasons.REJECTION_REASON_NOT_MESSAGING_ENABLED:
           return 'Contact phone number was not messaging enabled.'
         case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_DELETED:

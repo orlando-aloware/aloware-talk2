@@ -5,7 +5,7 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <trial-banner v-if="isTrialKYC"/>
+    <trial-banner v-if="isTrialKYC && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -67,6 +67,7 @@
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
+                         :xmasEnabled="isXmasEnabled"
                          @toggleMode="toggleMode">
             </app-sidebar>
           </q-list>
@@ -213,8 +214,7 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog"
-                       @change-showed-kyc-dialog="changeShowedKycDialog" />
+      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
     </div>
   </div>
 </template>
@@ -233,7 +233,8 @@ import {
   unownedContactTaskMixin,
   agentMixin,
   contactV2AttributesMixin,
-  kycMixin
+  kycMixin,
+  settingsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -303,7 +304,8 @@ export default {
     unownedContactTaskMixin,
     agentMixin,
     contactV2AttributesMixin,
-    kycMixin
+    kycMixin,
+    settingsMixin
   ],
 
   data () {
@@ -356,7 +358,6 @@ export default {
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin,
-      showedKycDialog: false,
       isFirstLoading: true
     }
   },
@@ -377,7 +378,9 @@ export default {
       'suspended',
       'parkedCalls',
       'leadSources',
-      'isIntroVideoVisible'
+      'isIntroVideoVisible',
+      'showedKycDialog',
+      'statics'
     ]),
 
     ...mapState('auth', [
@@ -401,6 +404,8 @@ export default {
     ...mapState('powerDialer', [
       'ongoingSession'
     ]),
+
+    ...mapState(['xmasEnabled']),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
@@ -474,10 +479,9 @@ export default {
     },
 
     isShowPage () {
-      const isAuthenticated = !this.isGuest && this.authenticated
       const isUnauthenticated = this.isGuest && !this.authenticated
 
-      return isAuthenticated || isUnauthenticated || this.suspended
+      return this.isAuthenticated || isUnauthenticated || this.suspended
     },
 
     headerContainerClass () {
@@ -515,14 +519,16 @@ export default {
     },
 
     shouldShowKycFillDialog () {
-      const isAuthenticated = !this.isGuest && this.authenticated
-
-      return isAuthenticated &&
+      return this.isAuthenticated &&
              this.isIntroVideoVisible === null &&
              !this.isFirstLoading &&
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
+    },
+
+    isAuthenticated () {
+      return !this.isGuest && this.authenticated
     }
   },
 
@@ -2482,10 +2488,6 @@ export default {
 
     onShowMobileLiveCallBar (value) {
       this.mobileLiveCallBarShown = value
-    },
-
-    changeShowedKycDialog (value) {
-      this.showedKycDialog = value
     },
 
     beforeUnload () {

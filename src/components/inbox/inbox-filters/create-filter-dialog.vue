@@ -1,44 +1,41 @@
 <template>
-  <b-modal
-    id="create-filter-modal"
-    size="md"
-    modal-class="confirm-dialog"
-    hide-header-close
-    hide-header
-    hide-footer
-    ref="create-filter-modal"
-    v-model="isOpen"
-    @show="onShow"
-    @shown="onShown"
-    @hide="onHide"
-    @hidden="onHidden">
+  <b-modal id="create-filter-modal"
+           size="md"
+           modal-class="confirm-dialog"
+           ref="create-filter-modal"
+           hide-header-close
+           hide-header
+           hide-footer
+           v-model="isOpen"
+           @show="onShow"
+           @shown="onShown"
+           @hide="onHide"
+           @hidden="onHidden">
   <b-form @submit.prevent="onSubmit">
     <b-form-row>
-      <b-col sm="12" md="12" class="mb-3">
-        <span class="text-bold fs-20">Create New Filter</span>
+      <b-col sm="12"
+             md="12"
+             class="mb-3">
+        <span class="text-bold fs-20">Create New {{ dialogTitleLabel }}</span>
       </b-col>
-      <b-col sm="12" md="12">
-        <b-form-group
-          label="Filter Name"
-          class="form-label"
-        >
-          <b-form-input
-            ref="filterNameInput"
-            size="md"
-            type="text"
-            placeholder="Name"
-            v-model.trim="$v.filter.name.$model"
-            :state = "validateState('name')"
-          ></b-form-input>
+      <b-col sm="12"
+             md="12">
+        <b-form-group label="Filter Name"
+                      class="form-label">
+          <b-form-input ref="filterNameInput"
+                        size="md"
+                        type="text"
+                        placeholder="Name"
+                        :state="validateState('name')"
+                        v-model.trim="$v.filter.name.$model" />
           <b-form-invalid-feedback v-if="!$v.filter.name.required">Enter filter name</b-form-invalid-feedback>
         </b-form-group>
       </b-col>
 
-      <b-col sm="12" md="12">
-        <b-form-group
-          label="Filter Type"
-          class="form-label"
-        >
+      <b-col sm="12"
+             md="12">
+        <b-form-group label="Filter Type"
+                      class="form-label">
           <q-select color="primary"
                     ref="filterTypeSelect"
                     option-value="value"
@@ -48,27 +45,31 @@
                     map-options
                     outlined
                     dense
-                    v-model="filter.scope"
                     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
                     :options="scopeOptions"
                     :disable="true"
+                    v-model="filter.scope"
                     @popup-show="onFilterTypeShowMenu">
           </q-select>
         </b-form-group>
       </b-col>
 
-      <b-col sm="12" md="6">
-        <b-button block class="bg-grey-70 text-black border-0"
-                  @click="onHide">
+      <b-col sm="12"
+             md="6">
+        <b-button class="bg-grey-70 text-black border-0"
+                  block
+                  @click="onCancel">
           Cancel
         </b-button>
       </b-col>
-      <b-col sm="12" md="6">
-        <b-button block
-                  type="submit"
+      <b-col sm="12"
+             md="6">
+        <b-button type="submit"
                   variant="primary"
+                  block
                   :disabled="isCreating">
-          <q-spinner-bars v-if="isCreating" color="white" />
+          <q-spinner-bars color="white"
+                          v-if="isCreating" />
           {{ isCreating ? 'Creating filter...' : 'Create' }}
         </b-button>
       </b-col>
@@ -97,7 +98,7 @@ export default {
     ...mapState('inbox', [
       'isFilterModelFormShown',
       'isFilterDialogForView',
-      'isEditingView'
+      'activeChannel'
     ]),
 
     isOpen: {
@@ -108,6 +109,10 @@ export default {
       set (isOpen) {
         return isOpen
       }
+    },
+
+    dialogTitleLabel () {
+      return this.isFilterDialogForView ? 'View' : 'Filter'
     }
   },
 
@@ -140,7 +145,8 @@ export default {
         scope: 'user'
       },
       selectWidth: 0,
-      ChannelType
+      ChannelType,
+      isCancelled: false
     }
   },
 
@@ -161,21 +167,31 @@ export default {
       this.$v.filter.$reset()
       this.filter.name = ''
       this.filter.scope = 'user'
-      this.toggleFilterModelForm()
+
+      // toggle form state only if it's not for View
+      if (!this.isFilterDialogForView) {
+        this.toggleFilterModelForm()
+      }
     },
 
     onHide () {
       this.toggleFilterModelForm()
 
-      if (this.isFilterDialogForView) {
-        this.setIsEditingView(false)
-        this.setFilterDialogForView(false)
-        this.toggleFilterDialog(false)
-        this.$VueEvent.fire('openInboxViewPopup')
+      // after hiding the create filter dialog, show regular filter dialog form for non-View channels.
+      // also show regular filter dialog form for View channel if it's cancelled
+      // "Mentions" channel is excluded because it's not a regular channel with filters
+      const nonViewChannel = !this.isFilterDialogForView && this.activeChannel.value !== 'mentions'
+      if ((this.isFilterDialogForView && this.isCancelled) || nonViewChannel) {
+        this.toggleFilterDialog(true)
         return
       }
 
-      this.toggleFilterDialog(true)
+      // after hiding the create filter dialog, show the popup wherein Views are listed
+      // only if it's for View channel and saving the new filter is not cancelled
+      if (this.isFilterDialogForView && !this.isCancelled) {
+        this.$VueEvent.fire('openInboxViewPopup')
+        this.toggleFilterDialog(false)
+      }
     },
 
     onShow () {
@@ -191,47 +207,51 @@ export default {
     },
 
     onSubmit () {
+      this.isCancelled = false
       this.$v.$touch()
 
       if (this.$v.$invalid) {
         return
       }
 
+      const filterType = this.isFilterDialogForView
+        ? ChannelType.CHANNEL_INBOX
+        : (this.filterModel.type === ChannelType.CHANNEL_RECORDINGS
+          ? ChannelType.CHANNEL_CALLS
+          : this.filterModel.type)
+
       this.isCreating = true
       this.filter = {
         ...this.filter,
-        type: this.filterModel.type === ChannelType.CHANNEL_RECORDINGS ? ChannelType.CHANNEL_CALLS : this.filterModel.type,
-        filter: this.filterModel.filter }
+        type: filterType,
+        filter: this.filterModel.filter
+      }
 
       return talk2Api.V2.inbox.filters.save(this.filter)
         .then(response => {
-          this.isCreating = false
-          this.$VueEvent.fire('channel_filter_created', response.data.filter)
-          this.$emit('created', response.data.filter)
-          this.$nextTick(function () {
-            this.onHide()
-          })
-        }).catch(error => {
-          const errors = error.response.data.errors
-          const keys = Object.keys(errors)
-
-          if (keys && keys.length > 0) {
-            this.$generalNotification(errors[keys[0]], 'error')
+          // when saving a View filter, set the flag to true so that the filter dialog intended for View will be shown
+          if (this.isFilterDialogForView && filterType === ChannelType.CHANNEL_INBOX) {
+            this.setFilterDialogForView(true)
           }
 
           this.isCreating = false
+          this.$VueEvent.fire('channel_filter_created', response.data.filter)
+          this.$emit('created', response.data.filter)
+          this.onHide()
+        }).catch(error => {
+          this.$handleErrors(error.response)
+          this.isCreating = false
         })
+    },
+
+    onCancel () {
+      this.isCancelled = true
+      this.onHide()
     }
   },
 
   mounted () {
     this.toggleFilterModelForm()
-  },
-
-  watch: {
-    isFilterModelFormShown: function (value) {
-      this.open = value
-    }
   }
 }
 </script>

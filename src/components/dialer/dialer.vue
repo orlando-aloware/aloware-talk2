@@ -1392,6 +1392,7 @@ export default {
       })
       const err = new Error(`${error.message} Code: ${error.code}`)
       err.code = error.code
+      error.token = this.dialer.token
 
       console.log(error)
 
@@ -1406,12 +1407,13 @@ export default {
       // 31204 => Invalid JWT token.
       // 31205 => JWT token expired.
       // 9221 => Cannot connect to insights
-      if (![53405, 31204, 31205, 9221, 31000, 31005, 31009].includes(err.code)) {
+      // 20101 => Invalid token
+      if (![53405, 31204, 31205, 9221, 31000, 31005, 31009, 20101].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
 
       // Request new token if error
-      if ([31204, 31205].includes(err.code)) {
+      if ([31204, 31205, 20101].includes(err.code)) {
         return this.getDesktopToken(true)
       }
 

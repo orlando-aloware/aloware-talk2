@@ -44,6 +44,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setShowedKycDialog']),
     ...mapActions('accountRegistration', [
       'setBusinessInformationFieldsEmpty',
       'setFieldErrors'
@@ -87,6 +88,10 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
+    },
+
+    created () {
+      this.setShowedKycDialog(true)
     }
   }
 }
