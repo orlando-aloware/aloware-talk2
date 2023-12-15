@@ -1,6 +1,6 @@
 import qs from 'qs'
 import moment from 'moment'
-import { get, _ } from 'lodash'
+import { get } from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
@@ -341,9 +341,9 @@ export default {
     commit('CLEAR_REDIALED_TASKS')
   },
 
-  removeFirstInQueueTask: _.debounce(function (commit) {
+  removeFirstInQueueTask: ({ commit }) => {
     commit('REMOVE_FIRST_IN_QUEUE_TASK')
-  }, 500),
+  },
 
   reQueuePowerDialerTask: ({ commit }, payload) => {
     commit('REQUEUE_POWER_DIALER_TASK', payload)
