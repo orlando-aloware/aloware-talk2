@@ -55,7 +55,6 @@ export default {
   },
 
   props: {
-
     modelValue: [Number, String],
 
     disable: {
@@ -68,6 +67,7 @@ export default {
       type: String,
       required: false
     },
+
     clearable: {
       type: Boolean,
       default: false
@@ -85,11 +85,11 @@ export default {
   },
 
   computed: {
-
     localValue: {
       get () {
         return `${this.modelValue || ''}`
       },
+
       set (val) {
         this.$emit('change', val)
       }
@@ -123,6 +123,13 @@ export default {
   created () {
     this.fetchScripts().then(() => {
       this.scriptsOptions = this.scriptsAlphabeticalOrder
+    })
+  },
+
+  mounted () {
+    this.$VueEvent.listen('script_deleted', (script) => {
+      const updatedScripts = this.scripts.filter(item => +item.id !== +script.id)
+      this.scripts = updatedScripts
     })
   },
 
@@ -187,6 +194,10 @@ export default {
         this.$emit('on-change', this.selectedScriptObj)
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('script_deleted')
   }
 }
 </script>
