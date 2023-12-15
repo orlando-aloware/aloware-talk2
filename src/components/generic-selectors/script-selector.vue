@@ -119,8 +119,7 @@ export default {
 
   mounted () {
     this.$VueEvent.listen('script_deleted', (script) => {
-      const updatedScripts = this.scripts.filter(item => +item.id !== +script.id)
-      this.scripts = updatedScripts
+      this.scripts = this.scripts.filter(item => +item.id !== +script.id)
     })
   },
 
