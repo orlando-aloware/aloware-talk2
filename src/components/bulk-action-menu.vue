@@ -57,7 +57,7 @@
           <a href=""
              class="text-danger"
              :disabled="disabledDelete"
-             v-if="hasDeletePermission"
+             v-if="hasDeletePermission && canDelete"
              @click="onDelete">
             <i class="fa fa-trash text-danger"/>
             Delete
@@ -132,6 +132,11 @@ export default {
     checkedCount: {
       type: Number,
       default: 0
+    },
+
+    hideDeleteOnAllSelected: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -146,7 +151,10 @@ export default {
       'isAllContactsSelected'
     ]),
 
-    ...mapState(['isDatatableCountLoading']),
+    ...mapState([
+      'isDatatableCountLoading',
+      'isDatatableSelectedAll'
+    ]),
 
     selectedContactIds () {
       return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
@@ -201,6 +209,10 @@ export default {
 
     hasDeletePermission () {
       return this.hasPermissionTo('archive contact')
+    },
+
+    canDelete () {
+      return this.hideDeleteOnAllSelected ? !this.isDatatableSelectedAll : true
     }
   },
 

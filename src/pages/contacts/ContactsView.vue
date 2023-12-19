@@ -291,6 +291,7 @@
       <bulk-action-menu :id="id"
                         :total-rows="totalRows"
                         :checked-count="selectedAllCount"
+                        :hide-delete-on-all-selected="true"
                         @onSelectedAll="onSelectedAll" />
     </template>
 
