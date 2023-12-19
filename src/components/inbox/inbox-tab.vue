@@ -185,7 +185,7 @@
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
                      @onResetFilter="onResetFilter"
-                     v-model="channelClonedFilter" />
+                     v-model="filter" />
 
       <create-filter-dialog :filter-model="newFilterModel" />
     </div>
@@ -221,6 +221,7 @@ import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dia
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
+import { STATUS_OPEN } from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox-tab',
@@ -258,13 +259,15 @@ export default {
       'hasMoreContacts',
       'isFetchingContacts',
       'channelChangedFilterFields',
+      'selectedFilter',
       'appliedFilter',
       'isLoadingOpenTaskCount',
       'isLoadingPendingTaskCount',
       'activeChannel',
       'pinnedViews',
       'contacts',
-      'channelClonedFilter'
+      'channelClonedFilter',
+      'isFilterDialogForView'
     ]),
 
     ...mapState('contacts', [
@@ -377,9 +380,11 @@ export default {
 
     changedFilterFieldCount () {
       const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
+
       if (dateFieldIndex >= 0) {
         return this.channelChangedFilterFields.length - 1
       }
+
       return this.channelChangedFilterFields.length
     }
   },
@@ -509,7 +514,7 @@ export default {
       })
 
       // Inbox View
-      if (this.$route.name === 'Inbox View') {
+      if (this.inboxViewsRoutes.includes(this.$route.name)) {
         this.$router.push({
           name: 'Inbox View',
           params: {
@@ -675,6 +680,42 @@ export default {
       this.setChannelClonedFilter(this.filter)
       this.loadContactTasks()
       this.fetchTaskCounts()
+
+      // no redirection needed for non-view
+      if (!this.isFilterDialogForView) {
+        return
+      }
+
+      // if a pinned view is edited, redirect to inbox view route. otherwise, to inbox
+      this.currentTask = STATUS_OPEN
+
+      const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+      if (pinnedIndex >= 0) {
+        this.$router.push({
+          name: 'Inbox View',
+          params: {
+            viewId: this.appliedFilter.id,
+            status: this.statusText,
+            channel: 'view'
+          }
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+        return
+      }
+
+      this.$router.push({
+        name: 'Inbox Channel Task Status',
+        params: {
+          channel: 'inbox',
+          status: 'open'
+        }
+      }).catch(err => {
+        console.log(err)
+        this.$handleErrors(err.response)
+      })
     },
 
     onCreateNewFilter (filter) {
@@ -862,6 +903,9 @@ export default {
         this.setSelectedFilter(this.appliedFilter)
         this.setFilterDialogForView(true)
         this.setIsEditingView(true)
+      } else {
+        this.setFilterDialogForView(false)
+        this.setIsEditingView(false)
       }
 
       this.toggleFilterDialog(true)
@@ -896,9 +940,10 @@ export default {
   },
 
   created () {
-    if (this.$route.name !== 'Inbox View') {
+    if (this.$route.name !== 'Inbox View' && !this.isFilterDialogForView) {
       this.resetFilter()
     }
+
     this.toggleFilterDialog(false)
   },
 
@@ -906,7 +951,7 @@ export default {
     this.setContacts([])
     this.setStatus()
 
-    if (this.$route.name !== 'Inbox View') {
+    if (!this.inboxViewsRoutes.includes(this.$route.name)) {
       this.initInboxTaskRoute()
     }
 
@@ -1191,14 +1236,11 @@ export default {
         return
       }
 
-      this.filter.my_contact = +showMyContacts // convert boolean to numeric
-
-      if (showMyContacts) {
-        this.filter.contact_owner = []
-        this.updateChannelChangedFilterFields({
-          name: 'contact_owner',
-          value: []
-        })
+      // only when both have it, update the saved filters
+      // when my contacts is toggled
+      if (this.selectedFilter && this.appliedFilter) {
+        this.$VueEvent.fire('my_contacts_update_filter')
+        return
       }
 
       this.loadContactTasks(true)
@@ -1221,14 +1263,6 @@ export default {
     // restart listeners
     this.stopInboxListeners()
     this.startInboxListeners()
-
-    // this.$VueEvent.listen('inbox_route_change', () => {
-    //   this.onRouteChange()
-    // })
-    //
-    // this.$VueEvent.listen('inbox_route_name_change', () => {
-    //   this.onRouteNameChange()
-    // })
   },
 
   beforeDestroy () {
@@ -1238,6 +1272,10 @@ export default {
 
   watch: {
     $route (to, from) {
+      if (this.inboxViewsRoutes.includes(from.name) && !this.inboxChannelRoutes.includes(to.name)) {
+        this.resetFilter()
+      }
+
       // load contacts if not inbox view related route
       if (this.inboxViewsRoutes.includes(from.name) && !this.inboxViewsRoutes.includes(to.name)) {
         this.loadContactTasks(false)
@@ -1287,7 +1325,7 @@ export default {
         return
       }
 
-      if ((!this.isSearch && ['Inbox', 'Inbox View'].includes(this.previousRoute.name)) || this.$route.params.id) {
+      if ((!this.isSearch && ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.previousRoute.name)) || this.$route.params.id) {
         this.loadContactTasks()
       }
     },

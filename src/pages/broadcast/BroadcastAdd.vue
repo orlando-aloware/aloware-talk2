@@ -22,11 +22,17 @@
                         @next="onNext"
                         @back="onBack"
                         @loading="onLoading"/>
+
+    <transition name="slide-left">
+      <contacts-filters class="broadcasts__add__contacts-filters"
+                        v-if="filters"/>
+    </transition>
   </div>
 </template>
 
 <script>
 import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
+import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import StepsWrapper from 'src/components/generic-wrappers/steps-wrapper.vue'
 
 export default {
@@ -34,6 +40,7 @@ export default {
 
   components: {
     BroadcastAddView,
+    ContactsFilters,
     StepsWrapper
   },
 
@@ -63,8 +70,15 @@ export default {
         id: 4,
         name: 'Preview & Send'
       }
-    ]
+    ],
+    filters: false
   }),
+
+  mounted () {
+    this.$VueEvent.listen('toggle-contact-filters', (state) => {
+      this.filters = state
+    })
+  },
 
   methods: {
     onBack () {

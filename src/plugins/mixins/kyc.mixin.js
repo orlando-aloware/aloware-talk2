@@ -15,7 +15,15 @@ export default _.merge({
       return this.getStatus()
     },
 
+    ssuEnabled () {
+      return process.env.KYC_SSU_ENABLED || false
+    },
+
     isTrialKYC () {
+      if (!this.ssuEnabled) {
+        return false
+      }
+
       const status = this.getStatus()
       return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
     }
@@ -23,7 +31,7 @@ export default _.merge({
 
   methods: {
     skipRestrictions (kycStatus) {
-      return kycStatus === KycLogs.KYC_STATUS_NONE
+      return !this.ssuEnabled || kycStatus === KycLogs.KYC_STATUS_NONE
     },
 
     getStatus () {

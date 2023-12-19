@@ -1,7 +1,11 @@
 <template>
   <section :class="[success ? 'default-bg' : '']"
            class="row w-100 h-100 mx-0">
-    <login-large-screens-info v-show="!success" class="col-5 px-0"/>
+    <login-large-screens-info
+      class="col-5 px-0"
+      :xmasEnabled="isXmasBannerEnabled"
+      v-show="!success"
+      />
     <div v-if="!success"
          class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
@@ -99,7 +103,8 @@ import { mapActions, mapState } from 'vuex'
 import {
   guestMixin,
   guestFormsMixin,
-  recaptchaMixin
+  recaptchaMixin,
+  settingsMixin
 } from 'boot/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
@@ -109,7 +114,8 @@ export default {
   mixins: [
     guestMixin,
     guestFormsMixin,
-    recaptchaMixin
+    recaptchaMixin,
+    settingsMixin
   ],
 
   components: { LoginLargeScreensInfo },

@@ -59,11 +59,11 @@
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
           </span>
-          <span v-if="generalAuditsConditions(communication)">
-            {{ generalAuditMessages(communication) }}
+          <span v-if="generalAuditsConditions(communication)"
+                v-html="generalAuditMessages(communication)">
           </span>
-          <span v-if="customAuditsConditions(communication)">
-            {{ generateCustomAuditMessage(communication) + (communication.notes ? ' (Reason: ' + communication.notes + ')' : '') }}
+          <span v-if="customAuditsConditions(communication)"
+                v-html="generateCustomAuditMessageWithNotes(communication)">
           </span>
           <span v-if="communication.user_id && getUser(communication.user_id).name.length && showAuthor(communication)">
             by {{ getUser(communication.user_id).name }}
@@ -486,7 +486,7 @@ export default {
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound bg-danger text-white text-left'
+        return 'outbound bg-primary text-grey-50 text-left'
       }
 
       return ''
@@ -684,6 +684,11 @@ export default {
       } else {
         return this.custom_audit_messages[communication.property][communication.to]
       }
+    },
+
+    generateCustomAuditMessageWithNotes (communication) {
+      const notes = communication.notes ? ` (Reason: ${communication.notes.replace(/\\"/g, '"')})` : ''
+      return this.generateCustomAuditMessage(communication) + notes
     },
 
     getCampaign (id) {

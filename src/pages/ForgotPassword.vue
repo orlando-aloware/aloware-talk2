@@ -2,7 +2,9 @@
   <section class="row w-100 h-100 mx-0"
            :class="[success ? 'default-bg' : '']">
     <login-large-screens-info class="col-5 px-0"
-                              v-show="!success"/>
+                              :xmasEnabled="isXmasBannerEnabled"
+                              v-show="!success"
+                              />
     <div class="login-form-bg col-12 col-lg-7 px-0 h-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center"
          v-if="!success">
       <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
@@ -78,11 +80,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import {
   guestMixin,
   guestFormsMixin,
-  recaptchaMixin
+  recaptchaMixin,
+  settingsMixin
 } from '../boot/mixins'
 
 export default {
@@ -91,7 +95,8 @@ export default {
   mixins: [
     guestMixin,
     guestFormsMixin,
-    recaptchaMixin
+    recaptchaMixin,
+    settingsMixin
   ],
 
   components: { LoginLargeScreensInfo },
@@ -154,6 +159,10 @@ export default {
         this.user.recaptcha_response = response
       }
     }
+  },
+
+  computed: {
+    ...mapState(['statics'])
   }
 }
 </script>
