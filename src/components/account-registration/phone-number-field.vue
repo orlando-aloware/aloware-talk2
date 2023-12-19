@@ -55,6 +55,11 @@ export default {
       default: ''
     },
 
+    countryCode: {
+      type: String,
+      default: '+1'
+    },
+
     colMd: {
       type: String,
       default: 'col-md-5'
@@ -88,7 +93,6 @@ export default {
 
   data () {
     return {
-      countryCode: '+1',
       innerValue: this.value
     }
   },

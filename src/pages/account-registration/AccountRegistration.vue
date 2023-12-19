@@ -71,7 +71,8 @@
                                     :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
                                     :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                                     :disabled="checkIfFieldIsPreFilled('phone_number')"
-                                    v-model="form.phone_number"
+                                    :country-code="countryCode"
+                                    v-model="phoneNumberValue"
                                     @input="cleanFieldError('phone_number')" />
               </template>
             </input-group>
@@ -281,7 +282,8 @@ export default {
       preFilledData: {},
       shouldRedirectToLogin: false,
       recaptchaResponse: null,
-      loadingText: 'Please wait while we are creating your account...'
+      loadingText: 'Please wait while we are creating your account...',
+      countryCode: '+1'
     }
   },
 
@@ -327,6 +329,20 @@ export default {
       return this.form.password_confirmation === this.form.password
         ? 'The passwords match'
         : "The passwords doesn't match"
+    },
+
+    phoneNumberValue: {
+      get () {
+        if (this.checkIfFieldIsPreFilled('phone_number')) {
+          return this.form.phone_national || this.form.phone_number
+        }
+
+        return this.form.phone_number
+      },
+
+      set (val) {
+        this.form.phone_number = val
+      }
     }
   },
 
@@ -562,6 +578,8 @@ export default {
           id: matchedCountry.id,
           name: matchedCountry.name
         }
+
+        this.countryCode = this.getCountryCodeByCountryId(matchedCountry.id)
       }
     },
 
