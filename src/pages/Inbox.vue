@@ -4,8 +4,8 @@
     <div class="inbox animate__animated animate__fadeIn position-relative">
       <inbox-side ref="inbox-side"
                   :class="inboxSideClasses"
-                  @itemSelected="onItemSelected">
-      </inbox-side>
+                  @itemSelected="onItemSelected" />
+
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
            v-if="isContactShow">
@@ -100,7 +100,8 @@ export default {
         if (this.inboxViewsRoutes.includes(this.$route.name) && this.isLoadedPinnedViews) {
           channel = this.getPinnedViewChannel(this.$route.params.viewId)
         } else {
-          channel = this.navListItems.find(item => item.value === this.$route.params.channel)
+          const routeChannel = this.$route.params?.channel ?? 'inbox' // default fallback
+          channel = this.navListItems.find(item => item.value === routeChannel)
         }
 
         this.setActiveChannel(channel)
@@ -175,10 +176,10 @@ export default {
     isLoadedPinnedViews (value) {
       if (value && this.$route.name === 'Inbox View') {
         this.setChannel()
-
-        // get counts for inbox
-        this.fetchInboxTaskCounts()
       }
+
+      // get counts for inbox
+      this.fetchInboxTaskCounts()
     }
   }
 }
