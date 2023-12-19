@@ -381,7 +381,6 @@ export default {
 
     onOptoutMissingDialogClosed () {
       this.optoutMissingDialog.open = false
-      this.setIsOptoutActive(true)
     },
 
     onOptoutMissingDialogConfirmed () {
