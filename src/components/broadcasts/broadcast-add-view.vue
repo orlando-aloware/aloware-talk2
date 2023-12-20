@@ -468,8 +468,16 @@ export default {
           break
       }
 
-      bulkMessage.talk_filters = !isEmpty(this.source.filters) ? this.source.filters : null
       bulkMessage.contact_list_id = !isEmpty(this.source.list) ? this.source.list.id : null
+
+      if (!isEmpty(this.source.filters)) {
+        bulkMessage.talk_filters = this.source.filters
+      }
+
+      // set filters too if list is dynamic
+      if (!isEmpty(this.source.list) && this.source.list.type === 'dynamic') {
+        bulkMessage.talk_filters = this.source.list.filters
+      }
 
       if (!isEmpty(this.source.integration?.list)) {
         switch (this.source.integration.name) {

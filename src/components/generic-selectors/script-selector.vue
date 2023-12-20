@@ -90,7 +90,6 @@ export default {
   },
 
   computed: {
-
     placeholder () {
       if (this.selectedId) {
         return ''
@@ -115,6 +114,12 @@ export default {
   created () {
     this.fetchScripts().then(() => {
       this.options = this.scriptsAlphabeticalOrder
+    })
+  },
+
+  mounted () {
+    this.$VueEvent.listen('script_deleted', (script) => {
+      this.scripts = this.scripts.filter(item => +item.id !== +script.id)
     })
   },
 
@@ -166,6 +171,10 @@ export default {
 
       this.showInputPlaceholder()
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('script_deleted')
   }
 }
 </script>

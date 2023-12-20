@@ -361,6 +361,9 @@ export default {
         .listen('.bulk_tags.deleted', (event) => {
           window.VueEvent.fire('bulk_tags_deleted', event)
         })
+        .listen('.power_dialer_contact.removed', event => {
+          window.VueEvent.fire('power_dialer_contact_removed', event.contact_id)
+        })
         // .listen('.export.created', (event) => {
         //   console.log('created export event :>> ', event)
         //   window.VueEvent.fire('export_event_updates', event)
@@ -633,6 +636,9 @@ export default {
         })
         .listen('.broadcasts.deleted', (event) => {
           window.VueEvent.fire('broadcasts_deleted', event.broadcaster)
+        })
+        .listen('.script.deleted', (event) => {
+          window.VueEvent.fire('script_deleted', event.script)
         })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)

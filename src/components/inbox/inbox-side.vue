@@ -163,7 +163,11 @@ export default {
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
 
-    ...mapActions('inbox', ['gettingTasksList', 'setActiveChannel', 'setCommunications']),
+    ...mapActions('inbox', [
+      'gettingTasksList',
+      'setActiveChannel',
+      'setCommunications'
+    ]),
 
     ...mapActions(['resetVuex']),
 

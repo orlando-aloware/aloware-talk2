@@ -64,6 +64,7 @@ export default {
         return
       }
 
+      console.log('getting hubspot visitor token')
       api.V1.profile.getHubspotConversationsVisitorToken()
         .then((res) => {
           if (window?.HubSpotConversations) {
@@ -77,19 +78,29 @@ export default {
     },
 
     conversationsSettings (token) {
+      console.log('setting up hubspot conversations settings')
       window.hsConversationsSettings = {
         loadImmediately: false,
         identificationEmail: this.profile.email,
         identificationToken: token
       }
 
+      setTimeout(() => {
+        this.reloadHubspotConversations()
+      }, 2000)
+    },
+
+    reloadHubspotConversations () {
       if (window.HubSpotConversations?.widget) {
+        console.log('reloading hubspot conversations widget')
         window.HubSpotConversations.widget.refresh()
         window.HubSpotConversations.widget.load()
       }
     },
 
     remove () {
+      console.log('removing hubspot conversations widget')
+
       if (!window?.HubSpotConversations?.widget) {
         return
       }

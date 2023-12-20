@@ -67,6 +67,7 @@
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
+                         :xmasEnabled="isXmasEnabled"
                          @toggleMode="toggleMode">
             </app-sidebar>
           </q-list>
@@ -232,7 +233,8 @@ import {
   unownedContactTaskMixin,
   agentMixin,
   contactV2AttributesMixin,
-  kycMixin
+  kycMixin,
+  settingsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -302,7 +304,8 @@ export default {
     unownedContactTaskMixin,
     agentMixin,
     contactV2AttributesMixin,
-    kycMixin
+    kycMixin,
+    settingsMixin
   ],
 
   data () {
@@ -376,7 +379,8 @@ export default {
       'parkedCalls',
       'leadSources',
       'isIntroVideoVisible',
-      'showedKycDialog'
+      'showedKycDialog',
+      'statics'
     ]),
 
     ...mapState('auth', [
@@ -400,6 +404,8 @@ export default {
     ...mapState('powerDialer', [
       'ongoingSession'
     ]),
+
+    ...mapState(['xmasEnabled']),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
