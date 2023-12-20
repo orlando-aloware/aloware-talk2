@@ -208,6 +208,7 @@ import * as AgentStatus from 'src/constants/agent-status'
 import LogoutIcon from 'components/icons/logout-icon'
 import HalfMoonIcon from 'components/icons/half-moon-icon'
 import talk2Api from 'src/plugins/api/api'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'profile',
@@ -291,6 +292,10 @@ export default {
 
     userPersonalLine () {
       return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
+    },
+
+    classicUrlLogOut () {
+      return process.env.API_URL + '?from_talk_2=1&logout=0'
     }
   },
 
@@ -327,6 +332,16 @@ export default {
 
     logoutAction () {
       try {
+        const isImpersonating = storage.local.getItem('impersonate')
+        if (isImpersonating === 'true') {
+          /* this.logout()
+            .then(() => {
+              this.resetVuex(['all'])
+              this.$router.push({ name: 'Login' })
+            }) */
+          storage.local.removeItem('impersonate')
+          window.location.href = this.classicUrlLogOut
+        }
         this.hideMenu()
         this.logout()
           .then(() => {

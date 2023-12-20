@@ -131,6 +131,14 @@ const getCookieUser = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
+    const urlParams = new URLSearchParams(window.location.search)
+    const impersonating = urlParams.get('impersonating')
+    console.log('getCookieUser impersonating', impersonating)
+
+    if (impersonating) {
+      storage.local.setItem('impersonate', true)
+    }
+
     const cookieParams = { shared_token: getSharedCookie() }
 
     const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
