@@ -221,7 +221,7 @@ export default {
     messagePartCount () {
       if (this.smsBodyLength > 0) {
         const count = this.smartEncodedMessageLength % this.segmentUsedChars
-        return count === 0 ? this.segmentMaxChars : count
+        return (count === 0 ? this.segmentMaxChars : count) || this.smartEncodedMessageLength
       }
 
       return 0
@@ -298,9 +298,14 @@ export default {
       }
     },
 
-    isOptoutActive () {
-      const newBody = this.messageComposer.sms.body.substring(0, this.maxSmsBodyWithOptoutLength)
-      this.setMessageComposerSmsBody(newBody)
+    isOptoutActive: {
+      immediate: true,
+      handler () {
+        const newBody = this.messageComposer.sms.body.substring(0, this.maxSmsBodyWithOptoutLength)
+        this.setMessageComposerSmsBody(newBody)
+        this.messageLength(newBody)
+        this.getMessageInfo(newBody)
+      }
     },
 
     type (type) {
