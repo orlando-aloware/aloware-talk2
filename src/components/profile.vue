@@ -294,7 +294,7 @@ export default {
       return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
     },
 
-    classicUrlLogOut () {
+    classicLogOutUrl () {
       return process.env.API_URL + '?from_talk_2=1&logout=1'
     }
   },
@@ -339,7 +339,7 @@ export default {
               this.resetVuex(['all'])
               storage.local.removeItem('impersonate')
               storage.local.removeItem('shared_cookie')
-              window.location.href = this.classicUrlLogOut
+              window.location.href = this.classicLogOutUrl
             })
           return
         }

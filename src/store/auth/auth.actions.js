@@ -133,7 +133,6 @@ const getCookieUser = async ({ commit }) => {
 
     const urlParams = new URLSearchParams(window.location.search)
     const impersonating = urlParams.get('impersonating')
-    console.log('getCookieUser impersonating', impersonating)
 
     if (impersonating) {
       storage.local.setItem('impersonate', true)
