@@ -295,7 +295,7 @@ export default {
     },
 
     classicUrlLogOut () {
-      return process.env.API_URL + '?from_talk_2=1&logout=0'
+      return process.env.API_URL + '?from_talk_2=1&logout=1'
     }
   },
 
@@ -332,15 +332,16 @@ export default {
 
     logoutAction () {
       try {
-        const isImpersonating = storage.local.getItem('impersonate')
-        if (isImpersonating === 'true') {
-          /* this.logout()
+        const isImpersonating = storage.local.getItem('impersonate') === 'true'
+        if (isImpersonating) {
+          this.logout()
             .then(() => {
               this.resetVuex(['all'])
-              this.$router.push({ name: 'Login' })
-            }) */
-          storage.local.removeItem('impersonate')
-          window.location.href = this.classicUrlLogOut
+              storage.local.removeItem('impersonate')
+              storage.local.removeItem('shared_cookie')
+              window.location.href = this.classicUrlLogOut
+            })
+          return
         }
         this.hideMenu()
         this.logout()
