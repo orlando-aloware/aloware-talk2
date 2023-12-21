@@ -36,7 +36,7 @@ export default {
     ]),
 
     text () {
-      const messageBodyWithOptoutBolded = this.messageBodyWithOptout.replace(this.optoutText, `<span class="text-weight-bold"><br>${this.optoutText}</span>`)
+      const messageBodyWithOptoutBolded = this.messageBodyWithOptout.replace(this.optoutText, `<span class="text-weight-bold">${this.optoutText}</span>`)
       return this.translateMessage(messageBodyWithOptoutBolded, this.selectedLine, this.profile)
     },
 
