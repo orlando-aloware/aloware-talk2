@@ -29,6 +29,8 @@
                          :contact="contact"
                          @input="onNotesInput"/>
           <contact-integrations :contact="contact"/>
+          <contact-reservations v-if="contact && showGuestyReservations"
+                                :contact="contact"/>
           <contact-scheduled-messages/>
           <contact-activity-counts :summary="communicationsSummary.summaries"/>
           <contact-lines/>
@@ -62,6 +64,7 @@ import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
+import ContactReservations from 'components/contacts/contact-reservations.vue'
 import {
   aclMixin,
   contactMixin,
@@ -113,7 +116,8 @@ export default {
     ContactPhones,
     ContactTags,
     BackButton,
-    ContactAlohaBot
+    ContactAlohaBot,
+    ContactReservations
   },
 
   computed: {
@@ -140,6 +144,17 @@ export default {
         name: 'notes',
         value: value
       })
+    },
+
+    showGuestyReservations () {
+      // Show the reservations only for demo companies and Grand Welcome
+      let isDemoCompany = Object.values(process.env.DEMO_COMPANY_IDS).includes(this.contact.company.id)
+
+      if (isDemoCompany || this.contact.company.id === 3533) {
+        return true
+      }
+
+      return false
     }
   },
 
