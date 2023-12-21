@@ -332,18 +332,18 @@ export default {
 
     logoutAction () {
       try {
+        this.hideMenu()
         const isImpersonating = storage.local.getItem('impersonate') === 'true'
         if (isImpersonating) {
           this.logout()
             .then(() => {
-              this.resetVuex(['all'])
+              //this.resetVuex(['all'])
               storage.local.removeItem('impersonate')
-              storage.local.removeItem('shared_cookie')
+              //storage.local.removeItem('shared_cookie')
               window.location.href = this.classicLogOutUrl
             })
           return
         }
-        this.hideMenu()
         this.logout()
           .then(() => {
             this.resetVuex(['all'])
