@@ -3,7 +3,7 @@
     <img class="img-fluid broadcast-add__message__sms__preview__image"
          :src="attachment"
          v-if="attachment">
-    <span class="q-input-composer text-white"
+    <span class="q-input-composer text-white handle-whitespace"
           v-html="text"/>
   </div>
 </template>
@@ -36,7 +36,7 @@ export default {
     ]),
 
     text () {
-      const messageBodyWithOptoutBolded = this.messageBodyWithOptout.replace(this.optoutText, `<span class="text-weight-bold">${this.optoutText}</span>`)
+      const messageBodyWithOptoutBolded = this.messageBodyWithOptout.replace(this.optoutText, `<span class="text-weight-bold"><br>${this.optoutText}</span>`)
       return this.translateMessage(messageBodyWithOptoutBolded, this.selectedLine, this.profile)
     },
 

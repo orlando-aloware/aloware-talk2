@@ -1287,6 +1287,10 @@ i.option-separator {
   overflow-y: auto !important;
 }
 
+.handle-whitespace {
+  white-space: pre-line;
+}
+
 .q-input-composer .q-field__native,
 .q-input-composer .q-field__control {
   min-height: 18px;
