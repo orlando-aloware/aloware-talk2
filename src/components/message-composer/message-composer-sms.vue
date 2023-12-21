@@ -122,7 +122,7 @@
                        type="textarea"
                        placeholder="Type your message"
                        v-model="messageComposer.sms.body"
-                       :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
+                       :disable="isSendTextDisabled"
                        @input="imposeCharactersLimit"
                        @keydown="onKeyDown"
                        @blur="onBlur">
