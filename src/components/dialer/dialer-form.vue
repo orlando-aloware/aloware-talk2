@@ -157,6 +157,7 @@
                                placeholder="Text Message..."
                                rows="2"
                                max-rows="3"
+                               :disabled="isBlockTooltipPopoverEnabled"
                                v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
