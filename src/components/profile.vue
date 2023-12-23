@@ -337,9 +337,7 @@ export default {
         if (isImpersonating) {
           this.logout()
             .then(() => {
-              //this.resetVuex(['all'])
               storage.local.removeItem('impersonate')
-              //storage.local.removeItem('shared_cookie')
               window.location.href = this.classicLogOutUrl
             })
           return
