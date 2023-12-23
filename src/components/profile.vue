@@ -191,7 +191,9 @@
                 <logout-icon width="15"
                              height="15"
                              class="logout-icon" />
-                <span>Logout</span>
+                <span>
+                  {{ logoutLabel }}
+                </span>
               </div>
             </q-item-section>
           </q-item>
@@ -296,6 +298,10 @@ export default {
 
     classicLogOutUrl () {
       return process.env.API_URL + '?from_talk_2=1&logout=1'
+    },
+
+    logoutLabel () {
+      return localStorage.getItem('impersonate') === 'true' ? 'Stop Impersonating' : 'Logout'
     }
   },
 
