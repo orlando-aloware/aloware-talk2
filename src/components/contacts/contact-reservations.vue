@@ -15,15 +15,15 @@
               :href="reservation.reservation_link">
         <q-card-section>
           <div class="text-subtitle2">
-            Reservation ID:
+            Confirmation Code:
             <div class='text-caption'>
-              {{ reservation.reservation_id }}
+              {{ reservation.confirmation_code }}
             </div>
           </div>
           <div class="text-subtitle2">
-            Listing ID:
+            Listing:
             <div class='text-caption'>
-              {{ reservation.listing_id }}
+              {{ reservation.listing_nickname }}
             </div>
           </div>
           <div class="text-subtitle2">
