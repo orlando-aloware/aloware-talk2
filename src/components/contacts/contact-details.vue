@@ -31,6 +31,8 @@
           <contact-integrations :contact="contact"/>
           <contact-reservations v-if="contact && showGuestyReservations"
                                 :contact="contact"/>
+          <contact-reservations-messages v-if="contact && showGuestyReservations"
+                                :contact="contact"/>
           <contact-scheduled-messages/>
           <contact-activity-counts :summary="communicationsSummary.summaries"/>
           <contact-lines/>
@@ -65,6 +67,7 @@ import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
 import ContactReservations from 'components/contacts/contact-reservations.vue'
+import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import {
   aclMixin,
   contactMixin,
@@ -117,7 +120,8 @@ export default {
     ContactTags,
     BackButton,
     ContactAlohaBot,
-    ContactReservations
+    ContactReservations,
+    ContactReservationsMessages
   },
 
   computed: {
