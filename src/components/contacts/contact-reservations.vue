@@ -15,6 +15,12 @@
               :href="reservation.reservation_link">
         <q-card-section>
           <div class="text-subtitle2">
+            Account ID:
+            <div class='text-caption'>
+              {{ reservation.account_id }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
             Confirmation Code:
             <div class='text-caption'>
               {{ reservation.confirmation_code }}
