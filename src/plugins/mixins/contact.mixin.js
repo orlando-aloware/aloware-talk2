@@ -747,7 +747,9 @@ export default {
         this.communicationsPage++
 
         if (!skipContactInfo) {
-          this.showContactInfo(this.contactId, true)
+          this.$nextTick(() => {
+            this.showContactInfo(this.contactId, true)
+          })
         }
 
         return res
