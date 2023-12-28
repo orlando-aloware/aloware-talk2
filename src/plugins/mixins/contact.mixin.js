@@ -625,18 +625,25 @@ export default {
 
     showContactInfo (contactId, forceClearLoading = false) {
       this.mapCommunicationsData()
-
+      console.log('showContactInfo 1',
+        this.communicationsAndAudits.length,
+        this.contact,
+        this.contact.initial_campaign_id)
       // 1. if contact has initial campaign and there were no communications select initial campaign
       if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
         this.selectedCampaignId = this.contact.initial_campaign_id
       }
 
+      console.log('showContactInfo 2',
+        this.communicationsAndAudits.length,
+        this.selectedCampaign)
       // 2. if contact has communications select last communication campaign
       if (!this.selectedCampaign && this.communicationsAndAudits.length) {
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
           return item.type === CommunicationTypes.SMS
         })
-
+        console.log('showContactInfo 2-1',
+          latestCommunication)
         if (latestCommunication) {
           this.selectedCampaignId = latestCommunication.campaign_id
         }
@@ -645,13 +652,18 @@ export default {
       // 3. if user has a personal line and contact does not have an initial line
       const userCampaignId = _.get(this.profile, 'campaign_id', null)
 
+      console.log('showContactInfo 3',
+        userCampaignId,
+        this.selectedCampaign)
       if (!this.selectedCampaign && userCampaignId) {
         this.selectedCampaignId = userCampaignId
       }
 
       // 4. if contact doesn't have situation 1 and 2 and selected_contact_campaigns has one campaign select the campaign
       const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
-
+      console.log('showContactInfo 4',
+        selectedContactFirstCampaignId,
+        this.selectedCampaign)
       if (!this.selectedCampaign && selectedContactFirstCampaignId) {
         this.selectedCampaignId = selectedContactFirstCampaignId
       }
@@ -659,10 +671,17 @@ export default {
       // 5. if contact doesn't have situation 1 and 2 and 3 and company has one campaign select that campaign
       const firstCampaignId = _.get(this.campaigns, '[0].id', null)
 
+      console.log('showContactInfo 5',
+        selectedContactFirstCampaignId,
+        firstCampaignId,
+        this.selectedCampaign)
       if (!this.selectedCampaign && !selectedContactFirstCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 
+      console.log('showContactInfo 6',
+        firstCampaignId,
+        this.selectedCampaign)
       // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
       if (!this.selectedCampaign && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
