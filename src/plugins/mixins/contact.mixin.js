@@ -138,7 +138,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     selectedCampaign () {
-      console.log('selectedCampaign', this.campaigns)
+      console.log('selectedCampaign', this.campaigns, this.selectedCampaignId)
       if (this.campaigns) {
         return this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
       }
@@ -640,7 +640,7 @@ export default {
         this.selectedCampaignId,
         this.selectedCampaign)
       // 2. if contact has communications select last communication campaign
-      if (!this.selectedCampaign && this.communicationsAndAudits.length) {
+      if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
           return item.type === CommunicationTypes.SMS
         })
@@ -659,7 +659,7 @@ export default {
         userCampaignId,
         this.selectedCampaignId,
         this.selectedCampaign)
-      if (!this.selectedCampaign && userCampaignId) {
+      if (!this.selectedCampaignId && userCampaignId) {
         this.selectedCampaignId = userCampaignId
       }
 
@@ -669,7 +669,7 @@ export default {
         selectedContactFirstCampaignId,
         this.selectedCampaignId,
         this.selectedCampaign)
-      if (!this.selectedCampaign && selectedContactFirstCampaignId) {
+      if (!this.selectedCampaignId && selectedContactFirstCampaignId) {
         this.selectedCampaignId = selectedContactFirstCampaignId
       }
 
@@ -681,7 +681,7 @@ export default {
         this.selectedCampaignId,
         firstCampaignId,
         this.selectedCampaign)
-      if (!this.selectedCampaign && !selectedContactFirstCampaignId && firstCampaignId) {
+      if (!this.selectedCampaignId && !selectedContactFirstCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 
@@ -689,7 +689,7 @@ export default {
         firstCampaignId,
         this.selectedCampaign)
       // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
-      if (!this.selectedCampaign && firstCampaignId) {
+      if (!this.selectedCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 
