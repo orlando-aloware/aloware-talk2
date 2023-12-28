@@ -1389,6 +1389,7 @@ export default {
 
   watch: {
     'selectedCampaign.id': _.debounce(function (value) {
+      console.log('selectedCampaign.id', value)
       this.updateMessageComposer()
       this.updateLineIncomingNumber()
     }, 1000),
