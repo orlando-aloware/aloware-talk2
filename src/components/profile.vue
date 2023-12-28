@@ -340,18 +340,15 @@ export default {
       try {
         this.hideMenu()
         const isImpersonating = storage.local.getItem('impersonate') === 'true'
-        if (isImpersonating) {
-          this.logout()
-            .then(() => {
-              storage.local.removeItem('impersonate')
-              window.location.href = this.classicLogOutUrl
-            })
-          return
-        }
         this.logout()
           .then(() => {
             this.resetVuex(['all'])
-            this.$router.push({ name: 'Login' })
+            if (isImpersonating) {
+              window.location.href = this.classicLogOutUrl
+            }
+            if (!isImpersonating) {
+              this.$router.push({ name: 'Login' })
+            }
           })
       } catch (err) {
         console.error(err)
