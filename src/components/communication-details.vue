@@ -680,7 +680,7 @@
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                        :uniqueId="communication.id + '1'"/>
                 </div>
-                <div class="d-flex align-items-center"
+                <div class="d-flex align-items-center mt-3"
                      v-else>
                   No Call Recording
                 </div>
