@@ -637,6 +637,7 @@ export default {
 
       console.log('showContactInfo 2',
         this.communicationsAndAudits.length,
+        this.selectedCampaignId,
         this.selectedCampaign)
       // 2. if contact has communications select last communication campaign
       if (!this.selectedCampaign && this.communicationsAndAudits.length) {
@@ -644,6 +645,7 @@ export default {
           return item.type === CommunicationTypes.SMS
         })
         console.log('showContactInfo 2-1',
+          this.selectedCampaignId,
           latestCommunication)
         if (latestCommunication) {
           this.selectedCampaignId = latestCommunication.campaign_id
@@ -655,6 +657,7 @@ export default {
 
       console.log('showContactInfo 3',
         userCampaignId,
+        this.selectedCampaignId,
         this.selectedCampaign)
       if (!this.selectedCampaign && userCampaignId) {
         this.selectedCampaignId = userCampaignId
@@ -664,6 +667,7 @@ export default {
       const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
       console.log('showContactInfo 4',
         selectedContactFirstCampaignId,
+        this.selectedCampaignId,
         this.selectedCampaign)
       if (!this.selectedCampaign && selectedContactFirstCampaignId) {
         this.selectedCampaignId = selectedContactFirstCampaignId
@@ -674,6 +678,7 @@ export default {
 
       console.log('showContactInfo 5',
         selectedContactFirstCampaignId,
+        this.selectedCampaignId,
         firstCampaignId,
         this.selectedCampaign)
       if (!this.selectedCampaign && !selectedContactFirstCampaignId && firstCampaignId) {
