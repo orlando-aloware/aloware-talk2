@@ -50,12 +50,6 @@ export default {
     contact: {
       type: Object,
       required: true
-    },
-
-    no_title: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
 
@@ -71,10 +65,6 @@ export default {
     isGuestyEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.guesty_integration_enabled)
-    },
-
-    autoHeightClass () {
-      return this.expanded ? 'auto-height' : 'overflow-hidden'
     }
   },
 
@@ -89,11 +79,9 @@ export default {
       })
     },
 
-    fetchReservationsMessagesData (force = false) {
-      if (this.contact && this.contact.id) {
-        if (this.isGuestyEnabled) {
-          this.fetchContactReservationsMessages(this.contact.id)
-        }
+    fetchReservationsMessagesData () {
+      if (this.contact && this.contact.id && this.isGuestyEnabled) {
+        this.fetchContactReservationsMessages(this.contact.id)
       }
     },
 
