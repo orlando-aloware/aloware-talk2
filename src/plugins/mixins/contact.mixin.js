@@ -138,6 +138,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     selectedCampaign () {
+      console.log('selectedCampaign', this.campaigns)
       if (this.campaigns) {
         return this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
       }
