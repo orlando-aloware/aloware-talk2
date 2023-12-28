@@ -154,11 +154,7 @@ export default {
       // Show the reservations only for demo companies and Grand Welcome
       let isDemoCompany = Object.values(process.env.DEMO_COMPANY_IDS).includes(this.contact.company.id)
 
-      if (isDemoCompany || this.contact.company.id === 3533) {
-        return true
-      }
-
-      return false
+      return isDemoCompany || this.contact.company.id === 3533
     }
   },
 

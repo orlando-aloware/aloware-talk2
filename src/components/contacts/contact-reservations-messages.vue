@@ -42,6 +42,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import _ from 'lodash'
 
 export default {
   name: 'contact-reservations-messages',
@@ -63,8 +64,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     isGuestyEnabled () {
-      return !!(this.currentCompany &&
-        this.currentCompany.guesty_integration_enabled)
+      return this.currentCompany && this.currentCompany.guesty_integration_enabled
     }
   },
 
@@ -76,6 +76,9 @@ export default {
     fetchContactReservationsMessages (contactId) {
       window.axios.get('/api/v1/contact/' + contactId + '/reservations/messages').then(res => {
         this.messages = res.data
+      }).catch(err => {
+        this.messages = []
+        console.log(err)
       })
     },
 
@@ -86,7 +89,7 @@ export default {
     },
 
     isEmpty (obj) {
-      return Object.keys(obj).length === 0 && obj.constructor === Object
+      return _.isEmpty(obj)
     }
   }
 
