@@ -34,7 +34,7 @@ export default {
 
       if (this.isModGenius) {
         this.loadScript(process.env.HS_CUSTOM_JS_MOD_GENIUS)
-      } else if (this.isAloware) {
+      } else {
         this.loadScript(process.env.HS_CUSTOM_JS)
       }
 
