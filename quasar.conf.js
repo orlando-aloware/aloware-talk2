@@ -82,7 +82,6 @@ module.exports = function (/* ctx */) {
           }
         })
 
-        /*
         if (process.env.APP_ENV !== 'local') {
           const SentryWebpackPlugin = require('@sentry/webpack-plugin')
           const sentryPluginInstance = new SentryWebpackPlugin({
@@ -98,7 +97,6 @@ module.exports = function (/* ctx */) {
 
           cfg.plugins.push(sentryPluginInstance)
         }
-        */
       }
     },
 
@@ -258,7 +256,6 @@ module.exports = function (/* ctx */) {
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
 
-        /*
         if (process.env.APP_ENV !== 'local') {
           const SentryWebpackPlugin = require('@sentry/webpack-plugin')
           const sentryPluginInstance = new SentryWebpackPlugin({
@@ -274,7 +271,6 @@ module.exports = function (/* ctx */) {
 
           cfg.plugins.push(sentryPluginInstance)
         }
-        */
       }
     }
   }
