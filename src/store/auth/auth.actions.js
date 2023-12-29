@@ -176,9 +176,6 @@ const logout = async ({ commit }) => {
     const params = impersonate ? { impersonate: true } : {}
     const response = await window.axios.post('/logout', params)
 
-    // Sleep for 10 seconds
-    await new Promise(resolve => setTimeout(resolve, 10000))
-
     clear({ commit })
 
     commit('SET_LOADING', false)
