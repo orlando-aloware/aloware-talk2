@@ -171,7 +171,10 @@ const logout = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
-    const response = await window.axios.post('/logout')
+    // Add impersonate param to logout request
+    const impersonate = storage.local.getItem('impersonate')
+    const params = impersonate ? { impersonate: true } : {}
+    const response = await window.axios.post('/logout', params)
 
     clear({ commit })
 
