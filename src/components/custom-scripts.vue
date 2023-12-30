@@ -5,12 +5,9 @@
 <script>
 import { mapState } from 'vuex'
 import api from 'src/plugins/api/api'
-import { customScriptsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'custom-scripts',
-
-  mixins: [customScriptsMixin],
 
   computed: {
     ...mapState('cache', ['currentCompany']),
@@ -18,6 +15,10 @@ export default {
 
     isModGenius () {
       return this.currentCompany?.reseller_id === 2132
+    },
+
+    isSimpSocial () {
+      return this.currentCompany?.reseller_id === 357
     }
   },
 
@@ -60,7 +61,7 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
-      if (!this.isAloware && !this.isModGenius) {
+      if (this.isSimpSocial()) {
         return
       }
 
