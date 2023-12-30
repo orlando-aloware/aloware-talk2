@@ -17,7 +17,7 @@ export default {
       return this.currentCompany?.reseller_id === 2132
     },
 
-    isSimpSocial () {
+     () {
       return this.currentCompany?.reseller_id === 357
     }
   },
@@ -35,7 +35,7 @@ export default {
 
       if (this.isModGenius) {
         this.loadScript(process.env.HS_CUSTOM_JS_MOD_GENIUS)
-      } else {
+      } else if (!this.isSimpSocial) {
         this.loadScript(process.env.HS_CUSTOM_JS)
       }
 
@@ -61,7 +61,7 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
-      if (this.isSimpSocial()) {
+      if (this.) {
         return
       }
 
