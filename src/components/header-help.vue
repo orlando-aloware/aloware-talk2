@@ -23,16 +23,6 @@
                 @click="noClose($event)">
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
-
-          <q-btn class="mt-2 d-block"
-                 @click="showIntercom"
-                 type="a"
-                 color="primary"
-                 unelevated
-                 no-caps
-                 v-if="!user.profile.company.reseller_id">
-            Get Help
-          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -42,13 +32,8 @@
 <script>
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
-import intercomMixin from 'src/plugins/mixins/intercom.mixin'
 
 export default {
-  mixins: [
-    intercomMixin
-  ],
-
   data () {
     return {
       env: null,
