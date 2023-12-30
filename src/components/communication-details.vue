@@ -850,7 +850,6 @@ export default {
     PencilOIcon,
     PredefinedTimeDurationSelector,
     RingGroupSnapshot,
-    CommunicationReportIssue,
     CallDispositionSelector,
     CommunicationTags,
     CommunicationNote,
