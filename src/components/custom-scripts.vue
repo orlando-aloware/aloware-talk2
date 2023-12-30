@@ -61,7 +61,7 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
-      if (this.) {
+      if (this.isSimpSocial) {
         return
       }
 
