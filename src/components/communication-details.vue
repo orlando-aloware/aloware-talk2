@@ -13,7 +13,6 @@
               <div class="fs-14 mt-1 header-title">Communication Info</div>
 
               <div class="d-flex header-btn-wrapper">
-                <communication-report-issue :communication-id="communication.id"/>
                 <b-button variant="danger"
                           size="sm"
                           v-if="hasPermissionTo('archive communication')"
@@ -838,7 +837,6 @@ import CommunicationNote from 'components/communication-note'
 import CommunicationTags from 'components/generic-selectors/communication-tags'
 import CallDispositionSelector from 'components/call-disposition-selector'
 
-import CommunicationReportIssue from 'components/communication-report-issue'
 import RingGroupSnapshot from 'components/ring-group-snapshot'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import PencilOIcon from 'components/icons/pencil-o-icon'

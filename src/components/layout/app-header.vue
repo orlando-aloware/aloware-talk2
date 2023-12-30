@@ -258,7 +258,6 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      updatesLink: 'https://news.intercom.com/aloware',
       PHONE_USAGE_ERRORS
     }
   },
