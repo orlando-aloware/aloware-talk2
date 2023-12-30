@@ -17,7 +17,7 @@ export default {
       return this.currentCompany?.reseller_id === 2132
     },
 
-     () {
+    isSimpSocial () {
       return this.currentCompany?.reseller_id === 357
     }
   },
