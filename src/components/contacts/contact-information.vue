@@ -191,6 +191,7 @@
         <p>{{ contact.intake_source | toUpperCase }}</p>
       </div>
     </div>
+
     <b-button class="contact-information-toggle"
               variant="light"
               size="sm"
