@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-100">
     <div v-if="shouldShowBroadcast"
          class="broadcasts__home position-relative d-flex flex-column h-100">
       <b-overlay class="broadcasts__home__loading-overlay"
@@ -273,6 +273,11 @@
                     </b-dropdown>
                   </div>
                 </td>
+                <td class="sorted-column"
+                    :key="`c-${colIndex}`"
+                    v-else-if="col.name === 'date_created'">
+                  {{ row[col.field] | fixDateTime }}
+                </td>
                 <td :key="`c-${colIndex}`"
                     :class="col.draggable ? 'sorted-column' : ''"
                     v-else>
@@ -365,7 +370,7 @@
                       text="Scale your outreach with the click of a button. Send captivating SMS campaigns to many contacts at once via Broadcast."
                       extra-text="Upgrade today to unlock this feature"
                       title-text="Broadcast"
-                      kb-link="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
+                      kb-link="https://support.aloware.com/exploring-aloware-talks-broadcast"
                       class="mt-5"
                       v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
     </upgrade-now-page>

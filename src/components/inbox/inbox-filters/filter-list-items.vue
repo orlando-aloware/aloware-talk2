@@ -73,7 +73,6 @@ export default {
       this.isUpdating = true
       return talk2Api.V2.inbox.filters.update(this.selectedFilter.id, { ...this.filterModel, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
         this.setSelectedFilter(res.data.filter)
-        // this.selectedFilterClone = { ...this.selectedFilter }
         this.isUpdating = false
       })
     },

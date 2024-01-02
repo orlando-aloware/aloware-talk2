@@ -15,10 +15,13 @@ import CountriesAndTimezones from 'countries-and-timezones'
 import infiniteScroll from 'vue-infinite-scroll'
 import loadStock from 'highcharts/modules/stock'
 import loadExporting from 'highcharts/modules/exporting'
+import loadExportData from 'highcharts/modules/export-data'
 import loadOfflineExporting from 'highcharts/modules/offline-exporting'
 import loadSunburst from 'highcharts/modules/sunburst'
 import loadMap from 'highcharts/modules/map'
 import loadDrilldown from 'highcharts/modules/drilldown'
+import More from 'highcharts/highcharts-more'
+import HighchartsNoData from 'highcharts/modules/no-data-to-display'
 import VueHighcharts from 'vue-highcharts'
 import Highcharts from 'highcharts'
 import HighchartsThemes from './HighchartsTheme'
@@ -38,11 +41,14 @@ Screen.setSizes({
 
 loadStock(Highcharts)
 loadExporting(Highcharts)
+loadExportData(Highcharts)
 loadOfflineExporting(Highcharts)
 loadSunburst(Highcharts)
 loadMap(Highcharts)
 loadDrilldown(Highcharts)
+More(Highcharts)
 Highcharts.theme = HighchartsThemes.themes.future
+HighchartsNoData(Highcharts)
 
 Highcharts.setOptions(Highcharts.theme)
 Highcharts.setOptions({
@@ -50,8 +56,18 @@ Highcharts.setOptions({
     style: {
       fontFamily: ['Quicksand', '-apple-system', 'system-ui', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
     }
+  },
+
+  exporting: {
+    buttons: {
+      contextButton: {
+        menuItems: ['printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG', 'separator', 'downloadCSV']
+      }
+    }
   }
 })
+
+window.Highcharts = Highcharts
 
 // local storage
 storage.local.setItem('api_url', process.env.API_URL)
