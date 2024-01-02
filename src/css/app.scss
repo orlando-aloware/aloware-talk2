@@ -2320,6 +2320,8 @@ i.option-separator {
 
 //ABOUT THIS CONTACT
 .contact-about-wrapper {
+  padding-bottom: 10px;
+
   .information-container {
     display: flex;
     flex-direction: column;
@@ -2340,7 +2342,8 @@ i.option-separator {
     background: transparent;
     border: 1px solid $grey-60;
     position: absolute;
-    margin: 0;
+    margin: 8px 0 0 0;
+    padding: 0 0 0 1px;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -2356,7 +2359,6 @@ i.option-separator {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-left: 2px;
     }
   }
 }
