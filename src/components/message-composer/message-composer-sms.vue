@@ -113,19 +113,28 @@
                 </div>
 
             </div>
-            <q-input class="q-input-composer"
-                     borderless
-                     autogrow
-                     ref="smsMessageBody"
-                     input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
-                     type="textarea"
-                     placeholder="Type your message"
-                     v-model="messageComposer.sms.body"
-                     :disable="isDisabled || isTCPAApprovedTextNotAuthorized"
-                     @input="imposeCharactersLimit"
-                     @keydown="onKeyDown"
-                     @blur="onBlur">
-            </q-input>
+            <div id="message-sms-input">
+              <q-input class="q-input-composer"
+                       borderless
+                       autogrow
+                       ref="smsMessageBody"
+                       input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
+                       type="textarea"
+                       placeholder="Type your message"
+                       v-model="messageComposer.sms.body"
+                       :disable="isSendTextDisabled"
+                       @input="imposeCharactersLimit"
+                       @keydown="onKeyDown"
+                       @blur="onBlur">
+              </q-input>
+            </div>
+
+            <block-tooltip placement="top"
+                           triggers="hover"
+                           target="message-sms-input"
+                           task="text"
+                           v-if="!canTextToNumber">
+            </block-tooltip>
             <q-dialog v-model="urlShortenerDialog"
                       persistent
                       transition-show="scale"
