@@ -555,6 +555,26 @@ export default {
       sendVmDrop (params) {
         return window.axios.post(`${suffixV1}dialer/play-prerecorded-voicemail`, params)
       }
+    },
+
+    accountRegistration: {
+      getPreSignupDetails (params) {
+        return window.axios.get(`/api/admin/company-registration/pre-signup-prefill/${params.verification_token}`)
+      },
+
+      save (payload) {
+        return window.axios.post('/api/admin/company-registration', payload)
+      },
+
+      update (params, payload) {
+        return window.axios.patch(`/api/admin/company-registration/${params.preSignupId}`, payload)
+      }
+    },
+
+    company: {
+      get (params) {
+        return window.axios.get(`${suffixV1}company/${params.id}`)
+      }
     }
   },
 
