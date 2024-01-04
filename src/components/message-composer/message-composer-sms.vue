@@ -1,4 +1,4 @@
-w<template>
+<template>
     <div class="pt-2 message-composer-text-wrapper"
          :disabled="isDisabled || isTCPAApprovedTextNotAuthorized">
         <div class="file-dropper position-absolute"
