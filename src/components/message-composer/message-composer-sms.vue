@@ -173,11 +173,11 @@
                    v-if="isOptoutActive">
                   [{{ optoutText.trim() }}]
               </div>
-              <block-tooltip v-if="!canTextToNumber"
-                             placement="top"
+              <block-tooltip placement="top"
                              triggers="hover"
                              target="message-sms-popover"
-                             task="text">
+                             task="text"
+                             v-if="!canTextToNumber">
               </block-tooltip>
               <div id="message-sms-popover">
                   <q-btn-dropdown split
@@ -192,9 +192,9 @@
                                   v-if="useSendButton"
                                   @click="onSend">
                       <template slot="label">
-                          <q-spinner-bars v-if="isSending || generatingShortUrl"
-                                          class="mr-1"
-                                          color="white"/>
+                          <q-spinner-bars class="mr-1"
+                                          color="white"
+                                          v-if="isSending || generatingShortUrl"/>
                           {{ sendButtonText }}
                       </template>
                       <q-list class="message-composer-send-dropdown-button-list">
