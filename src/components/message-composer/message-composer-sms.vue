@@ -169,8 +169,8 @@
                                       @variableSelected="variableSelected"/>
             <div class="d-flex items-end">
               <div class="text-sm text-grey-80"
-                  :class="{ 'mr-2': useSendButton }"
-                  v-if="isOptoutActive">
+                   :class="{ 'mr-2': useSendButton }"
+                   v-if="isOptoutActive">
                   [{{ optoutText.trim() }}]
               </div>
               <block-tooltip v-if="!canTextToNumber"
