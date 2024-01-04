@@ -174,10 +174,10 @@
                   [{{ optoutText.trim() }}]
               </div>
               <block-tooltip v-if="!canTextToNumber"
-                            placement="top"
-                            triggers="hover"
-                            target="message-sms-popover"
-                            task="text">
+                             placement="top"
+                             triggers="hover"
+                             target="message-sms-popover"
+                             task="text">
               </block-tooltip>
               <div id="message-sms-popover">
                   <q-btn-dropdown split
