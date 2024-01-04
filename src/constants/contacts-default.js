@@ -201,6 +201,8 @@ export const DEFAULT_STATE = {
   isAddPowerDialerOpen: false,
   isEnrollSequenceOpen: false,
   isAddReminderOpen: false,
+  isOptoutActive: true,
+  optoutText: '\nText STOP to unsubscribe.',
   changingSelectedContact: false,
   smsTemplateModal: {
     open: false,
