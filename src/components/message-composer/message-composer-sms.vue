@@ -208,8 +208,8 @@
                       </q-list>
                   </q-btn-dropdown>
                   <q-tooltip anchor="top middle"
-                            self="center middle"
-                            v-if="isTCPAApprovedTextNotAuthorized">
+                             self="center middle"
+                             v-if="isTCPAApprovedTextNotAuthorized">
                     <span class="text-black-dk">
                       This number cannot be texted based on TCPA enforcement.
                     </span>
