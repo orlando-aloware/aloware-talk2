@@ -1287,6 +1287,10 @@ i.option-separator {
   overflow-y: auto !important;
 }
 
+.handle-whitespace {
+  white-space: pre-line;
+}
+
 .q-input-composer .q-field__native,
 .q-input-composer .q-field__control {
   min-height: 18px;
@@ -13125,7 +13129,6 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-
         &.paused {
           border-color: $warning;
         }
@@ -13373,6 +13376,7 @@ h1.contact-list-name-label {
                   border-radius: 8px;
                   padding: 10px;
                   transition: all .3s;
+                  min-height: 58px;
 
                   textarea {
                     color: $white;
@@ -13380,6 +13384,11 @@ h1.contact-list-name-label {
 
                   &--empty {
                     background-color: $grey-70;
+                  }
+
+                  &__image {
+                    display: block;
+                    margin-bottom: 10px;
                   }
                 }
               }
