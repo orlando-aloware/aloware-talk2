@@ -45,8 +45,8 @@ export default {
       if (country) {
         return country.countryCode
       }
-       
-       return '+1'
+
+      return '+1'
     }
   }
 }
