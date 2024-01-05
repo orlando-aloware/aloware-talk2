@@ -463,7 +463,7 @@ export default {
     },
 
     validatePhoneNumber (phone) {
-      const cleanedPhone = this.getCleanedPhoneNumber(phone)
+      const cleanedPhone = this.getCleanedPhoneNumber(this.preFilledData?.phone_number || phone)
       const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
 
       // if the phone number is empty or invalid
@@ -722,7 +722,7 @@ export default {
       const payload = {
         ...this.form,
         verification_token: this.$route.params.verification_token,
-        phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.phone_number), 'E164', true),
+        phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.preFilledData?.phone_number || this.form.phone_number), 'E164', true),
         auth_rep_phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.auth_rep_phone_number), 'E164', true),
         ...this.getBusinessInformationFieldsValue
       }
