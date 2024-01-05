@@ -748,7 +748,7 @@ export default {
             const response = await this.login({
               email: this.form.email,
               password: this.form.password,
-              // recaptchaResponse: this.recaptchaResponse,
+              recaptchaResponse: this.recaptchaResponse,
               deviceInfo: null,
               requestedFrom: 'bypass',
               skipSetAuthenticated: true
