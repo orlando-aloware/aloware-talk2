@@ -15,21 +15,9 @@
               :href="reservation.reservation_link">
         <q-card-section>
           <div class="text-subtitle2">
-            Account ID:
-            <div class='text-caption'>
-              {{ reservation.account_id }}
-            </div>
-          </div>
-          <div class="text-subtitle2">
             Confirmation Code:
             <div class='text-caption'>
               {{ reservation.confirmation_code }}
-            </div>
-          </div>
-          <div class="text-subtitle2">
-            Listing:
-            <div class='text-caption'>
-              {{ reservation.listing_nickname }}
             </div>
           </div>
           <div class="text-subtitle2">
@@ -48,6 +36,36 @@
             Checkout Date:
             <div class='text-caption'>
               {{ reservation.checkout_date }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Checkout Date:
+            <div class='text-caption'>
+              {{ reservation.checkout_date }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Listing ID:
+            <div class='text-caption'>
+              {{ reservation.listing_id }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Guests count:
+            <div class='text-caption'>
+              {{ reservation.guests_count }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Currency:
+            <div class='text-caption'>
+              {{ reservation.currency }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Total income:
+            <div class='text-caption'>
+              {{ reservation.total_income }}
             </div>
           </div>
         </q-card-section>
