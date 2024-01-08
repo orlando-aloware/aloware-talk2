@@ -132,6 +132,13 @@ const getCookieUser = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
 
+    const urlParams = new URLSearchParams(window.location.search)
+    const impersonating = urlParams.get('impersonating')
+
+    if (impersonating) {
+      storage.local.setItem('impersonate', true)
+    }
+
     const cookieParams = { shared_token: getSharedCookie() }
 
     const response = await window.axios.get('/get-cookie-user', { params: cookieParams })
@@ -186,10 +193,6 @@ const clear = ({ commit }) => {
   storage.local.removeItem('shared_cookie')
 
   window.axios.defaults.headers.common['Authorization'] = null
-
-  if (window.Intercom) {
-    window.Intercom('shutdown')
-  }
 
   commit('SET_AUTHENTICATED', false)
   commit('SET_PROFILE', null)

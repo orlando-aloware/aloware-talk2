@@ -26,26 +26,20 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
-    <intercom v-if="isLoggedIn && staticsLoaded && !statics.whitelabel && !isAloware"/>
   </div>
 </template>
 <script>
 import * as storage from 'src/plugins/helpers/storage'
-import { customScriptsMixin } from 'src/plugins/mixins'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
-import Intercom from 'components/intercom'
 import CustomScripts from 'components/custom-scripts'
 import HeaderNotification from 'components/header-notification'
 
 export default {
   name: 'App',
 
-  mixins: [customScriptsMixin],
-
   components: {
     HeaderNotification,
-    Intercom,
     CustomScripts,
     ActionNotification
   },

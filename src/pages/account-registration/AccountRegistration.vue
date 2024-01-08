@@ -176,7 +176,7 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://support.aloware.com/en/articles/5059467-carrier-fees-for-at-t-verizon-and-t-mobile')">
+                         @click="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
                         Notice on Carrier Fees for SMS and MMS
                       </a>
                     </template>
