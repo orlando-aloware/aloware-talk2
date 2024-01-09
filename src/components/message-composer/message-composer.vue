@@ -43,13 +43,17 @@
       <div>
         <message-composer-sms :is-disabled="isSmsDisabled"
                               :campaignId="campaignId"
+                              :disabled-message="disabledComplianceMessage"
                               v-if="messageComposer.mode === 'sms'"
                               @message-sent="onMessageSent"/>
+
         <message-composer-fax v-if="messageComposer.mode === 'fax'"
                               @message-sent="onMessageSent"/>
-        <message-composer-email v-if="messageComposer.mode === 'email' && contact.email"
-                                :campaignId="campaignId"
+
+        <message-composer-email :campaignId="campaignId"
+                                v-if="messageComposer.mode === 'email' && contact.email"
                                 @message-sent="onMessageSent"/>
+
         <message-composer-note v-if="messageComposer.mode === 'note'"
                                @message-sent="onMessageSent"/>
       </div>
