@@ -5616,6 +5616,10 @@ button#bs-folder-options {
   margin: auto;
   overflow-y: auto;
   overflow-x: auto;
+
+  .datatable {
+    z-index: 0;
+  }
 }
 
 .paginated {
