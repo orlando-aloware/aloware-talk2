@@ -44,18 +44,18 @@
         <message-composer-sms :is-disabled="isSmsDisabled"
                               :campaignId="campaignId"
                               :disabled-message="disabledComplianceMessage"
-                              @message-sent="onMessageSent"
-                              v-if="messageComposer.mode === 'sms'"/>
+                              v-if="messageComposer.mode === 'sms'"
+                              @message-sent="onMessageSent"/>
 
-        <message-composer-fax @message-sent="onMessageSent"
-                              v-if="messageComposer.mode === 'fax'"/>
+        <message-composer-fax v-if="messageComposer.mode === 'fax'"
+                              @message-sent="onMessageSent"/>
 
         <message-composer-email :campaignId="campaignId"
-                                @message-sent="onMessageSent"
-                                v-if="messageComposer.mode === 'email' && contact.email"/>
+                                v-if="messageComposer.mode === 'email' && contact.email"
+                                @message-sent="onMessageSent"/>
 
-        <message-composer-note @message-sent="onMessageSent"
-                               v-if="messageComposer.mode === 'note'"/>
+        <message-composer-note v-if="messageComposer.mode === 'note'"
+                               @message-sent="onMessageSent"/>
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1">
