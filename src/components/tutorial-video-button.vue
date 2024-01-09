@@ -33,9 +33,11 @@ export default {
     doesRouteHasTutorial () {
       return [
         'Inbox',
+        'Contacts',
         'Wallboard',
         'Broadcasts',
-        'Tags'
+        'Tags',
+        'Communication'
       ].includes(this.$route.name)
     },
 
@@ -51,8 +53,8 @@ export default {
         'Contacts': {
           title: '📇 Unveil the Contacts Tab in Aloware!',
           cookieName: 'contacts',
-          videoUrl: 'https://www.youtube.com/embed/U5l4PMXOpSM?si=sAnahiyuAASpWrP0',
-          learnMoreLink: '',
+          videoUrl: 'https://www.youtube.com/embed/U5l4PMXOpSM?si=9Wlh4v_pBtdO9EAz',
+          learnMoreLink: 'https://support.aloware.com/aloware-talk-2-contacts-menu',
           notes: 'Discover, organize, and optimize your network. </br></br>The Contacts Tab is your gateway to streamlined connections. </br></br>Delve in and direct your networking journey to triumph with every contact!'
         },
         'Wallboard': {
