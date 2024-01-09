@@ -44,18 +44,18 @@
         <message-composer-sms :is-disabled="isSmsDisabled"
                               :campaignId="campaignId"
                               :disabled-message="disabledComplianceMessage"
-                              v-if="messageComposer.mode === 'sms'"
-                              @message-sent="onMessageSent"/>
+                              @message-sent="onMessageSent"
+                              v-if="messageComposer.mode === 'sms'"/>
 
-        <message-composer-fax v-if="messageComposer.mode === 'fax'"
-                              @message-sent="onMessageSent"/>
+        <message-composer-fax @message-sent="onMessageSent"
+                              v-if="messageComposer.mode === 'fax'"/>
 
         <message-composer-email :campaignId="campaignId"
-                                v-if="messageComposer.mode === 'email' && contact.email"
-                                @message-sent="onMessageSent"/>
+                                @message-sent="onMessageSent"
+                                v-if="messageComposer.mode === 'email' && contact.email"/>
 
-        <message-composer-note v-if="messageComposer.mode === 'note'"
-                               @message-sent="onMessageSent"/>
+        <message-composer-note @message-sent="onMessageSent"
+                               v-if="messageComposer.mode === 'note'"/>
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1">
@@ -76,9 +76,9 @@
         </div>
       </div>
     </div>
-    <div v-if="isMessagingBlocked(selectedLine, true)" class="composer-footer">
+    <div v-if="shouldShowComplianceMessage" class="composer-footer">
       <div class="compliance-badge mb-2">
-        {{ selectedLine.blocked_messaging_information['reason'] }}
+        {{ disabledComplianceMessage }}
       </div>
     </div>
   </div>
@@ -92,7 +92,8 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  selectorMixin
+  selectorMixin,
+  kycMixin
 } from 'src/plugins/mixins'
 import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
@@ -111,7 +112,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    selectorMixin
+    selectorMixin,
+    kycMixin
   ],
 
   props: {
@@ -154,6 +156,14 @@ export default {
       }
 
       return false
+    },
+
+    disabledComplianceMessage () {
+      return this.selectedLine?.blocked_messaging_information?.['reason'] ?? ''
+    },
+
+    shouldShowComplianceMessage () {
+      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason']
     }
   },
 

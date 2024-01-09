@@ -132,6 +132,7 @@
                            triggers="hover"
                            target="message-sms-input"
                            task="text"
+                           :message="disabledMessage"
                            v-if="!canTextToNumber">
             </block-tooltip>
             <q-dialog v-model="urlShortenerDialog"
@@ -185,6 +186,7 @@
                              triggers="hover"
                              target="message-sms-popover"
                              task="text"
+                             :message="disabledMessage"
                              v-if="!canTextToNumber">
               </block-tooltip>
               <div id="message-sms-popover">
@@ -296,6 +298,11 @@ export default {
     isBroadcast: {
       type: Boolean,
       default: false
+    },
+    disabledMessage: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
 
@@ -352,7 +359,7 @@ export default {
 
     canTextToNumber () {
       const phoneNumber = this.messageComposer.sms.phone_number
-      return this.enabledToTextNumber(phoneNumber)
+      return this.enabledToTextNumber(phoneNumber) && !this.disabledMessage
     }
   },
 

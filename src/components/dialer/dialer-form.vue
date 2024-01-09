@@ -19,6 +19,7 @@
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
                        :task="blockTooltipHandler.task"
+                       :message="disabledComplianceMessage"
                        v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
@@ -98,8 +99,9 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="isMessagingBlocked(selectedCampaign, true)" class="compliance-badge mb-2">
-              {{ selectedCampaign.blocked_messaging_information['reason'] }}
+            <div class="compliance-badge mb-2"
+                 v-if="shouldShowComplianceMessage">
+              {{ disabledComplianceMessage }}
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
@@ -339,6 +341,14 @@ export default {
         callClass,
         modeClass
       ]
+    },
+
+    disabledComplianceMessage () {
+      return this.selectedCampaign?.blocked_messaging_information?.['reason'] ?? ''
+    },
+
+    shouldShowComplianceMessage () {
+      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign && this.selectedCampaign.blocked_messaging_information && this.selectedCampaign.blocked_messaging_information['reason']
     }
   },
 
