@@ -51,6 +51,12 @@ export default {
     task: {
       required: true,
       type: String
+    },
+
+    message: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
 
@@ -92,6 +98,10 @@ export default {
           // For KYC_STATUS_APPROVED_FOR_SELF_CALLING and KYC_STATUS_APPROVED_FOR_CALLING_ONLY
           message = `Your account is not yet verified to ${action}, you can reach out to our support to remove the restriction`
           break
+      }
+
+      if (this.message) {
+        message = this.message
       }
 
       return message
