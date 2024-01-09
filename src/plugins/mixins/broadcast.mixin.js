@@ -637,6 +637,9 @@ export default {
         .listen('.broadcasts.deleted', (event) => {
           window.VueEvent.fire('broadcasts_deleted', event.broadcaster)
         })
+        .listen('.script.deleted', (event) => {
+          window.VueEvent.fire('script_deleted', event.script)
+        })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event

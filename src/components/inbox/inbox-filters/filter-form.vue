@@ -2,7 +2,7 @@
   <div>
     <b-form class="inbox-channel-filter-form">
       <b-container>
-        <div v-if="$route.name === 'Inbox' || !isMentionsChannel">
+        <div v-if="$route.name === 'Inbox' || !isMentionsChannel || isFilterDialogForView">
           <h5 class="section-header">Quick Access</h5>
           <b-form-row class="mt-2 quick-access">
             <b-col sm="12"
@@ -11,7 +11,7 @@
                 <template v-slot:label>
                   <span>{{ dateRangeLabel }}</span>
                   <span class="pl-1"
-                        v-if="isInboxOrAllComms">
+                        v-if="isInboxOrAllComms || isFilterDialogForView">
                     <information-circle-icon color="#2F80ED"/>
                     <q-tooltip anchor="top middle"
                                self="center middle">
@@ -67,7 +67,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsOrInboxChannel">
+        <div v-if="!isMentionsOrInboxChannel && !isFilterDialogForView">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
@@ -138,7 +138,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsChannel">
+        <div v-if="!isMentionsChannel || isFilterDialogForView">
           <h5 class="mt-4 section-header">Properties</h5>
           <b-form-row class="mt-2">
             <b-col md="6"
@@ -354,7 +354,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsChannel">
+                   v-if="!isMentionsChannel || isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Contact Owners">
                 <user-selector custom-placeholder="Select Contact Owners"
@@ -372,7 +372,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isMessagesOnlyChannel">
+                   v-if="isMessagesOnlyChannel && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -456,6 +456,7 @@ export default {
       'channelChangedFilterFields',
       'isFilterDialogShown',
       'isFilterModelFormShown',
+      'isFilterDialogForView',
       'inboxShowMyContacts'
     ]),
 
@@ -469,7 +470,7 @@ export default {
     },
 
     dateRangeLabel () {
-      return this.isInboxOrAllComms ? 'Last Engagement Date' : 'Time'
+      return this.isInboxOrAllComms || this.isFilterDialogForView ? 'Last Engagement Date' : 'Time'
     },
 
     dateHasChanges () {
@@ -534,7 +535,7 @@ export default {
     },
 
     isInboxOrInboxViews () {
-      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel)
+      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel) || this.isFilterDialogForView
     }
   },
 

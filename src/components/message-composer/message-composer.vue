@@ -159,7 +159,8 @@ export default {
         'setMessageComposerSmsPhoneNumber',
         'setMessageComposerAttachments',
         'setMessageComposerMode',
-        'setSelectedLine'
+        'setSelectedLine',
+        'setIsOptoutActive'
       ]
     ),
 
@@ -212,6 +213,8 @@ export default {
     if (!this.templates || this.templates.length < 1) {
       this.getSmsTemplates()
     }
+
+    this.setIsOptoutActive(false)
   },
 
   watch: {

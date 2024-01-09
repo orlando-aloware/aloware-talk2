@@ -1,7 +1,7 @@
 <template>
   <div class="contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative"
        :class="inboxItemClass"
-       @click="onItemClick()">
+       @click="onItemClick">
     <div class="d-flex justify-content-center avatar-wrapper">
       <div class="avatar d-flex justify-content-center pb-1 position-relative"
            role="button">

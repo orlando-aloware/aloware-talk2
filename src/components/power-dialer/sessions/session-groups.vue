@@ -128,35 +128,35 @@
                       <template>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
-                                         @click="moveTask(itm, moveDirection.top)">
+                                         @click="moveTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
                                        width="16px" />
                           Move to Top
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
-                                         @click="moveTask(itm, moveDirection.bottom)">
+                                         @click="moveTask(taskItem, moveDirection.bottom)">
                           <ArrowDownIcon height="15px"
                                          width="15px" />
                           Move to Bottom
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key !== 'in_queue'"
-                                         @click="addTask(itm, moveDirection.top)">
+                                         @click="addTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
                                        width="16px"/>
                           Add to Top of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key !== 'in_queue'"
-                                         @click="addTask(itm, moveDirection.bottom)">
+                                         @click="addTask(taskItem, moveDirection.bottom)">
                           <ArrowDownIcon height="15px"
                                          width="15px" />
                           Add to Bottom of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
-                                         @click="onDeleteTask(itm)">
+                                         @click="onDeleteTask(taskItem)">
                           <TrashIcon />
                           Remove from List
                         </b-dropdown-item>
@@ -171,7 +171,7 @@
                              flat
                              round
                              :disabled="isMoving || isDeleting"
-                             @click="moveTask(itm, moveDirection.top)">
+                             @click="moveTask(taskItem, moveDirection.top)">
                         <q-avatar size="15px">
                           <ContactInQueueIcon />
                         </q-avatar>
