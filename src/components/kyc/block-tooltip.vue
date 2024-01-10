@@ -96,7 +96,7 @@ export default {
           break
         default:
           // For KYC_STATUS_APPROVED_FOR_SELF_CALLING and KYC_STATUS_APPROVED_FOR_CALLING_ONLY
-          message = `Your account is not yet verified to ${action}, you can reach out to our support to remove the restriction`
+          message = `Your account has not yet been verified for ${action}. Please contact our support team to remove this restriction.`
           break
       }
 
