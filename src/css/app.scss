@@ -11562,6 +11562,12 @@ screen and (max-width: 956px) {
 
 .communication-details-card {
 
+  .record-was-deleted-label {
+    margin-top: 1rem !important;
+    line-height: 1.2em !important;
+    display: block;
+  }
+
   .header-line {
     margin-bottom: 33px !important;
   }
@@ -11595,6 +11601,11 @@ screen and (max-width: 956px) {
 
   .q-item__label:not(.custom-item-label) {
     margin-top: 0.25rem !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  .q-item__label.custom-item-label {
     padding-left: 5px !important;
     padding-right: 5px !important;
   }
