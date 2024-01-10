@@ -163,6 +163,7 @@ export default {
       get () {
         return this.isOptoutActive
       },
+
       set (value) {
         return this.setIsOptoutActive(value)
       }
