@@ -215,6 +215,7 @@
       <pro-feature-dialog/>
 
       <kyc-fill-dialog :show="shouldShowKycFillDialog" />
+      <kyc-reload-dialog :show="shouldShowKycReloadDialog" />
     </div>
   </div>
 </template>
@@ -263,6 +264,7 @@ import * as storage from 'src/plugins/helpers/storage'
 import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import KycFillDialog from 'components/kyc-fill-dialog.vue'
+import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
@@ -288,6 +290,7 @@ export default {
     Phone,
     ProFeatureDialog,
     KycFillDialog,
+    KycReloadDialog,
     Modal,
     TrialBanner
   },
@@ -380,6 +383,7 @@ export default {
       'leadSources',
       'isIntroVideoVisible',
       'showedKycDialog',
+      'showedKycReloadDialog',
       'statics'
     ]),
 
@@ -525,6 +529,14 @@ export default {
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
+    },
+
+    shouldShowKycReloadDialog () {
+      console.log('shouldShowKycReloadDialog', this.isAuthenticated, this.isFirstLoading, this.showedKycReloadDialog, this.profile?.company?.is_trial)
+      return this.isAuthenticated &&
+            !this.isFirstLoading &&
+            this.showedKycReloadDialog &&
+            this.profile?.company?.is_trial
     },
 
     isAuthenticated () {
@@ -906,6 +918,12 @@ export default {
       this.checkSuspended(company)
     }
 
+    this.mainListeners.kycStatusUpdated = (company) => {
+      // this.checkSuspended(company)
+      this.setShowedKycReloadDialog(true)
+      console.log('Changed kyc status [event]: ', company, this.showedKycReloadDialog)
+    }
+
     this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
@@ -1228,6 +1246,7 @@ export default {
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
       this.$VueEvent.listen('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
+      this.$VueEvent.listen('kyc_status_updated', this.mainListeners.kycStatusUpdated)
     },
 
     stopMainEvents () {
@@ -1257,6 +1276,7 @@ export default {
       this.$VueEvent.stop('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.stop('hide_mobile_footer', this.mainListeners.hideMobileFooter)
       this.$VueEvent.stop('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
+      this.$VueEvent.stop('kyc_status_updated', this.mainListeners.kycStatusUpdated)
     },
 
     checkSuspended (data, isUser = false) {
@@ -2557,7 +2577,8 @@ export default {
       'setLeadSources',
       'updateUserStatus',
       'setStatics',
-      'setStaticsLoaded'
+      'setStaticsLoaded',
+      'setShowedKycReloadDialog'
     ]),
     ...mapActions('contacts', [
       'resetSearch',

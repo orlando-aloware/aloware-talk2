@@ -640,6 +640,12 @@ export default {
         .listen('.script.deleted', (event) => {
           window.VueEvent.fire('script_deleted', event.script)
         })
+        .listen('.kyc_status_updated', (event) => {
+          if (this.currentCompany && this.currentCompany.id === event.company.id) {
+            this.setCurrentCompany(event.company)
+            this.$VueEvent.fire('kyc_status_updated', event.company)
+          }
+        })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)
         // as long as this broadcast will fire, everyone on the presence channel will receive this event
