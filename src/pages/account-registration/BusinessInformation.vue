@@ -9,6 +9,7 @@
                                    ref="businessInformationForm"
                                    :should-show-action-buttons="true"
                                    :is-loading="isLoading"
+                                   :ssu="ssu"
                                    @submit="onSubmit"
                                    @back-to-dashboard="onBackToPreviousRoute"
                                    @skip-for-now="onBackToPreviousRoute" />
@@ -34,7 +35,8 @@ export default {
 
   data () {
     return {
-      isLoading: false
+      isLoading: false,
+      ssu: {}
     }
   },
 
@@ -91,9 +93,26 @@ export default {
         })
     },
 
+    async getSSUData () {
+      this.isLoading = true
+      API.V1.accountRegistration.getSSUData()
+        .then((res) => {
+          this.ssu = res.data.data
+        })
+        .catch(() => {
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
     created () {
       this.setShowedKycDialog(true)
     }
+  },
+
+  mounted () {
+    this.getSSUData()
   }
 }
 </script>

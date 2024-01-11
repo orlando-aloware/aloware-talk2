@@ -33,7 +33,7 @@ export default {
         case '86': // China
           return '### #### ####'
         case '502': // Guatemala
-          return '#### ################'
+          return '#### ####'
         default: // Generic fallback
           return '#########################'
       }
