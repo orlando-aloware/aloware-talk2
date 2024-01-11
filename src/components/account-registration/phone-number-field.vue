@@ -4,7 +4,7 @@
       {{ label }}
     </label>
     <div class="phone-row">
-      <q-input class="col-md-2"
+      <q-input class="col-md-3"
                rounded
                outlined
                placeholder="+1"
@@ -13,7 +13,7 @@
                :disable="disabled"
                v-model="countryCode">
       </q-input>
-      <q-input class="col-md-10 pl-2"
+      <q-input class="col-md-9 pl-2"
                ref="inputRef"
                type="text"
                rounded
@@ -21,7 +21,7 @@
                :placeholder="placeholder"
                :rules="rules"
                :mask="phoneMask"
-               :value="innerValue"
+               :value="formattedValue"
                :disable="disabled"
                @input="emitUpdateEvent">
       </q-input>
@@ -53,11 +53,6 @@ export default {
     value: {
       type: String,
       default: ''
-    },
-
-    countryCode: {
-      type: String,
-      default: '+1'
     },
 
     colMd: {
@@ -93,7 +88,8 @@ export default {
 
   data () {
     return {
-      innerValue: this.value
+      innerValue: this.value,
+      countryCode: '+1'
     }
   },
 
@@ -106,7 +102,7 @@ export default {
   methods: {
     emitUpdateEvent (value) {
       this.innerValue = value
-      this.$emit('input', this.innerValue)
+      this.$emit('input', this.countryCode + ' ' + this.innerValue)
     },
 
     validate () {
@@ -118,7 +114,14 @@ export default {
 
   watch: {
     value (value) {
-      this.innerValue = value
+      if (value && value.includes('//')) {
+        const [countryCode, phoneNumber] = value.split('//')
+        this.countryCode = countryCode
+        this.innerValue = phoneNumber
+        this.formattedValue = phoneNumber
+      } else {
+        this.innerValue = value
+      }
     }
   }
 }

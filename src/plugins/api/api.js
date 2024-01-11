@@ -562,6 +562,10 @@ export default {
         return window.axios.get(`/api/admin/company-registration/pre-signup-prefill/${params.verification_token}`)
       },
 
+      getSSUData () {
+        return window.axios.get(`/api/v1/company/ssu/get`)
+      },
+
       save (payload) {
         return window.axios.post('/api/admin/company-registration', payload)
       },
