@@ -58,7 +58,7 @@ import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
@@ -126,6 +126,7 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact', 'contactClone']),
+    ...mapState('cache', ['currentCompany']),
 
     contactName () {
       if (this.contact && this.contact.name) {
@@ -151,10 +152,7 @@ export default {
     },
 
     showGuestyReservations () {
-      // Show the reservations only for demo companies and Grand Welcome
-      let isDemoCompany = Object.values(process.env.DEMO_COMPANY_IDS).includes(this.contact.company.id)
-
-      return isDemoCompany || this.contact.company.id === 3533
+      return this.currentCompany.is_multi_guesty
     }
   },
 
