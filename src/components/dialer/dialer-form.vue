@@ -310,6 +310,18 @@ export default {
     },
 
     isBlockTooltipPopoverEnabled () {
+      if (this.disabledComplianceMessage) {
+        return true
+      }
+
+      if (this.mode === 'call') {
+        return !this.enabledToCallNumber(this.phoneNumber)
+      }
+
+      if (this.mode === 'text') {
+        return !this.enabledToTextNumber(this.phoneNumber)
+      }
+
       return !this.enabledToCallNumber(this.phoneNumber) || !this.enabledToTextNumber(this.phoneNumber)
     },
 
