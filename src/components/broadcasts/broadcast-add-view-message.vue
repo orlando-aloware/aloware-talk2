@@ -17,8 +17,8 @@
                               :max-characters="maxSmsBodyWithOptoutLength"
                               :reset-on-load="false"
                               :use-send-button="false"
-                              @messageChanged="messageLength"
-                              :is-broadcast="true"/>
+                              :is-broadcast="true"
+                              @messageChanged="messageLength"/>
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
@@ -163,6 +163,7 @@ export default {
       get () {
         return this.isOptoutActive
       },
+
       set (value) {
         return this.setIsOptoutActive(value)
       }
@@ -268,6 +269,7 @@ export default {
 
     // type setup
     this.type = this.rvm ? 'rvm' : 'sms'
+    this.setIsOptoutActive(true)
   },
 
   methods: {
