@@ -77,7 +77,7 @@
                dense
                no-caps
                unelevated
-               :disabled="kycFilled"
+               v-if="isCompanyKYC && !kycFilled"
                @click="onOpenFinishRegistration" />
       </div>
       <div class="button-index">
@@ -124,7 +124,7 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapGetters('auth', ['isTrial']),
+    ...mapGetters('auth', ['isTrial', 'isCompanyKYC']),
 
     kycFilled () {
       return this.profile?.company?.kyc_filled
