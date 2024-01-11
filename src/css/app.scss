@@ -665,6 +665,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
+  z-index: 1;
 
   & .q-item {
     padding: 0;
@@ -2117,6 +2118,7 @@ i.option-separator {
   overflow: hidden;
   position: relative;
   background: $grey-50;
+  height: 93%;
 
   .contact-activity-wrapper.w-less-630px {
     width: calc(100% - 630px)
@@ -2322,6 +2324,8 @@ i.option-separator {
 
 //ABOUT THIS CONTACT
 .contact-about-wrapper {
+  padding-bottom: 10px;
+
   .information-container {
     display: flex;
     flex-direction: column;
@@ -2342,7 +2346,8 @@ i.option-separator {
     background: transparent;
     border: 1px solid $grey-60;
     position: absolute;
-    margin: 0;
+    margin: 8px 0 0 0;
+    padding: 0 0 0 1px;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -2352,6 +2357,12 @@ i.option-separator {
     & .material-icons {
       margin: auto auto;
       display: block;
+    }
+
+    & .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }
@@ -5605,6 +5616,10 @@ button#bs-folder-options {
   margin: auto;
   overflow-y: auto;
   overflow-x: auto;
+
+  .datatable {
+    z-index: 0;
+  }
 }
 
 .paginated {
@@ -8778,6 +8793,10 @@ span.mention {
     &.minimized {
       width: 100%;
     }
+  }
+
+  .table-header {
+    z-index: 0;
   }
 }
 

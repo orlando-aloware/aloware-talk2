@@ -5,10 +5,11 @@
                :notes="routeTutorialData.notes"
                :video-url="routeTutorialData.videoUrl"
                :learn-more-link="routeTutorialData.learnMoreLink"
-               v-if="isCompanyKYC && doesRouteHasTutorial"/>
+               v-if="doesRouteHasTutorial && isNotSimpsocial && isTrial"/>
 </template>
 
 <script>
+import { simpsocialMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 import VideoModal from './video-modal.vue'
 
@@ -19,17 +20,24 @@ export default {
     VideoModal
   },
 
+  mixins: [
+    simpsocialMixin
+  ],
+
   computed: {
     ...mapGetters('auth', [
-      'isCompanyKYC'
+      'isCompanyKYC',
+      'isTrial'
     ]),
 
     doesRouteHasTutorial () {
       return [
         'Inbox',
+        'Contacts',
         'Wallboard',
         'Broadcasts',
-        'Tags'
+        'Tags',
+        'Communication'
       ].includes(this.$route.name)
     },
 
@@ -38,15 +46,15 @@ export default {
         'Inbox': {
           title: '📞 Explore Aloware Talk | Your Complete Guide',
           cookieName: 'inbox',
-          videoUrl: 'https://www.youtube.com/embed/1YjuDUF53iQ?si=uJqAQe2WeqNIPJE6',
+          videoUrl: 'https://www.youtube.com/embed/OmBIUrq-HC4?si=AQtrcj1QqUnCiDt1',
           learnMoreLink: 'https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents',
           notes: '🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊'
         },
         'Contacts': {
           title: '📇 Unveil the Contacts Tab in Aloware!',
           cookieName: 'contacts',
-          videoUrl: 'https://www.youtube.com/embed/U5l4PMXOpSM?si=sAnahiyuAASpWrP0',
-          learnMoreLink: '',
+          videoUrl: 'https://www.youtube.com/embed/U5l4PMXOpSM?si=9Wlh4v_pBtdO9EAz',
+          learnMoreLink: 'https://support.aloware.com/aloware-talk-2-contacts-menu',
           notes: 'Discover, organize, and optimize your network. </br></br>The Contacts Tab is your gateway to streamlined connections. </br></br>Delve in and direct your networking journey to triumph with every contact!'
         },
         'Wallboard': {
