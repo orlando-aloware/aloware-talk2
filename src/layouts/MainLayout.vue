@@ -1486,7 +1486,9 @@ export default {
             }, 10000)
 
             // prevent showing an empty screen with a loading spinner in login page
-            if (this.$route.name !== 'Login' && this.$route.name !== 'Account Registration') {
+            const nonLoadingRoutes = ['Login', 'Account Registration']
+
+            if (!nonLoadingRoutes.includes(this.$route.name)) {
               this.loading = true
             }
 
