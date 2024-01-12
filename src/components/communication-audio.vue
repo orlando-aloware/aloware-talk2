@@ -16,7 +16,7 @@
         </div>
       </div>
     </div>
-    <span class="text-grey-900"
+    <span class="text-grey-900 record-was-deleted-label"
           v-if="isDeleted">
       record was deleted
     </span>
@@ -90,7 +90,7 @@ export default {
 
   methods: {
     onShow () {
-      if (this.hasAudio) {
+      if (this.hasAudio && !this.isDeleted) {
         this.loading = true
         this.remoteUrl = null
         this.downloadUrl = null

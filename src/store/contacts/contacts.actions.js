@@ -362,6 +362,9 @@ export default {
   setIsShortenedUrlRemembered: ({ commit }, value) => {
     commit('SET_IS_SHORTENED_URL_REMEMBERED', value)
   },
+  setIsOptoutActive: ({ commit }, value) => {
+    commit('SET_IS_OPTOUT_ACTIVE', value)
+  },
   setDefaultIsShortenedUrlRemembered: ({ commit }) => {
     commit('SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED')
   },

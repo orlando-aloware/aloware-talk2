@@ -51,6 +51,12 @@ export default {
     task: {
       required: true,
       type: String
+    },
+
+    message: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
 
@@ -77,6 +83,8 @@ export default {
 
       switch (status) {
         case KycLogs.KYC_STATUS_NONE:
+        case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_ONLY:
+        case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING:
           message = ''
           break
         case KycLogs.KYC_STATUS_ZERO:
@@ -85,13 +93,14 @@ export default {
         case KycLogs.KYC_STATUS_DEFINITELY_REJECTED:
           message = `You need to <a href="${link}"><u class="text-white">submit again the info</u></a> about your business to ${action}`
           break
-        case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING:
-          message = `The ${action} isn't available on trial. please contact us to upgrade today!`
-          break
         default:
-          // For KYC_STATUS_APPROVED_FOR_SELF_CALLING and KYC_STATUS_APPROVED_FOR_CALLING_ONLY
-          message = `Your account is not yet verified to ${action}, you can reach out to our support to remove the restriction`
+          // For KYC_STATUS_APPROVED_FOR_SELF_CALLING
+          message = `Your account has not yet been verified for ${action}. Please contact our support team to remove this restriction.`
           break
+      }
+
+      if (this.message) {
+        message = this.message
       }
 
       return message

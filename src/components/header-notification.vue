@@ -33,7 +33,7 @@
     </div>
 
     <portal to="diagnosisButtons">
-      <a :href="getLink(link)"
+      <a @click="onOpenFinishRegistration(link)"
          v-if="link && !link.external">
         <b-button class="text-nowrap"
                   variant="primary"
@@ -43,7 +43,7 @@
       </a>
 
       <a target="_blank"
-         :href="getLink(link)"
+         @click="onOpenFinishRegistration(link)"
          v-if="link && link.external">
         <b-button class="text-nowrap"
                   variant="primary"
@@ -84,8 +84,13 @@ export default {
       'isMobile'
     ]),
 
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapGetters('auth', [
-      'profile'
+      'profile',
+      'isCompanyKYC'
     ]),
 
     isShow () {
@@ -174,6 +179,23 @@ export default {
       let regEx = new RegExp('^(?:[a-z+]+:)?//', 'i')
 
       return regEx.test(url)
+    },
+
+    onOpenFinishRegistration (link) {
+      if (!this.isCompanyKYC) {
+        const link = this.getLink(this.link)
+
+        return window.open(link, '_self')
+      }
+
+      if (this.$router.currentRoute.name === 'Business Information') {
+        return
+      }
+
+      this.$router.push({
+        name: 'Business Information',
+        params: { company_id: this.currentCompany.id }
+      })
     },
 
     getLink (link) {
