@@ -79,15 +79,15 @@
           <b-form-group
             class="form-label"
             label="Email"
-            :disabled="viewOnly"
+            :disabled="viewOnly || isCompanyKYC"
           >
             <b-form-input
               type="text"
               placeholder="name@company.com"
               required
-              v-model.trim="$v.user.email.$model"
               :state="validateState('email')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'email')">
+              @input="(eventPayload) => onUpdateFields(eventPayload, 'email')"
+              v-model.trim="$v.user.email.$model">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.email.required">Enter your email address.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.email.email">Enter a valid email address.</b-form-invalid-feedback>
@@ -460,7 +460,7 @@ import {
   settingsMixin,
   kycMixin
 } from 'src/plugins/mixins'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
 
@@ -481,6 +481,8 @@ export default {
     ...mapState('settings', ['userClone']),
 
     ...mapState('auth', ['profile']),
+
+    ...mapGetters('auth', ['isCompanyKYC']),
 
     userDestinationEditable () {
       return this.user.role_name && !this.user.read_only_access

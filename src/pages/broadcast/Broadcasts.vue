@@ -82,11 +82,11 @@
             </template>
           </q-btn-toggle>
         </div>
-        <block-tooltip v-if="viewOnly"
-                       placement="left"
+        <block-tooltip placement="left"
                        triggers="click"
                        target="broadcast-popover"
-                       task="broadcasts.create">
+                       task="broadcasts.create"
+                       v-if="viewOnly">
         </block-tooltip>
         <div id="broadcast-popover"
             class="broadcasts__home__header__new-button">
