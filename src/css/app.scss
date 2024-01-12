@@ -2118,7 +2118,7 @@ i.option-separator {
   overflow: hidden;
   position: relative;
   background: $grey-50;
-  height: 93%;
+  height: 100%;
 
   .contact-activity-wrapper.w-less-630px {
     width: calc(100% - 630px)
@@ -8793,10 +8793,6 @@ span.mention {
     &.minimized {
       width: 100%;
     }
-  }
-
-  .table-header {
-    z-index: 0;
   }
 }
 

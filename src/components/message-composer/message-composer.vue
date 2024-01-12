@@ -43,17 +43,13 @@
       <div>
         <message-composer-sms :is-disabled="isSmsDisabled"
                               :campaignId="campaignId"
-                              :disabled-message="disabledComplianceMessage"
                               v-if="messageComposer.mode === 'sms'"
                               @message-sent="onMessageSent"/>
-
         <message-composer-fax v-if="messageComposer.mode === 'fax'"
                               @message-sent="onMessageSent"/>
-
-        <message-composer-email :campaignId="campaignId"
-                                v-if="messageComposer.mode === 'email' && contact.email"
+        <message-composer-email v-if="messageComposer.mode === 'email' && contact.email"
+                                :campaignId="campaignId"
                                 @message-sent="onMessageSent"/>
-
         <message-composer-note v-if="messageComposer.mode === 'note'"
                                @message-sent="onMessageSent"/>
       </div>
@@ -76,9 +72,9 @@
         </div>
       </div>
     </div>
-    <div v-if="shouldShowComplianceMessage" class="composer-footer">
+    <div v-if="isMessagingBlocked(selectedLine, true)" class="composer-footer">
       <div class="compliance-badge mb-2">
-        {{ disabledComplianceMessage }}
+        {{ selectedLine.blocked_messaging_information['reason'] }}
       </div>
     </div>
   </div>
@@ -92,8 +88,7 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  selectorMixin,
-  kycMixin
+  selectorMixin
 } from 'src/plugins/mixins'
 import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
@@ -112,8 +107,7 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    selectorMixin,
-    kycMixin
+    selectorMixin
   ],
 
   props: {
@@ -156,14 +150,6 @@ export default {
       }
 
       return false
-    },
-
-    disabledComplianceMessage () {
-      return this.selectedLine?.blocked_messaging_information?.['reason'] ?? ''
-    },
-
-    shouldShowComplianceMessage () {
-      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason']
     }
   },
 
