@@ -95,7 +95,7 @@ export default {
           break
         default:
           // For KYC_STATUS_APPROVED_FOR_SELF_CALLING
-          message = `Your account has not yet been verified for ${action}. Please contact our support team to remove this restriction.`
+          message = `Your account is in trial, according to regulations you cannot send outbound ${action} without registration. Please convert to a subscription and register to use messaging services.”`
           break
       }
 
@@ -120,7 +120,7 @@ export default {
           text = 'call numbers beside yours'
           break
         case 'text':
-          text = 'text messages'
+          text = 'messages'
           break
         case 'sms.template':
           text = 'create sms templates'
