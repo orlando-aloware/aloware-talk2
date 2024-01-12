@@ -122,7 +122,6 @@
                        type="textarea"
                        placeholder="Type your message"
                        v-model="messageComposer.sms.body"
-                       :disable="isSendTextDisabled"
                        @input="imposeCharactersLimit"
                        @keydown="onKeyDown"
                        @blur="onBlur">
