@@ -122,7 +122,7 @@
                        type="textarea"
                        placeholder="Type your message"
                        v-model="messageComposer.sms.body"
-                       :disable="isSendTextDisabled"
+                       :disable="isSendTextInputDisabled"
                        @input="imposeCharactersLimit"
                        @keydown="onKeyDown"
                        @blur="onBlur">
@@ -356,6 +356,10 @@ export default {
 
     isSendTextDisabled () {
       return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+    },
+
+    isSendTextInputDisabled () {
+      return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 
     canTextToNumber () {
