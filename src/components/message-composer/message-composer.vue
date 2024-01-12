@@ -159,7 +159,7 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.selectedLine?.blocked_messaging_information?.['reason'] ?? ''
+      return this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
     },
 
     shouldShowComplianceMessage () {
