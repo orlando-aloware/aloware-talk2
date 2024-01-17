@@ -214,8 +214,7 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog"
-                       v-if="shouldShowKycFillDialog" />
+      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
     </div>
   </div>
 </template>
