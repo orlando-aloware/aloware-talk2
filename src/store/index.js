@@ -841,7 +841,7 @@ export default function (/* { ssrContext } */) {
 
       setIsTrialBannerVisible ({ commit }, value) {
         commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
-      },
+      }
 
     },
 

@@ -8,7 +8,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters'])
+    ...mapState(['campaigns', 'filters', 'dialer'])
   },
   methods: {
     ...mapActions([
@@ -641,9 +641,16 @@ export default {
           window.VueEvent.fire('script_deleted', event.script)
         })
         .listen('.kyc_status_updated', (event) => {
-          if (this.currentCompany && this.currentCompany.id === event.company.id) {
-            this.setCurrentCompany(event.company)
-            this.$VueEvent.fire('kyc_status_updated', event.company)
+          console.log('listen kyc_status_updated', this.dialer, this.dialer.currentStatus)
+          console.log('listen currentCompany', this.currentCompany.id, event.company.id)
+          const sameCompany = this.currentCompany && this.currentCompany.id === event.company.id
+          if (sameCompany) {
+            setInterval(() => {
+              if (this.dialer.currentStatus !== 'MAKING_CALL') {
+                this.setCurrentCompany(event.company)
+                this.$VueEvent.fire('kyc_status_updated', event.company)
+              }
+            }, 10000)
           }
         })
 

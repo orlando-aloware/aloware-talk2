@@ -236,6 +236,8 @@ import {
   agentMixin,
   contactV2AttributesMixin,
   kycMixin,
+  simpsocialMixin,
+  userMixin,
   settingsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
@@ -309,6 +311,8 @@ export default {
     agentMixin,
     contactV2AttributesMixin,
     kycMixin,
+    simpsocialMixin,
+    userMixin,
     settingsMixin
   ],
 
@@ -920,9 +924,10 @@ export default {
     }
 
     this.mainListeners.kycStatusUpdated = (company) => {
-      // this.checkSuspended(company)
-      this.setShowedKycReloadDialog(true)
-      console.log('Changed kyc status [event]: ', company, this.showedKycReloadDialog)
+      if (this.isTrialKYC && this.isNotSimpsocial && !this.isModGen) {
+        this.setShowedKycReloadDialog(true)
+        console.log('Changed kyc status [event]: ', company, this.showedKycReloadDialog)
+      }
     }
 
     this.mainListeners.agentStatusUpdated = (event) => {

@@ -2,34 +2,22 @@
   <q-dialog transition-show="scale"
             transition-hide="scale"
             persistent
-            v-model="show">
-    <q-card class="bg-white text-black text-center q-pt-lg"
-            style="width: 635px; border-radius: 30px">
+            v-model="show"
+            position="top">
+    <q-card class="bg-white text-center"
+            style="width: 635px; border-radius: 10px">
       <q-card-section>
-        <div class="text-h6">
-          Hi, {{ userFullName }}! 🎉
-        </div>
-
-        <div class="text-body2 q-pt-lg">
-          Your trial account access <strong>has changed</strong> based on your business information submitted.
-        </div>
-
-        <div class="text-body2 q-pt-lg">
-          It's easy, you just need to reload and then you're ready to continue.
+        <div class="text-body2">
+          Your trial account access has changed based on your business information submitted, to access the new permissions,
+          <span size="small"
+                type="text"
+                class="cursor-pointer el-button learn-more-text mr-2"
+                @click="reload"
+                style="color: #054CDB">
+            <strong>Reload Now</strong>
+          </span>
         </div>
       </q-card-section>
-
-      <q-card-actions class="bg-white q-pb-lg"
-                      align="center">
-        <q-btn class="text-regular"
-               label="Reload"
-               color="primary"
-               text-color="white"
-               rounded
-               @click="reload"
-               v-close-popup>
-        </q-btn>
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
