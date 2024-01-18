@@ -335,10 +335,10 @@ export default {
     phoneNumberValue: {
       get () {
         if (this.checkIfFieldIsPreFilled('phone_number')) {
-          return this.form.phone_national || this.form.phone_number
+          return this.countryCode + '//' + this.form.phone_national || this.form.phone_number
         }
 
-        return this.form.phone_number
+        return this.countryCode + '//' + this.form.phone_number
       },
 
       set (val) {

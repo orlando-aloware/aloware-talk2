@@ -25,7 +25,7 @@ export default {
     },
 
     initRecaptcha () {
-      if (!this.$q.platform.is.electron) {
+      if (!this.$q.platform.is.electron && this.siteKey !== '') {
         this.disabledSubmit = true
 
         window.recaptchaOnloadCallback = () => {

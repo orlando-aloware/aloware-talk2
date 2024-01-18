@@ -344,7 +344,7 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.selectedCampaign?.blocked_messaging_information?.['reason'] ?? ''
+      return this.isMessagingBlocked(this.selectedCampaign, true) ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     },
 
     shouldShowComplianceMessage () {

@@ -76,7 +76,7 @@ export default {
           cookieName: 'tags',
           videoUrl: 'https://www.youtube.com/embed/I68fcqIrW7E?si=QtbTTk2vzauPqpAd',
           learnMoreLink: 'https://support.aloware.com/tags-in-aloware-talk-organize-your-contacts-with-ease',
-          notes: '🌟 <strong>Tags = Your Ultimate Categorizer! </br></br> 🌟 Like Lists, but leveled up! Place the same person everywhere. </br></br> Bonus? Enroll a whole Tag audience in a sequence. </br></br> Plus, new contacts? They flash in with a fresh tag stamped with their upload date. 🚀'
+          notes: '🌟 <strong>Tags</strong> = Your Ultimate Categorizer! </br></br> 🌟 Like Lists, but leveled up! Place the same person everywhere. </br></br> Bonus? Enroll a whole Tag audience in a sequence. </br></br> Plus, new contacts? They flash in with a fresh tag stamped with their upload date. 🚀'
         },
         'Communication': {
           title: '📞 Embrace the Communications in Aloware! 🚀',

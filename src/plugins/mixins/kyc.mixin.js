@@ -16,7 +16,7 @@ export default _.merge({
     },
 
     ssuEnabled () {
-      return process.env.KYC_SSU_ENABLED || false
+      return !!(process.env.KYC_SSU_ENABLED || false)
     },
 
     isTrialKYC () {
@@ -111,14 +111,24 @@ export default _.merge({
       return KycLogs.BUY_NEW_NUMBERS_ALLOWED.includes(kycStatus)
     },
 
-    enabledToVisitIntegrationsPage () {
+    enabledToAddSequences () {
       const kycStatus = this.getStatus()
 
       if (this.skipRestrictions(kycStatus)) {
         return true
       }
 
-      return KycLogs.VISIT_INTEGRATIONS_ALLOWED.includes(kycStatus)
+      return KycLogs.ADD_SEQUENCES_ALLOWED.includes(kycStatus)
+    },
+
+    allowedToEnableIntegrationsPage () {
+      const kycStatus = this.getStatus()
+
+      if (this.skipRestrictions(kycStatus)) {
+        return true
+      }
+
+      return KycLogs.ENABLE_INTEGRATIONS_ALLOWED.includes(kycStatus)
     },
 
     enabledToSkipTrialAndSubscribe () {

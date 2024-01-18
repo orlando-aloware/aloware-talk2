@@ -214,7 +214,8 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
+      <kyc-fill-dialog :show="shouldShowKycFillDialog"
+                       v-if="shouldShowKycFillDialog"/>
       <kyc-reload-dialog :show="shouldShowKycReloadDialog" />
     </div>
   </div>
@@ -1506,7 +1507,9 @@ export default {
             }, 10000)
 
             // prevent showing an empty screen with a loading spinner in login page
-            if (this.$route.name !== 'Login') {
+            const nonLoadingRoutes = ['Login', 'Account Registration']
+
+            if (!nonLoadingRoutes.includes(this.$route.name)) {
               this.loading = true
             }
 

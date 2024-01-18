@@ -89,7 +89,8 @@ export default {
   data () {
     return {
       innerValue: this.value,
-      countryCode: '+1'
+      countryCode: '+1',
+      formattedValue: this.value
     }
   },
 
