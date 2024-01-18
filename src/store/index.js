@@ -282,7 +282,8 @@ export default function (/* { ssrContext } */) {
       isCallDisposed: false,
       isContactDisposed: false,
       isIntroVideoVisible: false,
-      showedKycDialog: false
+      showedKycDialog: false,
+      isTrialBannerVisible: false
     },
 
     getters: {
@@ -831,6 +832,10 @@ export default function (/* { ssrContext } */) {
 
       setShowedKycDialog ({ commit }, value) {
         commit('SET_SHOWED_KYC_DIALOG', value)
+      },
+
+      setIsTrialBannerVisible ({ commit }, value) {
+        commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
       }
     },
 
@@ -1556,6 +1561,10 @@ export default function (/* { ssrContext } */) {
 
       SET_SHOWED_KYC_DIALOG (state, value) {
         state.showedKycDialog = value
+      },
+
+      SET_IS_TRIAL_BANNER_VISIBLE (state, value) {
+        state.isTrialBannerVisible = value
       },
 
       updateField
