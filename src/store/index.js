@@ -283,6 +283,7 @@ export default function (/* { ssrContext } */) {
       isContactDisposed: false,
       isIntroVideoVisible: false,
       showedKycDialog: false,
+      showedKycReloadDialog: false,
       isTrialBannerVisible: false
     },
 
@@ -834,9 +835,14 @@ export default function (/* { ssrContext } */) {
         commit('SET_SHOWED_KYC_DIALOG', value)
       },
 
+      setShowedKycReloadDialog ({ commit }, value) {
+        commit('SET_SHOWED_KYC_RELOAD_DIALOG', value)
+      },
+
       setIsTrialBannerVisible ({ commit }, value) {
         commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
       }
+
     },
 
     mutations: {
@@ -1561,6 +1567,10 @@ export default function (/* { ssrContext } */) {
 
       SET_SHOWED_KYC_DIALOG (state, value) {
         state.showedKycDialog = value
+      },
+
+      SET_SHOWED_KYC_RELOAD_DIALOG (state, value) {
+        state.showedKycReloadDialog = value
       },
 
       SET_IS_TRIAL_BANNER_VISIBLE (state, value) {

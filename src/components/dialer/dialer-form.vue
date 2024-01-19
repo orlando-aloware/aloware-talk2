@@ -310,7 +310,7 @@ export default {
     },
 
     isBlockTooltipPopoverEnabled () {
-      if (this.disabledComplianceMessage) {
+      if (this.mode === 'text' && this.disabledComplianceMessage) {
         return true
       }
 
