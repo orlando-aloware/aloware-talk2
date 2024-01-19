@@ -538,7 +538,6 @@ export default {
       // get contact's sequence info
       talk2Api.V1.contact.getSequenceInfo(contactIdToFetch)
         .then(response => {
-          console.log('response', response.data)
           this.setSequenceInfo(response.data)
           this.setSequenceInfoLoading(false)
         }).catch((err) => {
