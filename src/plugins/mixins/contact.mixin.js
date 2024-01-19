@@ -470,16 +470,28 @@ export default {
       this.fetchFailed = true
     },
 
-    async fetchContactInfo (isFetchContact = true) {
+    async fetchContactInfo (isFetchContact = true, contactId = null, skipRouterPush = false) {
+      const contactIdToFetch = contactId || this.contactId
+
       // Sanity check: if contact id is actually one of the lists, take person to the list
-      if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(this.contactId)) {
-        const path = '/contacts/list/' + this.contactId
+      if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(contactIdToFetch)) {
+        if (skipRouterPush) {
+          return
+        }
+
+        const path = '/contacts/list/' + contactIdToFetch
+
         this.$router.push({ path })
+
         return
       }
 
       // Sanity check: if contact id is actually a weird number, just redirect to inbox
-      if (isNaN(Number.parseInt(this.contactId))) {
+      if (isNaN(Number.parseInt(contactIdToFetch))) {
+        if (skipRouterPush) {
+          return
+        }
+
         this.$router.push({ name: 'inbox' })
         return
       }
@@ -491,7 +503,7 @@ export default {
       this.loadingContactCommunications = true
       this.fetchFailed = false
 
-      if (!this.contactId) {
+      if (!contactIdToFetch) {
         console.log('Failed to fetch contact info: Missing contact id!')
         this.loadingContact = false
         this.loadingContactCommunications = false
@@ -503,7 +515,7 @@ export default {
       this.source = this.cancelToken.source()
 
       // get contact phone numbers
-      talk2Api.V1.contact.getPhoneNumbers(this.contactId)
+      talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch)
         .then(response => {
           this.setContactPhoneNumbers(response.data)
         }).catch(err => {
@@ -512,7 +524,7 @@ export default {
         })
 
       // get contact's communication summary
-      talk2Api.V1.contact.getCommunicationsSummary(this.contactId)
+      talk2Api.V1.contact.getCommunicationsSummary(contactIdToFetch)
         .then(response => {
           // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
           this.setCommunicationSummary(response.data)
@@ -524,10 +536,11 @@ export default {
       this.setSequenceInfoLoading(true)
 
       // get contact's sequence info
-      talk2Api.V1.contact.getSequenceInfo(this.contactId)
+      talk2Api.V1.contact.getSequenceInfo(contactIdToFetch)
         .then(response => {
+          console.log('response', response.data)
           this.setSequenceInfo(response.data)
-          this.setSequenceInfoLoading(true)
+          this.setSequenceInfoLoading(false)
         }).catch((err) => {
           this.setSequenceInfoLoading(false)
           console.log(err)
@@ -535,7 +548,7 @@ export default {
         })
 
       // get contact's contact attributes
-      talk2Api.V1.contact.getAttributes(this.contactId)
+      talk2Api.V1.contact.getAttributes(contactIdToFetch)
         .then(response => {
           this.setContactAttributes(_.cloneDeep(response.data))
         }).catch(err => {
@@ -544,7 +557,7 @@ export default {
         })
 
       // get contact's communications
-      this.fetchContactCommunications(this.contactId, false, false)
+      this.fetchContactCommunications(contactIdToFetch, false, false)
         .then(res => {
           this.loadingContact = false
 
@@ -580,7 +593,7 @@ export default {
       }
 
       // get contact's info
-      return this.$axios.get(`/api/v2/contacts/${this.contactId}`,
+      return this.$axios.get(`/api/v2/contacts/${contactIdToFetch}`,
         {
           cancelToken: this.source.token
         })
