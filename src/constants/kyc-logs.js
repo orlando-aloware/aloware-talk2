@@ -25,10 +25,7 @@ export const CALLS_TO_OTHERS_ALLOWED = [
   KYC_STATUS_APPROVED_FOR_CALLING_ONLY
 ]
 
-export const ONESELF_TEXTS_ALLOWED = [
-]
-
-export const TEXTS_TO_OTHERS_ALLOWED = [
+export const TEXTS_ALLOWED = [
 ]
 
 export const SINGLE_TEST_NUMBER_PURCHASED_ALLOWED = [
