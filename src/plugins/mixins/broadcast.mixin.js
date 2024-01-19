@@ -641,12 +641,11 @@ export default {
           window.VueEvent.fire('script_deleted', event.script)
         })
         .listen('.kyc_status_updated', (event) => {
-          console.log('listen kyc_status_updated', this.dialer, this.dialer.currentStatus)
-          console.log('listen currentCompany', this.currentCompany.id, event.company.id)
           const sameCompany = this.currentCompany && this.currentCompany.id === event.company.id
           if (sameCompany) {
             setInterval(() => {
-              if (this.dialer.currentStatus !== 'MAKING_CALL') {
+              // check if there is a current call in progress
+              if (!['MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus)) {
                 this.setCurrentCompany(event.company)
                 this.$VueEvent.fire('kyc_status_updated', event.company)
               }
