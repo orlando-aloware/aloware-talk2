@@ -646,7 +646,8 @@ export default {
           const sameCompany = this.currentCompany && this.currentCompany.id === event.company.id
           if (sameCompany) {
             setInterval(() => {
-              if (this.dialer.currentStatus !== 'MAKING_CALL') {
+              // check if dialer.currentStatus is not MAKING_CALL or CALL_CONNECTED
+              if (!['MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus)) {
                 this.setCurrentCompany(event.company)
                 this.$VueEvent.fire('kyc_status_updated', event.company)
               }
