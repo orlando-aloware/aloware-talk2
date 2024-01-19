@@ -537,7 +537,6 @@ export default {
     },
 
     shouldShowKycReloadDialog () {
-      console.log('shouldShowKycReloadDialog', this.isAuthenticated, this.isFirstLoading, this.showedKycReloadDialog, this.profile?.company?.is_trial)
       return this.isAuthenticated &&
             !this.isFirstLoading &&
             this.showedKycReloadDialog &&
@@ -926,7 +925,6 @@ export default {
     this.mainListeners.kycStatusUpdated = (company) => {
       if (this.isTrialKYC && this.isNotSimpsocial && !this.isModGen) {
         this.setShowedKycReloadDialog(true)
-        console.log('Changed kyc status [event]: ', company, this.showedKycReloadDialog)
       }
     }
 
