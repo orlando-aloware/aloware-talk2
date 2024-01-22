@@ -205,6 +205,11 @@ export default {
 
   computed: {
     ...mapState(['isMobile']),
+
+    ...mapState('inbox', [
+      'taskCounts'
+    ]),
+
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:
@@ -236,13 +241,14 @@ export default {
     onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
       this.nextStat = status
+      console.log('onUpdateTaskStatus taskCounts', this.taskCounts)
       talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
         console.log('onUpdateTaskStatus', res, res.data)
         if (status === ContactTaskStatus.STATUS_CLOSED) {
           this.$emit('markAllAsRead')
         }
 
-        const contact = { ...this.contact }
+        let contact = { ...this.contact }
         const key = { data: null }
         for (key.data in res.data) {
           if (typeof contact[key.data] !== 'undefined') {
@@ -275,6 +281,7 @@ export default {
   },
   watch: {
     'contact.task_status': function () {
+      console.log('watch contact.task_status this.contact', this.contact)
       this.$VueEvent.fire('contact_task_status_updated', this.contact)
       this.isUpdatingStatus = false
       this.nextStat = null

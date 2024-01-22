@@ -1168,6 +1168,7 @@ export default {
         this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
       }
 
+      console.log('isContactMixinUsed', this.isContactMixinUsed)
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
         this.fetchTaskCounts()
