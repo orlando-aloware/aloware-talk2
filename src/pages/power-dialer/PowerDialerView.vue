@@ -55,11 +55,11 @@
             </b-col>
             <b-col class="p-0">
               <div class="d-flex float-right">
-                <block-tooltip v-if="!canCreateContacts"
-                               placement="left"
+                <block-tooltip placement="left"
                                triggers="click"
                                target="contacts-create-popover"
-                               task="contacts.create">
+                               task="contacts.create"
+                               v-if="!canCreateContacts">
                 </block-tooltip>
                 <b-dropdown class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                             toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"

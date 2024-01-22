@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.36.1",
+  "version": "1.37.2",
   "description": "Aloware Agent Interface",
   "productName": "Aloware Talk",
   "author": "Aloware <support@aloware.com>",
@@ -67,7 +67,7 @@
     "vue": "^2.7.14",
     "vue-at": "^2.5.0-beta",
     "vue-bootstrap-typeahead": "^0.2.6",
-    "vue-business-hours": "git+https://github.com/aloware/vue-business-hours.git",
+    "vue-business-hours": "https://github.com/aloware/vue-business-hours.git",
     "vue-cookies": "^1.8.3",
     "vue-countup-v2": "^4.0.0",
     "vue-ctk-date-time-picker": "^2.5.0",

@@ -39,6 +39,11 @@ export default {
         this.loadScript(process.env.HS_CUSTOM_JS)
       }
 
+      // set to false so the widget isn't load without user identification
+      window.hsConversationsSettings = {
+        loadImmediately: false
+      }
+
       this.initiateHubspotConversationsWithUserDetails()
     },
 
@@ -81,7 +86,6 @@ export default {
     conversationsSettings (token) {
       console.log('setting up hubspot conversations settings')
       window.hsConversationsSettings = {
-        loadImmediately: false,
         identificationEmail: this.profile.email,
         identificationToken: token
       }

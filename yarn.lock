@@ -13490,9 +13490,9 @@
     "resize-observer-polyfill" "^1.5.0"
     "vue" "^2.5.17"
 
-"vue-business-hours@git+https://github.com/aloware/vue-business-hours.git":
+"vue-business-hours@https://github.com/aloware/vue-business-hours.git":
   "integrity" "sha512-TvJ1aSxliUdJs7NjcGDGsaoCdRmGyv9H6/39jZN1FNtkC+TtoMD4+ObQwNAUSmSU8/K7dJ0P4w9y/6ctx53vVQ=="
-  "resolved" "git+ssh://git@github.com/aloware/vue-business-hours.git#fd80a637f3db1b4989cb2b7eb07a35c596b30899"
+  "resolved" "https://github.com/aloware/vue-business-hours.git#fd80a637f3db1b4989cb2b7eb07a35c596b30899"
   "version" "1.4.1"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"

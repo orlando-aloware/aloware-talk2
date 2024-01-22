@@ -6,13 +6,14 @@
       <div class="d-flex"
            v-if="!isBigScreen">
         <video-modal ref="videoModal"
-                     title="📞 Explore Aloware Talk | Your Complete Guide"
-                     cookieName="inbox"
-                     videoUrl="https://www.youtube.com/embed/OmBIUrq-HC4?si=_74OeNHYRSssrfYR"
+                     title="📞 Welcome to Aloware Talk!"
+                     cookieName="welcome"
+                     videoUrl="https://www.youtube.com/embed/1YjuDUF53iQ?si=iO3kICM1p_mFXX0J"
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false">
+                     :should-show-in-first-visit="false"
+                     v-if="isNotSimpsocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -39,13 +40,14 @@
       <div class="d-flex"
            v-if="isBigScreen">
         <video-modal ref="videoModal"
-                     title="📞 Explore Aloware Talk | Your Complete Guide"
-                     cookieName="inbox"
-                     videoUrl="https://www.youtube.com/embed/OmBIUrq-HC4?si=_74OeNHYRSssrfYR"
+                     title="📞 Welcome to Aloware Talk!"
+                     cookieName="welcome"
+                     videoUrl="https://www.youtube.com/embed/1YjuDUF53iQ?si=iO3kICM1p_mFXX0J"
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false">
+                     :should-show-in-first-visit="false"
+                     v-if="isNotSimpsocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -75,7 +77,7 @@
                dense
                no-caps
                unelevated
-               :disabled="kycFilled"
+               v-if="isCompanyKYC && !kycFilled"
                @click="onOpenFinishRegistration" />
       </div>
       <div class="button-index">
@@ -91,7 +93,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { simpsocialMixin } from 'src/plugins/mixins'
+import { mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
 
@@ -102,6 +105,10 @@ export default {
     VideoModal,
     CompactBtn
   },
+
+  mixins: [
+    simpsocialMixin
+  ],
 
   data () {
     return {
@@ -116,6 +123,8 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapGetters('auth', ['isTrial', 'isCompanyKYC']),
 
     kycFilled () {
       return this.profile?.company?.kyc_filled
