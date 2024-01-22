@@ -71,7 +71,7 @@
                     </a>
                 </div>
                 <div class="field text-left pt-3 mt-1">
-                    <b-link href="https://support.aloware.com/en/articles/5456128-aloware-authentication-issues"
+                    <b-link href="https://support.aloware.com/troubleshooting-aloware-authentication-issues"
                             class="cursor-pointer field text-left text-decoration-none"
                             target="_blank">
                         Trouble authenticating?

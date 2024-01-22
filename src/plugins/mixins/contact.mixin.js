@@ -632,7 +632,7 @@ export default {
       }
 
       // 2. if contact has communications select last communication campaign
-      if (!this.selectedCampaign && this.communicationsAndAudits.length) {
+      if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
           return item.type === CommunicationTypes.SMS
         })
@@ -645,26 +645,26 @@ export default {
       // 3. if user has a personal line and contact does not have an initial line
       const userCampaignId = _.get(this.profile, 'campaign_id', null)
 
-      if (!this.selectedCampaign && userCampaignId) {
+      if (!this.selectedCampaignId && userCampaignId) {
         this.selectedCampaignId = userCampaignId
       }
 
       // 4. if contact doesn't have situation 1 and 2 and selected_contact_campaigns has one campaign select the campaign
       const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
 
-      if (!this.selectedCampaign && selectedContactFirstCampaignId) {
+      if (!this.selectedCampaignId && selectedContactFirstCampaignId) {
         this.selectedCampaignId = selectedContactFirstCampaignId
       }
 
       // 5. if contact doesn't have situation 1 and 2 and 3 and company has one campaign select that campaign
       const firstCampaignId = _.get(this.campaigns, '[0].id', null)
 
-      if (!this.selectedCampaign && !selectedContactFirstCampaignId && firstCampaignId) {
+      if (!this.selectedCampaignId && !selectedContactFirstCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 
       // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
-      if (!this.selectedCampaign && firstCampaignId) {
+      if (!this.selectedCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 

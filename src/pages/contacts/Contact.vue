@@ -10,7 +10,7 @@
       <h2>Contact resource is unavailable/deleted</h2>
     </div>
 
-    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between h-100"
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between"
          v-if="!leaving && !showContactResourceUnavailable">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"

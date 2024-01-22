@@ -10,7 +10,7 @@
       <input-group>
         <template v-slot:content>
           <input-field label="Business Legal Name"
-                       placeholder="Aloware Inc."
+                       placeholder="Your Business"
                        ref="legal_name-input"
                        :paddingClasses="paddingLeftClasses"
                        :rules="[validateFieldError('legal_name')]"
@@ -118,8 +118,8 @@
 
       <input-group>
         <template v-slot:content>
-          <input-field label="Street"
-                       placeholder="Ex: Fifth Avenue"
+          <input-field label="Address"
+                       placeholder="Street address or P.O"
                        col-md="col-md-10"
                        ref="street-input"
                        :paddingClasses="paddingRightClasses"
@@ -326,6 +326,11 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
+    },
+
+    ssu: {
+      type: Object,
+      default: () => (null)
     }
   },
 
@@ -480,11 +485,31 @@ export default {
 
     onSubmit () {
       this.$emit('submit', this.form)
+    },
+
+    loadForm (data) {
+      this.form.legal_name = data.business_name
+      this.form.website_url = data.website_url
+      this.form.legal_country = { id: data.country, name: data.country }
+      this.form.auth_rep_first_name = data.first_name
+      this.form.auth_rep_last_name = data.last_name
+      this.form.auth_rep_email = data.email
+      this.form.auth_rep_phone_number = data.phone_country_code + '//' + data.phone_national
     }
   },
 
   mounted () {
+    if (this.ssu) {
+      this.loadForm(this.ssu)
+    }
+
     this.verifyFieldErrors()
+  },
+
+  watch: {
+    ssu (val) {
+      this.loadForm(val)
+    }
   }
 }
 </script>

@@ -17,7 +17,7 @@
         </span>
       </div>
 
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center chart-types">
         <strong>Chart type:</strong>
         <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
                       toggle-color="green"
@@ -265,7 +265,14 @@ export default {
         },
         exporting: {
           sourceWidth: 0,
-          sourceHeight: 0
+          sourceHeight: 0,
+          menuItemDefinitions: {
+            printChart: {
+              onclick () {
+                window.print()
+              }
+            }
+          }
         },
         series: [
           {

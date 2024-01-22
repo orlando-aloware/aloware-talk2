@@ -405,7 +405,7 @@ export default {
       'ongoingSession'
     ]),
 
-    ...mapState('xmasEnabled'),
+    ...mapState(['xmasEnabled']),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
@@ -1486,7 +1486,9 @@ export default {
             }, 10000)
 
             // prevent showing an empty screen with a loading spinner in login page
-            if (this.$route.name !== 'Login') {
+            const nonLoadingRoutes = ['Login', 'Account Registration']
+
+            if (!nonLoadingRoutes.includes(this.$route.name)) {
               this.loading = true
             }
 

@@ -1,15 +1,10 @@
 <template>
   <div>
-    <img class="img-fluid"
+    <img class="img-fluid broadcast-add__message__sms__preview__image"
          :src="attachment"
          v-if="attachment">
-    <q-input class="q-input-composer"
-             borderless
-             autogrow
-             ref="smsMessageBody"
-             input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
-             type="textarea"
-             :value="text"/>
+    <span class="q-input-composer text-white handle-whitespace"
+          v-html="text"/>
   </div>
 </template>
 
@@ -35,11 +30,14 @@ export default {
 
     ...mapGetters('contacts', [
       'messageComposer',
-      'selectedLine'
+      'selectedLine',
+      'messageBodyWithOptout',
+      'optoutText'
     ]),
 
     text () {
-      return this.translateMessage(this.messageComposer.sms.body, this.selectedLine, this.profile)
+      const messageBodyWithOptoutBolded = this.messageBodyWithOptout.replace(this.optoutText, `<span class="text-weight-bold">${this.optoutText}</span>`)
+      return this.translateMessage(messageBodyWithOptoutBolded, this.selectedLine, this.profile)
     },
 
     baseUrl () {
