@@ -200,7 +200,7 @@ export default {
 
   watch: {
     'contact.id': _.debounce(function () {
-      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+      if (this.contact && this.contact.id && (this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer')) {
         this.contactIntegrationDataLoaded = false
         this.getData()
       }
