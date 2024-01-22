@@ -1381,21 +1381,6 @@ export default {
       if (this.$route.name === 'Inbox Channel') {
         this.isSearch = false
       }
-    },
-
-    'taskCounts.open': function (value) {
-      console.trace('WATCH taskCounts.open')
-      console.log('WATCH taskCounts.open', value)
-    },
-
-    'taskCounts.pending': function (value) {
-      console.trace('WATCH taskCounts.pending')
-      console.log('WATCH taskCounts.pending', value)
-    },
-
-    'taskCounts.close': function (value) {
-      console.trace('WATCH taskCounts.close')
-      console.log('WATCH taskCounts.close', value)
     }
   }
 }
