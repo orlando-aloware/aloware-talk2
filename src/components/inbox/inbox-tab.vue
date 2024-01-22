@@ -1134,64 +1134,34 @@ export default {
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
       const sameStatus = this.currentTask === contact.task_status
-      console.log('contactTaskStatusUpdated', this.$route.name !== 'Inbox Contact Task')
-      console.log('contactTaskStatusUpdated', this.isSearch)
-      console.log('contactTaskStatusUpdated', !this.currentTask)
-      console.log('contactTaskStatusUpdated', !contact)
-      console.log('contactTaskStatusUpdated', sameStatus)
+
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || !contact || sameStatus) {
         return
       }
 
-      console.log('contactTaskStatusUpdated this.currentTask', this.currentTask)
-      console.log('contactTaskStatusUpdated contact.task_status', contact.task_status)
       if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
-        console.log('PENDING TO OPEN')
-        console.log('incrementing pending task count', this.taskCounts)
-        console.log('incrementing pending task count', this.inboxTaskCounts)
         this.setPendingTaskCount(this.taskCounts.pending - 1)
         this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)
-        console.log('incrementing pending task count', this.taskCounts)
-        console.log('incrementing pending task count', this.inboxTaskCounts)
         if (contact.task_status === ContactTaskStatus.STATUS_OPEN) {
-          console.log('incrementing open task count', this.taskCounts)
-          console.log('incrementing open task count', this.inboxTaskCounts)
           this.setOpenTaskCount(this.taskCounts.open + 1)
           this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
-          console.log('incrementing open task count', this.taskCounts)
-          console.log('incrementing open task count', this.inboxTaskCounts)
         }
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
-        console.log('OPEN TO PENDING')
-        console.log('decrementing open task count', this.taskCounts)
-        console.log('decrementing open task count', this.inboxTaskCounts)
         this.setOpenTaskCount(this.taskCounts.open - 1)
         this.setInboxOpenTaskCount(this.inboxTaskCounts.open - 1)
-        console.log('decrementing open task count', this.taskCounts)
-        console.log('decrementing open task count', this.inboxTaskCounts)
         if (contact.task_status === ContactTaskStatus.STATUS_PENDING) {
-          console.log('incrementing pending task count', this.taskCounts)
-          console.log('incrementing pending task count', this.inboxTaskCounts)
           this.setPendingTaskCount(this.taskCounts.pending + 1)
           this.setInboxPendingTaskCount(this.inboxTaskCounts.pending + 1)
-          console.log('incrementing pending task count', this.taskCounts)
-          console.log('incrementing pending task count', this.inboxTaskCounts)
         }
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_CLOSED && contact.task_status === ContactTaskStatus.STATUS_OPEN) {
-        console.log('CLOSED TO OPEN')
-        console.log('incrementing open task count', this.taskCounts)
-        console.log('incrementing open task count', this.inboxTaskCounts)
         this.setOpenTaskCount(this.taskCounts.open + 1)
         this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
-        console.log('incrementing open task count', this.taskCounts)
-        console.log('incrementing open task count', this.inboxTaskCounts)
       }
 
-      console.log('isContactMixinUsed', this.isContactMixinUsed)
       // prevent duplicate task status count request when Contact component is active
       if (!this.isContactMixinUsed) {
         this.fetchTaskCounts()
