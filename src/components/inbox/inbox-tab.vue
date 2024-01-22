@@ -1134,10 +1134,17 @@ export default {
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
       const sameStatus = this.currentTask === contact.task_status
+      console.log('contactTaskStatusUpdated', this.$route.name !== 'Inbox Contact Task')
+      console.log('contactTaskStatusUpdated', this.isSearch)
+      console.log('contactTaskStatusUpdated', !this.currentTask)
+      console.log('contactTaskStatusUpdated', !contact)
+      console.log('contactTaskStatusUpdated', sameStatus)
       if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || !contact || sameStatus) {
         return
       }
 
+      console.log('contactTaskStatusUpdated this.currentTask', this.currentTask)
+      console.log('contactTaskStatusUpdated contact.task_status', contact.task_status)
       if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
         this.setPendingTaskCount(this.taskCounts.pending - 1)
         this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)

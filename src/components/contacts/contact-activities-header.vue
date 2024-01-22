@@ -237,6 +237,7 @@ export default {
       this.isUpdatingStatus = true
       this.nextStat = status
       talk2Api.V2.contacts.taskStatusUpdate(this.contact.id, { status: status }).then(res => {
+        console.log('onUpdateTaskStatus', res, res.data)
         if (status === ContactTaskStatus.STATUS_CLOSED) {
           this.$emit('markAllAsRead')
         }
@@ -250,6 +251,8 @@ export default {
         }
         contact.task_status = status
         this.activityContact = contact
+        console.log('onUpdateTaskStatus contact.task_status', contact.task_status)
+        console.log('onUpdateTaskStatus this.activityContact', this.activityContact)
       })
     },
     back () {
