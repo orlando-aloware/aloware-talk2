@@ -59,7 +59,6 @@
           <b-form-group
             class="form-label"
             label="Description (Optional)"
-            :disabled="viewOnly"
           >
             <b-form-textarea
               id="textarea"
@@ -110,7 +109,6 @@
                 v-model="showPasswordFields"
                 :value="true"
                 :unchecked-value="false"
-                :disabled="viewOnly"
                 @change="(eventPayload) => onUpdateFields(eventPayload, 'showPasswordFields')">
                 Change password
               </b-form-checkbox>
@@ -128,7 +126,6 @@
               type="password"
               placeholder="New Password"
               autocomplete="off"
-              :disabled="viewOnly"
               :state="validateState('password')"
               v-model.trim="$v.user.password.$model"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
@@ -147,7 +144,6 @@
               type="password"
               placeholder="Password Confirmation"
               autocomplete="off"
-              :disabled="viewOnly"
               :state="validateState('password_confirmation')"
               v-model.trim="$v.user.password_confirmation.$model"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
@@ -169,7 +165,6 @@
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-radio inline
                           value="Company Admin"
-                          :disabled="viewOnly"
                           v-model="user.role_name"
                           :aria-describedby="ariaDescribedby"
                           @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">
@@ -184,7 +179,6 @@
                           value="Company Agent"
                           v-model="user.role_name"
                           :aria-describedby="ariaDescribedby"
-                          :disabled="viewOnly"
                           @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">
               Agent
               <q-tooltip anchor="top left"
@@ -208,7 +202,6 @@
 
           <b-form-group label="" >
             <answer-type-selector v-model="user.answer_by"
-                                  :disable="viewOnly"
                                   @select="(eventPayload) => onUpdateFields(eventPayload, 'answer_by')">
             </answer-type-selector>
           </b-form-group>
@@ -229,7 +222,6 @@
                 v-model="user.phone_number_as_backup"
                 :value="true"
                 :unchecked-value="false"
-                :disabled="viewOnly"
                 @change="(eventPayload) => onUpdateFields(eventPayload, 'phone_number_as_backup')">
                 Use a phone number as backup.
               </b-form-checkbox>
@@ -249,7 +241,6 @@
             <b-form-input
               type="text"
               placeholder="(123) 456-7890"
-              :disabled="viewOnly"
               v-model.trim="$v.user.phone_number.$model"
               :state="validateState('phone_number')"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'phone_number')">
@@ -273,7 +264,6 @@
                 v-model="user.respect_agent_status"
                 :value="true"
                 :unchecked-value="false"
-                :disabled="viewOnly"
                 @change="(eventPayload) => onUpdateFields(eventPayload, 'respect_agent_status')"
               >
                 Respect agent availability status
@@ -297,7 +287,6 @@
               v-model="user.answers_messages"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'answers_messages')"
             >
               Answers text messages
@@ -321,7 +310,6 @@
                   v-model="user.can_change_contact_ownership"
                   :value="true"
                   :unchecked-value="false"
-                  :disabled="viewOnly"
                   @change="(eventPayload) => onUpdateFields(eventPayload, 'can_change_contact_ownership')"
                 >
                   Can change contact ownership
@@ -345,7 +333,6 @@
                 v-model="user.can_modify_contact_ring_groups"
                 :value="true"
                 :unchecked-value="false"
-                :disabled="viewOnly"
                 @change="(eventPayload) => onUpdateFields(eventPayload, 'can_modify_contact_ring_groups')"
               >
                 Can modify contact ring groups
@@ -369,7 +356,6 @@
                 v-model="user.can_barge_and_whisper_on_call"
                 :value="true"
                 :unchecked-value="false"
-                :disabled="viewOnly"
                 @change="(eventPayload) => onUpdateFields(eventPayload, 'can_barge_and_whisper_on_call')"
               >
                 Can barge and whisper on a call
@@ -395,7 +381,6 @@
               v-model="user.has_broadcast_access"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'has_broadcast_access')">
               Can create and update broadcast
             </b-form-checkbox>
@@ -419,7 +404,6 @@
               v-model="user.can_delete_contact"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'can_delete_contact')">
               Can delete a contact
             </b-form-checkbox>

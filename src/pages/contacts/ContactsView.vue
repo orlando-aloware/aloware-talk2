@@ -187,7 +187,7 @@
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
         <block-tooltip placement="left"
-                       triggers="click"
+                       triggers="hover"
                        target="contacts-create-popover"
                        task="contacts.create"
                        v-if="!canCreateContacts">

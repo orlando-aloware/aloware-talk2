@@ -83,15 +83,15 @@
           </q-btn-toggle>
         </div>
         <block-tooltip placement="left"
-                       triggers="click"
+                       triggers="hover"
                        target="broadcast-popover"
                        task="broadcasts.create"
-                       v-if="viewOnly">
+                       v-if="!this.canAddBroadcasts">
         </block-tooltip>
         <div id="broadcast-popover"
             class="broadcasts__home__header__new-button">
           <compact-btn variant="primary"
-                       :disabled="viewOnly"
+                       :disabled="!this.canAddBroadcasts"
                        v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
                        @clicked="$router.push({ path: '/broadcasts/new' })">
             <plus-icon class="mr-1"
@@ -503,10 +503,6 @@ export default {
       return this.broadcasts.length === 0
     },
 
-    viewOnly () {
-      return this.isViewOnlyAccess()
-    },
-
     contextMenuTarget () {
       return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : '#bulk-action-dropdown'
     },
@@ -572,6 +568,10 @@ export default {
           icon: 'context-menu-delete.svg'
         }
       ]
+    },
+
+    canAddBroadcasts () {
+      return this.enabledToAddBroadcasts()
     }
   },
 
