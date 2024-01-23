@@ -33,7 +33,7 @@ export default {
 
       if (this.isModGen) {
         this.loadScript(process.env.HS_CUSTOM_JS_MOD_GENIUS)
-      } else if (!this.isSimpsocial) {
+      } else if (!this.isSimpSocial) {
         this.loadScript(process.env.HS_CUSTOM_JS)
       }
 
@@ -64,7 +64,7 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
-      if (this.isSimpsocial) {
+      if (this.isSimpSocial) {
         return
       }
 

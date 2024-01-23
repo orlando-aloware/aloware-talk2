@@ -59,7 +59,7 @@
     <tutorial-video-button />
 
     <div class="ml-auto d-block h-100"
-         v-if="!isSimpsocial && !isTrialKYC">
+         v-if="!isSimpSocial && !isTrialKYC">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
         <div class='bridge-menu-wrapper'>
           <div id='referralhero-inline-button'></div>

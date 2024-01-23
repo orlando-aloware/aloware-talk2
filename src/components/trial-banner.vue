@@ -13,7 +13,7 @@
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
                      :should-show-in-first-visit="false"
-                     v-if="isNotSimpsocial && isTrial">
+                     v-if="!isSimpSocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -47,7 +47,7 @@
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
                      :should-show-in-first-visit="false"
-                     v-if="isNotSimpsocial && isTrial">
+                     v-if="!isSimpSocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">

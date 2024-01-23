@@ -5,7 +5,7 @@
                :notes="routeTutorialData.notes"
                :video-url="routeTutorialData.videoUrl"
                :learn-more-link="routeTutorialData.learnMoreLink"
-               v-if="doesRouteHasTutorial && isNotSimpsocial && isTrial"/>
+               v-if="doesRouteHasTutorial && !isSimpSocial && isTrial"/>
 </template>
 
 <script>
