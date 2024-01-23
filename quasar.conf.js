@@ -107,7 +107,7 @@ module.exports = function (/* ctx */) {
         app.use(cors())
       },
 
-      https: false,
+      https: true,
       host: 'localhost',
       port: 9090,
       disableHostCheck: true,
