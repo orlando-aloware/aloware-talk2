@@ -37,7 +37,7 @@
       </b-card>
     </div>
     <contact-tags class="mb-2"
-                 :contact="contact" />
+                  :contact="contact" />
     <contact-notes class="mb-2"
                    :contact="contact"
                    @input="onNotesInput" />
