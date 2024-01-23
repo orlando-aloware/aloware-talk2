@@ -1,6 +1,7 @@
 <template>
   <div class="composer-container">
-    <div class="composer-wrapper"
+    <div id="composer-wrapper"
+         class="composer-wrapper"
          :class="[messageComposer.mode === 'note' ? 'bg-blue-70' : '']">
       <div class="tab-links d-inline-flex">
         <b-link href="#"
@@ -81,6 +82,13 @@
         {{ disabledComplianceMessage }}
       </div>
     </div>
+    <block-tooltip placement="top"
+                   triggers="hover"
+                   target="composer-wrapper"
+                   task="text"
+                   :message="disabledComplianceMessage"
+                   v-if="!canTextToNumber">
+    </block-tooltip>
   </div>
 </template>
 
@@ -101,6 +109,7 @@ import talk2Api from 'src/plugins/api/api'
 import MessageComposerFax from 'components/message-composer/message-composer-fax'
 import MessageComposerEmail from 'components/message-composer/message-composer-email'
 import MessageComposerNote from 'components/message-composer/message-composer-note'
+import BlockTooltip from 'components/kyc/block-tooltip'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as Roles from 'src/constants/roles'
 
@@ -128,7 +137,8 @@ export default {
     MessageComposerFax,
     LineSelector,
     ContactPhoneNumberSelector,
-    MessageComposerSms
+    MessageComposerSms,
+    BlockTooltip
   },
 
   computed: {
@@ -164,6 +174,11 @@ export default {
 
     shouldShowComplianceMessage () {
       return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason']
+    },
+
+    canTextToNumber () {
+      const phoneNumber = this.messageComposer.sms.phone_number
+      return this.enabledToTextNumber(phoneNumber) && !this.disabledComplianceMessage
     }
   },
 

@@ -15,7 +15,7 @@
               pills
               vertical>
         <block-tooltip placement="left"
-                       triggers="hover"
+                       triggers="hover focus"
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
                        :task="blockTooltipHandler.task"
@@ -344,7 +344,7 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.isMessagingBlocked(this.selectedCampaign, true) ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
+      return this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     },
 
     shouldShowComplianceMessage () {

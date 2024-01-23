@@ -129,13 +129,6 @@
               </q-input>
             </div>
 
-            <block-tooltip placement="top"
-                           triggers="hover"
-                           target="message-sms-input"
-                           task="text"
-                           :message="disabledMessage"
-                           v-if="!canTextToNumber">
-            </block-tooltip>
             <q-dialog v-model="urlShortenerDialog"
                       persistent
                       transition-show="scale"
@@ -183,13 +176,6 @@
                    v-if="isOptoutActive">
                   [{{ optoutText.trim() }}]
               </div>
-              <block-tooltip placement="top"
-                             triggers="hover"
-                             target="message-sms-popover"
-                             task="text"
-                             :message="disabledMessage"
-                             v-if="!canTextToNumber">
-              </block-tooltip>
               <div id="message-sms-popover">
                   <q-btn-dropdown split
                                   class="message-composer-send-dropdown-button"
@@ -244,7 +230,6 @@ import VideoPlaceholder from 'components/message-composer/file-placeholders/vide
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { kycMixin } from 'src/plugins/mixins'
 
@@ -262,8 +247,7 @@ export default {
     VideoPlaceholder,
     ImagePlaceholder,
     SmsTemplateModal,
-    ScheduledMessage,
-    BlockTooltip
+    ScheduledMessage
   },
 
   props: {
