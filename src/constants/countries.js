@@ -1,982 +1,1227 @@
 export const COUNTRIES = [
   {
     code: 'AF',
-    name: 'Afghanistan'
+    name: 'Afghanistan',
+    countryCode: '+93'
   },
   {
     code: 'AX',
-    name: 'Aland Islands'
+    name: 'Aland Islands',
+    countryCode: '+358'
   },
   {
     code: 'AL',
-    name: 'Albania'
+    name: 'Albania',
+    countryCode: '+355'
   },
   {
     code: 'DZ',
-    name: 'Algeria'
+    name: 'Algeria',
+    countryCode: '+213'
   },
   {
     code: 'AS',
-    name: 'American Samoa'
+    name: 'American Samoa',
+    countryCode: '+1'
   },
   {
     code: 'AD',
-    name: 'Andorra'
+    name: 'Andorra',
+    countryCode: '+376'
   },
   {
     code: 'AO',
-    name: 'Angola'
+    name: 'Angola',
+    countryCode: '+244'
   },
   {
     code: 'AI',
-    name: 'Anguilla'
+    name: 'Anguilla',
+    countryCode: '+1'
   },
   {
     code: 'AQ',
-    name: 'Antarctica'
+    name: 'Antarctica',
+    countryCode: ''
   },
   {
     code: 'AG',
-    name: 'Antigua And Barbuda'
+    name: 'Antigua And Barbuda',
+    countryCode: '+1'
   },
   {
     code: 'AR',
-    name: 'Argentina'
+    name: 'Argentina',
+    countryCode: '+54'
   },
   {
     code: 'AM',
-    name: 'Armenia'
+    name: 'Armenia',
+    countryCode: '+374'
   },
   {
     code: 'AW',
-    name: 'Aruba'
+    name: 'Aruba',
+    countryCode: '+297'
   },
   {
     code: 'AU',
-    name: 'Australia'
+    name: 'Australia',
+    countryCode: '+61'
   },
   {
     code: 'AT',
-    name: 'Austria'
+    name: 'Austria',
+    countryCode: '+43'
   },
   {
     code: 'AZ',
-    name: 'Azerbaijan'
+    name: 'Azerbaijan',
+    countryCode: '+994'
   },
   {
     code: 'BS',
-    name: 'Bahamas'
+    name: 'Bahamas',
+    countryCode: '+1'
   },
   {
     code: 'BH',
-    name: 'Bahrain'
+    name: 'Bahrain',
+    countryCode: '+973'
   },
   {
     code: 'BD',
-    name: 'Bangladesh'
+    name: 'Bangladesh',
+    countryCode: '+880'
   },
   {
     code: 'BB',
-    name: 'Barbados'
+    name: 'Barbados',
+    countryCode: '+1'
   },
   {
     code: 'BY',
-    name: 'Belarus'
+    name: 'Belarus',
+    countryCode: '+375'
   },
   {
     code: 'BE',
-    name: 'Belgium'
+    name: 'Belgium',
+    countryCode: '+32'
   },
   {
     code: 'BZ',
-    name: 'Belize'
+    name: 'Belize',
+    countryCode: '+501'
   },
   {
     code: 'BJ',
-    name: 'Benin'
+    name: 'Benin',
+    countryCode: '+229'
   },
   {
     code: 'BM',
-    name: 'Bermuda'
+    name: 'Bermuda',
+    countryCode: '+1'
   },
   {
     code: 'BT',
-    name: 'Bhutan'
+    name: 'Bhutan',
+    countryCode: '+975'
   },
   {
     code: 'BO',
-    name: 'Bolivia'
+    name: 'Bolivia',
+    countryCode: '+591'
   },
   {
     code: 'BA',
-    name: 'Bosnia And Herzegovina'
+    name: 'Bosnia And Herzegovina',
+    countryCode: '+387'
   },
   {
     code: 'BW',
-    name: 'Botswana'
+    name: 'Botswana',
+    countryCode: '+267'
   },
   {
     code: 'BV',
-    name: 'Bouvet Island'
+    name: 'Bouvet Island',
+    countryCode: ''
   },
   {
     code: 'BR',
-    name: 'Brazil'
+    name: 'Brazil',
+    countryCode: '+55'
   },
   {
     code: 'IO',
-    name: 'British Indian Ocean Territory'
+    name: 'British Indian Ocean Territory',
+    countryCode: ''
   },
   {
     code: 'BN',
-    name: 'Brunei Darussalam'
+    name: 'Brunei Darussalam',
+    countryCode: '+673'
   },
   {
     code: 'BG',
-    name: 'Bulgaria'
+    name: 'Bulgaria',
+    countryCode: '+359'
   },
   {
     code: 'BF',
-    name: 'Burkina Faso'
+    name: 'Burkina Faso',
+    countryCode: '+226'
   },
   {
     code: 'BI',
-    name: 'Burundi'
+    name: 'Burundi',
+    countryCode: '+257'
   },
   {
     code: 'KH',
-    name: 'Cambodia'
+    name: 'Cambodia',
+    countryCode: '+855'
   },
   {
     code: 'CM',
-    name: 'Cameroon'
+    name: 'Cameroon',
+    countryCode: '+237'
   },
   {
     code: 'CA',
-    name: 'Canada'
+    name: 'Canada',
+    countryCode: '+1'
   },
   {
     code: 'CV',
-    name: 'Cape Verde'
+    name: 'Cape Verde',
+    countryCode: '+238'
   },
   {
     code: 'KY',
-    name: 'Cayman Islands'
+    name: 'Cayman Islands',
+    countryCode: '+1'
   },
   {
     code: 'CF',
-    name: 'Central African Republic'
+    name: 'Central African Republic',
+    countryCode: '+236'
   },
   {
     code: 'TD',
-    name: 'Chad'
+    name: 'Chad',
+    countryCode: '+235'
   },
   {
     code: 'CL',
-    name: 'Chile'
+    name: 'Chile',
+    countryCode: '+56'
   },
   {
     code: 'CN',
-    name: 'China'
+    name: 'China',
+    countryCode: '+86'
   },
   {
     code: 'CX',
-    name: 'Christmas Island'
+    name: 'Christmas Island',
+    countryCode: '+61'
   },
   {
     code: 'CC',
-    name: 'Cocos (Keeling) Islands'
+    name: 'Cocos (Keeling) Islands',
+    countryCode: '+61'
   },
   {
     code: 'CO',
-    name: 'Colombia'
+    name: 'Colombia',
+    countryCode: '+57'
   },
   {
     code: 'KM',
-    name: 'Comoros'
+    name: 'Comoros',
+    countryCode: '+269'
   },
   {
     code: 'CG',
-    name: 'Congo'
+    name: 'Congo',
+    countryCode: '+242'
   },
   {
     code: 'CD',
-    name: 'Congo, Democratic Republic'
+    name: 'Congo, Democratic Republic',
+    countryCode: '+243'
   },
   {
     code: 'CK',
-    name: 'Cook Islands'
+    name: 'Cook Islands',
+    countryCode: '+682'
   },
   {
     code: 'CR',
-    name: 'Costa Rica'
+    name: 'Costa Rica',
+    countryCode: '+506'
   },
   {
     code: 'CI',
-    name: 'Cote D\'Ivoire'
+    name: 'Cote D\'Ivoire',
+    countryCode: '+225'
   },
   {
     code: 'HR',
-    name: 'Croatia'
+    name: 'Croatia',
+    countryCode: '+385'
   },
   {
     code: 'CU',
-    name: 'Cuba'
+    name: 'Cuba',
+    countryCode: '+53'
   },
   {
     code: 'CY',
-    name: 'Cyprus'
+    name: 'Cyprus',
+    countryCode: '+357'
   },
   {
     code: 'CZ',
-    name: 'Czech Republic'
+    name: 'Czech Republic',
+    countryCode: '+420'
   },
   {
     code: 'DK',
-    name: 'Denmark'
+    name: 'Denmark',
+    countryCode: '+45'
   },
   {
     code: 'DJ',
-    name: 'Djibouti'
+    name: 'Djibouti',
+    countryCode: '+253'
   },
   {
     code: 'DM',
-    name: 'Dominica'
+    name: 'Dominica',
+    countryCode: '+1'
   },
   {
     code: 'DO',
-    name: 'Dominican Republic'
+    name: 'Dominican Republic',
+    countryCode: '+1'
   },
   {
     code: 'EC',
-    name: 'Ecuador'
+    name: 'Ecuador',
+    countryCode: '+593'
   },
   {
     code: 'EG',
-    name: 'Egypt'
+    name: 'Egypt',
+    countryCode: '+20'
   },
   {
     code: 'SV',
-    name: 'El Salvador'
+    name: 'El Salvador',
+    countryCode: '+503'
   },
   {
     code: 'GQ',
-    name: 'Equatorial Guinea'
+    name: 'Equatorial Guinea',
+    countryCode: '+240'
   },
   {
     code: 'ER',
-    name: 'Eritrea'
+    name: 'Eritrea',
+    countryCode: '+291'
   },
   {
     code: 'EE',
-    name: 'Estonia'
+    name: 'Estonia',
+    countryCode: '+372'
   },
   {
     code: 'ET',
-    name: 'Ethiopia'
+    name: 'Ethiopia',
+    countryCode: '+251'
   },
   {
     code: 'FK',
-    name: 'Falkland Islands (Malvinas)'
+    name: 'Falkland Islands (Malvinas)',
+    countryCode: '+500'
   },
   {
     code: 'FO',
-    name: 'Faroe Islands'
+    name: 'Faroe Islands',
+    countryCode: '+298'
   },
   {
     code: 'FJ',
-    name: 'Fiji'
+    name: 'Fiji',
+    countryCode: '+679'
   },
   {
     code: 'FI',
-    name: 'Finland'
+    name: 'Finland',
+    countryCode: '+358'
   },
   {
     code: 'FR',
-    name: 'France'
+    name: 'France',
+    countryCode: '+33'
   },
   {
     code: 'GF',
-    name: 'French Guiana'
+    name: 'French Guiana',
+    countryCode: '+594'
   },
   {
     code: 'PF',
-    name: 'French Polynesia'
+    name: 'French Polynesia',
+    countryCode: '+689'
   },
   {
     code: 'TF',
-    name: 'French Southern Territories'
+    name: 'French Southern Territories',
+    countryCode: ''
   },
   {
     code: 'GA',
-    name: 'Gabon'
+    name: 'Gabon',
+    countryCode: '+241'
   },
   {
     code: 'GM',
-    name: 'Gambia'
+    name: 'Gambia',
+    countryCode: '+220'
   },
   {
     code: 'GE',
-    name: 'Georgia'
+    name: 'Georgia',
+    countryCode: '+995'
   },
   {
     code: 'DE',
-    name: 'Germany'
+    name: 'Germany',
+    countryCode: '+49'
   },
   {
     code: 'GH',
-    name: 'Ghana'
+    name: 'Ghana',
+    countryCode: '+233'
   },
   {
     code: 'GI',
-    name: 'Gibraltar'
+    name: 'Gibraltar',
+    countryCode: '+350'
   },
   {
     code: 'GR',
-    name: 'Greece'
+    name: 'Greece',
+    countryCode: '+30'
   },
   {
     code: 'GL',
-    name: 'Greenland'
+    name: 'Greenland',
+    countryCode: '+299'
   },
   {
     code: 'GD',
-    name: 'Grenada'
+    name: 'Grenada',
+    countryCode: '+1'
   },
   {
     code: 'GP',
-    name: 'Guadeloupe'
+    name: 'Guadeloupe',
+    countryCode: '+590'
   },
   {
     code: 'GU',
-    name: 'Guam'
+    name: 'Guam',
+    countryCode: '+1'
   },
   {
     code: 'GT',
-    name: 'Guatemala'
+    name: 'Guatemala',
+    countryCode: '+502'
   },
   {
     code: 'GG',
-    name: 'Guernsey'
+    name: 'Guernsey',
+    countryCode: '+44'
   },
   {
     code: 'GN',
-    name: 'Guinea'
+    name: 'Guinea',
+    countryCode: '+224'
   },
   {
     code: 'GW',
-    name: 'Guinea-Bissau'
+    name: 'Guinea-Bissau',
+    countryCode: '+245'
   },
   {
     code: 'GY',
-    name: 'Guyana'
+    name: 'Guyana',
+    countryCode: '+592'
   },
   {
     code: 'HT',
-    name: 'Haiti'
+    name: 'Haiti',
+    countryCode: '+509'
   },
   {
     code: 'HM',
-    name: 'Heard Island & Mcdonald Islands'
+    name: 'Heard Island & Mcdonald Islands',
+    countryCode: ''
   },
   {
     code: 'VA',
-    name: 'Holy See (Vatican City State)'
+    name: 'Holy See (Vatican City State)',
+    countryCode: '+379'
   },
   {
     code: 'HN',
-    name: 'Honduras'
+    name: 'Honduras',
+    countryCode: '+504'
   },
   {
     code: 'HK',
-    name: 'Hong Kong'
+    name: 'Hong Kong',
+    countryCode: '+852'
   },
   {
     code: 'HU',
-    name: 'Hungary'
+    name: 'Hungary',
+    countryCode: '+36'
   },
   {
     code: 'IS',
-    name: 'Iceland'
+    name: 'Iceland',
+    countryCode: '+354'
   },
   {
     code: 'IN',
-    name: 'India'
+    name: 'India',
+    countryCode: '+91'
   },
   {
     code: 'ID',
-    name: 'Indonesia'
+    name: 'Indonesia',
+    countryCode: '+62'
   },
   {
     code: 'IR',
-    name: 'Iran, Islamic Republic Of'
+    name: 'Iran, Islamic Republic Of',
+    countryCode: '+98'
   },
   {
     code: 'IQ',
-    name: 'Iraq'
+    name: 'Iraq',
+    countryCode: '+964'
   },
   {
     code: 'IE',
-    name: 'Ireland'
+    name: 'Ireland',
+    countryCode: '+353'
   },
   {
     code: 'IM',
-    name: 'Isle Of Man'
+    name: 'Isle Of Man',
+    countryCode: '+44'
   },
   {
     code: 'IL',
-    name: 'Israel'
+    name: 'Israel',
+    countryCode: '+972'
   },
   {
     code: 'IT',
-    name: 'Italy'
+    name: 'Italy',
+    countryCode: '+39'
   },
   {
     code: 'JM',
-    name: 'Jamaica'
+    name: 'Jamaica',
+    countryCode: '+1'
   },
   {
     code: 'JP',
-    name: 'Japan'
+    name: 'Japan',
+    countryCode: '+81'
   },
   {
     code: 'JE',
-    name: 'Jersey'
+    name: 'Jersey',
+    countryCode: '+44'
   },
   {
     code: 'JO',
-    name: 'Jordan'
+    name: 'Jordan',
+    countryCode: '+962'
   },
   {
     code: 'KZ',
-    name: 'Kazakhstan'
+    name: 'Kazakhstan',
+    countryCode: '+7'
   },
   {
     code: 'KE',
-    name: 'Kenya'
+    name: 'Kenya',
+    countryCode: '+254'
   },
   {
     code: 'KI',
-    name: 'Kiribati'
+    name: 'Kiribati',
+    countryCode: '+686'
   },
   {
     code: 'KR',
-    name: 'Korea'
+    name: 'Korea',
+    countryCode: '+82'
   },
   {
     code: 'KW',
-    name: 'Kuwait'
+    name: 'Kuwait',
+    countryCode: '+965'
   },
   {
     code: 'KG',
-    name: 'Kyrgyzstan'
+    name: 'Kyrgyzstan',
+    countryCode: '+996'
   },
   {
     code: 'LA',
-    name: 'Lao People\'s Democratic Republic'
+    name: 'Lao People\'s Democratic Republic',
+    countryCode: '+856'
   },
   {
     code: 'LV',
-    name: 'Latvia'
+    name: 'Latvia',
+    countryCode: '+371'
   },
   {
     code: 'LB',
-    name: 'Lebanon'
+    name: 'Lebanon',
+    countryCode: '+961'
   },
   {
     code: 'LS',
-    name: 'Lesotho'
+    name: 'Lesotho',
+    countryCode: '+266'
   },
   {
     code: 'LR',
-    name: 'Liberia'
+    name: 'Liberia',
+    countryCode: '+231'
   },
   {
     code: 'LY',
-    name: 'Libyan Arab Jamahiriya'
+    name: 'Libyan Arab Jamahiriya',
+    countryCode: '+218'
   },
   {
     code: 'LI',
-    name: 'Liechtenstein'
+    name: 'Liechtenstein',
+    countryCode: '+423'
   },
   {
     code: 'LT',
-    name: 'Lithuania'
+    name: 'Lithuania',
+    countryCode: '+370'
   },
   {
     code: 'LU',
-    name: 'Luxembourg'
+    name: 'Luxembourg',
+    countryCode: '+352'
   },
   {
     code: 'MO',
-    name: 'Macao'
+    name: 'Macao',
+    countryCode: '+853'
   },
   {
     code: 'MK',
-    name: 'Macedonia'
+    name: 'Macedonia',
+    countryCode: '+389'
   },
   {
     code: 'MG',
-    name: 'Madagascar'
+    name: 'Madagascar',
+    countryCode: '+261'
   },
   {
     code: 'MW',
-    name: 'Malawi'
+    name: 'Malawi',
+    countryCode: '+265'
   },
   {
     code: 'MY',
-    name: 'Malaysia'
+    name: 'Malaysia',
+    countryCode: '+60'
   },
   {
     code: 'MV',
-    name: 'Maldives'
+    name: 'Maldives',
+    countryCode: '+960'
   },
   {
     code: 'ML',
-    name: 'Mali'
+    name: 'Mali',
+    countryCode: '+223'
   },
   {
     code: 'MT',
-    name: 'Malta'
+    name: 'Malta',
+    countryCode: '+356'
   },
   {
     code: 'MH',
-    name: 'Marshall Islands'
+    name: 'Marshall Islands',
+    countryCode: '+692'
   },
   {
     code: 'MQ',
-    name: 'Martinique'
+    name: 'Martinique',
+    countryCode: '+596'
   },
   {
     code: 'MR',
-    name: 'Mauritania'
+    name: 'Mauritania',
+    countryCode: '+222'
   },
   {
     code: 'MU',
-    name: 'Mauritius'
+    name: 'Mauritius',
+    countryCode: '+230'
   },
   {
     code: 'YT',
-    name: 'Mayotte'
+    name: 'Mayotte',
+    countryCode: '+262'
   },
   {
     code: 'MX',
-    name: 'Mexico'
+    name: 'Mexico',
+    countryCode: '+52'
   },
   {
     code: 'FM',
-    name: 'Micronesia, Federated States Of'
+    name: 'Micronesia, Federated States Of',
+    countryCode: '+691'
   },
   {
     code: 'MD',
-    name: 'Moldova'
+    name: 'Moldova',
+    countryCode: '+373'
   },
   {
     code: 'MC',
-    name: 'Monaco'
+    name: 'Monaco',
+    countryCode: '+377'
   },
   {
     code: 'MN',
-    name: 'Mongolia'
+    name: 'Mongolia',
+    countryCode: '+976'
   },
   {
     code: 'ME',
-    name: 'Montenegro'
+    name: 'Montenegro',
+    countryCode: '+382'
   },
   {
     code: 'MS',
-    name: 'Montserrat'
+    name: 'Montserrat',
+    countryCode: '+1'
   },
   {
     code: 'MA',
-    name: 'Morocco'
+    name: 'Morocco',
+    countryCode: '+212'
   },
   {
     code: 'MZ',
-    name: 'Mozambique'
+    name: 'Mozambique',
+    countryCode: '+258'
   },
   {
     code: 'MM',
-    name: 'Myanmar'
+    name: 'Myanmar',
+    countryCode: '+95'
   },
   {
     code: 'NA',
-    name: 'Namibia'
+    name: 'Namibia',
+    countryCode: '+264'
   },
   {
     code: 'NR',
-    name: 'Nauru'
+    name: 'Nauru',
+    countryCode: '+674'
   },
   {
     code: 'NP',
-    name: 'Nepal'
+    name: 'Nepal',
+    countryCode: '+977'
   },
   {
     code: 'NL',
-    name: 'Netherlands'
+    name: 'Netherlands',
+    countryCode: '+31'
   },
   {
     code: 'AN',
-    name: 'Netherlands Antilles'
+    name: 'Netherlands Antilles',
+    countryCode: '+599'
   },
   {
     code: 'NC',
-    name: 'New Caledonia'
+    name: 'New Caledonia',
+    countryCode: '+687'
   },
   {
     code: 'NZ',
-    name: 'New Zealand'
+    name: 'New Zealand',
+    countryCode: '+64'
   },
   {
     code: 'NI',
-    name: 'Nicaragua'
+    name: 'Nicaragua',
+    countryCode: '+505'
   },
   {
     code: 'NE',
-    name: 'Niger'
+    name: 'Niger',
+    countryCode: '+227'
   },
   {
     code: 'NG',
-    name: 'Nigeria'
+    name: 'Nigeria',
+    countryCode: '+234'
   },
   {
     code: 'NU',
-    name: 'Niue'
+    name: 'Niue',
+    countryCode: '+683'
   },
   {
     code: 'NF',
-    name: 'Norfolk Island'
+    name: 'Norfolk Island',
+    countryCode: '+672'
   },
   {
     code: 'MP',
-    name: 'Northern Mariana Islands'
+    name: 'Northern Mariana Islands',
+    countryCode: '+1'
   },
   {
     code: 'NO',
-    name: 'Norway'
+    name: 'Norway',
+    countryCode: '+47'
   },
   {
     code: 'OM',
-    name: 'Oman'
+    name: 'Oman',
+    countryCode: '+968'
   },
   {
     code: 'PK',
-    name: 'Pakistan'
+    name: 'Pakistan',
+    countryCode: '+92'
   },
   {
     code: 'PW',
-    name: 'Palau'
+    name: 'Palau',
+    countryCode: '+680'
   },
   {
     code: 'PS',
-    name: 'Palestinian Territory, Occupied'
+    name: 'Palestinian Territory, Occupied',
+    countryCode: '+970'
   },
   {
     code: 'PA',
-    name: 'Panama'
+    name: 'Panama',
+    countryCode: '+507'
   },
   {
     code: 'PG',
-    name: 'Papua New Guinea'
+    name: 'Papua New Guinea',
+    countryCode: '+675'
   },
   {
     code: 'PY',
-    name: 'Paraguay'
+    name: 'Paraguay',
+    countryCode: '+595'
   },
   {
     code: 'PE',
-    name: 'Peru'
+    name: 'Peru',
+    countryCode: '+51'
   },
   {
     code: 'PH',
-    name: 'Philippines'
+    name: 'Philippines',
+    countryCode: '+63'
   },
   {
     code: 'PN',
-    name: 'Pitcairn'
+    name: 'Pitcairn',
+    countryCode: '+870'
   },
   {
     code: 'PL',
-    name: 'Poland'
+    name: 'Poland',
+    countryCode: '+48'
   },
   {
     code: 'PT',
-    name: 'Portugal'
+    name: 'Portugal',
+    countryCode: '+351'
   },
   {
     code: 'PR',
-    name: 'Puerto Rico'
+    name: 'Puerto Rico',
+    countryCode: '+1'
   },
   {
     code: 'QA',
-    name: 'Qatar'
+    name: 'Qatar',
+    countryCode: '+974'
   },
   {
     code: 'RE',
-    name: 'Reunion'
+    name: 'Reunion',
+    countryCode: '+262'
   },
   {
     code: 'RO',
-    name: 'Romania'
+    name: 'Romania',
+    countryCode: '+40'
   },
   {
     code: 'RU',
-    name: 'Russian Federation'
+    name: 'Russian Federation',
+    countryCode: '+7'
   },
   {
     code: 'RW',
-    name: 'Rwanda'
+    name: 'Rwanda',
+    countryCode: '+250'
   },
   {
     code: 'BL',
-    name: 'Saint Barthelemy'
+    name: 'Saint Barthelemy',
+    countryCode: '+590'
   },
   {
     code: 'SH',
-    name: 'Saint Helena'
+    name: 'Saint Helena',
+    countryCode: '+290'
   },
   {
     code: 'KN',
-    name: 'Saint Kitts And Nevis'
+    name: 'Saint Kitts And Nevis',
+    countryCode: '+1'
   },
   {
     code: 'LC',
-    name: 'Saint Lucia'
+    name: 'Saint Lucia',
+    countryCode: '+1'
   },
   {
     code: 'MF',
-    name: 'Saint Martin'
+    name: 'Saint Martin',
+    countryCode: '+590'
   },
   {
     code: 'PM',
-    name: 'Saint Pierre And Miquelon'
+    name: 'Saint Pierre And Miquelon',
+    countryCode: '+508'
   },
   {
     code: 'VC',
-    name: 'Saint Vincent And Grenadines'
+    name: 'Saint Vincent And Grenadines',
+    countryCode: '+1'
   },
   {
     code: 'WS',
-    name: 'Samoa'
+    name: 'Samoa',
+    countryCode: '+685'
   },
   {
     code: 'SM',
-    name: 'San Marino'
+    name: 'San Marino',
+    countryCode: '+378'
   },
   {
     code: 'ST',
-    name: 'Sao Tome And Principe'
+    name: 'Sao Tome And Principe',
+    countryCode: '+239'
   },
   {
     code: 'SA',
-    name: 'Saudi Arabia'
+    name: 'Saudi Arabia',
+    countryCode: '+966'
   },
   {
     code: 'SN',
-    name: 'Senegal'
+    name: 'Senegal',
+    countryCode: '+221'
   },
   {
     code: 'RS',
-    name: 'Serbia'
+    name: 'Serbia',
+    countryCode: '+381'
   },
   {
     code: 'SC',
-    name: 'Seychelles'
+    name: 'Seychelles',
+    countryCode: '+248'
   },
   {
     code: 'SL',
-    name: 'Sierra Leone'
+    name: 'Sierra Leone',
+    countryCode: '+232'
   },
   {
     code: 'SG',
-    name: 'Singapore'
+    name: 'Singapore',
+    countryCode: '+65'
   },
   {
     code: 'SK',
-    name: 'Slovakia'
+    name: 'Slovakia',
+    countryCode: '+421'
   },
   {
     code: 'SI',
-    name: 'Slovenia'
+    name: 'Slovenia',
+    countryCode: '+386'
   },
   {
     code: 'SB',
-    name: 'Solomon Islands'
+    name: 'Solomon Islands',
+    countryCode: '+677'
   },
   {
     code: 'SO',
-    name: 'Somalia'
+    name: 'Somalia',
+    countryCode: '+252'
   },
   {
     code: 'ZA',
-    name: 'South Africa'
+    name: 'South Africa',
+    countryCode: '+27'
   },
   {
     code: 'GS',
-    name: 'South Georgia And Sandwich Isl.'
+    name: 'South Georgia And Sandwich Isl.',
+    countryCode: '+500'
   },
   {
     code: 'ES',
-    name: 'Spain'
+    name: 'Spain',
+    countryCode: '+34'
   },
   {
     code: 'LK',
-    name: 'Sri Lanka'
+    name: 'Sri Lanka',
+    countryCode: '+94'
   },
   {
     code: 'SD',
-    name: 'Sudan'
+    name: 'Sudan',
+    countryCode: '+249'
   },
   {
     code: 'SR',
-    name: 'Suriname'
+    name: 'Suriname',
+    countryCode: '+597'
   },
   {
     code: 'SJ',
-    name: 'Svalbard And Jan Mayen'
+    name: 'Svalbard And Jan Mayen',
+    countryCode: '+47'
   },
   {
     code: 'SZ',
-    name: 'Swaziland'
+    name: 'Swaziland',
+    countryCode: '+268'
   },
   {
     code: 'SE',
-    name: 'Sweden'
+    name: 'Sweden',
+    countryCode: '+46'
   },
   {
     code: 'CH',
-    name: 'Switzerland'
+    name: 'Switzerland',
+    countryCode: '+41'
   },
   {
     code: 'SY',
-    name: 'Syrian Arab Republic'
+    name: 'Syrian Arab Republic',
+    countryCode: '+963'
   },
   {
     code: 'TW',
-    name: 'Taiwan'
+    name: 'Taiwan',
+    countryCode: '+886'
   },
   {
     code: 'TJ',
-    name: 'Tajikistan'
+    name: 'Tajikistan',
+    countryCode: '+992'
   },
   {
     code: 'TZ',
-    name: 'Tanzania'
+    name: 'Tanzania',
+    countryCode: '+255'
   },
   {
     code: 'TH',
-    name: 'Thailand'
+    name: 'Thailand',
+    countryCode: '+66'
   },
   {
     code: 'TL',
-    name: 'Timor-Leste'
+    name: 'Timor-Leste',
+    countryCode: '+670'
   },
   {
     code: 'TG',
-    name: 'Togo'
+    name: 'Togo',
+    countryCode: '+228'
   },
   {
     code: 'TK',
-    name: 'Tokelau'
+    name: 'Tokelau',
+    countryCode: '+690'
   },
   {
     code: 'TO',
-    name: 'Tonga'
+    name: 'Tonga',
+    countryCode: '+676'
   },
   {
     code: 'TT',
-    name: 'Trinidad And Tobago'
+    name: 'Trinidad And Tobago',
+    countryCode: '+1'
   },
   {
     code: 'TN',
-    name: 'Tunisia'
+    name: 'Tunisia',
+    countryCode: '+216'
   },
   {
     code: 'TR',
-    name: 'Turkey'
+    name: 'Turkey',
+    countryCode: '+90'
   },
   {
     code: 'TM',
-    name: 'Turkmenistan'
+    name: 'Turkmenistan',
+    countryCode: '+993'
   },
   {
     code: 'TC',
-    name: 'Turks And Caicos Islands'
+    name: 'Turks And Caicos Islands',
+    countryCode: '+1'
   },
   {
     code: 'TV',
-    name: 'Tuvalu'
+    name: 'Tuvalu',
+    countryCode: '+688'
   },
   {
     code: 'UG',
-    name: 'Uganda'
+    name: 'Uganda',
+    countryCode: '+256'
   },
   {
     code: 'UA',
-    name: 'Ukraine'
+    name: 'Ukraine',
+    countryCode: '+380'
   },
   {
     code: 'AE',
-    name: 'United Arab Emirates'
+    name: 'United Arab Emirates',
+    countryCode: '+971'
   },
   {
     code: 'GB',
-    name: 'United Kingdom'
+    name: 'United Kingdom',
+    countryCode: '+44'
   },
   {
     code: 'US',
-    name: 'United States'
+    name: 'United States',
+    countryCode: '+1'
   },
   {
     code: 'UM',
-    name: 'United States Outlying Islands'
+    name: 'United States Outlying Islands',
+    countryCode: ''
   },
   {
     code: 'UY',
-    name: 'Uruguay'
+    name: 'Uruguay',
+    countryCode: '+598'
   },
   {
     code: 'UZ',
-    name: 'Uzbekistan'
+    name: 'Uzbekistan',
+    countryCode: '+998'
   },
   {
     code: 'VU',
-    name: 'Vanuatu'
+    name: 'Vanuatu',
+    countryCode: '+678'
   },
   {
     code: 'VE',
-    name: 'Venezuela'
+    name: 'Venezuela',
+    countryCode: '+58'
   },
   {
     code: 'VN',
-    name: 'Viet Nam'
+    name: 'Viet Nam',
+    countryCode: '+84'
   },
   {
     code: 'VG',
-    name: 'Virgin Islands, British'
+    name: 'Virgin Islands, British',
+    countryCode: '+1'
   },
   {
     code: 'VI',
-    name: 'Virgin Islands, U.S.'
+    name: 'Virgin Islands, U.S.',
+    countryCode: '+1'
   },
   {
     code: 'WF',
-    name: 'Wallis And Futuna'
+    name: 'Wallis And Futuna',
+    countryCode: '+681'
   },
   {
     code: 'EH',
-    name: 'Western Sahara'
+    name: 'Western Sahara',
+    countryCode: '+212'
   },
   {
     code: 'YE',
-    name: 'Yemen'
+    name: 'Yemen',
+    countryCode: '+967'
   },
   {
     code: 'ZM',
-    name: 'Zambia'
+    name: 'Zambia',
+    countryCode: '+260'
   },
   {
     code: 'ZW',
-    name: 'Zimbabwe'
+    name: 'Zimbabwe',
+    countryCode: '+263'
   }
 ]

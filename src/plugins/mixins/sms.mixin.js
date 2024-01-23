@@ -1,4 +1,5 @@
 import * as SMS from 'src/constants/sms'
+import { mapGetters } from 'vuex'
 
 export default {
   data () {
@@ -10,6 +11,17 @@ export default {
       segments: 0,
       segmentUsedChars: 0,
       hasUnicode: false
+    }
+  },
+
+  computed: {
+    ...mapGetters('contacts', [
+      'isOptoutActive',
+      'optoutText'
+    ]),
+
+    optoutTextLength () {
+      return this.isOptoutActive ? this.optoutText.length : 0
     }
   },
 
@@ -52,7 +64,7 @@ export default {
       })
 
       this.smartEncodedMessageLength =
-        message.length + this.smartEncodingExtraChars
+        message.length + this.optoutTextLength + this.smartEncodingExtraChars
 
       this.getMessageInfo(message)
 

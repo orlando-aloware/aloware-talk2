@@ -307,6 +307,10 @@ export default {
       }
 
       return head(url.split('?')).split('/').pop()
+    },
+
+    showAudio (communication) {
+      return communication.has_recording || communication.recording_is_deleted
     }
   }
 }

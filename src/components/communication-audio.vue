@@ -1,6 +1,6 @@
 <template>
   <div class="w-100">
-    <div v-if="hasAudio">
+    <div v-if="!isDeleted && hasAudio">
       <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"
              v-if="remoteUrl">
@@ -16,6 +16,10 @@
         </div>
       </div>
     </div>
+    <span class="text-grey-900 record-was-deleted-label"
+          v-if="isDeleted">
+      record was deleted
+    </span>
   </div>
 </template>
 
@@ -71,6 +75,10 @@ export default {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.has_recording : this.communication.has_voicemail
     },
 
+    isDeleted () {
+      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.recording_is_deleted : false
+    },
+
     title () {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Play Recording' : 'Play Voicemail'
     }
@@ -82,7 +90,7 @@ export default {
 
   methods: {
     onShow () {
-      if (this.hasAudio) {
+      if (this.hasAudio && !this.isDeleted) {
         this.loading = true
         this.remoteUrl = null
         this.downloadUrl = null

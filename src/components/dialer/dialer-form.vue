@@ -15,10 +15,11 @@
               pills
               vertical>
         <block-tooltip placement="left"
-                       triggers="click"
+                       triggers="hover"
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
-                       :task="blockTooltipHandler.task">
+                       :task="blockTooltipHandler.task"
+                       v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
                :active="mode === 'call'"
@@ -156,6 +157,7 @@
                                placeholder="Text Message..."
                                rows="2"
                                max-rows="3"
+                               :disabled="isBlockTooltipPopoverEnabled"
                                v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
@@ -303,6 +305,22 @@ export default {
 
     sendDisabled () {
       return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
+    },
+
+    isBlockTooltipPopoverEnabled () {
+      if (this.disabledComplianceMessage) {
+        return true
+      }
+
+      if (this.mode === 'call') {
+        return !this.enabledToCallNumber(this.phoneNumber)
+      }
+
+      if (this.mode === 'text') {
+        return !this.enabledToTextNumber(this.phoneNumber)
+      }
+
+      return !this.enabledToCallNumber(this.phoneNumber) || !this.enabledToTextNumber(this.phoneNumber)
     },
 
     dialerFormClass () {
@@ -551,7 +569,6 @@ export default {
     },
 
     hideBlockTooltip () {
-      console.log('hideBlockTooltip')
       this.blockTooltipHandler.show = false
     }
   },

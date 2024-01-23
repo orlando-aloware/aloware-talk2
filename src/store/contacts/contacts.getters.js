@@ -74,6 +74,19 @@ export default {
   removedFolder: (state) => state.removedFolder,
   clearList: (state) => state.clearList,
   isAllContactsSelected: (state) => state.isAllContactsSelected,
+  isOptoutActive: (state) => state.isOptoutActive,
+  optoutText: (state) => state.optoutText,
+  messageBodyWithOptout: (state) => {
+    const optoutText = state.optoutText
+    const messageBody = state.messageComposer.sms.body
+    const isOptoutActive = state.isOptoutActive
+
+    if (!isOptoutActive) {
+      return messageBody
+    }
+
+    return `${messageBody}${optoutText}`
+  },
   isContactSaveBarVisible: (state) => {
     const hasChanges = (state.changedContactProperties.length > 0 || state.changedContactAttributes.length > 0)
 

@@ -665,6 +665,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
+  z-index: 1;
 
   & .q-item {
     padding: 0;
@@ -1285,6 +1286,10 @@ i.option-separator {
   resize: none !important;
   max-height: 31vh;
   overflow-y: auto !important;
+}
+
+.handle-whitespace {
+  white-space: pre-line;
 }
 
 .q-input-composer .q-field__native,
@@ -2113,6 +2118,7 @@ i.option-separator {
   overflow: hidden;
   position: relative;
   background: $grey-50;
+  height: 100%;
 
   .contact-activity-wrapper.w-less-630px {
     width: calc(100% - 630px)
@@ -2318,6 +2324,8 @@ i.option-separator {
 
 //ABOUT THIS CONTACT
 .contact-about-wrapper {
+  padding-bottom: 10px;
+
   .information-container {
     display: flex;
     flex-direction: column;
@@ -2338,7 +2346,8 @@ i.option-separator {
     background: transparent;
     border: 1px solid $grey-60;
     position: absolute;
-    margin: 0;
+    margin: 8px 0 0 0;
+    padding: 0 0 0 1px;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -2348,6 +2357,12 @@ i.option-separator {
     & .material-icons {
       margin: auto auto;
       display: block;
+    }
+
+    & .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }
@@ -5605,6 +5620,10 @@ button#bs-folder-options {
   margin: auto;
   overflow-y: auto;
   overflow-x: auto;
+
+  .datatable {
+    z-index: 0;
+  }
 }
 
 .paginated {
@@ -11579,6 +11598,12 @@ screen and (max-width: 956px) {
 
 .communication-details-card {
 
+  .record-was-deleted-label {
+    margin-top: 1rem !important;
+    line-height: 1.2em !important;
+    display: block;
+  }
+
   .header-line {
     margin-bottom: 33px !important;
   }
@@ -11612,6 +11637,11 @@ screen and (max-width: 956px) {
 
   .q-item__label:not(.custom-item-label) {
     margin-top: 0.25rem !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  .q-item__label.custom-item-label {
     padding-left: 5px !important;
     padding-right: 5px !important;
   }
@@ -13146,7 +13176,6 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
-
         &.paused {
           border-color: $warning;
         }
@@ -13394,6 +13423,7 @@ h1.contact-list-name-label {
                   border-radius: 8px;
                   padding: 10px;
                   transition: all .3s;
+                  min-height: 58px;
 
                   textarea {
                     color: $white;
@@ -13401,6 +13431,11 @@ h1.contact-list-name-label {
 
                   &--empty {
                     background-color: $grey-70;
+                  }
+
+                  &__image {
+                    display: block;
+                    margin-bottom: 10px;
                   }
                 }
               }

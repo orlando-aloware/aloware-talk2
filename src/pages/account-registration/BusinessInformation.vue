@@ -9,6 +9,7 @@
                                    ref="businessInformationForm"
                                    :should-show-action-buttons="true"
                                    :is-loading="isLoading"
+                                   :ssu="ssu"
                                    @submit="onSubmit"
                                    @back-to-dashboard="onBackToPreviousRoute"
                                    @skip-for-now="onBackToPreviousRoute" />
@@ -22,6 +23,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'BusinessInformation',
@@ -33,7 +35,8 @@ export default {
 
   data () {
     return {
-      isLoading: false
+      isLoading: false,
+      ssu: {}
     }
   },
 
@@ -70,7 +73,7 @@ export default {
         user_id: this.profile.id
       }
 
-      this.$axios.patch(`/api/admin/company-registration/${preSignupId}`, payload)
+      API.V1.accountRegistration.update({ preSignupId }, payload)
         .then((res) => {
           this.isSubmitted = true
 
@@ -90,9 +93,26 @@ export default {
         })
     },
 
+    async getSSUData () {
+      this.isLoading = true
+      API.V1.accountRegistration.getSSUData()
+        .then((res) => {
+          this.ssu = res.data.data
+        })
+        .catch(() => {
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
     created () {
       this.setShowedKycDialog(true)
     }
+  },
+
+  mounted () {
+    this.getSSUData()
   }
 }
 </script>
