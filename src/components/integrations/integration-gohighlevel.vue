@@ -153,6 +153,18 @@ export default {
 
     whiteLabelText () {
       return this.statics.whitelabel ? this.statics.name : 'Aloware'
+    },
+
+    isContactValid () {
+      return this.contact && this.contact.id
+    },
+
+    isRouteMatch () {
+      return this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer'
+    },
+
+    isContactAndRouteValid () {
+      return this.isContactValid && this.isRouteMatch
     }
   },
 
@@ -200,7 +212,7 @@ export default {
 
   watch: {
     'contact.id': _.debounce(function () {
-      if (this.contact && this.contact.id && (this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer')) {
+      if (this.isContactAndRouteValid) {
         this.contactIntegrationDataLoaded = false
         this.getData()
       }
