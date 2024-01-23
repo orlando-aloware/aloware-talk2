@@ -113,6 +113,7 @@ jobs:
           XMAS_ENABLED: ${{ secrets.xmas_enabled }}
           XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
+          USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           file-name: .env.prod
 
       - name: Build/release Electron mac app
@@ -185,3 +186,6 @@ jobs:
 
           # Read Reviews
           URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
+
+          # Userpilot
+          USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
