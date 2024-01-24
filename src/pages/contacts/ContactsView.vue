@@ -83,7 +83,7 @@
               My Contacts
             </label>
             <b-form-checkbox id="my-contacts"
-                             class="mt-2 cursor-pointer"
+                             class="mt-2 cursor-pointer z-0"
                              name="check-button"
                              size="sm"
                              switch
@@ -187,7 +187,7 @@
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
         <block-tooltip placement="left"
-                       triggers="click"
+                       triggers="hover"
                        target="contacts-create-popover"
                        task="contacts.create"
                        v-if="!canCreateContacts">

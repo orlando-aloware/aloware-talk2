@@ -1,6 +1,6 @@
 <template>
   <div class="trial-banner"
-       v-if="!shouldShow">
+       v-if="shouldShow">
     <div class="left-content">
       <p class="trial--text">{{ trialText }}</p>
       <div class="d-flex"
@@ -94,7 +94,7 @@
 
 <script>
 import { simpsocialMixin } from 'src/plugins/mixins'
-import { mapState, mapGetters } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
 
@@ -112,7 +112,7 @@ export default {
 
   data () {
     return {
-      shouldShow: false
+      shouldShow: true
     }
   },
 
@@ -141,8 +141,11 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setIsTrialBannerVisible']),
+
     closeBanner () {
-      this.shouldShow = true
+      this.shouldShow = false
+      this.setIsTrialBannerVisible(false)
     },
 
     openBookDemo () {
@@ -162,6 +165,12 @@ export default {
 
     openWatchGuideVideo () {
       this.$refs.videoModal.openModal()
+    }
+  },
+
+  mounted () {
+    if (this.isCompanyKYC) {
+      this.setIsTrialBannerVisible(true)
     }
   }
 }

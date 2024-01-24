@@ -1,5 +1,6 @@
 <template>
-  <div class="contact-activity-container w-100">
+  <div class="contact-activity-container w-100"
+       :class="{ 'h-93': isTrialBannerVisible }">
     <contact-activities-header
       :label="contactName"
       :hasUnreads="hasUnreads"
@@ -60,7 +61,7 @@
 
 <script>
 import _ from 'lodash'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ContactActivitiesHeader from 'src/components/contacts/contact-activities-header'
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
@@ -109,6 +110,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['isTrialBannerVisible']),
     ...mapGetters('contacts', ['contact']),
     contactName () {
       if (this.contact && this.contact.name) {

@@ -21,13 +21,11 @@
         <block-tooltip placement="left"
                        triggers="click"
                        target="sms-template-popover"
-                       task="sms.template"
-                       v-if="viewOnly">
+                       task="sms.template">
         </block-tooltip>
         <div id="sms-template-popover">
           <b-button variant="primary"
                     size="sm"
-                    :disabled="viewOnly"
                     @click="onAdd('user')">
             <i class="fa fa-plus mr-1" /> New Template
           </b-button>
@@ -82,7 +80,6 @@
                   <div>
                     <b-button size="sm"
                               variant="primary"
-                              :disabled="viewOnly"
                               @click="onEdit(template)">
 
                       <pencil-o-icon color="#FFF"/>
@@ -90,7 +87,6 @@
                     <b-button size="sm"
                               variant="danger"
                               class="ml-1"
-                              :disabled="viewOnly"
                               @click="onDelete(template)">
 
                       <trash-o-icon color="#FFF"/>
