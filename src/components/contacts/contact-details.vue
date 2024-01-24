@@ -29,10 +29,6 @@
                          :contact="contact"
                          @input="onNotesInput"/>
           <contact-integrations :contact="contact"/>
-          <contact-reservations v-if="contact && showGuestyReservations"
-                                :contact="contact"/>
-          <contact-reservations-messages v-if="contact && showGuestyReservations"
-                                :contact="contact"/>
           <contact-scheduled-messages/>
           <contact-activity-counts :summary="communicationsSummary.summaries"/>
           <contact-lines/>
@@ -58,7 +54,7 @@ import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
-import { mapGetters, mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
@@ -66,8 +62,6 @@ import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
-import ContactReservations from 'components/contacts/contact-reservations.vue'
-import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import {
   aclMixin,
   contactMixin,
@@ -119,14 +113,11 @@ export default {
     ContactPhones,
     ContactTags,
     BackButton,
-    ContactAlohaBot,
-    ContactReservations,
-    ContactReservationsMessages
+    ContactAlohaBot
   },
 
   computed: {
     ...mapGetters('contacts', ['contact', 'contactClone']),
-    ...mapState('cache', ['currentCompany']),
 
     contactName () {
       if (this.contact && this.contact.name) {
@@ -149,10 +140,6 @@ export default {
         name: 'notes',
         value: value
       })
-    },
-
-    showGuestyReservations () {
-      return this.currentCompany.is_multi_guesty
     }
   },
 
