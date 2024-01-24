@@ -444,7 +444,8 @@ export default {
         message_body: this.messageBodyWithOptout,
         throttle_limit: this.throttle.value,
         accept_outside_business_hours: this.acceptedOutsideBusinessHours,
-        is_scheduled: this.time.time === 'scheduled'
+        is_scheduled: this.time.time === 'scheduled',
+        opt_out_bypassed: !this.isOptoutActive
       }
 
       switch (this.type) {

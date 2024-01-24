@@ -34,6 +34,7 @@
           <q-checkbox class="pr-4"
                       label="Add opt-out phrase for this message"
                       size="xs"
+                      :disable="isOptOutForced"
                       v-model="isOptoutActiveComputed"/>
           <span class="mr-4">
             Message parts: {{ messagePartCount }} / {{ baseLine }}
@@ -144,6 +145,10 @@ export default {
   }),
 
   computed: {
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapState([
       'campaigns'
     ]),
@@ -167,6 +172,10 @@ export default {
       set (value) {
         return this.setIsOptoutActive(value)
       }
+    },
+
+    isOptOutForced () {
+      return this.currentCompany.force_opt_out_phrase
     },
 
     maxSmsBodyWithOptoutLength () {
