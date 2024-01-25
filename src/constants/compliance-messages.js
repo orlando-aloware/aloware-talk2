@@ -1,0 +1,1 @@
+export const IS_OPT_OUT_FORCED = 'To comply with messaging regulations, adding the opt-out phrase in the message is enforced on the account level. If you wish to deactivate this feature, please contact us for assistance.'
