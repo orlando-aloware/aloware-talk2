@@ -112,7 +112,7 @@ import MessageComposerSmsPreview from 'src/components/message-composer/message-c
 import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, smsMixin } from 'src/plugins/mixins'
-import { IS_OPT_OUT_FORCED } from '../../constants/compliance-messages'
+import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
   name: 'broadcast-add-view-message',
@@ -274,7 +274,7 @@ export default {
     },
 
     optoutTooltipText () {
-      return IS_OPT_OUT_FORCED
+      return IS_OPT_OUT_FORCED_TEXT
     }
   },
 
