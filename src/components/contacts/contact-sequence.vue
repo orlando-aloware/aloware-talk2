@@ -59,7 +59,7 @@
                     class="btn-contact-sequence-enrol"
                     block
                     @click="openSequenceModal"
-                    :disabled="!enabledToAddSequences()">
+                    :disabled="!enabledToAddSequences() || !isEnabledToEnroll">
             <add-sequence-icon color="white"
                               :height="12"
                               :width="12">
@@ -123,6 +123,8 @@ export default {
       'sequenceInfoLoading'
     ]),
 
+    ...mapState('cache', ['currentCompany']),
+
     isContactValid () {
       return this.contact && this.contact.id
     },
@@ -133,6 +135,10 @@ export default {
 
     isContactAndRouteValid () {
       return this.isContactValid && this.isRouteMatch
+    },
+
+    isEnabledToEnroll () {
+      return this.currentCompany?.automation_enabled
     }
   },
 
