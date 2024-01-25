@@ -135,6 +135,9 @@ export default {
         case 'sequences':
           text = 'sequences'
           break
+        case 'sequences.enroll':
+          text = 'enroll to sequences'
+          break
         case 'ring-group.create':
           text = 'create ring group'
           break

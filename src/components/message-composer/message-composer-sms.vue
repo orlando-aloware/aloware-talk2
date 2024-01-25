@@ -480,6 +480,9 @@ export default {
     },
 
     onKeyDown (evt) {
+      if (this.isSendTextInputDisabled) {
+        return
+      }
       if (evt.keyCode === 13 && !evt.shiftKey && !this.isBroadcast) {
         if (this.validSms) {
           this.onSend()
