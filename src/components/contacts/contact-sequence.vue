@@ -121,7 +121,19 @@ export default {
     ...mapState('contacts', [
       'sequenceInfo',
       'sequenceInfoLoading'
-    ])
+    ]),
+
+    isContactValid () {
+      return this.contact && this.contact.id
+    },
+
+    isRouteMatch () {
+      return this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer'
+    },
+
+    isContactAndRouteValid () {
+      return this.isContactValid && this.isRouteMatch
+    }
   },
 
   methods: {
@@ -193,7 +205,8 @@ export default {
 
   watch: {
     'contact.id': _.debounce(function (value) {
-      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+      if (this.isContactAndRouteValid) {
+        this.resetSequence()
         this.getSequenceInfo()
       }
     }, 500),
@@ -204,9 +217,10 @@ export default {
 
     sequenceInfo: {
       deep: true,
-      handler: function (data) {
+      handler (data) {
         this.sequence = data.sequence
         this.workflow = data.workflow
+
         this.emitSequenceInfo()
       }
     }

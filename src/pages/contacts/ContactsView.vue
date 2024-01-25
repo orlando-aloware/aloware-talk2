@@ -97,7 +97,7 @@
             <compact-btn borderless
                          variant="outlined-light"
                          customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                         v-if="isSimpsocial"
+                         v-if="isSimpSocial"
                          @clicked="onMessengerClick">
               <iframe id="ss-messenger-button"
                       frameborder="0"

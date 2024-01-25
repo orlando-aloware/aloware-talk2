@@ -59,7 +59,7 @@ export default {
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),
           text: 'Estimated Cost',
-          enabled: this.isNotSimpsocial
+          enabled: !this.isSimpSocial
         }
       ].filter(card => card.enabled)
     },
