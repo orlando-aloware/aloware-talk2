@@ -169,7 +169,9 @@ export default {
   },
 
   mounted () {
-    this.setIsTrialBannerVisible(true)
+    if (this.isCompanyKYC) {
+      this.setIsTrialBannerVisible(true)
+    }
   }
 }
 </script>

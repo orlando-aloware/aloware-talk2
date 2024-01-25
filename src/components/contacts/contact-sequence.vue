@@ -46,18 +46,29 @@
           This contact is currently not enrolled to a sequence.
         </b-card-text>
 
-        <b-button variant="outline-primary"
-                  size="sm"
-                  class="btn-contact-sequence-enrol"
-                  block
-                  @click="openSequenceModal">
-          <add-sequence-icon color="white"
-                             :height="12"
-                             :width="12">
+        <block-tooltip placement="left"
+                       triggers="hover"
+                       target="enroll-to-sequence-popover"
+                       task="sequences.enroll"
+                       v-if="!enabledToAddSequences()">
+        </block-tooltip>
 
-          </add-sequence-icon>
-          Enroll To Sequence
-        </b-button>
+        <div id="enroll-to-sequence-popover">
+          <b-button variant="outline-primary"
+                    size="sm"
+                    class="btn-contact-sequence-enrol"
+                    block
+                    @click="openSequenceModal"
+                    :disabled="!enabledToAddSequences()">
+            <add-sequence-icon color="white"
+                              :height="12"
+                              :width="12">
+
+            </add-sequence-icon>
+            Enroll To Sequence
+          </b-button>
+        </div>
+
         <enroll-sequence-modal></enroll-sequence-modal>
       </div>
     </b-card>
@@ -78,11 +89,17 @@ import EnrollSequenceModal from 'components/enroll-sequence-modal'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
+import BlockTooltip from 'components/kyc/block-tooltip'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-sequence',
 
-  components: { EnrollSequenceModal, AddSequenceIcon },
+  mixins: [
+    kycMixin
+  ],
+
+  components: { EnrollSequenceModal, AddSequenceIcon, BlockTooltip },
 
   data () {
     return {

@@ -1,6 +1,5 @@
 <template>
   <b-card header-tag="header"
-          :disabled="viewOnly"
           footer-tag="footer"
           title="Record an audio file"
   >
