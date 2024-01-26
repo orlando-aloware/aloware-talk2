@@ -310,6 +310,10 @@ export default {
     },
 
     isBlockTooltipPopoverEnabled () {
+      if (!this.isTrialKYC) {
+        return false
+      }
+
       if (this.mode === 'text' && this.disabledComplianceMessage) {
         return true
       }

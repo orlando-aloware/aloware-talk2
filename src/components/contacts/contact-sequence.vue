@@ -46,18 +46,29 @@
           This contact is currently not enrolled to a sequence.
         </b-card-text>
 
-        <b-button variant="outline-primary"
-                  size="sm"
-                  class="btn-contact-sequence-enrol"
-                  block
-                  @click="openSequenceModal">
-          <add-sequence-icon color="white"
-                             :height="12"
-                             :width="12">
+        <block-tooltip placement="left"
+                       triggers="hover"
+                       target="enroll-to-sequence-popover"
+                       task="sequences.enroll"
+                       v-if="!enabledToAddSequences()">
+        </block-tooltip>
 
-          </add-sequence-icon>
-          Enroll To Sequence
-        </b-button>
+        <div id="enroll-to-sequence-popover">
+          <b-button variant="outline-primary"
+                    size="sm"
+                    class="btn-contact-sequence-enrol"
+                    block
+                    @click="openSequenceModal"
+                    :disabled="!enabledToAddSequences() || !isEnabledToEnroll">
+            <add-sequence-icon color="white"
+                              :height="12"
+                              :width="12">
+
+            </add-sequence-icon>
+            Enroll To Sequence
+          </b-button>
+        </div>
+
         <enroll-sequence-modal></enroll-sequence-modal>
       </div>
     </b-card>
@@ -78,11 +89,17 @@ import EnrollSequenceModal from 'components/enroll-sequence-modal'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
+import BlockTooltip from 'components/kyc/block-tooltip'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-sequence',
 
-  components: { EnrollSequenceModal, AddSequenceIcon },
+  mixins: [
+    kycMixin
+  ],
+
+  components: { EnrollSequenceModal, AddSequenceIcon, BlockTooltip },
 
   data () {
     return {
@@ -104,7 +121,25 @@ export default {
     ...mapState('contacts', [
       'sequenceInfo',
       'sequenceInfoLoading'
-    ])
+    ]),
+
+    ...mapState('cache', ['currentCompany']),
+
+    isContactValid () {
+      return this.contact && this.contact.id
+    },
+
+    isRouteMatch () {
+      return this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer'
+    },
+
+    isContactAndRouteValid () {
+      return this.isContactValid && this.isRouteMatch
+    },
+
+    isEnabledToEnroll () {
+      return this.currentCompany?.automation_enabled
+    }
   },
 
   methods: {
@@ -176,7 +211,8 @@ export default {
 
   watch: {
     'contact.id': _.debounce(function (value) {
-      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+      if (this.isContactAndRouteValid) {
+        this.resetSequence()
         this.getSequenceInfo()
       }
     }, 500),
@@ -187,9 +223,10 @@ export default {
 
     sequenceInfo: {
       deep: true,
-      handler: function (data) {
+      handler (data) {
         this.sequence = data.sequence
         this.workflow = data.workflow
+
         this.emitSequenceInfo()
       }
     }
