@@ -54,7 +54,6 @@
           </b-button>
           <b-button variant="danger"
                     class="ml-2"
-                    :disabled="viewOnly"
                     @click="removeUploadedFile">
             <i class="fa fa-times"></i> Remove
           </b-button>
@@ -70,8 +69,7 @@
 
           <b-card title="Upload an audio file"
                   header-tag="header"
-                  footer-tag="footer"
-                  :disabled="viewOnly">
+                  footer-tag="footer">
             <file-uploader accepted-file-types=".mp3, .wav"
                            :upload-url="vmDropUploadUrl"
                            @fileUploaded="fileUploaded">

@@ -1,6 +1,6 @@
 <template>
   <div class="upgrade-now no-select"
-       v-if="!isSimpsocial">
+       v-if="!isSimpSocial">
       <h3 class="title-text mt-2">{{ titleText }}</h3>
       <div class="flex-row mb-4 mt-2">
           <div class="col-12 col-md-10 offset-md-1">
