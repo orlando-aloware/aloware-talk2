@@ -12,7 +12,7 @@
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false"
+                     :should-show-in-first-visit="true"
                      v-if="!isSimpSocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
@@ -46,7 +46,7 @@
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false"
+                     :should-show-in-first-visit="true"
                      v-if="!isSimpSocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
