@@ -151,7 +151,7 @@ export default {
     },
 
     classicUrlCompliancePage () {
-      return process.env.API_URL + '/account?tab=compliance?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
+      return process.env.API_URL + '/account?tab=compliance'
     }
   },
 
