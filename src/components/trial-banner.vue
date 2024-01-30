@@ -107,7 +107,6 @@ import { simpsocialMixin } from 'src/plugins/mixins'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
-import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'TrialBanner',
