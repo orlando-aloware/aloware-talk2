@@ -142,7 +142,11 @@ export default {
     },
 
     trialText () {
-      const dayNoun = this.currentCompany.trial_remaining_days > 1 ? 'days' : 'day'
+      if (typeof this.currentCompany.trial_remaining_days === 'undefined' || typeof this.currentCompany.trial_days === 'undefined') {
+        return `Welcome, ${this.profile.first_name}, your account is on trial.`
+      }
+
+      const dayNoun = this.currentCompany.trial_remaining_days === 1 ? 'day' : 'days'
       return `Welcome, ${this.profile.first_name}, you have ${this.currentCompany.trial_remaining_days} ${dayNoun} left until your ${this.currentCompany.trial_days}-day trial account expires.`
     },
 
