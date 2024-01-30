@@ -79,10 +79,16 @@
                unelevated
                v-if="isCompanyKYC && !kycFilled"
                @click="onOpenFinishRegistration" />
-        <p class="trial--text"
-           v-else>
-          We are verifying your business
-        </p>
+        <q-btn class="q-mr-lg"
+               color="primary"
+               size="md"
+               label="Registration in Review"
+               rounded
+               dense
+               no-caps
+               unelevated
+               v-else
+               @click="onOpenRegistrationInReview" />
       </div>
       <div class="button-index">
         <compact-btn customClass="fs-24 _500 position-relative not-focusable text-red-130"
@@ -101,6 +107,7 @@ import { simpsocialMixin } from 'src/plugins/mixins'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'TrialBanner',
@@ -141,6 +148,10 @@ export default {
 
     isBigScreen () {
       return this.$q.screen.width > 1280
+    },
+
+    classicUrlCompliancePage () {
+      return process.env.API_URL + '/account?tab=compliance?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
     }
   },
 
@@ -165,6 +176,10 @@ export default {
         name: 'Business Information',
         params: { company_id: this.currentCompany.id }
       })
+    },
+
+    onOpenRegistrationInReview () {
+      window.location.href = this.classicUrlCompliancePage
     },
 
     openWatchGuideVideo () {
