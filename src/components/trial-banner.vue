@@ -79,6 +79,10 @@
                unelevated
                v-if="isCompanyKYC && !kycFilled"
                @click="onOpenFinishRegistration" />
+        <p class="trial--text"
+           v-else>
+          We are verifying your business
+        </p>
       </div>
       <div class="button-index">
         <compact-btn customClass="fs-24 _500 position-relative not-focusable text-red-130"
