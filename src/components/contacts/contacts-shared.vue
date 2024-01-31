@@ -14,22 +14,17 @@
       </contacts-shared-item>
       <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
 
-      <div class="q-pa-lg flex flex-center"
-         style="min-height: 56px;"
-         v-if="paginated">
-        <q-pagination class="pagination"
-                      padding="0 2px"
+      <div class="paginated q-pa-lg flex flex-center"
+           style="min-height: 56px;"
+           v-if="paginated">
+        <q-pagination class="table-pagination"
+                      padding="0 5px"
                       direction-links
                       :max="lastPage"
-                      flat
+                      dense
                       :ellipses="false"
                       :boundary-numbers="false"
-                      color="blue"
-                      text-color="blue"
-                      active-design="push"
-                      active-color="yellow"
-                      v-model="paginationPage"
-                      >
+                      v-model="paginationPage">
         </q-pagination>
 
       </div>
