@@ -29,7 +29,6 @@
                       active-design="push"
                       active-color="yellow"
                       v-model="paginationPage"
-                      @input="loadFolders"
                       >
         </q-pagination>
 
@@ -54,7 +53,7 @@ export default {
   props: {
     paginated: {
       type: Boolean,
-      default: true
+      default: false
     },
 
     lastPage: {
@@ -75,7 +74,7 @@ export default {
       layer: 1,
       listeners: {},
       paginationPage: 1,
-      perPage: 5
+      perPage: 20
     }
   },
   methods: {
@@ -103,6 +102,11 @@ export default {
       }).then(response => {
         const total = response.data.total
         this.lastPage = Math.ceil(total > this.perPage ? Math.ceil(total / this.perPage) : 1)
+
+        if (total > this.perPage) {
+          this.paginated = true
+        }
+
         this.lists = response.data.data
       }).catch((err) => {
         console.error(err)
@@ -147,10 +151,12 @@ export default {
 
     paginationPage: function () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
+      this.loadFolders()
     },
 
     perPage: function () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
+      this.loadFolders()
     },
 
     $route (to) {
