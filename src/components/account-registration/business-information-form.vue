@@ -174,11 +174,11 @@
               <div class="zipcode-hint"
                    :class="validateFieldError('postal_code') ? 'negative-top' : ''">
                 <q-icon class="q-mr-xs"
-                        :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
-                        :name="iconForValidation(validateZipCode(form.postal_code))">
+                        :class="getZipCodeRuleClass(validateZipCodeByCountryId(form.postal_code, form.legal_country?.id))"
+                        :name="iconForValidation(validateZipCodeByCountryId(form.postal_code, form.legal_country?.id))">
                 </q-icon>
                   {{
-                    validateZipCode(form.postal_code)
+                    validateZipCodeByCountryId(form.postal_code, form.legal_country?.id)
                       ? 'The Postal Code is valid'
                       : 'Please enter a valid Postal Code'
                   }}
@@ -438,7 +438,7 @@ export default {
         this.form.region?.length &&
         this.form.city?.length &&
         this.form.legal_country &&
-        this.validateZipCode(this.form.postal_code) &&
+        this.validateZipCodeByCountryId(this.form.postal_code, this.form.legal_country?.id) &&
         this.form.auth_rep_first_name?.length &&
         this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&
@@ -448,8 +448,25 @@ export default {
       )
     },
 
-    validateZipCode (zip) {
-      const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
+    validateZipCode (zip, countryCode) {
+      let zipRegex
+      switch (countryCode) {
+        case 'US':
+          // US ZIP code pattern (5 digits or 5 digits-4 digits)
+          zipRegex = /^\d{5}(-\d{4})?$/
+          break
+        case 'CA':
+          // Canadian postal code pattern (letter-digit-letter space digit-letter-digit)
+          zipRegex = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/
+          break
+        case 'UK':
+          // UK postcode pattern (variable length and format)
+          zipRegex = /^(GIR ?0AA|(?:(?:A[BL]|B[ABDHLNRST]?|C[ABHMORTVW]|D[ADEGHLNTY]|E[HNX]?|F[KY]|G[LUY]?|H[ADGPRSUX]|I[GMPV]|JE|K[ATWY]|L[ADELNSU]?|M[EKX]|N[EGNPRW]?|O[LX]|P[AEHLOR]|R[GHM]?|S[AEGKL-PRSTY]?|T[ADFNQRSW]|UB|W[ADFNRSV]?|X[ABDEFGHLNRTW]|Y[O]|ZE)(?:\d(?:\d|[A-Z])? ?\d[A-Z]{2})))$/
+          break
+        default:
+          // No validation for other countries, free text allowed
+          return true
+      }
 
       return zipRegex.test(zip)
     },
