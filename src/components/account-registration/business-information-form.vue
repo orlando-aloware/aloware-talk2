@@ -174,11 +174,11 @@
               <div class="zipcode-hint"
                    :class="validateFieldError('postal_code') ? 'negative-top' : ''">
                 <q-icon class="q-mr-xs"
-                        :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
-                        :name="iconForValidation(validateZipCode(form.postal_code))">
+                        :class="getZipCodeRuleClass(validateZipCodeByCountryId(form.postal_code, form.legal_country?.id))"
+                        :name="iconForValidation(validateZipCodeByCountryId(form.postal_code, form.legal_country?.id))">
                 </q-icon>
                   {{
-                    validateZipCode(form.postal_code)
+                    validateZipCodeByCountryId(form.postal_code, form.legal_country?.id)
                       ? 'The Postal Code is valid'
                       : 'Please enter a valid Postal Code'
                   }}
@@ -438,7 +438,7 @@ export default {
         this.form.region?.length &&
         this.form.city?.length &&
         this.form.legal_country &&
-        this.validateZipCode(this.form.postal_code) &&
+        this.validateZipCodeByCountryId(this.form.postal_code, this.form.legal_country?.id) &&
         this.form.auth_rep_first_name?.length &&
         this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&
@@ -446,12 +446,6 @@ export default {
         this.form.auth_rep_business_title &&
         this.form.auth_rep_job_position
       )
-    },
-
-    validateZipCode (zip) {
-      const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
-
-      return zipRegex.test(zip)
     },
 
     validatePhoneNumber (phone) {
