@@ -448,29 +448,6 @@ export default {
       )
     },
 
-    validateZipCode (zip, countryCode) {
-      let zipRegex
-      switch (countryCode) {
-        case 'US':
-          // US ZIP code pattern (5 digits or 5 digits-4 digits)
-          zipRegex = /^\d{5}(-\d{4})?$/
-          break
-        case 'CA':
-          // Canadian postal code pattern (letter-digit-letter space digit-letter-digit)
-          zipRegex = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/
-          break
-        case 'UK':
-          // UK postcode pattern (variable length and format)
-          zipRegex = /^(GIR ?0AA|(?:(?:A[BL]|B[ABDHLNRST]?|C[ABHMORTVW]|D[ADEGHLNTY]|E[HNX]?|F[KY]|G[LUY]?|H[ADGPRSUX]|I[GMPV]|JE|K[ATWY]|L[ADELNSU]?|M[EKX]|N[EGNPRW]?|O[LX]|P[AEHLOR]|R[GHM]?|S[AEGKL-PRSTY]?|T[ADFNQRSW]|UB|W[ADFNRSV]?|X[ABDEFGHLNRTW]|Y[O]|ZE)(?:\d(?:\d|[A-Z])? ?\d[A-Z]{2})))$/
-          break
-        default:
-          // No validation for other countries, free text allowed
-          return true
-      }
-
-      return zipRegex.test(zip)
-    },
-
     validatePhoneNumber (phone) {
       const cleanedPhone = phone.replace(/[^\d]/g, '')
       const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
