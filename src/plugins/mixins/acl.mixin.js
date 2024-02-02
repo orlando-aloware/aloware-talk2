@@ -154,11 +154,11 @@ export default _.merge({
       if (Array.isArray(roles)) {
         const role = { data: null }
         for (role.data of roles) {
-          if (!source.user_roles.includes(role.data)) {
-            return false
+          if (source.user_roles.includes(role.data)) {
+            return true
           }
         }
-        return true
+        return false
       } else {
         return source.user_roles.includes(roles)
       }
