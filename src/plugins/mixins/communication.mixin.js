@@ -6,7 +6,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 export default {
   computed: {
     isAnAgentPermittedToBargeAndWhisperOnCall () {
-      return this.hasRole('Company Agent') && this.hasPermissionTo('barge and whisper on call')
+      return this.hasRole('Company Agent', 'Company Supervisor') && this.hasPermissionTo('barge and whisper on call')
     }
   },
 

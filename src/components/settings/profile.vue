@@ -155,7 +155,7 @@
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.role.hash_keyword}-container`"
-                  v-if="!user.is_destination && isAdminOrSupervisor">
+                  v-if="!user.is_destination && isAdmin">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Role</h5>
@@ -424,7 +424,7 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row v-if="isAdmin && connectedCampaigns.length"
+      <b-form-row v-if="isAdminOrSupervisor && connectedCampaigns.length"
                   class="mt-4"
                   :id="`${SettingsMap.campaign_id.hash_keyword}-container`">
         <b-col sm="12"

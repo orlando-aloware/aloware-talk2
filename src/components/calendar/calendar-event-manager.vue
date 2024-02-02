@@ -481,7 +481,7 @@ export default {
 
     isDeletable () {
       if (this.mode === 'edit') {
-        if (this.hasRole('Company Admin')) {
+        if (this.hasRole(['Company Admin', 'Company Supervisor'])) {
           return true
         }
 
