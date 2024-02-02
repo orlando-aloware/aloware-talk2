@@ -177,3 +177,6 @@ jobs:
 
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+
+      - name: List Built assets
+        run: ls -l dist/electron
