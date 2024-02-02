@@ -189,3 +189,6 @@ jobs:
 
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+
+      - name: List built files
+        run: ls -l dist/electron/mac
