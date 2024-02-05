@@ -45,18 +45,6 @@ export const DEFAULT_PAGES = 3
 
 export default {
 
-  props: {
-    paginated: {
-      type: Boolean,
-      default: false
-    },
-
-    lastPage: {
-      type: Number,
-      default: 1
-    }
-  },
-
   components: {
     ContactsSidebarLoader,
     ContactsSharedItem
@@ -68,6 +56,8 @@ export default {
       lists: [],
       layer: 1,
       listeners: {},
+      paginated: false,
+      lastPage: 1,
       paginationPage: 1,
       perPage: 20
     }
@@ -95,10 +85,10 @@ export default {
         page: this.paginationPage,
         size: this.perPage
       }).then(response => {
-        const total = response.data.total
-        this.lastPage = Math.ceil(total > this.perPage ? Math.ceil(total / this.perPage) : 1)
+        this.total = response.data.total
+        this.lastPage = Math.ceil(this.total > this.perPage ? Math.ceil(this.total / this.perPage) : 1)
 
-        if (total > this.perPage) {
+        if (this.total > this.perPage) {
           this.paginated = true
         }
 
