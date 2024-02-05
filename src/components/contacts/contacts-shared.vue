@@ -115,19 +115,6 @@ export default {
     }
   },
   computed: {
-
-    maxPaginationPages () {
-      if (this.$q.screen.xl) {
-        return XL_SCREEN_PAGES
-      }
-
-      if (this.$q.screen.lg) {
-        return LG_SCREEN_PAGES
-      }
-
-      return DEFAULT_PAGES
-    },
-
     foldersWithoutRoot () {
       return this.lists.filter(folder => folder.name !== 'Root')
     },
