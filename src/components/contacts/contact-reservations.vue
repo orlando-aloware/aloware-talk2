@@ -23,25 +23,19 @@
           <div class="text-subtitle2">
             Status:
             <div class='text-caption'>
-              {{ reservation.status }}
+              {{ capitalizedStatus(reservation.status) }}
             </div>
           </div>
           <div class="text-subtitle2">
             Checkin Date:
             <div class='text-caption'>
-              {{ reservation.checkin_date }}
+              {{ reservation.checkin_date | fixFullDateLocal }}
             </div>
           </div>
           <div class="text-subtitle2">
             Checkout Date:
             <div class='text-caption'>
-              {{ reservation.checkout_date }}
-            </div>
-          </div>
-          <div class="text-subtitle2">
-            Checkout Date:
-            <div class='text-caption'>
-              {{ reservation.checkout_date }}
+              {{ reservation.checkout_date | fixFullDateLocal }}
             </div>
           </div>
           <div class="text-subtitle2">
@@ -77,6 +71,7 @@
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import { fixFullDateLocal } from 'src/plugins/filters/datetime.filters'
 
 export default {
   name: 'contact-reservations',
@@ -107,6 +102,10 @@ export default {
   },
 
   methods: {
+    fixFullDateLocal,
+    capitalizedStatus (status) {
+      return this.$options.filters.capitalize(status)
+    },
     fetchContactReservations (contactId) {
       window.axios.get('/api/v1/contact/' + contactId + '/reservations').then(res => {
         this.reservations = res.data
