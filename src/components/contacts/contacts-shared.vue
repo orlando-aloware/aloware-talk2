@@ -20,10 +20,10 @@
         <q-pagination class="table-pagination"
                       padding="0 5px"
                       direction-links
-                      :max="lastPage"
                       dense
                       :ellipses="false"
                       :boundary-numbers="false"
+                      :max="lastPage"
                       v-model="paginationPage">
         </q-pagination>
 
@@ -38,10 +38,6 @@ import { mapActions } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import ContactsSharedItem from 'components/contacts/contacts-shared-item'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
-
-export const XL_SCREEN_PAGES = 11
-export const LG_SCREEN_PAGES = 7
-export const DEFAULT_PAGES = 3
 
 export default {
 
