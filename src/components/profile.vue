@@ -315,7 +315,7 @@ export default {
         return
       }
 
-      this.changeAgentStatus(status)
+      this.changeAgentStatus(status, false, 1, 'Talk-ChangeStatus')
     },
 
     hideMenu () {

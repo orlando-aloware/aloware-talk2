@@ -938,8 +938,8 @@ export default {
       }
     }
 
-    this.mainListeners.changeAgentStatus = (agentStatus) => {
-      this.changeAgentStatus(agentStatus)
+    this.mainListeners.changeAgentStatus = (agentStatus, signature = 'Talk-MainListeners-ChangeAgentStatus') => {
+      this.changeAgentStatus(agentStatus, false, 1, signature)
     }
 
     this.mainListeners.exportEventCreate = (task) => {
@@ -1456,11 +1456,11 @@ export default {
 
         if (this.profile && this.profile.live_calls === 0 && this.dialer.call &&
           !this.profile.go_to_available_after_login) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE)
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE, false, 1, 'Talk-InitAuth')
         }
 
         if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-2')
         }
 
         // company id should be available by now so fetch statics if it's not yet fetched
@@ -2503,12 +2503,12 @@ export default {
     },
 
     goAvailable () {
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-GoAvailable')
       this.$bvModal.hide('missed-call-modal')
     },
 
     stayBusy () {
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-StayBusy')
       this.$bvModal.hide('missed-call-modal')
     },
 
