@@ -81,10 +81,10 @@ export default {
         page: this.paginationPage,
         size: this.perPage
       }).then(response => {
-        this.total = response.data.total
-        this.lastPage = Math.ceil(this.total > this.perPage ? Math.ceil(this.total / this.perPage) : 1)
+        const total = response.data.total
+        this.lastPage = Math.ceil(total > this.perPage ? Math.ceil(total / this.perPage) : 1)
 
-        if (this.total > this.perPage) {
+        if (total > this.perPage) {
           this.paginated = true
         }
 
