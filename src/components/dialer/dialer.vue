@@ -504,7 +504,7 @@ export default {
         // error
         console.log('An error occurred while getting the communication', err)
         // check if we have found the communication after 3 retries
-        if (getCommunicationTry > 10) {
+        if (getCommunicationTry > 4) {
           this.setDialerCommunication()
           this.setDialerContact()
           this.setDialerDeal()
