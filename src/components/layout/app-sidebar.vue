@@ -604,12 +604,12 @@ export default {
 
     showDisabledCalendarMenu () {
       const ipro_plan = this.planUseCase == 'iPro'
-      return !ipro_plan && !this.isTrialKYC && !isActive('Calendar') && !this.profile.calendar_enabled
+      return !ipro_plan && !this.isTrialKYC && !this.isActive('Calendar') && !this.profile.calendar_enabled
     },
 
     showDisabledPowerDialerMenu () {
       const ipro_plan = this.planUseCase == 'iPro'
-      return !ipro_plan && !this.isTrialKYC && !isActive('Power Dialer') && !this.profile.auto_dialer_enabled
+      return !ipro_plan && !this.isTrialKYC && !this.isActive('Power Dialer') && !this.profile.auto_dialer_enabled
     }
   },
 
