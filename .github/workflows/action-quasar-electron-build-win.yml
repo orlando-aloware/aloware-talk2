@@ -178,5 +178,24 @@ jobs:
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
 
-      - name: List Built assets
-        run: ls -lR dist/electron
+      - name: Extract Metadata from package.json
+        id: pkg
+        run: |
+          echo "::set-output name=VERSION::$(jq -r '.version' package.json)"
+          echo "::set-output name=PRODUCT_NAME::$(jq -r '.productName' package.json)"
+        
+      - name: Rename and Move Windows Executable
+        run: |
+          mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup ${{ steps.pkg.outputs.VERSION }}.exe" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe"
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe"
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          SOURCE_DIR: ''
+          DEST_DIR: 'latest'
