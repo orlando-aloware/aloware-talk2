@@ -183,5 +183,6 @@ export const DEFAULT_STATE = {
   },
   redialed: [],
   pdViewSource: null,
-  pdViewCancelToken: null
+  pdViewCancelToken: null,
+  sessionManuallyPaused: false
 }
