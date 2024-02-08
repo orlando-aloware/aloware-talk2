@@ -500,6 +500,17 @@ export default {
 
         return Promise.resolve(res)
       }).catch(err => {
+        // Fail if the API returned a 4xx error
+        if (err.response && err.response.status >= 400 && err.response.status < 500) {
+          this.setDialerCommunication()
+          this.setDialerContact()
+          this.setDialerDeal()
+          this.$VueEvent.fire('communicationLoaded')
+          this.loadingCommunication = false
+
+          return Promise.reject(err)
+        }
+
         getCommunicationTry++
         // error
         console.log('An error occurred while getting the communication', err)
