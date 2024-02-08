@@ -152,8 +152,8 @@ export default {
         this.contact &&
         this.contact.integration_data &&
         this.contact.integration_data.guesty &&
-        this.contact.integration_data.guesty.conversation_id) {
-        return `https://app.guesty.com/inbox-v2/${this.contact.integration_data.guesty.conversation_id}/reservation`
+        this.contact.integration_data.guesty.guest_id) {
+        return `https://app.guesty.com/people/contact/${this.contact.integration_data.guesty.guest_id}/profile`
       }
 
       return false
