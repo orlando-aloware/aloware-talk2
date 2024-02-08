@@ -152,8 +152,6 @@ export default {
     },
 
     showGuestyReservations () {
-      console.log('reservation', this.currentCompany.is_multi_guesty)
-
       return this.currentCompany.is_multi_guesty
     }
   },
