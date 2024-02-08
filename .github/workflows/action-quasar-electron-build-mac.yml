@@ -189,3 +189,28 @@ jobs:
 
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+
+      - name: Extract Metadata from package.json
+        id: pkg
+        run: |
+          echo "::set-output name=VERSION::$(jq -r '.version' package.json)"
+          echo "::set-output name=PRODUCT_NAME::$(jq -r '.productName' package.json)"
+
+      - name: Rename and Move macOS DMG File
+        run: |
+          mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }}-${{ steps.pkg.outputs.VERSION }}.dmg" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg"
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+  
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ secrets.aws_secret_access_key }}
+          aws configure set default.region ${{ secrets.aws_bucket_region }}
+
+      - name: Upload Renamed macOS DMG to S3
+        run: |
+          aws s3 cp "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" --acl public-read
