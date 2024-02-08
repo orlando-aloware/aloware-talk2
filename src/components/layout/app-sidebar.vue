@@ -80,7 +80,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isTrialKYC && !isActive('Power Dialer') && !profile.auto_dialer_enabled"
+           v-show="showDisabledPowerDialerMenu"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -156,7 +156,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100 disabled"
-           v-show="!isTrialKYC && !isActive('Calendar') && !profile.calendar_enabled"
+           v-show="showDisabledCalendarMenu"
            flat
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
@@ -568,6 +568,8 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
+    ...mapState(['usage']),
+
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -594,6 +596,20 @@ export default {
     isKycAccount () {
       const status = this.profile?.company?.kyc_status
       return status !== KycLogs.KYC_STATUS_NONE
+    },
+
+    planUseCase () {
+      return this.usage.plan.use_case
+    },
+
+    showDisabledCalendarMenu () {
+      const ipro_plan = this.planUseCase == 'iPro'
+      return !ipro_plan && !this.isTrialKYC && !isActive('Calendar') && !this.profile.calendar_enabled
+    },
+
+    showDisabledPowerDialerMenu () {
+      const ipro_plan = this.planUseCase == 'iPro'
+      return !ipro_plan && !this.isTrialKYC && !isActive('Power Dialer') && !this.profile.auto_dialer_enabled
     }
   },
 
