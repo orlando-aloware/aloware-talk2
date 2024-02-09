@@ -897,6 +897,11 @@ export default {
     start () {
       this.resetSession()
       this.initialize()
+
+      // Force unpause if session is started after being manually paused (it might happen when internet is restablished)
+      if (this.sessionPaused) {
+        this.onTogglePause()
+      }
     },
 
     async initialize () {
