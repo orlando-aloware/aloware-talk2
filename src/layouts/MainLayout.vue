@@ -223,6 +223,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   htmlMixin,
@@ -415,6 +416,10 @@ export default {
     ]),
 
     ...mapState(['xmasEnabled']),
+
+    ...mapFields('powerDialer', [
+      'sessionPaused'
+    ]),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
@@ -2722,6 +2727,11 @@ export default {
       // temporary
       if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
         this.$router.back()
+      }
+
+      // Power Dialer session control - mark as false every time the session module is exited
+      if (from.meta.id === 'power-dialer-session') {
+        this.sessionPaused = false
       }
     },
 
