@@ -243,13 +243,6 @@ export default {
     }
   },
 
-  created () {
-    // check if user has access and redirect to inbox in case it doesnt
-    if (!this.profile.auto_dialer_enabled) {
-      this.$router.push({ name: 'Inbox' })
-    }
-  },
-
   async mounted () {
     this.START_DIAL_TOGGLE(false)
     // // await this.initialize()
