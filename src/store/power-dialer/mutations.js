@@ -193,10 +193,6 @@ export default {
     state.redialed = []
   },
 
-  SET_SESSION_MANUALLY_PAUSED: (state, payload) => {
-    state.sessionManuallyPaused = payload
-  },
-
   RESET_VUEX (state, value) {
     if (!_.isArray(value) || _.isEmpty(value)) {
       return
