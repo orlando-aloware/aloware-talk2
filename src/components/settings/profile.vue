@@ -497,7 +497,11 @@ export default {
     },
 
     isCompanyKYCNotAbleToAddUser () {
-      return this.isCompanyKYC && this.user.id === this.profile.id
+      if (!this.isCompanyKYC) {
+        return false
+      }
+
+      return this.user.id === this.profile.id
     }
   },
 
