@@ -6,7 +6,13 @@
            round
            dense
            v-if="singleButton"
-           @click="fetchSmartTranscriptionData"/>
+           @click="fetchSmartTranscriptionData">
+      <q-tooltip>
+        <span>
+          {{ buttonText }}
+        </span>
+      </q-tooltip>
+    </q-btn>
     <div class="flex items-center mr-1 h-100"
          v-else
          @click="fetchSmartTranscriptionData">
@@ -55,13 +61,13 @@
                           :key="category_index"
                           v-for="(category, category_index) in category_summary.categories">
                     {{ category }}
+                    <q-tooltip class="float-right">
+                      <span>
+                        Relevance between the conversation and this category: <strong>{{ category_summary.relevance }}%</strong>
+                      </span>
+                    </q-tooltip>
                   </q-chip>
-                  <q-tooltip class="float-right"
-                             :content="'Relevance between the conversation and this category'">
-                    <span style="font-size: 16px">
-                      {{ category_summary.relevance }}%
-                    </span>
-                  </q-tooltip>
+
                 </div>
               </div>
 
@@ -200,10 +206,11 @@
                                 dense
                                 :color="sentimentChipColors[sentimentSummary.overall]">
                           {{ sentimentSummary.overall }}
+                          <q-tooltip>
+                            {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
+                          </q-tooltip>
                         </q-chip>
-                        <!-- <q-tooltip :content="calculateOverAllSentimentBySpeaker(sentimentSummary)">
 
-                        </q-tooltip> -->
                       </div>
                     </div>
                   </div>
