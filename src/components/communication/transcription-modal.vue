@@ -36,7 +36,7 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none px-4">
-          <div class="q-pa-md mx-3 border"
+          <div class="q-pa-md mx-3 py-0 border border-rounded"
                v-if="remote_url">
             <waveform :remote-url="remote_url"
                       :unique-id="communication.id"/>
@@ -53,22 +53,30 @@
               <!-- Sanity check. -->
               <div class="q-my-md"
                    v-if="!isEmpty(iab_categories)">
-                <!-- Let's iterate over iab categories to extract each category summary. -->
-                <div :key="summary_index" class="q-mb-md"
-                     v-for="(category_summary, summary_index) in iab_categories">
-                  <q-chip class="q-mr-sm"
-                          dense
-                          :key="category_index"
-                          v-for="(category, category_index) in category_summary.categories">
-                    {{ category }}
-                    <q-tooltip class="float-right">
+                <q-breadcrumbs class="flex black w-100"
+                               active-color="black"
+                               :key="summary_index"
+                               v-for="(category_summary, summary_index) in iab_categories">
+                  <template v-slot:separator>
+                    <q-icon
+                      size="1em"
+                      name="chevron_right"
+                      color="primary"
+                    />
+                  </template>
+
+                  <q-breadcrumbs-el :label="category"
+                                    :key="category_index"
+                                    v-for="(category, category_index) in category_summary.categories" />
+                  <span class="pl-2">
+                    -<strong class="pl-3">{{ category_summary.relevance }}%</strong>
+                    <q-tooltip class="float-bottom">
                       <span>
                         Relevance between the conversation and this category: <strong>{{ category_summary.relevance }}%</strong>
                       </span>
                     </q-tooltip>
-                  </q-chip>
-
-                </div>
+                  </span>
+                </q-breadcrumbs>
               </div>
 
               <!-- If no categories were detected. -->
@@ -205,7 +213,7 @@
                         <q-chip text-color="black"
                                 dense
                                 :color="sentimentChipColors[sentimentSummary.overall]">
-                          {{ sentimentSummary.overall }}
+                          <strong>{{ sentimentSummary.overall }}</strong>
                           <q-tooltip>
                             {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
                           </q-tooltip>
@@ -237,46 +245,43 @@
                 </div>
 
                 <!-- Conversation section. -->
-                <div>
-                  <section class="transcription chat-area"
-                           ref="chatArea">
-                    <!-- Sanity check. -->
-                    <div v-if="!isEmpty(messages)">
-                      <div :key="message_index"
-                           v-for="(message, message_index) in messages">
-                        <!--
-                          Any agent message will prompt on the left side of conversation.
-                          Any customer message will prompt on the right side of conversation.
-                          Also, we need to change the background color based on the message sentiment.
-                        -->
-                        <p class="message-box break-word"
-                           :class="{ 'message-box-out': ['AGENT', 'A'].includes(message.speaker), 'message-box-in': !['AGENT', 'A'].includes(message.speaker) }"
-                           :style="{ background: sentimentColors[message.sentiment], borderRadius: '10px', padding: '0.5em', margin: '0.5em 0', color: 'black' }">
-                          <strong>Speaker: {{ message.speaker }}</strong>
-                          <br>
-                          <span style="line-height: 1.6"
-                                v-html="circleText(message.speaker, message.text)">
-                          </span>
-                        </p>
-
-                        <!-- Show the speaker's sentiment below each message. -->
-                        <span class="sentiment flex justify-end"
-                              :class="{ 'sentiment-out': ['AGENT', 'A'].includes(message.speaker), 'sentiment-in': !['AGENT', 'A'].includes(message.speaker) }">
-                          <q-chip text-color="white"
-                                  :style="{ background: sentimentColors[message.sentiment] }">
-                            {{ message.sentiment_possibility }}% {{ message.sentiment }}
-                          </q-chip>
+                <section class="transcription chat-area"
+                         ref="chatArea">
+                  <!-- Sanity check. -->
+                  <div v-if="!isEmpty(messages)">
+                    <div :key="message_index"
+                          v-for="(message, message_index) in messages">
+                      <!--
+                        Any agent message will prompt on the left side of conversation.
+                        Any customer message will prompt on the right side of conversation.
+                        Also, we need to change the background color based on the message sentiment.
+                      -->
+                      <p class="message-box break-word"
+                          :class="{ 'message-box-out': ['AGENT', 'A'].includes(message.speaker), 'message-box-in': !['AGENT', 'A'].includes(message.speaker) }"
+                          :style="{ border: `3px solid ${sentimentColors[message.sentiment]}`, borderRadius: '10px', padding: '0.5em', margin: '0.5em 0', color: 'black' }">
+                        <strong>Speaker: {{ message.speaker }}</strong>
+                        <br>
+                        <span style="line-height: 1.6"
+                              v-html="circleText(message.speaker, message.text)">
                         </span>
-                      </div>
-                    </div>
+                      </p>
 
-                    <!-- If no conversation was detected. -->
-                    <div class="text-center"
-                         v-else>
-                      <span>No Conversation</span>
+                      <!-- Show the speaker's sentiment below each message. -->
+                      <span class="sentiment flex items-center justify-start"
+                            :class="{ 'sentiment-out': ['AGENT', 'A'].includes(message.speaker), 'sentiment-in': !['AGENT', 'A'].includes(message.speaker) }">
+                        <span class="sentiment-circle"
+                              :style="{ background: sentimentColors[message.sentiment] }" />
+                        <span class="sentiment-description">{{ message.sentiment_possibility }}% {{ message.sentiment }}</span>
+                      </span>
                     </div>
-                  </section>
-                </div>
+                  </div>
+
+                  <!-- If no conversation was detected. -->
+                  <div class="text-center"
+                        v-else>
+                    <span>No Conversation</span>
+                  </div>
+                </section>
               </div>
             </div>
           </div>
@@ -331,12 +336,12 @@ export default {
       ],
       sentimentChipColors: {
         'POSITIVE': 'green-11',
-        'NEUTRAL': 'blue-grey-3',
+        'NEUTRAL': 'blue-grey-2',
         'NEGATIVE': 'red-6'
       },
       sentimentColors: {
         'POSITIVE': '#b9f6ca',
-        'NEUTRAL': '#b0bec6',
+        'NEUTRAL': '#d0d8dc',
         'NEGATIVE': '#f44336'
       },
       UploadedFileTypes

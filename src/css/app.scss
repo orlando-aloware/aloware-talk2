@@ -14573,13 +14573,29 @@ h1.contact-list-name-label {
     font-size: 14px;
   }
 
+  ::-webkit-scrollbar-thumb {
+    background-color: #256EFF !important;
+    border-radius: 6px !important;
+
+    &:hover {
+      background-color: #256EFF !important;
+      border-radius: 6px !important;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #E0E0E0 !important;
+    border-radius: 6px !important;
+  }
+
   .chat-area {
     background: whitesmoke;
     max-height: 52vh;
     padding: 1em;
-    overflow: auto;
     margin: 0 auto 2em auto;
-    border-radius: 10px;
+    border-radius: 14px;
+    overflow: auto;
+    flex-grow: 1;
 
     .sentiment {
       width: 45%;
@@ -14591,6 +14607,19 @@ h1.contact-list-name-label {
       &-in {
         margin-left: 53% !important;
       }
+
+      &-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+
+      &-description {
+        font-size: 12px;
+        font-weight: 700;
+      }
     }
 
     .message-box {
@@ -14598,6 +14627,7 @@ h1.contact-list-name-label {
       border-radius: 10px;
       padding: .5em;
       font-size: 14px;
+      background-color: #85858511;
 
       &-out {
         color: black !important;
