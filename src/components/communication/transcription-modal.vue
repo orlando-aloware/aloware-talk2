@@ -102,7 +102,7 @@
                   <div class="speaker--title">{{ speaker }}</div>
                   <!-- The highlight[speaker] contains the array of highlights. -->
                   <q-chip class="q-mr-sm q-chip__content white-color"
-                          color="green-11"
+                          color="blue-3"
                           text-color="white"
                           dense
                           :key="highlight_index"
@@ -135,15 +135,19 @@
                   <div class="mt-2"
                        v-if="entities[speaker]">
                     <div class="speaker--title">{{ speaker }}</div>
-                    <!-- Let's iterate over each entity that belongs to the current speaker and type. -->
-                    <q-chip class="q-mx-sm q-my-sm q-chip__content white-color"
-                            color="green-11"
-                            text-color="white"
-                            dense
-                            :key="entity_index"
-                            v-for="(entity, entity_index) in entities[speaker]">
-                      {{ entity }}
-                    </q-chip>
+                      <div :key="type_index"
+                           v-for="(type, type_index) in entity_types">
+                        {{ type | ucfirst }}
+
+                        <q-chip class="q-mx-sm q-my-sm q-chip__content white-color"
+                                color="green-11"
+                                text-color="white"
+                                dense
+                                :key="entity_index"
+                                v-for="(entity, entity_index) in entities[speaker][type]">
+                          {{ entity }}
+                        </q-chip>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -171,12 +175,12 @@
                     <div class="speaker--title">{{ speaker }}</div>
                     <!-- custom_keywords[speaker] contains an object in which the keys represent the custom keywords. -->
                     <q-chip class="q-mr-sm q-mt-sm q-chip__content white-color"
-                            color="orange"
+                            color="amber-2"
                             text-color="white"
                             dense
                             :key="idx"
                             v-for="(keyword, idx) in Object.keys(custom_keywords[speaker])">
-                      {{ keyword | ucfirst }}<span>{{ ` x ${custom_keywords[speaker][keyword]}` }}</span>
+                      {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${custom_keywords[speaker][keyword]}` }}</span>
                     </q-chip>
                   </div>
                 </div>
@@ -448,9 +452,9 @@ export default {
     },
 
     /**
-         * Closes Smart Transcription modal.
-         * @public
-         */
+    * Closes Smart Transcription modal.
+    * @public
+    */
     handleClose () {
       this.show_form = false
     },
