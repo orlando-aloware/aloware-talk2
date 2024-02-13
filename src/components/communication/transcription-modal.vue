@@ -90,7 +90,7 @@
               <div v-else>
                 <span>
                   We couldn't find any categories in this call. For more information please check
-                  <a style="color: blue"
+                  <a class="link"
                      href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
                      this article.
                   </a>
@@ -123,7 +123,7 @@
               <div v-else>
                 <span class="mt-3">
                   We couldn't find any highlights in this call. For more information please check
-                  <a style="color: blue"
+                  <a class="link"
                      href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
                      this article.
                   </a>
@@ -163,7 +163,7 @@
               <div v-else>
                 <span class="mt-3">
                   We couldn't find any specific entities in this call. For more information please check
-                  <a style="color: blue"
+                  <a class="link"
                      href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
                     this article.
                   </a>
@@ -197,7 +197,7 @@
               <div v-else>
                 <span>
                   We couldn't find any custom keywords in this call. For more information please check
-                  <a style="color: blue"
+                  <a class="link"
                      href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
                     this article.
                   </a>
@@ -261,27 +261,27 @@
                   <!-- Sanity check. -->
                   <div v-if="!isEmpty(messages)">
                     <div :key="message_index"
-                          v-for="(message, message_index) in messages">
+                         v-for="(message, message_index) in formattedMessages">
                       <!--
                         Any agent message will prompt on the left side of conversation.
                         Any customer message will prompt on the right side of conversation.
                         Also, we need to change the background color based on the message sentiment.
                       -->
                       <p class="message-box break-word"
-                          :class="{ 'message-box-out': ['AGENT', 'A'].includes(message.speaker), 'message-box-in': !['AGENT', 'A'].includes(message.speaker) }"
-                          :style="{ border: `3px solid ${sentimentColors[message.sentiment]}`, borderRadius: '10px', padding: '0.5em', margin: '0.5em 0', color: 'black' }">
+                         :class="message.classes.messageBoxClass"
+                         :style="{ border: message.sentimentBorder }">
                         <strong>Speaker: {{ message.speaker }}</strong>
                         <br>
                         <span style="line-height: 1.6"
-                              v-html="circleText(message.speaker, message.text)">
+                              v-html="message.formattedText">
                         </span>
                       </p>
 
                       <!-- Show the speaker's sentiment below each message. -->
                       <span class="sentiment flex items-center justify-start"
-                            :class="{ 'sentiment-out': ['AGENT', 'A'].includes(message.speaker), 'sentiment-in': !['AGENT', 'A'].includes(message.speaker) }">
+                            :class="message.classes.sentimentClass">
                         <span class="sentiment-circle"
-                              :style="{ background: sentimentColors[message.sentiment] }" />
+                              :style="{ background: message.sentimentBackgroundColor }" />
                         <span class="sentiment-description">{{ message.sentiment_possibility }}% {{ message.sentiment }}</span>
                       </span>
                     </div>
@@ -303,10 +303,9 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import Waveform from 'components/waveform'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'TranscriptionModal',
@@ -355,22 +354,32 @@ export default {
         'NEUTRAL': '#d0d8dc',
         'NEGATIVE': '#f44336'
       },
-      UploadedFileTypes
+      UploadedFileTypes,
+      isEmpty
+    }
+  },
+
+  computed: {
+    formattedMessages () {
+      return this.messages.map(message => ({
+        ...message,
+        classes: this.getMessageClasses(message.speaker),
+        formattedText: this.circleText(message.speaker, message.text),
+        sentimentBorder: `3px solid ${this.sentimentColors[message.sentiment]}`,
+        sentimentBackgroundColor: this.sentimentColors[message.sentiment]
+      }))
+    },
+
+    sentimentSummaryText () {
+      return this.sentiment_analysis.map(sentiment => this.calculateOverAllSentimentBySpeaker(sentiment))
     }
   },
 
   methods: {
-    /**
-     * Fetches Transcription's data along with communication remote url.
-     * @public
-     */
     fetchSmartTranscriptionData () {
       this.isLoading = true
-      // Once the button is clicked, let's show the form.
       this.show_form = true
-      // Remote url is reset to reload <waveform> component.
       this.remote_url = null
-      this.setSidebarFolded(true)
 
       // Fetch communication transcription.
       window.axios.get(`/api/v1/transcription/communication/${this.communication.id}`)
@@ -428,10 +437,7 @@ export default {
     circleText (speaker, messageText) {
       this.highlights_summary.forEach(function (highlightSummary) {
         if (speaker === highlightSummary.speaker) {
-          /** @var {string} messageText Needed to revert doubled highlighted words. */
           let backupMessageText = messageText
-
-          /** @var {string} highlightText Get highlight text to circle. */
           let highlightText = highlightSummary.text
 
           // Circle the highlight if it exists in the message text.
@@ -458,24 +464,8 @@ export default {
       return messageText
     },
 
-    /**
-    * Closes Smart Transcription modal.
-    * @public
-    */
     handleClose () {
       this.show_form = false
-    },
-
-    /**
-    * Encapsulates lodash _.isEmpty() function.
-    * @public
-    *
-    * @param {Object} data
-    *
-    * @returns {boolean}
-    */
-    isEmpty (data) {
-      return _.isEmpty(data)
     },
 
     /**
@@ -487,17 +477,11 @@ export default {
     * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
     */
     calculateOverAllSentimentBySpeaker (sentimentSummary) {
-      /** @var {number} positiveSum */
       const positiveSum = sentimentSummary.positive
-      /** @var {number} neutralSum */
       const neutralSum = sentimentSummary.neutral
-      /** @var {number} negativeSum */
       const negativeSum = sentimentSummary.negative
-
-      /** @var {number} wholeSentimentsSum */
       const wholeSentimentsSum = positiveSum + neutralSum + negativeSum
 
-      /**  @var {string} sentimentPercentages The actual string shown in the Overall Sentiment Tooltip. */
       let sentimentPercentages = ''
 
       // If we had no sentiments, don't do anything.
@@ -507,10 +491,7 @@ export default {
 
       // Let's build each sentiment percentage.
       for (const sentiment of this.sentiments) {
-        /** @var {number} percentage Current sentiment percentage. */
         let percentage = 0
-
-        /** @var {number} currentSentimentSum */
         let currentSentimentSum = 0
 
         // Match each sentiment with its count
@@ -536,7 +517,14 @@ export default {
       return sentimentPercentages
     },
 
-    ...mapActions('cache', ['setSidebarFolded', 'resetCache'])
+    getMessageClasses (speaker) {
+      const isAgent = ['AGENT', 'A'].includes(speaker)
+
+      return {
+        messageBoxClass: isAgent ? 'message-box-out' : 'message-box-in',
+        sentimentClass: isAgent ? 'sentiment-out' : 'sentiment-in'
+      }
+    }
   }
 }
 </script>
