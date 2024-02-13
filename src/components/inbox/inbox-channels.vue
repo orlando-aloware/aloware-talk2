@@ -25,7 +25,7 @@
               </compact-btn>
               <compact-btn customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            borderless
-                           @clicked="processToggleFilter(true)">
+                           @clicked="onClickAppliedFilterButton">
                 <q-tooltip anchor="top middle"
                            self="center middle"
                            v-if="appliedFilter">
@@ -176,7 +176,8 @@ import { mapActions, mapState } from 'vuex'
 import {
   aclMixin,
   dateMixin,
-  visibilityMixin
+  visibilityMixin,
+  inboxMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/inbox/channel-tasks/task-list'
@@ -192,6 +193,7 @@ import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
+import { STATUS_OPEN } from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox-channels',
@@ -199,7 +201,8 @@ export default {
   mixins: [
     aclMixin,
     dateMixin,
-    visibilityMixin
+    visibilityMixin,
+    inboxMixin
   ],
 
   components: {
@@ -324,9 +327,11 @@ export default {
       'activeChannel',
       'communications',
       'channelChangedFilterFields',
+      'selectedFilter',
       'appliedFilter',
       'hasMoreCommunications',
-      'inboxShowMyContacts'
+      'inboxShowMyContacts',
+      'isFilterDialogForView'
     ]),
 
     nextPage () {
@@ -667,18 +672,15 @@ export default {
     }
 
     this.listeners.inboxLoadCommunications = (showMyContacts) => {
-      this.filter = this.filterMyContacts(this.filter, showMyContacts)
-
       if (this.filter.cursor !== undefined) {
         delete this.filter.cursor
       }
 
-      if (showMyContacts) {
-        this.filter.contact_owner = []
-        this.updateChannelChangedFilterFields({
-          name: 'contact_owner',
-          value: []
-        })
+      // only when both have it, update the saved filters
+      // when my contacts is toggled
+      if (this.selectedFilter && this.appliedFilter) {
+        this.$VueEvent.fire('my_contacts_update_filter')
+        return
       }
 
       this.isLoaded = false
@@ -781,7 +783,8 @@ export default {
       'Inbox Channel',
       'Inbox Contact Communication',
       'Inbox Contact',
-      'Inbox Channel Task Status', 'Inbox Contact Task'
+      'Inbox Channel Task Status',
+      'Inbox Contact Task'
     ]
     const generalChannelRoutes = ['Inbox Channel', 'Inbox Contact']
     const communicationsChannelRoutes = ['Inbox Contact', 'Inbox Contact Communication']
@@ -825,7 +828,9 @@ export default {
       'toggleFilterDialogWithFilters',
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
-      'setInboxShowMyContacts'
+      'setInboxShowMyContacts',
+      'setFilterDialogForView',
+      'setIsEditingView'
     ]),
 
     processToggleFilter (value) {
@@ -880,8 +885,46 @@ export default {
     },
 
     onApplyFilter (filter) {
+      if (this.isFilterDialogForView) {
+        this.currentTask = STATUS_OPEN
+
+        // change actively selected channel
+        this.setSelectedFilter(this.appliedFilter)
+        this.loadContactTasks()
+        this.fetchTaskCounts()
+
+        const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
+        if (pinnedIndex >= 0) {
+          this.$router.push({
+            name: 'Inbox View',
+            params: {
+              viewId: this.appliedFilter.id,
+              status: this.statusText,
+              channel: 'view'
+            }
+          }).catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
+
+          return
+        }
+
+        this.$router.push({
+          name: 'Inbox Channel Task Status',
+          params: {
+            channel: 'inbox',
+            status: 'open'
+          }
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+
+        return
+      }
+
       this.filter = filter
-      this.setChannelClonedFilter(this.filter)
 
       if (this.$route.params.channel === 'recordings') {
         this.filter.answer_status = 'recorded'
@@ -897,11 +940,22 @@ export default {
         }
       }
 
+      // channel cloned filter are the current filter settings populated in the filter dialog form
+      // especially when there is no applied or selected filter.
+      this.setChannelClonedFilter(this.filter)
       this.getCommunications(this.filter)
     },
 
     onCreateNewFilter (filter) {
-      this.newFilterModel = { ...this.newFilterModel, filter: filter, type: this.channelDefaultFilterModel.type }
+      let filterType = this.channelDefaultFilterModel.type
+
+      // making sure to save the filter type (inbox) when it's created from "Create View"
+      if (this.isFilterDialogForView) {
+        filterType = ChannelType.CHANNEL_INBOX
+        this.setFilterDialogForView(true)
+      }
+
+      this.newFilterModel = { ...this.newFilterModel, filter: filter, type: filterType }
       this.toggleFilterModelForm(true)
     },
 
@@ -1279,6 +1333,12 @@ export default {
       }
 
       return params
+    },
+
+    onClickAppliedFilterButton () {
+      this.setFilterDialogForView(false)
+      this.setIsEditingView(false)
+      this.toggleFilterDialog(true)
     }
   },
 

@@ -25,7 +25,6 @@
               v-model="user.outbound_calling_selector"
               :options="options"
               :aria-describedby="ariaDescribedby"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'outbound_calling_selector')">
             </b-form-radio-group>
           </b-form-group>
@@ -66,7 +65,7 @@
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-radio-group
               v-model="user.outbound_call_recording_mode"
-              :disabled="!hasRole(['Company Admin', 'Company Agent']) || (currentCompany && currentCompany.force_outbound_recording) || viewOnly"
+              :disabled="!hasRole(['Company Admin', 'Company Agent']) || (currentCompany && currentCompany.force_outbound_recording)"
               :options="callRecordingsOptions"
               :aria-describedby="ariaDescribedby"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'outbound_call_recording_mode')"
@@ -92,7 +91,6 @@
                              v-model="user.enabled_two_legged_outbound"
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
                              @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_two_legged_outbound')">
               Enable Two Legged Outbound Calls
             </b-form-checkbox>
@@ -114,7 +112,7 @@
               placeholder="(123) 456-7890"
               v-model.trim="$v.user.secondary_phone_number.$model"
               :state="validateState('secondary_phone_number')"
-              :disabled="(user.role_name && user.read_only_access) || viewOnly"
+              :disabled="(user.role_name && user.read_only_access)"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'secondary_phone_number')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.secondary_phone_number.required">Enter secondary phone number.</b-form-invalid-feedback>

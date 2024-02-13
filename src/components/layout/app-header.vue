@@ -44,7 +44,7 @@
         {{ refreshButtonLabel }}
       </compact-btn>
 
-      <a href="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
+      <a href="https://support.aloware.com/exploring-aloware-talks-broadcast"
          target="_blank"
          v-if="$route.name === 'Broadcasts'">
         <information-circle-icon class="ml-2 cursor-pointer"/>
@@ -59,7 +59,7 @@
     <tutorial-video-button />
 
     <div class="ml-auto d-block h-100"
-         v-if="!isSimpsocial && !isTrialKYC">
+         v-if="!isSimpSocial && !isTrialKYC">
       <div class="d-flex h-100 align-items-center justify-content-end ml-1">
         <div class='bridge-menu-wrapper'>
           <div id='referralhero-inline-button'></div>
@@ -134,7 +134,7 @@
                      placement="bottomleft"
                      v-if="dialer.error.code">
             <template #title>Connection timeout</template>
-            <p>Click here to reconnect or please check the <a href="https://support.aloware.com/en/articles/6958138-common-dialer-errors" target="_blank">troubleshooting guide here</a>.</p>
+            <p>Click here to reconnect or please check the <a href="https://support.aloware.com/understanding-and-fixing-common-dialer-errors-in-aloware-a-comprehensive-guide" target="_blank">troubleshooting guide here</a>.</p>
             <p>Error Code: [{{ dialer.error.code }}]</p>
             <q-btn class="start-dial-button p-0"
                    color="success"
@@ -146,7 +146,7 @@
                 Reconnect
               </div>
             </q-btn>
-            <a href="https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208" target="_blank"
+            <a href="https://support.aloware.com/troubleshooting-tip-audio-issues-during-calls-heres-how-to-fix-it" target="_blank"
                v-if="dialer.error.code === 31208">
               See fix
             </a>
@@ -258,7 +258,6 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      updatesLink: 'https://news.intercom.com/aloware',
       PHONE_USAGE_ERRORS
     }
   },
@@ -507,7 +506,7 @@ export default {
 
     onDialerErrorStatus () {
       if (this.dialer.error.code === 31208) {
-        window.open('https://support.aloware.com/en/articles/5059657-troubleshoot-audio-issues-microphone-error-31201-or-31208')
+        window.open('https://support.aloware.com/troubleshooting-tip-audio-issues-during-calls-heres-how-to-fix-it')
       }
     },
 

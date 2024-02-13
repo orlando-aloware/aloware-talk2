@@ -10,7 +10,7 @@
       <input-group>
         <template v-slot:content>
           <input-field label="Business Legal Name"
-                       placeholder="Aloware Inc."
+                       placeholder="Your Business"
                        ref="legal_name-input"
                        :paddingClasses="paddingLeftClasses"
                        :rules="[validateFieldError('legal_name')]"
@@ -118,8 +118,8 @@
 
       <input-group>
         <template v-slot:content>
-          <input-field label="Street"
-                       placeholder="Ex: Fifth Avenue"
+          <input-field label="Address"
+                       placeholder="Street address or P.O"
                        col-md="col-md-10"
                        ref="street-input"
                        :paddingClasses="paddingRightClasses"
@@ -174,11 +174,11 @@
               <div class="zipcode-hint"
                    :class="validateFieldError('postal_code') ? 'negative-top' : ''">
                 <q-icon class="q-mr-xs"
-                        :class="getZipCodeRuleClass(validateZipCode(form.postal_code))"
-                        :name="iconForValidation(validateZipCode(form.postal_code))">
+                        :class="getZipCodeRuleClass(validateZipCodeByCountryId(form.postal_code, form.legal_country?.id))"
+                        :name="iconForValidation(validateZipCodeByCountryId(form.postal_code, form.legal_country?.id))">
                 </q-icon>
                   {{
-                    validateZipCode(form.postal_code)
+                    validateZipCodeByCountryId(form.postal_code, form.legal_country?.id)
                       ? 'The Postal Code is valid'
                       : 'Please enter a valid Postal Code'
                   }}
@@ -326,6 +326,11 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
+    },
+
+    ssu: {
+      type: Object,
+      default: () => (null)
     }
   },
 
@@ -433,7 +438,7 @@ export default {
         this.form.region?.length &&
         this.form.city?.length &&
         this.form.legal_country &&
-        this.validateZipCode(this.form.postal_code) &&
+        this.validateZipCodeByCountryId(this.form.postal_code, this.form.legal_country?.id) &&
         this.form.auth_rep_first_name?.length &&
         this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&
@@ -441,12 +446,6 @@ export default {
         this.form.auth_rep_business_title &&
         this.form.auth_rep_job_position
       )
-    },
-
-    validateZipCode (zip) {
-      const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
-
-      return zipRegex.test(zip)
     },
 
     validatePhoneNumber (phone) {
@@ -480,11 +479,31 @@ export default {
 
     onSubmit () {
       this.$emit('submit', this.form)
+    },
+
+    loadForm (data) {
+      this.form.legal_name = data.business_name
+      this.form.website_url = data.website_url
+      this.form.legal_country = { id: data.country, name: data.country }
+      this.form.auth_rep_first_name = data.first_name
+      this.form.auth_rep_last_name = data.last_name
+      this.form.auth_rep_email = data.email
+      this.form.auth_rep_phone_number = data.phone_country_code + '//' + data.phone_national
     }
   },
 
   mounted () {
+    if (this.ssu) {
+      this.loadForm(this.ssu)
+    }
+
     this.verifyFieldErrors()
+  },
+
+  watch: {
+    ssu (val) {
+      this.loadForm(val)
+    }
   }
 }
 </script>

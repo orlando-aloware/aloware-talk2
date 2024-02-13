@@ -1,7 +1,7 @@
 <template>
   <div class="banner col-xl-4 q-xl-show q-md-hide q-sm-hide">
     <div class="text-center items-center align-center">
-      <img alt="phone"
+      <img :alt="getBannerTitle()"
            :src="getBannerImageSrc()" />
       <div class="card text-center">
         <h3 class="mb-4 mt-4">{{ getBannerTitle() }}</h3>
@@ -25,40 +25,28 @@ export default {
   methods: {
     getBannerImageSrc () {
       switch (this.currentStep) {
+        case 0:
+          return '/images/ssu-start.png'
         case 1:
-          return '/images/woman-agent.png'
-        case 2:
-          return '/images/man-agent.png'
-        case 3:
-          return '/images/woman-agent-in-call.png'
-        default:
-          return '/images/woman-agent.png'
+          return '/images/ssu-account-creation.png'
       }
     },
 
     getBannerTitle () {
       switch (this.currentStep) {
+        case 0:
+          return 'Revolutionize the way you communicate!'
         case 1:
-          return 'Your customers prefer text'
-        case 2:
-          return 'Supercharge your sales team'
-        case 3:
-          return 'Measure the metrics that matter'
-        default:
-          return 'Your customers prefer text'
+          return 'Let\'s set you up for success'
       }
     },
 
     getBannerDescription () {
-      switch (this.step) {
+      switch (this.currentStep) {
+        case 0:
+          return 'Aloware is the premier cloud contact center solution offering a robust suite of calling, texting, and automation tools to effortlessly fuel growth and deliver exceptional customer experiences at scale. Get ready to take your business to the next level!'
         case 1:
-          return 'Research (and common sense!) shows that people look at their texts within 3 minutes, and open <span class="text-weight-bold">97% of messages</span> they receive.<br>Be where it matters most: their inbox. 📥'
-        case 2:
-          return 'Make <span class="text-weight-bold">300+ calls daily</span> with our AI-driven power dialer. Scale up text campaigns with smart sequence builder.<br>Your CRM has the fuel, Aloware brings the fire. 🚀'
-        case 3:
-          return 'Gain visibility into the metrics that matter to your business with advanced <span class="text-weight-bold">reporting, pre-built</span>, and <span class="text-weight-bold">customizable dashboards</span>. 📊'
-        default:
-          return 'Texting is the most preferred communication channel for customers. With Aloware, you can text your customers from your business phone number.'
+          return 'Telecommunications regulatory authorities need certain information to make sure that calls and texts are from a real business. Please take a moment to provide this info so we can verify your business & unlock outgoing calls during your trial.'
       }
     }
   }
