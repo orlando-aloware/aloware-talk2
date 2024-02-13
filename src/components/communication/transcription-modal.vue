@@ -37,14 +37,21 @@
 
         <q-card-section class="q-pt-none px-4">
           <div class="q-pa-md mx-3 py-0 border border-rounded"
-               v-if="remote_url">
+               v-if="remote_url && !isLoading">
             <waveform :remote-url="remote_url"
                       :unique-id="communication.id"/>
           </div>
 
-          <div v-if="loading" class="text-center">Loading...</div>
+          <div class="loading-overlay"
+               v-if="isLoading">
+            <div>
+              <img class="loading-icon"
+                   alt="Loading"
+                   src="/assets/images/loading.svg"/>
+            </div>
+          </div>
 
-          <div class="flex row py-4">
+          <div class="flex row py-4" v-else>
             <div class="col-6">
               <!-- Categories section. -->
               <h2 class="mb-1 text-dark">Categories</h2>
@@ -322,7 +329,7 @@ export default {
 
   data () {
     return {
-      loading: false,
+      isLoading: false,
       show_form: false,
       remote_url: null,
       iab_categories: [],
@@ -358,7 +365,7 @@ export default {
      * @public
      */
     fetchSmartTranscriptionData () {
-      this.loading = true
+      this.isLoading = true
       // Once the button is clicked, let's show the form.
       this.show_form = true
       // Remote url is reset to reload <waveform> component.
@@ -369,10 +376,10 @@ export default {
       window.axios.get(`/api/v1/transcription/communication/${this.communication.id}`)
         .then(res => {
           this.setSmartTranscriptionData(res.data)
-          this.loading = false
+          this.isLoading = false
         }).catch(err => {
           console.log("Couldn't fetch transcription information.", err)
-          this.loading = false
+          this.isLoading = false
         })
 
       // Fetch communication recording url.
