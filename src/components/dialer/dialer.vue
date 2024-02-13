@@ -57,7 +57,7 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
+    ...mapState('cache', ['currentCompany', 'profile']),
 
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
 
@@ -290,6 +290,7 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
+      this.checkForcedStatus()
     })
 
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
@@ -379,6 +380,24 @@ export default {
   },
 
   methods: {
+    checkForcedStatus () {
+      if (!this.profile.lastCall || (!this.currentCompany.force_contact_disposition && !this.currentCompany.force_call_disposition)) {
+        return
+      }
+      let needDisposition = false
+      if (this.currentCompany.force_contact_disposition && !this.profile.lastCall.contact.disposition_status_id) {
+        needDisposition = true
+      }
+      if (this.currentCompany.force_call_disposition && !this.profile.lastCall.call_disposition_id) {
+        needDisposition = true
+      }
+      if (!needDisposition) {
+        return
+      }
+      this.setDialerCommunication(this.profile.lastCall)
+      this.setDialerContact(this.profile.lastCall.contact)
+      this.startWrapUpTimer()
+    },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
