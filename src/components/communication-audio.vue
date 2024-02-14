@@ -13,6 +13,9 @@
                            :communication-id="communication.id"
                            :filename="filename"
                            :file-uuid="fileUuid"/>
+          <transcription-modal button-text="Show Smart Transcription"
+                               :communication="communication"
+                               :single-button="true"/>
         </div>
       </div>
     </div>
@@ -31,6 +34,8 @@ import {
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import Waveform from 'components/waveform'
 import DownloadButton from 'components/download-button'
+import TranscriptionModal from 'components/communication/transcription-modal'
+
 export default {
   name: 'communication-audio',
 
@@ -39,7 +44,11 @@ export default {
     communicationInfoMixin
   ],
 
-  components: { DownloadButton, Waveform },
+  components: {
+    DownloadButton,
+    Waveform,
+    TranscriptionModal
+  },
 
   props: {
     communication: {
