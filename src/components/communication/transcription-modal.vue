@@ -51,7 +51,8 @@
             </div>
           </div>
 
-          <div class="flex row py-4" v-else>
+          <div class="flex row py-4"
+               v-else>
             <div class="col-6">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"/>
@@ -71,74 +72,20 @@
             </div>
 
             <div class="col-6">
-              <div>
-                <!-- Overall Sentiment Analysis section. -->
-                <div class="mb-2">
-                  <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
-                                              :sentiment-chip-colors="sentimentChipColors"
-                                              :is-empty="isEmpty"
-                                              :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"/>
+              <div class="mb-2">
+                <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
+                                            :sentiment-chip-colors="sentimentChipColors"
+                                            :is-empty="isEmpty"
+                                            :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"/>
 
-                  <!-- Talk Time Analysis section. -->
-                  <div class="flex items-center"
-                       v-if="!isEmpty(talk_time_analysis)">
-                    <strong class="mr-2">Talk Time:</strong>
-                    <div>
-                      <!--
-                          Talk time analysis contains:
-                              [key]: speaker as a string value.
-                              [value]: talk time ratio float.
-                      -->
-                      <div class="flex inline items-center mr-3"
-                           :key="speaker_index"
-                           v-for="(speaker, speaker_index) in speakers">
-                        <div class="flex mr-2">
-                          {{ speaker }}:<strong class="ml-1">{{ talk_time_analysis[speaker] }}%</strong>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Conversation section. -->
-                <section class="transcription chat-area"
-                         ref="chatArea">
-                  <!-- Sanity check. -->
-                  <div v-if="!isEmpty(messages)">
-                    <div :key="message_index"
-                         v-for="(message, message_index) in formattedMessages">
-                      <!--
-                        Any agent message will prompt on the left side of conversation.
-                        Any customer message will prompt on the right side of conversation.
-                        Also, we need to change the background color based on the message sentiment.
-                      -->
-                      <p class="message-box break-word"
-                         :class="message.classes.messageBoxClass"
-                         :style="{ border: message.sentimentBorder }">
-                        <strong>Speaker: {{ message.speaker }}</strong>
-                        <br>
-                        <span style="line-height: 1.6"
-                              v-html="message.formattedText">
-                        </span>
-                      </p>
-
-                      <!-- Show the speaker's sentiment below each message. -->
-                      <span class="sentiment flex items-center justify-start"
-                            :class="message.classes.sentimentClass">
-                        <span class="sentiment-circle"
-                              :style="{ background: message.sentimentBackgroundColor }" />
-                        <span class="sentiment-description">{{ message.sentiment_possibility }}% {{ message.sentiment }}</span>
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- If no conversation was detected. -->
-                  <div class="text-center"
-                        v-else>
-                    <span>No Conversation</span>
-                  </div>
-                </section>
+                <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+                                            :speakers="speakers"
+                                            :is-empty="isEmpty"/>
               </div>
+
+              <conversation-section :messages="messages"
+                                    :formatted-messages="formattedMessages"
+                                    :is-empty="isEmpty"/>
             </div>
           </div>
         </q-card-section>
@@ -156,6 +103,8 @@ import HighlightsSection from './transcription-components/highlights-section'
 import EntitiesSection from './transcription-components/entities-section'
 import CustomKeywordsSection from './transcription-components/custom-keywords-section'
 import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
+import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
+import ConversationSection from './transcription-components/conversation-section'
 
 export default {
   name: 'TranscriptionModal',
@@ -166,7 +115,9 @@ export default {
     HighlightsSection,
     EntitiesSection,
     CustomKeywordsSection,
-    SentimentAnalysisSection
+    SentimentAnalysisSection,
+    TalkTimeAnalysisSection,
+    ConversationSection
   },
 
   props: {
