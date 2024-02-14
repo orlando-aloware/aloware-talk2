@@ -51,7 +51,7 @@ export default {
       required: true
     },
     formattedMessages: {
-      type: Object,
+      type: [Object, Array],
       required: true
     }
   }

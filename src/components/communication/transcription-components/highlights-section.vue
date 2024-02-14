@@ -41,7 +41,7 @@ export default {
 
   props: {
     highlights: {
-      type: Object,
+      type: [Object, Array],
       required: true
     },
     speakers: {

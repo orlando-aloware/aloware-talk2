@@ -48,7 +48,7 @@ export default {
 
   props: {
     entities: {
-      type: Object,
+      type: [Object, Array],
       required: true
     },
     speakers: {

@@ -4,20 +4,20 @@
     <h2 class="mt-4 mb-1 text-dark">Custom Keywords Frequency</h2>
     <hr class="my-1">
     <!-- Sanity check. -->
-    <div v-if="!isEmpty(custom_keywords)">
+    <div v-if="!isEmpty(customKeywords)">
       <!-- We want to show the custom keywords by speaker. -->
       <div v-for="(speaker, speaker_index) in speakers" :key="speaker_index">
         <!-- Check if the current speaker said any custom keyword -->
-        <div v-if="custom_keywords[speaker]" class="mt-2">
+        <div v-if="customKeywords[speaker]" class="mt-2">
           <div class="speaker--title">{{ speaker }}</div>
-          <!-- custom_keywords[speaker] contains an object in which the keys represent the custom keywords. -->
+          <!-- customKeywords[speaker] contains an object in which the keys represent the custom keywords. -->
           <q-chip class="q-mr-sm q-mt-sm q-chip__content white-color"
                   color="amber-2"
                   text-color="white"
                   dense
                   :key="idx"
-                  v-for="(keyword, idx) in Object.keys(custom_keywords[speaker])">
-            {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${custom_keywords[speaker][keyword]}` }}</span>
+                  v-for="(keyword, idx) in Object.keys(customKeywords[speaker])">
+            {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${customKeywords[speaker][keyword]}` }}</span>
           </q-chip>
         </div>
       </div>
@@ -41,8 +41,8 @@ export default {
   name: 'CustomKeywordsSection',
 
   props: {
-    custom_keywords: {
-      type: Object,
+    customKeywords: {
+      type: [Object, Array],
       required: true
     },
     speakers: {
