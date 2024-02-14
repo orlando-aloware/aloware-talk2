@@ -53,156 +53,21 @@
 
           <div class="flex row py-4" v-else>
             <div class="col-6">
-              <!-- Categories section. -->
-              <h2 class="mb-1 text-dark">Categories</h2>
-              <hr class="my-1">
+              <categories-section :categories="iab_categories"
+                                  :is-empty="isEmpty"/>
 
-              <!-- Sanity check. -->
-              <div class="q-my-md"
-                   v-if="!isEmpty(iab_categories)">
-                <q-breadcrumbs class="flex black w-100"
-                               active-color="black"
-                               :key="summary_index"
-                               v-for="(category_summary, summary_index) in iab_categories">
-                  <template v-slot:separator>
-                    <q-icon
-                      size="1em"
-                      name="chevron_right"
-                      color="primary"
-                    />
-                  </template>
+              <highlights-section :highlights="highlights"
+                                  :speakers="speakers"
+                                  :is-empty="isEmpty"/>
 
-                  <q-breadcrumbs-el :label="category"
-                                    :key="category_index"
-                                    v-for="(category, category_index) in category_summary.categories" />
-                  <span class="pl-2">
-                    -<strong class="pl-3">{{ category_summary.relevance }}%</strong>
-                    <q-tooltip class="float-bottom">
-                      <span>
-                        Relevance between the conversation and this category: <strong>{{ category_summary.relevance }}%</strong>
-                      </span>
-                    </q-tooltip>
-                  </span>
-                </q-breadcrumbs>
-              </div>
+              <entities-section :entities="entities"
+                                :entity-types="entity_types"
+                                :speakers="speakers"
+                                :is-empty="isEmpty"/>
 
-              <!-- If no categories were detected. -->
-              <div v-else>
-                <span>
-                  We couldn't find any categories in this call. For more information please check
-                  <a class="link"
-                     href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
-                     this article.
-                  </a>
-                </span>
-              </div>
-
-              <!-- Highlights section. -->
-              <h2 class="mt-4 mb-1 text-dark">Highlights</h2>
-              <hr class="my-1">
-              <!-- Sanity check. -->
-              <div v-if="!isEmpty(highlights)">
-                <!-- To get the highlights by speaker, first we iterate over speakers array. -->
-                <div class="mt-2"
-                     :key="speaker_index"
-                     v-for="(speaker, speaker_index) of speakers">
-                  <div class="speaker--title">{{ speaker }}</div>
-                  <!-- The highlight[speaker] contains the array of highlights. -->
-                  <q-chip class="q-mr-sm q-chip__content white-color"
-                          color="blue-3"
-                          text-color="white"
-                          dense
-                          :key="highlight_index"
-                          v-for="(highlight, highlight_index) in highlights[speaker]">
-                    {{ highlight }}
-                  </q-chip>
-                </div>
-              </div>
-
-              <!-- If no highlights were detected. -->
-              <div v-else>
-                <span class="mt-3">
-                  We couldn't find any highlights in this call. For more information please check
-                  <a class="link"
-                     href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
-                     this article.
-                  </a>
-                </span>
-              </div>
-
-              <!-- Entities section. -->
-              <h2 class="mt-4 mb-1 text-dark">Entities</h2>
-              <hr class="my-1">
-              <!-- Sanity check. -->
-              <div v-if="!isEmpty(entities)">
-                <!-- We want to show the entities by speaker -->
-                <div :key="speaker_index"
-                     v-for="(speaker, speaker_index) in speakers">
-                  <!-- Check if an entity was the detected the current speaker -->
-                  <div class="mt-2"
-                       v-if="entities[speaker]">
-                    <div class="speaker--title">{{ speaker }}</div>
-                      <div :key="type_index"
-                           v-for="(type, type_index) in entity_types">
-                        {{ type | ucfirst }}
-
-                        <q-chip class="q-mx-sm q-my-sm q-chip__content white-color"
-                                color="green-11"
-                                text-color="white"
-                                dense
-                                :key="entity_index"
-                                v-for="(entity, entity_index) in entities[speaker][type]">
-                          {{ entity }}
-                        </q-chip>
-                      </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- If no entities were detected. -->
-              <div v-else>
-                <span class="mt-3">
-                  We couldn't find any specific entities in this call. For more information please check
-                  <a class="link"
-                     href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
-                    this article.
-                  </a>
-                </span>
-              </div>
-
-              <!-- Custom Keywords section. -->
-              <h2 class="mt-4 mb-1 text-dark">Custom Keywords Frequency</h2>
-              <hr class="my-1">
-              <!-- Sanity check. -->
-              <div v-if="!isEmpty(custom_keywords)">
-                <!-- We want to show the custom keywords by speaker. -->
-                <div v-for="(speaker, speaker_index) in speakers" :key="speaker_index">
-                  <!-- Check if the current speaker said any custom keyword -->
-                  <div v-if="custom_keywords[speaker]" class="mt-2">
-                    <div class="speaker--title">{{ speaker }}</div>
-                    <!-- custom_keywords[speaker] contains an object in which the keys represent the custom keywords. -->
-                    <q-chip class="q-mr-sm q-mt-sm q-chip__content white-color"
-                            color="amber-2"
-                            text-color="white"
-                            dense
-                            :key="idx"
-                            v-for="(keyword, idx) in Object.keys(custom_keywords[speaker])">
-                      {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${custom_keywords[speaker][keyword]}` }}</span>
-                    </q-chip>
-                  </div>
-                </div>
-              </div>
-
-              <!-- If no custom keywords were detected. -->
-              <div v-else>
-                <span>
-                  We couldn't find any custom keywords in this call. For more information please check
-                  <a class="link"
-                     href="https://support.aloware.com/frequently-asked-questions-smart-transcription-1">
-                    this article.
-                  </a>
-                </span>
-              </div>
+              <custom-keywords-section :custom_keywords="custom_keywords"
+                                       :speakers="speakers"
+                                       :is-empty="isEmpty"/>
             </div>
 
             <div class="col-6">
@@ -306,11 +171,21 @@
 import Waveform from 'components/waveform'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
+import CategoriesSection from './transcription-components/categories-section'
+import HighlightsSection from './transcription-components/highlights-section'
+import EntitiesSection from './transcription-components/entities-section'
+import CustomKeywordsSection from './transcription-components/custom-keywords-section'
 
 export default {
   name: 'TranscriptionModal',
 
-  components: { Waveform },
+  components: {
+    Waveform,
+    CategoriesSection,
+    HighlightsSection,
+    EntitiesSection,
+    CustomKeywordsSection
+  },
 
   props: {
     communication: {
