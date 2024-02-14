@@ -67,7 +67,7 @@
                                 :speakers="speakers"
                                 :is-empty="isEmpty"/>
 
-              <custom-keywords-section :custom_keywords="custom_keywords"
+              <custom-keywords-section :custom-keywords="custom_keywords"
                                        :speakers="speakers"
                                        :is-empty="isEmpty"/>
             </div>
@@ -141,7 +141,7 @@ export default {
 
   data () {
     return {
-      isLoading: false,
+      isLoading: true,
       show_form: false,
       remote_url: null,
       iab_categories: [],
@@ -227,7 +227,7 @@ export default {
     */
     setSmartTranscriptionData (data) {
       // Sort the speakers to always get AGENT first.
-      this.speakers = data.speakers.sort()
+      this.speakers = data.speakers?.sort()
       this.iab_categories = data.iab_categories
       this.highlights = data.highlights
       this.highlights_summary = data.auto_highlights_summary
