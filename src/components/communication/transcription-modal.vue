@@ -5,6 +5,7 @@
            flat
            round
            dense
+           :size="buttonSize"
            v-if="singleButton"
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
@@ -127,6 +128,10 @@ export default {
     buttonText: {
       type: String,
       default: 'Show Transcription'
+    },
+    buttonSize: {
+      type: String,
+      default: 'sm'
     },
     singleButton: {
       type: Boolean,
