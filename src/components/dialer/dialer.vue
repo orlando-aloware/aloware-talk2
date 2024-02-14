@@ -381,22 +381,18 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.lastCall || (!this.currentCompany.force_contact_disposition && !this.currentCompany.force_call_disposition)) {
+      if (!this.profile.lastCall) {
         return
       }
-      let needDisposition = false
-      if (this.currentCompany.force_contact_disposition && !this.profile.lastCall.contact.disposition_status_id) {
-        needDisposition = true
+      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+        !this.profile.lastCall.contact.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+        !this.profile.lastCall.call_disposition_id
+      if (shouldForceContactDisposition || shouldForceCallDisposition) {
+        this.setDialerCommunication(this.profile.lastCall)
+        this.setDialerContact(this.profile.lastCall.contact)
+        this.startWrapUpTimer()
       }
-      if (this.currentCompany.force_call_disposition && !this.profile.lastCall.call_disposition_id) {
-        needDisposition = true
-      }
-      if (!needDisposition) {
-        return
-      }
-      this.setDialerCommunication(this.profile.lastCall)
-      this.setDialerContact(this.profile.lastCall.contact)
-      this.startWrapUpTimer()
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
