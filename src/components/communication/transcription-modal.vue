@@ -74,30 +74,10 @@
               <div>
                 <!-- Overall Sentiment Analysis section. -->
                 <div class="mb-2">
-                  <div class="flex items-center">
-                    <strong class="mr-2">Overall Sentiment:</strong>
-                    <div v-if="!isEmpty(sentiment_analysis)">
-                      <!--
-                          Sentiment analysis object contains:
-                              1. speaker.
-                              2. overall: speaker's overall sentiment.
-                      -->
-                      <div class="flex inline items-center mr-3"
-                          :key="sentiment_index"
-                          v-for="(sentimentSummary, sentiment_index) in sentiment_analysis">
-                        <div class="mr-2">{{ sentimentSummary.speaker }}:</div>
-                        <q-chip text-color="black"
-                                dense
-                                :color="sentimentChipColors[sentimentSummary.overall]">
-                          <strong>{{ sentimentSummary.overall }}</strong>
-                          <q-tooltip>
-                            {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
-                          </q-tooltip>
-                        </q-chip>
-
-                      </div>
-                    </div>
-                  </div>
+                  <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
+                                              :sentiment-chip-colors="sentimentChipColors"
+                                              :is-empty="isEmpty"
+                                              :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"/>
 
                   <!-- Talk Time Analysis section. -->
                   <div class="flex items-center"
@@ -175,6 +155,7 @@ import CategoriesSection from './transcription-components/categories-section'
 import HighlightsSection from './transcription-components/highlights-section'
 import EntitiesSection from './transcription-components/entities-section'
 import CustomKeywordsSection from './transcription-components/custom-keywords-section'
+import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
 
 export default {
   name: 'TranscriptionModal',
@@ -184,7 +165,8 @@ export default {
     CategoriesSection,
     HighlightsSection,
     EntitiesSection,
-    CustomKeywordsSection
+    CustomKeywordsSection,
+    SentimentAnalysisSection
   },
 
   props: {
