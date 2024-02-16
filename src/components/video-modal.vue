@@ -100,8 +100,6 @@ export default {
       this.showModal = true
       return this.setIsIntroVideoVisible(true)
     }
-
-    return this.setIsIntroVideoVisible(null)
   },
 
   methods: {

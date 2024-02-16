@@ -16,7 +16,7 @@ export default _.merge({
     },
 
     ssuEnabled () {
-      return process.env.KYC_SSU_ENABLED || false
+      return !!(process.env.KYC_SSU_ENABLED || false)
     },
 
     isTrialKYC () {
@@ -75,20 +75,14 @@ export default _.merge({
       return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(kycStatus)
     },
 
-    enabledToTextNumber (phone) {
+    enabledToTextNumber () {
       const kycStatus = this.getStatus()
 
       if (this.skipRestrictions(kycStatus)) {
         return true
       }
 
-      phone = this.$options.filters.fixPhone(phone)
-
-      if (phone === this.profile?.phone_number) {
-        return KycLogs.ONESELF_TEXTS_ALLOWED.includes(kycStatus)
-      }
-
-      return KycLogs.TEXTS_TO_OTHERS_ALLOWED.includes(kycStatus)
+      return KycLogs.TEXTS_ALLOWED.includes(kycStatus)
     },
 
     singleTestNumberPurchased () {
@@ -111,14 +105,34 @@ export default _.merge({
       return KycLogs.BUY_NEW_NUMBERS_ALLOWED.includes(kycStatus)
     },
 
-    enabledToVisitIntegrationsPage () {
+    enabledToAddSequences () {
       const kycStatus = this.getStatus()
 
       if (this.skipRestrictions(kycStatus)) {
         return true
       }
 
-      return KycLogs.VISIT_INTEGRATIONS_ALLOWED.includes(kycStatus)
+      return KycLogs.ADD_SEQUENCES_ALLOWED.includes(kycStatus)
+    },
+
+    enabledToAddBroadcasts () {
+      const kycStatus = this.getStatus()
+
+      if (this.skipRestrictions(kycStatus)) {
+        return true
+      }
+
+      return KycLogs.ADD_BROADCASTS_ALLOWED.includes(kycStatus)
+    },
+
+    allowedToEnableIntegrationsPage () {
+      const kycStatus = this.getStatus()
+
+      if (this.skipRestrictions(kycStatus)) {
+        return true
+      }
+
+      return KycLogs.ENABLE_INTEGRATIONS_ALLOWED.includes(kycStatus)
     },
 
     enabledToSkipTrialAndSubscribe () {
@@ -138,7 +152,7 @@ export default _.merge({
         return false
       }
 
-      return KycLogs.VIEW_ONLY_ALLOWED.includes(kycStatus) && this.currentCompany?.is_trial
+      return KycLogs.VIEW_ONLY_ALLOWED.includes(kycStatus)
     }
   }
 })

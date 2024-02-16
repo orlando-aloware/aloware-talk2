@@ -15,39 +15,51 @@
               :href="reservation.reservation_link">
         <q-card-section>
           <div class="text-subtitle2">
-            Account ID:
-            <div class='text-caption'>
-              {{ reservation.account_id }}
-            </div>
-          </div>
-          <div class="text-subtitle2">
             Confirmation Code:
             <div class='text-caption'>
               {{ reservation.confirmation_code }}
             </div>
           </div>
           <div class="text-subtitle2">
-            Listing:
-            <div class='text-caption'>
-              {{ reservation.listing_nickname }}
-            </div>
-          </div>
-          <div class="text-subtitle2">
             Status:
             <div class='text-caption'>
-              {{ reservation.status }}
+              {{ capitalizedStatus(reservation.status) }}
             </div>
           </div>
           <div class="text-subtitle2">
             Checkin Date:
             <div class='text-caption'>
-              {{ reservation.checkin_date }}
+              {{ reservation.checkin_date | fixFullDateLocal }}
             </div>
           </div>
           <div class="text-subtitle2">
             Checkout Date:
             <div class='text-caption'>
-              {{ reservation.checkout_date }}
+              {{ reservation.checkout_date | fixFullDateLocal }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Listing ID:
+            <div class='text-caption'>
+              {{ reservation.listing_id }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Guests count:
+            <div class='text-caption'>
+              {{ reservation.guests_count }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Currency:
+            <div class='text-caption'>
+              {{ reservation.currency }}
+            </div>
+          </div>
+          <div class="text-subtitle2">
+            Total income:
+            <div class='text-caption'>
+              {{ reservation.total_income }}
             </div>
           </div>
         </q-card-section>
@@ -59,6 +71,7 @@
 <script>
 import { mapState } from 'vuex'
 import _ from 'lodash'
+import { fixFullDateLocal } from 'src/plugins/filters/datetime.filters'
 
 export default {
   name: 'contact-reservations',
@@ -89,6 +102,10 @@ export default {
   },
 
   methods: {
+    fixFullDateLocal,
+    capitalizedStatus (status) {
+      return this.$options.filters.capitalize(status)
+    },
     fetchContactReservations (contactId) {
       window.axios.get('/api/v1/contact/' + contactId + '/reservations').then(res => {
         this.reservations = res.data

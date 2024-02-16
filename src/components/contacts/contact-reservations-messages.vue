@@ -12,12 +12,6 @@
       style='margin-bottom: 10px'>
         <q-card-section>
           <div class="text-subtitle2">
-            Account ID:
-            <div class='text-caption'>
-              {{ message.account_id }}
-            </div>
-          </div>
-          <div class="text-subtitle2">
             Module:
             <div class='text-caption'>
               {{ message.module }}

@@ -8,7 +8,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters'])
+    ...mapState(['campaigns', 'filters', 'dialer'])
   },
   methods: {
     ...mapActions([
@@ -645,6 +645,18 @@ export default {
         })
         .listen('.script.deleted', (event) => {
           window.VueEvent.fire('script_deleted', event.script)
+        })
+        .listen('.kyc_status_updated', (event) => {
+          const sameCompany = this.currentCompany && this.currentCompany.id === event.company.id
+          if (sameCompany) {
+            setInterval(() => {
+              // check if there is a current call in progress
+              if (!['MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus)) {
+                this.setCurrentCompany(event.company)
+                this.$VueEvent.fire('kyc_status_updated', event.company)
+              }
+            }, 10000)
+          }
         })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)

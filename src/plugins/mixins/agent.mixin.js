@@ -72,7 +72,7 @@ export default {
       })
     },
 
-    resetAgentStatus (forceStatus = false) {
+    resetAgentStatus (forceStatus = false, signature = 'Talk-ResetAgentStatus') {
       const agentStatus = { data: null }
       switch (this.oldAgentStatus) {
         case AgentStatus.AGENT_STATUS_OFFLINE:
@@ -93,11 +93,11 @@ export default {
       console.log('new agent status [reset]: ', agentStatus.data)
       // check status
       if (this.profile.agent_status !== agentStatus.data) {
-        this.changeAgentStatus(agentStatus.data, forceStatus)
+        this.changeAgentStatus(agentStatus.data, forceStatus, 1, signature)
       }
     },
 
-    changeAgentStatus: _.debounce(function (val, forceStatus = false, changeAgentStatusTry = 1) {
+    changeAgentStatus: _.debounce(function (val, forceStatus = false, changeAgentStatusTry = 1, signature = 'Unknown') {
       if (!this.authenticated) {
         return
       }
@@ -112,11 +112,15 @@ export default {
         this.loadingAgentStatus = true
         this.$axios.post('/api/v1/user/' + this.profile.id + '/agent-status', {
           agent_status: val
+        }, {
+          headers: {
+            'Signature': signature
+          }
         }).then(({ data }) => {
           this.loadingAgentStatus = false
           if (forceStatus && val !== data.agent_status) {
             console.log(`Requested Agent status value (${val}) and API response value (${data.agent_status}) is not the same. Retrying request...`)
-            this.changeAgentStatus(val, forceStatus)
+            this.changeAgentStatus(val, forceStatus, 1, signature)
             return
           }
           this.setAgentStatus(data.agent_status)
@@ -130,7 +134,7 @@ export default {
           if (changeAgentStatusTry > 3) {
             this.loadingAgentStatus = false
           } else {
-            this.changeAgentStatus(val, forceStatus, changeAgentStatusTry)
+            this.changeAgentStatus(val, forceStatus, changeAgentStatusTry, signature)
           }
         })
       }

@@ -1,4 +1,5 @@
 import * as storage from 'src/plugins/helpers/storage'
+import userpilot from 'src/plugins/vendor/userpilot'
 import { get } from 'lodash'
 
 const check = async ({ commit }, payload, skipSetAuthenticated) => {
@@ -28,6 +29,9 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
+
+    // auth user in Userpilot
+    userpilot.auth(response.data.user)
 
     if (!preventRedirect &&
       (!response.data.user.enabled ||
