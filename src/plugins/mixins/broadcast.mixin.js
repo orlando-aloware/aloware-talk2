@@ -33,6 +33,8 @@ export default {
       'deleteDispositionStatus',
       'newBulkCallDisposition',
       'newCallDisposition',
+      'newActivityType',
+      'deleteActivityType',
       'updateCallDisposition',
       'deleteCallDisposition'
     ]),
@@ -518,6 +520,16 @@ export default {
         .listen('.call_disposition.deleted', (event) => {
           this.deleteCallDisposition(event.call_disposition)
           this.$VueEvent.fire('call_disposition_deleted', event.call_disposition)
+        })
+        .listen('.activity_type.created', (event) => {
+          console.log('created', event)
+          this.newActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_created', event.activity_type)
+        })
+        .listen('.activity_type.deleted', (event) => {
+          console.log('deleted', event)
+          this.deleteActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_deleted', event.activity_type)
         })
         .listen('.contact.created', (event) => {
           if (event.contact) {

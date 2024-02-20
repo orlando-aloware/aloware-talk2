@@ -802,6 +802,16 @@
                 </div>
               </b-col>
             </b-form-row>
+            <b-form-row v-if="currentCompany.hubspot_type_field_on_dialer">
+              <b-col class="pl-0 pr-0">
+                <q-item-label class="mt-3 custom-item-label">Hubspot Type: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
+                </div>
+              </b-col>
+            </b-form-row>
           </q-card-section>
         </q-card>
       </b-col>
@@ -842,11 +852,13 @@ import PredefinedTimeDurationSelector from 'components/predefined-time-duration-
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 
 export default {
   name: 'communication-details',
 
   components: {
+    HubspotActivityTypeSelector,
     PencilOIcon,
     PredefinedTimeDurationSelector,
     RingGroupSnapshot,
