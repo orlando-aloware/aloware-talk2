@@ -17,7 +17,7 @@
           <b-form-group
             label="First Name"
             class="form-label"
-            :disabled="viewOnly"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -36,7 +36,7 @@
           <b-form-group
             class="form-label"
             label="Last Name"
-            :disabled="viewOnly"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               v-model.trim="$v.user.last_name.$model"
@@ -78,7 +78,7 @@
           <b-form-group
             class="form-label"
             label="Email"
-            :disabled="viewOnly || isCompanyKYC"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -444,7 +444,7 @@ import {
   settingsMixin,
   kycMixin
 } from 'src/plugins/mixins'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
 
@@ -465,8 +465,6 @@ export default {
     ...mapState('settings', ['userClone']),
 
     ...mapState('auth', ['profile']),
-
-    ...mapGetters('auth', ['isCompanyKYC']),
 
     userDestinationEditable () {
       return this.user.role_name && !this.user.read_only_access
@@ -496,6 +494,14 @@ export default {
 
     whiteLabelText () {
       return this.statics.whitelabel ? '' : ' on Aloware'
+    },
+
+    isCompanyKYCNotAbleToAddUser () {
+      if (!this.isCompanyKYC) {
+        return false
+      }
+
+      return this.user.id === this.profile.id
     }
   },
 
