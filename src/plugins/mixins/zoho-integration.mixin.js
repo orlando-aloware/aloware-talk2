@@ -20,7 +20,7 @@ export default {
       if (contact?.integration_data?.zoho?.contact_id) {
         return contact?.integration_data?.zoho?.contact_link
       }
-      
+
       return contact?.integration_data?.zoho?.lead_link
     }
   }
