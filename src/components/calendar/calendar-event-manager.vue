@@ -30,12 +30,12 @@
             ref="scheduleForm">
       <b-row>
         <b-col>
-          <b-form-group class='form-label'
-                        label='Title'>
+          <b-form-group class="form-label"
+                        label="Title">
             <b-form-input
               type="text"
-              placeholder='Add title'
-              v-model='schedule.text'>
+              placeholder="Add title"
+              v-model="schedule.text">
             </b-form-input>
           </b-form-group>
         </b-col>
