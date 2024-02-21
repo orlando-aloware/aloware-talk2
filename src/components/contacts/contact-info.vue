@@ -171,7 +171,7 @@
                       size="sm"
                       class="custom-action-button my-1"
                       :disabled="!isSimpSocialIntegrationEnabled"
-                      v-if="isSimpsocial"
+                      v-if="isSimpSocial"
                       @click="openEmailBlast">
                 <q-tooltip anchor="bottom middle"
                            self="center middle">
@@ -183,7 +183,7 @@
                       size="sm"
                       class="custom-action-button my-1"
                       :disabled="isVideoConferenceLinkSending"
-                      v-if="isSimpsocial"
+                      v-if="isSimpSocial"
                       @click="openVideoConference">
                 <q-tooltip anchor="bottom middle"
                            self="center middle">

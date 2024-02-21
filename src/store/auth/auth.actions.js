@@ -1,7 +1,8 @@
 import * as storage from 'src/plugins/helpers/storage'
+import userpilot from 'src/plugins/vendor/userpilot'
 import { get } from 'lodash'
 
-const check = async ({ commit }, payload) => {
+const check = async ({ commit }, payload, skipSetAuthenticated) => {
   const preventLogout = get(payload, 'preventLogout', false)
   const preventRedirect = get(payload, 'preventRedirect', false)
 
@@ -20,12 +21,18 @@ const check = async ({ commit }, payload) => {
 
     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 
-    commit('SET_AUTHENTICATED', true)
+    if (!skipSetAuthenticated) {
+      commit('SET_AUTHENTICATED', true)
+    }
+
     commit('SET_PROFILE', response.data.user)
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
     commit('SET_OLD_AGENT_STATUS', response.data.user.agent_status, { root: true })
+
+    // auth user in Userpilot
+    userpilot.auth(response.data.user)
 
     if (!preventRedirect &&
       (!response.data.user.enabled ||
@@ -62,7 +69,8 @@ const login = async ({ commit }, {
   recaptchaResponse = null,
   isMobile = false,
   deviceInfo = null,
-  requestedFrom = null
+  requestedFrom = null,
+  skipSetAuthenticated = false
 }) => {
   const config = {}
 
@@ -102,8 +110,7 @@ const login = async ({ commit }, {
 
     commit('SET_LOADING', false)
 
-    await check({ commit }, {})
-
+    await check({ commit }, {}, skipSetAuthenticated)
     return response
   } catch (err) {
     commit('SET_LOADING', false)

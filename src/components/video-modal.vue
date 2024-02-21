@@ -100,8 +100,6 @@ export default {
       this.showModal = true
       return this.setIsIntroVideoVisible(true)
     }
-
-    return this.setIsIntroVideoVisible(null)
   },
 
   methods: {
@@ -109,7 +107,7 @@ export default {
 
     closeModal () {
       this.showModal = false
-      this.$cookies.set(this.cookieName, 'viewed') // Set cookie to expire in 1 day
+      this.$cookies.set(this.cookieName, 'viewed', 3650) // Set cookie to expire in 10 years
       this.setIsIntroVideoVisible(null)
     },
 

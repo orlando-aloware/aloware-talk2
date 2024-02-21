@@ -15,20 +15,20 @@
           <h2>Hey! It looks like that your account has been suspended. Please
             contact our support at
             <span class="text-primary"
-                  v-if="isNotSimpsocial">
+                  v-if="!isSimpSocial">
               support@aloware.com
             </span>
             <span class="text-primary"
-                  v-if="isSimpsocial">
+                  v-if="isSimpSocial">
               support@simpsocial.com
             </span>
             or call
             <span class="text-primary"
-                  v-if="isNotSimpsocial">
+                  v-if="!isSimpSocial">
                 855-256-2001
             </span>
             <span class="text-primary"
-                  v-if="isSimpsocial">
+                  v-if="isSimpSocial">
                 888-829-1110
             </span>
             for assistance.
@@ -40,26 +40,26 @@
                   variant="success"
                   size="sm"
                   class="mr-2"
-                  v-if="isNotSimpsocial">
+                  v-if="!isSimpSocial">
           Send an Email
         </b-button>
         <b-button href="mailto:support@simpsocial.com"
                   variant="success"
                   size="sm"
                   class="mr-2"
-                  v-if="isSimpsocial">
+                  v-if="isSimpSocial">
           Send an Email
         </b-button>
         <b-button href="tel:+18552562001"
                   variant="primary"
                   size="sm"
-                  v-if="isNotSimpsocial">
+                  v-if="!isSimpSocial">
           Call us
         </b-button>
         <b-button href="tel:+18888291110"
                   variant="primary"
                   size="sm"
-                  v-if="isSimpsocial">
+                  v-if="isSimpSocial">
           Call us
         </b-button>
       </div>

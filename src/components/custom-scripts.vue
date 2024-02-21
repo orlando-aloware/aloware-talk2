@@ -4,22 +4,20 @@
 
 <script>
 import { mapState } from 'vuex'
+import { userMixin, simpsocialMixin } from 'src/plugins/mixins'
 import api from 'src/plugins/api/api'
 
 export default {
   name: 'custom-scripts',
 
+  mixins: [
+    simpsocialMixin,
+    userMixin
+  ],
+
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState('auth', ['profile', 'authenticated']),
-
-    isModGenius () {
-      return this.currentCompany?.reseller_id === 2132
-    },
-
-    isSimpSocial () {
-      return this.currentCompany?.reseller_id === 357
-    }
+    ...mapState('auth', ['profile', 'authenticated'])
   },
 
   mounted () {
@@ -33,10 +31,15 @@ export default {
         return
       }
 
-      if (this.isModGenius) {
+      if (this.isModGen) {
         this.loadScript(process.env.HS_CUSTOM_JS_MOD_GENIUS)
-      } else if (!this.isSimpSocial) {
+      } else if (!this.isSimpsocial) {
         this.loadScript(process.env.HS_CUSTOM_JS)
+      }
+
+      // set to false so the widget isn't load without user identification
+      window.hsConversationsSettings = {
+        loadImmediately: false
       }
 
       this.initiateHubspotConversationsWithUserDetails()
@@ -61,7 +64,7 @@ export default {
     },
 
     initiateHubspotConversationsWithUserDetails () {
-      if (this.isSimpSocial) {
+      if (this.isSimpsocial) {
         return
       }
 
@@ -81,7 +84,6 @@ export default {
     conversationsSettings (token) {
       console.log('setting up hubspot conversations settings')
       window.hsConversationsSettings = {
-        loadImmediately: false,
         identificationEmail: this.profile.email,
         identificationToken: token
       }

@@ -14,28 +14,39 @@
 
       <div class="broadcast-add__message__sms__composer-body">
         <message-composer-sms :max-attachments="1"
-                              :max-characters="maxSmsBodyLength"
+                              :max-characters="maxSmsBodyWithOptoutLength"
                               :reset-on-load="false"
                               :use-send-button="false"
-                              @messageChanged="messageLength"
-                              :is-broadcast="true"/>
+                              :is-broadcast="true"
+                              @messageChanged="messageLength"/>
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
-        <div style="z-index: 10">
+        <div class="d-flex items-center"
+             style="z-index: 10">
           <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
             This is the text message you want to send to the selected group of contacts.<br>
             If the user has no contact name or 'Aloware Contact' as the name, then the variable will be blank.
           </q-tooltip>
         </div>
-        <div>
+        <div class="d-flex items-center">
+          <q-checkbox class="pr-4"
+                      size="xs"
+                      :disable="isOptOutForced"
+                      v-model="isOptoutActiveComputed">
+              Add opt-out phrase for this message
+              <q-tooltip v-if="isOptOutForced">
+                {{ optoutTooltipText }}
+              </q-tooltip>
+            </q-checkbox>
           <span class="mr-4">
             Message parts: {{ messagePartCount }} / {{ baseLine }}
           </span>
           <span>
             Message(s): {{ messageCount }}
           </span>
+
         </div>
       </div>
 
@@ -101,6 +112,7 @@ import MessageComposerSmsPreview from 'src/components/message-composer/message-c
 import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, smsMixin } from 'src/plugins/mixins'
+import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
   name: 'broadcast-add-view-message',
@@ -132,7 +144,16 @@ export default {
     }
   },
 
+  data: () => ({
+    type: 'sms',
+    maxSmsBodyLength: 1600
+  }),
+
   computed: {
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapState([
       'campaigns'
     ]),
@@ -142,8 +163,29 @@ export default {
     ]),
 
     ...mapGetters('contacts', [
-      'messageComposer'
+      'messageComposer',
+      'isOptoutActive',
+      'optoutText',
+      'messageBodyWithOptout'
     ]),
+
+    isOptoutActiveComputed: {
+      get () {
+        return this.isOptoutActive
+      },
+
+      set (value) {
+        return this.setIsOptoutActive(value)
+      }
+    },
+
+    isOptOutForced () {
+      return this.currentCompany.force_opt_out_phrase
+    },
+
+    maxSmsBodyWithOptoutLength () {
+      return this.isOptoutActive ? 1600 - this.optoutTextLength : 1600
+    },
 
     isValid () {
       switch (this.type) {
@@ -171,6 +213,10 @@ export default {
       ].filter(type => type.enabled)
     },
 
+    optoutTextLength () {
+      return this.isOptoutActive ? this.optoutText.length : 0
+    },
+
     smsBodyLength () {
       return this.smartEncodedMessageLength
     },
@@ -190,7 +236,7 @@ export default {
     messagePartCount () {
       if (this.smsBodyLength > 0) {
         const count = this.smartEncodedMessageLength % this.segmentUsedChars
-        return count === 0 ? this.segmentMaxChars : count
+        return (count === 0 ? this.segmentMaxChars : count) || this.smartEncodedMessageLength
       }
 
       return 0
@@ -225,13 +271,12 @@ export default {
 
     rvmUrl () {
       return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm?.file_name}`
+    },
+
+    optoutTooltipText () {
+      return IS_OPT_OUT_FORCED_TEXT
     }
   },
-
-  data: () => ({
-    type: 'sms',
-    maxSmsBodyLength: 1600
-  }),
 
   created () {
     const campaign = this.profile.campaign_id
@@ -242,12 +287,14 @@ export default {
 
     // type setup
     this.type = this.rvm ? 'rvm' : 'sms'
+    this.setIsOptoutActive(true)
   },
 
   methods: {
     ...mapActions('contacts', [
       'setMessageComposerSmsBody',
-      'setSelectedLine'
+      'setSelectedLine',
+      'setIsOptoutActive'
     ]),
 
     applyVMDropAudioFile (data) {
@@ -268,6 +315,16 @@ export default {
       immediate: true,
       handler (state) {
         this.$emit('input', state)
+      }
+    },
+
+    isOptoutActive: {
+      immediate: true,
+      handler () {
+        const newBody = this.messageComposer.sms.body.substring(0, this.maxSmsBodyWithOptoutLength)
+        this.setMessageComposerSmsBody(newBody)
+        this.messageLength(newBody)
+        this.getMessageInfo(newBody)
       }
     },
 
