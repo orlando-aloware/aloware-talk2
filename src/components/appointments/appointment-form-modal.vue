@@ -11,6 +11,16 @@
             @submit.prevent="onSubmit"
             @reset="resetForm">
       <b-form-row>
+          <b-col sm="12">
+            <b-form-group label="Title">
+              <b-form-input
+                type="text"
+                placeholder="Add title"
+                v-model="appointment.text">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+
         <b-col sm="12">
           <b-form-group id="input-group-1"
                         label="Select date"
