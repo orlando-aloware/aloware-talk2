@@ -80,7 +80,9 @@
       <div class="text-center">
         <q-spinner-bars color="primary"
                         size="2em" />
-        <p id="cancel-label">Fetching contact...</p>
+        <p id="cancel-label">
+          Fetching contact...
+        </p>
       </div>
     </template>
   </b-overlay>

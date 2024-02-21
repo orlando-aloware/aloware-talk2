@@ -12,7 +12,7 @@
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false"
+                     :should-show-in-first-visit="true"
                      v-if="!isSimpSocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
@@ -46,7 +46,7 @@
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
-                     :should-show-in-first-visit="false"
+                     :should-show-in-first-visit="true"
                      v-if="!isSimpSocial && isTrial">
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
@@ -79,6 +79,16 @@
                unelevated
                v-if="isCompanyKYC && !kycFilled"
                @click="onOpenFinishRegistration" />
+        <q-btn class="q-mr-lg"
+               color="primary"
+               size="md"
+               label="Registration in Review"
+               rounded
+               dense
+               no-caps
+               unelevated
+               v-else
+               @click="onOpenRegistrationInReview" />
       </div>
       <div class="button-index">
         <compact-btn customClass="fs-24 _500 position-relative not-focusable text-red-130"
@@ -131,12 +141,20 @@ export default {
     },
 
     trialText () {
-      const dayNoun = this.currentCompany.trial_remaining_days > 1 ? 'days' : 'day'
+      if (typeof this.currentCompany.trial_remaining_days === 'undefined' || typeof this.currentCompany.trial_days === 'undefined') {
+        return `Welcome, ${this.profile.first_name}, your account is on trial.`
+      }
+
+      const dayNoun = this.currentCompany.trial_remaining_days === 1 ? 'day' : 'days'
       return `Welcome, ${this.profile.first_name}, you have ${this.currentCompany.trial_remaining_days} ${dayNoun} left until your ${this.currentCompany.trial_days}-day trial account expires.`
     },
 
     isBigScreen () {
       return this.$q.screen.width > 1280
+    },
+
+    classicUrlCompliancePage () {
+      return process.env.API_URL + '/account?tab=compliance'
     }
   },
 
@@ -161,6 +179,10 @@ export default {
         name: 'Business Information',
         params: { company_id: this.currentCompany.id }
       })
+    },
+
+    onOpenRegistrationInReview () {
+      window.location.href = this.classicUrlCompliancePage
     },
 
     openWatchGuideVideo () {

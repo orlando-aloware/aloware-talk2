@@ -6,31 +6,33 @@
                :show="isLoadingCommunication"
                :opacity="0.85">
       <communication-details :verbose="true"
-                             v-if="!hasError && communication" :communication="communication" />
+                             :communication="communication"
+                             v-if="!hasError && communication">
+      </communication-details>
       <b-row v-else-if="hasError && !isLoadingCommunication">
         <b-col md="4"
                sm="12"
                class="pl-0 pr-0">
-            <q-card flat
-                    bordered
-                    class="my-card">
-              <q-card-section class="text-center">
+          <q-card flat
+                  bordered
+                  class="my-card">
+            <q-card-section class="text-center">
                  <span class="material-icons fs-45">
                   error_outline
                 </span>
-              </q-card-section>
+            </q-card-section>
 
-              <q-card-section class="q-pt-none text-center">
-                We could not find the requested resource.
-              </q-card-section>
-            </q-card>
+            <q-card-section class="q-pt-none text-center">
+              We could not find the requested resource.
+            </q-card-section>
+          </q-card>
         </b-col>
       </b-row>
 
       <template #overlay>
         <div class="text-center">
           <q-spinner-bars color="primary"
-                          size="2em" />
+                          size="2em"/>
           <p>Fetching Communication...</p>
         </div>
       </template>
