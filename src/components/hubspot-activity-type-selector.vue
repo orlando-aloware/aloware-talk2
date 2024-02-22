@@ -1,16 +1,15 @@
 <template>
   <div class="w-full flex-grow-1">
     <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
-                 v-model="activity_type"
+                 open-direction="bottom"
                  placeholder="Select Activity Type"
                  :selectLabel="null"
                  :deselectLabel="null"
                  :selectedLabel="null"
-                 open-direction="bottom"
                  :searchable="true"
                  :options="activityTypes"
                  :multiple="false"
-                 :loading="loading_activity_type"
+                 :loading="loadingActivityType"
                  :internal-search="false"
                  :clear-on-select="false"
                  :options-limit="300"
@@ -19,6 +18,7 @@
                  :max-height="150"
                  :show-no-results="true"
                  :class="selectClass"
+                 v-model="activityType"
                  @open="onSelectOpen"
                  @close="onSelectClose"
                  @input="changeActivityType">
@@ -49,10 +49,12 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
 
     value: {
+      type: String,
       required: false,
       default: null
     }
@@ -60,9 +62,9 @@ export default {
 
   data () {
     return {
-      activity_type: this.value,
-      prev_activity_type: this.value,
-      loading_activity_type: false,
+      activityType: this.value,
+      prevActivityType: this.value,
+      loadingActivityType: false,
       selectClass: []
     }
   },
@@ -75,7 +77,7 @@ export default {
 
   mounted () {
     if (this.communication) {
-      this.activity_type = this.communication.activity_type
+      this.activityType = this.communication.activity_type
     }
   },
 
@@ -93,20 +95,20 @@ export default {
     },
 
     changeActivityType () {
-      if (isNull(this.activity_type)) {
-        this.activity_type = this.prev_activity_type
+      if (isNull(this.activityType)) {
+        this.activityType = this.prevActivityType
         return
       }
-      this.prev_activity_type = this.activity_type
-      this.loading_activity_type = true
-      this.$axios.post('/api/v1/communication/' + this.communication.id + '/activity-type', {
-        activity_type: this.activity_type
+      this.prevActivityType = this.activityType
+      this.loadingActivityType = true
+      this.$axios.post(`/api/v1/communication/${this.communication.id}/activity-type`, {
+        activity_type: this.activityType
       }).then((res) => {
-        this.loading_activity_type = false
+        this.loadingActivityType = false
         this.$generalNotification('Activity type updated.')
         this.$emit('activityTypeChosen', res.data.activity_type)
       }).catch((err) => {
-        this.loading_activity_type = false
+        this.loadingActivityType = false
         this.$handleErrors(err.response)
       })
     }
