@@ -75,31 +75,13 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :ripple="false"
-           icon="img:app-icons/menu/power_dialer_gray.svg"
-           align="center"
-           padding="none"
-           class="nav-icons w-100 disabled"
-           v-show="showDisabledPowerDialerMenu"
-           flat
-           @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Power Dialer</span>
-      </q-tooltip>
-    </q-btn>
     <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && isActive('Power Dialer') && profile.auto_dialer_enabled"
+           v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -113,7 +95,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && !isActive('Power Dialer') && profile.auto_dialer_enabled"
+           v-show="(!isActive('Power Dialer') && profile.auto_dialer_enabled) || !profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -151,31 +133,13 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :ripple="false"
-           icon="img:app-icons/menu/calendar_gray.svg"
-           align="center"
-           padding="none"
-           class="nav-icons w-100 disabled"
-           v-show="showDisabledCalendarMenu"
-           flat
-           @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Calendar</span>
-      </q-tooltip>
-    </q-btn>
     <q-btn :to="{ path: '/calendar' }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && isActive('Calendar') && profile.calendar_enabled"
+           v-show="isActive('Calendar') && profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -189,7 +153,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && !isActive('Calendar') && profile.calendar_enabled"
+           v-show="(!isActive('Calendar') && profile.calendar_enabled) || !profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -568,8 +532,6 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState(['usage']),
-
     isProd () {
       return storage.local.getItem('env') === 'production'
     },
@@ -596,20 +558,6 @@ export default {
     isKycAccount () {
       const status = this.profile?.company?.kyc_status
       return status !== KycLogs.KYC_STATUS_NONE
-    },
-
-    planUseCase () {
-      return this.usage.plan.use_case
-    },
-
-    showDisabledCalendarMenu () {
-      const iProPlan = this.planUseCase === 'iPro'
-      return !iProPlan && !this.isTrialKYC && !this.isActive('Calendar') && !this.profile.calendar_enabled
-    },
-
-    showDisabledPowerDialerMenu () {
-      const iProPlan = this.planUseCase === 'iPro'
-      return !iProPlan && !this.isTrialKYC && !this.isActive('Power Dialer') && !this.profile.auto_dialer_enabled
     }
   },
 
