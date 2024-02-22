@@ -35,7 +35,8 @@
             <b-form-input
               type="text"
               placeholder="Add title"
-              v-model="schedule.text">
+              v-model="schedule.text"
+              :disabled="!isEditable">
             </b-form-input>
           </b-form-group>
         </b-col>
