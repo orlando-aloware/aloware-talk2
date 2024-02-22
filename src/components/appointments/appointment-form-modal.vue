@@ -218,6 +218,7 @@ export default {
         duration: 15,
         timezone: this.contact.timezone || '',
         body: '',
+        text: '',
         type: 12,
         smsReminder: {
           enabled: false,
@@ -288,6 +289,7 @@ export default {
         duration: this.appointment.duration,
         timezone: this.appointment.timezone,
         body: this.appointment.body,
+        text: this.appointment.text,
         type: this.appointment.type,
         contact: this.contact,
         user: this.profile,
