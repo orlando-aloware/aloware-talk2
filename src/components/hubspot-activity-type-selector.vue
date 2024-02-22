@@ -99,7 +99,7 @@ export default {
       }
       this.prev_activity_type = this.activity_type
       this.loading_activity_type = true
-      this.$axios.post('/api/v1/communication/' + this.communication.id + '/activity-type', {
+      this.$axios.post(`/api/v1/communication/${this.communication.id}/activity-type`, {
         activity_type: this.activity_type
       }).then((res) => {
         this.loading_activity_type = false
