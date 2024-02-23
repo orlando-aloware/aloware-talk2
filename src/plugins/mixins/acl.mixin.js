@@ -167,7 +167,7 @@ export default _.merge({
     isBlockedFrom (permissions) {
       let blockedAccess = []
 
-      switch (this.usage.plan.use_case) {
+      switch (this.usage?.plan?.use_case) {
         case 'iPro':
           blockedAccess = [
             'line cnam',

@@ -299,39 +299,41 @@
               <!-- operations -->
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'operations'">
-                <!-- unpark -->
-                <unpark-communication-button class="ml-2"
-                                             :communication="call"
-                                             v-if="isParkedCall(call)" />
+                <div class="calls__table__operations">
+                  <!-- unpark -->
+                  <unpark-communication-button class="ml-2"
+                                              :communication="call"
+                                              v-if="isParkedCall(call)" />
 
-                <!-- go to messages -->
-                <router-link :to="{ path: `/contacts/${call.contact_id}` }"
-                              v-if="call.contact && call.type === CommunicationTypes.SMS && hasPermissionTo('send sms')">
-                  <button class="btn btn-sm btn-primary">
-                    <i class="material-icons">reply</i>
-                    <q-tooltip>Reply</q-tooltip>
-                  </button>
-                </router-link>
+                  <!-- go to messages -->
+                  <router-link :to="{ path: `/contacts/${call.contact_id}` }"
+                                v-if="call.contact && call.type === CommunicationTypes.SMS && hasPermissionTo('send sms')">
+                    <button class="btn btn-sm btn-primary">
+                      <i class="material-icons">reply</i>
+                      <q-tooltip>Reply</q-tooltip>
+                    </button>
+                  </router-link>
 
-                <!-- go to comm info -->
-                <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
-                  <information-circle-icon class="ml-2"
-                                           height="24"
-                                           width="24" />
-                  <q-tooltip>More Details</q-tooltip>
-                </router-link>
+                  <!-- go to comm info -->
+                  <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
+                    <information-circle-icon class="ml-2"
+                                            height="24"
+                                            width="24" />
+                    <q-tooltip>More Details</q-tooltip>
+                  </router-link>
 
-                <!-- terminate -->
-                <terminate-communication-button class="ml-2"
-                                                :communication="call" />
+                  <!-- terminate -->
+                  <terminate-communication-button class="ml-2"
+                                                  :communication="call" />
 
-                <!-- barge -->
-                <barge-communication-button class="ml-2"
-                                            :communication="call" />
-
-                <!-- whisper -->
-                <whisper-communication-button class="ml-2"
+                  <!-- barge -->
+                  <barge-communication-button class="ml-2"
                                               :communication="call" />
+
+                  <!-- whisper -->
+                  <whisper-communication-button class="ml-2"
+                                                :communication="call" />
+                </div>
               </td>
             </template>
           </tr>
