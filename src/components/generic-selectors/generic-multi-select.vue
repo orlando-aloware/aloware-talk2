@@ -229,10 +229,26 @@ export default {
     },
 
     filteredOptions () {
+      const newOptions = []
+
+      // if label == 'Tags' then request API using filter
+      if (this.label === 'Tags') {
+        const params = {
+          full_load: true,
+          filter: this.search
+        }
+
+        return this.$axios.get('/api/v1/tag', { params }).then(res => {
+          newOptions = res.data
+        }).catch(err => {
+          console.log(err)
+        })
+        return newOptions
+      }
       if (!this.optionsIsGrouped) {
         return this.options.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
       }
-      const newOptions = []
+      
       const option = { item: null }
       for (option.item of this.options) {
         newOptions.push({
