@@ -13969,6 +13969,12 @@ h1.contact-list-name-label {
 
     @media (min-height: 480px) {
       .business-information__container {
+        height: 42vh;
+      }
+    }
+
+    @media (min-height: 620px) {
+      .business-information__container {
         height: 50vh;
       }
     }
@@ -13982,6 +13988,12 @@ h1.contact-list-name-label {
     @media (min-height: 900px) {
       .business-information__container {
         height: 65vh;
+      }
+    }
+
+    @media (min-height: 1024px) {
+      .business-information__container {
+        height: 68vh;
       }
     }
 
@@ -14257,7 +14269,13 @@ h1.contact-list-name-label {
 
   @media (min-height: 480px) {
     .business-information-actions {
-      top: calc(100vh - 40vh);
+      top: calc(100vh - 36vh);
+    }
+  }
+
+  @media (min-height: 620px) {
+    .business-information-actions {
+      top: calc(100vh - 32vh);
     }
   }
 
@@ -14271,6 +14289,13 @@ h1.contact-list-name-label {
     .business-information-actions {
       top: calc(100vh - 22vh);
       height: 65vh;
+    }
+  }
+
+  @media (min-height: 1024px) {
+    .business-information-actions {
+      top: calc(100vh - 16vh);
+      height: 68vh;
     }
   }
 
