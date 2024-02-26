@@ -24,7 +24,7 @@ export default _.merge({
         return false
       }
 
-      return this.current_company?.is_kyc && this.currentCompany?.is_trial
+      return this.currentCompany?.is_kyc && this.currentCompany?.is_trial
     },
 
     isCompanyKYC () {
@@ -32,7 +32,7 @@ export default _.merge({
         return false
       }
 
-      return this.current_company?.is_kyc
+      return this.currentCompany?.is_kyc
     },
 
     isKYCFilled () {
@@ -40,7 +40,7 @@ export default _.merge({
         return false
       }
 
-      return this.current_company?.kyc_filled
+      return this.currentCompany?.kyc_filled
     }
   },
 
