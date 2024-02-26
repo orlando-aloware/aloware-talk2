@@ -143,11 +143,6 @@ export default {
     if (this.tags) {
       this.options = this.tags
     }
-    /*
-    if (!this.tags) {
-      this.getTags()
-    }
-    */
   },
 
   methods: {
