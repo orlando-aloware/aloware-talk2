@@ -42,7 +42,8 @@
         </template>
       </q-field>
       <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
-           :style="height ? `height: ${height}px !important` : ''">
+           :style="height ? `height: ${height}px !important` : ''"
+           v-if="options.length">
         <template v-if="!optionsIsGrouped">
           <div class="mr-1">
             <div role="button"
@@ -100,10 +101,10 @@
           </div>
         </template>
       </div>
-      <!--div class="text-center w-100"
+      <div class="text-center w-100"
            v-else>
         <span>No options to select</span>
-      </div-->
+      </div>
     </q-field>
     <div class="list-wrapper"
          v-else>
@@ -144,8 +145,6 @@ import _ from 'lodash'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
-import * as TagTypes from 'src/constants/tag-types'
-
 export default {
   name: 'generic-multi-select',
   components: { CheckOIcon, PencilOIcon, RemoveTagIcon },
@@ -174,12 +173,6 @@ export default {
       default: () => []
     },
 
-    current: {
-      required: false,
-      type: Array,
-      default: () => []
-    },
-
     canEdit: {
       required: false,
       type: Boolean,
@@ -202,19 +195,7 @@ export default {
     return {
       search: '',
       isEdit: false,
-      loadingTags: false,
-      selectedValues: [],
-      searchList: [
-        {
-          title: 'Account Tags',
-          children: []
-        },
-        {
-          title: 'Import Tags',
-          children: []
-        }
-      ],
-      searchedOptions: []
+      selectedValues: []
     }
   },
 
@@ -232,10 +213,6 @@ export default {
     },
 
     formattedValues () {
-      if (this.label === 'Tags') {
-        return this.current
-      }
-
       if (_.isEmpty(this.selectedValues)) {
         return []
       }
@@ -252,28 +229,9 @@ export default {
     },
 
     filteredOptions () {
-      if (this.label === 'Tags') {
-        if (!this.loadingTags && (this.searchList[0].children.length || this.searchList[1].children.length)) {
-          return this.searchList
-        }
-        this.getTags()
-        return
-        /* let newOptions = []
-        const tags = this.getTags()
-        console.log('searchOptions tags', tags)
-        if (tags.length) {
-          newOptions.push({
-            title: 'Account Tags',
-            children: tags.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
-          })
-          newOptions.push({
-            title: 'Import Tags',
-            children: tags.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
-          })
-        }
-        return newOptions */
+      if (!this.optionsIsGrouped) {
+        return this.options.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
       }
-
       const newOptions = []
       const option = { item: null }
       for (option.item of this.options) {
@@ -321,16 +279,6 @@ export default {
 
     onEdit () {
       this.isEdit = true
-      this.searchList = [
-        {
-          title: 'Account Tags',
-          children: []
-        },
-        {
-          title: 'Import Tags',
-          children: []
-        }
-      ]
       this.$nextTick(() => {
         this.$refs.search.focus()
       })
@@ -343,42 +291,6 @@ export default {
         this.selectedValues.splice(found.data, 1)
       }
       this.$emit('valuesUpdated', this.selectedValues)
-    },
-
-    searchOptions () {
-      let tags = this.getTags()
-      console.log('searchOptions tags', tags)
-      if (this.searchedOptions.length) {
-        
-      }
-      return this.searchList
-    },
-
-    getTags () {
-      const params = {
-        full_load: true,
-        filter: this.search
-      }
-
-      this.loadingTags = true
-
-      this.$axios.get('/api/v1/tag', { params }).then(res => {
-        let list = res.data
-
-        console.log('/api/v1/tag list', list)
-
-        let accountTags = list.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
-        let importTags = list.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
-
-        this.searchList[0].children = accountTags
-        this.searchList[1].children = importTags
-
-        this.loadingTags = false
-
-        console.log('this.searchList', this.searchList)
-      }).catch(err => {
-        console.log(err)
-      })
     }
   },
 
