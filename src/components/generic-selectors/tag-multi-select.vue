@@ -42,7 +42,8 @@
         </template>
       </q-field>
       <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
-           :style="height ? `height: ${height}px !important` : ''">
+           :style="height ? `height: ${height}px !important` : ''"
+           v-if="searchList[0].children.length || searchList[1].children.length">
         <template v-if="!optionsIsGrouped">
           <div class="mr-1">
             <div role="button"
@@ -74,7 +75,7 @@
                v-for="(item, index) in searchList">
             <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
                  :class="[index !== 0 ? 'border-top' : '']">
-              <span class="d-inline-flex align-items-center text-grey-100 w-100">
+              <span v-if="item.children.length" class="d-inline-flex align-items-center text-grey-100 w-100">
                 <span class="tag-text">{{ item.title }}</span>
               </span>
             </div>
@@ -100,10 +101,10 @@
           </div>
         </template>
       </div>
-      <!--div class="text-center w-100"
+      <div class="text-center w-100"
            v-else>
         <span>No options to select</span>
-      </div-->
+      </div>
     </q-field>
     <div class="list-wrapper"
          v-else>
@@ -214,76 +215,21 @@ export default {
           title: 'Import Tags',
           children: []
         }
-      ],
-      searchedOptions: []
+      ]
     }
   },
 
   computed: {
-    allOptions () {
-      if (!this.optionsIsGrouped) {
-        return this.options
-      }
-      const newOptions = { data: [] }
-      const option = { item: null }
-      for (option.item of this.options) {
-        newOptions.data = newOptions.data.concat(option.item.children)
-      }
-      return newOptions.data
-    },
-
     formattedValues () {
-      if (this.label === 'Tags') {
-        return this.current
-      }
-
-      if (_.isEmpty(this.selectedValues)) {
-        return []
-      }
-
-      const newValues = []
-      const values = { item: null }
-      for (values.item of this.selectedValues) {
-        const found = this.allOptions.find(option => option.id === values.item)
-        if (found) {
-          newValues.push(found)
-        }
-      }
-      return newValues
+      return this.current
     },
 
     filteredOptions () {
-      if (this.label === 'Tags') {
-        if (!this.loadingTags && (this.searchList[0].children.length || this.searchList[1].children.length)) {
-          return this.searchList
-        }
-        this.getTags()
-        return
-        /* let newOptions = []
-        const tags = this.getTags()
-        console.log('searchOptions tags', tags)
-        if (tags.length) {
-          newOptions.push({
-            title: 'Account Tags',
-            children: tags.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
-          })
-          newOptions.push({
-            title: 'Import Tags',
-            children: tags.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
-          })
-        }
-        return newOptions */
+      if (!this.loadingTags && (this.searchList[0].children.length || this.searchList[1].children.length)) {
+        return this.searchList
       }
-
-      const newOptions = []
-      const option = { item: null }
-      for (option.item of this.options) {
-        newOptions.push({
-          title: option.item.title,
-          children: option.item.children.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
-        })
-      }
-      return newOptions
+      this.getTags()
+      return []
     }
   },
 
@@ -346,14 +292,6 @@ export default {
       this.$emit('valuesUpdated', this.selectedValues)
     },
 
-    searchOptions () {
-      let tags = this.getTags()
-      console.log('searchOptions tags', tags)
-      if (this.searchedOptions.length) {
-      }
-      return this.searchList
-    },
-
     getTags () {
       if (!this.search) {
         return
@@ -367,18 +305,12 @@ export default {
 
       this.$axios.get('/api/v1/tag', { params }).then(res => {
         let list = res.data
-
-        console.log('/api/v1/tag list', list)
-
         let accountTags = list.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
         let importTags = list.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
 
         this.searchList[0].children = accountTags
         this.searchList[1].children = importTags
-
         this.loadingTags = false
-
-        console.log('this.searchList', this.searchList)
       }).catch(err => {
         console.log(err)
       })
@@ -399,7 +331,7 @@ export default {
         // Set a new timer to make the call after 1 second
         this.timer = setTimeout(() => {
           this.getTags()
-        }, 1000) // 1000 milisegundos = 1 segundo
+        }, 1000)
       }
     }
   }
