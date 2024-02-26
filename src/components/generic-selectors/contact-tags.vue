@@ -146,31 +146,6 @@ export default {
   },
 
   methods: {
-    getTags () {
-      if (!this.hasPermissionTo('list tag')) {
-        return
-      }
-
-      if (this.tagsFullyLoaded) {
-        this.options = this.tags
-        return
-      }
-
-      this.loadingTags = true
-      const params = {
-        full_load: true
-      }
-
-      return this.$axios.get('/api/v1/tag', { params }).then(res => {
-        this.options = res.data
-        this.loadingTags = false
-        this.setTagsFullyLoaded(true)
-      }).catch(err => {
-        console.log(err)
-        this.loadingTags = false
-      })
-    },
-
     saveTags (tags) {
       if (!this.hasPermissionTo('tag contact')) {
         return
