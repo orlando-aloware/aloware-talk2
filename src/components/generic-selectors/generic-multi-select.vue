@@ -42,8 +42,7 @@
         </template>
       </q-field>
       <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
-           :style="height ? `height: ${height}px !important` : ''"
-           v-if="options.length">
+           :style="height ? `height: ${height}px !important` : ''">
         <template v-if="!optionsIsGrouped">
           <div class="mr-1">
             <div role="button"
@@ -101,10 +100,10 @@
           </div>
         </template>
       </div>
-      <div class="text-center w-100"
+      <!--div class="text-center w-100"
            v-else>
         <span>No options to select</span>
-      </div>
+      </div-->
     </q-field>
     <div class="list-wrapper"
          v-else>
@@ -145,6 +144,8 @@ import _ from 'lodash'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
+import * as TagTypes from 'src/constants/tag-types'
+
 export default {
   name: 'generic-multi-select',
   components: { CheckOIcon, PencilOIcon, RemoveTagIcon },
@@ -173,6 +174,12 @@ export default {
       default: () => []
     },
 
+    current: {
+      required: false,
+      type: Array,
+      default: () => []
+    },
+
     canEdit: {
       required: false,
       type: Boolean,
@@ -195,7 +202,9 @@ export default {
     return {
       search: '',
       isEdit: false,
-      selectedValues: []
+      selectedValues: [],
+      searchList: [],
+      searchedOptions: []
     }
   },
 
@@ -213,6 +222,10 @@ export default {
     },
 
     formattedValues () {
+      if (this.label === 'Tags') {
+        return this.current
+      }
+
       if (_.isEmpty(this.selectedValues)) {
         return []
       }
@@ -229,26 +242,28 @@ export default {
     },
 
     filteredOptions () {
-      const newOptions = []
-
-      // if label == 'Tags' then request API using filter
       if (this.label === 'Tags') {
-        const params = {
-          full_load: true,
-          filter: this.search
+        if (this.searchList.length) {
+          return this.searchList
         }
+        this.getTags()
+        /* let newOptions = []
+        const tags = this.getTags()
+        console.log('searchOptions tags', tags)
+        if (tags.length) {
+          newOptions.push({
+            title: 'Account Tags',
+            children: tags.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
+          })
+          newOptions.push({
+            title: 'Import Tags',
+            children: tags.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
+          })
+        }
+        return newOptions */
+      }
 
-        return this.$axios.get('/api/v1/tag', { params }).then(res => {
-          newOptions = res.data
-        }).catch(err => {
-          console.log(err)
-        })
-        return newOptions
-      }
-      if (!this.optionsIsGrouped) {
-        return this.options.filter(item => item.name.toLowerCase().includes(this.search.toLocaleLowerCase()))
-      }
-      
+      const newOptions = []
       const option = { item: null }
       for (option.item of this.options) {
         newOptions.push({
@@ -307,6 +322,38 @@ export default {
         this.selectedValues.splice(found.data, 1)
       }
       this.$emit('valuesUpdated', this.selectedValues)
+    },
+
+    searchOptions () {
+      let tags = this.getTags()
+      console.log('searchOptions tags', tags)
+      if (this.searchedOptions.length) {
+        
+      }
+      return this.searchList
+    },
+
+    getTags () {
+      const params = {
+        full_load: true,
+        filter: this.search
+      }
+
+      this.$axios.get('/api/v1/tag', { params }).then(res => {
+        let list = res.data
+
+        this.searchList.push({
+          title: 'Account Tags',
+          children: list.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
+        })
+        this.searchList.push({
+          title: 'Import Tags',
+          children: list.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
+        })
+        console.log('this.searchList', this.searchList)
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
 

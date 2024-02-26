@@ -1480,7 +1480,7 @@ export default {
         this.getTemplates()
 
         this.getCampaigns()
-        this.getFullTags()
+        // this.getFullTags()
         // this.getTags()
         this.getWorkflows()
 
@@ -1642,22 +1642,43 @@ export default {
     getFullTags () {
       this.loadingTags = true
 
-      return this.$axios
-        .get('/api/v1/tag', { params: { full_load: true } })
-        .then((res) => {
-          this.setTags(res.data)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
+      let list = []
 
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
+      const getTagsChunk = (page) => {
+        const params = {
+          page: page,
+          per_page: 200,
+          force_per_page: true
+        }
 
-          return Promise.reject()
-        })
+        return this.$axios
+          .get('/api/v1/tag', { params })
+          .then((res) => {
+            if (res.data.data && res.data.data.length) {
+              res.data.data.forEach((tag) => {
+                list.push(tag)
+              })
+              console.log('list', list)
+            }
+
+            if (res.data.to !== res.data.total) {
+              return getTagsChunk(page + 1)
+            } else {
+              this.setTags(list)
+              this.$VueEvent.fire('tags_loaded')
+              this.loadingTags = false
+              return Promise.resolve()
+            }
+          })
+          .catch((err) => {
+            this.setTagsFullyLoaded(false)
+            console.log(err)
+            this.loadingTags = false
+            return Promise.reject()
+          })
+      }
+
+      return getTagsChunk(1)
     },
 
     getTags (page = 1) {
@@ -1666,7 +1687,9 @@ export default {
       }
 
       const params = {
-        page: page
+        page: page,
+        per_page: 200,
+        force_per_page: true
       }
 
       return this.$axios

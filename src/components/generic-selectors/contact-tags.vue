@@ -5,6 +5,7 @@
                           button-text="Modify Tags"
                           :values="tagIds"
                           :options="combinedTags"
+                          :current="currentTags"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           :optionsIsGrouped="true"
                           @valuesUpdated="saveTags">
@@ -121,6 +122,10 @@ export default {
       return tags
     },
 
+    currentTags () {
+      return this.contact?.tags ?? []
+    },
+
     tagIds () {
       if (this.contact?.tag_ids) {
         return this.contact.tag_ids
@@ -138,10 +143,11 @@ export default {
     if (this.tags) {
       this.options = this.tags
     }
-
+    /*
     if (!this.tags) {
       this.getTags()
     }
+    */
   },
 
   methods: {
