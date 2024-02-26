@@ -1,7 +1,7 @@
 <template>
   <b-card class="border-0 tags-wrapper"
           v-if="hasPermissionTo('tag contact')">
-    <generic-multi-select label="Tags"
+    <tag-multi-select label="Tags"
                           button-text="Modify Tags"
                           :values="tagIds"
                           :options="combinedTags"
@@ -9,14 +9,14 @@
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                           :optionsIsGrouped="true"
                           @valuesUpdated="saveTags">
-    </generic-multi-select>
+    </tag-multi-select>
   </b-card>
 </template>
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
-import GenericMultiSelect from 'src/components/generic-selectors/generic-multi-select'
+import TagMultiSelect from 'src/components/generic-selectors/tag-multi-select'
 import {
   TAG_CATEGORIES as TagCategories,
   TAG_CATEGORIES_VALUES as TagCategoriesValues
@@ -30,7 +30,7 @@ export default {
   mixins: [aclMixin],
 
   components: {
-    GenericMultiSelect
+    TagMultiSelect
   },
 
   props: {

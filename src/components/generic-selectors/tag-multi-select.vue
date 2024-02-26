@@ -37,7 +37,7 @@
                    dense
                    input-class="input-text-sm"
                    placeholder="Type to search"
-                   v-model="search">
+                   v-model.lazy="search">
           </q-input>
         </template>
       </q-field>
@@ -71,7 +71,7 @@
         <template v-else>
           <div class="mr-1"
                :key="`title-${index}`"
-               v-for="(item, index) in filteredOptions">
+               v-for="(item, index) in searchList">
             <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
                  :class="[index !== 0 ? 'border-top' : '']">
               <span class="d-inline-flex align-items-center text-grey-100 w-100">
@@ -204,6 +204,7 @@ export default {
       isEdit: false,
       loadingTags: false,
       selectedValues: [],
+      timer: null,
       searchList: [
         {
           title: 'Account Tags',
@@ -349,7 +350,6 @@ export default {
       let tags = this.getTags()
       console.log('searchOptions tags', tags)
       if (this.searchedOptions.length) {
-        
       }
       return this.searchList
     },
@@ -388,6 +388,14 @@ export default {
       handler () {
         this.selectedValues = this.values
       }
+    },
+    search (newValue) {
+      // When the text value changes, call request for the tags
+      clearTimeout(this.timer)
+      // Set a new timer to make the call after 1 second
+      this.timer = setTimeout(() => {
+        this.getTags()
+      }, 1000) // 1000 milisegundos = 1 segundo
     }
   }
 }
