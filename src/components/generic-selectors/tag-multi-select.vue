@@ -355,6 +355,9 @@ export default {
     },
 
     getTags () {
+      if (!this.search) {
+        return
+      }
       const params = {
         full_load: true,
         filter: this.search
@@ -390,12 +393,14 @@ export default {
       }
     },
     search (newValue) {
-      // When the text value changes, call request for the tags
-      clearTimeout(this.timer)
-      // Set a new timer to make the call after 1 second
-      this.timer = setTimeout(() => {
-        this.getTags()
-      }, 1000) // 1000 milisegundos = 1 segundo
+      if (newValue) {
+        // When the text value changes, call request for the tags
+        clearTimeout(this.timer)
+        // Set a new timer to make the call after 1 second
+        this.timer = setTimeout(() => {
+          this.getTags()
+        }, 1000) // 1000 milisegundos = 1 segundo
+      }
     }
   }
 }
