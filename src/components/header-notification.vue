@@ -64,7 +64,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin } from 'src/plugins/mixins'
 import * as CompanyIssues from 'src/constants/company-issues'
 import CompactBtn from 'components/compact-btn'
 
@@ -74,7 +74,8 @@ export default {
   components: { CompactBtn },
 
   mixins: [
-    aclMixin
+    aclMixin,
+    kycMixin
   ],
 
   computed: {
@@ -89,8 +90,7 @@ export default {
     ]),
 
     ...mapGetters('auth', [
-      'profile',
-      'isCompanyKYC'
+      'profile'
     ]),
 
     isShow () {
