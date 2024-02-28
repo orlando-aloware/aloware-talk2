@@ -5,7 +5,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     isAloware () {
-      return this.currentCompany.id === (process.env.NODE_ENV === 'development' ? 7 : 47)
+      return this.currentCompany.id === (process.env.APP_ENV === 'development' ? 7 : 47)
     },
 
     isLocal () {
