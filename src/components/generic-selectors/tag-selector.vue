@@ -151,6 +151,10 @@ export default {
   computed: {
     ...mapState(['tags']),
 
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     getLabel () {
       return tag => {
         return `<q-icon name="fa fa-circle" :style="color:${tag.color}" /> ${tag.name}`
@@ -242,15 +246,48 @@ export default {
         return
       }
 
-      return talk2Api.V1.tags.get({
-        params: { full_load: true }
-      }).then(res => {
-        this.tagsArray = res.data
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
-      }).catch(err => {
-        console.log(err)
-      })
+      let tagsPerPage = 0
+
+      if (this.currentCompany?.tags_count > 10000) {
+        tagsPerPage = 10000
+      }
+      if (this.currentCompany?.tags_count <= 10000) {
+        tagsPerPage = 1000
+      }
+      if (this.currentCompany?.tags_count <= 1000) {
+        tagsPerPage = 200
+      }
+
+      if (!tagsPerPage) {
+        return
+      }
+
+      const params = {
+        force_per_page: true,
+        page: 1, // Start with the first page
+        per_page: tagsPerPage
+      }
+
+      const fetchTags = (params) => {
+        return talk2Api.V1.tags.get({
+          params: params
+        })
+          .then(res => {
+            this.tagsArray = this.tagsArray.concat(res.data.data)
+            this.tagsOptions = this.tagsOptions.concat(res.data.data)
+            this.selectedTags = this.value
+            if (res.data.to !== res.data.total) {
+              // If there are more tags, fetch the next page
+              params.page++
+              return fetchTags(params)
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
+
+      return fetchTags(params)
     }
   },
 
