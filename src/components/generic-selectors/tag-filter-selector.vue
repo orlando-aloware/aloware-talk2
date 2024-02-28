@@ -1,19 +1,11 @@
 <template>
   <div>
-    <generic-multi-select :label="label"
-                          :buttonText="buttonText"
-                          :values="selectedTags"
-                          :options="optionsAlphabeticalOrder"
-                          :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          v-if="genericMultiselect"
-                          @valuesUpdated="select">
-    </generic-multi-select>
     <q-select ref="tagSelect"
               options-selected-class="text-primary"
               color="primary"
               option-value="id"
               option-label="name"
-              input-debounce="0"
+              input-debounce="1000"
               style="word-break: break-all;"
               use-input
               emit-value
@@ -28,7 +20,6 @@
               :multiple="multiple"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="selectedTags"
-              v-else
               @popup-show="onShowMenu"
               @filter="filterFn">
 
@@ -76,9 +67,8 @@
 <script>
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
-import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { TAG_CATEGORIES_VALUES as TagCategoriesValues } from 'src/constants/tag-categories'
 
 export default {
@@ -86,7 +76,7 @@ export default {
 
   mixins: [aclMixin],
 
-  components: { RemoveTagIcon, GenericMultiSelect },
+  components: { RemoveTagIcon },
 
   props: {
 
@@ -98,16 +88,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-
-    label: {
-      type: String,
-      default: 'Tags'
-    },
-
-    buttonText: {
-      type: String,
-      default: 'Modify Tags'
     },
 
     disable: {
@@ -125,11 +105,6 @@ export default {
       type: Boolean,
       default: false,
       required: false
-    },
-
-    genericMultiselect: {
-      type: Boolean,
-      default: false
     },
 
     highlighted: {
@@ -164,7 +139,7 @@ export default {
     placeholder () {
       switch (true) {
         case this.multiple && this.selectedTags.length < 1:
-          return 'Select Tags'
+          return 'Type to search tags'
         case !this.multiple && !this.selectedTags:
           return 'Select Tag'
         case this.multiple && this.selectedTags.length > 0:
@@ -200,22 +175,14 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setTags']),
+
     onShowMenu () {
       this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
     filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.tagsOptions = this.tagsArray
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.tagsOptions = this.tagsArray.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
-      })
+      this.getTags(val, update)
     },
 
     changeTags (event) {
@@ -230,32 +197,47 @@ export default {
       this.isEdit = true
     },
 
-    getTags () {
+    getTags (search = '', update) {
       if (!this.hasPermissionTo('list tag')) {
         return
       }
 
-      if (this.tags && this.tags.length > 0) {
-        this.tagsArray = this.tags
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
+      if (!search) {
+        update(() => {
+          this.tagsOptions = this.tagsArray
+        })
         return
       }
 
+      const params = {
+        full_load: true,
+        filter: search
+      }
+
       return talk2Api.V1.tags.get({
-        params: { full_load: true }
+        params: params
       }).then(res => {
-        this.tagsArray = res.data
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
+        update(() => {
+          this.tagsArray = res.data
+          this.tagsOptions = res.data
+          // this.tags = res.data
+          this.selectedTags = this.value
+          /* eslint-disable */console.log(...oo_oo(`1175016048_252_10_252_51_4`,'getTags ', this.tagsOptions))
+          /* eslint-disable */console.log(...oo_oo(`1175016048_253_10_253_55_4`,'getTags this.value', this.value))
+          this.setTags(this.selectedTags)
+        })
       }).catch(err => {
-        console.log(err)
+        /* eslint-disable */console.log(...oo_oo(`1175016048_257_8_257_24_4`,err))
       })
     }
   },
 
   mounted () {
-    this.getTags()
+    if (this.tags && this.tags.length > 0) {
+      this.tagsArray = this.tags
+      this.tagsOptions = this.tags
+      this.selectedTags = this.value
+    }
   },
 
   watch: {
@@ -273,6 +255,13 @@ export default {
 
     selectedTags (val) {
       if (this.selectedTags !== this.value) {
+        let currentTags = this.tags
+
+        /* const matchingTags = this.tagsOptions.filter(tag => val.includes(tag.id))
+        const all = [...currentTags, ...matchingTags]
+        this.setTags(all)
+        */
+        // this.setTags()
         this.$emit('change', val)
       }
     }
