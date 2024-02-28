@@ -795,7 +795,7 @@ export default {
 
     shouldAllowContextMenuButton (item, broadcast) {
       if (item.name === 'delete') {
-        return this.isAdmin && [4].includes(broadcast.status)
+        return (this.isAdmin || this.isSupervisor) && [4].includes(broadcast.status)
       }
 
       return true
