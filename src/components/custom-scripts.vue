@@ -69,6 +69,10 @@ export default {
         return
       }
 
+      if (this.isAloware || this.isLocal) {
+        return
+      }
+
       console.log('getting hubspot visitor token')
       api.V1.profile.getHubspotConversationsVisitorToken()
         .then((res) => {
