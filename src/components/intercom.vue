@@ -48,11 +48,13 @@ export default {
         if (window.Intercom) {
           window.Intercom('boot', {
             alignment: 'left',
+            api_base: 'https://api-iam.intercom.io',
             app_id: this.app_id,
             name: this.profile.name, // Current user's name
             email: this.profile.email, // Current user email address
             user_id: this.profile.id, // Current user id
-            user_hash: response.data // Current user hash
+            user_hash: response.data, // Current user hash
+            created_at: Math.floor(Date.now() / 1000)
           })
 
           this.timeInterval = setInterval(() => {
