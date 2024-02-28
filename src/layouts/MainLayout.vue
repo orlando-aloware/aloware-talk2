@@ -2490,6 +2490,7 @@ export default {
           this.setStatics(res.data)
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
+          this.setWhiteLabel(res.data.whitelabel)
         }).catch(err => {
           console.log(err)
 

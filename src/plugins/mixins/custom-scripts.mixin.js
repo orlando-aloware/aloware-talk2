@@ -5,8 +5,11 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     isAloware () {
-      const companyId = process.env.NODE_ENV === 'development' ? 7 : 47
-      return this.currentCompany.id === companyId
+      return this.currentCompany.id === (process.env.NODE_ENV === 'development' ? 7 : 47)
+    },
+
+    isLocal () {
+      return process.env.APP_ENV === 'local'
     }
   }
 }

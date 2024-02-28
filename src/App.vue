@@ -26,7 +26,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
-    <intercom v-if="isLoggedIn && staticsLoaded && !statics.whitelabel && isAloware"/>
+    <intercom v-if="isLoggedIn && staticsLoaded && isWhitelabel  && (isAloware || isLocal)"/>
   </div>
 </template>
 <script>
@@ -55,14 +55,15 @@ export default {
       cookieValidated: false,
       sharedCookie: null,
       isPageLoading: false,
-      fullstoryOrgId: process.env.FULLSTORY_ORG_ID
+      fullstoryOrgId: process.env.FULLSTORY_ORG_ID,
+      isWhitelabel: false
     }
   },
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
 
-    ...mapState(['statics', 'staticsLoaded']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
