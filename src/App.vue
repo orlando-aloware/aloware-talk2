@@ -26,7 +26,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
-    <intercom v-if="isLoggedIn && staticsLoaded && isWhitelabel  && (isAloware || isLocal)"/>
+    <intercom v-if="isLoggedIn && staticsLoaded && !isWhitelabel  && (isAloware || isLocal)"/>
   </div>
 </template>
 <script>
