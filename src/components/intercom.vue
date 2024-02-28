@@ -124,7 +124,7 @@ export default {
       if (!this.hasReporterAccess &&
         !this.isWhiteLabel &&
         this.profile &&
-        process.env.APP_ENV !== 'local') {
+        process.env.APP_ENV === 'local') {
         this.setup(newRoute)
       }
     }
