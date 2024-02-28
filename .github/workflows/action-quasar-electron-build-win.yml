@@ -82,6 +82,7 @@ jobs:
           ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
           ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
+          ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
           ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
           ENV_API_KEY_ID: ${{ secrets.api_key_id }}
