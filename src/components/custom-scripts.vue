@@ -69,6 +69,7 @@ export default {
         return
       }
 
+      // Disable Hubspot chat for Aloware and local environments
       if (this.isAloware || this.isLocal) {
         return
       }
