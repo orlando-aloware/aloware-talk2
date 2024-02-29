@@ -157,12 +157,12 @@ export default {
       sentimentChipColors: {
         'POSITIVE': 'green-11',
         'NEUTRAL': 'blue-grey-2',
-        'NEGATIVE': 'red-6'
+        'NEGATIVE': 'red-3'
       },
       sentimentColors: {
         'POSITIVE': '#b9f6ca',
         'NEUTRAL': '#d0d8dc',
-        'NEGATIVE': '#f44336'
+        'NEGATIVE': '#ff7d74'
       },
       UploadedFileTypes,
       isEmpty
