@@ -18,6 +18,8 @@ module.exports = function (/* ctx */) {
     process.env = { ...process.env, ...parsedEnv }
   }
 
+  const noHttps = process.env.APP_SECURE === 'false'
+
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
@@ -107,8 +109,8 @@ module.exports = function (/* ctx */) {
         app.use(cors())
       },
 
-      https: true,
-      host: 'localhost',
+      https: !noHttps,
+      host: '0.0.0.0',
       port: 9090,
       disableHostCheck: true,
       open: true // opens browser window automatically
