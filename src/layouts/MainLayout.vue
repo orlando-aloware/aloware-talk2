@@ -1668,7 +1668,7 @@ export default {
       let tagsPerPage = 0
 
       if (this.currentCompany?.tags_count > 10000) {
-        tagsPerPage = 10000
+        tagsPerPage = 5000
       }
       if (this.currentCompany?.tags_count <= 10000) {
         tagsPerPage = 1000
