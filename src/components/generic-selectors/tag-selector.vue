@@ -13,7 +13,7 @@
               color="primary"
               option-value="id"
               option-label="name"
-              input-debounce="0"
+              input-debounce="1000"
               style="word-break: break-all;"
               use-input
               emit-value
@@ -145,15 +145,16 @@ export default {
     category: {
       type: Number,
       default: null
+    },
+
+    threshold: {
+      type: Number,
+      default: 3
     }
   },
 
   computed: {
     ...mapState(['tags']),
-
-    ...mapState('cache', [
-      'currentCompany'
-    ]),
 
     getLabel () {
       return tag => {
@@ -168,7 +169,7 @@ export default {
     placeholder () {
       switch (true) {
         case this.multiple && this.selectedTags.length < 1:
-          return 'Select Tags'
+          return 'Type to search tags'
         case !this.multiple && !this.selectedTags:
           return 'Select Tag'
         case this.multiple && this.selectedTags.length > 0:
@@ -199,7 +200,8 @@ export default {
       tagsArray: [],
       tagsOptions: [],
       selectedTags: this.value,
-      selectWidth: 0
+      selectWidth: 0,
+      preliminarTags: []
     }
   },
 
@@ -209,17 +211,7 @@ export default {
     },
 
     filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.tagsOptions = this.tagsArray
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.tagsOptions = this.tagsArray.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
-      })
+      this.getTags(val, update)
     },
 
     changeTags (event) {
@@ -234,65 +226,52 @@ export default {
       this.isEdit = true
     },
 
-    getTags () {
+    getTags (search = '', update) {
       if (!this.hasPermissionTo('list tag')) {
         return
       }
 
-      if (this.tags && this.tags.length > 0) {
-        this.tagsArray = this.tags
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
+      if (!search) {
+        update(() => {
+          this.tagsOptions = this.tagsArray
+        })
         return
       }
 
-      let tagsPerPage = 0
+      if (search.length >= this.threshold) {
+        const params = {
+          per_page: 100,
+          filter: search
+        }
 
-      if (this.currentCompany?.tags_count > 10000) {
-        tagsPerPage = 1000
-      }
-      if (this.currentCompany?.tags_count <= 10000) {
-        tagsPerPage = 1000
-      }
-      if (this.currentCompany?.tags_count <= 1000) {
-        tagsPerPage = 200
-      }
+        this.tagsOptions = []
 
-      if (!tagsPerPage) {
-        return
-      }
-
-      const params = {
-        force_per_page: true,
-        page: 1, // Start with the first page
-        per_page: tagsPerPage
-      }
-
-      const fetchTags = (params) => {
         return talk2Api.V1.tags.get({
           params: params
-        })
-          .then(res => {
-            this.tagsArray = this.tagsArray.concat(res.data.data)
-            this.tagsOptions = this.tagsOptions.concat(res.data.data)
+        }).then(res => {
+          update(() => {
+            this.tagsArray = res.data
+            this.tagsOptions = res.data
+            // this.tags = res.data
             this.selectedTags = this.value
-            if (res.data.to !== res.data.total) {
-              // If there are more tags, fetch the next page
-              params.page++
-              return fetchTags(params)
-            }
           })
-          .catch(err => {
-            console.log(err)
-          })
+        }).catch(err => {
+          console.log(err)
+        })
       }
-
-      return fetchTags(params)
     }
   },
 
   mounted () {
-    this.getTags()
+    if (Array.isArray(this.tags) && this.tags.length > 0) {
+      this.tagsOptions = this.tags
+      console.log('mounted this.tags', this.tags)
+      console.log('mounted this.tagsOptions', this.tagsOptions)
+    }
+    console.log('mounted this.tags', this.tags)
+    console.log('Type of this.tags:', typeof this.tags)
+    console.log('mounted this.tagsOptions', this.tagsOptions)
+    console.log('Type of this.tagsOptions:', typeof this.tagsOptions)
   },
 
   watch: {
@@ -309,8 +288,11 @@ export default {
     },
 
     selectedTags (val) {
+      let matching = this.tagsOptions.filter(tag => val.includes(tag.id))
+      this.preliminarTags = [...new Set([...this.preliminarTags, ...matching])]
       if (this.selectedTags !== this.value) {
         this.$emit('change', val)
+        this.$emit('preliminar', this.preliminarTags)
       }
     }
   }

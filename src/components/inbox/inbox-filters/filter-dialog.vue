@@ -414,6 +414,8 @@ export default {
       'setShowViewsList'
     ]),
 
+    ...mapActions(['setTags']),
+
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
     },
@@ -506,6 +508,7 @@ export default {
       }
 
       this.setChannelClonedFilter(this.filter)
+      this.setTags([])
     },
 
     onApply (skipChangedFields = false) {
