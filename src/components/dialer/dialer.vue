@@ -583,11 +583,6 @@ export default {
         return
       }
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
-        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
-        return
-      }
-
       const isCallNotPending = this.dialer.call && this.dialer.call.state !== 'pending'
 
       if (isCallNotPending || !currentNumber || !outboundCampaignId) {
@@ -597,6 +592,11 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
+        return
+      }
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
