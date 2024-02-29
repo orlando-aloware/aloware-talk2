@@ -53,17 +53,22 @@
                                            @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
-            <q-btn icon="img:app-icons/dialer/call_btn.svg"
-                   size="32px"
-                   class="icon-btn auto-size height-32"
-                   align="right"
-                   padding="none"
-                   rounded
-                   flat
-                   :ripple="true"
-                   :disable="callDisabled"
-                   @click="onCall">
-            </q-btn>
+            <div>
+              <q-btn icon="img:app-icons/dialer/call_btn.svg"
+                    size="32px"
+                    class="icon-btn auto-size height-32"
+                    align="right"
+                    padding="none"
+                    rounded
+                    flat
+                    :ripple="true"
+                    :disable="callDisabled"
+                    @click="onCall">
+              </q-btn>
+              <q-tooltip v-if="isAgentOnCall">
+                There is a call in progress on another device.
+              </q-tooltip>
+            </div>
           </div>
 
           <div class="dialer-contact-info width-190"
@@ -211,6 +216,7 @@ import {
   visibilityMixin,
   kycMixin
 } from 'src/plugins/mixins'
+import * as AgentStatus from 'src/constants/agent-status'
 
 export default {
   name: 'dialer-form',
@@ -301,8 +307,12 @@ export default {
       return 'Please select a line'
     },
 
+    isAgentOnCall () {
+      return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+    },
+
     callDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber)
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber) || this.isAgentOnCall
     },
 
     sendDisabled () {
