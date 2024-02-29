@@ -77,7 +77,10 @@ export default {
 
     ...mapGetters('contacts', [
       'contact',
-      'selectedList'
+      'selectedList',
+      'currentListFilters',
+      'selectedContacts',
+      'search'
     ]),
 
     ...mapGetters('powerDialer', [
@@ -171,6 +174,9 @@ export default {
         : params.id
       delete params.name
       delete params.id
+
+      // prepare extra filters
+      params = this.prepareFilters(params, listId)
 
       return window.axios.get(
         `api/v2/power-dialer-lists/${listId}/items`,
@@ -322,6 +328,31 @@ export default {
       }
 
       this.$VueEvent.fire('redial_task')
+    },
+
+    prepareFilters (params, listId) {
+      // add current filters to the params
+      const currentFilters = this.$jsonClone(this.currentListFilters)
+      // exclude contact_lists from the filters, since it will always be present
+      delete currentFilters.contact_lists
+
+      if (!isEmpty(currentFilters)) {
+        params.filter_groups = currentFilters
+      }
+
+      // add selected contacts to the params, when they arent empty
+      const contactIds = this.selectedContacts[listId].map(contact => contact.id)
+
+      if (contactIds.length) {
+        params.contact_ids = contactIds
+      }
+
+      // add current search to the params
+      if (this.search.trim()) {
+        params.keyword = this.search.trim()
+      }
+
+      return params
     }
   },
 
