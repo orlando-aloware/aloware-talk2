@@ -43,13 +43,10 @@
                       :unique-id="communication.id"/>
           </div>
 
-          <div class="loading-overlay"
+          <div class="h-100 w-100 flex items-center justify-center"
                v-if="isLoading">
-            <div>
-              <img class="loading-icon"
-                   alt="Loading"
-                   src="/assets/images/loading.svg"/>
-            </div>
+            <q-spinner-bars color="primary"
+                            size="40px"/>
           </div>
 
           <div class="flex row py-4"
