@@ -1481,7 +1481,7 @@ export default {
 
         this.getCampaigns()
         // this.getFullTags()
-        this.getTags()
+        // this.getTags()
         this.getWorkflows()
 
         this.getDispositionStatuses()
