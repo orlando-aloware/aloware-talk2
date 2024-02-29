@@ -175,7 +175,7 @@ export default {
         ...message,
         classes: this.getMessageClasses(message.speaker),
         formattedText: this.circleText(message.speaker, message.text),
-        sentimentBorder: `3px solid ${this.sentimentColors[message.sentiment]}`,
+        sentimentBorder: `1px solid ${this.sentimentColors[message.sentiment]}`,
         sentimentBackgroundColor: this.sentimentColors[message.sentiment]
       }))
     },
