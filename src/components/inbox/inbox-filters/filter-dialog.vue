@@ -508,7 +508,7 @@ export default {
       }
 
       this.setChannelClonedFilter(this.filter)
-      this.setTags([])
+      // this.setTags([])
     },
 
     onApply (skipChangedFields = false) {
@@ -650,6 +650,26 @@ export default {
         .then(response => {
           this.personalFilters = response.data.data.user || []
           this.companyFilters = response.data.data.company || []
+
+          let tagsIds = []
+          this.personalFilters.forEach(filter => {
+            if (filter.filter.tags) {
+              tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
+            }
+          })
+          this.companyFilters.forEach(filter => {
+            if (filter.filter.tags) {
+              tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
+            }
+          })
+          this.getTagsByIds(tagsIds)
+        })
+    },
+
+    getTagsByIds (ids) {
+      return talk2Api.V1.tags.get({ params: { tag_ids: ids } })
+        .then(response => {
+          this.setTags(response.data.data)
           this.isGettingFilters = false
         })
     },

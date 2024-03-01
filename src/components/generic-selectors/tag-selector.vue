@@ -201,7 +201,7 @@ export default {
       tagsOptions: [],
       selectedTags: this.value,
       selectWidth: 0,
-      preliminarTags: []
+      preliminarOptions: []
     }
   },
 
@@ -244,15 +244,12 @@ export default {
           filter: search
         }
 
-        this.tagsOptions = []
-
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
           update(() => {
-            this.tagsArray = res.data
-            this.tagsOptions = res.data
-            // this.tags = res.data
+            this.tagsArray = res.data.data
+            this.tagsOptions = res.data.data
             this.selectedTags = this.value
           })
         }).catch(err => {
@@ -263,15 +260,10 @@ export default {
   },
 
   mounted () {
-    if (Array.isArray(this.tags) && this.tags.length > 0) {
+    if (this.tags.length) {
       this.tagsOptions = this.tags
-      console.log('mounted this.tags', this.tags)
-      console.log('mounted this.tagsOptions', this.tagsOptions)
+      this.preliminarOptions = this.tags
     }
-    console.log('mounted this.tags', this.tags)
-    console.log('Type of this.tags:', typeof this.tags)
-    console.log('mounted this.tagsOptions', this.tagsOptions)
-    console.log('Type of this.tagsOptions:', typeof this.tagsOptions)
   },
 
   watch: {
@@ -289,11 +281,15 @@ export default {
 
     selectedTags (val) {
       let matching = this.tagsOptions.filter(tag => val.includes(tag.id))
-      this.preliminarTags = [...new Set([...this.preliminarTags, ...matching])]
+      this.preliminarOptions = [...new Set([...this.preliminarOptions, ...matching])]
       if (this.selectedTags !== this.value) {
         this.$emit('change', val)
-        this.$emit('preliminar', this.preliminarTags)
+        this.$emit('preliminar', this.preliminarOptions)
       }
+    },
+
+    tags (val) {
+      this.tagsOptions = val
     }
   }
 }
