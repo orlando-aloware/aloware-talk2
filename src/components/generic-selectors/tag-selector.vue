@@ -240,6 +240,7 @@ export default {
 
       if (search.length >= this.threshold) {
         const params = {
+          page: 1,
           per_page: 100,
           filter: search
         }

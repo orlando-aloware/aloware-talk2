@@ -106,10 +106,13 @@
                 <b-form-group
                   label="Tags (Optional)"
                   class="form-label">
-                  <tag-filter-selector :multiple="true"
+                  <q-tooltip anchor="top middle">
+                    Type at least 3 characters to search in tags
+                  </q-tooltip>
+                  <tag-selector :multiple="true"
                                 v-model="contact.tag_ids"
                                 @change="onTagsSelected">
-                  </tag-filter-selector>
+                  </tag-selector>
                 </b-form-group>
               </b-col>
             </b-form-row>
@@ -147,7 +150,7 @@ import { mapState } from 'vuex'
 import { formValidationMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/generic-selectors/line-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
-import TagFilterSelector from 'components/generic-selectors/tag-filter-selector'
+import TagSelector from 'components/generic-selectors/tag-selector'
 import talk2Api from 'src/plugins/api/api'
 
 import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -163,7 +166,7 @@ export default {
     }
   },
 
-  components: { UserSelector, LineSelector, TagFilterSelector },
+  components: { UserSelector, LineSelector, TagSelector },
 
   computed: {
     ...mapState('contacts', ['selectedList', 'lists']),
