@@ -755,7 +755,7 @@ export default {
           data.communications = this.communications
         }
         this.$nextTick(() => {
-          this.$VueEvent.fire('contact_updated', res.data.contact)
+          this.$VueEvent.fire('contact_updated', data)
         })
         this.communication.is_read = false
 
