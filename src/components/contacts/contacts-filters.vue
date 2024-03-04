@@ -437,7 +437,13 @@ export default {
       }
     },
 
-    filtersApplied () {
+    filtersApplied (appliedFilter = {}) {
+      for (let i = 0; i < this.filters.length; i++) {
+        if (this.filters[i].key === appliedFilter.key) {
+          this.filters[i].options = appliedFilter.options
+          break
+        }
+      }
       this.step = 1
       this.$emit('filtersUpdated')
     },
@@ -569,10 +575,15 @@ export default {
               .options
               // if is array search inside it, if not compare with the value
               .filter(option => Array.isArray(index)
-                ? index.includes(option.value)
-                : index === option.value)
+                ? index.includes(filterFound.key === 'tags' ? option.id : option.value)
+                : index === (filterFound.key === 'tags' ? option.id : option.value))
               .forEach(option => {
-                labels.push(option.label)
+                if (filterFound.key === 'tags' && !labels.includes(option.label)) {
+                  labels.push(option.name)
+                }
+                if (filterFound.key !== 'tags') {
+                  labels.push(option.label)
+                }
               })
           }
         } else if (isBoolean) {
