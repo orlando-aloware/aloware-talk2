@@ -15,7 +15,8 @@
                            :file-uuid="fileUuid"/>
           <transcription-modal button-text="Show Smart Transcription"
                                :communication="communication"
-                               :single-button="true"/>
+                               :single-button="true"
+                               v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
         </div>
       </div>
     </div>
