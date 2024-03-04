@@ -302,8 +302,8 @@
                 <div class="calls__table__operations">
                   <!-- unpark -->
                   <unpark-communication-button class="ml-2"
-                                              :communication="call"
-                                              v-if="isParkedCall(call)" />
+                                               :communication="call"
+                                               v-if="isParkedCall(call)" />
 
                   <!-- go to messages -->
                   <router-link :to="{ path: `/contacts/${call.contact_id}` }"
@@ -317,8 +317,8 @@
                   <!-- go to comm info -->
                   <router-link :to="{ name: 'Communication', params: {contactId: call.contact_id, communicationId: call.id }}">
                     <information-circle-icon class="ml-2"
-                                            height="24"
-                                            width="24" />
+                                             height="24"
+                                             width="24" />
                     <q-tooltip>More Details</q-tooltip>
                   </router-link>
 
