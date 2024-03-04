@@ -143,10 +143,12 @@ export default {
         this.isLoadingLibrary = false
       })
     },
+
     applyVMDropAudioFile (file) {
       this.vmDropUploadedFile.id = file.id
-      this.vmDropUploadedFile.fileName = file.uid
+      this.vmDropUploadedFile.fileName = file.file_name
     },
+
     fileUploaded (file) {
       this.vmDropUploadedFile.id = file.id
       this.vmDropUploadedFile.fileName = file.file_name
