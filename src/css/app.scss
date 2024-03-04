@@ -12869,6 +12869,10 @@ h1.contact-list-name-label {
           }
         }
 
+        &__operations {
+          display: flex;
+        }
+
         .relative-time {
           font-size: 13px !important;
           color: $grey-92;

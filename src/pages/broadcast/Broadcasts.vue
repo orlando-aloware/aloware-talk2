@@ -795,7 +795,7 @@ export default {
 
     shouldAllowContextMenuButton (item, broadcast) {
       if (item.name === 'delete') {
-        return this.isAdmin && [4].includes(broadcast.status)
+        return (this.isAdmin || this.isSupervisor) && [4].includes(broadcast.status)
       }
 
       return true
@@ -823,7 +823,7 @@ export default {
     shouldAllowContextMenuBulk (action) {
       if (action === 'delete') {
         const isAllCheckedDone = this.checked.reduce((results, item) => results && item.status === 4, true)
-        return this.isAdmin && isAllCheckedDone
+        return (this.isAdmin || this.isSupervisor) && isAllCheckedDone
       }
 
       if (action === 'play') {
