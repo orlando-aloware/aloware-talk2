@@ -10,12 +10,8 @@ export default {
       return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
     },
 
-    isSimpsocial () {
+    isSimpSocial () {
       return this.currentCompany && this.currentCompany.reseller_id === 357
-    },
-
-    isNotSimpsocial () {
-      return this.currentCompany && this.currentCompany.reseller_id !== 357
     }
   }
 }

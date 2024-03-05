@@ -20,7 +20,6 @@
              sm="12">
         <b-button size="sm"
                   variant="success"
-                  :disabled="viewOnly"
                   @click="diagnose">
           <i class="fa fa-redo"
              v-if="!isDiagnosing"/>

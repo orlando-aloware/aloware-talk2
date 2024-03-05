@@ -21,7 +21,6 @@
 
           <b-form-group label="" >
             <visibility-selector v-model="user.contacts_visibility"
-                                 :disable="viewOnly"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'contacts_visibility')">
             </visibility-selector>
           </b-form-group>
@@ -50,7 +49,6 @@
           <b-form-group label="" >
             <visibility-selector v-model="user.communications_visibility"
                                  :is-contact-access-type="false"
-                                 :disable="viewOnly"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'communications_visibility')">
             </visibility-selector>
           </b-form-group>
@@ -72,7 +70,6 @@
               v-model="user.line_access_limit"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'line_access_limit')">
               Limit user's visibility
             </b-form-checkbox>
@@ -93,7 +90,6 @@
               v-model="user.selected_campaign_ids"
               :options="sortedCampaigns"
               :aria-describedby="ariaDescribedby"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'selected_campaign_ids')"
             ></b-form-checkbox-group>
           </b-form-group>
@@ -108,7 +104,6 @@
               v-model="user.line_communication_limit"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'line_communication_limit')">
               Apply visibility limit to communications
             </b-form-checkbox>
@@ -124,7 +119,6 @@
               v-model="user.line_contact_limit"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'line_contact_limit')">
               Apply visibility limit to contacts
             </b-form-checkbox>
@@ -148,7 +142,6 @@
               v-model="user.read_only_access"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'read_only_access')">
               Make this user a reporter
             </b-form-checkbox>
@@ -172,7 +165,6 @@
               v-model="user.user_access_limit"
               :value="true"
               :unchecked-value="false"
-              :disabled="viewOnly"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'user_access_limit')">
               Limit visibility of other users
             </b-form-checkbox>

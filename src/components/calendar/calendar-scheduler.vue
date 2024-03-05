@@ -103,9 +103,11 @@ export default {
     }
 
     Scheduler.templates.event_bar_text = function (start, end, event) {
-      return event.contact.first_name || event.contact.last_name
-        ? `${event.contact.first_name || ''} ${event.contact.last_name || ''}`
-        : event.contact.phone_number
+      return event.text
+        ? event.text
+        : (event.contact.first_name || event.contact.last_name
+          ? `${event.contact.first_name || ''} ${event.contact.last_name || ''}`
+          : event.contact.phone_number)
     }
 
     Scheduler.templates.event_text = Scheduler.templates.event_bar_text
