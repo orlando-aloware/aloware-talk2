@@ -376,7 +376,7 @@ export default {
     },
 
     processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
-      const updatedContact = this.$jsonClone(this.contact)
+      const updatedContact = this.$jsonClone(this.contacts.find(item => parseInt(item.id) === parseInt(contact.id)))
       const contactEvent = this.$jsonClone(contact)
       let newCommunication = null
 
