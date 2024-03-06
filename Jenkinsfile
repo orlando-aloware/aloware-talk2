@@ -35,7 +35,7 @@ pipeline {
               script {
                 //String text
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                   text = readFile(dev_env)
+                   // text = readFile(dev_env)
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
 
@@ -44,12 +44,11 @@ pipeline {
                   sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
                 }
 
-                println "${text}"
+                // println "${text}"
               }
             }
         }
 
-        /*
         stage('Load Cached Modules') {
             when { not { branch 'master' } }
             steps {
@@ -147,6 +146,5 @@ pipeline {
             //noInspection GroovyAssignabilityCheck
             cleanWs()
         }
-        */
     }
 }
