@@ -1252,18 +1252,18 @@ export default {
         console.log('contactAuditCreated data.to === ContactTaskStatus.STATUS_OPEN', data.to === ContactTaskStatus.STATUS_OPEN)
         console.log('contactAuditCreated data.to === ContactTaskStatus.STATUS_PENDING', data.to === ContactTaskStatus.STATUS_PENDING)
 
-        if (data.from === ContactTaskStatus.STATUS_PENDING) {
+        if (parseInt(data.from) === ContactTaskStatus.STATUS_PENDING) {
           this.setPendingTaskCount(this.taskCounts.pending - 1)
           this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)
-          if (data.to === ContactTaskStatus.STATUS_OPEN) {
+          if (parseInt(data.to) === ContactTaskStatus.STATUS_OPEN) {
             this.setOpenTaskCount(this.taskCounts.open + 1)
             this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
           }
         }
-        if (data.from === ContactTaskStatus.STATUS_OPEN) {
+        if (parseInt(data.from) === ContactTaskStatus.STATUS_OPEN) {
           this.setOpenTaskCount(this.taskCounts.open - 1)
           this.setInboxOpenTaskCount(this.inboxTaskCounts.open - 1)
-          if (data.to === ContactTaskStatus.STATUS_PENDING) {
+          if (parseInt(data.to) === ContactTaskStatus.STATUS_PENDING) {
             this.setPendingTaskCount(this.taskCounts.pending + 1)
             this.setInboxPendingTaskCount(this.inboxTaskCounts.pending + 1)
           }
