@@ -813,11 +813,11 @@ export default {
     },
 
     isPausable (broadcast) {
-      return [BroadcastStatuses.STATUS_ENROLLING, BroadcastStatuses.STATUS_NEW].includes(broadcast.status)
+      return [BroadcastStatuses.STATUS_ENROLLING_ID, BroadcastStatuses.STATUS_NEW_ID].includes(broadcast.status)
     },
 
     isPlayable (broadcast) {
-      return broadcast.status === BroadcastStatuses.STATUS_PAUSED
+      return broadcast.status === BroadcastStatuses.STATUS_PAUSED_ID
     },
 
     shouldAllowContextMenuBulk (action) {
