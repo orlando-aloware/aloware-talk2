@@ -246,7 +246,7 @@ export default {
           this.$emit('markAllAsRead')
         }
 
-        const contact = { ...this.contact }
+        const contact = JSON.parse(JSON.stringify(this.contact))
         const key = { data: null }
         for (key.data in res.data) {
           if (typeof contact[key.data] !== 'undefined') {
