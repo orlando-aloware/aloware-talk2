@@ -262,6 +262,7 @@ export default {
             case ContactTaskStatus.STATUS_OPEN:
               if (response) {
                 if (!forInbox) {
+                  console.trace('antes de setOpenTaskCount (inbox mixin)')
                   this.setOpenTaskCount(+response.data.count)
                 }
 
@@ -276,6 +277,7 @@ export default {
             case ContactTaskStatus.STATUS_PENDING:
               if (response) {
                 if (!forInbox) {
+                  console.trace('antes de setPendingTaskCount (inbox mixin)')
                   this.setPendingTaskCount(+response.data.count)
                 }
 
