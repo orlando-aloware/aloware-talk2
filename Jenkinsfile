@@ -17,6 +17,7 @@ pipeline {
         GIT_AUTH = credentials('jenkins-github-user')
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
+        API_URL_OVERWRITE = 'https://pr-9331.mde.alodev.org'
     }
 
     stages {
@@ -34,15 +35,21 @@ pipeline {
               script {
                 //String text
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                   //text = readFile(dev_env)
+                   text = readFile(dev_env)
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
 
-                //println "${text}"
+                // If the API_URL_OVERWRITE is set, we will replace the API_URL in the .env file
+                if (env.API_URL_OVERWRITE) {
+                  sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                }
+
+                println "${text}"
               }
             }
         }
 
+        /*
         stage('Load Cached Modules') {
             when { not { branch 'master' } }
             steps {
@@ -140,5 +147,6 @@ pipeline {
             //noInspection GroovyAssignabilityCheck
             cleanWs()
         }
+        */
     }
 }
