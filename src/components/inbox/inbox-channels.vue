@@ -172,7 +172,7 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   aclMixin,
   dateMixin,
@@ -222,7 +222,7 @@ export default {
       type: String,
       required: false,
       default () {
-        return ['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId
+        return ['all-communications', 'my-personal-line'].includes(this.$route.params.channel) && this.$route.query?.tagId
           ? 'all'
           : 'call'
       }
@@ -334,6 +334,10 @@ export default {
       'isFilterDialogForView'
     ]),
 
+    ...mapGetters('auth', [
+      'profile'
+    ]),
+
     nextPage () {
       if (this.$route.params.channel === 'mentions') {
         return this.currentPage + 1
@@ -434,6 +438,16 @@ export default {
 
         if (this.$route.query?.broadcastIds) {
           defaultFilterModel.filter.broadcasts = typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
+        }
+
+        return defaultFilterModel
+      }
+
+      if (this.$route.params.channel === 'my-personal-line') {
+        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
+        defaultFilterModel.filter = {
+          ...Filters.DEFAULT_STATE.filter,
+          campaigns: [this.profile.campaign_id]
         }
 
         return defaultFilterModel
@@ -853,6 +867,11 @@ export default {
         this.filter.page = 1
       } else {
         this.filter.cursor = null
+      }
+
+      // set user personal line as current filter
+      if (this.$route.params.channel === 'my-personal-line') {
+        this.filter.campaigns = this.channelDefaultFilterModel.filter.campaigns
       }
 
       if (this.campaignId) {
@@ -1424,7 +1443,8 @@ export default {
         'messages',
         'voicemails',
         'recordings',
-        'all-communications'
+        'all-communications',
+        'my-personal-line'
       ]
 
       if (communicationChannels.includes(value)) {
