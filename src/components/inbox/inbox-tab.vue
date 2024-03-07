@@ -1246,32 +1246,6 @@ export default {
             this.setSelectedContact(contacts[contactIndex])
           }
         }
-
-        console.log('contactAuditCreated data', data)
-        console.log('contactAuditCreated parseInt(data.from) === ContactTaskStatus.STATUS_PENDING', parseInt(data.from) === ContactTaskStatus.STATUS_PENDING)
-        console.log('contactAuditCreated parseInt(data.from) === ContactTaskStatus.STATUS_OPEN', parseInt(data.from) === ContactTaskStatus.STATUS_OPEN)
-
-        console.log('contactAuditCreated parseInt(data.to) === ContactTaskStatus.STATUS_OPEN', parseInt(data.to) === ContactTaskStatus.STATUS_OPEN)
-        console.log('contactAuditCreated parseInt(data.to) === ContactTaskStatus.STATUS_PENDING', parseInt(data.to) === ContactTaskStatus.STATUS_PENDING)
-
-        /* if (parseInt(data.from) === ContactTaskStatus.STATUS_PENDING) {
-          console.trace('antes de setPendingTaskCount')
-          this.setPendingTaskCount(this.taskCounts.pending - 1)
-          this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)
-          if (parseInt(data.to) === ContactTaskStatus.STATUS_OPEN) {
-            this.setOpenTaskCount(this.taskCounts.open + 1)
-            this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
-          }
-        }
-        if (parseInt(data.from) === ContactTaskStatus.STATUS_OPEN) {
-          console.trace('antes de setOpenTaskCount')
-          this.setOpenTaskCount(this.taskCounts.open - 1)
-          this.setInboxOpenTaskCount(this.inboxTaskCounts.open - 1)
-          if (parseInt(data.to) === ContactTaskStatus.STATUS_PENDING) {
-            this.setPendingTaskCount(this.taskCounts.pending + 1)
-            this.setInboxPendingTaskCount(this.inboxTaskCounts.pending + 1)
-          }
-        } */
       }
     }
 
