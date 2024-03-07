@@ -205,7 +205,6 @@ export default {
 
   computed: {
     ...mapState(['isMobile']),
-
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:

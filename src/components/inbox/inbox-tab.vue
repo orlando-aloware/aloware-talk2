@@ -1140,7 +1140,6 @@ export default {
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
-        console.trace('antes de setPendingTaskCount')
         this.setPendingTaskCount(this.taskCounts.pending - 1)
         this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)
         if (contact.task_status === ContactTaskStatus.STATUS_OPEN) {
@@ -1150,7 +1149,6 @@ export default {
       }
 
       if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
-        console.trace('antes de setOpenTaskCount')
         this.setOpenTaskCount(this.taskCounts.open - 1)
         this.setInboxOpenTaskCount(this.inboxTaskCounts.open - 1)
         if (contact.task_status === ContactTaskStatus.STATUS_PENDING) {
