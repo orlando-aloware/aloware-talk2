@@ -184,9 +184,10 @@ export default {
     },
 
     fetchTasks (status, isNextPage = false, refreshData = false) {
+      console.trace('tracking fetchTasks')
       if (status) {
         let taskType = 'in_queue'
-
+        console.log('tracking fetchTasks status: ', status)
         switch (status) {
           case AutoDialTaskStatus.STATUS_COMPLETED:
             taskType = 'called'
@@ -209,16 +210,17 @@ export default {
 
         params.page = isNextPage ? 2 : 1
         const isInProgress = get(this.inProgressFetchTasks, taskType, false)
-
+        console.log('tracking fetchTasks status: ', status)
         // skip if there's an in-progress tasks fetching for the specific type
         if (isInProgress) {
           return
         }
 
         this.inProgressFetchTasks[taskType] = true
-
+        console.log('tracking fetchTasks params: ', params)
         this.getTaskByFilter(params)
           .then(res => {
+            console.log('tracking fetchTasks response: ', res)
             this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
             delete this.powerDialerTaskFilters[taskType].data
 
