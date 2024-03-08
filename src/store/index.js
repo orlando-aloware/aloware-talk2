@@ -279,10 +279,13 @@ export default function (/* { ssrContext } */) {
         xmas_enabled: false
       },
       staticsLoaded: false,
+      isWhiteLabel: false,
       isCallDisposed: false,
       isContactDisposed: false,
       isIntroVideoVisible: false,
-      showedKycDialog: false
+      showedKycDialog: false,
+      showedKycReloadDialog: false,
+      isTrialBannerVisible: false
     },
 
     getters: {
@@ -800,6 +803,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_STATICS_LOADED', value)
       },
 
+      setIsWhiteLabel ({ commit }, value) {
+        commit('SET_IS_WHITE_LABEL', value)
+      },
+
       setIsCallDisposed ({ commit }, value) {
         commit('SET_IS_CALL_DISPOSED', value)
       },
@@ -831,6 +838,14 @@ export default function (/* { ssrContext } */) {
 
       setShowedKycDialog ({ commit }, value) {
         commit('SET_SHOWED_KYC_DIALOG', value)
+      },
+
+      setShowedKycReloadDialog ({ commit }, value) {
+        commit('SET_SHOWED_KYC_RELOAD_DIALOG', value)
+      },
+
+      setIsTrialBannerVisible ({ commit }, value) {
+        commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
       }
     },
 
@@ -1538,6 +1553,10 @@ export default function (/* { ssrContext } */) {
         state.staticsLoaded = value
       },
 
+      SET_IS_WHITE_LABEL (state, value) {
+        state.isWhiteLabel = value
+      },
+
       SET_IS_CALL_DISPOSED (state, value) {
         state.isCallDisposed = value
       },
@@ -1556,6 +1575,14 @@ export default function (/* { ssrContext } */) {
 
       SET_SHOWED_KYC_DIALOG (state, value) {
         state.showedKycDialog = value
+      },
+
+      SET_SHOWED_KYC_RELOAD_DIALOG (state, value) {
+        state.showedKycReloadDialog = value
+      },
+
+      SET_IS_TRIAL_BANNER_VISIBLE (state, value) {
+        state.isTrialBannerVisible = value
       },
 
       updateField

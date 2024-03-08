@@ -32,9 +32,14 @@
         </div>
         <div class="d-flex items-center">
           <q-checkbox class="pr-4"
-                      label="Add opt-out phrase for this message"
                       size="xs"
-                      v-model="isOptoutActiveComputed"/>
+                      :disable="isOptOutForced"
+                      v-model="isOptoutActiveComputed">
+              Add opt-out phrase for this message
+              <q-tooltip v-if="isOptOutForced">
+                {{ optoutTooltipText }}
+              </q-tooltip>
+            </q-checkbox>
           <span class="mr-4">
             Message parts: {{ messagePartCount }} / {{ baseLine }}
           </span>
@@ -107,6 +112,7 @@ import MessageComposerSmsPreview from 'src/components/message-composer/message-c
 import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, smsMixin } from 'src/plugins/mixins'
+import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
   name: 'broadcast-add-view-message',
@@ -144,6 +150,10 @@ export default {
   }),
 
   computed: {
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapState([
       'campaigns'
     ]),
@@ -167,6 +177,10 @@ export default {
       set (value) {
         return this.setIsOptoutActive(value)
       }
+    },
+
+    isOptOutForced () {
+      return this.currentCompany.force_opt_out_phrase
     },
 
     maxSmsBodyWithOptoutLength () {
@@ -257,6 +271,10 @@ export default {
 
     rvmUrl () {
       return `${window.axios.defaults.baseURL}/static/uploaded_file/${this.rvm?.file_name}`
+    },
+
+    optoutTooltipText () {
+      return IS_OPT_OUT_FORCED_TEXT
     }
   },
 

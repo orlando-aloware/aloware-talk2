@@ -13,6 +13,9 @@
               <div class="fs-14 mt-1 header-title">Communication Info</div>
 
               <div class="d-flex header-btn-wrapper">
+                <transcription-modal class="mr-2"
+                                     :communication="communication"
+                                     v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
                 <b-button variant="danger"
                           size="sm"
                           v-if="hasPermissionTo('archive communication')"
@@ -841,6 +844,7 @@ import RingGroupSnapshot from 'components/ring-group-snapshot'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
+import TranscriptionModal from 'src/components/communication/transcription-modal'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
@@ -855,7 +859,8 @@ export default {
     CommunicationNote,
     CommunicationAudio,
     TargetUsersTree,
-    DownloadButton
+    DownloadButton,
+    TranscriptionModal
   },
 
   mixins: [

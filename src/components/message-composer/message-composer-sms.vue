@@ -122,18 +122,13 @@
                        type="textarea"
                        placeholder="Type your message"
                        v-model="messageComposer.sms.body"
+                       :disable="isSendTextInputDisabled"
                        @input="imposeCharactersLimit"
                        @keydown="onKeyDown"
                        @blur="onBlur">
               </q-input>
             </div>
 
-            <block-tooltip placement="top"
-                           triggers="hover"
-                           target="message-sms-input"
-                           task="text"
-                           v-if="!canTextToNumber">
-            </block-tooltip>
             <q-dialog v-model="urlShortenerDialog"
                       persistent
                       transition-show="scale"
@@ -181,12 +176,6 @@
                    v-if="isOptoutActive">
                   [{{ optoutText.trim() }}]
               </div>
-              <block-tooltip placement="top"
-                             triggers="hover"
-                             target="message-sms-popover"
-                             task="text"
-                             v-if="!canTextToNumber">
-              </block-tooltip>
               <div id="message-sms-popover">
                   <q-btn-dropdown split
                                   class="message-composer-send-dropdown-button"
@@ -241,7 +230,6 @@ import VideoPlaceholder from 'components/message-composer/file-placeholders/vide
 import ApplicationPlaceholder from 'components/message-composer/file-placeholders/application-placeholder'
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { kycMixin } from 'src/plugins/mixins'
 
@@ -259,8 +247,7 @@ export default {
     VideoPlaceholder,
     ImagePlaceholder,
     SmsTemplateModal,
-    ScheduledMessage,
-    BlockTooltip
+    ScheduledMessage
   },
 
   props: {
@@ -296,6 +283,11 @@ export default {
     isBroadcast: {
       type: Boolean,
       default: false
+    },
+    disabledMessage: {
+      type: String,
+      required: false,
+      default: ''
     }
   },
 
@@ -350,9 +342,13 @@ export default {
       return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 
+    isSendTextInputDisabled () {
+      return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+    },
+
     canTextToNumber () {
       const phoneNumber = this.messageComposer.sms.phone_number
-      return this.enabledToTextNumber(phoneNumber)
+      return this.enabledToTextNumber(phoneNumber) && !this.disabledMessage
     }
   },
 
@@ -484,6 +480,9 @@ export default {
     },
 
     onKeyDown (evt) {
+      if (this.isSendTextInputDisabled) {
+        return
+      }
       if (evt.keyCode === 13 && !evt.shiftKey && !this.isBroadcast) {
         if (this.validSms) {
           this.onSend()

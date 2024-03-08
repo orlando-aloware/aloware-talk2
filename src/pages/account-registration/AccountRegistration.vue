@@ -177,7 +177,7 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
+                         @click.stop="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
                         Notice on Carrier Fees for SMS and MMS
                       </a>
                     </template>
@@ -193,12 +193,12 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/terms-and-conditions')">
+                         @click.stop="openLink('https://aloware.com/terms-and-conditions')">
                         Terms and Conditions,
                       </a>
                       and
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
+                         @click.stop="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
                         Acceptable Use Policy.
                       </a>
                     </template>
@@ -271,7 +271,7 @@ export default {
 
   data () {
     return {
-      step: 1,
+      step: 0,
       password_validation: [],
       show_password: false,
       isSubmitted: false,
@@ -298,10 +298,7 @@ export default {
     ...mapGetters('accountRegistration', ['getBusinessInformationFieldsValue']),
 
     isNextButtonDisabled () {
-      return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
-        (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
-        (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms)) ||
-        this.isLoading
+      return !this.validateFirstStepFieldsFilled() || this.isLoading
     },
 
     isLargeScreen () {
@@ -354,16 +351,6 @@ export default {
 
     'form.password_confirmation' () {
       this.validateAllPasswordRules()
-    },
-
-    step (newStep) {
-      if (newStep === 3 && !this.$q.platform.is.electron) {
-        this.initRecaptcha()
-      }
-
-      if (newStep === 1 || newStep === 2) {
-        this.verifyFieldErrors()
-      }
     }
   },
 
@@ -490,11 +477,6 @@ export default {
       this.updateValidationState('match', this.validatePasswordMatch(this.form.password_confirmation))
     },
 
-    validateZipCode (zip) {
-      const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
-      return zipRegex.test(zip)
-    },
-
     iconForValidation (isValid) {
       return isValid ? 'check' : 'close'
     },
@@ -550,7 +532,7 @@ export default {
         this.form.region?.length &&
         this.form.city?.length &&
         this.form.legal_country &&
-        this.validateZipCode(this.form.postal_code) &&
+        this.validateZipCodeByCountryId(this.form.postal_code, this.form?.legal_country?.id) &&
         this.form.auth_rep_first_name?.length &&
         this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&

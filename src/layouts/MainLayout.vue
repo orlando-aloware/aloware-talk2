@@ -214,7 +214,9 @@
 
       <pro-feature-dialog/>
 
-      <kyc-fill-dialog :show="shouldShowKycFillDialog" />
+      <kyc-fill-dialog :show="shouldShowKycFillDialog"
+                       v-if="shouldShowKycFillDialog"/>
+      <kyc-reload-dialog :show="shouldShowKycReloadDialog" />
     </div>
   </div>
 </template>
@@ -234,7 +236,10 @@ import {
   agentMixin,
   contactV2AttributesMixin,
   kycMixin,
-  settingsMixin
+  simpsocialMixin,
+  userMixin,
+  settingsMixin,
+  broadcastsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -263,6 +268,7 @@ import * as storage from 'src/plugins/helpers/storage'
 import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import KycFillDialog from 'components/kyc-fill-dialog.vue'
+import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
@@ -288,6 +294,7 @@ export default {
     Phone,
     ProFeatureDialog,
     KycFillDialog,
+    KycReloadDialog,
     Modal,
     TrialBanner
   },
@@ -305,7 +312,10 @@ export default {
     agentMixin,
     contactV2AttributesMixin,
     kycMixin,
-    settingsMixin
+    simpsocialMixin,
+    userMixin,
+    settingsMixin,
+    broadcastsMixin
   ],
 
   data () {
@@ -380,6 +390,7 @@ export default {
       'leadSources',
       'isIntroVideoVisible',
       'showedKycDialog',
+      'showedKycReloadDialog',
       'statics'
     ]),
 
@@ -525,6 +536,13 @@ export default {
              !this.showedKycDialog &&
              this.profile?.company?.kyc_filled === false &&
              !this.$router.currentRoute.name.includes('Business Information')
+    },
+
+    shouldShowKycReloadDialog () {
+      return this.isAuthenticated &&
+            !this.isFirstLoading &&
+            this.showedKycReloadDialog &&
+            this.profile?.company?.is_trial
     },
 
     isAuthenticated () {
@@ -906,6 +924,12 @@ export default {
       this.checkSuspended(company)
     }
 
+    this.mainListeners.kycStatusUpdated = (company) => {
+      if (this.isTrialKYC && this.isNotSimpsocial && !this.isModGen) {
+        this.setShowedKycReloadDialog(true)
+      }
+    }
+
     this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
@@ -916,8 +940,8 @@ export default {
       }
     }
 
-    this.mainListeners.changeAgentStatus = (agentStatus) => {
-      this.changeAgentStatus(agentStatus)
+    this.mainListeners.changeAgentStatus = (agentStatus, signature = 'Talk-MainListeners-ChangeAgentStatus') => {
+      this.changeAgentStatus(agentStatus, false, 1, signature)
     }
 
     this.mainListeners.exportEventCreate = (task) => {
@@ -1053,7 +1077,7 @@ export default {
     this.resetPowerDialerSession(this.$route)
 
     // temporary
-    if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+    if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
       this.$router.push({ path: '/' })
     }
   },
@@ -1228,6 +1252,7 @@ export default {
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
       this.$VueEvent.listen('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
+      this.$VueEvent.listen('kyc_status_updated', this.mainListeners.kycStatusUpdated)
     },
 
     stopMainEvents () {
@@ -1257,6 +1282,7 @@ export default {
       this.$VueEvent.stop('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.stop('hide_mobile_footer', this.mainListeners.hideMobileFooter)
       this.$VueEvent.stop('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
+      this.$VueEvent.stop('kyc_status_updated', this.mainListeners.kycStatusUpdated)
     },
 
     checkSuspended (data, isUser = false) {
@@ -1432,11 +1458,11 @@ export default {
 
         if (this.profile && this.profile.live_calls === 0 && this.dialer.call &&
           !this.profile.go_to_available_after_login) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE)
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE, false, 1, 'Talk-InitAuth')
         }
 
         if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-2')
         }
 
         // company id should be available by now so fetch statics if it's not yet fetched
@@ -2466,6 +2492,7 @@ export default {
           this.setStatics(res.data)
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
+          this.setIsWhiteLabel(res.data.whitelabel)
         }).catch(err => {
           console.log(err)
 
@@ -2479,12 +2506,12 @@ export default {
     },
 
     goAvailable () {
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-GoAvailable')
       this.$bvModal.hide('missed-call-modal')
     },
 
     stayBusy () {
-      this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-StayBusy')
       this.$bvModal.hide('missed-call-modal')
     },
 
@@ -2559,7 +2586,9 @@ export default {
       'setLeadSources',
       'updateUserStatus',
       'setStatics',
-      'setStaticsLoaded'
+      'setStaticsLoaded',
+      'setIsWhiteLabel',
+      'setShowedKycReloadDialog'
     ]),
     ...mapActions('contacts', [
       'resetSearch',
@@ -2695,7 +2724,7 @@ export default {
       this.resetPowerDialerSession(to)
 
       // temporary
-      if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+      if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
         this.$router.back()
       }
     },
