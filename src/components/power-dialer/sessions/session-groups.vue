@@ -463,8 +463,19 @@ export default {
     },
 
     async loadMore (key) {
+      console.log('loadMore key', key)
+      console.log('loadMore this.filterDisabled[key]', this.filterDisabled[key])
+      console.log('loadMore this.groupPageFilters[key]', this.groupPageFilters[key])
       this.filterDisabled[key] = true
       this.groupPageFilters[key]++
+
+      console.log('loadMore this.groupPageFilters[key]', this.groupPageFilters[key])
+      console.log('loadMore params', {
+        id: this.selectedList.id,
+        task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
+        per_page: this.itemsPerPage,
+        page: this.powerDialerTaskFilters[key].current_page + 1
+      })
 
       const res = await this.getSessionTaskByFilter({
         id: this.selectedList.id,
@@ -474,8 +485,11 @@ export default {
       })
 
       if (res.status === 200) {
+        console.log('loadMore response', res.data)
         this.powerDialerTasks[key] = this.powerDialerTasks[key].concat(res.data.data)
         this.powerDialerTaskFilters[key] = res.data
+        console.log('loadMore this.powerDialerTasks[key]', this.powerDialerTasks[key])
+        console.log('loadMore this.powerDialerTasks[key]', this.powerDialerTasks[key])
       }
 
       this.filterDisabled[key] = false
