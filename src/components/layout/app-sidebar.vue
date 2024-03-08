@@ -412,7 +412,7 @@
            class="nav-icons w-100 disabled"
            flat
            :ripple="false"
-           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled && isDemoCompany"
+           v-show="!isActive('Broadcasts') && !canUseBroadcast"
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
                rounded
@@ -431,7 +431,7 @@
            flat
            :to="{ path: '/broadcasts' }"
            :ripple="false"
-           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
+           v-show="isActive('Broadcasts') && canUseBroadcast">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -445,7 +445,7 @@
            flat
            :to="{ path: '/broadcasts' }"
            :ripple="false"
-           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
+           v-show="!isActive('Broadcasts') && canUseBroadcast">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -501,7 +501,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { simpsocialMixin, kycMixin } from 'src/plugins/mixins'
+import { simpsocialMixin, kycMixin, broadcastsMixin } from 'src/plugins/mixins'
 import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
@@ -522,7 +522,8 @@ export default {
 
   mixins: [
     simpsocialMixin,
-    kycMixin
+    kycMixin,
+    broadcastsMixin
   ],
 
   computed: {

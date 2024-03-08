@@ -471,6 +471,10 @@ export default {
     ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
+    ...mapState('inbox', [
+      'communications',
+      'channelChangedFilterFields'
+    ]),
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
@@ -722,7 +726,13 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: true
       }).then(res => {
-        this.$VueEvent.fire('contact_updated', res.data.contact)
+        let data = res.data.contact
+        if (this.channelChangedFilterFields) {
+          data.communications = this.communications
+        }
+        this.$nextTick(() => {
+          this.$VueEvent.fire('contact_updated', data)
+        })
         this.communication.is_read = true
 
         // if contact has no unreads anymore, refresh inbox result
@@ -740,7 +750,13 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: false
       }).then(res => {
-        this.$VueEvent.fire('contact_updated', res.data.contact)
+        let data = res.data.contact
+        if (this.channelChangedFilterFields) {
+          data.communications = this.communications
+        }
+        this.$nextTick(() => {
+          this.$VueEvent.fire('contact_updated', data)
+        })
         this.communication.is_read = false
 
         // if contact has no unreads before, refresh inbox result

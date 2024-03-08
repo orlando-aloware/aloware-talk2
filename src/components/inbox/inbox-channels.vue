@@ -753,7 +753,9 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      const communications = [...this.communications]
+      const communications = (data?.communications?.length > 0)
+        ? [...data.communications]
+        : [...this.communications]
       const channels = [
         'calls',
         'messages',
