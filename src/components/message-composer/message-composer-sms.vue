@@ -339,7 +339,7 @@ export default {
     },
 
     isSendTextDisabled () {
-      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
     },
 
     isSendTextInputDisabled () {
