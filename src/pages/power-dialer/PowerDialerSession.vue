@@ -227,7 +227,7 @@ export default {
               this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
               delete this.powerDialerTaskFilters[taskType].data
               this.pagesFetched += 1
-              this.powerDialerTaskFilters[taskType].total_queued = currentTotalQueued
+              this.powerDialerTaskFilters[taskType].total_queued = this.totalTasksInQueue + (res.data.to - res.data.from)
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
             } else {
