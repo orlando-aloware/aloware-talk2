@@ -223,7 +223,6 @@ export default {
             console.log('tracking fetchTasks response: ', res)
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              const currentTotalQueued = this.powerDialerTaskFilters[taskType].total_queued
               this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
               delete this.powerDialerTaskFilters[taskType].data
               this.pagesFetched += 1
