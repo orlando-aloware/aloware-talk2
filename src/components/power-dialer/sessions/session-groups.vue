@@ -547,7 +547,8 @@ export default {
           console.log('getTotalItem inQueue', inQueue)
           console.log('getTotalItem key', key)
           console.log('getTotalItem this.powerDialerTaskFilters[key]', this.powerDialerTaskFilters[key])
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for in progress
+          return inQueue ? inQueue.length : 0
+          // return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for in progress
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
