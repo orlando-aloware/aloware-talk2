@@ -72,6 +72,15 @@
                       v-model="currentTask"
                       @click="onToggleStatus">
           <template v-slot:one>
+            <div class="w-100 options"
+                 :class="[currentTask !== ContactTaskStatusAll ? 'text-grey-90' : 'active']">
+                <span class="text-center task-status-name">
+                  All
+                </span>
+            </div>
+          </template>
+
+          <template v-slot:two>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
               <span class="text-left task-status-name">
@@ -98,7 +107,7 @@
             </div>
           </template>
 
-          <template v-slot:two>
+          <template v-slot:three>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-90' : 'active']">
               <span class="text-left task-status-name">
@@ -116,7 +125,7 @@
             </div>
           </template>
 
-          <template v-slot:three>
+          <template v-slot:four>
             <div class="w-100 options"
                  :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-90' : 'active']">
                 <span class="text-center task-status-name">
@@ -221,7 +230,6 @@ import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dia
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
-import { STATUS_OPEN } from 'src/constants/contact-task-status'
 
 export default {
   name: 'inbox-tab',
@@ -499,8 +507,10 @@ export default {
         case ContactTaskStatus.STATUS_NEW:
           return 'New'
         case ContactTaskStatus.STATUS_OPEN:
-        default:
           return 'Open'
+        case ContactTaskStatus.STATUS_ALL:
+        default:
+          return 'All'
       }
     },
 
@@ -687,7 +697,7 @@ export default {
       }
 
       // if a pinned view is edited, redirect to inbox view route. otherwise, to inbox
-      this.currentTask = STATUS_OPEN
+      this.currentTask = ContactTaskStatus.STATUS_ALL
 
       const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
       if (pinnedIndex >= 0) {
@@ -710,7 +720,7 @@ export default {
         name: 'Inbox Channel Task Status',
         params: {
           channel: 'inbox',
-          status: 'open'
+          status: ContactTaskStatus.STATUS_ALL
         }
       }).catch(err => {
         console.log(err)
@@ -767,7 +777,7 @@ export default {
     },
 
     onRouteNameChange () {
-      this.currentTask = ContactTaskStatus.STATUS_OPEN
+      this.currentTask = ContactTaskStatus.STATUS_ALL
       this.resetList()
     },
 
@@ -1314,7 +1324,7 @@ export default {
       this.lineOrRingGroupFilter = null
 
       // avoid contacts refresh if status is not expected
-      if (!['open', 'pending', 'closed'].includes(this.$route.params.status)) {
+      if (!['open', 'pending', 'closed', 'all'].includes(this.$route.params.status)) {
         return
       }
 
@@ -1334,7 +1344,7 @@ export default {
       if (['Inbox'].includes(value)) {
         this.searchText = ''
         this.isSearch = false
-        this.currentTask = ContactTaskStatus.STATUS_OPEN
+        this.currentTask = ContactTaskStatus.STATUS_ALL
         this.resetList()
         if (this.previousRoute && this.previousRoute.params.status === 'pending') {
           this.setLoadingPendingTaskCount(true)

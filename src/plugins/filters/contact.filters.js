@@ -169,8 +169,9 @@ const fixTaskStatusName = (taskStatusId) => {
       return 'New'
     case ContactTaskStatus.STATUS_OPEN:
       return 'Open'
+    case ContactTaskStatus.STATUS_ALL:
     default:
-      return ''
+      return 'All'
   }
 }
 
@@ -188,8 +189,10 @@ const getTaskStatusIdByName = (taskStatusName) => {
     case 'new':
       return ContactTaskStatus.STATUS_NEW
     case 'open':
-    default:
       return ContactTaskStatus.STATUS_OPEN
+    case 'all':
+    default:
+      return ContactTaskStatus.STATUS_ALL
   }
 }
 

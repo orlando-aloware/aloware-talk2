@@ -185,8 +185,10 @@ export default {
           case ContactTaskStatus.STATUS_NEW:
             return 'New'
           case ContactTaskStatus.STATUS_OPEN:
-          default:
             return 'Open'
+          case ContactTaskStatus.STATUS_ALL:
+          default:
+            return 'All'
         }
       }
 

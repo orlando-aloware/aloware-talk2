@@ -36,8 +36,10 @@ export default {
         case ContactTaskStatus.STATUS_CLOSED:
           return 'closed'
         case ContactTaskStatus.STATUS_OPEN:
-        default:
           return 'open'
+        case ContactTaskStatus.STATUS_ALL:
+        default:
+          return 'all'
       }
     }
   },
@@ -55,25 +57,30 @@ export default {
     ]
 
     return {
-      currentTask: ContactTaskStatus.STATUS_OPEN,
+      currentTask: ContactTaskStatus.STATUS_ALL,
       options: [
         {
-          value: ContactTaskStatus.STATUS_OPEN,
+          value: ContactTaskStatus.STATUS_ALL,
           slot: 'one'
         },
         {
-          value: ContactTaskStatus.STATUS_PENDING,
+          value: ContactTaskStatus.STATUS_OPEN,
           slot: 'two'
         },
         {
-          value: ContactTaskStatus.STATUS_CLOSED,
+          value: ContactTaskStatus.STATUS_PENDING,
           slot: 'three'
+        },
+        {
+          value: ContactTaskStatus.STATUS_CLOSED,
+          slot: 'four'
         }
       ],
       ContactTaskStatusNew: ContactTaskStatus.STATUS_NEW,
       ContactTaskStatusOpen: ContactTaskStatus.STATUS_OPEN,
       ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
       ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
+      ContactTaskStatusAll: ContactTaskStatus.STATUS_ALL,
       filters: {
         search: []
       },
@@ -304,7 +311,9 @@ export default {
 
         delete this.filters.contact_task_status
       } else {
-        this.filters.contact_task_status[0].value = [taskId]
+        this.filters.contact_task_status[0].value = taskId === ContactTaskStatus.STATUS_ALL
+          ? ContactTaskStatus.STATUS_ALL_IDS
+          : [taskId]
       }
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
@@ -411,7 +420,7 @@ export default {
       this.filters = {
         contact_task_status: [
           {
-            value: [ContactTaskStatus.STATUS_OPEN],
+            value: ContactTaskStatus.STATUS_ALL_IDS,
             operator: OPERATORS.IS_ANY_OF
           }
         ],
@@ -483,7 +492,9 @@ export default {
           this.currentTask = ContactTaskStatus.STATUS_CLOSED
           break
         case 'open':
+          this.currentTask = ContactTaskStatus.STATUS_OPEN
           break
+        case 'all':
         default:
       }
     },
