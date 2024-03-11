@@ -221,22 +221,24 @@ export default {
         this.getTaskByFilter(params)
           .then(res => {
             console.log('tracking fetchTasks response: ', res)
-            console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
-            this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-            delete this.powerDialerTaskFilters[taskType].data
-            console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
+            // console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
+            // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+            // delete this.powerDialerTaskFilters[taskType].data
+            // console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-              // delete this.powerDialerTaskFilters[taskType].data
+              if (!this.powerDialerTaskFilters[taskType]) {
+                this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+                delete this.powerDialerTaskFilters[taskType].data
+              }
               this.pagesFetched += 1
               // this.powerDialerTaskFilters[taskType].total_queued = this.totalTasksInQueue + (res.data.to - res.data.from)
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
-              // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-              // delete this.powerDialerTaskFilters[taskType].data
+              this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+              delete this.powerDialerTaskFilters[taskType].data
             }
 
             // no more queued tasks
