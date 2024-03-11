@@ -184,10 +184,8 @@ export default {
     },
 
     fetchTasks (status, isNextPage = false, refreshData = false) {
-      console.trace('tracking fetchTasks')
       if (status) {
         let taskType = 'in_queue'
-        console.log('tracking fetchTasks status: ', status)
         switch (status) {
           case AutoDialTaskStatus.STATUS_COMPLETED:
             taskType = 'called'
@@ -210,33 +208,36 @@ export default {
 
         params.page = isNextPage ? 2 : 1
         const isInProgress = get(this.inProgressFetchTasks, taskType, false)
-        console.log('tracking fetchTasks status: ', status)
+
         // skip if there's an in-progress tasks fetching for the specific type
         if (isInProgress) {
           return
         }
 
         this.inProgressFetchTasks[taskType] = true
-        console.log('tracking fetchTasks params: ', params)
+
         this.getTaskByFilter(params)
           .then(res => {
-            console.log('tracking fetchTasks response: ', res)
             // console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
             // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
             // delete this.powerDialerTaskFilters[taskType].data
             // console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
+              console.log('tracking fetchTasks response: ', res)
               if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
                 delete this.powerDialerTaskFilters[taskType].data
               }
-              console.log('tracking fetchTasks antes de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType])
+              console.log('tracking fetchTasks antes de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType].length)
               this.pagesFetched += 1
               // this.powerDialerTaskFilters[taskType].total_queued = this.totalTasksInQueue + (res.data.to - res.data.from)
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
-              console.log('tracking fetchTasks despues de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType])
+              if (!this.powerDialerTaskFilters[taskType]) {
+                this.powerDialerTaskFilters[taskType].total_queued = this.powerDialerTasks[taskType].length
+              }
+              console.log('tracking fetchTasks despues de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType].length)
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
               this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
