@@ -72,6 +72,18 @@ pipeline {
                 sh 'quasar build --debug'
             }
         }
+        
+        stage('Sonar Analysis') {
+            steps {
+                script {
+                    sh 'git rev-parse --abbrev-ref HEAD'
+                    def scannerHome = tool 'SonarQube Tool';
+                    withSonarQubeEnv('Sonar') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
 
         stage('Deploy New Dev-Env Cloudfront Distribution') {
             when { not { branch 'master' } }
