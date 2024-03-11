@@ -231,10 +231,12 @@ export default {
                 this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
                 delete this.powerDialerTaskFilters[taskType].data
               }
+              console.log('tracking fetchTasks antes de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType])
               this.pagesFetched += 1
               // this.powerDialerTaskFilters[taskType].total_queued = this.totalTasksInQueue + (res.data.to - res.data.from)
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
+              console.log('tracking fetchTasks despues de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType])
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
               this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
