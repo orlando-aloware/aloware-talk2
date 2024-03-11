@@ -221,8 +221,10 @@ export default {
         this.getTaskByFilter(params)
           .then(res => {
             console.log('tracking fetchTasks response: ', res)
+            console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
             this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
             delete this.powerDialerTaskFilters[taskType].data
+            console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
               // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)

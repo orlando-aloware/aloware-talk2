@@ -540,13 +540,11 @@ export default {
       if (!this.powerDialerTaskFilters[key]) {
         return 0
       }
-
+      console.log('getTotalItem key', key)
+      console.log('getTotalItem this.powerDialerTaskFilters[key]', this.powerDialerTaskFilters[key])
       switch (key) {
         case 'in_queue':
-          const inQueue = get(this.powerDialerTasks, 'in_queue', null)
-          console.log('getTotalItem key', key)
-          console.log('getTotalItem inQueue', inQueue)
-          return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for in progress
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
