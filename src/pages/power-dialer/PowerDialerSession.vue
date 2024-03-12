@@ -218,26 +218,19 @@ export default {
 
         this.getTaskByFilter(params)
           .then(res => {
-            // console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
-            // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-            // delete this.powerDialerTaskFilters[taskType].data
-            // console.log('tracking fetchTasks response this.powerDialerTaskFilters[taskType]: ', this.powerDialerTaskFilters[taskType])
-
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              console.log('tracking fetchTasks response: ', res)
               if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
                 delete this.powerDialerTaskFilters[taskType].data
               }
-              console.log('tracking fetchTasks antes de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType].length)
+
               this.pagesFetched += 1
-              // this.powerDialerTaskFilters[taskType].total_queued = this.totalTasksInQueue + (res.data.to - res.data.from)
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
+
               if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType].total_queued = this.powerDialerTasks[taskType].length
               }
-              console.log('tracking fetchTasks despues de agregar a this.powerDialerTasks[taskType]: ', this.powerDialerTasks[taskType].length)
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
               this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
@@ -316,10 +309,6 @@ export default {
       // current total tasks in queue + the active task,
       // and if current total tasks in queue is less than
       // the number of tasks per page
-      console.log('fetchQueuedTasks this.totalTasksInQueue + 1', this.totalTasksInQueue + 1)
-      console.log('fetchQueuedTasks get(this.powerDialerTaskFilters.in_queue, "total_queued", null)', get(this.powerDialerTaskFilters.in_queue, 'total_queued', null))
-      console.log('fetchQueuedTasks get(this.powerDialerTaskFilters.in_queue, "per_page", 20)', get(this.powerDialerTaskFilters.in_queue, 'per_page', 20))
-      console.log('fetchQueuedTasks this.totalTasksInQueue', this.totalTasksInQueue)
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
       const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
       const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
@@ -347,7 +336,6 @@ export default {
   watch: {
     activeTask: {
       handler (newValue, oldValue) {
-        console.log('watch activeTask', oldValue, newValue)
         const newContactListItemId = get(newValue, 'contact_list_item_id', null)
         const oldContactListItemId = get(oldValue, 'contact_list_item_id', null)
 
