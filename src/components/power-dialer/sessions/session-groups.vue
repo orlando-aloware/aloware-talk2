@@ -556,6 +556,35 @@ export default {
     getTotalItems (group) {
       return get(this.powerDialerTaskFilters[group], 'total_items', 0)
     }
+  },
+
+  watch: {
+    'powerDialerTasks.in_queue': {
+      handler (tasks) {
+        console.log('observando powerDialerTasks.in_queue, tasks: ', tasks)
+        console.log('observando powerDialerTasks.in_queue, this.powerDialerTasks.in_queue: ', this.powerDialerTasks.in_queue)
+        // end the session if:
+        // there's no tasks in queue
+        // and there's no active task
+        if (tasks.length === 0 && !this.hasActiveTask) {
+          this.shouldRedirect = true
+          return
+        }
+
+        if (tasks.length === 0 && !this.togglePause) {
+          this.shouldRedirect = true
+        }
+
+        if (tasks.length > 0 && !this.isSessionRunning) {
+          this.shouldRedirect = false
+          if (!this.wrapUp) {
+            // Calls this function the first time the page loads
+            this.start()
+          }
+        }
+      },
+      deep: true
+    }
   }
 }
 </script>
