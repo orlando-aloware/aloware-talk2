@@ -206,7 +206,7 @@ export default {
           task_status: status
         }
 
-        params.page = isNextPage ? 2 : 1
+        params.page = this.pagesFetched + 1
         const isInProgress = get(this.inProgressFetchTasks, taskType, false)
 
         // skip if there's an in-progress tasks fetching for the specific type
