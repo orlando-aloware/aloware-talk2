@@ -530,13 +530,7 @@ export default {
       switch (key) {
         case 'in_queue':
           const inQueue = get(this.powerDialerTasks, 'in_queue', null)
-          const totalQueued = this.powerDialerTaskFilters[key].total_queued
-          const totalCalled = this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
-          console.log('total IN QUEUE, inQueue:', inQueue.length)
-          console.log('total IN QUEUE, powerDialerTaskFilters[key].total_queued:', this.powerDialerTaskFilters[key])
-          return totalQueued - totalCalled - 1 // -1 for the one in progress
-          // return inQueue ? inQueue.length : 0
-          // return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for in progress
+          return inQueue ? inQueue.length : 0
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
@@ -558,30 +552,6 @@ export default {
 
     getTotalItems (group) {
       return get(this.powerDialerTaskFilters[group], 'total_items', 0)
-    }
-  },
-
-  watch: {
-    'powerDialerTasks.in_queue': {
-      handler (tasks) {
-        console.log('observando powerDialerTasks.in_queue, tasks: ', tasks)
-        console.log('observando powerDialerTasks.in_queue, this.powerDialerTasks.in_queue: ', this.powerDialerTasks.in_queue)
-        // end the session if:
-        // there's no tasks in queue
-        // and there's no active task
-      },
-      deep: true
-    },
-
-    'powerDialerTaskFilters.in_queue': {
-      handler (tasks) {
-        console.log('observando powerDialerTaskFilters.in_queue, tasks: ', tasks)
-        console.log('observando powerDialerTaskFilters.in_queue, this.powerDialerTaskFilters.in_queue: ', this.powerDialerTaskFilters.in_queue)
-        // end the session if:
-        // there's no tasks in queue
-        // and there's no active task
-      },
-      deep: true
     }
   }
 }
