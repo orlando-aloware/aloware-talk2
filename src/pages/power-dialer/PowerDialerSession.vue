@@ -206,7 +206,7 @@ export default {
           task_status: status
         }
 
-        params.page = this.pagesFetched + 1
+        params.page = isNextPage ? this.pagesFetched + 1 : 1
         const isInProgress = get(this.inProgressFetchTasks, taskType, false)
 
         // skip if there's an in-progress tasks fetching for the specific type
@@ -216,9 +216,14 @@ export default {
 
         this.inProgressFetchTasks[taskType] = true
 
+        if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+          console.log('solicitando IN QUEUE, params: ', params)
+        }
+
         this.getTaskByFilter(params)
           .then(res => {
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
+              console.log('solicitando IN QUEUE, res.data: ', res.data)
               if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
                 delete this.powerDialerTaskFilters[taskType].data
@@ -312,6 +317,12 @@ export default {
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
       const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
       const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
+      console.log('powerDialerTaskInQueueTotalQueued', powerDialerTaskInQueueTotalQueued)
+      console.log('totalTasksInQueueWithActiveCall', totalTasksInQueueWithActiveCall)
+      console.log('this.totalTasksInQueue', this.totalTasksInQueue)
+      console.log('powerDialerTaskInQueuePerPage', powerDialerTaskInQueuePerPage)
+      console.log('powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall', powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall)
+      console.log('this.totalTasksInQueue < powerDialerTaskInQueuePerPage', this.totalTasksInQueue < powerDialerTaskInQueuePerPage)
       if (powerDialerTaskInQueueTotalQueued &&
         powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < powerDialerTaskInQueuePerPage) {
