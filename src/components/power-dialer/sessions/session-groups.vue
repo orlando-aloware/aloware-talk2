@@ -531,7 +531,7 @@ export default {
         case 'in_queue':
           const inQueue = get(this.powerDialerTasks, 'in_queue', null)
           console.log('total IN QUEUE, inQueue:', inQueue.length)
-          console.log('total IN QUEUE, powerDialerTaskFilters[key].total_queued:', this.powerDialerTaskFilters[key].total_queued)
+          console.log('total IN QUEUE, powerDialerTaskFilters[key].total_queued:', this.powerDialerTaskFilters[key])
           return inQueue ? inQueue.length : 0
           // return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for in progress
         case 'called':
