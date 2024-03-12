@@ -566,22 +566,17 @@ export default {
         // end the session if:
         // there's no tasks in queue
         // and there's no active task
-        if (tasks.length === 0 && !this.hasActiveTask) {
-          this.shouldRedirect = true
-          return
-        }
+      },
+      deep: true
+    },
 
-        if (tasks.length === 0 && !this.togglePause) {
-          this.shouldRedirect = true
-        }
-
-        if (tasks.length > 0 && !this.isSessionRunning) {
-          this.shouldRedirect = false
-          if (!this.wrapUp) {
-            // Calls this function the first time the page loads
-            this.start()
-          }
-        }
+    'powerDialerTaskFilters.in_queue': {
+      handler (tasks) {
+        console.log('observando powerDialerTaskFilters.in_queue, tasks: ', tasks)
+        console.log('observando powerDialerTaskFilters.in_queue, this.powerDialerTaskFilters.in_queue: ', this.powerDialerTaskFilters.in_queue)
+        // end the session if:
+        // there's no tasks in queue
+        // and there's no active task
       },
       deep: true
     }
