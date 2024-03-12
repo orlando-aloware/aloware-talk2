@@ -443,7 +443,7 @@ export default {
         return defaultFilterModel
       }
 
-      if (this.$route.params.channel === 'my-personal-line') {
+      if (this.activeChannel?.value === 'my-personal-line') {
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
         defaultFilterModel.filter = {
           ...Filters.DEFAULT_STATE.filter,
@@ -870,7 +870,7 @@ export default {
       }
 
       // set user personal line as current filter
-      if (this.$route.params.channel === 'my-personal-line') {
+      if (this.activeChannel?.value === 'my-personal-line') {
         this.filter.campaigns = this.channelDefaultFilterModel.filter.campaigns
       }
 
