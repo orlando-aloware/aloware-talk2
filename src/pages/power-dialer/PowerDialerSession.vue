@@ -216,9 +216,14 @@ export default {
 
         this.inProgressFetchTasks[taskType] = true
 
+        if (status === AutoDialTaskStatus.STATUS_QUEUED) {
+          console.log('solicitando IN QUEUE, params:', params)
+        }
+
         this.getTaskByFilter(params)
           .then(res => {
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
+              console.log('solicitando IN QUEUE, respuesta:', res.data)
               if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
                 delete this.powerDialerTaskFilters[taskType].data
