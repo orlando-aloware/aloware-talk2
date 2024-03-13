@@ -218,36 +218,20 @@ export default {
 
         this.inProgressFetchTasks[taskType] = true
 
-        if (status === AutoDialTaskStatus.STATUS_QUEUED) {
-          console.log('solicitando IN QUEUE, params: ', params)
-        }
-
         this.getTaskByFilter(params)
           .then(res => {
             this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
             delete this.powerDialerTaskFilters[taskType].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              console.log('solicitando IN QUEUE, res.data: ', res.data)
-              /* if (!this.powerDialerTaskFilters[taskType]) {
-                this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-                delete this.powerDialerTaskFilters[taskType].data
-              } */
-
               if (!res.data.next_page_url) {
                 this.inQueueHasNextPage = false
               }
               this.pagesFetched += 1
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
-
-              /* if (!this.powerDialerTaskFilters[taskType]) {
-                this.powerDialerTaskFilters[taskType].total_queued = this.powerDialerTasks[taskType].length
-              } */
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
-              // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-              // delete this.powerDialerTaskFilters[taskType].data
             }
 
             // no more queued tasks
@@ -325,12 +309,6 @@ export default {
       const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
       const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
       const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
-      console.log('powerDialerTaskInQueueTotalQueued', powerDialerTaskInQueueTotalQueued)
-      console.log('totalTasksInQueueWithActiveCall', totalTasksInQueueWithActiveCall)
-      console.log('this.totalTasksInQueue', this.totalTasksInQueue)
-      console.log('powerDialerTaskInQueuePerPage', powerDialerTaskInQueuePerPage)
-      console.log('powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall', powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall)
-      console.log('this.totalTasksInQueue < powerDialerTaskInQueuePerPage', this.totalTasksInQueue < powerDialerTaskInQueuePerPage)
       if (powerDialerTaskInQueueTotalQueued &&
         powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < powerDialerTaskInQueuePerPage &&
