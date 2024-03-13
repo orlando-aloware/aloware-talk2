@@ -508,7 +508,6 @@ export default {
       }
 
       this.setChannelClonedFilter(this.filter)
-      // this.setTags([])
     },
 
     onApply (skipChangedFields = false) {

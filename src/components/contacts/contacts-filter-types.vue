@@ -648,12 +648,11 @@ export default {
 
       applyFilterInterval = setInterval(() => {
         if (!this.isDebounceInProgress) {
-          console.log('applyFilter this.filterOperatorValue', this.filterOperatorValue)
           if (this.filter.key === 'tags' && this.filterOperatorValue) {
             let selectedOptions = this.options.filter(option => this.filterOperatorValue.includes(option.id))
-            // Crear un conjunto temporal para manejar los elementos únicos
+            // Create a temporary set to handle unique items
             let tempSet = new Set([...this.appliedTags, ...selectedOptions])
-            // Convertir el conjunto temporal de nuevo a un array
+            // Convert the temporary set back to an array
             this.appliedTags = Array.from(tempSet)
             this.filter.options = this.appliedTags
           }
