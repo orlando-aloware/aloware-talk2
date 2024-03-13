@@ -55,7 +55,8 @@ import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-lis
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
-import { get, isEmpty } from 'lodash'
+/* import { get, isEmpty } from 'lodash' */
+import { get } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
@@ -204,11 +205,11 @@ export default {
 
         let params = {
           id: this.selectedList.id,
-          task_status: status
+          task_status: status,
+          per_page: 50
         }
 
-        params.page = isNextPage ? this.pagesFetched + 1 : 1
-        // params.page = isNextPage ? 2 : 1
+        params.page = isNextPage ? 2 : 1
         const isInProgress = get(this.inProgressFetchTasks, taskType, false)
 
         // skip if there's an in-progress tasks fetching for the specific type
@@ -227,9 +228,17 @@ export default {
               if (!res.data.next_page_url) {
                 this.inQueueHasNextPage = false
               }
-              this.pagesFetched += 1
+              // this.pagesFetched += 1
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
-              this.powerDialerTasks[taskType].push(...res.data.data)
+              const currSkipped = this.powerDialerTasks.skipped
+              const currSkippedAndInProgress = [...currSkipped, this.activeTask]
+              let currInQueue = [...res.data.data]
+              console.log('currSkipped', currSkipped)
+              console.log('currSkippedAndInProgress', currSkippedAndInProgress)
+              console.log('currInQueue', currInQueue)
+              let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+              console.log('newInQueue', newInQueue)
+              this.powerDialerTasks[taskType] = newInQueue
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
             }
@@ -306,14 +315,14 @@ export default {
       // current total tasks in queue + the active task,
       // and if current total tasks in queue is less than
       // the number of tasks per page
-      const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
-      const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
-      const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
-      if (powerDialerTaskInQueueTotalQueued &&
+      // const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
+      // const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
+      // const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
+      /* if (powerDialerTaskInQueueTotalQueued &&
         powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
         this.totalTasksInQueue < powerDialerTaskInQueuePerPage &&
         this.inQueueHasNextPage) {
-        this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
+        this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
         // decrement the total number of queued tasks only on the
         // 3rd page and up
         if (this.pagesFetched >= 3) {
@@ -321,11 +330,13 @@ export default {
         }
 
         return
-      }
+      } */
 
-      if (!isEmpty(this.powerDialerTaskFilters.in_queue)) {
+      this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
+
+      /* if (!isEmpty(this.powerDialerTaskFilters.in_queue)) {
         this.powerDialerTaskFilters.in_queue.total_queued -= 1
-      }
+      } */
 
       this.$VueEvent.fire('redial_task')
     }

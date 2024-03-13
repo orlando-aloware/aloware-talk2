@@ -1249,6 +1249,7 @@ export default {
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
+        this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
         const task = get(this.powerDialerTasks.in_queue, '0', null)
 
         this.taskToCall = cloneDeep(task)
