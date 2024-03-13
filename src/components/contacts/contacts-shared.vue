@@ -116,13 +116,12 @@ export default {
     this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
   },
   watch: {
-
-    paginationPage: function () {
+    paginationPage () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
       this.loadFolders()
     },
 
-    perPage: function () {
+    perPage () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
       this.loadFolders()
     },

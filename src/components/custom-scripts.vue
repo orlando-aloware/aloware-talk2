@@ -4,7 +4,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import { userMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { userMixin, simpsocialMixin, customScriptsMixin } from 'src/plugins/mixins'
 import api from 'src/plugins/api/api'
 
 export default {
@@ -12,7 +12,8 @@ export default {
 
   mixins: [
     simpsocialMixin,
-    userMixin
+    userMixin,
+    customScriptsMixin
   ],
 
   computed: {
@@ -65,6 +66,11 @@ export default {
 
     initiateHubspotConversationsWithUserDetails () {
       if (this.isSimpsocial) {
+        return
+      }
+
+      // Disable Hubspot chat for Aloware and local environments
+      if (this.isAloware || this.isLocal) {
         return
       }
 

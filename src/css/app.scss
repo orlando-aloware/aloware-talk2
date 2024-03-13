@@ -46,6 +46,10 @@ body,
   color: $grey-100 !important;
 }
 
+.text-blue {
+  color: $blue !important;
+}
+
 .btn-white {
   border: 1px solid $grey-60;
   background: $white;
@@ -3458,6 +3462,14 @@ i.option-separator {
   &.important {
     width: 190px !important;
   }
+}
+
+.max-w-75 {
+  max-width: 75% !important;
+}
+
+.max-w-85 {
+  max-width: 85% !important;
 }
 
 .max-width-266 {
@@ -12869,6 +12881,10 @@ h1.contact-list-name-label {
           }
         }
 
+        &__operations {
+          display: flex;
+        }
+
         .relative-time {
           font-size: 13px !important;
           color: $grey-92;
@@ -13969,19 +13985,31 @@ h1.contact-list-name-label {
 
     @media (min-height: 480px) {
       .business-information__container {
+        height: 42vh;
+      }
+    }
+
+    @media (min-height: 620px) {
+      .business-information__container {
         height: 50vh;
       }
     }
 
     @media (min-height: 720px) {
       .business-information__container {
-        height: 60vh;
+        height: 55vh;
       }
     }
 
     @media (min-height: 900px) {
       .business-information__container {
         height: 65vh;
+      }
+    }
+
+    @media (min-height: 1024px) {
+      .business-information__container {
+        height: 68vh;
       }
     }
 
@@ -14257,13 +14285,19 @@ h1.contact-list-name-label {
 
   @media (min-height: 480px) {
     .business-information-actions {
-      top: calc(100vh - 40vh);
+      top: calc(100vh - 36vh);
+    }
+  }
+
+  @media (min-height: 620px) {
+    .business-information-actions {
+      top: calc(100vh - 32vh);
     }
   }
 
   @media (min-height: 720px) {
     .business-information-actions {
-      top: calc(100vh - 25vh);
+      top: calc(100vh - 30vh);
     }
   }
 
@@ -14271,6 +14305,13 @@ h1.contact-list-name-label {
     .business-information-actions {
       top: calc(100vh - 22vh);
       height: 65vh;
+    }
+  }
+
+  @media (min-height: 1024px) {
+    .business-information-actions {
+      top: calc(100vh - 16vh);
+      height: 68vh;
     }
   }
 
@@ -14553,4 +14594,119 @@ h1.contact-list-name-label {
     font-weight: 600;
     line-height: normal;
   }
+}
+
+.transcription {
+  .speaker--title {
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #256EFF !important;
+    border-radius: 6px !important;
+
+    &:hover {
+      background-color: #256EFF !important;
+      border-radius: 6px !important;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #E0E0E0 !important;
+    border-radius: 6px !important;
+  }
+
+  .chat-area {
+    background: whitesmoke;
+    max-height: 64vh;
+    padding: 1em;
+    margin: 0 auto 2em auto;
+    border-radius: 14px;
+    overflow: auto;
+    flex-grow: 1;
+
+    .sentiment {
+      width: 45%;
+
+      &-out {
+        margin-left: 0% !important;
+      }
+
+      &-in {
+        margin-left: 53% !important;
+      }
+
+      &-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+
+      &-description {
+        font-size: 12px;
+        font-weight: 700;
+      }
+    }
+
+    .message-box {
+      width: 45%;
+      border-radius: 10px;
+      padding: .5em;
+      font-size: 14px;
+      margin: 0.5em 0;
+      color: black;
+      background-color: #85858511;
+
+      &-out {
+        color: black !important;
+      }
+
+      &-in {
+        color: black;
+        margin-left: 53% !important;
+      }
+    }
+  }
+
+  .q-chip {
+    height: 100%;
+    max-height: 34px;
+  }
+
+  .q-chip__content {
+    .white-color {
+      color: white;
+    }
+  }
+
+  .link {
+    color: blue;
+  }
+}
+
+.loading-overlay {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.loading-icon {
+  width: 250px;
+  height: 250px;
+}
+
+.loading-text {
+  font-size: 20px;
+  font-weight: 500;
+  margin-top: 20px;
 }

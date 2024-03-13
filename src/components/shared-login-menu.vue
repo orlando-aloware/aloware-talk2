@@ -1,7 +1,7 @@
 <template>
   <div v-if="profile && profile.company.talk_enabled && canSwitchApps"
        class="bridge-menu-wrapper">
-    <q-btn v-if="isAdmin"
+    <q-btn v-if="isAdmin || isSupervisor"
            outline
            class="q-btn-standard"
            :href="classicUrl"
@@ -76,7 +76,7 @@ export default {
     ...mapState(['statics']),
 
     canSwitchApps () {
-      if (this.isAdmin) {
+      if (this.isAdmin || this.isSupervisor) {
         return true
       }
 

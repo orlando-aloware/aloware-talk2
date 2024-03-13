@@ -35,7 +35,8 @@
             <b-form-input
               type="text"
               placeholder="Add title"
-              v-model="schedule.text">
+              v-model="schedule.text"
+              :disabled="!isEditable">
             </b-form-input>
           </b-form-group>
         </b-col>
@@ -494,7 +495,7 @@ export default {
 
     isDeletable () {
       if (this.mode === 'edit') {
-        if (this.hasRole('Company Admin')) {
+        if (this.hasRole(['Company Admin', 'Company Supervisor'])) {
           return true
         }
 

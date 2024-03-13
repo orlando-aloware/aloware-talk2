@@ -13,7 +13,9 @@
               :badge="true"
               :openCount="openCount"
               :pending-count="pendingCount"
-              v-for="item in navListItems"
+              :disabled="item.disabled"
+              :tooltip="item.tooltip"
+              v-for="item in inboxChannels"
               @click="onItemClicked" />
 
     <hr>
@@ -119,10 +121,28 @@ export default {
       'allInboxFilters'
     ]),
 
+    ...mapGetters('auth', [
+      'profile'
+    ]),
+
     isShowActive () {
       const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
 
       return !this.$q.screen.lt.md || isMobileInboxRoutes
+    },
+
+    inboxChannels () {
+      if (this.profile?.campaign_id) {
+        return this.navListItems
+      }
+
+      // hard-coded disabling my-personal-line channel
+      const channels = this.navListItems
+      let index = channels.findIndex(channel => channel.value === 'my-personal-line')
+      channels[index].disabled = true
+      channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
+
+      return channels
     }
   },
 

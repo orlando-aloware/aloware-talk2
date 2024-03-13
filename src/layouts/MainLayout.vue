@@ -238,7 +238,8 @@ import {
   kycMixin,
   simpsocialMixin,
   userMixin,
-  settingsMixin
+  settingsMixin,
+  broadcastsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -313,7 +314,8 @@ export default {
     kycMixin,
     simpsocialMixin,
     userMixin,
-    settingsMixin
+    settingsMixin,
+    broadcastsMixin
   ],
 
   data () {
@@ -1076,7 +1078,7 @@ export default {
     this.resetPowerDialerSession(this.$route)
 
     // temporary
-    if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+    if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
       this.$router.push({ path: '/' })
     }
   },
@@ -2508,6 +2510,7 @@ export default {
           this.setStatics(res.data)
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
+          this.setIsWhiteLabel(res.data.whitelabel)
         }).catch(err => {
           console.log(err)
 
@@ -2603,6 +2606,7 @@ export default {
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded',
+      'setIsWhiteLabel',
       'setShowedKycReloadDialog'
     ]),
     ...mapActions('contacts', [
@@ -2739,7 +2743,7 @@ export default {
       this.resetPowerDialerSession(to)
 
       // temporary
-      if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+      if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
         this.$router.back()
       }
     },

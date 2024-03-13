@@ -280,6 +280,7 @@ export default function (/* { ssrContext } */) {
         xmas_enabled: false
       },
       staticsLoaded: false,
+      isWhiteLabel: false,
       isCallDisposed: false,
       isContactDisposed: false,
       isIntroVideoVisible: false,
@@ -813,6 +814,10 @@ export default function (/* { ssrContext } */) {
 
       setStaticsLoaded ({ commit }, value) {
         commit('SET_STATICS_LOADED', value)
+      },
+
+      setIsWhiteLabel ({ commit }, value) {
+        commit('SET_IS_WHITE_LABEL', value)
       },
 
       setIsCallDisposed ({ commit }, value) {
@@ -1580,6 +1585,10 @@ export default function (/* { ssrContext } */) {
 
       SET_STATICS_LOADED (state, value) {
         state.staticsLoaded = value
+      },
+
+      SET_IS_WHITE_LABEL (state, value) {
+        state.isWhiteLabel = value
       },
 
       SET_IS_CALL_DISPOSED (state, value) {
