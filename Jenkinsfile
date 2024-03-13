@@ -62,7 +62,7 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
-                sh '''npm install yarn && \
+                sh '''npm install -g yarn && \
                 yarn install --frozen-lockfile
                 '''
             }
