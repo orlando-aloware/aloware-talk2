@@ -230,6 +230,7 @@ import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dia
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   name: 'inbox-tab',
@@ -508,7 +509,7 @@ export default {
           return 'New'
         case ContactTaskStatus.STATUS_OPEN:
           return 'Open'
-        case ContactTaskStatus.STATUS_ALL:
+        case InboxTaskStatus.STATUS_ALL:
         default:
           return 'All'
       }
@@ -574,9 +575,15 @@ export default {
         return
       }
 
-      if (this.currentTask !== contact.task_status) {
+      if (![contact.task_status, InboxTaskStatus.STATUS_ALL].includes(this.currentTask)) {
         this.currentTask = contact.task_status
       }
+
+      const isAllCurrentTaskStatus = this.currentTask === InboxTaskStatus.STATUS_ALL
+      // only change the status if its not empty and current task is not all
+      const status = contact.task_status && !isAllCurrentTaskStatus
+        ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase()
+        : InboxTaskStatus.STATUS_ALL
 
       if (this.inboxViewsRoutes.includes(this.$route.name)) {
         this.$emit('itemSelected', {
@@ -585,7 +592,7 @@ export default {
             id: contactId.toString(),
             channel: 'view',
             viewId: this.$route.params.viewId,
-            status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
+            status
           }
         })
 
@@ -597,7 +604,7 @@ export default {
         params: {
           id: contactId.toString(),
           channel: 'inbox',
-          status: contact.task_status ? this.$options.filters.fixTaskStatusName(contact.task_status).toLowerCase() : 'all'
+          status
         }
       })
     },
@@ -697,7 +704,7 @@ export default {
       }
 
       // if a pinned view is edited, redirect to inbox view route. otherwise, to inbox
-      this.currentTask = ContactTaskStatus.STATUS_ALL
+      this.currentTask = InboxTaskStatus.STATUS_ALL
 
       const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
       if (pinnedIndex >= 0) {
@@ -720,7 +727,7 @@ export default {
         name: 'Inbox Channel Task Status',
         params: {
           channel: 'inbox',
-          status: ContactTaskStatus.STATUS_ALL
+          status: InboxTaskStatus.STATUS_ALL
         }
       }).catch(err => {
         console.log(err)
@@ -777,7 +784,7 @@ export default {
     },
 
     onRouteNameChange () {
-      this.currentTask = ContactTaskStatus.STATUS_ALL
+      this.currentTask = InboxTaskStatus.STATUS_ALL
       this.resetList()
     },
 
@@ -1344,7 +1351,7 @@ export default {
       if (['Inbox'].includes(value)) {
         this.searchText = ''
         this.isSearch = false
-        this.currentTask = ContactTaskStatus.STATUS_ALL
+        this.currentTask = InboxTaskStatus.STATUS_ALL
         this.resetList()
         if (this.previousRoute && this.previousRoute.params.status === 'pending') {
           this.setLoadingPendingTaskCount(true)

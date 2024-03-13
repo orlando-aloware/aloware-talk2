@@ -3,6 +3,7 @@ import moment from 'moment'
 import { get, debounce, isEmpty } from 'lodash'
 import { COUNT_FIELDS } from 'src/constants/count-fields-default'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import talk2Api from 'src/plugins/api/api'
 
@@ -186,7 +187,7 @@ export default {
             return 'New'
           case ContactTaskStatus.STATUS_OPEN:
             return 'Open'
-          case ContactTaskStatus.STATUS_ALL:
+          case InboxTaskStatus.STATUS_ALL:
           default:
             return 'All'
         }

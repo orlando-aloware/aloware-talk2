@@ -193,7 +193,7 @@ import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   name: 'inbox-channels',
@@ -905,7 +905,7 @@ export default {
 
     onApplyFilter (filter) {
       if (this.isFilterDialogForView) {
-        this.currentTask = ContactTaskStatus.STATUS_ALL
+        this.currentTask = InboxTaskStatus.STATUS_ALL
 
         // change actively selected channel
         this.setSelectedFilter(this.appliedFilter)
@@ -933,7 +933,7 @@ export default {
           name: 'Inbox Channel Task Status',
           params: {
             channel: 'inbox',
-            status: ContactTaskStatus.STATUS_ALL
+            status: InboxTaskStatus.STATUS_ALL
           }
         }).catch(err => {
           console.log(err)

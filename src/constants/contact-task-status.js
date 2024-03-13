@@ -9,7 +9,3 @@ export const STATUS_PENDING = 3
 
 // The user manually closed this task (finished)
 export const STATUS_CLOSED = 4
-
-// This is a combination of open, pending and closed
-export const STATUS_ALL = 'all'
-export const STATUS_ALL_IDS = [2, 3, 4]

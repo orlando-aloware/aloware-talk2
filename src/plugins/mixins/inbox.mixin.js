@@ -8,6 +8,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
 import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   computed: {
@@ -37,7 +38,7 @@ export default {
           return 'closed'
         case ContactTaskStatus.STATUS_OPEN:
           return 'open'
-        case ContactTaskStatus.STATUS_ALL:
+        case InboxTaskStatus.STATUS_ALL:
         default:
           return 'all'
       }
@@ -57,10 +58,10 @@ export default {
     ]
 
     return {
-      currentTask: ContactTaskStatus.STATUS_ALL,
+      currentTask: InboxTaskStatus.STATUS_ALL,
       options: [
         {
-          value: ContactTaskStatus.STATUS_ALL,
+          value: InboxTaskStatus.STATUS_ALL,
           slot: 'one'
         },
         {
@@ -80,7 +81,7 @@ export default {
       ContactTaskStatusOpen: ContactTaskStatus.STATUS_OPEN,
       ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
       ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
-      ContactTaskStatusAll: ContactTaskStatus.STATUS_ALL,
+      ContactTaskStatusAll: InboxTaskStatus.STATUS_ALL,
       filters: {
         search: []
       },
@@ -311,8 +312,8 @@ export default {
 
         delete this.filters.contact_task_status
       } else {
-        this.filters.contact_task_status[0].value = taskId === ContactTaskStatus.STATUS_ALL
-          ? ContactTaskStatus.STATUS_ALL_IDS
+        this.filters.contact_task_status[0].value = taskId === InboxTaskStatus.STATUS_ALL
+          ? InboxTaskStatus.STATUS_ALL_IDS
           : [taskId]
       }
 
@@ -420,7 +421,7 @@ export default {
       this.filters = {
         contact_task_status: [
           {
-            value: ContactTaskStatus.STATUS_ALL_IDS,
+            value: InboxTaskStatus.STATUS_ALL_IDS,
             operator: OPERATORS.IS_ANY_OF
           }
         ],
@@ -496,6 +497,7 @@ export default {
           break
         case 'all':
         default:
+        // FIXME: create a case for InboxTaskStatus.DEFAULT_STATUS
       }
     },
 
