@@ -119,7 +119,8 @@ export default {
       source: null,
       tasksProcessed: 0,
       inProgressFetchTasks: {},
-      pagesFetched: 0
+      pagesFetched: 0,
+      inQueueHasNextPage: true
     }
   },
 
@@ -207,6 +208,7 @@ export default {
         }
 
         params.page = isNextPage ? this.pagesFetched + 1 : 1
+        // params.page = isNextPage ? 2 : 1
         const isInProgress = get(this.inProgressFetchTasks, taskType, false)
 
         // skip if there's an in-progress tasks fetching for the specific type
@@ -222,24 +224,30 @@ export default {
 
         this.getTaskByFilter(params)
           .then(res => {
+            this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+            delete this.powerDialerTaskFilters[taskType].data
+
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
               console.log('solicitando IN QUEUE, res.data: ', res.data)
-              if (!this.powerDialerTaskFilters[taskType]) {
+              /* if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
                 delete this.powerDialerTaskFilters[taskType].data
-              }
+              } */
 
+              if (!res.data.next_page_url) {
+                this.inQueueHasNextPage = false
+              }
               this.pagesFetched += 1
               this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               this.powerDialerTasks[taskType].push(...res.data.data)
 
-              if (!this.powerDialerTaskFilters[taskType]) {
+              /* if (!this.powerDialerTaskFilters[taskType]) {
                 this.powerDialerTaskFilters[taskType].total_queued = this.powerDialerTasks[taskType].length
-              }
+              } */
             } else {
               this.powerDialerTasks[taskType].data = res.data.data
-              this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
-              delete this.powerDialerTaskFilters[taskType].data
+              // this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+              // delete this.powerDialerTaskFilters[taskType].data
             }
 
             // no more queued tasks
@@ -325,7 +333,8 @@ export default {
       console.log('this.totalTasksInQueue < powerDialerTaskInQueuePerPage', this.totalTasksInQueue < powerDialerTaskInQueuePerPage)
       if (powerDialerTaskInQueueTotalQueued &&
         powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
-        this.totalTasksInQueue < powerDialerTaskInQueuePerPage) {
+        this.totalTasksInQueue < powerDialerTaskInQueuePerPage &&
+        this.inQueueHasNextPage) {
         this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED, true)
         // decrement the total number of queued tasks only on the
         // 3rd page and up

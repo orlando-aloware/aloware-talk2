@@ -1259,8 +1259,7 @@ export default {
           return
         }
 
-        // this.processRemoveFirstInQueueTask()
-        this.removeFirstInQueueTask()
+        this.processRemoveFirstInQueueTask()
         this.processSession(noWrapUp)
         return
       }
