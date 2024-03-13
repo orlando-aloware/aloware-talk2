@@ -72,7 +72,7 @@
                  @close="onSelectClose"
                  @input="selectCallDisposition">
       <template slot="option" slot-scope="props">
-        <div class="option__desc">somethign
+        <div class="option__desc">
           <q-icon name="fa fa-bolt"
                   :style="{ color: props.option.color }"
                   v-show="!props.option.is_external">
