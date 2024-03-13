@@ -251,7 +251,7 @@ export default {
         const viewId = nextActive.split('-')[1]
         const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
 
-        this.currentTask = InboxTaskStatus.STATUS_ALL
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
         this.onSelectView(view.filter)
         return
       }
@@ -290,7 +290,7 @@ export default {
         name: 'Inbox Channel Task Status',
         params: {
           channel: this.active,
-          status: InboxTaskStatus.STATUS_ALL
+          status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
         //  properly reload contacts if redirected or navigation clicked to the same "inbox" route

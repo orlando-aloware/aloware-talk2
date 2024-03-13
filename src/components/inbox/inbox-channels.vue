@@ -905,7 +905,7 @@ export default {
 
     onApplyFilter (filter) {
       if (this.isFilterDialogForView) {
-        this.currentTask = InboxTaskStatus.STATUS_ALL
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
 
         // change actively selected channel
         this.setSelectedFilter(this.appliedFilter)
@@ -933,7 +933,7 @@ export default {
           name: 'Inbox Channel Task Status',
           params: {
             channel: 'inbox',
-            status: InboxTaskStatus.STATUS_ALL
+            status: InboxTaskStatus.DEFAULT_STATUS
           }
         }).catch(err => {
           console.log(err)

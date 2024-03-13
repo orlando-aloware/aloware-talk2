@@ -39,8 +39,9 @@ export default {
         case ContactTaskStatus.STATUS_OPEN:
           return 'open'
         case InboxTaskStatus.STATUS_ALL:
-        default:
           return 'all'
+        default:
+          return ''
       }
     }
   },
@@ -58,7 +59,7 @@ export default {
     ]
 
     return {
-      currentTask: InboxTaskStatus.STATUS_ALL,
+      currentTask: InboxTaskStatus.DEFAULT_STATUS,
       options: [
         {
           value: InboxTaskStatus.STATUS_ALL,
@@ -302,7 +303,7 @@ export default {
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
       let relations = []
 
-      this.reInitFilters()
+      this.reInitFilters(taskId)
       query.filter_groups = []
 
       if (this.searchText && this.searchText.trim() && this.searchText.length >= 3) {
@@ -417,11 +418,11 @@ export default {
       return query
     },
 
-    reInitFilters () {
+    reInitFilters (taskId) {
       this.filters = {
         contact_task_status: [
           {
-            value: InboxTaskStatus.STATUS_ALL_IDS,
+            value: taskId === InboxTaskStatus.STATUS_ALL ? InboxTaskStatus.STATUS_ALL_IDS : [taskId],
             operator: OPERATORS.IS_ANY_OF
           }
         ],
@@ -496,8 +497,8 @@ export default {
           this.currentTask = ContactTaskStatus.STATUS_OPEN
           break
         case 'all':
-        default:
-        // FIXME: create a case for InboxTaskStatus.DEFAULT_STATUS
+          this.currentTask = InboxTaskStatus.STATUS_ALL
+          break
       }
     },
 

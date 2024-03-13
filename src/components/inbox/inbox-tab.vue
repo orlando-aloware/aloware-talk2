@@ -510,8 +510,9 @@ export default {
         case ContactTaskStatus.STATUS_OPEN:
           return 'Open'
         case InboxTaskStatus.STATUS_ALL:
-        default:
           return 'All'
+        default:
+          return ''
       }
     },
 
@@ -704,7 +705,7 @@ export default {
       }
 
       // if a pinned view is edited, redirect to inbox view route. otherwise, to inbox
-      this.currentTask = InboxTaskStatus.STATUS_ALL
+      this.currentTask = InboxTaskStatus.DEFAULT_STATUS
 
       const pinnedIndex = this.pinnedViews.findIndex(view => +view.filter_id === +this.appliedFilter.id)
       if (pinnedIndex >= 0) {
@@ -727,7 +728,7 @@ export default {
         name: 'Inbox Channel Task Status',
         params: {
           channel: 'inbox',
-          status: InboxTaskStatus.STATUS_ALL
+          status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
         console.log(err)
@@ -784,7 +785,7 @@ export default {
     },
 
     onRouteNameChange () {
-      this.currentTask = InboxTaskStatus.STATUS_ALL
+      this.currentTask = InboxTaskStatus.DEFAULT_STATUS
       this.resetList()
     },
 
@@ -1351,7 +1352,7 @@ export default {
       if (['Inbox'].includes(value)) {
         this.searchText = ''
         this.isSearch = false
-        this.currentTask = InboxTaskStatus.STATUS_ALL
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
         this.resetList()
         if (this.previousRoute && this.previousRoute.params.status === 'pending') {
           this.setLoadingPendingTaskCount(true)

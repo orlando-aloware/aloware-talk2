@@ -1243,7 +1243,7 @@ export default {
             params: {
               id: res.data.id,
               channel: 'inbox',
-              status: InboxTaskStatus.STATUS_ALL
+              status: InboxTaskStatus.DEFAULT_STATUS
             }
           }).catch(err => {
             console.log(err)
