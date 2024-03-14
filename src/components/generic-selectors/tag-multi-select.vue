@@ -197,6 +197,12 @@ export default {
     height: {
       required: false,
       type: Number
+    },
+
+    threshold: {
+      type: Number,
+      default: 3,
+      required: false
     }
   },
 
@@ -206,7 +212,6 @@ export default {
       isEdit: false,
       loadingTags: false,
       selectedValues: [],
-      timer: null,
       searchList: [
         {
           title: 'Account Tags',
@@ -326,13 +331,8 @@ export default {
       }
     },
     search (newValue) {
-      if (newValue) {
-        // When the text value changes, call request for the tags
-        clearTimeout(this.timer)
-        // Set a new timer to make the call after 1 second
-        this.timer = setTimeout(() => {
-          this.getTags()
-        }, 1000)
+      if (newValue && newValue.length >= this.threshold) {
+        this.getTags()
       }
     }
   }
