@@ -1080,7 +1080,7 @@ export default {
     },
 
     getClassicUrlBroadcastActivity (broadcastId) {
-      return process.env.API_URL + `/broadcasts/${broadcastId}/activity`
+      return process.env.API_URL + `/broadcast/${broadcastId}/activity`
     },
 
     onArchive () {
