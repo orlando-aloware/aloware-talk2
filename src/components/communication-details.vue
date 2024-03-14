@@ -550,16 +550,21 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'User Activity', params: {userId: userId }}"
-                               :key="userId + '-user-' + index"
-                               v-for="(userId, index) in communication.transfer_prior_user_ids">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
+                  <div class="flex items-center mr-1 h-100"
+                       :key="userId + '-user-' + index"
+                       @click="onOpenUserInClassicClicked(userId)"
+                       v-for="(userId, index) in communication.transfer_prior_user_ids">
+                    <span class="text-blue cursor-pointer"
+                          :title="getUserName(getUser(userId))">
+                      <q-tooltip class="item"
+                                 content-class="bg-grey-light11"
+                                 anchor="top middle"
+                                 self="bottom middle">
+                        {{ getUserName(getUser(userId)) }}
+                      </q-tooltip>
                       {{ getUserName(getUser(userId)) }}
-                    </q-tooltip>
-                    {{ getUserName(getUser(userId)) }}
-                  </router-link>
+                    </span>
+                  </div>
                 </div>
               </b-col>
             </b-form-row>
@@ -571,16 +576,21 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'User Activity', params: {userId: userId }}"
-                               :key="userId + '-user-' + index"
-                               v-for="(userId, index) in communication.transfer_target_user_ids">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
+                  <div class="flex items-center mr-1 h-100"
+                       :key="userId + '-user-' + index"
+                       @click="onOpenUserInClassicClicked(userId)"
+                       v-for="(userId, index) in communication.transfer_target_user_ids">
+                    <span class="text-blue cursor-pointer"
+                          :title="getUserName(getUser(userId))">
+                      <q-tooltip class="item"
+                                 content-class="bg-grey-light11"
+                                 anchor="top middle"
+                                 self="bottom middle">
+                        {{ getUserName(getUser(userId)) }}
+                      </q-tooltip>
                       {{ getUserName(getUser(userId)) }}
-                    </q-tooltip>
-                    {{ getUserName(getUser(userId)) }}
-                  </router-link>
+                    </span>
+                  </div>
                 </div>
               </b-col>
             </b-form-row>
