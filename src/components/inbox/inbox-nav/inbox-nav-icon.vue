@@ -10,6 +10,7 @@ import mention from 'components/icons/inbox/mention-icon'
 import voicemail from 'components/icons/inbox/voicemail-icon'
 import record from 'components/icons/inbox/record-icon'
 import allCommunications from 'components/icons/inbox/all-communications-icon'
+import person from 'components/icons/person-o-icon'
 
 export default {
   /* eslint-disable */
@@ -24,7 +25,8 @@ export default {
     message,
     mention,
     record,
-    allCommunications
+    allCommunications,
+    person
     /* eslint-enable */
   },
   props: {
