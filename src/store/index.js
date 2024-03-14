@@ -284,10 +284,10 @@ export default function (/* { ssrContext } */) {
       isContactDisposed: false,
       isIntroVideoVisible: false,
       showedKycDialog: false,
-      showedKycReloadDialog: false,
-      isTrialBannerVisible: false,
       isDatatableSelectedAll: false,
-      isDatatableCountLoading: false
+      isDatatableCountLoading: false,
+      showedKycReloadDialog: false,
+      isTrialBannerVisible: false
     },
 
     getters: {
