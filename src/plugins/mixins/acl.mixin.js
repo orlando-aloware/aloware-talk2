@@ -154,11 +154,11 @@ export default _.merge({
       if (Array.isArray(roles)) {
         const role = { data: null }
         for (role.data of roles) {
-          if (!source.user_roles.includes(role.data)) {
-            return false
+          if (source.user_roles.includes(role.data)) {
+            return true
           }
         }
-        return true
+        return false
       } else {
         return source.user_roles.includes(roles)
       }
@@ -167,7 +167,7 @@ export default _.merge({
     isBlockedFrom (permissions) {
       let blockedAccess = []
 
-      switch (this.usage.plan.use_case) {
+      switch (this.usage?.plan?.use_case) {
         case 'iPro':
           blockedAccess = [
             'line cnam',
@@ -216,11 +216,25 @@ export default _.merge({
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
     ...mapState(['usage']),
+
     hasReporterAccess () {
       return this.profile && this.profile.read_only_access
     },
+
+    isAgent () {
+      return this.hasRole(Roles.COMPANY_AGENT)
+    },
+
     isAdmin () {
       return this.hasRole(Roles.COMPANY_ADMIN)
+    },
+
+    isSupervisor () {
+      return this.hasRole(Roles.COMPANY_SUPERVISOR)
+    },
+
+    isAdminOrSupervisor () {
+      return this.hasRole(Roles.COMPANY_ADMIN) || this.hasRole(Roles.COMPANY_SUPERVISOR)
     },
     /**
      * Decides if the Broadcast should be shown.

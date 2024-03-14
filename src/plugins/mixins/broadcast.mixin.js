@@ -8,7 +8,11 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters', 'dialer'])
+    ...mapState(['campaigns', 'filters', 'dialer']),
+    ...mapState('inbox', [
+      'communications',
+      'channelChangedFilterFields'
+    ])
   },
   methods: {
     ...mapActions([
@@ -539,6 +543,9 @@ export default {
             if (event.tags) {
               event.contact.tags = event.tags
               event.contact.tag_ids = event.contact.tags.map((a) => a.id)
+            }
+            if (this.channelChangedFilterFields) {
+              event.contact.communications = this.communications
             }
             this.$VueEvent.fire('contact_updated', event.contact)
           }

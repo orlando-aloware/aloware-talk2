@@ -202,9 +202,9 @@ export default {
 
       return window.axios.post(this.uploadUrl, data).then(response => {
         this.$emit('recordedAudioUploaded', {
-          file_name: response.data.file_name,
-          uid: response.data.file_name,
-          id: response.data.file_name
+          file_name: response.data?.file_name,
+          uid: response.data?.uid,
+          id: response.data?.id
         })
         this.recordedAudio = null
         this.isUploading = false

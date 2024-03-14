@@ -26,20 +26,26 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
+    <intercom v-if="isLoggedIn && staticsLoaded && !isWhitelabel && (isAloware || isLocal)"/>
   </div>
 </template>
 <script>
 import * as storage from 'src/plugins/helpers/storage'
+import { customScriptsMixin } from 'src/plugins/mixins'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
+import Intercom from 'components/intercom'
 import CustomScripts from 'components/custom-scripts'
 import HeaderNotification from 'components/header-notification'
 
 export default {
   name: 'App',
 
+  mixins: [customScriptsMixin],
+
   components: {
     HeaderNotification,
+    Intercom,
     CustomScripts,
     ActionNotification
   },
@@ -49,14 +55,15 @@ export default {
       cookieValidated: false,
       sharedCookie: null,
       isPageLoading: false,
-      fullstoryOrgId: process.env.FULLSTORY_ORG_ID
+      fullstoryOrgId: process.env.FULLSTORY_ORG_ID,
+      isWhitelabel: false
     }
   },
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
 
-    ...mapState(['statics', 'staticsLoaded']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)

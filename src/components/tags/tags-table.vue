@@ -95,7 +95,7 @@
               <!-- Admins -->
               <div class="text-right w-75"
                    style="{ position: initial }"
-                   v-if="hasRole('Company Admin')">
+                   v-if="isAdmin || isSupervisor">
                 <b-button title="Communications"
                           variant="transparent"
                           size="sm"
@@ -154,18 +154,18 @@
               <b-button class="mb-1 w-100"
                         variant="light"
                         size="sm"
-                        v-if="hasRole('Company Agent') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
+                        v-if="isAgent && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
                         @click="openTagCommunications(tag.id)">
-                <span v-if="hasRole('Company Agent')"><q-icon :name="ionOpenOutline" /> Communications</span>
+                <span v-if="isAgent"><q-icon :name="ionOpenOutline" /> Communications</span>
               </b-button>
 
               <!-- Agent's Button: Redirect to Contacts -->
               <b-button class="mb-1 w-100"
                         variant="light"
                         size="sm"
-                        v-if="hasRole('Company Agent') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
+                        v-if="isAgent && selectedTagCategory === ContactTags && tag.contacts_count > 0"
                         @click="openTagContacts(tag.id)">
-                <span v-if="hasRole('Company Agent')"><q-icon :name="ionOpenOutline" /> Contacts</span>
+                <span v-if="isAgent"><q-icon :name="ionOpenOutline" /> Contacts</span>
               </b-button>
             </td>
           </template>
