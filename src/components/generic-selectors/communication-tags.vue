@@ -2,12 +2,12 @@
   <div class="w-100 tags-wrapper"
        v-if="hasPermissionTo('tag communication')">
     <tag-multi-select :values="communication.tag_ids"
-                          :options="combinedTags"
-                          :current="currentTags"
-                          :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          :optionsIsGrouped="true"
-                          :height="height"
-                          @valuesUpdated="saveTags">
+                      :options="combinedTags"
+                      :current="currentTags"
+                      :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                      :optionsIsGrouped="true"
+                      :height="height"
+                      @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14"
                          width="14"

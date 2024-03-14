@@ -281,7 +281,7 @@ export default {
     },
 
     selectedTags (val) {
-      let matching = this.tagsOptions.filter(tag => val.includes(tag.id))
+      const matching = this.tagsOptions.filter(tag => val.includes(tag.id))
       this.preliminarOptions = [...new Set([...this.preliminarOptions, ...matching])]
       if (this.selectedTags !== this.value) {
         this.$emit('change', val)

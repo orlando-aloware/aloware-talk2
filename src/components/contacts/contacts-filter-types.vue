@@ -65,7 +65,7 @@
                            v-if="operator.value === filterOperator && hasSecondaryOperator">
         </b-form-datepicker>
       </template>
-      <template v-if="['relation', 'multi_relation'].includes(filter.type) && filter.key !== 'tags'">
+      <template v-if="isRelationFilterType(filter.type, filter.key) ">
         <q-select ref="filterOperation"
                   class="filter-operation border"
                   input-debounce="0"
@@ -102,7 +102,7 @@
                   @input-value="showSecondaryFilterOperationOptions"
                   @input="addSecondaryValue"/>
       </template>
-      <template v-if="['multi_relation'].includes(filter.type) && filter.key === 'tags'">
+      <template v-if="isTagsFilterType(filter.type, filter.key)">
         <q-select ref="filterOperation"
                   class="filter-operation border"
                   hint="Type at least 3 characters"
@@ -877,7 +877,15 @@ export default {
       'setCurrentListFilters',
       'setShowMyContacts',
       'setListContactsLoaded'
-    ])
+    ]),
+
+    isRelationFilterType (type, key) {
+      return ['relation', 'multi_relation'].includes(type) && key !== 'tags'
+    },
+
+    isTagsFilterType (type, key) {
+      return ['multi_relation'].includes(type) && key === 'tags'
+    }
   },
 
   watch: {

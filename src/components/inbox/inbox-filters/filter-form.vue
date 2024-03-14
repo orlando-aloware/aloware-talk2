@@ -154,7 +154,7 @@
                               :category="tagsFilterCategory"
                               v-model="filter.tags"
                               @change="(eventPayload) => onFilterChange(eventPayload, 'tags')"
-                              @preliminar="(eventPayload) => onPreliminarChange(eventPayload)">
+                              @preliminar="onPreliminarChange">
                 </tag-selector>
               </b-form-group>
             </b-col>

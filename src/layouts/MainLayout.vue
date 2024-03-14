@@ -1665,26 +1665,8 @@ export default {
         this.loadingTags = true
       }
 
-      let tagsPerPage = 0
-
-      if (this.currentCompany?.tags_count > 10000) {
-        tagsPerPage = 1000
-      }
-      if (this.currentCompany?.tags_count <= 10000) {
-        tagsPerPage = 1000
-      }
-      if (this.currentCompany?.tags_count <= 1000) {
-        tagsPerPage = 200
-      }
-
-      if (!tagsPerPage) {
-        return
-      }
-
       const params = {
-        force_per_page: true,
-        page: page,
-        per_page: tagsPerPage
+        page: page
       }
 
       return this.$axios

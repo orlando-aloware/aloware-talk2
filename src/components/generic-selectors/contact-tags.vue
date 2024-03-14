@@ -2,13 +2,13 @@
   <b-card class="border-0 tags-wrapper"
           v-if="hasPermissionTo('tag contact')">
     <tag-multi-select label="Tags"
-                          button-text="Modify Tags"
-                          :values="tagIds"
-                          :options="combinedTags"
-                          :current="currentTags"
-                          :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          :optionsIsGrouped="true"
-                          @valuesUpdated="saveTags">
+                      button-text="Modify Tags"
+                      :values="tagIds"
+                      :options="combinedTags"
+                      :current="currentTags"
+                      :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                      :optionsIsGrouped="true"
+                      @valuesUpdated="saveTags">
     </tag-multi-select>
   </b-card>
 </template>

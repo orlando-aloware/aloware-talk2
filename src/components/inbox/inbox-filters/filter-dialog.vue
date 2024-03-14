@@ -650,6 +650,7 @@ export default {
           this.personalFilters = response.data.data.user || []
           this.companyFilters = response.data.data.company || []
 
+          // Gather all tags IDs from personal and company filters into a single list for display in select
           let tagsIds = []
           this.personalFilters.forEach(filter => {
             if (filter.filter.tags) {

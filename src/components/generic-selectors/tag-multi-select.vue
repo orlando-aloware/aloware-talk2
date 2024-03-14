@@ -75,7 +75,8 @@
                v-for="(item, index) in searchList">
             <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
                  :class="[index !== 0 ? 'border-top' : '']">
-              <span v-if="item.children.length" class="d-inline-flex align-items-center text-grey-100 w-100">
+              <span class="d-inline-flex align-items-center text-grey-100 w-100"
+                    v-if="item.children.length">
                 <span class="tag-text">{{ item.title }}</span>
               </span>
             </div>
