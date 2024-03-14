@@ -120,8 +120,6 @@ export default {
       source: null,
       tasksProcessed: 0,
       inProgressFetchTasks: {},
-      pagesFetched: 0,
-      inQueueHasNextPage: true,
       inQueueFetchTasks: {
         currentPage: 0,
         fetchedTasks: 0,
@@ -228,9 +226,6 @@ export default {
         const hasSkippedTasks = this.powerDialerTasks['skipped'].length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters['in_queue'] ? this.powerDialerTaskFilters['in_queue'].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
-        console.log('*** oneLastInCurrentQueue =', oneLastInCurrentQueue)
-        console.log('*** hasSkippedTasks =', hasSkippedTasks)
-        console.log('*** remainingInQueueTasks =', remainingInQueueTasks)
         if (oneLastInCurrentQueue && hasSkippedTasks && remainingInQueueTasks) {
           params.page = this.inQueueFetchTasks.currentPage + 1
         }
@@ -241,11 +236,6 @@ export default {
             delete this.powerDialerTaskFilters[taskType].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              if (!res.data.next_page_url) {
-                this.inQueueHasNextPage = false
-              }
-              // this.pagesFetched += 1
-              // this.powerDialerTaskFilters[taskType].current_page = this.pagesFetched
               const currSkipped = this.powerDialerTasks.skipped
               const currSkippedAndInProgress = [...currSkipped, this.activeTask]
               const currInQueue = [...res.data.data]
@@ -256,11 +246,7 @@ export default {
                 this.inQueueFetchTasks.fetchedTasks += currInQueue.length
               }
               this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
-              console.log('currSkipped', currSkipped)
-              console.log('currSkippedAndInProgress', currSkippedAndInProgress)
-              console.log('currInQueue', currInQueue)
               let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
-              console.log('newInQueue', newInQueue)
               if (newInQueue.length) {
                 this.powerDialerTasks[taskType] = newInQueue
               }
@@ -335,34 +321,7 @@ export default {
     },
 
     fetchQueuedTasks () {
-      // fetch tasks only if:
-      // total queued tasks for the next task is more than
-      // current total tasks in queue + the active task,
-      // and if current total tasks in queue is less than
-      // the number of tasks per page
-      // const totalTasksInQueueWithActiveCall = (this.totalTasksInQueue + 1)
-      // const powerDialerTaskInQueueTotalQueued = get(this.powerDialerTaskFilters.in_queue, 'total_queued', null)
-      // const powerDialerTaskInQueuePerPage = get(this.powerDialerTaskFilters.in_queue, 'per_page', 20)
-      /* if (powerDialerTaskInQueueTotalQueued &&
-        powerDialerTaskInQueueTotalQueued > totalTasksInQueueWithActiveCall &&
-        this.totalTasksInQueue < powerDialerTaskInQueuePerPage &&
-        this.inQueueHasNextPage) {
-        this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
-        // decrement the total number of queued tasks only on the
-        // 3rd page and up
-        if (this.pagesFetched >= 3) {
-          this.powerDialerTaskFilters.in_queue.total_queued -= 1
-        }
-
-        return
-      } */
-
       this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
-
-      /* if (!isEmpty(this.powerDialerTaskFilters.in_queue)) {
-        this.powerDialerTaskFilters.in_queue.total_queued -= 1
-      } */
-
       this.$VueEvent.fire('redial_task')
     }
   },
