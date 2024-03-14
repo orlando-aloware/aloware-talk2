@@ -12,6 +12,7 @@
               :options="lineOptions"
               :loading="isBusy"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :disable="disable"
               @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
@@ -72,6 +73,11 @@ export default {
     },
 
     checkBlockedMessaging: {
+      type: Boolean,
+      default: false
+    },
+
+    disable: {
       type: Boolean,
       default: false
     }

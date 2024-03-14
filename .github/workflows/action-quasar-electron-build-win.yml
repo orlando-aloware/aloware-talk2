@@ -83,7 +83,6 @@ jobs:
           ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
           ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
           ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
           ENV_API_KEY_ID: ${{ secrets.api_key_id }}
@@ -126,7 +125,6 @@ jobs:
 
           # Intercom
           INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
 
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)

@@ -201,6 +201,10 @@ const clear = ({ commit }) => {
 
   window.axios.defaults.headers.common['Authorization'] = null
 
+  if (window.Intercom) {
+    window.Intercom('shutdown')
+  }
+
   commit('SET_AUTHENTICATED', false)
   commit('SET_PROFILE', null)
 }

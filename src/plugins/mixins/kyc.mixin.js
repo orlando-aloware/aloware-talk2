@@ -24,8 +24,23 @@ export default _.merge({
         return false
       }
 
-      const status = this.getStatus()
-      return status !== KycLogs.KYC_STATUS_NONE && this.currentCompany?.is_trial
+      return this.currentCompany?.is_kyc && this.currentCompany?.is_trial
+    },
+
+    isCompanyKYC () {
+      if (!this.ssuEnabled) {
+        return false
+      }
+
+      return this.currentCompany?.is_kyc
+    },
+
+    isKYCFilled () {
+      if (!this.ssuEnabled) {
+        return false
+      }
+
+      return this.currentCompany?.kyc_filled
     }
   },
 

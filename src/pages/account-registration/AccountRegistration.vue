@@ -177,7 +177,7 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
+                         @click.stop="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
                         Notice on Carrier Fees for SMS and MMS
                       </a>
                     </template>
@@ -193,12 +193,12 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/terms-and-conditions')">
+                         @click.stop="openLink('https://aloware.com/terms-and-conditions')">
                         Terms and Conditions,
                       </a>
                       and
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
+                         @click.stop="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
                         Acceptable Use Policy.
                       </a>
                     </template>
