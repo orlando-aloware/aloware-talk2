@@ -481,15 +481,19 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Ring Group Activity', params: { ringGroupId: communication.ring_group_id }}"
-                               v-if="usedRingGroup && !usedRingGroup?.call_waiting">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ usedRingGroup.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
+                       v-if="usedRingGroup && !usedRingGroup?.call_waiting">
+                    <span class="text-blue cursor-pointer"
+                          :title="usedRingGroup.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ usedRingGroup.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     <span v-if="usedRingGroup?.call_waiting">
                       Call waiting Queue
@@ -509,15 +513,19 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Sequence Activity', params: { sequenceId: communication.workflow_id }}"
-                               v-if="useSequence">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ useSequence.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenSequenceInClassicClicked(useSequence?.id)"
+                       v-if="useSequence">
+                    <span class="text-blue cursor-pointer"
+                          :title="useSequence?.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ useSequence?.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     Deleted Sequence
                   </template>
@@ -532,15 +540,19 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Broadcast Activity', params: { broadcastId: communication.broadcast_id }}"
-                               v-if="useBroadCast">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ useBroadCast.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenBroadcastInClassicClicked(communication.broadcast_id)"
+                       v-if="useBroadCast">
+                    <span class="text-blue cursor-pointer"
+                          :title="useBroadCast.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ useBroadCast.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     Deleted Broadcast
                   </template>
@@ -1059,6 +1071,18 @@ export default {
       return process.env.API_URL + `/users/${userId}/activity`
     },
 
+    getClassicUrlSequenceActivity (sequenceId) {
+      return process.env.API_URL + `/sequences2/manager/${sequenceId}`
+    },
+
+    getClassicUrlRingGroupActivity (ringGroupId) {
+      return process.env.API_URL + `/ring-groups/${ringGroupId}/activity`
+    },
+
+    getClassicUrlBroadcastActivity (broadcastId) {
+      return process.env.API_URL + `/broadcasts/${broadcastId}/activity`
+    },
+
     onArchive () {
       this.$bvModal.msgBoxConfirm('Archiving communication will remove it from all reports and plots. Continue?', {
         title: 'Archive Communication',
@@ -1106,6 +1130,18 @@ export default {
 
     onOpenUserInClassicClicked (userId) {
       window.open(this.getClassicUrlUserActivity(userId), '_blank')
+    },
+
+    onOpenSequenceInClassicClicked (sequenceId) {
+      window.open(this.getClassicUrlSequenceActivity(sequenceId), '_blank')
+    },
+
+    onOpenRingGroupInClassicClicked (ringGroupId) {
+      window.open(this.getClassicUrlRingGroupActivity(ringGroupId), '_blank')
+    },
+
+    onOpenBroadcastInClassicClicked (broadcastId) {
+      window.open(this.getClassicUrlBroadcastActivity(broadcastId), '_blank')
     },
 
     isAttachmentImage (mimeType) {
