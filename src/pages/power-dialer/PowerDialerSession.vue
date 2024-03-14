@@ -55,7 +55,6 @@ import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-lis
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
-/* import { get, isEmpty } from 'lodash' */
 import { get } from 'lodash'
 
 export default {

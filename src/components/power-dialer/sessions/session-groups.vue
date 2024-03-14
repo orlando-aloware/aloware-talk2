@@ -529,8 +529,6 @@ export default {
 
       switch (key) {
         case 'in_queue':
-          // const inQueue = get(this.powerDialerTasks, 'in_queue', null)
-          // return inQueue ? inQueue.length : 0
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for the one in progress
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
