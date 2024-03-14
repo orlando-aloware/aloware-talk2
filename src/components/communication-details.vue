@@ -452,15 +452,13 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Line Activity', params: { campaignId: communication.campaign_id }}"
-                               v-if="usedCampaign">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ usedCampaign.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       v-if="usedCampaign"
+                       @click="onOpenLineInClassicClicked()">
+                    <span class="text-blue cursor-pointer">
+                      {{ usedCampaign.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     Deleted Line
                   </template>
@@ -991,6 +989,10 @@ export default {
         this.callDispositions &&
         this.callDispositions.length > 0 &&
         !this.dialerMode
+    },
+
+    classicUrlLineActivity () {
+      return process.env.API_URL + `/lines/${this.usedCampaign.id}/activity`
     }
   },
 
@@ -1074,6 +1076,10 @@ export default {
 
     onEditNote () {
       this.isEditingNote = true
+    },
+
+    onOpenLineInClassicClicked () {
+      window.open(this.classicUrlLineActivity, '_blank')
     },
 
     isAttachmentImage (mimeType) {
