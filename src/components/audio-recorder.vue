@@ -1,6 +1,5 @@
 <template>
   <b-card header-tag="header"
-          :disabled="viewOnly"
           footer-tag="footer"
           title="Record an audio file"
   >
@@ -13,7 +12,6 @@
           <i class="fa fa-microphone fa-2x"></i>
         </b-button>
         <b-card-text class="mt-2">Press to start recording</b-card-text>
-
       </div>
 
       <div class="text-center mt-4"
@@ -38,35 +36,35 @@
     </div>
 
     <template #footer>
-      <b-button v-if="!recordedAudio && !isRecording"
-                size="sm"
+      <b-button size="sm"
                 href="#"
                 variant="primary"
                 :disabled="isRecording"
+                v-if="!recordedAudio && !isRecording"
                 @click="startRecording">Start Recording</b-button>
-      <b-button v-if="!recordedAudio && isRecording"
-                size="sm"
+      <b-button size="sm"
                 href="#"
                 variant="danger"
                 :disabled="!isRecording"
+                v-if="!recordedAudio && isRecording"
                 @click="stopRecording">Stop Recording</b-button>
-      <b-button v-if="recordedAudio"
-                size="sm"
+      <b-button size="sm"
                 href="#"
                 variant="primary"
                 :disabled="isUploading"
+                v-if="recordedAudio"
                 @click="removeRecordedAudio">Change</b-button>
 
-      <b-button v-if="recordedAudio"
-                class="ml-2"
+      <b-button class="ml-2"
                 size="sm"
                 href="#"
                 variant="primary"
                 :disabled="!recordedAudio || isUploading"
+                v-if="recordedAudio"
                 @click="uploadRecordedAudio">
-        <q-spinner-bars v-if="isUploading"
-                        class="mr-1"
-                        color="white" />
+        <q-spinner-bars class="mr-1"
+                        color="white"
+                        v-if="isUploading"/>
         <i class="fa fa-upload" v-else></i>
         {{ isUploading ? ' Uploading...' : 'Upload' }}
       </b-button>
@@ -199,12 +197,14 @@ export default {
       this.isUploading = true
       const audioFileName = new Date().getTime() + '_recording_upload.wav'
       const data = new FormData()
+
       data.append('file', this.audioBlob, audioFileName)
+
       return window.axios.post(this.uploadUrl, data).then(response => {
         this.$emit('recordedAudioUploaded', {
-          file_name: audioFileName,
-          uid: response.data.file_name,
-          id: response.data.id
+          file_name: response.data?.file_name,
+          uid: response.data?.uid,
+          id: response.data?.id
         })
         this.recordedAudio = null
         this.isUploading = false

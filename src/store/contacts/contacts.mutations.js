@@ -528,6 +528,9 @@ export default {
   SET_IS_SHORTENED_URL_REMEMBERED (state, value) {
     state.isShortenedUrlRemembered = value
   },
+  SET_IS_OPTOUT_ACTIVE (state, value) {
+    state.isOptoutActive = value
+  },
   SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED (state) {
     state.isShortenedUrlRemembered = false
   },

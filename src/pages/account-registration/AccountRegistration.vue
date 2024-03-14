@@ -71,7 +71,8 @@
                                     :rules="[validatePhoneNumber, validateFieldError('phone_number')]"
                                     :paddingClasses="isLargeScreen ? 'q-pl-4' : ''"
                                     :disabled="checkIfFieldIsPreFilled('phone_number')"
-                                    v-model="form.phone_number"
+                                    :country-code="countryCode"
+                                    v-model="phoneNumberValue"
                                     @input="cleanFieldError('phone_number')" />
               </template>
             </input-group>
@@ -176,7 +177,7 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://support.aloware.com/en/articles/5059467-carrier-fees-for-at-t-verizon-and-t-mobile')">
+                         @click.stop="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
                         Notice on Carrier Fees for SMS and MMS
                       </a>
                     </template>
@@ -192,12 +193,12 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/terms-and-conditions')">
+                         @click.stop="openLink('https://aloware.com/terms-and-conditions')">
                         Terms and Conditions,
                       </a>
                       and
                       <a class="text-weight-bold"
-                         @click="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
+                         @click.stop="openLink('https://aloware.com/acceptable-use-guidelines-and-policy/')">
                         Acceptable Use Policy.
                       </a>
                     </template>
@@ -247,6 +248,7 @@ import SelectField from 'src/components/account-registration/select-field.vue'
 import PhoneNumberField from 'src/components/account-registration/phone-number-field.vue'
 import Banner from 'src/components/account-registration/banner.vue'
 import * as storage from 'src/plugins/helpers/storage'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'account-registration',
@@ -269,7 +271,7 @@ export default {
 
   data () {
     return {
-      step: 1,
+      step: 0,
       password_validation: [],
       show_password: false,
       isSubmitted: false,
@@ -281,7 +283,8 @@ export default {
       preFilledData: {},
       shouldRedirectToLogin: false,
       recaptchaResponse: null,
-      loadingText: 'Please wait while we are creating your account...'
+      loadingText: 'Please wait while we are creating your account...',
+      countryCode: '+1'
     }
   },
 
@@ -295,10 +298,7 @@ export default {
     ...mapGetters('accountRegistration', ['getBusinessInformationFieldsValue']),
 
     isNextButtonDisabled () {
-      return (this.step === 1 && !this.validateFirstStepFieldsFilled()) ||
-        (this.step === 2 && !this.validateSecondStepFieldsFilled()) ||
-        (this.step === 3 && (this.disabledSubmit || !this.form.agreed_to_terms)) ||
-        this.isLoading
+      return !this.validateFirstStepFieldsFilled() || this.isLoading
     },
 
     isLargeScreen () {
@@ -327,6 +327,20 @@ export default {
       return this.form.password_confirmation === this.form.password
         ? 'The passwords match'
         : "The passwords doesn't match"
+    },
+
+    phoneNumberValue: {
+      get () {
+        if (this.checkIfFieldIsPreFilled('phone_number')) {
+          return this.countryCode + '//' + this.form.phone_national || this.form.phone_number
+        }
+
+        return this.countryCode + '//' + this.form.phone_number
+      },
+
+      set (val) {
+        this.form.phone_number = val
+      }
     }
   },
 
@@ -337,16 +351,6 @@ export default {
 
     'form.password_confirmation' () {
       this.validateAllPasswordRules()
-    },
-
-    step (newStep) {
-      if (newStep === 3 && !this.$q.platform.is.electron) {
-        this.initRecaptcha()
-      }
-
-      if (newStep === 1 || newStep === 2) {
-        this.verifyFieldErrors()
-      }
     }
   },
 
@@ -446,7 +450,7 @@ export default {
     },
 
     validatePhoneNumber (phone) {
-      const cleanedPhone = this.getCleanedPhoneNumber(phone)
+      const cleanedPhone = this.getCleanedPhoneNumber(this.preFilledData?.phone_number || phone)
       const formattedPhone = this.$options.filters.fixPhone(cleanedPhone, 'E164', true)
 
       // if the phone number is empty or invalid
@@ -471,11 +475,6 @@ export default {
       this.updateValidationState('cases', this.validatePasswordCases(this.form.password))
       this.updateValidationState('digit', this.validatePasswordDigit(this.form.password))
       this.updateValidationState('match', this.validatePasswordMatch(this.form.password_confirmation))
-    },
-
-    validateZipCode (zip) {
-      const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/
-      return zipRegex.test(zip)
     },
 
     iconForValidation (isValid) {
@@ -533,7 +532,7 @@ export default {
         this.form.region?.length &&
         this.form.city?.length &&
         this.form.legal_country &&
-        this.validateZipCode(this.form.postal_code) &&
+        this.validateZipCodeByCountryId(this.form.postal_code, this.form?.legal_country?.id) &&
         this.form.auth_rep_first_name?.length &&
         this.form.auth_rep_last_name?.length &&
         this.validateEmail(this.form.auth_rep_email) === true &&
@@ -562,6 +561,8 @@ export default {
           id: matchedCountry.id,
           name: matchedCountry.name
         }
+
+        this.countryCode = this.getCountryCodeByCountryId(matchedCountry.id)
       }
     },
 
@@ -620,7 +621,7 @@ export default {
       this.isLoading = true
       this.loadingText = 'Please wait while we are loading your information...'
 
-      this.$axios.get(`/api/admin/company-registration/pre-signup-prefill/${this.$route.params.verification_token}`)
+      API.V1.accountRegistration.getPreSignupDetails({ verification_token: this.$route.params.verification_token })
         .then((res) => {
           if (res.headers['content-type'] !== 'application/json') {
             return this.$router.push({ name: 'Login' })
@@ -663,7 +664,9 @@ export default {
 
     async onLoginSuccess ({ data: { data } }) {
       const { usage, company } = data
+      await this.verifyCompanyIsReadyToLogin(company.id)
 
+      this.loadingText = 'Almost done...'
       this.resetVuex(['all'])
       this.setCurrentCompany(company)
       this.setUsage(usage)
@@ -677,19 +680,36 @@ export default {
       await this.$router.push(redirectPath)
     },
 
+    async verifyCompanyIsReadyToLogin (companyId) {
+      let companySetupComplete = false
+      this.loadingText = 'Please wait while we are logging you in...'
+
+      while (!companySetupComplete) {
+        const companyInfo = await API.V1.company.get({ id: companyId })
+
+        if (companyInfo.data?.is_setup) {
+          companySetupComplete = true
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 3000))
+        }
+      }
+
+      return companySetupComplete
+    },
+
     onSubmit () {
       this.isLoading = true
-      this.loadingText = 'Please wait while we are creating your account...'
+      this.loadingText = 'Please wait while we are sending your information...'
 
       const payload = {
         ...this.form,
         verification_token: this.$route.params.verification_token,
-        phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.phone_number), 'E164', true),
+        phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.preFilledData?.phone_number || this.form.phone_number), 'E164', true),
         auth_rep_phone_number: this.$options.filters.fixPhone(this.getCleanedPhoneNumber(this.form.auth_rep_phone_number), 'E164', true),
         ...this.getBusinessInformationFieldsValue
       }
 
-      this.$axios.post('/api/admin/company-registration', payload)
+      API.V1.accountRegistration.save(payload)
         .then(async (res) => {
           this.isSubmitted = true
 
@@ -705,14 +725,15 @@ export default {
         })
         .finally(async () => {
           if (this.isSubmitted) {
-            this.loadingText = 'Almost done...'
+            this.loadingText = 'Your account is being created...'
 
             const response = await this.login({
               email: this.form.email,
               password: this.form.password,
               recaptchaResponse: this.recaptchaResponse,
               deviceInfo: null,
-              requestedFrom: 'bypass'
+              requestedFrom: 'bypass',
+              skipSetAuthenticated: true
             })
 
             await this.onLoginSuccess(response)

@@ -13,7 +13,9 @@
               <div class="fs-14 mt-1 header-title">Communication Info</div>
 
               <div class="d-flex header-btn-wrapper">
-                <communication-report-issue :communication-id="communication.id"/>
+                <transcription-modal class="mr-2"
+                                     :communication="communication"
+                                     v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
                 <b-button variant="danger"
                           size="sm"
                           v-if="hasPermissionTo('archive communication')"
@@ -674,13 +676,13 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center"
-                     v-if="communication.has_recording">
+                     v-if="showAudio(communication)">
                   <communication-audio class="mb-2"
                                        :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                        :uniqueId="communication.id + '1'"/>
                 </div>
-                <div class="d-flex align-items-center"
+                <div class="d-flex align-items-center mt-3"
                      v-else>
                   No Call Recording
                 </div>
@@ -838,11 +840,11 @@ import CommunicationNote from 'components/communication-note'
 import CommunicationTags from 'components/generic-selectors/communication-tags'
 import CallDispositionSelector from 'components/call-disposition-selector'
 
-import CommunicationReportIssue from 'components/communication-report-issue'
 import RingGroupSnapshot from 'components/ring-group-snapshot'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
+import TranscriptionModal from 'src/components/communication/transcription-modal'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
@@ -852,13 +854,13 @@ export default {
     PencilOIcon,
     PredefinedTimeDurationSelector,
     RingGroupSnapshot,
-    CommunicationReportIssue,
     CallDispositionSelector,
     CommunicationTags,
     CommunicationNote,
     CommunicationAudio,
     TargetUsersTree,
-    DownloadButton
+    DownloadButton,
+    TranscriptionModal
   },
 
   mixins: [

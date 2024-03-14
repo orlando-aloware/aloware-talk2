@@ -5,6 +5,7 @@ import VueGtagEsm from 'vue-gtag'
 Vue.use(VueRouter)
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
+import Userpilot from 'userpilot'
 
 // This listener will execute before router.beforeEach only if registered
 // before vue-router is registered with Vue.use(VueRouter)
@@ -64,6 +65,10 @@ export default function ({ store }) {
       name: to.name,
       path: to.path
     })
+
+    if (process.env.USERPILOT_APPTOKEN) {
+      Userpilot.Userpilot.reload()
+    }
   })
 
   if (process.env.APP_ENV === 'production') {

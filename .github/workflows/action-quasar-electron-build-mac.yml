@@ -89,7 +89,6 @@ jobs:
           ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
           ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
           ENV_CSC_LINK: ${{ secrets.mac_certs }}
           ENV_CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
@@ -110,9 +109,10 @@ jobs:
           ENV_KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
           ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
-          XMAS_ENABLED: ${{ secrets.xmas_enabled }}
-          XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
-          URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
+          ENV_XMAS_ENABLED: ${{ secrets.xmas_enabled }}
+          ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
+          ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
+          ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           file-name: .env.prod
 
       - name: Build/release Electron mac app
@@ -133,7 +133,6 @@ jobs:
 
           # Intercom
           INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
 
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
@@ -185,3 +184,31 @@ jobs:
 
           # Read Reviews
           URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
+
+          # Userpilot
+          USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+
+      - name: Extract Metadata from package.json
+        id: pkg
+        run: |
+          echo "::set-output name=VERSION::$(jq -r '.version' package.json)"
+          echo "::set-output name=PRODUCT_NAME::$(jq -r '.productName' package.json)"
+
+      - name: Rename and Move macOS DMG File
+        run: |
+          mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }}-${{ steps.pkg.outputs.VERSION }}.dmg" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg"
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+  
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ secrets.aws_secret_access_key }}
+          aws configure set default.region ${{ secrets.aws_bucket_region }}
+
+      - name: Upload Renamed macOS DMG to S3
+        run: |
+          aws s3 cp "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg" --acl public-read

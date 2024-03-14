@@ -51,6 +51,12 @@ export default {
     task: {
       required: true,
       type: String
+    },
+
+    message: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
 
@@ -75,23 +81,24 @@ export default {
       const link = url ? `${url}business-information-registration/${companyId}` : '#'
       let message = ''
 
+      if (this.task === 'text' && this.isTrialKYC) {
+        return 'Your account is in trial, according to regulations you cannot send outbound messages without registration. Please convert to a subscription and register to use messaging services.'
+      }
+
       switch (status) {
         case KycLogs.KYC_STATUS_NONE:
           message = ''
           break
-        case KycLogs.KYC_STATUS_ZERO:
-          message = `You need to <a href="${link}"><u class="text-white">submit important info</u></a> about your business to unlock access to ${action}`
-          break
         case KycLogs.KYC_STATUS_DEFINITELY_REJECTED:
           message = `You need to <a href="${link}"><u class="text-white">submit again the info</u></a> about your business to ${action}`
           break
-        case KycLogs.KYC_STATUS_APPROVED_FOR_CALLING_AND_MESSAGING:
-          message = `The ${action} isn't available on trial. please contact us to upgrade today!`
-          break
         default:
-          // For KYC_STATUS_APPROVED_FOR_SELF_CALLING and KYC_STATUS_APPROVED_FOR_CALLING_ONLY
-          message = `Your account is not yet verified to ${action}, you can reach out to our support to remove the restriction`
+          message = `Your account is not on a plan with ${action}. Please upgrade today to gain full access.`
           break
+      }
+
+      if (this.message) {
+        message = this.message
       }
 
       return message
@@ -111,7 +118,7 @@ export default {
           text = 'call numbers beside yours'
           break
         case 'text':
-          text = 'text messages'
+          text = 'messages'
           break
         case 'sms.template':
           text = 'create sms templates'
@@ -127,6 +134,9 @@ export default {
           break
         case 'sequences':
           text = 'sequences'
+          break
+        case 'sequences.enroll':
+          text = 'enroll to sequences'
           break
         case 'ring-group.create':
           text = 'create ring group'

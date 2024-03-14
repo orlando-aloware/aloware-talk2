@@ -470,16 +470,28 @@ export default {
       this.fetchFailed = true
     },
 
-    async fetchContactInfo (isFetchContact = true) {
+    async fetchContactInfo (isFetchContact = true, contactId = null, skipRouterPush = false) {
+      const contactIdToFetch = contactId || this.contactId
+
       // Sanity check: if contact id is actually one of the lists, take person to the list
-      if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(this.contactId)) {
-        const path = '/contacts/list/' + this.contactId
+      if (Object.values(DEFAULT_PINNED_LIST).map(item => item.id).includes(contactIdToFetch)) {
+        if (skipRouterPush) {
+          return
+        }
+
+        const path = '/contacts/list/' + contactIdToFetch
+
         this.$router.push({ path })
+
         return
       }
 
       // Sanity check: if contact id is actually a weird number, just redirect to inbox
-      if (isNaN(Number.parseInt(this.contactId))) {
+      if (isNaN(Number.parseInt(contactIdToFetch))) {
+        if (skipRouterPush) {
+          return
+        }
+
         this.$router.push({ name: 'inbox' })
         return
       }
@@ -491,7 +503,7 @@ export default {
       this.loadingContactCommunications = true
       this.fetchFailed = false
 
-      if (!this.contactId) {
+      if (!contactIdToFetch) {
         console.log('Failed to fetch contact info: Missing contact id!')
         this.loadingContact = false
         this.loadingContactCommunications = false
@@ -503,7 +515,7 @@ export default {
       this.source = this.cancelToken.source()
 
       // get contact phone numbers
-      talk2Api.V1.contact.getPhoneNumbers(this.contactId)
+      talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch)
         .then(response => {
           this.setContactPhoneNumbers(response.data)
         }).catch(err => {
@@ -512,7 +524,7 @@ export default {
         })
 
       // get contact's communication summary
-      talk2Api.V1.contact.getCommunicationsSummary(this.contactId)
+      talk2Api.V1.contact.getCommunicationsSummary(contactIdToFetch)
         .then(response => {
           // Object.keys(response.data.summaries).forEach(key => response.data.summaries[key] = response.data.summaries[key] || 0)
           this.setCommunicationSummary(response.data)
@@ -524,10 +536,10 @@ export default {
       this.setSequenceInfoLoading(true)
 
       // get contact's sequence info
-      talk2Api.V1.contact.getSequenceInfo(this.contactId)
+      talk2Api.V1.contact.getSequenceInfo(contactIdToFetch)
         .then(response => {
           this.setSequenceInfo(response.data)
-          this.setSequenceInfoLoading(true)
+          this.setSequenceInfoLoading(false)
         }).catch((err) => {
           this.setSequenceInfoLoading(false)
           console.log(err)
@@ -535,7 +547,7 @@ export default {
         })
 
       // get contact's contact attributes
-      talk2Api.V1.contact.getAttributes(this.contactId)
+      talk2Api.V1.contact.getAttributes(contactIdToFetch)
         .then(response => {
           this.setContactAttributes(_.cloneDeep(response.data))
         }).catch(err => {
@@ -544,7 +556,7 @@ export default {
         })
 
       // get contact's communications
-      this.fetchContactCommunications(this.contactId, false, false)
+      this.fetchContactCommunications(contactIdToFetch, false, false)
         .then(res => {
           this.loadingContact = false
 
@@ -580,7 +592,7 @@ export default {
       }
 
       // get contact's info
-      return this.$axios.get(`/api/v2/contacts/${this.contactId}`,
+      return this.$axios.get(`/api/v2/contacts/${contactIdToFetch}`,
         {
           cancelToken: this.source.token
         })
@@ -632,7 +644,7 @@ export default {
       }
 
       // 2. if contact has communications select last communication campaign
-      if (!this.selectedCampaign && this.communicationsAndAudits.length) {
+      if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
           return item.type === CommunicationTypes.SMS
         })
@@ -645,26 +657,26 @@ export default {
       // 3. if user has a personal line and contact does not have an initial line
       const userCampaignId = _.get(this.profile, 'campaign_id', null)
 
-      if (!this.selectedCampaign && userCampaignId) {
+      if (!this.selectedCampaignId && userCampaignId) {
         this.selectedCampaignId = userCampaignId
       }
 
       // 4. if contact doesn't have situation 1 and 2 and selected_contact_campaigns has one campaign select the campaign
       const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
 
-      if (!this.selectedCampaign && selectedContactFirstCampaignId) {
+      if (!this.selectedCampaignId && selectedContactFirstCampaignId) {
         this.selectedCampaignId = selectedContactFirstCampaignId
       }
 
       // 5. if contact doesn't have situation 1 and 2 and 3 and company has one campaign select that campaign
       const firstCampaignId = _.get(this.campaigns, '[0].id', null)
 
-      if (!this.selectedCampaign && !selectedContactFirstCampaignId && firstCampaignId) {
+      if (!this.selectedCampaignId && !selectedContactFirstCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 
       // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
-      if (!this.selectedCampaign && firstCampaignId) {
+      if (!this.selectedCampaignId && firstCampaignId) {
         this.selectedCampaignId = firstCampaignId
       }
 

@@ -72,6 +72,14 @@ export default function () {
         disabled: false,
         type: 'all',
         answerStatus: 'all'
+      },
+      {
+        label: 'My Personal Line',
+        value: 'my-personal-line',
+        icon: 'person',
+        disabled: false,
+        type: 'all',
+        answerStatus: 'all'
       }
     ],
     communications: [],

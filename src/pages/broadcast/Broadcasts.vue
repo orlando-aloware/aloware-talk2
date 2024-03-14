@@ -82,16 +82,16 @@
             </template>
           </q-btn-toggle>
         </div>
-        <block-tooltip v-if="viewOnly"
-                       placement="left"
-                       triggers="click"
+        <block-tooltip placement="left"
+                       triggers="hover"
                        target="broadcast-popover"
-                       task="broadcasts.create">
+                       task="broadcasts.create"
+                       v-if="!this.canAddBroadcasts">
         </block-tooltip>
         <div id="broadcast-popover"
             class="broadcasts__home__header__new-button">
           <compact-btn variant="primary"
-                       :disabled="viewOnly"
+                       :disabled="!this.canAddBroadcasts"
                        v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
                        @clicked="$router.push({ path: '/broadcasts/new' })">
             <plus-icon class="mr-1"
@@ -370,7 +370,7 @@
                       text="Scale your outreach with the click of a button. Send captivating SMS campaigns to many contacts at once via Broadcast."
                       extra-text="Upgrade today to unlock this feature"
                       title-text="Broadcast"
-                      kb-link="https://support.aloware.com/en/articles/5783932-aloware-broadcast"
+                      kb-link="https://support.aloware.com/exploring-aloware-talks-broadcast"
                       class="mt-5"
                       v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
     </upgrade-now-page>
@@ -503,10 +503,6 @@ export default {
       return this.broadcasts.length === 0
     },
 
-    viewOnly () {
-      return this.isViewOnlyAccess()
-    },
-
     contextMenuTarget () {
       return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : '#bulk-action-dropdown'
     },
@@ -572,6 +568,10 @@ export default {
           icon: 'context-menu-delete.svg'
         }
       ]
+    },
+
+    canAddBroadcasts () {
+      return this.enabledToAddBroadcasts()
     }
   },
 
@@ -795,7 +795,7 @@ export default {
 
     shouldAllowContextMenuButton (item, broadcast) {
       if (item.name === 'delete') {
-        return this.isAdmin && [4].includes(broadcast.status)
+        return (this.isAdmin || this.isSupervisor) && [4].includes(broadcast.status)
       }
 
       return true
@@ -813,17 +813,17 @@ export default {
     },
 
     isPausable (broadcast) {
-      return [BroadcastStatuses.STATUS_ENROLLING, BroadcastStatuses.STATUS_NEW].includes(broadcast.status)
+      return [BroadcastStatuses.STATUS_ENROLLING_ID, BroadcastStatuses.STATUS_NEW_ID].includes(broadcast.status)
     },
 
     isPlayable (broadcast) {
-      return broadcast.status === BroadcastStatuses.STATUS_PAUSED
+      return broadcast.status === BroadcastStatuses.STATUS_PAUSED_ID
     },
 
     shouldAllowContextMenuBulk (action) {
       if (action === 'delete') {
         const isAllCheckedDone = this.checked.reduce((results, item) => results && item.status === 4, true)
-        return this.isAdmin && isAllCheckedDone
+        return (this.isAdmin || this.isSupervisor) && isAllCheckedDone
       }
 
       if (action === 'play') {

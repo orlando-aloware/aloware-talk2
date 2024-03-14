@@ -93,7 +93,7 @@
               My Contacts
             </label>
             <b-form-checkbox id="my-contacts"
-                             class="mt-2 cursor-pointer"
+                             class="mt-2 cursor-pointer z-0"
                              name="check-button"
                              size="sm"
                              switch
@@ -107,7 +107,7 @@
             <compact-btn borderless
                          variant="outlined-light"
                          customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                         v-if="isSimpsocial"
+                         v-if="isSimpSocial"
                          @clicked="onMessengerClick">
               <iframe id="ss-messenger-button"
                       frameborder="0"
@@ -206,11 +206,11 @@
                           v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
-        <block-tooltip v-if="!canCreateContacts"
-                       placement="left"
-                       triggers="click"
+        <block-tooltip placement="left"
+                       triggers="hover"
                        target="contacts-create-popover"
-                       task="contacts.create">
+                       task="contacts.create"
+                       v-if="!canCreateContacts">
         </block-tooltip>
         <b-dropdown text="Add Contacts"
                     variant="light"

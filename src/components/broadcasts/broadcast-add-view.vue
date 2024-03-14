@@ -82,6 +82,30 @@
         </div>
       </template>
     </confirm-dialog>
+
+    <confirm-dialog id="optout-missing-dialog"
+                    :is-open="optoutMissingDialog.open"
+                    @close="optoutMissingDialog.open = false">
+      <template #content>
+        <p>
+          You haven't included the mandatory opt-out message in the SMS as required by law. Are you sure you want to proceed without it?
+        </p>
+      </template>
+
+      <template #footer>
+        <div>
+          <button class="btn btn-sm btn-light mr-2"
+                  @click="onOptoutMissingDialogClosed">
+            No, I'll add it
+          </button>
+
+          <button class="btn btn-sm btn-primary"
+                  @click="onOptoutMissingDialogConfirmed">
+            Yes, I want to proceed
+          </button>
+        </div>
+      </template>
+    </confirm-dialog>
   </div>
 </template>
 
@@ -145,7 +169,9 @@ export default {
     ]),
 
     ...mapGetters('contacts', [
-      'messageComposer'
+      'messageComposer',
+      'messageBodyWithOptout',
+      'isOptoutActive'
     ]),
 
     mainComponent () {
@@ -277,6 +303,9 @@ export default {
     acceptedOutsideBusinessHours: false,
     outsideBusinessHoursDialog: {
       open: false
+    },
+    optoutMissingDialog: {
+      open: false
     }
   }),
 
@@ -285,7 +314,8 @@ export default {
       'setCurrentListFilters',
       'setMessageComposerSmsBody',
       'setMessageComposerSmsGif',
-      'setMessageComposerAttachments'
+      'setMessageComposerAttachments',
+      'setIsOptoutActive'
     ]),
 
     mainComponentChanged (state) {
@@ -349,6 +379,24 @@ export default {
       this.outsideBusinessHoursDialog.open = false
     },
 
+    onOptoutMissingDialogClosed () {
+      this.optoutMissingDialog.open = false
+    },
+
+    onOptoutMissingDialogConfirmed () {
+      this.optoutMissingDialog.open = false
+      this.goToNextStep()
+      this.setIsOptoutActive(false)
+    },
+
+    goToNextStep () {
+      this.isMainComponentValid = false
+      this.isFooterComponentValid = false
+
+      this.direction = 'right'
+      this.$emit('next')
+    },
+
     next () {
       // send outside business hours confirmation
       if (this.currentStep.id === 3 && this.isRestrictedTime && !this.acceptedOutsideBusinessHours) {
@@ -357,11 +405,13 @@ export default {
         return
       }
 
-      this.isMainComponentValid = false
-      this.isFooterComponentValid = false
+      if (this.currentStep.id === 2 && this.type === 'sms' && !this.isOptoutActive) {
+        this.optoutMissingDialog.open = true
 
-      this.direction = 'right'
-      this.$emit('next')
+        return
+      }
+
+      this.goToNextStep()
     },
 
     back () {
@@ -391,10 +441,11 @@ export default {
         campaign_id: this.campaign.id,
         run_at_date: this.date.substr(0, 10),
         run_at_time: this.date.substr(11, 10),
-        message_body: this.messageComposer.sms.body,
+        message_body: this.messageBodyWithOptout,
         throttle_limit: this.throttle.value,
         accept_outside_business_hours: this.acceptedOutsideBusinessHours,
-        is_scheduled: this.time.time === 'scheduled'
+        is_scheduled: this.time.time === 'scheduled',
+        opt_out_bypassed: !this.isOptoutActive
       }
 
       switch (this.type) {

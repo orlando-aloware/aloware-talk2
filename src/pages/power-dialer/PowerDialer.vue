@@ -62,7 +62,7 @@
                       text="Boost your sales team’s productivity! Power Dialer automatically calls contacts one by one from a list so agents have less idle time."
                       extra-text="Upgrade today to unlock this feature"
                       title-text="Power Dialer"
-                      kb-link="https://support.aloware.com/en/articles/5987054-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
+                      kb-link="https://support.aloware.com/power-up-your-outbound-calls-with-aloware-talks-power-dialer"
                       class="mt-5"
                       v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
     </upgrade-now-page>
@@ -227,13 +227,6 @@ export default {
       const routeMetaTitle = get(this.$route, 'meta.title', '')
 
       return routeMetaTitle === 'Power Dialer Sessions'
-    }
-  },
-
-  created () {
-    // check if user has access and redirect to inbox in case it doesnt
-    if (!this.profile.auto_dialer_enabled) {
-      this.$router.push({ name: 'Inbox' })
     }
   },
 

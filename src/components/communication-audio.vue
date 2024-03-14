@@ -1,6 +1,6 @@
 <template>
   <div class="w-100">
-    <div v-if="hasAudio">
+    <div v-if="!isDeleted && hasAudio">
       <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"
              v-if="remoteUrl">
@@ -13,9 +13,17 @@
                            :communication-id="communication.id"
                            :filename="filename"
                            :file-uuid="fileUuid"/>
+          <transcription-modal button-text="Show Smart Transcription"
+                               :communication="communication"
+                               :single-button="true"
+                               v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
         </div>
       </div>
     </div>
+    <span class="text-grey-900 record-was-deleted-label"
+          v-if="isDeleted">
+      record was deleted
+    </span>
   </div>
 </template>
 
@@ -27,6 +35,8 @@ import {
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import Waveform from 'components/waveform'
 import DownloadButton from 'components/download-button'
+import TranscriptionModal from 'components/communication/transcription-modal'
+
 export default {
   name: 'communication-audio',
 
@@ -35,7 +45,11 @@ export default {
     communicationInfoMixin
   ],
 
-  components: { DownloadButton, Waveform },
+  components: {
+    DownloadButton,
+    Waveform,
+    TranscriptionModal
+  },
 
   props: {
     communication: {
@@ -71,6 +85,10 @@ export default {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.has_recording : this.communication.has_voicemail
     },
 
+    isDeleted () {
+      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.recording_is_deleted : false
+    },
+
     title () {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Play Recording' : 'Play Voicemail'
     }
@@ -82,7 +100,7 @@ export default {
 
   methods: {
     onShow () {
-      if (this.hasAudio) {
+      if (this.hasAudio && !this.isDeleted) {
         this.loading = true
         this.remoteUrl = null
         this.downloadUrl = null
