@@ -305,9 +305,9 @@ export default {
       this.loadingTags = true
 
       this.$axios.get('/api/v1/tag', { params }).then(res => {
-        let list = res.data
-        let accountTags = list.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
-        let importTags = list.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
+        const list = res.data
+        const accountTags = list.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
+        const importTags = list.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
 
         this.searchList[0].children = accountTags
         this.searchList[1].children = importTags
