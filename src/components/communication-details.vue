@@ -458,6 +458,11 @@
                   <div class="flex items-center mr-1 h-100"
                        v-if="usedCampaign"
                        @click="onOpenLineInClassicClicked()">
+                    <q-tooltip anchor="top middle"
+                               self="bottom middle"
+                               max-width="150px">
+                      Click for more info
+                    </q-tooltip>
                     <span class="text-blue cursor-pointer">
                       {{ usedCampaign.name }}
                     </span>
