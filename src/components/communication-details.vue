@@ -247,18 +247,19 @@
                   </q-tooltip>
                 </q-icon>
                 <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
-                  <router-link :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
-                      <span class="text-black"
-                            :title="getUserName(getUser(communication.user_id))">
-                        <q-tooltip class="item"
-                                   content-class="bg-grey-light11"
-                                   anchor="top left"
-                                   self="center middle">
-                          Click For More Info
-                        </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
-                      </span>
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenUserInClassicClicked(communication?.user_id)">
+                    <span class="text-blue cursor-pointer"
+                          :title="getUserName(getUser(communication.user_id))">
+                      <q-tooltip class="item"
+                                 content-class="bg-grey-light11"
+                                 anchor="top left"
+                                 self="center middle">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ getUserName(getUser(communication.user_id)) }}
+                    </span>
+                  </div>
                 </div>
                 <div v-else>
                   <span class="text-greyish">
@@ -279,12 +280,14 @@
                     <li class="pb-1"
                         :key="attemptingUser + '-user-' + index"
                         v-for="(attemptingUser, index) in communication.attempting_users">
-                      <router-link :to="{ name: 'User Activity', params: { userId: getUser(attemptingUser).id }}">
-                        <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
+                      <div class="flex items-center mr-1 h-100"
+                           @click="onOpenUserInClassicClicked(getUser(attemptingUser).id)">
+                        <span class="text-blue cursor-pointer"
+                              :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                               :title="getUserName(getUser(attemptingUser))">
                           {{ getUserName(getUser(attemptingUser)) }}
                         </span>
-                      </router-link>
+                      </div>
                     </li>
                   </ul>
                 </b-col>
@@ -1037,6 +1040,10 @@ export default {
       return null
     },
 
+    getClassicUrlUserActivity (userId) {
+      return process.env.API_URL + `/users/${userId}/activity`
+    },
+
     onArchive () {
       this.$bvModal.msgBoxConfirm('Archiving communication will remove it from all reports and plots. Continue?', {
         title: 'Archive Communication',
@@ -1080,6 +1087,10 @@ export default {
 
     onOpenLineInClassicClicked () {
       window.open(this.classicUrlLineActivity, '_blank')
+    },
+
+    onOpenUserInClassicClicked (userId) {
+      window.open(this.getClassicUrlUserActivity(userId), '_blank')
     },
 
     isAttachmentImage (mimeType) {
