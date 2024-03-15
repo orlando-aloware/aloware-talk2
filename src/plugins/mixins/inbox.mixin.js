@@ -31,18 +31,7 @@ export default {
     },
 
     statusText () {
-      switch (this.currentTask) {
-        case ContactTaskStatus.STATUS_PENDING:
-          return 'pending'
-        case ContactTaskStatus.STATUS_CLOSED:
-          return 'closed'
-        case ContactTaskStatus.STATUS_OPEN:
-          return 'open'
-        case InboxTaskStatus.STATUS_ALL:
-          return 'all'
-        default:
-          return ''
-      }
+      return this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase()
     }
   },
 

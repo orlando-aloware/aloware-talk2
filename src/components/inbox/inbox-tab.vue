@@ -499,23 +499,6 @@ export default {
       }
     },
 
-    getStatusName (taskStatusId) {
-      switch (taskStatusId) {
-        case ContactTaskStatus.STATUS_PENDING:
-          return 'Pending'
-        case ContactTaskStatus.STATUS_CLOSED:
-          return 'Closed'
-        case ContactTaskStatus.STATUS_NEW:
-          return 'New'
-        case ContactTaskStatus.STATUS_OPEN:
-          return 'Open'
-        case InboxTaskStatus.STATUS_ALL:
-          return 'All'
-        default:
-          return ''
-      }
-    },
-
     onToggleStatus () {
       if (this.statusText === this.$route.params.status) {
         return
