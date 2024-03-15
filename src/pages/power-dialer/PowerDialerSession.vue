@@ -221,11 +221,11 @@ export default {
 
         this.inProgressFetchTasks[taskType] = true
 
-        const oneLastInCurrentQueue = this.powerDialerTasks['in_queue'].length === 1
+        const lastItemsInCurrentQueue = this.powerDialerTasks['in_queue'].length === 3
         const hasSkippedTasks = this.powerDialerTasks['skipped'].length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters['in_queue'] ? this.powerDialerTaskFilters['in_queue'].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
-        if (oneLastInCurrentQueue && hasSkippedTasks && remainingInQueueTasks) {
+        if (lastItemsInCurrentQueue && hasSkippedTasks && remainingInQueueTasks) {
           params.page = this.inQueueFetchTasks.currentPage + 1
         }
 
