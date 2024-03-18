@@ -42,8 +42,6 @@ export default {
       window.hsConversationsSettings = {
         loadImmediately: false
       }
-
-      this.initiateHubspotConversationsWithUserDetails()
     },
 
     loadScript (src) {
