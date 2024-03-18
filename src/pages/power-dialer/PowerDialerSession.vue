@@ -52,6 +52,7 @@ import AppointmentFormModal from 'src/components/appointments/appointment-form-m
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import * as TaskType from 'src/constants/task-types'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
@@ -189,20 +190,20 @@ export default {
 
     fetchTasks (status, isNextPage = false, refreshData = false) {
       if (status) {
-        let taskType = 'in_queue'
+        let taskType = ''
         switch (status) {
           case AutoDialTaskStatus.STATUS_COMPLETED:
-            taskType = 'called'
+            taskType = TaskType.CALLED
             break
           case AutoDialTaskStatus.STATUS_FAILED:
-            taskType = 'failed'
+            taskType = TaskType.FAILED
             break
           case AutoDialTaskStatus.STATUS_SCHEDULED:
-            taskType = 'scheduled'
+            taskType = TaskType.SCHEDULED
             break
           case AutoDialTaskStatus.STATUS_QUEUED:
           default:
-            taskType = 'in_queue'
+            taskType = TaskType.IN_QUEUE
         }
 
         let params = {
