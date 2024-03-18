@@ -8,6 +8,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
 import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   computed: {
@@ -30,15 +31,7 @@ export default {
     },
 
     statusText () {
-      switch (this.currentTask) {
-        case ContactTaskStatus.STATUS_PENDING:
-          return 'pending'
-        case ContactTaskStatus.STATUS_CLOSED:
-          return 'closed'
-        case ContactTaskStatus.STATUS_OPEN:
-        default:
-          return 'open'
-      }
+      return this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase()
     }
   },
 
@@ -55,25 +48,30 @@ export default {
     ]
 
     return {
-      currentTask: ContactTaskStatus.STATUS_OPEN,
+      currentTask: InboxTaskStatus.DEFAULT_STATUS,
       options: [
         {
-          value: ContactTaskStatus.STATUS_OPEN,
+          value: InboxTaskStatus.STATUS_ALL,
           slot: 'one'
         },
         {
-          value: ContactTaskStatus.STATUS_PENDING,
+          value: ContactTaskStatus.STATUS_OPEN,
           slot: 'two'
         },
         {
-          value: ContactTaskStatus.STATUS_CLOSED,
+          value: ContactTaskStatus.STATUS_PENDING,
           slot: 'three'
+        },
+        {
+          value: ContactTaskStatus.STATUS_CLOSED,
+          slot: 'four'
         }
       ],
       ContactTaskStatusNew: ContactTaskStatus.STATUS_NEW,
       ContactTaskStatusOpen: ContactTaskStatus.STATUS_OPEN,
       ContactTaskStatusPending: ContactTaskStatus.STATUS_PENDING,
       ContactTaskStatusClosed: ContactTaskStatus.STATUS_CLOSED,
+      ContactTaskStatusAll: InboxTaskStatus.STATUS_ALL,
       filters: {
         search: []
       },
@@ -294,7 +292,7 @@ export default {
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
       let relations = []
 
-      this.reInitFilters()
+      this.reInitFilters(taskId)
       query.filter_groups = []
 
       if (this.searchText && this.searchText.trim() && this.searchText.length >= 3) {
@@ -304,7 +302,9 @@ export default {
 
         delete this.filters.contact_task_status
       } else {
-        this.filters.contact_task_status[0].value = [taskId]
+        this.filters.contact_task_status[0].value = taskId === InboxTaskStatus.STATUS_ALL
+          ? InboxTaskStatus.STATUS_ALL_IDS
+          : [taskId]
       }
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
@@ -407,11 +407,11 @@ export default {
       return query
     },
 
-    reInitFilters () {
+    reInitFilters (taskId) {
       this.filters = {
         contact_task_status: [
           {
-            value: [ContactTaskStatus.STATUS_OPEN],
+            value: taskId === InboxTaskStatus.STATUS_ALL ? InboxTaskStatus.STATUS_ALL_IDS : [taskId],
             operator: OPERATORS.IS_ANY_OF
           }
         ],
@@ -483,8 +483,11 @@ export default {
           this.currentTask = ContactTaskStatus.STATUS_CLOSED
           break
         case 'open':
+          this.currentTask = ContactTaskStatus.STATUS_OPEN
           break
-        default:
+        case 'all':
+          this.currentTask = InboxTaskStatus.STATUS_ALL
+          break
       }
     },
 
