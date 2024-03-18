@@ -226,7 +226,7 @@ export default {
         const hasSkippedTasks = this.powerDialerTasks['skipped'].length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters['in_queue'] ? this.powerDialerTaskFilters['in_queue'].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
-        // Increment the pagination when the last items in the current queue are reached.
+        // Increment the pagination when the last items in the current list of IN QUEUE taks are reached.
         // If we have skipped any calls, we need to fetch the next page of IN QUEUE tasks.
         if (lastItemsInCurrentQueue && hasSkippedTasks && remainingInQueueTasks) {
           params.page = this.inQueueFetchTasks.currentPage + 1
