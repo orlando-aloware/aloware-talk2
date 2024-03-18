@@ -1482,7 +1482,7 @@ export default {
         this.getTemplates()
 
         this.getCampaigns()
-        this.getFullTags()
+        // this.getFullTags()
         // this.getTags()
         this.getWorkflows()
 
