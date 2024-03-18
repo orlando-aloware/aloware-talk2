@@ -333,7 +333,7 @@ export default {
     },
 
     fetchQueuedTasks () {
-      // fetch IN QUEUE tasks
+      // fetch IN QUEUE tasks through the API every time the active task changes (could be skipped, completed, or failed)
       this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
       this.$VueEvent.fire('redial_task')
     }
