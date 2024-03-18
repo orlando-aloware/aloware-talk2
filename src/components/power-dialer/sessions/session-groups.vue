@@ -523,6 +523,9 @@ export default {
     },
 
     getTotalItem (key) {
+      // Sanity check: if the key is not in the powerDialerTaskFilters, return 0
+      // here we are getting the total of items for each group
+      // to be displayed during the PD session: In Queue, Called, Failed, Scheduled.
       if (!this.powerDialerTaskFilters[key]) {
         return 0
       }

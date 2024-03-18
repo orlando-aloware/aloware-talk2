@@ -226,6 +226,8 @@ export default {
         const hasSkippedTasks = this.powerDialerTasks['skipped'].length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters['in_queue'] ? this.powerDialerTaskFilters['in_queue'].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
+        // Increment the pagination when the last items in the current queue are reached.
+        // If we have skipped any calls, we need to fetch the next page of IN QUEUE tasks.
         if (lastItemsInCurrentQueue && hasSkippedTasks && remainingInQueueTasks) {
           params.page = this.inQueueFetchTasks.currentPage + 1
         }
@@ -236,16 +238,26 @@ export default {
             delete this.powerDialerTaskFilters[taskType].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              const currSkipped = this.powerDialerTasks.skipped
-              const currSkippedAndInProgress = [...currSkipped, this.activeTask]
+              // Total of skipped tasks in the current PD session plus the active task
+              const currSkippedAndInProgress = [...this.powerDialerTasks.skipped, this.activeTask]
+
+              // The new set of IN QUEUE tasks that are retrieved by the API
               const currInQueue = [...res.data.data]
+
+              // if the current page is the same as the last page, then we keep the total of fetched tasks the same
               if (this.powerDialerTaskFilters[taskType].current_page === this.inQueueFetchTasks.currentPage) {
                 this.inQueueFetchTasks.fetchedTasks = currInQueue.length
               }
+
+              // if the current page is greater than the last page, then we increment the total of fetched tasks
               if (this.powerDialerTaskFilters[taskType].current_page > this.inQueueFetchTasks.currentPage) {
                 this.inQueueFetchTasks.fetchedTasks += currInQueue.length
               }
+
               this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
+
+              // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
+              // but discarding the ones have been skipped so we don't list them again
               let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
               if (newInQueue.length) {
                 this.powerDialerTasks[taskType] = newInQueue
@@ -321,6 +333,7 @@ export default {
     },
 
     fetchQueuedTasks () {
+      // fetch IN QUEUE tasks
       this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
       this.$VueEvent.fire('redial_task')
     }
@@ -333,7 +346,7 @@ export default {
         const oldContactListItemId = get(oldValue, 'contact_list_item_id', null)
 
         // check if current and previous active task are not the same,
-        // then check if we can fetch more tasks
+        // then fetch more tasks
         if (oldContactListItemId && newContactListItemId !== oldContactListItemId) {
           this.fetchQueuedTasks()
         }
