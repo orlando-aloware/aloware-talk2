@@ -376,13 +376,13 @@ export default {
       }
     },
 
-    processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
+    processContactUpdate (contact, communication = null, deleteCommsAndAudits = false) {
       const updatedContact = this.$jsonClone(this.contact)
       const contactEvent = this.$jsonClone(contact)
       let newCommunication = null
 
-      if (communciation) {
-        newCommunication = this.$jsonClone(communciation)
+      if (communication) {
+        newCommunication = this.$jsonClone(communication)
       }
 
       // add the v2 contact attributes that we need
