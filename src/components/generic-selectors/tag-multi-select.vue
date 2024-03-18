@@ -304,7 +304,7 @@ export default {
       }
       const params = {
         full_load: true,
-        filter: this.search
+        search: this.search
       }
 
       this.loadingTags = true

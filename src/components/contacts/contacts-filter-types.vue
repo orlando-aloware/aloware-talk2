@@ -833,7 +833,7 @@ export default {
         const params = {
           page: 1,
           per_page: 50,
-          filter: search
+          search: search
         }
 
         return talk2Api.V1.tags.get({
