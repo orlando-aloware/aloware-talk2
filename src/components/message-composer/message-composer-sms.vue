@@ -339,7 +339,7 @@ export default {
     },
 
     isSendTextDisabled () {
-      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
     },
 
     isSendTextInputDisabled () {
@@ -480,9 +480,10 @@ export default {
     },
 
     onKeyDown (evt) {
-      if (this.isSendTextInputDisabled) {
+      if (this.isSendTextInputDisabled || this.isSendTextDisabled) {
         return
       }
+
       if (evt.keyCode === 13 && !evt.shiftKey && !this.isBroadcast) {
         if (this.validSms) {
           this.onSend()

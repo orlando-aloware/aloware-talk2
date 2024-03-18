@@ -312,7 +312,7 @@ export default {
       }
 
       if (this.$route.params.channel === 'my-personal-line') {
-        return 'My Commms. Filters'
+        return 'My Comms. Filters'
       }
 
       return 'Calls & Recordings Filters'
