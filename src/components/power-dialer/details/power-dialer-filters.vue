@@ -72,6 +72,7 @@ export default {
     },
 
     listFilters () {
+      // Remove the skipped filter from the list of available filters
       const { SKIPPED, ...DEFAULT_FILTERS } = DEFAULT_FILTER_LIST
       return DEFAULT_FILTERS
     },

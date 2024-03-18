@@ -532,7 +532,7 @@ export default {
 
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // -1 for the one in progress
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // Get the actual number of tasks in queue -1 (for the one in progress)
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
