@@ -47,7 +47,8 @@ export default {
 
   computed: {
     ...mapGetters('auth', [
-      'authenticated'
+      'authenticated',
+      'profile'
     ]),
 
     ...mapState('inbox', [
@@ -141,6 +142,12 @@ export default {
   },
 
   mounted () {
+    // when the user tries to access the channel directly but without a personal line
+    if (this.$route.params?.channel === 'my-personal-line' && !this.profile.campaign_id) {
+      this.$router.push({ name: 'Inbox' })
+      return
+    }
+
     if (this.authenticated && this.$route.name !== 'Inbox View') {
       this.setChannel()
       this.fetchTaskCounts()

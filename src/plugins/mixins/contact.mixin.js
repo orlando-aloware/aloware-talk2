@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
@@ -375,13 +376,13 @@ export default {
       }
     },
 
-    processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
+    processContactUpdate (contact, communication = null, deleteCommsAndAudits = false) {
       const updatedContact = this.$jsonClone(this.contact)
       const contactEvent = this.$jsonClone(contact)
       let newCommunication = null
 
-      if (communciation) {
-        newCommunication = this.$jsonClone(communciation)
+      if (communication) {
+        newCommunication = this.$jsonClone(communication)
       }
 
       // add the v2 contact attributes that we need
@@ -1218,15 +1219,17 @@ export default {
           return
         }
 
+        const contactTaskStatus = this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase()
+        const isAllCurrentTaskStatus = this.$route.params.status === InboxTaskStatus.STATUS_ALL
+
         // if contact status changes then redirect to the right url
-        if (this.$route.name === 'Inbox Contact Task' &&
-          this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
+        if (this.$route.name === 'Inbox Contact Task' && contactTaskStatus !== this.$route.params.status && !isAllCurrentTaskStatus) {
           this.$router.push({
             name: 'Inbox Contact Task',
             params: {
               id: res.data.id,
               channel: 'inbox',
-              status: this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase()
+              status: contactTaskStatus
             }
           }).catch(err => {
             console.log(err)
@@ -1240,7 +1243,7 @@ export default {
             params: {
               id: res.data.id,
               channel: 'inbox',
-              status: 'all'
+              status: InboxTaskStatus.DEFAULT_STATUS
             }
           }).catch(err => {
             console.log(err)
