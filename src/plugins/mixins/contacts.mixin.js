@@ -1194,9 +1194,7 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function () {
-        // if (this.$route.name === 'Contacts') {
         this.filtersCount = this.getFiltersCount(this.currentListFilters)
-        // }
       }
     },
 

@@ -983,7 +983,6 @@ export default {
       'removeListOpen',
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
-      // 'listLoaded',
       'pinnedCountLoaded',
       'setShowMyContacts'
     ]),
