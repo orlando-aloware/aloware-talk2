@@ -13,7 +13,7 @@
               color="primary"
               option-value="id"
               option-label="name"
-              input-debounce="0"
+              input-debounce="1000"
               style="word-break: break-all;"
               use-input
               emit-value
@@ -145,6 +145,11 @@ export default {
     category: {
       type: Number,
       default: null
+    },
+
+    threshold: {
+      type: Number,
+      default: 3
     }
   },
 
@@ -164,7 +169,7 @@ export default {
     placeholder () {
       switch (true) {
         case this.multiple && this.selectedTags.length < 1:
-          return 'Select Tags'
+          return 'Type to search tags'
         case !this.multiple && !this.selectedTags:
           return 'Select Tag'
         case this.multiple && this.selectedTags.length > 0:
@@ -195,7 +200,8 @@ export default {
       tagsArray: [],
       tagsOptions: [],
       selectedTags: this.value,
-      selectWidth: 0
+      selectWidth: 0,
+      preliminarOptions: []
     }
   },
 
@@ -205,17 +211,7 @@ export default {
     },
 
     filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.tagsOptions = this.tagsArray
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.tagsOptions = this.tagsArray.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
-      })
+      this.getTags(val, update)
     },
 
     changeTags (event) {
@@ -230,32 +226,45 @@ export default {
       this.isEdit = true
     },
 
-    getTags () {
+    getTags (search = '', update) {
       if (!this.hasPermissionTo('list tag')) {
         return
       }
 
-      if (this.tags && this.tags.length > 0) {
-        this.tagsArray = this.tags
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
+      if (!search) {
+        update(() => {
+          this.tagsOptions = this.tagsArray
+        })
         return
       }
 
-      return talk2Api.V1.tags.get({
-        params: { full_load: true }
-      }).then(res => {
-        this.tagsArray = res.data
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
-      }).catch(err => {
-        console.log(err)
-      })
+      if (search.length >= this.threshold) {
+        const params = {
+          page: 1,
+          per_page: 50,
+          search: search
+        }
+
+        return talk2Api.V1.tags.get({
+          params: params
+        }).then(res => {
+          update(() => {
+            this.tagsArray = res.data.data
+            this.tagsOptions = res.data.data
+            this.selectedTags = this.value
+          })
+        }).catch(err => {
+          console.log(err)
+        })
+      }
     }
   },
 
   mounted () {
-    this.getTags()
+    if (this.tags.length) {
+      this.tagsOptions = this.tags
+      this.preliminarOptions = this.tags
+    }
   },
 
   watch: {
@@ -272,9 +281,16 @@ export default {
     },
 
     selectedTags (val) {
+      const matching = this.tagsOptions.filter(tag => val.includes(tag.id))
+      this.preliminarOptions = [...new Set([...this.preliminarOptions, ...matching])]
       if (this.selectedTags !== this.value) {
         this.$emit('change', val)
+        this.$emit('preliminar', this.preliminarOptions)
       }
+    },
+
+    tags (val) {
+      this.tagsOptions = val
     }
   }
 }

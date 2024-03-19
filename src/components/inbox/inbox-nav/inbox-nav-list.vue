@@ -66,7 +66,7 @@ import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { inboxRoutesMixin, inboxMixin, userMixin } from 'src/plugins/mixins'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   name: 'inbox-nav-list',
@@ -251,7 +251,7 @@ export default {
         const viewId = nextActive.split('-')[1]
         const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
 
-        this.currentTask = ContactTaskStatus.STATUS_OPEN
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
         this.onSelectView(view.filter)
         return
       }
@@ -290,7 +290,7 @@ export default {
         name: 'Inbox Channel Task Status',
         params: {
           channel: this.active,
-          status: 'open'
+          status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
         //  properly reload contacts if redirected or navigation clicked to the same "inbox" route

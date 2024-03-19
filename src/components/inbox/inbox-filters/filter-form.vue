@@ -146,12 +146,16 @@
                    sm="12">
               <b-form-group class="form-label"
                             :label="tagsFilterLabel">
+                <q-tooltip anchor="top middle">
+                  Type at least 3 characters to search in tags
+                </q-tooltip>
                 <tag-selector ref="tagSelector"
                               :multiple="true"
                               :highlighted="isChanged('tags')"
                               :category="tagsFilterCategory"
                               v-model="filter.tags"
-                              @change="(eventPayload) => onFilterChange(eventPayload, 'tags')">
+                              @change="(eventPayload) => onFilterChange(eventPayload, 'tags')"
+                              @preliminar="onPreliminarChange">
                 </tag-selector>
               </b-form-group>
             </b-col>
@@ -407,7 +411,7 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -617,6 +621,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setTags']),
+
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },
@@ -631,6 +637,10 @@ export default {
       }
 
       return 'All Time'
+    },
+
+    onPreliminarChange (tags) {
+      this.setTags(tags)
     }
   },
 

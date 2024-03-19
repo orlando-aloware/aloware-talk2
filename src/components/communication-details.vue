@@ -247,18 +247,19 @@
                   </q-tooltip>
                 </q-icon>
                 <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
-                  <router-link :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
-                      <span class="text-black"
-                            :title="getUserName(getUser(communication.user_id))">
-                        <q-tooltip class="item"
-                                   content-class="bg-grey-light11"
-                                   anchor="top left"
-                                   self="center middle">
-                          Click For More Info
-                        </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
-                      </span>
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenUserInClassicClicked(communication?.user_id)">
+                    <span class="text-blue cursor-pointer"
+                          :title="getUserName(getUser(communication.user_id))">
+                      <q-tooltip class="item"
+                                 content-class="bg-grey-light11"
+                                 anchor="top left"
+                                 self="center middle">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ getUserName(getUser(communication.user_id)) }}
+                    </span>
+                  </div>
                 </div>
                 <div v-else>
                   <span class="text-greyish">
@@ -279,12 +280,14 @@
                     <li class="pb-1"
                         :key="attemptingUser + '-user-' + index"
                         v-for="(attemptingUser, index) in communication.attempting_users">
-                      <router-link :to="{ name: 'User Activity', params: { userId: getUser(attemptingUser).id }}">
-                        <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
+                      <div class="flex items-center mr-1 h-100"
+                           @click="onOpenUserInClassicClicked(getUser(attemptingUser).id)">
+                        <span class="text-blue cursor-pointer"
+                              :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                               :title="getUserName(getUser(attemptingUser))">
                           {{ getUserName(getUser(attemptingUser)) }}
                         </span>
-                      </router-link>
+                      </div>
                     </li>
                   </ul>
                 </b-col>
@@ -452,15 +455,18 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Line Activity', params: { campaignId: communication.campaign_id }}"
-                               v-if="usedCampaign">
+                  <div class="flex items-center mr-1 h-100"
+                       v-if="usedCampaign"
+                       @click="onOpenLineInClassicClicked()">
                     <q-tooltip anchor="top middle"
                                self="bottom middle"
                                max-width="150px">
                       Click for more info
                     </q-tooltip>
-                    {{ usedCampaign.name }}
-                  </router-link>
+                    <span class="text-blue cursor-pointer">
+                      {{ usedCampaign.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     Deleted Line
                   </template>
@@ -475,15 +481,19 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Ring Group Activity', params: { ringGroupId: communication.ring_group_id }}"
-                               v-if="usedRingGroup && !usedRingGroup?.call_waiting">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ usedRingGroup.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
+                       v-if="usedRingGroup && !usedRingGroup?.call_waiting">
+                    <span class="text-blue cursor-pointer"
+                          :title="usedRingGroup.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ usedRingGroup.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     <span v-if="usedRingGroup?.call_waiting">
                       Call waiting Queue
@@ -503,15 +513,19 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Sequence Activity', params: { sequenceId: communication.workflow_id }}"
-                               v-if="useSequence">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ useSequence.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenSequenceInClassicClicked(useSequence?.id)"
+                       v-if="useSequence">
+                    <span class="text-blue cursor-pointer"
+                          :title="useSequence?.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ useSequence?.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     Deleted Sequence
                   </template>
@@ -526,15 +540,19 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Broadcast Activity', params: { broadcastId: communication.broadcast_id }}"
-                               v-if="useBroadCast">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    {{ useBroadCast.name }}
-                  </router-link>
+                  <div class="flex items-center mr-1 h-100"
+                       @click="onOpenBroadcastInClassicClicked(communication.broadcast_id)"
+                       v-if="useBroadCast">
+                    <span class="text-blue cursor-pointer"
+                          :title="useBroadCast.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click For More Info
+                      </q-tooltip>
+                      {{ useBroadCast.name }}
+                    </span>
+                  </div>
                   <template v-else>
                     Deleted Broadcast
                   </template>
@@ -549,16 +567,21 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'User Activity', params: {userId: userId }}"
-                               :key="userId + '-user-' + index"
-                               v-for="(userId, index) in communication.transfer_prior_user_ids">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
+                  <div class="flex items-center mr-1 h-100"
+                       :key="userId + '-user-' + index"
+                       @click="onOpenUserInClassicClicked(userId)"
+                       v-for="(userId, index) in communication.transfer_prior_user_ids">
+                    <span class="text-blue cursor-pointer"
+                          :title="getUserName(getUser(userId))">
+                      <q-tooltip class="item"
+                                 content-class="bg-grey-light11"
+                                 anchor="top middle"
+                                 self="bottom middle">
+                        {{ getUserName(getUser(userId)) }}
+                      </q-tooltip>
                       {{ getUserName(getUser(userId)) }}
-                    </q-tooltip>
-                    {{ getUserName(getUser(userId)) }}
-                  </router-link>
+                    </span>
+                  </div>
                 </div>
               </b-col>
             </b-form-row>
@@ -570,16 +593,21 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'User Activity', params: {userId: userId }}"
-                               :key="userId + '-user-' + index"
-                               v-for="(userId, index) in communication.transfer_target_user_ids">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
+                  <div class="flex items-center mr-1 h-100"
+                       :key="userId + '-user-' + index"
+                       @click="onOpenUserInClassicClicked(userId)"
+                       v-for="(userId, index) in communication.transfer_target_user_ids">
+                    <span class="text-blue cursor-pointer"
+                          :title="getUserName(getUser(userId))">
+                      <q-tooltip class="item"
+                                 content-class="bg-grey-light11"
+                                 anchor="top middle"
+                                 self="bottom middle">
+                        {{ getUserName(getUser(userId)) }}
+                      </q-tooltip>
                       {{ getUserName(getUser(userId)) }}
-                    </q-tooltip>
-                    {{ getUserName(getUser(userId)) }}
-                  </router-link>
+                    </span>
+                  </div>
                 </div>
               </b-col>
             </b-form-row>
@@ -991,6 +1019,10 @@ export default {
         this.callDispositions &&
         this.callDispositions.length > 0 &&
         !this.dialerMode
+    },
+
+    classicUrlLineActivity () {
+      return process.env.API_URL + `/lines/${this.usedCampaign.id}/activity`
     }
   },
 
@@ -1035,6 +1067,22 @@ export default {
       return null
     },
 
+    getClassicUrlUserActivity (userId) {
+      return process.env.API_URL + `/users/${userId}/activity`
+    },
+
+    getClassicUrlSequenceActivity (sequenceId) {
+      return process.env.API_URL + `/sequences2/manager/${sequenceId}`
+    },
+
+    getClassicUrlRingGroupActivity (ringGroupId) {
+      return process.env.API_URL + `/ring-groups/${ringGroupId}/activity`
+    },
+
+    getClassicUrlBroadcastActivity (broadcastId) {
+      return process.env.API_URL + `/broadcast/${broadcastId}/activity`
+    },
+
     onArchive () {
       this.$bvModal.msgBoxConfirm('Archiving communication will remove it from all reports and plots. Continue?', {
         title: 'Archive Communication',
@@ -1074,6 +1122,26 @@ export default {
 
     onEditNote () {
       this.isEditingNote = true
+    },
+
+    onOpenLineInClassicClicked () {
+      window.open(this.classicUrlLineActivity, '_blank')
+    },
+
+    onOpenUserInClassicClicked (userId) {
+      window.open(this.getClassicUrlUserActivity(userId), '_blank')
+    },
+
+    onOpenSequenceInClassicClicked (sequenceId) {
+      window.open(this.getClassicUrlSequenceActivity(sequenceId), '_blank')
+    },
+
+    onOpenRingGroupInClassicClicked (ringGroupId) {
+      window.open(this.getClassicUrlRingGroupActivity(ringGroupId), '_blank')
+    },
+
+    onOpenBroadcastInClassicClicked (broadcastId) {
+      window.open(this.getClassicUrlBroadcastActivity(broadcastId), '_blank')
     },
 
     isAttachmentImage (mimeType) {
