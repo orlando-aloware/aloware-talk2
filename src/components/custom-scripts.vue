@@ -42,6 +42,8 @@ export default {
       window.hsConversationsSettings = {
         loadImmediately: false
       }
+
+      this.initiateHubspotConversationsWithUserDetails()
     },
 
     loadScript (src) {
@@ -67,8 +69,8 @@ export default {
         return
       }
 
-      // Disable Hubspot chat for Aloware and local environments
-      if (this.isAloware || this.isLocal) {
+      // No hubspot chat in local environment or for any company but ModGen
+      if (!this.isModGen || this.isLocal) {
         return
       }
 
