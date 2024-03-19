@@ -69,8 +69,8 @@ export default {
         return
       }
 
-      // No hubspot chat in local environment or for any company but ModGen
-      if (!this.isModGen || this.isLocal) {
+      // Disable Hubspot chat for Aloware and local environments
+      if (!(this.isModGen) || this.isLocal) {
         return
       }
 
