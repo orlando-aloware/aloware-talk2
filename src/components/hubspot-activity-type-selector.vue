@@ -77,7 +77,7 @@ export default {
 
   mounted () {
     if (this.communication) {
-      this.activityType = this.communication.activity_type
+      this.activityType = this.communication.metadata?.activity_type
     }
   },
 
@@ -106,7 +106,7 @@ export default {
       }).then((res) => {
         this.loadingActivityType = false
         this.$generalNotification('Activity type updated.')
-        this.$emit('activityTypeChosen', res.data.activity_type)
+        this.$emit('activityTypeChosen', res.data.metadata?.activity_type)
       }).catch((err) => {
         this.loadingActivityType = false
         this.$handleErrors(err.response)
