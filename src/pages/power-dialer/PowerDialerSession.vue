@@ -56,7 +56,7 @@ import * as TaskType from 'src/constants/task-types'
 import { sessionCallStatusMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 export default {
   name: 'PowerDialerSession',
