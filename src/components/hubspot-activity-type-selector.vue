@@ -130,15 +130,6 @@ export default {
           this.activityType = this.computedCommunicationActivityType
         }
       }
-    },
-
-    'computedCommunicationActivityType.metadata.activity_type': {
-      handler (newVal) {
-        if (this.communication) {
-          this.activityType = this.computedCommunicationActivityType
-        }
-      },
-      deep: true
     }
   }
 }
