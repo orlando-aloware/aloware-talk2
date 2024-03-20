@@ -176,13 +176,39 @@
                 </div>
                 <div class="d-flex align-items-center"
                      v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
-                  {{ communication.incoming_number }}
+                  <div>
+                    <div class="flex items-center mr-1 h-100"
+                         v-if="usedCampaign?.id"
+                         @click="onOpenLineInClassicClicked(usedCampaign?.id)">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click for more info
+                      </q-tooltip>
+                      <span class="text-blue cursor-pointer">
+                        {{ usedCampaign?.name }}
+                      </span>
+                    </div>
+                    {{ communication.incoming_number }}
+                  </div>
                 </div>
                 <div class="d-flex align-items-center"
                      v-else>
-                  {{ getCommunicationCampaignName() }}
-                  <br v-if="getCommunicationCampaignName()">
-                  {{ communication.incoming_number | fixPhone }}
+                  <div>
+                    <div class="flex items-center mr-1 h-100 w-100"
+                         v-if="usedCampaign?.id"
+                         @click="onOpenLineInClassicClicked(usedCampaign?.id)">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click for more info
+                      </q-tooltip>
+                      <span class="text-blue cursor-pointer">
+                        {{ usedCampaign?.name }}
+                      </span>
+                    </div>
+                    {{ communication.incoming_number | fixPhone }}
+                  </div>
                 </div>
               </b-col>
             </b-form-row>
@@ -195,13 +221,39 @@
               <b-col>
                 <div class="d-flex align-items-center"
                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
-                  {{ getCommunicationCampaignName() }}
-                  <br v-if="getCommunicationCampaignName()">
-                  {{ communication.incoming_number | fixPhone }}
+                  <div>
+                      <div class="flex items-center mr-1 h-100"
+                           v-if="usedCampaign?.id"
+                           @click="onOpenLineInClassicClicked(usedCampaign?.id)">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click for more info
+                      </q-tooltip>
+                      <span class="text-blue cursor-pointer">
+                        {{ usedCampaign?.name }}
+                      </span>
+                    </div>
+                    {{ communication.incoming_number | fixPhone }}
+                  </div>
                 </div>
                 <div class="d-flex align-items-center"
                      v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
-                  {{ communication.incoming_number }}
+                  <div>
+                    <div class="flex items-center mr-1 h-100"
+                         v-if="usedCampaign?.id"
+                         @click="onOpenLineInClassicClicked(usedCampaign?.id)">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click for more info
+                      </q-tooltip>
+                      <span class="text-blue cursor-pointer">
+                        {{ usedCampaign?.name }}
+                      </span>
+                      {{ communication.incoming_number }}
+                    </div>
+                  </div>
                 </div>
                 <div class="d-flex align-items-center"
                      v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
@@ -447,33 +499,6 @@
 
           <q-card-section class="pt-0 pb-0"
                           v-if="typeHaveLine">
-
-            <!--LINE-->
-            <b-form-row v-if="communication.campaign_id">
-              <b-col class="pl-0 pr-0">
-                <q-item-label>Line: </q-item-label>
-              </b-col>
-              <b-col>
-                <div class="d-flex align-items-center">
-                  <div class="flex items-center mr-1 h-100"
-                       v-if="usedCampaign"
-                       @click="onOpenLineInClassicClicked()">
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               max-width="150px">
-                      Click for more info
-                    </q-tooltip>
-                    <span class="text-blue cursor-pointer">
-                      {{ usedCampaign.name }}
-                    </span>
-                  </div>
-                  <template v-else>
-                    Deleted Line
-                  </template>
-                </div>
-              </b-col>
-            </b-form-row>
-
             <!--RING GROUP-->
             <b-form-row v-if="communication.ring_group_id">
               <b-col class="pl-0 pr-0">
@@ -942,12 +967,7 @@ export default {
         return null
       }
 
-      const campaign = this.campaigns.find(campaign => campaign.id === this.communication.campaign_id)
-      if (campaign) {
-        return campaign
-      }
-
-      return null
+      return this.getCampaign(this.communication.campaign_id)
     },
 
     usedRingGroup () {
@@ -1019,23 +1039,10 @@ export default {
         this.callDispositions &&
         this.callDispositions.length > 0 &&
         !this.dialerMode
-    },
-
-    classicUrlLineActivity () {
-      return process.env.API_URL + `/lines/${this.usedCampaign.id}/activity`
     }
   },
 
   methods: {
-    getCommunicationCampaignName () {
-      const communicationIncomingNumber = _.get(this.communication, 'incoming_number', null)
-      if (!communicationIncomingNumber) {
-        return null
-      }
-
-      return this.getCampaign(this.campaignId)?.name
-    },
-
     getCampaign (id) {
       if (!id) {
         return null
@@ -1083,6 +1090,10 @@ export default {
       return process.env.API_URL + `/broadcast/${broadcastId}/activity`
     },
 
+    getClassicUrlLineActivity (campaignId) {
+      return process.env.API_URL + `/lines/${campaignId}/activity`
+    },
+
     onArchive () {
       this.$bvModal.msgBoxConfirm('Archiving communication will remove it from all reports and plots. Continue?', {
         title: 'Archive Communication',
@@ -1124,8 +1135,8 @@ export default {
       this.isEditingNote = true
     },
 
-    onOpenLineInClassicClicked () {
-      window.open(this.classicUrlLineActivity, '_blank')
+    onOpenLineInClassicClicked (campaignId) {
+      window.open(this.getClassicUrlLineActivity(campaignId), '_blank')
     },
 
     onOpenUserInClassicClicked (userId) {
