@@ -720,7 +720,11 @@ export default {
     },
 
     filters: {
-      get () {
+      get (tags = false) {
+        if (!tags) {
+          // Call a different endpoint to get filters without tags as options
+          return window.axios.get(`${suffixV2}contacts/filters?exclude_tags=true`)
+        }
         return window.axios.get(`${suffixV2}contacts/filters`)
       }
     },
