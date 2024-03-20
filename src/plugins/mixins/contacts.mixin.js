@@ -123,12 +123,17 @@ export default {
       this.isLoaded = false
       this.sorts = sorts
 
-      this.fetch({
+      const params = {
         search: this.search,
-        page: 1,
-        sort: sorts.orderBy,
-        order: sorts.order
-      }, true, true)
+        page: 1
+      }
+
+      if (sorts.order) {
+        params.sort = sorts.orderBy
+        params.order = sorts.order
+      }
+
+      this.fetch(params, true, true)
 
       document.getElementsByClassName('scrollableArea')[0].scrollTop = 0
     },
@@ -589,7 +594,7 @@ export default {
         delete query.filter_groups
       }
 
-      if (params?.sort) {
+      if (params?.order) {
         query.sort = this.getSortByColumn(params.sort)
         query.order = params.order ? params.order : 'asc'
         powerQuery.sort_by = this.getSortByColumn(params.sort)
