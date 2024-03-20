@@ -130,6 +130,15 @@ export default {
           this.activityType = this.computedCommunicationActivityType
         }
       }
+    },
+
+    'computedCommunicationActivityType': {
+      handler (newVal) {
+        if (this.communication) {
+          this.activityType = this.computedCommunicationActivityType
+        }
+      },
+      deep: true
     }
   }
 }
