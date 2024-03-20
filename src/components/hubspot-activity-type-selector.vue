@@ -19,6 +19,7 @@
                  :show-no-results="true"
                  :class="selectClass"
                  v-model="activityType"
+                 v-if="activityTypes"
                  @open="onSelectOpen"
                  @close="onSelectClose"
                  @input="changeActivityType">
@@ -70,14 +71,22 @@ export default {
   },
 
   computed: {
-    ...mapState({
-      activityTypes: state => state.activityTypes
-    })
+    ...mapState(['activityTypes']),
+
+    computedCommunicationActivityType () {
+      if (this.communication && this.activityTypes) {
+        const found = this.activityTypes.find(activityType => activityType === this.communication.metadata?.activity_type)
+
+        return found
+      }
+
+      return null
+    }
   },
 
   mounted () {
     if (this.communication) {
-      this.activityType = this.communication.metadata?.activity_type
+      this.activityType = this.computedCommunicationActivityType
     }
   },
 
@@ -112,7 +121,27 @@ export default {
         this.$handleErrors(err.response)
       })
     }
+  },
+
+  watch: {
+    activityTypes: {
+      handler (newVal) {
+        if (this.communication) {
+          this.activityType = this.computedCommunicationActivityType
+        }
+      }
+    },
+
+    'computedCommunicationActivityType.metadata.activity_type': {
+      handler (newVal) {
+        if (this.communication) {
+          this.activityType = this.computedCommunicationActivityType
+        }
+      },
+      deep: true
+    }
   }
 }
 </script>
+
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
