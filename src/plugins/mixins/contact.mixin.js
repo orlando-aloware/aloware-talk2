@@ -377,19 +377,18 @@ export default {
     },
 
     processContactUpdate (contact, communication = null, deleteCommsAndAudits = false) {
-      const updatedContact = this.$jsonClone(this.contacts.find(item => parseInt(item.id) === parseInt(contact.id)))
       const contactEvent = this.$jsonClone(contact)
       let newCommunication = null
-
       if (communication) {
         newCommunication = this.$jsonClone(communication)
       }
 
-      // add the v2 contact attributes that we need
-      Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
-
       // check if communication's contact is the same as the current contact
       if (parseInt(contact.id) === parseInt(this.contact.id)) {
+        const updatedContact = this.$jsonClone(this.contact)
+        // add the v2 contact attributes that we need
+        Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
+
         if (deleteCommsAndAudits) {
           delete contact.communications_and_audits
         }
