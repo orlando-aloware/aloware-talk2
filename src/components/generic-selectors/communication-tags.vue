@@ -141,7 +141,6 @@ export default {
     },
 
     currentTags () {
-      console.log('currentTags this.communication?.tags', this.communication?.tags)
       return this.communication?.tags ?? []
     }
   },
@@ -164,7 +163,6 @@ export default {
     ...mapActions(['setTagsFullyLoaded']),
 
     saveTags (tags) {
-      console.log('onSelectOption saveTags tags', tags)
       if (!this.hasPermissionTo('tag communication')) {
         return
       }

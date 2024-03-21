@@ -258,13 +258,11 @@ export default {
     },
 
     onSelectOption (id) {
-      console.log('onSelectOption', id)
       if (this.isSelected(id)) {
         this.remove(id)
         return
       }
       this.selectedValues.push(id)
-      console.log('onSelectOption this.selectedValues', this.selectedValues)
       this.$emit('valuesUpdated', this.selectedValues)
       this.$nextTick(() => {
         if (typeof this.$refs.search !== 'undefined') {
@@ -335,7 +333,6 @@ export default {
     values: {
       deep: true,
       handler () {
-        console.log('watch this.selectedValues', this.selectedValues)
         this.selectedValues = this.values
       }
     },
