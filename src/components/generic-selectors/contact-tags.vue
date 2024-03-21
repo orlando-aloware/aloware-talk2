@@ -8,6 +8,7 @@
                       :current="currentTags"
                       :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                       :optionsIsGrouped="true"
+                      :category="category"
                       @valuesUpdated="saveTags">
     </tag-multi-select>
   </b-card>

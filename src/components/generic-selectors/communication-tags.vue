@@ -7,6 +7,7 @@
                       :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                       :optionsIsGrouped="true"
                       :height="height"
+                      :category="category"
                       @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14"
@@ -137,6 +138,11 @@ export default {
         })
       }
       return tags
+    },
+
+    currentTags () {
+      console.log('currentTags this.communication?.tags', this.communication?.tags)
+      return this.communication?.tags ?? []
     }
   },
 
@@ -158,6 +164,7 @@ export default {
     ...mapActions(['setTagsFullyLoaded']),
 
     saveTags (tags) {
+      console.log('onSelectOption saveTags tags', tags)
       if (!this.hasPermissionTo('tag communication')) {
         return
       }
@@ -177,10 +184,6 @@ export default {
           this.communication.tag_ids = this.communication.tags.map((o) => o.id)
         }
       })
-    },
-
-    currentTags () {
-      return this.communication?.tags ?? []
     }
   },
   watch: {
