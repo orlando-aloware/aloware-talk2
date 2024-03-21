@@ -385,7 +385,7 @@ export default {
 
       // check if communication's contact is the same as the current contact
       if (parseInt(contact.id) === parseInt(this.contact.id)) {
-        const updatedContact = this.$jsonClone(this.contact.id)
+        const updatedContact = this.$jsonClone(this.contact)
         // add the v2 contact attributes that we need
         Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
 
