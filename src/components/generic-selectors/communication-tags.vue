@@ -7,6 +7,7 @@
                       :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                       :optionsIsGrouped="true"
                       :height="height"
+                      :category="category"
                       @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14"
@@ -137,6 +138,10 @@ export default {
         })
       }
       return tags
+    },
+
+    currentTags () {
+      return this.communication?.tags ?? []
     }
   },
 
@@ -177,10 +182,6 @@ export default {
           this.communication.tag_ids = this.communication.tags.map((o) => o.id)
         }
       })
-    },
-
-    currentTags () {
-      return this.communication?.tags ?? []
     }
   },
   watch: {

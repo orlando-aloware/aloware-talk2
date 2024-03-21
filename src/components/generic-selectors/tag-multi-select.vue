@@ -149,7 +149,7 @@ import CheckOIcon from 'components/icons/check-o-icon'
 import * as TagTypes from 'src/constants/tag-types'
 
 export default {
-  name: 'generic-multi-select',
+  name: 'tag-multi-select',
   components: { CheckOIcon, PencilOIcon, RemoveTagIcon },
   props: {
     label: {
@@ -203,6 +203,11 @@ export default {
       type: Number,
       default: 3,
       required: false
+    },
+
+    category: {
+      required: true,
+      type: Number
     }
   },
 
@@ -311,8 +316,9 @@ export default {
 
       this.$axios.get('/api/v1/tag', { params }).then(res => {
         const list = res.data
-        const accountTags = list.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
-        const importTags = list.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
+        const tags = list.filter(tag => tag.category === this.category)
+        const accountTags = tags.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
+        const importTags = tags.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
 
         this.searchList[0].children = accountTags
         this.searchList[1].children = importTags
