@@ -210,8 +210,8 @@ export default {
       this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    filterFn (val, update) {
-      this.getTags(val, update)
+    filterFn (val, update, abortFn) {
+      this.getTags(val, update, abortFn)
     },
 
     changeTags (event) {
@@ -226,8 +226,13 @@ export default {
       this.isEdit = true
     },
 
-    getTags (search = '', update) {
+    getTags (search = '', update, abortFn) {
       if (!this.hasPermissionTo('list tag')) {
+        return
+      }
+
+      if (search.length < 3) {
+        abortFn()
         return
       }
 
@@ -265,6 +270,8 @@ export default {
       this.tagsOptions = this.tags
       this.preliminarOptions = this.tags
     }
+
+    this.getTags('')
   },
 
   watch: {
