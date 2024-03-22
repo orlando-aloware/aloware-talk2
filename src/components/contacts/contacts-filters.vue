@@ -580,15 +580,10 @@ export default {
               .options
               // if is array search inside it, if not compare with the value
               .filter(option => Array.isArray(index)
-                ? index.includes(filterFound.key === 'tags' ? option.id : option.value)
-                : index === (filterFound.key === 'tags' ? option.id : option.value))
+                ? index.includes(option.value)
+                : index === option.value)
               .forEach(option => {
-                if (filterFound.key === 'tags' && !labels.includes(option.name)) {
-                  labels.push(option.name)
-                }
-                if (filterFound.key !== 'tags') {
-                  labels.push(option.label)
-                }
+                labels.push(option.label)
               })
           }
         } else if (isBoolean) {
