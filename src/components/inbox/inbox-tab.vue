@@ -1321,6 +1321,7 @@ export default {
       // prevent reset of filters if coming from the root
       if (this.$route.name !== 'Inbox View' && !this.$route.params.id) {
         this.resetList()
+        return
       }
 
       if (!this.isSearch && ['Inbox View'].includes(this.previousRoute.name)) {
