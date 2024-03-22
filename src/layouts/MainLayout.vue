@@ -1479,10 +1479,8 @@ export default {
         this.getRingGroups()
         this.getBroadcasts()
         this.getTemplates()
-
         this.getCampaigns()
         this.getWorkflows()
-
         this.getDispositionStatuses()
         this.getCallDispositions()
         this.getLeadSources()
