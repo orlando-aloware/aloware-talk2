@@ -3,6 +3,7 @@
                     expand-icon-toggle
                     label="My Lists"
                     icon="perm_identity"
+                    data-testid="contacts-expansion-item-my-lists"
                     :class="`contact-sidebar-list-wrapper my-lists ${isContactModuleType ? '' : 'hide-toggle'}`">
     <template v-slot:header>
       <q-item-section>
@@ -13,12 +14,14 @@
             <button class="btn btn-link btn-sm tooltip-target mr-1"
                     :id="folderId"
                     :ref="folderId"
+                    data-testid="contacts-folder-destroy-submenu-btn"
                     @click="destroySubmenu">
               <plus-icon color="#256EFF"
                           width="14"
                           height="14"
                           firstD="M7 1.5V12.5"
                           secondD="M12.5 7H1.5"
+                          data-testid="contacts-folder-plus-icon"
                           strokeWidth="1.5" />
             </button>
 
@@ -29,7 +32,7 @@
                         :target="folderId">
               <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
-                <contact-menu-item @click="onCreateFolderToggle($event)">
+                <contact-menu-item @click="onCreateFolderToggle($event)" data-testid="contacts-folder-icon">
                   <template slot="icon">
                     <folder-icon color="#62666E"></folder-icon>
                   </template>
@@ -39,6 +42,7 @@
                 </contact-menu-item>
 
                 <contact-menu-item v-if="isContactModuleType"
+                                    data-testid="contacts-list-icon"
                                     @click="onCreateList($event)">
                   <template slot="icon">
                     <people-icon></people-icon>
