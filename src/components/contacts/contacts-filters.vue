@@ -386,6 +386,11 @@ export default {
     },
 
     selectFilter (filter) {
+      if (filter.key === 'tags') {
+        // Suponiendo que this.filter.options es el array en el que quieres eliminar duplicados
+        let optionsSet = new Set(filter.options.map(JSON.stringify)) // Convertir cada elemento a JSON para garantizar la comparación correcta
+        filter.options = Array.from(optionsSet).map(JSON.parse) // Convertir los elementos de nuevo a sus tipos originales
+      }
       this.selectedFilter = filter
       this.filterSearch = ''
       this.step = 3
@@ -578,7 +583,7 @@ export default {
                 ? index.includes(filterFound.key === 'tags' ? option.id : option.value)
                 : index === (filterFound.key === 'tags' ? option.id : option.value))
               .forEach(option => {
-                if (filterFound.key === 'tags' && !labels.includes(option.label)) {
+                if (filterFound.key === 'tags' && !labels.includes(option.name)) {
                   labels.push(option.name)
                 }
                 if (filterFound.key !== 'tags') {

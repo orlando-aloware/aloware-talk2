@@ -392,8 +392,11 @@ export default {
 
   mounted () {
     if (this.filter.key === 'tags') {
-      let tempSet = new Set([...this.appliedTags, ...this.filter.options])
-      this.appliedTags = Array.from(tempSet)
+      // Suponiendo que this.filter.options es el array en el que quieres eliminar duplicados
+      let optionsSet = new Set(this.filter.options.map(JSON.stringify)) // Convertir cada elemento a JSON para garantizar la comparación correcta
+      this.filter.options = Array.from(optionsSet).map(JSON.parse) // Convertir los elementos de nuevo a sus tipos originales
+      let appiedTagsSet = new Set([...this.appliedTags, ...this.filter.options])
+      this.appliedTags = Array.from(appiedTagsSet)
     }
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
@@ -653,11 +656,12 @@ export default {
             // Create a temporary set to handle unique items
             let tempSet = new Set([...this.appliedTags, ...selectedOptions])
             // Convert the temporary set back to an array
-            this.appliedTags = Array.from(tempSet)
-            this.filter.options = this.appliedTags
+            // this.appliedTags = Array.from(tempSet)
+            this.filter.options = Array.from(tempSet)
           }
           this.processFilters()
           this.appliedFiltersInProgress = false
+          this.appliedTags = []
           clearInterval(applyFilterInterval)
         }
       }, debounceDelay)
@@ -815,17 +819,13 @@ export default {
       this.filterOperatorValue = 1
     },
 
-    filterTagFn (val, update) {
-      if (val) {
-        this.getTags(val, update)
-      }
+    filterTagFn (val, update, abortFn) {
+      this.getTags(val, update, abortFn)
     },
 
-    getTags (search = '', update) {
-      if (!search) {
-        update(() => {
-          this.options = this.tagsArray
-        })
+    getTags (search = '', update, abortFn) {
+      if (search.length < 3) {
+        abortFn()
         return
       }
 
