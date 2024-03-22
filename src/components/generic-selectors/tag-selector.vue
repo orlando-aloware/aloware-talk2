@@ -200,11 +200,11 @@ export default {
   data () {
     return {
       isEdit: false,
-      tagsArray: [],
       tagsOptions: [],
       selectedTags: this.value,
       selectWidth: 0,
-      preliminarOptions: []
+      preliminarOptions: [],
+      defaultOptions: []
     }
   },
 
@@ -213,12 +213,8 @@ export default {
       this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    filterFn (val, updateFn, abortFn) {
-      this.getTags(val, false, updateFn, abortFn)
-    },
-
-    changeTags (event) {
-      this.tagsArray = event
+    filterFn (val, updateFn) {
+      this.getTags(val, false, updateFn)
     },
 
     onSelectClose () {
@@ -229,13 +225,15 @@ export default {
       this.isEdit = true
     },
 
-    getTags (search = '', force, updateFn, abortFn) {
+    getTags (search = '', force, updateFn) {
       if (!this.hasPermissionTo('list tag')) {
+        updateFn()
         return
       }
 
       if (search.length < 3 && !force) {
-        abortFn()
+        this.tagsOptions = this.defaultOptions
+        updateFn()
         return
       }
 
@@ -249,12 +247,16 @@ export default {
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
-          this.tagsArray = res.data.data
+          if (force) {
+            this.defaultOptions = res.data.data
+          }
+
           this.tagsOptions = res.data.data
           this.selectedTags = this.value
           updateFn()
         }).catch(err => {
           console.log(err)
+          updateFn()
         })
       }
     }
@@ -266,7 +268,7 @@ export default {
       this.preliminarOptions = this.tags
     }
 
-    this.getTags('', true, () => {}, () => {})
+    this.getTags('', true, () => {})
   },
 
   watch: {
