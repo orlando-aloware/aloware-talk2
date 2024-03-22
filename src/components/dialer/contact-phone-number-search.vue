@@ -108,6 +108,14 @@ export default {
       }).catch(err => {
         console.log(err)
         this.$handleErrors(err.response)
+      }).finally(() => {
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
       })
     },
 
@@ -137,7 +145,7 @@ export default {
       if (this.selectedPhoneNumber && this.selectedPhoneNumber !== newVal) {
         this.changePhoneNumber({
           phone_number: this.query,
-          contactName: '',
+          contactName: null,
           company_name: null,
           contact_id: null,
           timezone: null
