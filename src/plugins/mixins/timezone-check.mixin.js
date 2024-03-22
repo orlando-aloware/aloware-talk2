@@ -23,7 +23,7 @@ export default {
 
         if (!contactLocalTime.isBetween(startDay, endDay)) {
           return this.$bvModal.msgBoxConfirm(
-            `This is outside the lead's day time. Do you want to make a call? It's ${contactLocalTime.format(
+            `This is outside the contact's day time. Do you want to make a call? It's ${contactLocalTime.format(
               'hh:mm A'
             )} for ${name}.`,
             {
