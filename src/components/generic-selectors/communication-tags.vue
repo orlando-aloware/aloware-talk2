@@ -1,12 +1,14 @@
 <template>
   <div class="w-100 tags-wrapper"
        v-if="hasPermissionTo('tag communication')">
-    <generic-multi-select :values="communication.tag_ids"
-                          :options="combinedTags"
-                          :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          :optionsIsGrouped="true"
-                          :height="height"
-                          @valuesUpdated="saveTags">
+    <tag-multi-select :values="communication.tag_ids"
+                      :options="combinedTags"
+                      :current="currentTags"
+                      :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                      :optionsIsGrouped="true"
+                      :height="height"
+                      :category="category"
+                      @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14"
                          width="14"
@@ -15,14 +17,14 @@
           {{ buttonText }}
         </span>
       </template>
-    </generic-multi-select>
+    </tag-multi-select>
   </div>
 </template>
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
-import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
+import TagMultiSelect from 'components/generic-selectors/tag-multi-select'
 import {
   TAG_CATEGORIES as TagCategories,
   TAG_CATEGORIES_VALUES as TagCategoriesValues
@@ -38,7 +40,7 @@ export default {
 
   components: {
     AddIconCircle,
-    GenericMultiSelect
+    TagMultiSelect
   },
 
   props: {
@@ -136,6 +138,10 @@ export default {
         })
       }
       return tags
+    },
+
+    currentTags () {
+      return this.communication?.tags ?? []
     }
   },
 
@@ -151,37 +157,10 @@ export default {
     if (this.tags) {
       this.options = this.tags
     }
-
-    if (!this.tags) {
-      this.getTags()
-    }
   },
 
   methods: {
-    getTags () {
-      if (!this.hasPermissionTo('list tag')) {
-        return
-      }
-
-      if (this.tagsFullyLoaded) {
-        this.options = this.tags
-        return
-      }
-
-      this.loadingTags = true
-      const params = {
-        full_load: true
-      }
-
-      return this.$axios.get('/api/v1/tag', { params }).then(res => {
-        this.options = res.data
-        this.loadingTags = false
-        this.setTagsFullyLoaded(true)
-      }).catch(err => {
-        console.log(err)
-        this.loadingTags = false
-      })
-    },
+    ...mapActions(['setTagsFullyLoaded']),
 
     saveTags (tags) {
       if (!this.hasPermissionTo('tag communication')) {
@@ -203,8 +182,7 @@ export default {
           this.communication.tag_ids = this.communication.tags.map((o) => o.id)
         }
       })
-    },
-    ...mapActions(['setTagsFullyLoaded'])
+    }
   },
   watch: {
     tags: {

@@ -1,21 +1,23 @@
 <template>
   <b-card class="border-0 tags-wrapper"
           v-if="hasPermissionTo('tag contact')">
-    <generic-multi-select label="Tags"
-                          button-text="Modify Tags"
-                          :values="tagIds"
-                          :options="combinedTags"
-                          :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                          :optionsIsGrouped="true"
-                          @valuesUpdated="saveTags">
-    </generic-multi-select>
+    <tag-multi-select label="Tags"
+                      button-text="Modify Tags"
+                      :values="tagIds"
+                      :options="combinedTags"
+                      :current="currentTags"
+                      :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                      :optionsIsGrouped="true"
+                      :category="category"
+                      @valuesUpdated="saveTags">
+    </tag-multi-select>
   </b-card>
 </template>
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
-import GenericMultiSelect from 'src/components/generic-selectors/generic-multi-select'
+import TagMultiSelect from 'src/components/generic-selectors/tag-multi-select'
 import {
   TAG_CATEGORIES as TagCategories,
   TAG_CATEGORIES_VALUES as TagCategoriesValues
@@ -29,7 +31,7 @@ export default {
   mixins: [aclMixin],
 
   components: {
-    GenericMultiSelect
+    TagMultiSelect
   },
 
   props: {
@@ -121,6 +123,10 @@ export default {
       return tags
     },
 
+    currentTags () {
+      return this.contact?.tags ?? []
+    },
+
     tagIds () {
       if (this.contact?.tag_ids) {
         return this.contact.tag_ids
@@ -138,38 +144,9 @@ export default {
     if (this.tags) {
       this.options = this.tags
     }
-
-    if (!this.tags) {
-      this.getTags()
-    }
   },
 
   methods: {
-    getTags () {
-      if (!this.hasPermissionTo('list tag')) {
-        return
-      }
-
-      if (this.tagsFullyLoaded) {
-        this.options = this.tags
-        return
-      }
-
-      this.loadingTags = true
-      const params = {
-        full_load: true
-      }
-
-      return this.$axios.get('/api/v1/tag', { params }).then(res => {
-        this.options = res.data
-        this.loadingTags = false
-        this.setTagsFullyLoaded(true)
-      }).catch(err => {
-        console.log(err)
-        this.loadingTags = false
-      })
-    },
-
     saveTags (tags) {
       if (!this.hasPermissionTo('tag contact')) {
         return
