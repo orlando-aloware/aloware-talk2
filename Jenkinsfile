@@ -62,7 +62,7 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
-                sh 'npm i -g yarn'
+                sh 'sudo npm i -g yarn'
                 sh 'yarn install'
             }
         }
