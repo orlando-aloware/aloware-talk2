@@ -387,7 +387,7 @@ export default {
 
     selectFilter (filter) {
       if (filter.key === 'tags') {
-        // // Prevent duplicated options
+        // Prevent duplicated options
         let optionsSet = new Set(filter.options.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
         filter.options = Array.from(optionsSet).map(JSON.parse) // Convert elements back to their original types
       }
