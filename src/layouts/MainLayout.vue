@@ -1437,7 +1437,6 @@ export default {
       let fetchingStatics = false
       this.loading = true
       this.setCampaignsIsLoading(true)
-      this.setTagsFullyLoaded(true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -2506,7 +2505,6 @@ export default {
       'setDialerIsMuted',
       'setDialerParkedCall',
       'setFilters',
-      'setTagsFullyLoaded',
       'setNotifications',
       'resetNotifications',
       'setTags',
