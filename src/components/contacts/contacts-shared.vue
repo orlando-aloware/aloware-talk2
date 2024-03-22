@@ -3,16 +3,17 @@
     <div class="d-flex pinned__content flex-column">
       <div v-if="!lists.length && !isLoading"
            class="item-empty">
-        <span class="fs-12 text-muted">
+        <span class="fs-12 text-muted" data-testid="contact-shared-no-public-list-available">
           No public list available
         </span>
       </div>
       <contacts-shared-item v-else
                             v-for="item in lists"
+                            data-testid="contacts-shared-item"
                             :item="item"
                             :key="item.id">
       </contacts-shared-item>
-      <contacts-sidebar-loader v-if="isLoading"></contacts-sidebar-loader>
+      <contacts-sidebar-loader v-if="isLoading" data-testid="contacts-sidebar-loader"></contacts-sidebar-loader>
 
       <div class="paginated q-pa-lg flex flex-center"
            style="min-height: 56px;"
@@ -24,6 +25,7 @@
                       :ellipses="false"
                       :boundary-numbers="false"
                       :max="lastPage"
+                      data-testid="contacts-shared-pagination"
                       v-model="paginationPage">
         </q-pagination>
 
