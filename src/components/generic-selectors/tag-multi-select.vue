@@ -24,7 +24,9 @@
                 </q-badge>
               </div>
               <div class="tag-text"
-                   :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</div>
+                   :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">
+                {{ item.name }}
+              </div>
               <div role="button" class="custom__remove d-flex align-items-center"
                    @click="remove(item.id)">
                 <remove-tag-icon class="ml-1 remove-tag-icon"/>
@@ -150,7 +152,11 @@ import * as TagTypes from 'src/constants/tag-types'
 
 export default {
   name: 'tag-multi-select',
-  components: { CheckOIcon, PencilOIcon, RemoveTagIcon },
+  components: {
+    CheckOIcon,
+    PencilOIcon,
+    RemoveTagIcon
+  },
   props: {
     label: {
       required: false,
