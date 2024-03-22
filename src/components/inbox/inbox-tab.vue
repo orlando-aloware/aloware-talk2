@@ -426,7 +426,6 @@ export default {
       'setAppliedFilter',
       'setChannelClonedFilter',
       'setLoadingPendingTaskCount',
-      'setLoadingPendingTaskCount',
       'setOpenTaskCount',
       'setPendingTaskCount',
       'updateChannelChangedFilterFields',
@@ -1322,11 +1321,9 @@ export default {
       // prevent reset of filters if coming from the root
       if (this.$route.name !== 'Inbox View' && !this.$route.params.id) {
         this.resetList()
-
-        return
       }
 
-      if ((!this.isSearch && ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.previousRoute.name)) || this.$route.params.id) {
+      if (!this.isSearch && ['Inbox View'].includes(this.previousRoute.name)) {
         this.loadContactTasks()
       }
     },
