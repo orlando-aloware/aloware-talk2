@@ -86,7 +86,10 @@ export default {
 
   mixins: [aclMixin],
 
-  components: { RemoveTagIcon, GenericMultiSelect },
+  components: {
+    RemoveTagIcon,
+    GenericMultiSelect
+  },
 
   props: {
 
@@ -210,8 +213,8 @@ export default {
       this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    filterFn (val, update, abortFn) {
-      this.getTags(val, update, abortFn)
+    filterFn (val, updateFn, abortFn) {
+      this.getTags(val, updateFn, abortFn)
     },
 
     changeTags (event) {
@@ -226,7 +229,7 @@ export default {
       this.isEdit = true
     },
 
-    getTags (search = '', update, abortFn) {
+    getTags (search = '', updateFn, abortFn) {
       if (!this.hasPermissionTo('list tag')) {
         return
       }
@@ -237,7 +240,7 @@ export default {
       }
 
       if (!search) {
-        update(() => {
+        updateFn(() => {
           this.tagsOptions = this.tagsArray
         })
         return
@@ -253,7 +256,7 @@ export default {
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
-          update(() => {
+          updateFn(() => {
             this.tagsArray = res.data.data
             this.tagsOptions = res.data.data
             this.selectedTags = this.value
@@ -271,7 +274,7 @@ export default {
       this.preliminarOptions = this.tags
     }
 
-    this.getTags('')
+    this.getTags('', () => {}, () => {})
   },
 
   watch: {
