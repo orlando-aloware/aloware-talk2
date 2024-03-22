@@ -249,11 +249,10 @@ export default {
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
-          updateFn(() => {
-            this.tagsArray = res.data.data
-            this.tagsOptions = res.data.data
-            this.selectedTags = this.value
-          })
+          this.tagsArray = res.data.data
+          this.tagsOptions = res.data.data
+          this.selectedTags = this.value
+          updateFn()
         }).catch(err => {
           console.log(err)
         })
