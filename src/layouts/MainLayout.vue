@@ -1647,7 +1647,7 @@ export default {
       return this.$axios
         .get('/api/v1/tag', { params: { per_page: 50 } })
         .then((res) => {
-          this.setTags(res.data)
+          this.setTags(res.data.data)
           this.$VueEvent.fire('tags_loaded')
           this.loadingTags = false
 
