@@ -137,8 +137,7 @@ export default {
           children: importTags
         })
       }
-
-      return ((tags && tags[0] && tags[0].children.length) || (tags && tags[1] && tags[1].children.length)) ? tags : this.tags
+      return tags
     },
 
     currentTags () {
