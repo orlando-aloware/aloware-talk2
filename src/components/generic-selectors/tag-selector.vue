@@ -214,7 +214,7 @@ export default {
     },
 
     filterFn (val, updateFn, abortFn) {
-      this.getTags(val, updateFn, abortFn)
+      this.getTags(val, false, updateFn, abortFn)
     },
 
     changeTags (event) {
@@ -229,24 +229,17 @@ export default {
       this.isEdit = true
     },
 
-    getTags (search = '', updateFn, abortFn) {
+    getTags (search = '', force, updateFn, abortFn) {
       if (!this.hasPermissionTo('list tag')) {
         return
       }
 
-      if (search.length < 3) {
+      if (search.length < 3 && !force) {
         abortFn()
         return
       }
 
-      if (!search) {
-        updateFn(() => {
-          this.tagsOptions = this.tagsArray
-        })
-        return
-      }
-
-      if (search.length >= this.threshold) {
+      if (search.length >= this.threshold || force) {
         const params = {
           page: 1,
           per_page: 50,
@@ -274,7 +267,7 @@ export default {
       this.preliminarOptions = this.tags
     }
 
-    this.getTags('', () => {}, () => {})
+    this.getTags('', true, () => {}, () => {})
   },
 
   watch: {
