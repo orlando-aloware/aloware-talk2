@@ -149,7 +149,6 @@ export default {
       'contactDetailsDrawer',
       'campaignsIsLoading',
       'usersIsLoading',
-      'tagsFullyLoaded',
       'campaigns',
       'users',
       'tags'

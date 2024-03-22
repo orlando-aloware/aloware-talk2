@@ -86,7 +86,10 @@ export default {
 
   mixins: [aclMixin],
 
-  components: { RemoveTagIcon, GenericMultiSelect },
+  components: {
+    RemoveTagIcon,
+    GenericMultiSelect
+  },
 
   props: {
 
@@ -197,11 +200,11 @@ export default {
   data () {
     return {
       isEdit: false,
-      tagsArray: [],
       tagsOptions: [],
       selectedTags: this.value,
       selectWidth: 0,
-      preliminarOptions: []
+      preliminarOptions: [],
+      defaultOptions: []
     }
   },
 
@@ -210,12 +213,8 @@ export default {
       this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    filterFn (val, update) {
-      this.getTags(val, update)
-    },
-
-    changeTags (event) {
-      this.tagsArray = event
+    filterFn (val, updateFn) {
+      this.getTags(val, false, updateFn)
     },
 
     onSelectClose () {
@@ -226,19 +225,19 @@ export default {
       this.isEdit = true
     },
 
-    getTags (search = '', update) {
+    getTags (search = '', force, updateFn) {
       if (!this.hasPermissionTo('list tag')) {
+        updateFn()
         return
       }
 
-      if (!search) {
-        update(() => {
-          this.tagsOptions = this.tagsArray
-        })
+      if (search.length < 3 && !force) {
+        this.tagsOptions = this.defaultOptions
+        updateFn()
         return
       }
 
-      if (search.length >= this.threshold) {
+      if (search.length >= this.threshold || force) {
         const params = {
           page: 1,
           per_page: 50,
@@ -248,13 +247,16 @@ export default {
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
-          update(() => {
-            this.tagsArray = res.data.data
-            this.tagsOptions = res.data.data
-            this.selectedTags = this.value
-          })
+          if (force) {
+            this.defaultOptions = res.data.data
+          }
+
+          this.tagsOptions = res.data.data
+          this.selectedTags = this.value
+          updateFn()
         }).catch(err => {
           console.log(err)
+          updateFn()
         })
       }
     }
@@ -265,6 +267,8 @@ export default {
       this.tagsOptions = this.tags
       this.preliminarOptions = this.tags
     }
+
+    this.getTags('', true, () => {})
   },
 
   watch: {
