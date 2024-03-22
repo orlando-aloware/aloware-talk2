@@ -62,7 +62,8 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
-                sh 'npm install --no-audit'
+                sh 'npm i -g yarn'
+                sh 'yarn install'
             }
         }
 
