@@ -1482,7 +1482,7 @@ export default {
         this.getTemplates()
 
         this.getCampaigns()
-        // this.getFullTags()
+        this.getFullTags()
         // this.getTags()
         this.getWorkflows()
 
@@ -1645,7 +1645,7 @@ export default {
       this.loadingTags = true
 
       return this.$axios
-        .get('/api/v1/tag', { params: { full_load: true } })
+        .get('/api/v1/tag', { params: { per_page: 50 } })
         .then((res) => {
           this.setTags(res.data)
           this.$VueEvent.fire('tags_loaded')
