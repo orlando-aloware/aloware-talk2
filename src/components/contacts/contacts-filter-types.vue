@@ -392,9 +392,9 @@ export default {
 
   mounted () {
     if (this.filter.key === 'tags') {
-      // Suponiendo que this.filter.options es el array en el que quieres eliminar duplicados
-      let optionsSet = new Set(this.filter.options.map(JSON.stringify)) // Convertir cada elemento a JSON para garantizar la comparación correcta
-      this.filter.options = Array.from(optionsSet).map(JSON.parse) // Convertir los elementos de nuevo a sus tipos originales
+      // Prevent duplicated options
+      let optionsSet = new Set(this.filter.options.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+      this.filter.options = Array.from(optionsSet).map(JSON.parse) // Convert elements back to their original types
       let appiedTagsSet = new Set([...this.appliedTags, ...this.filter.options])
       this.appliedTags = Array.from(appiedTagsSet)
     }
@@ -656,7 +656,6 @@ export default {
             // Create a temporary set to handle unique items
             let tempSet = new Set([...this.appliedTags, ...selectedOptions])
             // Convert the temporary set back to an array
-            // this.appliedTags = Array.from(tempSet)
             this.filter.options = Array.from(tempSet)
           }
           this.processFilters()
