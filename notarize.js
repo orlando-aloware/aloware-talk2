@@ -19,6 +19,8 @@ exports.default = async function notarizing (context) {
     appleApiIssuer: process.env.API_KEY_ISSUER_ID // Issuer ID
   }
 
+  console.log('Params:', notarizeParams)
+
   await notarize(notarizeParams)
 
   console.log(`Notarized com.aloware.talk2`)
