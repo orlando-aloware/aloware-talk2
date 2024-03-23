@@ -44,6 +44,7 @@
     "countup.js": "^2.6.2",
     "dhtmlx-scheduler": "^6.0.2",
     "dotenv": "^16.0.3",
+    "fs-extra": "^11.2.0",
     "giphy-js-sdk-core": "^1.0.6",
     "google-libphonenumber": "^3.2.32",
     "highcharts": "^9.3.3",
