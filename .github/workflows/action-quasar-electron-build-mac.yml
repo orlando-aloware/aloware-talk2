@@ -182,6 +182,11 @@ jobs:
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
 
+      ## Read notarization-error.log file regardless of failure of the previous step
+      - name: Read notarization-error.log
+        if: always()
+        run: cat notarization-error.log
+
       - name: Extract Metadata from package.json
         id: pkg
         run: |
