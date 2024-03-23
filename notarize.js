@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require('dotenv').config()
 const { notarize } = require('@electron/notarize')
 
@@ -12,8 +14,9 @@ exports.default = async function notarizing (context) {
   await notarize({
     appBundleId: 'com.aloware.talk2',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: process.env.MACOS_APPLE_ID,
-    appleIdPassword: process.env.MACOS_APPLE_ID_PASSWORD,
-    teamId: process.env.MACOS_APPLE_ID_TEAM_ID
+    appleApiKey: process.env.API_KEY, // Path to the .p8 API key file
+    appleApiIssuer: process.env.API_KEY_ISSUER_ID // Issuer ID
   })
+
+  console.log(`Notarized ${appName}`)
 }

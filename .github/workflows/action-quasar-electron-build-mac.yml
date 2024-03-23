@@ -89,9 +89,6 @@ jobs:
           ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
           ENV_API_KEY_ID: ${{ secrets.api_key_id }}
           ENV_API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-          ENV_MACOS_APPLE_ID: ${{ secrets.macos_apple_id }}
-          ENV_MACOS_APPLE_ID_PASSWORD: ${{ secrets.macos_apple_id_password }}
-          ENV_MACOS_APPLE_ID_TEAM_ID: ${{ secrets.macos_apple_id_team_id }}
           ENV_AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           ENV_AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           ENV_AWS_BUCKET: ${{ secrets.aws_bucket }}
@@ -111,7 +108,7 @@ jobs:
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
           ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           file-name: .env.prod
-
+      
       - name: Build/release Electron mac app
         run: quasar build -d -m electron -T mac -b builder -P always
         env:
@@ -145,11 +142,10 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+          API_KEY: ${{ secrets.api_key }}
 
-          # macOS notarization account
-          MACOS_APPLE_ID: ${{ secrets.macos_apple_id }}
-          MACOS_APPLE_ID_PASSWORD: ${{ secrets.macos_apple_id_password }}
-          MACOS_APPLE_ID_TEAM_ID: ${{ secrets.macos_apple_id_team_id }}
+          # Path to the p8 file
+          P8_FILE: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
           # AWS bucket credentials
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
