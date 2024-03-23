@@ -392,11 +392,10 @@ export default {
 
   mounted () {
     if (this.filter.key === 'tags') {
-      // Prevent duplicated options
-      let optionsSet = new Set(this.filter.options.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
-      this.filter.options = Array.from(optionsSet).map(JSON.parse) // Convert elements back to their original types
-      let appiedTagsSet = new Set([...this.appliedTags, ...this.filter.options])
-      this.appliedTags = Array.from(appiedTagsSet)
+      // Prevent duplicated options when loading tags previously added
+      const optionsSet = new Set(this.filter.options)
+      this.filter.options = [...optionsSet]
+      this.appliedTags = [...new Set([...this.appliedTags, ...this.filter.options])]
     }
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
