@@ -143,9 +143,7 @@ jobs:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
           API_KEY: ${{ secrets.api_key }}
-
-          # Path to the p8 file
-          P8_FILE: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+          API_KEY_FILE: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
           # AWS bucket credentials
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
