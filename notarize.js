@@ -15,6 +15,7 @@ exports.default = async function notarizing (context) {
     appBundleId: 'com.aloware.talk2',
     appPath: `${appOutDir}/${appName}.app`,
     appleApiKey: process.env.API_KEY, // Path to the .p8 API key file
+    appleApiKeyId: process.env.API_KEY_ID, // Key ID
     appleApiIssuer: process.env.API_KEY_ISSUER_ID // Issuer ID
   })
 
