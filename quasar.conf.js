@@ -248,7 +248,7 @@ module.exports = function (/* ctx */) {
           name: 'Aloware Talk',
           schemes: ['alowaretalk', 'tel', 'callto']
         },
-        afterSign: 'electron-builder-notarize'
+        afterSign: 'notarize.js'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
