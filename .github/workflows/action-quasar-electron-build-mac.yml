@@ -108,7 +108,7 @@ jobs:
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
           ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           file-name: .env.prod
-      
+
       - name: Build/release Electron mac app
         run: quasar build -d -m electron -T mac -b builder -P always
         env:
