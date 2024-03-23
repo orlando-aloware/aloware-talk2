@@ -109,11 +109,6 @@ jobs:
           ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           file-name: .env.prod
       
-      # Read the version from the package.json file and store them in reusable variables
-      - name: Read package.json
-        id: read-package-json
-        run: echo ::set-output name=version::$(jq -r '.version' package.json)
-
       - name: Build/release Electron mac app
         run: quasar build -d -m electron -T mac -b builder -P always
         env:
@@ -149,9 +144,6 @@ jobs:
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
           API_KEY: ${{ secrets.api_key }}
           API_KEY_FILE: "~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8"
-
-          # Final file location
-          FILE_LOCATION: "./dist/electron/Packaged/${{ secrets.app_name }}-${{ steps.read-package-json.outputs.version }}.dmg"
 
           # AWS bucket credentials
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
