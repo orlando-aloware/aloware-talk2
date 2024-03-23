@@ -12,8 +12,8 @@ exports.default = async function notarizing (context) {
   await notarize({
     appBundleId: 'com.aloware.talk2',
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: 'tito@aloware.com',
-    appleIdPassword: 'bgcn-uzxa-brhq-rvqg',
-    teamId: '4UQ6G3245S'
+    appleId: process.env.MACOS_APPLE_ID,
+    appleIdPassword: process.env.MACOS_APPLE_ID_PASSWORD,
+    teamId: process.env.MACOS_APPLE_ID_TEAM_ID
   })
 }
