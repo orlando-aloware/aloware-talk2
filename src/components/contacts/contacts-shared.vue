@@ -9,7 +9,7 @@
       </div>
       <contacts-shared-item v-else
                             v-for="item in lists"
-                            data-testid="contacts-shared-item"
+                            :data-testid="'contacts-shared-'+item.name.toLowerCase().replace(/ /g, '-')"
                             :item="item"
                             :key="item.id">
       </contacts-shared-item>
