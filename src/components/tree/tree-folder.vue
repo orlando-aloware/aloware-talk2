@@ -9,18 +9,23 @@
       <div
         class="folder__indent"
         :style="indentStyle"
+        data-testid="tree-folder-indent-toggle"
         @click="onToggleFolder"
       ></div>
       <div class="folder__arrow d-flex align-items-center">
         <div v-if="lists.length > 0 || folders.length > 0"
+             data-testid="tree-folder-arrow-toggle"
              @click="onToggleFolder">
           <folder-arrow-open-icon v-if="isOpen"
+                                  data-testid="tree-folder-open-icon"
                                   color="#62666E"></folder-arrow-open-icon>
           <folder-arrow-close-icon v-else
+                                   data-testid="tree-folder-close-icon"
                                    color="#62666E"></folder-arrow-close-icon>
         </div>
       </div>
       <div class="folder__icon d-flex align-items-center"
+           data-testid="tree-folder-icon-toggle"
            @click="onToggleFolder">
         <folder-icon color="#62666E"></folder-icon>
       </div>
@@ -29,6 +34,7 @@
         <div
           v-if="!isEditing"
           class="folder__name"
+          data-testid="tree-folder-name-toggle"
           @click="onToggleFolder">
           {{ name }}
         </div>
@@ -42,6 +48,7 @@
           :id="'folder-input-' + id"
           :value="name"
           :disabled="isRenaming"
+          data-testid="tree-folder-renaming-input"
           @blur="onInputBlur"
           @keydown="onKeyDown" />
       </div>
@@ -52,6 +59,7 @@
         :data-popper-target="folderId"
         :id="folderId"
         :ref="folderId"
+        data-testid="tree-folder-option-btn"
       >
         <folder-option></folder-option>
       </button>
@@ -63,6 +71,7 @@
       :endpoint="endpoint"
       :layer="layer + 1"
       :parent_id="id"
+      data-testid="tree-folder-creating-input"
       @blur="onCloseFolder"
       @cancel="onCreateFolderCancel"
     />
@@ -78,6 +87,7 @@
         :hasDelete="hasDelete"
         :layer="layer + 1"
         :endpoint="endpoint"
+        data-testid="tree-folder-contents"
       ></tree-folder-contents>
       <tree-list-contents
         :lists="lists"
@@ -86,6 +96,7 @@
         :hasDelete="hasDelete"
         :endpoint="endpoint"
         :folder-id="id"
+        data-testid="tree-list-contents-1"
       ></tree-list-contents>
     </div>
 
@@ -98,6 +109,7 @@
       :isRootList="isRootList"
       :endpoint="endpoint"
       :folder-id="id"
+      data-testid="tree-list-contents-2"
     ></tree-list-contents>
 
     <template
@@ -107,6 +119,7 @@
         placement="bottomright"
         boundary="window"
         custom-class="contact-popover"
+        data-testid="create-edit-remove-popover"
         :target="folderId">
         <folder-actions
           :id="id"

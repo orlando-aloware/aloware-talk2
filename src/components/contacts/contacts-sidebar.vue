@@ -6,7 +6,7 @@
       expand-icon-toggle
       label="Public List"
       class="contact-sidebar-list-wrapper"
-      data-testid="contact-public-list-expansion-item"
+      data-testid="public-lists-sidebar-expansion-item"
     >
       <template v-slot:header>
         <q-item-section>
@@ -16,9 +16,10 @@
               <q-icon name="info"
                       class="material-icons-outlined ml-2 cursor-pointer"
                       color="#62666E"
-                      data-testid="contact-public-list-tooltip"
+                      data-testid="contact-public-list-icon"
                       size="14px">
                 <q-tooltip anchor="top middle"
+                           data-testid="contact-public-list-tooltip"
                            self="center middle">
                   These are the contact list your admin shares with you.
                 </q-tooltip>
@@ -27,7 +28,7 @@
           </div>
         </q-item-section>
       </template>
-      <contacts-shared class="public-lists" data-testid="contact-share-list"></contacts-shared>
+      <contacts-shared class="public-lists" data-testid="contacts-folders-shared-list"></contacts-shared>
     </q-expansion-item>
 
     <contacts-folders data-testid="contact-share-folders"></contacts-folders>
