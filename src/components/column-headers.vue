@@ -4,27 +4,30 @@
            :title="title"
            modal-class="column-headers-modal"
            scrollable
+           data-testid="column-headers-modal"
            @show="onModalShow">
     <b-overlay class="h-100"
                :show="loading"
                rounded="sm"
+               data-testid="column-headers-modal-overlay"
                variant="white">
       <div class="w-100 column-headers-modal__inner d-flex position-relative px-2 h-100">
         <div class="d-flex flex-column flex-grow-1 pr-3">
           <div class="mb-2">
             <search class="w-100"
                     placeholder="Search available columns..."
+                    data-testid="column-headers-search-input"
                     @search="onSearch">
             </search>
           </div>
           <div class="column-headers-modal__checkboxes">
             <div class="d-flex align-items-center justify-content-center p-4 border my-3"
                  v-if="!allColumns.results">
-              <div class="text-muted">No results found</div>
+              <div class="text-muted" data-testid="column-headers-no-results-found">No results found</div>
             </div>
             <div v-for="(items, index) in allColumns.items"
                  :key="index">
-              <div class="category-name">
+              <div class="category-name" data-testid="column-headers-category-name">
                 {{ categories[index] }}
               </div>
               <div class="column-headers-modal__item d-flex align-items-center no-select"
@@ -34,11 +37,13 @@
                   'column-headers-modal__item--hidden': isHidden(column)
                 }">
                 <div class="pl-2 checkbox d-flex align-items-center cursor-pointer w-100"
+                     data-testid="column-headers-checkbox-item"
                      @click="onClickedColumn(column, selectedColumns.has(column.name))">
                   <input class="cursor-pointer mt-1"
                          type="checkbox"
                          :checked="selectedColumns.has(column.name)"
                          :disabled="column.required"
+                         data-testid="column-headers-checkbox"
                          :value="column.name"/>
                   <div class="flex-grow-1 pl-2 column-headers-modal__label">
                     {{ column.label }}
@@ -49,7 +54,7 @@
           </div>
         </div>
         <div class="w-50">
-          <div class="font-weight-bold body text-uppercase column-headers-modal__selected">
+          <div class="font-weight-bold body text-uppercase column-headers-modal__selected" data-testid="selected-columns-header">
             Selected Columns ({{ currentColumns.length - 2 }})
           </div>
           <div class="d-flex flex-column draggable-columns">
@@ -58,6 +63,7 @@
                        ghost-class="ghost"
                        handle=".handle"
                        :move="onCheckMove"
+                       data-testid="column-headers-draggable"
                        @start="isDragging = true"
                        @end="isDragging = false">
               <div class="column-headers-modal__item border px-2 py-1 mb-2 d-flex align-items-center"
@@ -66,9 +72,11 @@
                   'column-headers-modal__item--hidden': isHidden(column)
                 }"
                    v-for="column in currentColumns"
+                   data-testid="column-headers-selected-columns-item"
                    :key="column.name">
                 <i class="fa fa-align-justify"
                    aria-hidden="true"
+                   data-testid="column-headers-draggable-column-icon"
                    v-if="column.draggable && !column.required">
                 </i>
 
@@ -81,6 +89,7 @@
                   {{ column.label }}
                 </div>
                 <button v-if="column.draggable && !column.required"
+                        data-testid="column-headers-remove-button"
                         @click="onClickedColumn(column, true)"
                         class="d-inline column-headers-modal__remove btn btn-sm btn-link m-0 p-0">
                   <i class="fa fa-times"></i>
@@ -97,12 +106,14 @@
           <b-button variant="success mr-2"
                     class="custom-btn"
                     :disabled="loading"
+                    data-testid="column-headers-apply-button"
                     @click="onApplyChanges">
             Apply
           </b-button>
           <b-button variant="outline-success mr-2"
                     class="custom-btn"
                     :disabled="loading"
+                    data-testid="column-headers-cancel-button"
                     @click="columnsClose">
             Cancel
           </b-button>
@@ -111,6 +122,7 @@
         <b-button variant="link"
                   size="sm"
                   :disabled="loading"
+                  data-testid="column-headers-reset-all-columns-button"
                   class="font-weight-bold text-danger text-decoration-none"
                   @click="confirmedSave = true">
           Reset all columns
@@ -120,6 +132,7 @@
           :id="resourceId"
           size="md"
           title="Reset Columns"
+          data-testid="column-headers-confirm-dialog"
           @hide="confirmedSave = false">
           <div slot="content">
             <div class="text-left">
@@ -133,12 +146,14 @@
               <div class="flex-grow-1"></div>
               <button
                 class="btn btn-sm btn-outline-dark mr-2"
+                data-testid="confirm-dialog-cancel-button"
                 @click="confirmedSave = false"
               >
                 Cancel
               </button>
               <button
                 class="btn btn-sm btn-success mr-2"
+                data-testid="confirm-dialog-confirm-button"
                 @click="onConfirmSave">
                 Yes
               </button>
