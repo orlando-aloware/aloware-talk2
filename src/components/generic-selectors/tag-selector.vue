@@ -5,6 +5,7 @@
                           :values="selectedTags"
                           :options="optionsAlphabeticalOrder"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                          data-testid="tags-selector-generic-multi-select"
                           v-if="genericMultiselect"
                           @valuesUpdated="select">
     </generic-multi-select>
@@ -21,6 +22,7 @@
               menu-shrink
               outlined
               dense
+              data-testid="tags-selector-select"
               :options="optionsAlphabeticalOrder"
               :placeholder="placeholder"
               :disable="disable"
@@ -34,7 +36,7 @@
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" data-testid="tags-selector-select-no-results">
             No results
           </q-item-section>
         </q-item>
@@ -56,6 +58,7 @@
                 :tabindex="scope.tabindex"
                 color="white"
                 class="tag-selected-chip"
+                data-testid="tags-selector-selected-chip"
                 text-color="secondary">
           <i class="fa fa-circle position-absolute"
              :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`">
@@ -63,6 +66,7 @@
           <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
           <div role="button"
                class="custom__remove d-flex align-items-center position-absolute r-0"
+               data-testid="tags-selector-remove-at-index"
                @click="scope.removeAtIndex(scope.index)">
             <remove-tag-icon class="ml-1 remove-tag-icon">
             </remove-tag-icon>
