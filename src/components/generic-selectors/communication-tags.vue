@@ -8,10 +8,12 @@
                       :optionsIsGrouped="true"
                       :height="height"
                       :category="category"
+                      data-testid="communication-tags-multi-select"
                       @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14"
                          width="14"
+                         data-testid="communication-tags-add-icon"
                          color="#256EFF"/>
         <span class="ml-1">
           {{ buttonText }}

@@ -7,6 +7,7 @@
               option-label="phone_number"
               behavior="menu"
               v-model="selectedId"
+              data-testid="contact-phone-number-selector"
               :use-input="true"
               :options="options"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"

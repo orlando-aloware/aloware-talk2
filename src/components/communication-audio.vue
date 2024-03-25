@@ -6,14 +6,17 @@
              v-if="remoteUrl">
           <waveform :remoteUrl="remoteUrl"
                     :uniqueId="uniqueId"
+                    data-testid="communication-audio-waveform"
                     @ready="loading = false">
           </waveform>
           <download-button v-if="fileUuid"
+                           data-testid="communication-audio-download-button"
                            is-simple
                            :communication-id="communication.id"
                            :filename="filename"
                            :file-uuid="fileUuid"/>
           <transcription-modal button-text="Show Smart Transcription"
+                               data-testid="communication-audio-transcription-modal"
                                :communication="communication"
                                :single-button="true"
                                v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
@@ -21,6 +24,7 @@
       </div>
     </div>
     <span class="text-grey-900 record-was-deleted-label"
+          data-testid="communication-audio-record-was-deleted-label"
           v-if="isDeleted">
       record was deleted
     </span>

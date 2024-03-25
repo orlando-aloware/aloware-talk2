@@ -6,6 +6,7 @@
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
       :contact="contact"
+      data-testid="contact-activities-header"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
@@ -14,6 +15,7 @@
         <b-overlay class="h-100 w-100"
                    variant="white"
                    rounded="sm"
+                   data-testid="contact-activities-overlay"
                    :show="loadingCommunications"
                    :opacity="0.85">
           <div class="inner-1">
@@ -24,6 +26,7 @@
               </slot>
             </div>
             <contact-activity v-for="(communication, index) in communications"
+                              data-testid="contact-activities-activity-1"
                               :key="communication.id + '-comm-' + index"
                               :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
                               :communication="communication"
@@ -31,6 +34,7 @@
                               :campaignId="campaignId">
             </contact-activity>
             <contact-activity v-for="(communication, index) in sendingCommunications"
+                              data-testid="contact-activities-activity-2"
                               v-bind:key="'sending-comm-' + index"
                               ref="communication-0"
                               :communication="communication"

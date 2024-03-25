@@ -583,6 +583,7 @@
                   <div class="d-flex align-items-center popover-items"
                        :id="`ot-${index}-${colIndx}`"
                        v-if="contact[column.name].length > 0"
+                       data-testid="contacts-view-mouse-overpopover-item"
                        @mouseenter="onMouseOverPopover(column.label, `ot-${index}-${colIndx}`, index, column.name, $event)">
                     <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`"
                          v-if="typeof contact[column.name][0].phone_number !== 'undefined'">
@@ -634,10 +635,10 @@
           <div class="start-state"
                @click="onNavigateToAdd($event)">
             <div class="p-4 bg-light w-100 text-center border-bottom text-primary">
-              <template v-if="list.type == ContactListTypes.STATIC">
+              <template v-if="list.type == ContactListTypes.STATIC" data-testid="add-contacts-template">
                 Add contacts <i class="fa fa-plus"></i>
               </template>
-              <template v-else-if="list.type == ContactListTypes.DYNAMIC">
+              <template v-else-if="list.type == ContactListTypes.DYNAMIC" data-testid="add-contacts-through-a-filter-template">
                 Add Contacts through a Filter <i class="fa fa-plus"></i>
               </template>
             </div>
@@ -652,6 +653,7 @@
                  :key="hoverPopover.key"
                  :show.sync="hoverPopover.show"
                  :target="hoverPopover.target"
+                 data-testid="contacts-view-popover"
                  v-if="hoverPopover.target">
         <template #title>
           <div class="contact-tags-title">{{ hoverPopover.title }}</div>

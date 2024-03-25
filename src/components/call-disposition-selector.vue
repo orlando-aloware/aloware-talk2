@@ -6,6 +6,7 @@
                  label="name"
                  track-by="id"
                  placeholder="Select Disposition"
+                 data-testid="call-disposition-selector-1"
                  :selectLabel="null"
                  :deselectLabel="null"
                  :selectedLabel="null"
@@ -36,7 +37,7 @@
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
-      <span slot="noResult">
+      <span slot="noResult" data-testid="call-disposition-no-call-found">
         No call dispositions found.
       </span>
     </multiselect>
@@ -45,6 +46,7 @@
                  label="name"
                  track-by="id"
                  placeholder="Select Disposition"
+                 data-testid="call-disposition-selector-2"
                  :selectLabel="null"
                  :deselectLabel="null"
                  :selectedLabel="null"

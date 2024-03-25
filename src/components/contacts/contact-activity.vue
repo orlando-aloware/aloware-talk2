@@ -7,6 +7,7 @@
          v-if="communication.property === undefined">
       <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
                rounded
+               data-testid="contact-activity-unread-dot-badget"
                v-if="(markable || (communication.type === CommunicationTypes.SMS ||
                (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) &&
                (communication.body || communication.attachments)) && !communication.is_read">
@@ -14,12 +15,14 @@
       <avatar class="contact-avatar"
               width="34"
               height="34"
+              data-testid="contact-activity-avatar"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
               :style="avatarStyle(isSender)"
               :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
               v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
               :name="avatarName">
         <q-tooltip content-class="bg-grey-light11"
+                   data-testid="contact-activity-avatar-tooltip"
                    anchor="top middle" self="center middle">
           {{ avatarName }}
         </q-tooltip>
@@ -123,6 +126,7 @@
 
               <div v-if="isAttachmentAudio(attachment.mime_type)">
                 <audio style="height: 25px;width: 300px;margin-top: 10px;"
+                       data-testid="contact-activity-audio"
                        controls>
                   <source :src="attachment.url"
                           :type="attachment.mime_type">
@@ -132,6 +136,7 @@
 
               <div v-if="isAttachmentVideo(attachment.mime_type)">
                 <video width="320"
+                       data-testid="contact-activity-video"
                        class="border-rounded"
                        controls>
                   <source :src="attachment.url"
@@ -141,6 +146,7 @@
               </div>
 
               <download-button is-simple-attachment
+                               data-testid="contact-activity-download-button"
                                :communication-id="communication.id"
                                :filename="attachment.name"
                                :file-mime-type="attachment.mime_type"
@@ -177,6 +183,7 @@
           <div class="p-y-sm"
                :class="[communication.direction === CommunicationDirection.INBOUND ? 'text-left' : 'text-right']">
             <communication-info ref="communicationInfo"
+                                data-testid="contact-activity-communication-info"
                                 :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"

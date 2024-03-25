@@ -13,6 +13,7 @@
               :loading="isBusy"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               :disable="disable"
+              data-testid="line-selector"
               @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
@@ -22,6 +23,7 @@
         <q-item v-if="!scope.opt.group"
                 v-bind="scope.itemProps"
                 v-on="scope.itemEvents"
+                data-testid="line-selector-option"
                 v-close-popup>
           <q-item-section>
             <q-item-label v-html="scope.opt.name"></q-item-label>
