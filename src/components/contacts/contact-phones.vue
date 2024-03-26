@@ -2,11 +2,13 @@
   <div class="w-100"
        v-if="contact">
     <b-card class="border-0 w-100"
+            data-testid="contact-phones-card"
             no-body>
-      <b-card-body :class="bodyClass">
+      <b-card-body :class="bodyClass" data-testid="contact-phones-body">
         <div class="w-100">
           <h4>All Numbers</h4>
           <contact-phones-list-items :phones="primaryPhone"
+                                     data-testid="contact-phones-list-items-primary"
                                      @edit="onEditPhone"
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
@@ -14,6 +16,7 @@
           </contact-phones-list-items>
 
           <contact-phones-list-items :phones="otherPhones"
+                                     data-testid="contact-phones-list-items-other"
                                      @edit="onEditPhone"
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
@@ -23,6 +26,7 @@
           <b-link ref="phone_form"
                   href="#"
                   class="custom-link text-decoration-none"
+                  data-testid="contact-phones-add-phone-button"
                   @click="onAddPhone">
             <plus-circle-icon />
             Add Phone Number
@@ -33,9 +37,11 @@
                   no-parent-event
                   no-focus
                   :offset="[284, -105]"
+                  data-testid="contact-phones-form-menu"
                   v-model="showPhonesForm">
             <div class="row no-wrap q-pa-md">
               <contact-phones-form :phone="phone"
+                                   data-testid="contact-phones-form"
                                    @close="onClosePhoneForm">
               </contact-phones-form>
             </div>

@@ -1,11 +1,12 @@
 <template>
-  <b-form @submit.prevent="onSubmit">
+  <b-form @submit.prevent="onSubmit" data-testid="contact-phones-form">
     <b-form-group label="Title">
       <b-form-input
         type="text"
         placeholder="e.g. Wireless"
         ref="title"
         autofocus
+        data-testid="contact-phones-form-title-input"
         v-model="phone.title">
       </b-form-input>
     </b-form-group>
@@ -15,6 +16,7 @@
                   :state="validPhoneNumber">
       <b-form-input type="text"
                     placeholder="Phone Number"
+                    data-testid="contact-phones-form-phone-number-input"
                     v-model="phone.number"
                     required>
       </b-form-input>
@@ -26,6 +28,7 @@
       <b-form-checkbox
         v-model="phone.isPrimary"
         :value="true"
+        data-testid="contact-phones-form-make-primary-checkbox"
         :unchecked-value="false">
         <span class="make-primary-label">Make Primary</span>
       </b-form-checkbox>
@@ -38,24 +41,34 @@
         v-model="phone.isOptedOut"
         :value="true"
         :unchecked-value="false"
+        data-testid="contact-phones-form-sms-opt-out-checkbox"
         :disabled="this.contactSelectedPhone.is_opted_out">
         <span class="make-primary-label">SMS Opt-Out</span>
         <b-icon
           class="ml-2 info-icon"
           icon="exclamation-circle-fill"
+          data-testid="contact-phones-form-sms-opt-out-info-icon"
           variant="dark" />
-        <q-tooltip target=".info-icon" anchor="top middle" self="top middle">
+        <q-tooltip target=".info-icon" anchor="top middle" self="top middle" data-testid="cant-uncheck-it-tooltip">
           Once the phone number is opted out, you can't uncheck it.
         </q-tooltip>
       </b-form-checkbox>
     </b-form-group>
 
     <div class="d-flex justify-content-between">
-      <b-button type="button" size="sm" variant="light" @click="onClose">Cancel</b-button>
+      <b-button
+                type="button"
+                size="sm"
+                variant="light"
+                data-testid="contact-phones-form-cancel-button"
+                @click="onClose">
+                Cancel
+      </b-button>
       <b-button type="button"
                 size="sm"
                 variant="primary"
                 :disabled="isBusy || !validPhoneNumber || !phone.number || phone.number.length < 1"
+                data-testid="contact-phones-form-save-button"
                 @click="onSubmit">
         <b-spinner v-if="isBusy"
                    small label="Small Spinner"

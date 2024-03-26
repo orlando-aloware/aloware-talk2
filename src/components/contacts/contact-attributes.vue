@@ -1,10 +1,11 @@
 <template>
-  <div class="h-100 w-100">
+  <div class="h-100 w-100" data-testid="contact-attributes-wrapper">
     <div v-for="attribute in attributes"
          :key="attribute.id">
       <p class="text-muted custom-input-label mb-0">{{ attribute.name }}</p>
       <contact-input-field v-model="attribute.value"
                            :disabled="!hasPermissionTo('update contact')"
+                           data-testid="contact-attributes-input-field"
                            @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)">
       </contact-input-field>
     </div>

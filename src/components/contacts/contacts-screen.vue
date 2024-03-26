@@ -19,12 +19,14 @@
         </div>
         <b-overlay class="flex-grow-1 overflow-hidden-y"
                    :show="loading"
+                   data-testid="contacts-screen-overlay"
                    rounded="sm">
           <div class="datatable-wrapper h-100 overflow-hidden-y">
             <slot name="table" />
           </div>
           <template #overlay>
             <q-spinner-bars color="primary"
+                            data-testid="contacts-screen-spinner-bars"
                             size="40px" />
           </template>
         </b-overlay>

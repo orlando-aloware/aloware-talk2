@@ -1,5 +1,5 @@
 <template>
-  <div class="message p-3 pb-1 d-flex flex-row align-items-start"
+  <div class="message p-3 pb-1 d-flex flex-row align-items-start" data-testid="contact-activity-wrapper"
        v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) ||
        (communication.property === undefined)"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">

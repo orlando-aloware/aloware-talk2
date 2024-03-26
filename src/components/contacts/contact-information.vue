@@ -1,6 +1,6 @@
 <template>
-  <b-card class="border-0 position-relative contact-about-wrapper">
-    <h4 v-if="hasExpanded">About this contact</h4>
+  <b-card class="border-0 position-relative contact-about-wrapper" data-testid="contact-information-wrapper">
+    <h4 v-if="hasExpanded" data-testid="contact-information-has-expanded">About this contact</h4>
 
     <div :class="`information-container ${autoHeightClass}`">
       <div class="w-100 mt-2"
@@ -14,6 +14,7 @@
                        :outlined="false"
                        :show-placeholder="false"
                        v-model="contact.user_id"
+                       data-testid="contact-information-user-selector"
                        @change="(eventPayload) => onUpdateFields(eventPayload, 'user_id')">
         </user-selector>
       </div>
@@ -29,6 +30,7 @@
                                       :outlined="false"
                                       :show-placeholder="false"
                                       :emit-value="true"
+                                      data-testid="contact-information-disposition-selector"
                                       v-model="contact.disposition_status_id"
                                       @change="(eventPayload) => onUpdateFields(eventPayload, 'disposition_status_id')">
         </contact-disposition-selector>
@@ -38,6 +40,7 @@
         <p class="text-muted custom-input-label mb-0">Email</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.email"
+                             data-testid="contact-information-email-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'email')">
         </contact-input-field>
       </div>
@@ -46,6 +49,7 @@
         <p class="text-muted custom-input-label mb-0">Address</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.address"
+                             data-testid="contact-information-address-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'address')">
         </contact-input-field>
       </div>
@@ -54,6 +58,7 @@
         <p class="text-muted custom-input-label mb-0">Company</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.company_name"
+                             data-testid="contact-information-company-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'company_name')">
         </contact-input-field>
       </div>
@@ -62,6 +67,7 @@
         <p class="text-muted custom-input-label mb-0">Website</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.website"
+                             data-testid="contact-information-website-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'website')">
         </contact-input-field>
       </div>
@@ -70,6 +76,7 @@
         <p class="text-muted custom-input-label mb-0">City</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.cnam_city"
+                             data-testid="contact-information-city-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_city')">
         </contact-input-field>
       </div>
@@ -80,6 +87,7 @@
         <location-state-selector :contact="contact"
                                  :disabled="!hasPermissionTo('update contact')"
                                  v-model="contact.cnam_state"
+                                 data-testid="contact-information-state-selector"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_state')">
         </location-state-selector>
       </div>
@@ -89,6 +97,7 @@
         <location-country-selector :contact="contact"
                                    :disabled="!hasPermissionTo('update contact')"
                                    v-model="contact.cnam_country"
+                                   data-testid="contact-information-country-selector"
                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_country')">
         </location-country-selector>
       </div>
@@ -97,6 +106,7 @@
         <p class="text-muted custom-input-label mb-0">Zip Code</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.cnam_zipcode"
+                             data-testid="contact-information-zip-code-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_zipcode')">
         </contact-input-field>
       </div>
@@ -105,6 +115,7 @@
         <p class="text-muted custom-input-label mb-0">Timezone</p>
         <q-timezone-selector :disabled="!isAdmin"
                              v-model="contact.timezone"
+                             data-testid="contact-information-timezone-selector"
                              @select="(eventPayload) => onUpdateFields(eventPayload, 'timezone')">
         </q-timezone-selector>
       </div>
@@ -117,6 +128,7 @@
                               popoverId="popover-date-picker-sync"
                               :canEdit="hasPermissionTo('update contact')"
                               v-model="contact.date_of_birth"
+                              data-testid="contact-information-date-of-birth-selector"
                               @change="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
         </date-picker-selector>
       </div>
@@ -131,6 +143,7 @@
                               :outlined="false"
                               :disabled="!hasPermissionTo('update contact')"
                               v-model="contact.lead_source"
+                              data-testid="contact-information-lead-source-selector"
                               @change="(eventPayload) => onUpdateFields(eventPayload, 'lead_source')">
         </lead-source-selector>
       </div>
@@ -145,6 +158,7 @@
                        :borderless="true"
                        :outlined="false"
                        v-model="contact.initial_campaign_id"
+                       data-testid=""
                        @change="(eventPayload) => onUpdateFields(eventPayload, 'initial_campaign_id')">
         </line-selector>
       </div>
@@ -153,6 +167,7 @@
         <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.csf1"
+                             data-testid="contact-information-custom-field-1-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
         </contact-input-field>
       </div>
@@ -160,10 +175,12 @@
         <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
         <contact-input-field :disabled="!hasPermissionTo('update contact')"
                              v-model="contact.csf2"
+                             data-testid="contact-information-custom-field-2-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
         </contact-input-field>
       </div>
       <contact-attributes :contact="contact"
+                          data-testid="contact-information-attributes"
                           v-if="contact.id"/>
 
       <div class="w-100">
@@ -197,6 +214,7 @@
               size="sm"
               pill
               v-if="hasExpanded"
+              data-testid="contact-information-toggle"
               @click="onExpanded">
       <i class="material-icons icon">{{ expanded ? 'expand_less' : 'expand_more' }}</i>
     </b-button>

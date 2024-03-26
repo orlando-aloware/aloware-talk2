@@ -67,7 +67,7 @@
                                 v-if="messageComposer.mode === 'email' && contact.email"/>
 
         <message-composer-note @message-sent="onMessageSent"
-                              data-testid="message-composer-note"
+                               data-testid="message-composer-note"
                                v-if="messageComposer.mode === 'note'"/>
       </div>
     </div>
