@@ -1,13 +1,15 @@
 <template>
   <div class="attachment-wrapper"
        v-cloak
+       data-testid="attachment-wrapper"
        @drop.prevent="onDrop"
        @dragover.prevent>
 
-    <form class="mt-1" @click="onBrowse">
+    <form class="mt-1" @click="onBrowse" data-testid="attachment-form">
       <b-form-group id="fileInput"
+                    data-testid="attachment-form-group"
                     class="dragdrop">
-        <div class="text-center uploader-label">
+        <div class="text-center uploader-label" data-testid="upload-attachment-browse">
           <upload-icon height="40" width="40" class="pb-2"></upload-icon>
           <p>Drop files to attach, or <span style="color: #256EFF;cursor: pointer" @click="onBrowse">Browse</span></p>
         </div>
@@ -17,23 +19,27 @@
                type="file"
                class="w-px h-px opacity-0 overflow-hidden absolute d-none"
                ref="file"
+               data-testid="attachment-add-file-input"
                accept="audio/basic, audio/L24, audio/mp4, audio/mpeg, audio/ogg, audio/vnd.rn-realaudio, audio/vnd.wave, audio/3gpp, audio/3gpp2, audio/ac3, audio/vnd.wave, audio/webm, audio/amr-nb, audio/amr, video/mpeg, video/mp4, video/quicktime, video/webm, video/3gpp, video/3gpp2, video/3gpp-tt, video/H261, video/H263, video/H263-1998, video/H263-2000, video/H264, image/bmp, image/tiff, image/jpeg, image/jpg, image/gif, image/png, text/vcard, text/x-vcard, text/csv, text/rtf, text/richtext, text/calendar, text/directory, application/pdf, application/vcard"
                @change="onAdded" />
       </b-form-group>
       <b-progress v-if="isUploading && !hasError"
                   class="attachment-upload-progress"
                   variant="success"
+                  data-testid="attachment-upload-progress"
                   :max="100">
         <b-progress-bar :value="uploadPercentage"
+                        data-testid="attachment-upload-progress-bar"
                         :label="`${uploadPercentage}%`"/>
       </b-progress>
       <p v-if="hasError && !isUploading"
+         data-testid="attachment-upload-error"
          class="error-notice">
         Error while uploading attachment...
       </p>
     </form>
-    <div class="text-center mt-2 notice">
-      <p class="mb-0"><a href="https://support.aloware.com/different-data-types-supported-in-aloware" target="_blank">Click here</a> to see the supported media file list.</p>
+    <div class="text-center mt-2 notice" data-testid="attachment-size-messages">
+      <p class="mb-0"><a href="https://support.aloware.com/different-data-types-supported-in-aloware" target="_blank" data-testid="attachment-click-here">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>
       <p class="mb-0">Other file types should be below 600KB</p>
     </div>

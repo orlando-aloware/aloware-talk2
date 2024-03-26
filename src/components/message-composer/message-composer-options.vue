@@ -2,45 +2,52 @@
   <div class="message-options">
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
+            data-testid="add-gif-image-butto "
             :disabled="isTextingDisabled || !canAddMoreAttachments">
       <q-menu content-class="mx-height-500"
               ref="giphyMenu"
+              data-testid="add-gif-image-menu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
-          <search-giphy @selected="onGifSelected"></search-giphy>
+          <search-giphy data-testid="message-search-giphy" @selected="onGifSelected"></search-giphy>
         </div>
       </q-menu>
 
       <gif-icon></gif-icon>
-      <q-tooltip>
+      <q-tooltip data-testid="add-gif-image-tooltip">
         Add Gif image
       </q-tooltip>
     </b-link>
 
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
+            data-testid="sms-upload-attachment-link"
             :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments">
       <q-menu ref="attachmentMenu"
+              data-testid="sms-upload-attachment-menu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
           <attachments :is-broadcast="isBroadcast"
+                       data-testid="sms-upload-attachment-component"
                        @attachmentUploaded="onAttachmentUploaded"/>
         </div>
       </q-menu>
-      <attachment-icon></attachment-icon>
-      <q-tooltip>
+      <attachment-icon data-testid="message-composer-attachment-icon"></attachment-icon>
+      <q-tooltip data-testid="message-composer-add-tooltip">
         {{  !selectedLine ? 'Please select line before adding attachments' : 'Add attachments' }}
       </q-tooltip>
     </b-link>
 
     <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
             href="#"
+            data-testid="message-composer-add-template-link"
             :disabled="isTextingDisabled">
       <q-menu content-class="mx-height-300"
               ref="templatesMenu"
+              data-testid="message-composer-add-template-menu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
-          <message-templates @templateSelected="onTemplateSelected"></message-templates>
+          <message-templates @templateSelected="onTemplateSelected" data-testid="message-composer-templates"></message-templates>
         </div>
       </q-menu>
       <calendar-today-icon></calendar-today-icon>

@@ -2,6 +2,7 @@
   <div class="composer-container">
     <div id="composer-wrapper"
          class="composer-wrapper"
+         data-testid="message-composer-wrapper"
          :class="[messageComposer.mode === 'note' ? 'bg-blue-70' : '']">
       <div class="tab-links d-inline-flex">
         <b-link href="#"
