@@ -1,5 +1,5 @@
 <template>
-  <div class="message-options">
+  <div class="message-options" data-testid="message-composer-o">
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
             data-testid="add-gif-image-butto "
@@ -50,26 +50,29 @@
           <message-templates @templateSelected="onTemplateSelected" data-testid="message-composer-templates"></message-templates>
         </div>
       </q-menu>
-      <calendar-today-icon></calendar-today-icon>
-      <q-tooltip>
+      <calendar-today-icon data-testid="mesasge-composer-calendar-today-icon"></calendar-today-icon>
+      <q-tooltip data-testid="message-composer-add-template-tooltip">
         Add template
       </q-tooltip>
     </b-link>
 
     <b-link v-if="['sms', 'email'].includes(messageComposer.mode)"
             href="#"
+            data-testid="message-composer-add-variable-link"
             :disabled="isTextingDisabled">
       <q-menu content-class="mx-height-300"
               ref="variablesMenu"
+              data-testid="message-composer-add-variable-menu"
               :offset="[0,5]">
         <div class="row no-wrap q-pa-md">
           <variables always-open
+                     data-testid="message-composer-variables-selected"
                      @variableSelected="onVariableSelected">
           </variables>
         </div>
       </q-menu>
       <variable-icon></variable-icon>
-      <q-tooltip>
+      <q-tooltip data-testid="message-composer-add-variable-tooltip">
         Add variable
       </q-tooltip>
     </b-link>

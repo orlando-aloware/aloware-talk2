@@ -189,7 +189,7 @@
             <message-composer-options :campaign-id="campaignId"
                                       :max-attachments="maxAttachments"
                                       :is-broadcast="isBroadcast"
-                                      data-testid="message-composer-options"
+                                      data-testid="sms-message-composer-options"
                                       @gifSelected="gifSelected"
                                       @attachmentUploaded="attachmentUploaded"
                                       @templateSelected="templateSelected"
@@ -206,6 +206,7 @@
                                   color="primary"
                                   size="sm"
                                   padding="0px 12px"
+                                  data-testid="sms-send-dropdown-button"
                                   :ripple="false"
                                   :disable="isSendTextDisabled"
                                   :disable-dropdown="isSendTextDisabled"
@@ -215,12 +216,14 @@
                       <template slot="label">
                           <q-spinner-bars class="mr-1"
                                           color="white"
+                                          data-testid="sms-send-spinner"
                                           v-if="isSending || generatingShortUrl"/>
                           {{ sendButtonText }}
                       </template>
                       <q-list class="message-composer-send-dropdown-button-list">
                           <q-item clickable
                                   v-close-popup
+                                  data-testid="sms-schedule-send-button"
                                   @click="showScheduleMessage">
                               <q-item-section>
                                   <q-item-label>Schedule Send</q-item-label>
@@ -230,6 +233,7 @@
                   </q-btn-dropdown>
                   <q-tooltip anchor="top middle"
                              self="center middle"
+                             data-testid="sms-cannot-be-texted-tooltip"
                              v-if="isTCPAApprovedTextNotAuthorized">
                     <span class="text-black-dk">
                       This number cannot be texted based on TCPA enforcement.
@@ -238,8 +242,8 @@
               </div>
             </div>
         </div>
-        <scheduled-message></scheduled-message>
-        <sms-template-modal></sms-template-modal>
+        <scheduled-message data-testid="sms-scheduled-message"></scheduled-message>
+        <sms-template-modal data-testid="sms-template-modal"></sms-template-modal>
     </div>
 </template>
 
