@@ -28,7 +28,7 @@
             <b-popover triggers="click blur"
                         placement="bottomright"
                         boundary="window"
-                        custom-class="contacts-folder-popover"
+                        custom-class="contact-popover"
                         :target="folderId">
               <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
@@ -52,9 +52,9 @@
                   </template>
                 </contact-menu-item>
                 <contact-menu-item v-else
+                                    data-testid="contacts-create-destroy-submenu"
                                     @mouseover="createSubmenu"
-                                    @mouseleave="destroySubmenu"
-                                    data-testid="contacts-create-destroy-submenu">
+                                    @mouseleave="destroySubmenu">
                   <template slot="icon">
                     <people-icon></people-icon>
                   </template>
@@ -89,7 +89,7 @@
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item @click="onCreateByManualSelection" data-testid="create-new-list-by-manual-selection">
+                  <contact-menu-item data-testid="create-new-list-by-manual-selection" @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">
                         Create new list &amp; select contacts

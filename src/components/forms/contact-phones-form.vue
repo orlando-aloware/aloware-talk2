@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit.prevent="onSubmit" data-testid="contact-phones-form">
+  <b-form data-testid="contact-phones-form" @submit.prevent="onSubmit">
     <b-form-group label="Title">
       <b-form-input
         type="text"
