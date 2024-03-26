@@ -457,7 +457,7 @@ export default {
         params: {
           sid: sid,
           phone_number: from,
-          live: 1
+          live: true
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
