@@ -8,7 +8,7 @@
         <video-modal ref="videoModal"
                      title="📞 Welcome to Aloware Talk!"
                      cookieName="welcome"
-                     videoUrl="https://www.youtube.com/embed/1YjuDUF53iQ?si=iO3kICM1p_mFXX0J"
+                     videoUrl="https://www.youtube.com/embed/6CAkvtjJMBQ?si=5IzLiDNjjIarUr1m"
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
@@ -42,7 +42,7 @@
         <video-modal ref="videoModal"
                      title="📞 Welcome to Aloware Talk!"
                      cookieName="welcome"
-                     videoUrl="https://www.youtube.com/embed/1YjuDUF53iQ?si=iO3kICM1p_mFXX0J"
+                     videoUrl="https://www.youtube.com/embed/6CAkvtjJMBQ?si=5IzLiDNjjIarUr1m"
                      learnMoreLink="https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents"
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
@@ -77,7 +77,7 @@
                dense
                no-caps
                unelevated
-               v-if="isCompanyKYC && !kycFilled"
+               v-if="isCompanyKYC && !isKYCFilled"
                @click="onOpenFinishRegistration" />
         <q-btn class="q-mr-lg"
                color="primary"
@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { simpsocialMixin } from 'src/plugins/mixins'
+import { simpsocialMixin, kycMixin } from 'src/plugins/mixins'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
@@ -117,7 +117,8 @@ export default {
   },
 
   mixins: [
-    simpsocialMixin
+    simpsocialMixin,
+    kycMixin
   ],
 
   data () {
@@ -134,11 +135,7 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    ...mapGetters('auth', ['isTrial', 'isCompanyKYC']),
-
-    kycFilled () {
-      return this.profile?.company?.kyc_filled
-    },
+    ...mapGetters('auth', ['isTrial']),
 
     trialText () {
       if (typeof this.currentCompany.trial_remaining_days === 'undefined' || typeof this.currentCompany.trial_days === 'undefined') {

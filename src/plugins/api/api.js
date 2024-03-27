@@ -714,13 +714,18 @@ export default {
       get (params) {
         return window.axios.get(`${suffixV2}contacts-list`, { params })
       },
-      public () {
-        return window.axios.get(`${suffixV2}contacts-list/public`)
+      public (params) {
+        return window.axios.get(`${suffixV2}contacts-list/public`, { params })
       }
     },
 
     filters: {
-      get () {
+      get (tags = false) {
+        if (!tags) {
+          // Request for filters without tags as options
+          const params = { exclude_tags: true }
+          return window.axios.get(`${suffixV2}contacts/filters`, { params })
+        }
         return window.axios.get(`${suffixV2}contacts/filters`)
       }
     },

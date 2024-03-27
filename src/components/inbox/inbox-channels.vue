@@ -172,7 +172,7 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   aclMixin,
   dateMixin,
@@ -193,7 +193,7 @@ import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
-import { STATUS_OPEN } from 'src/constants/contact-task-status'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   name: 'inbox-channels',
@@ -222,7 +222,7 @@ export default {
       type: String,
       required: false,
       default () {
-        return ['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId
+        return ['all-communications', 'my-personal-line'].includes(this.$route.params.channel) && this.$route.query?.tagId
           ? 'all'
           : 'call'
       }
@@ -334,6 +334,10 @@ export default {
       'isFilterDialogForView'
     ]),
 
+    ...mapGetters('auth', [
+      'profile'
+    ]),
+
     nextPage () {
       if (this.$route.params.channel === 'mentions') {
         return this.currentPage + 1
@@ -434,6 +438,16 @@ export default {
 
         if (this.$route.query?.broadcastIds) {
           defaultFilterModel.filter.broadcasts = typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
+        }
+
+        return defaultFilterModel
+      }
+
+      if (this.activeChannel?.value === 'my-personal-line') {
+        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
+        defaultFilterModel.filter = {
+          ...Filters.DEFAULT_STATE.filter,
+          campaigns: [this.profile.campaign_id]
         }
 
         return defaultFilterModel
@@ -753,7 +767,9 @@ export default {
     })
 
     this.$VueEvent.listen('contact_updated', (data) => {
-      const communications = [...this.communications]
+      const communications = (data?.communications?.length > 0)
+        ? [...data.communications]
+        : [...this.communications]
       const channels = [
         'calls',
         'messages',
@@ -853,6 +869,11 @@ export default {
         this.filter.cursor = null
       }
 
+      // set user personal line as current filter
+      if (this.activeChannel?.value === 'my-personal-line') {
+        this.filter.campaigns = this.channelDefaultFilterModel.filter.campaigns
+      }
+
       if (this.campaignId) {
         this.filter.campaign_id = this.campaignId
       }
@@ -884,7 +905,7 @@ export default {
 
     onApplyFilter (filter) {
       if (this.isFilterDialogForView) {
-        this.currentTask = STATUS_OPEN
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
 
         // change actively selected channel
         this.setSelectedFilter(this.appliedFilter)
@@ -912,7 +933,7 @@ export default {
           name: 'Inbox Channel Task Status',
           params: {
             channel: 'inbox',
-            status: 'open'
+            status: InboxTaskStatus.DEFAULT_STATUS
           }
         }).catch(err => {
           console.log(err)
@@ -1422,7 +1443,8 @@ export default {
         'messages',
         'voicemails',
         'recordings',
-        'all-communications'
+        'all-communications',
+        'my-personal-line'
       ]
 
       if (communicationChannels.includes(value)) {

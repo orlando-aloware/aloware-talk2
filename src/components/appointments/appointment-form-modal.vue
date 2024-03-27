@@ -11,6 +11,16 @@
             @submit.prevent="onSubmit"
             @reset="resetForm">
       <b-form-row>
+          <b-col sm="12">
+            <b-form-group label="Title">
+              <b-form-input
+                type="text"
+                placeholder="Add title"
+                v-model="appointment.text">
+              </b-form-input>
+            </b-form-group>
+          </b-col>
+
         <b-col sm="12">
           <b-form-group id="input-group-1"
                         label="Select date"
@@ -208,6 +218,7 @@ export default {
         duration: 15,
         timezone: this.contact.timezone || '',
         body: '',
+        text: '',
         type: 12,
         smsReminder: {
           enabled: false,
@@ -278,6 +289,7 @@ export default {
         duration: this.appointment.duration,
         timezone: this.appointment.timezone,
         body: this.appointment.body,
+        text: this.appointment.text,
         type: this.appointment.type,
         contact: this.contact,
         user: this.profile,

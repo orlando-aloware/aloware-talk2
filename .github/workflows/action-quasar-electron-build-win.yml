@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '16.x' ]
-        npm-version: [ '9.x' ]
+        yarn-version: [ '1.x' ]
 
     steps:
       - name: Set Dynamic Environment
@@ -53,14 +53,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Update NPM
-        run: npm install -g npm@${{ matrix.npm-version }}
-
       - name: Node version
         run: node --version
-
-      - name: NPM version
-        run: npm --version
 
       - name: Setup Python3
         uses: actions/setup-python@v4
@@ -83,7 +77,6 @@ jobs:
           ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
           ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          ENV_INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
           ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
           ENV_API_KEY_ID: ${{ secrets.api_key_id }}
@@ -126,7 +119,6 @@ jobs:
 
           # Intercom
           INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
-          INTERCOM_SECRET_KEY: ${{ secrets.intercom_secret_key }}
 
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
@@ -177,3 +169,28 @@ jobs:
 
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+
+      - name: Extract Metadata from package.json
+        id: pkg
+        run: |
+          echo "::set-output name=VERSION::$(jq -r '.version' package.json)"
+          echo "::set-output name=PRODUCT_NAME::$(jq -r '.productName' package.json)"
+        
+      - name: Rename and Move Windows Executable
+        run: |
+          mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup ${{ steps.pkg.outputs.VERSION }}.exe" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe"
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ secrets.aws_secret_access_key }}
+          aws configure set default.region ${{ secrets.aws_bucket_region }}
+        
+      - name: Upload Renamed File to S3
+        run: |
+          aws s3 cp "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" --acl public-read

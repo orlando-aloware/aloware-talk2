@@ -239,7 +239,8 @@ import {
   kycMixin,
   simpsocialMixin,
   userMixin,
-  settingsMixin
+  settingsMixin,
+  broadcastsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -314,7 +315,8 @@ export default {
     kycMixin,
     simpsocialMixin,
     userMixin,
-    settingsMixin
+    settingsMixin,
+    broadcastsMixin
   ],
 
   data () {
@@ -1080,7 +1082,7 @@ export default {
     this.resetPowerDialerSession(this.$route)
 
     // temporary
-    if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+    if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
       this.$router.push({ path: '/' })
     }
   },
@@ -1440,7 +1442,6 @@ export default {
       let fetchingStatics = false
       this.loading = true
       this.setCampaignsIsLoading(true)
-      this.setTagsFullyLoaded(true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -1483,12 +1484,8 @@ export default {
         this.getRingGroups()
         this.getBroadcasts()
         this.getTemplates()
-
         this.getCampaigns()
-        this.getFullTags()
-        // this.getTags()
         this.getWorkflows()
-
         this.getDispositionStatuses()
         this.getCallDispositions()
         this.getLeadSources()
@@ -1642,68 +1639,6 @@ export default {
             return Promise.reject()
           })
       }
-    },
-
-    getFullTags () {
-      this.loadingTags = true
-
-      return this.$axios
-        .get('/api/v1/tag', { params: { full_load: true } })
-        .then((res) => {
-          this.setTags(res.data)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
-
-          return Promise.reject()
-        })
-    },
-
-    getTags (page = 1) {
-      if (page === 1) {
-        this.loadingTags = true
-      }
-
-      const params = {
-        page: page
-      }
-
-      return this.$axios
-        .get('/api/v1/tag', { params })
-        .then((res) => {
-          this.setTagsFullyLoaded(false)
-
-          if (res.data.data && res.data.data.length) {
-            res.data.data.forEach((tag) => {
-              this.newTag(tag)
-            })
-          }
-
-          if (res.data.to !== res.data.total) {
-            this.getTags(page + 1)
-
-            return Promise.resolve()
-          }
-
-          this.setTagsFullyLoaded(true)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
-
-          return Promise.reject()
-        })
     },
 
     getWorkflows (page = 1) {
@@ -2495,6 +2430,7 @@ export default {
           this.setStatics(res.data)
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
+          this.setIsWhiteLabel(res.data.whitelabel)
         }).catch(err => {
           console.log(err)
 
@@ -2572,7 +2508,6 @@ export default {
       'setDialerIsMuted',
       'setDialerParkedCall',
       'setFilters',
-      'setTagsFullyLoaded',
       'setNotifications',
       'resetNotifications',
       'setTags',
@@ -2589,6 +2524,7 @@ export default {
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded',
+      'setIsWhiteLabel',
       'setShowedKycReloadDialog'
     ]),
     ...mapActions('contacts', [
@@ -2725,7 +2661,7 @@ export default {
       this.resetPowerDialerSession(to)
 
       // temporary
-      if (this.$route.name === 'Broadcasts' && !this.isDemoCompany) {
+      if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
         this.$router.back()
       }
 

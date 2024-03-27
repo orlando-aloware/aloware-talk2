@@ -17,7 +17,7 @@
           <b-form-group
             label="First Name"
             class="form-label"
-            :disabled="viewOnly"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -36,7 +36,7 @@
           <b-form-group
             class="form-label"
             label="Last Name"
-            :disabled="viewOnly"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               v-model.trim="$v.user.last_name.$model"
@@ -78,7 +78,7 @@
           <b-form-group
             class="form-label"
             label="Email"
-            :disabled="viewOnly || isCompanyKYC"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -155,7 +155,7 @@
 
       <b-form-row class="mt-4"
                   :id="`${SettingsMap.role.hash_keyword}-container`"
-                  v-if="!user.is_destination && hasRole('Company Admin')">
+                  v-if="!user.is_destination && isAdmin">
         <b-col sm="12" md="12">
           <div>
             <h5 class="form-label">Role</h5>
@@ -173,7 +173,7 @@
                          self="top left"
                          :offset="[0, -33]">
                 Admins have full access to everything.
-            </q-tooltip>
+              </q-tooltip>
             </b-form-radio>
             <b-form-radio inline
                           value="Company Agent"
@@ -186,6 +186,19 @@
                          :offset="[0, -33]">
                 Agents have read access to all your lines, users, contacts, and sequences. <br/>
                 Agent's visibility can be configured in the Visibility Settings tab.
+              </q-tooltip>
+            </b-form-radio>
+            <b-form-radio inline
+                          value="Company Supervisor"
+                          :disabled="viewOnly"
+                          :aria-describedby="ariaDescribedby"
+                          v-model="user.role_name"
+                          @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">
+              Supervisor
+              <q-tooltip anchor="top left"
+                         self="top left"
+                         :offset="[0, -33]">
+                Supervisors have limited admin access.
               </q-tooltip>
             </b-form-radio>
           </b-form-group>
@@ -411,7 +424,7 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row v-if="isAdmin && connectedCampaigns.length"
+      <b-form-row v-if="isAdminOrSupervisor && connectedCampaigns.length"
                   class="mt-4"
                   :id="`${SettingsMap.campaign_id.hash_keyword}-container`">
         <b-col sm="12"
@@ -444,7 +457,7 @@ import {
   settingsMixin,
   kycMixin
 } from 'src/plugins/mixins'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
 
@@ -465,8 +478,6 @@ export default {
     ...mapState('settings', ['userClone']),
 
     ...mapState('auth', ['profile']),
-
-    ...mapGetters('auth', ['isCompanyKYC']),
 
     userDestinationEditable () {
       return this.user.role_name && !this.user.read_only_access
@@ -496,6 +507,14 @@ export default {
 
     whiteLabelText () {
       return this.statics.whitelabel ? '' : ' on Aloware'
+    },
+
+    isCompanyKYCNotAbleToAddUser () {
+      if (!this.isCompanyKYC) {
+        return false
+      }
+
+      return this.user.id === this.profile.id
     }
   },
 

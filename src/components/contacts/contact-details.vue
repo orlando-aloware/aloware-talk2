@@ -29,9 +29,9 @@
                          :contact="contact"
                          @input="onNotesInput"/>
           <contact-integrations :contact="contact"/>
-          <contact-reservations v-if="contact && showGuestyReservations"
+          <contact-reservations v-if="contact && showGuestyReservations()"
                                 :contact="contact"/>
-          <contact-reservations-messages v-if="contact && showGuestyReservations"
+          <contact-reservations-messages v-if="contact && showGuestyReservations()"
                                 :contact="contact"/>
           <contact-scheduled-messages/>
           <contact-activity-counts :summary="communicationsSummary.summaries"/>

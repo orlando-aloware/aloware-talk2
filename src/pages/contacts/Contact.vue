@@ -80,7 +80,9 @@
       <div class="text-center">
         <q-spinner-bars color="primary"
                         size="2em" />
-        <p id="cancel-label">Fetching contact...</p>
+        <p id="cancel-label">
+          Fetching contact...
+        </p>
       </div>
     </template>
   </b-overlay>
@@ -143,7 +145,6 @@ export default {
       'contactDetailsDrawer',
       'campaignsIsLoading',
       'usersIsLoading',
-      'tagsFullyLoaded',
       'campaigns',
       'users',
       'tags',
@@ -164,13 +165,12 @@ export default {
       }
 
       return this.changingSelectedContact || this.campaignsIsLoading ||
-        this.usersIsLoading || !this.tagsFullyLoaded || !this.campaigns ||
+        this.usersIsLoading || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
     },
 
     isShowContactActivities () {
-      return !this.campaignsIsLoading && !this.usersIsLoading &&
-        this.tagsFullyLoaded && this.campaigns && this.users && this.tags
+      return !this.campaignsIsLoading && !this.usersIsLoading && this.campaigns && this.users && this.tags
     },
 
     isMediumScreen () {

@@ -22,7 +22,7 @@
         </div>
         <div class="inbox-nav-item__label h-100 text-truncate">
           <q-tooltip>
-            {{ label }}
+            {{ tooltip || label }}
           </q-tooltip>
           {{ label }}
         </div>
@@ -163,6 +163,11 @@ export default {
 
     customCount: {
       type: Number,
+      default: null
+    },
+
+    tooltip: {
+      type: String,
       default: null
     }
   },
