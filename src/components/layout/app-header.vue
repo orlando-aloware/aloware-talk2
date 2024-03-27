@@ -44,7 +44,7 @@
         {{ refreshButtonLabel }}
       </compact-btn>
 
-      <a href="https://support.aloware.com/exploring-aloware-talks-broadcast"
+      <a href="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
          target="_blank"
          v-if="$route.name === 'Broadcasts'">
         <information-circle-icon class="ml-2 cursor-pointer"/>
@@ -134,7 +134,7 @@
                      placement="bottomleft"
                      v-if="dialer.error.code">
             <template #title>Connection timeout</template>
-            <p>Click here to reconnect or please check the <a href="https://support.aloware.com/understanding-and-fixing-common-dialer-errors-in-aloware-a-comprehensive-guide" target="_blank">troubleshooting guide here</a>.</p>
+            <p>Click here to reconnect or please check the <a href="https://support.aloware.com/en/articles/9020342-understanding-and-fixing-common-dialer-errors-in-aloware-a-comprehensive-guide" target="_blank">troubleshooting guide here</a>.</p>
             <p>Error Code: [{{ dialer.error.code }}]</p>
             <q-btn class="start-dial-button p-0"
                    color="success"
@@ -146,7 +146,7 @@
                 Reconnect
               </div>
             </q-btn>
-            <a href="https://support.aloware.com/troubleshooting-tip-audio-issues-during-calls-heres-how-to-fix-it" target="_blank"
+            <a href="https://support.aloware.com/en/articles/9037858-troubleshooting-tip-audio-issues-during-calls-here-s-how-to-fix-it" target="_blank"
                v-if="dialer.error.code === 31208">
               See fix
             </a>
@@ -506,7 +506,7 @@ export default {
 
     onDialerErrorStatus () {
       if (this.dialer.error.code === 31208) {
-        window.open('https://support.aloware.com/troubleshooting-tip-audio-issues-during-calls-heres-how-to-fix-it')
+        window.open('https://support.aloware.com/en/articles/9037858-troubleshooting-tip-audio-issues-during-calls-here-s-how-to-fix-it')
       }
     },
 

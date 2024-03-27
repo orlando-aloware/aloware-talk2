@@ -177,7 +177,7 @@
                     <template slot="default">
                       I agree to
                       <a class="text-weight-bold"
-                         @click.stop="openLink('https://support.aloware.com/a2p-10dlc-fees-brand-registration-and-campaign-costs')">
+                         @click.stop="openLink('https://support.aloware.com/en/articles/9032003-a2p-10dlc-fees-brand-registration-and-campaign-costs')">
                         Notice on Carrier Fees for SMS and MMS
                       </a>
                     </template>
