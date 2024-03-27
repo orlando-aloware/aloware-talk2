@@ -747,11 +747,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
 }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
 
 Vue.prototype.$jsonClone = (value) => {
-  if (value) {
-    return cloneDeep(value)
-  }
-
-  return value
+  return cloneDeep(value)
 }
 
 Vue.prototype.$copyToClipboard = (value) => {
