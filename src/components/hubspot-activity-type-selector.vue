@@ -75,9 +75,9 @@ export default {
 
     computedCommunicationActivityType () {
       if (this.communication && this.activityTypes) {
-        const found = this.activityTypes.find(activityType => activityType === this.communication.metadata?.activity_type)
-
-        return found
+        return this.activityTypes.find(
+          activityType => activityType === this.communication.metadata?.activity_type
+        )
       }
 
       return null
