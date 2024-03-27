@@ -108,8 +108,10 @@ export default {
         this.activityType = this.prevActivityType
         return
       }
+
       this.prevActivityType = this.activityType
       this.loadingActivityType = true
+
       this.$axios.post(`/api/v1/communication/${this.communication.id}/activity-type`, {
         activity_type: this.activityType
       }).then((res) => {
