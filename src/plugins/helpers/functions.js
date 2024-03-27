@@ -107,8 +107,6 @@ export const isQueuedCall = (communication) => {
  * @returns {Object} A deep clone of the object.
  */
 export const cloneDeep = (value, map = new WeakMap()) => {
-  // Base case: if the value is not an object (or is null), return it directly.
-  // This handles primitive types which do not need cloning.
   if (value === null || typeof value !== 'object') {
     return value
   }
