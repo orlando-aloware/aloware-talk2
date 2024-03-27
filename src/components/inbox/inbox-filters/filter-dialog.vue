@@ -312,7 +312,7 @@ export default {
       }
 
       if (this.$route.params.channel === 'my-personal-line') {
-        return 'My Commms. Filters'
+        return 'My Comms. Filters'
       }
 
       return 'Calls & Recordings Filters'
@@ -417,6 +417,8 @@ export default {
       'setInboxPersonalFilters',
       'setShowViewsList'
     ]),
+
+    ...mapActions(['setTags']),
 
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
@@ -651,6 +653,27 @@ export default {
         .then(response => {
           this.personalFilters = response.data.data.user || []
           this.companyFilters = response.data.data.company || []
+
+          // Gather all tags IDs from personal and company filters into a single list for display in select
+          let tagsIds = []
+          this.personalFilters.forEach(filter => {
+            if (filter.filter.tags) {
+              tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
+            }
+          })
+          this.companyFilters.forEach(filter => {
+            if (filter.filter.tags) {
+              tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
+            }
+          })
+          this.getTagsByIds(tagsIds)
+        })
+    },
+
+    getTagsByIds (ids) {
+      return talk2Api.V1.tags.get({ params: { tag_ids: ids } })
+        .then(response => {
+          this.setTags(response.data.data)
           this.isGettingFilters = false
         })
     },

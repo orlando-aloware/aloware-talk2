@@ -26,7 +26,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
-    <intercom v-if="isLoggedIn && staticsLoaded && !isWhitelabel && (isAloware || isLocal)"/>
+    <intercom v-if="isIntercomEnabled"/>
   </div>
 </template>
 <script>
@@ -73,6 +73,10 @@ export default {
 
     isLoggedIn () {
       return this.authenticated && this.profile && this.profile.enabled
+    },
+
+    isIntercomEnabled () {
+      return this.isLoggedIn && this.staticsLoaded && !this.isWhitelabel
     }
   },
 

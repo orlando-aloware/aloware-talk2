@@ -193,7 +193,7 @@ import InboxSearcher from 'components/inbox/inbox-searcher'
 import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
-import { STATUS_OPEN } from 'src/constants/contact-task-status'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   name: 'inbox-channels',
@@ -443,7 +443,7 @@ export default {
         return defaultFilterModel
       }
 
-      if (this.$route.params.channel === 'my-personal-line') {
+      if (this.activeChannel?.value === 'my-personal-line') {
         defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
         defaultFilterModel.filter = {
           ...Filters.DEFAULT_STATE.filter,
@@ -870,7 +870,7 @@ export default {
       }
 
       // set user personal line as current filter
-      if (this.$route.params.channel === 'my-personal-line') {
+      if (this.activeChannel?.value === 'my-personal-line') {
         this.filter.campaigns = this.channelDefaultFilterModel.filter.campaigns
       }
 
@@ -905,7 +905,7 @@ export default {
 
     onApplyFilter (filter) {
       if (this.isFilterDialogForView) {
-        this.currentTask = STATUS_OPEN
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
 
         // change actively selected channel
         this.setSelectedFilter(this.appliedFilter)
@@ -933,7 +933,7 @@ export default {
           name: 'Inbox Channel Task Status',
           params: {
             channel: 'inbox',
-            status: 'open'
+            status: InboxTaskStatus.DEFAULT_STATUS
           }
         }).catch(err => {
           console.log(err)

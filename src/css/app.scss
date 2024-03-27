@@ -3854,7 +3854,7 @@ i.option-separator {
 
       & > .q-btn-item:nth-child(2) {
         flex-grow: 1;
-        min-width: 105px;
+        min-width: 100px;
       }
     }
   }
@@ -3922,7 +3922,7 @@ i.option-separator {
   }
 }
 
-.vbt-autcomplete-list {
+.vbt-autocomplete-list {
   z-index: 6001 !important;
   position: fixed !important;
 
@@ -3952,7 +3952,7 @@ i.option-separator {
   .form-control {
     font-size: $f-size-body-xs;
     padding-left: 8px;
-    border-width: 1px 1px 1px 0 !important;
+    border-width: 1px !important;
     color: $grey-100;
     border-radius: 6px;
 
@@ -11468,7 +11468,7 @@ screen and (max-width: 956px) {
 }
 
 .contact-phone-number-search {
-  .vbt-autcomplete-list {
+  .vbt-autocomplete-list {
     .list-group-item {
       padding: 0.75rem;
     }

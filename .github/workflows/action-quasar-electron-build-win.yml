@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '16.x' ]
-        npm-version: [ '9.x' ]
+        yarn-version: [ '1.x' ]
 
     steps:
       - name: Set Dynamic Environment
@@ -53,14 +53,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Update NPM
-        run: npm install -g npm@${{ matrix.npm-version }}
-
       - name: Node version
         run: node --version
-
-      - name: NPM version
-        run: npm --version
 
       - name: Setup Python3
         uses: actions/setup-python@v4
