@@ -506,7 +506,7 @@ export default {
         case AutoDialTaskStatus.STATUSES.failed:
           return this.listItems[this.selectedList.id].total_failed
         case AutoDialTaskStatus.STATUSES.in_queue:
-          return this.listItems[this.selectedList.id].total_queued
+          return this.listItems[this.selectedList.id].total_found || this.listItems[this.selectedList.id].total_queued
         case AutoDialTaskStatus.STATUSES.scheduled:
           return this.listItems[this.selectedList.id].total_scheduled
         default:
@@ -532,7 +532,9 @@ export default {
 
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // Get the actual number of tasks in queue -1 (for the one in progress)
+          return this.powerDialerTaskFilters[key]
+            ? (this.powerDialerTaskFilters[key].total_found || this.powerDialerTaskFilters[key].total_queued) - 1
+            : 0 // Get the actual number of tasks in queue -1 (for the one in progress)
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':
