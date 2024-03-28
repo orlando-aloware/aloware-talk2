@@ -10,14 +10,6 @@ export const DEFAULT_FILTER_LIST = {
     order: 1,
     status: 'STATUS_QUEUED'
   },
-  SKIPPED: {
-    id: 'skipped',
-    name: 'Skipped',
-    link: '/skipped/',
-    meta: 'skipped',
-    order: 2,
-    status: 'STATUS_SKIPPED'
-  },
   CALLED: {
     id: 'called',
     name: 'Called',

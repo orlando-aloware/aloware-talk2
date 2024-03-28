@@ -1437,7 +1437,6 @@ export default {
       let fetchingStatics = false
       this.loading = true
       this.setCampaignsIsLoading(true)
-      this.setTagsFullyLoaded(true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -1480,12 +1479,8 @@ export default {
         this.getRingGroups()
         this.getBroadcasts()
         this.getTemplates()
-
         this.getCampaigns()
-        // this.getFullTags()
-        // this.getTags()
         this.getWorkflows()
-
         this.getDispositionStatuses()
         this.getCallDispositions()
         this.getLeadSources()
@@ -1639,68 +1634,6 @@ export default {
             return Promise.reject()
           })
       }
-    },
-
-    getFullTags () {
-      this.loadingTags = true
-
-      return this.$axios
-        .get('/api/v1/tag', { params: { full_load: true } })
-        .then((res) => {
-          this.setTags(res.data)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
-
-          return Promise.reject()
-        })
-    },
-
-    getTags (page = 1) {
-      if (page === 1) {
-        this.loadingTags = true
-      }
-
-      const params = {
-        page: page
-      }
-
-      return this.$axios
-        .get('/api/v1/tag', { params })
-        .then((res) => {
-          this.setTagsFullyLoaded(false)
-
-          if (res.data.data && res.data.data.length) {
-            res.data.data.forEach((tag) => {
-              this.newTag(tag)
-            })
-          }
-
-          if (res.data.to !== res.data.total) {
-            this.getTags(page + 1)
-
-            return Promise.resolve()
-          }
-
-          this.setTagsFullyLoaded(true)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
-
-          return Promise.reject()
-        })
     },
 
     getWorkflows (page = 1) {
@@ -2570,7 +2503,6 @@ export default {
       'setDialerIsMuted',
       'setDialerParkedCall',
       'setFilters',
-      'setTagsFullyLoaded',
       'setNotifications',
       'resetNotifications',
       'setTags',

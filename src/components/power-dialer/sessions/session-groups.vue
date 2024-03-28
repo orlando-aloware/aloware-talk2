@@ -470,7 +470,7 @@ export default {
         id: this.selectedList.id,
         task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
         per_page: this.itemsPerPage,
-        page: this.powerDialerTaskFilters[key].current_page + 1
+        page: this.groupPageFilters[key]
       })
 
       if (res.status === 200) {
@@ -523,18 +523,10 @@ export default {
     },
 
     getTotalItem (key) {
-      // Sanity check: if the key is not in the powerDialerTaskFilters, return 0
-      // here we are getting the total of items for each group
-      // to be displayed during the PD session: In Queue, Called, Failed, Scheduled.
-      if (!this.powerDialerTaskFilters[key]) {
-        return 0
-      }
-
       switch (key) {
         case 'in_queue':
-          return this.powerDialerTaskFilters[key]
-            ? (this.powerDialerTaskFilters[key].total_found || this.powerDialerTaskFilters[key].total_queued) - 1
-            : 0 // Get the actual number of tasks in queue -1 (for the one in progress)
+          const inQueue = get(this.powerDialerTasks, 'in_queue', null)
+          return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':

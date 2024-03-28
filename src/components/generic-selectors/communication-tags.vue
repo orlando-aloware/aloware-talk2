@@ -7,6 +7,7 @@
                       :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                       :optionsIsGrouped="true"
                       :height="height"
+                      :category="category"
                       @valuesUpdated="saveTags">
       <template v-slot:button>
         <add-icon-circle height="14"
@@ -22,12 +23,9 @@
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import TagMultiSelect from 'components/generic-selectors/tag-multi-select'
-import {
-  TAG_CATEGORIES as TagCategories,
-  TAG_CATEGORIES_VALUES as TagCategoriesValues
-} from 'src/constants/tag-categories'
+import { TAG_CATEGORIES as TagCategories, TAG_CATEGORIES_VALUES as TagCategoriesValues } from 'src/constants/tag-categories'
 import { clone, isEmpty } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 import AddIconCircle from 'components/icons/add-icon-circle'
@@ -74,7 +72,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['tagsFullyLoaded', 'tags']),
+    ...mapState(['tags']),
     availableTags () {
       if (this.options) {
         return this.options.filter((tag) => {
@@ -137,6 +135,10 @@ export default {
         })
       }
       return tags
+    },
+
+    currentTags () {
+      return this.communication?.tags ?? []
     }
   },
 
@@ -155,8 +157,6 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setTagsFullyLoaded']),
-
     saveTags (tags) {
       if (!this.hasPermissionTo('tag communication')) {
         return
@@ -177,10 +177,6 @@ export default {
           this.communication.tag_ids = this.communication.tags.map((o) => o.id)
         }
       })
-    },
-
-    currentTags () {
-      return this.communication?.tags ?? []
     }
   },
   watch: {
