@@ -101,7 +101,6 @@
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import FileIcon from 'components/icons/contact-activity/file-icon'
-import { isEmpty } from 'lodash'
 import mime from 'mime-types'
 export default {
   name: 'download-button',
@@ -169,7 +168,8 @@ export default {
     return {
       isLoading: false,
       newFilename: '',
-      filenameText: ''
+      filenameText: '',
+      fileUuidValue: null
     }
   },
 
@@ -180,17 +180,20 @@ export default {
   },
 
   created () {
-    this.newFilename = this.filename
-    this.filenameText = this.filename
-
-    if (isEmpty(this.filename)) {
-      this.newFilename = this.getFilenameFromURL(this.attachmentUrl)
-      this.filenameText = this.$options.filters.toUpperCase(this.newFilename.split('.').pop())
-      this.filenameText += ' File'
-    }
+    this.initializeFilename()
+    this.initializeFileUuid()
   },
 
   methods: {
+    initializeFilename () {
+      this.newFilename = this.filename || this.getFilenameFromURL(this.attachmentUrl)
+      this.filenameText = `${this.$options.filters.toUpperCase(this.newFilename.split('.').pop())} File`
+    },
+
+    initializeFileUuid () {
+      this.fileUuidValue = this.fileUuid || this.getUuidFromURL(this.attachmentUrl)
+    },
+
     onDownload (fixFilenameExtension = false) {
       const isNotValidFilenameExtension = !this.hasFilenameExtension && !fixFilenameExtension
       const hasNoMimeType = fixFilenameExtension && !this.fileMimeType
@@ -223,14 +226,13 @@ export default {
         return
       }
 
-      const fileUuid = !this.fileUuid ? this.getUuidFromURL(this.attachmentUrl) : this.fileUuid
       let filename = this.newFilename
 
       if (fixFilenameExtension) {
         filename = `${filename}.${mime.extension(this.fileMimeType)}`
       }
 
-      this.$downloadFileWithUuid(fileUuid, filename)
+      this.$downloadFileWithUuid(this.fileUuidValue, filename)
         .then(() => {
           this.isLoading = false
         }).catch(() => {
