@@ -241,7 +241,7 @@ export default {
     }
 
     this.dialerListeners.answerCallFishing = (data) => {
-      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup, data.middleOfPowerDialer)
     }
 
     this.dialerListeners.setInputDevice = (inputDevice) => {
@@ -1444,13 +1444,22 @@ export default {
       this.setDialerCurrentStatus('READY')
     },
 
-    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false, middleOfPowerDialer = false) {
       this.setShowIncomingCallNotification(false)
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'
         })
+      }
+
+      // if the call is being answered in the middle of a power dialer session
+      if (middleOfPowerDialer) {
+      // @todo: warn the user that the session is being paused and should be resumed after the call manually
+        this.$VueEvent.fire('togglePausePowerDialerSession')
+        // regardless of the result, we need to refresh the communication of the dialer
+        // https://lodash.com/docs/4.17.15#defer
+        _.defer(this.forceRefreshCommunication)
       }
 
       // store temporarily the parked call

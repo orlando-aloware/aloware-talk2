@@ -159,6 +159,7 @@ export default {
           contactId: this.dialer.parkedCall.contact.id,
           phoneNumber: this.dialer.parkedCall.contact.phone_number
         },
+        middleOfPowerDialer: false,
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
