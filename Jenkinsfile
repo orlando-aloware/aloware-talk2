@@ -20,7 +20,7 @@ pipeline {
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
-        API_URL_OVERWRITE = 'https://pr-9270.mde.alodev.org'
+        API_URL_OVERWRITE = ''
     }
 
     stages {
