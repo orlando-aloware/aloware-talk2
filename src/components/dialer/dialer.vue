@@ -1459,7 +1459,7 @@ export default {
         this.$VueEvent.fire('pauseSessionForFishingModeCall')
         // regardless of the result, we need to refresh the communication of the dialer
         // https://lodash.com/docs/4.17.15#defer
-        _.defer(function () {
+        _.defer(() => {
           console.log('Refreshing communication')
           this.forceRefreshCommunication()
         })

@@ -1423,10 +1423,8 @@ export default {
       // pause the session
       this.togglePause = true
       this.sessionPaused = true
-      // remove the first task in queue
-      this.removeFirstInQueueTask()
       // notify the user that the session is paused and should be resumed manually
-      this.$generalNotification('The is paused. Please resume the session after the call manually.')
+      this.$generalNotification('The session is paused. Please resume the session after the call manually.')
     }
   },
 
