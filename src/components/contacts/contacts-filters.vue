@@ -332,7 +332,7 @@ export default {
       return Object.keys(filtersGroup).map(filter => filtersGroup[filter].length).reduce((acc, value) => acc + value, 0) >= this.maxInnerFilters
     },
 
-    getFilters () {
+    async getFilters () {
       if (this.hasPermissionTo('list filter')) {
         this.loadingFilters = true
 
@@ -748,6 +748,11 @@ export default {
     },
 
     async fetchTagsOptions () {
+      // If no filters have been loaded, we request them
+      if (this.filters.length < 1) {
+        await this.getFilters()
+      }
+
       // Get list of filters inside visibleListFilters
       const filters = this.visibleListFilters?.[0]?.filters
       if (filters) {
@@ -756,7 +761,6 @@ export default {
 
         // Get the tags filter object
         let tagsFilter = this.filters.find(filter => filter.key === 'tags')
-
         if (tagsFilter) {
           // Iterate over tagsArray to get the array of options for each element
           let tagsToFetch = []
@@ -783,8 +787,8 @@ export default {
 
           // Request the tags from the API using the IDs and assign the list to the tags filter
           await this.getTags(tagsToFetch)
-          if (this.visibleListFilters?.[0]?.filters?.tags[0]?.hasOwnProperty('key')) {
-            let tagsFilter = this.filters.find(filter => filter.key === 'tags')
+          let tagsFilter = this.filters.find(filter => filter.key === 'tags')
+          if (tagsFilter) {
             tagsFilter.options = this.tagsOptions
           }
         }
