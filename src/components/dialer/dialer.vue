@@ -1460,8 +1460,10 @@ export default {
         // regardless of the result, we need to refresh the communication of the dialer
         // https://lodash.com/docs/4.17.15#defer
         _.defer(() => {
-          console.log('Refreshing communication')
-          this.forceRefreshCommunication()
+          setTimeout(() => {
+            console.log('Refreshing communication')
+            this.forceRefreshCommunication()
+          }, 1000)
         })
       }
 
