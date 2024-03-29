@@ -58,7 +58,7 @@ export default {
         device_info: null
       }).then(res => {
         this.setAgentStatus(res.data.agent_status)
-        console.log('Changed agent status [pull]: ', res.data.agent_status)
+        console.log('Changed agent status [pull]: ', this.getStatusLabel(res.data.agent_status))
       }).catch((err) => {
         console.log(err)
         getTry++
@@ -70,6 +70,26 @@ export default {
           this.getAgentStatus(getTry)
         }
       })
+    },
+
+    getStatusLabel (agentStatus) {
+      switch (agentStatus) {
+        case AgentStatus.AGENT_STATUS_OFFLINE:
+          return 'Offline'
+        case AgentStatus.AGENT_STATUS_ACCEPTING_CALLS:
+          return 'Available'
+        case AgentStatus.AGENT_STATUS_ON_BREAK:
+          return 'On-break'
+        case AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS:
+        case AgentStatus.AGENT_STATUS_ON_CALL:
+        case AgentStatus.AGENT_STATUS_ON_WRAP_UP:
+        case AgentStatus.AGENT_STATUS_RINGING:
+        case AgentStatus.AGENT_STATUS_AUTO_DIAL:
+        case AgentStatus.AGENT_STATUS_SENTRY:
+          return 'Busy'
+        default:
+          return 'Offline'
+      }
     },
 
     resetAgentStatus (forceStatus = false, signature = 'Talk-ResetAgentStatus') {
@@ -89,9 +109,10 @@ export default {
           agentStatus = AgentStatus.AGENT_STATUS_ACCEPTING_CALLS
           break
       }
-      console.log('old agent status [reset]: ', this.oldAgentStatus)
-      console.log('current agent status [reset]: ', this.profile.agent_status)
-      console.log('new agent status [reset]: ', agentStatus)
+
+      console.log('old agent status [reset]: ', this.getStatusLabel(this.oldAgentStatus))
+      console.log('current agent status [reset]: ', this.getStatusLabel(this.profile.agent_status))
+      console.log('new agent status [reset]: ', this.getStatusLabel(agentStatus))
       // check status
       if (this.profile.agent_status !== agentStatus.data) {
         this.changeAgentStatus(agentStatus, forceStatus, 1, signature)
@@ -104,11 +125,11 @@ export default {
       }
 
       if (val !== undefined && ![AgentStatus.AGENT_STATUS_ON_WRAP_UP, AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_RINGING].includes(val)) {
-        console.log('Setting old agent status [api]: ', val)
+        console.log('Setting old agent status [api]: ', this.getStatusLabel(val))
         this.setOldAgentStatus(val)
       }
 
-      console.log('Changing agent status [api]: ', val)
+      console.log('Changing agent status [api]: ', this.getStatusLabel(val))
 
       // make sure that the session is valid
       if (this.profile) {
@@ -123,14 +144,14 @@ export default {
           this.loadingAgentStatus = false
 
           if (forceStatus && val !== data.agent_status) {
-            console.log(`Requested Agent status value (${val}) and API response value (${data.agent_status}) is not the same. Retrying request...`)
+            console.log(`Requested Agent status value (${this.getStatusLabel(val)}) and API response value (${this.getStatusLabel(data.agent_status)}) is not the same. Retrying request...`)
             this.changeAgentStatus(val, forceStatus, 1, signature)
             return
           }
 
           this.setAgentStatus(data.agent_status)
           this.$VueEvent.fire('user_updated', data)
-          console.log('Changed agent status [api]: ', data.agent_status)
+          console.log('Changed agent status [api]: ', this.getStatusLabel(data.agent_status))
         }).catch(err => {
           changeAgentStatusTry++
           // error
