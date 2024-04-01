@@ -107,8 +107,7 @@
                     v-if="communication.type !== CommunicationTypes.SMS"
                     v-html="$options.filters.nl2br(communication.body)">
               </span>
-              <span class="text-muted fs-14 font-weight-light-bold"
-                    style="white-space: pre-line; word-break: break-word;"
+              <span class="text-muted fs-14 font-weight-light-bold handle-whitespace break-word"
                     v-else>
                   {{ communication.body }}
               </span>
