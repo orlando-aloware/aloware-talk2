@@ -921,7 +921,7 @@ export default {
         console.log('Changed agent status [event]: ', this.getStatusLabel(user.agent_status))
         console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
 
-        if (this.oldAgentStatus) {
+        if (this.oldAgentStatus !== undefined) {
           this.resetAgentStatus()
         }
       }
