@@ -391,7 +391,8 @@ export default {
       'isIntroVideoVisible',
       'showedKycDialog',
       'showedKycReloadDialog',
-      'statics'
+      'statics',
+      'oldAgentStatus'
     ]),
 
     ...mapState('auth', [
@@ -917,6 +918,7 @@ export default {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
         console.log('Changed agent status [event]: ', this.getAgentStatus(user.agent_status))
+        console.log('Old Agent Status: ', this.getAgentStatus(this.oldAgentStatus))
       }
     }
 
