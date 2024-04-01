@@ -764,9 +764,10 @@ export default {
         if (tagsFilter && tagsArray) {
           // Iterate over tagsArray to get the array of options for each element
           let tagsToFetch = []
+
           tagsArray.forEach(tag => {
             const trueValueArray = tag.trueValue
-            if (Array.isArray(trueValueArray) && trueValueArray.length) {
+            if (Array.isArray(trueValueArray) && trueValueArray.length && trueValueArray[0]) {
               tagsToFetch = [...tagsToFetch, ...trueValueArray[0]]
             }
           })
@@ -780,7 +781,8 @@ export default {
           // Iterate over tagsArray to get the array of options for each element
           let tagsToFetch = []
           tagsArray.forEach(tag => {
-            if (Array.isArray(tag?.value) && tag?.value?.length) {
+            const tagValue = tag?.value
+            if (tagValue && Array.isArray(tagValue) && tagValue.length) {
               tagsToFetch = [...tagsToFetch, ...tag.value]
             }
           })
