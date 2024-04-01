@@ -98,7 +98,6 @@ export default {
 
       if (this.oldAgentStatus !== undefined) {
         this.resetAgentStatus()
-        this.setOldAgentStatus(undefined)
       }
     },
 
