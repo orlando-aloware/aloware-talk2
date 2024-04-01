@@ -917,8 +917,13 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
+
         console.log('Changed agent status [event]: ', this.getStatusLabel(user.agent_status))
         console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
+
+        if (this.oldAgentStatus) {
+          this.resetAgentStatus()
+        }
       }
     }
 
