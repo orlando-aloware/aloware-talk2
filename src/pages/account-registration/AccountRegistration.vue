@@ -169,22 +169,6 @@
 
             <div class="accept-box">
               <div>
-                <div class="carrier-fees">
-                  <q-checkbox class="mb-3"
-                              color="primary"
-                              dense
-                              v-model="form.agreed_on_sms_fees">
-                    <template slot="default">
-                      I agree to
-                      <a class="text-weight-bold"
-                         @click.stop="openLink('https://support.aloware.com/en/articles/9032003-a2p-10dlc-fees-brand-registration-and-campaign-costs')">
-                        Notice on Carrier Fees for SMS and MMS
-                      </a>
-                    </template>
-
-                  </q-checkbox>
-                </div>
-
                 <div>
                   <q-checkbox class="mb-3 q-pr-xs"
                               color="primary"
@@ -514,7 +498,6 @@ export default {
         this.form.password_confirmation?.length &&
         this.password_validation?.length === 4 &&
         this.form.agreed_to_terms &&
-        this.form.agreed_on_sms_fees &&
         !this.disabledSubmit // recaptcha
       )
     },
