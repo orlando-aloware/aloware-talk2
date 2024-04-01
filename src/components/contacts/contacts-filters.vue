@@ -780,7 +780,7 @@ export default {
           // Iterate over tagsArray to get the array of options for each element
           let tagsToFetch = []
           tagsArray.forEach(tag => {
-            if (tag?.value?.length) {
+            if (Array.isArray(tag?.value) && tag?.value?.length) {
               tagsToFetch = [...tagsToFetch, ...tag.value]
             }
           })
