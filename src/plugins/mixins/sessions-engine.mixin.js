@@ -63,14 +63,21 @@ export default {
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
     onStatusCompleted (task) {
-      let contactTask = this.powerDialerTasks.in_queue.find(item => item.id === task.contact.id)
-      this.powerDialerTasks.called.push(contactTask)
+      if (isEmpty(task)) {
+        return
+      }
+      const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
+      if (contactTask) {
+        let tempSet = new Set([...this.powerDialerTasks['called'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+        this.powerDialerTasks['called'] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+      }
       // window.VueEvent.fire('initiate_session', task)
     },
     onStatusFailed (task) {
-      let contactTask = this.powerDialerTasks.in_queue.find(item => item.id === task.contact.id)
+      const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
       if (contactTask) {
-        this.powerDialerTasks.failed.push(contactTask)
+        let tempSet = new Set([...this.powerDialerTasks['failed'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+        this.powerDialerTasks['failed'] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
       }
     },
     onStatusQueued (task) {

@@ -379,7 +379,7 @@ export default {
 
           const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.fetch(params, false, true)
-          this.$generalNotification('Contacts was successfully removed.')
+          this.$generalNotification('Contacts were successfully removed.')
         })
         .catch((_err) => {
           this.$generalNotification('Unable to remove contacts please try again.', 'error')

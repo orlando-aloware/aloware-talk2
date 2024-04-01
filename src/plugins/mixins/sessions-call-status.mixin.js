@@ -27,6 +27,7 @@ export default {
   computed: {
     ...mapState('powerDialer', [
       'powerDialerTasks',
+      'inQueueFetchTasks',
       'redialed'
     ]),
 
@@ -253,6 +254,8 @@ export default {
         .then(res => {
           if (!this.skippedTasks.includes(contactListItemId)) {
             this.skippedTasks.push(contactListItemId)
+            let tempSet = new Set([...this.powerDialerTasks.skipped, autoDialTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+            this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
           }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list
