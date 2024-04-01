@@ -12,7 +12,7 @@
              color="success"
              no-caps
              unelevated
-             :disabled="disabledTrigger || callDisabled"
+             :disabled="disabledTrigger || callDisabled || isAgentOnCall"
              @click="dialPreparation">
         <PhoneIcon class="mr-2"
                    color="white"
@@ -22,6 +22,9 @@
           Start Dialing
           <q-tooltip v-if="disabledTrigger">
             To start dialing, a minimum of one (1) contact item in the list is required.
+          </q-tooltip>
+          <q-tooltip v-if="isAgentOnCall">
+            It is not possible to start a dialer if there is a call in progress on another device.
           </q-tooltip>
         </div>
       </q-btn>
@@ -195,15 +198,20 @@
                              @click="newSetting = true">
                         Save As New
                       </q-btn>
-                      <q-btn class="px-3 py-0 ml-2"
-                             size="sm"
-                             color="success"
-                             unelevated
-                             no-caps
-                             :disabled="disabled"
-                             @click="beginDial">
-                        {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
-                      </q-btn>
+                      <div>
+                        <q-btn class="px-3 py-0 ml-2"
+                               size="sm"
+                               color="success"
+                               unelevated
+                               no-caps
+                               :disabled="disabled || isAgentOnCall"
+                               @click="beginDial">
+                               {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                        </q-btn>
+                        <q-tooltip v-if="isAgentOnCall">
+                          There is a call in progress on another device.
+                        </q-tooltip>
+                      </div>
                     </div>
                   </div>
                   <div class="row mt-3 mb-2">
@@ -331,6 +339,7 @@ import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
+import * as AgentStatus from 'src/constants/agent-status'
 import SettingIcon from 'components/icons/setting-o-icon'
 import BlockTooltip from 'components/kyc/block-tooltip'
 import { isEmpty, isEqual } from 'lodash'
@@ -481,6 +490,10 @@ export default {
 
     isSaveAsNewAllowed () {
       return !this.isBusy && !this.newSetting && !this.disabled
+    },
+
+    isAgentOnCall () {
+      return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
 
