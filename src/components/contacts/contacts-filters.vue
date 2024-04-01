@@ -761,7 +761,7 @@ export default {
 
         // Get the tags filter object
         let tagsFilter = this.filters.find(filter => filter.key === 'tags')
-        if (tagsFilter) {
+        if (tagsFilter && tagsArray) {
           // Iterate over tagsArray to get the array of options for each element
           let tagsToFetch = []
           tagsArray.forEach(tag => {
@@ -776,7 +776,7 @@ export default {
           tagsFilter.options = this.tagsOptions
         }
 
-        if (!tagsFilter) {
+        if (!tagsFilter && tagsArray) {
           // Iterate over tagsArray to get the array of options for each element
           let tagsToFetch = []
           tagsArray.forEach(tag => {
