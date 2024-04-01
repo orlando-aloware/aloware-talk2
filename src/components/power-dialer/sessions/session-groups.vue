@@ -559,6 +559,16 @@ export default {
         return false
       }
 
+      // If the task type is IN QUEUE, we check if the total of items in queue plus the total of skipped tasks
+      // is greater than or equal to the total of items in queue that are allowed to be queued
+      if (taskType === TaskType.IN_QUEUE) {
+        const totalInQueue = group.length + 1 // items in current queue + the one in progress
+        const totalSkipped = this.powerDialerTasks.skipped.length
+        if ((totalInQueue + totalSkipped) >= this.powerDialerTaskFilters.in_queue.total_queued) {
+          return false
+        }
+      }
+
       return group.length < this.getTotalItem(taskType)
     },
 
