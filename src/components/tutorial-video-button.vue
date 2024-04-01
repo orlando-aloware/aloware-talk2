@@ -53,7 +53,7 @@ export default {
           title: '📞 Explore Aloware Talk | Your Complete Guide',
           cookieName: 'inbox',
           videoUrl: 'https://www.youtube.com/embed/1YjuDUF53iQ?si=1qCnFh9y2D0gqZsc',
-          learnMoreLink: 'https://support.aloware.com/logging-in-to-aloware-talk-a-step-by-step-guide-for-agents',
+          learnMoreLink: 'https://support.aloware.com/en/articles/9034164-logging-in-to-aloware-talk-a-step-by-step-guide-for-agents',
           notes: '🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊',
           shouldShowInFirstVisit: false
         },
@@ -61,7 +61,7 @@ export default {
           title: '📇 Unveil the Contacts Tab in Aloware!',
           cookieName: 'contacts',
           videoUrl: 'https://www.youtube.com/embed/U5l4PMXOpSM?si=9Wlh4v_pBtdO9EAz',
-          learnMoreLink: 'https://support.aloware.com/aloware-talk-2-contacts-menu',
+          learnMoreLink: 'https://support.aloware.com/en/articles/9020090-aloware-talk-2-contacts-menu',
           notes: 'Discover, organize, and optimize your network. </br></br>The Contacts Tab is your gateway to streamlined connections. </br></br>Delve in and direct your networking journey to triumph with every contact!',
           shouldShowInFirstVisit: true
         },
@@ -69,7 +69,7 @@ export default {
           title: '🚀 Mastering Aloware Wallboard: Elevate Your Contact Center Insights',
           cookieName: 'wallboard',
           videoUrl: 'https://www.youtube.com/embed/WU2R7haxbDQ?si=86mi9-Mmdz8E8Srv',
-          learnMoreLink: 'https://support.aloware.com/introducing-aloware-wallboard-your-real-time-communication-metrics-dashboard',
+          learnMoreLink: 'https://support.aloware.com/en/articles/9034191-introducing-aloware-wallboard-your-real-time-communication-metrics-dashboard',
           notes: '🚀 Amplify your insights with <strong>Aloware Wallboard!</strong> </br></br> 🌟 Visualize, track, and dominate. Dive into real-time data like never before. </br></br> Your dashboard revolution starts here!',
           shouldShowInFirstVisit: true
         },
@@ -77,7 +77,7 @@ export default {
           title: 'Master Bulk SMS with Aloware Broadcast 💬',
           cookieName: 'broadcasts4',
           videoUrl: 'https://www.youtube.com/embed/nSAAyHLAnk4?si=PW_Mod_FJtO8jcFY',
-          learnMoreLink: 'https://support.aloware.com/exploring-aloware-talks-broadcast',
+          learnMoreLink: 'https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast',
           notes: 'Dive deep into Aloware\'s Bulk SMS feature, perfect for boosting your marketing campaigns.#SuperchargeYourOutreach. </br></br> 📱 Explore the power of Aloware\'s Bulk SMS Broadcast: a game-changer for your marketing strategies.',
           shouldShowInFirstVisit: true
         },
@@ -85,7 +85,7 @@ export default {
           title: '🏷️ Mastering Aloware Tags: Organize Your Contacts Effectively',
           cookieName: 'tags',
           videoUrl: 'https://www.youtube.com/embed/I68fcqIrW7E?si=QtbTTk2vzauPqpAd',
-          learnMoreLink: 'https://support.aloware.com/tags-in-aloware-talk-organize-your-contacts-with-ease',
+          learnMoreLink: 'https://support.aloware.com/en/articles/9034198-tags-in-aloware-talk-organize-your-contacts-with-ease',
           notes: '🌟 <strong>Tags</strong> = Your Ultimate Categorizer! </br></br> 🌟 Like Lists, but leveled up! Place the same person everywhere. </br></br> Bonus? Enroll a whole Tag audience in a sequence. </br></br> Plus, new contacts? They flash in with a fresh tag stamped with their upload date. 🚀',
           shouldShowInFirstVisit: true
         },
