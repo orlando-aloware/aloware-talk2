@@ -386,6 +386,11 @@ export default {
     },
 
     selectFilter (filter) {
+      if (filter.key === 'tags') {
+        // Prevent duplicated options
+        let optionsSet = new Set(filter.options.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+        filter.options = Array.from(optionsSet).map(JSON.parse) // Convert elements back to their original types
+      }
       this.selectedFilter = filter
       this.filterSearch = ''
       this.step = 3
@@ -578,7 +583,7 @@ export default {
                 ? index.includes(filterFound.key === 'tags' ? option.id : option.value)
                 : index === (filterFound.key === 'tags' ? option.id : option.value))
               .forEach(option => {
-                if (filterFound.key === 'tags' && !labels.includes(option.label)) {
+                if (filterFound.key === 'tags' && !labels.includes(option.name)) {
                   labels.push(option.name)
                 }
                 if (filterFound.key !== 'tags') {
