@@ -917,8 +917,8 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
-        console.log('Changed agent status [event]: ', this.getAgentStatus(user.agent_status))
-        console.log('Old Agent Status: ', this.getAgentStatus(this.oldAgentStatus))
+        console.log('Changed agent status [event]: ', this.getStatusLabel(user.agent_status))
+        console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
       }
     }
 
@@ -938,7 +938,7 @@ export default {
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
         this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
         this.setAgentStatus(event.agent_status)
-        console.log('Changed agent status [event]: ', this.getAgentStatus(event.agent_status))
+        console.log('Changed agent status [event]: ', this.getStatusLabel(event.agent_status))
       }
     }
 
