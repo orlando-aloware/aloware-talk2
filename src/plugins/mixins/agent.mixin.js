@@ -92,6 +92,16 @@ export default {
       }
     },
 
+    verifyOldAgentStatus (agentStatus = 0) {
+      console.log('Changed agent status [event]: ', this.getStatusLabel(agentStatus))
+      console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
+
+      if (this.oldAgentStatus !== undefined) {
+        this.resetAgentStatus()
+        this.setOldAgentStatus(undefined)
+      }
+    },
+
     resetAgentStatus (forceStatus = false, signature = 'Talk-ResetAgentStatus') {
       let agentStatus = null
 
