@@ -414,7 +414,8 @@ export default {
     ]),
 
     ...mapState('powerDialer', [
-      'ongoingSession'
+      'ongoingSession',
+      'isSessionRunning'
     ]),
 
     ...mapState(['xmasEnabled']),
@@ -917,7 +918,10 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
-        this.verifyOldAgentStatus(user.agent_status)
+
+        if (!this.isSessionRunning) {
+          this.verifyOldAgentStatus(user.agent_status)
+        }
       }
     }
 
