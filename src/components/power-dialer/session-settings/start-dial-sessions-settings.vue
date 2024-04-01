@@ -200,13 +200,13 @@
                       </q-btn>
                       <div>
                         <q-btn class="px-3 py-0 ml-2"
-                              size="sm"
-                              color="success"
-                              unelevated
-                              no-caps
-                              :disabled="disabled || isAgentOnCall"
-                              @click="beginDial">
-                          {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
+                               size="sm"
+                               color="success"
+                               unelevated
+                               no-caps
+                               :disabled="disabled || isAgentOnCall"
+                               @click="beginDial">
+                               {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
                         </q-btn>
                         <q-tooltip v-if="isAgentOnCall">
                           There is a call in progress on another device.

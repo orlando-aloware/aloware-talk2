@@ -55,15 +55,15 @@
             </b-form-group>
             <div>
               <q-btn icon="img:app-icons/dialer/call_btn.svg"
-                    size="32px"
-                    class="icon-btn auto-size height-32"
-                    align="right"
-                    padding="none"
-                    rounded
-                    flat
-                    :ripple="true"
-                    :disable="callDisabled"
-                    @click="onCall">
+                     size="32px"
+                     class="icon-btn auto-size height-32"
+                     align="right"
+                     padding="none"
+                     rounded
+                     flat
+                     :ripple="true"
+                     :disable="callDisabled"
+                     @click="onCall">
               </q-btn>
               <q-tooltip v-if="isAgentOnCall">
                 There is a call in progress on another device.
@@ -312,7 +312,13 @@ export default {
     },
 
     callDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber) || this.isAgentOnCall
+      const isCallDisabled = !this.validPhoneNumber ||
+      !this.phoneNumber.length ||
+      !this.campaignId ||
+      !this.enabledToCallNumber(this.phoneNumber) ||
+      this.isAgentOnCall
+
+      return isCallDisabled
     },
 
     sendDisabled () {
