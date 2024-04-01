@@ -766,7 +766,7 @@ export default {
           let tagsToFetch = []
           tagsArray.forEach(tag => {
             const trueValueArray = tag.trueValue
-            if (tag?.trueValue?.length) {
+            if (Array.isArray(trueValueArray) && trueValueArray.length) {
               tagsToFetch = [...tagsToFetch, ...trueValueArray[0]]
             }
           })
