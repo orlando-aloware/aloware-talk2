@@ -53,7 +53,7 @@
                 <q-img class="img-fluid d-block r-2x br-8"
                        height="300px"
                        native-context-menu
-                       :class="index > 0 ? 'mb-1' : ''"
+                       :class="index > 0 ? 'mb-1 mt-1' : ''"
                        :src="attachment.url"
                        v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
                   <template v-slot:error>
