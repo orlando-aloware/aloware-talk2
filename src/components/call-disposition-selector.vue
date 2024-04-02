@@ -31,7 +31,12 @@
       <template slot="option" slot-scope="props">
         <div class="option__desc">
           <q-icon name="fa fa-bolt"
-                  :style="{ color: props.option.color }">
+                  :style="{ color: props.option.color }"
+                  v-show="!props.option.is_external">
+          </q-icon>
+          <q-icon name="fa fa-lock"
+                  :style="{ color: props.option.color }"
+                  v-show="props.option.is_external">
           </q-icon>
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
@@ -69,7 +74,12 @@
       <template slot="option" slot-scope="props">
         <div class="option__desc">
           <q-icon name="fa fa-bolt"
-                  :style="{ color: props.option.color }">
+                  :style="{ color: props.option.color }"
+                  v-show="!props.option.is_external">
+          </q-icon>
+          <q-icon name="fa fa-lock"
+                  :style="{ color: props.option.color }"
+                  v-show="props.option.is_external">
           </q-icon>
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
