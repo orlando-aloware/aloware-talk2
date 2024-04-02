@@ -772,9 +772,11 @@ export default {
             }
           })
 
-          // Request the tags from the API using the IDs and assign the list to the tags filter
-          await this.getTags(tagsToFetch)
-          tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
+          if (tagsToFetch.length) {
+            // Request the tags from the API using the IDs and assign the list to the tags filter
+            await this.getTags(tagsToFetch)
+            tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
+          }
         }
 
         if (!tagsFilter && tagsArray) {
@@ -787,11 +789,13 @@ export default {
             }
           })
 
-          // Request the tags from the API using the IDs and assign the list to the tags filter
-          await this.getTags(tagsToFetch)
-          let tagsFilter = this.filters.find(filter => filter.key === 'tags')
-          if (tagsFilter) {
-            tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
+          if (tagsToFetch.length) {
+            // Request the tags from the API using the IDs and assign the list to the tags filter
+            await this.getTags(tagsToFetch)
+            let tagsFilter = this.filters.find(filter => filter.key === 'tags')
+            if (tagsFilter) {
+              tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
+            }
           }
         }
       }
