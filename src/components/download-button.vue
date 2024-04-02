@@ -22,7 +22,7 @@
                     :loading="isLoading"
                     :disabled="isLoading"
                     v-if="!isSimple && !isSimpleAttachment && !hasFilenameExtension">
-      <portal-target :name="`downloadDropdownList-${communicationId}`"/>
+      <portal-target :name="uniqueIdentifier"/>
     </q-btn-dropdown>
     <div class="d-flex align-items-center"
          v-if="isSimple && !isSimpleAttachment">
@@ -59,7 +59,7 @@
         <download-icon height="16"
                        width="16">
         </download-icon>
-        <portal-target :name="`downloadDropdownList-${communicationId}`"/>
+        <portal-target :name="uniqueIdentifier"/>
       </q-btn-dropdown>
     </div>
     <a role="button"
@@ -73,7 +73,7 @@
         </p>
       </div>
     </a>
-    <portal :to="`downloadDropdownList-${communicationId}`">
+    <portal :to="uniqueIdentifier">
       <q-list>
         <q-item class="p-2"
                 clickable
@@ -176,6 +176,10 @@ export default {
   computed: {
     hasFilenameExtension () {
       return this.filename.includes('.')
+    },
+
+    uniqueIdentifier () {
+      return `downloadDropdownList-${this.communicationId}-${this.attachmentUrl}-${this.fileUuidValue}`
     }
   },
 
