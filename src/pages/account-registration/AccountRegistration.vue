@@ -684,6 +684,8 @@ export default {
       this.isLoading = true
       this.loadingText = 'Please wait while we are sending your information...'
 
+      this.form.agreed_on_sms_fees = true
+
       const payload = {
         ...this.form,
         verification_token: this.$route.params.verification_token,
