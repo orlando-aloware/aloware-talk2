@@ -1250,7 +1250,7 @@ export default {
         this.wrapUp = false
         this.hasActiveTask = false
         // Add task to skipped list when users clicks on the Next button
-        if (!forceSkip && skipWrapUp && this.dialer.currentStatus === 'READY') {
+        if (!forceSkip && skipWrapUp && this.sessionPaused) {
           this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
         }
         const task = get(this.powerDialerTasks.in_queue, '0', null)
