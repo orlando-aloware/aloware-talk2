@@ -656,11 +656,11 @@ export default {
             // Create a temporary set to handle unique items
             let tempSet = new Set([...this.appliedTags, ...selectedOptions])
             // Convert the temporary set back to an array
-            this.filter.options = Array.from(tempSet)
+            this.appliedTags = Array.from(tempSet)
+            this.filter.options = this.appliedTags
           }
           this.processFilters()
           this.appliedFiltersInProgress = false
-          this.appliedTags = []
           clearInterval(applyFilterInterval)
         }
       }, debounceDelay)

@@ -387,6 +387,11 @@ export default {
     },
 
     selectFilter (filter) {
+      if (filter.key === 'tags') {
+        // Prevent duplicated options
+        let optionsSet = new Set(filter.options.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+        filter.options = Array.from(optionsSet).map(JSON.parse) // Convert elements back to their original types
+      }
       this.selectedFilter = filter
       this.filterSearch = ''
       this.step = 3
@@ -568,7 +573,7 @@ export default {
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
         }
-        console.log('getFormattedFilterSummary filterFound', filterFound)
+
         if (filterFound && (isRelationType || isSelectionType)) {
           for (let index of values) {
             filterFound
@@ -769,7 +774,7 @@ export default {
 
           // Request the tags from the API using the IDs and assign the list to the tags filter
           await this.getTags(tagsToFetch)
-          tagsFilter.options = this.tagsOptions
+          tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
         }
 
         if (!tagsFilter && tagsArray) {
@@ -786,7 +791,7 @@ export default {
           await this.getTags(tagsToFetch)
           let tagsFilter = this.filters.find(filter => filter.key === 'tags')
           if (tagsFilter) {
-            tagsFilter.options = this.tagsOptions
+            tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
           }
         }
       }
