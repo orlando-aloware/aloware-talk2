@@ -805,7 +805,7 @@
                 </div>
               </b-col>
             </b-form-row>
-            <b-form-row v-if="currentCompany.hubspot_type_field_on_dialer">
+            <b-form-row v-if="currentCompany.hubspot_integration_enabled">
               <b-col class="pl-0 pr-0">
                 <q-item-label class="mt-3 custom-item-label">Hubspot Type: </q-item-label>
               </b-col>

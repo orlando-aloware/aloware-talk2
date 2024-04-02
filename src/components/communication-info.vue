@@ -720,7 +720,7 @@
                     <call-disposition-selector :communication="communication"></call-disposition-selector>
                   </div>
                   <div class="mt-2 w-100"
-                       v-if="currentCompany.hubspot_type_field_on_dialer">
+                       v-if="currentCompany.hubspot_integration_enabled">
                     <div class="d-flex align-items-center co-12">
                       <label class="form-control-label mb-1">Hubspot Type:</label>
                     </div>
