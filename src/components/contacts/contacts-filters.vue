@@ -387,11 +387,6 @@ export default {
     },
 
     selectFilter (filter) {
-      if (filter.key === 'tags') {
-        // Prevent duplicated options
-        let optionsSet = new Set(filter.options.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
-        filter.options = Array.from(optionsSet).map(JSON.parse) // Convert elements back to their original types
-      }
       this.selectedFilter = filter
       this.filterSearch = ''
       this.step = 3
@@ -573,7 +568,7 @@ export default {
           case filter.trueValue.length === 2 && filter.operator === 'Is between':
             return filter.trueValue.join(' and ')
         }
-
+        console.log('getFormattedFilterSummary filterFound', filterFound)
         if (filterFound && (isRelationType || isSelectionType)) {
           for (let index of values) {
             filterFound
