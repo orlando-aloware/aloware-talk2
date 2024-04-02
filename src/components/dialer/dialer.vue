@@ -456,7 +456,8 @@ export default {
       return this.$axios.get('/api/v1/communication/info', {
         params: {
           sid: sid,
-          phone_number: from
+          phone_number: from,
+          live: true
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
