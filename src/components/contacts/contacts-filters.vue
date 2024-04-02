@@ -832,7 +832,6 @@ export default {
       deep: true,
       handler: function () {
         this.visibleListFilters = this.generateListFilters()
-        console.log('this.visibleListFilters', this.visibleListFilters)
         if (this.visibleListFilters.length) {
           this.fetchTagsOptions()
         }
