@@ -92,10 +92,8 @@ export default {
     ...mapState(['campaigns']),
 
     selectedCampaign () {
-      console.log('campaignId: ', this.campaignId)
-      console.log('campaigns: ', this.campaigns)
       if (this.campaigns) {
-        // return this.campaigns.find(campaign => campaign.id === this.campaignId)
+        return this.campaigns.find(campaign => campaign.id === this.campaignId && campaign.incoming_number)
       }
 
       return null
