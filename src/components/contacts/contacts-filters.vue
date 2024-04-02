@@ -225,7 +225,8 @@ export default {
         GROUP_CONTACT_COMM_METADATA
       },
       maxOuterFilters: 3, // OR
-      maxInnerFilters: 5 // AND
+      maxInnerFilters: 5, // AND
+      tagsOptions: []
     }
   },
 
@@ -318,7 +319,7 @@ export default {
     this.visibleListFilters = this.generateListFilters()
   },
 
-  mounted () {
+  async mounted () {
     this.step = 1
 
     if (this.isFiltersOpen) {
@@ -331,7 +332,7 @@ export default {
       return Object.keys(filtersGroup).map(filter => filtersGroup[filter].length).reduce((acc, value) => acc + value, 0) >= this.maxInnerFilters
     },
 
-    getFilters () {
+    async getFilters () {
       if (this.hasPermissionTo('list filter')) {
         this.loadingFilters = true
 
@@ -552,7 +553,6 @@ export default {
       if (!filter.trueValue) {
         return ''
       }
-
       const filterFound = this.filters.find(filter => filter.key === key)
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
@@ -747,6 +747,75 @@ export default {
       return true
     },
 
+    async fetchTagsOptions () {
+      // If no filters have been loaded, we request them
+      if (this.filters.length < 1) {
+        await this.getFilters()
+      }
+
+      // Get list of filters inside visibleListFilters
+      const filters = this.visibleListFilters?.[0]?.filters
+      if (filters) {
+        // Get the tags filter and look for the options in it
+        const tagsArray = filters.tags
+
+        // Get the tags filter object
+        let tagsFilter = this.filters.find(filter => filter.key === 'tags')
+        if (tagsFilter && tagsArray) {
+          // Iterate over tagsArray to get the array of options for each element
+          let tagsToFetch = []
+
+          tagsArray.forEach(tag => {
+            const trueValueArray = tag.trueValue
+            if (Array.isArray(trueValueArray) && trueValueArray.length && trueValueArray[0]) {
+              tagsToFetch = [...tagsToFetch, ...trueValueArray[0]]
+            }
+          })
+
+          if (tagsToFetch.length) {
+            // Request the tags from the API using the IDs and assign the list to the tags filter
+            await this.getTags(tagsToFetch)
+            tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
+          }
+        }
+
+        if (!tagsFilter && tagsArray) {
+          // Iterate over tagsArray to get the array of options for each element
+          let tagsToFetch = []
+          tagsArray.forEach(tag => {
+            const tagValue = tag?.value
+            if (tagValue && Array.isArray(tagValue) && tagValue.length) {
+              tagsToFetch = [...tagsToFetch, ...tag.value]
+            }
+          })
+
+          if (tagsToFetch.length) {
+            // Request the tags from the API using the IDs and assign the list to the tags filter
+            await this.getTags(tagsToFetch)
+            let tagsFilter = this.filters.find(filter => filter.key === 'tags')
+            if (tagsFilter) {
+              tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
+            }
+          }
+        }
+      }
+    },
+
+    async getTags (ids) {
+      let params = {
+        full_load: true,
+        tag_ids: ids
+      }
+
+      return talk2Api.V1.tags.get({
+        params: params
+      }).then(res => {
+        this.tagsOptions = res.data
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
     ...mapActions('contacts', [
       'openFilters',
       'closeFilters',
@@ -771,6 +840,9 @@ export default {
       deep: true,
       handler: function () {
         this.visibleListFilters = this.generateListFilters()
+        if (this.visibleListFilters.length) {
+          this.fetchTagsOptions()
+        }
 
         // if there's any change in the current list's filters,
         // we need to update the filter group index value to
