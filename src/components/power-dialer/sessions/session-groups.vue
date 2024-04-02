@@ -506,7 +506,7 @@ export default {
         case AutoDialTaskStatus.STATUSES.failed:
           return this.listItems[this.selectedList.id].total_failed
         case AutoDialTaskStatus.STATUSES.in_queue:
-          return this.listItems[this.selectedList.id].total_queued
+          return this.listItems[this.selectedList.id].total_found || this.listItems[this.selectedList.id].total_queued
         case AutoDialTaskStatus.STATUSES.scheduled:
           return this.listItems[this.selectedList.id].total_scheduled
         default:
