@@ -754,49 +754,41 @@ export default {
       }
 
       // Get list of filters inside visibleListFilters
-      const filters = this.visibleListFilters?.[0]?.filters
-      if (filters) {
-        // Get the tags filter and look for the options in it
-        const tagsArray = filters.tags
+      // We create an auxiliary array to store the objects that contain the 'tags' property
+      let tagsFilters = []
 
-        // Get the tags filter object
-        let tagsFilter = this.filters.find(filter => filter.key === 'tags')
-        if (tagsFilter && tagsArray) {
-          // Iterate over tagsArray to get the array of options for each element
-          let tagsToFetch = []
-
-          tagsArray.forEach(tag => {
-            const trueValueArray = tag.trueValue
-            if (Array.isArray(trueValueArray) && trueValueArray.length && trueValueArray[0]) {
-              tagsToFetch = [...tagsToFetch, ...trueValueArray[0]]
+      // We iterate over the properties of the 'visibleListFilters' object
+      for (let key in this.visibleListFilters) {
+        // We check if the 'tags' property is present in the current object
+        if (this.visibleListFilters[key].hasOwnProperty('filters') && this.visibleListFilters[key]['filters'].hasOwnProperty('tags')) {
+          // We iterate over the properties of the 'tags' object
+          for (let tagKey in this.visibleListFilters[key]['filters']['tags']) {
+            if (this.visibleListFilters[key]['filters']['tags'][tagKey]) {
+              // If the 'tags' property is present, we add the entire object to the auxiliary array
+              tagsFilters = [...tagsFilters, this.visibleListFilters[key]['filters']['tags'][tagKey]]
             }
-          })
-
-          if (tagsToFetch.length) {
-            // Request the tags from the API using the IDs and assign the list to the tags filter
-            await this.getTags(tagsToFetch)
-            tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
           }
         }
+      }
 
-        if (!tagsFilter && tagsArray) {
-          // Iterate over tagsArray to get the array of options for each element
-          let tagsToFetch = []
-          tagsArray.forEach(tag => {
-            const tagValue = tag?.value
-            if (tagValue && Array.isArray(tagValue) && tagValue.length) {
-              tagsToFetch = [...tagsToFetch, ...tag.value]
-            }
-          })
-
-          if (tagsToFetch.length) {
-            // Request the tags from the API using the IDs and assign the list to the tags filter
-            await this.getTags(tagsToFetch)
-            let tagsFilter = this.filters.find(filter => filter.key === 'tags')
-            if (tagsFilter) {
-              tagsFilter.options = [...tagsFilter.options, ...this.tagsOptions]
-            }
+      if (tagsFilters.length) {
+        // We collect the tags ids in an array in order to send request to the API
+        let tagsToFetch = []
+        tagsFilters.forEach(tag => {
+          const trueValueArray = tag.trueValue
+          if (Array.isArray(trueValueArray) && trueValueArray.length && trueValueArray[0]) {
+            tagsToFetch = [...tagsToFetch, ...trueValueArray[0]]
           }
+        })
+
+        // Get the tags filter object
+        let tagsFilterToUpdate = this.filters.find(filter => filter.key === 'tags')
+
+        // If the tags filter object is found and there are tags to fetch
+        if (tagsFilterToUpdate && tagsToFetch.length) {
+          // Request the tags from the API using the IDs and assign the list to the tags filter
+          await this.getTags(tagsToFetch)
+          tagsFilterToUpdate.options = this.tagsOptions
         }
       }
     },
@@ -840,6 +832,7 @@ export default {
       deep: true,
       handler: function () {
         this.visibleListFilters = this.generateListFilters()
+        console.log('this.visibleListFilters', this.visibleListFilters)
         if (this.visibleListFilters.length) {
           this.fetchTagsOptions()
         }
