@@ -84,7 +84,7 @@ export default {
     },
 
     openKnowledgeBaseLink () {
-      window.open('https://support.aloware.com/introducing-aloware-wallboard-your-real-time-communication-metrics-dashboard', '_blank')
+      window.open('https://support.aloware.com/en/articles/9034191-introducing-aloware-wallboard-your-real-time-communication-metrics-dashboard', '_blank')
     },
 
     checkClick () {

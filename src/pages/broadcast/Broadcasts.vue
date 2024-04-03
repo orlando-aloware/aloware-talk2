@@ -370,7 +370,7 @@
                       text="Scale your outreach with the click of a button. Send captivating SMS campaigns to many contacts at once via Broadcast."
                       extra-text="Upgrade today to unlock this feature"
                       title-text="Broadcast"
-                      kb-link="https://support.aloware.com/exploring-aloware-talks-broadcast"
+                      kb-link="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
                       class="mt-5"
                       v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
     </upgrade-now-page>
@@ -813,11 +813,11 @@ export default {
     },
 
     isPausable (broadcast) {
-      return [BroadcastStatuses.STATUS_ENROLLING, BroadcastStatuses.STATUS_NEW].includes(broadcast.status)
+      return [BroadcastStatuses.STATUS_ENROLLING_ID, BroadcastStatuses.STATUS_NEW_ID].includes(broadcast.status)
     },
 
     isPlayable (broadcast) {
-      return broadcast.status === BroadcastStatuses.STATUS_PAUSED
+      return broadcast.status === BroadcastStatuses.STATUS_PAUSED_ID
     },
 
     shouldAllowContextMenuBulk (action) {

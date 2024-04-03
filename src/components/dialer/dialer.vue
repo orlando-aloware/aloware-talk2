@@ -57,7 +57,7 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany', 'profile']),
+    ...mapState('cache', ['currentCompany']),
 
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
 
@@ -290,7 +290,6 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
-      this.checkForcedStatus()
     })
 
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
@@ -380,20 +379,6 @@ export default {
   },
 
   methods: {
-    checkForcedStatus () {
-      if (!this.profile.lastCall) {
-        return
-      }
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.lastCall.contact.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.lastCall.call_disposition_id
-      if (shouldForceContactDisposition || shouldForceCallDisposition) {
-        this.setDialerCommunication(this.profile.lastCall)
-        this.setDialerContact(this.profile.lastCall.contact)
-        this.startWrapUpTimer()
-      }
-    },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
@@ -471,7 +456,8 @@ export default {
       return this.$axios.get('/api/v1/communication/info', {
         params: {
           sid: sid,
-          phone_number: from
+          phone_number: from,
+          live: true
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
@@ -607,6 +593,11 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
+        return
+      }
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({

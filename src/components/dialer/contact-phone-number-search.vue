@@ -1,18 +1,18 @@
 <template>
-  <vue-bootstrap-typeahead :serializer="serializer"
-                           :data="phoneNumbers"
-                           :minMatchingChars="3"
-                           :prepend="prependText"
-                           :class="[no_prepend ? 'no-prepend' : '']"
-                           ref="searchField"
-                           v-model="query"
-                           class="important search-form contact-phone-number-search"
-                           placeholder="Name or phone number"
-                           @hit="changePhoneNumber">
+  <vue-bootstrap-autocomplete :serializer="(item) => item.phone_number"
+                              :screen-reader-text-serializer="(item) => this.getContactName(item)"
+                              :data="phoneNumbers"
+                              :minMatchingChars="3"
+                              :showAllResults="true"
+                              ref="searchField"
+                              v-model="query"
+                              class="important search-form contact-phone-number-search"
+                              placeholder="Name or phone number"
+                              @input="lookupPhoneNumber"
+                              @hit="changePhoneNumber">
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
-    <template slot="suggestion"
-              slot-scope="{ data }">
+    <template slot="suggestion" slot-scope="{ data }">
       <div class="contact-name">
         <span class="text-grey-100">{{ data.phone_number | fixPhone('INTERNATIONAL') }}</span>
       </div>
@@ -22,11 +22,11 @@
         <span class="text-xs">{{ data.company_name }}</span>
       </template>
     </template>
-  </vue-bootstrap-typeahead>
+  </vue-bootstrap-autocomplete>
 </template>
 
 <script>
-import _ from 'lodash'
+import { debounce } from 'lodash'
 
 export default {
   name: 'contact-phone-number-search',
@@ -52,12 +52,6 @@ export default {
   },
 
   computed: {
-    serializer () {
-      return item => {
-        return `${this.getContactName(item)} ${item.phone_number}`
-      }
-    },
-
     prependText () {
       if (this.no_prepend) {
         return ''
@@ -97,6 +91,11 @@ export default {
     },
 
     getPhoneNumbers (search) {
+      if (!search) {
+        this.phoneNumbers = []
+        return
+      }
+
       this.phoneNumbers = []
       this.$emit('searchResults', true)
       this.$axios.get('api/v2/contacts/quick-search', {
@@ -109,12 +108,20 @@ export default {
       }).catch(err => {
         console.log(err)
         this.$handleErrors(err.response)
+      }).finally(() => {
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
       })
     },
 
     changePhoneNumber ($event) {
       this.selectedPhoneNumber = $event.phone_number
-      this.$refs.searchField.inputValue = this.selectedPhoneNumber
+      // this.$refs.searchField.inputValue = this.selectedPhoneNumber
 
       this.$emit('change', {
         currentNumber: this.selectedPhoneNumber,
@@ -123,7 +130,7 @@ export default {
         contactId: $event.contact_id,
         contactTimezone: $event.timezone
       })
-      this.blurInput()
+      // this.blurInput()
     },
 
     getContactName (item) {
@@ -132,37 +139,26 @@ export default {
       }
 
       return (item.first_name + ' ' + item.last_name).trim()
-    }
+    },
+
+    lookupPhoneNumber: debounce(function (newVal) {
+      if (this.selectedPhoneNumber && this.selectedPhoneNumber !== newVal) {
+        this.changePhoneNumber({
+          phone_number: this.query,
+          contactName: null,
+          company_name: null,
+          contact_id: null,
+          timezone: null
+        })
+      }
+      this.getPhoneNumbers(this.query)
+    }, 1000)
   },
 
   watch: {
     value () {
       this.setupForm(true)
-    },
-
-    query: _.debounce(function () {
-      if (this.value && this.value === this.query) {
-        return
-      }
-
-      if (!this.query.includes(' - +')) {
-        this.$emit('change', {
-          currentNumber: this.query,
-          contactName: '',
-          companyName: '',
-          contactId: null,
-          contactTimezone: null
-        })
-      }
-
-      if (this.query.length >= 3) {
-        this.getPhoneNumbers(this.query)
-      }
-
-      if (this.query.length < 3) {
-        this.$emit('searchResults', false)
-      }
-    }, 1000)
+    }
   }
 }
 </script>

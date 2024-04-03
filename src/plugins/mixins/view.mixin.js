@@ -2,7 +2,6 @@ import { mapActions, mapState } from 'vuex'
 import moment from 'moment'
 import { get, debounce, isEmpty } from 'lodash'
 import { COUNT_FIELDS } from 'src/constants/count-fields-default'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import talk2Api from 'src/plugins/api/api'
 
@@ -177,17 +176,7 @@ export default {
       }
 
       if (module === 'contacts') {
-        switch (integerTaskStatus) {
-          case ContactTaskStatus.STATUS_PENDING:
-            return 'Pending'
-          case ContactTaskStatus.STATUS_CLOSED:
-            return 'Closed'
-          case ContactTaskStatus.STATUS_NEW:
-            return 'New'
-          case ContactTaskStatus.STATUS_OPEN:
-          default:
-            return 'Open'
-        }
+        return this.$options.filters.fixTaskStatusName(integerTaskStatus)
       }
 
       switch (integerTaskStatus) {

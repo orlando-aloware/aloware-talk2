@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ 'macos-latest' ]
         node-version: [ '16.x' ]
-        npm-version: [ '9.x' ]
+        yarn-version: [ '1.x' ]
 
     steps:
       - name: Set Dynamic Environment
@@ -53,14 +53,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Update NPM
-        run: npm install -g npm@${{ matrix.npm-version }}
-
       - name: Node version
         run: node --version
-
-      - name: NPM version
-        run: npm --version
 
       - name: Setup Python3
         uses: actions/setup-python@v4
@@ -148,7 +142,9 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+          API_KEY_FILE: "~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8"
 
+          # AWS bucket credentials
           AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
           AWS_BUCKET: ${{ secrets.aws_bucket }}
@@ -162,7 +158,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
           SENTRY_ORG: ${{ secrets.sentry_org }}
           SENTRY_PROJECT: ${{ secrets.sentry_project }}
-          #SENTRY_VERSION: ${{ secrets.sentry_version }}
+          SENTRY_VERSION: ${{ secrets.sentry_version }}
 
           # Google reCAPTCHA
           RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
