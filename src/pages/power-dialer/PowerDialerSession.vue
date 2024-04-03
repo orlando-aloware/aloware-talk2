@@ -341,10 +341,12 @@ export default {
       }
 
       // add selected contacts to the params, when they arent empty
-      const contactIds = this.selectedContacts[listId].map(contact => contact.id)
+      if (this.selectedContacts[listId]) {
+        const contactIds = this.selectedContacts[listId].map(contact => contact.id)
 
-      if (contactIds.length) {
-        params.contact_ids = contactIds
+        if (contactIds.length) {
+          params.contact_ids = contactIds
+        }
       }
 
       // add current search to the params
