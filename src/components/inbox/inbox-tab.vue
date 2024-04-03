@@ -1332,7 +1332,8 @@ export default {
         return
       }
 
-      if (['Inbox Channel Task Status'].includes(this.$route.name)) {
+      // Reset list if route is Inbox Channel Task Status
+      if (this.$route.name === 'Inbox Channel Task Status') {
         this.resetList(false, true)
         return
       }

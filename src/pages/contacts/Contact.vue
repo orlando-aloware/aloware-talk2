@@ -284,7 +284,8 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-      if (['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
+      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication']
+      if (validRoutes.includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
     }
