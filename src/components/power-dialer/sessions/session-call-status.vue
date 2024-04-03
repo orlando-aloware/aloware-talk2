@@ -324,7 +324,7 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep, get, debounce } from 'lodash'
+import { isEmpty, cloneDeep, get } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -759,10 +759,6 @@ export default {
       'removeFirstInQueueTask'
     ]),
 
-    processRemoveFirstInQueueTask: debounce(function () {
-      this.removeFirstInQueueTask()
-    }, 500),
-
     processHangup () {
       this.$VueEvent.fire('hangupCall')
 
@@ -901,6 +897,11 @@ export default {
     start () {
       this.resetSession()
       this.initialize()
+
+      // Force pause if session is started after being manually paused (it might happen when internet is restablished)
+      if (this.sessionPaused) {
+        this.onTogglePause()
+      }
     },
 
     async initialize () {
@@ -947,7 +948,7 @@ export default {
         this.taskToCall = cloneDeep(task)
 
         if (this.taskToCall) {
-          this.processRemoveFirstInQueueTask()
+          this.removeFirstInQueueTask()
         }
 
         this.activeTask = this.taskToCall
@@ -1249,7 +1250,6 @@ export default {
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
-        this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
         const task = get(this.powerDialerTasks.in_queue, '0', null)
 
         this.taskToCall = cloneDeep(task)
@@ -1260,7 +1260,7 @@ export default {
           return
         }
 
-        this.processRemoveFirstInQueueTask()
+        this.removeFirstInQueueTask()
         this.processSession(noWrapUp)
         return
       }
@@ -1276,7 +1276,7 @@ export default {
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall) {
-        this.processRemoveFirstInQueueTask()
+        this.removeFirstInQueueTask()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -1322,7 +1322,7 @@ export default {
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
-          this.processRemoveFirstInQueueTask()
+          this.removeFirstInQueueTask()
           this.processSession(true)
         }, 200)
 

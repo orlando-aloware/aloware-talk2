@@ -594,6 +594,9 @@ export default {
         delete query.filter_groups
       }
 
+      // copy filters to power dialer query
+      powerQuery.filter_groups = query.filter_groups
+
       if (params?.order) {
         query.sort = this.getSortByColumn(params.sort)
         query.order = params.order ? params.order : 'asc'
@@ -1196,9 +1199,7 @@ export default {
     currentListFilters: {
       deep: true,
       handler: function () {
-        if (this.$route.name === 'Contacts') {
-          this.filtersCount = this.getFiltersCount(this.currentListFilters)
-        }
+        this.filtersCount = this.getFiltersCount(this.currentListFilters)
       }
     },
 

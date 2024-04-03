@@ -163,7 +163,6 @@ export default function () {
     warmupDurations: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
     powerDialerTasks: {
       in_queue: [],
-      skipped: [],
       called: [],
       failed: [],
       scheduled: [],
@@ -171,7 +170,6 @@ export default function () {
     },
     powerDialerTaskFilters: {
       in_queue: null,
-      skipped: null,
       called: null,
       failed: null,
       scheduled: null,

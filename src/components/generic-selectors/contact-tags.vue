@@ -8,6 +8,7 @@
                       :current="currentTags"
                       :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                       :optionsIsGrouped="true"
+                      :category="category"
                       @valuesUpdated="saveTags">
     </tag-multi-select>
   </b-card>
@@ -15,12 +16,9 @@
 
 <script>
 import { aclMixin } from 'src/plugins/mixins'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import TagMultiSelect from 'src/components/generic-selectors/tag-multi-select'
-import {
-  TAG_CATEGORIES as TagCategories,
-  TAG_CATEGORIES_VALUES as TagCategoriesValues
-} from 'src/constants/tag-categories'
+import { TAG_CATEGORIES as TagCategories, TAG_CATEGORIES_VALUES as TagCategoriesValues } from 'src/constants/tag-categories'
 import { clone, isEmpty } from 'lodash'
 import * as TagTypes from 'src/constants/tag-types'
 
@@ -53,7 +51,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['tagsFullyLoaded', 'tags']),
+    ...mapState(['tags']),
 
     availableTags () {
       if (this.options) {
@@ -168,9 +166,7 @@ export default {
           this.contact.tag_ids = this.contact.tags.map((o) => o.id)
         }
       })
-    },
-
-    ...mapActions(['setTagsFullyLoaded'])
+    }
   },
 
   watch: {
