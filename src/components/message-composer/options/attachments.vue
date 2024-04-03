@@ -33,7 +33,7 @@
       </p>
     </form>
     <div class="text-center mt-2 notice">
-      <p class="mb-0"><a href="https://support.aloware.com/different-data-types-supported-in-aloware" target="_blank">Click here</a> to see the supported media file list.</p>
+      <p class="mb-0"><a href="https://support.aloware.com/en/articles/9037680-different-data-types-supported-in-aloware" target="_blank">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>
       <p class="mb-0">Other file types should be below 600KB</p>
     </div>

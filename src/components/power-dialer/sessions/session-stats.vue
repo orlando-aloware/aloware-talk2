@@ -44,7 +44,7 @@
     </div>
     <div class="d-flex t-menu__content flex-column pb-0 pl-2">
       <q-card class="py-0 my-0 pl-1" flat>
-        <SummaryInfoLabels
+        <summary-info-labels
           :prefetched-items="defaultStats"
           metric-type="1" />
       </q-card>
@@ -84,7 +84,7 @@ export default {
       return this.powerDialerTaskFilters?.all?.total_called || 0 + this.powerDialerTaskFilters?.all?.total_failed || 0
     },
     allTasks () {
-      return this.powerDialerTaskFilters?.all?.total_queued || 0
+      return this.powerDialerTaskFilters?.all?.total_found || this.powerDialerTaskFilters?.all?.total_queued || 0
     },
     timer () {
       return this.ongoingSession.totalSeconds
