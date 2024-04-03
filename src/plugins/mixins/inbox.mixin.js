@@ -188,8 +188,6 @@ export default {
 
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
-          console.log('*** loadContactTasks this.currentTask', this.currentTask)
-          console.log('*** loadContactTasks response', response)
           this.taskListHasError = false
 
           if (!response) {
@@ -272,7 +270,6 @@ export default {
         .then(response => {
           switch (taskId) {
             case ContactTaskStatus.STATUS_OPEN:
-              console.log('ContactTaskStatus.STATUS_OPEN response', response)
               if (response) {
                 if (!forInbox) {
                   this.setOpenTaskCount(+response.data.count)
@@ -287,7 +284,6 @@ export default {
               break
 
             case ContactTaskStatus.STATUS_PENDING:
-              console.log('ContactTaskStatus.STATUS_PENDING response', response)
               if (response) {
                 if (!forInbox) {
                   this.setPendingTaskCount(+response.data.count)

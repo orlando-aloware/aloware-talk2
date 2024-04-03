@@ -1134,12 +1134,18 @@ export default {
     }
 
     this.listeners.contactTaskStatusUpdated = (contact) => {
-      const sameStatus = this.currentTask === contact.task_status
-
-      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || !this.currentTask || !contact || sameStatus) {
+      // Sanity check: make sure both current task and contact are set before updating anything
+      if (!this.currentTask || !contact) {
         return
       }
 
+      // prevent duplicate task status count request when Contact component is active
+      const sameStatus = this.currentTask === contact.task_status
+      if (this.$route.name !== 'Inbox Contact Task' || this.isSearch || sameStatus) {
+        return
+      }
+
+      // update task counts based on the current task and the contact's task status
       if (this.currentTask === ContactTaskStatus.STATUS_PENDING) {
         this.setPendingTaskCount(this.taskCounts.pending - 1)
         this.setInboxPendingTaskCount(this.inboxTaskCounts.pending - 1)
@@ -1149,6 +1155,7 @@ export default {
         }
       }
 
+      // update task counts based on the current task and the contact's task status
       if (this.currentTask === ContactTaskStatus.STATUS_OPEN) {
         this.setOpenTaskCount(this.taskCounts.open - 1)
         this.setInboxOpenTaskCount(this.inboxTaskCounts.open - 1)
@@ -1158,6 +1165,7 @@ export default {
         }
       }
 
+      // update task counts based on the current task and the contact's task status
       if (this.currentTask === ContactTaskStatus.STATUS_CLOSED && contact.task_status === ContactTaskStatus.STATUS_OPEN) {
         this.setOpenTaskCount(this.taskCounts.open + 1)
         this.setInboxOpenTaskCount(this.inboxTaskCounts.open + 1)
