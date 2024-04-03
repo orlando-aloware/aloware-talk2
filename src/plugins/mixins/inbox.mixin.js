@@ -188,6 +188,8 @@ export default {
 
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
+          console.log('*** loadContactTasks this.currentTask', this.currentTask)
+          console.log('*** loadContactTasks response', response)
           this.taskListHasError = false
 
           if (!response) {
@@ -203,6 +205,18 @@ export default {
           this.gettingContactsList(false)
           this.setContactsCurrentPage(response.data.current_page)
           this.setHasMoreContacts(response.data.next_page_url)
+
+          const isSinglePage = response.data.current_page === 1 && !response.data.next_page_url
+          // set the task count as the length of the list of contacts if it is the first and only page
+          if (this.currentTask === ContactTaskStatus.STATUS_OPEN && isSinglePage) {
+            this.setOpenTaskCount(response.data.data.length)
+            this.setInboxOpenTaskCount(response.data.data.length)
+          }
+          // set the task count as the length of the list of contacts if it is the first and only page
+          if (this.currentTask === ContactTaskStatus.STATUS_PENDING && isSinglePage) {
+            this.setPendingTaskCount(response.data.data.length)
+            this.setInboxPendingTaskCount(response.data.data.length)
+          }
           this.isLoadingMore = false
           this.isLoaded = true
           this.setIsInboxFiltersLoaded(this.isLoaded)
@@ -258,6 +272,7 @@ export default {
         .then(response => {
           switch (taskId) {
             case ContactTaskStatus.STATUS_OPEN:
+              console.log('ContactTaskStatus.STATUS_OPEN response', response)
               if (response) {
                 if (!forInbox) {
                   this.setOpenTaskCount(+response.data.count)
@@ -272,6 +287,7 @@ export default {
               break
 
             case ContactTaskStatus.STATUS_PENDING:
+              console.log('ContactTaskStatus.STATUS_PENDING response', response)
               if (response) {
                 if (!forInbox) {
                   this.setPendingTaskCount(+response.data.count)
