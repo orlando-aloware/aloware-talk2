@@ -24,6 +24,29 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    if (sh(script: 'command -v nvm', returnStatus: true) != 0) {
+                        echo 'nvm is not installed, installing now.'
+                        sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash'
+                        sh 'echo "export NVM_DIR=\"$HOME/.nvm\"" >> $HOME/.bashrc'
+                        sh 'echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $HOME/.bashrc'
+                        sh 'echo "[ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\"" >> $HOME/.bashrc'
+                    }
+
+                    sh 'echo Loading nvm'
+                    sh 'export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+
+                    def nodeVersion = '20.12.1'
+                    echo "Using Node.js version $nodeVersion"
+                    sh "nvm install $nodeVersion"
+                    sh "nvm use $nodeVersion"
+                    sh 'node --version'
+                }
+            }
+        }
+
         stage('Send Job Start Notification') {
             steps {
                 script {
