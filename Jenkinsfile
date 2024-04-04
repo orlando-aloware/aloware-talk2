@@ -30,12 +30,10 @@ pipeline {
                   if (sh(script: 'command -v nvm', returnStatus: true) != 0) {
                       echo 'nvm is not installed, installing now.'
                       sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash'
-                      sh 'echo export NVM_DIR="$HOME/.nvm" >> $HOME/.bashrc'
-                      sh 'echo [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" >> $HOME/.bashrc'
-                      sh 'echo [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" >> $HOME/.bashrc'
+                      sh 'export NVM_DIR="$HOME/.nvm"'
+                      sh 'source $NVM_DIR/nvm.sh'
                   }
 
-                  sh 'source $HOME/.bashrc'
                   sh 'nvm install 20.12.1'
                   sh 'nvm use 20.12.1'
                   sh 'node --version'
