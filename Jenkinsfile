@@ -31,7 +31,9 @@ pipeline {
                       echo 'nvm is not installed, installing now.'
                       sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash'
                       sh 'export NVM_DIR="$HOME/.nvm"'
-                      sh 'source $NVM_DIR/nvm.sh'
+                      sh 'export NVM_DIR="$HOME/.nvm" && \\'
+                        + 'echo "Sourcing NVM scripts..." && \\'
+                        + 'bash -c "source $NVM_DIR/nvm.sh'
                   }
 
                   sh 'nvm install 20.12.1'
