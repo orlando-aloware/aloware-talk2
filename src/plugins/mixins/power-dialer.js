@@ -89,7 +89,7 @@ export default {
       let filters = {}
       // add current filters to the params
       const currentFilters = this.$jsonClone(this.selectedFilters)
-      console.log(this.selectedFilters)
+
       // exclude contact_lists from the filters, since it will always be present
       delete currentFilters.contact_lists
 
