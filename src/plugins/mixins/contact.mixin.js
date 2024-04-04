@@ -646,7 +646,7 @@ export default {
       // 2. if contact has communications select last communication campaign
       if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
-          return item.type === CommunicationTypes.SMS
+          return item.type === CommunicationTypes.SMS || item.type === CommunicationTypes.CALL
         })
 
         if (latestCommunication) {
