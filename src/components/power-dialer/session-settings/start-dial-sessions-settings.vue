@@ -548,7 +548,8 @@ export default {
     ]),
 
     ...mapActions([
-      'setDialerCommunication'
+      'setDialerCommunication',
+      'setOldAgentStatus'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -575,6 +576,7 @@ export default {
       this.loading = true
       this.isDialing = true
       this.loadingText = this.defaultTrigger ? 'Redirecting you to Power Dialer session..' : 'Applying changes to session settings..'
+      this.setOldAgentStatus(this.profile?.agent_status)
 
       if (this.temporarySetting.id === this.selectedItem.id) {
         const newSettings = { ...this.filterSelectedItem }
