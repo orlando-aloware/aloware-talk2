@@ -923,6 +923,10 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
+
+        if (!this.isSessionRunning) {
+          this.verifyOldAgentStatus(user.agent_status)
+        }
       }
     }
 
