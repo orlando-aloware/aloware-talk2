@@ -93,10 +93,10 @@ export default {
     },
 
     verifyOldAgentStatus (agentStatus = 0) {
-      console.log('Changed agent status [event]: ', this.getStatusLabel(agentStatus))
+      console.log('Changed agent status [verifyOldAgentStatus]: ', this.getStatusLabel(agentStatus))
       console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
 
-      if (this.oldAgentStatus !== undefined) {
+      if (this.oldAgentStatus !== null) {
         this.resetAgentStatus(true)
       }
     },

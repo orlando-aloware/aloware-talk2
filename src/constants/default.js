@@ -14,7 +14,7 @@ export const DEFAULT_STATE = {
   filters: [],
   firstLogin: false,
   userStatus: false,
-  oldAgentStatus: false,
+  oldAgentStatus: null,
   dialer: {
     token: null,
     call: null,
