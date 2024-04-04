@@ -97,7 +97,7 @@ export default {
       console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
 
       if (this.oldAgentStatus !== undefined) {
-        this.resetAgentStatus()
+        this.resetAgentStatus(true)
       }
     },
 
