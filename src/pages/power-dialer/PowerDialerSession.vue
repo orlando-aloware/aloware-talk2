@@ -341,7 +341,7 @@ export default {
       }
 
       // add selected contacts to the params, when they arent empty
-      if (this.selectedContacts[listId]) {
+      if (this.selectedContacts[listId] && Array.isArray(this.selectedContacts[listId])) {
         const contactIds = this.selectedContacts[listId].map(contact => contact.id)
 
         if (contactIds.length) {
