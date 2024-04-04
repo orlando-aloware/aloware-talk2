@@ -951,7 +951,7 @@ export default {
         }
 
         console.log('Changed agent status [event]: ', this.getStatusLabel(event.agent_status))
-        return this.setAgentStatus(this.profile.agent_status)
+        return this.setAgentStatus(event.agent_status)
       }
     }
 
