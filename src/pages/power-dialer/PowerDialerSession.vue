@@ -357,11 +357,11 @@ export default {
 
       if (!isEmpty(filters)) {
         // if there is some filter applied, save it in the local storage
-        localStorage.setItem('current_pd_filters', JSON.stringify(filters))
+        window.localStorage.setItem('current_pd_filters', JSON.stringify(filters))
       } else {
         // when there is no filter, try to get the filters from the local storage
         // this is necessary in some cases, like when the user refreshes the page during the PD session
-        filters = JSON.parse(localStorage.getItem('current_pd_filters'))
+        filters = JSON.parse(window.localStorage.getItem('current_pd_filters')) || {}
       }
 
       return { ...params, ...filters }
