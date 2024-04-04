@@ -35,12 +35,11 @@ pipeline {
                       sh 'echo [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" >> $HOME/.bashrc'
                   }
 
-                  sh 'export NVM_DIR="$HOME/.nvm"'
-                  sh '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"'
+                  sh 'source $HOME/.bashrc'
                   sh 'nvm install 20.12.1'
                   sh 'nvm use 20.12.1'
                   sh 'node --version'
-              }
+                }
             }
         }
 
