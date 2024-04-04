@@ -962,6 +962,9 @@ export default {
     this.$VueEvent.listen('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
     this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
     this.$VueEvent.listen('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+
+    // clean filters every time that this page is loaded
+    window.localStorage.removeItem('current_pd_filters')
   },
 
   methods: {

@@ -331,30 +331,40 @@ export default {
     },
 
     prepareFilters (params, listId) {
+      let filters = {}
       // add current filters to the params
       const currentFilters = this.$jsonClone(this.currentListFilters)
       // exclude contact_lists from the filters, since it will always be present
       delete currentFilters.contact_lists
 
       if (!isEmpty(currentFilters)) {
-        params.filter_groups = currentFilters
+        filters.filter_groups = currentFilters
       }
 
       // add selected contacts to the params, when they arent empty
-      if (this.selectedContacts[listId]) {
+      if (Array.isArray(this.selectedContacts[listId])) {
         const contactIds = this.selectedContacts[listId].map(contact => contact.id)
 
         if (contactIds.length) {
-          params.contact_ids = contactIds
+          filters.contact_ids = contactIds
         }
       }
 
       // add current search to the params
       if (this.search.trim()) {
-        params.keyword = this.search.trim()
+        filters.keyword = this.search.trim()
       }
 
-      return params
+      if (!isEmpty(filters)) {
+        // if there is some filter applied, save it in the local storage
+        window.localStorage.setItem('current_pd_filters', JSON.stringify(filters))
+      } else {
+        // when there is no filter, try to get the filters from the local storage
+        // this is necessary in some cases, like when the user refreshes the page during the PD session
+        filters = JSON.parse(window.localStorage.getItem('current_pd_filters')) || {}
+      }
+
+      return { ...params, ...filters }
     }
   },
 
