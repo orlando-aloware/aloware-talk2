@@ -132,7 +132,7 @@
                       text="Simplify your appointment scheduling and receive timely reminders with Calendar"
                       extra-text="Upgrade today to unlock this feature"
                       title-text="Calendar"
-                      kb-link="https://support.aloware.com/the-aloware-talk-calendar"
+                      kb-link="https://support.aloware.com/en/articles/9034189-the-aloware-talk-calendar"
                       class="mt-5"
                       v-if="!shouldShowCalendar && shouldShowUpgradeNow">
     </upgrade-now-page>

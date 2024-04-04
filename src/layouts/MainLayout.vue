@@ -223,6 +223,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   htmlMixin,
@@ -328,6 +329,7 @@ export default {
       loadingWorkflows: false,
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
+      loadingActivityTypes: false,
       loadingScripts: false,
       loadingTemplates: false,
       loadingBroadcasts: false,
@@ -419,6 +421,10 @@ export default {
     ]),
 
     ...mapState(['xmasEnabled']),
+
+    ...mapFields('powerDialer', [
+      'sessionPaused'
+    ]),
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
@@ -1488,6 +1494,7 @@ export default {
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
+        this.getActivityTypes()
         this.getLeadSources()
         this.getMyQueueList()
       })
@@ -1715,6 +1722,22 @@ export default {
             return Promise.reject()
           })
       }
+    },
+
+    getActivityTypes () {
+      this.loadingActivityTypes = true
+      return this.$axios
+        .get('/api/v1/activity-types').then(res => {
+          this.setActivityTypes(res.data)
+          this.loadingActivityTypes = false
+
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingActivityTypes = false
+
+          return Promise.reject()
+        })
     },
 
     getTemplates () {
@@ -2497,6 +2520,7 @@ export default {
       'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
+      'setActivityTypes',
       'setTemplates',
       'setBroadcasts',
       'setDialerToken',
@@ -2663,6 +2687,11 @@ export default {
       // temporary
       if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
         this.$router.back()
+      }
+
+      // Power Dialer session control - mark as false every time the session module is exited
+      if (from.meta.id === 'power-dialer-session') {
+        this.sessionPaused = false
       }
     },
 

@@ -532,6 +532,16 @@
               </div>
             </div>
 
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
+              <label class="form-control-label text-grey-90">
+                Hubspot Type
+              </label>
+              <div class="d-flex flex-row align-items-center w-100">
+                <hubspot-activity-type-selector :communication="dialer.communication"></hubspot-activity-type-selector>
+              </div>
+            </div>
+
             <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
               <label class="form-control-label text-grey-90">
                 Contact Disposition
@@ -1284,11 +1294,13 @@ import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import API from 'src/plugins/api/api'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 
 export default {
   name: 'phone',
 
   components: {
+    HubspotActivityTypeSelector,
     ParkedCallIcon,
     MobileLiveCallBar,
     IgnoreCallIcon,

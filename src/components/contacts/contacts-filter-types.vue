@@ -405,6 +405,7 @@ export default {
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
       this.setValue()
+      this.getTags('', true, () => {})
     }, 10)
 
     this.$VueEvent.listen('filters-reset', () => {
@@ -655,11 +656,11 @@ export default {
             // Create a temporary set to handle unique items
             let tempSet = new Set([...this.appliedTags, ...selectedOptions])
             // Convert the temporary set back to an array
-            this.filter.options = Array.from(tempSet)
+            this.appliedTags = Array.from(tempSet)
+            this.filter.options = this.appliedTags
           }
           this.processFilters()
           this.appliedFiltersInProgress = false
-          this.appliedTags = []
           clearInterval(applyFilterInterval)
         }
       }, debounceDelay)
@@ -817,29 +818,32 @@ export default {
       this.filterOperatorValue = 1
     },
 
-    filterTagFn (val, update, abortFn) {
-      this.getTags(val, update, abortFn)
+    filterTagFn (val, updateFn, abortFn) {
+      this.getTags(val, false, updateFn, abortFn)
     },
 
-    getTags (search = '', update, abortFn) {
-      if (search.length < 3) {
-        abortFn()
+    getTags (search = '', force, updateFn, abortFn) {
+      if (search.length < 3 && !force) {
+        updateFn()
         return
       }
 
-      if (search.length >= this.threshold) {
-        const params = {
+      if (search.length >= this.threshold || force) {
+        let params = {
           page: 1,
           per_page: 50,
           search: search
         }
 
+        if (force && this.filterOperatorValue?.length) {
+          params.tag_ids = this.filterOperatorValue
+        }
+
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
-          update(() => {
-            this.options = res.data.data
-          })
+          this.options = res.data.data
+          updateFn()
         }).catch(err => {
           console.log(err)
         })
