@@ -27,6 +27,7 @@ export default {
   filters: (state) => state.filters,
   isFiltersOpen: (state) => state.isFiltersOpen,
   isBulkDelete: (state) => state.isBulkDelete,
+  search: (state) => state.search,
   pinnedLists: (state) => {
     return Object.values(DEFAULT_PINNED_LIST)
       .map((item) => {
