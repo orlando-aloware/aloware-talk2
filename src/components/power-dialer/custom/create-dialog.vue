@@ -83,8 +83,7 @@ export default {
       contactFolders: null,
       powerDialerParams: {},
       initialpublicContactListItems: [],
-      publicContactListItems: [],
-      folderListItems: []
+      publicContactListItems: []
     }
   },
   computed: {
@@ -211,7 +210,6 @@ export default {
     searchedPdItem: {
       deep: true,
       handler: function (newValue) {
-        console.log('WATCH searchedPdItem newValue', newValue)
         // If no newValue has been set, set the initial list
         if (!newValue) {
           this.publicContactListItems = this.initialpublicContactListItems
