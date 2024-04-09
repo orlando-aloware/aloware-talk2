@@ -53,7 +53,7 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as TaskType from 'src/constants/task-types'
-import { sessionCallStatusMixin } from 'src/plugins/mixins'
+import { sessionCallStatusMixin, powerDialerMixin } from 'src/plugins/mixins'
 import broadcast from 'src/plugins/mixins/broadcast.mixin'
 import qs from 'qs'
 import { get } from 'lodash'
@@ -72,6 +72,7 @@ export default {
 
   mixins: [
     sessionCallStatusMixin,
+    powerDialerMixin,
     broadcast
   ],
 
@@ -173,6 +174,9 @@ export default {
         : params.id
       delete params.name
       delete params.id
+
+      // prepare extra filters
+      params = this.prepareFilters(params, listId)
 
       return window.axios.get(
         `api/v2/power-dialer-lists/${listId}/items`,

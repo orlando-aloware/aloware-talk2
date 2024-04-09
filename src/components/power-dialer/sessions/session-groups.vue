@@ -230,8 +230,8 @@ import ContactInQueueIcon from 'components/icons/contact-in-queue-icon'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { avatarMixin, sessionCallStatusMixin } from 'src/plugins/mixins'
 import * as TaskType from 'src/constants/task-types'
+import { avatarMixin, powerDialerMixin, sessionCallStatusMixin } from 'src/plugins/mixins'
 
 const DIRECTION = {
   top: 1,
@@ -243,7 +243,8 @@ export default {
 
   mixins: [
     avatarMixin,
-    sessionCallStatusMixin
+    sessionCallStatusMixin,
+    powerDialerMixin
   ],
 
   components: {
@@ -425,10 +426,10 @@ export default {
       })
 
       if (res.status === 200) {
-        const res = await this.getSessionTaskByFilter({
+        const res = await this.getSessionTaskByFilter(this.prepareFilters({
           id: this.selectedList.id,
           task_status: 1
-        })
+        }))
 
         this.powerDialerTasks['in_queue'] = res.data.data
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
@@ -449,10 +450,10 @@ export default {
           `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${data.contact_list_item_id}`
         )
         .then(async (res) => {
-          let response = await this.getSessionTaskByFilter({
+          let response = await this.getSessionTaskByFilter(this.prepareFilters({
             id: this.selectedList.id,
             task_status: 1
-          })
+          }))
 
           this.powerDialerTasks['in_queue'] = response.data.data
           this.$generalNotification(res.data.message)
@@ -546,7 +547,7 @@ export default {
         case AutoDialTaskStatus.STATUSES.failed:
           return this.listItems[this.selectedList.id].total_failed
         case AutoDialTaskStatus.STATUSES.in_queue:
-          return this.listItems[this.selectedList.id].total_queued
+          return this.listItems[this.selectedList.id].total_found || this.listItems[this.selectedList.id].total_queued
         case AutoDialTaskStatus.STATUSES.scheduled:
           return this.listItems[this.selectedList.id].total_scheduled
         default:
