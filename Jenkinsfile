@@ -1,7 +1,7 @@
 @Library('jenkins-shared-libraries')_
 pipeline {
     agent {
-        label 'runner'
+        label 'runner2'
     }
 
     options {
@@ -24,25 +24,6 @@ pipeline {
     }
 
     stages {
-        stage('Prepare Environment') {
-            steps {
-                script {
-                  if (sh(script: 'command -v nvm', returnStatus: true) != 0) {
-                      echo 'nvm is not installed, installing now.'
-                      sh 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash'
-                      sh 'export NVM_DIR="$HOME/.nvm"'
-                      sh 'export NVM_DIR="$HOME/.nvm" && \\'
-                        + 'echo "Sourcing NVM scripts..." && \\'
-                        + 'bash -c "source $NVM_DIR/nvm.sh'
-                  }
-
-                  sh 'nvm install 20.12.1'
-                  sh 'nvm use 20.12.1'
-                  sh 'node --version'
-                }
-            }
-        }
-
         stage('Send Job Start Notification') {
             steps {
                 script {
@@ -81,8 +62,9 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
+                sh 'nvm use 20'
                 sh 'sudo npm i -g yarn'
-                sh 'yarn install --frozen-lockfile'
+                sh 'yarn install'
             }
         }
 
