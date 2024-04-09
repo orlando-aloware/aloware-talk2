@@ -14714,3 +14714,9 @@ h1.contact-list-name-label {
   font-weight: 500;
   margin-top: 20px;
 }
+
+@media (max-width: 768px) {
+  .intercom-lightweight-app {
+    display: none !important;
+  }
+}
