@@ -35,9 +35,8 @@ pipeline {
 
         stage('Setup environment') {
             steps {
-                script {
-                    sh 'nvm use ${NODE_VERSION}'
-                    sh 'sudo npm i -g yarn'
+                nvm("${NODE_VERSION}") {
+                    sh 'npm i -g yarn'
                 }
             }
         }
@@ -72,14 +71,18 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
-                sh 'yarn install'
+                nvm("${NODE_VERSION}") {
+                    sh 'yarn install'
+                }
             }
         }
 
         stage('Build Talk2 Assets') {
             when { not { branch 'master' } }
             steps {
-                sh 'quasar build --debug'
+                nvm("${NODE_VERSION}") {
+                    sh 'quasar build --debug'
+                }
             }
         }
 
