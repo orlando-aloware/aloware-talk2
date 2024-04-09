@@ -381,16 +381,16 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.lastCall) {
+      if (!this.profile.last_call) {
         return
       }
       const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.lastCall.contact.disposition_status_id
+        !this.profile.last_call.contact.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.lastCall.call_disposition_id
+        !this.profile.last_call.call_disposition_id
       if (shouldForceContactDisposition || shouldForceCallDisposition) {
-        this.setDialerCommunication(this.profile.lastCall)
-        this.setDialerContact(this.profile.lastCall.contact)
+        this.setDialerCommunication(this.profile.last_call)
+        this.setDialerContact(this.profile.last_call.contact)
         this.startWrapUpTimer()
       }
     },
