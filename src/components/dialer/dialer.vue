@@ -389,10 +389,13 @@ export default {
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
         !this.profile.last_call.call_disposition_id
       if (shouldForceContactDisposition || shouldForceCallDisposition) {
-        this.setDialerCommunication(this.profile.last_call)
-        this.setDialerContact(this.profile.last_call.contact)
-        this.startWrapUpTimer()
+        this.forceStartOnWrapUp()
       }
+    },
+    forceStartOnWrapUp () {
+      this.setDialerCommunication(this.profile.last_call)
+      this.setDialerContact(this.profile.last_call.contact)
+      this.startWrapUpTimer()
     },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
