@@ -191,7 +191,7 @@ export default {
   methods: {
     initializeFilename () {
       this.newFilename = this.filename || this.getFilenameFromURL(this.attachmentUrl)
-      const fileExtension = this.newFilename.split('.')?.pop() || 'FILE'
+      const fileExtension = (this.newFilename || 'FILE').split('.').pop()
       this.filenameText = `${this.$options.filters.toUpperCase(fileExtension)} File`
     },
 
