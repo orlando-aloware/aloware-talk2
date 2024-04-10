@@ -396,6 +396,7 @@ export default {
       const optionsSet = new Set(this.filter.options)
       this.filter.options = [...optionsSet]
       this.appliedTags = [...new Set([...this.appliedTags, ...this.filter.options])]
+      this.getTags('', true, () => {})
     }
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
@@ -405,7 +406,6 @@ export default {
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
       this.setValue()
-      this.getTags('', true, () => {})
     }, 10)
 
     this.$VueEvent.listen('filters-reset', () => {
