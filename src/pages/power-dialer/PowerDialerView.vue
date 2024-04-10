@@ -577,7 +577,6 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import ContactsScreen from 'src/components/contacts/contacts-screen'
 import CompactBtn from 'src/components/compact-btn.vue'
-import PowerDialerViewScreen from 'src/components/power-dialer/power-dialer-view-screen'
 import PowerDialerFilter from 'src/components/power-dialer/details/power-dialer-filters'
 import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-labels'
 import Datatable from 'src/components/datatable'
@@ -688,7 +687,6 @@ export default {
   components: {
     ContactsScreen,
     CompactBtn,
-    PowerDialerViewScreen,
     PowerDialerFilter,
     Datatable,
     SearchList,
@@ -699,7 +697,6 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     BulkActionMenu,
-    PowerDialerBulkActionMenu,
     BlockTooltip,
     RefreshIcon,
     ContactsFilters
