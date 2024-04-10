@@ -667,7 +667,7 @@ export default {
       const elem = document.querySelector('.data-table-check-all')
       const isPD = this.isPowerDialer || this.isPowerDialerAddContacts
       const isInQueue = isPD && (this.$route.params?.id === 'in-queue' || this.$route?.meta?.id === 'power-dialer-add-queue-list')
-      const id = isInQueue ? this.myQueueId : (this.tempId || this.id)
+      const id = isInQueue ? this.myQueue.id : (this.tempId || this.id)
 
       if (isPD && elem?.checked) {
         this.$VueEvent.fire('setListSelectedContacts', {
