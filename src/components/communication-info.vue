@@ -388,9 +388,8 @@
                     </q-tooltip>
                   </q-icon>
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
-                    <router-link
-                      :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
-                      <span class="text-black"
+                    <div @click="onOpenUserInClassicClicked(communication?.user_id)">
+                      <span class="text-black cursor-pointer"
                             :title="getUserName(getUser(communication.user_id))">
                         <q-tooltip class="item"
                                    content-class="bg-grey-light11"
@@ -400,7 +399,7 @@
                         </q-tooltip>
                         {{ getUserName(getUser(communication.user_id)) }}
                       </span>
-                    </router-link>
+                    </div>
                   </div>
                   <div v-else>
                     <span class="text-greyish">
@@ -441,9 +440,8 @@
                     </component>
                   </q-tooltip-->
                   <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
-                    <router-link
-                      :to="{ name: 'User Activity', params: {userId: communication.user_id }}">
-                      <span class="text-black"
+                    <div @click="onOpenUserInClassicClicked(communication?.user_id)">
+                      <span class="text-black cursor-pointer"
                             :title="getUserName(getUser(communication.user_id))">
                         <q-tooltip class="item"
                                    content-class="bg-grey-light11"
@@ -453,7 +451,7 @@
                         </q-tooltip>
                         {{ getUserName(getUser(communication.user_id)) }}
                       </span>
-                    </router-link>
+                    </div>
                   </div>
                   <div v-else>
                     <span class="text-greyish">-</span>
@@ -473,13 +471,13 @@
                             <li :key="attemptingUser + '-user-' + index"
                                 v-if="getUser(attemptingUser) && getUser(attemptingUser).id"
                                 class="pb-1">
-                                <router-link
-                                  :to="{ name: 'User Activity', params: {userId: getUser(attemptingUser).id }}">
-                                    <span :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
-                                          :title="getUserName(getUser(attemptingUser))">
-                                        {{ getUserName(getUser(attemptingUser)) }}
-                                    </span>
-                                </router-link>
+                                <div @click="onOpenUserInClassicClicked(communication?.user_id)">
+                                  <span class="cursor-pointer"
+                                        :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
+                                        :title="getUserName(getUser(attemptingUser))">
+                                    {{ getUserName(getUser(attemptingUser)) }}
+                                  </span>
+                                </div>
                             </li>
                         </template>
                       </ul>
@@ -719,6 +717,15 @@
                   <div class="d-flex align-items-center pt-2 w-100">
                     <call-disposition-selector :communication="communication"></call-disposition-selector>
                   </div>
+                  <div class="mt-2 w-100"
+                       v-if="currentCompany.hubspot_integration_enabled">
+                    <div class="d-flex align-items-center co-12">
+                      <label class="form-control-label mb-1">Hubspot Type:</label>
+                    </div>
+                    <div class="d-flex align-items-center pt-2 w-100">
+                      <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
+                    </div>
+                  </div>
                 </template>
               </div>
             </div>
@@ -807,6 +814,7 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
 import DownloadButton from 'components/download-button'
 import API from 'src/plugins/api/api'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 
 export default {
   name: 'communication-info',
@@ -823,6 +831,7 @@ export default {
   ],
 
   components: {
+    HubspotActivityTypeSelector,
     OpenCalendarButton,
     IgnoreCallIcon,
     HangupIcon,
@@ -1073,6 +1082,10 @@ export default {
       return null
     },
 
+    getClassicUrlUserActivity (userId) {
+      return process.env.API_URL + `/users/${userId}/activity`
+    },
+
     dispose (dispositionStatus) {
       this.loadingDispose = true
       this.$axios.post(`/api/v1/contact/${this.communication.contact_id}/dispose`, { dispositionStatus }).then((res) => {
@@ -1118,6 +1131,10 @@ export default {
       } else {
         this.$emit('contactNotDisposed')
       }
+    },
+
+    onOpenUserInClassicClicked (userId) {
+      window.open(this.getClassicUrlUserActivity(userId), '_blank')
     }
   },
 

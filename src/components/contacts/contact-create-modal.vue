@@ -106,6 +106,9 @@
                 <b-form-group
                   label="Tags (Optional)"
                   class="form-label">
+                  <q-tooltip anchor="top middle">
+                    Type at least 3 characters to search in tags
+                  </q-tooltip>
                   <tag-selector :multiple="true"
                                 v-model="contact.tag_ids"
                                 @change="onTagsSelected">

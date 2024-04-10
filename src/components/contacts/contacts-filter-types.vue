@@ -65,7 +65,7 @@
                            v-if="operator.value === filterOperator && hasSecondaryOperator">
         </b-form-datepicker>
       </template>
-      <template v-if="['relation', 'multi_relation'].includes(filter.type)">
+      <template v-if="isRelationFilterType(filter.type, filter.key) ">
         <q-select ref="filterOperation"
                   class="filter-operation border"
                   input-debounce="0"
@@ -87,6 +87,47 @@
         </label>
         <q-select ref="secondaryFilterOperation"
                   class="filter-operation border"
+                  input-debounce="0"
+                  option-value="originalLabel"
+                  option-label="label"
+                  option-disable="disabled"
+                  borderless
+                  dense
+                  use-input
+                  use-chips
+                  multiple
+                  :options="filterOptions"
+                  v-model="secondaryFilterOperatorValue"
+                  v-if="operator.value === filterOperator && hasSecondaryOperator"
+                  @input-value="showSecondaryFilterOperationOptions"
+                  @input="addSecondaryValue"/>
+      </template>
+      <template v-if="isTagsFilterType(filter.type, filter.key)">
+        <q-select ref="filterOperation"
+                  class="filter-operation border"
+                  hint="Type at least 3 characters"
+                  input-debounce="1000"
+                  option-disable="disabled"
+                  option-value="id"
+                  option-label="name"
+                  borderless
+                  dense
+                  use-chips
+                  multiple
+                  map-options
+                  emit-value
+                  use-input
+                  :options="options"
+                  v-model="filterOperatorValue"
+                  v-if="operator.value === filterOperator && hasValue"
+                  @input="onInput"
+                  @filter="filterTagFn"/>
+        <label v-if="operator.value === filterOperator && hasSecondaryOperator">
+          Content:
+        </label>
+        <q-select ref="secondaryFilterOperation"
+                  class="filter-operation border"
+                  hint="Type at least 3 characters"
                   input-debounce="0"
                   option-value="originalLabel"
                   option-label="label"
@@ -148,6 +189,7 @@ import {
 import * as Countries from 'src/constants/countries'
 import { State } from 'country-state-city'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'contacts-filter-types',
@@ -175,6 +217,11 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+
+    threshold: {
+      type: Number,
+      default: 3
     }
   },
 
@@ -200,7 +247,8 @@ export default {
       filterOperatorDebounceInProgress: false,
       filterOperatorValueDebounceInProgress: false,
       secondaryFilterOperatorValueDebounceInProgress: false,
-      appliedFiltersInProgress: false
+      appliedFiltersInProgress: false,
+      appliedTags: []
     }
   },
 
@@ -343,6 +391,12 @@ export default {
   },
 
   mounted () {
+    if (this.filter.key === 'tags') {
+      // Prevent duplicated options when loading tags previously added
+      const optionsSet = new Set(this.filter.options)
+      this.filter.options = [...optionsSet]
+      this.appliedTags = [...new Set([...this.appliedTags, ...this.filter.options])]
+    }
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
     const path = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}].operator`
@@ -351,6 +405,7 @@ export default {
     // timeout to make sure "filterOperatorValue" is set after "filterOperator" watch ran
     setTimeout(() => {
       this.setValue()
+      this.getTags('', true, () => {})
     }, 10)
 
     this.$VueEvent.listen('filters-reset', () => {
@@ -573,7 +628,7 @@ export default {
       // update initial list filters with new set of currently selected filters
       this.initialListFilters = this.$jsonClone(this.currentListFilters)
 
-      this.$emit('filtersApplied')
+      this.$emit('filtersApplied', this.filter)
 
       // update the results with new query
       if (!isEqual(this.initialListFilters, currentListFilters)) {
@@ -596,6 +651,14 @@ export default {
 
       applyFilterInterval = setInterval(() => {
         if (!this.isDebounceInProgress) {
+          if (this.filter.key === 'tags' && this.filterOperatorValue) {
+            let selectedOptions = this.options.filter(option => this.filterOperatorValue.includes(option.id))
+            // Create a temporary set to handle unique items
+            let tempSet = new Set([...this.appliedTags, ...selectedOptions])
+            // Convert the temporary set back to an array
+            this.appliedTags = Array.from(tempSet)
+            this.filter.options = this.appliedTags
+          }
           this.processFilters()
           this.appliedFiltersInProgress = false
           clearInterval(applyFilterInterval)
@@ -755,6 +818,38 @@ export default {
       this.filterOperatorValue = 1
     },
 
+    filterTagFn (val, updateFn, abortFn) {
+      this.getTags(val, false, updateFn, abortFn)
+    },
+
+    getTags (search = '', force, updateFn, abortFn) {
+      if (search.length < 3 && !force) {
+        updateFn()
+        return
+      }
+
+      if (search.length >= this.threshold || force) {
+        let params = {
+          page: 1,
+          per_page: 50,
+          search: search
+        }
+
+        if (force && this.filterOperatorValue?.length) {
+          params.tag_ids = this.filterOperatorValue
+        }
+
+        return talk2Api.V1.tags.get({
+          params: params
+        }).then(res => {
+          this.options = res.data.data
+          updateFn()
+        }).catch(err => {
+          console.log(err)
+        })
+      }
+    },
+
     filterFn (val, update) {
       if (this.filterOperatorValue && val === this.filterOperatorValue) {
         update(() => {
@@ -784,7 +879,15 @@ export default {
       'setCurrentListFilters',
       'setShowMyContacts',
       'setListContactsLoaded'
-    ])
+    ]),
+
+    isRelationFilterType (type, key) {
+      return ['relation', 'multi_relation'].includes(type) && key !== 'tags'
+    },
+
+    isTagsFilterType (type, key) {
+      return ['multi_relation'].includes(type) && key === 'tags'
+    }
   },
 
   watch: {

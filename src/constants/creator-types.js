@@ -18,6 +18,8 @@ export const CREATOR_TYPE_HUBSPOT = 8
 export const CREATOR_TYPE_ZAPIER = 9
 // Communication that initiated from AlohaBot
 export const CREATOR_TYPE_ALOHABOT = 10
+// Communication that initiated from GoHighLevel
+export const CREATOR_TYPE_GOHIGHLEVEL = 11
 
 export const ALL_CREATOR_TYPES = [
   {
@@ -59,5 +61,9 @@ export const ALL_CREATOR_TYPES = [
   {
     id: CREATOR_TYPE_ALOHABOT,
     label: 'AlohaBot'
+  },
+  {
+    id: CREATOR_TYPE_GOHIGHLEVEL,
+    label: 'GoHighLevel'
   }
 ]
