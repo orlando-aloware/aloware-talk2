@@ -1296,6 +1296,10 @@ i.option-separator {
   white-space: pre-line;
 }
 
+.break-word {
+  word-break: break-word;
+}
+
 .q-input-composer .q-field__native,
 .q-input-composer .q-field__control {
   min-height: 18px;

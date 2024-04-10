@@ -32,6 +32,7 @@ import { VALID_ENG_COUNTRIES, VALID_NA_COUNTRIES } from 'src/constants/valid-cou
 import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 import { Userpilot } from 'userpilot'
+import { cloneDeep } from 'src/plugins/helpers/functions'
 
 Screen.setSizes({
   sm: 300,
@@ -746,11 +747,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
 }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
 Vue.prototype.$jsonClone = (value) => {
-  if (value) {
-    return JSON.parse(JSON.stringify(value))
-  }
-
-  return value
+  return cloneDeep(value)
 }
 
 Vue.prototype.$copyToClipboard = (value) => {

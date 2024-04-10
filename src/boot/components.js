@@ -58,7 +58,7 @@ Vue.component('reminder-icon', require('src/components/icons/contact-activity/re
 
 // voicemail
 Vue.component('inbound-voicemail-icon', require('src/components/icons/contact-activity/inbound-voicemail-icon').default)
-Vue.component('outbound-voicemail-icon', require('src/components/icons/contact-activity/inbound-voicemail-icon').default)
+Vue.component('outbound-voicemail-icon', require('src/components/icons/contact-activity/outbound-voicemail-icon').default)
 
 // note
 Vue.component('note-icon', require('src/components/icons/contact-activity/note-icon').default)

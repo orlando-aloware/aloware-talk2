@@ -511,6 +511,11 @@ export default {
     },
 
     onColumnSort (column) {
+      /* sorts object will be like this:
+       - first click: {sort: column, order: 'asc'}
+       - second click: {sort: column, order: 'desc'}
+       - third click: {sort: column, order: ''}
+      */
       let sorts = Object.assign({}, this.getColumnSorts(column))
 
       setTimeout(() => {

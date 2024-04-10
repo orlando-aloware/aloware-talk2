@@ -1,4 +1,5 @@
 import { mapGetters, mapMutations } from 'vuex'
+import { isEmpty } from 'lodash'
 
 export default {
   data () {
@@ -20,9 +21,14 @@ export default {
     ...mapGetters('powerDialer', [
       'listItems',
       'currentListFilters',
-      'search',
       'myQueueId'
     ]),
+
+    ...mapGetters('contacts', {
+      selectedContacts: 'selectedContacts',
+      selectedFilters: 'currentListFilters',
+      search: 'search'
+    }),
 
     tempId () {
       if (this.filter === 'in-queue') {
@@ -67,6 +73,50 @@ export default {
     closeModal () {
       this.selectedItem = null
       this.isOpen = false
+    },
+
+    getCleanedListId (id) {
+      let cleanedId = this.$isNumeric(id) ? parseInt(id) : id
+
+      return cleanedId === 'in-queue' ? this.myQueueId : cleanedId
+    },
+
+    prepareFilters (params, listId) {
+      let filters = {}
+      // add current filters to the params
+      const currentFilters = this.$jsonClone(this.selectedFilters)
+
+      // exclude contact_lists from the filters, since it will always be present
+      delete currentFilters.contact_lists
+
+      if (!isEmpty(currentFilters)) {
+        filters.filter_groups = currentFilters
+      }
+
+      // add selected contacts to the params, when they arent empty
+      if (Array.isArray(this.selectedContacts[listId])) {
+        const contactIds = this.selectedContacts[listId].map(contact => contact.id)
+
+        if (contactIds.length) {
+          filters.contact_ids = contactIds
+        }
+      }
+
+      // add current search to the params
+      if (this.search.trim()) {
+        filters.keyword = this.search.trim()
+      }
+
+      if (!isEmpty(filters)) {
+        // if there is some filter applied, save it in the local storage
+        window.localStorage.setItem('current_pd_filters', JSON.stringify(filters))
+      } else {
+        // when there is no filter, try to get the filters from the local storage
+        // this is necessary in some cases, like when the user refreshes the page during the PD session
+        filters = JSON.parse(window.localStorage.getItem('current_pd_filters')) || {}
+      }
+
+      return { ...params, ...filters }
     }
   }
 }
