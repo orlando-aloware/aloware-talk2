@@ -415,6 +415,8 @@ export default {
 
     async moveTask (item = {}, direction = this.moveDirection.top) {
       this.isMoving = true
+      console.log('moveTask item', item)
+      console.log('moveTask direction', direction)
 
       const res = await this.moveContactItems({
         id: this.selectedList.id,
@@ -428,8 +430,12 @@ export default {
       if (res.status === 200) {
         const res = await this.getSessionTaskByFilter(this.prepareFilters({
           id: this.selectedList.id,
-          task_status: 1
+          task_status: 1,
+          per_page: 50
         }))
+
+        console.log('moveTask getSessionTaskByFilter res', res)
+        console.log('moveTask getSessionTaskByFilter this.powerDialerTasks.in_queue', this.powerDialerTasks.in_queue)
 
         this.powerDialerTasks['in_queue'] = res.data.data
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
