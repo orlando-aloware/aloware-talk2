@@ -1,5 +1,5 @@
 <template>
-  <b-modal title="Create A List"
+  <b-modal title="Trial Expired"
            size="lg"
            modal-class="trial-expired-modal"
            scrollable
