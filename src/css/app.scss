@@ -5617,7 +5617,7 @@ button#bs-folder-options {
 .trial-expired-modal {
   .modal-lg {
     @media (min-width: 992px) {
-      max-width: 650px;
+      max-width: 750px;
     }
   }
 
@@ -5626,7 +5626,7 @@ button#bs-folder-options {
   }
 
   &__body {
-    font-size: 20px;
+    font-size: 16px;
     padding: 20px;
     word-break: normal;
   }
