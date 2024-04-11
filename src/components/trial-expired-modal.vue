@@ -41,7 +41,7 @@
                       </div>
                       <div class="row">
                           <div class="col-12 d-flex align-items-center flex-center text-center pl-0">
-                            <p>Should you have any inquiries or require additional support, remember, our team is just a message away</p>
+                            <p>Should you have any inquiries or require additional support, remember, our team is just a message away.</p>
                           </div>
                       </div>
                   </div>
