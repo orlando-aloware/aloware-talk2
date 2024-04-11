@@ -50,7 +50,7 @@
 
               <div class="d-flex align-items-center flex-center pt-3">
                   <button class="btn btn-primary mt-0" @click="openDemo">
-                      Update Now
+                      Upgrade Now
                   </button>
               </div>
 
