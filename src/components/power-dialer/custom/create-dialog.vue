@@ -82,7 +82,7 @@ export default {
       isCreating: false,
       contactFolders: null,
       powerDialerParams: {},
-      initialpublicContactListItems: [],
+      initialPublicContactListItems: [],
       publicContactListItems: []
     }
   },
@@ -212,7 +212,7 @@ export default {
       handler: function (newValue) {
         // If no newValue has been set, set the initial list
         if (!newValue) {
-          this.publicContactListItems = this.initialpublicContactListItems
+          this.publicContactListItems = this.initialPublicContactListItems
           return
         }
 
@@ -224,7 +224,7 @@ export default {
   mounted () {
     this.getPublicContactLists()
       .then(res => {
-        this.initialpublicContactListItems = res.data
+        this.initialPublicContactListItems = res.data
         this.publicContactListItems = res.data
       })
     this.getContactFolders()
