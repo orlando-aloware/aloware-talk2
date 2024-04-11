@@ -477,9 +477,12 @@ export default {
           `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${data.contact_list_item_id}`
         )
         .then(async (res) => {
+          this.inQueueFetchTasks.currentPage = 1
           let response = await this.getSessionTaskByFilter(this.prepareFilters({
             id: this.selectedList.id,
-            task_status: 1
+            task_status: 1,
+            per_page: 50,
+            page: this.inQueueFetchTasks.currentPage
           }))
 
           this.powerDialerTasks['in_queue'] = response.data.data
