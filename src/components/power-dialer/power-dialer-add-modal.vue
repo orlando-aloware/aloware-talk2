@@ -532,7 +532,8 @@ export default {
 
     getListCount (id) {
       return this.$axios
-        .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
+        // .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
+        .get(`${process.env.API_URL}/api/v2/contacts-list/${id}/count`)
     },
 
     checkIntegrationImport () {

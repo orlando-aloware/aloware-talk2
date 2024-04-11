@@ -78,7 +78,8 @@ if (process.env.USERPILOT_APPTOKEN) {
 
 // local storage
 storage.local.setItem('api_url', process.env.API_URL)
-storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
+storage.local.setItem('api_reporting_url', process.env.API_URL)
+// storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
 storage.local.setItem('pusher_app_key', process.env.PUSHER_APP_KEY)
 storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
