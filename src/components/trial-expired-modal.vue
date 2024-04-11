@@ -68,7 +68,7 @@
 
 <script>
 import VueCookies from 'vue-cookies'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'trial-expired-modal',
@@ -77,26 +77,6 @@ export default {
     title: {
       type: String,
       default: null
-    },
-
-    notes: {
-      type: String,
-      default: null
-    },
-
-    cookieName: {
-      type: String,
-      required: true
-    },
-
-    shouldShowDefaultActivator: {
-      type: Boolean,
-      default: true
-    },
-
-    shouldShowInFirstVisit: {
-      type: Boolean,
-      default: true
     }
   },
 
@@ -118,22 +98,9 @@ export default {
 
   created () {
     this.$cookies = VueCookies
-
-    if (!this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit) {
-      this.showModal = true
-      return this.setIsIntroVideoVisible(true)
-    }
   },
 
   methods: {
-    ...mapActions(['setIsIntroVideoVisible']),
-
-    closeModal () {
-      this.showModal = false
-      this.$cookies.set(this.parsedCookieName, 'viewed', 3650) // Set cookie to expire in 10 years
-      this.setIsIntroVideoVisible(null)
-    },
-
     openModal () {
       this.showModal = true
     },
