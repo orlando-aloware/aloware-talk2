@@ -25,7 +25,7 @@ export default {
     ]),
 
     ...mapGetters('contacts', {
-      selectedContacts: 'selectedContacts',
+      currentSelectedContacts: 'selectedContacts',
       selectedFilters: 'currentListFilters',
       search: 'search'
     }),
@@ -94,8 +94,8 @@ export default {
       }
 
       // add selected contacts to the params, when they arent empty
-      if (Array.isArray(this.selectedContacts[listId])) {
-        const contactIds = this.selectedContacts[listId].map(contact => contact.id)
+      if (Array.isArray(this.currentSelectedContacts[listId])) {
+        const contactIds = this.currentSelectedContacts[listId].map(contact => contact.id)
 
         if (contactIds.length) {
           filters.contact_ids = contactIds
