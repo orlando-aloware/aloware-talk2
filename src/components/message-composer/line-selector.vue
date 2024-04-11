@@ -93,6 +93,7 @@ export default {
 
     selectedCampaign () {
       if (this.campaigns) {
+        // It returns the campaign validating the campaignId and the incoming_number
         return this.campaigns.find(campaign => campaign.id === this.campaignId && campaign.incoming_number)
       }
 
