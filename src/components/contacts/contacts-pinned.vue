@@ -162,13 +162,11 @@ export default {
     },
 
     loadAllCount () {
-      // return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`).then((response) => response.data.count)
-      return this.$axios.get(`${process.env.API_URL}/api/v2/contacts/count`).then((response) => response.data.count)
+      return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`).then((response) => response.data.count)
     },
 
     loadMyContactsCount () {
-      // return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
-      return this.$axios.get(`${process.env.API_URL}/api/v2/contacts/count`, {
+      return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
         params: {
           filter_groups: [{
             filters: {
@@ -192,8 +190,7 @@ export default {
     },
 
     loadStatusCounts () {
-      // return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/status-counts`).then((response) => response.data)
-      return this.$axios.get(`${process.env.API_URL}/api/v2/contacts/status-counts`).then((response) => response.data)
+      return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/status-counts`).then((response) => response.data)
         .catch((err) => {
           console.error(err)
           this.$generalNotification('Unable to load status counts, please try again.', 'error')
