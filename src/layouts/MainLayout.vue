@@ -6,8 +6,7 @@
       <span>This screen size is not supported.</span>
     </div>
     <trial-banner v-if="isTrialKYC && isAuthenticated"/>
-    <!-- <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/> -->
-    <trial-expired-modal v-if="true"/>
+    <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
