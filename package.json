@@ -38,7 +38,7 @@
     "bootstrap-vue": "^2.23.1",
     "bowser": "^2.11.0",
     "cleave.js": "^1.6.0",
-    "core-js": "3.36.0",
+    "core-js": "^3.36.0",
     "countries-and-timezones": "^2.4.0",
     "country-state-city": "3.2.1",
     "countup.js": "2.8.0",
