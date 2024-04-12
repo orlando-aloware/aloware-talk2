@@ -46,7 +46,6 @@ export default {
     }
 
     this.wrapUpListeners.pauseWrapUp = (pauseWrapUp) => {
-      console.trace('this.wrapUpListeners.pauseWrapUp this.wrapUpPaused')
       this.wrapUpPaused = pauseWrapUp
     }
 
@@ -66,7 +65,6 @@ export default {
   watch: {
     isContactNotDisposed (value) {
       if (!value && !this.isForcedCallDisposition) {
-        console.trace('isContactNotDisposed this.wrapUpPaused')
         this.wrapUpPaused = false
       }
     }
