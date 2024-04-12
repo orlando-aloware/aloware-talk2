@@ -608,8 +608,13 @@ export default {
       const canNextStatuses = ['WRAP_UP', 'READY']
       const canNext = this.statusCallConnected ||
         canNextStatuses.includes(this.dialer.currentStatus)
-
-      return !this.wrapUpPaused && !this.loadingNext && canNext
+      console.log('canNextTask this.statusCallConnected', this.statusCallConnected)
+      console.log('canNextTask this.dialer.currentStatus', this.dialer.currentStatus)
+      console.log('canNextTask this.wrapUpPaused', this.wrapUpPaused)
+      console.log('canNextTask this.loadingNext', this.loadingNext)
+      console.log('canNextTask canNext', canNext)
+      return true
+      // return !this.wrapUpPaused && !this.loadingNext && canNext
     },
 
     canRedialLater () {
@@ -683,7 +688,8 @@ export default {
     },
 
     isEndSessionDisabled () {
-      return this.toggleEnd || this.wrapUpPaused
+      return false
+      // return this.toggleEnd || this.wrapUpPaused
     },
 
     endSessionButtonColor () {

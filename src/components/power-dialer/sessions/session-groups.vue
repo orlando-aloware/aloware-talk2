@@ -455,7 +455,16 @@ export default {
               page: this.inQueueFetchTasks.currentPage
             }))
 
-            this.powerDialerTasks['in_queue'] = res.data.data
+            // Total of skipped tasks in the current PD session plus the active task
+            const currSkippedAndInProgress = [...this.powerDialerTasks.skipped, this.activeTask]
+
+            // The new set of IN QUEUE tasks that are retrieved by the API
+            const currInQueue = [...res.data.data]
+
+            // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
+            // but discarding the ones have been skipped so we don't list them again
+            let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+            this.powerDialerTasks['in_queue'] = newInQueue
           }
         }
 
@@ -485,7 +494,17 @@ export default {
             page: this.inQueueFetchTasks.currentPage
           }))
 
-          this.powerDialerTasks['in_queue'] = response.data.data
+          // Total of skipped tasks in the current PD session plus the active task
+          const currSkippedAndInProgress = [...this.powerDialerTasks.skipped, this.activeTask]
+
+          // The new set of IN QUEUE tasks that are retrieved by the API
+          const currInQueue = [...response.data.data]
+
+          // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
+          // but discarding the ones have been skipped so we don't list them again
+          let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+          this.powerDialerTasks['in_queue'] = newInQueue
+
           this.$generalNotification(res.data.message)
           this.isDeleting = false
         })
