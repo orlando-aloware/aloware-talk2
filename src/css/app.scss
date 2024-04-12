@@ -5614,6 +5614,46 @@ button#bs-folder-options {
   }
 }
 
+.trial-expired-modal {
+  .modal-lg {
+    @media (min-width: 992px) {
+      max-width: 750px;
+    }
+  }
+
+  .modal-body {
+    padding: 0;
+  }
+
+  &__body {
+    font-size: 16px;
+    padding: 20px;
+    word-break: normal;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 400;
+    color: $black;
+  }
+
+  &__close {
+    margin-right: -15px;
+    margin-top: -30px;
+  }
+
+  &__list-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $black;
+  }
+
+  &__list-desc {
+    font-size: 13px;
+    color: $grey-light5;
+  }
+}
+
 .empty-state {
   position: absolute;
   width: 100%;
@@ -14713,4 +14753,10 @@ h1.contact-list-name-label {
   font-size: 20px;
   font-weight: 500;
   margin-top: 20px;
+}
+
+.trial-expired-icon {
+  margin: 2rem;
+  color: #d0d0d0;
+  font-size: 120px
 }
