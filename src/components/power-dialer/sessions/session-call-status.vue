@@ -1254,10 +1254,6 @@ export default {
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
         this.wrapUp = false
         this.hasActiveTask = false
-        // Add task to skipped list when users clicks on the Next button
-        if (!forceSkip && skipWrapUp && this.sessionPaused) {
-          this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
-        }
         const task = get(this.powerDialerTasks.in_queue, '0', null)
 
         this.taskToCall = cloneDeep(task)
@@ -1270,6 +1266,10 @@ export default {
 
         this.processRemoveFirstInQueueTask()
         this.processSession(noWrapUp)
+        // Add task to skipped list when users clicks on the Next button
+        if (!forceSkip && skipWrapUp && this.sessionPaused) {
+          this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
+        }
         return
       }
 
