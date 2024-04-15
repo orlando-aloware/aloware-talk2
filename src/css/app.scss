@@ -14755,6 +14755,12 @@ h1.contact-list-name-label {
   margin-top: 20px;
 }
 
+@media (max-width: 768px) {
+  .intercom-lightweight-app {
+    display: none !important;
+  }
+}
+
 .trial-expired-icon {
   margin: 2rem;
   color: #d0d0d0;
