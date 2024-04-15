@@ -6,6 +6,7 @@
       <span>This screen size is not supported.</span>
     </div>
     <trial-banner v-if="isTrialKYC && isAuthenticated"/>
+    <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -281,6 +282,8 @@ import {
   MAX_SCREEN_WIDTH_MOBILE_HEADER
 } from 'src/constants/viewport-sizes'
 import TrialBanner from 'components/trial-banner.vue'
+import { TRIAL_STATUS_EXPIRED } from 'src/constants/trial-account-status'
+import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 
 export default {
   name: 'MyLayout',
@@ -297,7 +300,8 @@ export default {
     KycFillDialog,
     KycReloadDialog,
     Modal,
-    TrialBanner
+    TrialBanner,
+    TrialExpiredModal
   },
 
   mixins: [
@@ -427,6 +431,10 @@ export default {
 
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
+    },
+
+    isTrialExpired () {
+      return this.currentCompany && this.currentCompany.trial_status === TRIAL_STATUS_EXPIRED
     },
 
     pageClass () {

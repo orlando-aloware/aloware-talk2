@@ -1,0 +1,5 @@
+export const TRIAL_STATUS_NOT_STARTED = 1
+export const TRIAL_STATUS_SUCCESS = 2
+export const TRIAL_STATUS_ACTIVE = 3
+export const TRIAL_STATUS_EXPIRED = 4
+export const TRIAL_STATUS_PURGE_ELIGIBLE = 5
