@@ -233,7 +233,7 @@ import ContactDispositionSelector from 'components/generic-selectors/contact-dis
 import QTimezoneSelector from 'components/contacts/q-timezone-selector'
 import DatePickerSelector from 'components/generic-selectors/date-picker-selector'
 import LineSelector from 'components/generic-selectors/line-selector'
-import ContactAttributes from 'components/contacts/contact-attributes'
+import ContactAttributes from 'components/contacts/contact-attributes/contact-attributes'
 import LeadSourceSelector from 'components/generic-selectors/lead-source-selector.vue'
 
 export default {

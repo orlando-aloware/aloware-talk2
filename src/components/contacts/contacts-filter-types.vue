@@ -407,8 +407,11 @@ export default {
 
   mounted () {
     if (this.filter.key === 'tags') {
-      let tempSet = new Set([...this.appliedTags, ...this.filter.options])
-      this.appliedTags = Array.from(tempSet)
+      // Prevent duplicated options when loading tags previously added
+      const optionsSet = new Set(this.filter.options)
+      this.filter.options = [...optionsSet]
+      this.appliedTags = [...new Set([...this.appliedTags, ...this.filter.options])]
+      this.getTags('', true, () => {})
     }
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
@@ -830,33 +833,32 @@ export default {
       this.filterOperatorValue = 1
     },
 
-    filterTagFn (val, update) {
-      if (val) {
-        this.getTags(val, update)
-      }
+    filterTagFn (val, updateFn, abortFn) {
+      this.getTags(val, false, updateFn, abortFn)
     },
 
-    getTags (search = '', update) {
-      if (!search) {
-        update(() => {
-          this.options = this.tagsArray
-        })
+    getTags (search = '', force, updateFn, abortFn) {
+      if (search.length < 3 && !force) {
+        updateFn()
         return
       }
 
-      if (search.length >= this.threshold) {
-        const params = {
+      if (search.length >= this.threshold || force) {
+        let params = {
           page: 1,
           per_page: 50,
           search: search
         }
 
+        if (force && this.filterOperatorValue?.length) {
+          params.tag_ids = this.filterOperatorValue
+        }
+
         return talk2Api.V1.tags.get({
           params: params
         }).then(res => {
-          update(() => {
-            this.options = res.data.data
-          })
+          this.options = res.data.data
+          updateFn()
         }).catch(err => {
           console.log(err)
         })

@@ -749,6 +749,15 @@
                   <div class="d-flex align-items-center pt-2 w-100">
                     <call-disposition-selector :communication="communication"></call-disposition-selector>
                   </div>
+                  <div class="mt-2 w-100"
+                       v-if="currentCompany.hubspot_integration_enabled">
+                    <div class="d-flex align-items-center co-12">
+                      <label class="form-control-label mb-1">Hubspot Type:</label>
+                    </div>
+                    <div class="d-flex align-items-center pt-2 w-100">
+                      <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
+                    </div>
+                  </div>
                 </template>
               </div>
             </div>
@@ -840,6 +849,7 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
 import DownloadButton from 'components/download-button'
 import API from 'src/plugins/api/api'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 
 export default {
   name: 'communication-info',
@@ -856,6 +866,7 @@ export default {
   ],
 
   components: {
+    HubspotActivityTypeSelector,
     OpenCalendarButton,
     IgnoreCallIcon,
     HangupIcon,

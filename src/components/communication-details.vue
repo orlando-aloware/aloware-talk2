@@ -53,7 +53,7 @@
                 <q-img class="img-fluid d-block r-2x br-8"
                        height="300px"
                        native-context-menu
-                       :class="index > 0 ? 'mb-1' : ''"
+                       :class="index > 0 ? 'mb-1 mt-1' : ''"
                        :src="attachment.url"
                        v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
                   <template v-slot:error>
@@ -107,7 +107,7 @@
                     v-if="communication.type !== CommunicationTypes.SMS"
                     v-html="$options.filters.nl2br(communication.body)">
               </span>
-              <span class="text-muted fs-14 font-weight-light-bold"
+              <span class="text-muted fs-14 font-weight-light-bold handle-whitespace break-word"
                     v-else>
                   {{ communication.body }}
               </span>
@@ -858,6 +858,16 @@
                 </div>
               </b-col>
             </b-form-row>
+            <b-form-row v-if="currentCompany.hubspot_integration_enabled">
+              <b-col class="pl-0 pr-0">
+                <q-item-label class="mt-3 custom-item-label">Hubspot Type: </q-item-label>
+              </b-col>
+              <b-col>
+                <div class="d-flex align-items-center">
+                  <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
+                </div>
+              </b-col>
+            </b-form-row>
           </q-card-section>
         </q-card>
       </b-col>
@@ -899,11 +909,13 @@ import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 
 export default {
   name: 'communication-details',
 
   components: {
+    HubspotActivityTypeSelector,
     PencilOIcon,
     PredefinedTimeDurationSelector,
     RingGroupSnapshot,

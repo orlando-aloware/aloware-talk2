@@ -456,7 +456,8 @@ export default {
       return this.$axios.get('/api/v1/communication/info', {
         params: {
           sid: sid,
-          phone_number: from
+          phone_number: from,
+          live: true
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
@@ -592,6 +593,13 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
+
+      /*
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
+        return
+      }
+      */
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({

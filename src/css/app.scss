@@ -1296,6 +1296,10 @@ i.option-separator {
   white-space: pre-line;
 }
 
+.break-word {
+  word-break: break-word;
+}
+
 .q-input-composer .q-field__native,
 .q-input-composer .q-field__control {
   min-height: 18px;
@@ -5589,6 +5593,46 @@ button#bs-folder-options {
 
   &__title {
     font-size: 18px;
+    font-weight: 400;
+    color: $black;
+  }
+
+  &__close {
+    margin-right: -15px;
+    margin-top: -30px;
+  }
+
+  &__list-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $black;
+  }
+
+  &__list-desc {
+    font-size: 13px;
+    color: $grey-light5;
+  }
+}
+
+.trial-expired-modal {
+  .modal-lg {
+    @media (min-width: 992px) {
+      max-width: 750px;
+    }
+  }
+
+  .modal-body {
+    padding: 0;
+  }
+
+  &__body {
+    font-size: 16px;
+    padding: 20px;
+    word-break: normal;
+  }
+
+  &__title {
+    font-size: 28px;
     font-weight: 400;
     color: $black;
   }
@@ -14709,4 +14753,10 @@ h1.contact-list-name-label {
   font-size: 20px;
   font-weight: 500;
   margin-top: 20px;
+}
+
+.trial-expired-icon {
+  margin: 2rem;
+  color: #d0d0d0;
+  font-size: 120px
 }

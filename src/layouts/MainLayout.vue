@@ -6,6 +6,7 @@
       <span>This screen size is not supported.</span>
     </div>
     <trial-banner v-if="isTrialKYC && isAuthenticated"/>
+    <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -223,6 +224,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   htmlMixin,
@@ -280,6 +282,8 @@ import {
   MAX_SCREEN_WIDTH_MOBILE_HEADER
 } from 'src/constants/viewport-sizes'
 import TrialBanner from 'components/trial-banner.vue'
+import { TRIAL_STATUS_EXPIRED } from 'src/constants/trial-account-status'
+import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 
 export default {
   name: 'MyLayout',
@@ -296,7 +300,8 @@ export default {
     KycFillDialog,
     KycReloadDialog,
     Modal,
-    TrialBanner
+    TrialBanner,
+    TrialExpiredModal
   },
 
   mixins: [
@@ -328,6 +333,7 @@ export default {
       loadingWorkflows: false,
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
+      loadingActivityTypes: false,
       loadingScripts: false,
       loadingTemplates: false,
       loadingBroadcasts: false,
@@ -418,8 +424,16 @@ export default {
 
     ...mapState(['xmasEnabled']),
 
+    ...mapFields('powerDialer', [
+      'sessionPaused'
+    ]),
+
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
+    },
+
+    isTrialExpired () {
+      return this.currentCompany && this.currentCompany.trial_status === TRIAL_STATUS_EXPIRED
     },
 
     pageClass () {
@@ -1483,6 +1497,7 @@ export default {
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
+        this.getActivityTypes()
         this.getLeadSources()
         this.getMyQueueList()
       })
@@ -1710,6 +1725,22 @@ export default {
             return Promise.reject()
           })
       }
+    },
+
+    getActivityTypes () {
+      this.loadingActivityTypes = true
+      return this.$axios
+        .get('/api/v1/activity-types').then(res => {
+          this.setActivityTypes(res.data)
+          this.loadingActivityTypes = false
+
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingActivityTypes = false
+
+          return Promise.reject()
+        })
     },
 
     getTemplates () {
@@ -2492,6 +2523,7 @@ export default {
       'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
+      'setActivityTypes',
       'setTemplates',
       'setBroadcasts',
       'setDialerToken',
@@ -2658,6 +2690,11 @@ export default {
       // temporary
       if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
         this.$router.back()
+      }
+
+      // Power Dialer session control - mark as false every time the session module is exited
+      if (from.meta.id === 'power-dialer-session') {
+        this.sessionPaused = false
       }
     },
 

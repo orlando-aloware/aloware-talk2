@@ -865,7 +865,6 @@ export default {
 
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
-          this.$VueEvent.fire('fetchInbox')
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false

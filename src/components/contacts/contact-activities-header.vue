@@ -181,6 +181,7 @@ import EllipsisIcon from 'components/icons/ellipsis-icon'
 import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState } from 'vuex'
+import { cloneDeep } from 'src/plugins/helpers/functions'
 export default {
   name: 'contact-activities-header',
 
@@ -254,7 +255,7 @@ export default {
           this.$emit('markAllAsRead')
         }
 
-        const contact = { ...this.contact }
+        const contact = cloneDeep(this.contact)
         const key = { data: null }
         for (key.data in res.data) {
           if (typeof contact[key.data] !== 'undefined') {
