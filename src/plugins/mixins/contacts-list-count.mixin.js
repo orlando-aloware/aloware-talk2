@@ -214,6 +214,11 @@ export default {
           if (key === 'my_contacts') {
             query.my_contacts = filters[key]
           }
+
+          // non-grouped filters
+          if (key === 'filters') {
+            query.filters = filters[key]
+          }
         })
       }
 

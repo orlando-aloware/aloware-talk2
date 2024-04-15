@@ -918,40 +918,21 @@ export default {
       // get the current filters
       let filterGroups = this.$parent.buildQueryString({}).filter_groups
 
-      // add the DNC filter in every filter group if some filter exists, or just add it once otherwise
-      if (filterGroups) {
-        filterGroups = filterGroups.map(filterGroup => {
-          filterGroup.filters.dnc_option = [
-            {
-              value: 2,
-              operator: 1
-            }
-          ]
-
-          return filterGroup
-        })
-      } else {
-        filterGroups = [
-          {
-            filters: {
-              dnc_option: [
-                {
-                  value: 2,
-                  operator: 1
-                }
-              ]
-            }
-          }
-        ]
-      }
-
       // build the filter structure
       const filters = {
         filters: {
           filter_groups: filterGroups,
           my_contacts: this.$parent.showMyContactsViewBased || undefined,
           list_id: undefined,
-          search: this.$parent.search || undefined
+          search: this.$parent.search || undefined,
+          filters: {
+            dnc_option: [
+              {
+                value: 2,
+                operator: 1
+              }
+            ]
+          }
         }
       }
 
