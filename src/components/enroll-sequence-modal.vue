@@ -2,17 +2,20 @@
   <b-modal title="Enroll To Sequence"
            size="md"
            v-model="isOpen"
+           data-testid="enroll-sequence-modal"
            @hidden="onHidden">
-    <b-form @submit.prevent="onSubmit">
+    <b-form @submit.prevent="onSubmit" data-testid="enroll-sequence-modal-form">
       <b-form-group
         id="input-group-1"
         label-for="input-1"
         description="Choose the sequence you want this contact to enroll"
+        data-testid="enroll-sequence-modal-form-group"
       >
         <sequence-selector :multiple="false"
                            :use-chips="false"
                            :clearable="true"
                            :generic-styling="false"
+                           data-testid="enroll-sequence-modal-sequence-selector"
                            @change="onSequenceSelected"/>
       </b-form-group>
     </b-form>
@@ -20,6 +23,7 @@
       <b-button variant="success"
                 class="custom-btn"
                 size="sm"
+                data-testid="enroll-sequence-modal-close-button"
                 @click="onHidden"
       >
         Close
@@ -28,6 +32,7 @@
                 class="custom-btn"
                 size="sm"
                 :disabled="isEnrolling || !sequenceId"
+                data-testid="enroll-sequence-modal-enroll-contact-button"
                 @click="onSubmit"
       >
         <q-spinner-bars v-if="isEnrolling"

@@ -1,8 +1,10 @@
 <template>
   <b-card class="border-0 tags-wrapper"
+          data-testid="contact-tags-wrapper"
           v-if="hasPermissionTo('tag contact')">
     <tag-multi-select label="Tags"
                       button-text="Modify Tags"
+                      data-testid="contact-tags-multi-select"
                       :values="tagIds"
                       :options="combinedTags"
                       :current="currentTags"

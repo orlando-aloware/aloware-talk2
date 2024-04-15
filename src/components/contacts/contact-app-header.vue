@@ -1,7 +1,8 @@
 <template>
-  <h1 class="contact-list-name-label">
+  <h1 class="contact-list-name-label" data-testid="contact-app-header">
     {{ title }}
     <q-tooltip anchor="bottom middle"
+               data-testid="contact-app-header-tooltip"
                self="center middle">
       {{ title }}
     </q-tooltip>

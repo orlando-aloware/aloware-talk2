@@ -9,6 +9,7 @@
               option-label="name"
               behavior="menu"
               v-model="contact.disposition_status_id"
+              data-testid="contact-disposition-select"
               :options="options"
               :loading="isBusy"
               :disable="disabled"

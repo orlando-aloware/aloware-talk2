@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="phone-number-wrapper"
+         data-testid="contact-phones-list-items-wrapper"
          v-for="phone in phones"
          :key="phone.id">
       <div>
@@ -11,24 +12,28 @@
 
         <b-badge class="badge-phone-info mr-1"
                  :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
+                 data-testid="contact-phones-list-items-lrn-badge"
                  v-if="(phone.lrn_type || phone.lrn_type === 0) && $options.filters.validLrnType(phone.lrn_type)">
           {{ phone.lrn_type | fixLrnType }}
         </b-badge>
 
         <b-badge variant="grey-80"
                  class="badge-phone-info mr-1"
+                 data-testid="contact-phones-list-items-lrn-primary-badge"
                  v-if="phone.phone_number === contact.phone_number">
           Primary
         </b-badge>
 
         <b-badge variant="danger"
                  class="badge-phone-info"
+                 data-testid="contact-phones-list-items-invalid-number-badge"
                  v-if="phone.is_invalid">
           Invalid Number
         </b-badge>
 
         <b-badge variant="danger"
                  class="badge-phone-info"
+                 data-testid="contact-phones-list-items-opt-out-badge"
                  v-if="phone.is_opted_out">
           Opt-Out
         </b-badge>
@@ -43,9 +48,11 @@
                     size="sm"
                     variant="light"
                     v-if="hasPermissionTo('update contact')"
+                    data-testid="contact-phones-list-items-edit"
                     @click="onEdit(phone)">
             <pencil-o-icon width="12"
                            height="12"
+                           data-testid="contact-phones-list-items-edit-icon"
                            color="#256EFF"></pencil-o-icon>
           </b-button>
 
@@ -53,6 +60,7 @@
                       class="bg-transparent b-0"
                       size="sm"
                       offset="-125"
+                      data-testid="contact-phones-list-items-dropdown"
                       no-caret>
             <template slot="button-content">
               <i class="material-icons"
@@ -61,24 +69,29 @@
             <b-dropdown-item class="phone-actions"
                              :disabled="contact.is_dnc"
                              v-if="hasPermissionTo('update contact')"
+                             data-testid="contact-phones-list-items-composer-text-item"
                              @click="onComposerMedia('sms', phone)">
               <text-icon color="#62666E"></text-icon> Text
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
                              :disabled="contact.is_dnc"
                              v-if="hasPermissionTo('update contact')"
+                             data-testid="contact-phones-list-items-call-item"
                              @click="onCall(phone)">
               <call-icon /> Call
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
+                             data-testid="contact-phones-list-items-fax-item"
                              @click="onComposerMedia('fax', phone)">
               <fax-icon /> Fax
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
                              v-if="hasPermissionTo('archive contact') && phone.phone_number !== contact.phone_number"
+                             data-testid="contact-phones-list-items-delete-item"
                              @click="onDelete(phone)">
               <trash-icon color="#62666E"
                           width="13"
+                          data-testid="contact-phones-list-items-delete-icon"
                           height="13">
               </trash-icon> Delete
             </b-dropdown-item>

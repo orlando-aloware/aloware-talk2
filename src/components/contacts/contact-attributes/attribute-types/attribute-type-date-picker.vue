@@ -2,6 +2,7 @@
   <div>
 
     <date-selector
+      data-testid="attr-type-date-picker-selector"
       v-model="defaultDate"
       :format="momentDateFormat"
       :formatted="momentDateFormat"

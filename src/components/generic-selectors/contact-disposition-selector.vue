@@ -20,6 +20,7 @@
             :outlined="outlined"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             v-model="selectedId"
+            data-testid="contact-disposition-selector"
             @popup-show="onShowMenu"
             @filter="filterFn"
             @focus="onFocus"
@@ -32,7 +33,7 @@
 
     <template v-slot:no-option>
       <q-item>
-        <q-item-section class="no-results text-grey">
+        <q-item-section class="no-results text-grey" data-testid="contact-disposition-no-results">
           No results
         </q-item-section>
       </q-item>

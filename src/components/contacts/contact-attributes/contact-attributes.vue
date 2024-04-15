@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100 w-100">
+  <div class="h-100 w-100" data-testid="contact-attributes-wrapper">
     <div v-for="attribute in attributes"
          :key="attribute.id">
 
@@ -10,8 +10,9 @@
         v-if="attribute.type === ContactAttributetTypeEnum.DATE_PICKER"
         :attribute="attribute"
         :disabled="!hasPermissionTo('update contact')"
-        @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)"
         :timezone="contact.timezone"
+        data-testid="contact-attributes-type-date-picker"
+        @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)"
       />
 
       <!-- if any other type -->
@@ -19,6 +20,7 @@
         v-else
         :attribute="attribute"
         :disabled="!hasPermissionTo('update contact')"
+        data-testid="contact-attributes-type-text"
         @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)"
       />
 

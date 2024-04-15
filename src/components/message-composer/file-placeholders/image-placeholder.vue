@@ -1,9 +1,11 @@
 <template>
   <div>
     <img  class="img-preview"
+          data-testid="image-placeholder-preview"
           :src="getFilePreview(file)"/>
     <b-button size="sm"
               class="btn-remove-file text-white"
+              data-testid="image-placeholder-remove-button"
               @click="onRemove"
               @mouseout="hovered = false"
               @mouseover="hovered = true"

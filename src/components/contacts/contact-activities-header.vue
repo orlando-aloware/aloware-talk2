@@ -3,10 +3,12 @@
     <div class="calls-header__label">
       <back-button class="p-0"
                    v-if="$q.screen.lt.md"
+                   data-testid="contact-activities-back-btn"
                    @click="back"/>
       <div class="contact-name">{{ label }}</div>
       <b-badge class="d-flex align-items-center badge-task-status"
                :variant="resolveVariant"
+               data-testid="contact-activities-status-badge"
                v-if="contact.task_status">
         {{ contact.task_status | fixTaskStatusName }}
       </b-badge>
@@ -17,12 +19,14 @@
                     right
                     variant="light"
                     toggle-class="bg-white d-flex align-items-center"
+                    data-testid="contact-activities-actions-dropdown"
                     class="m-2 b-compact-dropdown-button text-bold contact-activities-actions-dropdown d-flex align-items-center">
           <template #button-content>
             <ellipsis-icon/>
           </template>
           <b-dropdown-item href=""
                            :disabled="!hasUnreads"
+                           data-testid="contact-activities-mark-all-as-read-item"
                            @click="$emit('markAllAsRead')">
             <mail-open-icon class="mark-all-as-read-icon dropdown-icon"/>
             Mark All as Read ({{ unreadCount }})
@@ -30,6 +34,7 @@
           <b-dropdown-item href="#"
                            :disable="isUpdatingStatus"
                            v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
+                           data-testid="contact-activities-move-to-pending-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
             <timer-o-icon class="dropdown-icon"></timer-o-icon>
             Move to Pending
@@ -37,6 +42,7 @@
           <b-dropdown-item href="#"
                            :disable="isUpdatingStatus"
                            v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+                           data-testid="contact-activities-close-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
             <check-o-icon class="dropdown-icon"></check-o-icon>
             Close
@@ -44,6 +50,7 @@
           <b-dropdown-item href="#"
                            :disable="isUpdatingStatus"
                            v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
+                           data-testid="contact-activities-reopen-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
             <inbox-o-icon class="dropdown-icon"></inbox-o-icon>
             Reopen
@@ -52,12 +59,14 @@
         <q-btn borderless
                flat
                class="contact-activities-actions__drawer_btn"
+               data-testid="contact-activities-drawer-btn"
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
         </q-btn>
         <q-btn borderless
                flat
                class="contact-activities-actions__mobile_btn"
+               data-testid="contact-activities-details-mobile-btn"
                @click="$emit('toggleDetails')">
           <information-circle-icon width="33"
                                    height="33"/>
@@ -72,6 +81,7 @@
           color="primary"
           class="text-decoration-none mr-2"
           v-if="hasUnreads"
+          data-testid="contact-activities-mark-all-as-read-btn"
           @click="$emit('markAllAsRead')">
           <span class="mx-2">
             Mark All as Read ({{ unreadCount }})
@@ -86,6 +96,7 @@
           color="primary"
           class="text-decoration-none"
           :disable="isUpdatingStatus"
+          data-testid="contact-activities-move-to-pending-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
           <q-tooltip anchor="top middle"
                      self="center middle">
@@ -110,6 +121,7 @@
           color="primary"
           class="text-decoration-none"
           :disable="isUpdatingStatus"
+          data-testid="contact-activities-reopen-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
           <q-tooltip anchor="top middle"
                      self="center middle">
@@ -134,6 +146,7 @@
           color="primary"
           class="text-decoration-none"
           :disable="isUpdatingStatus"
+          data-testid="contact-activities-close-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
           <q-tooltip anchor="top middle"
                      self="center middle">

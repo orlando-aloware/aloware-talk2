@@ -9,12 +9,14 @@
       <contacts-pinned-item v-for="item in defaultLists"
                             :item="item"
                             :key="item.id"
+                            :data-testid="'contacts-pinned-default-list-'+item.id"
                             :countsLoading="loading">
       </contacts-pinned-item>
       <template v-if="!loadingPinned">
         <contacts-pinned-item v-for="item in nonDefaultLists"
                               :item="item"
                               :key="item.id"
+                              :data-testid="'contacts-pinned-non-default-list-'+item.id"
                               :countsLoading="loading">
         </contacts-pinned-item>
       </template>

@@ -1,6 +1,7 @@
 <template>
   <b-overlay :show="isBusy"
              rounded="sm"
+             data-testid="contact-sequence-overlay"
              variant="white">
 
     <b-card class="border-0 position-relative contact-about-wrapper">
@@ -9,10 +10,11 @@
       <div v-if="sequence">
         <b-card-text class="fs-14 mt-3">
 
-          <b-media>
+          <b-media data-testid="contact-sequence-media">
             <template #aside>
               <b-img width="34"
                      alt="The Sequence icon"
+                     data-testid="sequence-icon=img"
                      :src="getIconUrl(sequence.img_src)"></b-img>
             </template>
 
@@ -26,6 +28,7 @@
                   variant="outline-primary"
                   size="sm"
                   class="mr-1"
+                  data-testid="refresh-sequence-info-button"
                   @click="getSequenceInfo">
           <i class="fa fa-sync-alt"></i>
           <q-tooltip anchor="top middle"
@@ -36,6 +39,7 @@
         <b-button href="#"
                   variant="outline-danger"
                   size="sm"
+                  data-testid="disenroll-contact-button"
                   @click="disenrollContact">
           <i class="fa fa-trash"></i> Disenroll from sequence
         </b-button>
@@ -50,6 +54,7 @@
                        triggers="hover"
                        target="enroll-to-sequence-popover"
                        task="sequences.enroll"
+                       data-testid="enroll-to-sequence-tooltip"
                        v-if="!enabledToAddSequences()">
         </block-tooltip>
 
@@ -58,9 +63,11 @@
                     size="sm"
                     class="btn-contact-sequence-enrol"
                     block
+                    data-testid="enroll-to-sequence-button"
                     @click="openSequenceModal"
                     :disabled="!enabledToAddSequences() || !isEnabledToEnroll">
             <add-sequence-icon color="white"
+                              data-testid="add-sequence-icon"
                               :height="12"
                               :width="12">
 

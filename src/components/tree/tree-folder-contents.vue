@@ -13,6 +13,7 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
       :endpoint="endpoint"
+      data-testid="tree-folder-contents"
     />
   </div>
 </template>

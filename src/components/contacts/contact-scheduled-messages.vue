@@ -1,16 +1,17 @@
 <template>
-  <b-card class="border-0">
+  <b-card class="border-0" data-testid="contact-scheduled-messages-wrapper">
     <h4 class="mb-2">Scheduled Messages</h4>
     <div>
       <b-button
         class="btn-block"
         variant="outline-primary"
         size="sm"
+        data-testid="contact-scheduled-messages-button"
         @click="showDialog">
         View Scheduled Messages
       </b-button>
     </div>
-    <contact-scheduled-messages-modal/>
+    <contact-scheduled-messages-modal data-testid="contact-scheduled-messages-modal"/>
   </b-card>
 </template>
 

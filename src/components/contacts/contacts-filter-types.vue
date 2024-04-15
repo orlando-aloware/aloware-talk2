@@ -2,11 +2,13 @@
   <div>
     <div class="filter-types"
          :key="`${filter.key}-${operator.value}`"
+         data-testid="contacts-filter-types"
          v-for="operator in filter.operators">
       <q-radio class="my-2 flex-nowrap"
                dense
                :val="operator.value"
                :label="operator.label"
+               data-testid="contacts-filter-types-radio"
                v-model="filterOperator">
       </q-radio>
       <template v-if="filter.type === 'string'">
@@ -21,6 +23,7 @@
                   use-input
                   use-chips
                   multiple
+                  data-testid="contacts-filter-types-string-select"
                   :emit-value="isSpecialStringTypeFilterKey"
                   :options="filterOptions"
                   v-model="filterOperatorValue"
@@ -32,12 +35,14 @@
         <q-input outlined
                  dense
                  v-model="filterOperatorValue"
+                 data-testid="contacts-filter-operator-value-input"
                  v-if="operator.value === filterOperator && hasValue" />
         <span v-if="operator.value === filterOperator && hasSecondaryOperator">and</span>
         <q-input outlined
                  dense
                  class="pt-2"
                  v-model="secondaryFilterOperatorValue"
+                 data-testid="contacts-filter-secondary-operator-value-input"
                  v-if="operator.value === filterOperator && hasSecondaryOperator" />
       </template>
       <template v-if="filter.type === 'date'">
@@ -47,6 +52,7 @@
                   emit-value
                   map-options
                   :options="operator.options"
+                  data-testid="contacts-filter-operator-value-date-select"
                   v-model="filterOperatorValue"
                   v-if="operator.value === filterOperator && hasValue" />
         <b-form-datepicker label-today="Today"
@@ -54,6 +60,7 @@
                            reset-button
                            :date-format-options="format"
                            v-model="filterOperatorValue"
+                           data-testid="contacts-filter-operator-value-datepicker"
                            v-if="operator.value === filterOperator && expectsDatepicker">
         </b-form-datepicker>
         <span v-if="operator.value === filterOperator && hasSecondaryOperator">and</span>
@@ -61,6 +68,7 @@
                            today-button
                            reset-button
                            :date-format-options="format"
+                           data-testid="contacts-filter-secondary-operator-value-datepicker"
                            v-model="secondaryFilterOperatorValue"
                            v-if="operator.value === filterOperator && hasSecondaryOperator">
         </b-form-datepicker>
@@ -79,6 +87,7 @@
                   use-input
                   :options="options"
                   v-model="filterOperatorValue"
+                  data-testid="contacts-filter-operator-value-relation-select"
                   v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
                   @filter="filterFn"/>
@@ -97,6 +106,7 @@
                   use-chips
                   multiple
                   :options="filterOptions"
+                  data-testid="contacts-filter-secondary-operator-value-relation-select"
                   v-model="secondaryFilterOperatorValue"
                   v-if="operator.value === filterOperator && hasSecondaryOperator"
                   @input-value="showSecondaryFilterOperationOptions"
@@ -119,6 +129,7 @@
                   use-input
                   :options="options"
                   v-model="filterOperatorValue"
+                  data-testid="contacts-filter-operator-value-tags-select"
                   v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
                   @filter="filterTagFn"/>
@@ -139,6 +150,7 @@
                   multiple
                   :options="filterOptions"
                   v-model="secondaryFilterOperatorValue"
+                  data-testid="contacts-filter-secondary-operator-value-tags-select"
                   v-if="operator.value === filterOperator && hasSecondaryOperator"
                   @input-value="showSecondaryFilterOperationOptions"
                   @input="addSecondaryValue"/>
@@ -148,6 +160,7 @@
                       toggle-color="primary"
                       :options="options"
                       v-show="operator.value === filterOperator"
+                      data-testid="contacts-filter-operator-value-toggle"
                       v-model="filterOperatorValue">
         </q-btn-toggle>
       </template>
@@ -162,6 +175,7 @@
                   emit-value
                   :options="options"
                   v-model="filterOperatorValue"
+                  data-testid="contacts-filter-operator-value-select"
                   v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
                   @filter="filterFn" />
@@ -170,6 +184,7 @@
     <compact-btn class="mr-2 mt-3 p-3"
                  variant="success"
                  :disabled="!isValidated || appliedFiltersInProgress"
+                 data-testid="contacts-filter-types-apply-btn"
                  @clicked="applyFilter">
       {{ applyFilterText }}
     </compact-btn>

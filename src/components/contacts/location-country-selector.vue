@@ -11,6 +11,7 @@
               option-label="name"
               behavior="menu"
               v-model="contact.cnam_country"
+              data-testid="location-country-selector"
               :options="options"
               :disable="disabled"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"

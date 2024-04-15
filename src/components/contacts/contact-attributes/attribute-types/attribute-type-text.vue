@@ -4,6 +4,7 @@
     <contact-input-field
       v-model="attribute.value"
       :disabled="disabled"
+      data-testid="attribute-type-text-input"
       @updateField="(eventPayload) => $emit('updateField', eventPayload)"
     />
 
