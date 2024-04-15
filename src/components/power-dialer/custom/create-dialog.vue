@@ -15,7 +15,7 @@
                       :id="0"
                       :order="0"
                       :layer="0"
-                      :items="searchList(publicContactLists)" />
+                      :items="publicContactListItems" />
       <CreateListItem v-for="folder in contactFolders"
                       :name="folder.name"
                       :key="folder.id"
@@ -80,9 +80,10 @@ export default {
     return {
       searchValue: '',
       isCreating: false,
-      publicContactLists: null,
       contactFolders: null,
-      powerDialerParams: {}
+      powerDialerParams: {},
+      initialPublicContactListItems: [],
+      publicContactListItems: []
     }
   },
   computed: {
@@ -175,10 +176,21 @@ export default {
     onHiddenPowerDialerModal () {
       this.powerDialerParams = {}
     },
-    searchList (lists) {
-      return this.searchedPdItem && this.searchedPdItem.length > 0
-        ? lists.filter(item => item.name.toLowerCase().includes(this.searchedPdItem.toLocaleLowerCase()))
-        : lists
+    searchList (list) {
+      if (!this.searchedPdItem.length) {
+        return list
+      }
+
+      const search = this.searchedPdItem.toLocaleLowerCase()
+      return list.filter(item => item.name.toLowerCase().includes(search))
+    },
+    searchPublicContactLists () {
+      this.getPublicContactLists({
+        search: this.searchedPdItem.toLocaleLowerCase()
+      })
+        .then(res => {
+          this.publicContactListItems = res.data.length ? res.data : []
+        })
     }
   },
   beforeDestroy () {
@@ -194,12 +206,26 @@ export default {
         document.body.removeEventListener('focus', this.handleClick)
         this.destroyDialogInstance(state)
       }
+    },
+    searchedPdItem: {
+      deep: true,
+      handler: function (newValue) {
+        // If no newValue has been set, set the initial list
+        if (!newValue) {
+          this.publicContactListItems = this.initialPublicContactListItems
+          return
+        }
+
+        // Search for the public contact lists through the API
+        this.searchPublicContactLists()
+      }
     }
   },
   mounted () {
     this.getPublicContactLists()
       .then(res => {
-        this.publicContactLists = res
+        this.initialPublicContactListItems = res.data
+        this.publicContactListItems = res.data
       })
     this.getContactFolders()
       .then(res => {
