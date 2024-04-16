@@ -24,6 +24,8 @@ export default {
   SET_AGENT_STATUS (state, agentStatus) {
     // only update agent_status if the new value
     // is not the same
+    console.log('SET_AGENT_STATUS agentStatus', agentStatus)
+    console.log('SET_AGENT_STATUS state.profile.agent_status', state.profile.agent_status)
     if (state.profile.agent_status !== agentStatus) {
       state.profile.agent_status = agentStatus
     }

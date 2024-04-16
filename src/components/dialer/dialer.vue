@@ -612,6 +612,7 @@ export default {
       // reject ongoing call if there is one
       this.rejectCall()
 
+      console.trace('ESPERA AQUI!!')
       /*
       if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
         console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
