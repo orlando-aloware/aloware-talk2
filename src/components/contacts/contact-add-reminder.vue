@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form @submit.prevent="onSubmit">
+    <b-form @submit.prevent="onSubmit" data-testid="contact-add-reminder-form">
       <b-form-group
         id="input-group-1"
         label=""
@@ -12,12 +12,13 @@
                                   :no-label="true"
                                   :format="`MM/DD/YYYY`"
                                   :auto-close="true"
+                                  data-testid="contact-add-reminder-date-time-picker"
                                   v-model="reminder.date">
         </vue-ctk-date-time-picker>
       </b-form-group>
 
       <b-form-group id="input-group-2" label="" label-for="input-2">
-        <predefined-time-selector @select="onTimeSelected"></predefined-time-selector>
+        <predefined-time-selector data-testid="contact-add-reminder-predefined-time-selector" @select="onTimeSelected"></predefined-time-selector>
       </b-form-group>
 
       <b-form-group id="input-group-2" label-for="input-2">
@@ -27,11 +28,16 @@
           rows="3"
           max-rows="8"
           no-auto-shrink
+          data-testid="contact-add-reminder-notes-textarea"
           v-model="reminder.note"
         ></b-form-textarea>
       </b-form-group>
 
-      <b-button type="submit" size="sm" variant="primary" :disabled="isAdding || !isValid">
+      <b-button type="submit"
+                size="sm"
+                variant="primary"
+                data-testid="contact-add-reminder-submit-button"
+                :disabled="isAdding || !isValid">
         <q-spinner-bars v-if="isAdding" color="white" />
         {{ isAdding ? 'Adding Reminder...' : 'Add Reminder' }}
       </b-button>

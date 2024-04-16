@@ -6,6 +6,7 @@
   <p class="ellipsis mt-1 text-center">{{ file.name }}</p>
   <b-button size="sm"
             class="btn-remove-file"
+            data-testid="application-placeholder-remove-file-button"
             @click="onRemove(file)"
             @mouseout="hovered = false"
             @mouseover="hovered = true"

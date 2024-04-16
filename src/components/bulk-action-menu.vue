@@ -6,26 +6,27 @@
         <span v-else>Selected all {{ selectedList.contactCount | numFormat }} contact from this list</span>
       </div>
       <div class="items" v-if="!isAllContactsSelected && selectedList.contactCount > 25 && forceAllSelection">
-        <a href="#" @click="onSetAllContactsSelected">
+        <a href="#" @click="onSetAllContactsSelected" data-testid="bulk-action-menu-select-all-link">
           Select all {{ selectedList.contactCount | numFormat }} contacts from this list
         </a>
       </div>
       <div class="items"
            v-if="false">
-        <a href="#" disabled>
+        <a href="#" disabled data-testid="bulk-action-menu-enroll-in-sequence-link">
           <i class="fa fa-layer-group"></i>
           Enroll in Sequence
         </a>
       </div>
       <div class="items"
            v-if="false">
-        <a href="#" disabled>
+        <a href="#" disabled data-testid="bulk-action-menu-power-dialer-link">
           <i class="fa fa-crosshairs"></i>
           Power Dialer
         </a>
       </div>
       <div class="items">
         <a href=""
+           data-testid="bulk-action-menu-add-to-static-list-link"
            @click="onAddToStaticList">
           <i class="fa fa-user-plus"></i>
           Add to Static List
@@ -33,6 +34,7 @@
       </div>
       <div class="items">
         <a href=""
+           data-testid="bulk-action-menu-create-static-list-link"
            @click="onCreateStaticList">
           <i class="fa fa-plus"></i>
           Create Static List
@@ -42,6 +44,7 @@
            v-if="hasPermissionTo('archive contact')">
         <a href=""
            class="text-danger"
+           data-testid="bulk-action-menu-delete-link"
            @click="onDelete">
           <i class="fa fa-trash text-danger"></i>
           Delete

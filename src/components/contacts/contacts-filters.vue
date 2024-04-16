@@ -7,6 +7,7 @@
                rounded="sm">
       <b-card class="filter-container h-100"
               header-class="flex-grow-0"
+              data-testid="contacts-filter-card"
               body-class="flex-grow-1">
         <template #header>
           <div class="d-flex justify-content-between">
@@ -14,6 +15,7 @@
               <b-button variant="light"
                         class="header-buttons border-0 grey-90"
                         size="sm"
+                        data-testid="contacts-filters-back-to-step-1"
                         v-if="step !== 1"
                         @click="backToStep">
                 <i class="fa fa-arrow-left"></i>
@@ -24,6 +26,7 @@
             <b-button variant="light"
                       class="header-buttons btn-close-filter border-0 grey-90"
                       size="sm"
+                      data-testid="contacts-filters-close-button"
                       v-if="!noCloseButton"
                       @click="onCloseFilter">
               <i class="fa fa-times"></i>
@@ -36,6 +39,7 @@
           <compact-btn variant="primary"
                        customClass="px-4 add-filters m-2"
                        v-if="isEmptyListFilters"
+                       data-testid="contacts-filters-add-filter-button-step-1"
                        @clicked="toAddFiltersStep">
             <i class="material-icons mr-1 add-icon">add</i> Add a Filter
           </compact-btn>
@@ -50,6 +54,7 @@
                 </div>
                 <compact-btn class="py-0 delete-group-filter ml-auto"
                              v-if="!hasDefault(group)"
+                             data-testid="contacts-filters-delete-group-filter-button"
                              @clicked="onDeleteGroupFilter(groupIndex)">
                   Remove
                 </compact-btn>
@@ -62,6 +67,7 @@
                             role="button"
                             :class="[isDefault(filter) ? 'cursor-default' : '']"
                             :key="`filter-item-${key}-${filterItemIndex}`"
+                            data-testid="contacts-select-filters-step-1"
                             @click="selectFilterByKey(filter, groupIndex, filterItemIndex, group.is_conjunction)">
                       <span v-if="!filter.operator && typeof filter.trueValue === 'number' && !filter.trueValue">
                         Not
@@ -76,6 +82,7 @@
                       </span>
                       <compact-btn class="py-0 delete-filter"
                                    v-if="!isDefault(filter)"
+                                   data-testid="contacts-filters-delete-filter-button"
                                    @clicked="onDeleteFilter(groupIndex, key, filterItemIndex)">
                         <i class="fa fa-trash"></i>
                         <q-tooltip>
@@ -96,6 +103,7 @@
                 <compact-btn variant="outlined-light"
                              customClass="add-filters with-border conjunction-button"
                              v-if="!isMaxInnerFiltersReached(group.filters)"
+                             data-testid="contacts-filters-add-filter-button-step-1"
                              @clicked="toAddFiltersStep(groupIndex)">
                   AND
                 </compact-btn>
@@ -103,6 +111,7 @@
             </template>
             <compact-btn variant="outlined-light"
                          customClass="mb-2 add-filters with-border conjunction-button"
+                         data-testid="contacts-filters-add-filter-button-step-1-2"
                          v-if="!isMaxOuterFiltersReached"
                          @clicked="toAddFiltersStep(Object.keys(visibleListFilters).length, null, false, false)">
               OR
@@ -118,6 +127,7 @@
           <div class="mb-3 flex-grow-0">
             <h6 class="contact-prop-label mb-1">Contact properties</h6>
             <search placeholder="Search"
+                    data-testid="contacts-properties-filter-search"
                     @search="searchFilter"/>
           </div>
           <b-list-group class="filter-list flex-grow-1">
@@ -160,6 +170,7 @@
                                  :filterGroupIndex="filterGroupIndex"
                                  :filterGroupItemIndex="filterGroupItemIndex"
                                  :filterConjunction="filterConjunction"
+                                 data-testid="contacts-filter-types"
                                  @filtersApplied="filtersApplied">
           </contacts-filter-types>
         </div>

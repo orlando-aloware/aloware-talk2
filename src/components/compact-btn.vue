@@ -2,6 +2,7 @@
   <button
     :class="computedClass"
     :disabled="disabled"
+    data-testid="compact-button"
     @click.stop="onClickEvent"
   >
     <slot />
@@ -9,6 +10,7 @@
                content-class="bg-grey-light11"
                anchor="top middle"
                self="center middle"
+               data-testid="compact-button-tooltip"
                :offset="[20, 20]">
       {{ tooltipText }}
     </q-tooltip>

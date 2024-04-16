@@ -4,18 +4,20 @@
     title="Manage Filters"
     modal-class="filters-modal"
     id="filters-modal"
+    data-testid="contacts-filters-dialog-modal"
     hide-footer
   >
     <b-overlay
       :show="show"
       rounded="sm"
+      data-testid="contacts-filters-dialog-overlay"
       style="max-width: 324px"
     >
       <div class="filter-contents">
         <div class="p-3">
           <!-- Using slots -->
           <div class="mb-3">
-            <search />
+            <search data-testid="contacts-filters-dialog-search"/>
           </div>
 
           <b-list-group class="filter-list">
@@ -35,7 +37,7 @@
       </div>
 
       <template #overlay>
-        <q-spinner-bars color="primary"/>
+        <q-spinner-bars data-testid="contacts-filters-dialog-spinner-bars" color="primary"/>
       </template>
     </b-overlay>
   </b-modal>

@@ -12,6 +12,7 @@
                      :show-labels="false"
                      :allow-empty="false"
                      v-model="duration"
+                     data-testid="predefined-time-duration-selector"
                      @select="onSelect" />
   </div>
 </template>

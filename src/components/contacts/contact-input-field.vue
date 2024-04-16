@@ -7,11 +7,13 @@
              :placeholder="placeholder"
              :value="field"
              :disable="disabled"
+             data-testid="contact-input-field"
              v-model="field">
       <template v-slot:append class="q-field-icon__append">
         <pencil-o-icon v-if="!is_busy && !disabled"
                        color="#256EFF"
                        class="cursor-pointer text-size-rg"
+                       data-testid="contact-input-field-pencil-icon"
                        @click="getFocus">
         </pencil-o-icon>
       </template>

@@ -4,18 +4,21 @@
            size="md"
            scrollable
            v-model="isOpen"
+           data-testid="appointment-form-modal"
            @hidden="onHidden">
 
     <b-form class="appointment-form"
             ref="appointmentForm"
+            data-testid="appointment-form"
             @submit.prevent="onSubmit"
             @reset="resetForm">
-      <b-form-row>
+      <b-form-row data-testid="appointment-form-row">
           <b-col sm="12">
             <b-form-group label="Title">
               <b-form-input
                 type="text"
                 placeholder="Add title"
+                data-testid="appointment-text-input"
                 v-model="appointment.text">
               </b-form-input>
             </b-form-group>
@@ -29,6 +32,7 @@
             <date-selector :min-date="minDate"
                            :no-clear-button="true"
                            v-model="appointment.date"
+                           data-testid="appointment-date-selector"
                            @dateSelected="dateSelected"/>
           </b-form-group>
         </b-col>
@@ -38,6 +42,7 @@
                         label="Time"
                         label-for="input-2">
             <predefined-time-selector v-model="appointment.time"
+                                      data-testid="appointment-time-selector"
                                       @select="timeSelected"/>
           </b-form-group>
         </b-col>
@@ -47,6 +52,7 @@
                         label="Duration"
                         label-for="input-2">
             <predefined-time-duration-selector v-model="appointment.duration"
+                                               data-testid="appointment-duration-selector"
                                                @select="durationSelected"/>
           </b-form-group>
         </b-col>
@@ -56,6 +62,7 @@
                         label="Timezone"
                         label-for="input-2">
             <timezone-selector v-model="contact.timezone"
+                               data-testid="appointment-timezone-selector"
                                @select="timezoneSelected"/>
           </b-form-group>
 
@@ -67,6 +74,7 @@
                              rows="3"
                              max-rows="8"
                              no-auto-shrink
+                             data-testid="appointment-body-input"
                              v-model="appointment.body"/>
           </b-form-group>
         </b-col>
@@ -82,6 +90,7 @@
                         class="checkbox-wrapper">
             <b-form-checkbox :value="true"
                              :unchecked-value="false"
+                             data-testid="appointment-sms-reminder-checkbox"
                              v-model="appointment.smsReminder.enabled">
               <span class="sms-reminder-label">Enable SMS reminder</span>
             </b-form-checkbox>
@@ -96,6 +105,7 @@
                                    :use-groups="false"
                                    preselect-first
                                    v-model="appointment.smsReminder.campaign_id"
+                                   data-testid="appointment-sms-reminder-line-selector"
                                    @select="lineSelected"/>
           </b-form-group>
 
@@ -103,6 +113,7 @@
                         label="Time"
                         label-for="input-2">
             <predefined-time-selector v-model="appointment.smsReminder.time"
+                                      data-testid="appointment-sms-reminder-time-selector"
                                       @select="smsReminderTimeSelected"/>
           </b-form-group>
 
@@ -110,6 +121,7 @@
                         label="Send (n) days before"
                         label-for="input-2">
             <number-of-days-selector v-model="appointment.smsReminder.frequencies"
+                                     data-testid="appointment-sms-reminder-frequency-selector"
                                      @select="smsReminderFrequencySelected"/>
           </b-form-group>
 
@@ -120,6 +132,7 @@
               <span class="text-danger sms-reminder-template-variables"
                     :key="item"
                     v-for="item in appointment.smsReminder.template_variables"
+                    data-testid="appointment-sms-reminder-template-variable"
                     @click="appendSmsReminderTemplateVariable(item)">
                 {{ item }}
             </span>
@@ -129,6 +142,7 @@
                              rows="3"
                              max-rows="8"
                              no-auto-shrink
+                             data-testid="appointment-sms-reminder-body-text-area"
                              v-model="appointment.smsReminder.body"/>
           </b-form-group>
         </b-col>
@@ -139,6 +153,7 @@
       <b-button variant="success"
                 class="custom-btn"
                 size="sm"
+                data-testid="appointment-form-cancel-button"
                 @click="onHidden">
         Close
       </b-button>
@@ -146,6 +161,7 @@
                 class="custom-btn"
                 size="sm"
                 :disabled="isSaving || !isValid"
+                data-testid="appointment-form-submit-button"
                 @click="onSubmit">
         <q-spinner-bars color="white"
                         v-if="isSaving"/>

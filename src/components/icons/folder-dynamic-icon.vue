@@ -1,5 +1,5 @@
 <template>
-  <svg :width="width" :height="height" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg :width="width" :height="height" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg" data-testid="dynamic-icon-svg">
     <path d="M9 1L10.5 2.41176L9 3.82353" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M10 2.40967H3.5C2.83757 2.41153 2.20283 2.66003 1.73442 3.10089C1.26601 3.54174 1.00198 4.13914 1 4.76261V5.2332" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M5 10.0003L3.5 8.58852L5 7.17676" :stroke="color" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
