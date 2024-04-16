@@ -26,7 +26,7 @@
                              v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
-                               :first-outbound-call="communicationsSummary?.first_outbound_call"/>
+                               :first-outbound-call="communicationsSummary.first_outbound_call"/>
           <contact-tags data-testid="contact-details-tags" :contact="contact"/>
           <contact-notes v-if="contact"
                          :contact="contact"
@@ -40,7 +40,7 @@
                                 data-testid="contact-details-reservations-messages"
                                 :contact="contact"/>
           <contact-scheduled-messages data-testid="contact-details-scheduled-messages"/>
-          <contact-activity-counts data-testid="contact-details-activity-counts" :summary="communicationsSummary?.summaries"/>
+          <contact-activity-counts data-testid="contact-details-activity-counts" :summary="communicationsSummary.summaries"/>
           <contact-lines data-testid="contact-details-lines"/>
           <contact-ring-groups data-testid="contact-details-ring-groups"/>
           <contact-broadcast data-testid="contact-details-broadcast"/>
@@ -186,7 +186,7 @@ export default {
           this.communicationsSummary.summaries.outbound_calls_count++
 
           // if no outbound call and the new com. is an outbound call, assign.
-          if (!this.communicationsSummary?.first_outbound_call) {
+          if (!this.communicationsSummary.first_outbound_call) {
             this.communicationsSummary.first_outbound_call = communication
           }
         } else if (type === SMS && direction === INBOUND) {
