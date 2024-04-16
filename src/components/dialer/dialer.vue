@@ -613,12 +613,11 @@ export default {
       this.rejectCall()
 
       console.trace('ESPERA AQUI!!')
-      /*
+
       if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
         console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
         return
       }
-      */
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
