@@ -232,6 +232,7 @@ export default {
 
       console.log('JUST BEFORE YOU CALL this.dialer', this.dialer)
       console.log('JUST BEFORE YOU CALL this.redialedTask', this.redialedTask)
+      console.log('JUST BEFORE YOU CALL this.profile.agent_status', this.profile.agent_status)
       // check if redialedTask is not empty and if this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       // then do not continue until this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL
       if (this.redialedTask?.redialed_now && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {

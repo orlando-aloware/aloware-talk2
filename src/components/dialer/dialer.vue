@@ -611,7 +611,7 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
-
+      console.log('this.profile.agent_status', this.profile.agent_status)
       console.trace('ESPERA AQUI!!')
 
       if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
