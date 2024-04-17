@@ -237,7 +237,7 @@ export default {
       // then do not continue until this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL
       if (this.redialedTask?.redialed_now && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
         console.log('JUST BEFORE REDIAL, WAITING...', this.profile.agent_status)
-        return new Promise((resolve, reject) => {
+        await new Promise(resolve => {
           const checkAgentStatus = setInterval(() => {
             if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
               console.log('JUST BEFORE REDIAL, ¡LISTO!', this.profile.agent_status)
