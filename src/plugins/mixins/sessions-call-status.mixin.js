@@ -230,17 +230,12 @@ export default {
       this.hasActiveTask = true
       this.skipWrapUp = false
 
-      console.log('JUST BEFORE YOU CALL this.dialer', this.dialer)
-      console.log('JUST BEFORE YOU CALL this.redialedTask', this.redialedTask)
-      console.log('JUST BEFORE YOU CALL this.profile.agent_status', this.profile.agent_status)
-      // check if redialedTask is not empty and if this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-      // then do not continue until this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL
+      // check if redial is true (this.redialedTask?.redialed_now) and if agent status is on call
+      // then do not continue until agent status is not on call
       if (this.redialedTask?.redialed_now && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
-        console.log('JUST BEFORE REDIAL, WAITING...', this.profile.agent_status)
         await new Promise(resolve => {
           const checkAgentStatus = setInterval(() => {
             if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
-              console.log('JUST BEFORE REDIAL, ¡LISTO!', this.profile.agent_status)
               clearInterval(checkAgentStatus)
               resolve()
             }

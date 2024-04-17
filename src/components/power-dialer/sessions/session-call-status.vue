@@ -1364,8 +1364,6 @@ export default {
 
       this.redialTask(this.activeTask, redial).then(() => {
         // hang-up call if still in a call
-        console.log('*** onRedial redialTask this.dialer.currentStatus', this.dialer.currentStatus)
-        console.log('*** onRedial redialTask this.dialer', this.dialer)
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
@@ -1377,7 +1375,6 @@ export default {
             // if it's redial now, we should skip wrap up
             this.wrapUp = false
             this.skipWrapUp = redial
-            console.log('*** onRedial redialTask this.skipWrapUp', this.skipWrapUp)
             this.processSession()
           }, 1000)
 
@@ -1496,8 +1493,6 @@ export default {
       // session is not ready if session failed to call the contact
       // because dialer is not ready. If dialer reconnects and status
       // goes to ready, then we can continue running the task
-      console.log('*** dialer.isReady', this.dialer.isReady)
-      console.log('*** redialedTask', this.redialedTask)
       if (!this.sessionNotReady) {
         this.runTask()
         this.sessionNotReady = false
