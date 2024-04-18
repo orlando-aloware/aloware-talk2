@@ -27,7 +27,8 @@
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
-          <contact-tags data-testid="contact-details-tags" :contact="contact"/>
+          <contact-tags data-testid="contact-details-tags"
+                        :contact="contact"/>
           <contact-notes v-if="contact"
                          :contact="contact"
                          data-testid="contact-details-notes"
