@@ -1234,6 +1234,11 @@ export default {
         this.skipWrapUp = skipWrapUp
       }
 
+      // when user clicks on Next button we also need to check if agent is on call
+      if (!forceSkip && skipWrapUp) {
+        this.verifyAgentOnCall = true
+      }
+
       this.onPhoneExpansionReset()
 
       // end wrap up
@@ -1361,7 +1366,7 @@ export default {
 
       this.redialedTask = this.$jsonClone(this.activeTask)
       this.redialedTask.redialed_now = redial
-      this.processRedial = true
+      this.verifyAgentOnCall = true
 
       this.redialTask(this.activeTask, redial).then(() => {
         // hang-up call if still in a call

@@ -22,7 +22,7 @@ export default {
       loadingNext: false,
       sessionNotReady: false,
       skipWrapUp: false,
-      processRedial: false
+      verifyAgentOnCall: false
     }
   },
 
@@ -233,12 +233,12 @@ export default {
 
       // check if redial is true (this.redialedTask?.redialed_now) and if agent status is on call
       // then do not continue until agent status is not on call
-      if (this.processRedial && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (this.verifyAgentOnCall && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
         await new Promise(resolve => {
           const checkAgentStatus = setInterval(() => {
             if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
               clearInterval(checkAgentStatus)
-              this.processRedial = false
+              this.verifyAgentOnCall = false
               resolve()
             }
           }, 1000)
