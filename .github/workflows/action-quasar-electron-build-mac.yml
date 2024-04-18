@@ -22,11 +22,8 @@ jobs:
     strategy:
       matrix:
         os: [ 'macos-latest' ]
-        node-version: [ '16.x' ]
+        node-version: [ '20.x' ]
         yarn-version: [ '1.x' ]
-
-    env:
-      NODE_OPTIONS: '--openssl-legacy-provider'
 
     steps:
       - name: Set Dynamic Environment
