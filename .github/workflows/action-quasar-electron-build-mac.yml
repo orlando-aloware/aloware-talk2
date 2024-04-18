@@ -27,6 +27,9 @@ jobs:
     env:
       NODE_OPTIONS: '--openssl-legacy-provider'
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
       - name: Set Dynamic Environment
         id: set-env
         run: |
@@ -36,9 +39,6 @@ jobs:
             echo "DYNAMIC_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           fi
           echo "Dynamic environment set to ${{ env.DYNAMIC_ENV }}"
-
-      - name: Check out Git repository
-        uses: actions/checkout@v3
 
       - name: Get branch name
         id: branch-name
