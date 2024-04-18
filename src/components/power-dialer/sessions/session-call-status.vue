@@ -1361,6 +1361,10 @@ export default {
 
       this.redialedTask = this.$jsonClone(this.activeTask)
       this.redialedTask.redialed_now = redial
+      this.processRedial = true
+
+      console.log('processRedial: ', this.processRedial)
+      console.log('redialed task: ', this.redialedTask)
 
       this.redialTask(this.activeTask, redial).then(() => {
         // hang-up call if still in a call
