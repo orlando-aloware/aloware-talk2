@@ -6,14 +6,14 @@
     <div class="wallboard__header__actions bordered-bottom">
       For {{ new Date() | fullShortDate }}
 
-      <ring-group-selector class="ml-2 ring-group-filter"
+      <line-and-ring-group-selector class="ml-2 ring-group-filter"
                            clearable
                            split-by-queued
                            :force-remove-missing-values="true"
                            :generic-multiselect="false"
                            :value="filters.ringGroup"
                            @change="onFilterRingGroup">
-      </ring-group-selector>
+      </line-and-ring-group-selector>
 
       <div class="flex-grow-1 text-right">
         <wallboard-view-mode-button class="ml-2"/>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import RingGroupSelector from 'src/components/generic-selectors/ring-group-selector.vue'
+import LineAndRingGroupSelector from 'src/components/generic-selectors/line-and-ring-group-selector.vue'
 import WallboardViewModeButton from 'src/components/wallboard/wallboard-view-mode-button.vue'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
@@ -31,7 +31,7 @@ export default {
   name: 'wallboard-header',
 
   components: {
-    RingGroupSelector,
+    LineAndRingGroupSelector,
     WallboardViewModeButton
   },
 
