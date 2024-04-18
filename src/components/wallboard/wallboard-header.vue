@@ -51,24 +51,24 @@ export default {
     }),
 
     onFilterRingGroup (selectedValue) {
-      if (selectedValue == null) {
-        console.log('AA')
-        this.setFilter({
-          filter: 'ringGroup',
-          value: null
-        })
+      let ringGroup = (selectedValue && selectedValue.id) || null
+      let lineId = false
 
-        this.setFilter({
-          filter: 'lineRingGroup',
-          value: null
-        })
+      const isALine = !!(selectedValue && selectedValue.ring_group_id)
 
-        return
+      if (isALine) {
+        ringGroup = selectedValue.ring_group_id
+        lineId = selectedValue.id
       }
 
       this.setFilter({
+        filter: 'ringGroup',
+        value: ringGroup
+      })
+
+      this.setFilter({
         filter: 'lineId',
-        value: selectedValue.id
+        value: lineId
       })
 
       this.setFilter({
