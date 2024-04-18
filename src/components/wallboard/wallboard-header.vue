@@ -6,12 +6,12 @@
     <div class="wallboard__header__actions bordered-bottom">
       For {{ new Date() | fullShortDate }}
 
-      <line-and-ring-group-selector class="ml-2 ring-group-filter"
+      <line-and-ring-group-selector class="ml-2 ring-group-filter w-100"
                            clearable
                            split-by-queued
                            :force-remove-missing-values="true"
                            :generic-multiselect="false"
-                           :value="filters.ringGroup"
+                           :value="filters.lineRingGroup"
                            @change="onFilterRingGroup">
       </line-and-ring-group-selector>
 
@@ -50,10 +50,30 @@ export default {
       setFilter: 'SET_FILTER'
     }),
 
-    onFilterRingGroup (value) {
+    onFilterRingGroup (selectedValue) {
+      if (selectedValue == null) {
+        console.log('AA')
+        this.setFilter({
+          filter: 'ringGroup',
+          value: null
+        })
+
+        this.setFilter({
+          filter: 'lineRingGroup',
+          value: null
+        })
+
+        return
+      }
+
       this.setFilter({
-        filter: 'ringGroup',
-        value
+        filter: 'lineId',
+        value: selectedValue.id
+      })
+
+      this.setFilter({
+        filter: 'lineRingGroup',
+        value: selectedValue
       })
 
       // automatically refresh summary when ring group changes

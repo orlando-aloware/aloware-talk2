@@ -49,6 +49,8 @@ export default function () {
     callsEnabledColumns: [],
     filters: {
       ringGroup: null,
+      lineRingGroup: null,
+      lineId: null,
       agent: null,
       agentStatus: 'all'
     },
