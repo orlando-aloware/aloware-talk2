@@ -24,21 +24,24 @@ jobs:
         os: [ 'macos-latest' ]
         node-version: [ '20.x' ]
         yarn-version: [ '1.x' ]
+
     env:
       NODE_OPTIONS: '--openssl-legacy-provider'
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
 
+    steps:
       - name: Set Dynamic Environment
         id: set-env
         run: |
+          echo "NODE_OPTIONS=${NODE_OPTIONS}
           if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "DYNAMIC_ENV=Prod" >> $GITHUB_ENV
           else
             echo "DYNAMIC_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           fi
           echo "Dynamic environment set to ${{ env.DYNAMIC_ENV }}"
+
+      - name: Check out Git repository
+        uses: actions/checkout@v3
 
       - name: Get branch name
         id: branch-name
@@ -53,7 +56,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          node-options: '--openssl-legacy-provider'
 
       - name: Node version
         run: node --version
