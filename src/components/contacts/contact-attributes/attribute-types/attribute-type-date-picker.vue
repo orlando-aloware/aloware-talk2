@@ -46,7 +46,7 @@ export default {
 
   data () {
     return {
-      defaultDate: this.attribute.value !== null
+      defaultDate: this.attribute.value
         ? moment(parseInt(this.attribute.value)).utc().format(this.momentDateFormat)
         : null,
       ContactAttributetTypeEnum
