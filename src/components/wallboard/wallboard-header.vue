@@ -54,7 +54,7 @@ export default {
       let ringGroup = (selectedValue && selectedValue.id) || null
       let lineId = false
 
-      const isALine = !!(selectedValue && selectedValue.ring_group_id)
+      const isALine = selectedValue && selectedValue.hasOwnProperty('ring_group_id')
 
       if (isALine) {
         ringGroup = selectedValue.ring_group_id
