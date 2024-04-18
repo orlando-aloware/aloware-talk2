@@ -233,16 +233,11 @@ export default {
 
       // check if redial is true (this.redialedTask?.redialed_now) and if agent status is on call
       // then do not continue until agent status is not on call
-      console.log('*** this.processRedial', this.processRedial)
-      console.log('*** this.redialedTask', this.redialedTask)
-      console.log('*** this.profile.agent_status', this.profile.agent_status)
       if (this.processRedial && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
-        console.log('*** esperando')
         await new Promise(resolve => {
           const checkAgentStatus = setInterval(() => {
             if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
               clearInterval(checkAgentStatus)
-              console.log('*** adelante')
               this.processRedial = false
               resolve()
             }
