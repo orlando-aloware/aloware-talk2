@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     # Dynamically set the environment name
-    environment: 
+    environment:
       name: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) && 'Prod' || github.event.inputs.environment }}
 
     strategy:
@@ -52,6 +52,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          node-options: '--openssl-legacy-provider'
 
       - name: Node version
         run: node --version
@@ -175,7 +176,7 @@ jobs:
         run: |
           echo "::set-output name=VERSION::$(jq -r '.version' package.json)"
           echo "::set-output name=PRODUCT_NAME::$(jq -r '.productName' package.json)"
-        
+
       - name: Rename and Move Windows Executable
         run: |
           mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup ${{ steps.pkg.outputs.VERSION }}.exe" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe"
@@ -190,7 +191,7 @@ jobs:
           aws configure set aws_access_key_id ${{ secrets.aws_access_key_id }}
           aws configure set aws_secret_access_key ${{ secrets.aws_secret_access_key }}
           aws configure set default.region ${{ secrets.aws_bucket_region }}
-        
+
       - name: Upload Renamed File to S3
         run: |
           aws s3 cp "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" --acl public-read
