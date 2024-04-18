@@ -282,7 +282,7 @@ import {
   MAX_SCREEN_WIDTH_MOBILE_HEADER
 } from 'src/constants/viewport-sizes'
 import TrialBanner from 'components/trial-banner.vue'
-import { TRIAL_STATUS_EXPIRED } from 'src/constants/trial-account-status'
+import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 
 export default {
@@ -433,7 +433,7 @@ export default {
     },
 
     isTrialExpired () {
-      return this.currentCompany && this.currentCompany.trial_status === TRIAL_STATUS_EXPIRED
+      return this.currentCompany && [TrialStatus.TRIAL_STATUS_EXPIRED, TrialStatus.TRIAL_STATUS_PURGE_ELIGIBLE].includes(this.currentCompany.trial_status)
     },
 
     pageClass () {
