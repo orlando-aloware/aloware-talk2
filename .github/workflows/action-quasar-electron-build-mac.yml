@@ -32,7 +32,7 @@ jobs:
       - name: Set Dynamic Environment
         id: set-env
         run: |
-          echo "NODE_OPTIONS=${NODE_OPTIONS}
+          echo "NODE_OPTIONS=${NODE_OPTIONS}"
           if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "DYNAMIC_ENV=Prod" >> $GITHUB_ENV
           else
