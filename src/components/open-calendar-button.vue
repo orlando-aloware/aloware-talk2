@@ -8,6 +8,7 @@
                class="btn-filter-wrapper border btn-outlined-light"
                :loading="loading"
                :disable="loading"
+               data-testid="open-calendar-button"
                @click="openCalendar">
           <template v-slot>
             <div class="mx-2 px-1 text-nowrap d-flex align-items-center">

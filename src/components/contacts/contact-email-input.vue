@@ -2,9 +2,10 @@
   <div>
     <q-input class="inline-input"
              placeholder=""
+             data-testid="contact-email-input"
              v-model="email" >
       <template v-slot:append>
-        <q-icon name="edit" @click="email = ''" class="cursor-pointer input-edit-icon" />
+        <q-icon data-testid="contact-email-icon" name="edit" @click="email = ''" class="cursor-pointer input-edit-icon" />
       </template>
     </q-input>
   </div>

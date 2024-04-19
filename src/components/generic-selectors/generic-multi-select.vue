@@ -26,6 +26,7 @@
               <div class="tag-text"
                    :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</div>
               <div role="button" class="custom__remove d-flex align-items-center"
+                   data-testid="generic-multi-select-remove-item"
                    @click="remove(item.id)">
                 <remove-tag-icon class="ml-1 remove-tag-icon"/>
               </div>
@@ -37,6 +38,7 @@
                    dense
                    input-class="input-text-sm"
                    placeholder="Type to search"
+                   data-testid="generic-multi-select-search"
                    v-model="search">
           </q-input>
         </template>
@@ -83,6 +85,7 @@
                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
                  :key="`child-${child.id}`"
                  v-for="child in item.children"
+                 data-testid="generic-multi-select-child-option"
                  @click="onSelectOption(child.id)">
               <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
                     v-if="typeof child.color !== 'undefined'">
@@ -102,6 +105,7 @@
         </template>
       </div>
       <div class="text-center w-100"
+           data-testid="generic-multi-select-no-options-available"
            v-else>
         <span>No options to select</span>
       </div>
@@ -127,6 +131,7 @@
            v-if="canEdit">
         <b-link href="#"
                 class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
+                data-testid="generic-multi-select-edit-button"
                 @click="onEdit">
           <slot name="button">
             <pencil-o-icon/>

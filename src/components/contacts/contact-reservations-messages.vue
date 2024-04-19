@@ -1,29 +1,30 @@
 <template>
-  <b-card class="integrations-wrapper border-0" v-if="!isEmpty(messages)">
+  <b-card class="integrations-wrapper border-0" v-if="!isEmpty(messages)" data-testid="contact-reservations-messages-wrapper">
     <h4 class="mb-2">
       Guesty Messages
     </h4>
 
     <q-card
+      data-testid="contact-reservations-messages-card"
       v-for="(message, key) in messages.messages"
       :key="key"
       bordered
       class="my-card"
       style='margin-bottom: 10px'>
-        <q-card-section>
-          <div class="text-subtitle2">
+        <q-card-section data-testid="contact-reservations-messages-card-section">
+          <div class="text-subtitle2" data-testid="contact-reservations-messages-module">
             Module:
             <div class='text-caption'>
               {{ message.module }}
             </div>
           </div>
-          <div class="text-subtitle2">
+          <div class="text-subtitle2" data-testid="contact-reservations-messages-direciton">
             Direction:
             <div class='text-caption'>
               {{ message.direction }}
             </div>
           </div>
-          <div class="text-subtitle2">
+          <div class="text-subtitle2" data-testid="contact-reservations-messages-message">
             Message:
             <div class='text-caption'>
               {{ message.body }}

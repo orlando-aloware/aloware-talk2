@@ -1,20 +1,23 @@
 <template>
-  <div class="pt-2 message-composer-note-wrapper">
+  <div class="pt-2 message-composer-note-wrapper" data-testid="message-composer-note-wrapper">
     <div class="form-input-container">
-      <form>
+      <form data-testid="note-form">
         <at hideOnBlur
             ref="noteMessageBody"
             name-key="full_name"
             v-model="messageComposer.note.body"
+            data-testid="note-message-body-input"
             :members="items">
           <template slot="item" slot-scope="props">
             <avatar class="contact-avatar mr-2 position-absolute"
                     width="30"
                     height="30"
+                    data-testid="note-avatar"
                     :name="props.item.full_name">
             </avatar>
             <span :data-text="props.item.full_name"
-                    class="at-custom-text">
+                  data-testid="note-mention-item"
+                  class="at-custom-text">
                 {{ props.item.full_name }}
                 <br>
                 <small>{{ props.item.email }}</small>
@@ -23,6 +26,7 @@
           <template v-slot:embeddedItem="props">
             <span>
                 <span :data-id="props.current.id"
+                      data-testid="note-mention-full_name-item"
                       class="mention-tag">
                   @{{ props.current.full_name }}
                 </span>
@@ -32,6 +36,7 @@
                id="noteContentEditable"
                placeholder="Type @ to mention someone"
                contenteditable
+               data-testid="note-content-editable"
                @keydown="onKeyDown">
           </div>
         </at>
@@ -45,6 +50,7 @@
         <q-btn color="primary"
                class="message-composer-send-button"
                :disable="isAdding || !validNote"
+               data-testid="add-note-button"
                @click="onAdd">
           <template slot="default">
             <q-spinner-bars v-if="isAdding"

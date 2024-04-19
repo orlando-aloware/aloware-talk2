@@ -1,5 +1,6 @@
 <template>
   <svg
+    data-testid="folder-arrow-close-icon-svg"
     width="5"
     height="6"
     viewBox="0 0 5 6"

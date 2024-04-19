@@ -12,6 +12,7 @@
             map-options
             dense
             v-model="selectedId"
+            data-testid="lead-source-selector"
             :hide-dropdown-icon="hideDropdownIcon"
             :clearable="clearable"
             :outlined="outlined"

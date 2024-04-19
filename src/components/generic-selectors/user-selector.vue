@@ -24,6 +24,7 @@
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             v-model="selectedId"
+            data-testid="user-selector"
             @popup-show="onShowMenu"
             @focus="onFocus"
             @blur="onBlur"

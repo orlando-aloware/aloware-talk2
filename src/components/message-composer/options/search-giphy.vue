@@ -5,10 +5,11 @@
                outlined
                v-model="search_text"
                placeholder="Search"
+               data-testid="search-giphy-input"
                @input="findGif">
         <template v-slot:append>
-          <q-avatar>
-            <search-icon/>
+          <q-avatar data-testid="search-giphy-avatar">
+            <search-icon data-testid="search-giphy-icon"/>
           </q-avatar>
         </template>
       </q-input>
@@ -19,6 +20,7 @@
                            :width="418"
                            :height="292"
                            :img-width="100"
+                           data-testid="search-giphy-gallery"
                            @scrollReachBottom="loadMoreGiphy"
                            @click="selected">
       </vue-masonry-gallery>

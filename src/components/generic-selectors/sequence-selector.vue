@@ -22,6 +22,7 @@
               :use-chips="useChips"
               :clearable="clearable"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              data-testid="sequence-selector"
               @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"

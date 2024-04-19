@@ -1,15 +1,18 @@
 <template>
   <b-card class="border-0 contact-notes-wrapper"
+          data-testid="contact-notes-wrapper"
           v-if="contact">
     <h4 v-if="!no_title">Notes</h4>
     <div class="notes mt-1"
          style="min-height: 15px;"
          v-if="!isEdit"
          v-html="notes"
+         data-testid="contact-edit-notes"
          @click="onEditNotes">
     </div>
     <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
          class="notes-empty-placeholder"
+         data-testid="contact-notes-add-notes"
          @click="onEditNotes">
       Add notes here..
     </div>
@@ -18,6 +21,7 @@
          style="max-width: 300px">
       <contact-notes-input ref="notesInput"
                            v-model="contact.notes"
+                           data-testid="contact-notes-input"
                            @input="onInput"
                            @blur="onBlur">
       </contact-notes-input>

@@ -4,6 +4,7 @@
     id="contact-undnc-modal"
     hide-header-close
     no-close-on-backdrop
+    data-testid="contact-undnc-modal"
     @show="onShow"
     @shown="onShown"
   >
@@ -11,6 +12,7 @@
     <p>Please enter a reason:</p>
     <b-form-input placeholder="Reason"
                   ref="inputReason"
+                  data-testid="contact-undnc-reason-input"
                   v-model="reason"></b-form-input>
 
     <template #modal-footer="{ hide }">
@@ -19,6 +21,7 @@
         class="custom-btn"
         size="sm"
         :disabled="isProcessingDNC"
+        data-testid="contact-undnc-cancel-button"
         @click="hide"
       >
         Cancel
@@ -28,6 +31,7 @@
         class="custom-btn"
         size="sm"
         :disabled="isProcessingDNC || reason.trim().length < 1"
+        data-testid="contact-undnc-confirm-button"
         @click="unDncContact"
       >
         <q-spinner-bars v-if="isProcessingDNC" color="white"/>
