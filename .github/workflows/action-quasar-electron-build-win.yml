@@ -24,8 +24,6 @@ jobs:
         os: [ 'macos-latest' ]
         node-version: [ '18.x' ]
         yarn-version: [ '1.x' ]
-    env:
-      NODE_OPTIONS: --openssl-legacy-provider
     
     steps:
       - name: Set Dynamic Environment
