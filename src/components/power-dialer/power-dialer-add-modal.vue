@@ -93,13 +93,39 @@
                     </template>
                 </date-picker>
 
-                <b-button class="btn-block mt-4"
-                          variant="primary"
-                          size="sm"
-                          data-testid="power-dialer-add-modal-save-button"
-                          @click="save">
+                <div class="row justify-center"
+                     v-if="showContactButtons">
+                  <div class="col-6 text-center">
+                    <b-button class="btn-block mt-4"
+                              variant="secondary"
+                              size="sm"
+                              data-testid="power-dialer-add-modal-stay-in-contacts"
+                              @click="saveAndStay">
+                      Stay in Contacts
+                    </b-button>
+                  </div>
+                  <div class="col-6 text-center">
+                    <b-button class="btn-block mt-4"
+                              variant="primary"
+                              size="sm"
+                              data-testid="power-dialer-add-modal-go-to-power-dialer"
+                              @click="save">
+                      Go to PowerDialer
+                    </b-button>
+                  </div>
+                </div>
+
+                <div class="row"
+                     v-else>
+                  <b-button class="btn-block mt-4"
+                            variant="primary"
+                            size="sm"
+                            data-testid="power-dialer-add-modal-save-button"
+                            v-if="!showContactButtons"
+                            @click="save">
                     Ok
-                </b-button>
+                  </b-button>
+                </div>
             </b-overlay>
         </q-card>
         <b-modal modal-class="confirm-dialog"
@@ -167,6 +193,11 @@ export default {
     mode: {
       type: String,
       default: 'add' // add, duplicate, hubspot
+    },
+
+    showContactButtons: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -339,6 +370,11 @@ export default {
     onHidden () {
       this.addPowerDialerOpen(false)
       this.$emit('hidden')
+    },
+
+    saveAndStay () {
+      this.redirect = false
+      this.save()
     },
 
     save () {

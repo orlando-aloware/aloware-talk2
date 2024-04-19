@@ -269,15 +269,9 @@
             Edit Columns
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           data-testid="contacts-view-power-dialer-option-dropdown"
-                           :disabled="true">
-            <power-dialer-mobile-icon width="14"
-                                      height="14"
-                                      color="#62666E" />
-            Power Dialer
-          </b-dropdown-item>
-          <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
+                           v-if="shouldShowPowerDialer"
+                           :disabled="isAddToPowerDialerDisabled"
                            @click="addSelectedContacts">
             <power-dialer-mobile-icon width="14"
                                       height="14"
@@ -705,6 +699,7 @@
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
       <power-dialer-add-modal :params="attachedParams()"
+                              :show-contact-buttons="true"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
@@ -753,7 +748,7 @@ import {
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
-import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 
 export default {
   name: 'contacts-view',
@@ -1110,6 +1105,10 @@ export default {
       console.log('checkedItemIds', ids)
 
       return ids
+    },
+
+    isAddToPowerDialerDisabled () {
+      return !this.checked.length
     }
   },
 
