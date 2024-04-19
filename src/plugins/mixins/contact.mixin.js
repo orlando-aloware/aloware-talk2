@@ -1339,9 +1339,10 @@ export default {
         // check if we have found the contact after 3 retries
         if (getContactTry > 3) {
           // error
-          console.log('An error occurred while getting the contact', err)
+          console.log('An error occurred while getting the contact', err?.response?.data || err)
           this.loadingContact = false
-          return Promise.reject(err)
+          this.$generalNotification('Contact not found, please try again.', 'error')
+          return Promise.resolve(null)
         } else {
           this.getContactByPhoneNumber(phoneNumber, getContactTry)
         }
