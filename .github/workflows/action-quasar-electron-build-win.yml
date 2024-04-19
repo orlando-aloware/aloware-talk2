@@ -24,7 +24,7 @@ jobs:
         os: [ 'macos-latest' ]
         node-version: [ '18.x' ]
         yarn-version: [ '1.x' ]
-    
+
     steps:
       - name: Set Dynamic Environment
         id: set-env
