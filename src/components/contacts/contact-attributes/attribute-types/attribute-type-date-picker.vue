@@ -15,7 +15,7 @@
 <script>
 import moment from 'moment'
 import DateSelector from 'components/date-selector'
-import { ContactAttributetTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attributet-type-enum'
+import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attribute-type-enum'
 
 export default {
   name: 'attribute-type-date-picker',
@@ -49,7 +49,7 @@ export default {
       defaultDate: this.attribute.value
         ? moment(parseInt(this.attribute.value)).utc().format(this.momentDateFormat)
         : null,
-      ContactAttributetTypeEnum
+      ContactAttributetTypeEnum: ContactAttributeTypeEnum
     }
   },
 
