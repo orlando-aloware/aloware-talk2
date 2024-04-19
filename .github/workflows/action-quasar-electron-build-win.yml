@@ -104,6 +104,7 @@ jobs:
       - name: Build/release Electron win app
         run: quasar build -d -m electron -T win -b builder -P always
         env:
+          NODE_OPTIONS: --openssl-legacy-provider
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
           APP_DEBUG: ${{ secrets.app_debug }}
