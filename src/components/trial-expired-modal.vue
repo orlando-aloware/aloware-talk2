@@ -57,14 +57,14 @@
               <div class="d-flex align-items-center flex-center pt-3">
                 <p class="mt-3">Sales Contact:
                   <strong class="mb-3 text-dark">
-                    {{ this.current_company.sales_rep.name }}
+                    {{ this.currentCompany.sales_rep.name }}
                   </strong>
                 </p>
                 <p class="mt-3">Email address:
                   <strong class="mb-3 text-dark">
-                    <a :href="'mailto:' + this.current_company.sales_rep.email"
+                    <a :href="'mailto:' + this.currentCompany.sales_rep.email"
                        target="_blank">
-                      {{ this.current_company.sales_rep.email }}
+                      {{ this.currentCompany.sales_rep.email }}
                     </a>
                   </strong>
                 </p>
@@ -130,7 +130,7 @@ export default {
     },
 
     openDemo () {
-      window.open('mailto:' + this.current_company.sales_rep.email, '_blank')
+      window.open('mailto:' + this.currentCompany.sales_rep.email, '_blank')
     }
   }
 }
