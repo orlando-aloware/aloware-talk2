@@ -1,4 +1,5 @@
 <template>
+  <div>
     <b-modal dialog-class="modal-pd-add"
              centered
              hide-footer
@@ -150,7 +151,35 @@
                 </div>
             </template>
         </b-modal>
+
     </b-modal>
+    <b-modal modal-class="confirm-dialog"
+                 title="Continue"
+                 centered
+                 v-model="confirmCancelModal"
+                 data-testid="power-dialer-add-modal-confirm-dialog">
+          <div class="text-left">
+            <div class="text-dark">
+              Are you sure you want to cancel the action?
+            </div>
+          </div>
+          <template slot="modal-footer">
+            <div class="d-flex w-100">
+              <div class="flex-grow-1"></div>
+              <button class="btn btn-sm btn-danger mr-2"
+                      data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
+                      @click="cancelConfirmationDialog">
+                No, Go Back
+              </button>
+              <button class="btn btn-sm btn-primary mr-2"
+                      data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
+                      @click="closeConfirmationDialog">
+                Continue
+              </button>
+            </div>
+          </template>
+        </b-modal>
+  </div>
 </template>
 
 <script>
@@ -217,7 +246,8 @@ export default {
     popover_config: {
       placement: 'right'
     },
-    count: 0
+    count: 0,
+    confirmCancelModal: false
   }),
 
   computed: {
@@ -368,8 +398,13 @@ export default {
     },
 
     onHidden () {
-      this.addPowerDialerOpen(false)
-      this.$emit('hidden')
+      if (!this.showContactButtons) {
+        this.addPowerDialerOpen(false)
+        this.$emit('hidden')
+      }
+      if (this.showContactButtons) {
+        this.confirmCancelModal = true
+      }
     },
 
     saveAndStay () {
@@ -617,6 +652,18 @@ export default {
     closeConfirmDialog () {
       this.confirm = false
       this.loading--
+    },
+
+    closeConfirmationDialog () {
+      this.confirmCancelModal = false
+      this.addPowerDialerOpen(false)
+      this.$emit('hidden')
+    },
+
+    cancelConfirmationDialog () {
+      this.confirmCancelModal = false
+      this.addPowerDialerOpen(true)
+      this.$emit('reload')
     },
 
     getIntegration () {

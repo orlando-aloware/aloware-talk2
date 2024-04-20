@@ -701,7 +701,8 @@
       <power-dialer-add-modal :params="attachedParams()"
                               :show-contact-buttons="true"
                               v-if="openPDModal"
-                              @hidden="openPDModal = false">
+                              @hidden="openPDModal = false"
+                              @reload="openPDModal = false; openPDModal = true;">
       </power-dialer-add-modal>
     </template>
   </contacts-screen>
