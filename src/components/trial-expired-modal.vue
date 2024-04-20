@@ -54,6 +54,22 @@
                   </button>
               </div>
 
+              <div class="d-flex align-items-center flex-center pt-3">
+                <p class="mt-3">Sales Contact:
+                  <strong class="mb-3 text-dark">
+                    {{ this.current_company.sales_rep.name }}
+                  </strong>
+                </p>
+                <p class="mt-3">Email address:
+                  <strong class="mb-3 text-dark">
+                    <a :href="'mailto:' + this.current_company.sales_rep.email"
+                       target="_blank">
+                      {{ this.current_company.sales_rep.email }}
+                    </a>
+                  </strong>
+                </p>
+              </div>
+
               <div class="d-flex align-items-center flex flex-column pt-3">
                 <p class="mt-3">Contact Support:</p>
                 <p class="my-2">
@@ -114,7 +130,7 @@ export default {
     },
 
     openDemo () {
-      window.open('https://meetings.hubspot.com/alwr/aloware-demo', '_blank')
+      window.open('mailto:' + this.current_company.sales_rep.email, '_blank')
     }
   }
 }
