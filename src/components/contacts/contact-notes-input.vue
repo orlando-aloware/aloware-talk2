@@ -6,6 +6,7 @@
       autogrow
       :debounce="debounce"
       v-model="notes"
+      data-testid="contact-notes-input"
       @input="onInput"
       @blur="onBlur"
     />

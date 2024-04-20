@@ -5,6 +5,7 @@
            scrollable
            v-model="isOpen"
            :title="title"
+           data-testid="schedule-message-modal"
            @hidden="onHidden">
     <div>
       <b-row>
@@ -14,6 +15,7 @@
                       locale="en-US"
                       hide-header
                       block
+                      data-testid="schedule-message-calendar"
                       @context="onContext">
           </b-calendar>
         </b-col>
@@ -22,6 +24,7 @@
                   class="mt-2 w-100"
                   locale="en"
                   hide-header
+                  data-testid="schedule-message-time"
                   @context="onContext">
           </b-time>
         </b-col>
@@ -29,6 +32,7 @@
         <b-col cols="12 p-0">
           <b-alert class="schedule-notice p-1 mt-2 mb-0"
                    :show="!isScheduleDeliverable"
+                   data-testid="schedule-message-notice-alert"
                    variant="warning">
             Schedule must be in future date
           </b-alert>
@@ -42,6 +46,7 @@
           <b-button variant="outline-success"
                     class="custom-btn"
                     size="sm"
+                    data-testid="schedule-message-reset-btn"
                     :disabled="isSending"
                     @click="onReset">
             Reset
@@ -51,6 +56,7 @@
         <b-button variant="primary"
                   class="custom-btn"
                   size="sm"
+                  data-testid="schedule-message-send-btn"
                   :disabled="isSending || !isScheduleDeliverable"
                   @click="onSend">
           <q-spinner-bars v-if="isSending"

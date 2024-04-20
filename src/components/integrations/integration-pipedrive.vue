@@ -1,36 +1,40 @@
 <template>
-  <div class="integration-wrapper">
+  <div class="integration-wrapper" data-testid="integration-pipedrive-wrapper">
     <q-card class="hubspot-card"
+            data-testid="integration-pipedrive-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="contactLink">
+        <q-item-section data-testid="integration-pipedrive-section-1" v-if="contactLink">
           <b-link target="_blank"
+                  data-testid="integration-pipedrive-contact-link"
                   :href="contactLink">
-            <table>
-              <tr>
-                <td><img class="pipedrive-btn" /></td>
-                <td><span class="integration-title">Pipedrive</span></td>
+            <table data-testid="integration-pipedrive-table-1">
+              <tr data-testid="integration-pipedrive-row-1">
+                <td data-testid="integration-pipedrive-column-1-1"><img class="pipedrive-btn" /></td>
+                <td data-testid="integration-pipedrive-column-1-2"><span class="integration-title">Pipedrive</span></td>
               </tr>
             </table>
           </b-link>
         </q-item-section>
-        <q-item-section v-else>
+        <q-item-section data-testid="integration-pipedrive-section-2" v-else>
           <a href="#"
+             data-testid="integration-pipedrive-link"
              onclick="return false;">
-              <table>
-                <tr>
-                  <td><img class="pipedrive-btn" /></td>
-                  <td><span class="integration-title">Pipedrive</span></td>
+              <table data-testid="integration-pipedrive-table-2">
+                <tr data-testid="integration-pipedrive-row-2">
+                  <td data-testid="integration-pipedrive-column-2-1"><img class="pipedrive-btn" /></td>
+                  <td data-testid="integration-pipedrive-column-2-2"><span class="integration-title">Pipedrive</span></td>
                 </tr>
               </table>
           </a>
         </q-item-section>
       </q-item>
 
-      <q-separator/>
+      <q-separator data-testid="integration-pipedrive-separator"/>
 
-      <q-card-section v-if="integrationData && integrationData.contact_details">
+      <q-card-section v-if="integrationData && integrationData.contact_details" data-testid="integration-pipedrive-card-section-1">
         <p class="mb-0"
+           data-testid="integration-pipedrive-name"
            v-if="integrationData.contact_details.name !== undefined">
           <span class="data-icon-label">Name: </span>
           <span class="data-value">
@@ -42,37 +46,43 @@
           </span>
         </p>
         <p class="mb-0"
+           data-testid="integration-pipedrive-email"
            v-if="integrationData.contact_details.email && integrationData.contact_details.email.length > 0 && integrationData.contact_details.email[0].value">
           <span class="data-icon-label">Email: </span>
           <span class="data-value">{{ integrationData.contact_details.email[0].value }}</span>
         </p>
         <p class="mb-0"
+           data-testid="integration-pipedrive-company"
            v-if="integrationData.contact_details.org_name">
           <span class="data-icon-label">Company: </span>
           <span class="data-value">{{ integrationData.contact_details.org_name }}</span>
         </p>
         <p class="mb-0"
+           data-testid="integration-pipedrive-owner"
            v-if="integrationData.contact_details.owner_name">
           <span class="data-icon-label">Owner: </span>
           <span class="data-value">{{ integrationData.contact_details.owner_name }}</span>
         </p>
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section data-testid="integration-pipedrive-card-section-2">
         <b-row>
           <b-button class="text-white"
                     size="sm"
                     variant="primary"
                     tabindex="0"
                     block
+                    data-testid="integration-pipedrive-sync-button"
                     @click="syncPipedrive">
             <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
             <q-spinner-bars v-if="isSyncing"
+                            data-testid="integration-pipedrive-sync-spinner"
                             color="white">
             </q-spinner-bars>
             {{ isSyncing ? 'Syncing...' : 'Sync with Pipedrive' }}
             <q-tooltip anchor="center start"
                        self="center left"
+                       data-testid="integration-pipedrive-sync-tooltip"
                        :offset="[-220, 10]">
               <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelText }} and Pipedrive.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>

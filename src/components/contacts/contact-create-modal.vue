@@ -7,15 +7,16 @@
     hide-header
     hide-footer
     ref="create-contact-modal"
+    data-testid="contact-create-modal"
     @hidden="onReset">
 
     <div class="modal-body-wrapper">
 
-        <b-form @submit.prevent="onSubmit">
+        <b-form @submit.prevent="onSubmit" data-testid="contact-create-form">
           <h5 class="mb-4 section-header fs-24 text-bold _600 text-center">Create Contact</h5>
 
           <div class="scrollable p-2">
-            <b-form-row class="mt-2">
+            <b-form-row class="mt-2" data-testid="contact-create-row">
               <b-col sm="12" md="6">
                 <b-form-group label="First Name">
                   <b-form-input
@@ -24,6 +25,7 @@
                     ref="first_name"
                     autofocus
                     :state = "validateState('first_name')"
+                    data-testid="contact-create-first-name-input"
                     v-model.trim="$v.contact.first_name.$model">
                   </b-form-input>
                   <b-form-invalid-feedback v-if="!$v.contact.first_name.required">First name is required</b-form-invalid-feedback>
@@ -38,6 +40,7 @@
                     placeholder="Doe"
                     ref="first_name"
                     :state = "validateState('last_name')"
+                    data-testid="contact-create-last-name-input"
                     v-model.trim="$v.contact.last_name.$model">
                   </b-form-input>
                   <b-form-invalid-feedback v-if="!$v.contact.first_name.required">Last name is required</b-form-invalid-feedback>
@@ -54,6 +57,7 @@
                     placeholder="+18185005050"
                     ref="phone_number"
                     :state="validateState('phone_number')"
+                    data-testid="contact-create-phone-number-input"
                     v-model.trim="$v.contact.phone_number.$model">
                   </b-form-input>
                   <b-form-invalid-feedback v-if="!$v.contact.phone_number.validPhone">Enter valid phone number</b-form-invalid-feedback>
@@ -67,6 +71,7 @@
                     placeholder="e.g. john.doe@email.com"
                     ref="email"
                     :state = "validateState('email')"
+                    data-testid="contact-create-email-input"
                     v-model.trim="$v.contact.email.$model">
                   </b-form-input>
                   <b-form-invalid-feedback v-if="!$v.contact.email.email">Enter a valid email address</b-form-invalid-feedback>
@@ -83,6 +88,7 @@
                                  :use-chips="false"
                                  :generic-styling="false"
                                  :generic-multiselect="false"
+                                 data-testid="contact-create-initial-line-selector"
                                  @change="onLineSelected">
                   </line-selector>
                 </b-form-group>
@@ -96,6 +102,7 @@
                                  :generic-styling="false"
                                  :multiple="false"
                                  :use-chips="false"
+                                 data-testid="contact-create-owner-selector"
                                  @change="onUserSelected">
                   </user-selector>
                 </b-form-group>
@@ -111,6 +118,7 @@
                   </q-tooltip>
                   <tag-selector :multiple="true"
                                 v-model="contact.tag_ids"
+                                data-testid="contact-create-tag-selector"
                                 @change="onTagsSelected">
                   </tag-selector>
                 </b-form-group>
@@ -123,6 +131,7 @@
                      md="6">
                 <b-button block
                           class="btn-grey-80"
+                          data-testid="contact-create-hide-modal-button"
                           @click="hideModal">
                   Cancel
                 </b-button>
@@ -133,6 +142,7 @@
                 <b-button block
                           type="submit"
                           variant="primary"
+                          data-testid="contact-create-submit-button"
                           :disabled="isCreating">
                   <q-spinner-bars v-if="isCreating" color="white" />
                   {{ isCreating ? 'Saving Contact...' : 'Save' }}

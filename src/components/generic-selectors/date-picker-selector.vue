@@ -5,21 +5,25 @@
              :mask="inputMask"
              :disabled="!canEdit"
              v-model="selectedId"
+             data-testid="date-picker-selector-input"
              @input="onInput">
       <template v-slot:append>
         <b-button variant="info"
                   class="q-field__focusable-action bg-transparent border-0"
+                  data-testid="date-picker-selector-button"
                   :id="popoverId">
           <q-icon name="event" />
         </b-button>
         <b-popover :show.sync="showDatePicker"
                    target="popover-date-picker-sync"
+                   data-testid="date-picker-selector-popover"
                    placement="bottom">
           <div :class="popoverClass">
             <q-date ref="datePickerSelect"
                     minimal
                     :mask="datePickerMask"
                     v-model="selectedId"
+                    data-testid="date-picker-selector-date-picker"
                     @input="onDateOfBirthSelected">
               <div class="row items-center justify-end">
                 <q-btn color="primary"
@@ -27,6 +31,7 @@
                        no-caps
                        dense
                        v-show="showCloseButton"
+                       data-testid="date-picker-selector-close-button"
                        @click="showDatePicker = false">
                   <div class="px-1">
                     Close

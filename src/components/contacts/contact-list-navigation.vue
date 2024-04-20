@@ -1,10 +1,11 @@
 <template>
-  <b-button-toolbar class="btn-contact-list-navigation" key-nav>
-    <b-button-group class="mx-1">
+  <b-button-toolbar data-testid="contact-list-navigation-btn-toolbar" class="btn-contact-list-navigation" key-nav>
+    <b-button-group class="mx-1" data-testid="contact-list-navigation-btn-group">
       <b-button size="sm"
                 variant="light"
                 class="btn-white btn-contact-prev-next"
                 :disabled="disabledPrev"
+                data-testid="contact-list-navigation-btn-prev"
                 @click.prevent="onPrevContact">
         <i class="material-icons">keyboard_arrow_left</i>
       </b-button>
@@ -14,6 +15,7 @@
                 variant="light"
                 class="btn-white btn-contact-prev-next"
                 :disabled="disabledNext"
+                data-testid="contact-list-navigation-btn-next"
                 @click.prevent="onNextContact">
         <i class="material-icons">keyboard_arrow_right</i>
       </b-button>

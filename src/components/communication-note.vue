@@ -11,17 +11,20 @@
              placeholder="Write notes"
              ref="communicationNotes"
              dense
+             data-testid="communication-notes-note-input"
              @input="changeNote"
              @blur="onBlur"
              @keyup.esc="onBlur">
     </q-input>
     <div class="comm-notes-state d-flex w-100 justify-end">
       <span class="text-muted"
+            data-testid="communication-notes-saving-text"
             v-show="loadingBtn">
           <i class="rotating material-icons loader text-dark-greenish">&#xE863;</i>
           saving
       </span>
       <span class="text-muted"
+            data-testid="communication-notes-saved-text"
             v-show="!loadingBtn && loading">
           saved
       </span>

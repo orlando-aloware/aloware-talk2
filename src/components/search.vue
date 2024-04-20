@@ -7,6 +7,7 @@
              v-model="searchValue"
              borderless
              clearable
+             data-testid="search-input"
              @blur="onBlur"
              @focus="onFocus"
              @clear="onInput"
@@ -18,6 +19,7 @@
                 v-if="limitSearchCharacters">
         <q-tooltip anchor="bottom middle"
                    self="center middle"
+                   data-testid="search-tooltip"
                    v-if="!searchValue || (searchValue && searchValue.length < 3)">
           Search requires at least 3 characters
         </q-tooltip>

@@ -3,6 +3,7 @@ import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
 import { get } from 'lodash'
+import * as AgentStatus from '../../constants/agent-status'
 
 const DIRECTION = {
   top: 1,
@@ -20,7 +21,8 @@ export default {
       reRouteModal: false,
       loadingNext: false,
       sessionNotReady: false,
-      skipWrapUp: false
+      skipWrapUp: false,
+      verifyAgentOnCall: false
     }
   },
 
@@ -229,6 +231,20 @@ export default {
 
       this.hasActiveTask = true
       this.skipWrapUp = false
+
+      // check if redial is true (this.redialedTask?.redialed_now) and if agent status is on call
+      // then do not continue until agent status is not on call
+      if (this.verifyAgentOnCall && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        await new Promise(resolve => {
+          const checkAgentStatus = setInterval(() => {
+            if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
+              clearInterval(checkAgentStatus)
+              this.verifyAgentOnCall = false
+              resolve()
+            }
+          }, 1000)
+        })
+      }
 
       // Fires an event to make a call
       this.$VueEvent.fire('makeCall', {

@@ -23,6 +23,7 @@
           type="text"
           v-model="text"
           autofocus
+          data-testid="tree-folder-create-input"
           @blur="onInputBlur"
           @keydown="onKeyDown" />
 
