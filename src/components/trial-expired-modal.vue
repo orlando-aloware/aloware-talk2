@@ -55,13 +55,15 @@
               </div>
 
               <div class="d-flex align-items-center flex-center pt-3">
-                <p class="mt-3">Sales Contact:
-                  <strong class="mb-3 text-dark">
+                <p class="mb-0">Sales Contact:
+                  <strong class="mb-0 text-dark">
                     {{ this.currentCompany.sales_rep.name }}
                   </strong>
                 </p>
-                <p class="mt-3">Email address:
-                  <strong class="mb-3 text-dark">
+              </div>
+              <div class="d-flex align-items-center flex-center pt-0">
+                <p class="mb-0">Email address:
+                  <strong class="mb-0 text-dark">
                     <a :href="'mailto:' + this.currentCompany.sales_rep.email"
                        target="_blank">
                       {{ this.currentCompany.sales_rep.email }}
@@ -71,7 +73,7 @@
               </div>
 
               <div class="d-flex align-items-center flex flex-column pt-3">
-                <p class="mt-3">Contact Support:</p>
+                <p class="mt-3 mb-0">Contact Support:</p>
                 <p class="my-2">
                   <a href="tel:(855) 256-2001">
                       <i class="fa fa-phone-alt"></i>
