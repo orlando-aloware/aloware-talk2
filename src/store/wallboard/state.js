@@ -50,7 +50,7 @@ export default function () {
     filters: {
       ringGroup: null,
       lineRingGroup: null,
-      lineId: null,
+      campaignId: null,
       agent: null,
       agentStatus: 'all'
     },

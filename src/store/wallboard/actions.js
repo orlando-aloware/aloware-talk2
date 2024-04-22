@@ -86,7 +86,7 @@ export default {
 
       const res = await API.V1.contactCenter.summary.get({
         ring_group_id: state.filters.ringGroup,
-        line_id: state.filters.lineId,
+        campaign_id: state.filters.campaignId,
         timezone: window.timezone
       })
       const summary = res.data

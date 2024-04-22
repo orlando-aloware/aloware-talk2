@@ -52,13 +52,13 @@ export default {
 
     onFilterRingGroup (selectedValue) {
       let ringGroup = (selectedValue && selectedValue.id) || null
-      let lineId = false
+      let campaignId = null
 
       const isALine = selectedValue && selectedValue.hasOwnProperty('ring_group_id')
 
       if (isALine) {
-        ringGroup = selectedValue.ring_group_id
-        lineId = selectedValue.id
+        ringGroup = null
+        campaignId = selectedValue.id
       }
 
       this.setFilter({
@@ -67,8 +67,8 @@ export default {
       })
 
       this.setFilter({
-        filter: 'lineId',
-        value: lineId
+        filter: 'campaignId',
+        value: campaignId
       })
 
       this.setFilter({
