@@ -334,6 +334,7 @@ export default {
       placement: 'right'
     },
     count: 0,
+    stay: false,
     showContactModals: {
       1: false,
       2: false
@@ -497,7 +498,7 @@ export default {
     },
 
     saveAndStay () {
-      this.redirect = false
+      this.stay = true
       this.save()
       this.addPowerDialerOpen(false)
       this.$emit('hidden')
@@ -566,7 +567,8 @@ export default {
           this.$generalNotification(res.data.message)
           this.$emit('submit')
 
-          if (this.redirect) {
+          if (this.redirect && !this.stay) {
+            this.stay = false
             if (this.params.contact_list_id) {
               this.$router.push(`/power-dialer/list/${this.params.contact_list_id}`)
 
