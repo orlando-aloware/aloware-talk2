@@ -441,11 +441,24 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
     },
 
-    forceRefreshCommunication () {
-      return this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
+    async forceRefreshCommunication (isFishingMode = false) {
+      let communication = null
+
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          console.log('Trying to get callSid...', this.dialer?.call?.callSid)
+          if (this.dialer?.call?.callSid) {
+            communication = this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true, isFishingMode)
+            clearInterval(interval)
+            resolve()
+          }
+        }, 1000)
+      })
+
+      return communication
     },
 
-    getCommunication (sid, from, getCommunicationTry = 1, force = false) {
+    getCommunication (sid, from, getCommunicationTry = 1, force = false, isFishingMode = false) {
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
@@ -476,7 +489,8 @@ export default {
         // seconds, which is being prevented here:
         if (routeTitle && this.activeTask &&
           routeTitle === 'Power Dialer Sessions' &&
-          this.activeTask.id !== res.data.contact_id) {
+          this.activeTask.id !== res.data.contact_id &&
+          !isFishingMode) {
           return Promise.resolve()
         }
 
@@ -485,12 +499,9 @@ export default {
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
         // else, set the contact.
-        if ((routeTitle &&
-            this.activeTask &&
-            routeTitle === 'Power Dialer Sessions' &&
-            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
-          (routeTitle !== 'Power Dialer Sessions' &&
-            this.dialer.communication.contact)) {
+        const isPowerDialerSameContact = routeTitle && this.activeTask && routeTitle === 'Power Dialer Sessions' && (parseInt(this.activeTask.id) === parseInt(res.data.contact_id) || isFishingMode)
+
+        if (isPowerDialerSameContact || (routeTitle !== 'Power Dialer Sessions' && this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
 
@@ -1462,7 +1473,7 @@ export default {
         _.defer(() => {
           setTimeout(() => {
             console.log('Refreshing communication')
-            this.forceRefreshCommunication()
+            this.forceRefreshCommunication(true)
           }, 1000)
         })
       }
