@@ -43,65 +43,90 @@
           </q-input>
         </template>
       </q-field>
-      <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
+      <div ref="scrollableArea"
+           :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
            :style="height ? `height: ${height}px !important` : ''"
            v-if="searchList[0].children.length || searchList[1].children.length">
         <template v-if="!optionsIsGrouped">
-          <div class="mr-1">
-            <div role="button"
-                 class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                 :key="item.id"
-                 v-for="item in filteredOptions"
-                 @click="onSelectOption(item.id)">
-              <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
-                    class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
-                <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
-                         rounded
-                         :style="{ background: item.color }"
-                         v-if="typeof item.color !== 'undefined'">
-                </q-badge>
-                <span class="tag-text text-grey-100">{{ item.name }}</span>
-              </span>
-              <div>
+          <q-infinite-scroll scroll-target=".scrollableArea"
+                             :offset="1000"
+                             @load="getTags">
+            <div class="mr-1">
+              <div role="button"
+                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
+                  :key="item.id"
+                  v-for="item in filteredOptions"
+                  @click="onSelectOption(item.id)">
+                <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
+                      class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
+                  <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
+                          rounded
+                          :style="{ background: item.color }"
+                          v-if="typeof item.color !== 'undefined'">
+                  </q-badge>
+                  <span class="tag-text text-grey-100">{{ item.name }}</span>
+                </span>
+                <div>
+                  <check-o-icon color="#256EFF"
+                                width="12"
+                                height="8"
+                                v-if="isSelected(item.id)"/>
+                </div>
+              </div>
+              asd
+            </div>
+            <template v-slot:loading
+                      v-if="loadingTags">
+              <div class="row justify-center q-my-md">
+                <q-spinner-dots color="primary"
+                                size="20px" />
+              </div>
+            </template>
+          </q-infinite-scroll>
+        </template>
+        <template v-else>
+          <q-infinite-scroll scroll-target=".scrollableArea"
+                             :offset="1000"
+                             @load="getTags">
+            <div class="mr-1"
+                :key="`title-${index}`"
+                v-for="(item, index) in searchList">
+              <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
+                  :class="[index !== 0 ? 'border-top' : '']">
+                <span class="d-inline-flex align-items-center text-grey-100 w-100"
+                      v-if="item.children.length">
+                  <span class="tag-text">{{ item.title }}</span>
+                </span>
+              </div>
+              <div role="button"
+                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
+                  :key="`child-${child.id}`"
+                  v-for="child in item.children"
+                  @click="onSelectOption(child.id)">
+                <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
+                      v-if="typeof child.color !== 'undefined'">
+                  <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
+                          rounded
+                          :style="{ background: child.color }"
+                          v-if="typeof child.color !== 'undefined'">
+                  </q-badge>
+                  <span class="tag-text text-grey-100">{{ child.name }}</span>
+                </span>
                 <check-o-icon color="#256EFF"
                               width="12"
                               height="8"
-                              v-if="isSelected(item.id)"/>
+                              v-if="isSelected(child.id)"/>
               </div>
+              abc
             </div>
-          </div>
-        </template>
-        <template v-else>
-          <div class="mr-1"
-               :key="`title-${index}`"
-               v-for="(item, index) in searchList">
-            <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
-                 :class="[index !== 0 ? 'border-top' : '']">
-              <span class="d-inline-flex align-items-center text-grey-100 w-100"
-                    v-if="item.children.length">
-                <span class="tag-text">{{ item.title }}</span>
-              </span>
-            </div>
-            <div role="button"
-                 class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                 :key="`child-${child.id}`"
-                 v-for="child in item.children"
-                 @click="onSelectOption(child.id)">
-              <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
-                    v-if="typeof child.color !== 'undefined'">
-                <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
-                         rounded
-                         :style="{ background: child.color }"
-                         v-if="typeof child.color !== 'undefined'">
-                </q-badge>
-                <span class="tag-text text-grey-100">{{ child.name }}</span>
-              </span>
-              <check-o-icon color="#256EFF"
-                            width="12"
-                            height="8"
-                            v-if="isSelected(child.id)"/>
-            </div>
-          </div>
+            <template v-slot:loading
+                      v-if="loadingTags">
+              <div class="row justify-center q-my-md">
+                <q-spinner-dots color="primary"
+                                size="20px" />
+              </div>
+            </template>
+          </q-infinite-scroll>
         </template>
       </div>
       <div class="text-center w-100"
@@ -115,15 +140,30 @@
         <div class="d-inline-block"
              :key="item.id"
              v-for="item in formattedValues">
-        <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
-          <q-badge class="is-dot"
-                   rounded
-                   :style="{ background: item.color }"
-                   v-if="typeof item.color !== 'undefined'">
-          </q-badge>
-          <span class="tag-text"
-                :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</span>
-        </span>
+          <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
+            <q-badge class="is-dot"
+                    rounded
+                    :style="{ background: item.color }"
+                    v-if="typeof item.color !== 'undefined'">
+            </q-badge>
+            <span class="tag-text"
+                  :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</span>
+          </span>
+        </div>
+        <div v-if="isEdit">
+          <!-- infinite loading -->
+          <div class="spinner-container p-l-3"
+               v-if="loadingTags">
+            <q-spinner class="spinner" />
+          </div>
+          <!-- <q-btn class="btn-tag-edit"
+                 :disabled="loadingTags"
+                 v-if="hasMorePages"
+                 @click="getTags()">
+            <span class="ml-1">
+              Load more tags
+            </span>
+          </q-btn> -->
         </div>
       </div>
       <div class="w-100 mt-1"
@@ -232,7 +272,9 @@ export default {
           title: 'Import Tags',
           children: []
         }
-      ]
+      ],
+      page: 1,
+      hasMorePages: true
     }
   },
 
@@ -280,12 +322,12 @@ export default {
 
     handleBlur () {
       this.search = ''
-      this.isEdit = false
+      this.isEdit = true
     },
 
     onEdit () {
       this.isEdit = true
-      this.getTags(true)
+      this.getTags()
       this.$nextTick(() => {
         this.$refs.search.focus()
       })
@@ -300,29 +342,48 @@ export default {
       this.$emit('valuesUpdated', this.selectedValues)
     },
 
-    getTags (force = false) {
-      if (this.search.length >= this.threshold || force) {
-        const params = {
-          per_page: 50,
-          search: this.search
-        }
+    filterByTagType (tags, tagType) {
+      return tags.filter(tag => tag.type === tagType).map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        color: tag.color
+      }))
+    },
 
-        this.loadingTags = true
-
-        this.$axios.get('/api/v1/tag', { params }).then(res => {
-          const list = res.data.data
-          const tags = list.filter(tag => tag.category === this.category)
-          const accountTags = tags.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
-          const importTags = tags.filter(tag => tag.type === TagTypes.TYPE_IMPORT)
-
-          this.searchList[0].children = accountTags
-          this.searchList[1].children = importTags
-
-          this.loadingTags = false
-        }).catch(err => {
-          console.log(err)
-        })
+    getTags (done) {
+      console.log('getTags', this.page, done, this.hasMorePages)
+      if (!this.hasMorePages || this.loadingTags) {
+        return
       }
+
+      const params = {
+        per_page: 50,
+        search: this.search,
+        page: this.page
+      }
+
+      this.loadingTags = true
+
+      this.$axios.get('/api/v1/tag', { params }).then(res => {
+        const tags = res.data.data.filter(tag => tag.category === this.category)
+        const accountTags = this.filterByTagType(tags, TagTypes.TYPE_COMPANY)
+        const importTags = this.filterByTagType(tags, TagTypes.TYPE_IMPORT)
+
+        this.searchList[0].children = [...this.searchList[0].children, ...accountTags]
+        this.searchList[1].children = [...this.searchList[1].children, ...importTags]
+
+        this.page++
+        this.hasMorePages = res.data.current_page < res.data.last_page
+
+        if (!this.hasMorePages) {
+          console.log('no more pages')
+          done()
+        }
+      }).catch(err => {
+        console.error(err)
+      }).finally(() => {
+        this.loadingTags = false
+      })
     }
   },
 
