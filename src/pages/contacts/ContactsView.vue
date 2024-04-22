@@ -1102,8 +1102,6 @@ export default {
         ids.push(check.id)
       })
 
-      console.log('checkedItemIds', ids)
-
       return ids
     },
 
