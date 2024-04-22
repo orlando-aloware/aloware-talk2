@@ -699,10 +699,9 @@
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
       <power-dialer-add-modal :params="attachedParams()"
-                              :show-contact-buttons="true"
+                              :show-in-contacts-page="true"
                               v-if="openPDModal"
-                              @hidden="openPDModal = false"
-                              @reload="openPDModal = false; openPDModal = true;">
+                              @hidden="openPDModal = false">
       </power-dialer-add-modal>
     </template>
   </contacts-screen>

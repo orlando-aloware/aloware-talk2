@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!showInContactsPage">
     <b-modal dialog-class="modal-pd-add"
              centered
              hide-footer
@@ -94,39 +94,14 @@
                     </template>
                 </date-picker>
 
-                <div class="row justify-center"
-                     v-if="showContactButtons">
-                  <div class="col-6 text-center">
-                    <b-button class="btn-block mt-4"
-                              variant="secondary"
-                              size="sm"
-                              data-testid="power-dialer-add-modal-stay-in-contacts"
-                              @click="saveAndStay">
-                      Stay in Contacts
-                    </b-button>
-                  </div>
-                  <div class="col-6 text-center">
-                    <b-button class="btn-block mt-4"
-                              variant="primary"
-                              size="sm"
-                              data-testid="power-dialer-add-modal-go-to-power-dialer"
-                              @click="save">
-                      Go to PowerDialer
-                    </b-button>
-                  </div>
-                </div>
-
-                <div class="row"
-                     v-else>
-                  <b-button class="btn-block mt-4"
-                            variant="primary"
-                            size="sm"
-                            data-testid="power-dialer-add-modal-save-button"
-                            v-if="!showContactButtons"
-                            @click="save">
-                    Ok
-                  </b-button>
-                </div>
+                <b-button class="btn-block mt-4"
+                          variant="primary"
+                          size="sm"
+                          data-testid="power-dialer-add-modal-save-button"
+                          v-if="!showInContactsPage"
+                          @click="save">
+                  Ok
+                </b-button>
             </b-overlay>
         </q-card>
         <b-modal modal-class="confirm-dialog"
@@ -151,34 +126,145 @@
                 </div>
             </template>
         </b-modal>
-
     </b-modal>
-    <b-modal modal-class="confirm-dialog"
-                 title="Continue"
-                 centered
-                 v-model="confirmCancelModal"
-                 data-testid="power-dialer-add-modal-confirm-dialog">
-          <div class="text-left">
-            <div class="text-dark">
-              Are you sure you want to cancel the action?
+  </div>
+  <div v-else>
+    <b-modal v-model="showContactModals[1]"
+             id="modal-multi-1"
+             title="Second Modal"
+             header-class="custom-modal-header"
+             no-close-on-backdrop
+             no-close-on-esc
+             hide-footer>
+      <template #modal-header>
+        <h2>Power Dialer Task Options</h2>
+        <slot name="header-close-content">
+          <b-button @click="openPDModalInContacts(2)"
+                    variant="transparent">
+            <i class="fas fa-times"></i>
+          </b-button>
+        </slot>
+      </template>
+      <q-card class="my-card"
+              data-testid="power-dialer-add-modal-card"
+              flat>
+        <b-overlay :show="loading > 0"  data-testid="power-dialer-add-modal-overlay">
+          <div  data-testid="power-dialer-add-modal-converting-message">
+            You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+          </div>
+
+          <hr>
+
+          <label class="label mb-1 text-weight-bold"  data-testid="power-dialer-add-modal-conversion-options">
+            Conversion Options
+          </label>
+          <b-form-checkbox class="mb-2"
+                           :value="option.value"
+                           :key="option.value"
+                           v-model="conversion"
+                           data-testid="power-dialer-add-modal-conversion-checkbox"
+                           v-for="option in conversionOptions">
+            {{ option.text }}
+            <information-circle-icon color="#2F80ED"
+                                     data-testid="power-dialer-add-modal-circle-icon"
+                                     v-if="option.helper"/>
+            <q-tooltip anchor="top middle"
+                       self="bottom middle"
+                       data-testid="power-dialer-add-modal-helper-tooltip"
+                       v-if="option.helper">
+              {{ option.helper }}
+            </q-tooltip>
+          </b-form-checkbox>
+
+          <label class="label mt-2 mb-1 text-weight-bold">
+            Direction
+          </label>
+          <q-btn-toggle class="custom-toggle-button"
+                        toggle-color="primary active"
+                        color="transparent"
+                        text-color="grey-90"
+                        no-caps
+                        dense
+                        spread
+                        unelevated
+                        :options="directionOptions"
+                        data-testid="power-dialer-add-modal-direction-toggle"
+                        v-model="direction"/>
+
+          <hr>
+
+          <label class="label mb-1 text-weight-bold">
+              Where do you want to add these tasks?
+          </label>
+          <b-form-radio class="mb-2"
+                        :value="option.value"
+                        :key="option.value"
+                        v-model="where"
+                        data-testid="power-dialer-add-modal-where-radio"
+                        v-for="option in whereOptions">
+            {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
+          </b-form-radio>
+          <date-picker mode="dateTime"
+                       title-position="left"
+                       color="blue"
+                       :min-date="new Date()"
+                       :masks="masks"
+                       :popover="popover_config"
+                       v-model="schedule"
+                       data-testid="power-dialer-add-modal-date-picker"
+                       v-if="where === 'scheduled'">
+            <template v-slot="{ inputValue, inputEvents }">
+              <div class="ml-4 text-sm">
+                <small class="text-grey">
+                  Scheduled time:
+                </small>
+                <br>
+                <input class="px-2 py-1 border rounded text-grey"
+                       style="width: 155px"
+                       :value="inputValue"
+                       data-testid="power-dialer-add-modal-date-picker-input"
+                       v-on="inputEvents"/>
+              </div>
+            </template>
+          </date-picker>
+
+          <div class="row justify-center">
+            <div class="col-6 text-center">
+              <b-button class="btn-block mt-4"
+                        variant="secondary"
+                        size="sm"
+                        data-testid="power-dialer-add-modal-stay-in-contacts"
+                        @click="saveAndStay">
+                Stay in Contacts
+              </b-button>
+            </div>
+            <div class="col-6 text-center">
+              <b-button class="btn-block mt-4"
+                        variant="primary"
+                        size="sm"
+                        data-testid="power-dialer-add-modal-go-to-power-dialer"
+                        @click="save">
+                Go to PowerDialer
+              </b-button>
             </div>
           </div>
-          <template slot="modal-footer">
-            <div class="d-flex w-100">
-              <div class="flex-grow-1"></div>
-              <button class="btn btn-sm btn-danger mr-2"
-                      data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
-                      @click="cancelConfirmationDialog">
-                No, Go Back
-              </button>
-              <button class="btn btn-sm btn-primary mr-2"
-                      data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
-                      @click="closeConfirmationDialog">
-                Continue
-              </button>
-            </div>
-          </template>
-        </b-modal>
+        </b-overlay>
+      </q-card>
+    </b-modal>
+
+    <b-modal v-model="showContactModals[2]" id="modal-multi-2" title="Confirmation">
+      <p class="my-1">
+        Are you sure you want to cancel the action?. The contacts will not be added to the queue.
+      </p>
+      <template #modal-footer="{ ok, cancel }">
+        <b-button variant="danger" @click="cancel()">
+          Cancel
+        </b-button>
+        <b-button variant="primary" @click="hidePDModalsInContacts()">
+          Yes, Continue
+        </b-button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -224,7 +310,7 @@ export default {
       default: 'add' // add, duplicate, hubspot
     },
 
-    showContactButtons: {
+    showInContactsPage: {
       type: Boolean,
       default: false
     }
@@ -247,7 +333,10 @@ export default {
       placement: 'right'
     },
     count: 0,
-    confirmCancelModal: false
+    showContactModals: {
+      1: false,
+      2: false
+    }
   }),
 
   computed: {
@@ -362,6 +451,10 @@ export default {
       this.checkIntegrationImport()
     }
 
+    if (this.showInContactsPage) {
+      this.showContactModals[1] = true
+    }
+
     this.setCount()
   },
 
@@ -398,18 +491,29 @@ export default {
     },
 
     onHidden () {
-      if (!this.showContactButtons) {
-        this.addPowerDialerOpen(false)
-        this.$emit('hidden')
-      }
-      if (this.showContactButtons) {
-        this.confirmCancelModal = true
-      }
+      this.addPowerDialerOpen(false)
+      this.$emit('hidden')
     },
 
     saveAndStay () {
       this.redirect = false
       this.save()
+      this.addPowerDialerOpen(false)
+      this.$emit('hidden')
+    },
+
+    openPDModalInContacts (modalNumber) {
+      // Show the specified modal
+      this.showContactModals[modalNumber] = true
+    },
+
+    hidePDModalsInContacts () {
+      // Hide all modals
+      for (let modal in this.showContactModals) {
+        this.showContactModals[modal] = false
+      }
+      this.addPowerDialerOpen(false)
+      this.$emit('hidden')
     },
 
     save () {
@@ -652,18 +756,6 @@ export default {
     closeConfirmDialog () {
       this.confirm = false
       this.loading--
-    },
-
-    closeConfirmationDialog () {
-      this.confirmCancelModal = false
-      this.addPowerDialerOpen(false)
-      this.$emit('hidden')
-    },
-
-    cancelConfirmationDialog () {
-      this.confirmCancelModal = false
-      this.addPowerDialerOpen(true)
-      this.$emit('reload')
     },
 
     getIntegration () {
