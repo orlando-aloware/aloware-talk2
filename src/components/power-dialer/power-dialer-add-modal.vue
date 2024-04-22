@@ -98,7 +98,6 @@
                           variant="primary"
                           size="sm"
                           data-testid="power-dialer-add-modal-save-button"
-                          v-if="!showInContactsPage"
                           @click="save">
                   Ok
                 </b-button>
@@ -130,9 +129,6 @@
   </div>
   <div v-else>
     <b-modal v-model="showContactModals[1]"
-             id="modal-multi-1"
-             title="Second Modal"
-             header-class="custom-modal-header"
              no-close-on-backdrop
              no-close-on-esc
              hide-footer>
@@ -252,15 +248,20 @@
       </q-card>
     </b-modal>
 
-    <b-modal v-model="showContactModals[2]" id="modal-multi-2" title="Confirmation">
+    <b-modal v-model="showContactModals[2]"
+             title="Confirmation">
       <p class="my-1">
         Are you sure you want to cancel the action?. The contacts will not be added to the queue.
       </p>
       <template #modal-footer="{ ok, cancel }">
-        <b-button variant="danger" @click="cancel()">
+        <b-button variant="danger"
+                  data-testid="power-dialer-add-modal-cancel-action-cancel"
+                  @click="cancel()">
           Cancel
         </b-button>
-        <b-button variant="primary" @click="hidePDModalsInContacts()">
+        <b-button variant="primary"
+                  data-testid="power-dialer-add-modal-cancel-action-proceed"
+                  @click="hidePDModalsInContacts()">
           Yes, Continue
         </b-button>
       </template>
