@@ -331,10 +331,20 @@ export default {
     userPersonalLine () {
       return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
     },
+
+    classicLogOutUrl () {
+      return process.env.API_URL + '?from_talk_2=1&logout=1'
+    },
+
+    logoutLabel () {
+      return localStorage.getItem('impersonate') === 'true' ? 'Stop Impersonating' : 'Logout'
+    }
   },
 
   methods: {
-    ...mapActions('auth', ['setProfile']),
+    ...mapActions('auth', ['logout', 'setProfile']),
+
+    ...mapActions(['resetVuex']),
 
     changeStatus (status) {
       if (this.agentStatus === status) {
