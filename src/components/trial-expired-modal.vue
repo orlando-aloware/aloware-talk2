@@ -49,16 +49,16 @@
 
               <div class="d-flex align-items-center flex-center pt-3">
                   <button v-if="currentCompany.sales_rep"
-                          class="btn btn-primary mt-0"
+                          class="btn btn-primary mr-1"
                           @click="emailSalesRep">
                       Upgrade Now
                   </button>
                   <button v-if="!currentCompany.sales_rep"
-                          class="btn btn-primary mt-0"
+                          class="btn btn-primary mr-1"
                           @click="openDemo">
                       Upgrade Now
                   </button>
-                  <button class="btn btn-primary mt-0"
+                  <button class="btn btn-primary ml-1"
                           @click="logoutAction">
                       {{ logoutLabel }}
                   </button>
