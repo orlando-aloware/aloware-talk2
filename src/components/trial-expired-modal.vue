@@ -148,7 +148,7 @@ export default {
     },
 
     emailSalesRep () {
-      window.open('mailto:' + currentCompany.sales_rep.email, '_blank')
+      window.open(this.mailToSalesRep, '_blank')
     }
   }
 }
