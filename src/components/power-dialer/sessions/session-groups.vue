@@ -558,7 +558,7 @@ export default {
 
           // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
           // but discarding the ones have been skipped so we don't list them again
-          let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+          const newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
           if (newInQueue.length) {
             this.powerDialerTasks[taskType] = [...this.powerDialerTasks[taskType], ...newInQueue]
           }
