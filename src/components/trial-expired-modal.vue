@@ -48,15 +48,19 @@
               </div>
 
               <div class="d-flex align-items-center flex-center pt-3">
-                  <button v-if="this.current_company.sales_rep"
+                  <button v-if="this.currentCompany.sales_rep"
                           class="btn btn-primary mt-0"
                           @click="emailSalesRep">
                       Upgrade Now
                   </button>
-                  <button v-if="!this.current_company.sales_rep"
+                  <button v-if="!this.currentCompany.sales_rep"
                           class="btn btn-primary mt-0"
                           @click="openDemo">
                       Upgrade Now
+                  </button>
+                  <button class="btn btn-primary mt-0"
+                          @click="logoutAction">
+                      {{ logoutLabel }}
                   </button>
               </div>
 
@@ -144,7 +148,7 @@ export default {
     },
 
     emailSalesRep () {
-      window.open('mailto:' + this.current_company.sales_rep.email, '_blank')
+      window.open('mailto:' + this.currentCompany.sales_rep.email, '_blank')
     }
   }
 }
