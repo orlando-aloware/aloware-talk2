@@ -43,26 +43,25 @@
           </q-input>
         </template>
       </q-field>
-      <div ref="scrollableArea"
-           :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
+      <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
            :style="height ? `height: ${height}px !important` : ''"
            v-if="searchList[0].children.length || searchList[1].children.length">
-        <template v-if="!optionsIsGrouped">
+        <div v-if="!optionsIsGrouped">
           <q-infinite-scroll scroll-target=".scrollableArea"
-                             :offset="1000"
+                             :initial-index="1"
                              @load="getTags">
             <div class="mr-1">
               <div role="button"
-                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                  :key="item.id"
-                  v-for="item in filteredOptions"
-                  @click="onSelectOption(item.id)">
+                   class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
+                   :key="item.id"
+                   v-for="item in filteredOptions"
+                   @click="onSelectOption(item.id)">
                 <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
                       class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
                   <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
-                          rounded
-                          :style="{ background: item.color }"
-                          v-if="typeof item.color !== 'undefined'">
+                           rounded
+                           :style="{ background: item.color }"
+                           v-if="typeof item.color !== 'undefined'">
                   </q-badge>
                   <span class="tag-text text-grey-100">{{ item.name }}</span>
                 </span>
@@ -73,7 +72,6 @@
                                 v-if="isSelected(item.id)"/>
                 </div>
               </div>
-              asd
             </div>
             <template v-slot:loading
                       v-if="loadingTags">
@@ -83,32 +81,32 @@
               </div>
             </template>
           </q-infinite-scroll>
-        </template>
-        <template v-else>
+        </div>
+        <div v-else>
           <q-infinite-scroll scroll-target=".scrollableArea"
-                             :offset="1000"
+                             :initial-index="1"
                              @load="getTags">
             <div class="mr-1"
-                :key="`title-${index}`"
-                v-for="(item, index) in searchList">
+                 :key="`title-${index}`"
+                 v-for="(item, index) in searchList">
               <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
-                  :class="[index !== 0 ? 'border-top' : '']">
+                   :class="[index !== 0 ? 'border-top' : '']">
                 <span class="d-inline-flex align-items-center text-grey-100 w-100"
                       v-if="item.children.length">
                   <span class="tag-text">{{ item.title }}</span>
                 </span>
               </div>
               <div role="button"
-                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                  :key="`child-${child.id}`"
-                  v-for="child in item.children"
-                  @click="onSelectOption(child.id)">
+                   class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
+                   :key="`child-${child.id}`"
+                   v-for="child in item.children"
+                   @click="onSelectOption(child.id)">
                 <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
                       v-if="typeof child.color !== 'undefined'">
                   <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
-                          rounded
-                          :style="{ background: child.color }"
-                          v-if="typeof child.color !== 'undefined'">
+                           rounded
+                           :style="{ background: child.color }"
+                           v-if="typeof child.color !== 'undefined'">
                   </q-badge>
                   <span class="tag-text text-grey-100">{{ child.name }}</span>
                 </span>
@@ -117,7 +115,6 @@
                               height="8"
                               v-if="isSelected(child.id)"/>
               </div>
-              abc
             </div>
             <template v-slot:loading
                       v-if="loadingTags">
@@ -127,7 +124,7 @@
               </div>
             </template>
           </q-infinite-scroll>
-        </template>
+        </div>
       </div>
       <div class="text-center w-100"
            v-else>
@@ -142,28 +139,13 @@
              v-for="item in formattedValues">
           <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
             <q-badge class="is-dot"
-                    rounded
-                    :style="{ background: item.color }"
-                    v-if="typeof item.color !== 'undefined'">
+                     rounded
+                     :style="{ background: item.color }"
+                     v-if="typeof item.color !== 'undefined'">
             </q-badge>
             <span class="tag-text"
                   :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</span>
           </span>
-        </div>
-        <div v-if="isEdit">
-          <!-- infinite loading -->
-          <div class="spinner-container p-l-3"
-               v-if="loadingTags">
-            <q-spinner class="spinner" />
-          </div>
-          <!-- <q-btn class="btn-tag-edit"
-                 :disabled="loadingTags"
-                 v-if="hasMorePages"
-                 @click="getTags()">
-            <span class="ml-1">
-              Load more tags
-            </span>
-          </q-btn> -->
         </div>
       </div>
       <div class="w-100 mt-1"
@@ -184,7 +166,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _, { debounce } from 'lodash'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
@@ -322,7 +304,7 @@ export default {
 
     handleBlur () {
       this.search = ''
-      this.isEdit = true
+      this.isEdit = false
     },
 
     onEdit () {
@@ -350,8 +332,7 @@ export default {
       }))
     },
 
-    getTags (done) {
-      console.log('getTags', this.page, done, this.hasMorePages)
+    getTags (page, done) {
       if (!this.hasMorePages || this.loadingTags) {
         return
       }
@@ -359,7 +340,9 @@ export default {
       const params = {
         per_page: 50,
         search: this.search,
-        page: this.page
+        page: this.page,
+        order_by: 'name',
+        order: 'asc'
       }
 
       this.loadingTags = true
@@ -374,15 +357,13 @@ export default {
 
         this.page++
         this.hasMorePages = res.data.current_page < res.data.last_page
-
-        if (!this.hasMorePages) {
-          console.log('no more pages')
-          done()
-        }
       }).catch(err => {
         console.error(err)
       }).finally(() => {
         this.loadingTags = false
+        if (done) {
+          done()
+        }
       })
     }
   },
@@ -394,11 +375,15 @@ export default {
         this.selectedValues = this.values
       }
     },
-    search (newValue) {
+    search: debounce(function (newValue) {
       if (newValue && newValue.length >= this.threshold) {
+        this.page = 1
+        this.searchList[0].children = []
+        this.searchList[1].children = []
+
         this.getTags()
       }
-    }
+    }, 500)
   }
 }
 </script>
