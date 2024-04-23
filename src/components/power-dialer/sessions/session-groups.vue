@@ -527,12 +527,12 @@ export default {
       const page = inQueueTaskType && this.inQueueFetchTasks ? this.inQueueFetchTasks.currentPage + 1 : this.groupPageFilters[taskType]
 
       // Fetch the next page of tasks
-      const res = await this.getSessionTaskByFilter({
+      const res = await this.getSessionTaskByFilter(this.prepareFilters({
         id: this.selectedList.id,
         task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[taskType]].status],
         per_page: this.itemsPerPage,
         page: page
-      })
+      }))
 
       if (res.status === 200) {
         this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)

@@ -120,7 +120,8 @@ export default {
       cancelToken: null,
       source: null,
       tasksProcessed: 0,
-      inProgressFetchTasks: {}
+      inProgressFetchTasks: {},
+      minNumberOfInQueueTasks: 5
     }
   },
 
@@ -221,7 +222,9 @@ export default {
 
         this.inProgressFetchTasks[taskType] = true
 
-        const lastItemsInCurrentQueue = this.powerDialerTasks['in_queue'].length === 3
+        // Check if the number of tasks in the IN QUEUE list is equal
+        // to the minimum number of tasks required to check/increment the page for pagination
+        const lastItemsInCurrentQueue = this.powerDialerTasks['in_queue'].length === this.minNumberOfInQueueTasks
         const hasSkippedTasks = this.powerDialerTasks['skipped'].length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters['in_queue'] ? this.powerDialerTaskFilters['in_queue'].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
