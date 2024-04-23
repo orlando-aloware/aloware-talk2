@@ -564,7 +564,7 @@ export default {
           }
         } else {
           // Add the list of retrieved tasks to the current list, this is for all but IN QUEUE tasks
-          let tempSet = new Set([...this.powerDialerTasks[taskType], ...res.data.data].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          const tempSet = new Set([...this.powerDialerTasks[taskType], ...res.data.data].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks[taskType] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
         }
       }
