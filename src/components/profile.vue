@@ -354,6 +354,12 @@ export default {
       this.changeAgentStatus(status, false, 1, 'Talk-ChangeStatus')
     },
 
+    hideMenu () {
+      if (this.$refs && this.$refs.menu) {
+        this.$refs.menu.hide()
+      }
+    },
+
     toggleSleepMode () {
       this.togglingSleepMode = true
 
@@ -365,6 +371,25 @@ export default {
         this.$handleErrors(err.response)
       })
     },
+
+    logoutAction () {
+      try {
+        this.hideMenu()
+        const isImpersonating = storage.local.getItem('impersonate') === 'true'
+        this.logout()
+          .then(() => {
+            this.resetVuex(['all'])
+            if (isImpersonating) {
+              window.location.href = this.classicLogOutUrl
+            }
+            if (!isImpersonating) {
+              this.$router.push({ name: 'Login' })
+            }
+          })
+      } catch (err) {
+        console.error(err)
+      }
+    }
   }
 }
 </script>
