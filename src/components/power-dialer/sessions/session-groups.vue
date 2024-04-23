@@ -456,7 +456,7 @@ export default {
             }))
 
             // Total of skipped tasks in the current PD session plus the active task
-            const currSkippedAndInProgress = [...this.powerDialerTasks.skipped, this.activeTask]
+            const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
 
             // The new set of IN QUEUE tasks that are retrieved by the API
             const currInQueue = [...res.data.data]
@@ -495,7 +495,7 @@ export default {
           }))
 
           // Total of skipped tasks in the current PD session plus the active task
-          const currSkippedAndInProgress = [...this.powerDialerTasks.skipped, this.activeTask]
+          const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
 
           // The new set of IN QUEUE tasks that are retrieved by the API
           const currInQueue = [...response.data.data]
@@ -539,22 +539,18 @@ export default {
         delete this.powerDialerTaskFilters[taskType].data
 
         if (inQueueTaskType) {
-          // Total of skipped tasks in the current PD session plus the active task
-          const currSkippedAndInProgress = [...this.powerDialerTasks.skipped, this.activeTask]
+          // Get list of processed tasks at this point
+          // (Total of skipped tasks in the current PD session + active task)
+          const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
 
           // The new set of IN QUEUE tasks that are retrieved by the API
           const currInQueue = [...res.data.data]
-          // if the current page is the same as the last page, then we keep the total of fetched tasks the same
-          if (this.powerDialerTaskFilters[taskType].current_page === this.inQueueFetchTasks.currentPage) {
-            this.inQueueFetchTasks.fetchedTasks = currInQueue.length
-          }
 
-          // if the current page is greater than the last page, then we increment the total of fetched tasks
-          if (this.powerDialerTaskFilters[taskType].current_page > this.inQueueFetchTasks.currentPage) {
-            this.inQueueFetchTasks.fetchedTasks += currInQueue.length
-          }
+          // Update the number of fetched tasks in the current session
+          this.updateNumberOfFetchedTasks(taskType, currInQueue.length)
 
-          this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
+          // Update the current page in the current session
+          this.updateCurrentPage(taskType)
 
           // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
           // but discarding the ones have been skipped so we don't list them again

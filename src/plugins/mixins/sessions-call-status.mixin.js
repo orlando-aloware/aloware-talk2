@@ -350,6 +350,26 @@ export default {
 
     removeTaskFromList () {
       // TODOs: Remove task from list
+    },
+
+    getSkippedAndActiveTasks () {
+      return [...this.powerDialerTasks.skipped, this.activeTask]
+    },
+
+    updateNumberOfFetchedTasks (taskType, taskCount) {
+      // if the current page is the same as the last page, then we keep the total of fetched tasks the same
+      if (this.powerDialerTaskFilters[taskType].current_page === this.inQueueFetchTasks.currentPage) {
+        this.inQueueFetchTasks.fetchedTasks = taskCount
+      }
+
+      // if the current page is greater than the last page, then we increment the total of fetched tasks
+      if (this.powerDialerTaskFilters[taskType].current_page > this.inQueueFetchTasks.currentPage) {
+        this.inQueueFetchTasks.fetchedTasks += taskCount
+      }
+    },
+
+    updateCurrentPage (taskType) {
+      this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
     }
   }
 }
