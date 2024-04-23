@@ -524,7 +524,7 @@ export default {
 
       // Set the page properly
       const inQueueTaskType = taskType === TaskType.IN_QUEUE
-      let page = inQueueTaskType && this.inQueueFetchTasks ? this.inQueueFetchTasks.currentPage + 1 : this.groupPageFilters[taskType]
+      const page = inQueueTaskType && this.inQueueFetchTasks ? this.inQueueFetchTasks.currentPage + 1 : this.groupPageFilters[taskType]
 
       // Fetch the next page of tasks
       const res = await this.getSessionTaskByFilter({
