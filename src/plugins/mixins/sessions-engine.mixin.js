@@ -76,7 +76,7 @@ export default {
     onStatusFailed (task) {
       const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
       if (contactTask) {
-        let tempSet = new Set([...this.powerDialerTasks['failed'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+        const tempSet = new Set([...this.powerDialerTasks['failed'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
         this.powerDialerTasks['failed'] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
       }
     },
