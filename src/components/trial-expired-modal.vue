@@ -49,27 +49,30 @@
               </div>
 
               <div class="d-flex align-items-center flex-center pt-3">
-                  <button class="btn btn-primary mt-0" @click="openDemo">
+                  <button class="btn btn-primary mt-0"
+                          @click="this.currentCompany.sales_rep ? emailSalesRep : openDemo">
                       Upgrade Now
                   </button>
               </div>
 
-              <div class="d-flex align-items-center flex-center pt-3">
-                <p class="mb-0">Sales Contact:
-                  <strong class="mb-0 text-dark">
-                    {{ this.currentCompany.sales_rep.name }}
-                  </strong>
-                </p>
+              <div class="d-flex align-items-center flex-center pt-3"
+                   v-if="this.currentCompany.sales_rep">
+                  <p class="mb-0">Sales Contact:
+                      <strong class="mb-0 text-dark">
+                          {{ this.currentCompany.sales_rep.name }}
+                      </strong>
+                  </p>
               </div>
-              <div class="d-flex align-items-center flex-center pt-0">
-                <p class="mb-0">Email address:
-                  <strong class="mb-0 text-dark">
-                    <a :href="'mailto:' + this.currentCompany.sales_rep.email"
-                       target="_blank">
-                      {{ this.currentCompany.sales_rep.email }}
-                    </a>
-                  </strong>
-                </p>
+              <div class="d-flex align-items-center flex-center pt-0"
+                   v-if="this.currentCompany.sales_rep">
+                  <p class="mb-0">Email address:
+                      <strong class="mb-0 text-dark">
+                          <a :href="'mailto:' + this.currentCompany.sales_rep.email"
+                             target="_blank">
+                              {{ this.currentCompany.sales_rep.email }}
+                          </a>
+                      </strong>
+                  </p>
               </div>
 
               <div class="d-flex align-items-center flex flex-column pt-3">
@@ -132,7 +135,11 @@ export default {
     },
 
     openDemo () {
-      window.open('mailto:' + this.currentCompany.sales_rep.email, '_blank')
+      window.open('https://meetings.hubspot.com/alwr/aloware-demo', '_blank')
+    },
+
+    emailSalesRep () {
+      window.open('mailto:' + this.current_company.sales_rep.email, '_blank')
     }
   }
 }
