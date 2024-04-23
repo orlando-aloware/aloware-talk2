@@ -331,20 +331,10 @@ export default {
     userPersonalLine () {
       return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
     },
-
-    classicLogOutUrl () {
-      return process.env.API_URL + '?from_talk_2=1&logout=1'
-    },
-
-    logoutLabel () {
-      return localStorage.getItem('impersonate') === 'true' ? 'Stop Impersonating' : 'Logout'
-    }
   },
 
   methods: {
-    ...mapActions('auth', ['logout', 'setProfile']),
-
-    ...mapActions(['resetVuex']),
+    ...mapActions('auth', ['setProfile']),
 
     changeStatus (status) {
       if (this.agentStatus === status) {
@@ -352,12 +342,6 @@ export default {
       }
 
       this.changeAgentStatus(status, false, 1, 'Talk-ChangeStatus')
-    },
-
-    hideMenu () {
-      if (this.$refs && this.$refs.menu) {
-        this.$refs.menu.hide()
-      }
     },
 
     toggleSleepMode () {
@@ -371,25 +355,6 @@ export default {
         this.$handleErrors(err.response)
       })
     },
-
-    logoutAction () {
-      try {
-        this.hideMenu()
-        const isImpersonating = storage.local.getItem('impersonate') === 'true'
-        this.logout()
-          .then(() => {
-            this.resetVuex(['all'])
-            if (isImpersonating) {
-              window.location.href = this.classicLogOutUrl
-            }
-            if (!isImpersonating) {
-              this.$router.push({ name: 'Login' })
-            }
-          })
-      } catch (err) {
-        console.error(err)
-      }
-    }
   }
 }
 </script>

@@ -58,6 +58,10 @@
                           @click="openDemo">
                       Upgrade Now
                   </button>
+                  <button class="btn btn-primary mt-0"
+                          @click="logoutAction">
+                      {{ logoutLabel }}
+                  </button>
               </div>
 
               <div v-if="currentCompany.sales_rep">
