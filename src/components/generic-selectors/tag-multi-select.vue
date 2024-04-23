@@ -45,9 +45,11 @@
       </q-field>
       <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
            :style="height ? `height: ${height}px !important` : ''"
-           v-if="searchList[0].children.length || searchList[1].children.length">
+           v-if="isEdit || searchList[0].children.length || searchList[1].children.length || loadingTags">
         <div v-if="!optionsIsGrouped">
-          <q-infinite-scroll scroll-target=".scrollableArea"
+          <q-infinite-scroll ref="infiniteScroll"
+                             scroll-target=".scrollableArea"
+                             :offset="6"
                              :initial-index="1"
                              @load="getTags">
             <div class="mr-1">
@@ -75,7 +77,7 @@
             </div>
             <template v-slot:loading
                       v-if="loadingTags">
-              <div class="row justify-center q-my-md">
+              <div class="row justify-center q-my-sm">
                 <q-spinner-dots color="primary"
                                 size="20px" />
               </div>
@@ -83,14 +85,16 @@
           </q-infinite-scroll>
         </div>
         <div v-else>
-          <q-infinite-scroll scroll-target=".scrollableArea"
+          <q-infinite-scroll ref="infiniteScroll"
+                             scroll-target=".scrollableArea"
+                             :offset="6"
                              :initial-index="1"
                              @load="getTags">
             <div class="mr-1"
                  :key="`title-${index}`"
                  v-for="(item, index) in searchList">
               <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
-                   :class="[index !== 0 ? 'border-top' : '']">
+                   :class="[index !== 0 && item.children?.length ? 'border-top' : '']">
                 <span class="d-inline-flex align-items-center text-grey-100 w-100"
                       v-if="item.children.length">
                   <span class="tag-text">{{ item.title }}</span>
@@ -118,7 +122,7 @@
             </div>
             <template v-slot:loading
                       v-if="loadingTags">
-              <div class="row justify-center q-my-md">
+              <div class="row justify-center q-my-sm">
                 <q-spinner-dots color="primary"
                                 size="20px" />
               </div>
@@ -309,8 +313,8 @@ export default {
 
     onEdit () {
       this.isEdit = true
-      this.getTags()
       this.$nextTick(() => {
+        this.$refs.infiniteScroll.trigger()
         this.$refs.search.focus()
       })
     },
@@ -357,14 +361,24 @@ export default {
 
         this.page++
         this.hasMorePages = res.data.current_page < res.data.last_page
+
+        if (this.hasMorePages) {
+          done && done()
+        }
       }).catch(err => {
         console.error(err)
       }).finally(() => {
         this.loadingTags = false
-        if (done) {
-          done()
-        }
       })
+    },
+
+    resetTags () {
+      this.page = 1
+      this.hasMorePages = true
+      this.searchList[0].children = []
+      this.searchList[1].children = []
+
+      this.getTags()
     }
   },
 
@@ -376,12 +390,8 @@ export default {
       }
     },
     search: debounce(function (newValue) {
-      if (newValue && newValue.length >= this.threshold) {
-        this.page = 1
-        this.searchList[0].children = []
-        this.searchList[1].children = []
-
-        this.getTags()
+      if ((newValue && newValue.length >= this.threshold) || !newValue.length) {
+        this.resetTags()
       }
     }, 500)
   }
