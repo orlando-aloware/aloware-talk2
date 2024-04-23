@@ -107,9 +107,14 @@
 <script>
 import VueCookies from 'vue-cookies'
 import { mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'trial-expired-modal',
+
+  mixins: [
+    aclMixin
+  ],
 
   props: {
     title: {
@@ -134,7 +139,7 @@ export default {
     },
 
     mailToSalesRep () {
-        return 'mailto:' + this.currentCompany.sales_rep.email;
+        return 'mailto:' + this.currentCompany.sales_rep?.email;
     }
   },
 
