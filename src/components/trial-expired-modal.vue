@@ -71,7 +71,7 @@
                   <div class="d-flex align-items-center flex-center pt-0">
                       <p class="mb-0">Email address:
                           <strong class="mb-0 text-dark">
-                              <a :href="'mailto:' + currentCompany.sales_rep.email"
+                              <a :href="mailToSalesRep"
                                  target="_blank">
                                   {{ currentCompany.sales_rep.email }}
                               </a>
