@@ -68,7 +68,7 @@ export default {
       }
       const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
       if (contactTask) {
-        let tempSet = new Set([...this.powerDialerTasks['called'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+        const tempSet = new Set([...this.powerDialerTasks['called'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
         this.powerDialerTasks['called'] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
       }
       // window.VueEvent.fire('initiate_session', task)
