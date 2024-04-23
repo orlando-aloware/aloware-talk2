@@ -45,34 +45,39 @@
                           </div>
                       </div>
                   </div>
-
               </div>
 
               <div class="d-flex align-items-center flex-center pt-3">
-                  <button class="btn btn-primary mt-0"
-                          @click="this.currentCompany.sales_rep ? emailSalesRep : openDemo">
+                  <button v-if="this.current_company.sales_rep"
+                          class="btn btn-primary mt-0"
+                          @click="emailSalesRep">
+                      Upgrade Now
+                  </button>
+                  <button v-if="!this.current_company.sales_rep"
+                          class="btn btn-primary mt-0"
+                          @click="openDemo">
                       Upgrade Now
                   </button>
               </div>
 
-              <div class="d-flex align-items-center flex-center pt-3"
-                   v-if="this.currentCompany.sales_rep">
-                  <p class="mb-0">Sales Contact:
-                      <strong class="mb-0 text-dark">
-                          {{ this.currentCompany.sales_rep.name }}
-                      </strong>
-                  </p>
-              </div>
-              <div class="d-flex align-items-center flex-center pt-0"
-                   v-if="this.currentCompany.sales_rep">
-                  <p class="mb-0">Email address:
-                      <strong class="mb-0 text-dark">
-                          <a :href="'mailto:' + this.currentCompany.sales_rep.email"
-                             target="_blank">
-                              {{ this.currentCompany.sales_rep.email }}
-                          </a>
-                      </strong>
-                  </p>
+              <div v-if="this.currentCompany.sales_rep">
+                  <div class="d-flex align-items-center flex-center pt-3">
+                      <p class="mb-0">Sales Contact:
+                          <strong class="mb-0 text-dark">
+                              {{ this.currentCompany.sales_rep.name }}
+                          </strong>
+                      </p>
+                  </div>
+                  <div class="d-flex align-items-center flex-center pt-0">
+                      <p class="mb-0">Email address:
+                          <strong class="mb-0 text-dark">
+                              <a :href="'mailto:' + this.currentCompany.sales_rep.email"
+                                 target="_blank">
+                                  {{ this.currentCompany.sales_rep.email }}
+                              </a>
+                          </strong>
+                      </p>
+                  </div>
               </div>
 
               <div class="d-flex align-items-center flex flex-column pt-3">
