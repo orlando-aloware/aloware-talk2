@@ -241,24 +241,10 @@ export default {
             delete this.powerDialerTaskFilters[taskType].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
-              // Get list of processed tasks at this point
-              // (Total of skipped tasks in the current PD session + active task)
-              const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
+              const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
 
-              // The new set of IN QUEUE tasks that are retrieved by the API
-              const currInQueue = [...res.data.data]
-
-              // Update the number of fetched tasks in the current session
-              this.updateNumberOfFetchedTasks(taskType, currInQueue.length)
-
-              // Update the current page in the current session
-              this.updateCurrentPage(taskType)
-
-              // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
-              // but discarding the ones have been skipped so we don't list them again
-              const newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
-              if (newInQueue.length) {
-                this.powerDialerTasks[taskType] = newInQueue
+              if (newInQueueList.length) {
+                this.powerDialerTasks[taskType] = newInQueueList
               }
             } else {
               const retrievedTasks = res.data.data

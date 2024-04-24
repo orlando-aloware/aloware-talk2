@@ -370,6 +370,31 @@ export default {
 
     updateCurrentPage (taskType) {
       this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
+    },
+
+    filterNewInQueueTasks (currentList, taskType, updateFetched = false, updatePagination = false) {
+      // Get list of processed tasks at this point
+      // (Total of skipped tasks in the current PD session + active task)
+      const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
+
+      // The new set of IN QUEUE tasks that are retrieved by the API
+      const currInQueue = [...currentList]
+
+      if (updateFetched) {
+        // Update the number of fetched tasks in the current session
+        this.updateNumberOfFetchedTasks(taskType, currInQueue.length)
+      }
+
+      if (updatePagination) {
+        // Update the current page in the current session
+        this.updateCurrentPage(taskType)
+      }
+
+      // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
+      // but discarding the ones have been skipped so we don't list them again
+      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+
+      return newInQueueList
     }
   }
 }

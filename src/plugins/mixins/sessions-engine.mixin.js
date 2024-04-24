@@ -2,6 +2,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { isEmpty } from 'lodash'
+import * as TaskType from 'src/constants/task-types'
 
 export default {
   data () {
@@ -66,18 +67,23 @@ export default {
       if (isEmpty(task)) {
         return
       }
+
       const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
+
       if (contactTask) {
-        const tempSet = new Set([...this.powerDialerTasks['called'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
-        this.powerDialerTasks['called'] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+        this.addTaskToList(TaskType.CALLED, contactTask)
       }
       // window.VueEvent.fire('initiate_session', task)
     },
     onStatusFailed (task) {
+      if (isEmpty(task)) {
+        return
+      }
+
       const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
+
       if (contactTask) {
-        const tempSet = new Set([...this.powerDialerTasks['failed'], contactTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
-        this.powerDialerTasks['failed'] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+        this.addTaskToList(TaskType.FAILED, contactTask)
       }
     },
     onStatusQueued (task) {
@@ -107,6 +113,11 @@ export default {
         next: false,
         mute: false
       }
+    },
+    addTaskToList (taskType, task) {
+      // Add the task to the specified taskType list, ensuring no duplicates
+      const tempSet = new Set([...this.powerDialerTasks[taskType], task].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+      this.powerDialerTasks[taskType] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
     }
   }
 }

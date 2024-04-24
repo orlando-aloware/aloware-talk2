@@ -455,16 +455,8 @@ export default {
               page: this.inQueueFetchTasks.currentPage
             }))
 
-            // Total of skipped tasks in the current PD session plus the active task
-            const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
-
-            // The new set of IN QUEUE tasks that are retrieved by the API
-            const currInQueue = [...res.data.data]
-
-            // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
-            // but discarding the ones have been skipped so we don't list them again
-            let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
-            this.powerDialerTasks['in_queue'] = newInQueue
+            const newInQueueList = this.filterNewInQueueTasks(res.data.data, TaskType.IN_QUEUE, false, false)
+            this.powerDialerTasks[TaskType.IN_QUEUE] = newInQueueList
           }
         }
 
@@ -494,16 +486,8 @@ export default {
             page: this.inQueueFetchTasks.currentPage
           }))
 
-          // Total of skipped tasks in the current PD session plus the active task
-          const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
-
-          // The new set of IN QUEUE tasks that are retrieved by the API
-          const currInQueue = [...response.data.data]
-
-          // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
-          // but discarding the ones have been skipped so we don't list them again
-          let newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
-          this.powerDialerTasks['in_queue'] = newInQueue
+          const newInQueueList = this.filterNewInQueueTasks(response.data.data, TaskType.IN_QUEUE, false, false)
+          this.powerDialerTasks[TaskType.IN_QUEUE] = newInQueueList
 
           this.$generalNotification(res.data.message)
           this.isDeleting = false
@@ -539,24 +523,10 @@ export default {
         delete this.powerDialerTaskFilters[taskType].data
 
         if (inQueueTaskType) {
-          // Get list of processed tasks at this point
-          // (Total of skipped tasks in the current PD session + active task)
-          const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
+          const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
 
-          // The new set of IN QUEUE tasks that are retrieved by the API
-          const currInQueue = [...res.data.data]
-
-          // Update the number of fetched tasks in the current session
-          this.updateNumberOfFetchedTasks(taskType, currInQueue.length)
-
-          // Update the current page in the current session
-          this.updateCurrentPage(taskType)
-
-          // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
-          // but discarding the ones have been skipped so we don't list them again
-          const newInQueue = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
-          if (newInQueue.length) {
-            this.powerDialerTasks[taskType] = [...this.powerDialerTasks[taskType], ...newInQueue]
+          if (newInQueueList.length) {
+            this.powerDialerTasks[taskType] = [...this.powerDialerTasks[taskType], ...newInQueueList]
           }
         } else {
           // Add the list of retrieved tasks to the current list, this is for all but IN QUEUE tasks
