@@ -224,9 +224,9 @@ export default {
 
         // Check if the number of tasks in the IN QUEUE list is equal
         // to the minimum number of tasks required to check/increment the page for pagination
-        const lastItemsInCurrentQueue = this.powerDialerTasks['in_queue'].length === this.minNumberOfInQueueTasks
-        const hasSkippedTasks = this.powerDialerTasks['skipped'].length > 0
-        const remainingInQueueTasks = this.powerDialerTaskFilters['in_queue'] ? this.powerDialerTaskFilters['in_queue'].total_queued > this.inQueueFetchTasks.fetchedTasks : false
+        const lastItemsInCurrentQueue = this.powerDialerTasks[TaskType.IN_QUEUE].length === this.minNumberOfInQueueTasks
+        const hasSkippedTasks = this.powerDialerTasks[TaskType.SKIPPED].length > 0
+        const remainingInQueueTasks = this.powerDialerTaskFilters[TaskType.IN_QUEUE] ? this.powerDialerTaskFilters[TaskType.IN_QUEUE].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
         // Increment the pagination when the last items in the current list of IN QUEUE taks are reached
         // AND we have skipped tasks, so we need to fetch the next page of IN QUEUE tasks.
