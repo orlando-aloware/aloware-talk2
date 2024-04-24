@@ -480,6 +480,9 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
     case 'updated':
       colorClass.data = 'bg-blue-10'
       break
+    case 'warning':
+      colorClass.data = 'bg-orange-2'
+      break
     case 'deleted':
     case 'error':
       colorClass.data = 'bg-red-10'

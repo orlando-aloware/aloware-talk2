@@ -10,6 +10,85 @@
           </div>
         </b-col>
       </b-form-row>
+      <b-form-row class="mt-4"
+                  :id="`${SettingsMap.notifications_channel.hash_keyword}-container`">
+        <b-col sm="12"
+               md="12">
+          <div>
+            <h5 class="form-label">Notification Channels</h5>
+            <p class="form-helper-text">Choose what channels you want this user to get notified on.</p>
+          </div>
+
+          <b-form-group label=""
+                        :id="`${SettingsMap.inAppNotifications.hash_keyword}-container`">
+            <b-form-checkbox switch
+                             v-model="inAppNotifications"
+                             @change="eventPayload => onUpdateFields(eventPayload, 'inAppNotifications')">
+              In-App
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group label=""
+                        :id="`${SettingsMap.desktopNotifications.hash_keyword}-container`">
+            <b-form-checkbox switch
+                             v-model="desktopNotifications"
+                             @change="eventPayload => onUpdateFields(eventPayload, 'desktopNotifications')">
+              Desktop
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group label=""
+                        :id="`${SettingsMap.mobileNotifications.hash_keyword}-container`">
+            <b-form-checkbox switch
+                             v-model="mobileNotifications"
+                             @change="eventPayload => onUpdateFields(eventPayload, 'mobileNotifications')">
+              Mobile
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group label=""
+                        :id="`${SettingsMap.emailNotifications.hash_keyword}-container`">
+            <b-form-checkbox switch
+                             v-model="emailNotifications"
+                             @change="eventPayload => onUpdateFields(eventPayload, 'emailNotifications')">
+              Email
+            </b-form-checkbox>
+          </b-form-group>
+
+          <b-form-group label=""
+                        :id="`${SettingsMap.textNotifications.hash_keyword}-container`">
+            <b-form-checkbox switch
+                             v-model="textNotifications"
+                             @change="eventPayload => onUpdateFields(eventPayload, 'textNotifications')">
+              Text Message
+            </b-form-checkbox>
+          </b-form-group>
+          <hr v-if="textNotifications"/>
+
+          <b-form-group class="form-label"
+                        v-if="textNotifications">
+            <b-form-checkbox switch
+                             :value="true"
+                             :unchecked-value="false"
+                             v-model="setCustomNotificationPhoneNumber"
+                             @change="onChangeCustomNotificationPhoneNumber">
+              Send text to custom number
+            </b-form-checkbox>
+          </b-form-group>
+          <b-form-group class="form-label"
+                        v-if="textNotifications && setCustomNotificationPhoneNumber">
+            <b-form-input type="text"
+                          ref="notificationPhoneNumberInput"
+                          placeholder="(123) 456-7890"
+                          :state="validateState('notification_phone_number')"
+                          v-model.trim="$v.user.notification_phone_number.$model"
+                          @input="eventPayload => onUpdateFields(eventPayload, 'notification_phone_number')">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter phone number.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
       <b-form-row class="mt-4">
         <b-col sm="12" md="12">
           <div>
@@ -18,74 +97,113 @@
           </div>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_calls.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myCalls"
-                             :value="true"
-                             :unchecked-value="false"
+                             :disabled="isCommunicationNotificationsDisabled"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myCalls')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               Call to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_texts.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myTexts"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myTexts')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               Text message to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_voicemail.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myVoicemails"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myVoicemails')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               Voicemail to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_faxes.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myFaxes"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myFaxes')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               Fax to personal line
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_mentions.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myMentions"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myMentions')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               When this user is mentioned
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_contacts.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myContacts"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myContacts')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               When a contact is assigned to this user
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
                         :id="`${SettingsMap.my_appointments.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myAppointments"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myAppointments')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               When an appointment is assigned to this user
             </b-form-checkbox>
           </b-form-group>
 
-          <b-form-group label="" :id="`${SettingsMap.my_reminders.hash_keyword}-container`">
+          <b-form-group label=""
+                        :class="{ 'cursor-blocked': isCommunicationNotificationsDisabled }"
+                        :id="`${SettingsMap.my_reminders.hash_keyword}-container`">
             <b-form-checkbox switch
+                             :disabled="isCommunicationNotificationsDisabled"
                              v-model="myReminders"
                              @change="eventPayload => onUpdateFields(eventPayload, 'myReminders')">
+              <q-tooltip v-if="isCommunicationNotificationsDisabled">
+                {{ isCommunicationNotificationsDisabledTooltipText }}
+              </q-tooltip>
               When a reminder is assigned to this user
             </b-form-checkbox>
           </b-form-group>
@@ -255,81 +373,6 @@
           </b-col>
         </b-form-row>
       </div>
-
-      <b-form-row class="mt-4"
-                  :id="`${SettingsMap.notifications_channel.hash_keyword}-container`">
-        <b-col sm="12"
-               md="12">
-          <div>
-            <h5 class="form-label">Notification Channels</h5>
-            <p class="form-helper-text">Choose what channels you want this user to get notified on.</p>
-          </div>
-
-          <b-form-group label="" :id="`${SettingsMap.inAppNotifications.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="inAppNotifications"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'inAppNotifications')">
-              In-App
-            </b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.desktopNotifications.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="desktopNotifications"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'desktopNotifications')">
-              Desktop
-            </b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.mobileNotifications.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="mobileNotifications"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'mobileNotifications')">
-              Mobile
-            </b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.emailNotifications.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="emailNotifications"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'emailNotifications')">
-              Email
-            </b-form-checkbox>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.textNotifications.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="textNotifications"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'textNotifications')">
-              Text Message
-            </b-form-checkbox>
-          </b-form-group>
-          <hr v-if="textNotifications"/>
-
-          <b-form-group v-if="textNotifications"
-                        class="form-label">
-            <b-form-checkbox switch
-                             :value="true"
-                             :unchecked-value="false"
-                             v-model="setCustomNotificationPhoneNumber"
-                             @change="onChangeCustomNotificationPhoneNumber">
-              Send text to custom number
-            </b-form-checkbox>
-          </b-form-group>
-          <b-form-group class="form-label"
-                        v-if="textNotifications && setCustomNotificationPhoneNumber">
-            <b-form-input type="text"
-                          ref="notificationPhoneNumberInput"
-                          placeholder="(123) 456-7890"
-                          :state="validateState('notification_phone_number')"
-                          v-model.trim="$v.user.notification_phone_number.$model"
-                          @input="eventPayload => onUpdateFields(eventPayload, 'notification_phone_number')">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter phone number.</b-form-invalid-feedback>
-            <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
-      </b-form-row>
     </b-form>
   </b-container>
 </template>
@@ -360,12 +403,15 @@ export default {
     isCompanyAdmin () {
       return this.user.role_names.includes('Company Admin')
     },
+
     isBillingAdmin () {
       return this.user.role_names.includes('Billing Admin')
     },
+
     hasAdminRole () {
       return this.user && (this.isCompanyAdmin || this.isBillingAdmin)
     },
+
     rules () {
       const rulesObject = { data: {} }
 
@@ -393,6 +439,10 @@ export default {
       }
 
       return rulesObject.data
+    },
+
+    isCommunicationNotificationsDisabled () {
+      return !this.inAppNotifications && !this.desktopNotifications && !this.mobileNotifications && !this.emailNotifications && !this.textNotifications
     }
   },
 
@@ -452,6 +502,7 @@ export default {
       mobileNotifications: false,
       textNotifications: false,
       shouldObserve: false,
+      isCommunicationNotificationsDisabledTooltipText: 'To enable Communication Notifications, you should enable at least one of the Notification Channels: In-App, Desktop, Mobile, Email, or Text Message.',
       SettingsMap
     }
   },
@@ -482,6 +533,10 @@ export default {
   methods: {
     ...mapActions('settings', ['updateChangedUserProperties', 'setFormValidity']),
     onUpdateFields (value, prop) {
+      if (this.isCommunicationNotificationsDisabled) {
+        this.resetCommunicationFlags()
+      }
+
       if (!['shouldObserve', 'myCalls', 'myTexts', 'myVoicemails', 'myContacts', 'myAppointments', 'myFaxes', 'myReminders', 'myMentions'].includes(prop)) {
         this.user[prop] = value
         this.updateChangedUserProperties({
@@ -576,30 +631,23 @@ export default {
       }
 
       this.updateFormValidity()
-    }
-  },
+    },
 
-  mounted () {
-    this.shouldObserve = !!this.user.observing_campaigns.length
+    resetCommunicationFlags () {
+      const fields = ['myCalls', 'myTexts', 'myVoicemails', 'myContacts', 'myAppointments', 'myReminders', 'myFaxes', 'myMentions']
 
-    this.setCustomNotificationPhoneNumber = !!this.user.notification_phone_number
+      fields.forEach((field) => {
+        this[field] = false
+        this.updateChangedUserProperties({
+          name: field,
+          value: false
+        })
+      })
 
-    this.myCalls = this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs
-    this.myTexts = this.user.texts_inapp_notifs || this.user.texts_desktop_notifs || this.user.texts_push_notifs || this.user.texts_email_notifs || this.user.texts_text_notifs
-    this.myVoicemails = this.user.voicemails_inapp_notifs || this.user.voicemails_desktop_notifs || this.user.voicemails_push_notifs || this.user.voicemails_email_notifs || this.user.voicemails_text_notifs
-    this.myContacts = this.user.contacts_inapp_notifs || this.user.contacts_desktop_notifs || this.user.contacts_push_notifs || this.user.contacts_email_notifs || this.user.contacts_text_notifs
-    this.myAppointments = this.user.appointments_inapp_notifs || this.user.appointments_desktop_notifs || this.user.appointments_push_notifs || this.user.appointments_email_notifs
-    this.myReminders = this.user.reminders_inapp_notifs || this.user.reminders_desktop_notifs || this.user.reminders_push_notifs || this.user.reminders_email_notifs
-    this.myFaxes = this.user.faxes_inapp_notifs || this.user.faxes_desktop_notifs || this.user.faxes_push_notifs || this.user.faxes_email_notifs || this.user.faxes_text_notifs
-    this.myMentions = this.user.mentions_inapp_notifs || this.user.mentions_desktop_notifs || this.user.mentions_push_notifs || this.user.mentions_email_notifs || this.user.mentions_text_notifs
+      this.$generalNotification('Please enable at least one Notification Channel to be able to enable Communication Notifications.', 'warning')
+    },
 
-    this.inAppNotifications = this.user.calls_inapp_notifs || this.user.texts_inapp_notifs || this.user.voicemails_inapp_notifs || this.user.contacts_inapp_notifs || this.user.appointments_inapp_notifs || this.user.reminders_inapp_notifs || this.user.faxes_inapp_notifs || this.user.mentions_inapp_notifs
-    this.desktopNotifications = this.user.calls_desktop_notifs || this.user.texts_desktop_notifs || this.user.voicemails_desktop_notifs || this.user.contacts_desktop_notifs || this.user.appointments_desktop_notifs || this.user.reminders_desktop_notifs || this.user.faxes_desktop_notifs || this.user.mentions_desktop_notifs
-    this.mobileNotifications = this.user.calls_push_notifs || this.user.texts_push_notifs || this.user.voicemails_push_notifs || this.user.contacts_push_notifs || this.user.appointments_push_notifs || this.user.reminders_push_notifs || this.user.faxes_push_notifs || this.user.mentions_push_notifs
-    this.emailNotifications = this.user.calls_email_notifs || this.user.texts_email_notifs || this.user.voicemails_email_notifs || this.user.contacts_email_notifs || this.user.appointments_email_notifs || this.user.reminders_email_notifs || this.user.faxes_email_notifs || this.user.mentions_email_notifs
-    this.textNotifications = this.user.calls_text_notifs || this.user.texts_text_notifs || this.user.voicemails_text_notifs || this.user.contacts_text_notifs || this.user.faxes_text_notifs || this.user.mentions_text_notifs
-
-    this.$VueEvent.listen('resetSettingsForm', () => {
+    resetSettingsForm () {
       this.myCalls = this.user.calls_inapp_notifs || this.user.calls_desktop_notifs || this.user.calls_push_notifs || this.user.calls_email_notifs || this.user.calls_text_notifs
       this.myTexts = this.user.texts_inapp_notifs || this.user.texts_desktop_notifs || this.user.texts_push_notifs || this.user.texts_email_notifs || this.user.texts_text_notifs
       this.myVoicemails = this.user.voicemails_inapp_notifs || this.user.voicemails_desktop_notifs || this.user.voicemails_push_notifs || this.user.voicemails_email_notifs || this.user.voicemails_text_notifs
@@ -614,7 +662,16 @@ export default {
       this.mobileNotifications = this.user.calls_push_notifs || this.user.texts_push_notifs || this.user.voicemails_push_notifs || this.user.contacts_push_notifs || this.user.appointments_push_notifs || this.user.reminders_push_notifs || this.user.faxes_push_notifs || this.user.mentions_push_notifs
       this.emailNotifications = this.user.calls_email_notifs || this.user.texts_email_notifs || this.user.voicemails_email_notifs || this.user.contacts_email_notifs || this.user.appointments_email_notifs || this.user.reminders_email_notifs || this.user.faxes_email_notifs || this.user.mentions_email_notifs
       this.textNotifications = this.user.calls_text_notifs || this.user.texts_text_notifs || this.user.voicemails_text_notifs || this.user.contacts_text_notifs || this.user.faxes_text_notifs || this.user.mentions_text_notifs
+    }
+  },
 
+  mounted () {
+    this.shouldObserve = !!this.user.observing_campaigns.length
+    this.setCustomNotificationPhoneNumber = !!this.user.notification_phone_number
+    this.resetSettingsForm()
+
+    this.$VueEvent.listen('resetSettingsForm', () => {
+      this.resetSettingsForm()
       this.user.notification_phone_number = this.userClone.notification_phone_number
       this.setCustomNotificationPhoneNumber = !!this.user.notification_phone_number
     })

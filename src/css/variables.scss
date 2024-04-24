@@ -138,6 +138,20 @@ $purple-40: #EEE3FB;
 $purple-10: #F7F1FD;
 $purple-9: #F6F1FC;
 
+// yellow
+$yellow-10: #f47f16;
+$yellow-9: #F9A925;
+$yellow-8: #FBC02d;
+$yellow-7: #FDD836;
+$yellow-6: #FFEb3b;
+$yellow-5: #FFEE58;
+
+// amber
+$amber-4: #FFD54E;
+
+// orange
+$orange-2: #FFE0B1;
+
 // black
 $black: $grey-100;
 
@@ -209,6 +223,14 @@ $primary-hover: #054CDB;
 @include bg-color('primary', $primary, true);
 @include bg-color('purple-100', $purple-100, true);
 @include bg-color('red-9', $red-9, true);
+@include bg-color('yellow-10', $yellow-10, true);
+@include bg-color('yellow-9', $yellow-9, true);
+@include bg-color('yellow-8', $yellow-8, true);
+@include bg-color('yellow-7', $yellow-7, true);
+@include bg-color('yellow-6', $yellow-6, true);
+@include bg-color('yellow-5', $yellow-5, true);
+@include bg-color('amber-4', $amber-4, true);
+@include bg-color('orange-2', $orange-2, true);
 
 
 .bg-primary {
