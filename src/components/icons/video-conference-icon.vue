@@ -3,6 +3,7 @@
        fill="none"
        xmlns="http://www.w3.org/2000/svg"
        :width="width"
+       data-testid="video-conference-icon-svg"
        :height="height">
     <path fill-rule="evenodd"
           clip-rule="evenodd"

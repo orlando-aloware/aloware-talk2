@@ -25,20 +25,25 @@
         <template v-if="isContacts && !isAddView">
           <div class="items"
                v-if="false">
-            <a href="#" disabled>
+            <a href="#"
+               disabled
+               data-testid="bulk-action-menu-enroll-in-sequence-link">
               <i class="fa fa-layer-group"></i>
               Enroll in Sequence
             </a>
           </div>
           <div class="items"
                v-if="false">
-            <a href="#" disabled>
+            <a href="#"
+               disabled
+               data-testid="bulk-action-menu-power-dialer-link">
               <i class="fa fa-crosshairs"></i>
               Power Dialer
             </a>
           </div>
           <div class="items">
             <a href=""
+               data-testid="bulk-action-menu-add-to-static-list-link"
                @click="onAddToStaticList">
               <i class="fa fa-user-plus"></i>
               Add to Static List
@@ -46,6 +51,7 @@
           </div>
           <div class="items">
             <a href=""
+               data-testid="bulk-action-menu-create-static-list-link"
                @click="onCreateStaticList">
               <i class="fa fa-plus"></i>
               Create Static List
@@ -56,6 +62,7 @@
              v-if="!isAddView">
           <a href=""
              class="text-danger"
+             data-testid="bulk-action-menu-delete-link"
              :disabled="disabledDelete"
              v-if="hasDeletePermission && canDelete"
              @click="onDelete">
@@ -69,12 +76,14 @@
          v-if="isCheckboxAllChecked">
       {{ checkedCount | numFormat }} contacts on this page selected.&nbsp;
       <a href=""
+         data-testid="bulk-action-menu-select-all-link"
          v-if="canSelectAll"
          @click.prevent="onClickAll">
           Select all {{ totalRows | numFormat }} contacts.
           <slot name="checkall-tooltip"/>
       </a>
       <a href=""
+         data-testid="bulk-action-menu-clear-link"
          v-if="isAllSelected && !isDatatableCountLoading"
          @click.prevent="onClearAll">
         Clear selection

@@ -1,7 +1,7 @@
 @Library('jenkins-shared-libraries')_
 pipeline {
     agent {
-        label 'runner'
+        label 'runner2'
     }
 
     options {
@@ -10,13 +10,14 @@ pipeline {
 
     environment {
         DEV_DOMAIN = 'alodev.org'
-        NODE_MODULES_PATH = '/cached_modules/npm/talk2/node_modules'
         TERRAFORM_REPO = 'terraform-groundwork'
         TALK2_REPO = 'aloware-talk2'
         GITHUB_ORG = 'aloware'
         GIT_AUTH = credentials('jenkins-github-user')
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
+        NODE_VERSION = '20'
+        NODE_MODULES_PATH = '/cached_modules/npm/${NODE_VERSION}/talk2/node_modules'
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -28,6 +29,14 @@ pipeline {
             steps {
                 script {
                     notificationSender.sendSlackInfo()
+                }
+            }
+        }
+
+        stage('Setup environment') {
+            steps {
+                nvm("${NODE_VERSION}") {
+                    sh 'npm i -g yarn'
                 }
             }
         }
@@ -62,15 +71,30 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
-                sh 'sudo npm i -g yarn'
-                sh 'yarn install'
+                nvm("${NODE_VERSION}") {
+                    sh 'yarn install'
+                }
             }
         }
 
         stage('Build Talk2 Assets') {
             when { not { branch 'master' } }
             steps {
-                sh 'quasar build --debug'
+                nvm("${NODE_VERSION}") {
+                    sh 'quasar build --debug'
+                }
+            }
+        }
+        
+        stage('Sonar Analysis') {
+            steps {
+                script {
+                    sh 'git rev-parse --abbrev-ref HEAD'
+                    def scannerHome = tool 'SonarQube Tool';
+                    withSonarQubeEnv('Sonar') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
             }
         }
 

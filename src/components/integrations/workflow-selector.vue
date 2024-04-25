@@ -13,13 +13,14 @@
               :options="options"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="selectedId"
+              data-testid="workflow-selector"
               @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
               @filter="filterFn">
       <template v-slot:append>
-        <b-button size="sm" variant="light" @click.stop="getWorkflows">
+        <b-button data-testid="workflow-selector-button" size="sm" variant="light" @click.stop="getWorkflows">
           <i v-if="!isLoadingWorkflow" class="fa fa-redo-alt"></i>
           <b-spinner v-if="isLoadingWorkflow" variant="success" label="Spinning" small></b-spinner>
         </b-button>

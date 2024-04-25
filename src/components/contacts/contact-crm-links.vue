@@ -1,9 +1,10 @@
 <template>
-  <div class="contact-crm-integrations-wrapper contact-integration-wrapper">
+  <div class="contact-crm-integrations-wrapper contact-integration-wrapper" data-testid="contact-crm-links-wrapper">
     <b-link class="md-btn md-raised white integrations-link d-flex"
             target="_blank"
             :href="integration.link"
             :key="integration.name"
+            data-testid="contact-crm-link"
             v-for="integration in activeCrmIntegrations">
       <div class="integrations-logo mr-3" :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></div>
       <span class="integration-title">{{ integration.label }}</span>

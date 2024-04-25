@@ -1,5 +1,6 @@
 <template>
   <div class="contact-save-bar-wrapper d-flex w-100"
+       data-testid="contact-save-bar-wrapper"
        :class="contentClass"
        v-if="isVisible">
     <span class="label">
@@ -11,6 +12,7 @@
                 size="sm"
                 variant="outline-primary"
                 :disabled="isBusy"
+                data-testid="cancel-button"
                 @click="onCancel">
         Cancel
       </b-button>
@@ -18,6 +20,7 @@
                 size="sm"
                 variant="primary"
                 :disabled="isBusy || isDisposing"
+                data-testid="save-button"
                 @click="onSave">
         <q-spinner-bars v-if="isBusy || isDisposing" color="white" />
         {{ saveButtonLabel }}

@@ -9,9 +9,11 @@
          @scroll="handleScroll">
 
       <table ref="table"
+             data-testid="datatable-table"
              :class="tableClass">
-        <thead>
+        <thead data-testid="datatable-header">
           <draggable class="dragable-header"
+                     data-testid="datatable-draggable-header"
                      tag="tr"
                      ghost-class="ghost"
                      handle=".handle"
@@ -20,6 +22,7 @@
                      @change="onOrderChanged">
 
             <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
+                :data-testid="`datatable-header-${column.name.replace('_', '-')}`"
                 :key="column.name"
                 :data-column-id="column.name"
                 :id="`cols-${column.name}`"
@@ -61,12 +64,14 @@
                    href="#"
                    :class="getSorterClass(column.name)"
                    v-if="column.sortable"
+                   :data-testid="`datatable-sorter-${column.name.replace('_', '-')}`"
                    @click.prevent="onColumnSort(column)">
                 </a>
                 </div>
                 <div class="tableResizer"
                      :data-resizer-id="column.name"
                      v-if="column.resizable"
+                     :data-testid="`datatable-resizer-${column.name.replace('_', '-')}`"
                      @mousedown="onResizerMouseDown">
                   {{ column.label }}
                 </div>
@@ -76,7 +81,7 @@
           </draggable>
         </thead>
 
-        <tbody>
+        <tbody data-testid="datatable-body">
           <slot name="tbody" />
         </tbody>
       </table>
@@ -109,6 +114,7 @@
                     boundary-links
                     direction-links
                     dense
+                    data-testid="datatable-pagination"
                     :max="lastPage"
                     :max-pages="maxPaginationPages"
                     :ellipses="false"
@@ -122,6 +128,7 @@
                 outlined
                 dense
                 emit-value
+                data-testid="datatable-per-page-select"
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`"
                 v-model="perPage" />

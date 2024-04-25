@@ -5,24 +5,28 @@
                 variant="light"
                 size="sm"
                 v-if="!$q.screen.lt.md"
+                data-testid="contact-list-sidebar-toggle"
                 @click="onSidebarToggle">
         <i class="material-icons">{{ isExpanded ? 'keyboard_arrow_left' : 'keyboard_arrow_right' }}</i>
       </b-button>
       <b-card class="no-border position-relative h-100"
               no-body
+              data-testid="contact-list-sidebar-card"
               @scroll="handScroll">
         <b-list-group class="p-2 pr-2">
             <contact-list-sidebar-item :class="[isSelected(item) ? 'router-link-exact-active router-link-active' : '']"
                                        :key="item.id"
                                        v-for="(item, index) in fixedContactsData.data"
                                        v-model="fixedContactsData.data[index]"
+                                       data-testid="contact-list-sidebar-item"
                                        @itemSelected="onSidebarToggleMobile(item)"/>
         </b-list-group>
         <div class="relative py-4">
           <b-overlay rounded="sm"
+                     data-testid="contact-list-sidebar-overlay"
                      :show="isLoadingMore">
             <template #overlay>
-              <q-spinner-bars color="primary"/>
+              <q-spinner-bars data-testid="contact-list-sidebar-spinner-bars" color="primary"/>
             </template>
           </b-overlay>
         </div>

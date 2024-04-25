@@ -3,6 +3,7 @@
                     expand-icon-toggle
                     label="My Lists"
                     icon="perm_identity"
+                    data-testid="my-lists-sidebar-expansion-item"
                     :class="`contact-sidebar-list-wrapper my-lists ${isContactModuleType ? '' : 'hide-toggle'}`">
     <template v-slot:header>
       <q-item-section>
@@ -13,12 +14,14 @@
             <button class="btn btn-link btn-sm tooltip-target mr-1"
                     :id="folderId"
                     :ref="folderId"
+                    data-testid="contacts-folder-destroy-submenu-btn"
                     @click="destroySubmenu">
               <plus-icon color="#256EFF"
                           width="14"
                           height="14"
                           firstD="M7 1.5V12.5"
                           secondD="M12.5 7H1.5"
+                          data-testid="contacts-folder-plus-icon"
                           strokeWidth="1.5" />
             </button>
 
@@ -29,25 +32,27 @@
                         :target="folderId">
               <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
-                <contact-menu-item @click="onCreateFolderToggle($event)">
+                <contact-menu-item @click="onCreateFolderToggle($event)" data-testid="create-folder-toggle-menu-item">
                   <template slot="icon">
-                    <folder-icon color="#62666E"></folder-icon>
+                    <folder-icon color="#62666E" data-testid="contacts-folder-icon"></folder-icon>
                   </template>
-                  <template slot="title">
+                  <template slot="title" data-testid="contacts-folder-text">
                     <span>Folder</span>
                   </template>
                 </contact-menu-item>
 
                 <contact-menu-item v-if="isContactModuleType"
+                                    data-testid="create-list-menu-item"
                                     @click="onCreateList($event)">
                   <template slot="icon">
-                    <people-icon></people-icon>
+                    <people-icon data-testid="contacts-people-icon"></people-icon>
                   </template>
-                  <template slot="title">
+                  <template slot="title" data-testid="contacts-list-text">
                     <span>List</span>
                   </template>
                 </contact-menu-item>
                 <contact-menu-item v-else
+                                    data-testid="contacts-create-destroy-submenu"
                                     @mouseover="createSubmenu"
                                     @mouseleave="destroySubmenu">
                   <template slot="icon">
@@ -59,6 +64,7 @@
                   <template slot="suffix">
                     <span :id="'folder-submenu-' + rootFolderId"
                           class="submenu-icon"
+                          data-testid="contacts-folder-create-submenu-click"
                           @click="createSubmenu">
                       <FolderArrowCloseIcon color="#62666E" />
                     </span>
@@ -68,11 +74,13 @@
                 <div class="folder-submenu-items extended"
                       :id="'folder-submenu-items-' + rootFolderId"
                       :class="{ 'd-flex': isMenuOpen }"
+                      data-testid="contacts-folder-create-submenu-mouseover"
                       @mouseleave="{}"
                       @mouseover="createSubmenu">
 
                   <contact-menu-item style="padding:0 !important"
-                                      @click="onCreateFromExistingList">
+                                     data-testid="contacts-folder-create-from-existing-list"
+                                     @click="onCreateFromExistingList">
                     <template slot="title">
                       <span class="create-item"
                             style="width:100%;padding:10px;">
@@ -81,7 +89,7 @@
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item @click="onCreateByManualSelection">
+                  <contact-menu-item data-testid="create-new-list-by-manual-selection" @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">
                         Create new list &amp; select contacts
@@ -89,6 +97,7 @@
                     </template>
                   </contact-menu-item>
                   <contact-menu-item v-if="isIntegrationEnabled"
+                                     data-testid="create-from-integration"
                                      @click="onCreateFromIntegration">
                     <template slot="title">
                       <span class="create-item">
@@ -112,6 +121,7 @@
                             :parent_id="null"
                             :endpoint="foldersEndpoint"
                             v-if="isCreatingFolder"
+                            data-testid="contacts-create-folder-toggle"
                             @blur="onCreateFolderToggle($event)"
                             @cancel="onCreateFolderCancel"/>
         <template v-if="foldersLength && !isLoading">
@@ -126,6 +136,7 @@
                           :folders="folder.child_folders"
                           :lists="folder.lists"
                           :layer="0"
+                          data-testid="create-tree-folder-component"
                           v-if="folder.id !== removedFolder"/>
           </template>
           <tree-folder :name="folders[0].name"
@@ -140,12 +151,13 @@
                         :layer="0"
                         :parent_id="null"
                         v-if="folders[0].id !== removedFolder"
+                        data-testid="create-tree-folder-toggle"
                         @blur="onCreateFolderToggle($event)"
                         @cancel="onCreateFolderCancel"/>
         </template>
         <div class="item-empty"
               v-if="isFolderEmpty && !isLoading">
-          <span class="fs-12 text-muted">
+          <span class="fs-12 text-muted" data-testid="my-lists-without-contacts">
             You don't have any {{ isContactModuleType ? 'contact' : 'power dialer' }} list
           </span>
         </div>

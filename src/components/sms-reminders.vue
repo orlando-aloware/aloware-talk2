@@ -17,6 +17,7 @@
                   option-value="id"
                   option-label="name"
                   v-model="selectedId"
+                  data-testid="sms-reminders-selector"
                   :options="options"
                   @filter="filterFn"
                   @focus="onFocus"
@@ -24,7 +25,7 @@
                   @input="onInput">
           <template v-slot:no-option>
             <q-item>
-              <q-item-section class="no-results text-grey">
+              <q-item-section class="no-results text-grey" data-testid="sms-reminders-item-section">
                 No results
               </q-item-section>
             </q-item>
@@ -40,6 +41,7 @@
                :loading="loading"
                :disable="loading"
                v-if="recentShowSendSmsReminderButton"
+               data-testid="send-sms-reminder-button"
                @click="sendDefaultSmsReminder">
           <div class="mx-2 px-1 text-nowrap">
             Send SMS Reminder

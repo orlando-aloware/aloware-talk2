@@ -170,17 +170,6 @@ export default _.merge({
       switch (this.usage?.plan?.use_case) {
         case 'iPro':
           blockedAccess = [
-            'line cnam',
-            'line triggers',
-            'line advanced settings',
-            'line external forwarding',
-            'ring group advanced queue settings',
-            'integrations sequences api',
-            'integrations number lookup api',
-            'integrations sms api',
-            'integrations rvm api',
-            'integrations two-legged call api',
-            'integrations hubspot workflows',
             'barge & whisper'
           ]
           break

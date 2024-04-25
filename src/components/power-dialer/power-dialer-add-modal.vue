@@ -5,32 +5,37 @@
              no-close-on-backdrop
              no-close-on-esc
              v-model="isOpen"
+             data-testid="power-dialer-add-modal"
              @hidden="onHidden">
         <template #modal-title>
             <h2>Power Dialer Task Options</h2>
         </template>
         <q-card class="my-card"
+                data-testid="power-dialer-add-modal-card"
                 flat>
-            <b-overlay :show="loading > 0">
-                <div>
+            <b-overlay :show="loading > 0"  data-testid="power-dialer-add-modal-overlay">
+                <div  data-testid="power-dialer-add-modal-converting-message">
                     You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
                 </div>
 
                 <hr>
 
-                <label class="label mb-1 text-weight-bold">
+                <label class="label mb-1 text-weight-bold"  data-testid="power-dialer-add-modal-conversion-options">
                     Conversion Options
                 </label>
                 <b-form-checkbox class="mb-2"
                                  :value="option.value"
                                  :key="option.value"
                                  v-model="conversion"
+                                 data-testid="power-dialer-add-modal-conversion-checkbox"
                                  v-for="option in conversionOptions">
                     {{ option.text }}
                     <information-circle-icon color="#2F80ED"
+                                             data-testid="power-dialer-add-modal-circle-icon"
                                              v-if="option.helper"/>
                     <q-tooltip anchor="top middle"
                                self="bottom middle"
+                               data-testid="power-dialer-add-modal-helper-tooltip"
                                v-if="option.helper">
                         {{ option.helper }}
                     </q-tooltip>
@@ -48,6 +53,7 @@
                               spread
                               unelevated
                               :options="directionOptions"
+                              data-testid="power-dialer-add-modal-direction-toggle"
                               v-model="direction"/>
 
                 <hr>
@@ -59,6 +65,7 @@
                               :value="option.value"
                               :key="option.value"
                               v-model="where"
+                              data-testid="power-dialer-add-modal-where-radio"
                               v-for="option in whereOptions">
                     {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
                 </b-form-radio>
@@ -69,6 +76,7 @@
                              :masks="masks"
                              :popover="popover_config"
                              v-model="schedule"
+                             data-testid="power-dialer-add-modal-date-picker"
                              v-if="where === 'scheduled'">
                     <template v-slot="{ inputValue, inputEvents }">
                         <div class="ml-4 text-sm">
@@ -79,6 +87,7 @@
                             <input class="px-2 py-1 border rounded text-grey"
                                    style="width: 155px"
                                    :value="inputValue"
+                                   data-testid="power-dialer-add-modal-date-picker-input"
                                    v-on="inputEvents"/>
                         </div>
                     </template>
@@ -87,6 +96,7 @@
                 <b-button class="btn-block mt-4"
                           variant="primary"
                           size="sm"
+                          data-testid="power-dialer-add-modal-save-button"
                           @click="save">
                     Ok
                 </b-button>
@@ -96,6 +106,7 @@
                  title="Continue"
                  centered
                  v-model="confirm"
+                 data-testid="power-dialer-add-modal-confirm-dialog"
                  @close="onHidden">
             <div class="text-left">
                 <div class="text-dark">
@@ -106,6 +117,7 @@
                 <div class="d-flex w-100">
                     <div class="flex-grow-1"></div>
                     <button class="btn btn-sm btn-primary mr-2"
+                            data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
                             @click="closeConfirmDialog">
                         Continue
                     </button>

@@ -4,12 +4,13 @@
     size="lg"
     :title="title"
     modal-class="scheduled-messages-modal"
+    data-testid="contact-scheduled-messages-modal"
     @hidden="onHidden"
     @show="onShow"
   >
     <b-row>
       <b-col cols="12" class="d-flex justify-between">
-        <b-form inline class="mb-2" style="width: 60%">
+        <b-form inline class="mb-2" style="width: 60%" data-testid="contact-scheduled-messages-form">
           <vue-multiselect track-by="value"
                            label="label"
                            class="mr-1"
@@ -21,9 +22,10 @@
                            :options="sortOptions"
                            :show-labels="false"
                            :allow-empty="false"
+                           data-testid="contact-scheduled-messages-multiselect-sort"
                            v-model="filter.sort">
           </vue-multiselect>
-          <b-button variant="primary" @click="refreshList">Refresh List</b-button>
+          <b-button data-testid="contact-scheduled-messages-refresh-list-button" variant="primary" @click="refreshList">Refresh List</b-button>
         </b-form>
         <span class="row-summary">Showing {{ messages.length }} of {{ totalRows }} </span>
       </b-col>
@@ -34,6 +36,7 @@
                  show-empty
                  :busy="isBusy"
                  :items="messages"
+                 data-testid="contact-scheduled-messages-table"
                  :fields="fields">
           <template #empty>
             <h5 class="text-center mt-2">No scheduled messages found..</h5>
@@ -58,6 +61,7 @@
             <div class="mb-2 d-inline-flex media-preview-wrapper">
                 <div v-if="data.item.gif_url" class="media-preview">
                   <img class="img-preview" height="20px" width="20px"
+                       data-testid="contact-scheduled-messages-gif"
                        :src="data.item.gif_url"/>
                 </div>
 
@@ -82,6 +86,7 @@
                 </div>
                 <div v-if="attachment.mimetype.includes('image')">
                   <img  class="img-preview"
+                        data-testid="contact-scheduled-messages-image"
                         :src="getPreviewLink(attachment.uuid)"/>
                 </div>
               </div>
@@ -98,6 +103,7 @@
           <template #cell(action)="data">
             <b-button size="sm"
                       variant="outline-danger"
+                      data-testid="contact-scheduled-messages-delete-button"
                       @click="onDelete(data.item)">
               <trash-o-icon></trash-o-icon>
             </b-button>
@@ -107,6 +113,7 @@
         <div class="d-flex justify-content-center">
           <b-pagination aria-controls="my-table"
                         v-model="currentPage"
+                        data-testid="contact-scheduled-messages-pagination"
                         :total-rows="totalRows"
                         :per-page="filter.size"
                         @change="onPagination">
@@ -118,6 +125,7 @@
       <b-button variant="success"
                 class="custom-btn"
                 size="sm"
+                data-testid="contact-scheduled-messages-close-button"
                 @click="onHidden">
         Close
       </b-button>

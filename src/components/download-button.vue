@@ -22,7 +22,7 @@
                     :loading="isLoading"
                     :disabled="isLoading"
                     v-if="!isSimple && !isSimpleAttachment && !hasFilenameExtension">
-      <portal-target :name="`downloadDropdownList-${communicationId}`"/>
+      <portal-target :name="uniqueIdentifier"/>
     </q-btn-dropdown>
     <div class="d-flex align-items-center"
          v-if="isSimple && !isSimpleAttachment">
@@ -59,7 +59,7 @@
         <download-icon height="16"
                        width="16">
         </download-icon>
-        <portal-target :name="`downloadDropdownList-${communicationId}`"/>
+        <portal-target :name="uniqueIdentifier"/>
       </q-btn-dropdown>
     </div>
     <a role="button"
@@ -73,7 +73,7 @@
         </p>
       </div>
     </a>
-    <portal :to="`downloadDropdownList-${communicationId}`">
+    <portal :to="uniqueIdentifier">
       <q-list>
         <q-item class="p-2"
                 clickable
@@ -101,7 +101,6 @@
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import FileIcon from 'components/icons/contact-activity/file-icon'
-import { isEmpty } from 'lodash'
 import mime from 'mime-types'
 export default {
   name: 'download-button',
@@ -169,28 +168,37 @@ export default {
     return {
       isLoading: false,
       newFilename: '',
-      filenameText: ''
+      filenameText: '',
+      fileUuidValue: null
     }
   },
 
   computed: {
     hasFilenameExtension () {
       return this.filename.includes('.')
+    },
+
+    uniqueIdentifier () {
+      return `downloadDropdownList-${this.communicationId}-${this.attachmentUrl}-${this.fileUuidValue}`
     }
   },
 
   created () {
-    this.newFilename = this.filename
-    this.filenameText = this.filename
-
-    if (isEmpty(this.filename)) {
-      this.newFilename = this.getFilenameFromURL(this.attachmentUrl)
-      this.filenameText = this.$options.filters.toUpperCase(this.newFilename.split('.').pop())
-      this.filenameText += ' File'
-    }
+    this.initializeFilename()
+    this.initializeFileUuid()
   },
 
   methods: {
+    initializeFilename () {
+      this.newFilename = this.filename || this.getFilenameFromURL(this.attachmentUrl)
+      const fileExtension = (this.newFilename || 'FILE').split('.').pop()
+      this.filenameText = `${this.$options.filters.toUpperCase(fileExtension)} File`
+    },
+
+    initializeFileUuid () {
+      this.fileUuidValue = this.fileUuid || this.getUuidFromURL(this.attachmentUrl)
+    },
+
     onDownload (fixFilenameExtension = false) {
       const isNotValidFilenameExtension = !this.hasFilenameExtension && !fixFilenameExtension
       const hasNoMimeType = fixFilenameExtension && !this.fileMimeType
@@ -223,14 +231,13 @@ export default {
         return
       }
 
-      const fileUuid = !this.fileUuid ? this.getUuidFromURL(this.attachmentUrl) : this.fileUuid
       let filename = this.newFilename
 
       if (fixFilenameExtension) {
         filename = `${filename}.${mime.extension(this.fileMimeType)}`
       }
 
-      this.$downloadFileWithUuid(fileUuid, filename)
+      this.$downloadFileWithUuid(this.fileUuidValue, filename)
         .then(() => {
           this.isLoading = false
         }).catch(() => {

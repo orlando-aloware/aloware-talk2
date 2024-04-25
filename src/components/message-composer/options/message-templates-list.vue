@@ -1,5 +1,5 @@
 <template>
-  <div ref="templateWrapper">
+  <div ref="templateWrapper" data-testid="messages-templates-list-wrapper">
     <ul class="pl-0">
       <li class="d-flex justify-content-between"
           v-for="template in templates"
@@ -8,23 +8,28 @@
         <div class="d-flex justify-content-between template-actions">
           <b-link href="#"
                   class="active"
+                  data-testid="message-templates-list-use-template-link"
                   @click="templateSelected(template)">
             <q-tooltip anchor="top middle"
+                       data-testid="message-templates-use-tooltip"
                        self="center middle">
               Use
             </q-tooltip>
-            <add-icon-square></add-icon-square>
+            <add-icon-square data-testid="message-templates-list-add-icon-square"></add-icon-square>
           </b-link>
           <b-link href="#"
+                  data-testid="message-templates-list-view-template-link"
                   :id="`template-view-${template.id}`">
             <q-tooltip anchor="top middle"
+                       data-testid="message-templates-view-tooltip"
                        self="center middle">
               View
             </q-tooltip>
-            <eye-icon height="16" width="16"></eye-icon>
+            <eye-icon height="16" width="16" data-testid="message-templates-list-eye-icon"></eye-icon>
             <q-menu content-class="mx-height-300 template-preview"
                     ref="templatesMenu"
                     max-width="15rem"
+                    data-testid="message-templates-list-body-menu"
                     :offset="[225, 0]">
               <div class="row no-wrap q-pa-md">
                 {{ template.body }}
@@ -33,15 +38,18 @@
           </b-link>
           <b-link v-if="canEdit(template)"
                   href="#"
+                  data-testid="message-templates-list-edit-template-link"
                   @click="onEdit(template)">
             <q-tooltip anchor="top middle"
+                       data-testid="message-templates-edit-tooltip"
                        self="center middle">
               Edit
             </q-tooltip>
-            <pencil-o-icon color="#62666E"/>
+            <pencil-o-icon color="#62666E" data-testid="message-templates-list-pencil-icon"/>
           </b-link>
           <b-link v-if="canDelete(template)"
                   href="#"
+                  data-testid="message-templates-list-delete-template-link"
                   @click="onDelete(template)">
             <q-tooltip anchor="top middle"
                        self="center middle">

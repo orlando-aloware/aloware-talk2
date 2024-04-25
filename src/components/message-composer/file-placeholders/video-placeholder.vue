@@ -1,18 +1,22 @@
 <template>
   <div>
     <b-embed type="video"
+             data-testid="video-placeholder-embed"
              aspect="1by1">
       <source :src="getFilePreview(file)"
+              data-testid="video-placeholder-source"
               :type="file.type">
     </b-embed>
     <b-button size="sm"
               variant="light"
               class="btn-play"
+              data-testid="video-placeholder-play-button"
               pill>
       <i class="fa fa-play"></i>
     </b-button>
     <b-button size="sm"
               class="btn-remove-file"
+              data-testid="video-placeholder-remove-button"
               @click="onRemove(file)"
               @mouseout="hovered = false"
               @mouseover="hovered = true"

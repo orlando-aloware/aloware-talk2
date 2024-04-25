@@ -11,6 +11,7 @@
               option-label="name"
               behavior="menu"
               v-model="timezone"
+              data-testid="timezone-selector"
               :options="options"
               :disable="disabled"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"

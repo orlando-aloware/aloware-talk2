@@ -1,15 +1,18 @@
 <template>
   <b-list-group-item class="d-flex align-items-center border-0 cursor-pointer"
+                     data-testid="contact-list-sidebar-item"
                      @click="onItemSelected">
     <div class="d-flex align-items-center border-0 w-100">
       <avatar class="contact-avatar"
               width="34"
               height="34"
+              data-testid="contact-list-sidebar-avatar"
               :name="contactName">
       </avatar>
       <div class="ml-2 d-flex flex-column justify-content-center align-items-start contact-details pt-0">
         <div class="text-bold contact-name mb-0 w-100">
           <q-tooltip anchor="top middle"
+                     data-testid="contact-list-sidebar-contact-name-tooltip"
                      self="center middle">
             {{ contactName }}
           </q-tooltip>
@@ -24,6 +27,7 @@
         <b-badge v-if="unreadCount > 0"
                  class="contact-badge d-flex justify-center align-items-center bg-red-80"
                  variant="danger"
+                 data-testid="contact-list-sidebar-unread-badge"
                  pill>
           {{ unreadCount }}
         </b-badge>

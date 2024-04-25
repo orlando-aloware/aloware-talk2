@@ -8,6 +8,7 @@
                      group-label="type"
                      group-values="variables"
                      v-model="variable"
+                     data-testid="variables-multiselect"
                      :class="`custom-multi-select custom-multi-select-single ${alwaysOpenClass} options__no-border`"
                      :options="multiselectOptions"
                      :searchable="true"
@@ -21,7 +22,7 @@
                      @close="onClose">
 
       <template slot="caret">
-        <i class="fa fa-search search-icon"></i>
+        <i class="fa fa-search search-icon" data-testid="variables-search-icon"></i>
       </template>
       <!--      <template slot="singleLabel" slot-scope="{ option }">{{ option.label }}</template>-->
       <template v-slot:option="props">

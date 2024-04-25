@@ -14,6 +14,7 @@
                      :allow-empty="true"
                      :multiple="multiple"
                      v-model="frequencies"
+                     data-testid="number-of-days-selector"
                      @input="onSelect"
                      @remove="onRemove" />
   </div>

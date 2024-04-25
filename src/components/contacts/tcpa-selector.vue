@@ -9,6 +9,7 @@
               option-label="text"
               behavior="menu"
               v-model="contact.text_authorized"
+              data-testid="tcpa-selector"
               :options="options"/>
   </div>
 </template>

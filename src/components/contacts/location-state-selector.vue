@@ -9,6 +9,7 @@
               :loading="isBusy"
               :disable="disabled"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              data-testid="location-state-selector"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"

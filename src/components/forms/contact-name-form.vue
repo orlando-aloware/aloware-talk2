@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit.prevent="onSubmit">
+  <b-form @submit.prevent="onSubmit" data-testid="contact-name-form">
     <b-form-group label="First Name">
       <b-form-input
         type="text"
@@ -7,6 +7,7 @@
         ref="first_name"
         required
         autofocus
+        data-testid="contact-first-name-form-input"
         v-model="selected_contact.first_name"
       ></b-form-input>
     </b-form-group>
@@ -16,6 +17,7 @@
         type="text"
         placeholder="Last Name"
         required
+        data-testid="contact-last-name-form-input"
         v-model="selected_contact.last_name"
       ></b-form-input>
     </b-form-group>
@@ -23,13 +25,16 @@
       <b-button type="button"
                 size="sm"
                 variant="light"
+                data-testid="contact-name-form-cancel-button"
                 @click="onCancel">Cancel</b-button>
       <b-button type="button"
                 size="sm"
                 variant="primary"
                 :disabled="is_busy"
+                data-testid="contact-name-form-submit-button"
                 @click="onSubmit">
         <b-spinner v-if="is_busy"
+                   data-testid="contact-name-form-spinner"
                    small label="Small Spinner"
                    type="grow">
         </b-spinner>

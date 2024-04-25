@@ -1,9 +1,11 @@
 <template>
   <div class="communication-info"
+       data-testid="communication-info"
        v-if="communication">
 
     <q-list bordered
             class="notes-wrapper float-right"
+            data-testid="communication-info-list"
             v-if="communication.type === CommunicationTypes.NOTE">
       <q-item>
         <q-item-section>
@@ -18,6 +20,7 @@
             bordered
             class="rounded-contact-activity b-radius-12"
             :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
+            data-testid="communication-info-show-phone"
             @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
@@ -35,12 +38,13 @@
             <span v-else class="call-connected-text">Connected</span>
         </div>
         <q-item-section class="text-lt pl-2 text-left"
+                        data-testid="communication-info-duration-section"
                         v-if="communication.duration && isParkedCall">
             <span v-if="communication.type === CommunicationTypes.CALL && activityMode">
               {{ communication.duration | fixDuration }}
             </span>
         </q-item-section>
-        <q-item-section class="text-lt pl-2 pr-2 text-left">
+        <q-item-section class="text-lt pl-2 pr-2 text-left" data-testid="communication-info-incoming-call-section">
           <!-- Incoming Call-->
           <div class="text-grey-90 d-flex flex-row justify-center"
                v-if="shouldShowIncomingCallMenu">
@@ -49,15 +53,17 @@
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
                         v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
+                        data-testid="communication-info-ignore-call"
                         @click="onRejectCall">
                 <ignore-call-icon v-if="isShowIgnoreCallIcon"
+                                  data-testid="communication-info-ignore-call-icon"
                                   height="24"
                                   width="24"/>
                 <q-tooltip anchor="top middle"
                            self="center middle">
                   {{ isShowIgnoreCallIcon ? 'Ignore' : 'Decline' }}
                 </q-tooltip>
-                <cancel-call-icon v-if="isShowCancelCallIcon"/>
+                <cancel-call-icon v-if="isShowCancelCallIcon" data-testid="communication-info-cancel-call-icon"/>
               </b-button>
             </div>
             <div class="pl-1 pr-0"
@@ -65,9 +71,11 @@
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
+                        data-testid="communication-info-accept-call"
                         @click="onAcceptCall">
                 <q-tooltip anchor="top middle"
                            self="center middle"
+                           data-testid="communication-info-answer-call"
                            v-if="!showIncomingCallMenu">
                   Answer
                 </q-tooltip>
@@ -83,8 +91,10 @@
               <b-button variant="light"
                         size="sm"
                         class="bg-transparent no-border no-box-shadow p-0"
+                        data-testid="communication-info-hangup-call"
                         @click="onHangUpCall">
                 <q-tooltip anchor="top middle"
+                           data-testid="communication-info-hangup-call-tooltip"
                            self="center middle">
                   Hang up
                 </q-tooltip>
@@ -99,9 +109,11 @@
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
+                      data-testid="communication-info-unpark-call"
                       @click="onUnparkCall">
               <q-tooltip anchor="top middle"
                          self="center middle"
+                         data-testid="communication-info-unpark-call-tooltip"
                          v-if="!showParkedCallMenu">
                 Unpark
               </q-tooltip>
@@ -117,25 +129,30 @@
               self="top left"
               v-model="showIncomingCallMenu"
               :offset="[5, -4]"
+              data-testid="communication-info-incoming-call-menu"
               @hide="showIncomingCallMenu = false">
         <q-list>
           <q-item clickable
                   v-close-popup
+                  data-testid="communication-info-park-call-and-answer"
                   @click="onParkCurrentCallAndAnswer">
             <q-item-section class="d-inline-flex">
               <park-call-icon color="#9B51E0"
                               class="park-call-icon"
                               width="11.7"
+                              data-testid="communication-info-park-call-and-answer-icon"
                               height="12.35"></park-call-icon>
               <span>Park Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
           <q-item clickable
                   v-close-popup
+                  data-testid="communication-info-hangup-call-and-answer"
                   @click="onHangUpCurrentCallAndAnswer">
             <q-item-section>
               <hangup-icon  width="16"
                             height="16"
+                            data-testid="communication-info-hangup-call-and-answer-icon"
                             class="hangup-icon"></hangup-icon>
               <span>Hang up Current Call &amp; Answer</span>
             </q-item-section>
@@ -149,25 +166,30 @@
               self="top left"
               v-model="showParkedCallMenu"
               :offset="[5, -4]"
+              data-testid="communication-info-parked-call-menu"
               @hide="showParkedCallMenu = false">
         <q-list>
           <q-item clickable
                   v-close-popup
+                  data-testid="communication-info-park-call-and-connect"
                   @click="onParkCurrentCallAndConnect">
             <q-item-section class="d-inline-flex">
               <park-call-icon color="#9B51E0"
                               class="park-call-icon"
                               width="11.7"
+                              data-testid="communication-info-park-call-and-connect-icon"
                               height="12.35"></park-call-icon>
               <span>Park Current Call &amp; Connect</span>
             </q-item-section>
           </q-item>
           <q-item clickable
                   v-close-popup
+                  data-testid="communication-info-hangup-call-and-connect"
                   @click="onHangupCurrentCallAndConnect">
             <q-item-section>
               <hangup-icon  width="16"
                             height="16"
+                            data-testid="communication-info-hangup-call-and-connect-icon"
                             class="hangup-icon"></hangup-icon>
               <span>Hang up Current Call &amp; Connect</span>
             </q-item-section>
@@ -182,6 +204,7 @@
                         ref="communicationInfoExpansionItem"
                         :class="activityExpansionClass"
                         v-model="activeName"
+                        data-testid="communication-info-expansion-item"
                         @before-show="onBeforeActivityShow"
                         @after-show="onAfterActivityShow"
                         @before-hide="onBeforeActivityHide"
@@ -220,6 +243,7 @@
               <template v-if="[CommunicationTypes.SMS, CommunicationTypes.NOTE].includes(communication.type) && communication.attachments && communication.attachments.length > 0">
                 <q-img
                   v-for="(image, index) in communication.attachments"
+                  data-testid="communication-info-attachment-img"
                   class="img-fluid d-block r-2x"
                   :key="index"
                   :class="index > 0 ? 'mb-1' : ''"
@@ -597,6 +621,7 @@
                   :disabled="loadingUpdateEngagement"
                   v-model="communication.disposition_status2"
                   v-if="communication.type === CommunicationTypes.APPOINTMENT"
+                  data-testid="communication-info-change-engagement-status-toogle-1"
                   @click="changeEngagementStatus"
                 />
                 <q-btn-toggle
@@ -611,6 +636,7 @@
                   :disabled="loadingUpdateEngagement"
                   v-model="communication.disposition_status2"
                   v-else
+                  data-testid="communication-info-change-engagement-status-toogle-2"
                   @click="changeEngagementStatus"/>
               </div>
             </div>
@@ -630,10 +656,11 @@
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
                                          class="mb-2"
+                                         data-testid="communication-info-call-recording-audio"
                                          v-if="activeName">
                     </communication-audio>
                   </div>
-                  <div class="form-control-label w-100 mb-2 pb-2 border-bottom"
+                  <div class="form-control-label w-100 mb-2 pb-2 border-bottom" data-testid="communication-info-no-call-recording"
                        v-else>
                     No Call Recording
                   </div>
@@ -651,10 +678,11 @@
                                          :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                          :uniqueId="communication.id + '2'"
                                          class="mb-2"
+                                         data-testid="communication-info-voicemail-audio"
                                          v-if="activeName">
                     </communication-audio>
                   </div>
-                  <div class="form-control-label w-100 mb-2 pb-2 border-bottom"
+                  <div class="form-control-label w-100 mb-2 pb-2 border-bottom" data-testid="communication-info-no-voicemail"
                        v-else>
                     No Voicemail
                   </div>
@@ -671,6 +699,7 @@
                             class="text-dark-greenish w-100">
                         <download-button is-simple
                                          show-file-name
+                                         data-testid="communication-info-download-files-button"
                                          :communication-id="communication.id"
                                          :filename="attachment.name"
                                          :file-mime-type="attachment.mime_type"
@@ -682,12 +711,13 @@
 
                 <label class="form-control-label w-100 mb-1">Tags</label>
                 <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom">
-                  <communication-tags :communication="communication"/>
+                  <communication-tags data-testid="communication-info-communication-tags" :communication="communication"/>
                 </div>
 
                 <label class="form-control-label mb-1">Notes</label>
                 <div class="d-flex flex-column justify-content-center pb-2 w-100">
                   <communication-note ref="communicationNotes"
+                                      data-testid="communication-info-communication-note"
                                       :communication="communication">
                   </communication-note>
                 </div>
@@ -701,6 +731,7 @@
                       <b-button id="audio-btn"
                                 size="sm"
                                 variant="link"
+                                data-testid="communication-info-as-mandated-button"
                                 class="p-0">
                         <q-icon name="info"
                                 class="text-danger">
@@ -709,6 +740,7 @@
                       <b-popover target="audio-btn"
                                  triggers="focus"
                                  placement="right"
+                                 data-testid="communication-info-as-mandated-popover"
                                  delay="100">
                         Your account admin as mandated call dispositions.
                       </b-popover>
@@ -737,9 +769,11 @@
               <div class="d-flex flex-row w-100 align-items-start"
                    :class="[communication.type === CommunicationTypes.REMINDER ? 'text-left' : 'justify-center']">
                 <open-calendar-button :communicationId="communication.id"
+                                      data-testid="communication-info-open-calendar-button"
                                       class="pr-2" />
                 <sms-reminders ref="sms-reminder"
                                class="d-flex flex-row justify-content-center w-100"
+                               data-testid="communication-info-sms-reminders"
                                :communicationId="communication.id"
                                :campaignId="campaignId"
                                :appointmentDatetime="communication.engagement_data.appointment_datetime"
@@ -754,9 +788,10 @@
             <div class="col-12 text-center">
               <router-link
                 :to="{ name: 'Communication', params: { contactId: contact.id , communicationId: communication.id}}">
-                <button class="more-details font-weight-light-bold btn btn-sm">
+                <button class="more-details font-weight-light-bold btn btn-sm" data-testid="communication-info-more-details-button">
                   More Details
                   <chevron-right width="5"
+                                 data-testid="communication-info-more-details-chevron-right-icon"
                                  height="8">
                   </chevron-right>
                 </button>
