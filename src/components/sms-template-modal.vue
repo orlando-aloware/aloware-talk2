@@ -4,17 +4,20 @@
            no-close-on-esc
            v-model="isOpen"
            :title="title"
+           data-testid="sms-template-modal"
            @hidden="onHidden"
            @shown="onShown">
 
     <b-form class="appointment-forms"
             ref="appointmentForm"
+            data-testid="sms-template-modal-form"
             @submit.prevent="onSubmit">
       <b-form-group
         label="Name"
         description="">
         <b-input  placeholder="Template name"
                   ref="templateName"
+                  data-testid="sms-template-name-input"
                   v-model="template.name"></b-input>
       </b-form-group>
 
@@ -25,6 +28,7 @@
           rows="3"
           max-rows="8"
           no-auto-shrink
+          data-testid="sms-template-body-input"
           v-model="template.body"
         ></b-form-textarea>
       </b-form-group>
@@ -36,6 +40,7 @@
           variant="primary"
           class="custom-btn"
           size="sm"
+          data-testid="sms-template-add-variable-btn"
           @click="showVariableSelector = true"
         >
           Add Variable
@@ -43,6 +48,7 @@
 
         <variables v-if="showVariableSelector"
                    :close-on-select="false"
+                   data-testid="sms-template-variable-selector"
                    @close="showVariableSelector = false"
                    @variableSelected="variableSelected">
         </variables>
@@ -58,6 +64,7 @@
           variant="success"
           class="custom-btn mr-1"
           size="sm"
+          data-testid="sms-template-close-btn"
           @click="onHidden"
         >
           Close
@@ -67,9 +74,10 @@
           class="custom-btn"
           size="sm"
           :disabled="isSaving || !isValid"
+          data-testid="sms-template-save-btn"
           @click="onSubmit"
         >
-          <q-spinner-bars v-if="isSaving" color="white" />
+          <q-spinner-bars v-if="isSaving" color="white" data-testid="sms-temlate-modal-spinner" />
           {{ isSaving ? 'Saving Template...' : 'Save Template' }}
         </b-button>
       </div>

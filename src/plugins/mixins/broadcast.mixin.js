@@ -8,7 +8,11 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['campaigns', 'filters'])
+    ...mapState(['campaigns', 'filters', 'dialer']),
+    ...mapState('inbox', [
+      'communications',
+      'channelChangedFilterFields'
+    ])
   },
   methods: {
     ...mapActions([
@@ -33,6 +37,8 @@ export default {
       'deleteDispositionStatus',
       'newBulkCallDisposition',
       'newCallDisposition',
+      'newActivityType',
+      'deleteActivityType',
       'updateCallDisposition',
       'deleteCallDisposition'
     ]),
@@ -361,6 +367,9 @@ export default {
         .listen('.bulk_tags.deleted', (event) => {
           window.VueEvent.fire('bulk_tags_deleted', event)
         })
+        .listen('.power_dialer_contact.removed', event => {
+          window.VueEvent.fire('power_dialer_contact_removed', event.contact_id)
+        })
         // .listen('.export.created', (event) => {
         //   console.log('created export event :>> ', event)
         //   window.VueEvent.fire('export_event_updates', event)
@@ -516,6 +525,14 @@ export default {
           this.deleteCallDisposition(event.call_disposition)
           this.$VueEvent.fire('call_disposition_deleted', event.call_disposition)
         })
+        .listen('.activity_type.created', (event) => {
+          this.newActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_created', event.activity_type)
+        })
+        .listen('.activity_type.deleted', (event) => {
+          this.deleteActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_deleted', event.activity_type)
+        })
         .listen('.contact.created', (event) => {
           if (event.contact) {
             if (event.user) {
@@ -536,6 +553,9 @@ export default {
             if (event.tags) {
               event.contact.tags = event.tags
               event.contact.tag_ids = event.contact.tags.map((a) => a.id)
+            }
+            if (this.channelChangedFilterFields) {
+              event.contact.communications = this.communications
             }
             this.$VueEvent.fire('contact_updated', event.contact)
           }
@@ -633,6 +653,21 @@ export default {
         })
         .listen('.broadcasts.deleted', (event) => {
           window.VueEvent.fire('broadcasts_deleted', event.broadcaster)
+        })
+        .listen('.script.deleted', (event) => {
+          window.VueEvent.fire('script_deleted', event.script)
+        })
+        .listen('.kyc_status_updated', (event) => {
+          const sameCompany = this.currentCompany && this.currentCompany.id === event.company.id
+          if (sameCompany) {
+            setInterval(() => {
+              // check if there is a current call in progress
+              if (!['MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus)) {
+                this.setCurrentCompany(event.company)
+                this.$VueEvent.fire('kyc_status_updated', event.company)
+              }
+            }, 10000)
+          }
         })
 
       window.Echo.join('online-users-company-' + this.profile.company_id)

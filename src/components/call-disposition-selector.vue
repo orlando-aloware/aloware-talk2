@@ -6,6 +6,7 @@
                  label="name"
                  track-by="id"
                  placeholder="Select Disposition"
+                 data-testid="call-disposition-selector-1"
                  :selectLabel="null"
                  :deselectLabel="null"
                  :selectedLabel="null"
@@ -31,12 +32,17 @@
       <template slot="option" slot-scope="props">
         <div class="option__desc">
           <q-icon name="fa fa-bolt"
-                  :style="{ color: props.option.color }">
+                  :style="{ color: props.option.color }"
+                  v-show="!props.option.is_external">
+          </q-icon>
+          <q-icon name="fa fa-lock"
+                  :style="{ color: props.option.color }"
+                  v-show="props.option.is_external">
           </q-icon>
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
-      <span slot="noResult">
+      <span slot="noResult" data-testid="call-disposition-no-call-found">
         No call dispositions found.
       </span>
     </multiselect>
@@ -45,6 +51,7 @@
                  label="name"
                  track-by="id"
                  placeholder="Select Disposition"
+                 data-testid="call-disposition-selector-2"
                  :selectLabel="null"
                  :deselectLabel="null"
                  :selectedLabel="null"
@@ -69,7 +76,12 @@
       <template slot="option" slot-scope="props">
         <div class="option__desc">
           <q-icon name="fa fa-bolt"
-                  :style="{ color: props.option.color }">
+                  :style="{ color: props.option.color }"
+                  v-show="!props.option.is_external">
+          </q-icon>
+          <q-icon name="fa fa-lock"
+                  :style="{ color: props.option.color }"
+                  v-show="props.option.is_external">
           </q-icon>
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>

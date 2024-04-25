@@ -1,10 +1,12 @@
 <template>
-  <div class="integration-wrapper">
+  <div class="integration-wrapper" data-testid="integration-hubspot-wrapper">
     <q-card class="hubspot-card"
+            data-testid="integration-hubspot-card"
             flat>
       <q-item class="p-0">
         <q-item-section v-if="contactLink">
           <b-link target="_blank"
+                  data-testid="integration-hubspot-hubspot-link"
                   :href="contactLink">
             <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
@@ -12,6 +14,7 @@
         </q-item-section>
         <q-item-section v-else>
           <a href="#"
+             data-testid="integration-hubspot-hubspot-a-tag"
              onclick="return false;">
             <i class="fab fa-hubspot hubspot-icon"></i>
             <span class="integration-title">Hubspot</span>
@@ -19,10 +22,11 @@
         </q-item-section>
       </q-item>
 
-      <q-separator/>
+      <q-separator data-testid="integration-hubspot-separator" />
 
-      <q-card-section v-if="integrationData && integrationData.properties">
+      <q-card-section v-if="integrationData && integrationData.properties" data-testid="integration-hubspot-card-section-1">
         <p class="mb-0"
+           data-testid="integration-hubspot-name"
            v-if="integrationData.properties.firstname !== undefined && integrationData.properties.lastname !== undefined">
           <span class="data-icon-label">Name: </span>
           <span class="data-value">
@@ -34,16 +38,19 @@
           </span>
         </p>
         <p class="mb-0"
+           data-testid="integration-hubspot-email"
            v-if="integrationData.properties.email">
           <span class="data-icon-label">Email: </span>
           <span class="data-value">{{ integrationData.properties.email.value }}</span>
         </p>
         <p class="mb-0"
+           data-testid="integration-hubspot-company"
            v-if="integrationData.properties.company">
           <span class="data-icon-label">Company: </span>
           <span class="data-value">{{ integrationData.properties.company.value }}</span>
         </p>
         <p class="mb-0"
+           data-testid="integration-hubspot-owner"
            v-if="integrationData.properties.hubspot_owner">
           <span class="data-icon-label">Owner: </span>
           <span class="data-value">{{ integrationData.properties.hubspot_owner.firstName + ' ' + integrationData.properties.hubspot_owner.lastName }}</span>
@@ -51,6 +58,7 @@
       </q-card-section>
 
       <q-card-section class="pt-0 pb-0"
+                      data-testid="integration-hubspot-card-section-2"
                       v-if="integrationData && integrationData.properties">
         <q-card class="deals mb-1"
                 v-for="(deal, index) in integrationData.properties.deals"
@@ -61,11 +69,12 @@
               <h6 class="mb-2">
                 <b-link class="deals-title ml-0"
                         :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
+                        data-testid="integration-hubspot-deal-link"
                         target="_blank">
                   {{ deal.properties.dealname.value }}
                 </b-link>
               </h6>
-              <p class="mb-1 d-flex">
+              <p class="mb-1 d-flex"  data-testid="integration-hubspot-amount">
                 <span class="data-icon-label">Amount: </span>
                 <span class="data-value ml-1"
                       v-if="deal.properties && deal.properties.amount">
@@ -76,7 +85,7 @@
                   {{ deal.properties.amount.value | toCurrency }}
                 </span>
               </p>
-              <p class="mb-1 d-flex">
+              <p class="mb-1 d-flex"  data-testid="integration-hubspot-pipeline">
                 <span class="data-icon-label">Pipeline: </span>
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
@@ -86,7 +95,7 @@
                   {{ deal.properties.pipeline.label }}
                 </span>
               </p>
-              <p class="mb-1 d-flex">
+              <p class="mb-1 d-flex"  data-testid="integration-hubspot-stage">
                 <span class="data-icon-label">Stage: </span>
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
@@ -101,21 +110,24 @@
         </q-card>
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section  data-testid="integration-hubspot-card-section-3">
         <b-row>
           <b-button class="text-white"
                     size="sm"
                     variant="primary"
                     tabindex="0"
                     block
+                    data-testid="integration-hubspot-sync-button"
                     @click="syncHubspot">
             <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
             <q-spinner-bars v-if="isSyncing"
+                            data-testid="integration-hubspot-sync-spinner"
                             color="white">
             </q-spinner-bars>
             {{ isSyncing ? 'Syncing...' : 'Sync with Hubspot' }}
             <q-tooltip anchor="center start"
                        self="center left"
+                       data-testid="integration-hubspot-sync-tooltip"
                        :offset="[-220, 10]">
               <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelText }} and HubSpot.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
@@ -127,12 +139,14 @@
       </q-card-section>
 
       <q-card-section
+        data-testid="integration-hubspot-card-section-4"
         v-if="integrationData && integrationData.properties && integrationData.properties.email && integrationData.properties.email.value && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
                     variant="primary"
                     tabindex="0"
+                    data-testid="integration-hubspot-enroll-button"
                     @click="onEnrollToWorkflow">
             <i class="fa fa-user-plus"></i>
             Enroll to Workflow
@@ -145,13 +159,16 @@
             ref="templatesMenu"
             no-parent-event
             no-focus
+            data-testid="hubspot-workflow-popover"
             :offset="[366, -105]"
             v-model="showWorkflowSelectorForm">
       <div class="no-wrap q-pa-md">
-        <workflow-selector @onWorkflowSelected="onWorkflowSelected"/>
+        <workflow-selector data-testid="integration-hubspot-workflow-selector"
+                           @onWorkflowSelected="onWorkflowSelected"/>
         <b-button class="btn-block"
                   size="sm"
                   variant="primary"
+                  data-testid="integration-hubspot-enroll-button"
                   :disabled="isEnrolling || !isWorkflowValid"
                   @click.prevent="enrollToWorkflow">
           <q-spinner-bars v-if="isEnrolling"
@@ -228,6 +245,18 @@ export default {
 
     whiteLabelText () {
       return this.statics.whitelabel ? this.statics.name : 'Aloware'
+    },
+
+    isContactValid () {
+      return this.contact && this.contact.id
+    },
+
+    isRouteMatch () {
+      return this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer'
+    },
+
+    isContactAndRouteValid () {
+      return this.isContactValid && this.isRouteMatch
     }
   },
 
@@ -307,7 +336,7 @@ export default {
 
   watch: {
     'contact.id': _.debounce(function () {
-      if (this.contact && this.contact.id && this.$route.params.id === this.contact.id.toString()) {
+      if (this.isContactAndRouteValid) {
         this.contactIntegrationDataLoaded = false
         this.getData()
       }

@@ -61,7 +61,7 @@
                       text="Boost your sales team’s productivity! Power Dialer automatically calls contacts one by one from a list so agents have less idle time."
                       extra-text="Upgrade today to unlock this feature"
                       title-text="Power Dialer"
-                      kb-link="https://support.aloware.com/en/articles/5987054-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
+                      kb-link="https://support.aloware.com/en/articles/9037581-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
                       class="mt-5"
                       v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
     </upgrade-now-page>
@@ -243,13 +243,6 @@ export default {
     }
   },
 
-  created () {
-    // check if user has access and redirect to inbox in case it doesnt
-    if (!this.profile.auto_dialer_enabled) {
-      this.$router.push({ name: 'Inbox' })
-    }
-  },
-
   async mounted () {
     this.START_DIAL_TOGGLE(false)
     // // await this.initialize()
@@ -291,12 +284,43 @@ export default {
       this.loadList(this.selectedListId)
     }
 
+    this.powerDialerListeners.contactRemoved = (contactId) => {
+      let index = this.contactsData.data.findIndex(contact => contact.id === contactId)
+
+      // try to remove the contact from the table
+      if (index >= 0) {
+        this.contactsData.data.splice(index, 1)
+
+        if (this.contactsData.total_items > 0) {
+          this.contactsData.total_items--
+        }
+
+        if (this.contactsData.total_queued > 0) {
+          this.contactsData.total_queued--
+        }
+
+        if (this.contactsData.to > 0) {
+          this.contactsData.to--
+        }
+
+        this.updateMyQueueListData(this.contactsData)
+      }
+
+      index = this.powerDialerTasks['in_queue'].findIndex(contact => contact.id === contactId)
+
+      // try to remove the contact from the session
+      if (index >= 0) {
+        this.powerDialerTasks['in_queue'].splice(index, 1)
+      }
+    }
+
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)
     this.$VueEvent.listen('contact_list_item_created', this.powerDialerListeners.contactListItemCreated)
     this.$VueEvent.listen('contact_list_item_updated', this.powerDialerListeners.contactListItemUpdated)
     this.$VueEvent.listen('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
     this.$VueEvent.listen('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
     this.$VueEvent.listen('fetchPowerDialerListItems', this.powerDialerListeners.fetchPowerDialerListItems)
+    this.$VueEvent.listen('power_dialer_contact_removed', this.powerDialerListeners.contactRemoved)
   },
 
   methods: {
@@ -474,6 +498,7 @@ export default {
       this.$VueEvent.stop('call_sessions_ended', this.powerDialerListeners.callSessionsEnded)
       this.$VueEvent.stop('add_contacts_progress', this.powerDialerListeners.addContactsProgress)
       this.$VueEvent.stop('fetchPowerDialerListItems', this.powerDialerListeners.fetchPowerDialerListItems)
+      this.$VueEvent.stop('power_dialer_contact_removed', this.powerDialerListeners.contactRemoved)
     }
   },
 

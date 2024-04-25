@@ -258,6 +258,13 @@ export default {
           return 'Messaging is disabled for this line.'
         case CommunicationRejectionReasons.REJECTION_REASON_CALL_TO_SELF_NUMBER:
           return 'You cannot place a call to your own number.'
+        case CommunicationRejectionReasons.REJECTION_REASON_SMS_TO_SELF_NUMBER:
+          return 'You cannot send a text to your own number.'
+        case CommunicationRejectionReasons.REJECTION_REASON_TRIAL_LIMIT_EXCEEDED:
+          const resource = type === CommunicationTypes.CALL ? 'calls' : 'messages'
+          return `You have reached the maximum number of trial ${resource}.`
+        case CommunicationRejectionReasons.REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT:
+          return 'Provider allows only one attachment.'
       }
     },
 
@@ -307,6 +314,10 @@ export default {
       }
 
       return head(url.split('?')).split('/').pop()
+    },
+
+    showAudio (communication) {
+      return communication.has_recording || communication.recording_is_deleted
     }
   }
 }

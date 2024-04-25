@@ -229,5 +229,6 @@ export const DEFAULT_STATE = {
   staticsLoaded: false,
   isCallDisposed: false,
   isContactDisposed: false,
-  integrationPDImportSummaries: {}
+  integrationPDImportSummaries: {},
+  isWhiteLabel: false
 }

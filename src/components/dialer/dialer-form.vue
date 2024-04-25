@@ -15,10 +15,12 @@
               pills
               vertical>
         <block-tooltip placement="left"
-                       triggers="click"
+                       triggers="hover focus"
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
-                       :task="blockTooltipHandler.task">
+                       :task="blockTooltipHandler.task"
+                       :message="disabledComplianceMessage"
+                       v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
                :active="mode === 'call'"
@@ -51,17 +53,22 @@
                                            @searchResults="onPhoneNumberSearch">
               </contact-phone-number-search>
             </b-form-group>
-            <q-btn icon="img:app-icons/dialer/call_btn.svg"
-                   size="32px"
-                   class="icon-btn auto-size height-32"
-                   align="right"
-                   padding="none"
-                   rounded
-                   flat
-                   :ripple="true"
-                   :disable="callDisabled"
-                   @click="onCall">
-            </q-btn>
+            <div>
+              <q-btn icon="img:app-icons/dialer/call_btn.svg"
+                     size="32px"
+                     class="icon-btn auto-size height-32"
+                     align="right"
+                     padding="none"
+                     rounded
+                     flat
+                     :ripple="true"
+                     :disable="callDisabled"
+                     @click="onCall">
+              </q-btn>
+              <q-tooltip v-if="isAgentOnCall">
+                There is a call in progress on another device.
+              </q-tooltip>
+            </div>
           </div>
 
           <div class="dialer-contact-info width-190"
@@ -97,8 +104,9 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div v-if="isMessagingBlocked(selectedCampaign, true)" class="compliance-badge mb-2">
-              {{ selectedCampaign.blocked_messaging_information['reason'] }}
+            <div class="compliance-badge mb-2"
+                 v-if="shouldShowComplianceMessage">
+              {{ disabledComplianceMessage }}
             </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
@@ -156,6 +164,7 @@
                                placeholder="Text Message..."
                                rows="2"
                                max-rows="3"
+                               :disabled="isBlockTooltipPopoverEnabled"
                                v-model="textMessage">
               </b-form-textarea>
             </b-input-group>
@@ -207,6 +216,7 @@ import {
   visibilityMixin,
   kycMixin
 } from 'src/plugins/mixins'
+import * as AgentStatus from 'src/constants/agent-status'
 
 export default {
   name: 'dialer-form',
@@ -297,12 +307,42 @@ export default {
       return 'Please select a line'
     },
 
+    isAgentOnCall () {
+      return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+    },
+
     callDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.enabledToCallNumber(this.phoneNumber)
+      const isCallDisabled = !this.validPhoneNumber ||
+      !this.phoneNumber.length ||
+      !this.campaignId ||
+      !this.enabledToCallNumber(this.phoneNumber) ||
+      this.isAgentOnCall
+
+      return isCallDisabled
     },
 
     sendDisabled () {
       return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
+    },
+
+    isBlockTooltipPopoverEnabled () {
+      if (!this.isTrialKYC) {
+        return false
+      }
+
+      if (this.mode === 'text' && this.disabledComplianceMessage) {
+        return true
+      }
+
+      if (this.mode === 'call') {
+        return !this.enabledToCallNumber(this.phoneNumber)
+      }
+
+      if (this.mode === 'text') {
+        return !this.enabledToTextNumber(this.phoneNumber)
+      }
+
+      return !this.enabledToCallNumber(this.phoneNumber) || !this.enabledToTextNumber(this.phoneNumber)
     },
 
     dialerFormClass () {
@@ -321,6 +361,14 @@ export default {
         callClass,
         modeClass
       ]
+    },
+
+    disabledComplianceMessage () {
+      return this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
+    },
+
+    shouldShowComplianceMessage () {
+      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign && this.selectedCampaign.blocked_messaging_information && this.selectedCampaign.blocked_messaging_information['reason']
     }
   },
 
@@ -551,7 +599,6 @@ export default {
     },
 
     hideBlockTooltip () {
-      console.log('hideBlockTooltip')
       this.blockTooltipHandler.show = false
     }
   },

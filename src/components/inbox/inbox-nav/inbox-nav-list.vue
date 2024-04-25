@@ -13,7 +13,9 @@
               :badge="true"
               :openCount="openCount"
               :pending-count="pendingCount"
-              v-for="item in navListItems"
+              :disabled="item.disabled"
+              :tooltip="item.tooltip"
+              v-for="item in inboxChannels"
               @click="onItemClicked" />
 
     <hr>
@@ -64,7 +66,7 @@ import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { inboxRoutesMixin, inboxMixin, userMixin } from 'src/plugins/mixins'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
   name: 'inbox-nav-list',
@@ -111,17 +113,36 @@ export default {
       'pinnedViews',
       'inboxPersonalFilters',
       'inboxCompanyFilters',
-      'isEditingView'
+      'isEditingView',
+      'isFilterDialogForView'
     ]),
 
     ...mapGetters('inbox', [
       'allInboxFilters'
     ]),
 
+    ...mapGetters('auth', [
+      'profile'
+    ]),
+
     isShowActive () {
       const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
 
       return !this.$q.screen.lt.md || isMobileInboxRoutes
+    },
+
+    inboxChannels () {
+      if (this.profile?.campaign_id) {
+        return this.navListItems
+      }
+
+      // hard-coded disabling my-personal-line channel
+      const channels = this.navListItems
+      let index = channels.findIndex(channel => channel.value === 'my-personal-line')
+      channels[index].disabled = true
+      channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
+
+      return channels
     }
   },
 
@@ -156,7 +177,12 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact'
-      ]
+      ],
+      listeners: {
+        pinnedViewsEvents: null,
+        openInboxViewPopup: null,
+        deletedFilter: null
+      }
     }
   },
 
@@ -175,32 +201,28 @@ export default {
           }
         })
     }
-
-    // listen to filter updates to update the inbox views dialog selection
-    this.$VueEvent.listen('personalFiltersUpdated', (personalFilters) => {
-      this.setInboxPersonalFilters(personalFilters)
-    })
   },
 
   mounted () {
-    this.$VueEvent.listen('viewPinned', () => {
+    this.listeners.pinnedViewsEvents = () => {
       this.getPinnedViews()
-    })
+    }
 
-    this.$VueEvent.listen('viewUnpinned', () => {
-      this.getPinnedViews()
-    })
+    this.listeners.openInboxViewPopup = () => {
+      this.setShowViewsList(true)
+    }
 
-    this.$VueEvent.listen('openInboxViewPopup', () => {
-      this.showViewsList = true
-    })
-
-    this.$VueEvent.listen('filter_deleted', (filter) => {
+    this.listeners.deletedFilter = (filter) => {
       const view = this.pinnedViews.find(view => +view.filter_id === +filter.id)
       if (view) {
         this.unpinView(view.id)
       }
-    })
+    }
+
+    this.$VueEvent.listen('viewPinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.listen('viewUnpinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.listen('openInboxViewPopup', this.listeners.openInboxViewPopup)
+    this.$VueEvent.listen('filter_deleted', this.listeners.deletedFilter)
   },
 
   methods: {
@@ -229,7 +251,7 @@ export default {
         const viewId = nextActive.split('-')[1]
         const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
 
-        this.currentTask = ContactTaskStatus.STATUS_OPEN
+        this.currentTask = InboxTaskStatus.DEFAULT_STATUS
         this.onSelectView(view.filter)
         return
       }
@@ -268,9 +290,14 @@ export default {
         name: 'Inbox Channel Task Status',
         params: {
           channel: this.active,
-          status: 'open'
+          status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
+        //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
+        if (this.$route.name === 'Inbox' || this.$route.params.channel === 'inbox') {
+          this.loadContactTasks()
+        }
+
         console.log(err)
         this.$handleErrors(err.response)
       })
@@ -381,9 +408,6 @@ export default {
         return
       }
 
-      // when filter dialog is closed
-      this.setFilterDialogForView(false)
-
       if (!this.$route.params.hasOwnProperty('viewId')) {
         return
       }
@@ -409,6 +433,13 @@ export default {
         })
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('viewPinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.stop('viewUnpinned', this.listeners.pinnedViewsEvents)
+    this.$VueEvent.stop('openInboxViewPopup', this.listeners.openInboxViewPopup)
+    this.$VueEvent.stop('filter_deleted', this.listeners.deletedFilter)
   }
 }
 </script>

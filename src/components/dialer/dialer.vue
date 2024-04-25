@@ -57,7 +57,7 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
+    ...mapState('cache', ['currentCompany', 'profile']),
 
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
 
@@ -148,7 +148,7 @@ export default {
         return
       }
 
-      this.backToDial()
+      this.backToDial('Talk-DialerListeners-EndWrapUp')
     }
 
     this.dialerListeners.forceEndWrapUp = () => {
@@ -156,7 +156,7 @@ export default {
         return
       }
 
-      this.backToDial(true)
+      this.backToDial('Talk-DialerListeners-ForceEndWrapUp', true)
     }
 
     this.dialerListeners.resetCall = () => {
@@ -290,6 +290,7 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
+      this.checkForcedStatus()
     })
 
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
@@ -310,7 +311,7 @@ export default {
     this.device.on(WebrtcEvents.ERROR, (error) => {
       this.removeUnownedLiveContactTask()
       this.handleError(error)
-      this.backToDial()
+      this.backToDial('Talk-Device.OnError')
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
@@ -343,7 +344,7 @@ export default {
       this.removeUnownedLiveContactTask()
       console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.backToDial()
+      this.backToDial('Talk-Device.OnCancel')
       this.connection = null
       this.$closeActionNotification('incomingCall')
     })
@@ -365,7 +366,7 @@ export default {
         return
       }
 
-      this.backToDial()
+      this.backToDial('Talk-Device.OnDisconnect')
     })
 
     this.getDesktopToken()
@@ -379,6 +380,23 @@ export default {
   },
 
   methods: {
+    checkForcedStatus () {
+      if (!this.profile.last_call) {
+        return
+      }
+      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+        !this.profile.last_call.contact.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+        !this.profile.last_call.call_disposition_id
+      if (shouldForceContactDisposition || shouldForceCallDisposition) {
+        this.forceStartOnWrapUp()
+      }
+    },
+    forceStartOnWrapUp () {
+      this.setDialerCommunication(this.profile.last_call)
+      this.setDialerContact(this.profile.last_call.contact)
+      this.startWrapUpTimer()
+    },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
@@ -456,7 +474,8 @@ export default {
       return this.$axios.get('/api/v1/communication/info', {
         params: {
           sid: sid,
-          phone_number: from
+          phone_number: from,
+          live: true
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
@@ -500,11 +519,22 @@ export default {
 
         return Promise.resolve(res)
       }).catch(err => {
+        // Fail if the API returned a 4xx error
+        if (err.response && err.response.status >= 400 && err.response.status < 500) {
+          this.setDialerCommunication()
+          this.setDialerContact()
+          this.setDialerDeal()
+          this.$VueEvent.fire('communicationLoaded')
+          this.loadingCommunication = false
+
+          return Promise.reject(err)
+        }
+
         getCommunicationTry++
         // error
         console.log('An error occurred while getting the communication', err)
         // check if we have found the communication after 3 retries
-        if (getCommunicationTry > 10) {
+        if (getCommunicationTry > 4) {
           this.setDialerCommunication()
           this.setDialerContact()
           this.setDialerDeal()
@@ -581,6 +611,11 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
+        return
+      }
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
@@ -669,7 +704,7 @@ export default {
         console.log('Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial()
+        this.backToDial('Talk-Connection.OnCancel')
         this.$closeActionNotification('incomingCall')
       })
 
@@ -689,7 +724,7 @@ export default {
           return
         }
 
-        this.backToDial()
+        this.backToDial('Talk-Connection.OnDisconnect')
       })
     },
 
@@ -767,7 +802,7 @@ export default {
       // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
       if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) &&
         !this.currentCompany.force_users_always_available) {
-        this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)
+        this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-RejectCall')
       }
 
       this.resetCall()
@@ -1015,7 +1050,7 @@ export default {
 
       this.$options.hangupInterval = setInterval(() => {
         if (this.dialer.currentStatus === 'WRAP_UP') {
-          this.backToDial()
+          this.backToDial('Talk-hangupInterval')
 
           setTimeout(() => {
             if (shouldUnpark) {
@@ -1217,7 +1252,7 @@ export default {
 
       if (duration <= 0) {
         this.stopWrapUpTimer()
-        this.backToDial()
+        this.backToDial('Talk-CountWrapUpDuration')
       }
     },
 
@@ -1257,7 +1292,7 @@ export default {
       console.log('Wrap-up time: ' + wrapUpTimer)
 
       if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
-        this.backToDial()
+        this.backToDial('Talk-StartWrapUpTimer')
         return
       }
 
@@ -1290,8 +1325,8 @@ export default {
       clearInterval(this.$options.parkedCallDurationInterval)
     },
 
-    backToDial (forceStatus = false) {
-      this.resetAgentStatus(forceStatus)
+    backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
+      this.resetAgentStatus(forceStatus, signature)
       this.resetCall()
     },
 
@@ -1392,6 +1427,7 @@ export default {
       })
       const err = new Error(`${error.message} Code: ${error.code}`)
       err.code = error.code
+      error.token = this.dialer.token
 
       console.log(error)
 
@@ -1406,12 +1442,13 @@ export default {
       // 31204 => Invalid JWT token.
       // 31205 => JWT token expired.
       // 9221 => Cannot connect to insights
-      if (![53405, 31204, 31205, 9221, 31000, 31005, 31009].includes(err.code)) {
+      // 20101 => Invalid token
+      if (![53405, 31204, 31205, 9221, 31000, 31005, 31009, 20101].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
 
       // Request new token if error
-      if ([31204, 31205].includes(err.code)) {
+      if ([31204, 31205, 20101].includes(err.code)) {
         return this.getDesktopToken(true)
       }
 
@@ -1419,7 +1456,7 @@ export default {
     },
 
     rebootPhone (login = false) {
-      this.backToDial()
+      this.backToDial('Talk-RebootPhone')
 
       if (login) {
         this.setDialerCurrentStatus('RESTARTING')

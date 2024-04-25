@@ -52,10 +52,12 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
+           data-testid="contacts-sidebar-btn"
            v-show="isActive('Contacts')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 data-testid="contacts-sidebar-tooltip"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Contacts</span>
       </q-tooltip>
@@ -75,31 +77,13 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :ripple="false"
-           icon="img:app-icons/menu/power_dialer_gray.svg"
-           align="center"
-           padding="none"
-           class="nav-icons w-100 disabled"
-           v-show="!isTrialKYC && !isActive('Power Dialer') && !profile.auto_dialer_enabled"
-           flat
-           @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Power Dialer</span>
-      </q-tooltip>
-    </q-btn>
     <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && isActive('Power Dialer') && profile.auto_dialer_enabled"
+           v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -113,7 +97,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && !isActive('Power Dialer') && profile.auto_dialer_enabled"
+           v-show="(!isActive('Power Dialer') && profile.auto_dialer_enabled) || !profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -151,31 +135,13 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :ripple="false"
-           icon="img:app-icons/menu/calendar_gray.svg"
-           align="center"
-           padding="none"
-           class="nav-icons w-100 disabled"
-           v-show="!isTrialKYC && !isActive('Calendar') && !profile.calendar_enabled"
-           flat
-           @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Calendar</span>
-      </q-tooltip>
-    </q-btn>
     <q-btn :to="{ path: '/calendar' }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && isActive('Calendar') && profile.calendar_enabled"
+           v-show="isActive('Calendar') && profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -189,7 +155,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
-           v-show="!isTrialKYC && !isActive('Calendar') && profile.calendar_enabled"
+           v-show="(!isActive('Calendar') && profile.calendar_enabled) || !profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -448,7 +414,7 @@
            class="nav-icons w-100 disabled"
            flat
            :ripple="false"
-           v-show="!isActive('Broadcasts') && !profile.bulk_sms_enabled && !profile.bulk_rvm_enabled && isDemoCompany"
+           v-show="!isActive('Broadcasts') && !canUseBroadcast"
            @click="toggleProFeatureDialog(true)">
       <q-badge floating
                rounded
@@ -467,7 +433,7 @@
            flat
            :to="{ path: '/broadcasts' }"
            :ripple="false"
-           v-show="isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
+           v-show="isActive('Broadcasts') && canUseBroadcast">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -481,7 +447,7 @@
            flat
            :to="{ path: '/broadcasts' }"
            :ripple="false"
-           v-show="!isActive('Broadcasts') && (profile.bulk_sms_enabled || profile.bulk_rvm_enabled) && isDemoCompany">
+           v-show="!isActive('Broadcasts') && canUseBroadcast">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
@@ -537,7 +503,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { simpsocialMixin, kycMixin } from 'src/plugins/mixins'
+import { simpsocialMixin, kycMixin, broadcastsMixin } from 'src/plugins/mixins'
 import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
@@ -558,7 +524,8 @@ export default {
 
   mixins: [
     simpsocialMixin,
-    kycMixin
+    kycMixin,
+    broadcastsMixin
   ],
 
   computed: {

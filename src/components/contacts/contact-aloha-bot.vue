@@ -2,18 +2,20 @@
   <b-overlay :show="isBusy"
              v-if="profile.company.alohabot_enabled"
              rounded="sm"
+             data-testid="contact-aloha-bot-overlay"
              variant="white">
 
-    <b-card class="border-0 position-relative contact-about-wrapper">
+    <b-card class="border-0 position-relative contact-about-wrapper" data-testid="contact-aloha-bot-card">
       <h4>AlohaBot</h4>
       <div v-if="is_disengaged">
-        <b-card-text class="fs-14 mt-3">
+        <b-card-text class="fs-14 mt-3" data-testid="contact-aloha-bot-card-disengaged-text">
           <span>This contact has disengaged with the bots</span>
         </b-card-text>
         <b-button variant="outline-primary"
                   size="sm"
                   class="btn-contact-sequence-enrol"
                   block
+                  data-testid="contact-aloha-bot-engage-button"
                   @click="disengageContact(false)">
           <i class="fa fa-unlock-alt"></i>
           Engage
@@ -21,7 +23,7 @@
       </div>
 
       <div v-else>
-        <b-card-text class="fs-14 mt-2">
+        <b-card-text class="fs-14 mt-2" data-testid="contact-aloha-bot-card-has-not-disengaged-text">
           This contact has not disengaged with the bots.
         </b-card-text>
 
@@ -29,6 +31,7 @@
                   size="sm"
                   class="btn-contact-sequence-enrol"
                   block
+                  data-testid="contact-aloha-bot-disengage-button"
                   @click="disengageContact(true)">
           <i class="fa fa-user-lock"></i>
           Disengage
@@ -38,6 +41,7 @@
     <template #overlay>
       <div class="text-center">
         <q-spinner-bars
+          data-testid="contact-aloha-bot-spinner"
           color="primary"
           size="2em"
         />

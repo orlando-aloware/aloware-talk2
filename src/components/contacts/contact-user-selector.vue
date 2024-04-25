@@ -8,6 +8,7 @@
               option-value="id"
               option-label="name"
               v-model="field"
+              data-testid="contact-user-selector"
               :loading="isBusy"
               :options="options"
               :disable="disabled"
@@ -36,7 +37,7 @@
       </template>
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="text-grey">
+          <q-item-section class="text-grey" data-testid="contact-user-selector-no-results">
             No results
           </q-item-section>
         </q-item>

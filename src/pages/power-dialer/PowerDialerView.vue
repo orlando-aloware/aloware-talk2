@@ -57,12 +57,36 @@
             </b-col>
             <b-col class="p-0">
               <div class="d-flex float-right">
-                <block-tooltip v-if="!canCreateContacts"
-                               placement="left"
+                <block-tooltip placement="left"
                                triggers="click"
                                target="contacts-create-popover"
-                               task="contacts.create">
+                               task="contacts.create"
+                               v-if="!canCreateContacts">
                 </block-tooltip>
+
+                <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                             variant="outlined-light"
+                             tooltip-text="Reset"
+                             borderless
+                             @clicked="resetFilters(false)">
+                  <refresh-icon width="14px"
+                                height="14px"
+                                icon-color="grey-90"/>
+                </compact-btn>
+                <compact-btn variant="outlined-light"
+                             customClass="pr-0 pl-0 mr-3 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+                             borderless
+                             :disabled="isStartState"
+                             @clicked="onFiltersClicked">
+                  <span class="pl-2 pr-2 d-flex filter-toggle-button align-items-center">Filters</span>
+                  <b-badge class="d-flex align-items-center py-1"
+                           variant="primary"
+                           pill
+                           v-if="hasAppliedFilters">
+                    {{ filtersCount }}
+                  </b-badge>
+                </compact-btn>
+
                 <b-dropdown class="m-0 mb-3 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
                             toggle-class="filter-toggle-button py-0 my-0 d-flex align-items-center"
                             text="Add Contacts"
@@ -531,7 +555,10 @@
           </div>
         </div>
       </confirm-dialog>
+    </template>
 
+    <template slot="filters">
+      <contacts-filters v-if="isFiltersOpen" />
     </template>
   </power-dialer-view-screen>
 </template>
@@ -540,6 +567,7 @@
 
 import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
+import CompactBtn from 'src/components/compact-btn.vue'
 import PowerDialerViewScreen from 'src/components/power-dialer/power-dialer-view-screen'
 import PowerDialerFilter from 'src/components/power-dialer/details/power-dialer-filters'
 import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-labels'
@@ -547,6 +575,7 @@ import Datatable from 'src/components/datatable'
 import SearchList from 'src/components/search'
 import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
 import PowerDialerBulkAddReportModal from 'src/components/power-dialer/power-dialer-bulk-add-report-modal'
+import ContactsFilters from 'src/components/contacts/contacts-filters'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
@@ -554,6 +583,7 @@ import PowerDialerBulkActionMenu from 'src/components/power-dialer-bulk-action-m
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import BlockTooltip from 'components/kyc/block-tooltip'
 import talk2Api from 'src/plugins/api/api'
+import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
 import { isEqual, get, isEmpty } from 'lodash'
 import {
@@ -657,6 +687,7 @@ export default {
   ],
 
   components: {
+    CompactBtn,
     PowerDialerViewScreen,
     PowerDialerFilter,
     Datatable,
@@ -669,7 +700,9 @@ export default {
     ContactCreateModal,
     PowerDialerBulkActionMenu,
     BlockTooltip,
-    PowerDialerBulkAddReportModal
+    PowerDialerBulkAddReportModal,
+    RefreshIcon,
+    ContactsFilters
   },
 
   filters: {
@@ -725,7 +758,8 @@ export default {
       'selectedList',
       'isFiltersOpen',
       'currentListFilters',
-      'clearList'
+      'clearList',
+      'isFiltersOpen'
     ]),
 
     taskAddAndClearingDisabled () {
@@ -739,6 +773,10 @@ export default {
 
     routeId () {
       return POWER_DIALER_ROUTE_META_ID
+    },
+
+    hasAppliedFilters () {
+      return this.filtersCount > 0
     },
 
     activeRoute () {
@@ -920,7 +958,9 @@ export default {
         })
 
         let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-        this.onFetch(params, this.hasFilters, true)
+        const hasFilters = this.filtersCount > 0
+
+        this.onFetch(params, hasFilters, true)
         this.$emit('onFiltersCount', this.currentListFilters)
       }
     }
@@ -929,6 +969,9 @@ export default {
     this.$VueEvent.listen('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
     this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
     this.$VueEvent.listen('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
+
+    // clean filters every time that this page is loaded
+    window.localStorage.removeItem('current_pd_filters')
   },
 
   methods: {
@@ -950,7 +993,6 @@ export default {
       'removeListOpen',
       'resetSearch',
       'setShouldUpdateSelectedListContactCount',
-      'listLoaded',
       'pinnedCountLoaded',
       'setShowMyContacts'
     ]),
@@ -990,6 +1032,15 @@ export default {
 
     onLoadMore () {
       this.$emit('loadMore')
+    },
+
+    onFiltersClicked () {
+      if (this.isFiltersOpen) {
+        this.closeFilters()
+        return
+      }
+
+      this.openFilters()
     },
 
     async beginDial () {
@@ -1145,6 +1196,8 @@ export default {
     },
 
     resetFilters (resetSearch = false) {
+      this.setCurrentListFilters({})
+
       if (resetSearch) {
         this.resetSearch()
       }
@@ -1228,8 +1281,10 @@ export default {
       deep: true,
       handler: function (val) {
         if (this.$route.name === 'Power Dialer') {
+          const hasFilters = this.filtersCount > 0
+
           let params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
-          this.onFetch(params, this.hasFilters, true)
+          this.onFetch(params, hasFilters, true)
           this.$emit('onFiltersCount', this.currentListFilters)
         }
       }

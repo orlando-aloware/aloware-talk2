@@ -1,11 +1,12 @@
 <template>
-    <b-card class="border-0 contact-info-wrapper">
+    <b-card class="border-0 contact-info-wrapper" data-testid="contact-info-wrapper">
         <b-media class="min-w-0">
             <template #aside>
                 <q-item-section avatar>
                     <avatar class="contact-avatar"
                             width="40"
                             height="40"
+                            data-testid="contact-info-avatar"
                             :name="contact.name">
                     </avatar>
                 </q-item-section>
@@ -15,6 +16,7 @@
                 <div class="w-100 d-grid">
                     <div class="mt-1 mb-0 contact-name-wrapper">
                         <q-tooltip anchor="top middle"
+                                   data-testid="contact-info-name-tooltip"
                                    self="center middle">
                             {{ contactName }}
                         </q-tooltip>
@@ -26,30 +28,34 @@
 
               <b-link href="#"
                       class="copy-phone-number ml-1"
+                      data-testid="contact-info-copy-phone-number-link"
                       @click.prevent="copyPhoneNumber(contact.phone_number)">
                 <q-tooltip anchor="top middle"
                            self="center middle">
                   Copy
                 </q-tooltip>
-                <i class="material-icons">content_copy</i>
+                <i class="material-icons" data-testid="contact-info-copy-phone-number-icon">content_copy</i>
               </b-link>
 
               <br/>
 
               <b-badge class="badge-phone-info mr-1"
                        :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
+                       data-testid="contact-info-lrn-type-badge"
                        v-if="phone && $options.filters.validLrnType(phone.lrn_type)">
                 {{ phone.lrn_type | fixLrnType }}
               </b-badge>
 
                <b-badge variant="danger"
                         class="badge-phone-info mr-1"
+                        data-testid="contact-info-invalid-number-badge"
                         v-if="phone && phone.is_invalid">
                 Invalid Number
               </b-badge>
 
                <b-badge variant="danger"
                         class="badge-phone-info mr-1"
+                        data-testid="contact-info-dnc-badge"
                         v-if="contact.is_dnc">
                 DNC
               </b-badge>
@@ -59,10 +65,11 @@
             </span>
                     </p>
                     <div class="flex mb-4">
-            <span class="material-icons">
+            <span class="material-icons" data-testid="contact-info-schedule-span">
                 schedule
             </span>
                         <digital-clock class="ml-2"
+                                       data-testid="contact-info-digital-clock"
                                        :timezone="contact.timezone">
                         </digital-clock>
                     </div>
@@ -70,6 +77,7 @@
                 <b-button class="btn-edit-contact-info btn-bg-transparent btn-b-0"
                           size="sm"
                           variant="light"
+                          data-testid="contact-info-edit-button"
                           @click="onOpenEditForm">
                     <pencil-o-icon/>
                 </b-button>
@@ -77,9 +85,10 @@
                         no-focus
                         no-parent-event
                         :offset="[300, -122]"
+                        data-testid="contact-info-edit-form-menu"
                         v-model="showEditForm">
                     <div class="row no-wrap q-pa-md">
-                        <contact-name-form @close="onCloseEditForm"></contact-name-form>
+                        <contact-name-form data-testid="contact-info-name-form" @close="onCloseEditForm"></contact-name-form>
                     </div>
                 </q-menu>
             </div>
@@ -88,8 +97,10 @@
             <b-button variant="light"
                       size="sm"
                       class="custom-action-button my-1"
+                      data-testid="contact-info-call-button"
                       @click="callContact">
                 <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-call-tooltip"
                            self="center middle">
                     Call
                 </q-tooltip>
@@ -101,16 +112,19 @@
                       class="custom-action-button my-1"
                       :disabled="isProcessingBlock"
                       v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
+                      data-testid="contact-info-block-button"
                       @click="blockContact">
                 <q-tooltip anchor="bottom middle"
                            self="center middle">
                     Block
                 </q-tooltip>
                 <i class="fa fa-lock"
+                   data-testid="contact-info-block-icon"
                    v-if="!isProcessingBlock">
                 </i>
                 <q-spinner-bars class="mr-1"
                                 color="blue"
+                                data-testid="contact-info-block-spinner"
                                 v-if="isProcessingBlock"/>
             </b-button>
 
@@ -119,6 +133,7 @@
                       class="custom-action-button my-1"
                       :disabled="isProcessingBlock"
                       v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
+                      data-testid="contact-info-unblock-button"
                       @click="unBlockContact">
                 <q-tooltip anchor="bottom middle"
                            self="center middle">
@@ -126,21 +141,26 @@
                 </q-tooltip>
                 <q-spinner-bars class="mr-1"
                                 color="blue"
+                                data-testid="contact-info-unblock-spinner"
                                 v-if="isProcessingBlock"/>
                 <i class="fa fa-lock-open"
+                   data-testid="contact-info-unblock-icon"
                    v-if="!isProcessingBlock">
                 </i>
             </b-button>
 
             <contact-dnc-actions class="mr-2 my-1"
+                                 data-testid="contact-info-dnc-actions"
                                  :contact="contact"></contact-dnc-actions>
 
             <b-button variant="light"
                       size="sm"
                       class="custom-action-button my-1"
                       :disabled="contact.is_dnc"
+                      data-testid="contact-info-add-appointment-button"
                       @click="addAppointmentOpen(true)">
                 <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-add-appointment-tooltip"
                            self="center middle">
                     Add appointment
                 </q-tooltip>
@@ -150,8 +170,10 @@
                       size="sm"
                       class="custom-action-button my-1"
                       :disabled="contact.is_dnc"
+                      data-testid="contact-info-add-reminder-button"
                       @click="addReminderOpen(true)">
                 <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-add-reminder-tooltip"
                            self="center middle">
                     Add reminder
                 </q-tooltip>
@@ -160,8 +182,10 @@
             <b-button variant="light"
                       size="sm"
                       class="custom-action-button my-1"
+                      data-testid="contact-info-add-power-dialer-button"
                       @click="openPowerDialerModal">
                 <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-add-power-dialer-tooltip"
                            self="center middle">
                     Add to power dialer
                 </q-tooltip>
@@ -171,9 +195,11 @@
                       size="sm"
                       class="custom-action-button my-1"
                       :disabled="!isSimpSocialIntegrationEnabled"
-                      v-if="isSimpsocial"
+                      v-if="isSimpSocial"
+                      data-testid="contact-info-email-button"
                       @click="openEmailBlast">
                 <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-email-tooltip"
                            self="center middle">
                     Email
                 </q-tooltip>
@@ -183,18 +209,21 @@
                       size="sm"
                       class="custom-action-button my-1"
                       :disabled="isVideoConferenceLinkSending"
-                      v-if="isSimpsocial"
+                      v-if="isSimpSocial"
+                      data-testid="contact-info-video-conference-button"
                       @click="openVideoConference">
                 <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-video-conference-tooltip"
                            self="center middle">
                     Video Conference
                 </q-tooltip>
-                <video-conference-icon width="16"/>
+                <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
             </b-button>
         </div>
-        <appointment-form-modal :contact="contact"></appointment-form-modal>
-        <contact-add-reminder-modal></contact-add-reminder-modal>
+        <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
+        <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
         <power-dialer-add-modal :params="addPowerDialerParams"
+                                data-testid="contact-info-power-dialer-add-modal"
                                 :redirect="false">
         </power-dialer-add-modal>
     </b-card>

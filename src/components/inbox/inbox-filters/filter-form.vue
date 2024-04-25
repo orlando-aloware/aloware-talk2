@@ -2,7 +2,7 @@
   <div>
     <b-form class="inbox-channel-filter-form">
       <b-container>
-        <div v-if="$route.name === 'Inbox' || !isMentionsChannel">
+        <div v-if="$route.name === 'Inbox' || !isMentionsChannel || isFilterDialogForView">
           <h5 class="section-header">Quick Access</h5>
           <b-form-row class="mt-2 quick-access">
             <b-col sm="12"
@@ -11,7 +11,7 @@
                 <template v-slot:label>
                   <span>{{ dateRangeLabel }}</span>
                   <span class="pl-1"
-                        v-if="isInboxOrAllComms">
+                        v-if="isInboxOrAllComms || isFilterDialogForView">
                     <information-circle-icon color="#2F80ED"/>
                     <q-tooltip anchor="top middle"
                                self="center middle">
@@ -43,6 +43,7 @@
                                :generic-styling="false"
                                :generic-multiselect="false"
                                :highlighted="isChanged('campaigns')"
+                               :disable="isLineSelectorDisabled"
                                v-model="filter.campaigns"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')">
                 </line-selector>
@@ -67,7 +68,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsOrInboxChannel">
+        <div v-if="!isMentionsOrInboxChannel && !isFilterDialogForView">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2">
             <b-col sm="12"
@@ -138,19 +139,23 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsChannel">
+        <div v-if="!isMentionsChannel || isFilterDialogForView">
           <h5 class="mt-4 section-header">Properties</h5>
           <b-form-row class="mt-2">
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
                             :label="tagsFilterLabel">
+                <q-tooltip anchor="top middle">
+                  Type at least 3 characters to search in tags
+                </q-tooltip>
                 <tag-selector ref="tagSelector"
                               :multiple="true"
                               :highlighted="isChanged('tags')"
                               :category="tagsFilterCategory"
                               v-model="filter.tags"
-                              @change="(eventPayload) => onFilterChange(eventPayload, 'tags')">
+                              @change="(eventPayload) => onFilterChange(eventPayload, 'tags')"
+                              @preliminar="onPreliminarChange">
                 </tag-selector>
               </b-form-group>
             </b-col>
@@ -354,7 +359,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsChannel">
+                   v-if="!isMentionsChannel || isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Contact Owners">
                 <user-selector custom-placeholder="Select Contact Owners"
@@ -372,7 +377,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isMessagesOnlyChannel">
+                   v-if="isMessagesOnlyChannel && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -406,7 +411,7 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -456,6 +461,7 @@ export default {
       'channelChangedFilterFields',
       'isFilterDialogShown',
       'isFilterModelFormShown',
+      'isFilterDialogForView',
       'inboxShowMyContacts'
     ]),
 
@@ -469,7 +475,7 @@ export default {
     },
 
     dateRangeLabel () {
-      return this.isInboxOrAllComms ? 'Last Engagement Date' : 'Time'
+      return this.isInboxOrAllComms || this.isFilterDialogForView ? 'Last Engagement Date' : 'Time'
     },
 
     dateHasChanges () {
@@ -501,26 +507,26 @@ export default {
     },
 
     isInboxOrAllCallsChannel () {
-      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications', 'view']
+      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', 'all-communications', 'view', 'my-personal-line']
 
       return this.isInboxOrInboxViews ||
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
-      const callsChannels = ['calls', 'all-communications']
+      const callsChannels = ['calls', 'all-communications', 'my-personal-line']
 
       return callsChannels.includes(this.$route.params.channel)
     },
 
     isCallsAndRecordingsChannel () {
-      const allCallsChannels = ['calls', 'recordings', 'all-communications']
+      const allCallsChannels = ['calls', 'recordings', 'all-communications', 'my-personal-line']
 
       return allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
-      const smsChannels = ['messages', 'all-communications']
+      const smsChannels = ['messages', 'all-communications', 'my-personal-line']
 
       return smsChannels.includes(this.$route.params.channel)
     },
@@ -534,7 +540,11 @@ export default {
     },
 
     isInboxOrInboxViews () {
-      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel)
+      return ['Inbox', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) || ['inbox', 'view'].includes(this.$route.params.channel) || this.isFilterDialogForView
+    },
+
+    isLineSelectorDisabled () {
+      return this.$route.params.channel === 'my-personal-line'
     }
   },
 
@@ -611,6 +621,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setTags']),
+
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },
@@ -625,6 +637,10 @@ export default {
       }
 
       return 'All Time'
+    },
+
+    onPreliminarChange (tags) {
+      this.setTags(tags)
     }
   },
 

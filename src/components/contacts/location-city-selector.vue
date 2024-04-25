@@ -1,9 +1,10 @@
 <template>
   <div>
     <q-input class="inline-input"
+             data-testid="location-city-selector"
              v-model="contact.cnam_city" >
       <template v-slot:append>
-        <q-icon name="edit" class="cursor-pointer input-edit-icon" />
+        <q-icon data-testid="location-city-selector" name="edit" class="cursor-pointer input-edit-icon" />
       </template>
     </q-input>
   </div>

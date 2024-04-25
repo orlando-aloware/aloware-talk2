@@ -1,7 +1,8 @@
 <template>
-  <b-card class="border-0 contact-ring-groups-wrapper">
+  <b-card class="border-0 contact-ring-groups-wrapper" data-testid="contact-ring-groups-wrapper">
     <ring-group-selector :value="ringGroupValues"
                          :multiple="true"
+                         data-testid="contact-ring-groups-selector"
                          @change="submit"/>
   </b-card>
 </template>

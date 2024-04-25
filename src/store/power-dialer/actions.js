@@ -14,10 +14,10 @@ export default {
     return res.data
   },
 
-  getPublicContactLists: async ({ commit }) => {
-    const res = await talk2Api.V2.contactList.public()
+  getPublicContactLists: async ({ commit }, params = {}) => {
+    const res = await talk2Api.V2.contactList.public(params)
 
-    return res.data.data
+    return res.data
   },
 
   /**

@@ -129,3 +129,38 @@ export const mergeObjectsAndAddValues = (obj1, obj2) => {
 
   return result
 }
+
+/**
+ * Deeply clones an object, handling circular references safely.
+ * @param {Object} value The object to clone.
+ * @returns {Object} A deep clone of the object.
+ */
+export const cloneDeep = (value, map = new WeakMap()) => {
+  if (value === null || typeof value !== 'object') {
+    return value
+  }
+
+  // Circular reference check: if this object has already been visited, return its cloned version.
+  // This prevents infinite loops when cloning objects that reference themselves, directly or indirectly.
+  if (map.has(value)) {
+    return map.get(value)
+  }
+
+  // Determine the structure of the clone based on whether the value is an array or an object.
+  // This keeps array values as arrays and object values as objects.
+  const clone = Array.isArray(value) ? [] : {}
+
+  // Store the clone in the map with the original object as the key.
+  // This allows us to reference it later if we encounter a circular reference.
+  map.set(value, clone)
+
+  // Recursively clone each property of the object.
+  // This ensures that nested objects and arrays are deeply cloned.
+  Object.keys(value).forEach(key => {
+    clone[key] = cloneDeep(value[key], map)
+  })
+
+  // Return the cloned object, which is now a deep clone of the original,
+  // with circular references safely handled.
+  return clone
+}

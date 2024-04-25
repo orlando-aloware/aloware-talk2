@@ -4,15 +4,18 @@
               variant="light"
               size="sm"
               class="custom-action-button"
+              data-testid="contact-dnc-actions-button"
               @click="dncContact">
       <q-tooltip v-if="!contact.is_dnc"
                  anchor="bottom middle"
+                 data-testid="contact-dnc-actions-tooltip"
                  self="center middle">
         DNC
       </q-tooltip>
 
       <q-spinner-bars v-if="isProcessingDNC"
                       class="mr-1"
+                      data-testid="contact-dnc-actions-spinner-bar"
                       color="blue" />
       <i v-if="!isProcessingDNC"
          class="fa fa-ban">
@@ -24,21 +27,25 @@
               size="sm"
               class="custom-action-button"
               :disabled="isProcessingDNC"
+              data-testid="contact-undnc-actions-button"
               @click="onShowUnDncModal">
       <q-tooltip v-if="contact.is_dnc"
                  anchor="bottom middle"
+                 data-testid="contact-undnc-actions-tooltip"
                  self="center middle">
         Un-DNC
       </q-tooltip>
 
       <q-spinner-bars v-if="isProcessingDNC"
                       class="mr-1"
+                      data-testid="contact-undnc-actions-spinner-bar"
                       color="white" />
       <i v-if="!isProcessingDNC"
          class="fa fa-ban">
       </i>
     </b-button>
     <contact-undnc-modal :contact="contact"
+                         data-testid="contact-dnc-undnc-modal"
                          @contactUnDnc="onUnDnc">
     </contact-undnc-modal>
   </div>

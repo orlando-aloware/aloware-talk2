@@ -1,7 +1,7 @@
 @Library('jenkins-shared-libraries')_
 pipeline {
     agent {
-        label 'runner'
+        label 'runner2'
     }
 
     options {
@@ -10,13 +10,18 @@ pipeline {
 
     environment {
         DEV_DOMAIN = 'alodev.org'
-        NODE_MODULES_PATH = '/cached_modules/npm/talk2/node_modules'
         TERRAFORM_REPO = 'terraform-groundwork'
         TALK2_REPO = 'aloware-talk2'
         GITHUB_ORG = 'aloware'
         GIT_AUTH = credentials('jenkins-github-user')
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
+        NODE_VERSION = '20'
+        NODE_MODULES_PATH = '/cached_modules/npm/${NODE_VERSION}/talk2/node_modules'
+
+        // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
+        // REMOVE BEFORE MERGING TO develop/master
+        API_URL_OVERWRITE = ''
     }
 
     stages {
@@ -28,17 +33,30 @@ pipeline {
             }
         }
 
+        stage('Setup environment') {
+            steps {
+                nvm("${NODE_VERSION}") {
+                    sh 'npm i -g yarn'
+                }
+            }
+        }
+
         stage('Setup Dev Env File') {
             when { not { branch 'master' } }
             steps {
               script {
                 //String text
                 withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                   //text = readFile(dev_env)
+                   // text = readFile(dev_env)
                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                 }
 
-                //println "${text}"
+                // If the API_URL_OVERWRITE is set, we will replace the API_URL in the .env file
+                if (env.API_URL_OVERWRITE) {
+                  sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                }
+
+                // println "${text}"
               }
             }
         }
@@ -53,14 +71,30 @@ pipeline {
         stage('Install Dependencies') {
             when { not { branch 'master' } }
             steps {
-                sh 'npm install --no-audit'
+                nvm("${NODE_VERSION}") {
+                    sh 'yarn install'
+                }
             }
         }
 
         stage('Build Talk2 Assets') {
             when { not { branch 'master' } }
             steps {
-                sh 'quasar build --debug'
+                nvm("${NODE_VERSION}") {
+                    sh 'quasar build --debug'
+                }
+            }
+        }
+        
+        stage('Sonar Analysis') {
+            steps {
+                script {
+                    sh 'git rev-parse --abbrev-ref HEAD'
+                    def scannerHome = tool 'SonarQube Tool';
+                    withSonarQubeEnv('Sonar') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
             }
         }
 

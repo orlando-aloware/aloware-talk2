@@ -1,7 +1,8 @@
 <template>
-  <b-card class="border-0 contact-lines-wrapper">
+  <b-card class="border-0 contact-lines-wrapper" data-testid="contact-lines-card">
     <line-selector :value="lineValues"
                    :multiple="true"
+                   data-testid="contact-lines-selector"
                    @change="submitLines"/>
   </b-card>
 </template>

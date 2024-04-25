@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import * as LrnTypes from '../../constants/lrn-types'
 import * as ContactTaskStatus from '../../constants/contact-task-status'
+import * as InboxTaskStatus from '../../constants/inbox-task-status'
 
 /**
  * Fix count format to have k suffix
@@ -169,6 +170,8 @@ const fixTaskStatusName = (taskStatusId) => {
       return 'New'
     case ContactTaskStatus.STATUS_OPEN:
       return 'Open'
+    case InboxTaskStatus.STATUS_ALL:
+      return 'All'
     default:
       return ''
   }
@@ -188,8 +191,11 @@ const getTaskStatusIdByName = (taskStatusName) => {
     case 'new':
       return ContactTaskStatus.STATUS_NEW
     case 'open':
-    default:
       return ContactTaskStatus.STATUS_OPEN
+    case 'all':
+      return InboxTaskStatus.STATUS_ALL
+    default:
+      return InboxTaskStatus.DEFAULT_STATUS
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="message p-3 pb-1 d-flex flex-row align-items-start"
+  <div class="message p-3 pb-1 d-flex flex-row align-items-start" data-testid="contact-activity-wrapper"
        v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) ||
        (communication.property === undefined)"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
@@ -7,6 +7,7 @@
          v-if="communication.property === undefined">
       <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
                rounded
+               data-testid="contact-activity-unread-dot-badget"
                v-if="(markable || (communication.type === CommunicationTypes.SMS ||
                (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) &&
                (communication.body || communication.attachments)) && !communication.is_read">
@@ -14,12 +15,14 @@
       <avatar class="contact-avatar"
               width="34"
               height="34"
+              data-testid="contact-activity-avatar"
               :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
               :style="avatarStyle(isSender)"
               :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
               v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
               :name="avatarName">
         <q-tooltip content-class="bg-grey-light11"
+                   data-testid="contact-activity-avatar-tooltip"
                    anchor="top middle" self="center middle">
           {{ avatarName }}
         </q-tooltip>
@@ -59,11 +62,11 @@
           <span v-if="hasAuditNotes(communication)">
             {{ communication.notes }}
           </span>
-          <span v-if="generalAuditsConditions(communication)">
-            {{ generalAuditMessages(communication) }}
+          <span v-if="generalAuditsConditions(communication)"
+                v-html="generalAuditMessages(communication)">
           </span>
-          <span v-if="customAuditsConditions(communication)">
-            {{ generateCustomAuditMessage(communication) + (communication.notes ? ' (Reason: ' + communication.notes + ')' : '') }}
+          <span v-if="customAuditsConditions(communication)"
+                v-html="generateCustomAuditMessageWithNotes(communication)">
           </span>
           <span v-if="communication.user_id && getUser(communication.user_id).name.length && showAuthor(communication)">
             by {{ getUser(communication.user_id).name }}
@@ -123,6 +126,7 @@
 
               <div v-if="isAttachmentAudio(attachment.mime_type)">
                 <audio style="height: 25px;width: 300px;margin-top: 10px;"
+                       data-testid="contact-activity-audio"
                        controls>
                   <source :src="attachment.url"
                           :type="attachment.mime_type">
@@ -132,6 +136,7 @@
 
               <div v-if="isAttachmentVideo(attachment.mime_type)">
                 <video width="320"
+                       data-testid="contact-activity-video"
                        class="border-rounded"
                        controls>
                   <source :src="attachment.url"
@@ -141,6 +146,7 @@
               </div>
 
               <download-button is-simple-attachment
+                               data-testid="contact-activity-download-button"
                                :communication-id="communication.id"
                                :filename="attachment.name"
                                :file-mime-type="attachment.mime_type"
@@ -177,6 +183,7 @@
           <div class="p-y-sm"
                :class="[communication.direction === CommunicationDirection.INBOUND ? 'text-left' : 'text-right']">
             <communication-info ref="communicationInfo"
+                                data-testid="contact-activity-communication-info"
                                 :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
@@ -471,6 +478,10 @@ export default {
     ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
+    ...mapState('inbox', [
+      'communications',
+      'channelChangedFilterFields'
+    ]),
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
@@ -486,7 +497,7 @@ export default {
       }
 
       if (this.communication.direction === CommunicationDirection.OUTBOUND && [CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_INVALID_NEW].includes(this.communication.disposition_status2)) {
-        return 'outbound bg-danger text-white text-left'
+        return 'outbound bg-primary text-grey-50 text-left'
       }
 
       return ''
@@ -686,6 +697,11 @@ export default {
       }
     },
 
+    generateCustomAuditMessageWithNotes (communication) {
+      const notes = communication.notes ? ` (Reason: ${communication.notes.replace(/\\"/g, '"')})` : ''
+      return this.generateCustomAuditMessage(communication) + notes
+    },
+
     getCampaign (id) {
       if (!id) {
         return null
@@ -717,7 +733,13 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: true
       }).then(res => {
-        this.$VueEvent.fire('contact_updated', res.data.contact)
+        let data = res.data.contact
+        if (this.channelChangedFilterFields) {
+          data.communications = this.communications
+        }
+        this.$nextTick(() => {
+          this.$VueEvent.fire('contact_updated', data)
+        })
         this.communication.is_read = true
 
         // if contact has no unreads anymore, refresh inbox result
@@ -735,7 +757,13 @@ export default {
       this.$axios.patch('/api/v1/communication/' + this.communication.id, {
         is_read: false
       }).then(res => {
-        this.$VueEvent.fire('contact_updated', res.data.contact)
+        let data = res.data.contact
+        if (this.channelChangedFilterFields) {
+          data.communications = this.communications
+        }
+        this.$nextTick(() => {
+          this.$VueEvent.fire('contact_updated', data)
+        })
         this.communication.is_read = false
 
         // if contact has no unreads before, refresh inbox result

@@ -19,7 +19,7 @@
           </q-card-section>
         </q-card>
 
-        <DetailsScripts class="flex-grow-1 h-100 overflow-hidden"
+        <details-scripts class="flex-grow-1 h-100 overflow-hidden"
                         :resources="scripts" />
       </div>
 
@@ -31,19 +31,32 @@
             <b-link class="text-weight-medium text-decoration-none"
                     target="_blank"
                     :href="hubspotLink">
-              <HubSpotIcon />
+              <hubspot-icon />
               <span class="session-integration-title ml-1">Open in HubSpot</span>
             </b-link>
           </q-card-section>
         </q-card>
 
-        <DetailsContactInformation class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
-                                   :resources="contact"
-                                   v-if="contact" />
+        <q-card class="p-3 flex-grow-0 mb-2"
+                flat
+                v-if="isZohoEnabled && zohoLink">
+          <q-card-section class="p-0">
+            <b-link class="text-weight-medium text-decoration-none"
+                    target="_blank"
+                    :href="zohoLink">
+              <zoho-icon />
+              <span class="session-integration-title ml-1">Open in Zoho</span>
+            </b-link>
+          </q-card-section>
+        </q-card>
+
+        <details-contact-information class="flex-grow-1 h-100 overflow-hidden d-flex flex-column"
+                                     :resources="contact"
+                                     v-if="contact" />
       </div>
       <div class="col-4 p-1 px-2 h-100 overflow-y-scroll">
 
-        <DetailsTools />
+        <details-tools />
       </div>
 
     </b-overlay>
@@ -56,21 +69,23 @@ import { mapGetters, mapState } from 'vuex'
 import DetailsScripts from './details-scripts'
 import DetailsContactInformation from './details-contact-information'
 import DetailsTools from './details-tools'
-import HubSpotIcon from 'components/icons/hubspot-icon'
-import { hubspotIntegrationMixin } from 'src/plugins/mixins'
+import HubspotIcon from 'components/icons/hubspot-icon'
+import { hubspotIntegrationMixin, zohoIntegrationMixin } from 'src/plugins/mixins'
+import ZohoIcon from 'components/icons/zoho-icon'
 
 export default {
   name: 'SessionContactPageDetails',
 
   mixins: [
-    hubspotIntegrationMixin
+    hubspotIntegrationMixin, zohoIntegrationMixin
   ],
 
   components: {
+    ZohoIcon,
     DetailsScripts,
     DetailsContactInformation,
     DetailsTools,
-    HubSpotIcon
+    HubspotIcon
   },
 
   data () {
@@ -99,6 +114,10 @@ export default {
 
     hubspotLink () {
       return this.getHubspotContactLink(this.contact)
+    },
+
+    zohoLink () {
+      return this.getZohoContactLink(this.contact)
     }
   }
 }

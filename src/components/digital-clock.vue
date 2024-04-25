@@ -1,5 +1,5 @@
 <template>
-  <div id="digital-clock">
+  <div id="digital-clock" data-testid="digital-clock-wrapper">
     <span class="time text-md _500">{{ time }}</span>
   </div>
 </template>

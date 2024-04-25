@@ -23,8 +23,7 @@
                              v-model="myCalls"
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myCalls')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myCalls')">
               Call to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
@@ -33,8 +32,7 @@
                         :id="`${SettingsMap.my_texts.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myTexts"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myTexts')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myTexts')">
               Text message to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
@@ -43,8 +41,7 @@
                         :id="`${SettingsMap.my_voicemail.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myVoicemails"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myVoicemails')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myVoicemails')">
               Voicemail to personal line or to the ring groups this user belongs to
             </b-form-checkbox>
           </b-form-group>
@@ -53,8 +50,7 @@
                         :id="`${SettingsMap.my_faxes.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myFaxes"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myFaxes')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myFaxes')">
               Fax to personal line
             </b-form-checkbox>
           </b-form-group>
@@ -63,8 +59,7 @@
                         :id="`${SettingsMap.my_mentions.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myMentions"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myMentions')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myMentions')">
               When this user is mentioned
             </b-form-checkbox>
           </b-form-group>
@@ -73,8 +68,7 @@
                         :id="`${SettingsMap.my_contacts.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myContacts"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myContacts')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myContacts')">
               When a contact is assigned to this user
             </b-form-checkbox>
           </b-form-group>
@@ -83,8 +77,7 @@
                         :id="`${SettingsMap.my_appointments.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myAppointments"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myAppointments')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myAppointments')">
               When an appointment is assigned to this user
             </b-form-checkbox>
           </b-form-group>
@@ -92,8 +85,7 @@
           <b-form-group label="" :id="`${SettingsMap.my_reminders.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="myReminders"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'myReminders')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'myReminders')">
               When a reminder is assigned to this user
             </b-form-checkbox>
           </b-form-group>
@@ -116,8 +108,7 @@
                              v-model="user.enabled_billing_warnings"
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
               Billing Warnings
             </b-form-checkbox>
             <div class="account-level-notification-tooltip-wrapper">
@@ -136,8 +127,7 @@
                              v-model="user.enabled_integration_reports"
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_integration_reports')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_integration_reports')">
               Integration Reports
             </b-form-checkbox>
             <div class="account-level-notification-tooltip-wrapper">
@@ -161,8 +151,7 @@
                              v-model="user.enabled_account_reports"
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_account_reports')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_account_reports')">
               Account Reports
             </b-form-checkbox>
             <div class="account-level-notification-tooltip-wrapper">
@@ -185,8 +174,7 @@
                              v-model="user.enabled_other_reports"
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'enabled_other_reports')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_other_reports')">
               Other Notifications
             </b-form-checkbox>
             <div class="account-level-notification-tooltip-wrapper">
@@ -218,10 +206,9 @@
             class="mb-3"
             value-field="value"
             text-field="title"
-            :disabled="viewOnly"
             :options="reminderOptions"
             v-model="user.reminders_options"
-            @change="(eventPayload) => onUpdateFields(eventPayload, 'reminders_options')">
+            @change="eventPayload => onUpdateFields(eventPayload, 'reminders_options')">
           </b-form-checkbox-group>
         </b-col>
       </b-form-row>
@@ -239,7 +226,6 @@
               <b-form-checkbox switch
                                :value="true"
                                :unchecked-value="false"
-                               :disabled="viewOnly"
                                v-model="shouldObserve">
                 Receive notifications from lines
               </b-form-checkbox>
@@ -262,8 +248,7 @@
                              :use-chips="true"
                              :generic-styling="false"
                              :generic-multiselect="false"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'observing_campaigns')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'observing_campaigns')">
               </line-selector>
               <b-form-invalid-feedback v-if="!$v.user.observing_campaigns.required">Please select lines to get notified from.</b-form-invalid-feedback>
             </b-form-group>
@@ -283,8 +268,7 @@
           <b-form-group label="" :id="`${SettingsMap.inAppNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="inAppNotifications"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'inAppNotifications')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'inAppNotifications')">
               In-App
             </b-form-checkbox>
           </b-form-group>
@@ -292,35 +276,31 @@
           <b-form-group label="" :id="`${SettingsMap.desktopNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
                              v-model="desktopNotifications"
-                             :disabled="viewOnly"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'desktopNotifications')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'desktopNotifications')">
               Desktop
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label="" :id="`${SettingsMap.mobileNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
-                             :disabled="viewOnly"
                              v-model="mobileNotifications"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'mobileNotifications')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'mobileNotifications')">
               Mobile
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label="" :id="`${SettingsMap.emailNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
-                             :disabled="viewOnly"
                              v-model="emailNotifications"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'emailNotifications')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'emailNotifications')">
               Email
             </b-form-checkbox>
           </b-form-group>
 
           <b-form-group label="" :id="`${SettingsMap.textNotifications.hash_keyword}-container`">
             <b-form-checkbox switch
-                             :disabled="viewOnly"
                              v-model="textNotifications"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'textNotifications')">
+                             @change="eventPayload => onUpdateFields(eventPayload, 'textNotifications')">
               Text Message
             </b-form-checkbox>
           </b-form-group>
@@ -331,7 +311,6 @@
             <b-form-checkbox switch
                              :value="true"
                              :unchecked-value="false"
-                             :disabled="viewOnly"
                              v-model="setCustomNotificationPhoneNumber"
                              @change="onChangeCustomNotificationPhoneNumber">
               Send text to custom number
@@ -342,10 +321,9 @@
             <b-form-input type="text"
                           ref="notificationPhoneNumberInput"
                           placeholder="(123) 456-7890"
-                          :disabled="viewOnly"
                           :state="validateState('notification_phone_number')"
                           v-model.trim="$v.user.notification_phone_number.$model"
-                          @input="(eventPayload) => onUpdateFields(eventPayload, 'notification_phone_number')">
+                          @input="eventPayload => onUpdateFields(eventPayload, 'notification_phone_number')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.required">Enter phone number.</b-form-invalid-feedback>
             <b-form-invalid-feedback v-if="!$v.user.notification_phone_number.validPhone">Enter valid phone number (e.g. (123) 456-7890).</b-form-invalid-feedback>
@@ -392,10 +370,16 @@ export default {
       const rulesObject = { data: {} }
 
       if (this.shouldObserve) {
-        rulesObject.data = { ...rulesObject.data,
+        rulesObject.data = {
+          ...rulesObject.data,
           observing_campaigns: {
             required
           }
+        }
+      } else {
+        rulesObject.data = {
+          ...rulesObject.data,
+          observing_campaigns: {}
         }
       }
 
@@ -469,6 +453,29 @@ export default {
       textNotifications: false,
       shouldObserve: false,
       SettingsMap
+    }
+  },
+
+  watch: {
+    shouldObserve (newValue) {
+      this.$v.user.observing_campaigns.$reset()
+
+      if (!newValue) {
+        this.user.observing_campaigns = []
+        this.updateChangedUserProperties({
+          name: 'observing_campaigns',
+          value: []
+        })
+      } else {
+        this.updateChangedUserProperties({
+          name: 'observing_campaigns',
+          value: this.user.observing_campaigns
+        })
+      }
+
+      this.$nextTick(() => {
+        this.updateFormValidity()
+      })
     }
   },
 

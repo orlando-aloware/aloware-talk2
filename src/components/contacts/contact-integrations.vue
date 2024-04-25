@@ -1,23 +1,28 @@
 <template>
-  <b-card class="integrations-card border-0">
+  <b-card class="integrations-card border-0" data-testid="contact-integrations-card">
     <h4 class="mb-2"
+        data-testid="contact-integrations-title"
         v-if="!no_title">
       Integrations
     </h4>
     <p v-if="isIntegrationsDisabled"
+       data-testid="contact-integrations-disabled-text"
        class="status-notice fs-12 text-muted mb-0">
       Enable your favorite CRM integration to see more details directly from the CRM.
     </p>
     <integration-hubspot v-if="isHubspotEnabled"
+                         data-testid="contact-integrations-hubspot"
                          :contact="contact"/>
 
     <integration-pipedrive v-if="isPipedriveEnabled"
+                           data-testid="contact-integrations-pipedrive"
                            :contact="contact"/>
 
     <integration-gohighlevel v-if="isGHLEnabled"
+                             data-testid="contact-integrations-gohighlevel"
                              :contact="contact"/>
 
-    <contact-crm-links :contact="contact"/>
+    <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
   </b-card>
 </template>
 

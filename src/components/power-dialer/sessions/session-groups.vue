@@ -128,35 +128,35 @@
                       <template>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
-                                         @click="moveTask(itm, moveDirection.top)">
+                                         @click="moveTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
                                        width="16px" />
                           Move to Top
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
-                                         @click="moveTask(itm, moveDirection.bottom)">
+                                         @click="moveTask(taskItem, moveDirection.bottom)">
                           <ArrowDownIcon height="15px"
                                          width="15px" />
                           Move to Bottom
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key !== 'in_queue'"
-                                         @click="addTask(itm, moveDirection.top)">
+                                         @click="addTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
                                        width="16px"/>
                           Add to Top of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key !== 'in_queue'"
-                                         @click="addTask(itm, moveDirection.bottom)">
+                                         @click="addTask(taskItem, moveDirection.bottom)">
                           <ArrowDownIcon height="15px"
                                          width="15px" />
                           Add to Bottom of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
                                          v-if="key === 'in_queue'"
-                                         @click="onDeleteTask(itm)">
+                                         @click="onDeleteTask(taskItem)">
                           <TrashIcon />
                           Remove from List
                         </b-dropdown-item>
@@ -171,7 +171,7 @@
                              flat
                              round
                              :disabled="isMoving || isDeleting"
-                             @click="moveTask(itm, moveDirection.top)">
+                             @click="moveTask(taskItem, moveDirection.top)">
                         <q-avatar size="15px">
                           <ContactInQueueIcon />
                         </q-avatar>
@@ -230,7 +230,7 @@ import ContactInQueueIcon from 'components/icons/contact-in-queue-icon'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { avatarMixin } from 'src/plugins/mixins'
+import { avatarMixin, powerDialerMixin } from 'src/plugins/mixins'
 
 const DIRECTION = {
   top: 1,
@@ -241,7 +241,8 @@ export default {
   name: 'SessionGroups',
 
   mixins: [
-    avatarMixin
+    avatarMixin,
+    powerDialerMixin
   ],
 
   components: {
@@ -423,10 +424,10 @@ export default {
       })
 
       if (res.status === 200) {
-        const res = await this.getSessionTaskByFilter({
+        const res = await this.getSessionTaskByFilter(this.prepareFilters({
           id: this.selectedList.id,
           task_status: 1
-        })
+        }))
 
         this.powerDialerTasks['in_queue'] = res.data.data
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
@@ -447,10 +448,10 @@ export default {
           `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${data.contact_list_item_id}`
         )
         .then(async (res) => {
-          let response = await this.getSessionTaskByFilter({
+          let response = await this.getSessionTaskByFilter(this.prepareFilters({
             id: this.selectedList.id,
             task_status: 1
-          })
+          }))
 
           this.powerDialerTasks['in_queue'] = response.data.data
           this.$generalNotification(res.data.message)
@@ -466,12 +467,12 @@ export default {
       this.filterDisabled[key] = true
       this.groupPageFilters[key]++
 
-      const res = await this.getSessionTaskByFilter({
+      const res = await this.getSessionTaskByFilter(this.prepareFilters({
         id: this.selectedList.id,
         task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
         per_page: this.itemsPerPage,
         page: this.groupPageFilters[key]
-      })
+      }))
 
       if (res.status === 200) {
         this.powerDialerTasks[key] = this.powerDialerTasks[key].concat(res.data.data)
@@ -506,7 +507,7 @@ export default {
         case AutoDialTaskStatus.STATUSES.failed:
           return this.listItems[this.selectedList.id].total_failed
         case AutoDialTaskStatus.STATUSES.in_queue:
-          return this.listItems[this.selectedList.id].total_queued
+          return this.listItems[this.selectedList.id].total_found || this.listItems[this.selectedList.id].total_queued
         case AutoDialTaskStatus.STATUSES.scheduled:
           return this.listItems[this.selectedList.id].total_scheduled
         default:

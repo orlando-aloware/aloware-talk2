@@ -61,6 +61,7 @@ export default function (/* { ssrContext } */) {
       broadcasts: [],
       dispositionStatuses: [],
       callDispositions: [],
+      activityTypes: [],
       templates: [],
       filters: [],
       firstLogin: false,
@@ -275,14 +276,18 @@ export default function (/* { ssrContext } */) {
         name: null,
         path: null,
         referer: null,
-        whitelabel: false
+        whitelabel: false,
+        xmas_enabled: false
       },
       staticsLoaded: false,
+      isWhiteLabel: false,
       isCallDisposed: false,
       isContactDisposed: false,
       isIntroVideoVisible: false,
       showedKycDialog: false,
-      integrationPDImportSummaries: {}
+      integrationPDImportSummaries: {},
+      showedKycReloadDialog: false,
+      isTrialBannerVisible: false
     },
 
     getters: {
@@ -459,6 +464,18 @@ export default function (/* { ssrContext } */) {
 
       setCallDispositions ({ commit }, callDispositions) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
+      },
+
+      setActivityTypes ({ commit }, activityTypes) {
+        commit('SET_ACTIVITY_TYPES', activityTypes)
+      },
+
+      newActivityType ({ commit }, activityType) {
+        commit('NEW_ACTIVITY_TYPE', activityType)
+      },
+
+      deleteActivityType ({ commit }, activityType) {
+        commit('DELETE_ACTIVITY_TYPE', activityType)
       },
 
       setBroadcasts ({ commit }, broadcasts) {
@@ -800,6 +817,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_STATICS_LOADED', value)
       },
 
+      setIsWhiteLabel ({ commit }, value) {
+        commit('SET_IS_WHITE_LABEL', value)
+      },
+
       setIsCallDisposed ({ commit }, value) {
         commit('SET_IS_CALL_DISPOSED', value)
       },
@@ -839,6 +860,14 @@ export default function (/* { ssrContext } */) {
 
       removeIntegrationPDImportSummary ({ commit }, id) {
         commit('REMOVE_INTEGRATION_PD_IMPORT_SUMMARY', id)
+      },
+
+      setShowedKycReloadDialog ({ commit }, value) {
+        commit('SET_SHOWED_KYC_RELOAD_DIALOG', value)
+      },
+
+      setIsTrialBannerVisible ({ commit }, value) {
+        commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
       }
     },
 
@@ -1077,6 +1106,27 @@ export default function (/* { ssrContext } */) {
 
       SET_CALL_DISPOSITIONS (state, callDispositions) {
         state.callDispositions = callDispositions
+      },
+
+      NEW_ACTIVITY_TYPE (state, activityType) {
+        if (state.activityTypes.find(item => item === activityType)) {
+          return
+        }
+        state.activityTypes.push(activityType)
+      },
+
+      DELETE_ACTIVITY_TYPE (state, activityType) {
+        const found = state.activityTypes.find(o => o === activityType)
+        if (found) {
+          state.activityTypes.splice(
+            state.activityTypes.indexOf(found),
+            1
+          )
+        }
+      },
+
+      SET_ACTIVITY_TYPES (state, activityTypes) {
+        state.activityTypes = activityTypes
       },
 
       SET_TEMPLATES (state, templates) {
@@ -1546,6 +1596,10 @@ export default function (/* { ssrContext } */) {
         state.staticsLoaded = value
       },
 
+      SET_IS_WHITE_LABEL (state, value) {
+        state.isWhiteLabel = value
+      },
+
       SET_IS_CALL_DISPOSED (state, value) {
         state.isCallDisposed = value
       },
@@ -1574,8 +1628,15 @@ export default function (/* { ssrContext } */) {
         if (!state.integrationPDImportSummaries?.[id]) {
           return
         }
-
         delete state.integrationPDImportSummaries[id]
+      },
+
+      SET_SHOWED_KYC_RELOAD_DIALOG (state, value) {
+        state.showedKycReloadDialog = value
+      },
+
+      SET_IS_TRIAL_BANNER_VISIBLE (state, value) {
+        state.isTrialBannerVisible = value
       },
 
       updateField
