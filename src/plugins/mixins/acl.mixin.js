@@ -1,10 +1,15 @@
 import _ from 'lodash'
 import * as Roles from '../../constants/roles'
 import goBackMixin from './goback.mixin'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default _.merge({
   methods: {
+    ...mapActions('auth', ['logout']),
+
+    ...mapActions(['resetVuex']),
+
     /*
         * Updated on 06/11/2018
         * Campaign Permissions:
@@ -199,6 +204,31 @@ export default _.merge({
 
     shouldShowUpgradeNow () {
       return !this.isSimpSocial()
+    },
+
+    hideMenu () {
+      if (this.$refs && this.$refs.menu) {
+          this.$refs.menu.hide()
+      }
+    },
+
+    logoutAction () {
+      try {
+          this.hideMenu()
+          const isImpersonating = storage.local.getItem('impersonate') === 'true'
+          this.logout()
+              .then(() => {
+                  this.resetVuex(['all'])
+                  if (isImpersonating) {
+                      window.location.href = this.classicLogOutUrl
+                  }
+                  if (!isImpersonating) {
+                      this.$router.push({ name: 'Login' })
+                  }
+              })
+      } catch (err) {
+          console.error(err)
+      }
     }
   },
   computed: {
@@ -295,7 +325,14 @@ export default _.merge({
       }
 
       return false
-    }
+    },
 
+    logoutLabel() {
+      return localStorage.getItem('impersonate') === 'true' ? 'Stop Impersonating' : 'Logout'
+    },
+
+    classicLogOutUrl () {
+      return process.env.API_URL + '?from_talk_2=1&logout=1'
+    },
   }
 }, goBackMixin)
