@@ -249,7 +249,7 @@ export default {
             } else {
               const retrievedTasks = res.data.data
               const newTasks = retrievedTasks.filter(element => !this.powerDialerTasks[taskType].some(item => item.id === element.id))
-              let tempSet = new Set([...this.powerDialerTasks[taskType], ...newTasks].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+              const tempSet = new Set([...this.powerDialerTasks[taskType], ...newTasks].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
               this.powerDialerTasks[taskType] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
             }
 
