@@ -92,7 +92,7 @@ export default {
     },
 
     mailToCsmRep () {
-      return 'mailto:' + this.currentCompany.csm_rep?.email
+      return 'mailto:' + (this.currentCompany.csm_rep?.email || 'cx@aloware.com')
     }
   },
 
