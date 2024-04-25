@@ -146,7 +146,7 @@
         <div class="item-empty"
               v-if="isFolderEmpty && !isLoading">
           <span class="fs-12 text-muted">
-            You don't have any power dialer list
+            You don't have any {{ isContactModuleType ? 'contact' : 'power dialer' }} list
           </span>
         </div>
         <contacts-sidebar-loader v-if="isLoading"/>
