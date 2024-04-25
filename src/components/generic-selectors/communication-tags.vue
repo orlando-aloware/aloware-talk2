@@ -6,8 +6,8 @@
                       :current="currentTags"
                       :canEdit="hasPermissionTo(['list tag', 'view tag'])"
                       :optionsIsGrouped="true"
-                      :height="height"
                       :category="category"
+                      :height="height"
                       data-testid="communication-tags-multi-select"
                       @valuesUpdated="saveTags">
       <template v-slot:button>

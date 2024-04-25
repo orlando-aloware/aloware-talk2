@@ -711,7 +711,8 @@
 
                 <label class="form-control-label w-100 mb-1">Tags</label>
                 <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom">
-                  <communication-tags data-testid="communication-info-communication-tags" :communication="communication"/>
+                  <communication-tags data-testid="communication-info-communication-tags"
+                                      :communication="communication"/>
                 </div>
 
                 <label class="form-control-label mb-1">Notes</label>

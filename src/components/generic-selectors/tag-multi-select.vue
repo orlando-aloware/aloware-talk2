@@ -43,13 +43,13 @@
           </q-input>
         </template>
       </q-field>
-      <div :class="['dropdown-select scrollableArea mt-2 ml-2 mx-0', { 'w-100': !height }]"
+      <div class="dropdown-select scrollableArea mt-2 ml-2 mx-0 w-100"
            :style="height ? `height: ${height}px !important` : ''"
-           v-if="isEdit || searchList[0].children.length || searchList[1].children.length || loadingTags">
+           v-if="isEdit || searchList[0].children.length || searchList[1].children.length">
         <div v-if="!optionsIsGrouped">
           <q-infinite-scroll ref="infiniteScroll"
                              scroll-target=".scrollableArea"
-                             :offset="6"
+                             :offset="100"
                              :initial-index="1"
                              @load="getTags">
             <div class="mr-1">
@@ -75,9 +75,9 @@
                 </div>
               </div>
             </div>
-            <template v-slot:loading
-                      v-if="loadingTags">
-              <div class="row justify-center q-my-sm">
+            <template v-slot:loading>
+              <div class="row justify-center q-my-sm"
+                   v-if="loadingTags">
                 <q-spinner-dots color="primary"
                                 size="20px" />
               </div>
@@ -120,9 +120,9 @@
                               v-if="isSelected(child.id)"/>
               </div>
             </div>
-            <template v-slot:loading
-                      v-if="loadingTags">
-              <div class="row justify-center q-my-sm">
+            <template v-slot:loading>
+              <div class="row justify-center q-my-sm"
+                   v-if="loadingTags">
                 <q-spinner-dots color="primary"
                                 size="20px" />
               </div>
@@ -345,6 +345,7 @@ export default {
         per_page: 50,
         search: this.search,
         page: this.page,
+        category: this.category,
         order_by: 'name',
         order: 'asc'
       }
@@ -352,7 +353,7 @@ export default {
       this.loadingTags = true
 
       this.$axios.get('/api/v1/tag', { params }).then(res => {
-        const tags = res.data.data.filter(tag => tag.category === this.category)
+        const tags = res.data?.data
         const accountTags = this.filterByTagType(tags, TagTypes.TYPE_COMPANY)
         const importTags = this.filterByTagType(tags, TagTypes.TYPE_IMPORT)
 
