@@ -31,7 +31,7 @@
             </div>
             <div class="row">
               <div class="col-12 d-flex align-items-center flex-center text-center pl-0">
-                <p>If there's anything we can assist with or if you have feedback that could help us improve, we're all ears. You can reach out to your CSM, {{ currentCompany.csm_rep  ? currentCompany.csm_rep.name + ',' : '' }} directly through {{ currentCompany.csm_rep?.email ?? 'cx@aloware.com' }}.</p>
+                <p>If there's anything we can assist with or if you have feedback that could help us improve, we're all ears. You can reach out to your CSM, {{ currentCompany.csm_rep  ? currentCompany.csm_rep.name + ',' : '' }} directly through {{ currentCompany.csm_rep?.email ?? 'sales@aloware.com' }}.</p>
               </div>
             </div>
             <div class="row">
@@ -92,7 +92,7 @@ export default {
     },
 
     mailToCsmRep () {
-      return 'mailto:' + (this.currentCompany.csm_rep?.email || 'cx@aloware.com')
+      return 'mailto:' + (this.currentCompany.csm_rep?.email || 'sales@aloware.com')
     }
   },
 
