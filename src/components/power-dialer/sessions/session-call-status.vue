@@ -1438,6 +1438,19 @@ export default {
     onUnholdFailed () {
       this.loadingUnhold = false
       this.toggleHold = true
+    },
+
+    manageTaskTransition () {
+      const task = this.powerDialerTasks.in_queue.shift()
+      this.taskToCall = cloneDeep(task)
+
+      if (isEmpty(task)) {
+        this.hasActiveTask = false
+        this.reRoute()
+        return
+      }
+
+      this.processSession(false)
     }
   },
 
@@ -1498,17 +1511,7 @@ export default {
         if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
           this.wrapUp = false
           this.hasActiveTask = false
-
-          const task = this.powerDialerTasks.in_queue.shift()
-          this.taskToCall = cloneDeep(task)
-
-          if (isEmpty(task)) {
-            this.hasActiveTask = false
-            this.reRoute()
-            return
-          }
-
-          this.processSession(false)
+          this.manageTaskTransition()
         }
       }
     },
