@@ -14,14 +14,16 @@
         <q-card class="my-card"
                 data-testid="power-dialer-add-modal-card"
                 flat>
-            <b-overlay :show="loading > 0"  data-testid="power-dialer-add-modal-overlay">
+            <b-overlay :show="loading > 0"
+                       data-testid="power-dialer-add-modal-overlay">
                 <div  data-testid="power-dialer-add-modal-converting-message">
                     You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
                 </div>
 
                 <hr>
 
-                <label class="label mb-1 text-weight-bold"  data-testid="power-dialer-add-modal-conversion-options">
+                <label class="label mb-1 text-weight-bold"
+                       data-testid="power-dialer-add-modal-conversion-options">
                     Conversion Options
                 </label>
                 <b-form-checkbox class="mb-2"
@@ -144,14 +146,16 @@
       <q-card class="my-card"
               data-testid="power-dialer-add-modal-card"
               flat>
-        <b-overlay :show="loading > 0"  data-testid="power-dialer-add-modal-overlay">
-          <div  data-testid="power-dialer-add-modal-converting-message">
+        <b-overlay :show="loading > 0"
+                   data-testid="power-dialer-add-modal-overlay">
+          <div data-testid="power-dialer-add-modal-converting-message">
             You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
           </div>
 
           <hr>
 
-          <label class="label mb-1 text-weight-bold"  data-testid="power-dialer-add-modal-conversion-options">
+          <label class="label mb-1 text-weight-bold"
+                 data-testid="power-dialer-add-modal-conversion-options">
             Conversion Options
           </label>
           <b-form-checkbox class="mb-2"
